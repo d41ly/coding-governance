@@ -2791,6 +2791,11 @@ The cloud round's research, dispatches 148 to 152, derived from each run the sam
   kept the recommendation as the default and added a planner with an opt-in planning workflow: the fold gives the Plan
   stage's planner a Design item, `design.streams`, a reading v2 `[open]` holds for the owner to confirm.
 
+- 2026-10-19, session 1799cb98: the owner described the fleet as it runs, recorded verbatim in `build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[fleet]`:
+  each node has a subscription of its own, at its own tier, and serves the same or different projects. The design had
+  assumed nodes sharing one account. The fold moves a plan's ledger to the node, spanning its projects, adds the node
+  profile and capability filtering to dWellOiledMachine, restates `gap-rt-40` and adds `gap-rt-46`.
+
 ## Instruments
 
 ### The gap-ownership join

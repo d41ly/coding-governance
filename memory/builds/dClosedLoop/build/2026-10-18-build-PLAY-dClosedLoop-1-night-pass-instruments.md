@@ -20737,6 +20737,276 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `fold_fleet_shape.py`
+
+The owner's fleet as it runs, folded: a plan's ledger moved to the node across its projects, the node profile and capability filtering, gap-rt-40 restated and gap-rt-46 added, dry-run first on a full copy of the tree with the eight checks green there.
+
+````python
+"""The owner's fleet as it runs, folded: each node has a plan of its own and serves the same or different projects, so
+a plan's ledger moves to the node and spans its projects, a node profile describes each node once outside every
+repository, and a pick or an offer first matches a unit's roles to what the node can run, then weighs the node's
+projects by the owner's shares. The record gains [fleet], v2 its rows, clauses and [planned] head, and the register
+restates gap-rt-40 and adds gap-rt-46.
+
+Usage: python -X utf8 fold_fleet_shape.py [<fleet-words-quoted.md>]   (from the worktree root, or a full copy; the
+quote defaults to the one beside this script)
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+QUOTE = pathlib.Path(sys.argv[1] if len(sys.argv) > 1 else HERE / "fleet-words-quoted.md").read_text(
+    encoding="utf-8").rstrip("\n")
+B = "memory/builds/dClosedLoop/build/"
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md"
+OLD40 = ("No node publishes its presence, capacity or plan: admission counts one session's agents, a plan limit is per "
+         "account and shared by every node signed into it, and a limit is seen only after it is hit; on a shared, tight "
+         "plan, node-local admission finished 48 to 54% of the work where a ledger keyed by plan finished all of it.")
+NEW40 = ("No node publishes its presence, capacity or plan, and no ledger spans the projects one node serves: admission "
+         "counts one session's agents, every project's gov on a node draws on the same plan and cores unaware of the "
+         "others, and a limit is seen only after it is hit; with several consumers on one tight plan, admission that "
+         "sees only its own share finished 48 to 54% of the work where one shared ledger finished all of it.")
+GAP46 = ("Nothing describes a node outside one repository: its hardware, its harnesses and their plans, and the "
+         "projects it serves with the owner's share for each live nowhere a node unit can read, so no unit can match "
+         "work to what a node can run or split a node between its projects.")
+
+
+def bounds(rec, section):
+    lines = rec.text.split("\n")
+    start = [i for i, ln in enumerate(lines) if ln.startswith(f"## [{section}]")]
+    if len(start) != 1:
+        sys.exit(f"{section}: {len(start)} headings")
+    end = next((i for i in range(start[0] + 1, len(lines)) if lines[i].startswith("## [")), len(lines))
+    return lines, start[0], end
+
+
+def edit_cells(rec, key, section, fn):
+    lines, a, b = bounds(rec, section)
+    idx = [i for i in range(a, b) if lines[i].startswith(f"| `{key}` |")]
+    if len(idx) != 1:
+        sys.exit(f"{key}: {len(idx)} rows")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{key}: row shape")
+    fn(cells)
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def swap(cell_index, old, new):
+    def fn(cells):
+        if cells[cell_index] != old:
+            sys.exit(f"cell moved: {cells[cell_index][:60]}")
+        cells[cell_index] = new
+    return fn
+
+
+# ---------------------------------------------------------------- the design record
+D = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md")
+D.sub("- **Model capacity grows with pools, not nodes.** Every node signed into one account draws on one five-hour window\n"
+      "  and one weekly limit, so a node added on the same plan adds hardware but no model capacity. Capacity scales with\n"
+      "  accounts, seats or API workspaces, and a ledger keyed by plan keeps the nodes sharing one from draining it (dispatch\n"
+      "  152, section 1; dispatch 150, C5).\n",
+      "- **Model capacity grows with plans, not nodes or projects.** A plan's five-hour window and weekly limit feed every\n"
+      "  act drawn on it. In the owner's fleet each node has a plan of its own, and what shares one is every project that\n"
+      "  node serves ([fleet]); a ledger keyed by plan keeps a plan's consumers from draining it (dispatch 152, section 1;\n"
+      "  dispatch 150, C5).\n", "scale")
+D.sub("- **The terms leave an owner's own unattended fleet on one subscription ambiguous.** The plan limits assume ordinary,\n"
+      "  individual use; setup tokens are offered for scripts and CI; products built for others should use API keys.\n"
+      "  Anthropic's legal page sends such questions to its sales team, so this is an owner action, not a design fork\n"
+      "  ([owed]).\n",
+      "- **The terms leave an owner's own unattended fleet ambiguous.** The plan limits assume ordinary, individual use;\n"
+      "  setup tokens are offered for scripts and CI; products built for others should use API keys. Anthropic's legal page\n"
+      "  sends such questions to its sales team, so this is an owner action, not a design fork ([owed]).\n", "platform")
+D.sub("7. **Admission counts pools.** The admission queue charges a reservation against the pool's ledger, by\n"
+      "   compare-and-swap, before a launch, sized by an estimate per item kind that falls back to `runtime.act-ceiling`\n"
+      "   until `trace.cost` rows give a p90 (`runtime.admission-scope: pool`). On a node alone in its pool, the ledger is\n"
+      "   the in-flight ledger the admission queue already plans.\n",
+      "7. **Admission counts plans, across every project on a node.** Before a launch, the admission queue charges a\n"
+      "   reservation against the plan's ledger and the node's hardware ledger, sized by an estimate per item kind that\n"
+      "   falls back to `runtime.act-ceiling` until `trace.cost` rows give a p90 (`runtime.admission-scope: pool`). Both\n"
+      "   ledgers are kept at the node, outside any one repository, so every project the node serves charges the same\n"
+      "   ones; a plan shared with another machine is charged through the shared store by compare-and-swap.\n",
+      "design item 7")
+D.sub("    context. Runtime's no-model-context and pure-position invariants stand unchanged.\n",
+      "    context. Runtime's no-model-context and pure-position invariants stand unchanged.\n"
+      "18. **A node is described once, outside every repository.** The node profile, kept at the node's home and read by\n"
+      "    every node unit on it, holds the node's fleet tag, its hardware, its harnesses with each one's plan tier and pool\n"
+      "    label, and the projects it serves with the owner's share for each, equal unless the owner sets them, never a\n"
+      "    credential. A pick or an offer first drops work whose roles need a harness, model or hardware the node lacks,\n"
+      "    then weighs the node's projects by their shares. Its beat to each project carries its free capacity across all\n"
+      "    of them, and nothing of another project's names or work ([fleet]).\n", "design item 18")
+D.sub("| runtime (core) | dWellOiledMachine | the node beat, admission by pool, discovery and the pick,",
+      "| runtime (core) | dWellOiledMachine | the node profile, the node beat, admission by plan across a node's projects, "
+      "discovery and the pick with capability filtering and project shares,", "layers")
+D.sub("  - the node beat;\n  - admission by pool through a reservation ledger;\n"
+      "  - discovery of released and expired leases, and the pure pick function;\n",
+      "  - the node profile, read by every node unit on the node;\n"
+      "  - the node beat, to every project the node serves;\n"
+      "  - admission by plan, through ledgers kept at the node across its projects;\n"
+      "  - discovery of released and expired leases, and the pure pick function, filtering by capability and weighing\n"
+      "    projects by the owner's shares;\n", "chain")
+D.sub(f"| `gap-rt-40` | Runtime | HIGH | {OLD40} | dWellOiledMachine |",
+      f"| `gap-rt-40` | Runtime | HIGH | {NEW40} | dWellOiledMachine |", "record gap-rt-40")
+ROW45 = ("| `gap-rt-45` | Runtime | MED | P39's rework budget is keyed to builds and intake content only, so a cadence "
+         "run's loop, Maintain's, the Loop Review's or any head's re-planning, has no bound. | dWellOiledMachine |")
+D.sub(ROW45 + "\n", ROW45 + f"\n| `gap-rt-46` | Runtime | MED | {GAP46} | dWellOiledMachine |\n", "record gap-rt-46")
+D.sub("- **The terms, an owner action.** Whether an owner's own unattended fleet on one subscription is the ordinary,\n"
+      "  individual use the plan limits assume is Anthropic's to answer, and its legal page sends such questions to sales.\n",
+      "- **The terms, an owner action.** Whether several plans, one per node and from two providers, may run as one\n"
+      "  coordinated, unattended fleet is Anthropic's to answer for its plans and OpenAI's for node x's, and Anthropic's\n"
+      "  legal page sends such questions to its sales team.\n", "owed terms")
+D.insert_before("## [owed] Owed\n", f"""## [fleet] The owner's fleet, 2026-10-19
+
+After the fold, the owner described the fleet as it runs, in the owner's words, verbatim:
+
+{QUOTE}
+
+What it changes, folded the same day:
+- **What shares a plan is the projects on one node, not the nodes on one project.** Each node has a plan of its own,
+  and every project the node serves draws on that plan and on the node's cores: node d's one Max plan feeds five
+  projects. The pool stays the account a node's acts draw on, and the ledger keyed by it moves to the node, outside any
+  one repository, so every project's gov on the node charges the same ledger. The simulation's finding carries over:
+  consumers of one tight plan that each saw only their own share finished 48 to 54% of the work, and one shared ledger
+  finished all of it (dispatch 150, C5).
+- **Nodes differ, and work must fit them.** A node is described once, in a node profile at its home: its hardware,
+  from 4 to 16 cores; its harnesses and their plans, Claude Max or Pro, or a ChatGPT plan through the Codex harness for
+  node x; and the projects it serves with the owner's share for each. A pick or an offer first drops work whose roles
+  need a harness, model or hardware the node lacks, then weighs the node's projects by their shares.
+- **Each project sees only the nodes that serve it, and learns nothing of the others.** A node's beat goes to every
+  project it serves, carrying its free capacity across all of them but no other project's names or work. A head per
+  project offers only to its own nodes, and each node arbitrates between its projects (P40).
+- **The terms question changes shape:** several plans, one per node and from two providers, run as one coordinated,
+  unattended fleet ([owed]).
+
+The fold restates `gap-rt-40`, adds `gap-rt-46`, gives `runtime.admission-scope` the value `project` and
+`roles.harness.<role>` several harnesses, and grows the critical path from 262 units at `b398ab226` to 263.
+
+""", "fleet section")
+D.save()
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):\n",
+    "Revised: 2026-10-19, the owner's fleet as it runs (`" + REC + "` `[fleet]`): each\n"
+    "node has a plan of its own and serves the same or different projects, so a plan's ledger moves to the node and spans\n"
+    "its projects. A node profile describes each node once, outside every repository, and a pick or an offer first\n"
+    "matches a unit's roles to what the node can run, then weighs the node's projects by the owner's shares.\n"
+    "`runtime.admission-scope` gains `project`, `roles.harness.<role>` takes several harnesses, `gap-rt-40` is restated\n"
+    "and `gap-rt-46` added.\n\n", "revision note")
+edit_cells(V, "runtime.admission-scope", "policies", swap(1, "session, node, pool", "session, project, node, pool"))
+edit_cells(V, "runtime.admission-scope", "policies", swap(
+    3, "the cloud round: what admission counts before a launch; under `pool` a reservation is charged against the "
+       "ledger of the account, seat or workspace the node's acts draw on, which on a node alone in its pool is the "
+       "in-flight ledger (P40)",
+    "the cloud round and the owner's fleet: what admission counts before a launch, one session's agents, one "
+    "project's, every project on the node, or every act on the node's plans; the plan's ledger and the node's hardware "
+    "ledger are kept at the node outside any one repository, so a node's projects charge the same ones (P40)"))
+edit_cells(V, "roles.harness.<role>", "policies", swap(
+    1, "the harness adapters that pass the act rows", "one or more of the harness adapters that pass the act rows"))
+edit_cells(V, "roles.harness.<role>", "policies", swap(
+    3, "the cloud round: a role's harness, so a judge role or a head runs on its own; never set by a preset (P40)",
+    "the cloud round: the harnesses a role's act may run on, so a judge role or a head runs on its own and a node takes "
+    "a role's work only with one of them; never set by a preset (P40)"))
+CLAUSES = [
+    ("the node beat: the supervisor's beat, pushed with each pass, carrying the node's fleet tag, its free agent slots "
+     "against `runtime.agents-in-flight`, any limit hold with its reset time, its hardware load read with the standard "
+     "library, its plan allowance with the reading's source and age, and its pool label, the account, seat or workspace "
+     "its acts draw on and never the credential, membership derived from live beats, seen red on two planted nodes "
+     "sharing one pool (P40)",
+     "the node beat: the supervisor's beat, pushed with each pass to every project the node serves, carrying the node's "
+     "fleet tag, its free agent slots against `runtime.agents-in-flight` and its hardware load across all those "
+     "projects, read with the standard library, any limit hold with its reset time, and each harness's plan allowance "
+     "with the reading's source and age and the plan's pool label, never a credential and nothing of another project's "
+     "names or work, membership derived from live beats, seen red on a planted beat that names another project's build "
+     "(P40, the owner's fleet)"),
+    ("admission under `runtime.admission-scope`, by default charging a reservation against the pool's ledger by "
+     "compare-and-swap before a launch, sized by an estimate per item kind that falls back to `runtime.act-ceiling` "
+     "until `trace.cost` rows give a p90 (P40)",
+     "admission under `runtime.admission-scope`, by default charging a reservation before a launch against the plan's "
+     "ledger and the node's hardware ledger, both kept at the node outside any one repository so every project the node "
+     "serves charges the same ones, a plan shared with another machine charged through the shared store by "
+     "compare-and-swap, each reservation sized by an estimate per item kind that falls back to `runtime.act-ceiling` "
+     "until `trace.cost` rows give a p90, seen red on two planted projects on one node draining one plan (P40, the "
+     "owner's fleet)"),
+    ("and a pure, replaceable pick function choosing what the node claims next, by plan priority then the oldest "
+     "released, from a spread start, an offer only reordering it, seen red on a released lease no node picks up (P40, "
+     "the owner's CL-3)",
+     "and a pure, replaceable pick function choosing what the node claims next across every project it serves, first "
+     "dropping work whose roles need a harness, model or hardware the node profile lacks, then weighing projects by the "
+     "profile's shares and each project's work by plan priority then the oldest released, from a spread start, an offer "
+     "only reordering it, seen red on a released lease no node picks up and on a unit offered to a node without its "
+     "harness (P40, the owner's CL-3 and fleet)"),
+]
+for old, new in CLAUSES:
+    V.sub(old, new, "clause " + old[:24])
+PROFILE = ("the node profile, kept at the node's home outside every repository and read by every node unit on it: its "
+           "fleet tag, hardware, harnesses with each one's plan tier and pool label, and the projects it serves with the "
+           "owner's share for each, equal unless the owner sets them, an owner-held fact that no preset and no "
+           "repository sets, never holding a credential (P40, the owner's fleet)")
+lines = V.text.split("\n")
+idx = [i for i, ln in enumerate(lines) if ln.startswith("| dWellOiledMachine |")]
+if len(idx) != 1:
+    sys.exit("dWellOiledMachine row")
+cells = lines[idx[0]].split(" | ")
+if len(cells) != 5 or not cells[4].endswith(" |") or "gap-rt-45" not in cells[4]:
+    sys.exit("dWellOiledMachine row shape")
+cells[3] += "; " + PROFILE
+cells[4] = cells[4][:-2] + ", gap-rt-46 |"
+lines[idx[0]] = " | ".join(cells)
+V.text = "\n".join(lines)
+V.done += 1
+V.sub("Units: the head, a model-free function from every\n"
+      "  node's beat, the pools' ledgers, the claimable ready set and any stream plan to offers of whole units across builds,\n"
+      "  hosted as a lease-held cadence item that any node may run; the judge role it calls",
+      "Units: a head per project, a model-free function\n"
+      "  from the beats of the nodes serving it, the claimable ready set and any stream plan to offers of whole units across\n"
+      "  builds, made only to nodes whose profile can run them and hosted as a lease-held cadence item any of those nodes\n"
+      "  may run, each node arbitrating between its projects' offers; the judge role it calls", "planned head")
+V.save()
+
+# ---------------------------------------------------------------- the register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+G.sub(f"| gap-rt-40 | Runtime | HIGH | {OLD40} |", f"| gap-rt-40 | Runtime | HIGH | {NEW40} |", "register gap-rt-40")
+lines = G.text.split("\n")
+idx = [i for i, ln in enumerate(lines) if ln.startswith("| gap-rt-45 |")]
+if len(idx) != 1:
+    sys.exit("gap-rt-45 row")
+lines.insert(idx[0] + 1, f"| gap-rt-46 | Runtime | MED | {GAP46} | `{REC}` `[fleet]`, the owner's words | — |")
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 378 or set(st) - set(ORDER) or len({k[0] for k in keys}) != len(keys):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the owner's fleet added `gap-rt-46` (`" + REC + "` `[fleet]`),\nsame instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the session log
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner described the fleet as it runs, recorded verbatim in `{REC}` `[fleet]`:
+  each node has a subscription of its own, at its own tier, and serves the same or different projects. The design had
+  assumed nodes sharing one account. The fold moves a plan's ledger to the node, spanning its projects, adds the node
+  profile and capability filtering to dWellOiledMachine, restates `gap-rt-40` and adds `gap-rt-46`.
+""", "the fleet's event")
+L.save()
+print("folded the owner's fleet")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -21124,6 +21394,7 @@ MINE = [
     ('cloud/log_cloud_research.py', "The session log's dispatch rows 148 to 152, the derived agent lines and the round's event."),
     ('cloud/fold_cloud_answers.py', "The owner's CL-1 to CL-4 folded: P40, the planned `fleet` expansion, six keys and four preset rows, the seams on six chain rows, sixteen gaps, the planner's `design.streams` item, the two stale statements corrected, and the record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there."),
     ('cloud/log_cloud_answers.py', "The session log's event for the cloud answers and their fold."),
+    ('cloud/fold_fleet_shape.py', "The owner's fleet as it runs, folded: a plan's ledger moved to the node across its projects, the node profile and capability filtering, gap-rt-40 restated and gap-rt-46 added, dry-run first on a full copy of the tree with the eight checks green there."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -22134,10 +22405,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:883 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:892 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:883 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:892 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -22185,13 +22456,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2599 nodes in 30 namespaces; 31881 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1792, derived 312, pending 495
-map: no stale facts read 62 records and 25 quotes of a map count or the critical path
+map: 2601 nodes in 30 namespaces; 31881 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1794, derived 312, pending 495
+map: no stale facts read 62 records and 26 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 220 records, 3611 sections, 210 decision sections, 16 comparison areas, 40 principles
+atlas: derived — 220 records, 3613 sections, 210 decision sections, 16 comparison areas, 40 principles
 rc 0
 
 $ fold state
@@ -22242,7 +22513,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 377 · chain builds 21
+register keys 378 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -22255,8 +22526,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 262 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 111, dWitnessedBar 122, dKeptSession 138, dTotalRecall 146, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 171, dIndexedDesign 186, dWellOiledMachine 207, dScopedBuild 220, dTendedCadence 223, dMindYourWords 224, dShippedRelease 236, dCalibratedLens 240, dConvergedCharter 262
+critical path: 263 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 111, dWitnessedBar 122, dKeptSession 138, dTotalRecall 146, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 171, dIndexedDesign 186, dWellOiledMachine 208, dScopedBuild 221, dTendedCadence 224, dMindYourWords 225, dShippedRelease 237, dCalibratedLens 241, dConvergedCharter 263
 rc 0
 ````
 

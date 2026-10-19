@@ -156,10 +156,10 @@ Smaller ones, each found by reading:
 
 - **Claim attempts.** Claiming the lowest free unit first costs n(n+1)/2 attempts for n nodes, 36 at eight; starting
   from a spread unit cost 12 (dispatch 149, P6).
-- **Model capacity grows with pools, not nodes.** Every node signed into one account draws on one five-hour window
-  and one weekly limit, so a node added on the same plan adds hardware but no model capacity. Capacity scales with
-  accounts, seats or API workspaces, and a ledger keyed by plan keeps the nodes sharing one from draining it (dispatch
-  152, section 1; dispatch 150, C5).
+- **Model capacity grows with plans, not nodes or projects.** A plan's five-hour window and weekly limit feed every
+  act drawn on it. In the owner's fleet each node has a plan of its own, and what shares one is every project that
+  node serves ([fleet]); a ledger keyed by plan keeps a plan's consumers from draining it (dispatch 152, section 1;
+  dispatch 150, C5).
 - **Writers on one ref.** One mailbox ref per build took 4.5 times the ideal attempts at eight writers, which one ref
   per session already fixes (`gap-conc-04`).
 - **News.** A fetch takes 0.6 s, but news waits for the reader's read points (`gap-conc-05`); the doorbell point is
@@ -180,10 +180,9 @@ All from dispatch 152:
 - **Hosted cloud sessions cannot write gov's refs.** Anthropic's cloud sessions and routines push branches only, so a
   hosted cloud node cannot acquire a `refs/gov` lease without a transport that falls back to a branch namespace; a
   self-hosted or Actions host can.
-- **The terms leave an owner's own unattended fleet on one subscription ambiguous.** The plan limits assume ordinary,
-  individual use; setup tokens are offered for scripts and CI; products built for others should use API keys.
-  Anthropic's legal page sends such questions to its sales team, so this is an owner action, not a design fork
-  ([owed]).
+- **The terms leave an owner's own unattended fleet ambiguous.** The plan limits assume ordinary, individual use;
+  setup tokens are offered for scripts and CI; products built for others should use API keys. Anthropic's legal page
+  sends such questions to its sales team, so this is an owner action, not a design fork ([owed]).
 - **Security.** No credential crosses a coordination record. A relayed prompt is data with provenance, never consent.
   An endpoint is a new copy of an adopter's records, under its own retention. A head serving several adopters must
   isolate each one's configuration, working directory and egress.
@@ -217,10 +216,11 @@ costs latency and never correctness.
    hardware load read with the standard library (about 1 ms on Windows, never a PowerShell CIM call per item), its
    plan allowance with the reading's source and age, and its pool label: the name of the account, seat or workspace
    its acts draw on, never the credential. Membership is derived from live beats.
-7. **Admission counts pools.** The admission queue charges a reservation against the pool's ledger, by
-   compare-and-swap, before a launch, sized by an estimate per item kind that falls back to `runtime.act-ceiling`
-   until `trace.cost` rows give a p90 (`runtime.admission-scope: pool`). On a node alone in its pool, the ledger is
-   the in-flight ledger the admission queue already plans.
+7. **Admission counts plans, across every project on a node.** Before a launch, the admission queue charges a
+   reservation against the plan's ledger and the node's hardware ledger, sized by an estimate per item kind that
+   falls back to `runtime.act-ceiling` until `trace.cost` rows give a p90 (`runtime.admission-scope: pool`). Both
+   ledgers are kept at the node, outside any one repository, so every project the node serves charges the same
+   ones; a plan shared with another machine is charged through the shared store by compare-and-swap.
 8. **A node finds and picks its own work.** One read gives the claimable ready set across builds: ready, unleased
    units whose dependencies are confirmed, and released or expired leases. A pure, replaceable pick function chooses
    what this node claims next, by plan priority and then the oldest released, from a spread start (dispatch 149, P6).
@@ -252,6 +252,12 @@ costs latency and never correctness.
     tag, `fleet.toml` and the new expansion.
 17. **What no head may do:** write a lease, a position or a verdict on a node's behalf, or hold a standing model
     context. Runtime's no-model-context and pure-position invariants stand unchanged.
+18. **A node is described once, outside every repository.** The node profile, kept at the node's home and read by
+    every node unit on it, holds the node's fleet tag, its hardware, its harnesses with each one's plan tier and pool
+    label, and the projects it serves with the owner's share for each, equal unless the owner sets them, never a
+    credential. A pick or an offer first drops work whose roles need a harness, model or hardware the node lacks,
+    then weighs the node's projects by their shares. Its beat to each project carries its free capacity across all
+    of them, and nothing of another project's names or work ([fleet]).
 
 The keys the fold would add, each with its preset row:
 - `leases.queued-claim-days`, in days, default 7, dPlacedRequest;
@@ -268,7 +274,7 @@ dWellOiledMachine arms it with the doorbell point.
 |---|---|---|
 | flow (core) | dPlacedRequest | the fenced effect push, tombstoned leases and monotonic epochs, the declared expiry clock, offers with a deadline, cadence lease kinds as names, project-level requests |
 | flow (core) | dKeptSession | causal, keyed messages, and recipients that name a node or the project |
-| runtime (core) | dWellOiledMachine | the node beat, admission by pool, discovery and the pick, the lease-store, doorbell and offer points, host capabilities and adapter tenancy, harness and credential per role, the scanned boundaries and the record door, a budget for every cadence run, and the fenced push in the commit queue and the lander |
+| runtime (core) | dWellOiledMachine | the node profile, the node beat, admission by plan across a node's projects, discovery and the pick with capability filtering and project shares, the lease-store, doorbell and offer points, host capabilities and adapter tenancy, harness and credential per role, the scanned boundaries and the record door, a budget for every cadence run, and the fenced push in the commit queue and the lander |
 | distribution (expansion) | dShippedRelease | the adopter register, renamed |
 | observability (expansion) | dCalibratedLens | the beats and the pools' ledgers trended, and the reservation estimate re-derived |
 | integrations (expansion) | planned | endpoint and cloud-host adapters at the core points |
@@ -307,9 +313,11 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 - **dKeptSession:** messages carrying a session sequence number, a take-over's predecessor and the interface's content
   key, seen red on the reorder test; recipients that name a node or the project.
 - **dWellOiledMachine:**
-  - the node beat;
-  - admission by pool through a reservation ledger;
-  - discovery of released and expired leases, and the pure pick function;
+  - the node profile, read by every node unit on the node;
+  - the node beat, to every project the node serves;
+  - admission by plan, through ledgers kept at the node across its projects;
+  - discovery of released and expired leases, and the pure pick function, filtering by capability and weighing
+    projects by the owner's shares;
   - the lease-store, doorbell and offer points, the lease store's conformance fixture, and `deps.messaging` armed;
   - host capabilities and adapter tenancy;
   - harness and credential per role, and the act launch pinned out of bare mode;
@@ -335,12 +343,13 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 | `gap-conc-17` | Spine | MED | An owner's request reaches only the node it was typed on: intake is bound to the owner's session, mailbox recipients are a build or its units, and no request record exists that another node can claim. | dPlacedRequest |
 | `gap-conc-18` | Spine | LOW | The cadence lease grammar lists its kinds literally, `maintain` and `review`, against Runtime's rule that a registered name never meets a literal list, so a cadence item an expansion registers cannot hold a lease. | dPlacedRequest |
 | `gap-conc-19` | Spine | MED | Nothing outside a node can offer it work: no lease takes an offer with a deadline and no point registers an offer source, so any head would have to assign, which lost 29% of makespan in a simulated head outage. | dPlacedRequest |
-| `gap-rt-40` | Runtime | HIGH | No node publishes its presence, capacity or plan: admission counts one session's agents, a plan limit is per account and shared by every node signed into it, and a limit is seen only after it is hit; on a shared, tight plan, node-local admission finished 48 to 54% of the work where a ledger keyed by plan finished all of it. | dWellOiledMachine |
+| `gap-rt-40` | Runtime | HIGH | No node publishes its presence, capacity or plan, and no ledger spans the projects one node serves: admission counts one session's agents, every project's gov on a node draws on the same plan and cores unaware of the others, and a limit is seen only after it is hit; with several consumers on one tight plan, admission that sees only its own share finished 48 to 54% of the work where one shared ledger finished all of it. | dWellOiledMachine |
 | `gap-rt-41` | Runtime | MED | Coordination has no transport point: leases and mail are written to `refs/gov/*` directly, which Anthropic's hosted cloud sessions and routines cannot push, and no host declares whether it can. | dWellOiledMachine |
 | `gap-rt-42` | Runtime | MED | The harness and its credential are set once for the repository, so a head or a judge role cannot run on another subscription or key without drawing on the workers' plan. | dWellOiledMachine |
 | `gap-rt-43` | Runtime | MED | Headless acts lose the subscription login once `--bare` becomes `-p`'s default, since bare mode reads neither the OAuth login nor the setup token, and no harness row records how an adapter reads its credential. | dWellOiledMachine |
 | `gap-rt-44` | Runtime | MED | New publishing boundaries go unscanned: lease, mail and mirror payloads sit outside the secret scan's population, and no door refuses a token shape in a coordination record. | dWellOiledMachine |
 | `gap-rt-45` | Runtime | MED | P39's rework budget is keyed to builds and intake content only, so a cadence run's loop, Maintain's, the Loop Review's or any head's re-planning, has no bound. | dWellOiledMachine |
+| `gap-rt-46` | Runtime | MED | Nothing describes a node outside one repository: its hardware, its harnesses and their plans, and the projects it serves with the owner's share for each live nowhere a node unit can read, so no unit can match work to what a node can run or split a node between its projects. | dWellOiledMachine |
 | `gap-deploy-29` | Deploy | LOW | "Fleet" names two things: the fleet register lists adopters while a fleet tag names a node. | dShippedRelease |
 
 ## [forks] For the owner, 2026-10-19
@@ -384,6 +393,38 @@ needing no head. v2 `[open]` holds that reading for the owner to confirm.
 - **The chain:** the critical path grows from 253 units at `ace51f4a7` to 262, its nine new units eight on
   dWellOiledMachine and one on dCalibratedLens.
 
+## [fleet] The owner's fleet, 2026-10-19
+
+After the fold, the owner described the fleet as it runs, in the owner's words, verbatim:
+
+> Currently, each node runs its own subscription. So it isn't a matter of running several nodes on one account,
+> rather, it's a matter of coordinating different nodes, with different accounts (and subscription levels) running
+> on the same OR different projects. Example: Node d (this node) - 16c/32gb, claude subscription 1 max, does work
+> for Coding Governance, inCMS, NicoCares, d41ly-infra, Swydee; Node a - 16c/32gb, claude subscription 2 max, does
+> work for Coding Governance, inCMS, NicoCares only; Node b - 4c/8gb, claude subscription 3 pro, does work for
+> inCMS, NicoCares only; Node x - OVH 8c/32gb, chatgpt subscription 4 max, does work for Coding Governance + other
+> unstated projects.
+
+What it changes, folded the same day:
+- **What shares a plan is the projects on one node, not the nodes on one project.** Each node has a plan of its own,
+  and every project the node serves draws on that plan and on the node's cores: node d's one Max plan feeds five
+  projects. The pool stays the account a node's acts draw on, and the ledger keyed by it moves to the node, outside any
+  one repository, so every project's gov on the node charges the same ledger. The simulation's finding carries over:
+  consumers of one tight plan that each saw only their own share finished 48 to 54% of the work, and one shared ledger
+  finished all of it (dispatch 150, C5).
+- **Nodes differ, and work must fit them.** A node is described once, in a node profile at its home: its hardware,
+  from 4 to 16 cores; its harnesses and their plans, Claude Max or Pro, or a ChatGPT plan through the Codex harness for
+  node x; and the projects it serves with the owner's share for each. A pick or an offer first drops work whose roles
+  need a harness, model or hardware the node lacks, then weighs the node's projects by their shares.
+- **Each project sees only the nodes that serve it, and learns nothing of the others.** A node's beat goes to every
+  project it serves, carrying its free capacity across all of them but no other project's names or work. A head per
+  project offers only to its own nodes, and each node arbitrates between its projects (P40).
+- **The terms question changes shape:** several plans, one per node and from two providers, run as one coordinated,
+  unattended fleet ([owed]).
+
+The fold restates `gap-rt-40`, adds `gap-rt-46`, gives `runtime.admission-scope` the value `project` and
+`roles.harness.<role>` several harnesses, and grows the critical path from 262 units at `b398ab226` to 263.
+
 ## [owed] Owed
 
 - **The review debt grows.** This record and its fold join the commits the parked closing-review pair must cover.
@@ -394,6 +435,7 @@ needing no head. v2 `[open]` holds that reading for the owner to confirm.
   `git push --atomic` (dPlacedRequest); whether a hosted cloud session's push of a `refs/gov` ref is refused, and
   whether the status line runs under `-p` (dWellOiledMachine); the message reorder test (dKeptSession); a lease service
   fenced against git (the fleet's own build).
-- **The terms, an owner action.** Whether an owner's own unattended fleet on one subscription is the ordinary,
-  individual use the plan limits assume is Anthropic's to answer, and its legal page sends such questions to sales.
+- **The terms, an owner action.** Whether several plans, one per node and from two providers, may run as one
+  coordinated, unattended fleet is Anthropic's to answer for its plans and OpenAI's for node x's, and Anthropic's
+  legal page sends such questions to its sales team.
   Until the owner records an answer, `runtime.act-auth` keeps its default, and `api-key` stays the owner's to add.
