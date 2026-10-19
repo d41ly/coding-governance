@@ -43,6 +43,8 @@ complete, the recall bar is met, no critical finding is open, and the closing pa
 instruments questions 2 and 3 rest on (`[instruments]`) and wall-time capture (`[walltime]`), each seen red. The sealed
 copy is made after step 2's fold, so it carries the design the walk reads.
 
+**Step 2, answered** (`[readings]`): all four readings confirmed as v2 `[open]` states them, and the locations settled.
+
 ## [stage0] Stage 0: the mechanical checks
 
 `build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` runs five new arms, one per class research-final-audit `[2]`
@@ -226,14 +228,35 @@ tree each says it measured nothing and is never green until its input exists.
   record, re-rendered and compared byte for byte, red on a hand edit, a record with no row and a changed clause with
   no citation.
 - **The baseline** is recorded as ``Baseline: `<sha>` `` in v2's `[clause-ids]`, which the last two read.
-- **Where the records and the view live once this build closes** is the owner's to settle with step 2's readings.
-  Until then a record sits in its departing build's `build/` folder and the view beside v2.
+- **Where the records and the view live** (the owner, 2026-10-20, `[readings]`): a deviation record in its departing
+  build's `build/` folder, and the as-built view beside v2 in this build's folder, re-rendered there whenever a record
+  lands, after this build closes too.
 
 ## [walltime] Wall time
 
 `build/2026-10-19-build-PLAY-dClosedLoop-1-walltime.py` reads each agent's transcript for its first and last timestamp
 and prints each agent's wall and each stage's span, from its first agent's start to its last agent's end. No review
 had recorded its wall time (`gap-rt-26`), and the audit records every stage's.
+
+## [readings] The owner's word on the open readings, 2026-10-20
+
+Asked as step 2, each with v2 `[open]`'s reading as the recommendation. The owner's answers, verbatim:
+- **SA-1**, the layered owner proof at "a layer date", read as "a later date": "A later date (Recommended)".
+- **SA-5**, the usage field named `usage` since `help` holds the rationale: "Keep `usage` (Recommended)".
+- **CL-3**, "a new headless-first planner role", read as Plan's planner with `design.streams` as its Design item:
+  "Same planner, new item (Recommended)".
+- **`wait`**, `run.on-owner-silence: wait` read as waiting parked: "Wait parked (Recommended)".
+- **Where deviation records and the as-built view live** once this build closes: "With builds; view by v2
+  (Recommended)", each record in its departing build's `build/` folder and the view beside v2, re-rendered there.
+
+v2 `[open]` marks the four confirmed, with a revision note.
+
+## [found] Defects found while building the tooling
+
+Each goes to the walk as a lead beside Stage 0's reds, and to the audit's fold:
+- **The deviation record is no registered kind.** dTrueNorth's `cl-dClosedLoop-0004` builds it, but layer-memory's kind
+  table, the memory plan and the map name no `deviation` kind, so Stage 0's K3, which reads registered kinds, cannot see
+  it: no owner, writer or reader is declared for it.
 
 ## [stage0-classes] Stage 0's classes
 

@@ -662,6 +662,11 @@ Revised: 2026-10-19, the whole-design audit's Stage 0 (`build/2026-10-19-build-P
 by id among them, so that Stage 0 reds a principle no clause enforces (research-final-audit's K5) before the walk
 judges whether each named clause does.
 
+Revised: 2026-10-20, the owner's word on the four open readings (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[readings]`): SA-1's layered proof waits in
+`[planned]`, SA-5's field is `usage`, CL-3's planner is Plan's own with `design.streams` as its Design item, and
+`run.on-owner-silence: wait` waits parked, each as `[open]` reads it. A deviation record lives in its departing
+build's `build/` folder, and the as-built view beside this record.
+
 Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):
 - dTotalRecall's row gains the shared extraction primitive, the research-return backfill and the
   `adopt` program, whose keys had no reader on any row;
@@ -1790,7 +1795,7 @@ Confirmed by the owner, 2026-10-17 (RC-5, the re-cut's `[applied]`).
   through every step, H1 to H14, and two more found with roles, H15 and H16: all settled in the
   flow revisit (`build/2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md`, `[closed]`).
 
-Open, 2026-10-19, from the owner's answers to the shape audit's forks (`build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` `[answers]`):
+Confirmed by the owner, 2026-10-20 (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[readings]`), read 2026-10-19 from the owner's answers to the shape audit's forks (`build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` `[answers]`):
 - SA-1's "a layer date" is read as "a later date": the layered proof is filed in `[planned]`, its forged-proof
   probes the test it must pass.
 - SA-5's field is named `usage`, since a unit's `help` field already holds its rationale, which renders only into
@@ -1799,12 +1804,12 @@ Open, 2026-10-19, from the owner's answers to the shape audit's forks (`build/20
 Confirmed by the owner, 2026-10-19 (`build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` `[skills]`): SK-2's names, `/gov-lexicon` as read, and
 `/gov-drift` in place of `/gov-drift-audit`.
 
-Open, 2026-10-19, from the owner's answers to the cloud round's forks (`build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[answers]`):
+Confirmed by the owner, 2026-10-20 (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[readings]`), read 2026-10-19 from the owner's answers to the cloud round's forks (`build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[answers]`):
 - CL-3's "new headless-first 'planner' role" is read as the planner the Plan stage already binds, given a Design item
   of its own, `design.streams`, since two roles cannot share one name. "Headless-first" is read as needing no head: any
   node unit runs the item, and a head, where one exists, reads its stream plan.
 
-Open, 2026-10-19, from the parked debt's closing review (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`):
+Confirmed by the owner, 2026-10-20 (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[readings]`), read 2026-10-19 from the parked debt's closing review (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`):
 - `run.on-owner-silence: wait`, SL-4's third option, "wait, as today", is read as waiting parked: at the deadline
   the build parks with its lease released and the item open for the owner's answer, since P39 gives every wait an
   outcome. No preset selects it.

@@ -24606,6 +24606,108 @@ R.write_text(t, encoding="utf-8", newline="\n")
 print(f"patched {R}")
 ````
 
+### `fold_readings.py`
+
+Step 2 folded: the owner's word on the four open readings and on the homes of deviation records and the as-built view, into v2's [open] and a revision note, the round record's [readings], [found] and [plan], and the session log, dry-run first on a full copy of the tree with the nine checks green there.
+
+````python
+"""Step 2 folded: the owner's word on v2's four open readings and on where deviation records and the as-built view live.
+v2's [open] marks the four confirmed, with a revision note; the round record gains [readings], [found], step 2's status
+and the location; the session log its event.
+
+Usage: python -X utf8 fold_readings.py   (from the worktree root, or a full copy of it)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+WA = "`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[readings]`"
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+for src in ("the owner's answers to the shape audit's forks (`build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md` `[answers]`):",
+            "the owner's answers to the cloud round's forks (`build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[answers]`):",
+            "the parked debt's closing review (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`):"):
+    V.sub("Open, 2026-10-19, from " + src, f"Confirmed by the owner, 2026-10-20 ({WA}), read 2026-10-19 from " + src,
+          "[open] " + src[:40])
+V.insert_before("Revised: 2026-10-17, after the folds' closing review", f"""Revised: 2026-10-20, the owner's word on the four open readings ({WA}): SA-1's layered proof waits in
+`[planned]`, SA-5's field is `usage`, CL-3's planner is Plan's own with `design.streams` as its Design item, and
+`run.on-owner-silence: wait` waits parked, each as `[open]` reads it. A deviation record lives in its departing
+build's `build/` folder, and the as-built view beside this record.
+
+""", "revision note")
+V.save()
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.sub("""copy is made after step 2's fold, so it carries the design the walk reads.
+""", """copy is made after step 2's fold, so it carries the design the walk reads.
+
+**Step 2, answered** (`[readings]`): all four readings confirmed as v2 `[open]` states them, and the locations settled.
+""", "[plan] step 2")
+R.sub("""- **Where the records and the view live once this build closes** is the owner's to settle with step 2's readings.
+  Until then a record sits in its departing build's `build/` folder and the view beside v2.
+""", """- **Where the records and the view live** (the owner, 2026-10-20, `[readings]`): a deviation record in its departing
+  build's `build/` folder, and the as-built view beside v2 in this build's folder, re-rendered there whenever a record
+  lands, after this build closes too.
+""", "[instruments] locations")
+R.insert_before("## [stage0-classes] ", """## [readings] The owner's word on the open readings, 2026-10-20
+
+Asked as step 2, each with v2 `[open]`'s reading as the recommendation. The owner's answers, verbatim:
+- **SA-1**, the layered owner proof at "a layer date", read as "a later date": "A later date (Recommended)".
+- **SA-5**, the usage field named `usage` since `help` holds the rationale: "Keep `usage` (Recommended)".
+- **CL-3**, "a new headless-first planner role", read as Plan's planner with `design.streams` as its Design item:
+  "Same planner, new item (Recommended)".
+- **`wait`**, `run.on-owner-silence: wait` read as waiting parked: "Wait parked (Recommended)".
+- **Where deviation records and the as-built view live** once this build closes: "With builds; view by v2
+  (Recommended)", each record in its departing build's `build/` folder and the view beside v2, re-rendered there.
+
+v2 `[open]` marks the four confirmed, with a revision note.
+
+## [found] Defects found while building the tooling
+
+Each goes to the walk as a lead beside Stage 0's reds, and to the audit's fold:
+- **The deviation record is no registered kind.** dTrueNorth's `cl-dClosedLoop-0004` builds it, but layer-memory's kind
+  table, the memory plan and the map name no `deviation` kind, so Stage 0's K3, which reads registered kinds, cannot see
+  it: no owner, writer or reader is declared for it.
+
+""", "[readings] and [found]")
+R.save()
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-20, session 1799cb98: the whole-design audit's step 2, the owner's word on v2's four open readings, SA-1,
+  SA-5, CL-3 and `wait`, each confirmed as `[open]` reads it, and on the homes of deviation records (their departing
+  build's folder) and the as-built view (beside v2); folded into v2 `[open]` and the round record's `[readings]`.
+""", "the step's event")
+L.save()
+````
+
+### `register.py`
+
+Registers scripts in this record's writer, each before the preset check's entry.
+
+````python
+"""Register scripts in the instruments recorder's MINE, each before the preset check's entry, which stays last but one.
+
+Usage: python -X utf8 register.py <rel path> <why> [<rel path> <why> ...]   (anywhere)
+"""
+import pathlib
+import sys
+
+R = pathlib.Path(__file__).resolve().parent.parent / "night/record_instruments.py"
+t = R.read_text(encoding="utf-8")
+ANCHOR = """    ("preset_check_canonical.py", "The preset check [final] runs"""
+if t.count(ANCHOR) != 1:
+    sys.exit("the recorder's anchor is not where it was")
+args = sys.argv[1:]
+rows = ""
+for rel, why in zip(args[::2], args[1::2]):
+    if f"('{rel}'," in t:
+        sys.exit(f"{rel} is registered already")
+    rows += f"    ('{rel}', {why!r}),\n"
+R.write_text(t.replace(ANCHOR, rows + ANCHOR, 1), encoding="utf-8", newline="\n")
+print(f"registered {len(args) // 2}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -25027,6 +25129,8 @@ MINE = [
     ('walkkit/run_kit_plants.py', "Every walk-kit, scorer and instrument run in one pass, each checked against the exit code and the line it wants: 37 runs."),
     ('walkkit/fold_kit_records.py', "The round record's [plan] status, [briefs] widened, [recall], [instruments] and [walltime], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there."),
     ('walkkit/patch_recorder.py', "This record's writer patched for the walk kit: the scripts registered and [walk-kit]."),
+    ('walkkit/fold_readings.py', "Step 2 folded: the owner's word on the four open readings and on the homes of deviation records and the as-built view, into v2's [open] and a revision note, the round record's [readings], [found] and [plan], and the session log, dry-run first on a full copy of the tree with the nine checks green there."),
+    ('walkkit/register.py', "Registers scripts in this record's writer, each before the preset check's entry."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -26341,7 +26445,7 @@ K5: principles 42, clauses 496, retired 0 · findings 0
 rerun design map: rc 0
   map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 230 records, 3784 sections, 215 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 230 records, 3794 sections, 215 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -26357,14 +26461,15 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 50 · lines 30976 · unreviewed 13099 (42%)
+  design records 50 · lines 31129 · unreviewed 13252 (43%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 5
+  design commits after the floor that no closing review covers: 6
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
     0e5d54a79  2 design record(s)  records(dClosedLoop): the clause ids minted — cl-dClosedLoop-0001 to -0496, one per chain clause, and their ch
     94f9607ca  3 design record(s)  records(dClosedLoop): the whole-design audit's Stage 0 — five checks over items, routes, kinds, keys and princ
+    1d5799a45  1 design record(s)  records(dClosedLoop): the audit's walk kit, its scorer and the instruments questions 2 and 3 rest on — each se
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -26583,13 +26688,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2649 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1828, derived 321, pending 500
+map: 2650 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1829, derived 321, pending 500
 map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 230 records, 3792 sections, 215 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 230 records, 3796 sections, 215 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

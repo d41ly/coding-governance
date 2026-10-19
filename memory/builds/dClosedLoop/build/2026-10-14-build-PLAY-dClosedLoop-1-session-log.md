@@ -2919,6 +2919,10 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   and 3 rest on; and wall-time capture. Each is seen red on its plants, 37 runs in all. The sealed copy waits for the
   owner's word on v2's four open readings.
 
+- 2026-10-20, session 1799cb98: the whole-design audit's step 2, the owner's word on v2's four open readings, SA-1,
+  SA-5, CL-3 and `wait`, each confirmed as `[open]` reads it, and on the homes of deviation records (their departing
+  build's folder) and the as-built view (beside v2); folded into v2 `[open]` and the round record's `[readings]`.
+
 ## Instruments
 
 ### The gap-ownership join
