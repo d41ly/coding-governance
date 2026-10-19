@@ -313,13 +313,14 @@ naming its line.
 Before the plain `{{TOOL_ROOT}}` substitution, each `{{TOOL_ROOT}}<home>/<file>` citation that
 `roles_lib.resolve_cited_paths` holds is replaced by the path it resolves, one whole citation at a
 time, so a held citation never rewrites a longer one it prefixes (TOOL-dRenderedAnchor-2,
-TOOL-dRenderedAnchor-3). Only a harness of the workflow table resolves through the role index's
-call, from the tool root, so the Skill names each harness where the role index lists it, a kit
-govkit landed under its id behind a `rendered` receipt row included. Every other citation, the
-merge bar's among them, resolves from the roles kit directory, the call `derive_kit_paths` makes:
-a receipt row can place it, and its probes stop at `<tool root>/<home>/`, so an adopter's file at
-the repository root is never named. The plain substitution answers a citation neither call holds.
-In this repository every citation is held at `<tool root>/<home>/`, so the render is unchanged. The
+TOOL-dRenderedAnchor-3). Only a `workflow`-driver harness of the workflow table resolves through the
+role index's call, from the tool root, so the Skill names each harness where the role index lists
+it, a kit govkit landed under its id behind a `rendered` receipt row included. Every other
+citation, the merge bar's among them, resolves from the roles kit directory, the call
+`derive_kit_paths` makes: a receipt row can place it, and its probes stop at `<tool root>/<home>/`,
+so at a prefixed install an adopter's file at the repository root is never named. The plain
+substitution answers a citation neither call holds. In this repository every citation is held at
+`<tool root>/<home>/`, so the render is unchanged. The
 answer reads the disk at render time: `apply` runs the adopter before the harnesses are rendered, so
 a first install names the plain path, `--check` reads the Skill out of sync, and the next
 `--scaffold`, which `govkit update` runs, corrects it. A failed citation pass exits 2.

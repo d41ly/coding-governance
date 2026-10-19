@@ -127,14 +127,14 @@ needs the kickoff and memory-tree kits.
 - `adopt-roles.sh --scaffold` renders the `/build` Skill, the agent types and `roles.json`. With no
   governing doc at the memory-tree conf's `CHARTER`, it renders the Skill alone and exits 3, and no
   hook check turns on.
-- The `/build` Skill names each harness where the install holds it. Only a harness of the
-  workflow table resolves as the role index does, from the tool root, so a kit govkit landed under
-  its id is named there. Every other tool-root citation of the template, the merge bar's among them,
-  resolves from the roles kit directory as `derive_kit_paths` resolves a rendered guide's: a receipt
-  row can place it, and a file at the repository root never answers it. The plain prefix fills
-  whatever neither holds. `apply` runs the adopter before the harnesses are rendered, so a first
-  install names the plain path until the next `--scaffold`, which `govkit update` runs; `--check`
-  reads the Skill out of sync until then.
+- The `/build` Skill names each harness where the install holds it. Only a
+  `workflow`-driver harness of the workflow table resolves as the role index does, from the tool
+  root, so a kit govkit landed under its id is named there. Every other tool-root citation of the
+  template, the merge bar's among them, resolves from the roles kit directory as `derive_kit_paths`
+  resolves a rendered guide's: a receipt row can place it, and at a prefixed install a file at the
+  repository root never answers it. The plain prefix fills whatever neither holds. `apply` runs the
+  adopter before the harnesses are rendered, so a first install names the plain path until the next
+  `--scaffold`, which `govkit update` runs; `--check` reads the Skill out of sync until then.
 - `/build`'s harnesses ship in the `review-harness` kit, which is not a default. Without it the role
   agents and handoffs still work, and three tools print a note naming the missing harness: the
   catalogue checker `check_roles.py`, `render_agents.py`, and check-wiring's session-start report.

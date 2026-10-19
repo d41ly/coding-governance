@@ -51,6 +51,21 @@ pruned its `kit.toml` holds the kit's own file there (round 2, L7, id 13). TOOL-
 wrote what the scan counts into all four. No machine gate compares a page's account of a
 predicate's outcome with the predicate.
 
+TOOL-dRenderedAnchor-3's `help/roles.md`, `tools/roles/README.md` and adopter header said a file at
+the repository root never answers a citation that is no harness, which holds only at a prefixed
+install: at a root install the tool root is the repository, so the kit directory's second probe
+reaches that file (its closing review round 3, L1, ids 4 and 6). `TOOL-dRenderedAnchor-4` wrote "at
+a prefixed install" into those three and into arm 15's comment in
+`tools/roles/adopt-roles.test.sh`. The check: a docs claim about resolver reach states the install
+shape it holds for.
+
+The same three carriers and the `resolve_cited_paths` docstring in `tools/roles/roles_lib.py` said
+"a harness of the workflow table", while the predicate that ships keeps only a `workflow` driver and
+the table's merge bar is a `program`-driver harness (round 3, L2, id 7). `TOOL-dRenderedAnchor-4`
+wrote "a `workflow`-driver harness of the workflow table" into all of them and arm 15's comment, each
+on one line: the phrase had wrapped at the help page and the adopter header, so the review's own
+one-line grep could not see those two carriers.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

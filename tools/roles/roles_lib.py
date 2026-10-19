@@ -607,10 +607,10 @@ def resolve_harness_path(tool_root, harness):
 def resolve_cited_paths(text, kit_dir, target_root, workflows):
     """`[(cite, rel)]` in first-seen order, one per distinct citation in text that this install
     holds, rel repo-relative. A citation of a `workflow`-driver harness of workflows resolves as
-    `resolve_harness_path` does, with `here` at the tool root, so the Skill names a harness where
-    the role index lists it (TOOL-dRenderedAnchor-2). Only a harness of the workflow table resolves
-    through the role index's call: every other citation resolves with `here` at kit_dir, the call
-    `derive_kit_paths` makes, so its probes stop at `<tool root>/<home>/` and a receipt row still
+    `resolve_harness_path` does, with `here` at the tool root, so the Skill names a harness where the
+    role index lists it (TOOL-dRenderedAnchor-2). Only a `workflow`-driver harness of the workflow table
+    resolves through the role index's call: every other citation resolves with `here` at kit_dir, the
+    call `derive_kit_paths` makes, so its probes stop at `<tool root>/<home>/` and a receipt row still
     places it (TOOL-dRenderedAnchor-3). A citation nothing holds, or held outside target_root, is
     not listed, and the caller's plain prefix substitution answers it; a path outside target_root
     could not be named repo-relative."""

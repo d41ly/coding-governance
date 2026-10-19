@@ -25,23 +25,26 @@
 # harnesses moved into a renamed directory behind `rendered` receipt rows, which the Skill then names
 # there, and a citation extending a held one, which keeps its own plain path (arm 14); a decoy at the
 # repository root for each citation that is no harness, which the Skill never names, and a receipt
-# row placing the first of them, which it does (arm 15); and a root install whose repository has a
-# sibling directory holding each cited harness, which the citation pass lists nowhere (arm 16). Every
-# arm is a self-contained block below the prologue, so a slice of the prologue and one block runs
-# that arm alone.
+# row placing the first of them, which it does (arm 15); a root install whose repository has a
+# sibling directory holding each cited harness, which the citation pass lists nowhere (arm 16); and
+# a harness held only in the directory above the tool root with no receipt, which the Skill and the
+# role index both name there (arm 17). Every arm is a self-contained block below the prologue, so a
+# slice of the prologue and one block runs that arm alone.
 #
 # WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
-# of arms 14 to 16, which the catalogue checker and the renderer's own self-test grade; the
+# of arms 14 to 17, which the catalogue checker and the renderer's own self-test grade; the
 # `--scaffold` restart notice's wording; or an adopter run at another install prefix, since the
-# fixture mirrors this repository's own, arm 16's root install aside. Arms 14 to 16 read only the
+# fixture mirrors this repository's own, arm 16's root install aside. Arms 14 to 17 read only the
 # citations the shipped template holds, so a harness the table lists and the template does not cite
 # is in none of them, and arm 15 reads only a citation inside backticks. Arm 16 does not check what
 # the role index lists at its root install, where the index's own probe names each sibling harness
-# as `../<home>/<file>`, outside the repository (TOOL-dRenderedAnchor-3 section 3). Arm 11 does not
-# compare a refusal's wording, any marker field beyond the whole line, or any micro-format head but
-# `agent` and `returned`. Arm 13 does not check which rule refused: any non-zero exit of the agent
-# render takes the same branch, so it grades the adopter's handling of a refusal, and R10 only as
-# the trigger.
+# as `../<home>/<file>`, outside the repository (TOOL-dRenderedAnchor-3 section 3). The kit path
+# needs two or more segments for arm 17, which does not run `--check` over its install and places
+# nothing for `unattended-unit.js`, which the template does not cite (TOOL-dRenderedAnchor-4).
+# Arm 11 does not compare a refusal's wording, any marker field beyond the whole line, or any
+# micro-format head but `agent` and `returned`. Arm 13 does not check which rule refused: any
+# non-zero exit of the agent render takes the same branch, so it grades the adopter's handling of a
+# refusal, and R10 only as the trigger.
 #
 # Withheld from the payload by the kit's descriptor (`project-owned`): its subject is the adopter in
 # this directory, so it has a job only where that source changes.
@@ -74,8 +77,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # spawn and +4 for arm 12 (TOOL-aOrientedCast-27): arm 6's one floored assertion is taken back off the
 # floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
 # +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2). +1 for arm 14, +3
-# for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3).
-FLOOR_ASSERTIONS=49
+# for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3). +1 for arm 17 (TOOL-dRenderedAnchor-4).
+FLOOR_ASSERTIONS=50
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""; FXK="$KREL"
@@ -585,9 +588,10 @@ check_arm "arm 14 ...and --check over that install exits 0" "$([ "$rc" = 0 ] && 
 [ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
 
 # ---- arm 15: a citation that is no harness never resolves above the tool root -------------------
-# TOOL-dRenderedAnchor-3 S7, the closing review's M1: a citation that is no harness of the workflow
-# table resolves from the kit directory, the call `derive_kit_paths` makes, so a file of its name at
-# the repository root is never named. The arm finds each backticked span of the template holding
+# TOOL-dRenderedAnchor-3 S7, the closing review's M1: a citation that is
+# no `workflow`-driver harness of the workflow table resolves from the kit directory, the call
+# `derive_kit_paths` makes, so at a prefixed install, this arm's fixture, a file of its name at the
+# repository root is never named. The arm finds each backticked span of the template holding
 # `{{TOOL_ROOT}}` with its own pattern, skips each whose `<home>/<file>` HARNESS_PAIRS_READ lists,
 # writes a decoy at `<repo>/<home>/<file>` for every other one, and the Skill must carry each such
 # span under the plain prefix: at least 2, PINNED from the merge bar's and `unattended.sh`'s
@@ -663,6 +667,46 @@ _ok=1; for _q in "${_p16[@]}"; do grep -qF -- "\`$_q\`" "$FX/.claude/skills/buil
 check_arm "arm 16 ...and --scaffold exits 0 naming each such harness by its plain citation" \
    "$([ "$rc" = 0 ] && [ "${#_p16[@]}" -ge 2 ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
 [ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+
+# ---- arm 17: a harness held only above the tool root is named where the role index lists it ---
+# TOOL-dRenderedAnchor-4 S1, the closing review's round-3 M1: the citation pass resolves a
+# `workflow`-driver harness with the tool root as `here` and every other citation from the kit
+# directory, and the two values of `here` part on one layout only: a harness held only in the
+# directory above the tool root, with no receipt row. The arm builds that layout. Each pair
+# HARNESS_PAIRS_READ lists is written there, with nothing under `<tool root>/<home>/` and no receipt.
+# After `--scaffold` the Skill must name each pair there, backticked, never under the tool root, and
+# the `harnesses` list of the role index must hold the same path. The expected path is built from
+# the pair and the kit path, never read from either output the arm grades. The fixture's
+# preconditions are in the assertion: a kit path of two or more segments, nothing under the tool
+# root's home, no receipt, and at least 2 pairs, PINNED from the template's two harness citations,
+# so a fixture that drifts toward a layout both values of `here` reach reds the arm. Red against
+# `roles_lib.py` line 626 staged as `here = kit`, the C2 break TOOL-dRenderedAnchor-3's spec
+# rejected, whose Skill names each pair under the tool root while the role index does not move.
+build_fixture; _rc17=$?
+A17P=$("$PY" -B -c "$HARNESS_PAIRS_READ" "$FX/$KREL"); A17P=${A17P//$'\r'/}; A17P=${A17P%$'\n'}
+_p17=(); [ -z "$A17P" ] || mapfile -t _p17 <<< "$A17P"
+_t17=${KREL%/*}; _u17=""; [[ $_t17 == */* ]] && _u17=${_t17%/*}/
+_ok=1
+for _q in "${_p17[@]}"; do
+  [ -e "$FX/$_t17/${_q%%/*}" ] && _ok=0
+  mkdir -p "$FX/$_u17${_q%/*}" && printf '// harness\n' > "$FX/$_u17$_q"
+done
+out=$(run_adopter --scaffold); rc=$?
+SK17="$FX/.claude/skills/build/SKILL.md"
+IX17=$("$PY" -B -c 'import json, sys
+with open(sys.argv[1], encoding="utf-8") as fh:
+    held = json.load(fh).get("harnesses") or []
+sys.stdout.buffer.write("".join(h + "\n" for h in held if isinstance(h, str)).encode("utf-8"))' \
+   "$FX/.claude/roles.json" 2>/dev/null); IX17=${IX17//$'\r'/}
+for _q in "${_p17[@]}"; do
+  grep -qF -- "\`$_u17$_q\`" "$SK17" || _ok=0
+  grep -qF -- "\`$_t17/$_q\`" "$SK17" && _ok=0
+  grep -qxF -- "$_u17$_q" <<< "$IX17" || _ok=0
+done
+_v17=$([[ $KREL == */* ]] && [ "$_rc17" = 0 ] && [ "$rc" = 0 ] && [ "${#_p17[@]}" -ge 2 ] \
+   && [ ! -e "$FX/.governance/install.json" ] && [ "$_ok" = 1 ] && echo 1 || echo 0)
+check_arm "arm 17 a harness held only above the tool root is named there by the Skill and by roles.json" "$_v17"
+[ "$_v17" = 1 ] || printf '%s\n' "$out" | sed 's/^/    /'
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

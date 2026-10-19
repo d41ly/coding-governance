@@ -30,13 +30,14 @@
 # THE HARNESS CITATIONS (TOOL-dRenderedAnchor-2, TOOL-dRenderedAnchor-3). Before the plain
 # `{{TOOL_ROOT}}` substitution, every `{{TOOL_ROOT}}<home>/<file>` citation of the template that
 # `roles_lib.resolve_cited_paths` holds is replaced by the path it resolves, one whole citation at a
-# time, so a held citation never rewrites a longer one it prefixes. Only a harness of the workflow
-# table resolves through the role index's call, with the tool root as `here`, so `/build` names each
-# harness where the role index lists it, a kit landed under its id behind a `rendered` receipt row
-# included. Every other citation resolves from the kit directory, the call `derive_kit_paths` makes,
-# so its probes stop at `<tool root>/<home>/` and an adopter's file at the repository root is never
-# named. A citation neither call holds falls through to the plain substitution. In gov every
-# citation is held at `<tool root>/<home>/`, so the render is unchanged.
+# time, so a held citation never rewrites a longer one it prefixes. Only a
+# `workflow`-driver harness of the workflow table resolves through the role index's call, with the
+# tool root as `here`, so `/build` names each harness where the role index lists it, a kit landed
+# under its id behind a `rendered` receipt row included. Every other citation resolves from the kit
+# directory, the call `derive_kit_paths` makes, so its probes stop at `<tool root>/<home>/`, and at a
+# prefixed install an adopter's file at the repository root is never named. A citation neither call
+# holds falls through to the plain substitution. In gov every citation is held at
+# `<tool root>/<home>/`, so the render is unchanged.
 # The answer reads the disk at render time: an `apply` that runs this before the harnesses are
 # rendered writes the plain path, and `--check` then reads the Skill out of sync until `--scaffold`.
 #
