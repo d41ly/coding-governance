@@ -106,7 +106,7 @@ Each walker walks its items through its scenarios (final-questions `[audit]`, re
 
 ## [slicing] The two runs' slices
 
-Run A slices by scenario, run B by step band, and each run gives every build and every principle one verdict.
+Run A slices by scenario, run B by step band, and each run gives every build and every principle one verdict. Run C slices the chain's clauses by build, five contiguous slices of the copy's `[chain]` balanced by the length of their rows, and gives every build one verdict and every clause one row (`[walk-run-c]`).
 `build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py` renders each walker's brief from this table and checks each
 return against it. The steps are flow-steps' sections, and `expansions` is the expansions' items.
 
@@ -122,6 +122,11 @@ return against it. The steps are flow-steps' sections, and `expansions` is the e
 | B | 3 | all | test, deploy | dWitnessedBar, dShippedRelease, dSafePassage, dConvergedCharter | P2, P3, P8, P9, P16, P37, P38, P42 |
 | B | 4 | all | breakpoint, probe, lifecycle | dFairHearing, dDeclaredLoop, dWellOiledMachine, dCalibratedLens | P1, P5, P7, P20, P27, P29, P31, P36, P39 |
 | B | 5 | all | adopt, expansions | dLinkedLibrary, dTotalRecall, dTendedCadence, dMindYourWords, dOrderedCharter | P6, P13, P14, P28, P30, P32, P33, P34, P35 |
+| C | 1 | clauses | clauses | dTrueNorth, dGroundRules, dSafePassage, dOrderedCharter | none |
+| C | 2 | clauses | clauses | dFairHearing, dDeclaredLoop, dPlacedRequest, dKeptSession | none |
+| C | 3 | clauses | clauses | dBoundRoles, dFurnishedOrders, dTotalRecall, dLinkedLibrary, dMindYourWords | none |
+| C | 4 | clauses | clauses | dWellOiledMachine, dWitnessedBar | none |
+| C | 5 | clauses | clauses | dRankedPlan, dIndexedDesign, dScopedBuild, dShippedRelease, dTendedCadence, dCalibratedLens, dConvergedCharter | none |
 
 ## [walk-table] The walk table's grammar
 
@@ -372,6 +377,21 @@ returned lines, where the template had typed eleven.
   spanned 14m07s, its skeptics 8m11s and its synthesis 10m14s. Run B's walk spanned
   41m18s over its ten dispatches, its skeptics 18m52s and its synthesis 9m30s.
 - **By `[recall]`, a run under the bar comes to the owner before anything is folded.** The owner's word is asked.
+
+### [walk-run-c] Run C, the clause walk, and a second look at refutations
+
+The owner, 2026-10-20, asked what follows a walk under the bar, answered "Run C: a clause walk (Recommended)", and asked
+whether refutations get a second look, answered "Second skeptic on refutations (Recommended)".
+- **Run C** walks the same sealed copy, its key still sealed, sliced by chain build as `[slicing]`'s C rows say. Each
+  walker reads every clause of its builds against the records that settle what the clause builds, and returns one row
+  per clause, `| clause | build | read against | verdict |`, the verdict `holds` or the ids of its findings.
+- **Run C's bar,** fixed before it is dispatched: each scenario run joined with run C, A with C and B with C, finds at
+  least eight of the twelve with Stage 0's two, and the three runs together at least ten (`score.py --with`).
+- **The second look:** every finding a skeptic refuted, in runs A, B and C, goes to a second skeptic, who sees the
+  finding but not the first refutation. A refutation stands only when both refute it, and a split goes to the report
+  as unverified, which the recall does not count. Runs A and B each take one more skeptic for it, five verify agents a
+  run, and run C's four skeptics and its second look make five.
+- **Afterwards** the three runs' confirmed findings fold together, and the key and the hand reading are committed.
 
 ## [stage0-classes] Stage 0's classes
 

@@ -24388,6 +24388,15 @@ mixed = report("mixed.md", [1, 2, 3, 4, 5, 11])
 rc, out = run(mixed, "--stage0-caught")
 checks.append(("a walker's mechanical hit adds nothing", "plants hit 7 of 12" in out.split("\n")[0]
                and "P11 <- Stage 0, and A1-F6 besides" in out))
+# Run C's bar: each run joined with the clause run. Two runs of five judgement hits miss alone; joined with a run
+# that adds three more, each joined run reaches eight with Stage 0's two, and the union ten.
+five_a, five_b = report("five-a.md", [1, 2, 3, 4, 5]), report("five-b.md", [1, 2, 3, 4, 5])
+c_run = report("c.md", [6, 7, 8])
+rc, out = run(five_a, five_b, "--stage0-caught")
+checks.append(("five and five miss without run C", rc == 1))
+rc, out = run(five_a, five_b, "--stage0-caught", "--with", c_run)
+checks.append(("joined with run C each reaches eight, the union ten", rc == 0 and "union: plants hit 10 of 12" in out
+               and "five-a.md with c.md" in out))
 for name, ok in checks:
     print(f"{'ok  ' if ok else 'FAIL'} {name}")
 sys.exit(0 if all(ok for _, ok in checks) else 1)
@@ -25031,7 +25040,7 @@ for arg in [a for a in sys.argv[2:] if "=" in a]:
                 cls = "the working tree's design folder"
             hits.setdefault(cls, []).append(f"{name}: {text[:160]}")
             break
-        others = [w for w in re.findall(r"((?:walk|skeptic)-[ab]\d)", text, flags=re.I) if w.lower() != me]
+        others = [w for w in re.findall(r"((?:walk|skeptic)-[abc]\d|recheck-[abc])\b", text, flags=re.I) if w.lower() != me]
         if others:
             hits.setdefault("another walker's scratch", []).append(f"{name}: {text[:160]}")
         # The walkers' scratch folders share one parent since run B's re-dispatch: a listing or a glob of the parent
@@ -25239,10 +25248,10 @@ elif verb == "skeptic":
     # A skeptic's counts come from its saved return, never typed: two typed counts were wrong on 2026-10-20.
     n, ret, text = args
     body = pathlib.Path(ret).read_text(encoding="utf-8")
-    vid = r"^- (?:\*\*)?[AB](?:[1-5]|S[1-4])-F\d+(?:\*\*)?: "
+    vid = r"^- (?:\*\*)?[ABC](?:[1-5]|S[1-4])-F\d+(?:\*\*)?: "
     c, r = (len(re.findall(vid + w, body, flags=re.M)) for w in ("confirmed", "refuted"))
-    h, d = (len(re.findall(r"^- `?[a-z]+\.[a-z-]+`? S\d: " + w, body, flags=re.M)) for w in ("holds", "defect"))
-    new = sorted(set(re.findall(r"^[ \t]*#+ ([AB]S[1-4]-F\d+)", body, flags=re.M)))
+    h, d = (len(re.findall(r"^- `?(?:[a-z]+\.[a-z-]+`? S\d|cl-dClosedLoop-\d{4}`? d[A-Z]\w+): " + w, body, flags=re.M)) for w in ("holds", "defect"))
+    new = sorted(set(re.findall(r"^[ \t]*#+ ([ABC]S[1-4]-F\d+)", body, flags=re.M)))
     counts = (f"{c + r} findings judged, {c} confirmed and {r} refuted; its clean cells {h} held and {d} defects"
               + (f", and new findings {', '.join(new)}" if new else ""))
     line = row_line(n)
@@ -25389,14 +25398,14 @@ Usage: python -X utf8 check_verdicts.py <skeptic brief> <skeptic return> [--plan
 import re
 import sys
 
-ID = r"[AB](?:[1-5]|S[1-4])-F\d+"
+ID = r"[ABC](?:[1-5]|S[1-4])-F\d+"
 brief, ret = open(sys.argv[1], encoding="utf-8").read(), open(sys.argv[2], encoding="utf-8").read()
 if "--plant" in sys.argv:
     first = re.search(r"^- \**(" + ID + r")\**: (?:confirmed|refuted)[^\n]*\n", ret, flags=re.M)
     ret = ret.replace(first.group(0), "", 1) if first else ret
 part = brief.split("## Findings to refute", 1)[1].split("## Clean cells to attack", 1)
 handed = re.findall(r"^### (" + ID + r")\b", part[0], flags=re.M)
-cells = re.findall(r"^- `([^`]+)` in (S\d)", part[1], flags=re.M)
+cells = re.findall(r"^- `([^`]+)` in (S\d|d[A-Z]\w+)", part[1], flags=re.M)
 judged = set(re.findall(r"^- \**(" + ID + r")\**: (?:confirmed|refuted)", ret, flags=re.M))
 missing = [i for i in handed if i not in judged]
 cell_missing = [f"{i} {s}" for i, s in cells
@@ -25427,7 +25436,7 @@ import sys
 sys.path.insert(0, "tools/roles")
 import handoff  # noqa: E402
 
-ID = r"[AB](?:[1-5]|S[1-4])-F\d+"
+ID = r"[ABC](?:[1-5]|S[1-4])-F\d+"
 GRADES = ("blocker", "high", "medium", "low")
 args = [a for a in sys.argv[1:] if a != "--check"]
 report, folder, ids = pathlib.Path(args[0]), pathlib.Path(args[1]), args[2:]
@@ -25490,7 +25499,7 @@ import json
 import re
 import sys
 
-ID = r"[AB](?:[1-5]|S[1-4])-F\d+"
+ID = r"[ABC](?:[1-5]|S[1-4])-F\d+"
 key = json.load(open(sys.argv[1], encoding="utf-8"))
 text = open(sys.argv[2], encoding="utf-8").read()
 want = set(sys.argv[3:])
@@ -25582,6 +25591,261 @@ L.insert_before("\n## Instruments\n", f"""
 """, "the event")
 L.save()
 print(f"A {ha}/{ja}, B {hb}/{jb}, union {union}, bar {bar}, {agents} dispatches, {tok} tokens, {total}")
+````
+
+### `clause_slices.py`
+
+Run C's slicing, derived from the sealed copy's [chain]: each build's clause ids and row length, and the five contiguous slices whose largest total length is the smallest.
+
+````python
+"""Run C's slicing, derived: each chain build's clause ids and its row's length, read from the sealed copy's v2
+[chain] in chain order, and the five contiguous slices whose largest row-length total is the smallest.
+
+Usage: python -X utf8 clause_slices.py <copy's architecture-v2.md>
+"""
+import re
+import sys
+
+text = open(sys.argv[1], encoding="utf-8").read()
+chain = re.search(r"^## \[chain\][^\n]*\n(.*?)(?=^## )", text, flags=re.M | re.S).group(1)
+rows = []
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \|", ln)
+    if m:
+        rows.append((m.group(1), re.findall(r"cl-dClosedLoop-\d{4}", ln), len(ln)))
+print(f"builds {len(rows)}, clauses {sum(len(r[1]) for r in rows)}, characters {sum(r[2] for r in rows)}")
+for b, ids, n in rows:
+    print(f"  {b}: {len(ids)} clauses, {n} characters")
+
+
+def pack(cap):
+    out, cur = [[]], 0
+    for r in rows:
+        if out[-1] and cur + r[2] > cap:
+            out.append([])
+            cur = 0
+        out[-1].append(r)
+        cur += r[2]
+    return out
+
+
+lo, hi = max(r[2] for r in rows), sum(r[2] for r in rows)
+while lo < hi:
+    mid = (lo + hi) // 2
+    lo, hi = (lo, mid) if len(pack(mid)) <= 5 else (mid + 1, hi)
+for n, s in enumerate(pack(lo), 1):
+    print(f"walker {n}: {', '.join(r[0] for r in s)} · {sum(len(r[1]) for r in s)} clauses, {sum(r[2] for r in s)} characters")
+````
+
+### `record_run_c.py`
+
+The owner's word on the scored walk, run C and the second look, recorded with run C's slices and bar before anything was rendered.
+
+````python
+"""The owner's word on the scored walk, recorded before anything is rendered: run C, a clause walk on the same sealed
+copy, and a second skeptic on every refutation. The round record gains [walk-run-c] (the owner's answers verbatim, run
+C's shape, its bar fixed before dispatch, the second look's rule) and [slicing]'s five C rows, which clause_slices.py
+derived from the copy's [chain].
+
+Usage: python -X utf8 record_run_c.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.sub("Run A slices by scenario, run B by step band, and each run gives every build and every principle one verdict.",
+      "Run A slices by scenario, run B by step band, and each run gives every build and every principle one verdict. Run C "
+      "slices the chain's clauses by build, five contiguous slices of the copy's `[chain]` balanced by the length of "
+      "their rows, and gives every build one verdict and every clause one row (`[walk-run-c]`).", "[slicing] intro")
+t = R.text
+start = t.index("| B | 5 | all | adopt, expansions |")
+b5 = t[start:t.index("\n", start) + 1]
+R.sub(b5, b5 + "| C | 1 | clauses | clauses | dTrueNorth, dGroundRules, dSafePassage, dOrderedCharter | none |\n"
+      "| C | 2 | clauses | clauses | dFairHearing, dDeclaredLoop, dPlacedRequest, dKeptSession | none |\n"
+      "| C | 3 | clauses | clauses | dBoundRoles, dFurnishedOrders, dTotalRecall, dLinkedLibrary, dMindYourWords | none |\n"
+      "| C | 4 | clauses | clauses | dWellOiledMachine, dWitnessedBar | none |\n"
+      "| C | 5 | clauses | clauses | dRankedPlan, dIndexedDesign, dScopedBuild, dShippedRelease, dTendedCadence, "
+      "dCalibratedLens, dConvergedCharter | none |\n", "[slicing] C rows")
+R.insert_before("## [stage0-classes] ", """### [walk-run-c] Run C, the clause walk, and a second look at refutations
+
+The owner, 2026-10-20, asked what follows a walk under the bar, answered "Run C: a clause walk (Recommended)", and asked
+whether refutations get a second look, answered "Second skeptic on refutations (Recommended)".
+- **Run C** walks the same sealed copy, its key still sealed, sliced by chain build as `[slicing]`'s C rows say. Each
+  walker reads every clause of its builds against the records that settle what the clause builds, and returns one row
+  per clause, `| clause | build | read against | verdict |`, the verdict `holds` or the ids of its findings.
+- **Run C's bar,** fixed before it is dispatched: each scenario run joined with run C, A with C and B with C, finds at
+  least eight of the twelve with Stage 0's two, and the three runs together at least ten (`score.py --with`).
+- **The second look:** every finding a skeptic refuted, in runs A, B and C, goes to a second skeptic, who sees the
+  finding but not the first refutation. A refutation stands only when both refute it, and a split goes to the report
+  as unverified, which the recall does not count. Runs A and B each take one more skeptic for it, five verify agents a
+  run, and run C's four skeptics and its second look make five.
+- **Afterwards** the three runs' confirmed findings fold together, and the key and the hand reading are committed.
+
+""", "[walk-run-c]")
+R.save()
+````
+
+### `patch_run_c_ids.py`
+
+Run C in the scratch instruments: finding ids take the letter C, a clean cell may be a clause and its build, the read audit knows the clause and second-look scratch folders.
+
+````python
+"""Run C in the scratch instruments: finding ids take the letter C, a clean cell may be a clause and its build as well
+as an item and its scenario, and the read audit knows the clause walkers' and the second look's scratch folders.
+Each replacement must match exactly once.
+
+Usage: python -X utf8 patch_run_c_ids.py   (from this folder's parent, the scratchpad)
+"""
+import pathlib
+
+HERE = pathlib.Path(__file__).resolve().parent
+CELL_OLD = r"^- `?[a-z]+\.[a-z-]+`? S\d: "
+CELL_NEW = r"^- `?(?:[a-z]+\.[a-z-]+`? S\d|cl-dClosedLoop-\d{4}`? d[A-Z]\w+): "
+PATCHES = {
+    "check_verdicts.py": [
+        ('ID = r"[AB](?:[1-5]|S[1-4])-F\\d+"', 'ID = r"[ABC](?:[1-5]|S[1-4])-F\\d+"'),
+        ('cells = re.findall(r"^- `([^`]+)` in (S\\d)", part[1], flags=re.M)',
+         'cells = re.findall(r"^- `([^`]+)` in (S\\d|d[A-Z]\\w+)", part[1], flags=re.M)'),
+    ],
+    "fill_shape.py": [('ID = r"[AB](?:[1-5]|S[1-4])-F\\d+"', 'ID = r"[ABC](?:[1-5]|S[1-4])-F\\d+"')],
+    "near_hits.py": [('ID = r"[AB](?:[1-5]|S[1-4])-F\\d+"', 'ID = r"[ABC](?:[1-5]|S[1-4])-F\\d+"')],
+    "log_dispatch.py": [
+        ('vid = r"^- (?:\\*\\*)?[AB](?:[1-5]|S[1-4])-F\\d+(?:\\*\\*)?: "',
+         'vid = r"^- (?:\\*\\*)?[ABC](?:[1-5]|S[1-4])-F\\d+(?:\\*\\*)?: "'),
+        ('re.findall(r"' + CELL_OLD + '" + w, body, flags=re.M)', 're.findall(r"' + CELL_NEW + '" + w, body, flags=re.M)'),
+        ('#+ ([AB]S[1-4]-F\\d+)', '#+ ([ABC]S[1-4]-F\\d+)'),
+    ],
+    "read_audit.py": [('r"((?:walk|skeptic)-[ab]\\d)"', 'r"((?:walk|skeptic|recheck)-[abc]\\d?)"')],
+}
+for name, pairs in PATCHES.items():
+    p = HERE / name
+    t = p.read_text(encoding="utf-8")
+    for old, new in pairs:
+        n = t.count(old)
+        if n != 1:
+            raise SystemExit(f"{name}: {n} matches for {old!r}")
+        t = t.replace(old, new)
+    p.write_text(t, encoding="utf-8", newline="\n")
+    print(f"{name}: {len(pairs)} replaced")
+````
+
+### `test_clause_walk.py`
+
+walk.py's run C and second look on synthetic returns from the copy's [chain]: briefs and counts, returns and reports green and seven plants red, skeptic batches, the second look's brief and application, runs A and B still green.
+
+````python
+"""walk.py's run C and second look, on synthetic returns built from the sealed copy's [chain]: the five briefs and
+their clause counts, a walker's return and the joined report green and each plant red, run C's skeptic batches with
+clean clauses, the second look's brief and its application, and runs A and B's real returns and reports still green.
+
+Usage: python -X utf8 test_clause_walk.py <sealed copy>   (from the worktree root)
+"""
+import importlib.util
+import pathlib
+import shutil
+import subprocess
+import sys
+
+COPY = sys.argv[1]
+B = "memory/builds/dClosedLoop/build/"
+WALK = B + "2026-10-19-build-PLAY-dClosedLoop-1-walk.py"
+OUT = pathlib.Path(__file__).resolve().parent / "test-clause"
+shutil.rmtree(OUT, ignore_errors=True)
+OUT.mkdir()
+spec = importlib.util.spec_from_file_location("walk", WALK)
+walk = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(walk)
+by_build = walk.clauses_of(COPY)
+_, _, slices = walk.load()
+checks = []
+
+
+def run(*a):
+    r = subprocess.run([sys.executable, "-X", "utf8", WALK, *a], capture_output=True, text=True, encoding="utf-8")
+    return r.returncode, r.stdout + r.stderr
+
+
+rc, out = run("brief", "--run", "C", "--seeded", COPY, "--leads", f"{COPY}/stage0-leads.md", "--out", str(OUT / "briefs"),
+              "--scratch", "X:/scratch", "--key-sha", "0" * 64)
+counts = [int(x) for x in __import__("re").findall(r"clauses (\d+), builds", out)]
+checks.append(("five briefs, every clause once", rc == 0 and len(counts) == 5 and sum(counts) == sum(map(len, by_build.values()))))
+
+
+def ret(builds, finding=False):
+    rows, lines = [], ["The chain shipped and failed because ...", ""]
+    if finding:
+        lines += ["### C1-F1 — x", "- **Address:** architecture-v2 [chain] `cl-dClosedLoop-0001`", ""]
+    lines += ["| clause | build | read against | verdict |", "|---|---|---|---|"]
+    first = True
+    for b in builds:
+        for c in by_build[b]:
+            lines.append(f"| `{c}` | {b} | gap-register; layer-memory [contract] | {'C1-F1' if finding and first else 'holds'} |")
+            first = False
+    lines += [""] + [f"| {b} | holds |" for b in builds] + ["", "**Read outside the list above:** none"]
+    return "\n".join(lines) + "\n"
+
+
+w1 = slices[("C", 1)]["builds"]
+(OUT / "ret-c1.md").write_text(ret(w1, finding=True), encoding="utf-8")
+rc, out = run("check", "--run", "C", "--walker", "1", str(OUT / "ret-c1.md"), "--seeded", COPY)
+checks.append(("a whole walker return passes", rc == 0))
+for plant in ("drop-cell", "bad-verdict", "ghost-finding", "extra-cell", "dup-cell", "drop-build", "no-against"):
+    rc, out = run("check", "--run", "C", "--walker", "1", str(OUT / "ret-c1.md"), "--seeded", COPY, "--plant", plant)
+    checks.append((f"plant {plant} reds", rc == 1))
+allb = [b for k in sorted(k for k in slices if k[0] == "C") for b in slices[k]["builds"]]
+(OUT / "report-c.md").write_text(ret(allb), encoding="utf-8")
+rc, out = run("check", "--run", "C", "--report", str(OUT / "report-c.md"), "--seeded", COPY)
+checks.append(("a joined report passes", rc == 0))
+rc, out = run("check", "--run", "C", "--report", str(OUT / "report-c.md"))
+checks.append(("run C's check refuses without the copy", rc == 2))
+# Run C's skeptics: five returns, a finding each, clean clauses drawn from their tables.
+rets = OUT / "rets"
+rets.mkdir()
+for w in range(1, 6):
+    text = ret(slices[("C", w)]["builds"]).replace("The chain shipped", f"### C{w}-F1 — x\n- **Address:** architecture-v2 "
+                                                     f"[chain] `cl-dClosedLoop-000{w}`\n\nThe chain shipped", 1)
+    (rets / f"2026-10-20-build-PLAY-dClosedLoop-1-walk-return-c{w}.md").write_text(text, encoding="utf-8")
+rc, out = run("skeptic", "--run", "C", "--returns", str(rets), "--seeded", COPY, "--out", str(OUT / "sk"), "--scratch", "X:/s")
+briefs = sorted((OUT / "sk").glob("*skeptic-brief-c*.md"))
+clean_ok = all("- `cl-dClosedLoop-" in b.read_text(encoding="utf-8") and "<clause> <build>: holds" in b.read_text(encoding="utf-8")
+               for b in briefs)
+checks.append(("four skeptic briefs with clean clauses", rc == 0 and len(briefs) == 4 and clean_ok))
+# The second look: a report refuting two findings, its brief, and its application both ways.
+rep = OUT / "report-r.md"
+rep.write_text("**Serves:** spec-audit PLAY-dClosedLoop-1\n\n# x\n\n## Medium\n\n### C1-F2 — kept\n- **Severity:** medium\n\n"
+               "## Refuted\n\n### C2-F1 — first\n- **Skeptic:** Refuted (batch 1). no.\n\n### C3-F1 — second\n"
+               "- **Skeptic:** Refuted (batch 2). no.\n\n## Clause table\n\nreview-shape kind=spec-audit round=1 "
+               "intensity=full at=synth raw=3 confirmed=1 refuted=2 unverified=0 blocker=0 high=0 medium=1 low=0 agents=0 "
+               "out-tokens=0\n", encoding="utf-8")
+rc, out = run("recheck", "--run", "C", "--report", str(rep), "--returns", str(rets), "--seeded", COPY, "--out", str(OUT))
+rb = (OUT / f"{walk.TODAY}-build-PLAY-dClosedLoop-1-recheck-brief-c.md")
+rbt = rb.read_text(encoding="utf-8") if rb.exists() else ""
+checks.append(("the second look's brief carries both, without the refutation",
+               rc == 0 and "### C2-F1" in rbt and "### C3-F1" in rbt and "Refuted (batch" not in rbt))
+verd = OUT / "second.md"
+verd.write_text("- C2-F1: confirmed high\n  it is there.\n- C3-F1: refuted\n  it is not.\n- **Read outside the list above:** none\n",
+                encoding="utf-8")
+before = rep.read_text(encoding="utf-8")
+rc, out = run("recheck-apply", "--run", "C", "--report", str(rep), "--verdicts", str(verd))
+after = rep.read_text(encoding="utf-8")
+un = after.split("## Unverified", 1)[1].split("## Refuted", 1)[0] if "## Unverified" in after else ""
+checks.append(("a split goes to Unverified, a double refutation stands",
+               rc == 0 and "### C2-F1" in un and "### C3-F1" in after.split("## Refuted", 1)[1]
+               and "refuted=1 unverified=1" in after and "Second skeptic:** Refuted. it is not." in after))
+rep.write_text(before, encoding="utf-8")
+verd.write_text("- C2-F1: confirmed high\n  it is there.\n", encoding="utf-8")
+rc, out = run("recheck-apply", "--run", "C", "--report", str(rep), "--verdicts", str(verd))
+checks.append(("an unjudged refutation refuses", rc == 2 and rep.read_text(encoding="utf-8") == before))
+# Runs A and B, unchanged: their real returns and reports still pass.
+for r in "AB":
+    rc, out = run("check", "--run", r, "--report", f"memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-{r.lower()}.md")
+    checks.append((f"run {r}'s report still passes", rc == 0))
+for name, ok in checks:
+    print(f"{'ok  ' if ok else 'FAIL'} {name}")
+sys.exit(0 if all(ok for _, ok in checks) else 1)
 ````
 
 ### `preset_check_canonical.py`
@@ -26023,6 +26287,10 @@ MINE = [
     ('audit-run/fill_shape.py', "A walk report's review-shape line filled from the report and the run's transcripts: raw severities by each confirmed heading's grade, the run's dispatch count, and their output tokens through the roles kit's own transcript reader; refuses when grades and the confirmed count disagree, seen on a planted count."),
     ('audit-run/near_hits.py', "For each plant a report's scorer did not hit, the findings naming one of its anchors, confirmed or refuted, with its words: the candidates a hand reading weighs; it scores nothing."),
     ('audit-run/record_scored.py', "Both runs scored: the round record's [walk-scored], the aggregate only, its numbers read from the reports' shape lines, score.py's saved output and walltime.py's stage lines; which plants were hit stays sealed until the owner's word."),
+    ('audit-run/clause_slices.py', "Run C's slicing, derived from the sealed copy's [chain]: each build's clause ids and row length, and the five contiguous slices whose largest total length is the smallest."),
+    ('audit-run/record_run_c.py', "The owner's word on the scored walk, run C and the second look, recorded with run C's slices and bar before anything was rendered."),
+    ('audit-run/patch_run_c_ids.py', 'Run C in the scratch instruments: finding ids take the letter C, a clean cell may be a clause and its build, the read audit knows the clause and second-look scratch folders.'),
+    ('walkkit/test_clause_walk.py', "walk.py's run C and second look on synthetic returns from the copy's [chain]: briefs and counts, returns and reports green and seven plants red, skeptic batches, the second look's brief and application, runs A and B still green."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -27343,9 +27611,9 @@ K4: keys 265 · findings 55
 K5: principles 42, clauses 496, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 104 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 110 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 271 records, 4421 sections, 219 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 277 records, 4453 sections, 219 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27361,9 +27629,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 89 · lines 38454 · unreviewed 7300 (19%)
+  design records 95 · lines 38472 · unreviewed 7318 (19%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 13
+  design commits after the floor that no closing review covers: 14
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27377,6 +27645,7 @@ rerun review debt: rc 0
     69b111f9e  13 design record(s)  records(dClosedLoop): both walks whole — run B's walkers 1, 3, 4 and 5 walk at last, and the ten returns join 
     cca97c487  13 design record(s)  records(dClosedLoop): run A's four skeptics returned, run B's sent, and run A's synthesis dispatched
     4a93b33bd  5 design record(s)  records(dClosedLoop): run B's four skeptics returned, and run B's synthesis dispatched
+    bb68f583d  1 design record(s)  records(dClosedLoop): both walks scored — two BLOCKED reports, and the recall bar not met
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27595,13 +27864,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2703 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1882, derived 321, pending 500
-map: no stale facts read 104 records and 28 quotes of a map count or the critical path
+map: 2709 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1888, derived 321, pending 500
+map: no stale facts read 110 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 271 records, 4422 sections, 219 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 277 records, 4457 sections, 219 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

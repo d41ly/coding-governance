@@ -14,7 +14,9 @@ where it has any) appears in the finding, and so does one of its words. A plant 
 `## Refuted` never hits.
 
 Usage: python score.py --key <key.json> --sha256 <hex> <report-a.md> [<report-b.md>] [--stage0-caught]
-                       [--plant tamper|blind|miss]
+                       [--with <report-c.md>] [--plant tamper|blind|miss]
+`--with` scores each run joined with that report, run C's bar: each joined run clears the per-run bar, and the
+union of all of them the joint one.
 Prints each run's hits, its recall and the union's, Mills's estimate of the real defects left, from the share of
 plants found, and Chapman's over the two runs' real findings, matched by full address. The bar (final-questions
 `[audit]`): each run finds at least two thirds of the plants and the two together at least ten of twelve. Stage 0 must
@@ -33,7 +35,7 @@ import re
 import sys
 from pathlib import Path
 
-ID = r"[AB](?:[1-5]|S[1-4])-F\d+"
+ID = r"[ABC](?:[1-5]|S[1-4])-F\d+"
 CONFIRMED = ("Critical", "High", "Medium", "Low")
 
 
@@ -77,8 +79,9 @@ def hits(key, found):
 def main():
     key_path, pinned = opt("--key"), opt("--sha256")
     plant = opt("--plant")
+    joined = opt("--with")
     reports = [a for i, a in enumerate(sys.argv[1:], 1)
-               if not a.startswith("--") and sys.argv[i - 1] not in ("--key", "--sha256", "--plant")]
+               if not a.startswith("--") and sys.argv[i - 1] not in ("--key", "--sha256", "--plant", "--with")]
     raw = Path(key_path).read_bytes()
     digest = hashlib.sha256(raw if plant != "tamper" else raw + b" ").hexdigest()
     if digest != pinned:
@@ -108,6 +111,18 @@ def main():
 
     def counted(h):
         return set(h) | mech
+
+    # Under --with <report>, each run is scored joined with that one, as run C's bar reads (`[walk-run-c]`): its hits
+    # and its findings join each run's, and the union is all of them.
+    if joined:
+        wf = findings(joined)
+        if not wf or not any(a for _, a, _ in wf):
+            print(f"score: REFUSED — {Path(joined).name}: no confirmed finding carries an address to score")
+            return 2
+        wh = hits(key, wf)
+        print(f"{Path(joined).name} alone: confirmed {len(wf)}, plants hit {len(counted(wh))} of {len(plants)}, of them "
+              f"judgement plants {sum(1 for p in judged if p['id'] in wh)} of {len(judged)}")
+        runs = [(f"{name} with {Path(joined).name}", found + wf, {**wh, **h}) for name, found, h in runs]
 
     for name, found, h in runs:
         c = counted(h)
