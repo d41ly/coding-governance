@@ -292,8 +292,11 @@ deviation joins into dScopedBuild and the approval route into dDeclaredLoop, eac
 ## [sequence] From here to the first chain spec
 
 1. The owner's rulings on [forks].
-2. The fold: v2's principles, keys, clauses and chain row for the answers; the gaps in [gaps]; the 484 clause ids.
-3. The audit's instruments, each seen red: Stage 0, the walk briefs, the rubric, the seeding and its scorer.
+2. The fold: v2's principles, keys, clauses and chain row for the answers; the gaps in [gaps]; the clause ids, 496
+   once the fold's own clauses were counted.
+3. The audit's instruments, each seen red: Stage 0, the walk briefs, the rubric, the seeding and its scorer; and
+   [bootstrap]'s three, the carries join with its coverage report, the deviation population and the as-built
+   renderer, which no step had scheduled (the whole-design audit's `[plan]`).
 4. The audit: Stage 0, the paired walk, the fold, the paired closing review, Stage 0 again.
 5. The baseline: v2 frozen at that commit; every later change a deviation record.
 6. The chain opened: its folders and rosters, the bootstrap build first, then dGroundRules onward, each Design exit
@@ -399,4 +402,5 @@ renders, but only into its own tree, which no agent loads.
   `[chain]` order, and v2's `[clause-ids]`, by `build/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py`, whose check was seen red on the
   tree before the minting and on four plants: a clause with no id, an id minted twice, a retired id in use and a
   next number behind the ids. It joins the final checks.
-- **Not yet folded:** the audit's instruments, the audit, and the baseline after it.
+- **Not yet folded:** the audit's instruments, the audit, and the baseline after it, which
+  `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` runs.

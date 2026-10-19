@@ -126,7 +126,7 @@ MEMORY_PLANTS = ("kind-unplaced", "kind-ghost-tag", "edge-status", "hop-edge", "
 CORPUS_PLANTS = ("instruments-decision", "view-unread")
 V2_VIEWS = {"layers": "overview", "principles": "principles", "front-door": "records", "policies": "policies",
             "presets": "policies", "floor": "records", "witnesses": "records", "contracts": "flow", "chain": "chain",
-            "clause-ids": "records", "planned": "records", "open": "progress", "owed": "progress"}
+            "clause-ids": "records", "enforcement": "records", "planned": "records", "open": "progress", "owed": "progress"}
 
 
 def text(path):

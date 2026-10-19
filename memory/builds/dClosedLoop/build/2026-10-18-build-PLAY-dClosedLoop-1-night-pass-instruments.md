@@ -23373,6 +23373,727 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `probe_then.py`
+
+Stage 0's first probe: every flow item's cells, and the Then cells naming no item, before any arm was written.
+
+````python
+"""Probe: every flow item's cells, and the shapes of its Then cell's branches."""
+import collections
+import re
+
+B = "memory/builds/dClosedLoop/build/"
+fs = open(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md", encoding="utf-8").read()
+
+
+def cells(ln):
+    return [c.strip() for c in re.split(r"(?<!\\)\|", ln.strip().strip("|"))]
+
+
+items = {}
+for m in re.finditer(r"^## \[([a-z-]+)\][^\n]*\n(.*?)(?=^## |\Z)", fs, flags=re.M | re.S):
+    for ln in m.group(2).split("\n"):
+        if ln.startswith("| `"):
+            c = cells(ln)
+            if len(c) == 7:
+                tags = re.findall(r"`([a-z]+\.[a-z0-9-]+)`", c[0])
+                for t in tags:
+                    items[t] = dict(step=m.group(1), actor=c[1], needs=c[2], does=c[3], proven=c[4], then=c[5], owner=c[6])
+print("items", len(items), collections.Counter(v["step"] for v in items.values()))
+prefixes = collections.Counter(t.split(".")[0] for t in items)
+print("prefixes", prefixes)
+tokens = collections.Counter()
+noroute = []
+for t, v in items.items():
+    toks = re.findall(r"`([^`]+)`", v["then"])
+    itoks = [x for x in toks if x in items]
+    for x in toks:
+        if x not in items:
+            tokens[x] += 1
+    if not itoks:
+        noroute.append(t)
+print("\nThen cells naming no item:", len(noroute))
+for t in noroute:
+    print(" ", t, "|", items[t]["then"][:220])
+print("\nnon-item backticked tokens in Then:", len(tokens))
+print(" ", sorted(tokens.items(), key=lambda kv: -kv[1])[:90])
+empty = {f: [t for t, v in items.items() if v[f] in ("", "—", "-")] for f in ("actor", "needs", "proven", "then", "owner")}
+for f, ts in empty.items():
+    print(f"\nempty or dash {f}: {len(ts)}", ts)
+````
+
+### `probe_pop.py`
+
+Stage 0's populations measured on the real tree before the arms: route edges outside the source owner's ancestry, kinds with no writer item or reader, keys read by no clause or item, principles cited by id.
+
+````python
+"""Probe the populations of the Stage 0 arms K2 to K5 on the real tree, before any arm is written."""
+import collections
+import importlib.util
+import re
+
+B = "memory/builds/dClosedLoop/build/"
+spec = importlib.util.spec_from_file_location("projectmap", B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py")
+mp = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mp)
+A, ns = mp.derive()
+print("namespaces:", sorted(ns))
+
+
+def owner_of(n):
+    own = [v for k, vs in n["rels"] if k == "owner" for v in vs]
+    return own
+
+
+v2 = open(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", encoding="utf-8").read()
+chain = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+rows, parents = {}, {}
+names = re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M)
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        rows[m.group(1)] = m.group(4)
+        parents[m.group(1)] = [p.strip() for p in m.group(3).split(",") if p.strip() in names]
+
+
+def ancestors(b, acc=None):
+    acc = set() if acc is None else acc
+    for p in parents.get(b, []):
+        if p not in acc:
+            acc.add(p)
+            ancestors(p, acc)
+    return acc
+
+
+def within(o, b):
+    return o == b or o in ancestors(b)
+
+
+def cells(ln):
+    return [c.strip() for c in re.split(r"(?<!\\)\|", ln.strip().strip("|"))]
+
+
+fs = open(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md", encoding="utf-8").read()
+items, first = {}, {}
+for m in re.finditer(r"^## \[([a-z-]+)\][^\n]*\n(.*?)(?=^## |\Z)", fs, flags=re.M | re.S):
+    for ln in m.group(2).split("\n"):
+        if ln.startswith("| `"):
+            c = cells(ln)
+            if len(c) == 7:
+                for t in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", c[0]):
+                    items[t] = dict(step=m.group(1), needs=c[2], proven=c[4], then=c[5], owner=c[6], does=c[3])
+                    first.setdefault(m.group(1), t)
+STEP_ENTRY = {"Plan": first["plan"], "Design": first["design"], "Build": first["build"], "Test": first["test"],
+              "Deploy": first["deploy"]}
+print("step entries:", STEP_ENTRY)
+# K2a: every route edge within the source owner's ancestry.
+edges, cross = [], []
+for t, v in items.items():
+    tgts = {x for x in re.findall(r"`([^`]+)`", v["then"]) if x in items}
+    tgts |= {STEP_ENTRY[w] for w in re.findall(r"\b(Plan|Design|Build|Test|Deploy)\b", v["then"])}
+    for x in sorted(tgts):
+        edges.append((t, x))
+        if not within(items[x]["owner"], v["owner"]):
+            cross.append((t, v["owner"], x, items[x]["owner"]))
+print(f"\nK2a route edges {len(edges)}, outside the source owner's ancestry {len(cross)}")
+for c in cross:
+    print("  ", c)
+# K3: record kinds, writers and readers.
+lm = open(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md", encoding="utf-8").read()
+krows = {}
+for ln in lm.split("\n"):
+    c = cells(ln) if ln.startswith("| ") else []
+    if len(c) == 3 and c[0] not in ("Kind", "---") and not c[0].startswith("-") and c[1].startswith("d"):
+        krows[c[0]] = c
+kinds = {n["key"]: owner_of(n) for n in ns["record-kind"]}
+print(f"\nK3 kinds in the map {len(kinds)}, rows in layer-memory's table {len(krows)}")
+missing_rows = [k for k in kinds if k.replace("-", " ") not in krows and k not in krows]
+print("  map kinds with no table row:", missing_rows)
+nowriter = []
+for k, c in krows.items():
+    w = [x for x in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", c[2]) if x in items]
+    if not w:
+        nowriter.append((k, c[2][:110]))
+print(f"  kinds whose row names no writer item: {len(nowriter)}")
+for k, why in nowriter:
+    print("    ", k, "|", why)
+# Readers: an item whose Needs names a writer of the kind, or whose cells (not Then) name the kind.
+writer_of = {k: [x for x in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", c[2]) if x in items] for k, c in krows.items()}
+noreader = []
+for k, ws in writer_of.items():
+    readers = {t for t, v in items.items() if any(f"`{w}`" in v["needs"] for w in ws)}
+    pat = re.compile(r"(?<![\w-])" + re.escape(k) + r"(?:s)? record", re.I)
+    readers |= {t for t, v in items.items() if pat.search(v["needs"] + " " + v["does"])}
+    if not readers:
+        noreader.append(k)
+print(f"  kinds with no reader item by Needs or a 'the <kind> record' mention: {len(noreader)}: {noreader}")
+# K4: catalogue keys read by no chain clause and no item.
+keys = {n["key"]: owner_of(n) for n in ns["policy-key"]}
+text_rows = "\n".join(rows.values())
+text_items = "\n".join(" ".join(v.values()) for v in items.values())
+toks = set(re.findall(r"`([a-z][a-z0-9.<>*-]*)(?::[^`]*)?`", text_rows + "\n" + text_items))
+wild = {t[:-2] for t in toks if t.endswith(".*")}
+unread = []
+for k in keys:
+    templ = re.escape(k).replace(r"<stage>", "[a-z]+").replace(r"<role>", "[a-z-]+")
+    hit = k in toks or any(k.startswith(w + ".") for w in wild) or any(re.fullmatch(templ, t) for t in toks if "<" not in k and False)
+    if not hit and "<" in k:
+        pat = re.compile(re.escape(k).replace(re.escape("<stage>"), "[a-z]+").replace(re.escape("<role>"), "[a-z-]+"))
+        hit = any(pat.fullmatch(t) for t in toks) or k in toks
+    if not hit:
+        unread.append(k)
+print(f"\nK4 keys {len(keys)}, read by no chain clause and no item: {len(unread)}")
+print("  ", unread)
+# K5: principles and the chain's citations of them by id.
+prin = re.findall(r"^- \*\*(P\d+) ", v2.split("\n## [principles]", 1)[1].split("\n## ", 1)[0], flags=re.M)
+cited = collections.Counter(re.findall(r"\b(P\d+)\b", chain))
+print(f"\nK5 principles {len(prin)}, cited by id in [chain]: {sum(1 for p in prin if cited[p])}")
+print("   never cited:", [p for p in prin if not cited[p]])
+````
+
+### `probe_branches.py`
+
+Every Then branch naming no item and no step, read to choose K2's declared target forms.
+
+````python
+"""Probe: every Then branch, split on '; ', that names no item and no step, to find the terminal vocabulary."""
+import importlib.util
+import re
+
+B = "memory/builds/dClosedLoop/build/"
+spec = importlib.util.spec_from_file_location("atlas", B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py")
+atlas = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(atlas)
+A = atlas.derive()
+print("STEPS", atlas.STEPS, "terminal", A["terminal"])
+tags = {it["tag"] for s in A["steps"] for it in s["items"]}
+n = 0
+for s in A["steps"]:
+    for it in s["items"]:
+        for br in re.split(r";\s+", it["then"]):
+            if any(f"`{t}`" in br for t in tags) or re.search(r"\b(Plan|Design|Build|Test|Deploy)\b", br):
+                continue
+            n += 1
+            print(f"{it['tag']:<22} | {br[:170]}")
+print("branches with no item and no step:", n)
+````
+
+### `promote.py`
+
+Promotes the seven final checks that lived only in the scratchpad or a record into the build folder, each with the Serves line and one note, line coverage reading the shape audits' `Subjects (round N):` line.
+
+````python
+"""Promote the final checks that live only in the session's scratchpad into the build folder, so the whole-design audit's
+Stage 0 runs every one of them in any tree, its seeded copy included: each gains the build's Serves line and one note in
+its docstring, and is otherwise byte for byte its scratch original. The line-coverage instrument comes from the state
+record's `[revisit-instrument]`, with the shape audits' `Subjects (round N):` line read as a blob set (research-final-
+audit [1b] found the instrument stopping on it).
+
+Usage: python -X utf8 promote.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+S = pathlib.Path(__file__).resolve().parent.parent
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+SERVES = "# **Serves:** research PLAY-dClosedLoop-1\n"
+NOTE = ("Promoted from the session's scratchpad (`{src}`) for the whole-design audit's Stage 0, which runs it in any tree;\n"
+        "byte for byte its scratch original but for this note and the Serves line.\n")
+PROMOTE = [("night/fold_state.py", "fold-state"), ("walk/paren_semis.py", "clause-scan"),
+           ("join_canonical.py", "gap-join"), ("preset_check_canonical.py", "preset-check"),
+           ("order/critical_path.py", "critical-path"), ("cloud/review_debt.py", "review-debt")]
+
+
+def place(body, src, name):
+    if not body.startswith('"""'):
+        sys.exit(f"{src}: no docstring to carry the note")
+    end = body.index('"""', 3)
+    doc = body[3:end]
+    sep = "" if doc.endswith("\n") else "\n"
+    body = '"""' + doc + sep + "\n" + NOTE.format(src=src) + body[end:]
+    out = B / f"2026-10-19-build-PLAY-dClosedLoop-1-{name}.py"
+    out.write_text(SERVES + body, encoding="utf-8", newline="\n")
+    print(f"wrote {out}: {out.stat().st_size} bytes")
+
+
+for src, name in PROMOTE:
+    place((S / src).read_text(encoding="utf-8"), src, name)
+state = (B / "2026-10-16-build-PLAY-dClosedLoop-1-state.md").read_text(encoding="utf-8")
+inst = state.split("### [revisit-instrument]", 1)[1]
+cov = re.search(r"```python\n(.*?)```", inst, flags=re.S).group(1)
+OLD = 'm = re.search(r"^(?:Reviewed|Range|Range reviewed): (.+)$", p.read_text(encoding="utf-8"), re.M)'
+NEW = 'm = re.search(r"^(?:Reviewed|Range|Range reviewed|Subjects \\(round \\d+\\)): (.+)$", p.read_text(encoding="utf-8"), re.M)'
+if cov.count(OLD) != 1:
+    sys.exit("the coverage instrument's subject line is not the one the fix replaces")
+cov = cov.replace(OLD, NEW)
+cov = cov.replace('Each report\'s "Reviewed:" or "Range:" line', 'Each report\'s "Reviewed:", "Range:" or "Subjects (round N):" line')
+place(cov, "the state record's [revisit-instrument], coverage_v2.py", "line-coverage")
+````
+
+### `run_plants.py`
+
+Runs every Stage 0 plant and checks each reds its arm for its own reason: the planted line present, and absent from the unplanted run.
+
+````python
+"""Run every Stage 0 plant and check that each turns its arm red for its own reason: the planted node appears among the
+arm's findings, which the unplanted run lacks.
+
+Usage: python -X utf8 run_plants.py [<case> ...]   (from the worktree root); writes each run to plants/<case>.out
+"""
+import pathlib
+import subprocess
+import sys
+
+S0 = pathlib.Path(__file__).resolve().parent
+OUT = S0 / "plants"
+OUT.mkdir(exist_ok=True)
+STAGE0 = "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py"
+# case: (arms to run, the line the plant must add)
+WANT = {
+    "k1-witness": ("K1", "K1 plan.dedupe: no witness"),
+    "k1-ghost-need": ("K1", "K1 plan.record: needs `plan.ghost`, which is no item"),
+    "k1-cycle": ("K1", "a cycle among Needs: plan.input > plan.dedupe > plan.input"),
+    "k1-dash": ("K1", "K1 plan.dedupe: a dash for Needs, on an item that is not its step's first"),
+    "k1-owner": ("K1", "K1 plan.dedupe: owner 'dNoSuchBuild' is no chain build"),
+    "k1-actor": ("K1", "K1 plan.dedupe: actor 'wizard' is no kind and no declared role"),
+    "k2-ghost": ("K2", "K2 plan.dedupe: routes to `plan.ghost`, which is no item and no key"),
+    "k2-unformed": ("K2", "K2 plan.dedupe: a target in no declared form: \"somewhere unnamed\""),
+    "k2-dead-end": ("K2", "K2 plan.loop-a: ends nowhere"),
+    "k2-unreached": ("K2", "K2 plan.island: reached from no entry"),
+    "k2-deploy-land": ("K2", "K2 dRankedPlan→deploy.land: order: routes `deploy.land`, dShippedRelease's, not an ancestor, UNCLASSED"),
+    "k3-writer": ("K3", "K3 plan: no writer item"),
+    "k3-reader": ("K3", "K3 planted-kind: no reader"),
+    "k4-unread": ("K4", "K4 plan.planted-knob: read by no chain clause and no item (guard-bearing)"),
+    "k5-row": ("K5", "no row in [enforcement]"),
+    "k5-ghost": ("K5", "names `cl-dClosedLoop-9999`, which no clause carries"),
+    "k5-retired": ("K5", "a retired id"),
+    "k5-cited": ("K5", "by id, and"),
+    "class-stale": ("K4", "classes plan.no-such-key: a K4 class row that no finding needs (planned)"),
+}
+
+
+def run(arms, plant=None):
+    args = [sys.executable, "-X", "utf8", STAGE0, "--arms", arms] + (["--plant", plant] if plant else [])
+    r = subprocess.run(args, capture_output=True, text=True, encoding="utf-8")
+    return r.stdout + r.stderr, r.returncode
+
+
+cases = sys.argv[1:] or list(WANT)
+base = {}
+failed = []
+for case in cases:
+    arms, want = WANT[case]
+    if arms not in base:
+        base[arms] = run(arms)[0]
+    out, rc = run(arms, case)
+    (OUT / f"{case}.out").write_text(out, encoding="utf-8", newline="\n")
+    ok = rc == 1 and want in out and want not in base[arms]
+    print(f"{case:<16} rc {rc}  {'RED for its reason' if ok else 'FAILED: ' + want}")
+    if not ok:
+        failed.append(case)
+print(f"plants {len(cases)}, red for their reason {len(cases) - len(failed)}" + (f", failed {failed}" if failed else ""))
+sys.exit(1 if failed else 0)
+````
+
+### `enforce_candidates.py`
+
+For each principle, the clauses citing it by id and the clauses sharing its rarest words, ranked: the candidates [enforcement]'s rows were chosen from.
+
+````python
+"""For each principle: its text, the clauses that cite it by id, and the clauses that share its rarest words, ranked, as
+candidates for v2's [enforcement]. Reads v2; writes nothing.
+
+Usage: python -X utf8 enforce_candidates.py [P<n> ...] [--top N]   (from the worktree root)
+"""
+import collections
+import math
+import re
+import sys
+
+V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+v2 = open(V2, encoding="utf-8").read()
+TOP = int(sys.argv[sys.argv.index("--top") + 1]) if "--top" in sys.argv else 6
+want = [a for a in sys.argv[1:] if re.fullmatch(r"P\d+", a)]
+prin_sec = v2.split("\n## [principles]", 1)[1].split("\n## ", 1)[0]
+prin, cur = {}, None
+for ln in prin_sec.split("\n"):
+    m = re.match(r"^- \*\*(P\d+) (.+?)\*\*\s*(.*)$", ln)
+    if m:
+        cur = m.group(1)
+        prin[cur] = m.group(2) + " " + m.group(3)
+    elif cur and ln.startswith("  "):
+        prin[cur] += " " + ln.strip()
+    elif cur and ln.strip() == "":
+        pass
+    else:
+        cur = None
+chain = v2.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+clauses = []
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| [^|]+ \| (.+) \| [^|]+ \|$", ln)
+    if m:
+        for cl in m.group(2).split("; "):
+            i = re.search(r"`(cl-dClosedLoop-\d{4})`\s*$", cl)
+            if i:
+                clauses.append((i.group(1), m.group(1), cl))
+STOP = set("""a an the and or of to in on for by with as at from is are be it its this that these those every each any
+no not never one two own its their them they who what which when where how than then into onto over under per only
+also all both either neither more most less least so such same other another itself whose while until unless before after
+s their there here we you i he she his her our your my me us do does did done has have had was were been being can could
+will would shall should may might must used use uses using via""".split())
+
+
+def words(s):
+    s = re.sub(r"`[^`]*`", lambda m: " " + m.group(0).strip("`").replace(".", " ").replace("-", " ") + " ", s)
+    return [w for w in re.findall(r"[a-z][a-z-]{2,}", s.lower()) if w not in STOP]
+
+
+df = collections.Counter()
+cw = []
+for cid, b, cl in clauses:
+    ws = set(words(cl))
+    cw.append(ws)
+    df.update(ws)
+N = len(clauses)
+idf = {w: math.log(N / (1 + n)) for w, n in df.items()}
+for p, text in prin.items():
+    if want and p not in want:
+        continue
+    cited = [(cid, b) for cid, b, cl in clauses if re.search(r"\b" + p + r"\b", cl)]
+    pw = set(words(text))
+    scored = []
+    for (cid, b, cl), ws in zip(clauses, cw):
+        shared = pw & ws
+        score = sum(idf.get(w, 0) for w in shared)
+        scored.append((score, cid, b, cl, sorted(shared, key=lambda w: -idf.get(w, 0))[:6]))
+    scored.sort(reverse=True)
+    print(f"=== {p}: {text[:600]}")
+    print(f"  cited by id: {', '.join(f'{c} ({b})' for c, b in cited) or 'none'}")
+    for score, cid, b, cl, sh in scored[:TOP]:
+        print(f"  {score:5.1f} {cid} {b}: {cl[:230]}  [{', '.join(sh)}]")
+````
+
+### `fold_stage0.py`
+
+Stage 0's records: v2's [enforcement] and its revision note, the atlas's view for it, the round record, the final-questions record's [sequence] and [folded], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there.
+
+````python
+"""Stage 0's records: v2's [enforcement] and its revision note, the atlas's view for it, the whole-design audit's round
+record, the final-questions record's [sequence] and [folded], and the session log's event.
+
+[enforcement]'s rows are the author's picks, each unioned with every clause that cites the principle by id, so the
+row holds them both ways (Stage 0's K5).
+
+Usage: python -X utf8 fold_stage0.py   (from the worktree root, or a full copy of it)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+AUDIT = B + "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"
+PICKS = {
+    1: "0086 0089 0097", 2: "0090 0102", 3: "0342 0344", 4: "0053 0155 0207 0304", 5: "0120 0143 0145",
+    6: "0442 0444 0449", 7: "0104 0105 0107 0460", 8: "0062 0064 0428", 9: "0015 0367 0459 0461", 10: "0007 0008 0012",
+    11: "0039 0042 0096 0476", 12: "0389 0391 0394", 13: "0033 0039 0040 0043", 14: "0031 0051", 15: "0032 0036 0280",
+    16: "0037 0091 0349", 17: "0390", 18: "0176 0390", 19: "0400", 20: "0097 0098", 21: "0145 0421 0422",
+    22: "0092 0121 0123", 23: "0093", 24: "0094 0097 0099", 25: "0167 0175 0303", 26: "0169 0170 0182 0286",
+    27: "0041 0057", 28: "0046 0047", 29: "0178", 30: "0212 0213 0229", 31: "0125 0408", 32: "0126 0208 0219",
+    33: "0054 0055", 34: "", 35: "", 36: "0292", 37: "0028", 38: "0019 0022", 39: "", 40: "", 41: "0003 0005",
+    42: "0489",
+}
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+chain = V.text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+prin = [int(n) for n in re.findall(r"^- \*\*P(\d+) ", V.text.split("\n## [principles]", 1)[1].split("\n## ", 1)[0],
+                                   flags=re.M)]
+if sorted(prin) != sorted(PICKS):
+    sys.exit(f"the principles are {sorted(prin)}, and the picks name {sorted(PICKS)}")
+cites = {n: set() for n in prin}
+minted = set()
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| [^|]+ \| (.+) \| [^|]+ \|$", ln)
+    if not m:
+        continue
+    for cl in m.group(2).split("; "):
+        i = re.search(r"`cl-dClosedLoop-(\d{4})`\s*$", cl).group(1)
+        minted.add(i)
+        for p in set(re.findall(r"\bP(\d+)\b", cl)):
+            if int(p) in cites:
+                cites[int(p)].add(i)
+rows = []
+for n in sorted(PICKS):
+    ids = sorted(set(PICKS[n].split()) | cites[n])
+    ghost = [i for i in ids if i not in minted]
+    if ghost or not ids:
+        sys.exit(f"P{n}: {'no clause' if not ids else 'ids no clause carries: ' + ' '.join(ghost)}")
+    rows.append(f"| `P{n}` | " + ", ".join(f"`cl-dClosedLoop-{i}`" for i in ids) + " |")
+V.insert_before("Revised: 2026-10-17, after the folds' closing review", """Revised: 2026-10-19, the whole-design audit's Stage 0 (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`
+`[stage0]`): `[enforcement]` names, for every principle, the clauses that enforce it, every clause citing a principle
+by id among them, so that Stage 0 reds a principle no clause enforces (research-final-audit's K5) before the walk
+judges whether each named clause does.
+
+""", "revision note")
+V.insert_before("\n## [planned] ", """
+## [enforcement] What enforces each principle
+
+Each principle names, by id, the clauses of `[chain]` that enforce it, and a clause that cites a principle by id sits
+in that principle's row. `build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` (K5) reds a principle with no row, a
+row naming no clause, an id no clause carries or a retired one, and a citing clause outside its principle's row.
+Whether a named clause does enforce its principle is the whole-design audit's walk to judge. In the product, the
+principle registry and its meta-check carry these rows (dOrderedCharter, P16).
+
+| Principle | Enforced by |
+|---|---|
+""" + "\n".join(rows) + "\n", "[enforcement]")
+V.save()
+
+A = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py")
+A.sub('"clause-ids": "records", ', '"clause-ids": "records", "enforcement": "records", ', "V2_VIEWS")
+A.save()
+
+Q = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md")
+Q.sub("2. The fold: v2's principles, keys, clauses and chain row for the answers; the gaps in [gaps]; the 484 clause ids.\n"
+      "3. The audit's instruments, each seen red: Stage 0, the walk briefs, the rubric, the seeding and its scorer.\n",
+      "2. The fold: v2's principles, keys, clauses and chain row for the answers; the gaps in [gaps]; the clause ids, 496\n"
+      "   once the fold's own clauses were counted.\n"
+      "3. The audit's instruments, each seen red: Stage 0, the walk briefs, the rubric, the seeding and its scorer; and\n"
+      "   [bootstrap]'s three, the carries join with its coverage report, the deviation population and the as-built\n"
+      "   renderer, which no step had scheduled (the whole-design audit's `[plan]`).\n", "[sequence]")
+Q.sub("- **Not yet folded:** the audit's instruments, the audit, and the baseline after it.\n",
+      "- **Not yet folded:** the audit's instruments, the audit, and the baseline after it, which\n"
+      "  `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` runs.\n", "[folded]")
+Q.save()
+
+pathlib.Path(AUDIT).write_text("""# The whole-design audit: the design walked step by step before any chain spec
+
+**Serves:** research PLAY-dClosedLoop-1
+
+The owner chose, at FQ-1, a whole-design audit before any chain spec: mechanical checks, a paired walk sliced two
+ways and graded on past defects planted back into a sealed copy, then the paired closing review
+(`build/2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md` `[audit]`, which designs it). This record runs it: the
+owner's words, the order of work, each instrument as built and seen red, and, as the audit runs, its findings, its
+fold and its witness.
+
+## [words] The owner's words, 2026-10-19
+
+> Session compacted. What're the next steps to conduct a whole-design audit as suggested + proceed with questions 2
+> and 3?
+
+The answer set out five steps, `[plan]`'s, and the owner replied:
+
+> go
+
+## [plan] The order of work
+
+The final-questions record's `[sequence]` put the audit's instruments in its step 3, and its `[bootstrap]` puts three
+more in this build: the carries join, the deviation population and the as-built renderer, which questions 2 and 3
+rest on and which no step had scheduled. They are built beside the audit's, so the walk reads them and the closing
+pair reviews them, and `[sequence]` now says so.
+
+1. **The tooling, with no agents.** Stage 0's checks (`[stage0]`); the walk's briefs, its table and the critical
+   rubric; the sealed seeding and a scorer that reads `[tag]` addresses; the carries join with its coverage report,
+   the deviation population and the as-built renderer; and wall-time capture. Each is seen red before it is trusted.
+2. **The owner's word on v2's four open readings,** SA-1, SA-5, CL-3 and `wait` (v2 `[open]`), so the walk reads
+   one design.
+3. **The audit,** as final-questions `[audit]` designs it: Stage 0, the paired walk over the seeded copy, the recall
+   scored, the owner's forks, the fold, the paired closing review from `6ba4eaaa1`, which also covers the review
+   debt, and Stage 0 again.
+4. **The baseline,** on the owner's word that the design is whole: v2 frozen at that commit, and every later change a
+   deviation record.
+5. **The chain opened,** dTrueNorth first, each Design exit read through its coverage report.
+
+"No critical gap left" is claimed only when Stage 0 is green with every check seen red, both walk tables are
+complete, the recall bar is met, no critical finding is open, and the closing pair finds no new critical one.
+
+## [stage0] Stage 0: the mechanical checks
+
+`build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` runs five new arms, one per class research-final-audit `[2]`
+says a table can check, and re-runs the design's existing checks in the same tree.
+
+| Arm | Reads | Red on | Left to the walk |
+|---|---|---|---|
+| K1 items | the 90 flow items and the 26 expansion items | an actor of no declared kind or role, or a core item naming an expansion role; a missing Needs cell, or a dash there off its step's first item; a need naming no item; a cycle among needs; no witness; no Then or Routes cell; an owner that is no chain build | whether a witness is actor-typed (P2), and whether an outcome is the right one |
+| K2 routes | every Then and Routes cell, branch by branch | a route to an item-shaped tag that is neither an item nor a key; a target in no declared form; an item that ends nowhere; an item no entry reaches; and, through the reconciliation probe's `--all-routes`, a route target that neither its source's owner nor an ancestor builds | whether a terminal, return, wait, owner, ask, policy or program target does end; a policy's routes per value; the `[transitions]` join `gap-flow-15` owes |
+| K3 kinds | the map's record kinds against layer-memory's kind table | a kind with no row; a row naming no writer item; a kind no item waits on or names, and no other build's clause names | a reader or writer that is a gate, a renderer or a hook |
+| K4 keys | the catalogue's keys against every chain clause and item | a key read by none, marked guard-bearing where one of its values loosens | whether an unread key bears a guard beyond its values' words |
+| K5 principles | v2's `[enforcement]` against `[chain]`'s minted ids | a principle with no row, or a row naming no clause; an id no clause carries, or a retired one; a clause citing a principle by id outside that principle's row | whether a named clause enforces its principle |
+
+The re-runs are the design map, the atlas, fold state, the reconciliation probe, the clause scan, the clause ids, the
+gap join, the preset check, the critical path, line coverage and the review debt. Seven of them lived only in the
+session's scratchpad or inside a record: each is promoted beside the map, byte for byte but for its Serves line and
+one note, so Stage 0 runs in any tree, the walk's seeded copy among them. Line coverage now reads the shape audits'
+`Subjects (round N):` line, where it had stopped (research-final-audit `[1b]`).
+
+A finding stands unless a row of `[stage0-classes]` names its arm, its node and a class from that arm's closed set,
+and a row no finding needs is itself a finding. The audit's fold fixes each red or classes it there; the walk takes
+the reds and each arm's "left out" lines as its leads.
+
+**Seen red.** Each arm's plants, on an in-memory copy, turn it red for their own reason, and the run is in the night
+pass's instruments record, `[stage0]`. The reconciliation probe's default run passes a plan item planted with a route
+to `deploy.land`, and its `--all-routes` run reds it.
+
+**K5's leads.** Two principles have rows that name clauses carrying only part of them: no clause builds P3's
+remote-CI verdict slot, and none names P18's ranking of a fork's options, the most feature-rich and then the most
+expandable.
+
+## [stage0-classes] Stage 0's classes
+
+Empty until the audit's fold classes what it does not fix.
+
+| Arm | Node | Class | Reason |
+|---|---|---|---|
+""", encoding="utf-8", newline="\n")
+print(f"wrote {AUDIT}")
+
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: the whole-design audit opened at the owner's "go"
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`). Stage 0's checks are built and each seen red on its
+  plants: `build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py`, five arms over items, routes, record kinds, keys and
+  principles; the reconciliation probe's `--all-routes`; and seven checks promoted beside the map from the scratchpad
+  and the state record. v2 gains `[enforcement]`, the clauses that enforce each principle. The final-questions
+  record's `[sequence]` gains the three instruments questions 2 and 3 rest on, which no step had scheduled.
+""", "the round's event")
+L.save()
+````
+
+### `note_first_run.py`
+
+The round record's note of Stage 0's first run, its counts read from the captured run, corrected by one inline edit (`[inline]` 18).
+
+````python
+"""The round record's [stage0] gains Stage 0's first run on the folded tree, its counts read from the captured run.
+
+Usage: python -X utf8 note_first_run.py <stage0 output>   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+out = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+n = {a: int(re.search(rf"^{a}: .* · findings (\d+)", out, flags=re.M).group(1)) for a in ("K1", "K2", "K3", "K4", "K5")}
+total = int(re.search(r"^stage0: .* · findings (\d+) ", out, flags=re.M).group(1))
+red = int(re.search(r"reruns red (\d+)", out).group(1))
+if red or total != sum(n.values()) or n["K5"]:
+    sys.exit(f"the run is not the one this note describes: {n}, total {total}, red re-runs {red}")
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.insert_before("**K5's leads.**", f"""**The first run,** on the folded tree before its commit: {total} findings, K1 {n['K1']}, K2 {n['K2']}, K3 {n['K3']},
+K4 {n['K4']} and K5 none, every re-run green. They are the audit's first leads, listed whole in the instruments
+record's `[stage0]`:
+- K1: three expansion items whose actor cell opens "the owner", where the kind is `owner`; and `design.streams`,
+  whose Needs cell names the policy key that shares its spelling, read as needing itself;
+- K2: prose targets the forms do not read, most in the expansions' Routes cells; the release and distribution
+  programs ending only through them; the Build step's second half, Maintain's and the Loop Review's closing items
+  and four distribution programs reached from no entry, since a prose need names no item; and 21 routes into a
+  build that comes later in the chain;
+- K3: 36 kinds whose row names no writer item, and 43 no item waits on or names;
+- K4: keys that no clause and no item reads, 23 of them guard-bearing.
+
+""", "first run")
+R.save()
+````
+
+### `patch_recorder.py`
+
+This record's writer patched for Stage 0: the round's scripts, [final] from the promoted copies, and [stage0].
+
+````python
+"""The instruments recorder for Stage 0: this round's scripts registered, [final] run from the promoted copies in the
+build folder, and a [stage0] section re-running every plant and the first run on the real tree.
+
+Usage: python -X utf8 patch_recorder.py   (anywhere)
+"""
+import pathlib
+import sys
+
+S = pathlib.Path(__file__).resolve().parent.parent
+R = S / "night/record_instruments.py"
+t = R.read_text(encoding="utf-8")
+
+
+def sub(old, new, label):
+    global t
+    if t.count(old) != 1:
+        sys.exit(f"{label}: the anchor matches {t.count(old)} times")
+    t = t.replace(old, new, 1)
+
+
+sub("""    ("preset_check_canonical.py", "The preset check [final] runs""",
+    """    ('stage0/probe_then.py', "Stage 0's first probe: every flow item's cells, and the Then cells naming no item, before any arm was written."),
+    ('stage0/probe_pop.py', "Stage 0's populations measured on the real tree before the arms: route edges outside the source owner's ancestry, kinds with no writer item or reader, keys read by no clause or item, principles cited by id."),
+    ('stage0/probe_branches.py', "Every Then branch naming no item and no step, read to choose K2's declared target forms."),
+    ('stage0/promote.py', "Promotes the seven final checks that lived only in the scratchpad or a record into the build folder, each with the Serves line and one note, line coverage reading the shape audits' `Subjects (round N):` line."),
+    ('stage0/run_plants.py', "Runs every Stage 0 plant and checks each reds its arm for its own reason: the planted line present, and absent from the unplanted run."),
+    ('stage0/enforce_candidates.py', "For each principle, the clauses citing it by id and the clauses sharing its rarest words, ranked: the candidates [enforcement]'s rows were chosen from."),
+    ('stage0/fold_stage0.py', "Stage 0's records: v2's [enforcement] and its revision note, the atlas's view for it, the round record, the final-questions record's [sequence] and [folded], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there."),
+    ('stage0/note_first_run.py', "The round record's note of Stage 0's first run, its counts read from the captured run, corrected by one inline edit (`[inline]` 18)."),
+    ('stage0/patch_recorder.py', "This record's writer patched for Stage 0: the round's scripts, [final] from the promoted copies, and [stage0]."),
+    ("preset_check_canonical.py", "The preset check [final] runs""", "MINE")
+sub('out, rc = run(str(S / "preset_check_canonical.py"), str(PLANT))',
+    'out, rc = run(B + "2026-10-19-build-PLAY-dClosedLoop-1-preset-check.py", str(PLANT))', "pair-rule plant")
+sub('''FINAL = (("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check"]),
+         ("atlas", [B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check"]),
+         ("fold state", [str(S / "night/fold_state.py")]),''',
+    '''FINAL = (("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check"]),
+         ("atlas", [B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check"]),
+         ("fold state", [B + "2026-10-19-build-PLAY-dClosedLoop-1-fold-state.py"]),''', "FINAL head")
+sub('''         ("clause scan", [str(S / "walk/paren_semis.py")]),''',
+    '''         ("clause scan", [B + "2026-10-19-build-PLAY-dClosedLoop-1-clause-scan.py"]),''', "FINAL clause scan")
+sub('''         ("gap join", [str(S / "join_canonical.py"), B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",''',
+    '''         ("gap join", [B + "2026-10-19-build-PLAY-dClosedLoop-1-gap-join.py", B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",''',
+    "FINAL gap join")
+sub('''         ("preset check", [str(S / "preset_check_canonical.py"),''',
+    '''         ("preset check", [B + "2026-10-19-build-PLAY-dClosedLoop-1-preset-check.py",''', "FINAL preset check")
+sub('''         ("critical path", [str(S / "order/critical_path.py")]))''',
+    '''         ("critical path", [B + "2026-10-19-build-PLAY-dClosedLoop-1-critical-path.py"]))''', "FINAL critical path")
+sub('''parts.append("""
+## [plants] The map's and the atlas's plants, re-run
+''', '''# The whole-design audit's Stage 0: every plant re-run, each red for its own reason, and the run on the real tree.
+STAGE0 = B + "2026-10-19-build-PLAY-dClosedLoop-1-stage0.py"
+s0_plants, s0_out = run(str(S / "stage0/run_plants.py"))
+if s0_out != 0:
+    sys.exit("a Stage 0 plant did not red for its own reason:\\n" + s0_plants[-600:])
+s0_lines = []
+for case_line in s0_plants.strip().split("\\n")[:-1]:
+    case = case_line.split()[0]
+    planted = read(S / f"stage0/plants/{case}.out").split("\\n")
+    s0_lines.append(f"$ python stage0.py --plant {case}\\n" + "\\n".join(ln for ln in planted if ln.startswith("stage0:")))
+real, real_rc = run(STAGE0)
+if real_rc != 1:
+    sys.exit(f"Stage 0 on the real tree returned {real_rc}, where its first run found leads")
+reconcile_plant = run(B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py", B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md",
+                      "--plant-item", "plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`")
+parts.append("""
+## [stage0] The whole-design audit's Stage 0: each plant, and the first run
+
+`2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` runs five arms and re-runs the design's checks
+(`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[stage0]`). Every plant damages one input in memory, and each
+reds its arm for its own reason: the planted line appears, and the unplanted run lacks it.
+
+""" + block("text", "$ python run_plants.py\\n" + s0_plants.strip() + "\\n\\n" + "\\n".join(s0_lines)) + """
+The reconciliation probe's default run on a plan item planted with a route to `deploy.land`, which its `--all-routes`
+run reds (the plant `k2-deploy-land` above):
+
+""" + block("text", "$ python reconcile.py recut.md --plant-item 'plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`'\\n"
+            + "\\n".join(reconcile_plant[0].strip().split("\\n")[-1:]) + f"\\nrc {reconcile_plant[1]}") + """
+The first run on the real tree, the audit's first leads, whole:
+
+""" + block("text", "$ python stage0.py\\n" + real.strip() + f"\\nrc {real_rc}"))
+parts.append("""
+## [plants] The map's and the atlas's plants, re-run
+''', "[stage0] section")
+R.write_text(t, encoding="utf-8", newline="\n")
+print(f"patched {R}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -23778,6 +24499,15 @@ MINE = [
     ('final/clause_ids.py', "The draft of the clause-id instrument the build folder now holds as `2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py`: it minted 496 ids in [chain] order and checks one id per clause, none minted twice, none retired and none past the recorded next number, red before the minting and on four plants."),
     ('final/place_clause_ids.py', "Places the clause-id draft in the build folder with its Serves line, byte for byte otherwise."),
     ('final/mint_record.py', "The round record's [folded] and the session log's event for the minted clause ids."),
+    ('stage0/probe_then.py', "Stage 0's first probe: every flow item's cells, and the Then cells naming no item, before any arm was written."),
+    ('stage0/probe_pop.py', "Stage 0's populations measured on the real tree before the arms: route edges outside the source owner's ancestry, kinds with no writer item or reader, keys read by no clause or item, principles cited by id."),
+    ('stage0/probe_branches.py', "Every Then branch naming no item and no step, read to choose K2's declared target forms."),
+    ('stage0/promote.py', "Promotes the seven final checks that lived only in the scratchpad or a record into the build folder, each with the Serves line and one note, line coverage reading the shape audits' `Subjects (round N):` line."),
+    ('stage0/run_plants.py', "Runs every Stage 0 plant and checks each reds its arm for its own reason: the planted line present, and absent from the unplanted run."),
+    ('stage0/enforce_candidates.py', "For each principle, the clauses citing it by id and the clauses sharing its rarest words, ranked: the candidates [enforcement]'s rows were chosen from."),
+    ('stage0/fold_stage0.py', "Stage 0's records: v2's [enforcement] and its revision note, the atlas's view for it, the round record, the final-questions record's [sequence] and [folded], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there."),
+    ('stage0/note_first_run.py', "The round record's note of Stage 0's first run, its counts read from the captured run, corrected by one inline edit (`[inline]` 18)."),
+    ('stage0/patch_recorder.py', "This record's writer patched for Stage 0: the round's scripts, [final] from the promoted copies, and [stage0]."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -23950,7 +24680,7 @@ if V2.count(ROW) != 1:
 PLANT = S / "debt/plant/v2-round-count-over.md"
 PLANT.parent.mkdir(parents=True, exist_ok=True)
 PLANT.write_text(V2.replace(ROW, "| `review.design.round-count` | 3 | 2 | 2 | 2 |"), encoding="utf-8", newline="\n")
-out, rc = run(str(S / "preset_check_canonical.py"), str(PLANT))
+out, rc = run(B + "2026-10-19-build-PLAY-dClosedLoop-1-preset-check.py", str(PLANT))
 if rc != 1 or "pair rule: velocity sets review.max-rounds 2 under review.design.round-count 3" not in out:
     sys.exit("the round-count pair rule did not red on its plant")
 parts.append("""
@@ -23979,22 +24709,53 @@ in `[final]`.
 
 """ + block("text", "$ python clause-ids.py\n" + "\n".join(before[:4] + before[-1:])) + "\n"
     + block("text", "\n".join(cid_runs)))
+# The whole-design audit's Stage 0: every plant re-run, each red for its own reason, and the run on the real tree.
+STAGE0 = B + "2026-10-19-build-PLAY-dClosedLoop-1-stage0.py"
+s0_plants, s0_out = run(str(S / "stage0/run_plants.py"))
+if s0_out != 0:
+    sys.exit("a Stage 0 plant did not red for its own reason:\n" + s0_plants[-600:])
+s0_lines = []
+for case_line in s0_plants.strip().split("\n")[:-1]:
+    case = case_line.split()[0]
+    planted = read(S / f"stage0/plants/{case}.out").split("\n")
+    s0_lines.append(f"$ python stage0.py --plant {case}\n" + "\n".join(ln for ln in planted if ln.startswith("stage0:")))
+real, real_rc = run(STAGE0)
+if real_rc != 1:
+    sys.exit(f"Stage 0 on the real tree returned {real_rc}, where its first run found leads")
+reconcile_plant = run(B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py", B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md",
+                      "--plant-item", "plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`")
+parts.append("""
+## [stage0] The whole-design audit's Stage 0: each plant, and the first run
+
+`2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` runs five arms and re-runs the design's checks
+(`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[stage0]`). Every plant damages one input in memory, and each
+reds its arm for its own reason: the planted line appears, and the unplanted run lacks it.
+
+""" + block("text", "$ python run_plants.py\n" + s0_plants.strip() + "\n\n" + "\n".join(s0_lines)) + """
+The reconciliation probe's default run on a plan item planted with a route to `deploy.land`, which its `--all-routes`
+run reds (the plant `k2-deploy-land` above):
+
+""" + block("text", "$ python reconcile.py recut.md --plant-item 'plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`'\n"
+            + "\n".join(reconcile_plant[0].strip().split("\n")[-1:]) + f"\nrc {reconcile_plant[1]}") + """
+The first run on the real tree, the audit's first leads, whole:
+
+""" + block("text", "$ python stage0.py\n" + real.strip() + f"\nrc {real_rc}"))
 parts.append("""
 ## [plants] The map's and the atlas's plants, re-run
 
 """ + block("text", "\n".join(plants)))
 FINAL = (("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check"]),
          ("atlas", [B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py", "--check"]),
-         ("fold state", [str(S / "night/fold_state.py")]),
+         ("fold state", [B + "2026-10-19-build-PLAY-dClosedLoop-1-fold-state.py"]),
          ("reconciliation probe", [B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py",
                                    B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md"]),
-         ("clause scan", [str(S / "walk/paren_semis.py")]),
+         ("clause scan", [B + "2026-10-19-build-PLAY-dClosedLoop-1-clause-scan.py"]),
          ("clause ids", [B + "2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py"]),
-         ("gap join", [str(S / "join_canonical.py"), B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",
+         ("gap join", [B + "2026-10-19-build-PLAY-dClosedLoop-1-gap-join.py", B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",
                        B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"]),
-         ("preset check", [str(S / "preset_check_canonical.py"),
+         ("preset check", [B + "2026-10-19-build-PLAY-dClosedLoop-1-preset-check.py",
                            B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"]),
-         ("critical path", [str(S / "order/critical_path.py")]))
+         ("critical path", [B + "2026-10-19-build-PLAY-dClosedLoop-1-critical-path.py"]))
 
 
 def run_final():
@@ -24128,6 +24889,14 @@ After the owner's answers, `1d32760f3`, and NP-24's pricing:
 After the walk's wave 2, `44c8c8435`:
 
 17. The critical-path script's build count, raised from 18 to 20 by one sed once WK-4 split dTotalRecall and dBoundRoles.
+
+During the whole-design audit's Stage 0, before its commit:
+
+18. The round record's first-run note, written by `note_first_run.py`, corrected by one Edit before any commit: the
+    guard-bearing keys counted 18, not the 23 typed, and the items reached from no entry named, fourteen, where the
+    note had said four distribution programs. Each count was re-read from the captured run first.
+19. The reader plant's writer moved from `plan.record`, which `plan.place` waits on, to `review.cost`, which no item
+    waits on, by a Python replace once the plant failed to red: a writer some item waits on gives its kind a reader.
 ````
 
 ## [red] The red runs, as captured
@@ -24763,6 +25532,313 @@ rc 1
 ````
 
 
+## [stage0] The whole-design audit's Stage 0: each plant, and the first run
+
+`2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` runs five arms and re-runs the design's checks
+(`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[stage0]`). Every plant damages one input in memory, and each
+reds its arm for its own reason: the planted line appears, and the unplanted run lacks it.
+
+````text
+$ python run_plants.py
+k1-witness       rc 1  RED for its reason
+k1-ghost-need    rc 1  RED for its reason
+k1-cycle         rc 1  RED for its reason
+k1-dash          rc 1  RED for its reason
+k1-owner         rc 1  RED for its reason
+k1-actor         rc 1  RED for its reason
+k2-ghost         rc 1  RED for its reason
+k2-unformed      rc 1  RED for its reason
+k2-dead-end      rc 1  RED for its reason
+k2-unreached     rc 1  RED for its reason
+k2-deploy-land   rc 1  RED for its reason
+k3-writer        rc 1  RED for its reason
+k3-reader        rc 1  RED for its reason
+k4-unread        rc 1  RED for its reason
+k5-row           rc 1  RED for its reason
+k5-ghost         rc 1  RED for its reason
+k5-retired       rc 1  RED for its reason
+k5-cited         rc 1  RED for its reason
+class-stale      rc 1  RED for its reason
+plants 19, red for their reason 19
+
+$ python stage0.py --plant k1-witness
+stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-witness
+$ python stage0.py --plant k1-ghost-need
+stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-ghost-need
+$ python stage0.py --plant k1-cycle
+stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-cycle
+$ python stage0.py --plant k1-dash
+stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-dash
+$ python stage0.py --plant k1-owner
+stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-owner
+$ python stage0.py --plant k1-actor
+stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-actor
+$ python stage0.py --plant k2-ghost
+stage0: arms K2 · findings 48 · classed 0 · reruns red 0 · plant k2-ghost
+$ python stage0.py --plant k2-unformed
+stage0: arms K2 · findings 47 · classed 0 · reruns red 0 · plant k2-unformed
+$ python stage0.py --plant k2-dead-end
+stage0: arms K2 · findings 48 · classed 0 · reruns red 0 · plant k2-dead-end
+$ python stage0.py --plant k2-unreached
+stage0: arms K2 · findings 47 · classed 0 · reruns red 0 · plant k2-unreached
+$ python stage0.py --plant k2-deploy-land
+stage0: arms K2 · findings 47 · classed 0 · reruns red 0 · plant k2-deploy-land
+$ python stage0.py --plant k3-writer
+stage0: arms K3 · findings 80 · classed 0 · reruns red 0 · plant k3-writer
+$ python stage0.py --plant k3-reader
+stage0: arms K3 · findings 80 · classed 0 · reruns red 0 · plant k3-reader
+$ python stage0.py --plant k4-unread
+stage0: arms K4 · findings 56 · classed 0 · reruns red 0 · plant k4-unread
+$ python stage0.py --plant k5-row
+stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-row
+$ python stage0.py --plant k5-ghost
+stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-ghost
+$ python stage0.py --plant k5-retired
+stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-retired
+$ python stage0.py --plant k5-cited
+stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-cited
+$ python stage0.py --plant class-stale
+stage0: arms K4 · findings 56 · classed 0 · reruns red 0 · plant class-stale
+````
+
+The reconciliation probe's default run on a plan item planted with a route to `deploy.land`, which its `--all-routes`
+run reds (the plant `k2-deploy-land` above):
+
+````text
+$ python reconcile.py recut.md --plant-item 'plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`'
+findings 0
+rc 0
+````
+
+The first run on the real tree, the audit's first leads, whole:
+
+````text
+$ python stage0.py
+K1: items 116 (90 flow, 26 expansion), roles 14 · findings 4
+  K1 release.approve: actor 'the owner' is no kind and no declared role
+  K1 kits.install: actor 'the owner' is no kind and no declared role
+  K1 kits.update: actor 'the owner' is no kind and no declared role
+  K1 design.streams: a cycle among Needs: design.streams > design.streams
+  left out: whether a witness is actor-typed (P2) and whether the outcome is the right one; a Needs cell's prose beyond its item tags
+K2: targets by form: ask 3, edge 142, owner 10, policy 6, program 12, return 20, terminal 33, wait 8; roots 14, reached 102, ending 113 · findings 46
+  K2 plan.exit: a target in no declared form: "the card is re-rendered and the executor launched where `run.host` says"
+  K2 loop.file: a target in no declared form: "a kept row's disposition is a keep record, keyed by (ledger kind, id, date), so each keep,"
+  K2 release.record: a target in no declared form: "the release slot's exit record for the SHA, with the outcome, E and this record's id"
+  K2 kits.cut: a target in no declared form: "the disposition its witness, keyed by period, or under `owner-cut` by the span's tip SHA, "
+  K2 kits.offer: a target in no declared form: "the adopter lands it with its own lander, whose bar runs the checks the offer left unrun"
+  K2 kits.offer: a target in no declared form: "an outbox order the adopter runs itself"
+  K2 kits.install: a target in no declared form: "its slot renders not installed, the core render kept"
+  K2 kits.update: a target in no declared form: "its slot renders not installed, the core render kept"
+  K2 kits.install: ends nowhere: every route it takes leads only to items that never end
+  K2 kits.offer: ends nowhere: every route it takes leads only to items that never end
+  K2 kits.update: ends nowhere: every route it takes leads only to items that never end
+  K2 build.core: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 build.distill: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 build.exit: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 build.ratify: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 build.recommend: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 kits.adopters: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 kits.currency: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 kits.cut: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 kits.install: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 kits.offer: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 kits.update: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 loop.record: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 maintain.levels: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 maintain.record: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 dDeclaredLoop→build.distill: order: routes `build.distill`, dScopedBuild's, not an ancestor, UNCLASSED
+  K2 dDeclaredLoop→build.ratify: order: routes `build.ratify`, dScopedBuild's, not an ancestor, UNCLASSED
+  K2 dDeclaredLoop→deploy.notify: order: routes `deploy.notify`, dShippedRelease's, not an ancestor, UNCLASSED
+  K2 dDeclaredLoop→design.ready: order: routes `design.ready`, dIndexedDesign's, not an ancestor, UNCLASSED
+  K2 dDeclaredLoop→plan.exit: order: routes `plan.exit`, dRankedPlan's, not an ancestor, UNCLASSED
+  K2 dDeclaredLoop→plan.input: order: routes `plan.input`, dRankedPlan's, not an ancestor, UNCLASSED
+  K2 dDeclaredLoop→test.exit: order: routes `test.exit`, dWitnessedBar's, not an ancestor, UNCLASSED
+  K2 dFairHearing→review.dispose: order: routes `review.dispose`, dDeclaredLoop's, not an ancestor, UNCLASSED
+  K2 dIndexedDesign→build.base: order: routes `build.base`, dScopedBuild's, not an ancestor, UNCLASSED
+  K2 dLinkedLibrary→build.unit-pass: order: routes `build.unit-pass`, dScopedBuild's, not an ancestor, UNCLASSED
+  K2 dPlacedRequest→design.input: order: routes `design.input`, dIndexedDesign's, not an ancestor, UNCLASSED
+  K2 dPlacedRequest→plan.dedupe: order: routes `plan.dedupe`, dRankedPlan's, not an ancestor, UNCLASSED
+  K2 dPlacedRequest→plan.input: order: routes `plan.input`, dRankedPlan's, not an ancestor, UNCLASSED
+  K2 dPlacedRequest→plan.triage-rule: order: routes `plan.triage-rule`, dRankedPlan's, not an ancestor, UNCLASSED
+  K2 dRankedPlan→design.input: order: routes `design.input`, dIndexedDesign's, not an ancestor, UNCLASSED
+  K2 dWellOiledMachine→deploy.current: order: routes `deploy.current`, dShippedRelease's, not an ancestor, UNCLASSED
+  K2 dWellOiledMachine→deploy.released: order: routes `deploy.released`, dShippedRelease's, not an ancestor, UNCLASSED
+  K2 dWellOiledMachine→deploy.unlease: order: routes `deploy.unlease`, dShippedRelease's, not an ancestor, UNCLASSED
+  K2 dWitnessedBar→build.base: order: routes `build.base`, dScopedBuild's, not an ancestor, UNCLASSED
+  K2 dWitnessedBar→deploy.current: order: routes `deploy.current`, dShippedRelease's, not an ancestor, UNCLASSED
+  K2 dWitnessedBar→design.input: order: routes `design.input`, dIndexedDesign's, not an ancestor, UNCLASSED
+  left out: whether a branch that ends by a terminal, return, wait, owner, ask, policy or program form does end (the walk's S6); a policy's routes per value; the [transitions] join gap-flow-15 owes; the conditions before each arrow
+K3: kinds 79, table rows 79 · findings 79
+  K3 act: no writer item: "one act session per role act; act binding and the epoch check; writer item not n"
+  K3 act: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 adopter-register: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 adopters: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 annotation-index: no writer item: "the generated annotation index and its resolve check; writer item not named"
+  K3 annotation-index: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 archive: no writer item: "a rotated record under `memory/archive/`, written by rotation (the away pass); w"
+  K3 archive: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 ask: no writer item: "the ask kind's acceptance at filing; writer item not named"
+  K3 ask: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 attribution: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 backlog-row: no writer item: "the ask register's row store; the memory contract declares it; writer item not n"
+  K3 backlog-row: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 baseline: no writer item: "retrofit's `baseline` and `census` record kinds; writer item not named"
+  K3 baseline: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 build-readme: no writer item: "the build README's declared front-matter schema, with unknown keys refused; writ"
+  K3 build-readme: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 claim: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 code: no writer item: "the core code record: files, definitions with their ranges and body hashes, impo"
+  K3 commit: no writer item: "a git commit, its `Gov-*` trailers an edge site; written by the commit queue fro"
+  K3 commit: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 currency: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 decision: no writer item: "decisions split by kind, the major-decision log; writer item not named"
+  K3 decision: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 design-record: no writer item: "a core memory kind with no writer item; the memory contract declares it"
+  K3 design-record: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 dossier: no writer item: "dossiers anchored to symbol keys; writer item not named"
+  K3 dossier: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 exception: no writer item: "the exception register beside the `core.*` policies; writer item not named"
+  K3 exception: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 flake: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 fork: no writer item: "a flow record kind (layer-memory `[decisions]`); fork resolution by `design.fork"
+  K3 gotcha: no writer item: "gotchas handed as the unit's spec names them, never by write set (revised 2026-1"
+  K3 gotcha: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 instrument: no writer item: "a script, table or drawing kept beside the record it serves (the away pass); wri"
+  K3 instrument: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 journal: no writer item: "the journal grammar moved into the core; writer item not named"
+  K3 kit-release: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 lease: no writer item: "dPlacedRequest's row builds the one lease grammar, a release writing a hand-over"
+  K3 lexicon-declaration: no writer item: "layer-memory lists the lexicon as an optional component's kind; dMindYourWords b"
+  K3 lexicon-declaration: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 loop-review: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 mailbox-message: no writer item: "dKeptSession's row builds the mailbox and its message kinds; writer item not nam"
+  K3 mailbox-message: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 maintenance-record: no writer item: "the maintenance record; writer item not named"
+  K3 maintenance-record: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 node-ledger: no writer item: "the plan and hardware ledgers at the node's home, under a versioned schema, each"
+  K3 node-ledger: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 node-profile: no writer item: "the node's one description, kept at the node's home outside every repository: wr"
+  K3 node-profile: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 override: no writer item: "`charter.override` and its record, under the precedence and override rule; write"
+  K3 override: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 playbook: no writer item: "a design record kind carrying dScriptedRepeat's canon, which an ordinary build a"
+  K3 playbook-set: no writer item: "its writer is the set check, which dIndexedDesign registers at Test's leg-pack p"
+  K3 playbook-set: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 recall-index: no writer item: "memory-recall narrowed to a record finder; writer item not named"
+  K3 recall-index: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 receipt: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 registry: no writer item: "a gate's row registry under `memory/project/`, written by its gate's pin emitter"
+  K3 registry: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 release: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 research-return: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 return: no writer item: "the persisted-return store, keyed per spawn site; writer item not named: the com"
+  K3 return: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 ruling: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 run-record: no writer item: "observability's journal reader writes it when the journal shows a run closed, as"
+  K3 run-record: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 session-binding: no writer item: "sessions bound on every source; writer item not named"
+  K3 session-binding: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 shape-run: no writer item: "the shape-run kind; writer item not named"
+  K3 shape-run: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 transition: no writer item: "the transition record three ways; every step's exit item writes it"
+  K3 value-ledger: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 view: no writer item: "a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged "
+  K3 view: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 witness: no writer item: "a declared pocket outside the tree, such as a transcript, a Codex rollout, the a"
+  K3 witness: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 work-order: no writer item: "the work order rendered per item; writer item not named"
+  K3 work-order: no reader: no item waits on its writer or names it, and no clause of another build names it
+  left out: a reader or writer that is a gate, a renderer or a hook rather than an item; a kind named in plain words other than '<kind> record'; whether a non-item writer is real
+K4: keys 265 · findings 55
+  K4 annotations.delivery: read by no chain clause and no item (guard-bearing)
+  K4 annotations.lookup: read by no chain clause and no item
+  K4 annotations.resolve-scope: read by no chain clause and no item
+  K4 budgets.*: read by no chain clause and no item
+  K4 card.follows: read by no chain clause and no item
+  K4 commits.squash: read by no chain clause and no item
+  K4 deploy.currency: read by no chain clause and no item
+  K4 deploy.runs: read by no chain clause and no item
+  K4 deps.coordination: read by no chain clause and no item
+  K4 deps.early-build: read by no chain clause and no item
+  K4 design.handoff: read by no chain clause and no item
+  K4 design.overlap: read by no chain clause and no item (guard-bearing)
+  K4 floor: read by no chain clause and no item (guard-bearing)
+  K4 instructions.slices: read by no chain clause and no item
+  K4 instructions.task-charter: read by no chain clause and no item
+  K4 kits.cadence: read by no chain clause and no item
+  K4 kits.host: read by no chain clause and no item
+  K4 kits.watch-cadence: read by no chain clause and no item
+  K4 landing.order: read by no chain clause and no item
+  K4 leases.granularity: read by no chain clause and no item
+  K4 maintain.cadence: read by no chain clause and no item
+  K4 maintain.events: read by no chain clause and no item (guard-bearing)
+  K4 maintain.host: read by no chain clause and no item
+  K4 maintain.reading-admission: read by no chain clause and no item (guard-bearing)
+  K4 memory.map-overflow: read by no chain clause and no item
+  K4 memory.map-unfold: read by no chain clause and no item (guard-bearing)
+  K4 memory.over-budget: read by no chain clause and no item (guard-bearing)
+  K4 memory.superseded-slices: read by no chain clause and no item
+  K4 observability.run-record: read by no chain clause and no item (guard-bearing)
+  K4 orient.budget: read by no chain clause and no item (guard-bearing)
+  K4 plan.authority: read by no chain clause and no item
+  K4 plan.kickoff: read by no chain clause and no item
+  K4 plan.triage: read by no chain clause and no item
+  K4 retrofit.claim-on-touch: read by no chain clause and no item (guard-bearing)
+  K4 retrofit.drain: read by no chain clause and no item (guard-bearing)
+  K4 retrofit.slot-bytes: read by no chain clause and no item
+  K4 retrofit.widen: read by no chain clause and no item
+  K4 review.build.when: read by no chain clause and no item
+  K4 review.loop.cadence: read by no chain clause and no item
+  K4 roles.orientation.house-index: read by no chain clause and no item (guard-bearing)
+  K4 roles.shape-enforce: read by no chain clause and no item
+  K4 runtime.attended-allowance: read by no chain clause and no item (guard-bearing)
+  K4 runtime.hook-failure: read by no chain clause and no item
+  K4 runtime.relaunch: read by no chain clause and no item
+  K4 runtime.secret-scan: read by no chain clause and no item (guard-bearing)
+  K4 runtime.spawn-backend: read by no chain clause and no item
+  K4 tags.bare-refs: read by no chain clause and no item (guard-bearing)
+  K4 tags.retired-cites: read by no chain clause and no item (guard-bearing)
+  K4 tags.slice: read by no chain clause and no item
+  K4 tests.product: read by no chain clause and no item (guard-bearing)
+  K4 transitions.record: read by no chain clause and no item (guard-bearing)
+  K4 verdict: read by no chain clause and no item
+  K4 verdict.remote.pin: read by no chain clause and no item
+  K4 verdict.remote.pin-scope: read by no chain clause and no item
+  K4 verdict.remote.trust: read by no chain clause and no item
+  left out: a key read in a layer or system record but built by no clause; whether an unread key is guard-bearing beyond its values' words
+K5: principles 42, clauses 496, retired 0 · findings 0
+  left out: whether a named clause enforces its principle, which only a reader judges
+rerun design map: rc 0
+  map: no stale facts read 65 records and 28 quotes of a map count or the critical path
+rerun atlas: rc 0
+  atlas: derived — 230 records, 3766 sections, 215 decision sections, 16 comparison areas, 42 principles
+rerun fold state: rc 0
+  rows read unfolded despite a fold section: 0
+rerun reconciliation probe: rc 0
+  findings 0
+rerun clause scan: rc 0
+  splits inside a clause: 0
+rerun clause ids: rc 0
+  clause ids: read 496 clauses in 22 builds; findings 0
+rerun gap join: rc 0
+  builds owning nothing: none
+rerun preset check: rc 0
+  no findings
+rerun critical path: rc 0
+  critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+rerun line coverage: rc 0
+  design records 50 · lines 30824 · unreviewed 12947 (42%)
+rerun review debt: rc 0
+  design commits after the floor that no closing review covers: 4
+    930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
+    590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
+    4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
+    0e5d54a79  2 design record(s)  records(dClosedLoop): the clause ids minted — cl-dClosedLoop-0001 to -0496, one per chain clause, and their ch
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
+rc 1
+````
+
+
 ## [plants] The map's and the atlas's plants, re-run
 
 ````text
@@ -24927,13 +26003,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2644 nodes in 30 namespaces; 32520 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1823, derived 321, pending 500
-map: no stale facts read 64 records and 28 quotes of a map count or the critical path
+map: 2648 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1827, derived 321, pending 500
+map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 229 records, 3760 sections, 214 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 230 records, 3776 sections, 215 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

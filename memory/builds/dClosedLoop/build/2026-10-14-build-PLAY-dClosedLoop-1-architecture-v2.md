@@ -657,6 +657,11 @@ review (FQ-1, FQ-3). Help is gated from dSafePassage on, its reference generated
 rendered into a tree of its own (FQ-5, FQ-6), and the atlas becomes generated pages under `help/atlas/` that
 dTotalRecall owns (FQ-8). Nine keys join the catalogue and every preset, and seven gaps join the register.
 
+Revised: 2026-10-19, the whole-design audit's Stage 0 (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`
+`[stage0]`): `[enforcement]` names, for every principle, the clauses that enforce it, every clause citing a principle
+by id among them, so that Stage 0 reds a principle no clause enforces (research-final-audit's K5) before the walk
+judges whether each named clause does.
+
 Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):
 - dTotalRecall's row gains the shared extraction primitive, the research-return backfill and the
   `adopt` program, whose keys had no reader on any row;
@@ -1661,6 +1666,59 @@ and a retired clause's id is listed below and never minted again.
 `cl-dClosedLoop-0497`.
 
 Retired: none.
+
+## [enforcement] What enforces each principle
+
+Each principle names, by id, the clauses of `[chain]` that enforce it, and a clause that cites a principle by id sits
+in that principle's row. `build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` (K5) reds a principle with no row, a
+row naming no clause, an id no clause carries or a retired one, and a citing clause outside its principle's row.
+Whether a named clause does enforce its principle is the whole-design audit's walk to judge. In the product, the
+principle registry and its meta-check carry these rows (dOrderedCharter, P16).
+
+| Principle | Enforced by |
+|---|---|
+| `P1` | `cl-dClosedLoop-0086`, `cl-dClosedLoop-0089`, `cl-dClosedLoop-0097` |
+| `P2` | `cl-dClosedLoop-0090`, `cl-dClosedLoop-0102` |
+| `P3` | `cl-dClosedLoop-0342`, `cl-dClosedLoop-0344` |
+| `P4` | `cl-dClosedLoop-0053`, `cl-dClosedLoop-0155`, `cl-dClosedLoop-0207`, `cl-dClosedLoop-0304` |
+| `P5` | `cl-dClosedLoop-0120`, `cl-dClosedLoop-0143`, `cl-dClosedLoop-0145` |
+| `P6` | `cl-dClosedLoop-0442`, `cl-dClosedLoop-0444`, `cl-dClosedLoop-0449` |
+| `P7` | `cl-dClosedLoop-0104`, `cl-dClosedLoop-0105`, `cl-dClosedLoop-0107`, `cl-dClosedLoop-0460` |
+| `P8` | `cl-dClosedLoop-0062`, `cl-dClosedLoop-0064`, `cl-dClosedLoop-0428` |
+| `P9` | `cl-dClosedLoop-0015`, `cl-dClosedLoop-0367`, `cl-dClosedLoop-0459`, `cl-dClosedLoop-0461`, `cl-dClosedLoop-0473`, `cl-dClosedLoop-0474` |
+| `P10` | `cl-dClosedLoop-0007`, `cl-dClosedLoop-0008`, `cl-dClosedLoop-0012` |
+| `P11` | `cl-dClosedLoop-0039`, `cl-dClosedLoop-0042`, `cl-dClosedLoop-0096`, `cl-dClosedLoop-0476` |
+| `P12` | `cl-dClosedLoop-0389`, `cl-dClosedLoop-0391`, `cl-dClosedLoop-0394` |
+| `P13` | `cl-dClosedLoop-0033`, `cl-dClosedLoop-0039`, `cl-dClosedLoop-0040`, `cl-dClosedLoop-0043` |
+| `P14` | `cl-dClosedLoop-0031`, `cl-dClosedLoop-0051` |
+| `P15` | `cl-dClosedLoop-0032`, `cl-dClosedLoop-0036`, `cl-dClosedLoop-0280` |
+| `P16` | `cl-dClosedLoop-0037`, `cl-dClosedLoop-0091`, `cl-dClosedLoop-0212`, `cl-dClosedLoop-0349`, `cl-dClosedLoop-0480` |
+| `P17` | `cl-dClosedLoop-0390` |
+| `P18` | `cl-dClosedLoop-0176`, `cl-dClosedLoop-0390` |
+| `P19` | `cl-dClosedLoop-0400` |
+| `P20` | `cl-dClosedLoop-0097`, `cl-dClosedLoop-0098`, `cl-dClosedLoop-0110` |
+| `P21` | `cl-dClosedLoop-0145`, `cl-dClosedLoop-0421`, `cl-dClosedLoop-0422` |
+| `P22` | `cl-dClosedLoop-0092`, `cl-dClosedLoop-0121`, `cl-dClosedLoop-0123` |
+| `P23` | `cl-dClosedLoop-0093` |
+| `P24` | `cl-dClosedLoop-0094`, `cl-dClosedLoop-0097`, `cl-dClosedLoop-0099` |
+| `P25` | `cl-dClosedLoop-0167`, `cl-dClosedLoop-0175`, `cl-dClosedLoop-0303` |
+| `P26` | `cl-dClosedLoop-0169`, `cl-dClosedLoop-0170`, `cl-dClosedLoop-0182`, `cl-dClosedLoop-0286` |
+| `P27` | `cl-dClosedLoop-0041`, `cl-dClosedLoop-0057` |
+| `P28` | `cl-dClosedLoop-0046`, `cl-dClosedLoop-0047` |
+| `P29` | `cl-dClosedLoop-0178` |
+| `P30` | `cl-dClosedLoop-0212`, `cl-dClosedLoop-0213`, `cl-dClosedLoop-0229` |
+| `P31` | `cl-dClosedLoop-0125`, `cl-dClosedLoop-0408` |
+| `P32` | `cl-dClosedLoop-0126`, `cl-dClosedLoop-0208`, `cl-dClosedLoop-0219` |
+| `P33` | `cl-dClosedLoop-0054`, `cl-dClosedLoop-0055`, `cl-dClosedLoop-0058`, `cl-dClosedLoop-0313`, `cl-dClosedLoop-0437` |
+| `P34` | `cl-dClosedLoop-0058`, `cl-dClosedLoop-0059`, `cl-dClosedLoop-0230`, `cl-dClosedLoop-0493` |
+| `P35` | `cl-dClosedLoop-0230`, `cl-dClosedLoop-0310`, `cl-dClosedLoop-0312`, `cl-dClosedLoop-0363`, `cl-dClosedLoop-0456`, `cl-dClosedLoop-0469` |
+| `P36` | `cl-dClosedLoop-0292`, `cl-dClosedLoop-0310`, `cl-dClosedLoop-0313`, `cl-dClosedLoop-0314`, `cl-dClosedLoop-0315`, `cl-dClosedLoop-0437` |
+| `P37` | `cl-dClosedLoop-0028`, `cl-dClosedLoop-0060`, `cl-dClosedLoop-0259`, `cl-dClosedLoop-0314`, `cl-dClosedLoop-0315`, `cl-dClosedLoop-0362`, `cl-dClosedLoop-0436`, `cl-dClosedLoop-0493` |
+| `P38` | `cl-dClosedLoop-0018`, `cl-dClosedLoop-0019`, `cl-dClosedLoop-0022`, `cl-dClosedLoop-0023`, `cl-dClosedLoop-0025`, `cl-dClosedLoop-0026`, `cl-dClosedLoop-0027`, `cl-dClosedLoop-0061`, `cl-dClosedLoop-0106`, `cl-dClosedLoop-0183`, `cl-dClosedLoop-0184`, `cl-dClosedLoop-0231`, `cl-dClosedLoop-0240`, `cl-dClosedLoop-0262`, `cl-dClosedLoop-0306`, `cl-dClosedLoop-0435`, `cl-dClosedLoop-0494`, `cl-dClosedLoop-0495` |
+| `P39` | `cl-dClosedLoop-0017`, `cl-dClosedLoop-0084`, `cl-dClosedLoop-0115`, `cl-dClosedLoop-0116`, `cl-dClosedLoop-0117`, `cl-dClosedLoop-0118`, `cl-dClosedLoop-0132`, `cl-dClosedLoop-0162`, `cl-dClosedLoop-0163`, `cl-dClosedLoop-0191`, `cl-dClosedLoop-0324`, `cl-dClosedLoop-0325`, `cl-dClosedLoop-0326`, `cl-dClosedLoop-0327`, `cl-dClosedLoop-0328`, `cl-dClosedLoop-0329`, `cl-dClosedLoop-0336`, `cl-dClosedLoop-0368`, `cl-dClosedLoop-0440`, `cl-dClosedLoop-0473` |
+| `P40` | `cl-dClosedLoop-0133`, `cl-dClosedLoop-0134`, `cl-dClosedLoop-0135`, `cl-dClosedLoop-0136`, `cl-dClosedLoop-0137`, `cl-dClosedLoop-0138`, `cl-dClosedLoop-0164`, `cl-dClosedLoop-0165`, `cl-dClosedLoop-0293`, `cl-dClosedLoop-0330`, `cl-dClosedLoop-0331`, `cl-dClosedLoop-0332`, `cl-dClosedLoop-0333`, `cl-dClosedLoop-0334`, `cl-dClosedLoop-0335`, `cl-dClosedLoop-0336`, `cl-dClosedLoop-0337`, `cl-dClosedLoop-0338`, `cl-dClosedLoop-0415`, `cl-dClosedLoop-0441`, `cl-dClosedLoop-0474` |
+| `P41` | `cl-dClosedLoop-0001`, `cl-dClosedLoop-0002`, `cl-dClosedLoop-0003`, `cl-dClosedLoop-0004`, `cl-dClosedLoop-0005`, `cl-dClosedLoop-0006`, `cl-dClosedLoop-0119`, `cl-dClosedLoop-0398`, `cl-dClosedLoop-0412` |
+| `P42` | `cl-dClosedLoop-0007`, `cl-dClosedLoop-0030`, `cl-dClosedLoop-0067`, `cl-dClosedLoop-0237`, `cl-dClosedLoop-0489` |
 
 ## [planned] Planned, not scheduled
 

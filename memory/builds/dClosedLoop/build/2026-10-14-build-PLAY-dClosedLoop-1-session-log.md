@@ -2905,6 +2905,13 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   grammar and the next number. The instrument, `build/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py`, mints and checks them; its check
   was seen red on the tree before the minting and on four plants, and joins the final checks.
 
+- 2026-10-19, session 1799cb98: the whole-design audit opened at the owner's "go"
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`). Stage 0's checks are built and each seen red on its
+  plants: `build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py`, five arms over items, routes, record kinds, keys and
+  principles; the reconciliation probe's `--all-routes`; and seven checks promoted beside the map from the scratchpad
+  and the state record. v2 gains `[enforcement]`, the clauses that enforce each principle. The final-questions
+  record's `[sequence]` gains the three instruments questions 2 and 3 rest on, which no step had scheduled.
+
 ## Instruments
 
 ### The gap-ownership join

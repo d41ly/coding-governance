@@ -25,6 +25,12 @@ Rules, each over a population it names in its summary line:
 6. transitions: each disposition `entry.place` routes through `entry.claim` has a `none` row in flow-steps'
    [transitions], since the engine refuses any transition the table lacks (the night pass's closing review, H1).
 
+--all-routes widens rule 3 to every route target, as the whole-design audit's Stage 0 asks (K2, final-questions
+`[audit]`): each item or step a flow item's Then cell or an expansion item's Routes cell names, a step by the name
+[chain]'s Stage column gives it and read as that step's first item, is built by the source item's owner or an ancestor
+of it. Until the audit's fold classes what it finds, the default run keeps rule 3 to the breakpoint program, so the
+widened run is Stage 0's and not yet the final check's.
+
 A dependency is classed only by a row of the re-cut's [reconciled-order] table naming its build, its node and its
 owner, with a class from the closed set; a row whose class is blank or outside the set, or that no dependency needs,
 is a finding. Exit 1 on any finding.
@@ -107,6 +113,7 @@ for b, text in rows.items():
             deps.append(("cites", b, key, own))
 # The flow items, and the breakpoint program's declared names.
 items = {}   # tag: (step, owner, cells but Item, Actor and Owner, Then cell)
+first = {}   # step: its table's first item, which a route naming the step reaches
 fs = open(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md", encoding="utf-8").read()
 for m in re.finditer(r"^## \[([a-z-]+)\][^\n]*\n(.*?)(?=^## |\Z)", fs, flags=re.M | re.S):
     for ln in m.group(2).split("\n"):
@@ -115,6 +122,7 @@ for m in re.finditer(r"^## \[([a-z-]+)\][^\n]*\n(.*?)(?=^## |\Z)", fs, flags=re.
             if len(c) == 7:
                 for tag in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", c[0]):
                     items[tag] = (m.group(1), c[6], " ".join(c[2:6]), c[5])
+                    first.setdefault(m.group(1), tag)
 for arg in plants("--plant-item"):
     tag, step, own, then = arg.split(":", 3)
     items[tag] = (step, own, then, then)
@@ -136,6 +144,7 @@ sources = {own for tag, (step, own, _, then) in items.items() if own and step !=
 sources |= {b for b, text in rows.items() if BREAK.search(text)}
 le = open(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md", encoding="utf-8").read()
 contracts = []   # (expansion's entry, its "extension points used" cell, the owners of its items)
+expansion_routes = []   # (owner, Routes cell) of each expansion item, read under --all-routes
 for sec in re.split(r"(?m)^\| Contract field \|", le)[1:]:
     entry = sec.split("|", 1)[0].strip()
     used = next((cells(ln)[1] for ln in sec.split("\n") if ln.startswith("| extension points used |")), "")
@@ -153,6 +162,7 @@ for sec in re.split(r"(?m)^\| Contract field \|", le)[1:]:
                 continue
             owners.add(own)
             routes = c[rc] if rc is not None and rc < len(c) else ""
+            expansion_routes.append((own, routes))
             if BREAK.search(routes):
                 sources.add(own)
             for stage in STAGE_WORD.findall(routes):
@@ -164,6 +174,23 @@ for src in sorted(sources):
     outside = sorted({o for _, o in program if not within(o, src)})
     if outside:
         deps.append(("routes", src, "review.trigger", ",".join(outside)))
+# --all-routes: every item or step a route names, from flow items and expansion items alike.
+ALL_ROUTES = "--all-routes" in sys.argv
+STEP_NAME = re.compile(r"\b(" + "|".join(s.capitalize() for s in STAGES) + r")\b")
+route_edges = 0
+if ALL_ROUTES:
+    item_owner = {tag: v[1] for tag, v in items.items()}
+    item_owner.update({key: o for (kind, key), o in owner.items() if kind == "item" and key not in item_owner})
+    route_sources = [(own, then) for _, (_, own, _, then) in items.items() if own] + \
+                    [(own, routes) for own, routes in expansion_routes if own]
+    for own, text in route_sources:
+        targets = {t for t in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", text) if t in item_owner}
+        targets |= {first[w.lower()] for w in STEP_NAME.findall(text)}
+        for t in sorted(targets):
+            route_edges += 1
+            town = item_owner[t]
+            if town and not within(town, own):
+                deps.append(("routes", own, t, town))
 # 4. reads.
 keys = {n["key"]: owner.get(("policy-key", n["key"])) for n in ns["policy-key"]}
 templated = {re.sub(r"<stage>", "(" + "|".join(STAGES) + ")", re.escape(k).replace(r"\<stage\>", "<stage>")): o
@@ -233,6 +260,8 @@ print(f"left out: systems, cited in prose; roles, shapes and commands, not owned
       f"mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes "
       f"({len(unread)}): " + "; ".join(unread))
 print(f"transitions: {len(routed)} dispositions routed through entry.claim, {len(none_rows)} `none` rows")
+if ALL_ROUTES:
+    print(f"all routes: {route_edges} route edges read from flow and expansion items")
 findings = 0
 for d in untransitioned:
     print(f"  transitions: the disposition `{d}` routes through `entry.claim`, and [transitions] has no `none` row for it")
