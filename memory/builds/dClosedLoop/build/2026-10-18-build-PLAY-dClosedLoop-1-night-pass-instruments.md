@@ -25235,8 +25235,29 @@ elif verb == "outcome":
             sys.exit(f"row {n}: handoff.py derived no returned line for {prompt}")
         L.sub(line, line.replace("| dispatched |", f"| returned, {m.group(1)}, {m.group(2)} out: {text} |"),
               f"row {n}")
+elif verb == "skeptic":
+    # A skeptic's counts come from its saved return, never typed: two typed counts were wrong on 2026-10-20.
+    n, ret, text = args
+    body = pathlib.Path(ret).read_text(encoding="utf-8")
+    vid = r"^- (?:\*\*)?[AB](?:[1-5]|S[1-4])-F\d+(?:\*\*)?: "
+    c, r = (len(re.findall(vid + w, body, flags=re.M)) for w in ("confirmed", "refuted"))
+    h, d = (len(re.findall(r"^- `?[a-z]+\.[a-z-]+`? S\d: " + w, body, flags=re.M)) for w in ("holds", "defect"))
+    new = sorted(set(re.findall(r"^[ \t]*#+ ([AB]S[1-4]-F\d+)", body, flags=re.M)))
+    counts = (f"{c + r} findings judged, {c} confirmed and {r} refuted; its clean cells {h} held and {d} defects"
+              + (f", and new findings {', '.join(new)}" if new else ""))
+    line = row_line(n)
+    if line is None or line.count("| dispatched |") != 1:
+        sys.exit(f"row {n} is not one dispatched row")
+    prompt = re.search(r"`(prompts/[^`]+)`", line).group(1)
+    out = subprocess.run([sys.executable, "-X", "utf8", "tools/roles/handoff.py", "agents", "--handoff",
+                          BUILD + prompt], capture_output=True, text=True, encoding="utf-8").stdout
+    m = re.search(r"^- returned — [^·]+·[^·]+· (\S+) · (\S+) out ·", out, flags=re.M)
+    if not m:
+        sys.exit(f"row {n}: handoff.py derived no returned line for {prompt}")
+    L.sub(line, line.replace("| dispatched |", f"| returned, {m.group(1)}, {m.group(2)} out: {counts}"
+                             + (f"; {text}" if text else "") + " |"), f"row {n}")
 else:
-    sys.exit("verb is add or outcome")
+    sys.exit("verb is add, outcome or skeptic")
 L.save()
 ````
 
@@ -27142,9 +27163,9 @@ K4: keys 265 · findings 55
 K5: principles 42, clauses 496, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 99 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 104 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 264 records, 4222 sections, 219 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 270 records, 4324 sections, 219 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27160,9 +27181,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 84 · lines 35644 · unreviewed 17769 (50%)
+  design records 89 · lines 38034 · unreviewed 6880 (18%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 11
+  design commits after the floor that no closing review covers: 12
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27173,7 +27194,8 @@ rerun review debt: rc 0
     47de3dc82  11 design record(s)  records(dClosedLoop): the whole-design walk dispatched — the sealed copy, Stage 0 on it and on the tree, and t
     abbc8c76d  6 design record(s)  records(dClosedLoop): run B sealed tighter — the round record names no plant's kind, and its briefs forbid the
     8b51f1f39  5 design record(s)  records(dClosedLoop): run B's four brief reviews answered — the seal is an allow-list and a read audit, and wa
-    69b111f9e  13 design record(s)  records(dClosedLoop): both walks whole — run B's walkers 1, 3, 4 and 5 walk at last, and the ten returns join
+    69b111f9e  13 design record(s)  records(dClosedLoop): both walks whole — run B's walkers 1, 3, 4 and 5 walk at last, and the ten returns join 
+    cca97c487  13 design record(s)  records(dClosedLoop): run A's four skeptics returned, run B's sent, and run A's synthesis dispatched
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27392,13 +27414,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2695 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1874, derived 321, pending 500
-map: no stale facts read 99 records and 28 quotes of a map count or the critical path
+map: 2701 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1880, derived 321, pending 500
+map: no stale facts read 104 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 264 records, 4223 sections, 219 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 270 records, 4324 sections, 219 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
