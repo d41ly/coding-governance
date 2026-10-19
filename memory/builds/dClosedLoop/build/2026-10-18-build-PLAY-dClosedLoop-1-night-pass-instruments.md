@@ -19914,6 +19914,104 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `review_debt.py`
+
+The review debt derived: every design commit after the whole-design shape audit's floor that no closing review's `base...head` range covers. At `7e0322a5c` it read 29 ranges covering 77 commits, took the floor at `89e44048f`, and found eight.
+
+````python
+"""Derive dClosedLoop's review debt: every design commit after the whole-design shape audit that no closing review's
+range covers.
+
+A closing review names its range as `<base>...<head>` with the base excluded, and its commits are those after the base
+up to the head. The floor is the newest commit whose v2 blob is the one the shape audit's run A names as its subject,
+since that audit read the whole design there. A design commit touches a record under the build folder that is not a
+research return, an instruments record, the session log, a comparison of review runs, or a generator or its output.
+
+Usage: python -X utf8 review_debt.py [<head>]   (from the worktree root); prints the floor, the ranges and one row per
+uncovered commit, and writes nothing.
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+HEAD = sys.argv[1] if len(sys.argv) > 1 else "HEAD"
+B = "memory/builds/dClosedLoop/"
+V2 = B + "build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+NOT_DESIGN = re.compile(r"-research-|-instruments\.md$|-session-log\.md$|-compared\.md$|-reviews-|\.(py|html|svg|json|txt)$")
+
+
+def git(*args):
+    return subprocess.run(["git", *args], capture_output=True, text=True, encoding="utf-8", check=True).stdout
+
+
+audit = pathlib.Path(B + "reviews/2026-10-18-review-PLAY-dClosedLoop-1-shape-audit-a.md").read_text(encoding="utf-8")
+blob = re.search(re.escape(V2) + r"@([0-9a-f]{40})", audit).group(1)
+floor = next(c for c in git("log", "--format=%H", HEAD, "--", V2).split()
+             if git("rev-parse", f"{c}:{V2}").strip() == blob)
+print(f"floor: {floor[:9]}, the commit whose v2 blob the shape audit read ({blob[:9]})")
+
+ranges = []
+for rec in sorted(pathlib.Path(B + "reviews").glob("*.md")):
+    m = re.search(r"\b([0-9a-f]{40})\.\.\.([0-9a-f]{40})\b", rec.read_text(encoding="utf-8"))
+    if m:
+        ranges.append((rec.name, m.group(1), m.group(2)))
+covered = {}
+for name, base, head in ranges:
+    for c in git("rev-list", f"{base}..{head}").split():
+        covered.setdefault(c, name)
+print(f"closing-review ranges read: {len(ranges)}, commits they cover: {len(covered)}")
+
+rows = []
+for c in git("rev-list", "--reverse", f"{floor}..{HEAD}").split():
+    files = [f for f in git("diff-tree", "--no-commit-id", "--name-only", "-r", c).split()
+             if f.startswith(B + "build/") and not NOT_DESIGN.search(f)]
+    if files and c not in covered:
+        subject = git("log", "-1", "--format=%s", c).strip()
+        rows.append((c[:9], subject, len(files)))
+print(f"design commits after the floor that no closing review covers: {len(rows)}")
+for sha, subject, n in rows:
+    print(f"  {sha}  {n} design record(s)  {subject[:110]}")
+````
+
+### `record_debt.py`
+
+The README's parked decisions and the session log's event for the debt the owner parked.
+
+````python
+"""Park the closing reviews still owed, as the owner asked: the README's parked decisions carry the debt that
+`review_debt.py` derived at `7e0322a5c`, and the session log journals the parking.
+
+Usage: python -X utf8 record_debt.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+WORDS = "Record the review debt (and any previous ones still owed) for now"
+R = Record("memory/builds/dClosedLoop/README.md")
+R.sub("## Parked decisions\n\nNone yet.\n", f"""## Parked decisions
+
+- **Closing reviews owed, parked by the owner on 2026-10-19:** "Record the review debt (and any
+  previous ones still owed) for now". At `7e0322a5c`, eight design commits after the whole-design audit
+  sit outside every closing review's range, as `review_debt.py` derives them: the review folds
+  `67995cb6f`, `6310bda3d`, `1edb2d167` and `a09f1a3b0`, the tag-grammar changes `98f0439ab` and
+  `d56d7da4d`, and the stall-and-loop round `ad530a80c` and `7e0322a5c`. One A/B pair over them pays
+  it; later design commits join it until then.
+""", "parked decisions")
+R.save()
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner parked the closing reviews still owed, "{WORDS}", and opened the
+  cloud round. `review_debt.py` read 29 closing-review ranges covering 77 commits, took the whole-design shape audit's
+  floor at `89e44048f`, and found eight design commits no review covers at `7e0322a5c`. The README's parked decisions
+  carry them.
+""", "the parking's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -20294,6 +20392,8 @@ MINE = [
     ('stall/restore_c2.py', "Restores dispatch 120's probe, `probe/c2.py`, from the instruments record committed at HEAD, after a researcher of the stall-and-loop round deleted the scratchpad's `probe/` folder."),
     ('stall/fold_stall_answers.py', "The owner's SL-1 to SL-8 folded: P39, eleven keys and their presets, eight revised rows, nineteen clauses on ten chain rows, the seven gaps, flow-steps, layer-runtime and coordination, and the record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there."),
     ('stall/log_stall_answers.py', "The session log's event for the answers and their fold."),
+    ('cloud/review_debt.py', "The review debt derived: every design commit after the whole-design shape audit's floor that no closing review's `base...head` range covers. At `7e0322a5c` it read 29 ranges covering 77 commits, took the floor at `89e44048f`, and found eight."),
+    ('cloud/record_debt.py', "The README's parked decisions and the session log's event for the debt the owner parked."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -21355,13 +21455,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2561 nodes in 30 namespaces; 31722 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1760, derived 306, pending 495
+map: 2562 nodes in 30 namespaces; 31722 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1761, derived 306, pending 495
 map: no stale facts read 61 records and 24 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 214 records, 3544 sections, 206 decision sections, 16 comparison areas, 39 principles
+atlas: derived — 214 records, 3546 sections, 206 decision sections, 16 comparison areas, 39 principles
 rc 0
 
 $ fold state

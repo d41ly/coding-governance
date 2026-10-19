@@ -52,7 +52,12 @@ asks, 435 of them unlabelled. The owner's prompt is recorded verbatim under `pro
 
 ## Parked decisions
 
-None yet.
+- **Closing reviews owed, parked by the owner on 2026-10-19:** "Record the review debt (and any
+  previous ones still owed) for now". At `7e0322a5c`, eight design commits after the whole-design audit
+  sit outside every closing review's range, as `review_debt.py` derives them: the review folds
+  `67995cb6f`, `6310bda3d`, `1edb2d167` and `a09f1a3b0`, the tag-grammar changes `98f0439ab` and
+  `d56d7da4d`, and the stall-and-loop round `ad530a80c` and `7e0322a5c`. One A/B pair over them pays
+  it; later design commits join it until then.
 
 <!-- roster:units -->
 

@@ -2751,6 +2751,11 @@ The stall-and-loop round's research, dispatches 143 to 147, derived from each ru
   dWellOiledMachine, the owner-item keys to the `run` namespace, and the queue's stall check to `runtime.act-ceiling`.
   The fold's closing review is owed.
 
+- 2026-10-19, session 1799cb98: the owner parked the closing reviews still owed, "Record the review debt (and any previous ones still owed) for now", and opened the
+  cloud round. `review_debt.py` read 29 closing-review ranges covering 77 commits, took the whole-design shape audit's
+  floor at `89e44048f`, and found eight design commits no review covers at `7e0322a5c`. The README's parked decisions
+  carry them.
+
 ## Instruments
 
 ### The gap-ownership join
