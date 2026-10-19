@@ -1,11 +1,13 @@
 # TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch
 
-**Status:** INPROGRESS · rev-1 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
+**Status:** INPROGRESS · rev-2 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-19-prompt-TOOL-dRenderedAnchor-3-1-revision.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-1-revision.md) | research | — |
+| [2026-10-19-prompt-TOOL-dRenderedAnchor-3-2-spec-writer.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-2-spec-writer.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-3-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -258,11 +260,20 @@ Row 5's `../out/w.js` passes `root in hit.parents`, because `absolute()` keeps `
 only by `".." not in hit.parts` (`tools/lib/resolve_kit_dir.py:42-43`). Row 7 is the one only the
 other term refuses: the bash half writes `$TMP/out/y.js` beside `$TMP/out/w.js`. The python program
 appends `{"role": "rendered", "source": "p/h/y.template.js", "path": <abs>}` to the receipt before
-its queries, where `<abs>` is `str((root.parent / "out" / "y.js").absolute())`.
+its queries, where `<abs>` is `(root.parent / "out" / "y.js").absolute().as_posix()`.
 
 The path is written by python on purpose. A shell-written `/tmp/…` path inside a JSON file is not
 converted by MSYS, and Windows python reads it as drive-relative. So the row would name no file and
 pass on the existence test, which is `fixture-passes-by-finding-nothing`.
+
+It is written in posix form because the join splits `path` on `/` before either escape term is read
+(`tools/lib/resolve_kit_dir.py:39`). A Windows `str()` of the path holds backslashes, so its last
+`/`-field is not `y.js`, and the join skips the row. The canonical and a copy with
+`root in hit.parents` cut then both print `LookupError`, and the row can never be seen red. A
+drive-letter posix path still reads as absolute in `root / <abs>` on Windows (`:42`), and on POSIX
+`as_posix()` changes nothing. Probed on 2026-10-19 on this Windows host, with 2e's fixture shape and
+`here` at `p`: under `str()` both the canonical and the cut copy printed `LookupError`; under
+`as_posix()` the canonical printed `LookupError` and the cut copy returned the `out` directory.
 
 The query list gains `y.js`, the expected list a seventh `LookupError`, and the count check reads 7.
 The comment says that row 5 holds the `..` term, row 7 the outside-the-tree term, and row 6 the
@@ -486,6 +497,12 @@ New arm: tools/check-wiring.test.sh, the absent-harness remedy check · covers A
   part on one layout, which is F1. L7's wording claim was found in two more places than the review
   names: the README and the map. L4's row 7 writes its path from python, because a shell path in
   JSON would make it vacuous under MSYS.
+- rev-2 · 2026-10-19 · §4 · S10 · AC8 · §10 · the build pass found a divergence: row 7's `<abs>`
+  was `str(...)`, a backslash path on Windows that the receipt join's `/`-split
+  (`tools/lib/resolve_kit_dir.py:39`) skips, so the section-2e arm could not be seen red. §4 now
+  writes it with `.as_posix()` and says why, with the probe that showed it. AC8 and §7's section-2e
+  `New arm:` line read through §4 and are unchanged. §10's gotcha line says "python-written and
+  posix" in place of "native".
 
 ## 10. Reuse audit
 
@@ -510,7 +527,7 @@ the brief, the round-2 record, unit 2's spec and its ledger, which are this unit
 `TOOL-aWokenSentinel-21`, the precedent for a shrink-only `FLOOR_ASSERTIONS`.
 
 The gotchas checklist for the touched paths selected `fixture-passes-by-finding-nothing`, which is
-why row 7's path is native and why each term has a row only it rejects. It selected
+why row 7's path is python-written and posix, and why each term has a row only it rejects. It selected
 `staged-break-substitutes-a-synthetic-value`, which is why each arm's names come from the shipped
 template and table. It selected `two-answers-to-one-question`, which is S12 and S13, and
 `test-oracle-read-from-a-historical-sha`, which is why no arm reads `8a0e0b59` and each red half

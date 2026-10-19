@@ -68,10 +68,10 @@ ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3
 |---|---|---|---|---|---|
 | [TOOL-dRenderedAnchor-1 — the kit resolver finds a rendered file through its receipt row, and the role render reds a harness listed where it is not installed](spec/2026-10-19-spec-TOOL-dRenderedAnchor-1.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
 | [TOOL-dRenderedAnchor-2 — unit 1's closing-review findings closed as one batch, and the /build Skill's harness citations resolved like the role index](spec/2026-10-19-spec-TOOL-dRenderedAnchor-2.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
-| [TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch](spec/2026-10-19-spec-TOOL-dRenderedAnchor-3.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-19 |
+| [TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch](spec/2026-10-19-spec-TOOL-dRenderedAnchor-3.md) | — | 2 | INPROGRESS | rev-2 | 2026-10-19 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 4 record folder(s).
+Records: 10 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
