@@ -64,3 +64,24 @@ or guard rather than substituting a value.
   both runs `apply` exited 1, naming 35 legs that did not exist before the install and are red after
   it; nothing here depends on those legs.
 - AC8 — `derive_kit_paths` — `grep -c` printed 1 over each README; at `05357638` both read 0.
+
+## The close's observations
+
+Run by the main loop at `c012f0bcf`, before the closing review. Each staged break was written
+byte-preserving into the one file it names, the suite run, and the file restored by
+`git checkout`; the tree read clean after the last one.
+
+- `New arm:` RA6-1 — RED with the `render_kit_cites` call taken out of the parity script's `render`:
+  `unattended-build.test.sh` exited 1, the protocol naming its harness 0 times against 2. RED again,
+  separately, with the render mode's second pass disabled: the same count and the check mode's
+  parity line missing.
+- `New arm:` RA6-2 — RED with the `render_kit_cites` call taken out of the adopter's `render`:
+  exit 1, the Skill naming `unattended-build.js` and `unattended-unit.js` 0 times against 1 each.
+- `New arm:` section 2g — RED with the case filter taken out of the canonical `render_kit_cites`, and
+  separately with its CR drop taken out: each failed section 2g's own row, beside the parity rows a
+  canonical edit must red.
+- `New arm:` the `render_kit_cites` parity row — RED with one byte changed in the parity script's
+  copy: one `drifted` row naming `tools/workflows/check-protocol-parity.test.sh`.
+- GREEN, all restored: `unattended-build.test.sh` `PASS (1019 assertions)` and
+  `resolve-python.test.sh` `PASS — resolve-python: 352 assertions held`, each exit 0. The four shell
+  hygiene legs exit 0 at this tip.
