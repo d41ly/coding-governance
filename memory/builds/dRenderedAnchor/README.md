@@ -68,7 +68,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** INPROGRESS · 7 unit(s) · node d · opened 2026-10-19 · streams tooling
+**Build status:** CLOSED · 7 unit(s) · node d · opened 2026-10-19 · streams tooling
 ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5 TOOL-dRenderedAnchor-6 TOOL-dRenderedAnchor-7
 
 <!-- gen:build-units -->
@@ -80,10 +80,10 @@ ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dR
 | [TOOL-dRenderedAnchor-4 — the closing review's round-3 findings on unit 3 closed as one batch](spec/2026-10-19-spec-TOOL-dRenderedAnchor-4.md) | — | 1 | CLOSED | rev-1 | 2026-10-19 |
 | [TOOL-dRenderedAnchor-5 — the closing review's round-4 findings on unit 4 closed as one batch, with no review round after it](spec/2026-10-19-spec-TOOL-dRenderedAnchor-5.md) | — | 1 | CLOSED | rev-1 | 2026-10-19 |
 | [TOOL-dRenderedAnchor-6 — the review protocol and the unattended Skill resolve their harness citations through the receipt-aware resolver](spec/2026-10-19-spec-TOOL-dRenderedAnchor-6.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
-| [TOOL-dRenderedAnchor-7 — unit 6's closing-review findings closed as one batch, with no review round after it](spec/2026-10-19-spec-TOOL-dRenderedAnchor-7.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-19 |
+| [TOOL-dRenderedAnchor-7 — unit 6's closing-review findings closed as one batch, with no review round after it](spec/2026-10-19-spec-TOOL-dRenderedAnchor-7.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
 <!-- /gen:build-units -->
 
-Records: 22 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

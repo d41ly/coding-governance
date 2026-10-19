@@ -97,23 +97,6 @@ $KITREL/tier2-review.js|$KITREL/tier2-review.template.js
 $KITREL/drift-audit-code.js|$KITREL/drift-audit-code.template.js
 $KITREL/drift-audit-state.js|$KITREL/drift-audit-state.template.js"
 
-# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7. ANSWERED BY THE HOOK, never parsed here
-# (closing review round 1 residual b): this used to re-read `.agent-cap.conf` with a sed of its own,
-# which matched nothing on a BOM-led line and rendered cap-5 harnesses under a hook enforcing 4. The
-# sibling gate's `--print-cap` locates the hook and relays its answer for this checkout, so the value
-# rendered is the value enforced. A refusal stops here as the hook denies there, because a harness
-# rendered at a cap its own hook will not admit is exactly the fork this token retires.
-if ! FANOUT_CAP=$(bash "$HERE/check-verifier-fanout.sh" --print-cap 2>&1); then
-  echo "protocol-parity: the agent-cap hook would not answer the effective fan-out cap:"
-  printf '%s\n' "$FANOUT_CAP" | sed 's/^/  /'
-  echo "  Nothing was rendered or graded."
-  exit 2
-fi
-case "$FANOUT_CAP" in
-  [1-9]) ;;
-  *) echo "protocol-parity: the agent-cap hook answered '$FANOUT_CAP' for the fan-out cap, not a digit 1-9. Nothing was rendered or graded."; exit 2 ;;
-esac
-
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 # >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
 resolve_python() {
@@ -207,7 +190,8 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 # table. `derive_kit_paths` prints one `<cite><TAB><path>` line per `{{TOOL_ROOT}}<home>/<file>`
 # citation of the templates that this install HOLDS, its receipt row first; `render_kit_cites` applies
 # those lines alone to `render`'s buffer, so a citation of a renamed kit names the directory govkit
-# wrote and not the tool root plus gov's home for it.
+# wrote and not the tool root plus gov's home for it. `check_kit_cites` (TOOL-dRenderedAnchor-7 S4)
+# refuses, before anything is written, a line of those whose path leaves the charset below.
 # >>> derive_kit_paths — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 # `derive_kit_paths <python> <kit dir> <template>...` prints the KIT_PATHS `render_doc` applies: one
 # `{{TOOL_ROOT}}<home>/<file><TAB><path>` line per such citation in the templates that this install
@@ -290,7 +274,7 @@ def emit(p, v):
     print("%s\t%s" % (p, v))
 
 
-kit = pathlib.Path(sys.argv[1]).resolve()
+kit = pathlib.Path(sys.argv[1]).absolute()
 root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
 cites = []
 seen = ""
@@ -419,6 +403,24 @@ render_kit_cites() {
   done <<<"${KIT_PATHS//$'\r'/}"
 }
 # <<< render_kit_cites
+# >>> check_kit_cites — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `check_kit_cites <label> <kit paths>` returns 2 at the first `{{TOOL_ROOT}}<home>/<file>` line
+# whose path is empty or holds a character outside [A-Za-z0-9._/+@-], printing one line naming the
+# cite and the path, and 0 otherwise. It reads exactly the lines `render_kit_cites` applies: a bare
+# `{{TOOL_ROOT}}` line and an adopter-placeholder line carry phrases with spaces, never applied here.
+check_kit_cites() {
+  local kp kv
+  while IFS=$'\t' read -r kp kv; do
+    case "$kp" in '{{TOOL_ROOT}}'?*) ;; *) continue ;; esac
+    case "$kv" in
+      ''|*[!A-Za-z0-9._/+@-]*)
+        echo "$1: the citation $kp resolves to '$kv', which is empty or holds a character outside [A-Za-z0-9._/+@-]. A citation lands in a JS string literal and in commands an agent runs, where a quote ends the string and a space splits the command. Fix the install receipt row that places it."
+        return 2 ;;
+    esac
+  done <<<"${2//$'\r'/}"
+  return 0
+}
+# <<< check_kit_cites
 
 # MEMORY_TREE_DIR — the probe, then what an unanswered probe costs. The OVERRIDE is an environment
 # variable and it is a HAND-INSTALL channel only: the gate leg runs this file with no environment of
@@ -456,7 +458,8 @@ else
 fi
 # AN UNSUPPORTED CHARACTER IS A REFUSAL. Both values land inside a single-quoted JS string in the
 # harness and inside a shell command an agent runs, so a quote ends the string early and a space
-# splits the command. The set is a path's, and no install measured so far needs more.
+# splits the command. The set is a path's, and no install measured so far needs more. A citation's
+# path is checked where it is derived, by `check_kit_cites`, because the install receipt writes it.
 case "$KITREL/$MTD" in
   *[!A-Za-z0-9._/+@-]*)
     echo "protocol-parity: the kit path '$KITREL' or MEMORY_TREE_DIR '$MTD' holds a character outside"
@@ -521,6 +524,26 @@ $PAIRS
 EOF
 KIT_PATHS=$(derive_kit_paths "$_cite_py" "$KITREL" "${_cite_tpls[@]}") \
   || { echo "protocol-parity: could not resolve the citations the templates make"; exit 2; }
+check_kit_cites protocol-parity "$KIT_PATHS" || exit 2
+
+# FANOUT_CAP, THE FOURTH TOKEN — TOOL-aRepatriatedFork-7 S7. ANSWERED BY THE HOOK, never parsed here
+# (closing review round 1 residual b): this used to re-read `.agent-cap.conf` with a sed of its own,
+# which matched nothing on a BOM-led line and rendered cap-5 harnesses under a hook enforcing 4. The
+# sibling gate's `--print-cap` locates the hook and relays its answer for this checkout, so the value
+# rendered is the value enforced. A refusal stops here as the hook denies there, because a harness
+# rendered at a cap its own hook will not admit is exactly the fork this token retires.
+# ASKED AFTER THE CITATIONS (TOOL-dRenderedAnchor-7 S8): with no python on the host the gate's own
+# notice polluted this answer and refused first, so the resolver's reason above was never printed.
+if ! FANOUT_CAP=$(bash "$HERE/check-verifier-fanout.sh" --print-cap 2>&1); then
+  echo "protocol-parity: the agent-cap hook would not answer the effective fan-out cap:"
+  printf '%s\n' "$FANOUT_CAP" | sed 's/^/  /'
+  echo "  Nothing was rendered or graded."
+  exit 2
+fi
+case "$FANOUT_CAP" in
+  [1-9]) ;;
+  *) echo "protocol-parity: the agent-cap hook answered '$FANOUT_CAP' for the fan-out cap, not a digit 1-9. Nothing was rendered or graded."; exit 2 ;;
+esac
 
 TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT
@@ -598,13 +621,21 @@ EOF
   # check-mode run, deriving the held path, would read DRIFT. So the citations are derived again over
   # what was just written, and when they moved this script runs once more with the same arguments.
   # A child and not `exec`, because `exec` skips the EXIT trap that removes TMPD. The guard bounds it
-  # to one re-run, and under --tracked-only nothing is created, so the two derivations agree.
+  # to one re-run. --tracked-only creates only a live copy this install already tracks: on a tree that
+  # holds every rendered harness the two derivations agree and it does not re-run, and a tracked
+  # harness deleted from the worktree is written again, and then the run re-runs once, like a fresh
+  # render (TOOL-dRenderedAnchor-7 S9). The guard reads the value 1 alone, so an empty one a caller
+  # leaked does not disable it, and a re-run it suppresses is a named exit 1, never a silent 0 (S5).
   _kp_after=$(derive_kit_paths "$_cite_py" "$KITREL" "${_cite_tpls[@]}") \
     || { echo "protocol-parity: could not resolve the citations the templates make"; exit 2; }
-  if [ "$_kp_after" != "$KIT_PATHS" ] && [ -z "${PROTOCOL_PARITY_REPASS+set}" ]; then
-    echo "protocol-parity: this render wrote a file a template's citation resolves to, so the citations moved; rendering once more"
-    PROTOCOL_PARITY_REPASS=1 bash "$HERE/${0##*/}" "$@"
-    exit $?
+  if [ "$_kp_after" != "$KIT_PATHS" ]; then
+    if [ "${PROTOCOL_PARITY_REPASS:-}" != 1 ]; then
+      echo "protocol-parity: this render wrote a file a template's citation resolves to, so the citations moved; rendering once more"
+      PROTOCOL_PARITY_REPASS=1 bash "$HERE/${0##*/}" "$@"
+      exit $?
+    fi
+    echo "protocol-parity: the citations moved after this render wrote, and PROTOCOL_PARITY_REPASS=1 suppressed the re-run, so a rendered copy may name a stale path. Run bash $KITREL/check-protocol-parity.test.sh --render with PROTOCOL_PARITY_REPASS unset"
+    exit 1
   fi
   exit 0
 fi

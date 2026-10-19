@@ -316,6 +316,8 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 # table. `derive_kit_paths` prints one `<cite><TAB><path>` line per `{{TOOL_ROOT}}<home>/<file>`
 # citation of the Skill's template that this install HOLDS, its receipt row first; `render_kit_cites`
 # applies those lines alone to `render`'s buffer, so the Skill names the harness paths govkit wrote.
+# `check_kit_cites` (TOOL-dRenderedAnchor-7 S4) refuses, before anything is written, a line of those
+# whose path holds a character outside the path set this file refuses for its own values.
 # >>> derive_kit_paths — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 # `derive_kit_paths <python> <kit dir> <template>...` prints the KIT_PATHS `render_doc` applies: one
 # `{{TOOL_ROOT}}<home>/<file><TAB><path>` line per such citation in the templates that this install
@@ -398,7 +400,7 @@ def emit(p, v):
     print("%s\t%s" % (p, v))
 
 
-kit = pathlib.Path(sys.argv[1]).resolve()
+kit = pathlib.Path(sys.argv[1]).absolute()
 root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
 cites = []
 seen = ""
@@ -527,6 +529,24 @@ render_kit_cites() {
   done <<<"${KIT_PATHS//$'\r'/}"
 }
 # <<< render_kit_cites
+# >>> check_kit_cites — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `check_kit_cites <label> <kit paths>` returns 2 at the first `{{TOOL_ROOT}}<home>/<file>` line
+# whose path is empty or holds a character outside [A-Za-z0-9._/+@-], printing one line naming the
+# cite and the path, and 0 otherwise. It reads exactly the lines `render_kit_cites` applies: a bare
+# `{{TOOL_ROOT}}` line and an adopter-placeholder line carry phrases with spaces, never applied here.
+check_kit_cites() {
+  local kp kv
+  while IFS=$'\t' read -r kp kv; do
+    case "$kp" in '{{TOOL_ROOT}}'?*) ;; *) continue ;; esac
+    case "$kv" in
+      ''|*[!A-Za-z0-9._/+@-]*)
+        echo "$1: the citation $kp resolves to '$kv', which is empty or holds a character outside [A-Za-z0-9._/+@-]. A citation lands in a JS string literal and in commands an agent runs, where a quote ends the string and a space splits the command. Fix the install receipt row that places it."
+        return 2 ;;
+    esac
+  done <<<"${2//$'\r'/}"
+  return 0
+}
+# <<< check_kit_cites
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 MEMORY_TREE_DIR=""
 if [ -n "$_MTD_OVERRIDE" ]; then
@@ -565,9 +585,12 @@ fi
 # it is the one template this adopter renders that takes `TOOL_ROOT`, the fixture templates carry
 # `{{KIT_DIR}}` only and the copied ones no placeholder. Derived here, before both modes, so
 # `--check` grades exactly what a render writes. No python, or a derivation that fails, is exit 2,
-# the misconfigured code; the resolver or the derivation prints the reason.
+# the misconfigured code; the resolver or the derivation prints the reason. So is a citation whose
+# receipt-held path leaves [A-Za-z0-9._/+@-], which `check_kit_cites` names: the Skill tells an agent
+# to run it, where a space splits the command (TOOL-dRenderedAnchor-7 S4).
 _cite_py=$(resolve_python) || exit 2
 KIT_PATHS=$(derive_kit_paths "$_cite_py" "$KIT_DIR" "$TEMPLATE") || exit 2
+check_kit_cites unattended "$KIT_PATHS" || exit 2
 
 # THE STAMP — TOOL-aRepatriatedFork-24 S3. The shipped example spells `{{TOOL_ROOT}}` in LANDER,
 # GATE_CMD and WIRING_CHECK, and `{{MEMORY_TREE_DIR}}` for the generator in GENERATED_INDEXES. It

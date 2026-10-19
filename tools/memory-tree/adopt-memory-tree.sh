@@ -261,7 +261,7 @@ def emit(p, v):
     print("%s\t%s" % (p, v))
 
 
-kit = pathlib.Path(sys.argv[1]).resolve()
+kit = pathlib.Path(sys.argv[1]).absolute()
 root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
 cites = []
 seen = ""

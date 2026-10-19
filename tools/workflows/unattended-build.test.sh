@@ -2279,13 +2279,51 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
   # ---- script's second pass exists for, since the first derivation cannot see a render the same run
   # ---- writes. Each document's absence count sits beside a positive count, and its check mode runs
   # ---- after. RA6-1 reds with the parity script's `render_kit_cites` call taken out, and separately
-  # ---- with its second pass taken out; RA6-2 reds with the adopter's call taken out.
-  R6="$LAY/renamed"; build_layout "$R6" scripts/rh scripts/$UNK scripts/gotchas.py
-  rm -f "$R6/scripts/rh/tier2-review.js"; mkdir -p "$R6/.governance"
-  printf '{"files": [\n {"role": "rendered", "source": "g/%s/tier2-review.template.js", "path": "scripts/rh/tier2-review.js"},\n {"role": "rendered", "source": "g/%s/unattended-build.template.js", "path": "scripts/rh/unattended-build.js"},\n {"role": "engine", "source": "g/%s/unattended-unit.js", "path": "scripts/rh/unattended-unit.js"},\n {"role": "engine", "source": "g/%s/check-verifier-fanout.sh", "path": "scripts/rh/check-verifier-fanout.sh"}]}\n' \
-    "$WFK" "$WFK" "$WFK" "$WFK" > "$R6/.governance/install.json"
-  ( cd "$R6" && git add -A )
-  run_layout "$R6" scripts/rh --render >/dev/null
+  # ---- with its second pass taken out; RA6-2 reds with the adopter's call taken out. RA6-1's render
+  # ---- keeps its output (TOOL-dRenderedAnchor-7 S6): the re-run line once and the exit passed back.
+  # The three helpers below are extracted at their second instance, by the RA7 arms after RA6-2.
+  build_renamed() { # dir -> RA6's layout: the kit at scripts/rh behind four receipt rows, its tier2-review.js deleted
+    build_layout "$1" scripts/rh scripts/$UNK scripts/gotchas.py
+    rm -f "$1/scripts/rh/tier2-review.js"; mkdir -p "$1/.governance"
+    printf '{"files": [\n {"role": "rendered", "source": "g/%s/tier2-review.template.js", "path": "scripts/rh/tier2-review.js"},\n {"role": "rendered", "source": "g/%s/unattended-build.template.js", "path": "scripts/rh/unattended-build.js"},\n {"role": "engine", "source": "g/%s/unattended-unit.js", "path": "scripts/rh/unattended-unit.js"},\n {"role": "engine", "source": "g/%s/check-verifier-fanout.sh", "path": "scripts/rh/check-verifier-fanout.sh"}]}\n' \
+      "$WFK" "$WFK" "$WFK" "$WFK" > "$1/.governance/install.json"
+    ( cd "$1" && git add -A )
+  }
+  seed_unattended_kit() { # dir -> the unattended kit copied into the layout, its conf, and a settings file wiring each fragment
+    cp "$UK/adopt-unattended.sh" "$UK/unattended.sh" "$UK/lib-unattended.sh" "$UK/check-unattended.sh" \
+       "$UK"/*.template.md "$UK"/*.fragment.json "$UK"/*.js "$1/scripts/$UNK/"
+    printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\nRESUME_SCHEDULE_CREATE="rc"\nRESUME_SCHEDULE_DELETE="rd"\n' \
+      > "$1/.unattended.conf"
+    # `--check` grades every hook fragment the kit ships WIRED, so the layout's settings file carries one
+    # entry per fragment under its own event and matcher, each read off the fragment, never spelled.
+    mkdir -p "$1/.claude"; local _r6_sj="" _r6_re='"(event|matcher|marker)":[[:space:]]*"([^"]*)"' _fr _ev _ma _mk _ln
+    for _fr in "$UK"/*.fragment.json; do
+      _ev=""; _ma=""; _mk=""
+      while IFS= read -r _ln || [ -n "$_ln" ]; do
+        [[ $_ln =~ $_r6_re ]] || continue
+        case ${BASH_REMATCH[1]} in event) _ev=${BASH_REMATCH[2]} ;; matcher) _ma=${BASH_REMATCH[2]} ;; *) _mk=${BASH_REMATCH[2]} ;; esac
+      done < "$_fr"
+      _r6_sj="${_r6_sj:+$_r6_sj,}\"$_ev\":[{\"matcher\":\"$_ma\",\"hooks\":[{\"type\":\"command\",\"command\":\"node scripts/$UNK/$_mk\"}]}]"
+    done
+    printf '{"hooks":{%s}}\n' "$_r6_sj" > "$1/.claude/settings.json"
+  }
+  write_python_stubs() { # dir · always|repass -> python3, python and py there, each exiting 9009; under
+    # `repass` only inside the parity script's re-run, and otherwise exec this suite's own python
+    local _nm _real
+    _real=$(command -v "$_rkd_py"); mkdir -p "$1"
+    for _nm in python3 python py; do
+      if [ "$2" = always ]; then
+        printf '#!/usr/bin/env bash\nexit 9009\n' > "$1/$_nm"
+      else
+        printf '#!/usr/bin/env bash\n[ "${PROTOCOL_PARITY_REPASS:-}" = 1 ] && exit 9009\nexec %q "$@"\n' "$_real" > "$1/$_nm"
+      fi
+      chmod +x "$1/$_nm"
+    done
+  }
+  R6="$LAY/renamed"; build_renamed "$R6"
+  o=$(run_layout "$R6" scripts/rh --render)
+  same "RA6-1 a renamed kit behind a receipt: --render announces its one re-run" "$(grep -c 'rendering once more' <<<"$o")" 1
+  same "RA6-1 ...and passes the re-run's exit back, 0" "${o##*$'\n'}" "rc=0"
   P6="$R6/memory/guides/REVIEW-PROTOCOL.md"
   same "RA6-1 a renamed kit behind a receipt: the protocol names its tier2-review.js on both lines" "$(grep -cF 'scripts/rh/tier2-review.js' "$P6")" 2
   same "RA6-1 ...and its check-verifier-fanout.sh once" "$(grep -cF 'scripts/rh/check-verifier-fanout.sh' "$P6")" 1
@@ -2293,22 +2331,7 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
   o=$(run_layout "$R6" scripts/rh)
   has "RA6-1 ...and the check mode reads that render in parity" "$o" "protocol-parity: in parity"
   has "RA6-1 ...at exit 0" "$o" "rc=0"
-  cp "$UK/adopt-unattended.sh" "$UK/unattended.sh" "$UK/lib-unattended.sh" "$UK/check-unattended.sh" \
-     "$UK"/*.template.md "$UK"/*.fragment.json "$UK"/*.js "$R6/scripts/$UNK/"
-  printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\nRESUME_SCHEDULE_CREATE="rc"\nRESUME_SCHEDULE_DELETE="rd"\n' \
-    > "$R6/.unattended.conf"
-  # `--check` grades every hook fragment the kit ships WIRED, so the layout's settings file carries one
-  # entry per fragment under its own event and matcher, each read off the fragment, never spelled.
-  mkdir -p "$R6/.claude"; _r6_sj=""; _r6_re='"(event|matcher|marker)":[[:space:]]*"([^"]*)"'
-  for _fr in "$UK"/*.fragment.json; do
-    _ev=""; _ma=""; _mk=""
-    while IFS= read -r _ln || [ -n "$_ln" ]; do
-      [[ $_ln =~ $_r6_re ]] || continue
-      case ${BASH_REMATCH[1]} in event) _ev=${BASH_REMATCH[2]} ;; matcher) _ma=${BASH_REMATCH[2]} ;; *) _mk=${BASH_REMATCH[2]} ;; esac
-    done < "$_fr"
-    _r6_sj="${_r6_sj:+$_r6_sj,}\"$_ev\":[{\"matcher\":\"$_ma\",\"hooks\":[{\"type\":\"command\",\"command\":\"node scripts/$UNK/$_mk\"}]}]"
-  done
-  printf '{"hooks":{%s}}\n' "$_r6_sj" > "$R6/.claude/settings.json"
+  seed_unattended_kit "$R6"
   ( cd "$R6" && git add -A && bash scripts/$UNK/adopt-unattended.sh >/dev/null 2>&1 )
   S6="$R6/.claude/skills/unattended/SKILL.md"
   same "RA6-2 the unattended Skill in that layout names its unattended-build.js" "$(grep -cF 'scripts/rh/unattended-build.js' "$S6")" 1
@@ -2316,8 +2339,56 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
   same "RA6-2 ...and the tool root plus gov's home for them nowhere" "$(grep -cF "scripts/$WFK/" "$S6")" 0
   o=$( (cd "$R6" && GOV_SETTINGS_JSON= bash scripts/$UNK/adopt-unattended.sh --check 2>&1; echo "rc=$?") )
   has "RA6-2 ...and the adopter's --check reads that Skill in sync, at exit 0" "$o" "rc=0"
+  # ---- RA7-1 to RA7-4 (TOOL-dRenderedAnchor-7): THE RE-RUN'S EXIT, ITS SUPPRESSION, THE CITATION
+  # ---- CHARSET AND NO PYTHON, each in a fresh RA6 layout or in RA6's own. A stub run puts its stub
+  # ---- directory first on PATH with GOV_PYTHON unset, because the resolver falls through from a
+  # ---- failed GOV_PYTHON to the launcher names, so a wrapper passed through it alone stages nothing.
+  # ---- RA7-1 reds with `exit $?` after the re-run changed to `exit 0`; RA7-2 with the suppression
+  # ---- branch taken out, and separately with the guard reverted to a `+set` test; RA7-3 with either
+  # ---- script's `check_kit_cites` call taken out; RA7-4 with either script's `|| exit 2` on its
+  # ---- resolver line made `|| :`, where the line printed after the reason is a failed derivation's.
+  R71="$LAY/renamed-repass"; build_renamed "$R71"; write_python_stubs "$LAY/stubs-repass" repass
+  o=$( (cd "$R71" && unset GOV_PYTHON && PATH="$LAY/stubs-repass:$PATH" bash scripts/rh/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+  has "RA7-1 a re-run that alone fails: the parent announces it" "$o" "rendering once more"
+  same "RA7-1 ...and passes the child's exit back, 2" "${o##*$'\n'}" "rc=2"
+  R72="$LAY/renamed-suppressed"; build_renamed "$R72"
+  o=$( (cd "$R72" && export PROTOCOL_PARITY_REPASS=1 && bash scripts/rh/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+  has "RA7-2 an inherited PROTOCOL_PARITY_REPASS=1 suppresses the re-run out loud" "$o" "PROTOCOL_PARITY_REPASS=1 suppressed the re-run"
+  hasnt_ "RA7-2 ...and runs none" "$o" "rendering once more"
+  same "RA7-2 ...at exit 1" "${o##*$'\n'}" "rc=1"
+  R72="$LAY/renamed-empty"; build_renamed "$R72"
+  o=$( (cd "$R72" && export PROTOCOL_PARITY_REPASS= && bash scripts/rh/check-protocol-parity.test.sh --render 2>&1; echo "rc=$?") )
+  same "RA7-2 an inherited empty PROTOCOL_PARITY_REPASS still re-runs, once" "$(grep -c 'rendering once more' <<<"$o")" 1
+  same "RA7-2 ...at exit 0" "${o##*$'\n'}" "rc=0"
+  # RA7-3: the receipt's two rows place the protocol's line-92 citation and the Skill's line-125 one
+  # under `q r/`, a directory holding a space, and each file is there, so the resolver admits both.
+  R73="$LAY/renamed-unsafe"; build_renamed "$R73"
+  mkdir -p "$R73/q r"; cp "$HERE/check-verifier-fanout.sh" "$HERE/unattended-unit.js" "$R73/q r/"
+  printf '{"files": [\n {"role": "engine", "source": "g/%s/check-verifier-fanout.sh", "path": "q r/check-verifier-fanout.sh"},\n {"role": "engine", "source": "g/%s/unattended-unit.js", "path": "q r/unattended-unit.js"}]}\n' \
+    "$WFK" "$WFK" > "$R73/.governance/install.json"
+  seed_unattended_kit "$R73"; ( cd "$R73" && git add -A )
+  o=$(run_layout "$R73" scripts/rh --render)
+  has "RA7-3 a receipt path holding a space: the parity script refuses its citation by name" "$o" "protocol-parity: the citation {{TOOL_ROOT}}$WFK/check-verifier-fanout.sh resolves to 'q r/check-verifier-fanout.sh'"
+  same "RA7-3 ...at exit 2" "${o##*$'\n'}" "rc=2"
+  ra7_w=absent; [ -e "$R73/memory/guides/REVIEW-PROTOCOL.md" ] && ra7_w=written
+  same "RA7-3 ...and writes no protocol" "$ra7_w" absent
+  o=$( (cd "$R73" && bash scripts/$UNK/adopt-unattended.sh 2>&1; echo "rc=$?") )
+  has "RA7-3 the adopter refuses the Skill's citation by name" "$o" "unattended: the citation {{TOOL_ROOT}}$WFK/unattended-unit.js resolves to 'q r/unattended-unit.js'"
+  same "RA7-3 ...at exit 2" "${o##*$'\n'}" "rc=2"
+  ra7_w=absent; [ -e "$R73/.claude/skills/unattended/SKILL.md" ] && ra7_w=written
+  same "RA7-3 ...and writes no Skill" "$ra7_w" absent
+  # RA7-4: RA6's layout, rendered and in sync, on a host whose three launcher names all exit 9009.
+  write_python_stubs "$LAY/stubs-always" always
+  o=$( (cd "$R6" && unset GOV_PYTHON && PATH="$LAY/stubs-always:$PATH" GOV_SETTINGS_JSON= bash scripts/$UNK/adopt-unattended.sh --check 2>&1; echo "rc=$?") )
+  same "RA7-4 no python: the adopter's --check exits 2" "${o##*$'\n'}" "rc=2"
+  ra7_l=${o%$'\n'rc=*}; ra7_l=${ra7_l##*$'\n'}
+  same "RA7-4 ...and the resolver's reason is the last line it prints" "$ra7_l" "resolve_python: tried: python3 python py"
+  o=$( (cd "$R6" && unset GOV_PYTHON && PATH="$LAY/stubs-always:$PATH" bash scripts/rh/check-protocol-parity.test.sh 2>&1; echo "rc=$?") )
+  same "RA7-4 no python: the parity script's check mode exits 2" "${o##*$'\n'}" "rc=2"
+  ra7_l=${o%$'\n'rc=*}; ra7_l=${ra7_l##*$'\n'}
+  same "RA7-4 ...and the resolver's reason is the last line it prints" "$ra7_l" "resolve_python: tried: python3 python py"
 else
-  echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run, and RA6-1 and RA6-2 did not run"
+  echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run, and RA6-1, RA6-2 and RA7-1 to RA7-4 did not run"
 fi
 
 # ---- TOOL-aGraftedHelix-16: THE SPEC COMMIT BLOCK, RUN FOR REAL. Every GH15 arm grades the stage through
@@ -2947,7 +3018,12 @@ has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n'
 # RA6-1's three counts and its check mode's two, RA6-2's three counts and its --check. Each runs once,
 # inside the unattended-adopter guard PV-AC12 shares. Not measured by a run: the pass that wrote it
 # runs no suite.
-FLOOR_ASSERTIONS=667
+# RAISED 667 -> 686 by TOOL-dRenderedAnchor-7: its 19 static sites, counted by hand off the RA6 and RA7
+# blocks — RA6-1's re-run count and exit (2), RA7-1's line and exit (2), RA7-2's suppressed run (3) and
+# its empty-value run (2), RA7-3's two refusals, each a line, an exit and an absence (6), and RA7-4's two
+# runs, each an exit and a last line (4). Each runs once, inside the unattended-adopter guard PV-AC12
+# shares. Not measured by a run: the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=686
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

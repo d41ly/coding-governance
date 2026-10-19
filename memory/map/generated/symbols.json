@@ -2428,6 +2428,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_renamed",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "build_replaced_line",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -4286,6 +4291,21 @@
       "id": "check_keepalive_reaped",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "check_kit_cites",
+      "kind": "function",
+      "file": "tools/lib/render-doc.sh"
+    },
+    {
+      "id": "check_kit_cites",
+      "kind": "function",
+      "file": "tools/unattended/adopt-unattended.sh"
+    },
+    {
+      "id": "check_kit_cites",
+      "kind": "function",
+      "file": "tools/workflows/check-protocol-parity.test.sh"
     },
     {
       "id": "check_knob_classes",
@@ -20393,6 +20413,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "seed_unattended_kit",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
       "id": "seed_witness",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -23806,6 +23831,11 @@
       "id": "write_published_conf",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_python_stubs",
+      "kind": "function",
+      "file": "tools/workflows/unattended-build.test.sh"
     },
     {
       "id": "write_range_spec",

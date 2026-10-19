@@ -173,6 +173,7 @@ resolve_kit_dir|$ROOT/$KIT_REL/resolve_kit_dir.py|$KIT_REL/resolve_kit_dir
 derive_self_rel|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 derive_kit_paths|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 render_kit_cites|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
+check_kit_cites|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 resolve_prefix_token|$ROOT/$KIT_REL/resolve_prefix_token.py|$KIT_REL/resolve_prefix_token
 resolve_prefix_sh|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 mempause_sh|$ROOT/$RUNGATES_DIR/run-gates.sh|$RUNGATES_DIR/run-gates.sh
@@ -193,6 +194,8 @@ remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 # render_kit_cites (TOOL-dRenderedAnchor-6) is the filtered apply step of the two renderers that own
 # none of render_doc's conf facts, the review-harness parity script and the unattended adopter; both
 # carry it inline beside a copy of derive_kit_paths, and §2g below holds the canonical to its filter.
+# check_kit_cites (TOOL-dRenderedAnchor-7) is the charset guard the same two renderers carry beside it,
+# over the same lines, and §2i below holds the canonical to its filter and its set.
 # resolve_prefix_token and resolve_prefix_sh (TOOL-aRepatriatedFork-47) are the `{prefix}` token's
 # two canonicals, one per language; §2b below holds them to one answer. mempause_sh
 # (TOOL-aGraftedHelix-7) is the memory pause both of the run-gates kit's dispatchers carry inline; like
@@ -404,6 +407,61 @@ RC_PATHS=$'{{TOOL_ROOT}}h/t.js\tp/k/t.js\r\n{{TOOL_ROOT}}\tq/\r\n{{GATE_RUNNER}}
 RC_OUT='a {{TOOL_ROOT}}h/t.js b {{TOOL_ROOT}}c {{GATE_RUNNER}}'
 rc_got=$(KIT_PATHS="$RC_PATHS" out="$RC_OUT" bash -c '. "$1"; render_kit_cites; printf %s "$out"' _ "$HERE/render-doc.sh" 2>&1)
 [ "$rc_got" = 'a p/k/t.js b {{TOOL_ROOT}}c {{GATE_RUNNER}}' ] || bad "render_kit_cites applied a line that is no cite, or kept a CR: '${rc_got//$'\r'/<CR>}'"; ok
+
+# ---- 2h. A KIT DIRECTORY REACHED THROUGH A JUNCTION, BEHAVIOUR (TOOL-dRenderedAnchor-7) ------------
+# `derive_kit_paths` takes its kit directory LOGICALLY, as `resolve_kit_dir` takes `here`, because both
+# renderers find their own root with a logical walk: a kit that is a junction inside the adopting
+# repository cites that repository's paths, never the link target's. Two repositories, `jb` holding a
+# link `.gov/wf` to `jt/tools/wf`, whose prefix differs. The canonical in render-doc.sh, sourced, runs
+# over the link and must print the logical `.gov/wf/t.js`; red with `.resolve()`, which prints the
+# target's `tools/wf/t.js`. The link is tested with `[ -L ]` AFTER it is made, because on this fleet
+# `ln -s` can exit 0 and leave a copy; that copy is removed and a directory junction made instead.
+# NEITHER YIELDING A LINK FAILS, never skips: this suite is gov-internal, every host it runs on can link,
+# and a skip would be a gate that cannot go red.
+# WHAT THIS DOES NOT CHECK: the receipt rung under a junction, which no row here reaches, or any copy's
+# call site.
+mkdir -p "$TMP/jb/.git" "$TMP/jb/.gov" "$TMP/jt/.git" "$TMP/jt/tools/wf"
+printf 'x\n' > "$TMP/jt/tools/wf/t.js"
+printf 'cites %s here\n' '{{TOOL_ROOT}}wf/t.js' > "$TMP/jb/x.template.md"
+jl_how=""
+if ln -s "$TMP/jt/tools/wf" "$TMP/jb/.gov/wf" 2>/dev/null && [ -L "$TMP/jb/.gov/wf" ]; then jl_how=symlink
+else
+  rm -rf "$TMP/jb/.gov/wf"
+  cmd //c mklink //J "$(cygpath -w "$TMP/jb/.gov/wf" 2>/dev/null)" "$(cygpath -w "$TMP/jt/tools/wf" 2>/dev/null)" >/dev/null 2>&1 \
+    && [ -L "$TMP/jb/.gov/wf" ] && jl_how=junction
+fi
+if [ -n "$jl_how" ]; then
+  jl_got=$(bash -c '. "$1"; derive_kit_paths "$2" "$3/jb/.gov/wf" "$3/jb/x.template.md"' _ "$HERE/render-doc.sh" "$REALPY" "$TMP" 2>&1 | tr -d '\r')
+  [ "$jl_got" = '{{TOOL_ROOT}}wf/t.js'$'\t''.gov/wf/t.js' ] || bad "derive_kit_paths over a kit reached through a $jl_how did not cite the logical .gov/wf/t.js: '$jl_got'"; ok
+else
+  bad "section 2h could make neither a symlink nor a directory junction at $TMP/jb/.gov/wf, so derive_kit_paths was never run through a link; this suite runs only on hosts that can make one"
+fi
+
+# ---- 2i. THE CITATION CHARSET, BEHAVIOUR (TOOL-dRenderedAnchor-7) ------------------------------------
+# `check_kit_cites` refuses, at exit 2 and on one line naming the cite, a `{{TOOL_ROOT}}<home>/<file>`
+# line of KIT_PATHS whose path is empty or leaves [A-Za-z0-9._/+@-], and reads no other line. The
+# canonical in render-doc.sh, sourced, runs over three CRLF inputs: a clean cite with a bare
+# `{{TOOL_ROOT}}` line and an adopter-placeholder line, both of whose values hold a space, which must
+# return 0 and print nothing; then that set plus a cite holding a quote and a semicolon, and plus a cite
+# holding a space, each of which must return 2 naming it. Red with the value case taken out, where all
+# three return 0, and with the cite filter taken out, where the first returns 2 on `q r/`.
+# WHAT THIS DOES NOT CHECK: either inline copy's call site, which the renderers' own arms read.
+CK_BASE=$'{{TOOL_ROOT}}h/t.js\tp/k/t.js\r\n{{TOOL_ROOT}}\tq r/\r\n{{GATE_RUNNER}}\tthe merge bar of this repo\r\n'
+for ck_k in 1 2 3; do
+  case $ck_k in
+    1) ck_in=$CK_BASE; ck_rc=0; ck_cite="" ;;
+    2) ck_in=$CK_BASE$'{{TOOL_ROOT}}h/u.js\tp/u\';x;\'/u.js\r\n'; ck_rc=2; ck_cite="{{TOOL_ROOT}}h/u.js resolves to 'p/u';x;'/u.js'" ;;
+    *) ck_in=$CK_BASE$'{{TOOL_ROOT}}h/v.js\tp/q r/v.js\r\n'; ck_rc=2; ck_cite="{{TOOL_ROOT}}h/v.js resolves to 'p/q r/v.js'" ;;
+  esac
+  ck_got=$(bash -c '. "$1"; check_kit_cites t "$2"; echo "rc=$?"' _ "$HERE/render-doc.sh" "$ck_in" 2>&1)
+  ck_msg=${ck_got%$'\n'"rc=$ck_rc"}
+  if [ "$ck_rc" = 0 ]; then
+    [ "$ck_got" = rc=0 ] || bad "check_kit_cites input $ck_k refused a clean cite, a bare {{TOOL_ROOT}} line or an adopter-placeholder line: '${ck_got//$'\r'/<CR>}'"
+  else
+    { [ "$ck_msg" != "$ck_got" ] && [ "${ck_msg//$'\n'/}" = "$ck_msg" ] && [[ $ck_msg == "t: the citation $ck_cite,"* ]]; } \
+      || bad "check_kit_cites input $ck_k did not return 2 with one line naming $ck_cite: '${ck_got//$'\r'/<CR>}'"
+  fi; ok
+done
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

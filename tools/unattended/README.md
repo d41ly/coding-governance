@@ -64,6 +64,10 @@ template, the receipt row first, and applies each held one whole before the plai
 `--check` derives the same way, so it grades exactly what a render writes. A harness the
 review-harness kit's hand render has not written yet is not held, so run this adopter after that
 render; run before it, `--check` reads the Skill out of sync and names the re-render.
+A held citation whose path is empty or holds a character outside `[A-Za-z0-9._/+@-]` is refused at
+exit 2, in both modes and before anything is written, with one line naming the citation and its
+path (`TOOL-dRenderedAnchor-7`): the Skill tells an agent to run it, where a space splits the
+command. Fix the install receipt row that places it.
 
 ## The fixture is rendered, and this is the one thing to know about it
 
