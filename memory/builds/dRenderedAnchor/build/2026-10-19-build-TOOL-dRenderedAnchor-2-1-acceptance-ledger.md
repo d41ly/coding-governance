@@ -108,3 +108,28 @@ trees are `tools` `cf80fbde`, `help` `4ddcd941`, `skills` `18fefd1f` and `.githo
 - AC15 — `memory/gotchas/two-answers-to-one-question.md` — `grep -c 'TOOL-dRenderedAnchor-1'`
   printed 1 over it and 1 over `memory/gotchas/invariant-held-on-one-admission-path.md`, which
   gained a "Where it bit" section to hold its entry; at `2f7a67b0` both read 0.
+
+## The close's observations
+
+Run by the main loop at `54344d9a7`, the pass commit, before the closing review. Each staged break
+was written by a script into the one file it names, the suite run, and the file restored by
+`git checkout`; the tree read clean after the last one.
+
+- `New arm:` arm 16 — RED with the role term cut from `tools/roles/roles_lib.py`'s block, and
+  separately with the home term cut: `render_agents.py --selftest` exited 1 on arm 16 each time,
+  `harnesses` reading `['.claude/a.js']`, the decoy row's directory.
+- `New arm:` arm 17 — RED with the scan's template test replaced by `False`, on two arm 17
+  assertions, and separately with its `read_kit_home` test taken out, on one: each exited 1.
+- `New arm:` arm 18 — RED with unit 1's `scan_misplaced_harnesses` from `2f7a67b0` written back:
+  exit 1, 18a and 18b reading a namesake beside no mark as misplaced.
+- `New arm:` section 2e — RED with the role term cut from `tools/lib/resolve_kit_dir.py`: rows read
+  `p/k p/k c LookupError LookupError LookupError`; with the home term cut, `p/k p/k LookupError p/k
+  LookupError LookupError`. Each run also redded the inline-parity rows, as a canonical edit must.
+- `New arm:` section 2f — RED with the `a60b0c7d` block written into `tools/lib/render-doc.sh`:
+  `derive_kit_paths` printed nothing, beside the parity rows that edit also reds.
+- `New arm:` arm 14 — RED with the citation pass's substitution in `tools/roles/adopt-roles.sh`
+  replaced by `:`: `adopt-roles.test.sh` exited 1 on one arm 14 assertion, `FAIL (1 of 55)`, and
+  its `--check` half read `ok`, which re-observes AC14's check inside the suite.
+- GREEN, all restored: `render_agents.py --selftest` `PASS (51 assertions)`,
+  `resolve-python.test.sh` `PASS — resolve-python: 343 assertions held`, `adopt-roles.test.sh`
+  `PASS (55 assertions)`, each exit 0.
