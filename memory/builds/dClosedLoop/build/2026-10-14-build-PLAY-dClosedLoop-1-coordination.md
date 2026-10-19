@@ -111,7 +111,8 @@ build beside the policy and transition features rather than after them.
    messages: `next` derives done-ness from witnesses, a decision is its register's entry, and a problem
    is the problem register's, keyed by its subject.
    Every transition reads the build's mailbox and is refused while a message addressed to the build
-   is neither answered nor acknowledged, the reply being the witness; the card shows unread messages,
+   is neither answered nor acknowledged, the reply being the witness, until `flow.wait-ceiling` passes and the
+   asker's declared default answers it (revised 2026-10-19, P39); the card shows unread messages,
    and `next` lists them as next actions. Each transition writes the messages it disposed, with their
    replies, into the build's transition log, so every message is kept in the build's folder;
    Maintain prunes a closed build's mailbox ref once its folder holds every message.

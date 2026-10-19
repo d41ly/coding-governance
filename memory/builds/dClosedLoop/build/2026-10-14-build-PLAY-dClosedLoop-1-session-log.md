@@ -2744,6 +2744,13 @@ The stall-and-loop round's research, dispatches 143 to 147, derived from each ru
   owns and Runtime enforces. It recommends P39 and eleven mechanisms placed on ten builds, proposes seven gaps, and
   puts SL-1 to SL-8 to the owner.
 
+- 2026-10-19, session 1799cb98: the owner answered SL-1 to SL-8, recorded verbatim in `build/2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md` `[answers]`, and the
+  answers were folded (`[folded]`) with no agent dispatched. P39 joins v2, eleven keys join the catalogue and every
+  preset, eight rows say their part, ten chain rows gain nineteen clauses, and the seven gaps join the register. Where
+  the fold placed a thing differently from the record, the record now says so: an owner item's push goes to
+  dWellOiledMachine, the owner-item keys to the `run` namespace, and the queue's stall check to `runtime.act-ceiling`.
+  The fold's closing review is owed.
+
 ## Instruments
 
 ### The gap-ownership join

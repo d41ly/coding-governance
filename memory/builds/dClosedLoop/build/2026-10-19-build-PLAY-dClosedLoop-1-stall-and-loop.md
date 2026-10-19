@@ -202,12 +202,12 @@ progress is stopped by a detector, never by a person noticing.
      deadline, never on activity alone, so a looping holder's lease expires.
 6. **Every wait has a deadline and an outcome.** Every `awaiting`, hold, park, dependency hold, mailbox disposal,
    queue wait, quarantine, release hold and owner item declares both:
-   - **owner items:** a deadline (`owner.deadline`), then the outcome `owner.on-silence` says. A ratification or an
-     owner-only write is never decided for the owner;
+   - **owner items:** a deadline (`run.owner-deadline`), then the outcome `run.on-owner-silence` says. A
+     ratification or an owner-only write is never decided for the owner;
    - **the session-limit hold:** at `runtime.hold-ceiling` the lease is released, so a node with quota takes the build
      over, and the wake tick stops firing into a refused turn;
-   - **the admission queue:** a wait past `runtime.queue-stall` with no release writes a stall record naming the
-     holders; a slot held past the act ceiling is reclaimed;
+   - **the admission queue:** a wait past the act ceiling, `runtime.act-ceiling`, with no release writes a stall
+     record naming the holders, since every act ends by that ceiling; a slot held past it is reclaimed;
    - **dependency and mailbox waits:** past their deadline, the waiter takes its declared default (replan, or the
      asker's default answer);
    - **quarantine:** its threshold gets a default, and a held leg runs at least once each period;
@@ -238,7 +238,8 @@ progress is stopped by a detector, never by a person noticing.
    across builds (parent holds, interface waits, lease waits, open mailbox questions). A cycle raises one owner item
    naming every build in it, and a parent that ends incomplete releases its dependents to `deps.on-parent-withdrawn`.
 10. **Owner items reach the owner.** Progress keeps reaching the owner as the owner's FR-3 settled, by the micro-format
-    lines at each turn's end. Whether an owner item is also pushed while no owner session is open is the owner's fork.
+    lines at each turn's end. While no owner session is open, owner items alone are also pushed through the
+    registered channel, as the owner's SL-6 settled it, and `notify.owner-items` lets the owner change that.
 11. **Observability trends, never decides.** Runtime journals every stall and loop event with its class: no progress,
     repeat, budget spent, deadline passed, breaker open, cycle across builds. The Loop Review trends them per
     scenario, item and rule, and re-derives the budget, the deadlines and the thresholds from that evidence (P9).
@@ -251,10 +252,10 @@ progress is stopped by a detector, never by a person noticing.
 | Entry | dPlacedRequest | the pre-claim budget keyed by intake content |
 | Flow | dDeclaredLoop | the rework budget, contention routed to the queues, the ending when the budget runs out, the convergence routing, `review.max-rounds`, the static termination check |
 | Review | dFairHearing | each round's state computed against the round before |
-| Session | dKeptSession | the mailbox's question deadlines, and an owner item's delivery |
+| Session | dKeptSession | the mailbox's question deadlines, and the remaining budget on the card |
 | Roles | dBoundRoles | the typed refusal return, and routing to the remedy's actor |
 | Test | dWitnessedBar | quarantine's default threshold and its run each period, and what a quiet host is |
-| Runtime | dWellOiledMachine | the progress ledger, the no-progress and repeat detectors, the relaunch cap, lease renewal on progress, every wait's deadline and outcome, the refusal breaker, the queue's reservation and stall check, the wait graph across builds, restart intensity |
+| Runtime | dWellOiledMachine | the progress ledger, the no-progress and repeat detectors, the relaunch cap, lease renewal on progress, every wait's deadline and outcome, the refusal breaker, the queue's reservation and stall check, the wait graph across builds, restart intensity, an owner item's deadline and push, and each build's spend |
 | Deploy | dShippedRelease | patch-build chains on the originating budget, counted release retries and holds, the landing queue |
 | Review loop | dCalibratedLens | trends of every stall and loop class, and defaults re-derived from them |
 
@@ -270,7 +271,7 @@ progress is stopped by a detector, never by a person noticing.
 | SC-flow-4 and SC-x-4, landing races and re-conflicts | item 2: contention queues, and draws nothing |
 | SC-rt-3, the session-limit hold | item 6: the lease released at the hold ceiling |
 | SC-rt-4, a leaked admission slot | item 6's stall check and reclaim; item 8's reservation rule |
-| SC-own-5, owner items unseen | item 10, the owner's fork |
+| SC-own-5, owner items unseen | item 10, as the owner's SL-6 settled it |
 | Patch-build chains (C48) | item 1: one budget along the chain |
 | Waits with no ceiling (C20, C22, C36, C40, C43) | item 6, checked by item 8 |
 | Composition chains (SC-comp-1 to 8) | item 8; item 1 for what the check cannot see |
@@ -293,14 +294,15 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
   - the convergence routing for every `until-*` and `while-*` value, and `review.max-rounds`;
   - the static termination check, seen red on a planted repository stage that routes back into itself, a wait with no
     deadline, a scenario successor cycle and an unattended raise of a loop bound.
-- **dKeptSession:** mailbox question deadlines with the asker's default; owner-item delivery as the owner's fork says.
+- **dKeptSession:** mailbox question deadlines with the asker's default; the remaining budget on the card.
 - **dBoundRoles:** the typed refusal return with its rule, remedy and actor in every role's template, and remedy
   routing in the outcome table.
 - **dWitnessedBar:** quarantine's default threshold and a held leg run each period; a quiet host defined.
 - **dWellOiledMachine:** the progress ledger; the no-progress and repeat detectors; the lifetime relaunch cap; lease
   renewal on progress; every held wait's deadline and outcome; the refusal breaker and the remedy-actor check at hook
   registration; the reservation rule and the queue stall check; the wait graph across builds; restart intensity and
-  `invalid-input` raised. Each is seen red on a planted case, the 115-wake limit loop among them.
+  `invalid-input` raised; owner items' deadlines and their push; the spend record. Each is seen red on a planted
+  case, the 115-wake limit loop among them.
 - **dShippedRelease:** patch-build chains on the originating build's budget; release retries and "keep waiting"
   counted; the landing queue, already `gap-flow-08`'s.
 - **dCalibratedLens:** the stall and loop classes trended, and the budget, deadlines and thresholds re-derived.
@@ -329,6 +331,59 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 | SL-6 | While no owner session is open, is an owner item pushed? | push owner items only, through the registered channel, progress staying as your FR-3 set it; nothing pushed, as your FR-3 set it; push owner items and every park |
 | SL-7 | When does a repeated refusal stop being retried? | a refusal its target cannot act on routes at once to the remedy's actor, and the same rule 3 times in one act ends the act; the same, at 2; the same, at 5 |
 | SL-8 | How is spend bounded beyond the rework budget? | record each build's spend and trend it, then set a cap from the evidence, as `memory.item-budget` was measured first; a spend cap per build now; none |
+
+## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in two batches, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| SL-1 | "Per build, scaled (Recommended)" |
+| SL-2 | "Best-effort ending (Recommended)" |
+| SL-3 | "FR-9 + convergence (Recommended)" |
+| SL-4 | "Apply recommendation" |
+| SL-5 | "24 hours" |
+| SL-6 | "owner items only by default, changeable by the policy setting" |
+| SL-7 | "at once or after 3 by default,  changeable by the policy setting (2 or 5, or any owner-set number up to 10)" |
+| SL-8 | "Measure, then set (Recommended)" |
+
+Four took the recommendation as offered: SL-1, SL-2, SL-3 and SL-8. SL-4 chose the second option: past the deadline,
+the item's recommended option applies, unless it is a ratification or an owner-only write, which is never decided for
+the owner. SL-5 chose 24 hours over the recommended 72. SL-6 and SL-7 took the recommendation in the owner's own words,
+each a policy value the owner may change, and SL-7's count may be any the owner sets up to 10.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **v2:** P39 joins the principles. Eleven keys join the catalogue and every preset: `flow.rework-budget`,
+  `flow.on-exhausted`, `flow.wait-ceiling`, `review.max-rounds`, `runtime.no-progress`, `runtime.refusal-repeats`,
+  `runtime.restarts`, `notify.owner-items`, `run.owner-deadline`, `run.on-owner-silence` and `build.spend-cap`. Eight rows say
+  their part: `leases.renewal` gains `progress` as its default, and `flow.route-backs`, `review.design.round-count`,
+  `review.follow-up`, `run.on-owner-question`, `notify.owner`, `runtime.hold-ceiling` and `verdict.flakes` follow.
+  Ten chain rows gain clauses, each seen red on its planted case: dGroundRules, dPlacedRequest, dFairHearing,
+  dDeclaredLoop, dKeptSession, dBoundRoles, dWitnessedBar, dWellOiledMachine, dShippedRelease and dCalibratedLens.
+- **This record, where the fold placed a thing differently from [design], [layers] and [chain]:**
+  - an owner item's push moves from dKeptSession to dWellOiledMachine, which registers `notify.channel`, since a
+    clause sits on a descendant of every build whose schema it reads;
+  - the remaining budget goes on the card through dKeptSession, which updates the card's pointers;
+  - the admission queue's stall check reads `runtime.act-ceiling` instead of a key of its own: every act ends by that
+    ceiling, so a wait that outlasts it with no release can only be a leaked slot;
+  - the owner-item keys join the `run` namespace beside `run.on-owner-question`, as `run.owner-deadline` and
+    `run.on-owner-silence`, instead of opening an `owner` namespace for two keys;
+  - `leases.renewal` keeps its owner, dPlacedRequest, and gains the value `progress`, which dWellOiledMachine's ledger
+    arms;
+  - `flow.wait-ceiling` is the deadline gov's own waits declare, and the static check still reds a wait declaring
+    none;
+  - a CONTENDED red's quiet host is one running no other bar, and a re-run that finds none within the wait ceiling
+    raises an owner item.
+- **flow-steps:** a refused instance's re-dispatch draws on the budget, and the route-back rule ends a loop instead of
+  raising an owner item.
+- **layer-runtime:** the relaunch cap counts an instance's life, the session-limit hold releases the lease at its
+  ceiling, and `invalid-input` raises an owner item at once.
+- **coordination:** a mailbox question waits only until `flow.wait-ceiling`.
+- **The gap register:** the seven gaps in [gaps], each on its owning build's chain row.
+- **The chain:** nineteen clauses join ten rows, and the critical path grows from 239 units at `ad530a80c` to 253,
+  its fourteen new units one on dGroundRules, four on dDeclaredLoop, one on dWitnessedBar, one on dBoundRoles, six on
+  dWellOiledMachine and one on dCalibratedLens.
 
 ## [owed] Owed to later builds
 

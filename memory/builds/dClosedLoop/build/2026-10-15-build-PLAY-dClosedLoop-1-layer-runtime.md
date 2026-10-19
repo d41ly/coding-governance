@@ -331,7 +331,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | `blocked` | each blocked item, with what blocks it | raises an owner item once nothing the item waits on is in flight |
   | `terminal` | all work terminal | closes the run; the two runs left at BUILDING were this case |
   | `stuck` | no frontier, while the build is not terminal | raises an owner item at once |
-  | `invalid-input` | a malformed declaration, policy value or witness, named with its path | refuses to act, and journals it |
+  | `invalid-input` | a malformed declaration, policy value or witness, named with its path | refuses to act, journals it and raises an owner item at once (revised 2026-10-19, P39) |
   | `stale-remote` | lease or ref witnesses that cannot be read | holds and retries, and parks once `leases.expiry-hours` passes |
 - **Item instances.** An item's witness is keyed by the item, its round or pass, and its inputs' SHAs. A
   route back mints a new instance. Routes back include:
@@ -390,14 +390,19 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     `runtime.relaunch` says. The default is fresh.
   - A fresh relaunch loses nothing returned. The supervisor hands the act's persisted returns into its
     harness, which spawns only the agents with none (`[spawn]`).
-  - Relaunches of one act stop at `RESUME_ATTEMPTS`, with a backoff between them. Past the cap, the item
-    parks with a journaled reason and an owner item.
+  - Relaunches of one item instance stop at `RESUME_ATTEMPTS`, counted over the instance's life and reset only
+    by a new witness, never by a transcript entry, with a backoff between them. Past the cap, the item draws on
+    the build's rework budget and routes to its producer, and an instance reaped twice at the act ceiling with no
+    new witness routes there to be split. Revised 2026-10-19 (P39): past the cap the item parked with an owner
+    item, and nothing said what reset the count, which today resets on any transcript entry.
 - **Session limits.**
   - stall-recorder's StopFailure record is the limit signal.
   - The supervisor parses the reset time from the limit message, holds new launches until then, and
     keeps renewing its lease.
   - A weekly limit can hold for days. So once the hold passes `runtime.hold-ceiling`, the supervisor
-    raises an owner item and keeps holding.
+    raises an owner item and releases the build's lease, so a node with quota takes the build over, and its wake
+    tick stops firing into the refused turn. Revised 2026-10-19 (P39): it kept holding, and today's held run
+    woke a session 115 times over 4.8 days.
 - **Fencing.** Revised: 2026-10-17, the debt round's fold.
   - Each lease carries an epoch in dDeclaredLoop's lease grammar, bumped at every take-over. One name
     per lease: the build lease (which the first draft also called the run lease), the unit lease, and

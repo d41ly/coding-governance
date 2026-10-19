@@ -19424,6 +19424,496 @@ out.write_text(body + "\n", encoding="utf-8", newline="\n")
 print(f"restored {out}: {len(body) + 1} bytes")
 ````
 
+### `fold_stall_answers.py`
+
+The owner's SL-1 to SL-8 folded: P39, eleven keys and their presets, eight revised rows, nineteen clauses on ten chain rows, the seven gaps, flow-steps, layer-runtime and coordination, and the record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there.
+
+````python
+"""The owner's answers to SL-1 to SL-8, folded with the stall-and-loop design: P39, eleven keys and their preset rows,
+eight revised rows, clauses on ten chain builds, the seven gaps, flow-steps' rules, layer-runtime's relaunch, hold
+and `invalid-input`, coordination's mailbox disposal, and the record's [answers] and [folded], its own text settled
+where the fold placed a clause differently.
+
+Usage: python -X utf8 fold_stall_answers.py   (from the worktree root, or a full copy of it for a dry run)
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md"
+SL6 = "owner items only by default, changeable by the policy setting"
+SL7 = ("at once or after 3 by default,  changeable by the policy setting (2 or 5, or any owner-set number up to "
+       "10)")
+RV = "P39"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    if any("; " in c for c in clauses):
+        sys.exit(f"{build}: a clause holds '; '")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+
+# ---------------------------------------------------------------- the revision note and P39
+V.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):\n",
+    "Revised: 2026-10-19, the owner's answers to the stall-and-loop forks (`" + REC + "`\n"
+    "`[answers]`): P39 is added, every loop ending and every wait expiring. One rework budget per build bounds every\n"
+    "repetition, scaled by the units frozen at Design's exit (SL-1), and a build that spends it ends without another\n"
+    "lap (SL-2). Every review loop stops when it stops converging, under `review.max-rounds` (SL-3). An owner item\n"
+    "past its deadline takes its recommended option unless it is a ratification or an owner-only write (SL-4, SL-5),\n"
+    "and is pushed while no owner session is open (SL-6). A rule that keeps refusing in one act ends it (SL-7), and\n"
+    "spend is measured before any cap is set (SL-8). Eleven keys join the catalogue and every preset,\n"
+    "`leases.renewal` renews on progress by default, ten chain rows gain their part, and seven gaps are added.\n\n",
+    "revision note")
+V.sub("  or retires such a surface with no step reds at dSafePassage's step gate (SA-11), and a change of meaning behind\n"
+      "  an unchanged name is the review's to catch.\n",
+      "  or retires such a surface with no step reds at dSafePassage's step gate (SA-11), and a change of meaning behind\n"
+      "  an unchanged name is the review's to catch.\n"
+      "- **P39 Every loop ends and every wait expires.** Every way work can repeat, a route back, a fix pass, a review\n"
+      "  round after the first, a re-dispatch after a refusal, a research or probe round trip or a patch build of the\n"
+      "  build's own landing, draws on one rework budget per build that only the owner can raise, so the budget falls\n"
+      "  with every lap and the build ends. Contention waits in its turn and draws nothing. Every wait carries a\n"
+      "  deadline and a declared outcome, every refusal names a remedy its target can perform or goes at once to an\n"
+      "  actor who can, and a build that stops making witnessed progress is stopped by a detector, never by a person\n"
+      "  noticing. Flow owns the contract and Runtime enforces it (the owner's stall-and-loop review, SL-1 to SL-8).\n",
+      "P39")
+
+# ---------------------------------------------------------------- the catalogue: eight revised rows, eleven new ones
+V.sub("| `leases.renewal` | activity, fixed, none | activity | walk C2 | dPlacedRequest |",
+      "| `leases.renewal` | progress, activity, fixed, none | progress | walk C2; `progress`, added by the stall-and-loop "
+      "round and armed by dWellOiledMachine's progress ledger, renews on witnessed progress at item boundaries and on "
+      "declared waits inside their deadline, since a looping holder renews for ever under `activity` (P39) | "
+      "dPlacedRequest |", "leases.renewal")
+V.sub("| `runtime.hold-ceiling` | hours | 6 | runtime `[supervise]` | dWellOiledMachine |",
+      "| `runtime.hold-ceiling` | hours | 6 | runtime `[supervise]`; past it an owner item is raised and the build's lease "
+      "released, so a node with quota takes the build over (P39) | dWellOiledMachine |\n"
+      "| `runtime.no-progress` | a retry count of acts on one item instance with no new witness | 3 | the stall-and-loop "
+      "round: past it the item is stuck, draws on the build's rework budget and routes to its producer (P39) | "
+      "dWellOiledMachine |\n"
+      "| `runtime.refusal-repeats` | a retry count from 1 to 10 | 3 | the owner's SL-7: \"" + SL7 + "\"; the same rule "
+      "refusing this many times in one act ends the act and routes the item to the remedy's actor, and a refusal its "
+      "target cannot act on routes there at once (P39) | dWellOiledMachine |\n"
+      "| `runtime.restarts` | a retry count per hour | 3 | the stall-and-loop round: supervisor restarts past it within an "
+      "hour stop the supervisor with an owner item, as an Erlang supervisor escalates (P39) | dWellOiledMachine |",
+      "runtime keys")
+V.sub("| `notify.owner` | turn-micro-formats, park-and-landing, every-transition, park-only | turn-micro-formats | "
+      "flow-roles FR-3 | dKeptSession |",
+      "| `notify.owner` | turn-micro-formats, park-and-landing, every-transition, park-only | turn-micro-formats | "
+      "flow-roles FR-3: progress only, since the owner's SL-6 gave an owner item's push to Runtime | dKeptSession |",
+      "notify.owner")
+V.sub("| `notify.channel` | terminal, or another registered channel | terminal | the expansion round: integrations' "
+      "notification adapters | dWellOiledMachine |",
+      "| `notify.channel` | terminal, or another registered channel | terminal | the expansion round: integrations' "
+      "notification adapters | dWellOiledMachine |\n"
+      "| `notify.owner-items` | push-when-away, turn-end-only, push-items-and-parks | push-when-away | the owner's SL-6: "
+      "\"" + SL6 + "\"; while no owner session is open, owner items alone are pushed through `notify.channel`, progress "
+      "staying `notify.owner`'s as FR-3 set it (P39) | dWellOiledMachine |\n"
+      "| `run.owner-deadline` | hours | 24 | the owner's SL-5: \"24 hours\"; how long an owner item waits before "
+      "`run.on-owner-silence` applies (P39) | dWellOiledMachine |\n"
+      "| `run.on-owner-silence` | apply-recommendation, remind-then-park, wait | apply-recommendation | the owner's SL-4: "
+      "\"Apply recommendation\"; past the deadline the item's recommended option applies, and a ratification or an "
+      "owner-only write parks its build as `remind-then-park` does, never decided for the owner (P39) | "
+      "dWellOiledMachine |", "owner keys")
+V.sub("| `run.on-owner-question` | best-effort-recorded, park-item, park-build, stop-run | best-effort-recorded | "
+      "flow-roles FR-4, FR-12 | dBoundRoles |",
+      "| `run.on-owner-question` | best-effort-recorded, park-item, park-build, stop-run | best-effort-recorded | "
+      "flow-roles FR-4, FR-12; once a build's rework budget is spent, best effort chooses only among endings, never "
+      "another lap (the owner's SL-2) | dBoundRoles |", "run.on-owner-question")
+V.sub("| `review.follow-up` | after-high, while-finding, never | after-high | flow-roles FR-9 | dDeclaredLoop |",
+      "| `review.follow-up` | after-high, while-finding, never | after-high | flow-roles FR-9; the loop ends at a round "
+      "whose blocker and high count stops strictly falling, its findings promoted, and every round draws on "
+      "`flow.rework-budget` (the owner's SL-3) | dDeclaredLoop |", "review.follow-up")
+V.sub("| `review.design.round-count` | a round count held below the loop kit's runaway ceiling, `RUNAWAY_CEILING`, which "
+      "dDeclaredLoop moves out of unattended | 2 | flow steps; read only under `fixed-count` | dDeclaredLoop |",
+      "| `review.design.round-count` | a round count held at or below `review.max-rounds`, the loop kit's runaway "
+      "ceiling, which dDeclaredLoop moves out of unattended into the policy file | 2 | flow steps; read only under "
+      "`fixed-count` | dDeclaredLoop |\n"
+      "| `review.max-rounds` | a round count | 3 | the stall-and-loop round: `RUNAWAY_CEILING` made a policy value that "
+      "bounds every review loop, the closing review's follow-ups included, which had no backstop in the design (P39) | "
+      "dDeclaredLoop |", "review rounds")
+V.sub("| `flow.route-backs` | a route-back count | 3 | the flow layer's fold: a route back past the count becomes an "
+      "owner item | dDeclaredLoop |",
+      "| `flow.route-backs` | a route-back count | 3 | the flow layer's fold; since the stall-and-loop round, the "
+      "per-item early limit beneath `flow.rework-budget`, past which that item's loop ends non-converging and its open "
+      "work goes to asks (P39, the owner's SL-1) | dDeclaredLoop |\n"
+      "| `flow.rework-budget` | a route-back count per build, or a base plus a count per unit frozen at Design's exit, "
+      "written `<base>+<per-unit>` | 4+2 | the owner's SL-1: \"Per build, scaled (Recommended)\"; one budget per build "
+      "that every route back, fix pass, review round after the first, re-dispatch after a refusal, research or probe "
+      "round trip and patch build of the build's own landing draws on, and contention never does; raising it is a "
+      "loosening, the owner's alone (P39) | dDeclaredLoop |\n"
+      "| `flow.on-exhausted` | best-effort-ending, park-for-owner, close-incomplete | best-effort-ending | the owner's "
+      "SL-2: \"Best-effort ending (Recommended)\"; a build whose budget is spent ends and never laps again: best effort "
+      "lands what is witnessed green and files the rest, descopes the failing units, or closes the build incomplete "
+      "(P39) | dDeclaredLoop |\n"
+      "| `flow.wait-ceiling` | hours | 72 | the stall-and-loop round: the deadline gov's own waits declare, a dependency "
+      "hold, a mailbox question or an awaited record, past which the waiter takes its declared outcome (P39) | "
+      "dDeclaredLoop |", "flow keys")
+V.sub("| `verdict.flakes` | quarantine, record, retry-only; a threshold | quarantine | walk T3 | dWitnessedBar |",
+      "| `verdict.flakes` | quarantine, record, retry-only; a threshold | quarantine | walk T3; the threshold three "
+      "consecutive greens unless set, and a quarantined leg run at least once a day (P39) | dWitnessedBar |",
+      "verdict.flakes")
+V.sub("| `build.unit-holders` | any-session, driver-only | any-session | the night pass two, point 4: whether a session "
+      "that does not hold a build may drive one of its units under that unit's lease, the owner's NT-20 | "
+      "dWellOiledMachine |",
+      "| `build.unit-holders` | any-session, driver-only | any-session | the night pass two, point 4: whether a session "
+      "that does not hold a build may drive one of its units under that unit's lease, the owner's NT-20 | "
+      "dWellOiledMachine |\n"
+      "| `build.spend-cap` | measured, or a spend per build | measured | the owner's SL-8: \"Measure, then set "
+      "(Recommended)\"; each build's spend recorded from its `trace.cost` rows and trended, and a cap set from that "
+      "evidence, as `memory.item-budget` was measured first (P39) | dWellOiledMachine |", "build.spend-cap")
+
+# ---------------------------------------------------------------- the presets
+PRESETS = [
+    ("| `leases.renewal` | activity | activity | activity | activity |",
+     "| `leases.renewal` | progress | progress | progress | progress |", None),
+    ("| `runtime.hold-ceiling` | 6 | 6 | 6 | 6 |", None,
+     ["| `runtime.no-progress` | 4 | 3 | 2 | 3 |", "| `runtime.refusal-repeats` | 5 | 3 | 2 | 3 |",
+      "| `runtime.restarts` | 3 | 3 | 3 | 3 |"]),
+    ("| `notify.channel` | terminal | terminal | terminal | terminal |", None,
+     ["| `notify.owner-items` | push-when-away | push-when-away | push-items-and-parks | push-when-away |",
+      "| `run.owner-deadline` | 24 | 24 | 24 | 24 |",
+      "| `run.on-owner-silence` | apply-recommendation | apply-recommendation | remind-then-park | apply-recommendation |"]),
+    ("| `review.design.round-count` | 2 | 2 | 2 | 2 |", None, ["| `review.max-rounds` | 2 | 3 | 4 | 3 |"]),
+    ("| `flow.route-backs` | 5 | 3 | 2 | 3 |", None,
+     ["| `flow.rework-budget` | 6+3 | 4+2 | 3+1 | 4+2 |",
+      "| `flow.on-exhausted` | best-effort-ending | best-effort-ending | park-for-owner | best-effort-ending |",
+      "| `flow.wait-ceiling` | 48 | 72 | 168 | 72 |"]),
+    ("| `build.unit-holders` | any-session | any-session | driver-only | any-session |", None,
+     ["| `build.spend-cap` | measured | measured | measured | measured |"]),
+]
+for old, repl, add in PRESETS:
+    V.sub(old + "\n", (repl or old) + "".join("\n" + r for r in (add or [])) + "\n", f"preset {old[:34]}")
+
+# ---------------------------------------------------------------- the chain rows
+add_clauses(V, "dGroundRules", [
+    "each loop bound and deadline key declaring that raising it is a loosening, read by the schema, seen red on a "
+    f"planted loop bound with no declared direction ({RV})"], [])
+add_clauses(V, "dPlacedRequest", [
+    "the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the intake's content key, "
+    f"sized as `flow.rework-budget`'s base, seen red on a planted placement loop ({RV})"], [])
+add_clauses(V, "dFairHearing", [
+    "each round's state in the review report, CONVERGED, NON-CONVERGENT, BOUNDED or CEILING, computed against the round "
+    "before from its blocker and high count at the round limit its caller passes, seen red on a planted flat sequence "
+    f"and an oscillating one ({RV}, the owner's SL-3)"], ["gap-review-21"])
+add_clauses(V, "dDeclaredLoop", [
+    "the rework budget: one per build in its transition record, `flow.rework-budget`'s base plus its per-unit share "
+    "for each unit frozen at Design's exit, keyed to the build so units a loop mints cannot reset it, every repetition "
+    "drawing on it, a route back, a fix pass, a review round after the first, a re-dispatch of an unwitnessed instance "
+    "after a refusal, a voided witness or a lost SubagentStop, and a research or probe round trip, contention never "
+    "drawing on it, a verdict staled or a merge conflicted by another build's landing re-verified in its turn, and "
+    "`flow.route-backs` the per-item early limit past which that item's loop ends non-converging and its open work goes "
+    "to asks, seen red on a planted loop that mints a new unit each lap and green on a planted stale verdict that draws "
+    f"nothing ({RV}, the owner's SL-1)",
+    "`flow.on-exhausted`: a build whose budget is spent ends and never laps again, under `best-effort-ending` the driver "
+    "taking the ending its evidence supports and recording it for the owner, landing what is witnessed green with every "
+    "open finding filed as an ask, or descoping the failing units to asks and landing the rest, or closing the build "
+    "incomplete with its branch and records kept, `park-for-owner` and `close-incomplete` the other values, each "
+    "ending planted, a best-effort choice to lap again refused, and raising the budget the owner's alone "
+    f"({RV}, the owner's SL-2)",
+    "the convergence routing: every `until-*` and `while-*` value, spec audits, closing-review follow-ups and fix passes "
+    "against one acceptance red ending at a NON-CONVERGENT round, whose findings are promoted, to units while budget "
+    "remains and to asks after, never folded into another round, and every review loop, the closing review's included, "
+    "held to `review.max-rounds` rounds, seen red on a planted flat follow-up sequence that runs another round "
+    f"({RV}, the owner's SL-3, keeping FR-9)",
+    "the static termination check on every composition, gov's packs with the overlay, the scenarios and a build's "
+    "recorded changes, at the push and at each step boundary a build moves: every state reaching a terminal and every "
+    "item reachable, every cycle of the build and item transition tables passing a counted edge, every wait declaring "
+    "an outcome and a deadline, a value or a key such as `flow.wait-ceiling`, scenario successor chains acyclic, and a "
+    "raise of a loop bound read as a loosening that waits for the owner under `flow.adapt` and is named as a widening "
+    "in the overlay's update report, seen red on a planted repository stage routing back into itself, a wait declaring "
+    f"no deadline, a scenario successor cycle and an unattended raise of the budget ({RV})"],
+    ["gap-flow-23", "gap-flow-24"])
+add_clauses(V, "dKeptSession", [
+    "a message awaiting an answer declaring `flow.wait-ceiling` as its deadline, past which the asker's declared "
+    f"default answers it and the build's transitions go on, seen on a planted question nobody answers ({RV})",
+    f"the card showing the build's remaining rework budget beside its pointers ({RV})"], [])
+add_clauses(V, "dBoundRoles", [
+    "the typed refusal return in every role's template, its refusing rule, its remedy and the remedy's actor, who is "
+    "the refused agent, its producer, the driver, the owner or another build, the outcome table routing a remedy the "
+    "refused actor cannot perform within its grant at once to that actor and never re-offering the item to the refused "
+    "agent, and `run.on-owner-question`'s best effort choosing only among endings once a build's budget is spent, seen "
+    f"on a planted refusal of each actor kind ({RV}, the owner's SL-2 and SL-7)"], ["gap-roles-31"])
+add_clauses(V, "dWitnessedBar", [
+    "a quarantined leg released after three consecutive greens unless `verdict.flakes` sets another threshold, and run "
+    "at least once a day whatever `verdict.held` says so its greens accrue, and a blocking CONTENDED red re-run once on "
+    "a quiet host, one running no other bar, a red there routed by its attribution and never re-run, and none found "
+    "within `flow.wait-ceiling` raising an owner item, seen on a planted quarantine and a planted contended pair "
+    f"({RV})"], [])
+add_clauses(V, "dWellOiledMachine", [
+    "the progress ledger per item instance: each act recording a new witness, a new commit on its unit, a changed "
+    "findings digest or a refusal and its rule, `runtime.no-progress` acts with no new witness making the item stuck, "
+    "drawing on the build's budget and routing to its producer, the same verdict digest or refusal rule twice in a "
+    "row on one instance firing the loop detector, a wait inside its declared deadline exempt, the relaunch cap "
+    "counting lifetime relaunches of one instance reset only by a new witness and never by a transcript entry, an "
+    "instance reaped twice at the act ceiling with no new witness routed to its producer to split, and a build's lease "
+    "renewed under `leases.renewal`'s `progress` on witnessed progress and on declared waits inside their deadline, "
+    "never on activity alone, seen red on a planted act that writes its transcript every turn and never finishes, a "
+    f"planted repeat and a planted holder that loops while active ({RV})",
+    "every wait the supervisor holds given its deadline and outcome: the session-limit hold releasing the build's lease "
+    "at `runtime.hold-ceiling` so a node with quota takes the build over and the wake tick stops, the admission queue "
+    "writing a stall record naming the holders when a wait outlasts `runtime.act-ceiling` with no release and "
+    "reclaiming a slot held past it, every nested spawn drawing from its parent's reservation and never queueing again, "
+    "restarts beyond `runtime.restarts` in an hour stopping the supervisor with an owner item, and `invalid-input` "
+    "raising an owner item at once, seen red on the 115-wake limit loop replayed, a planted leaked slot, six acts each "
+    f"spawning a nested fan of two at saturation, and a planted crash loop ({RV})",
+    "owner items, each carrying `run.owner-deadline`, past which `run.on-owner-silence` applies, the item's recommended option "
+    "by default and a ratification or an owner-only write parked, never decided for the owner, and each pushed through "
+    "`notify.channel` while no owner session is open as `notify.owner-items` says, seen on a planted silent owner of "
+    f"each kind ({RV}, the owner's SL-4, SL-5 and SL-6)",
+    "the refusal breaker: every refusal journaled with its rule, the same rule refusing `runtime.refusal-repeats` "
+    "times in one act ending the act with a typed refusal return, the item drawing on the build's budget and routing "
+    "to the remedy's actor, the hook pack's refusal text declaring the remedy's actor too, and registration refusing a "
+    "remedy another registered guard refuses, seen red on a planted rule refusing a builder's rephrased write and on a "
+    f"planted pair of guards each refusing the other's remedy ({RV}, the owner's SL-7)",
+    "the wait graph across builds, built when a wait passes half its deadline, over parent holds, interface waits, "
+    "lease waits and open mailbox questions, a cycle raising one owner item naming every build in it, and a parent "
+    "ending incomplete releasing its dependents to `deps.on-parent-withdrawn`, seen red on two planted builds each "
+    f"waiting on the other ({RV})",
+    "each build's spend recorded from its `trace.cost` rows and trended, `build.spend-cap` measured by default and set "
+    f"from that evidence, as `memory.item-budget` was ({RV}, the owner's SL-8)"],
+    ["gap-rt-37", "gap-rt-38", "gap-rt-39"])
+add_clauses(V, "dShippedRelease", [
+    "a patch build raised by a landing drawing on the originating build's rework budget, so a chain of patch builds "
+    "shares one budget, each release retry drawing on it too, and a release hold's third keep-waiting answer parking "
+    f"the build, seen red on a planted patch chain ({RV})"], [])
+add_clauses(V, "dCalibratedLens", [
+    "the stall and loop classes Runtime journals, no progress, a repeat, a budget spent, a deadline passed, a breaker "
+    "open and a cycle across builds, trended per scenario, item and rule, and the rework budget, the deadlines and the "
+    f"thresholds re-derived from that evidence once 30 builds have run under them ({RV}, P9)"], [])
+V.save()
+
+# ---------------------------------------------------------------- flow-steps, layer-runtime, coordination
+F = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+F.sub("  - A refusal routes by default: it is recorded, and `next` returns the frontier, the unwitnessed items\n"
+      "    whose needs are witnessed.\n",
+      "  - A refusal routes by default: it is recorded, and `next` returns the frontier, the unwitnessed items\n"
+      "    whose needs are witnessed. A re-dispatch of a refused instance draws on the build's rework budget, and a\n"
+      "    refusal its target cannot act on goes at once to the remedy's actor (P39, the owner's SL-7).\n",
+      "refusal route")
+F.sub("- **Every route back is bounded.** A route back, a review round included, counts in the build's\n"
+      "  transition record. Past `flow.route-backs` returns to the same item, the loop becomes an owner item,\n"
+      "  resolved as [breakpoint]'s owner gate is (FH1).\n",
+      "- **Every route back is bounded** (P39). A route back, a fix pass, a review round after the first, a re-dispatch\n"
+      "  after a refusal and a research or probe round trip each draw on the build's one rework budget,\n"
+      "  `flow.rework-budget`, in its transition record. Contention draws nothing: a verdict staled or a merge conflicted\n"
+      "  by another build's landing is re-verified in its turn. Past `flow.route-backs` returns to the same item, that\n"
+      "  item's loop ends non-converging and its open work goes to asks. Once the budget is spent, the build ends as\n"
+      "  `flow.on-exhausted` says, never with another lap. Revised 2026-10-19 by the owner's SL-1 and SL-2: the loop\n"
+      "  had become an owner item, resolved as [breakpoint]'s owner gate is (FH1).\n", "route-back rule")
+F.save()
+R = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+R.sub("  - Relaunches of one act stop at `RESUME_ATTEMPTS`, with a backoff between them. Past the cap, the item\n"
+      "    parks with a journaled reason and an owner item.\n",
+      "  - Relaunches of one item instance stop at `RESUME_ATTEMPTS`, counted over the instance's life and reset only\n"
+      "    by a new witness, never by a transcript entry, with a backoff between them. Past the cap, the item draws on\n"
+      "    the build's rework budget and routes to its producer, and an instance reaped twice at the act ceiling with no\n"
+      "    new witness routes there to be split. Revised 2026-10-19 (P39): past the cap the item parked with an owner\n"
+      "    item, and nothing said what reset the count, which today resets on any transcript entry.\n", "relaunch")
+R.sub("  - A weekly limit can hold for days. So once the hold passes `runtime.hold-ceiling`, the supervisor\n"
+      "    raises an owner item and keeps holding.\n",
+      "  - A weekly limit can hold for days. So once the hold passes `runtime.hold-ceiling`, the supervisor\n"
+      "    raises an owner item and releases the build's lease, so a node with quota takes the build over, and its wake\n"
+      "    tick stops firing into the refused turn. Revised 2026-10-19 (P39): it kept holding, and today's held run\n"
+      "    woke a session 115 times over 4.8 days.\n", "hold")
+R.sub("| `invalid-input` | a malformed declaration, policy value or witness, named with its path | refuses to act, and "
+      "journals it |",
+      "| `invalid-input` | a malformed declaration, policy value or witness, named with its path | refuses to act, "
+      "journals it and raises an owner item at once (revised 2026-10-19, P39) |", "invalid-input")
+R.save()
+C = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md")
+C.sub("   is neither answered nor acknowledged, the reply being the witness;",
+      "   is neither answered nor acknowledged, the reply being the witness, until `flow.wait-ceiling` passes and the\n"
+      "   asker's declared default answers it (revised 2026-10-19, P39);", "mailbox disposal")
+C.save()
+
+# ---------------------------------------------------------------- the register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+S1 = "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-{}.md`"
+NEW = {
+    "gap-flow-22": [
+        ("gap-flow-23", "Flow", "HIGH", "No bound spans a build: the driver bounds each review loop and each unit pass "
+         "apart, so a build's total rework has no ceiling; a promotion cascade ran four audit generations, about 12M "
+         "tokens, before a run's own override stopped it. Raised by the owner.", S1.format("history") + " rows 6 to 8"),
+        ("gap-flow-24", "Flow", "MED", "Nothing checks that a flow can finish or that its loops are counted: the run's "
+         "phases are code, extension vocabularies add steps unchecked, and a per-item counter never escalated once a "
+         "loop minted new units.", S1.format("prior-art") + " P1 and P5; " + S1.format("census"))],
+    "gap-rt-36": [
+        ("gap-rt-37", "Runtime", "HIGH", "The resume cap counts consecutive fruitless launches and resets on any "
+         "transcript entry, so an act that writes and never finishes relaunches without end; all 23 recorded resumes "
+         "were manual.", "`tools/unattended/resume-tick.sh:70-74`; " + S1.format("scenarios") + " P1; "
+         + S1.format("history") + " row 26"),
+        ("gap-rt-38", "Runtime", "HIGH", "Waits have no deadline or outcome: held runs, limit holds and owner hand-offs "
+         "wait until a person resumes them; one weekly-limit stall woke a session 115 times over 4.8 days, and 8 run "
+         "records still read HELD after their work landed.", S1.format("history") + " rows 11 and 26"),
+        ("gap-rt-39", "Runtime", "MED", "No refusal is counted: every PreToolUse and git hook refuses afresh, a builder "
+         "was refused 10 times in a row by one rule, and the stop guard's cap resets with each session.",
+         S1.format("refusals") + " sections 2 and 3")],
+    "gap-roles-30": [
+        ("gap-roles-31", "Roles", "MED", "A refusal names no actor for its remedy: three of today's guards name remedies "
+         "their target cannot perform (a spawn, a parent's kickoff, an owner write), and a refused builder's only exit "
+         "is a free-text divergence.", S1.format("refusals") + " T5, T6, T7 and section 3")],
+    "gap-review-20": [
+        ("gap-review-21", "Review", "MED", "Only the unattended driver computes whether a review round converged: "
+         "attended reviews, promotion chains and follow-up rounds have no rule, the precision floor is never read, and "
+         "a round's own fold caused 68% to 97% of the next round's findings.", S1.format("history") + " section 2")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    for off, (k, st_, sv_, gap, ev) in enumerate(rows, 1):
+        lines.insert(idx[0] + off, f"| {k} | {st_} | {sv_} | {gap} | {ev} | — |")
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 361 or set(st) - set(ORDER) or len({k[0] for k in keys}) != len(keys):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the stall-and-loop round added `gap-flow-23`, `gap-flow-24`, `gap-rt-37` to `gap-rt-39`,\n"
+    "`gap-roles-31` and `gap-review-21` (`" + REC + "` `[gaps]`),\nsame instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the design record
+D = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md")
+D.sub("   - **the admission queue:** a wait past `runtime.queue-stall` with no release writes a stall record naming the\n"
+      "     holders; a slot held past the act ceiling is reclaimed;\n",
+      "   - **the admission queue:** a wait past the act ceiling, `runtime.act-ceiling`, with no release writes a stall\n"
+      "     record naming the holders, since every act ends by that ceiling; a slot held past it is reclaimed;\n",
+      "queue stall")
+D.sub("   - **owner items:** a deadline (`owner.deadline`), then the outcome `owner.on-silence` says. A ratification or an\n"
+      "     owner-only write is never decided for the owner;\n",
+      "   - **owner items:** a deadline (`run.owner-deadline`), then the outcome `run.on-owner-silence` says. A\n"
+      "     ratification or an owner-only write is never decided for the owner;\n", "owner keys")
+D.sub("    lines at each turn's end. Whether an owner item is also pushed while no owner session is open is the owner's fork.\n",
+      "    lines at each turn's end. While no owner session is open, owner items alone are also pushed through the\n"
+      "    registered channel, as the owner's SL-6 settled it, and `notify.owner-items` lets the owner change that.\n",
+      "item 10")
+D.sub("| Session | dKeptSession | the mailbox's question deadlines, and an owner item's delivery |",
+      "| Session | dKeptSession | the mailbox's question deadlines, and the remaining budget on the card |", "layers session")
+D.sub("the wait graph across builds, restart intensity |",
+      "the wait graph across builds, restart intensity, an owner item's deadline and push, and each build's spend |",
+      "layers runtime")
+D.sub("- **dKeptSession:** mailbox question deadlines with the asker's default; owner-item delivery as the owner's fork says.\n",
+      "- **dKeptSession:** mailbox question deadlines with the asker's default; the remaining budget on the card.\n",
+      "chain session")
+D.sub("  `invalid-input` raised. Each is seen red on a planted case, the 115-wake limit loop among them.\n",
+      "  `invalid-input` raised; owner items' deadlines and their push; the spend record. Each is seen red on a planted\n"
+      "  case, the 115-wake limit loop among them.\n", "chain runtime")
+D.sub("| SC-own-5, owner items unseen | item 10, the owner's fork |",
+      "| SC-own-5, owner items unseen | item 10, as the owner's SL-6 settled it |", "coverage")
+D.insert_before("## [owed] Owed to later builds\n", """## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in two batches, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| SL-1 | "Per build, scaled (Recommended)" |
+| SL-2 | "Best-effort ending (Recommended)" |
+| SL-3 | "FR-9 + convergence (Recommended)" |
+| SL-4 | "Apply recommendation" |
+| SL-5 | "24 hours" |
+| SL-6 | "%s" |
+| SL-7 | "%s" |
+| SL-8 | "Measure, then set (Recommended)" |
+
+Four took the recommendation as offered: SL-1, SL-2, SL-3 and SL-8. SL-4 chose the second option: past the deadline,
+the item's recommended option applies, unless it is a ratification or an owner-only write, which is never decided for
+the owner. SL-5 chose 24 hours over the recommended 72. SL-6 and SL-7 took the recommendation in the owner's own words,
+each a policy value the owner may change, and SL-7's count may be any the owner sets up to 10.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **v2:** P39 joins the principles. Eleven keys join the catalogue and every preset: `flow.rework-budget`,
+  `flow.on-exhausted`, `flow.wait-ceiling`, `review.max-rounds`, `runtime.no-progress`, `runtime.refusal-repeats`,
+  `runtime.restarts`, `notify.owner-items`, `run.owner-deadline`, `run.on-owner-silence` and `build.spend-cap`. Eight rows say
+  their part: `leases.renewal` gains `progress` as its default, and `flow.route-backs`, `review.design.round-count`,
+  `review.follow-up`, `run.on-owner-question`, `notify.owner`, `runtime.hold-ceiling` and `verdict.flakes` follow.
+  Ten chain rows gain clauses, each seen red on its planted case: dGroundRules, dPlacedRequest, dFairHearing,
+  dDeclaredLoop, dKeptSession, dBoundRoles, dWitnessedBar, dWellOiledMachine, dShippedRelease and dCalibratedLens.
+- **This record, where the fold placed a thing differently from [design], [layers] and [chain]:**
+  - an owner item's push moves from dKeptSession to dWellOiledMachine, which registers `notify.channel`, since a
+    clause sits on a descendant of every build whose schema it reads;
+  - the remaining budget goes on the card through dKeptSession, which updates the card's pointers;
+  - the admission queue's stall check reads `runtime.act-ceiling` instead of a key of its own: every act ends by that
+    ceiling, so a wait that outlasts it with no release can only be a leaked slot;
+  - the owner-item keys join the `run` namespace beside `run.on-owner-question`, as `run.owner-deadline` and
+    `run.on-owner-silence`, instead of opening an `owner` namespace for two keys;
+  - `leases.renewal` keeps its owner, dPlacedRequest, and gains the value `progress`, which dWellOiledMachine's ledger
+    arms;
+  - `flow.wait-ceiling` is the deadline gov's own waits declare, and the static check still reds a wait declaring
+    none;
+  - a CONTENDED red's quiet host is one running no other bar, and a re-run that finds none within the wait ceiling
+    raises an owner item.
+- **flow-steps:** a refused instance's re-dispatch draws on the budget, and the route-back rule ends a loop instead of
+  raising an owner item.
+- **layer-runtime:** the relaunch cap counts an instance's life, the session-limit hold releases the lease at its
+  ceiling, and `invalid-input` raises an owner item at once.
+- **coordination:** a mailbox question waits only until `flow.wait-ceiling`.
+- **The gap register:** the seven gaps in [gaps], each on its owning build's chain row.
+- **The chain:** nineteen clauses join ten rows, and the critical path grows from 239 units at `ad530a80c` to 253,
+  its fourteen new units one on dGroundRules, four on dDeclaredLoop, one on dWitnessedBar, one on dBoundRoles, six on
+  dWellOiledMachine and one on dCalibratedLens.
+
+""" % (SL6, SL7), "answers and folded")
+D.save()
+print("folded the owner's SL-1 to SL-8")
+````
+
+### `log_stall_answers.py`
+
+The session log's event for the answers and their fold.
+
+````python
+"""Record the owner's stall-and-loop answers and their fold in the session log's events.
+
+Usage: python -X utf8 log_stall_answers.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner answered SL-1 to SL-8, recorded verbatim in `{REC}` `[answers]`, and the
+  answers were folded (`[folded]`) with no agent dispatched. P39 joins v2, eleven keys join the catalogue and every
+  preset, eight rows say their part, ten chain rows gain nineteen clauses, and the seven gaps join the register. Where
+  the fold placed a thing differently from the record, the record now says so: an owner item's push goes to
+  dWellOiledMachine, the owner-item keys to the `run` namespace, and the queue's stall check to `runtime.act-ceiling`.
+  The fold's closing review is owed.
+""", "the fold's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -19802,6 +20292,8 @@ MINE = [
     ('stall/write_questions.py', "The stall-and-loop round's five research questions, each quoting the owner's request verbatim, for `handoff.py render --input question=...`."),
     ('stall/log_stall_research.py', "The session log's dispatch rows 143 to 147, the derived agent lines and the round's event."),
     ('stall/restore_c2.py', "Restores dispatch 120's probe, `probe/c2.py`, from the instruments record committed at HEAD, after a researcher of the stall-and-loop round deleted the scratchpad's `probe/` folder."),
+    ('stall/fold_stall_answers.py', "The owner's SL-1 to SL-8 folded: P39, eleven keys and their presets, eight revised rows, nineteen clauses on ten chain rows, the seven gaps, flow-steps, layer-runtime and coordination, and the record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there."),
+    ('stall/log_stall_answers.py', "The session log's event for the answers and their fold."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -20287,7 +20779,7 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 
 ````text
 $ python plain_cites.py
-landing                  9  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's) …
+landing                 10  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dDeclaredLoop (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's) …
 plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
 seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
 census                   6  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dPlacedRequest (dLinkedLibrary's), dKeptSession (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
@@ -20295,6 +20787,7 @@ code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalR
 witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
+spec                     4  dFairHearing (dIndexedDesign's), dDeclaredLoop (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
 act                      4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
@@ -20302,10 +20795,11 @@ review                   3  dGroundRules (dFairHearing's), dSafePassage (dFairHe
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
-spec                     3  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
+routing                  2  dDeclaredLoop (dWitnessedBar's), dKeptSession (dWitnessedBar's)
+ask                      2  dDeclaredLoop (dTotalRecall's), dKeptSession (dTotalRecall's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 roster                   2  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's)
 baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
@@ -20324,12 +20818,10 @@ triage                   1  dPlacedRequest (dRankedPlan's)
 overlap                  1  dPlacedRequest (dIndexedDesign's)
 comparison               1  dPlacedRequest (dShippedRelease's)
 fleet                    1  dPlacedRequest (dShippedRelease's)
-routing                  1  dKeptSession (dWitnessedBar's)
-ask                      1  dKeptSession (dTotalRecall's)
 seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 110, over 42 kinds
+plain-word hits on a non-ancestor's record kind: 114, over 42 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -20812,10 +21304,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:842 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:858 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:842 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:858 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -20863,13 +21355,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2540 nodes in 30 namespaces; 31663 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1750, derived 295, pending 495
-map: no stale facts read 61 records and 23 quotes of a map count or the critical path
+map: 2561 nodes in 30 namespaces; 31722 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1760, derived 306, pending 495
+map: no stale facts read 61 records and 24 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 214 records, 3540 sections, 205 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 214 records, 3544 sections, 206 decision sections, 16 comparison areas, 39 principles
 rc 0
 
 $ fold state
@@ -20887,8 +21379,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 470 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 110 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 21 · owned nodes read 481 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 114 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -20920,7 +21412,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 354 · chain builds 21
+register keys 361 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -20928,13 +21420,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 244 · presettable 220 · preset rows 220
+catalogue keys 255 · presettable 231 · preset rows 231
 no findings
 rc 0
 
 $ critical path
-critical path: 239 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 10, dSafePassage 22, dFairHearing 38, dOrderedCharter 58, dDeclaredLoop 87, dPlacedRequest 99, dWitnessedBar 116, dKeptSession 122, dTotalRecall 140, dBoundRoles 141, dRankedPlan 155, dFurnishedOrders 161, dLinkedLibrary 165, dIndexedDesign 179, dWellOiledMachine 186, dScopedBuild 199, dTendedCadence 202, dMindYourWords 203, dShippedRelease 213, dCalibratedLens 217, dConvergedCharter 239
+critical path: 253 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 105, dWitnessedBar 122, dKeptSession 130, dTotalRecall 146, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 171, dIndexedDesign 185, dWellOiledMachine 199, dScopedBuild 212, dTendedCadence 215, dMindYourWords 216, dShippedRelease 227, dCalibratedLens 231, dConvergedCharter 253
 rc 0
 ````
 

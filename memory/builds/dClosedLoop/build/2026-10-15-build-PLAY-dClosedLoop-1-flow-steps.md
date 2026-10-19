@@ -27,16 +27,21 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
   for. Independent items run in parallel within the fan-out bound (P24).
 - **Every item's outcome set is closed, and every outcome routes.**
   - A refusal routes by default: it is recorded, and `next` returns the frontier, the unwitnessed items
-    whose needs are witnessed.
+    whose needs are witnessed. A re-dispatch of a refused instance draws on the build's rework budget, and a
+    refusal its target cannot act on goes at once to the remedy's actor (P39, the owner's SL-7).
   - Routes are declared explicitly where a policy value decides them.
   - Every role item's outcome set includes `probe`, routed to `[probe]` under `probe.raise`, the probe's record
     returned as the item's input on re-entry (night pass, point 2).
 - **Attendance changes no item.** Whether the owner attends never changes an item's actor, the driver or a binding.
   It adds only the owner's interactions: the announcement, confirmations at breakpoints and owner questions asked
   live (P4; `[breakpoint]`; night pass, point 1).
-- **Every route back is bounded.** A route back, a review round included, counts in the build's
-  transition record. Past `flow.route-backs` returns to the same item, the loop becomes an owner item,
-  resolved as [breakpoint]'s owner gate is (FH1).
+- **Every route back is bounded** (P39). A route back, a fix pass, a review round after the first, a re-dispatch
+  after a refusal and a research or probe round trip each draw on the build's one rework budget,
+  `flow.rework-budget`, in its transition record. Contention draws nothing: a verdict staled or a merge conflicted
+  by another build's landing is re-verified in its turn. Past `flow.route-backs` returns to the same item, that
+  item's loop ends non-converging and its open work goes to asks. Once the budget is spent, the build ends as
+  `flow.on-exhausted` says, never with another lap. Revised 2026-10-19 by the owner's SL-1 and SL-2: the loop
+  had become an owner item, resolved as [breakpoint]'s owner gate is (FH1).
 - **Every ask an item files states its acceptance** in one of the mechanical forms the memory layer's
   `[asks]` declares (LR-5). The forms are cited from there, never copied.
 - **Every work order loads its load set (P27):**
