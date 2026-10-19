@@ -209,6 +209,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 145 | gov-researcher, at the owner's medium effort | Stall and loop prevention: concrete stall and loop scenarios, a repository's own compositions included | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-20-researcher.md` | 1799cb98 | returned, 11m27s, 60.1k out: 68 scenarios, the top ten ranked by likelihood times cost | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-scenarios.md` |
 | 146 | gov-researcher, at the owner's medium effort | Stall and loop prevention: gov's measured history of stalls and loops, and what stopped each | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 1799cb98 | returned, 9m05s, 50.7k out: findings flat across rounds, a fold causing 68% to 97% of the next; `RUNAWAY_CEILING` never fired; all 23 resumes manual | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-history.md` |
 | 147 | gov-researcher, at the owner's medium effort | Stall and loop prevention: how other systems bound loops and waits, and which mechanisms fit gov | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-22-researcher.md` | 1799cb98 | returned, 9m21s, 45.3k out: a per-build budget, the strict-decrease rule, deadlines, a refusal breaker and a static check, each probed | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-prior-art.md` |
+| 148 | gov-researcher, at the owner's medium effort | Cloud coordination: where the design and today's tree assume one node, and which layer cloud coordination belongs to | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-23-researcher.md` | 1799cb98 | returned, 10m22s, 52.4k out: the shared truth already multi-node; seven core points missing; a new expansion layer; 17 stale claims measured | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-census.md` |
+| 149 | gov-researcher, at the owner's medium effort | Cloud coordination: the headless shape, units claiming work and relaying state through a shared endpoint | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-24-researcher.md` | 1799cb98 | returned, 8m46s, 41.0k out: git refs as the store and the fence; check-then-act fencing and a pruned lease's restarted epoch reproduced | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-headless.md` |
+| 150 | gov-researcher, at the owner's medium effort | Cloud coordination: the agentless head, placing work by load and plan limits with no LLM | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-25-researcher.md` | 1799cb98 | returned, 10m14s, 46.1k out: a head that offers and never assigns; a ledger keyed by plan the real gain; median parallelism inside a build 1.00 | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-mechanical-head.md` |
+| 151 | gov-researcher, at the owner's medium effort | Cloud coordination: the agent-driven head, against a hybrid that calls an LLM role only where judgment is needed | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-26-researcher.md` | 1799cb98 | returned, 11m28s, 51.4k out: a hybrid; an LLM head placed 11 identical runs two ways; its probe ran 17 headless model calls and made one folder outside its scratch, which it removed | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-agent-head.md` |
+| 152 | gov-researcher, at the owner's medium effort | Cloud coordination: the platform's limits, terms, cloud runtimes and security | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-27-researcher.md` | 1799cb98 | returned, 6m56s, 30.5k out: limits per account, not per node; hosted cloud sessions cannot push `refs/gov`; the terms ambiguous, an owner action | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-platform.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1641,6 +1646,21 @@ The stall-and-loop round's research, dispatches 143 to 147, derived from each ru
 - returned — gov-researcher · wrote 0 files · 9m21s · 45.3k out · run direct/a78b20e7c94aff2eb
 ```
 
+The cloud round's research, dispatches 148 to 152, derived from each run the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-23-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-23-researcher.md) · writes none · gates none · run direct/a7de371dd89baeaf6
+- returned — gov-researcher · wrote 0 files · 10m22s · 52.4k out · run direct/a7de371dd89baeaf6
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-24-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-24-researcher.md) · writes none · gates none · run direct/a5af9bc0cc6d4051a
+- returned — gov-researcher · wrote 0 files · 8m46s · 41.0k out · run direct/a5af9bc0cc6d4051a
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-25-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-25-researcher.md) · writes none · gates none · run direct/a238e7134ffcab67c
+- returned — gov-researcher · wrote 0 files · 10m14s · 46.1k out · run direct/a238e7134ffcab67c
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-26-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-26-researcher.md) · writes none · gates none · run direct/a536778ae4e9e0606
+- returned — gov-researcher · wrote 0 files · 11m28s · 51.4k out · run direct/a536778ae4e9e0606
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-27-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-27-researcher.md) · writes none · gates none · run direct/a396db6bf0d317394
+- returned — gov-researcher · wrote 0 files · 6m56s · 30.5k out · run direct/a396db6bf0d317394
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2755,6 +2775,15 @@ The stall-and-loop round's research, dispatches 143 to 147, derived from each ru
   cloud round. `review_debt.py` read 29 closing-review ranges covering 77 commits, took the whole-design shape audit's
   floor at `89e44048f`, and found eight design commits no review covers at `7e0322a5c`. The README's parked decisions
   carry them.
+
+- 2026-10-19, session 1799cb98: the owner opened the cloud round, in words recorded verbatim in `build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[words]`.
+  Five researchers took one question each, dispatches 148 to 152, at the owner's medium effort, and their returns are
+  saved beside the record. The record answers the owner's three questions: cloud coordination is a new expansion,
+  `fleet`, attaching at points the core declares; headless is the floor, a model-free head may only offer, and an LLM
+  serves as a judge role only; and the design has the shared truth but lacks the deciding half. It reports the lease
+  defects the probes reproduced, recommends P40 and seventeen seams on five builds, proposes fifteen gaps, and puts
+  CL-1 to CL-4 to the owner. Dispatch 151's probe ran 17 headless model calls, and made one folder outside its scratch,
+  which it removed.
 
 ## Instruments
 

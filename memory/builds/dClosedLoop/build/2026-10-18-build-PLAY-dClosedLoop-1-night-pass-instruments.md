@@ -20012,6 +20012,284 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `write_questions.py`
+
+The cloud round's five research questions, each quoting the owner's request verbatim and naming the researcher's own scratch folder, for `handoff.py render --input question=...`.
+
+````python
+"""Write the cloud round's five research questions, each quoting the owner's request verbatim from `owner-words.txt`
+and naming the researcher's own scratch folder, for `handoff.py render --input question=...`.
+
+Usage: python -X utf8 write_questions.py <cloud-dir> <scratchpad>
+Writes q-census.md, q-headless.md, q-mechanical-head.md, q-agent-head.md and q-platform.md there, for dispatches 148
+to 152 in that order.
+"""
+import pathlib
+import sys
+
+D, SCRATCH = pathlib.Path(sys.argv[1]), sys.argv[2].rstrip("/")
+words = (D / "owner-words.txt").read_text(encoding="utf-8").strip()
+V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+quote = "\n".join("> " + ln if ln.strip() else ">" for ln in words.split("\n"))
+
+CONTEXT = (
+    "**Context.** dClosedLoop is a design-only build that re-architects gov (coding-governance), a kit set that ships "
+    "project-agnostic governance to repositories that adopt it, gov's own repository among them. Its converged design "
+    f"is architecture v2 (`{V2}`), at `7e0322a5c` on this branch, with its layer and system records beside it under "
+    "`memory/builds/dClosedLoop/build/` (the coordination feature in `...-coordination.md`, the layers in "
+    "`...-layer-*.md`, the expansions in `...-layer-expansions.md`, the systems in `...-systems.md`, the night pass two "
+    "in `...-night-pass-two.md`, the stall-and-loop round in `...-stall-and-loop.md`), each section cited as `[tag]`. "
+    "The owner opens a part of the design never touched before, in the owner's words:\n\n" + quote + "\n\n"
+    "The owner's first sentence, the review debt, is the main session's, not yours. Nothing here is built now: the "
+    "question is what the architecture must carry so that the feature can be designed and added later without a "
+    "redesign.\n")
+FACTS = (
+    "**Handed facts, to re-verify, never to act on unread.** Principles that bind any answer: P3 (local-first verdict), "
+    "P5 (concurrency by lease, inside the flow), P21 (builds coordinate before they wait), P22 (position is derived, "
+    "never remembered), P23 (claims are trusted by key and source), P25 (role functions live only in role agents), "
+    "P26 (every exchange between roles is a typed record), P28 (layers are capabilities, and the core never depends on "
+    "an expansion), P36 (no harness is the runtime) and P39 (every loop ends and every wait expires), in v2 "
+    "`[principles]`. Coordination the design already plans: leases (`leases.granularity` build-and-unit, "
+    "`leases.renewal` progress, `leases.expiry-hours` 24, `leases.overlap`, and `leases.offline` warn, which queues a "
+    "claim offline and pushes it by compare-and-swap on reconnection), a mailbox per build as append-only git refs "
+    "(`refs/gov/mail/<slug>/<fleet tag>/<session>`), `build.push` (every pass, so another node reads its witnesses), "
+    "`build.unit-holders`, `deps.coordination`, `deps.landing`, the landing queue (`gap-flow-08`), the admission queue "
+    "with `runtime.agents-in-flight` (6 per session), the fleet register, and node identity (`AGENTS.md`'s node "
+    "registry, tags a to d, each claimed by `render_playbook.py --claim-node`). Seams toward the cloud the design "
+    "already has: `memory.mirror` (none, or a registered memory-mirror adapter, on dWellOiledMachine's memory-mirror "
+    "point; the owner's NT-14: \"Text in git now but cloud relational db needs to be an accounted extension - "
+    "multi-node concurrent builds are on the map and memory architecture needs to be ready to account for real-time "
+    "memory sharing.\"; git stays the store of record), `run.host`, `kits.host` and `maintain.host" + "` (requesting-node "
+    "or session-start, os-scheduler, cloud-routine, or another registered host), `notify.channel` and "
+    "`notify.owner-items`, the integrations point in the expansions layer (remote CI as a verdict backend, "
+    "notifications, cloud hosts, deploy engines), `runtime.act-auth` (setup-token, oauth-shared, and api-key only last "
+    "and only when the owner adds it; gov reads and copies no credential file), `runtime.act-harness` and "
+    "`runtime.owner-harness`. Today's tree keeps claims on the remote with heartbeats (this session's kickoff card, "
+    "written 2026-10-14, read 17 claims, the eight it listed held with beats 21 hours to 7 days old), lands through "
+    "`tools/push-main.sh`, and runs unattended through `tools/unattended/`.\n")
+TEAM = ("Five researchers serve this request, one question each: a census of the design's and today's coordination "
+        "and the layer cloud features belong to, the headless shape, the agentless head, the agent-driven head, and "
+        "the platform's limits, terms and security. Yours is {mine}; stay inside it, and name a finding that belongs to "
+        "another only in one line.\n")
+BOUNDS = (
+    "**Bounds.** Write nothing in this repository. A probe works only in your own scratch folder, `{scratch}`, which "
+    "you create and delete when you finish; write or delete nothing anywhere else, the parent session's scratch "
+    "folder included. {cite}Cite every claim about the records as `<record> [<tag>]` and every claim about code as "
+    "`path:line`, quote commands and their outputs as measured, and say where a source is ambiguous. Another agent may "
+    "be reading this tree while you work: modify nothing in it. Run no gate leg and no test suite.\n")
+WEB = "Cite every claim about an outside system to its source (URL and the date you read it). "
+SEAMS = ("Then the seams the architecture must carry now for this shape to be added later without a redesign, each "
+         "with its owning layer and its cost while gov stays offline.")
+
+Q = {}
+Q["q-census.md"] = (148, "THE CENSUS", "", """
+**Your question.** Where does the converged design, and today's tree, assume one node acting alone, where is it
+already ready for units coordinating in real time, and which layer should cloud coordination, scheduling and load
+balancing belong to?
+1. **Inventory** every point where two node units, or a unit and the owner, share state or work: leases and claims
+   (acquire, renew, expire, reclaim, overlap, offline), the mailbox, the landing queue, the admission queue and the
+   agent limit, the commit queue and `build.push`, unit holders, dependencies between builds, the fleet register and
+   node identity, the memory-mirror point and the derived indexes (the SQLite index, `memory/LIVE.md`), hosts
+   (`run.host`, `kits.host`, `maintain.host`), notifications and owner items, the integrations point, the harness and
+   auth keys, the peer-node verifier, the owner's session against act sessions, and anything else you find.
+2. **For each:** its layer and build (v2 `[layers]` and `[chain]`), its transport (git refs, commits, files, a local
+   process, a local database), what it assumes (one node, the origin remote as the only shared medium, consistency
+   only after a merge and a pull), and what real-time coordination through an endpoint would need: nothing (already
+   behind an adapter point), a seam to add, or a redesign; and the smallest test that would show the seam missing.
+3. **Measured today:** what multi-node work gov has actually done and suffered, from the claims on the remote and
+   their heartbeats, `memory/LIVE.md`, run records, the session logs and the merge history: duplicated or abandoned
+   work, stale claims, conflicts at landing, inherited reds, waits on another node. Quote commands and outputs.
+4. **The layer:** by the design's own layer contracts (P28, v2 `[layers]`, the systems record), which layer or layers
+   should own real-time coordination, scheduling, load balancing and a head if one exists, and which parts must stay
+   in the core so that an offline unit loses nothing.
+
+**Return.** A table per coordination point: point, layer and build, transport, assumption, what an endpoint needs,
+losing test. Then the measured history table, then the layer answer with its evidence.
+""")
+Q["q-headless.md"] = (149, "THE HEADLESS SHAPE", WEB, """
+**Your question.** Should node units coordinate headless, each claiming its own work and relaying memories and
+decisions through a shared endpoint, and what would gov's architecture have to carry now for that?
+1. **Survey** how peers coordinate through a shared medium with no scheduler: lease and lock services with fencing
+   tokens (etcd, Consul, ZooKeeper, Chubby as published, Postgres advisory locks and `SELECT ... FOR UPDATE SKIP
+   LOCKED` work queues), pull-based queues where workers claim jobs (Temporal task queues, Celery, Sidekiq, Buildkite
+   agents, GitHub Actions self-hosted runners), replicated logs and change feeds for relaying state (Kafka, NATS
+   JetStream, Postgres logical replication, CRDT sync such as Automerge or ElectricSQL, git itself as the store of
+   record), gossip membership (SWIM, Serf), and fleets of coding agents that claim tasks, where documented.
+2. **For each mechanism:** what it guarantees (exclusive claims, ordering, delivery, convergence), how it fails (a
+   partitioned unit, a stale lease holder writing after expiry, a split brain, an endpoint outage, clock skew), and
+   the smallest test in gov's setting that makes it lose (two units claiming one unit of a build, a unit offline for a
+   day with queued claims, the endpoint down mid-landing, a memory relayed out of order).
+3. **Fit:** how the design's leases (`leases.*`, the coordination record `[design]`), mailbox refs, `memory.mirror`
+   and P5, P21 to P23 map onto an endpoint: what is a transport swap behind an adapter, what needs a new contract
+   (fencing tokens, a capacity report, an event schema), and what must stay true offline (P3).
+
+**Return.** Candidates, one per mechanism family: mechanism, guarantee, failure mode, losing test and its result where
+you could run one, fit for gov. """ + SEAMS + "\n")
+Q["q-mechanical-head.md"] = (150, "THE AGENTLESS HEAD", WEB, """
+**Your question.** Should a governing head with no LLM, a template-driven program, receive what each unit reports,
+watch each node's hardware load and plan-limit use, break a build's work into streams mechanically, and relay the
+owner's prompt to an available unit, and what would gov's architecture have to carry now for that?
+1. **Survey** deterministic schedulers and dispatchers: cluster schedulers (Kubernetes' scheduler with its filters and
+   scores, Nomad, Slurm's fair share and backfill, HTCondor's matchmaking, Borg and Omega as published), CI dispatch
+   (Buildkite agent queues, GitLab and GitHub runner selection), workflow engines that place tasks (Temporal, Airflow,
+   Argo, Ray), quota-aware dispatch for LLM workloads (LiteLLM's router and its strategies across deployments,
+   token-bucket and usage-based routing, provider fallbacks), and DAG decomposition (critical-path and list scheduling).
+2. **For each:** what it decides from which inputs (capacity, load, quota, priority, affinity, the work graph), what
+   it guarantees (no over-commit, fairness, progress), how it fails (a stale capacity report, a quota that drains
+   between report and dispatch, a head outage, herding onto one node, a work graph it cannot cut), and the smallest
+   test in gov's setting that makes it lose.
+3. **Fit:** what a head's inputs would be in gov (each node's free agent slots under `runtime.agents-in-flight`,
+   hardware load, a plan limit's window and weekly use, the units in derived READY with their leases, P39's budgets),
+   what it would decide (which unit runs where, when to hold), whether the flow's declared item graph lets a program
+   cut a build into streams without judgment, where judgment is still needed (a request that is not yet a build),
+   and whether the head should assign or only propose while units still claim through leases, so that a head outage
+   degrades to the headless shape.
+
+**Return.** Candidates, one per mechanism family: mechanism, inputs, guarantee, failure mode, losing test and its result
+where you could run one, fit for gov. """ + SEAMS + "\n")
+Q["q-agent-head.md"] = (151, "THE AGENT-DRIVEN HEAD", WEB, """
+**Your question.** Should the head be an agent, an LLM on another subscription or an API key that monitors the units
+and plans their workload through gov's own runtime, flow and roles, and what would gov's architecture have to carry
+now for that?
+1. **Survey** LLM orchestrators that plan and dispatch work to other agents or workers: Anthropic's published
+   orchestrator-worker research system and the Claude Agent SDK's subagents, LangGraph's supervisor, AutoGen's group
+   chat manager and Magentic-One's orchestrator, CrewAI's hierarchical process, the OpenAI Agents SDK's handoffs, and
+   products that assign coding tasks to agent fleets (Devin, Factory, Cursor background agents, GitHub Copilot coding
+   agent), as documented; and any measured results on orchestrators' reliability, cost and failures (re-planning
+   loops, decisions on stale or hallucinated state, over-delegation).
+2. **For each:** what the LLM decides that a program could not, what it costs (tokens per decision, latency), how it
+   fails (a plan built on stale state, a decision nobody can replay, an orchestrator that keeps re-planning, prompt
+   injection through a unit's report), and the smallest test in gov's setting that makes it lose.
+3. **Fit:** gov's principles bind a head: P25, P26, P36, P39 and P18 (decision principles outrank practices in
+   unattended forks), and the owner's FR-4 (best effort, recorded) and NT-12 (effort is the owner's, medium unless the
+   owner says otherwise). Could the head be a role, a planner or dispatcher run by the same runtime, flow and roles as
+   any act, so that it is governed and replayable, and what must each of its decisions leave as a witness? Compare it
+   with a mechanical head that calls an LLM role only where judgment is needed, a hybrid.
+
+**Return.** Candidates, one per orchestration family: what the LLM adds, cost, failure mode, losing test and its result
+where you could run one, fit for gov. """ + SEAMS.replace("this shape", "an agent head or a hybrid") + "\n")
+Q["q-platform.md"] = (152, "THE PLATFORM", WEB, """
+**Your question.** What do the platform's limits, terms and security allow and require of node units coordinating in
+real time, and of a head?
+1. **Plan limits and their measurement:** how Claude subscription plans (Pro, Max, Team, Enterprise) and API keys limit
+   use (session windows, weekly limits, rate limits, per-model limits), whether a limit is per account, per seat or
+   per organization, how a node can read its own remaining allowance programmatically and how fresh that reading is
+   (Claude Code's usage reporting, rate-limit response headers, the Admin and Usage APIs), so that a head knows what a
+   node's capacity is; and the hardware load a node can report on Windows, Linux and macOS, at what cost.
+2. **Terms:** what Anthropic's current terms and usage policies say about automated, unattended, multi-machine and
+   cloud use of a subscription (Claude Code signed in with a subscription, setup tokens, one OAuth login across
+   machines) against API keys, and about an LLM head on a separate subscription or key that drives other units. Quote
+   the clauses with URLs and dates, and say plainly where the terms are ambiguous.
+3. **Cloud runtimes:** where a node unit or a head could run in the cloud and what each allows (Claude Code on the web
+   and its cloud sessions, scheduled or remotely triggered routines, the Claude Agent SDK on a server, managed agents,
+   GitHub Actions with Claude Code, containers), with each one's auth, persistence, network access and limits.
+4. **Security and tenancy:** what relaying memories, decisions and prompts to an endpoint exposes (secrets in records,
+   an adopter's code leaving its node, isolation between adopters), how `runtime.act-auth` and the charter's security
+   rule (secrets kept out of files, memory and chat; deny by default; the narrowest grant to automation) constrain an
+   endpoint and a head, and what offline-first operation must keep (P3: a unit with the endpoint down still reaches a
+   verdict).
+
+**Return.** Findings per topic with sources, each with its consequence for the three shapes (headless, agentless head,
+agent head). Then the seams or invariants the architecture must carry now, each with its owning layer and its cost
+while gov stays offline.
+""")
+for name, (n, mine, cite, body) in Q.items():
+    text = (CONTEXT + "\n" + FACTS + "\n" + TEAM.format(mine=mine) + body + "\n"
+            + BOUNDS.format(scratch=f"{SCRATCH}/d{n}/", cite=cite))
+    (D / name).write_text(text, encoding="utf-8", newline="\n")
+    print(f"{name}: dispatch {n}, {len(text)} chars")
+````
+
+### `wrap_words.py`
+
+The owner's request quoted for the design record's [words], wrapped on spaces only and checked word for word.
+
+````python
+"""Quote the owner's words for a record's [words] section: each paragraph wrapped at 114 columns on spaces only, never
+at a hyphen, its lines prefixed `> `, paragraphs joined by a bare `>` line, and every word checked unchanged.
+
+Usage: python -X utf8 wrap_words.py <owner-words.txt> <out.md>
+"""
+import pathlib
+import sys
+import textwrap
+
+words = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").strip("\n")
+paras = ["\n".join("> " + ln for ln in textwrap.wrap(p, width=114, break_on_hyphens=False, break_long_words=False))
+         for p in words.split("\n")]
+text = "\n>\n".join(paras)
+if " ".join(ln[2:] for ln in text.split("\n") if ln != ">").split() != words.split():
+    sys.exit("a word changed in the wrapping")
+pathlib.Path(sys.argv[2]).write_text(text + "\n", encoding="utf-8", newline="\n")
+print(f"{len(text.splitlines())} lines")
+````
+
+### `log_cloud_research.py`
+
+The session log's dispatch rows 148 to 152, the derived agent lines and the round's event.
+
+````python
+"""Record the cloud round's research in the session log: dispatch rows 148 to 152, every agent and returned line as
+the roles kit derived them, and the round's event.
+
+Usage: python -X utf8 log_cloud_research.py <agent-lines-148-152.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+got = [ln for ln in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+       if ln.startswith(("- agent —", "- returned —"))]
+if len(got) != 10:
+    sys.exit(f"10 agent and returned lines expected, read {len(got)}")
+F = "`" * 3
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row147 = [ln for ln in L.text.split("\n") if ln.startswith("| 147 |")]
+if len(row147) != 1:
+    sys.exit("no single dispatch row 147")
+WHO = "gov-researcher, at the owner's medium effort"
+P = "`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-{}-researcher.md`"
+R = "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-{}.md`"
+Q = "Cloud coordination: "
+ROWS = [
+    (148, Q + "where the design and today's tree assume one node, and which layer cloud coordination belongs to", 23,
+     "returned, 10m22s, 52.4k out: the shared truth already multi-node; seven core points missing; a new expansion "
+     "layer; 17 stale claims measured", "census"),
+    (149, Q + "the headless shape, units claiming work and relaying state through a shared endpoint", 24,
+     "returned, 8m46s, 41.0k out: git refs as the store and the fence; check-then-act fencing and a pruned lease's "
+     "restarted epoch reproduced", "headless"),
+    (150, Q + "the agentless head, placing work by load and plan limits with no LLM", 25,
+     "returned, 10m14s, 46.1k out: a head that offers and never assigns; a ledger keyed by plan the real gain; median "
+     "parallelism inside a build 1.00", "mechanical-head"),
+    (151, Q + "the agent-driven head, against a hybrid that calls an LLM role only where judgment is needed", 26,
+     "returned, 11m28s, 51.4k out: a hybrid; an LLM head placed 11 identical runs two ways; its probe ran 17 headless "
+     "model calls and made one folder outside its scratch, which it removed", "agent-head"),
+    (152, Q + "the platform's limits, terms, cloud runtimes and security", 27,
+     "returned, 6m56s, 30.5k out: limits per account, not per node; hosted cloud sessions cannot push `refs/gov`; the "
+     "terms ambiguous, an owner action", "platform"),
+]
+new = "".join(f"| {n} | {WHO} | {what} | {P.format(p)} | 1799cb98 | {out} | {R.format(r)} |\n"
+              for n, what, p, out, r in ROWS)
+L.sub(row147[0] + "\n", row147[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n",
+                "\nThe cloud round's research, dispatches 148 to 152, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(got) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner opened the cloud round, in words recorded verbatim in `{REC}` `[words]`.
+  Five researchers took one question each, dispatches 148 to 152, at the owner's medium effort, and their returns are
+  saved beside the record. The record answers the owner's three questions: cloud coordination is a new expansion,
+  `fleet`, attaching at points the core declares; headless is the floor, a model-free head may only offer, and an LLM
+  serves as a judge role only; and the design has the shared truth but lacks the deciding half. It reports the lease
+  defects the probes reproduced, recommends P40 and seventeen seams on five builds, proposes fifteen gaps, and puts
+  CL-1 to CL-4 to the owner. Dispatch 151's probe ran 17 headless model calls, and made one folder outside its scratch,
+  which it removed.
+""", "the round's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -20394,6 +20672,9 @@ MINE = [
     ('stall/log_stall_answers.py', "The session log's event for the answers and their fold."),
     ('cloud/review_debt.py', "The review debt derived: every design commit after the whole-design shape audit's floor that no closing review's `base...head` range covers. At `7e0322a5c` it read 29 ranges covering 77 commits, took the floor at `89e44048f`, and found eight."),
     ('cloud/record_debt.py', "The README's parked decisions and the session log's event for the debt the owner parked."),
+    ('cloud/write_questions.py', "The cloud round's five research questions, each quoting the owner's request verbatim and naming the researcher's own scratch folder, for `handoff.py render --input question=...`."),
+    ('cloud/wrap_words.py', "The owner's request quoted for the design record's [words], wrapped on spaces only and checked word for word."),
+    ('cloud/log_cloud_research.py', "The session log's dispatch rows 148 to 152, the derived agent lines and the round's event."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -21455,13 +21736,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2562 nodes in 30 namespaces; 31722 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1761, derived 306, pending 495
-map: no stale facts read 61 records and 24 quotes of a map count or the critical path
+map: 2573 nodes in 30 namespaces; 31817 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1772, derived 306, pending 495
+map: no stale facts read 62 records and 24 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 214 records, 3546 sections, 206 decision sections, 16 comparison areas, 39 principles
+atlas: derived — 220 records, 3607 sections, 209 decision sections, 16 comparison areas, 39 principles
 rc 0
 
 $ fold state
