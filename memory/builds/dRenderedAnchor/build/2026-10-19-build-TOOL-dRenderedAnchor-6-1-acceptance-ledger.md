@@ -48,12 +48,19 @@ or guard rather than substituting a value.
 - AC6 — `git status --porcelain` — in this worktree, holding the bytes `<p1>` commits,
   `bash tools/workflows/check-protocol-parity.test.sh --render` printed its five `rendered` lines and
   no re-run line, and `bash tools/unattended/adopt-unattended.sh` rendered the Skill; both exited 0,
-  and the status named only this pass's own edited files. The red half was not staged.
-- AC7 — `tools/review-harness/` — the green half runs from `<p1>`, because govkit lands the commit
-  and not the working tree: it is recorded by the records commit that follows this one. Red half,
-  measured here: a fresh `%TEMP%/rh6` made by Instruments 1 to 3 from `2c5b6287`, which carries this
-  unit's base bytes, with the seven-key conf added and staged, read `tools/workflows/` on lines 34,
-  92 and 202 of its protocol and twice on line 125 of its Skill. `apply` exited 1 there, naming 35
-  legs that did not exist before the install and are red after it, and landed the kit at
-  `tools/review-harness/`.
+  and the status named only this pass's own edited files. Re-run at `b31803aab` itself, both exited
+  0 and the status printed nothing. The red half was not staged.
+- AC7 — `tools/review-harness/` — `<p1>` is `b31803aab`, and govkit lands a commit rather than the
+  working tree, so this answer was added by the records commit after it. A fresh `%TEMP%/rh6` made
+  by Instruments 1 to 3 from `b31803aab`: `apply` printed `[3/LAND] from b31803aa` and landed the kit
+  at `tools/review-harness/`, and the hand render printed its five `rendered` lines, the re-run line
+  and the five again, at rc 0. With PV-AC12's seven-key conf added and staged,
+  `bash tools/unattended/adopt-unattended.sh` exited 0. `grep -n 'tools/review-harness/'` printed
+  lines 34, 92 and 202 of `$T/memory/guides/REVIEW-PROTOCOL.md` and line 125 of
+  `$T/.claude/skills/unattended/SKILL.md`, which reads `` `tools/review-harness/unattended-build.js` ``
+  then `` `tools/review-harness/unattended-unit.js` ``, and `grep -c 'tools/workflows/'` printed 0
+  over each. Red half: the same instruments from `2c5b6287`, this unit's base bytes, read
+  `tools/workflows/` on lines 34, 92 and 202 of the protocol and twice on line 125 of the Skill. In
+  both runs `apply` exited 1, naming 35 legs that did not exist before the install and are red after
+  it; nothing here depends on those legs.
 - AC8 — `derive_kit_paths` — `grep -c` printed 1 over each README; at `05357638` both read 0.
