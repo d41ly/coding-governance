@@ -29,8 +29,8 @@ reads section 2e's python program out of the suite. Each adopter fixture was bui
   of `8a0e0b59`, called with the tool root as it was, also returned `unattended/unattended.sh` and
   `run-gates/run-gates.sh`, the two root files.
 - AC2 — `adopt-roles.sh --scaffold` — with the two root files written, rc 0, and the Skill held
-  `` `bash tools/run-gates/run-gates.sh` `` at line 84 and `` `bash tools/unattended/unattended.sh` ``
-  at line 12. Red half: with the adopter, library and render of `8a0e0b59` in the fixture's kit,
+  `` `bash tools/run-gates/run-gates.sh` `` at line 84 and
+  `` `bash tools/unattended/unattended.sh` `` at line 12. Red half: with the adopter, library and render of `8a0e0b59` in the fixture's kit,
   rc 0 and the Skill held `` `bash run-gates/run-gates.sh` `` and
   `` `bash unattended/unattended.sh` ``.
 - AC3 — `ci/run-gates.sh` — the same fixture with a receipt row whose `source` is
@@ -48,14 +48,15 @@ reads section 2e's python program out of the suite. Each adopter fixture was bui
   `tools/renamed/` and the line appended: rc 0, and the Skill held
   `` `tools/workflows/tier2-review.jsx` `` at line 102 and `` `tools/renamed/tier2-review.js` `` at
   line 76. Red half: the adopter of `8a0e0b59` wrote `` `tools/renamed/tier2-review.jsx` ``.
-- AC6 — arm 14's positive check — `` grep -qF -- "\`${_a14[$_i]}\`" `` with the value
-  `tools/renamed/tier2-review.js` failed on the file reading
-  `` `C:/x/tools/renamed/tier2-review.js` `` and passed on the one reading
-  `` `tools/renamed/tier2-review.js` ``. Red half: the bare `grep -qF` of `8a0e0b59` passed both.
-- AC7 — the root install — `repo/.git`, the kit at `repo/roles` and a sibling `workflows/` holding
-  both cited harnesses: `resolve_cited_paths` returned `[]`, and `bash roles/adopt-roles.sh
-  --scaffold` in `repo` exited 0 with the Skill naming `` `workflows/unattended-build.js` `` at
-  line 45 and `` `workflows/tier2-review.js` `` at line 76. Red half: with the library's `except`
+- AC6 — `tools/renamed/tier2-review.js` — arm 14's positive check, the backticked `grep -qF` with
+  that value, failed on the file reading `` `C:/x/tools/renamed/tier2-review.js` `` and passed on
+  the one reading `` `tools/renamed/tier2-review.js` ``. Red half: the bare `grep -qF` of
+  `8a0e0b59` passed both.
+- AC7 — `resolve_cited_paths` at the root install, `repo/.git`, the kit at `repo/roles` and a
+  sibling `workflows/` holding both cited harnesses: it returned `[]`, and
+  `bash roles/adopt-roles.sh --scaffold` in `repo` exited 0 with the Skill naming
+  `` `workflows/unattended-build.js` `` at line 45 and `` `workflows/tier2-review.js` `` at line 76.
+  Red half: with the library's `except`
   narrowed to `LookupError`, the call raised `ValueError` naming the sibling's
   `workflows\unattended-build.js`, and the adopter exited 2 on
   `roles: the citation pass over roles/SKILL.template.md failed`.
@@ -65,12 +66,12 @@ reads section 2e's python program out of the suite. Each adopter fixture was bui
   `out` directory, whose `relative_to` raised out of the program.
 - AC9 — `tools/check-wiring.test.sh` — the count printed 1; at `8a0e0b59` it reads 0.
 - AC10 — `help/roles.md` — `grep -c 'check_roles.py'` printed 1; at `8a0e0b59` it reads 0.
-- AC11 — the four files — the first count printed 0 over each and `grep -c 'not counted as its
-  kit'` printed 1 over each; at `8a0e0b59` they read 1 and 0 over each.
-- AC12 — the three counts printed 0, 0 and 2. At `8a0e0b59` they read 1, 0 and 1, not the 1, 1 and
-  1 the red half states: the README wraps the phrase as `citation the kit` and `resolver holds` on
-  two lines, so its `grep -c` cannot read the old text either way. That term of AC12 has no red
-  half on this file.
+- AC11 — `help/roles.md` and the other three files — the first count printed 0 over each, and
+  `grep -c 'not counted as its kit'` printed 1 over each; at `8a0e0b59` they read 1 and 0 over each.
+- AC12 — `help/roles.md` and `tools/roles/README.md` — the three counts printed 0, 0 and 2. At
+  `8a0e0b59` they read 1, 0 and 1, not the 1, 1 and 1 the red half states: the README wraps the
+  phrase as `citation the kit` and `resolver holds` on two lines, so its `grep -c` cannot read the
+  old text either way. That term of AC12 has no red half on this file.
 - AC13 — `git diff --quiet -- .claude/skills/build/SKILL.md .claude/roles.json` — after
   `bash tools/roles/adopt-roles.sh --scaffold` in this worktree, holding the bytes `<p1>` commits,
   which printed the render's unchanged line and exited 0, it exited 0. The red half, an absolute
