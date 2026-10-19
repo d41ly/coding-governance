@@ -87,3 +87,26 @@ stand in `<p1>`. Its trees are `tools` `92d5531a`, `skills` `18fefd1f`, `.githoo
 - AC10 — `tools/check-wiring.sh` — the comment range from `THE RECEIPT RUNG` to the reader carries
   `rendered` and `TOOL-dRenderedAnchor-1`, and read no `rendered` at `a60b0c7d`. The reader's
   function body extracted at `a60b0c7d` and at `<p1>` compared equal under `diff`.
+
+## The close's observations
+
+Run by the main loop at `1e0c2a2bb`, the tip after the pass, before the closing review.
+
+- `New arm:` arm 16 — RED with the `a60b0c7d` resolver block written back into
+  `tools/roles/roles_lib.py`: `render_agents.py --selftest` exited 1 on two arm 16 assertions,
+  `harnesses` reading `['toolroot/workflows/a.js']` and a `misplaced` line printed, and on no other
+  arm. GREEN with the file restored by `git checkout`: exit 0, `PASS (47 assertions)`.
+- `New arm:` arm 17 — RED with `return {}` inserted as the first statement of
+  `scan_misplaced_harnesses`: exit 1 on two arm 17 assertions, the write printing no `misplaced`
+  line and `--check` exiting 0. GREEN with the file restored: exit 0, `PASS (47 assertions)`.
+- AC8's remainder — `python tools/roles/render_agents.py --check` in this repository exited 0, read
+  unpiped, and `git diff --quiet a60b0c7d HEAD -- .claude/roles.json .claude/agents/` exited 0.
+- The repro install `%TEMP%/rh1`, built from `a60b0c7dc` by the repro record's instruments: its own
+  `render_agents.py --check` exited 0 over the index naming two absent `tools/workflows/` harnesses,
+  which is the gap this unit closes. With the `<p1>` `render_agents.py` copied in and the
+  `a60b0c7d` `roles_lib.py` kept, `--check` exited 1 and printed two `misplaced` lines naming
+  `tools/review-harness/tier2-review.js` and `tools/review-harness/unattended-build.js`. With the
+  `<p1>` `roles_lib.py` copied in too, `adopt-roles.sh --scaffold` exited 0 printing no `note` and
+  no `misplaced` line, `harnesses` read the three `tools/review-harness/` paths, each a file,
+  `--check` exited 0, and agent-cap exited 0 on the `tier2-review.js` and `unattended-build.js`
+  payloads that exited 2 in the repro record.
