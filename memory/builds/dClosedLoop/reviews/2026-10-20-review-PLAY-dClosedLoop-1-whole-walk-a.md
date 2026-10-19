@@ -693,37 +693,47 @@ Every confirmed high finding is critical and stands under Critical.
 - **Fix:** Reword each note to say what the route was before the revision, or drop it.
 - **Skeptic:** Confirmed low (batch 4), as wording.
 
-## Refuted
+## Unverified
+
+A skeptic refuted each finding below and a second confirmed it, so it stands unverified.
 
 ### A1-F7 — `design.ready` and `test.exit` wait on the recommend item, not the reason item, so the frontier can pass a review the reason calls for
 - **Address:** flow-steps [design] `design.ready`; flow-steps [test] `test.exit`
 - **Claimed:** once `design.recommend` is witnessed, `design.ready` can be recorded before `design.reason` asks for the audit, and Test has the same hole.
 - **Skeptic:** Refuted (batch 3). Under `scored-signals-and-reasoning`, `design.recommend` routes only to `design.reason` (flow-steps:190), and `design.ready` is reached only from `design.reason`'s "no review" arm or after the spec audit, which stands before it (flow-steps:191, 208, 450). A route-blind frontier would also run `design.seams`, `design.inventory` and `design.reentry` on every input, so the frontier cannot be read the finding's way. The evidence misquotes `test.reason`, whose Then (flow-steps:301) has no "a review →" arm keyed on its answer.
+- **Second skeptic:** Confirmed high. The finding holds. In flow-steps [design], line 192 gives `design.ready`'s Needs as only "`design.recommend`, and the spec audit where it ran". Line 302 gives `test.exit` the same shape, waiting on `test.recommend` and not `test.reason`. [rules] lines 26-31 build the frontier from the Needs column alone, and layer-runtime [decide] line 329 has `next` hand out every frontier item to run. So once `design.recommend` is witnessed, `design.ready` (a command) and `design.reason` (an architect agent) are both runnable. Line 208 says the audit sits "after `design.recommend` and `design.reason`, before `design.ready`", but no Needs column enforces that order. v2 :1527 sets `review.recommendation: binding` in a preset, so a review the reason calls for can be skipped (c3).
 
 ### A1-F9 — P14's "review lenses read the active practices' reach" has no enforcing clause
 - **Address:** architecture-v2 [enforcement] `P14`; architecture-v2 [principles] P14
 - **Claimed:** no clause makes a review lens load the active practices' reach.
 - **Skeptic:** Refuted (batch 1). Every work order loads "the step's practice reach" (flow-steps:47-51), each step lists reviewers at a breakpoint among its roles, and `review.lens` is an item. `cl-dClosedLoop-0168` renders a work order per item, and `cl-dClosedLoop-0051` hands each practice's reach per step in work orders, so a lens reads the active reach through its work order.
-
-### A2-F8 — Two nodes pushing one build branch: the race is undeclared under the default shared worktree
-- **Address:** layer-runtime [isolate]; architecture-v2 [chain] dWellOiledMachine `cl-dClosedLoop-0318`; dPlacedRequest `cl-dClosedLoop-0133`
-- **Claimed:** node x, holding only a unit lease, pushes X's build branch beside node d, and a refused non-fast-forward push has no route.
-- **Skeptic:** Refuted (batch 4). `cl-dClosedLoop-0319` has the other node's unit holder drive only that unit's passes on its own branch, with the driver alone running transitions. layer-runtime [isolate] "Integration before release" (731-735) has the supervisor merge each unit branch into the build branch, so the race the finding needs does not exist.
-
-### A3-F14 — `entry.claim`'s own-key idempotency routes a replayed claim into a terminal build
-- **Address:** flow-steps [entry] `entry.claim`
-- **Claimed:** a replayed intake after the withdrawal finds its own key, routes into withdrawn X, and is neither placed nor answered.
-- **Skeptic:** Refuted (batch 3). The replay ends in the refusal `cl-dClosedLoop-0281` asks for: [transitions] has no row leaving `withdrawn`, and [rules] routes that refusal by default. A replayed intake mints a fresh slug (layer-memory:532-535), and only a duplicate of X's own queued claim finds its own key, a request the withdrawal already disposed.
+- **Second skeptic:** Confirmed medium. I rebuilt the [chain] clauses from v2 into the scratch file `clauses.txt`. No clause ties a lens to practice reach. The P14 row (v2 :1698) names `cl-dClosedLoop-0031`, which is only the catalogue. It also names `cl-dClosedLoop-0051`, which hands step-scoped reach to role work orders. The lens clauses (0070, 0080, 0458, 0470) fill the harness's lens slots from catalogue data and never mention reach. The Review-stage reach that foundations :71-76 describe has no step to be scoped under.
 
 ### A4-F7 — The floor step is "the step kind's first step", but its progress field only arrives in the schema-4 step
 - **Address:** architecture-v2 [chain] `cl-dClosedLoop-0028`
 - **Claimed:** a kill after the floor step on a schema-3 receipt re-runs it or leaves the receipt unreadable.
 - **Skeptic:** Refuted (batch 1). The clause does order the steps, with the schema-4 step after the floor step. `cl-dClosedLoop-0019` skips a step whose witness holds and keeps it re-runnable, `cl-dClosedLoop-0022` plants the kill and the converging re-run, and a schema-3 receipt already carries `gov_commit` (govkit.py:8020). A kill after the floor step re-runs as a witness skip, and nothing writes `steps` into a schema-3 receipt.
+- **Second skeptic:** Confirmed medium. `cl-dClosedLoop-0028` makes the floor raise "the step kind's first step". `cl-dClosedLoop-0020` adds the per-step `steps` progress field to receipt schema 4, and that change is itself shipped as an upgrade step. No clause orders the two, or says where progress lands for a step completed on a schema-3 receipt. This collides with `cl-dClosedLoop-0019` ("the receipt advancing per completed step") and with `cl-dClosedLoop-0022` ("the k-th step made to exit 1 and the receipt naming step k-1"). One part of the stated consequence is overstated: a re-run of the floor step after a kill is skipped because its witness holds (0019).
+
+## Refuted
+
+### A2-F8 — Two nodes pushing one build branch: the race is undeclared under the default shared worktree
+- **Address:** layer-runtime [isolate]; architecture-v2 [chain] dWellOiledMachine `cl-dClosedLoop-0318`; dPlacedRequest `cl-dClosedLoop-0133`
+- **Claimed:** node x, holding only a unit lease, pushes X's build branch beside node d, and a refused non-fast-forward push has no route.
+- **Skeptic:** Refuted (batch 4). `cl-dClosedLoop-0319` has the other node's unit holder drive only that unit's passes on its own branch, with the driver alone running transitions. layer-runtime [isolate] "Integration before release" (731-735) has the supervisor merge each unit branch into the build branch, so the race the finding needs does not exist.
+- **Second skeptic:** Refuted. The copy already gives a unit holder on another node its own branch. `cl-dClosedLoop-0319` has that holder "driving only that unit's passes on its own branch, pushed the same way … the driver alone running transitions". night-pass-two :329 says the same, and :671 states "a build branch has one writer, a unit branch one each". layer-runtime [isolate] :732-735 merges unit branches into the build branch before release. So node x never pushes X's build branch, and the race the finding describes does not arise. Its proposed fix is already in the design.
+
+### A3-F14 — `entry.claim`'s own-key idempotency routes a replayed claim into a terminal build
+- **Address:** flow-steps [entry] `entry.claim`
+- **Claimed:** a replayed intake after the withdrawal finds its own key, routes into withdrawn X, and is neither placed nor answered.
+- **Skeptic:** Refuted (batch 3). The replay ends in the refusal `cl-dClosedLoop-0281` asks for: [transitions] has no row leaving `withdrawn`, and [rules] routes that refusal by default. A replayed intake mints a fresh slug (layer-memory:532-535), and only a duplicate of X's own queued claim finds its own key, a request the withdrawal already disposed.
+- **Second skeptic:** Refuted. The scenario cannot happen. The rule "a retry that finds its own key counts as claimed" only applies when the same slug is retried. That claim instance's witness is the claim ref, so after the build moves on it is never re-run (layer-runtime [decide] :336-343). A replayed intake is a content-keyed write and is a no-op (layer-memory :336-337). A fresh placement mints a new slug, collision-checked by the record command (layer-memory [names]), and since the claim ref is never pruned, "a slug is minted once" (:333). S5's "queued claim replayed" is a lease claim, and `cl-dClosedLoop-0134` refuses it at the terminal tombstone.
 
 ### A5-F5 — A build parked on the owner's silence loses its lease, and nothing takes it back
 - **Address:** architecture-v2 [policies] `run.on-owner-silence`, `cl-dClosedLoop-0326`; flow-steps [breakpoint]
 - **Claimed:** another node may take over a build parked on the owner, and a late go leaves it leaseless.
 - **Skeptic:** Refuted (batch 2). `cl-dClosedLoop-0332`'s discovery never offers "a build parked on an open owner item". Once the owner disposes the item, the normal pick claims the build and takes the lease with the epoch bumped.
+- **Second skeptic:** Refuted. The lease does not stay lost, and Design cannot be entered without one. Under v2 :1103 and `cl-dClosedLoop-0326`, parking releases the lease as a hand-over. `cl-dClosedLoop-0134` and layer-runtime :406 say any node takes a hand-over by design. `run <build>` takes the build lease again (layer-runtime :346). `cl-dClosedLoop-0133` fences every effect push on the holder's lease tip, so a node holding no lease cannot push `plan.exit`'s transition. The build therefore cannot enter Design without a lease.
 
 ## Walk table
 
@@ -1614,4 +1624,4 @@ Every confirmed high finding is critical and stands under Critical.
 | P32 | holds |
 | P39 | A5-F1, A5-F2, A5-F3, A5-F5, A5-F6, A5-F7, A5-F8 |
 
-review-shape kind=spec-audit round=1 intensity=full at=synth raw=78 confirmed=72 refuted=6 unverified=0 blocker=0 high=23 medium=39 low=10 agents=10 out-tokens=511490
+review-shape kind=spec-audit round=1 intensity=full at=synth raw=78 confirmed=72 refuted=3 unverified=3 blocker=0 high=23 medium=39 low=10 agents=11 out-tokens=533945
