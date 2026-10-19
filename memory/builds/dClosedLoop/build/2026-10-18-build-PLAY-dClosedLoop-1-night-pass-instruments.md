@@ -12967,6 +12967,417 @@ R.sub("- **dCalibratedLens:** repository lenses from the overlay, and lens tags 
 R.save()
 ````
 
+### `fold_flow.py`
+
+The owner's answers to FA-1 to FA-7 folded into v2, the systems record, the memory plan, the gap register, the fates record and the design record, with the session log's event.
+
+````python
+"""Fold the owner's answers to FA-1 to FA-7, the flow and roles adoption forks
+(`build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md`), into v2, the systems record, the memory plan, the
+gap register, the fates record and the design record itself, with the session log's event. FA-3 departed from the
+recommendation: a repository may insert a stage of its own between two of gov's, and P20 is amended.
+
+Usage: python -X utf8 fold_flow.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md"
+
+
+def chain_row(rec, build):
+    rows = [i for i, ln in enumerate(rec.text.split("\n")) if ln.startswith(f"| {build} |")]
+    if len(rows) != 1:
+        sys.exit(f"{len(rows)} chain rows for {build}")
+    return rows[0]
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    i = chain_row(rec, build)
+    cells = lines[i].split(" | ")
+    if len(cells) != 5:
+        sys.exit(f"{build}: {len(cells)} cells")
+    cells[3] = cells[3] + "".join("; " + c for c in clauses)
+    if gaps:
+        tail = cells[4]
+        if not tail.endswith(" |"):
+            sys.exit(f"{build}: the gaps cell does not end the row")
+        cells[4] = tail[:-2] + ", " + ", ".join(gaps) + " |"
+    lines[i] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("  repository's change (IA-1 to IA-6).\n",
+      "  repository's change (IA-1 to IA-6). Its own stages, items, roles, workflows, lenses and legs live in the same\n"
+      "  overlay and change gov's rows by the same edges, an amendment of a row being a field patch, and every check,\n"
+      "  the position engine and every render read the composition of gov's rows and the repository's (FA-1 to FA-7).\n",
+      "P8")
+V.sub("- **P20 The flow is the layer above the build.** A build passes five steps, Plan, Design, Build, Test\n"
+      "  and Deploy, from its fixed entry point:",
+      "- **P20 The flow is the layer above the build.** A build passes gov's five steps, Plan, Design, Build, Test\n"
+      "  and Deploy, with any stage its repository inserts between two adjacent ones (FA-3), from its fixed entry point:",
+      "P20 (FA-3)")
+V.sub("the product's delivery across a repository boundary: govkit's install by copy at a release tag and its receipt, "
+      "gov's tagged kit releases, overlays, the install",
+      "the product's delivery across a repository boundary: govkit's install by copy at a release tag and its receipt, "
+      "gov's tagged kit releases, the overlays' first seeding, which the core composes, the install",
+      "layers: overlays under distribution")
+V.sub("and\n`tools/roles/house/policy.toml`'s `[effort]` and `[gates]`, their readers re-pointed in the fold's own unit (DA-H5).",
+      "and\n`tools/roles/house/policy.toml`'s `[effort]`, into `roles.effort.*`, and `[gates]`, into each role definition's "
+      "gate grant, their readers re-pointed in the fold's own unit (DA-H5, FA-6).", "policies: the house file's fold")
+V.sub("| `instructions.exclude` | none, or a set of gov unit tags, a fixed unit and one another active unit requires "
+      "refused | none | the adopter-instructions pass: the gov units a repository drops, as `charter.practices` does "
+      "for practices; the owner's IA-2; never set by a preset | dOrderedCharter |",
+      "| `instructions.exclude` | none, or a set of gov tags of any kind the overlay holds, a fixed one and one another "
+      "active row needs, names as its actor or grants refused | none | the adopter-instructions pass: the gov units a "
+      "repository drops, as `charter.practices` does for practices; the owner's IA-2, widened to every kind by FA-1; "
+      "never set by a preset | dOrderedCharter |", "catalogue: instructions.exclude")
+V.sub("| `instructions.stale` | order, refuse, warn | order | the adopter-instructions pass: what an update does when a "
+      "semantic change to a gov unit leaves a repository's `amends` or `supersedes` edge behind it, an editorial "
+      "change never flagging; the owner's IA-3 | dOrderedCharter |",
+      "| `instructions.stale` | order, refuse, warn | order | the adopter-instructions pass: what an update does when a "
+      "semantic change to a gov unit leaves a repository's `amends` or `supersedes` edge behind it, an editorial "
+      "change never flagging; the owner's IA-3, read for rows by FA-2, `order` re-applying a row's patch over gov's "
+      "new row | dOrderedCharter |", "catalogue: instructions.stale")
+cat_roles = [ln for ln in V.text.split("\n") if ln.startswith("| `roles.on-contradiction` |")]
+if len(cat_roles) != 2:
+    sys.exit(f"{len(cat_roles)} roles.on-contradiction rows, two expected: the catalogue's and the presets'")
+V.sub(cat_roles[0] + "\n", cat_roles[0] + "\n"
+      "| `roles.effort.<role>` | the role efforts | the role's declared effort | the flow and roles adoption round's "
+      "FA-6: the house file's `[effort.roles]`, so a preset can set it | dBoundRoles |\n"
+      "| `roles.effort.<workflow>.<stage>` | the role efforts | the role's declared effort | FA-6: the house file's "
+      "`[effort.stages.<workflow>]` | dBoundRoles |\n"
+      "| `roles.model.<role>` | the models the harness adapter offers | the role's declared model | FA-6: a role's model, "
+      "which no key held | dBoundRoles |\n", "catalogue: the roles tuning keys")
+V.sub(cat_roles[1] + "\n", cat_roles[1] + "\n"
+      "| `roles.effort.<role>` | the role's effort | the role's effort | the role's effort | the role's effort |\n"
+      "| `roles.effort.<workflow>.<stage>` | the role's effort | the role's effort | the role's effort | the role's "
+      "effort |\n"
+      "| `roles.model.<role>` | the role's model | the role's model | the role's model | the role's model |\n",
+      "presets: the roles tuning keys")
+add_clauses(V, "dOrderedCharter", [
+    "the overlay's row mechanism for every kind a later build registers: `owned` admitting the `repo` segment in a "
+    "registered namespace, a row's `origin` the repository, a field patch as `amends`, a set field taking `add` and "
+    "`remove` and a scalar a value, a whole row as `supersedes` answering to gov's tag, `instructions.exclude` over any "
+    "registered kind's tags, pins over a row's canonical form, the change record's marks and successor lists covering "
+    "rows, and a semantic change re-applying the patch over gov's new row and filing an order as `instructions.stale` "
+    "says, the patch held where it no longer applies, each seen on a planted row of a fixture kind (FA-1, FA-2)"], [])
+add_clauses(V, "dFairHearing", [
+    "the lens catalogue as data in the review kit, the harness's five-slot literal filled from it, and agent-cap "
+    "counting slots, never names, seen red on a planted sixth slot and green on a catalogue row added as data (FA-1)"],
+    [])
+add_clauses(V, "dDeclaredLoop", [
+    "the `item` kind in the kinds register with its factory, a repository's items composed with the loop definition at "
+    "the landed revision, every check reading the composition: the needs graph acyclic with every need resolving, each "
+    "input an item declares produced by an item it needs at its record kind's version, that version bumped whenever "
+    "an output's meaning changes, and the floor, a gov item's `needs` and routes changed only by a pinned patch, and "
+    "item tags joined to dSafePassage's step gate, each seen red on a planted repository item (FA-1, FA-2)",
+    "a repository's own stages, each spliced between two adjacent gov stages by pinned rows of the build's transition "
+    "table, gov's five kept whole and in order, a repository stage's items and exit item witnessed as a gov step's are, "
+    "its boundaries reviewed through `review.breakpoints`, seen red on a planted stage that removes, reorders or "
+    "replaces a gov stage and green on one spliced between Test and Deploy (FA-3, P20)",
+    "a build's composition pinned per step: the transition record into a step carrying the composition's revision, "
+    "position derived from it inside the step, the build moving at its next step boundary with its witnesses carried "
+    "by the change records' successors, an item retired under it filing an order, and every policy value that names a "
+    "renamed boundary re-pointed, seen on a planted rename under a build positioned on the renamed item (FA-7)"],
+    ["gap-flow-19"])
+add_clauses(V, "dBoundRoles", [
+    "a repository's roles and workflow entries, in the `workflow` namespace, each role with its structured fields, "
+    "typed return and ceiling, declaring the shape kinds it runs in, `BODY_CEILINGS` a role field and `WORKFLOW_NAMES` "
+    "the workflow registry, never tables closed in code, the matrix arms and the spawn guard reading the composition, "
+    "a repository role acting in a gov item through a pinned patch of its actor when it returns the item's template, "
+    "its ceiling covers the item's allowance and it declares the item's shape kind, a widening patch named in the "
+    "update's report, role and workflow tags joined to dSafePassage's step gate, and the harness paths `roles.json` "
+    "names resolved in the install, each seen red on a planted role in a shape kind it does not declare, an actor "
+    "patch whose role lacks the item's template and a harness path the install lacks (FA-1, FA-4, FA-5)",
+    "`roles.effort.<role>`, `roles.effort.<workflow>.<stage>` and `roles.model.<role>`, each defaulting to the role's "
+    "declared value, and the gate grant a field of each role's definition, patched in the overlay (FA-6)"],
+    ["gap-roles-24", "gap-roles-25"])
+add_clauses(V, "dWitnessedBar", [
+    "a repository's legs from its overlay's leg rows through the leg factory, registered at Test's leg-pack point as "
+    "the repository's pack and counted once each has its seen-red record, a manifest row with no source red, today's "
+    "hand-added rows kept on a shrink-only legacy list until converted, a gov leg's arguments, guard and ceiling "
+    "changed by a pinned patch and dropped only through `instructions.exclude` while every other leg lands, and leg "
+    "tags joined to dSafePassage's step gate, each seen red on a planted unsourced row, a patch on a vanished leg and "
+    "a dropped fixed leg (FA-1, FA-2)"], ["gap-test-21"])
+add_clauses(V, "dCalibratedLens", [
+    "the `lens` kind and namespace, gov's lenses tagged in it and their briefs made units, a repository's lenses from "
+    "its overlay, chosen by `review.opt-in`, and lens tags joined to dSafePassage's step gate, seen on a planted "
+    "repository lens swapped into a run (FA-1)"], ["gap-review-17"])
+add_clauses(V, "dShippedRelease", [
+    "`adopt.declarations`: at install and update, today's flow and role customizations proposed as overlay rows for the "
+    "owner to rule once, a hand-added manifest leg as a repository leg, a leg's ceiling or argument override as a "
+    "patch, the house file's efforts as `roles.effort.*` values and its grants as patches, the run conf's extension "
+    "vocabularies as items with computed witnesses or as drops, and an adopter's role files as repository roles with "
+    "their workflow entries, seen on a fixture holding each (FA-1)",
+    "the update's report extended to every kind: each gov row's state in the repository, unchanged, amended, replaced, "
+    "excluded, stale or orphaned, every repository row and every widening, and every new gov row upstream of a "
+    "repository item in the needs graph listed for review, seen on a planted release (FA-2, FA-5)"], ["gap-deploy-28"])
+add_clauses(V, "dConvergedCharter", [
+    "`tools/roles/house/policy.toml` retired as a seed: its `[effort]` folded into `roles.effort.*` and its `[gates]` "
+    "into each role definition's gate grant, the one legacy home that folds into role definitions, never the policy "
+    "file, gov's defaults shipped in the role definitions every release updates, its readers re-pointed, with an "
+    "upgrade step (FA-6, P38)",
+    "the census of gov's own flow and role settings: the legs no descriptor declares, gov's efforts and grants, and its "
+    "run conf and gate environment values, each ruled by the owner, the gov-only ones moved to gov's own overlay and "
+    "policy file, and the run conf's extension keys retired with the unattended kit (IA-6, FA-1)"],
+    ["gap-roles-26", "gap-found-32"])
+V.sub("  - the map every restructuring release ships, its renames, splits and retirements, checked by the step gate from\n",
+      "  - the flow and roles adoption's owed checks (`" + REC + "` `[owed]`): the catalogue and render-wiring legs on a\n"
+      "    fixture holding an adopter role; agent-cap admitting a harness whose lens slots are filled from data; the\n"
+      "    whole-row pin's noise over gov's history of `workflows.toml`, the leg manifest and the role files; and a build\n"
+      "    positioned on an item an update renames, splits or retires, run end to end;\n"
+      "  - the map every restructuring release ships, its renames, splits and retirements, checked by the step gate from\n",
+      "owed")
+V.insert_before("Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-"
+                "folds.md`):\n",
+                "Revised: 2026-10-19, the owner's answers to the flow and roles adoption forks (`" + REC + "`\n"
+                "`[answers]`): a repository's own items, roles, workflows, lenses and legs live in its one overlay, in\n"
+                "their kinds' schemas (FA-1); a semantic change to a gov row it patched re-applies the patch and files an\n"
+                "order (FA-2); it may insert a stage of its own between two adjacent gov stages, and P20 says so (FA-3);\n"
+                "its role may act in a gov item through a pinned patch of the actor (FA-4); a patch may widen an open\n"
+                "field, every widening reported (FA-5); effort and model become `roles.effort.*` and `roles.model.*`, and\n"
+                "the gate grant a role field (FA-6); and a build moves to a new composition at its next step boundary\n"
+                "(FA-7). P8 says the composition covers every kind, and the distribution layer only seeds overlays.\n\n",
+                "revision note")
+V.save()
+
+# ---------------------------------------------------------------- the systems record
+Y = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("  - dBoundRoles `role` and `field`;\n",
+      "  - dBoundRoles `role` and `field`, and, declared by the flow and roles adoption answers (2026-10-19), `workflow`;\n",
+      "owners: workflow")
+Y.sub("  - dWellOiledMachine `hook` and `point`.\n",
+      "  - dWellOiledMachine `hook` and `point`;\n"
+      "  - dCalibratedLens `lens`, declared by the flow and roles adoption answers (2026-10-19).\n", "owners: lens")
+Y.sub("never by row key (IA-1, IA-2). Its fields: `tag`,\n",
+      "never by row key (IA-1, IA-2). The repository's flow and role rows sit beside its units, each in its kind's\n"
+      "  schema (FA-1). A unit's fields: `tag`,\n", "the unit: rows beside units")
+Y.sub("  - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which\n"
+      "    `resolve_stage_efforts` already reads (`roles_lib.py:561`).\n",
+      "  - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which\n"
+      "    `resolve_stage_efforts` already reads (`roles_lib.py:561`), until dConvergedCharter folds them into\n"
+      "    `roles.effort.<role>` and `roles.effort.<workflow>.<stage>`, beside `roles.model.<role>` (revised\n"
+      "    2026-10-19, FA-6).\n", "role shapes: effort")
+Y.save()
+
+# ---------------------------------------------------------------- the memory plan
+P = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+P.sub("| node: the repository's units, tagged `repo.`, changing gov's only by `amends` and `supersedes` edges pinned to "
+      "gov's text (IA-1, IA-2) |",
+      "| node: the repository's units, tagged `repo.`, and its flow and role rows in their kinds' schemas, a `repo` "
+      "segment in their tags, changing gov's only by `amends` and `supersedes` edges pinned to gov's text, a row's "
+      "amendment a field patch (IA-1, IA-2, FA-1) |", "pockets: the instruction overlay")
+P.sub("an `amends` or `supersedes` target pinned as `<tag>@<hash>` | `instructions.edit` |",
+      "an `amends` or `supersedes` target pinned as `<tag>@<hash>`; a flow or role row of the overlay carries `edges` "
+      "the same way, its `amends` naming the fields it patches | `instructions.edit` |", "sites: overlay rows")
+P.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+T = "`research-flow-today.md`"
+NEW = {
+    "gap-flow-18": [("gap-flow-19", "Flow", "HIGH", "An adopter cannot add an item to a step or change one of gov's: the "
+                     "unattended run's extra phases are vocabulary with no position, and its extra definition-of-done "
+                     "items are satisfied by attested facts.", f"{T} sections 2 and 3, the `.unattended.conf` row")],
+    "gap-roles-23": [("gap-roles-24", "Roles", "HIGH", "An adopter's own role or workflow cannot exist beside gov's: the "
+                      "role checker and the review harness type their populations in code, so the catalogue reds an "
+                      "adopter's role file, and the registering edit conflicts and holds the roles kit back.",
+                      f"{T} sections 2 and 3; `check_roles.py`'s `BODY_CEILINGS` and `WORKFLOW_NAMES`, read"),
+                     ("gap-roles-25", "Roles", "HIGH", "In a default adopter install, `roles.json` names the review "
+                      "harnesses where the kit is not installed, and the spawn guard refuses gov's own "
+                      "`tier2-review.js`.", f"{T}, its defect found on the way, rc 2 from `agent-cap.js`"),
+                     ("gap-roles-26", "Roles", "MED", "The seeded `house/policy.toml` never receives gov's change, so "
+                      "the records' lowered efforts never reach an adopter.",
+                      f"{T} section 2, the `policy.toml` row; `research-flow-design.md`, its second contradiction")],
+    "gap-test-20": [("gap-test-21", "Test", "HIGH", "An override of a gov leg other than its ceiling withholds the whole "
+                     "manifest, a deleted gov leg is re-appended with no line naming it, and an adopter's own leg is "
+                     "registered and checked by nothing.", f"{T} section 2, the `gate-legs.json` rows")],
+    "gap-review-16": [("gap-review-17", "Review", "MED", "A lens exists only as a literal in the harness, so an "
+                       "adopter's lens has no home beyond per-call notes.",
+                       f"{T} section 3; `research-flow-design.md`, its undecided list")],
+    "gap-deploy-27": [("gap-deploy-28", "Deploy", "MED", "No update line names an adopter's role, overlay or leg, or a "
+                       "restored gov leg, and an update exits 1 on unrelated holes, so an adopter cannot tell a lost "
+                       "change from the exit code.", f"{T} section 2, its notes on the update's output")],
+    "gap-found-31": [("gap-found-32", "Foundation", "MED", "Gov's own flow and role settings ship as every adopter's "
+                      "defaults: its retunes edit the shipped `workflows.toml` and the seeded `house/policy.toml` in "
+                      "place, and legs no descriptor declares sit in its manifest.",
+                      f"{T} section 4; the census at `67995cb6f`")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+    G.done += 1
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+by_stage = collections.Counter(st for _, st, _ in keys)
+by_sev = collections.Counter(sv for _, _, sv in keys)
+if set(by_stage) - set(ORDER) or len(keys) != 319:
+    sys.exit(f"{len(keys)} keys, stages {sorted(by_stage)}")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the flow and roles adoption answers added `gap-flow-19`, `gap-roles-24` to `gap-roles-26`,\n"
+    "`gap-test-21`, `gap-review-17`, `gap-deploy-28` and `gap-found-32` (`" + REC + "` `[folded]`), same instrument,\n"
+    "over " + str(len(keys)) + " keys:\n\n" + F3 + "text\n" + " ".join(f"{s}={by_stage[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={by_sev[s]}" for s in ("LOW", "MED", "HIGH")) + "\n" + F3 + "\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the fates record
+FT = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+FT.sub("| MERGED | into `.governance/policy.toml` (dConvergedCharter); on dGroundRules's legacy list until then | v2 "
+       "`[chain]` dGroundRules; v2 `[chain]` dBoundRoles |",
+       "| MERGED | `[effort]` into `roles.effort.*`, beside `roles.model.*`, and `[gates]` into each role definition's "
+       "gate grant, the seed retired (dConvergedCharter); on dGroundRules's legacy list until then | v2 `[chain]` "
+       "dGroundRules; v2 `[chain]` dBoundRoles; the owner, FA-6, 2026-10-19 |", "house/policy.toml")
+FT.sub("| shapes registry: kind, fan, checklist, merge, cap (dBoundRoles) | v2 `[chain]` dBoundRoles |",
+       "| shapes registry: kind, fan, checklist, merge, cap, a repository's own entries beside gov's (dBoundRoles) | v2 "
+       "`[chain]` dBoundRoles; the owner, FA-1, 2026-10-19 |", "workflows.toml entries")
+FT.sub("| presets, opt-in lenses, skeptic batches (dFairHearing), run at breakpoints (dDeclaredLoop) | v2 `[chain]` "
+       "dFairHearing; v2 `[chain]` dDeclaredLoop |",
+       "| presets, opt-in lenses, skeptic batches, its five lens slots filled from the catalogue as data (dFairHearing), "
+       "run at breakpoints (dDeclaredLoop), a repository's lenses from its overlay (dCalibratedLens) | v2 `[chain]` "
+       "dFairHearing; v2 `[chain]` dDeclaredLoop; the owner, FA-1, 2026-10-19 |", "tier2-review.js")
+FT.sub("one manifest whose rows the leg factory generates from the packs' declarations (dWitnessedBar) | v2 `[chain]` "
+       "dWitnessedBar; the owner, NP-22, 2026-10-18 |",
+       "one manifest whose rows the leg factory generates from the packs' declarations, a repository's own legs from "
+       "its overlay among them (dWitnessedBar) | v2 `[chain]` dWitnessedBar; the owner, NP-22, 2026-10-18; the owner, "
+       "FA-1, 2026-10-19 |", "gate-legs.json")
+guide = [ln for ln in FT.text.split("\n") if ln.startswith("| unattended | guide templates (PROTOCOL, VERBS, STOPS, ASKS)")]
+if len(guide) != 1:
+    sys.exit("no single guide-templates row")
+FT.sub(guide[0] + "\n", guide[0] + "\n"
+       "| unattended | `.unattended.conf` extension vocabularies (`PHASES_EXTRA`, `DOD_EXTRA`, `DIRECTIVES_EXTRA`, "
+       "`HALT_CODES_EXTRA`, `HOLD_CODES_EXTRA`) | an adopter's run vocabulary | RESHAPED | the repository's own items and "
+       "stages in its overlay, proposed by `adopt.declarations` (dShippedRelease), the keys retired with the kit "
+       "(dConvergedCharter) | the owner, FA-1 and FA-3, 2026-10-19 |\n", "the run vocabularies' row")
+FT.sub("72 reshaped, 25 merged and 17 retired, over 138 rows.", "73 reshaped, 25 merged and 17 retired, over 139 rows.",
+       "counts")
+FT.save()
+
+# ---------------------------------------------------------------- the design record
+D = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+D.sub("     Runtime's cadence-item point (FA-3).\n",
+      "     Runtime's cadence-item point (FA-3). The owner chose repository stages instead; `[folded]` gives the design.\n",
+      "item 3's pointer")
+D.text = D.text.rstrip("\n") + """
+
+## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in two batches, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| FA-1 | "One overlay (Recommended)" |
+| FA-2 | "Re-apply, file order (Recommended)" |
+| FA-3 | "Repository stages" |
+| FA-4 | "Yes, by amendment (Recommended)" |
+| FA-5 | "Yes, reported (Recommended)" |
+| FA-6 | "Keys + role field (Recommended)" |
+| FA-7 | "Next step boundary (Recommended)" |
+
+Six took the recommendation. FA-3 chose the alternative: a repository may insert a stage of its own between two of
+gov's, and P20 is amended. The foundations record's closed set of extension kinds already lists `stage`.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **A repository stage (FA-3).** A repository stage is spliced between two adjacent gov stages by pinned rows of the
+  build's transition table. Gov's five stages stay whole and in order, so the splice can neither remove, reorder nor
+  replace one, and the transitions between gov's stages stay fixed except where a splice sits. The stage's items and
+  its exit item are witnessed as a gov step's are, and its boundaries are reviewed through `review.breakpoints`.
+  Every build that passes its two neighbours passes it, unless a route of its own skips it. dDeclaredLoop builds it,
+  seen red on a planted stage that removes, reorders or replaces a gov stage, and green on one spliced between Test
+  and Deploy. P20 reads: "A build passes gov's five steps, Plan, Design, Build, Test and Deploy, with any stage its
+  repository inserts between two adjacent ones (FA-3)."
+- **v2:**
+  - P8 says the composition covers every kind, and P20 admits repository stages.
+  - The distribution layer only seeds overlays, which the core composes, closing the sixth contradiction.
+  - `instructions.exclude` takes any kind's tag, and `instructions.stale` reads rows as FA-2 says.
+  - The catalogue and presets gain `roles.effort.<role>`, `roles.effort.<workflow>.<stage>` and `roles.model.<role>`,
+    and the house file's `[gates]` folds into each role definition's gate grant, closing the first contradiction.
+  - dOrderedCharter gains the overlay's row mechanism, and dFairHearing the lens catalogue as data.
+  - dDeclaredLoop gains repository items, repository stages and the per-step composition pin.
+  - dBoundRoles gains repository roles and workflows, the harness-path check and the tuning keys.
+  - dWitnessedBar gains repository legs, and dCalibratedLens repository lenses.
+  - dShippedRelease gains `adopt.declarations` and the report over every kind.
+  - dConvergedCharter gains the seed's retirement and the census.
+  - `[owed]` carries this record's four checks, and a revision note records the answers.
+- **The systems record:** `workflow` is dBoundRoles' namespace and `lens` dCalibratedLens', the unit's row grammar
+  admits the overlay's flow and role rows, and the role shapes' effort names its destination keys.
+- **The memory plan:** the instruction overlay's pocket and the unit site take the flow and role rows.
+- **The gap register:** `gap-flow-19`, `gap-roles-24` to `gap-roles-26`, `gap-test-21`, `gap-review-17`,
+  `gap-deploy-28` and `gap-found-32`, each on its owning build's row.
+- **The fates record:** `house/policy.toml` folds as FA-6 says, and `workflows.toml`, `tier2-review.js` and the leg
+  manifest take a repository's rows. `.unattended.conf`'s extension vocabularies gain a row of their own.
+"""
+D.done += 1
+D.save()
+
+# ---------------------------------------------------------------- the session log
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner answered the flow and roles adoption forks, FA-1 to FA-7 (`{REC}`
+  `[answers]`), six with the recommendation. FA-3 chose repository stages, inserted between two adjacent gov stages,
+  so P20 is amended. The answers are folded into v2, the systems record, the memory plan, the register, the fates
+  record and the design record's `[folded]`.
+""", "event")
+L.save()
+print("folded")
+````
+
+### `fold_flow_model.py`
+
+The preset check reddened on `roles.model.<role>`'s preset row; the key joins the keys presets never touch, as `runtime.act-harness` does.
+
+````python
+"""The preset check reddened on the FA fold: `roles.model.<role>` took preset rows reading "the role's model", which
+its Allowed cell, the models the harness adapter offers, cannot hold. A role's model depends on the harness adapter,
+as `runtime.act-harness` does, so no preset can name one: the key joins the keys presets never touch, and its preset
+row goes. The design record's `[folded]` says so.
+
+Usage: python -X utf8 fold_flow_model.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("  `runtime.owner-harness`, `runtime.act-harness`, `runtime.act-auth`, `platforms.supported` or\n",
+      "  `runtime.owner-harness`, `runtime.act-harness`, `runtime.act-auth`, `roles.model.<role>`, `platforms.supported` or\n",
+      "never-touch list")
+V.sub("| `roles.model.<role>` | the role's model | the role's model | the role's model | the role's model |\n", "",
+      "the model's preset row")
+V.sub("| the role's declared model | FA-6: a role's model, which no key held | dBoundRoles |",
+      "| the role's declared model | FA-6: a role's model, which no key held; never set by a preset, its values the "
+      "harness adapter's | dBoundRoles |", "the model's source cell")
+V.save()
+D = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+D.sub("    and the house file's `[gates]` folds into each role definition's gate grant, closing the first contradiction.\n",
+      "    and the house file's `[gates]` folds into each role definition's gate grant, closing the first contradiction.\n"
+      "    `roles.model.<role>` joins the keys presets never touch, since its values are the harness adapter's, as\n"
+      "    `runtime.act-harness`'s are; the preset check reddened on it once, before that.\n", "folded: the model key")
+D.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -13280,6 +13691,10 @@ MINE = [
      "read as dDeclaredLoop's `commit` kind; named in plain words."),
     ("adopt/fix_flow_record.py", "The flow-roles adoption record corrected before its commit: chain placements "
      "that read a non-ancestor's schema, and the `gap-flow-15` citation."),
+    ("adopt/fold_flow.py", "The owner's answers to FA-1 to FA-7 folded into v2, the systems record, the memory "
+     "plan, the gap register, the fates record and the design record, with the session log's event."),
+    ("adopt/fold_flow_model.py", "The preset check reddened on `roles.model.<role>`'s preset row; the key joins "
+     "the keys presets never touch, as `runtime.act-harness` does."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -13758,9 +14173,9 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 $ python plain_cites.py
 landing                  8  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's), dLinkedLibrary (dShippedRelease's) …
 plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
+seen red                 6  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dKeptSession (dWitnessedBar's)
+code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
-seen red                 4  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
-code                     4  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 witness                  4  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
@@ -13795,7 +14210,7 @@ roster                   1  dBoundRoles (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 decision                 1  dWellOiledMachine (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 87, over 39 kinds
+plain-word hits on a non-ancestor's record kind: 90, over 39 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -14153,15 +14568,15 @@ atlas: 0 records named fates-absent-plant
 rc 1
 $ python map.py --check --plant fates-drop
 FINDING fates: kit.agent-instructions has no [table] row
-FINDING fates: the rows count [24, 71, 25, 17, 137], and the record states [24, 72, 25, 17, 138]
+FINDING fates: the rows count [24, 72, 25, 17, 138], and the record states [24, 73, 25, 17, 139]
 rc 1
 $ python map.py --check --plant fates-ghost
 FINDING fates: a row names ghostkit, which is no kit
-FINDING fates: the rows count [25, 72, 25, 17, 139], and the record states [24, 72, 25, 17, 138]
+FINDING fates: the rows count [25, 73, 25, 17, 140], and the record states [24, 73, 25, 17, 139]
 rc 1
 $ python map.py --check --plant fates-bad
 FINDING fates: agent-instructions · harness wiring has the fate MAYBE, outside the set
-FINDING fates: the rows count [24, 71, 25, 17, 138], and the record states [24, 72, 25, 17, 138]
+FINDING fates: the rows count [24, 72, 25, 17, 139], and the record states [24, 73, 25, 17, 139]
 rc 1
 $ python map.py --check --plant fates-unbuilt
 FINDING fates: agent-instructions · harness wiring names no chain build where it goes
@@ -14181,11 +14596,11 @@ $ python map.py --check --plant fates-kit-ghost
 FINDING fates: [kits] names ghostkit, which is no kit node
 rc 1
 $ python map.py --check --plant fates-count
-FINDING fates: the rows count [23, 73, 25, 17, 138], and the record states [24, 72, 25, 17, 138]
+FINDING fates: the rows count [23, 74, 25, 17, 139], and the record states [24, 73, 25, 17, 139]
 rc 1
 $ python map.py --check --plant fates-absorbed-stays
 FINDING fates: agent-instructions · harness wiring stays, yet its kit is absorbed
-FINDING fates: the rows count [25, 71, 25, 17, 138], and the record states [24, 72, 25, 17, 138]
+FINDING fates: the rows count [25, 72, 25, 17, 139], and the record states [24, 73, 25, 17, 139]
 rc 1
 $ python map.py --check --plant fates-bare-none
 FINDING fates: playbook · the seeded charter template retires naming neither a replacement nor a reason
@@ -14233,7 +14648,7 @@ FINDING fates: kit.unattended has no [kits] row
 FINDING fates: kit.unattended has no [table] row
 FINDING fates: kit.workflows has no [kits] row
 FINDING fates: kit.workflows has no [table] row
-FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [24, 72, 25, 17, 138]
+FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [24, 73, 25, 17, 139]
 FINDING fates: kit.agent-instructions carries fate=absorbed, and [kits] says None
 FINDING fates: kit.branch-reconcile carries fate=optional, and [kits] says None
 FINDING fates: kit.codebase-map carries fate=optional, and [kits] says None
@@ -14255,10 +14670,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:707 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:724 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:707 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:724 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -14306,13 +14721,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2427 nodes in 30 namespaces; 31158 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1656, derived 279, pending 492
+map: 2440 nodes in 30 namespaces; 31159 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1666, derived 282, pending 492
 map: no stale facts read 56 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 187 records, 3180 sections, 198 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 187 records, 3184 sections, 199 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -14330,8 +14745,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 449 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 87 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 21 · owned nodes read 452 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 90 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -14363,7 +14778,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 311 · chain builds 21
+register keys 319 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -14371,13 +14786,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 228 · presettable 207 · preset rows 207
+catalogue keys 231 · presettable 209 · preset rows 209
 no findings
 rc 0
 
 $ critical path
-critical path: 211 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 32, dOrderedCharter 54, dDeclaredLoop 77, dPlacedRequest 85, dKeptSession 104, dWitnessedBar 104, dBoundRoles 123, dTotalRecall 124, dRankedPlan 137, dFurnishedOrders 141, dLinkedLibrary 148, dIndexedDesign 160, dWellOiledMachine 163, dScopedBuild 174, dTendedCadence 179, dMindYourWords 180, dShippedRelease 188, dCalibratedLens 191, dConvergedCharter 211
+critical path: 220 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 33, dOrderedCharter 55, dDeclaredLoop 81, dPlacedRequest 89, dKeptSession 108, dWitnessedBar 109, dTotalRecall 129, dBoundRoles 130, dRankedPlan 143, dFurnishedOrders 148, dLinkedLibrary 153, dIndexedDesign 165, dWellOiledMachine 169, dScopedBuild 180, dTendedCadence 185, dMindYourWords 186, dShippedRelease 196, dCalibratedLens 198, dConvergedCharter 220
 rc 0
 ````
 
