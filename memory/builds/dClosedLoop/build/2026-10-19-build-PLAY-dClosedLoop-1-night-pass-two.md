@@ -485,6 +485,70 @@ column, and its selections were compared with the classes of the confirmed findi
 with three gaps; flow-steps' Build memory and extension points and the checklist's note; and the register's
 `gap-mem-44`, `gap-mem-45` and `gap-review-20`.
 
+## [p7-agent-cap] Point 7: agent-cap retired, the agent limit the owner's
+
+**The owner's report, measured.** Dispatch 136 piped synthetic hook payloads through a copy of
+`tools/hooks/agent-cap.js` and read this session's own slot ledger. agent-cap never counts agents in flight:
+- It gives each (session, prompt id) pair five claims. A claim frees 45 minutes after it was made, whether its agent
+  still runs or finished long ago.
+- Every new prompt id starts a fresh budget, and a task notification brings a new prompt id: 73 of this session's
+  143 prompt ids were notifications. So the owner's "5 every 45 minutes" holds within one prompt, and across prompts
+  nothing bounds the total.
+- It never counts a Workflow agent: three Workflow calls of five agents each touched no slot.
+- Five idle claims refuse a sixth agent, and five claims aged 46 minutes admit five more while the first five run.
+
+**Why per window.** A PreToolUse hook cannot see an agent end: a background `Agent` call's PostToolUse returns at
+launch. The harness offers two better counters:
+- **Its own settings.** `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` bounds Agent-tool spawns, 20 by default, and
+  `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS` bounds one Workflow run, 16 or fewer by default. This node's 2.1.292
+  binary carries both.
+- **Two hook events.** SubagentStart fired for every agent in this session, 466 Workflow agents and 89 direct ones.
+  SubagentStop carries the agent's id, but whether it fires for a killed, stopped or stalled agent is unmeasured.
+
+agent-cap's own comment says the Workflow cap is "NOT lowerable from userland", which the harness's documentation
+and binary now contradict.
+
+**Which layer.** The limit is Runtime's, since Runtime runs the cycle and already designs a reservation released at
+SubagentStop. The key belongs to the policy file, so dGroundRules declares it and every build may read it. It is
+enforced at three scopes:
+1. **The harness's own settings**, rendered from the key, for one session's direct spawns and one Workflow run. They
+   are the only reliable in-flight counters today, and they queue where agent-cap refused. dGroundRules lands them
+   with the key, and agent-cap's slot ledger, its conf, its `AGENT_CAP` refusal and its print mode retire in that
+   unit.
+2. **An in-flight ledger**, dWellOiledMachine's hook pack, for the session's total: a slot claimed at SubagentStart,
+   released at SubagentStop, and swept when a session dies. It is armed only once the spike shows SubagentStop firing
+   for every way an agent ends. Otherwise the limit splits into direct and Workflow budgets, with one live run per
+   session.
+3. **The supervisor's reservation** under the lease, for act sessions and nodes, as layer-runtime designed it.
+
+**`runtime.agents-in-flight`.** The key is an agent count, 5 by default. The owner raises or lowers it by a policy
+write (NT-28). Today's cap is lower-only, because an environment knob "leaves no diff", and a tracked policy write
+leaves one. No preset sets it, since the limit is a fact about the owner's plan and machine, like the harness keys
+presets already never touch.
+
+**Where agent-cap's other rules go** (NT-27):
+
+| Rule | Its home | Build |
+|---|---|---|
+| the slot ledger, `FANOUT_CAP`, `--print-cap`, the `AGENT_CAP` refusal | the key, rendered into the harness's settings | dGroundRules |
+| the raw `parallel` and `pipeline` ban, and the concurrency half of the bound rule | retired: the harness queues | dGroundRules |
+| the verifier total, the loop markers and the lens count | the merge bar's harness checks, and the shapes' declared fan | dFairHearing, dBoundRoles |
+| the ref-keyed join ban | `check-review-join.sh` alone | dFairHearing |
+| the spec-audit opt-in | a review-kit pack on Workflow calls | dFairHearing |
+| the handoff spawn guard and harness admission | the roles pack, admission comparing a harness with its landed blob | dBoundRoles |
+
+`tools/hooks/agent-cap.js` retires in dBoundRoles once its last rule has moved, with an upgrade step and its readers
+inventoried by value. The charter's agent-cap line is among them.
+
+**Left open.** Whether SubagentStop fires for every way an agent ends is the spike's to measure, and the in-flight
+ledger waits on it. An adopter with no roles file loses the inline-script total check, though the harness settings
+still bound its concurrency.
+
+**Folded.** v2's `runtime.agents-in-flight`, on the list presets never touch; the kit-conf passage and an owed check
+revised; dGroundRules, dFairHearing, dBoundRoles and dWellOiledMachine clauses, and four clauses revised; layer-runtime's
+bound, per-prompt total, script rules, agent-cap's arm, the owner-pack row, the carriers table, the roster and the
+in-flight test; and the register's `gap-rt-34` and `gap-roles-30`, with `gap-rt-05` amended.
+
 ## [forks] Parked for the owner, 2026-10-19
 
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
@@ -519,3 +583,5 @@ decision.
 | NT-24 | Does the builder's work order carry the classes its write set selects? | no: serving by path retires, with the per-pass checklist and the prebuild; yes, as designed; yes, without fully gated classes | a structural decision |
 | NT-25 | How does a review get its classes? | the checklist its range selects, minus fully gated classes, until a replay with and without the checklist decides between that and every ungated class; every ungated class; no checklist at review | a structural decision |
 | NT-26 | Who serves classes while code is written? | the reuse scout by intent, at most five with reasons, armed only after it wins its replay, else no one; a runtime hook by path or content; no one | a structural decision |
+| NT-27 | Where does the agent limit live, and what enforces it? | one Runtime key, enforced by the harness's own settings now, an in-flight ledger on SubagentStart and SubagentStop once the spike passes, and the supervisor's reservation, every other agent-cap rule moved to its home; the harness's settings alone; agent-cap kept, re-keyed per session | a structural decision |
+| NT-28 | May the owner raise the agent limit? | yes, by a policy write, which leaves a diff; no, lower-only as today | a structural decision; the key's default stays 5 |

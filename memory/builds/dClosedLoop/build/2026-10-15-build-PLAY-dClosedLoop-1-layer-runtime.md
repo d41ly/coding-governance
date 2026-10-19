@@ -426,8 +426,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
   So a take-over never pushes twice.
 - **Agents in flight.**
-  - The bound is agent-cap's lower-only cap: `FANOUT_CAP` in `.agent-cap.conf`, never above 5
-    (TOOL-aRepatriatedFork-7). Runtime adds no second carrier for it.
+  - The bound is `runtime.agents-in-flight`, one key the owner raises or lowers by a policy write (revised
+    2026-10-19, the night pass two, point 7, pending NT-27 and NT-28). It was agent-cap's lower-only
+    `FANOUT_CAP` in `.agent-cap.conf`, never above 5 (TOOL-aRepatriatedFork-7), which counted claims per
+    prompt, never agents in flight. Runtime adds no second carrier for it.
   - Before a launch, the supervisor reserves the act's declared fan, its harness's static maximum,
     against a counter under the lease. When slots are short, it queues the act.
   - It releases the slots when the act session exits, or when the reap kills its tree.
@@ -435,7 +437,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     the same way, and refuses instead of queueing. Both calls run in the background, so the reservation is released when the call's work
     ends: at SubagentStop for an Agent call, and at the run's saved result for a Workflow call. A sweep
     keyed to the session's liveness frees what a dead session held.
-  - agent-cap's per-prompt total is unchanged.
+  - agent-cap's per-prompt total retires with agent-cap (revised 2026-10-19, the night pass two, point 7).
+    The harness's own concurrency settings, rendered from the key, bound one session's direct spawns and
+    one Workflow run. A hook pack claiming a slot at SubagentStart and releasing it at SubagentStop bounds
+    the session's total, once the spike shows SubagentStop firing for every way an agent ends.
 - **Supervision.** On each beat, the supervisor:
   - runs `reap.py --sweep` under `PROCMON_REAP_MODE` (reap-orphans here);
   - reaps act sessions past `runtime.act-ceiling`;
@@ -492,7 +497,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **Inside an admitted script.** No hook sees `agent()` or a nested `workflow()`, so these are bound
     statically and reconciled afterwards:
     - each registered harness declares its spawn sites and its maximum fan, which agent-cap's script
-      rules already scan for;
+      rules already scan for, and the merge bar's harness checks scan once agent-cap retires (the night
+      pass two, point 7);
     - SubagentStart and SubagentStop journal each agent, with its spawn marker;
     - at the act's end, the supervisor reconciles the journal against the declaration. An agent outside
       the declaration voids the act's witness, so the item re-runs.
@@ -576,7 +582,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - the class check "every enforcement entry fails closed" is a new arm of check-wiring.sh, over its one
     fragment reader. It also fails when a gated tool's ask rule has no PermissionRequest dispatcher
     entry;
-  - agent-cap's hard-coded arm becomes a fragment.
+  - agent-cap's hard-coded arm becomes a fragment, then retires as its rules move to their homes (the
+    night pass two, point 7).
 - **The events:**
   - PreToolUse and PostToolUse;
   - PermissionRequest, the gated tools' one allow path;
@@ -590,7 +597,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
   | Hook today | Event | Kit | Pack |
   |---|---|---|---|
-  | agent-cap | PreToolUse: Workflow, Agent | hooks | roles: the spawn guard; runtime: the slot reservation, and binding's early refusal |
+  | agent-cap | PreToolUse: Workflow, Agent | hooks | roles: the spawn guard and harness admission; runtime: the slot reservation, from SubagentStart and SubagentStop, and binding's early refusal; the review kit: the verifier total, the join ban and the spec-audit opt-in; agent-cap itself retired (the night pass two, point 7) |
   | the dispatcher's permission entry, new | PermissionRequest: the gated tools | hooks | runtime: the permission baseline, act binding and the epoch check |
   | scratch-guard | PreToolUse: shell and edits; SubagentStart | hooks | roles: write gates |
   | gate-guard | PreToolUse: shell, AskUserQuestion | unattended | runtime: the run guard |
@@ -932,7 +939,7 @@ integrations because the grant they serve is Runtime's field.
 | workspaces | `build.worktree` | v2's catalogue |
 | where runs and cadence run | `run.host`, `maintain.host`, `kits.host` | v2's catalogue |
 | the owner's channel | `notify.channel` | v2's catalogue |
-| agents in flight | `FANOUT_CAP`: lower-only, never above 5 | `.agent-cap.conf` |
+| agents in flight | `runtime.agents-in-flight`, raised or lowered by the owner (revised 2026-10-19, the night pass two, point 7; it was `FANOUT_CAP`, lower-only, never above 5) | v2's catalogue |
 | reaping | `PROCMON_REAP_MODE` | `.process-monitor.conf` |
 | the relaunch cap and the turn cap | `RESUME_ATTEMPTS`, `RESUME_TURNS` | `.unattended.conf` |
 | return retries | `roles.retries` | v2's catalogue |
@@ -981,7 +988,7 @@ Settled by RT-3: the owner chose "Runtime takes `next` and the controls too".
      - writing the shared records itself;
   4. act binding and the epoch check, decided in the dispatcher's PermissionRequest entry, a runtime pack;
   5. the persisted-return store, and the deferral block;
-  6. the slot reservation, under agent-cap's cap;
+  6. the slot reservation, under `runtime.agents-in-flight` (revised 2026-10-19, the night pass two, point 7);
   7. the enforcement surface:
      - the fragments as packs, settings-merge's dispatcher entries, and check-wiring's class arm;
      - the permission baseline: ask rules on gated tools, the dispatcher's PermissionRequest entry as the
@@ -1096,7 +1103,7 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - on a StopFailure limit record, the supervisor parses the reset time, holds, renews its lease, and
     raises an owner item once `runtime.hold-ceiling` passes.
 - **`in-flight`:**
-  - with `FANOUT_CAP=3`, the supervisor queues an act whose declared fan exceeds the free slots, and the
+  - with `runtime.agents-in-flight` at 3 (`FANOUT_CAP=3` until the night pass two's point 7), the supervisor queues an act whose declared fan exceeds the free slots, and the
     attended PreToolUse entry refuses the same call;
   - killing an act session that holds slots releases them once the reap runs;
   - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep.

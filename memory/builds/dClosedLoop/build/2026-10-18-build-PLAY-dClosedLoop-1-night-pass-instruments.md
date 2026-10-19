@@ -15637,6 +15637,260 @@ R.save()
 print("folded point 6")
 ````
 
+### `fold_p7.py`
+
+Point 7, agent-cap: the point's section and forks NT-27 and NT-28, `runtime.agents-in-flight` and its three scopes, and every agent-cap rule moved, folded into v2, layer-runtime and the gap register.
+
+````python
+"""The night pass two, point 7: agent-cap retired, the agent limit the owner's by policy. Writes the point's section and
+its forks (NT-27 and NT-28) into the night pass two's record and folds the design, marked pending, into v2,
+layer-runtime and the gap register: `runtime.agents-in-flight`, enforced by the harness's own settings, an in-flight
+ledger and the supervisor, and every other agent-cap rule moved to its own home.
+
+Usage: python -X utf8 fold_p7.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+NP2 = "the night pass two"
+KEY = "`runtime.agents-in-flight`"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+hf = [ln for ln in V.text.split("\n") if ln.startswith("| `runtime.hook-failure` |")]
+if len(hf) != 2:
+    sys.exit(f"{len(hf)} runtime.hook-failure rows")
+V.sub(hf[0] + "\n", hf[0] + "\n"
+      f"| {KEY} | an agent count, at least 1 | 5 | {NP2}, point 7, the owner's words: \"agent limits must be "
+      "owner-adjustable by policy\"; agents in flight in one session, its direct spawns and Workflow agents together, "
+      "raised or lowered by a policy write, pending NT-27 and NT-28 | dGroundRules |\n", "catalogue: the agent limit")
+V.sub("  `runtime.owner-harness`, `runtime.act-harness`,",
+      f"  {KEY}, `runtime.owner-harness`, `runtime.act-harness`,", "presets never touch the agent limit")
+V.sub("as the four Runtime reads (`FANOUT_CAP`, `PROCMON_REAP_MODE`, `RESUME_ATTEMPTS` and `RESUME_TURNS`), stay\n"
+      "in their kit confs,",
+      "as the three Runtime reads (`PROCMON_REAP_MODE`, `RESUME_ATTEMPTS` and `RESUME_TURNS`), stay\n"
+      f"in their kit confs (`FANOUT_CAP` retired into {KEY}, revised 2026-10-19, the night pass two, point 7),",
+      "[policies]: the kit confs")
+V.sub("agent-cap admitting a harness whose lens slots are filled from data;",
+      "the roles pack admitting a harness whose lens slots are filled from data, where agent-cap admitted it until "
+      "the night pass two's point 7;", "[owed]: the harness admission")
+V.sub("an agent cap bounded by agent-cap's `FANOUT_CAP`,",
+      f"an agent cap bounded by {KEY} (revised by {NP2}, point 7: it was agent-cap's `FANOUT_CAP`),",
+      "dBoundRoles: the shapes' cap")
+V.sub("and agent-cap counting slots, never names, seen red on a planted sixth slot",
+      f"and the merge bar's harness check counting slots, never names, where agent-cap counted them until {NP2}'s "
+      "point 7, seen red on a planted sixth slot", "dFairHearing: the slot count")
+V.sub("agent slots reserved under agent-cap's cap",
+      f"agent slots reserved under {KEY}", "dWellOiledMachine: the reservation")
+V.sub("kit.toml's `*_keys`, the kit-placeholders leg and the agent-cap parser (H6),",
+      "kit.toml's `*_keys` and the kit-placeholders leg (H6, the agent-cap parser re-pointed earlier, by dGroundRules, "
+      "as the night pass two's point 7 moved it),", "dConvergedCharter: the agent-cap parser")
+add_clauses(V, "dGroundRules", [
+    f"{KEY}, the one carrier of the agent limit, which the owner raises or lowers by a policy write, rendered into the "
+    "harness's own concurrency settings for one session's direct spawns and one Workflow run, agent-cap's slot ledger "
+    "retired in the same unit with `.agent-cap.conf`, its refusal of a set `AGENT_CAP` and its print mode, their "
+    "readers re-pointed to the policy reader, seen on a fixture repository whose Workflow run of four agents overlaps "
+    f"at most two under a limit of two ({NP2}, point 7, pending NT-27 and NT-28)"], ["gap-rt-34"])
+add_clauses(V, "dFairHearing", [
+    "agent-cap's review rules moved to the review kit: the verifier total and the loop markers to the merge bar's "
+    "harness checks, the ref-keyed join ban to `check-review-join.sh` alone, and the spec-audit opt-in to a review-kit "
+    f"pack on Workflow calls, each seen red on its planted case before agent-cap stops carrying it ({NP2}, point 7, "
+    "pending NT-27)"], [])
+add_clauses(V, "dBoundRoles", [
+    "agent-cap's spawn guard and harness admission moved into the roles pack, admission comparing a harness file with "
+    "its landed blob so an edited harness never runs before the bar has read it, and `tools/hooks/agent-cap.js` "
+    "retired with an upgrade step once its last rule has moved, its readers inventoried by value, the charter's "
+    f"agent-cap line among them ({NP2}, point 7, pending NT-27)"], ["gap-roles-30"])
+add_clauses(V, "dWellOiledMachine", [
+    "the in-flight ledger: a hook pack claiming a slot keyed by agent id at SubagentStart and releasing it at "
+    f"SubagentStop, a direct or Workflow spawn admitted while the agents in flight and the reservations stay under {KEY}, "
+    "a Workflow call reserving its harness's declared fan, and a sweep keyed to the session's liveness in place of a "
+    "claim's expiry, armed only once the spike shows SubagentStop firing for a Workflow agent, an agent the owner "
+    "stopped, one failed by stalls and a killed session, and, if it does not, the limit split between direct and "
+    f"Workflow budgets with one live run per session ({NP2}, point 7, pending NT-27)"], [])
+V.save()
+
+# ---------------------------------------------------------------- layer-runtime
+L = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+L.sub("  - The bound is agent-cap's lower-only cap: `FANOUT_CAP` in `.agent-cap.conf`, never above 5\n"
+      "    (TOOL-aRepatriatedFork-7). Runtime adds no second carrier for it.\n",
+      f"  - The bound is {KEY}, one key the owner raises or lowers by a policy write (revised\n"
+      "    2026-10-19, the night pass two, point 7, pending NT-27 and NT-28). It was agent-cap's lower-only\n"
+      "    `FANOUT_CAP` in `.agent-cap.conf`, never above 5 (TOOL-aRepatriatedFork-7), which counted claims per\n"
+      "    prompt, never agents in flight. Runtime adds no second carrier for it.\n", "[supervise]: the bound")
+L.sub("  - agent-cap's per-prompt total is unchanged.\n",
+      "  - agent-cap's per-prompt total retires with agent-cap (revised 2026-10-19, the night pass two, point 7).\n"
+      "    The harness's own concurrency settings, rendered from the key, bound one session's direct spawns and\n"
+      "    one Workflow run. A hook pack claiming a slot at SubagentStart and releasing it at SubagentStop bounds\n"
+      "    the session's total, once the spike shows SubagentStop firing for every way an agent ends.\n",
+      "[supervise]: the per-prompt total")
+L.sub("    - each registered harness declares its spawn sites and its maximum fan, which agent-cap's script\n"
+      "      rules already scan for;\n",
+      "    - each registered harness declares its spawn sites and its maximum fan, which agent-cap's script\n"
+      "      rules already scan for, and the merge bar's harness checks scan once agent-cap retires (the night\n"
+      "      pass two, point 7);\n", "[enforce]: the script rules")
+L.sub("  - agent-cap's hard-coded arm becomes a fragment.\n",
+      "  - agent-cap's hard-coded arm becomes a fragment, then retires as its rules move to their homes (the\n"
+      "    night pass two, point 7).\n", "[enforce]: agent-cap's arm")
+L.sub("| agent-cap | PreToolUse: Workflow, Agent | hooks | roles: the spawn guard; runtime: the slot reservation, and "
+      "binding's early refusal |",
+      "| agent-cap | PreToolUse: Workflow, Agent | hooks | roles: the spawn guard and harness admission; runtime: the "
+      "slot reservation, from SubagentStart and SubagentStop, and binding's early refusal; the review kit: the "
+      "verifier total, the join ban and the spec-audit opt-in; agent-cap itself retired (the night pass two, point 7) |",
+      "the owner-pack table")
+L.sub("| agents in flight | `FANOUT_CAP`: lower-only, never above 5 | `.agent-cap.conf` |",
+      f"| agents in flight | {KEY}, raised or lowered by the owner (revised 2026-10-19, the night pass two, point 7; "
+      "it was `FANOUT_CAP`, lower-only, never above 5) | v2's catalogue |", "the carriers table")
+L.sub("  6. the slot reservation, under agent-cap's cap;\n",
+      f"  6. the slot reservation, under {KEY} (revised 2026-10-19, the night pass two, point 7);\n",
+      "the roster: the reservation")
+L.sub("  - with `FANOUT_CAP=3`, the supervisor queues",
+      f"  - with {KEY} at 3 (`FANOUT_CAP=3` until the night pass two's point 7), the supervisor queues",
+      "[tests]: in-flight")
+L.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+RA = "`research-agent-cap.md`"
+G.sub("| gap-rt-05 | Runtime | MED | Fan-out is bounded per prompt, not in flight: the direct budget resets on every "
+      "notification, and Workflow calls and headless launches are outside the count. |",
+      "| gap-rt-05 | Runtime | MED | Fan-out is bounded per prompt, not in flight: the direct budget resets on every "
+      "notification, and Workflow calls and headless launches are outside the count. A claim's 45-minute expiry also "
+      "admits five more agents while the first five run, and five idle claims refuse a sixth (measured by the night "
+      "pass two, point 7). |", "gap-rt-05 amended")
+NEW = {
+    "gap-rt-33": [("gap-rt-34", "Runtime", "MED", "The agent limit can only be lowered, never above 5, so the owner "
+                   "cannot raise it by policy, and its carrier is a kit conf, not the policy file.",
+                   f"{RA} sections 1 and 6")],
+    "gap-roles-29": [("gap-roles-30", "Roles", "MED", "A harness file edited and not yet committed runs at call time, "
+                      "before the merge bar has scanned it.", f"{RA} section 5")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 350 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's point 7 added `gap-rt-34` and `gap-roles-30` and amended `gap-rt-05`\n"
+    "(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p7-agent-cap]`), same instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night pass two's record
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.insert_before("\n## [forks] Parked for the owner, 2026-10-19\n", """
+## [p7-agent-cap] Point 7: agent-cap retired, the agent limit the owner's
+
+**The owner's report, measured.** Dispatch 136 piped synthetic hook payloads through a copy of
+`tools/hooks/agent-cap.js` and read this session's own slot ledger. agent-cap never counts agents in flight:
+- It gives each (session, prompt id) pair five claims. A claim frees 45 minutes after it was made, whether its agent
+  still runs or finished long ago.
+- Every new prompt id starts a fresh budget, and a task notification brings a new prompt id: 73 of this session's
+  143 prompt ids were notifications. So the owner's "5 every 45 minutes" holds within one prompt, and across prompts
+  nothing bounds the total.
+- It never counts a Workflow agent: three Workflow calls of five agents each touched no slot.
+- Five idle claims refuse a sixth agent, and five claims aged 46 minutes admit five more while the first five run.
+
+**Why per window.** A PreToolUse hook cannot see an agent end: a background `Agent` call's PostToolUse returns at
+launch. The harness offers two better counters:
+- **Its own settings.** `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` bounds Agent-tool spawns, 20 by default, and
+  `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS` bounds one Workflow run, 16 or fewer by default. This node's 2.1.292
+  binary carries both.
+- **Two hook events.** SubagentStart fired for every agent in this session, 466 Workflow agents and 89 direct ones.
+  SubagentStop carries the agent's id, but whether it fires for a killed, stopped or stalled agent is unmeasured.
+
+agent-cap's own comment says the Workflow cap is "NOT lowerable from userland", which the harness's documentation
+and binary now contradict.
+
+**Which layer.** The limit is Runtime's, since Runtime runs the cycle and already designs a reservation released at
+SubagentStop. The key belongs to the policy file, so dGroundRules declares it and every build may read it. It is
+enforced at three scopes:
+1. **The harness's own settings**, rendered from the key, for one session's direct spawns and one Workflow run. They
+   are the only reliable in-flight counters today, and they queue where agent-cap refused. dGroundRules lands them
+   with the key, and agent-cap's slot ledger, its conf, its `AGENT_CAP` refusal and its print mode retire in that
+   unit.
+2. **An in-flight ledger**, dWellOiledMachine's hook pack, for the session's total: a slot claimed at SubagentStart,
+   released at SubagentStop, and swept when a session dies. It is armed only once the spike shows SubagentStop firing
+   for every way an agent ends. Otherwise the limit splits into direct and Workflow budgets, with one live run per
+   session.
+3. **The supervisor's reservation** under the lease, for act sessions and nodes, as layer-runtime designed it.
+
+**`runtime.agents-in-flight`.** The key is an agent count, 5 by default. The owner raises or lowers it by a policy
+write (NT-28). Today's cap is lower-only, because an environment knob "leaves no diff", and a tracked policy write
+leaves one. No preset sets it, since the limit is a fact about the owner's plan and machine, like the harness keys
+presets already never touch.
+
+**Where agent-cap's other rules go** (NT-27):
+
+| Rule | Its home | Build |
+|---|---|---|
+| the slot ledger, `FANOUT_CAP`, `--print-cap`, the `AGENT_CAP` refusal | the key, rendered into the harness's settings | dGroundRules |
+| the raw `parallel` and `pipeline` ban, and the concurrency half of the bound rule | retired: the harness queues | dGroundRules |
+| the verifier total, the loop markers and the lens count | the merge bar's harness checks, and the shapes' declared fan | dFairHearing, dBoundRoles |
+| the ref-keyed join ban | `check-review-join.sh` alone | dFairHearing |
+| the spec-audit opt-in | a review-kit pack on Workflow calls | dFairHearing |
+| the handoff spawn guard and harness admission | the roles pack, admission comparing a harness with its landed blob | dBoundRoles |
+
+`tools/hooks/agent-cap.js` retires in dBoundRoles once its last rule has moved, with an upgrade step and its readers
+inventoried by value. The charter's agent-cap line is among them.
+
+**Left open.** Whether SubagentStop fires for every way an agent ends is the spike's to measure, and the in-flight
+ledger waits on it. An adopter with no roles file loses the inline-script total check, though the harness settings
+still bound its concurrency.
+
+**Folded.** v2's `runtime.agents-in-flight`, on the list presets never touch; the kit-conf passage and an owed check
+revised; dGroundRules, dFairHearing, dBoundRoles and dWellOiledMachine clauses, and four clauses revised; layer-runtime's
+bound, per-prompt total, script rules, agent-cap's arm, the owner-pack row, the carriers table, the roster and the
+in-flight test; and the register's `gap-rt-34` and `gap-roles-30`, with `gap-rt-05` amended.
+""", "point 7's section")
+R.text = R.text.rstrip("\n") + "\n" + (
+    "| NT-27 | Where does the agent limit live, and what enforces it? | one Runtime key, enforced by the harness's own "
+    "settings now, an in-flight ledger on SubagentStart and SubagentStop once the spike passes, and the supervisor's "
+    "reservation, every other agent-cap rule moved to its home; the harness's settings alone; agent-cap kept, re-keyed "
+    "per session | a structural decision |\n"
+    "| NT-28 | May the owner raise the agent limit? | yes, by a policy write, which leaves a diff; no, lower-only as "
+    "today | a structural decision; the key's default stays 5 |\n")
+R.done += 1
+R.save()
+print("folded point 7")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before.
@@ -15980,6 +16234,9 @@ MINE = [
     ("night2/fold_p6.py", "Point 6, the bug-class lookup: the point's section and forks NT-24 to NT-26, "
      "classes no longer selected by a write set, kept on review and served by intent only after a replay, "
      "folded into v2, flow-steps and the gap register."),
+    ("night2/fold_p7.py", "Point 7, agent-cap: the point's section and forks NT-27 and NT-28, "
+     "`runtime.agents-in-flight` and its three scopes, and every agent-cap rule moved, folded into v2, "
+     "layer-runtime and the gap register."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
@@ -16958,10 +17215,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:804 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:814 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:804 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:814 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -17009,13 +17266,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2496 nodes in 30 namespaces; 31452 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1710, derived 291, pending 495
+map: 2499 nodes in 30 namespaces; 31466 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1712, derived 292, pending 495
 map: no stale facts read 57 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 198 records, 3311 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 198 records, 3313 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -17033,7 +17290,7 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 465 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+chain rows 21 · owned nodes read 466 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
 left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 102 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
@@ -17066,7 +17323,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 348 · chain builds 21
+register keys 350 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -17074,13 +17331,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 240 · presettable 218 · preset rows 218
+catalogue keys 241 · presettable 218 · preset rows 218
 no findings
 rc 0
 
 $ critical path
-critical path: 233 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 9, dSafePassage 21, dFairHearing 36, dOrderedCharter 56, dDeclaredLoop 85, dPlacedRequest 96, dWitnessedBar 114, dKeptSession 118, dTotalRecall 137, dBoundRoles 138, dRankedPlan 152, dFurnishedOrders 158, dLinkedLibrary 162, dIndexedDesign 176, dWellOiledMachine 180, dScopedBuild 193, dTendedCadence 196, dMindYourWords 197, dShippedRelease 207, dCalibratedLens 211, dConvergedCharter 233
+critical path: 236 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 10, dSafePassage 22, dFairHearing 38, dOrderedCharter 57, dDeclaredLoop 86, dPlacedRequest 97, dWitnessedBar 115, dKeptSession 119, dTotalRecall 138, dBoundRoles 140, dRankedPlan 154, dFurnishedOrders 160, dLinkedLibrary 163, dIndexedDesign 177, dWellOiledMachine 183, dScopedBuild 196, dTendedCadence 199, dMindYourWords 200, dShippedRelease 210, dCalibratedLens 214, dConvergedCharter 236
 rc 0
 ````
 
