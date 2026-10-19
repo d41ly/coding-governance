@@ -168,6 +168,7 @@ extends.
 | gap-roles-24 | Roles | HIGH | An adopter's own role or workflow cannot exist beside gov's: the role checker and the review harness type their populations in code, so the catalogue reds an adopter's role file, and the registering edit conflicts and holds the roles kit back. | `research-flow-today.md` sections 2 and 3; `check_roles.py`'s `BODY_CEILINGS` and `WORKFLOW_NAMES`, read | — |
 | gap-roles-25 | Roles | HIGH | In a default adopter install, `roles.json` names the review harnesses where the kit is not installed, and the spawn guard refuses gov's own `tier2-review.js`. | `research-flow-today.md`, its defect found on the way, rc 2 from `agent-cap.js` | — |
 | gap-roles-26 | Roles | MED | The seeded `house/policy.toml` never receives gov's change, so the records' lowered efforts never reach an adopter. | `research-flow-today.md` section 2, the `policy.toml` row; `research-flow-design.md`, its second contradiction | — |
+| gap-roles-27 | Roles | MED | No edge between steps hands its commitments as rows the next step answers: a handed fact needs a disposition only when it proves false, and the review finder's schema holds findings only. | `research-scoutedseam-apply.md` section 4; `research-handoffs-design.md` section 2 | — |
 | gap-mem-01 | Memory | HIGH | No memory contract: no registry declares the record kinds with their schemas, writers, readers and checks. Conventions are spread over `HYGIENE.md` (58.5 KB), the spec template, the guides and 21 memory-tree legs; review bodies, build journals and 535 of 565 prompts are free prose; README front matter is open-world, so a misspelled `parent:` is accepted silently. Raised by the owner. | layer review, memory, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-builds.md` | — |
 | gap-mem-02 | Memory | HIGH | The decision index holds the wrong things and instructs no one: 28 of 200 rows are major decisions or features others must reuse, 0 carry a reuse instruction, nothing requires a row, recall opened the file 0 times in 121 opens, 47 rows chain a supersession or narrowing, and 79 sit within 20 characters of the 300-character cap. Raised by the owner. Nothing defines a major decision: 160 rows were added in 60 days, beside 1,829 `Decided:` trailers (the library round). | layer review, memory, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-asks-decisions.md` | — |
 | gap-mem-03 | Memory | HIGH | No reuse instruction reaches an agent: each dossier's `## Reuse affordance` block holds the facts, but no instruction carries them, the task card's `**Reuse:**` field has no producer, and `reuse_lookup.py` solved 0 of 24 cases, ranking test helpers first with a median of 110 candidates shown. Raised by the owner. Nothing proposes an entry when a unit builds a new seam (256 specs in 67 builds say no existing seam fits), `gov:feature` marks 0 code lines, and 4 of 20 stored cards fill `**Reuse:**` (the library round). | layer review, memory, `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-map-reuse.md`; aScoutedSeam's benchmark | — |
@@ -303,11 +304,13 @@ extends.
 | gap-design-08 | Design | MED | Audits never come back clean: 0 of 254, 170 BLOCKED; nothing measures whether specs reach review short of their bar or the bar moves. (main loop) | design §4.3 | — |
 | gap-design-09 | Design | LOW | Sub-spec agreement, tier assignment and unpushed specs are prose or invisible. | design §4.9–4.12 | — |
 | gap-design-10 | Design | LOW | Spec section numbers mean different sections by tier. | the systems round's `[gaps-proposed]` (`build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md`), from its `[agreement]` | — |
+| gap-design-11 | Design | MED | The reuse scout's return is unspecified: it returns one seam, with no cap, no MUST definition, no census and no unmet needs. | `research-scoutedseam-apply.md` section 5c, item 7 | — |
 | gap-build-01 | Build | HIGH | Scope is not bound to the unit: 120 of 584 unit-attributed product commits touched files outside their unit (42 of 582 at kit granularity). | build §4 | — |
 | gap-build-02 | Build | HIGH | The attended closing review is unenforced: 29 of 59 attended builds with a CLOSED unit carry one, against 86 of 89 unattended. | build §4 | — |
 | gap-build-03 | Build | MED | Bash and PowerShell product writes escape the write gate. | build §4 | — |
 | gap-build-04 | Build | LOW | The per-pass bug-class checklist is unverified, and agents a harness spawns are uncounted. | build §4 | — |
 | gap-build-05 | Build | MED | Baselines are not tied to touch: five kits stay baselined after 14 to 278 touches each, and the per-file count ratchet let 29 of 129 encoding sites persist on edited lines (`research-retrofit-b.md:118`, `research-retrofit-a.md:102`). | the retrofit round's `[gaps-proposed]` (`build/2026-10-17-build-PLAY-dClosedLoop-1-retrofit.md`) | — |
+| gap-build-06 | Build | HIGH | No diff-time reuse check runs in the flow: the measured two-stage shape's second stage, which took the system to 33 of 35, has no item, the diff preset has no reuse lens, and the diff reviewer reads only the diff and the spec. | `research-scoutedseam-apply.md` sections 4 (edge E1) and 5b | — |
 | gap-test-01 | Test | HIGH | Kit self-tests, 70 of 140 legs and 23,494 s of 28,066 s summed maxima, are on no pre-landing path. | test §4 | — |
 | gap-test-02 | Test | HIGH | The binding verdict is one node's bypassable hook; remote CI blocks nothing; the default branch reds memory hygiene today. The verdict-backend registry Test declares, and the remote verdict before the landing under `verdict: remote-ci`, are this gap's (the expansion round). | test §4; maintain instrument 4; the expansion round, `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` | — |
 | gap-test-03 | Test | HIGH | Adopters get no product-test contract: no test levels, selection, or flake policy; their manifest starts empty. | test §4 | — |
@@ -730,4 +733,12 @@ Re-measured after the night pass two's point 1 added `gap-flow-20`, `gap-flow-21
 ```text
 Roles=26 Deploy=28 Plan=8 Spine=13 Orient=21 Test=21 Runtime=32 Lexicon=10 Tooling=23 Review=18 Foundation=32 Build=5 Memory=39 Flow=21 Maintain=15 Design=10
 LOW=57 MED=155 HIGH=110
+```
+
+Re-measured after the night pass two's point 2 added `gap-build-06`, `gap-roles-27` and `gap-design-11`
+(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p2-scoutedseam]`), same instrument, over 325 keys:
+
+```text
+Roles=27 Deploy=28 Plan=8 Spine=13 Orient=21 Test=21 Runtime=32 Lexicon=10 Tooling=23 Review=18 Foundation=32 Build=6 Memory=39 Flow=21 Maintain=15 Design=11
+LOW=57 MED=157 HIGH=111
 ```

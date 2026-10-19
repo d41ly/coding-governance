@@ -14266,6 +14266,277 @@ R.sub("`gap-flow-20`, `gap-flow-21` and `gap-review-18`.\n\n## [forks]",
 R.save()
 ````
 
+### `fold_p2.py`
+
+Point 2, aScoutedSeam: the point's section and forks NT-10 to NT-13, the reuse check folded into v2, flow-steps, layer-roles and the gap register, and two research rows filled.
+
+````python
+"""The night pass two, point 2: aScoutedSeam's measured principles, applied to gov's flow and roles. Writes the
+point's section and its forks (NT-10 to NT-13) into the night pass two's record, fills two research rows, and folds the
+design, marked pending where a fork decides it, into v2, flow-steps, layer-roles and the gap register.
+
+Usage: python -X utf8 fold_p2.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+NP2 = "the night pass two"
+AS = "aScoutedSeam's records on the default branch"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("  - a scout that reads a generated house index first raised recall from 13 to 16 of 24;\n",
+      "  - a scout that reads a generated house index first raised recall from 13 to 16 of 24;\n"
+      "  - since then the two-stage reuse system, an orientation scout and then an enumerated diff check answering the\n"
+      "    scout's MUST seams as rows, reached 33 of 35 at medium over 23 tuning and 12 held-out cases (aScoutedSeam's\n"
+      "    `...-3-2-workflow-design-set.md` on the default branch), and its rows moved the orientation's catch into the\n"
+      "    step that gates rather than adding recall (`build/2026-10-19-build-PLAY-dClosedLoop-1-research-scoutedseam-apply.md`\n"
+      "    5a); dScopedBuild's reuse check carries it (the night pass two, point 2);\n", "owed: the measured system")
+V.sub("taken into the default branch by blob from the unmerged commit `b0fe68f30` in this unit, never waited on",
+      "taken by blob from commit `b0fe68f30`, since merged into the default branch with the later results the night pass "
+      "two cites, never waited on", "dFairHearing: merged")
+V.sub("accepted by re-running aScoutedSeam's benchmark, which dFairHearing lands",
+      "accepted by re-running aScoutedSeam's benchmark and its twelve held-out cases, which dFairHearing lands",
+      "dLinkedLibrary: the held-out set")
+add_clauses(V, "dFairHearing", [
+    "the experiment shape's method, from aScoutedSeam's measurements: cases with objective evidence, a held-out set "
+    "frozen before any tuning and never read to change a prompt, one variable per arm, parsed replies counted before any "
+    "score is read, one blind judge per case with labels rotated, and the arms' union read as one system, its held-out "
+    f"cases joining the benchmark's replay ({NP2}, point 2)"], [])
+add_clauses(V, "dDeclaredLoop", [
+    "an item's `upstream` field naming the items whose commitments it must answer, each commitment handed as a row its "
+    "return answers `used`, `bypassed` or `not-applicable` with a reason, the join computed at the return, a `bypassed` "
+    "row also a finding that routes, the rows recorded on every edge and gating only on an edge whose measurement "
+    "passed, the reuse edge the first to gate once a later build arms it, seen red on a planted return that drops a row "
+    f"on a gating edge ({NP2}, point 2, pending NT-10)"], [])
+add_clauses(V, "dBoundRoles", [
+    "the prompt writer's default frame for a role item, aScoutedSeam's skeleton in order: the role and its job's kind, "
+    "the material, the boundaries, the population from the item's lister or the needs-then-sketch steps that build it, "
+    "the upstream rows, the row contract with an escape verdict and proof of search, the added rows, the no-stop line, "
+    "and the return contract last, every list in the output bounded, its work orders carrying the upstream rows and its "
+    "returns answering them, and no coverage item's effort below medium without an experiment record that shows the "
+    f"lower effort holds, seen red on a planted lower effort with none ({NP2}, point 2, pending NT-10 and NT-12)"],
+    ["gap-roles-27"])
+add_clauses(V, "dIndexedDesign", [
+    "the reuse scout's return under aScoutedSeam's M1c contract: needs and a concrete sketch before the search, the "
+    "anchors resolved, a convention census, at most twelve seams and five MUSTs, a MUST defined as an existing "
+    "implementation that new code would duplicate, the unmet needs, and its MUST and SHOULD seams handed on as rows "
+    f"({NP2}, point 2, pending NT-10)"], ["gap-design-11"])
+add_clauses(V, "dScopedBuild", [
+    "`build.reuse-check`, per unit before the closing review: the reuse scout at medium over the units the unit's "
+    "commits add, listed from the code record and capped at sixty with an overflow line, one row per unit "
+    "(`duplicate`, `should-extend`, `new` or `not-a-unit`, each with its nearest existing symbol or what was searched), "
+    "added rows for what the lister cannot see, a no-stop line, and one row per MUST seam the unit's spec carried, a "
+    "`duplicate` or `bypassed` row routing to a fix pass, a second independent pass as `build.reuse-second-pass` says, "
+    "and its acceptance a reproduction of aScoutedSeam's measured figures through gov's own route on its 23 tuning and "
+    "12 held-out cases, at least 29 of 35 for the check with the card and 31 of 35 for the system, parsed replies "
+    f"counted first ({NP2}, point 2, pending NT-11 and NT-13)"], ["gap-build-06"])
+sc = [ln for ln in V.text.split("\n") if ln.startswith("| `build.scope` |")]
+if len(sc) != 2:
+    sys.exit(f"{len(sc)} build.scope rows, two expected")
+V.sub(sc[0] + "\n", sc[0] + "\n"
+      "| `build.reuse-check.second-pass` | off, on | off | " + NP2 + ", point 2: aScoutedSeam's T2, an independent second "
+      "pass over the same units, its rows unioned with the first's, pending NT-13 | dScopedBuild |\n",
+      "catalogue: the second pass")
+V.sub(sc[1] + "\n", sc[1] + "\n" + "| `build.reuse-check.second-pass` | off | off | on | off |\n",
+      "presets: the second pass")
+V.text = V.text.replace("as `build.reuse-second-pass` says", "as `build.reuse-check.second-pass` says")
+V.save()
+
+# ---------------------------------------------------------------- flow-steps
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+FS.sub("in scope → the unit's next pass, or, its last pass done, the unit built;",
+       "in scope → the unit's next pass, or, its last pass done, `build.reuse-check`;", "build.scope's route")
+FS.sub("| `build.recommend` | command | every unit built |",
+       "| `build.recommend` | command | every unit built and reuse-checked |", "build.recommend's needs")
+row = [ln for ln in FS.text.split("\n") if ln.startswith("| `build.scope` |")]
+if len(row) != 1:
+    sys.exit("no single build.scope row in flow-steps")
+FS.sub(row[0] + "\n", row[0] + "\n"
+       "| `build.reuse-check` | reuse scout, one per unit, at medium | `build.scope` | lists the units the unit's commits "
+       "add, from the code record, capped at sixty with an overflow line, and answers one row per unit (`duplicate`, "
+       "`should-extend`, `new` or `not-a-unit`, each with its nearest existing symbol or what was searched), added rows "
+       "for what the lister cannot see, and one row per MUST seam the unit's spec carried (`used`, `bypassed` or "
+       "`not-applicable`), under a no-stop line | a computed join: every listed unit and every MUST has one row, and a "
+       "`bypassed` MUST is also a `duplicate` | clean → the unit built; a `duplicate` or `bypassed` row → a fix pass on "
+       "the unit; under `build.reuse-check.second-pass: on`, a second independent pass, its rows unioned (the night pass "
+       "two, point 2) | dScopedBuild |\n", "the reuse check's row")
+FS.sub("- **The experiment shape,** dBoundRoles' `experiment` kind, after aScoutedSeam's benchmark, which no chain build\n"
+       "  counts on:\n",
+       "- **The experiment shape,** dBoundRoles' `experiment` kind, after aScoutedSeam's benchmark, which no chain build\n"
+       "  counts on, with its method since measured (revised 2026-10-19, the night pass two, point 2): a held-out set\n"
+       "  frozen before any tuning, one variable per arm, parsed replies counted before any score, labels rotated per\n"
+       "  case, and the union of arms read as one system:\n", "the experiment shape")
+FS.save()
+
+# ---------------------------------------------------------------- layer-roles
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+LR.sub("  diff-time reviewer was the exception: its recall fell from 7 to 4 of 23.\n",
+       "  diff-time reviewer was the exception: its recall fell from 7 to 4 of 23. Revised 2026-10-19 (the night pass\n"
+       "  two, point 2): aScoutedSeam's later arms traced that loss to the prompt's composition, not to effort: the\n"
+       "  enumerated check at medium covered 14 of 23 against the open question's 11 at `extra`.\n",
+       "owner-notes: effort")
+LR.sub("The orientation template and the merge are declared nowhere. aScoutedSeam is evidence only: its branch is unmerged "
+       "and no\nchain build counts on its code.\n",
+       "The orientation template and the merge are declared nowhere. aScoutedSeam is evidence only: its branch is unmerged "
+       "and no\nchain build counts on its code. Revised 2026-10-19 (the night pass two, point 2): the branch has since "
+       "merged into the\ndefault branch, and dScopedBuild's reuse check adopts its measured two-stage shape.\n",
+       "fit: merged")
+LR.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+NEW = {
+    "gap-build-05": [("gap-build-06", "Build", "HIGH", "No diff-time reuse check runs in the flow: the measured "
+                      "two-stage shape's second stage, which took the system to 33 of 35, has no item, the diff preset "
+                      "has no reuse lens, and the diff reviewer reads only the diff and the spec.",
+                      "`research-scoutedseam-apply.md` sections 4 (edge E1) and 5b")],
+    "gap-roles-26": [("gap-roles-27", "Roles", "MED", "No edge between steps hands its commitments as rows the next "
+                      "step answers: a handed fact needs a disposition only when it proves false, and the review "
+                      "finder's schema holds findings only.", "`research-scoutedseam-apply.md` section 4; "
+                      "`research-handoffs-design.md` section 2")],
+    "gap-design-10": [("gap-design-11", "Design", "MED", "The reuse scout's return is unspecified: it returns one "
+                       "seam, with no cap, no MUST definition, no census and no unmet needs.",
+                       "`research-scoutedseam-apply.md` section 5c, item 7")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 325 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's point 2 added `gap-build-06`, `gap-roles-27` and `gap-design-11`\n"
+    "(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p2-scoutedseam]`), same instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night pass two's record
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.sub("| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` | running |",
+      "| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` | markdown holds as the store of record; "
+      "the designed JSON index does not hold at 10x; a derived SQLite file per node keyed by blob |", "research: 130")
+R.sub("| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` | running |",
+      "| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` | eight families; a schema rendered "
+      "per work order, and create-only registers keyed by derived keys |", "research: 133")
+R.insert_before("\n## [forks] Parked for the owner, 2026-10-19\n", """
+## [p2-scoutedseam] Point 2: aScoutedSeam's measured principles, applied
+
+**What aScoutedSeam measured.** The owner's `origin/main`, at `a60b0c7dc`, holds the build's records and its handoff,
+and dispatch 129 re-derived every figure from its instruments. The reuse check went from 4 of 23 cases to 33 of 35
+across a tuned and an untuned set, with no change of model. The 94% is the union of two stages, one run each with one
+judge per case:
+- an orientation scout at kickoff, which frames needs and a concrete sketch before it searches, runs a convention
+  census, and returns at most twelve seams and five MUSTs;
+- an enumerated diff check, which lists every unit a diff adds, answers one closed-vocabulary row per unit, and answers
+  one row per orientation MUST: `used`, `bypassed` or `not-applicable`.
+
+Both stages run at medium. At `low` the check covered 8 of 23 where medium covered 14, and the open question at
+`extra` covered 11. The build states thirteen principles, each marked measured or not: only reuse finding was measured,
+and every other kind of step is a hypothesis to measure.
+
+**What the re-derivation adds.** The rows' +7 on the diff check (13 to 20 of 23) added no union recall on the tuning
+set: all seven cases were ones the orientation had already found. What the rows did was move the orientation's advisory
+catch into the step that gates. Rows therefore belong first on the edges that feed a gate. The pass also found three
+places where aScoutedSeam's own records disagree: a row headed "blind judge" that a path matcher graded, an orientation
+to spec edge called measured that no arm ran, and a spec half called unmeasured that a later arm measured.
+
+**What gov's flow lacks.** The inventory counts 23 agent calls in the target flow. Against them:
+- **The diff-time check is missing entirely.** No Build item runs it, the diff preset has no reuse lens, and the diff
+  reviewer reads only the diff and the spec.
+- **No edge hands its commitments as rows.** A handed fact needs a disposition only when it proves false (P29), and the
+  review finder's schema holds findings only, with the line "a class with no hit needs no finding", which is the silent
+  drop the principles name.
+- **The reuse scout's return is unspecified.** It returns "the seam", singular.
+- **The shape exists in places.** Five role items already answer their inputs one to one: refutation, report, fold,
+  attribution and inventory. It is not yet the rule.
+- **v2 is stale.** It still quotes the earlier figures and calls aScoutedSeam's branch unmerged.
+
+**The design worked in.**
+1. **The measured shape, adopted** (NT-11, NT-13). dScopedBuild gains `build.reuse-check`, per unit before the closing
+   review. It runs the reuse scout at medium over the units the unit's commits add, listed from the code record and
+   capped at sixty, one closed-vocabulary row per unit, added rows for what the lister cannot see, a no-stop line, and
+   one row per MUST seam the unit's spec carried. A `duplicate` or `bypassed` row is a fix pass. Its acceptance is a
+   reproduction of the measured figures through gov's own route, on the 23 tuning and 12 held-out cases.
+2. **The scout's contract** (NT-10). dIndexedDesign's reuse scout returns under M1c's contract: needs and a sketch,
+   anchors, a census, at most twelve seams and five MUSTs, MUST defined as a defect, the unmet needs, and its seams
+   handed on as rows.
+3. **Rows on edges, gated by evidence** (NT-10). dDeclaredLoop gives an item an `upstream` field. Every commitment it
+   names arrives as a row the return answers, the join is computed at the return, and a `bypassed` row is also a
+   finding. The rows are recorded on every edge but gate only where a measurement passed, the reuse edge first.
+4. **The prompt writer's frame** (NT-10). dBoundRoles composes every role item's task in the skeleton's order: role and
+   job kind, material, boundaries, population, upstream rows, row contract, added rows, the no-stop line, and the
+   return contract last, every output bounded.
+5. **An effort floor** (NT-12). No coverage item runs below medium without an experiment record that shows the lower
+   effort holds.
+6. **The experiment's method.** dFairHearing's experiment shape takes the measurement discipline that produced the
+   figures: a held-out set frozen before tuning, one variable per arm, parsed replies counted first, a blind judge with
+   rotated labels, and the union read as one system.
+7. **Stale lines corrected.** v2's `[owed]` gains the measured system, dFairHearing's "unmerged" is corrected,
+   dLinkedLibrary's acceptance names the held-out set, layer-roles' effort reading and "unmerged" are revised, and
+   flow-steps' experiment shape takes the method.
+
+**What waits on measurement.** The rest of the ranked changes are hypotheses until measured, each with its plan in the
+return: S-item and acceptance rows into the closing review, seam rows through decomposition and the spec's reuse
+section, checklist classes as rows, plan observations into decomposition, and needs listed from the plan record. The
+owner's "apply it across Flow and Role layers" therefore lands as structure now and as gates edge by edge, as each
+measurement passes.
+
+**Folded.** v2's `[owed]`, dFairHearing's and dLinkedLibrary's corrections, clauses on dFairHearing, dDeclaredLoop,
+dBoundRoles, dIndexedDesign and dScopedBuild, and the key `build.reuse-check.second-pass` with its preset row;
+flow-steps' Build table gains `build.reuse-check` and its route; layer-roles' two stale passages are revised; and the
+register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
+""", "point 2's section")
+R.text = R.text.rstrip("\n") + "\n" + (
+    "| NT-10 | How far do aScoutedSeam's principles reach now? | the measured shape and contracts now, the skeleton as the "
+    "prompt writer's frame, and rows recorded on every edge but gating only where a measurement passed; every edge's "
+    "rows gating at once; only the measured reuse shape | a structural decision |\n"
+    "| NT-11 | Where does the diff-time reuse check run? | a Build item per unit before the closing review, its duplicates "
+    "and bypassed MUSTs fix passes; a reuse lens in the closing review's panel; once per build at Test | a structural "
+    "decision |\n"
+    "| NT-12 | May a coverage step run below medium effort? | only with an experiment record that shows the lower effort "
+    "holds; freely, as the effort keys say | a structural decision: a check on the effort keys' values |\n"
+    "| NT-13 | Does the reuse check run a second, independent pass? | off by default, on where a miss is expensive; always; "
+    "never | `build.reuse-check.second-pass`'s default: off, on |\n")
+R.done += 1
+R.save()
+print("folded point 2")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -14593,6 +14864,8 @@ MINE = [
      "and eight layer records, pending NT-1 to NT-9."),
     ("night2/fold_p1_owner.py", "The design map reddened on point 1: dDeclaredLoop's namespace owner line was "
      "wrapped in two; it is one line again."),
+    ("night2/fold_p2.py", "Point 2, aScoutedSeam: the point's section and forks NT-10 to NT-13, the reuse check "
+     "folded into v2, flow-steps, layer-roles and the gap register, and two research rows filled."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -15074,8 +15347,8 @@ plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRank
 seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
+return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
 witness                  4  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
-return                   4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
@@ -15108,7 +15381,7 @@ roster                   1  dBoundRoles (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 decision                 1  dWellOiledMachine (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 92, over 39 kinds
+plain-word hits on a non-ancestor's record kind: 93, over 39 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -15568,10 +15841,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:735 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:746 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:735 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:746 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -15619,13 +15892,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2459 nodes in 30 namespaces; 31434 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1678, derived 286, pending 495
+map: 2468 nodes in 30 namespaces; 31435 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1686, derived 287, pending 495
 map: no stale facts read 57 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 193 records, 3250 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 197 records, 3294 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -15643,8 +15916,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 459 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 92 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 21 · owned nodes read 461 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 93 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -15676,7 +15949,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 322 · chain builds 21
+register keys 325 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -15684,13 +15957,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 235 · presettable 213 · preset rows 213
+catalogue keys 236 · presettable 214 · preset rows 214
 no findings
 rc 0
 
 $ critical path
-critical path: 224 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 33, dOrderedCharter 55, dDeclaredLoop 83, dPlacedRequest 92, dWitnessedBar 111, dKeptSession 112, dTotalRecall 131, dBoundRoles 133, dRankedPlan 147, dFurnishedOrders 151, dLinkedLibrary 155, dIndexedDesign 167, dWellOiledMachine 172, dScopedBuild 183, dTendedCadence 188, dMindYourWords 189, dShippedRelease 199, dCalibratedLens 202, dConvergedCharter 224
+critical path: 226 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 34, dOrderedCharter 55, dDeclaredLoop 84, dPlacedRequest 93, dWitnessedBar 112, dKeptSession 113, dTotalRecall 132, dBoundRoles 135, dRankedPlan 149, dFurnishedOrders 153, dLinkedLibrary 156, dIndexedDesign 169, dWellOiledMachine 174, dScopedBuild 186, dTendedCadence 190, dMindYourWords 191, dShippedRelease 201, dCalibratedLens 204, dConvergedCharter 226
 rc 0
 ````
 

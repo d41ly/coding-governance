@@ -53,12 +53,12 @@ arrives.
 | 127 | 1, the converged design | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-8-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scenarios-design.md` | six seams carry parts of a variant and none selects; a `scenario` kind over the composition |
 | 128 | 1, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-9-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scenarios-prior-art.md` | eight families, none whole; pinned fragments chosen per build, recorded and promoted |
 | 129 | 2, aScoutedSeam applied | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-10-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scoutedseam-apply.md` | 23 agent calls inventoried; the diff-time reuse check missing; most edges carry no rows |
-| 130 | 3, today and the design, measured | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-11-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` | running |
+| 130 | 3, today and the design, measured | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-11-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` | markdown holds as the store of record; the designed JSON index does not hold at 10x; a derived SQLite file per node keyed by blob |
 | 131 | 3, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-12-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-prior-art.md` | files in git, one derived SQLite index, per-sender refs, an ids-only doorbell |
 | 132 | 4, the converged design | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-13-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-design.md` | five carriers and no one contract; commitment rows on the record graph, the branch pushed per witnessed item |
-| 133 | 4, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` | running |
-| 134 | 5, caps | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | running |
-| 135 | 6, gotchas | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` | running |
+| 133 | 4, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` | eight families; a schema rendered per work order, and create-only registers keyed by derived keys |
+| 134 | 5, caps | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | 24 caps, 18 refusing; one switch at warn, made visible on a passing run, priced and trended, with consumer limits and correctness checks kept outside it |
+| 135 | 6, gotchas | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` | 6.2% precision on code reviews and 18% at the moment of the edit; retire writing-time serving by anchors, keep classes on review, gate the syntactic ones |
 | 136 | 7, agent-cap | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` | running |
 
 ## [p1-scenarios] Point 1: scenarios, one method for flexible flows and workers
@@ -153,6 +153,73 @@ matrix reads the composition; the memory plan's `promoted-from` takes a scenario
 `gap-flow-20`, `gap-flow-21` and `gap-review-18`. The design map reddened once on the fold: it reads each namespace
 owner line as one line, and the fold had wrapped dDeclaredLoop's in two; it is one line again.
 
+## [p2-scoutedseam] Point 2: aScoutedSeam's measured principles, applied
+
+**What aScoutedSeam measured.** The owner's `origin/main`, at `a60b0c7dc`, holds the build's records and its handoff,
+and dispatch 129 re-derived every figure from its instruments. The reuse check went from 4 of 23 cases to 33 of 35
+across a tuned and an untuned set, with no change of model. The 94% is the union of two stages, one run each with one
+judge per case:
+- an orientation scout at kickoff, which frames needs and a concrete sketch before it searches, runs a convention
+  census, and returns at most twelve seams and five MUSTs;
+- an enumerated diff check, which lists every unit a diff adds, answers one closed-vocabulary row per unit, and answers
+  one row per orientation MUST: `used`, `bypassed` or `not-applicable`.
+
+Both stages run at medium. At `low` the check covered 8 of 23 where medium covered 14, and the open question at
+`extra` covered 11. The build states thirteen principles, each marked measured or not: only reuse finding was measured,
+and every other kind of step is a hypothesis to measure.
+
+**What the re-derivation adds.** The rows' +7 on the diff check (13 to 20 of 23) added no union recall on the tuning
+set: all seven cases were ones the orientation had already found. What the rows did was move the orientation's advisory
+catch into the step that gates. Rows therefore belong first on the edges that feed a gate. The pass also found three
+places where aScoutedSeam's own records disagree: a row headed "blind judge" that a path matcher graded, an orientation
+to spec edge called measured that no arm ran, and a spec half called unmeasured that a later arm measured.
+
+**What gov's flow lacks.** The inventory counts 23 agent calls in the target flow. Against them:
+- **The diff-time check is missing entirely.** No Build item runs it, the diff preset has no reuse lens, and the diff
+  reviewer reads only the diff and the spec.
+- **No edge hands its commitments as rows.** A handed fact needs a disposition only when it proves false (P29), and the
+  review finder's schema holds findings only, with the line "a class with no hit needs no finding", which is the silent
+  drop the principles name.
+- **The reuse scout's return is unspecified.** It returns "the seam", singular.
+- **The shape exists in places.** Five role items already answer their inputs one to one: refutation, report, fold,
+  attribution and inventory. It is not yet the rule.
+- **v2 is stale.** It still quotes the earlier figures and calls aScoutedSeam's branch unmerged.
+
+**The design worked in.**
+1. **The measured shape, adopted** (NT-11, NT-13). dScopedBuild gains `build.reuse-check`, per unit before the closing
+   review. It runs the reuse scout at medium over the units the unit's commits add, listed from the code record and
+   capped at sixty, one closed-vocabulary row per unit, added rows for what the lister cannot see, a no-stop line, and
+   one row per MUST seam the unit's spec carried. A `duplicate` or `bypassed` row is a fix pass. Its acceptance is a
+   reproduction of the measured figures through gov's own route, on the 23 tuning and 12 held-out cases.
+2. **The scout's contract** (NT-10). dIndexedDesign's reuse scout returns under M1c's contract: needs and a sketch,
+   anchors, a census, at most twelve seams and five MUSTs, MUST defined as a defect, the unmet needs, and its seams
+   handed on as rows.
+3. **Rows on edges, gated by evidence** (NT-10). dDeclaredLoop gives an item an `upstream` field. Every commitment it
+   names arrives as a row the return answers, the join is computed at the return, and a `bypassed` row is also a
+   finding. The rows are recorded on every edge but gate only where a measurement passed, the reuse edge first.
+4. **The prompt writer's frame** (NT-10). dBoundRoles composes every role item's task in the skeleton's order: role and
+   job kind, material, boundaries, population, upstream rows, row contract, added rows, the no-stop line, and the
+   return contract last, every output bounded.
+5. **An effort floor** (NT-12). No coverage item runs below medium without an experiment record that shows the lower
+   effort holds.
+6. **The experiment's method.** dFairHearing's experiment shape takes the measurement discipline that produced the
+   figures: a held-out set frozen before tuning, one variable per arm, parsed replies counted first, a blind judge with
+   rotated labels, and the union read as one system.
+7. **Stale lines corrected.** v2's `[owed]` gains the measured system, dFairHearing's "unmerged" is corrected,
+   dLinkedLibrary's acceptance names the held-out set, layer-roles' effort reading and "unmerged" are revised, and
+   flow-steps' experiment shape takes the method.
+
+**What waits on measurement.** The rest of the ranked changes are hypotheses until measured, each with its plan in the
+return: S-item and acceptance rows into the closing review, seam rows through decomposition and the spec's reuse
+section, checklist classes as rows, plan observations into decomposition, and needs listed from the plan record. The
+owner's "apply it across Flow and Role layers" therefore lands as structure now and as gates edge by edge, as each
+measurement passes.
+
+**Folded.** v2's `[owed]`, dFairHearing's and dLinkedLibrary's corrections, clauses on dFairHearing, dDeclaredLoop,
+dBoundRoles, dIndexedDesign and dScopedBuild, and the key `build.reuse-check.second-pass` with its preset row;
+flow-steps' Build table gains `build.reuse-check` and its route; layer-roles' two stale passages are revised; and the
+register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
+
 ## [forks] Parked for the owner, 2026-10-19
 
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
@@ -170,3 +237,7 @@ decision.
 | NT-7 | Can a build run several scenarios? | yes, unioned in a declared order, a conflict refused for the owner to order, with in-build successors at a step's exit; one scenario per build | `flow.scenario-conflict`'s default: refuse, declared-order |
 | NT-8 | How are workflows reshaped? | each workflow entry's ordered stages as data, the five kinds named defaults; the five kinds only | a structural decision |
 | NT-9 | How is a lens removed, and must a repository lens prove itself? | a swap or an exclusion, and a repository lens records a replay result when one ran but never owes one; swaps only; every repository lens owes the blind replay | a structural decision |
+| NT-10 | How far do aScoutedSeam's principles reach now? | the measured shape and contracts now, the skeleton as the prompt writer's frame, and rows recorded on every edge but gating only where a measurement passed; every edge's rows gating at once; only the measured reuse shape | a structural decision |
+| NT-11 | Where does the diff-time reuse check run? | a Build item per unit before the closing review, its duplicates and bypassed MUSTs fix passes; a reuse lens in the closing review's panel; once per build at Test | a structural decision |
+| NT-12 | May a coverage step run below medium effort? | only with an experiment record that shows the lower effort holds; freely, as the effort keys say | a structural decision: a check on the effort keys' values |
+| NT-13 | Does the reuse check run a second, independent pass? | off by default, on where a miss is expensive; always; never | `build.reuse-check.second-pass`'s default: off, on |

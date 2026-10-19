@@ -646,7 +646,9 @@ What happens by default?"**
 **The evidence**, from aScoutedSeam's benchmark (`origin/branch/deterministic-reuse-workflows-f70c33` at `b0fe68f30`, `memory/builds/aScoutedSeam/build/2026-10-11-build-TOOL-aScoutedSeam-1-2-benchmark.md`). Its higher effort is named `extra`.
 - **Effort.** The three scout arms held their recall at `medium` for a fifth to a seventh of the cost:
   about ten minutes and 4M cache-read tokens per scout, against two hours and 28M at `extra`. The
-  diff-time reviewer was the exception: its recall fell from 7 to 4 of 23.
+  diff-time reviewer was the exception: its recall fell from 7 to 4 of 23. Revised 2026-10-19 (the night pass
+  two, point 2): aScoutedSeam's later arms traced that loss to the prompt's composition, not to effort: the
+  enumerated check at medium covered 14 of 23 against the open question's 11 at `extra`.
 - **Agent set.** At `medium`, a code scout and a design scout followed by a judge solved 12 of 23
   positives. One checklist scout solved the same 12, hit more items (22 against 20), and used a
   third of the agents. A five-lens fan-out with skeptics was ruled out on cost after three pilots.
@@ -670,7 +672,8 @@ Three of the five parts are declared data today, and the revisit extends them:
 - the bug-class checklist per diff (`tools/memory-tree/gotchas.py`).
 
 The orientation template and the merge are declared nowhere. aScoutedSeam is evidence only: its branch is unmerged and no
-chain build counts on its code.
+chain build counts on its code. Revised 2026-10-19 (the night pass two, point 2): the branch has since merged into the
+default branch, and dScopedBuild's reuse check adopts its measured two-stage shape.
 
 ## [instrument] The instruments, as run 2026-10-15
 
