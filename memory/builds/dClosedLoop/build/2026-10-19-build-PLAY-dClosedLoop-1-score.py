@@ -7,10 +7,11 @@ Today's replay scorer refuses a design report, since it scores only `§<n>` addr
 `<record> [<section tag>]` with the clause id or item tag that carries the defect (the round record's `[walk-table]`).
 
 The key is JSON kept outside the repository until both runs are scored, its SHA-256 pinned in every walker's brief
-before launch: `{"base": <sha>, "plants": [{"id", "record", "tag", "anchor", "words", "mechanical", "source"}]}`.
-A confirmed finding hits a plant when its address names the plant's record and tag, the plant's anchor (a clause id or
-an item tag, where it has one) appears in the finding, and so does one of the plant's words. A plant counts once per
-run. A finding under `## Refuted` never hits.
+before launch: `{"base": <sha>, "plants": [{"id", "record", "tag", "anchors", "words", "mechanical", "source"}]}`,
+`tag` one section tag or a list of them, since a contradiction can be cited from either end. A confirmed finding hits
+a plant when its address names the plant's record and one of its tags, one of its anchors (a clause id or an item tag,
+where it has any) appears in the finding, and so does one of its words. A plant counts once per run. A finding under
+`## Refuted` never hits.
 
 Usage: python score.py --key <key.json> --sha256 <hex> <report-a.md> [<report-b.md>] [--plant tamper|blind|miss]
 Prints each run's hits, its recall and the union's, Mills's estimate of the real defects left, from the share of
@@ -58,9 +59,11 @@ def hits(key, found):
     for p in key["plants"]:
         for fid, addr, text in found:
             m = re.match(r"([a-z0-9-]+) \[([a-z0-9-]+)\]", addr)
-            if not m or (m.group(1), m.group(2)) != (p["record"], p["tag"]):
+            tags = p["tag"] if isinstance(p["tag"], list) else [p["tag"]]
+            anchors = p.get("anchors") or ([p["anchor"]] if p.get("anchor") else [])
+            if not m or m.group(1) != p["record"] or m.group(2) not in tags:
                 continue
-            if p.get("anchor") and p["anchor"] not in text:
+            if anchors and not any(a in text for a in anchors):
                 continue
             if not any(w.lower() in text.lower() for w in p["words"]):
                 continue

@@ -26,6 +26,7 @@ Exit 1 on any finding, 2 on a slice or a record this script cannot read.
 What it does not check: whether a verdict is right, which the skeptics test on a sample of clean cells; whether a
 finding's address is the defect's, which the scorer reads; and the brief's prose, which is the template below.
 """
+import datetime
 import importlib.util
 import random
 import re
@@ -35,6 +36,7 @@ from pathlib import Path
 B = "memory/builds/dClosedLoop/build/"
 ROUND = B + "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"
 SCENARIOS = [f"S{i}" for i in range(1, 8)]
+TODAY = datetime.date.today().isoformat()   # a brief is named for the day it is rendered
 ROW = re.compile(r"^\| `?([a-z]+\.[a-z0-9-]+)`? \| (S[1-7]) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| ([^|]*) \| ([^|]*) \|\s*$")
 ID = r"[AB](?:[1-5]|S[1-4])-F\d+"   # a walker's finding, or a new one a skeptic batch raises
 FINDING = re.compile(r"^### (" + ID + r")\b", re.M)
@@ -272,7 +274,7 @@ def brief(run, seeded, leads, out_dir, scratch, key_sha):
                                steps=", ".join(f"{s} ({len(by_step[s])} items)" for s in steps),
                                builds=", ".join(sl["builds"]), principles=", ".join(sl["principles"]),
                                scenario_text=scenario_text, scratch=f"{Path(scratch).as_posix()}/walk-{run.lower()}{w}/")
-        p = out / f"2026-10-19-build-PLAY-dClosedLoop-1-walk-brief-{run.lower()}{w}.md"
+        p = out / f"{TODAY}-build-PLAY-dClosedLoop-1-walk-brief-{run.lower()}{w}.md"
         p.write_text(body, encoding="utf-8", newline="\n")
         print(f"wrote {p.as_posix()}: cells {len(cells_of(sl, by_step))}")
     return 0
@@ -307,7 +309,8 @@ Your final message, nothing else:
 - for each clean cell, `- <item> <scenario>: holds`, or `- <item> <scenario>: defect` with the defect written as a new
   finding in the walkers' grammar, its id `{run}S{batch}-F<n>`.
 
-Write nothing to the repository; any probe you run writes under `{scratch}` only. Your effort is the owner's medium.
+Write nothing to the repository; any probe you run writes under `{scratch}` only. Your effort is the one the owner's
+role definition sets.
 """
 SYNTH = """# Synthesis brief: run {run}
 
@@ -334,7 +337,8 @@ Write the report in this shape, and nothing else into the repository:
    the runs' returned lines.
 
 `walk.py check --run {run} --report` must pass on it: every cell, every build and principle, and every id a verdict
-names carried by a heading. Return the report's path and the critical findings' ids. Your effort is the owner's medium.
+names carried by a heading. Return the report's path and the critical findings' ids. Your effort is the one the owner's
+role definition sets.
 """
 
 
@@ -395,7 +399,7 @@ def skeptic(run, returns_dir, seeded, out_dir, scratch):
                               findings="\n\n".join(f["text"] for f in batch) or "None in this batch.",
                               cells="\n".join(f"- `{c[0]}` in {c[1]}" for c in cells),
                               scratch=f"{Path(scratch).as_posix()}/skeptic-{run.lower()}{n}/")
-        p = out / f"2026-10-19-build-PLAY-dClosedLoop-1-skeptic-brief-{run.lower()}{n}.md"
+        p = out / f"{TODAY}-build-PLAY-dClosedLoop-1-skeptic-brief-{run.lower()}{n}.md"
         p.write_text(body, encoding="utf-8", newline="\n")
         print(f"wrote {p.as_posix()}: findings {len(batch)}, clean cells {len(cells)}")
     return 0
@@ -411,7 +415,7 @@ def synth(run, returns_dir, verdicts_dir, report, subjects, out_dir):
         fail("the subjects file holds no 'Subjects (round 1): ' line")
     body = SYNTH.format(run=run, report=report, round=ROUND, subjects=line,
                         inputs="\n".join(f"- `{p.as_posix()}`" for p in files + verdicts))
-    p = Path(out_dir) / f"2026-10-19-build-PLAY-dClosedLoop-1-synth-brief-{run.lower()}.md"
+    p = Path(out_dir) / f"{TODAY}-build-PLAY-dClosedLoop-1-synth-brief-{run.lower()}.md"
     p.write_text(body, encoding="utf-8", newline="\n")
     print(f"wrote {p.as_posix()}")
     return 0

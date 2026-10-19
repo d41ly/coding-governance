@@ -221,6 +221,16 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 157 | gov-researcher, at the owner's medium effort | The final questions: spec deviation, its log and its reflection in what ships | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-30-researcher.md` | 1799cb98 | returned, 13m00s, 61.4k out: deviations recorded in four places and gated in none; a typed record, a frozen baseline and a generated as-built view | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-deviation.md` |
 | 158 | gov-researcher, at the owner's medium effort | The final questions: human-readable help, the plan as designed and when its gate lands | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-31-researcher.md` | 1799cb98 | returned, 11m06s, 52.7k out: help gated only at the chain's last build; a fingerprinted docs leg on dSafePassage, generated reference, rendered rationale for the owner to rule on | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-help.md` |
 | 159 | gov-researcher, at the owner's medium effort | The final questions: the atlas in the repository, what it shows and how it stays current | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-32-researcher.md` | 1799cb98 | returned, 9m33s, 46.4k out: generated Markdown and Mermaid pages under `help/atlas/` from the node table, owned by dTotalRecall, 275 KB measured | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-atlas.md` |
+| 160 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run A, walker 1: S1 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-1-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 161 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run A, walker 2: S2 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-2-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 162 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run A, walker 3: S3 and S5 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-3-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 163 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run A, walker 4: S4 and S7 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-4-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 164 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run A, walker 5: S6 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-5-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 165 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run B, walker 1: entry and plan | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-6-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 166 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run B, walker 2: design and build | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-7-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 167 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run B, walker 3: test and deploy | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-8-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 168 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run B, walker 4: breakpoint, probe and lifecycle | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-9-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
+| 169 | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run B, walker 5: adopt and the expansions | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-10-spec-reviewer.md` | 1799cb98 | dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -2922,6 +2932,10 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
 - 2026-10-20, session 1799cb98: the whole-design audit's step 2, the owner's word on v2's four open readings, SA-1,
   SA-5, CL-3 and `wait`, each confirmed as `[open]` reads it, and on the homes of deviation records (their departing
   build's folder) and the as-built view (beside v2); folded into v2 `[open]` and the round record's `[readings]`.
+
+- 2026-10-20, session 1799cb98: the whole-design audit's step 3 opened. The sealed copy made from `747a2af22` with its
+  twelve plants and its key's hash pinned in every brief; Stage 0 run on the copy, catching both mechanical plants, and
+  on the tree, as the walkers' leads; the ten walker briefs and handoffs rendered, dispatches 160 to 169, run A's first.
 
 ## Instruments
 

@@ -24284,6 +24284,8 @@ for b in range(1, 5):
 (S / "subjects.txt").write_text("Subjects (round 1): memory/builds/dClosedLoop/build/x.md@" + "0" * 40 + "\n",
                                 encoding="utf-8")
 out = S / "test-briefs"
+import shutil  # noqa: E402
+shutil.rmtree(out, ignore_errors=True)   # a render read back must be this run's, never a stale file's
 r1 = subprocess.run([sys.executable, "-X", "utf8", W, "skeptic", "--run", "A", "--returns", str(ret), "--seeded",
                      "SEEDED", "--out", str(out), "--scratch", "SCRATCH"], capture_output=True, text=True)
 print(r1.stdout + r1.stderr)
@@ -24293,7 +24295,7 @@ r2 = subprocess.run([sys.executable, "-X", "utf8", W, "synth", "--run", "A", "--
 print(r2.stdout + r2.stderr)
 ids = {}
 for b in range(1, 5):
-    text = (out / f"2026-10-19-build-PLAY-dClosedLoop-1-skeptic-brief-a{b}.md").read_text(encoding="utf-8")
+    text = next(out.glob(f"*-build-PLAY-dClosedLoop-1-skeptic-brief-a{b}.md")).read_text(encoding="utf-8")
     for m in re.finditer(r"^### (A\d-F\d+)[^\n]*\n- \*\*Address:\*\* ([^\n]+)", text, flags=re.M):
         ids.setdefault(m.group(1), []).append((b, m.group(2).split("]")[0]))
 split = {}
@@ -24706,6 +24708,119 @@ for rel, why in zip(args[::2], args[1::2]):
     rows += f"    ('{rel}', {why!r}),\n"
 R.write_text(t.replace(ANCHOR, rows + ANCHOR, 1), encoding="utf-8", newline="\n")
 print(f"registered {len(args) // 2}")
+````
+
+### `make_leads.py`
+
+The walk's leads: Stage 0's run on the working tree, never on the sealed copy, the round record's [found] and line coverage, written beside the copy's design as stage0-leads.md.
+
+````python
+"""The walk's leads: Stage 0's run on the working tree, never on the sealed copy, the round record's [found], and the
+design records no review has read, written beside the copy's design as stage0-leads.md.
+
+Usage: python -X utf8 make_leads.py <copy dir>   (from the worktree root)
+"""
+import re
+import subprocess
+import sys
+from pathlib import Path
+
+COPY = Path(sys.argv[1])
+B = "memory/builds/dClosedLoop/build/"
+r = subprocess.run([sys.executable, "-X", "utf8", B + "2026-10-19-build-PLAY-dClosedLoop-1-stage0.py"], capture_output=True,
+                   text=True, encoding="utf-8")
+if r.returncode != 1 or "stage0:" not in r.stdout:
+    sys.exit(f"stage0 returned {r.returncode}, where its run on the tree finds leads")
+cov = subprocess.run([sys.executable, "-X", "utf8", B + "2026-10-19-build-PLAY-dClosedLoop-1-line-coverage.py"],
+                     capture_output=True, text=True, encoding="utf-8").stdout
+audit = Path(B + "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md").read_text(encoding="utf-8")
+found = re.search(r"^## \[found\][^\n]*\n(.*?)(?=^## )", audit, flags=re.M | re.S).group(1).strip()
+head = subprocess.run(["git", "rev-parse", "--short=9", "HEAD"], capture_output=True, text=True).stdout.strip()
+body = f"""# Stage 0's leads for the whole-design walk
+
+Run on the working tree at `{head}`, the commit the sealed copy was made from, and never on the copy. Each line is a
+lead, not a finding: Stage 0 reads tables, and each arm says what it leaves out. Take the leads your slice reaches.
+
+## The mechanical checks
+
+```text
+{r.stdout.strip()}
+```
+
+## Found while the tooling was built
+
+{found}
+
+## Design records by the share no review has read
+
+```text
+{cov.strip()}
+```
+"""
+(COPY / "stage0-leads.md").write_text(body, encoding="utf-8", newline="\n")
+print(f"wrote {(COPY / 'stage0-leads.md').as_posix()}: {len(body)} bytes, stage0 {r.stdout.strip().splitlines()[-1]}")
+````
+
+### `record_dispatch.py`
+
+The walk as dispatched: the round record's [walk] and step 3's status, and the session log's dispatch rows 160 to 169 and event.
+
+````python
+"""The walk as dispatched: the round record's [walk] (the copy, the key's hash, the order, the efforts) and step 3's
+status, and the session log's dispatch rows 160 to 169, each "dispatched" until it returns.
+
+Usage: python -X utf8 record_dispatch.py <base sha> <copy commit> <key sha256>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+BASE, COPY_SHA, KEY = sys.argv[1], sys.argv[2], sys.argv[3]
+B = "memory/builds/dClosedLoop/build/"
+SLICE = {"a1": "S1", "a2": "S2", "a3": "S3 and S5", "a4": "S4 and S7", "a5": "S6", "b1": "entry and plan",
+         "b2": "design and build", "b3": "test and deploy", "b4": "breakpoint, probe and lifecycle",
+         "b5": "adopt and the expansions"}
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.insert_before("## [stage0-classes] ", f"""## [walk] The walk, as dispatched
+
+- **The sealed copy** was made 2026-10-20 from `{BASE[:9]}`, a fresh repository at one commit (`{COPY_SHA[:9]}`) in
+  the session's temp root, outside the repository. The key's SHA-256, pinned in every walker's brief before launch, is
+  `{KEY}`.
+- **Stage 0 on the copy** caught both its mechanical plants, by K3 and K5, and its run on the working tree is the
+  walkers' leads, beside the copy's design as `stage0-leads.md`.
+- **The order:** run A's five walkers, then run B's five, so neither run's walkers read the other's findings; then
+  each run's four skeptics and its synthesizer, whose briefs are rendered once both walks are back. The walkers'
+  returns stay outside the repository until both walks are back.
+- **Effort:** the walkers are `gov-spec-reviewer` at medium, the skeptics `gov-skeptic` and the synthesizers
+  `gov-synthesizer` at high, each its role definition's setting, none below the owner's medium.
+- **Dispatches** 160 to 164 are run A's walkers and 165 to 169 run B's, their handoffs
+  `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-1-spec-reviewer.md` to `...-10-spec-reviewer.md`, each handed its brief,
+  `build/2026-10-20-build-PLAY-dClosedLoop-1-walk-brief-<run><walker>.md`, as its `input:spec`.
+
+""", "[walk]")
+R.sub("""**Step 2, answered** (`[readings]`): all four readings confirmed as v2 `[open]` states them, and the locations settled.
+""", """**Step 2, answered** (`[readings]`): all four readings confirmed as v2 `[open]` states them, and the locations settled.
+
+**Step 3, under way** (`[walk]`): the sealed copy made, Stage 0 run on it and on the tree, and the walk dispatched.
+""", "[plan] step 3")
+R.save()
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+rows = ""
+for n, w in enumerate(SLICE, 160):
+    run, walker = w[0].upper(), w[1]
+    rows += (f"| {n} | gov-spec-reviewer, at the owner's medium effort | The whole-design walk, run {run}, walker {walker}: "
+             f"{SLICE[w]} | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-{n - 159}-spec-reviewer.md` | 1799cb98 | "
+             f"dispatched | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |\n")
+L.insert_before("\nMaintain, and the machinery by which the loop corrects itself, is researched by", rows,
+                "dispatch rows 160 to 169")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-20, session 1799cb98: the whole-design audit's step 3 opened. The sealed copy made from `{BASE[:9]}` with its
+  twelve plants and its key's hash pinned in every brief; Stage 0 run on the copy, catching both mechanical plants, and
+  on the tree, as the walkers' leads; the ten walker briefs and handoffs rendered, dispatches 160 to 169, run A's first.
+""", "the step's event")
+L.save()
 ````
 
 ### `preset_check_canonical.py`
@@ -25131,6 +25246,8 @@ MINE = [
     ('walkkit/patch_recorder.py', "This record's writer patched for the walk kit: the scripts registered and [walk-kit]."),
     ('walkkit/fold_readings.py', "Step 2 folded: the owner's word on the four open readings and on the homes of deviation records and the as-built view, into v2's [open] and a revision note, the round record's [readings], [found] and [plan], and the session log, dry-run first on a full copy of the tree with the nine checks green there."),
     ('walkkit/register.py', "Registers scripts in this record's writer, each before the preset check's entry."),
+    ('audit-run/make_leads.py', "The walk's leads: Stage 0's run on the working tree, never on the sealed copy, the round record's [found] and line coverage, written beside the copy's design as stage0-leads.md."),
+    ('audit-run/record_dispatch.py', "The walk as dispatched: the round record's [walk] and step 3's status, and the session log's dispatch rows 160 to 169 and event."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -25531,6 +25648,11 @@ During the whole-design audit's Stage 0, before its commit:
     note had said four distribution programs. Each count was re-read from the captured run first.
 19. The reader plant's writer moved from `plan.record`, which `plan.place` waits on, to `review.cost`, which no item
     waits on, by a Python replace once the plant failed to red: a writer some item waits on gives its kind a reader.
+20. The brief test, `test_briefs.py`, made to clear its output folder and read back the briefs by glob, once its green
+    was seen to read the 2026-10-19 files an earlier render left, after `walk.py` began naming briefs for the day they
+    are rendered. Its re-run read only that run's files.
+21. `walk.py`'s skeptic and synthesis templates: "Your effort is the owner's medium" replaced by "the one the owner's
+    role definition sets", once the rendered definitions read `gov-skeptic` and `gov-synthesizer` at high.
 ````
 
 ## [red] The red runs, as captured
@@ -26443,9 +26565,9 @@ K4: keys 265 · findings 55
 K5: principles 42, clauses 496, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 65 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 75 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 230 records, 3794 sections, 215 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 240 records, 3849 sections, 215 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -26461,15 +26583,16 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 50 · lines 31129 · unreviewed 13252 (43%)
+  design records 60 · lines 31157 · unreviewed 13282 (43%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 6
+  design commits after the floor that no closing review covers: 7
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
     0e5d54a79  2 design record(s)  records(dClosedLoop): the clause ids minted — cl-dClosedLoop-0001 to -0496, one per chain clause, and their ch
     94f9607ca  3 design record(s)  records(dClosedLoop): the whole-design audit's Stage 0 — five checks over items, routes, kinds, keys and princ
     1d5799a45  1 design record(s)  records(dClosedLoop): the audit's walk kit, its scorer and the instruments questions 2 and 3 rest on — each se
+    747a2af22  2 design record(s)  records(dClosedLoop): the audit's step 2 — the owner confirms v2's four open readings, and where deviation rec
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -26688,13 +26811,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2650 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1829, derived 321, pending 500
-map: no stale facts read 65 records and 28 quotes of a map count or the critical path
+map: 2661 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1840, derived 321, pending 500
+map: no stale facts read 75 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 230 records, 3796 sections, 215 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 240 records, 3849 sections, 215 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

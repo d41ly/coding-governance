@@ -45,6 +45,8 @@ copy is made after step 2's fold, so it carries the design the walk reads.
 
 **Step 2, answered** (`[readings]`): all four readings confirmed as v2 `[open]` states them, and the locations settled.
 
+**Step 3, under way** (`[walk]`): the sealed copy made, Stage 0 run on it and on the tree, and the walk dispatched.
+
 ## [stage0] Stage 0: the mechanical checks
 
 `build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` runs five new arms, one per class research-final-audit `[2]`
@@ -257,6 +259,22 @@ Each goes to the walk as a lead beside Stage 0's reds, and to the audit's fold:
 - **The deviation record is no registered kind.** dTrueNorth's `cl-dClosedLoop-0004` builds it, but layer-memory's kind
   table, the memory plan and the map name no `deviation` kind, so Stage 0's K3, which reads registered kinds, cannot see
   it: no owner, writer or reader is declared for it.
+
+## [walk] The walk, as dispatched
+
+- **The sealed copy** was made 2026-10-20 from `747a2af22`, a fresh repository at one commit (`d316e78a3`) in
+  the session's temp root, outside the repository. The key's SHA-256, pinned in every walker's brief before launch, is
+  `505c52433040b18b95d5da9021b5ad0feada756b88290857a1b9eee9c4b837b7`.
+- **Stage 0 on the copy** caught both its mechanical plants, by K3 and K5, and its run on the working tree is the
+  walkers' leads, beside the copy's design as `stage0-leads.md`.
+- **The order:** run A's five walkers, then run B's five, so neither run's walkers read the other's findings; then
+  each run's four skeptics and its synthesizer, whose briefs are rendered once both walks are back. The walkers'
+  returns stay outside the repository until both walks are back.
+- **Effort:** the walkers are `gov-spec-reviewer` at medium, the skeptics `gov-skeptic` and the synthesizers
+  `gov-synthesizer` at high, each its role definition's setting, none below the owner's medium.
+- **Dispatches** 160 to 164 are run A's walkers and 165 to 169 run B's, their handoffs
+  `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-1-spec-reviewer.md` to `...-10-spec-reviewer.md`, each handed its brief,
+  `build/2026-10-20-build-PLAY-dClosedLoop-1-walk-brief-<run><walker>.md`, as its `input:spec`.
 
 ## [stage0-classes] Stage 0's classes
 
