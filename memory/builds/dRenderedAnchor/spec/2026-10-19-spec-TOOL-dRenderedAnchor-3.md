@@ -10,6 +10,7 @@
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-3-1-revision.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-1-revision.md) | research | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-3-2-spec-writer.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-2-spec-writer.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-3-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-brief.md) | research | — |
+| [2026-10-19-review-TOOL-dRenderedAnchor-3-closing-diff-round3.md](../reviews/2026-10-19-review-TOOL-dRenderedAnchor-3-closing-diff-round3.md) | diff-review | TOOL-dRenderedAnchor-2 |
 
 <!-- /gen:spec-records -->
 
