@@ -161,7 +161,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 | Question | Both runs | Where they differ | The design takes |
 |---|---|---|---|
 | The mechanism | keyed sections, read through one command and handed out by the work order (`research-memory-structure-a.md:13`, `research-memory-structure-b.md:15`) | A calls it a catalogue, B a section index | both, as one index with the tags' (`[cross]`) |
-| The index | generated, keyed by tree hash, never tracked and never loaded whole (`research-memory-structure-a.md:119`, `research-memory-structure-b.md:18`) | A: JSONL, 0.9 s; B: TSV, 0.44 s | one JSON index, as `[cross]` names it (revised 2026-10-17, the audit's L3), since one SQLite file per node keyed by blob (revised 2026-10-19, the night pass two, point 3, pending NT-15) |
+| The index | generated, keyed by tree hash, never tracked and never loaded whole (`research-memory-structure-a.md:119`, `research-memory-structure-b.md:18`) | A: JSONL, 0.9 s; B: TSV, 0.44 s | one JSON index, as `[cross]` names it (revised 2026-10-17, the audit's L3), since one SQLite file per node keyed by blob (revised 2026-10-19, the night pass two, point 3, the owner's NT-15) |
 | Default load | the card only, under a budget (`research-memory-structure-a.md:17`, `research-memory-structure-b.md:22`) | A: 6 KB or less; B: 8 KB | 8 KB |
 | Why | reads run too wide rather than miss: an id grep returns a median 15.5 files (`research-memory-structure-a.md:56`), and a spec's median section is 715 B, 4% of its file (`research-memory-structure-b.md:81`) | different measures | both |
 | Rejected: summaries and ranked retrieval | summaries drop identifiers, and recall's read-through is under 6% (`research-memory-structure-a.md:83`, `research-memory-structure-b.md:153`) | — | rejected |
@@ -183,7 +183,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   - `gov tag show <address>` and `record show <id>#<tag>` resolve through one resolver.
   - **Where it lives** (revised 2026-10-17, the audit's M17 and L3).
     - The index is one SQLite file per node, at `<git-common-dir>/gov/index.db`, shared across
-      worktrees (revised 2026-10-19, the night pass two, point 3, pending NT-15; it was one JSON file
+      worktrees (revised 2026-10-19, the night pass two, point 3, the owner's NT-15; it was one JSON file
       per tree, which measured about 30 s to rebuild and 1.6 GB to load at ten times today's tree).
     - A tree is a set of paths, each naming a blob, so the index keeps a table from tree and path to
       blob, keys what a blob holds by blob and what a path names (a document's tag, a symbol's address, a
@@ -210,7 +210,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
   The instruction layer renders it (P27). Each slot has one key and one answer when it runs over:
   - **The instruction load set** is budgeted by P27. Over its budget, it warns or refuses at render as
     `budgets.enforce` says, and is routed back by the roles layer only under `refuse` (revised 2026-10-19,
-    the night pass two, point 5, pending NT-22).
+    the night pass two, point 5, the owner's NT-22).
   - **The memory slices** are priced by `memory.item-budget`. Over it, they are answered by
     `memory.over-budget`: counted and reported under the default `report` (MS-3), never refused and
     never routed back.
@@ -250,7 +250,7 @@ once dTotalRecall registers it (P33).
   `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`), and `repo`, a repository's own
   units (the adopter-instructions answers, IA-1), and `workflow` and `lens`, the workflow entries and review lenses a
   repository adds beside gov's (the flow and roles adoption answers, FA-1), and `scenario`, the flow's named
-  variants (the night pass two, pending NT-1). Each namespace is a row
+  variants (the night pass two, the owner's NT-1). Each namespace is a row
   in its owning layer's contract: its declaring source, its extractor, and whether it selects or
   describes. An expansion mints only under its own prefix, at a core point.
 - **A leg keeps its name** (revised 2026-10-17, the audit's M26).
@@ -268,7 +268,7 @@ once dTotalRecall registers it (P33).
   successor. A retired name is never reused (revised 2026-10-19, the folds' closing review).
 - **Index and resolver.** The index is the one derived SQLite file `[cross]` places, its rows keyed by
   blob, or by path and blob for what a path names, fresh per tree, re-parsing only changed blobs, never committed and never loaded whole (revised
-  2026-10-19, the night pass two, point 3, pending NT-15). `gov tag show|where|refs|check <address>` returns the
+  2026-10-19, the night pass two, point 3, the owner's NT-15). `gov tag show|where|refs|check <address>` returns the
   smallest leaf slice in one call.
 - **Joins.** `compute_coverage` moves to `tools/lib` as the join factory, because the map that holds it
   today is optional.
@@ -291,7 +291,7 @@ once dTotalRecall registers it (P33).
 - **Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter. Each registration
   carries its extractor. Six namespaces gained an owner (revised 2026-10-17, the audit's M10):
   - dOrderedCharter registers `doc` and `unit`, and, declared at PM-10 (2026-10-17), `reader`, `level`, `layer`, `practice`, `principle`, `kind` and `kit`, and, declared by the adopter-instructions answers (2026-10-19), `repo`;
-  - dDeclaredLoop `step`, `item`, `policy` and `command`, and, declared by the night pass two (pending NT-1), `scenario`;
+  - dDeclaredLoop `step`, `item`, `policy` and `command`, and, declared by the night pass two (the owner's NT-1), `scenario`;
   - dBoundRoles `role` and `field`, and, declared by the flow and roles adoption answers (2026-10-19), `workflow`;
   - dTotalRecall `section`, `record`, `feature`, `class` and `marker`;
   - dWitnessedBar `leg`, `check` and `pack`;
@@ -359,7 +359,7 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
   | `annotations.lookup` | query-and-map, query, map-index | query-and-map (AN-1) |
   | `annotations.grammar` | voluntary, required, pushed-at-read | voluntary; `pushed-at-read` kept and redefined for shell reads (AN-2) |
 
-  `annotations.budget` retired on 2026-10-19 (the night pass two, point 5, pending NT-22). The annotation budget is a
+  `annotations.budget` retired on 2026-10-19 (the night pass two, point 5, the owner's NT-22). The annotation budget is a
   value under `budgets.*`, still counted over the blocks a commit touches. Whether a breach warns or refuses is the
   one switch `budgets.enforce`.
 
@@ -428,7 +428,7 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
     rule, and its agent cap. A per-call intensity is a named variant row. That is run A's pick
     (`research-role-shapes-a.md:15,116`).
   - **The agent cap** of each stage is at or under `runtime.agents-in-flight` (revised 2026-10-19, the night
-    pass two, point 7, pending NT-27: it was agent-cap's `FANOUT_CAP`).
+    pass two, point 7, the owner's NT-27: it was agent-cap's `FANOUT_CAP`).
   - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which
     `resolve_stage_efforts` already reads (`roles_lib.py:561`), until dConvergedCharter folds them into
     `roles.effort.<role>` and `roles.effort.<workflow>.<stage>`, beside `roles.model.<role>` (revised
@@ -447,7 +447,7 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
   `panel` (finders, at most five skeptic batches, one synthesizer), `twin` (two runs of one shape,
   merged) and `experiment` (the night pass's point 2). A workflow entry declares its ordered stages as
   data, each with its role, fan, cap, effort and the rows it receives and returns, and the five kinds are
-  named defaults over them (revised 2026-10-19, the night pass two, pending NT-8).
+  named defaults over them (revised 2026-10-19, the night pass two, the owner's NT-8).
 - **Binding.** The work order carries the resolved shape's digest. Act binding refuses a Workflow call
   whose roles, efforts or fan differ from it, and the supervisor reconciles the journal against the shape
   afterwards. A verifier stage whose role wrote the artifact it verifies is refused.

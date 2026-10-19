@@ -447,7 +447,7 @@ layer that registers a kind adds its row.
 | ask | dTotalRecall | the ask kind's acceptance at filing; writer item not named |
 | backlog row | dTotalRecall | the ask register's row store; the memory contract declares it; writer item not named |
 | decision | dLinkedLibrary | decisions split by kind, the major-decision log; writer item not named |
-| gotcha | dLinkedLibrary | gotchas handed as the unit's spec names them, never by write set (revised 2026-10-19, the night pass two, point 6, pending NT-24); writer item not named |
+| gotcha | dLinkedLibrary | gotchas handed as the unit's spec names them, never by write set (revised 2026-10-19, the night pass two, point 6, the owner's NT-24); writer item not named |
 | dossier | dTotalRecall | dossiers anchored to symbol keys; writer item not named |
 | code | dTotalRecall | the core code record: files, definitions with their ranges and body hashes, imports, resolved calls, tests and kit membership, derived per blob and cached by tree hash. It replaces the optional symbols and callers (night pass, point 3); writer item not named |
 | annotation index | dLinkedLibrary | the generated annotation index and its resolve check; writer item not named |

@@ -118,8 +118,9 @@ build beside the policy and transition features rather than after them.
 7. **Live delivery.** Where the harness can message another session, the sender writes the mailbox
    first, then delivers live, citing the message id; any other harness, and the owner by hand, use
    the same CLI verbs on the mailbox. `deps.messaging` picks the channels. Revised 2026-10-19 (the night
-   pass two, point 3, pending NT-17): the live message carries only the message's ref and id, never a
-   fact, so a lost ring costs only latency. A session is also shown unread ids at every tool call, read
+   pass two, point 3, the owner's NT-17): the live message carries only the message's ref and id, never a
+   fact, so a lost ring costs only latency. A session is also shown unread ids at every item, or at every tool call where policy
+   sets it (the owner's NT-17), read
    from the node's local copy of the mail refs, which a detached fetch keeps fresh, because the read
    points, not the transport, set how late news arrives.
 8. **Dependency coordination.** A build depends on its `parents:`. A parent is reachable while its

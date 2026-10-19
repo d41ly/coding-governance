@@ -90,6 +90,10 @@ reader needs. The counts are the returns' measurements.
 | commits | git | the history | 6,084; `Pass:` on 1,353 and `Decided:` on 677; none names an item, act or session | node, its trailers an edge site | SHA | dDeclaredLoop |
 | refs: claims and leases | git | `refs/gov/claims`, `refs/gov/runs` | 17 run claims, never deleted | node: claims and leases | ref name | dPlacedRequest |
 | refs: mail | git | `refs/gov/mail` | designed | node: the mailbox's durable copy | ref name | dKeptSession |
+| refs: decisions | git | `refs/gov/decisions` | designed | node: a decision's write-once register entry, keyed by the item and fork that raised it (the owner's NT-18) | ref name | dPlacedRequest |
+| refs: problems | git | `refs/gov/problems` | designed | node: a problem's register entry, keyed per problem under its encoded subject (the owner's NT-18) | ref name | dPlacedRequest |
+| change feed | runtime | the git common dir | designed | node-local node: every lease, claim, register, mail and record write in order, replayable and rebuilt equal from git (the owner's NT-14) | — | dPlacedRequest |
+| memory mirror | outside | a registered adapter's store, a cloud relational database first | designed | out: a real-time copy of the change feed for other nodes, never read by a verdict (the owner's NT-14) | — | dWellOiledMachine |
 | refs: bar-red | git | `refs/gov/bar-red` | written and read by the pre-push hook | node: the red verdict's marker | ref name | dWitnessedBar |
 | refs: bindings | git | `refs/gov/bindings` | designed (SA-10) | node: each act's minimal binding record, read by the checks on any node | act id | dWellOiledMachine |
 | tags | git | kit releases, archive tags | 3 archive tags | node: `kit-release` | tag name | dShippedRelease |
@@ -191,7 +195,7 @@ derived.
 | `pinned-at` | record, probe, claim → commit or tree | "Derived at", a probe's pin | `pinned-by` | new: today's pins, now typed apart from `cites` | staleness |
 | `reads` | item, role → record kind | the role definition's `reads:` field and the item's declaration; the kind's registry row renders its readers from them | `read-by` | new | who reads a kind |
 | `writes` | item, role → record kind | the role definition's `writes:` field and the item's declaration; the kind's registry row names the door it writes through | `written-by` | new | who writes a kind |
-| `promoted-from` | instruction unit → memory node; scenario → a build's recorded change | `instructions.edit`'s change record | `promoted-to` | new; the scenario source added by the night pass two, pending NT-5 | memory to instruction (no route today), and a build's adaptation to a reusable scenario |
+| `promoted-from` | instruction unit → memory node; scenario → a build's recorded change | `instructions.edit`'s change record | `promoted-to` | new; the scenario source added by the night pass two, the owner's NT-5 | memory to instruction (no route today), and a build's adaptation to a reusable scenario |
 | `cites` | any text → any node | derived from the text | `cited-by` | derived | prose references |
 
 An unregistered type reds, and so does an edge whose source or target sits outside its row's namespaces.

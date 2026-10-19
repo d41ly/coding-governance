@@ -426,15 +426,15 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 
   So a take-over never pushes twice.
 - **Agents in flight.**
-  - The bound is `runtime.agents-in-flight`, one key the owner raises or lowers by a policy write (revised
-    2026-10-19, the night pass two, point 7, pending NT-27 and NT-28). It was agent-cap's lower-only
+  - The bound is `runtime.agents-in-flight`, one key, 6 by default, that the owner raises or lowers by a policy write (revised
+    2026-10-19, the night pass two, point 7, the owner's NT-27 and NT-28). It was agent-cap's lower-only
     `FANOUT_CAP` in `.agent-cap.conf`, never above 5 (TOOL-aRepatriatedFork-7), which counted claims per
     prompt, never agents in flight. Runtime adds no second carrier for it.
   - Before a launch, the supervisor reserves the act's declared fan, its harness's static maximum,
     against a counter under the lease. When slots are short, it queues the act.
   - It releases the slots when the act session exits, or when the reap kills its tree.
   - In the owner's session, while it hosts the driver, the PreToolUse entry on Workflow and Agent reserves
-    the same way, and refuses instead of queueing. Both calls run in the background, so the reservation is released when the call's work
+    the same way, and queues the call instead of refusing it (the owner's NT-28). Both calls run in the background, so the reservation is released when the call's work
     ends: at SubagentStop for an Agent call, and at the run's saved result for a Workflow call. A sweep
     keyed to the session's liveness frees what a dead session held.
   - agent-cap's per-prompt total retires with agent-cap (revised 2026-10-19, the night pass two, point 7).
@@ -838,9 +838,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | notification adapters | how an owner request reaches the owner | the terminal, a push notification | dWellOiledMachine |
 | journal readers | what reads the journal | runlog, observability's store | dWellOiledMachine |
 | cadence items | a program with its host key, its period, its lease and its events | Maintain and the Loop Review; gov's kit release and the currency probe | dWellOiledMachine |
+| memory mirrors | a backend that receives the change feed in real time and answers other nodes' reads, git staying the store of record | a cloud relational database | dWellOiledMachine |
 
 - The keys that select an extension (`runtime.harnesses`, `runtime.spawn-backend`, `verdict`, `run.host`,
-  `maintain.host`, `kits.host`, `notify.channel` and `release.environments`) take registered names.
+  `maintain.host`, `kits.host`, `notify.channel`, `release.environments` and `memory.mirror`) take registered names.
   This is the one list of them, and other records point here.
   They are validated against the registry, never against a literal enumeration. A name no installed
   layer registers is refused, or falls back to the built-in with a report, as
@@ -906,8 +907,8 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | instruction units | the act session's static block (make the one call your act names, nothing else); the supervisor's run rules; the compaction keep-list |
 | engine kits | unattended: the supervisor (resume-tick grown, act sessions, the commit queue), whose verbs become `next`, `run` and the owner's controls; workflows: the role harnesses and the deferral block; hooks: the dispatcher, the fragments as packs through settings-merge, and check-wiring's class arm; process-monitor: reaping; and the journal grammar, moved from runlog into the core, so the core writes what observability reads |
 | record kinds | return records, and act records (launch, epoch, outcome). Flow's witnesses and leases are written through `record` too |
-| extension points declared | the ten in `[extend]` |
-| extension points used | none. Integrations fill the host and notification adapters. Observability and memory's optional components register packs and read the journal |
+| extension points declared | the eleven in `[extend]`, the memory-mirror point added by the owner's NT-14 |
+| extension points used | none. Integrations fill the host, notification and memory-mirror adapters. Observability and memory's optional components register packs and read the journal |
 | policies | the `runtime.*` keys in `[policies]`, and the existing keys it reads |
 | gates | the build's fixtures in `[tests]`, the `grant`, `secret-scan` and `journal-retention` fixtures among them |
 
@@ -1109,7 +1110,7 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
     raises an owner item once `runtime.hold-ceiling` passes.
 - **`in-flight`:**
   - with `runtime.agents-in-flight` at 3 (`FANOUT_CAP=3` until the night pass two's point 7), the supervisor queues an act whose declared fan exceeds the free slots, and the
-    attended PreToolUse entry refuses the same call;
+    attended PreToolUse entry queues the same call (the owner's NT-28);
   - killing an act session that holds slots releases them once the reap runs;
   - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep;
   - with the limit at 3, two direct spawns and a two-agent Workflow admit one Workflow agent until a slot

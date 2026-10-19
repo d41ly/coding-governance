@@ -290,7 +290,7 @@ Code first. Answer: CLI-first (Recommended).
 - **C3. A closed set of extension kinds**: kit, command, instruction unit, policy key, preset, gate
   leg, role, workflow, hook, Skill, practice, record kind, stage, layer, item, lens and scenario, the
   last three registered by the chain (item and lens by the flow and roles adoption, FA-1; scenario by
-  the night pass two, pending NT-1; revised 2026-10-19). Each lists the principles that bind it; a part
+  the night pass two, the owner's NT-1; revised 2026-10-19). Each lists the principles that bind it; a part
   of a kind nobody registered reds, so a new kind cannot appear outside the mechanism.
 - **C4. One factory per kind.** A `new` verb per kind produces an instance that already conforms
   (descriptor and drive table, stage claim, envelope, `next —` line, schema entry with a default and a

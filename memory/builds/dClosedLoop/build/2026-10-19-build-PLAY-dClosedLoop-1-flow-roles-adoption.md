@@ -197,7 +197,7 @@ writes the repository's rows. This is the instruction round's "compose, never ed
    - Roles: the matrix arms, each core role's write class and return schema, and the cycle roles, the prompt writer
      and the driver, whole.
    - Shapes: the kinds, each stage's cap at or under `runtime.agents-in-flight` (revised 2026-10-19, the night
-     pass two, point 7, pending NT-27: it was `FANOUT_CAP`'s bound) and the five lens slots.
+     pass two, point 7, the owner's NT-27: it was `FANOUT_CAP`'s bound) and the five lens slots.
    - Legs: the canary's key set, and the legs that check the composition itself.
    - Every other row and field is open. The class is derived, never typed, as the closing review settled for units.
 10. **Widening.** A patch may widen an open field, a role's tools or gate grant among them. The overlay's write

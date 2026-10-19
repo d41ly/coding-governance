@@ -200,8 +200,9 @@ to spec edge called measured that no arm ran, and a spec half called unmeasured 
 4. **The prompt writer's frame** (NT-10). dBoundRoles composes every role item's task in the skeleton's order: role and
    job kind, material, boundaries, population, upstream rows, row contract, added rows, the no-stop line, and the
    return contract last, every output bounded.
-5. **An effort floor** (NT-12). No coverage item runs below medium without an experiment record that shows the lower
-   effort holds.
+5. **An effort floor** (NT-12, answered in the owner's words). Effort is the owner's setting: medium by default,
+   and no agent takes a role below medium without the owner's explicit authorization, though the owner may set
+   and run it at low.
 6. **The experiment's method.** dFairHearing's experiment shape takes the measurement discipline that produced the
    figures: a held-out set frozen before tuning, one variable per arm, parsed replies counted first, a blind judge with
    rotated labels, and the union read as one system.
@@ -254,7 +255,9 @@ register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
    possible as an optional read surface and is not built, since the CLI is the floor (P36).
 
 **The design worked in.**
-1. **Text in git stays the store of record** (NT-14).
+1. **Text in git stays the store of record** (NT-14), and, by the owner's answer, a cloud relational database is
+   an accounted extension: a change feed every write joins, and a memory-mirror point an adapter fills for
+   real-time sharing across nodes, the database itself planned.
 2. **The index becomes one SQLite file per node** (NT-15). dOrderedCharter's index clause, the systems record's
    `[cross]` and its index bullet are revised: rows keyed by blob, or by path and blob for what a path names, the tree id only a freshness key, JSON only as
    `gov tag`'s output, and a deleted file rebuilt to identical rows. dTotalRecall moves memory-recall's FTS5 tables
@@ -264,8 +267,8 @@ register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
    well as per source and checks it over the merged tree, seen red on probe D's two supersessions.
 4. **One mail ref per writing session** (NT-16): `refs/gov/mail/<slug>/<fleet tag>/<session>`, revised in v2,
    coordination and the memory plan, keyed by session after the review found one node's sessions sharing a ref.
-5. **News read at every tool call** (NT-17). dKeptSession gains `mailbox.notice` (`every-tool-call`, `every-item` or
-   `off`) and `mailbox.fetch-seconds` (60). The doorbell carries ids only, and the disposal still happens at items
+5. **News at every item, or at every tool call by policy** (NT-17, the owner's default: every item). dKeptSession
+   gains `mailbox.notice` (`every-item` by default, `every-tool-call` or `off`) and `mailbox.fetch-seconds` (60). The doorbell carries ids only, and the disposal still happens at items
    and transitions, as `mailbox.reads` says.
 6. **Leases with a history, and writes free of the lander.** dPlacedRequest writes each lease and claim as a commit
    whose parent is the ref's previous tip, so the history the design names as the witness exists. Lease, claim and
@@ -313,7 +316,9 @@ probes decide the shape:
 
 **How work moves between sessions on one build.** Through the trail, pushed, and through registers:
 - **The branch.** The commit queue commits each role return into the trail at its item's witness and pushes the
-  build's branch as `build.push` says, every item by default. Another node then reads the same witnesses, derives the
+  build's branch as `build.push` says, every pass commit by default (the owner's NT-19). A push takes no lock the
+  lander holds and runs no gate: a build branch's push skips the bar (110 pushes, median 0.44 s), and CI runs only
+  on `main`. Another node then reads the same witnesses, derives the
   card's pointers from the branch, and can take over (NT-19).
 - **Units across sessions.** A session that does not hold the build may take one of its units under that unit's
   lease, as `build.unit-holders` says. It drives only that unit's passes on its own branch, and the build's driver
@@ -393,8 +398,9 @@ of instructions, and past them text is silently lost.
 
 **The design worked in.**
 1. **One switch** (NT-22). dGroundRules builds `budgets.enforce`, read by every gate that enforces a size cap on a
-   document or record: `warn` by default, as the owner set it, with `refuse` and `record` the other values. Each cap's
-   value stays the owner's under `budgets.*`, which loses its per-cap mode. Line and entry lengths are size caps
+   document or record: `warn` by default, as the owner set it, with `refuse` the other value. Each cap's
+   value stays the owner's under `budgets.*`, which loses its per-cap mode, and the owner may pin named caps to
+   refuse through `budgets.pinned` (NT-22). Line and entry lengths are size caps
    too, so they fall under the switch. Two things stay outside it:
    - a consumer's own limit, which fits or refuses, because over it text is lost;
    - a check of correctness, which is no cap.
@@ -530,8 +536,8 @@ enforced at three scopes:
    session.
 3. **The supervisor's reservation** under the lease, for act sessions and nodes, as layer-runtime designed it.
 
-**`runtime.agents-in-flight`.** The key is an agent count, 5 by default. The owner raises or lowers it by a policy
-write (NT-28). Today's cap is lower-only, because an environment knob "leaves no diff", and a tracked policy write
+**`runtime.agents-in-flight`.** The key is an agent count, 6 by default by the owner's answer. The owner raises or lowers it
+by a policy write (NT-28), and a spawn over it waits in Runtime's admission queue instead of being refused. Today's cap is lower-only, because an environment knob "leaves no diff", and a tracked policy write
 leaves one. No preset sets it, since the limit is a fact about the owner's plan and machine, like the harness keys
 presets already never touch.
 
@@ -577,6 +583,8 @@ NT-22 gains the caps research's own pick as an option. NT-27 and NT-28 drop the 
 
 ## [forks] Parked for the owner, 2026-10-19
 
+Answered by the owner on 2026-10-19, in `[answers]` below.
+
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
 sets a key's default, the options are the key's allowed values (P10); where it is a structural choice, it is a
 decision.
@@ -611,3 +619,76 @@ decision.
 | NT-26 | Who serves classes while code is written? | the reuse scout by intent, at most five with reasons, armed only after it wins its replay, else no one; a runtime hook by path or content; no one | a structural decision |
 | NT-27 | Where does the agent limit live, and what enforces it? | one Runtime key, enforced by the harness's own settings now, an in-flight ledger on SubagentStart and SubagentStop once the spike passes, and the supervisor's reservation, every other agent-cap rule moved to its home; the harness's settings alone; the limit split between direct and Workflow budgets with one live run per session, the research's fallback | a structural decision |
 | NT-28 | How far may the owner raise the agent limit? | to any count, by a policy write, which leaves a diff; only up to the harness's own defaults, 20 direct agents and up to 16 per Workflow run | a structural decision; the key's default stays 5 |
+
+## [answers] The owner's answers, 2026-10-19
+
+The owner asked, "put the forks to me", and answered them in seven batches, each question with its recommendation
+first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| NT-1 | "Registered kind (Recommended)" |
+| NT-2 | "Scout, rechecked (Recommended)" |
+| NT-3 | "Yes, scoped (Recommended)" |
+| NT-4 | "Additive auto (Recommended)" |
+| NT-5 | "Loop proposes (Recommended)" |
+| NT-6 | "Design-only scenario (Recommended)" |
+| NT-7 | "Union, refuse conflicts (Recommended)" |
+| NT-8 | "Stages as data (Recommended)" |
+| NT-9 | "Swap or exclude (Recommended)" |
+| NT-10 | "Measured shape now (Recommended)" |
+| NT-11 | "Per unit in Build (Recommended)" |
+| NT-12 | "Effort is an owner-controlled setting, and it's possible for the owner to set and run it at low. By default, effort is medium and agents do NOT go below medium without an explicit owner authorization." |
+| NT-13 | "Off; on in strict (Recommended)" |
+| NT-14 | "Text in git now but cloud relational db needs to be an accounted extension - multi-node concurrent builds are on the map and memory architecture needs to be ready to account for real-time memory sharing." |
+| NT-15 | "SQLite per node (Recommended)" |
+| NT-16 | "Ref per session (Recommended)" |
+| NT-17 | "Every item by default, every tool call is settable by policy" |
+| NT-18 | "Keyed registers (Recommended)" |
+| NT-19 | "settable by policy, every pass commit by default. This creates a question of contention and gate runs." |
+| NT-20 | "Yes, by unit lease (Recommended)" |
+| NT-21 | "Intake + work order (Recommended)" |
+| NT-22 | "Plus per-cap pins" |
+| NT-23 | "Shown, priced, trended (Recommended)" |
+| NT-24 | "No, retire it (Recommended)" |
+| NT-25 | "Range minus gated (Recommended)" |
+| NT-26 | "Scout by intent, if earned (Recommended)" |
+| NT-27 | "Runtime key, 3 scopes (Recommended)" |
+| NT-28 | "Any count by a policy write, raise default cap to 6, a need a mechanism to maintain a queue of agents/workflows instead of simply refusing." |
+
+Twenty-two took the recommendation. NT-22 took another listed option, and five answers are the owner's own words:
+- **NT-12.** Effort is the owner's setting: medium by default, and no agent goes below medium without the owner's
+  explicit authorization. It replaces the recommended rule that an experiment record must justify a lower effort.
+- **NT-14.** Text in git stays the record now, and a cloud relational database becomes an accounted extension, so
+  memory is ready for real-time sharing across nodes.
+- **NT-17.** `mailbox.notice` defaults to every item, and every tool call stays a value the owner's policy may set.
+- **NT-19.** `build.push` defaults to every pass commit, settable by policy. The owner's question on contention and
+  gate runs, answered from the tree: a build branch has one writer, a unit branch one each, and a push of a branch
+  other than the default one skips the bar (110 pushes, median 0.44 s), while remote CI runs only on `main`. The one
+  real contention was the lander's lock, which a push no longer takes.
+- **NT-22.** Every size cap sits under the one switch, and the owner may pin named caps to refuse.
+- **NT-28.** The limit takes any count by a policy write and defaults to 6, and a spawn over it waits in a queue
+  instead of being refused.
+
+## [answers-folded] Where the answers went, 2026-10-19
+
+- **Every pending marker** in v2 and the layer records now reads "the owner's NT-x".
+- **NT-12:** dBoundRoles' clause and the two `roles.effort.*` rows. No role declares an effort below medium today:
+  the roles kit's default is medium, and its roles run at medium, high or xhigh.
+- **NT-14:**
+  - a change feed in dPlacedRequest, which dTotalRecall's record writes and dKeptSession's mail writes join;
+  - the memory-mirror point in dWellOiledMachine and Runtime's `[extend]` table;
+  - `memory.mirror`, which presets never touch;
+  - the database itself in v2's `[planned]`;
+  - the memory plan's pockets for the feed, the mirror and point 4's two registers;
+  - `gap-mem-46`.
+- **NT-17:** `mailbox.notice`'s default and presets, dKeptSession's clause and coordination's item 7.
+- **NT-19:** `build.push`'s default and presets, and dWellOiledMachine's clause, a push now free of the lander's lock.
+- **NT-22:** `budgets.pinned`, which presets never touch, and dGroundRules' clause and witness.
+- **NT-28:**
+  - `runtime.agents-in-flight` at 6;
+  - the admission queue in dWellOiledMachine;
+  - layer-runtime's attended entry and `in-flight` fixture, which now queue;
+  - `gap-rt-36`.
+- **The review's leftover.** `[p5-caps]` still listed `record` among `budgets.enforce`'s values, which the review had
+  dropped. It is corrected.

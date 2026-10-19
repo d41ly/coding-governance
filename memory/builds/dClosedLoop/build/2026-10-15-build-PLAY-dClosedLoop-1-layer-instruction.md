@@ -461,7 +461,7 @@ Proposed gaps, each with its proposed owner build. The register holds them as `g
   - **Rendered**, which gov writes: the charter, role files, Skills and work orders. A set over budget,
     which is too much, warns or refuses as `budgets.enforce` says, and one over a harness's own limit is
     refused. A set missing a unit that a role or item names in `required-by`, which is too little, is
-    refused (revised 2026-10-19, the night pass two, point 5, pending NT-22).
+    refused (revised 2026-10-19, the night pass two, point 5, the owner's NT-22).
   - **Injected**, which the harness or a hook places: the auto-memory index, the harness's agent and
     Skill lists, and hook output. Gov cannot refuse these, so they are measured at session start and a
     breach is reported. Hook text is composed from registered units (`gap-rt-13`).

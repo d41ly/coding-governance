@@ -16850,6 +16850,15 @@ for ln in forks_block.split("\n"):
         forks.append({"id": m.group(1), "q": m.group(2), "opts": opts, "sets": m.group(4)})
 if len(forks) != 28 or [f["id"] for f in forks] != [f"NT-{i}" for i in range(1, 29)]:
     sys.exit(f"forks: {len(forks)} rows, or out of order")
+# The owner's answers, once the record holds them: every fork answered, or none.
+answers = {}
+if "\n## [answers]" in rec:
+    for ln in rec.split("\n## [answers]", 1)[1].split("\n## ", 1)[0].split("\n"):
+        m = re.match(r'^\| (NT-\d+) \| "(.+)" \|$', ln)
+        if m:
+            answers[m.group(1)] = m.group(2)
+    if sorted(answers) != sorted(f["id"] for f in forks):
+        sys.exit(f"answers: {len(answers)} of {len(forks)} forks")
 
 # ---------------------------------------------------------------- the chain, from v2
 v2 = read(V)
@@ -17232,9 +17241,383 @@ any pick, then copy your answers and paste them into the session. Your picks are
 }})();
 </script>
 """
+# Once the owner has answered, the page shows the answers in place of the form, and carries no script.
+if answers:
+    def swap(old, new):
+        global page
+        if page.count(old) != 1:
+            sys.exit(f"report: {old[:50]!r} found {page.count(old)} times")
+        page = page.replace(old, new, 1)
+    swap("Every decision that is yours is parked below as a fork. The\n  recommendation is pre-selected and already "
+         "folded into the records, marked pending.",
+         "You answered all 28 forks on 2026-10-19, and the answers\n  are folded into the records.")
+    swap("<span>forks parked, NT-1 to NT-28</span>", "<span>forks answered, NT-1 to NT-28</span>")
+    start, end = page.index('<h2 id="forks">'), page.index("<textarea id=\"out\" readonly></textarea>")
+    own = [k for k, v in answers.items() if not v.endswith("(Recommended)")]
+    rows = "".join(
+        f'<tr id="{f["id"].lower()}"><td><code>{f["id"]}</code></td><td>{code(f["q"])}</td><td>{code(answers[f["id"]])} '
+        f'{"<em class=rec>recommended</em>" if answers[f["id"]].endswith("(Recommended)") else "<em class=chip>your choice</em>"}'
+        f"</td></tr>" for f in forks)
+    page = (page[:start] + f'<h2 id="forks">Your answers to the forks</h2>\n<p class="lede">{len(forks) - len(own)} took '
+            f"the recommendation, and {len(own)} are your own choice ({', '.join(own)}). Each is folded into the records "
+            f"at <code>{head}</code>, in the night record's <code>[answers]</code> and <code>[answers-folded]</code>.</p>\n"
+            f'<div class="tablewrap"><table><thead><tr><th>Fork</th><th>Question</th><th>Your answer</th></tr></thead>'
+            f"<tbody>{rows}</tbody></table></div>"
+            + page[end + len("<textarea id=\"out\" readonly></textarea>"):])
+    page = re.sub(r"<script>.*?</script>\n?", "", page, flags=re.S)
 OUT.write_text(page, encoding="utf-8", newline="\n")
 print(f"wrote {OUT}: {OUT.stat().st_size} bytes, {len(forks)} forks, {len(chain)} builds, {len(log)} commits, "
       f"review {'filled' if review else 'pending'}")
+````
+
+### `fold_answers.py`
+
+The owner's answers to NT-1 to NT-28, folded: the answers verbatim in the night record, the six departures from the recommendation in v2, the layer records, coordination, the memory plan and the register, and every pending marker turned into the owner's.
+
+````python
+"""The owner's answers to the night pass two's forks, NT-1 to NT-28, folded. Twenty-two took the recommendation, which
+the records already showed as pending; five are the owner's own words (NT-12, NT-14, NT-17, NT-19, NT-28) and one took
+another listed option (NT-22). Writes the answers verbatim into the night record, folds each departure into v2, the
+layer records, coordination, the memory plan and the register, then turns every "pending NT-x" into "the owner's NT-x".
+Also fixes the review's leftover: the night record still listed `record` among `budgets.enforce`'s values.
+
+Usage: python -X utf8 fold_answers.py <answers.txt>   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+ANSWERS = [ln.split("\t", 1) for ln in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").splitlines()
+           if ln.startswith("NT-")]
+if [a[0] for a in ANSWERS] != [f"NT-{i}" for i in range(1, 29)]:
+    sys.exit("the answers file does not hold NT-1 to NT-28 in order")
+WORDS = {k: (v[len("OTHER: "):].strip('"') if v.startswith("OTHER: ") else v) for k, v in ANSWERS}
+NT12, NT14, NT17, NT19, NT28 = (WORDS[k] for k in ("NT-12", "NT-14", "NT-17", "NT-19", "NT-28"))
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def first_row(rec, prefix):
+    rows = [ln for ln in rec.text.split("\n") if ln.startswith(prefix)]
+    if not rows:
+        sys.exit(f"no row starts {prefix!r}")
+    return rows
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+# NT-12: effort is the owner's setting, medium by default, never lowered by an agent
+V.sub("and no coverage item's effort below medium without an experiment record that shows the lower effort holds, seen "
+      "red on a planted lower effort with none (the night pass two, point 2, pending NT-10 and NT-12)",
+      "and effort the owner's setting under `roles.effort.<role>`, medium by default with no role declaring less, set "
+      "below medium only by the owner's explicit authorization in the policy file and never by an agent, a role's "
+      "proposal, a scenario or a build's own change, seen red on a planted effort below medium that no owner write "
+      "carries (the night pass two, point 2, pending NT-10 and NT-12)", "NT-12: dBoundRoles")
+for anchor in ("| the flow and roles adoption round's FA-6: the house file's `[effort.roles]`, so a preset can set it |",
+               "| FA-6: the house file's `[effort.stages.<workflow>]` |"):
+    V.sub(anchor, anchor[:-2] + "; medium by default, and below medium only by the owner's explicit authorization, "
+          "never an agent's (the owner's NT-12) |", "NT-12: " + anchor[:30])
+# NT-14: the change feed and the memory-mirror point, a cloud relational database planned behind it
+add_clauses(V, "dPlacedRequest", [
+    "the change feed: an ordered, append-only feed on each node that every lease, claim and register write joins, each "
+    "event naming its ref or record, its kind, its blob and its commit, replayable from any point and rebuilt equal "
+    "from git, so a real-time mirror needs no change to the core (pending NT-14)"], [])
+add_clauses(V, "dTotalRecall", ["every write through `record` appended to the change feed with its edges (pending NT-14)"],
+            [])
+add_clauses(V, "dKeptSession", ["every mail write appended to the change feed (pending NT-14)"], [])
+add_clauses(V, "dWellOiledMachine", [
+    "the memory-mirror point: an adapter registered there, a cloud relational database first, receiving the change "
+    "feed in real time and answering other nodes' sessions as `memory.mirror` says, git staying the store of record and "
+    "every verdict computed locally, an adapter's loss degrading to git and the local index, seen on a stand-in adapter "
+    "that drops events and is rebuilt equal from the feed, and on a record written on one node read on another through "
+    "it before that node's next fetch (pending NT-14)",
+    # NT-28: a queue, never a refusal
+    "the admission queue: every agent spawn and Workflow call a driver, an executor or an attended session makes waits "
+    "in Runtime's queue, in order, and starts when the agents in flight fall under `runtime.agents-in-flight` with room "
+    "for its declared fan, never refused for want of a slot, the harness's own settings kept as the backstop above it, "
+    "an attended session's call held at its PreToolUse entry for as long as the spike shows a hook can hold a call and "
+    "otherwise sent through the executor's queue, seen on seven spawns under a limit of six, the seventh starting when "
+    "the first ends (pending NT-28)"], ["gap-mem-46", "gap-rt-36"])
+mo = first_row(V, "| `memory.over-budget` |")[0]
+V.sub(mo + "\n", mo + "\n"
+      "| `memory.mirror` | none, or a registered memory-mirror adapter | none | the owner's NT-14: \"" + NT14 + "\"; git "
+      "stays the store of record, and every verdict is computed locally | dWellOiledMachine |\n", "NT-14: memory.mirror")
+V.sub("\n## [open] ", """
+One integration is planned the same way, and counts in no build's planned units (the owner's NT-14):
+- **A cloud relational database mirror.** Trigger: the owner's word that multi-node concurrent builds need
+  real-time memory sharing. Unit: an integrations adapter at Runtime's memory-mirror point, a hosted relational
+  database that receives the change feed and answers other nodes' reads, its credential kept where
+  `runtime.secret-home` says, its conformance run against the stand-in adapter's fixture.
+
+## [open] """, "NT-14: [planned]")
+V.sub("  `runtime.agents-in-flight`, `runtime.owner-harness`,",
+      "  `runtime.agents-in-flight`, `budgets.pinned`, `memory.mirror`, `runtime.owner-harness`,", "never touch")
+# NT-17: every item by default, every tool call by policy
+V.sub("| `mailbox.notice` | every-tool-call, every-item, off | every-tool-call |",
+      "| `mailbox.notice` | every-tool-call, every-item, off | every-item |", "NT-17: default")
+V.sub("read from the node's local copy of the mail refs, never over the network, pending NT-17 | dKeptSession |",
+      f"read from the node's local copy of the mail refs, never over the network, pending NT-17: \"{NT17}\" | "
+      "dKeptSession |", "NT-17: source")
+V.sub("| `mailbox.notice` | every-tool-call | every-tool-call | every-tool-call | every-tool-call |",
+      "| `mailbox.notice` | every-item | every-item | every-item | every-item |", "NT-17: presets")
+V.sub("news shown as `mailbox.notice` says: at every tool call a hook lists the unread message ids",
+      "news shown as `mailbox.notice` says, at every item by default and at every tool call where the owner's policy "
+      "sets it: a hook lists the unread message ids", "NT-17: dKeptSession")
+V.sub("seen on a message posted on one node shown on another's next tool call within twice the fetch interval",
+      "seen on a message posted on one node shown on another at its next item, and under `every-tool-call` at its next "
+      "tool call within twice the fetch interval", "NT-17: witness")
+# NT-19: every pass commit by default, settable by policy; the lander's lock and gate runs answered
+V.sub("| `build.push` | every-item, every-pass, every-transition, at-landing | every-item |",
+      "| `build.push` | every-item, every-pass, every-transition, at-landing | every-pass |", "NT-19: default")
+V.sub("so another node reads its witnesses, pending NT-19 |",
+      f"so another node reads its witnesses, pending NT-19: \"{NT19}\" |", "NT-19: source")
+V.sub("| `build.push` | every-item | every-item | every-item | every-item |",
+      "| `build.push` | every-pass | every-pass | every-pass | every-pass |", "NT-19: presets")
+V.sub("pushing the build's branch as `build.push` says, so a take-over",
+      "pushing the build's branch as `build.push` says, every pass commit by default, each push taking no lock the "
+      "lander holds and running no bar but a branch bar the repository declares, so a take-over", "NT-19: the push")
+# NT-22: per-cap pins
+be = first_row(V, "| `budgets.enforce` |")[0]
+V.sub(be + "\n", be + "\n"
+      "| `budgets.pinned` | none, or a set of named caps, each refusing whatever `budgets.enforce` says | none | the "
+      "owner's NT-22: \"Plus per-cap pins\"; each cap's value stays under `budgets.*` | dGroundRules |\n",
+      "NT-22: budgets.pinned")
+V.sub("`budgets.enforce`, the one switch every gate enforcing a size cap on a document or record reads, warning by "
+      "default as the owner set it,",
+      "`budgets.enforce`, the one switch every gate enforcing a size cap on a document or record reads, warning by "
+      "default as the owner set it, every cap the owner names in `budgets.pinned` refusing whatever the switch says,",
+      "NT-22: dGroundRules")
+V.sub("each planted over its cap under each value and red where one ignores the switch,",
+      "each planted over its cap under each value and red where one ignores the switch, a pinned cap refusing under "
+      "`warn`,", "NT-22: witness")
+# NT-28: 6 by default, any count by a policy write, a queue
+V.sub("| `runtime.agents-in-flight` | an agent count, at least 1 | 5 |",
+      "| `runtime.agents-in-flight` | an agent count, at least 1 | 6 |", "NT-28: default")
+V.sub("raised or lowered by a policy write, pending NT-27 and NT-28. Until the in-flight ledger arms,",
+      f"raised or lowered by a policy write, pending NT-27 and NT-28, the latter's words: \"{NT28}\". A spawn over it "
+      "waits in Runtime's admission queue once that lands. Until the in-flight ledger and the queue arm,",
+      "NT-28: source")
+V.save()
+
+# ---------------------------------------------------------------- layer-runtime: the point, the queue, the default
+L = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+ca = first_row(L, "| cadence items |")[0]
+L.sub(ca + "\n", ca + "\n"
+      "| memory mirrors | a backend that receives the change feed in real time and answers other nodes' reads, git "
+      "staying the store of record | a cloud relational database | dWellOiledMachine |\n", "the memory-mirror point")
+L.sub("`notify.channel` and `release.environments`) take registered names.",
+      "`notify.channel`, `release.environments` and `memory.mirror`) take registered names.", "the selecting keys")
+L.sub("| extension points declared | the ten in `[extend]` |",
+      "| extension points declared | the eleven in `[extend]`, the memory-mirror point added by the owner's NT-14 |",
+      "points declared")
+L.sub("Integrations fill the host and notification adapters.",
+      "Integrations fill the host, notification and memory-mirror adapters.", "points used")
+L.sub("the same way, and refuses instead of queueing.",
+      "the same way, and queues the call instead of refusing it (the owner's NT-28).", "attended queue")
+L.sub("    attended PreToolUse entry refuses the same call;",
+      "    attended PreToolUse entry queues the same call (the owner's NT-28);", "in-flight fixture")
+L.sub("one key the owner raises or lowers by a policy write (revised",
+      "one key, 6 by default, that the owner raises or lowers by a policy write (revised", "the default")
+L.save()
+
+# ---------------------------------------------------------------- coordination: NT-17
+CO = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md")
+CO.sub("A session is also shown unread ids at every tool call, read\n",
+       "A session is also shown unread ids at every item, or at every tool call where policy\n"
+       "   sets it (the owner's NT-17), read\n", "coordination: the notice")
+CO.save()
+
+# ---------------------------------------------------------------- memory plan: the registers, the feed, the mirror
+MP = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+MP.sub("| refs: mail | git | `refs/gov/mail` | designed | node: the mailbox's durable copy | ref name | dKeptSession |\n",
+       "| refs: mail | git | `refs/gov/mail` | designed | node: the mailbox's durable copy | ref name | dKeptSession |\n"
+       "| refs: decisions | git | `refs/gov/decisions` | designed | node: a decision's write-once register entry, keyed by "
+       "the item and fork that raised it (the owner's NT-18) | ref name | dPlacedRequest |\n"
+       "| refs: problems | git | `refs/gov/problems` | designed | node: a problem's register entry, keyed per problem "
+       "under its encoded subject (the owner's NT-18) | ref name | dPlacedRequest |\n"
+       "| change feed | runtime | the git common dir | designed | node-local node: every lease, claim, register, mail and "
+       "record write in order, replayable and rebuilt equal from git (the owner's NT-14) | — | dPlacedRequest |\n"
+       "| memory mirror | outside | a registered adapter's store, a cloud relational database first | designed | out: a "
+       "real-time copy of the change feed for other nodes, never read by a verdict (the owner's NT-14) | — | "
+       "dWellOiledMachine |\n", "memory plan: pockets")
+MP.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+NEW = {"gap-mem-45": ("gap-mem-46", "Memory", "HIGH", "Multi-node concurrent builds have no real-time shared memory: a "
+                      "node sees another's records only after a fetch at its read points, and nothing gives a real-time "
+                      "store a place to plug in.", "the owner's NT-14 (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-"
+                      "pass-two.md` `[answers]`); `research-storage-prior-art.md` family F4"),
+       "gap-rt-35": ("gap-rt-36", "Runtime", "MED", "A spawn over the agent limit is refused, never queued: agent-cap "
+                     "refuses a sixth direct spawn, and the harness refuses a direct spawn over its setting with \"Do not "
+                     "retry\".", "`research-agent-cap.md` sections 2 and 3; the owner's NT-28")}
+lines = G.text.split("\n")
+for after, (k, st_, sv_, gap, ev) in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines.insert(idx[0] + 1, f"| {k} | {st_} | {sv_} | {gap} | {ev} | — |")
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 353 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the owner's answers to the night pass two's forks added `gap-mem-46` and `gap-rt-36`\n"
+    "(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[answers]`), same instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night record
+N = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+N.sub("5. **An effort floor** (NT-12). No coverage item runs below medium without an experiment record that shows the "
+      "lower\n   effort holds.",
+      "5. **An effort floor** (NT-12, answered in the owner's words). Effort is the owner's setting: medium by default,\n"
+      "   and no agent takes a role below medium without the owner's explicit authorization, though the owner may set\n"
+      "   and run it at low.", "night: p2 effort")
+N.sub("1. **Text in git stays the store of record** (NT-14).",
+      "1. **Text in git stays the store of record** (NT-14), and, by the owner's answer, a cloud relational database is\n"
+      "   an accounted extension: a change feed every write joins, and a memory-mirror point an adapter fills for\n"
+      "   real-time sharing across nodes, the database itself planned.", "night: p3 store")
+N.sub("5. **News read at every tool call** (NT-17). dKeptSession gains `mailbox.notice` (`every-tool-call`, `every-item` "
+      "or\n   `off`)",
+      "5. **News at every item, or at every tool call by policy** (NT-17, the owner's default: every item). dKeptSession\n"
+      "   gains `mailbox.notice` (`every-item` by default, `every-tool-call` or `off`)", "night: p3 notice")
+N.sub("build's branch as `build.push` says, every item by default.",
+      "build's branch as `build.push` says, every pass commit by default (the owner's NT-19). A push takes no lock the\n"
+      "  lander holds and runs no gate: a build branch's push skips the bar (110 pushes, median 0.44 s), and CI runs only\n"
+      "  on `main`.", "night: p4 push")
+N.sub("with `refuse` and `record` the other values.", "with `refuse` the other value.", "night: p5 the review's leftover")
+N.sub("value stays the owner's under `budgets.*`, which loses its per-cap mode.",
+      "value stays the owner's under `budgets.*`, which loses its per-cap mode, and the owner may pin named caps to\n"
+      "   refuse through `budgets.pinned` (NT-22).", "night: p5 pins")
+N.sub("The key is an agent count, 5 by default. The owner raises or lowers it by a policy\nwrite (NT-28).",
+      "The key is an agent count, 6 by default by the owner's answer. The owner raises or lowers it\nby a policy write "
+      "(NT-28), and a spawn over it waits in Runtime's admission queue instead of being refused.", "night: p7 key")
+N.sub("## [forks] Parked for the owner, 2026-10-19\n\n",
+      "## [forks] Parked for the owner, 2026-10-19\n\nAnswered by the owner on 2026-10-19, in `[answers]` below.\n\n",
+      "night: forks answered")
+QUOTED = "\n".join(f"| {k} | \"{WORDS[k]}\" |" for k, _ in ANSWERS)
+N.text = N.text.rstrip("\n") + f"""
+
+## [answers] The owner's answers, 2026-10-19
+
+The owner asked, "put the forks to me", and answered them in seven batches, each question with its recommendation
+first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+{QUOTED}
+
+Twenty-two took the recommendation. NT-22 took another listed option, and five answers are the owner's own words:
+- **NT-12.** Effort is the owner's setting: medium by default, and no agent goes below medium without the owner's
+  explicit authorization. It replaces the recommended rule that an experiment record must justify a lower effort.
+- **NT-14.** Text in git stays the record now, and a cloud relational database becomes an accounted extension, so
+  memory is ready for real-time sharing across nodes.
+- **NT-17.** `mailbox.notice` defaults to every item, and every tool call stays a value the owner's policy may set.
+- **NT-19.** `build.push` defaults to every pass commit, settable by policy. The owner's question on contention and
+  gate runs, answered from the tree: a build branch has one writer, a unit branch one each, and a push of a branch
+  other than the default one skips the bar (110 pushes, median 0.44 s), while remote CI runs only on `main`. The one
+  real contention was the lander's lock, which a push no longer takes.
+- **NT-22.** Every size cap sits under the one switch, and the owner may pin named caps to refuse.
+- **NT-28.** The limit takes any count by a policy write and defaults to 6, and a spawn over it waits in a queue
+  instead of being refused.
+
+## [answers-folded] Where the answers went, 2026-10-19
+
+- **Every pending marker** in v2 and the layer records now reads "the owner's NT-x".
+- **NT-12:** dBoundRoles' clause and the two `roles.effort.*` rows. No role declares an effort below medium today:
+  the roles kit's default is medium, and its roles run at medium, high or xhigh.
+- **NT-14:**
+  - a change feed in dPlacedRequest, which dTotalRecall's record writes and dKeptSession's mail writes join;
+  - the memory-mirror point in dWellOiledMachine and Runtime's `[extend]` table;
+  - `memory.mirror`, which presets never touch;
+  - the database itself in v2's `[planned]`;
+  - the memory plan's pockets for the feed, the mirror and point 4's two registers;
+  - `gap-mem-46`.
+- **NT-17:** `mailbox.notice`'s default and presets, dKeptSession's clause and coordination's item 7.
+- **NT-19:** `build.push`'s default and presets, and dWellOiledMachine's clause, a push now free of the lander's lock.
+- **NT-22:** `budgets.pinned`, which presets never touch, and dGroundRules' clause and witness.
+- **NT-28:**
+  - `runtime.agents-in-flight` at 6;
+  - the admission queue in dWellOiledMachine;
+  - layer-runtime's attended entry and `in-flight` fixture, which now queue;
+  - `gap-rt-36`.
+- **The review's leftover.** `[p5-caps]` still listed `record` among `budgets.enforce`'s values, which the review had
+  dropped. It is corrected.
+"""
+N.done += 1
+N.save()
+
+# ---------------------------------------------------------------- every pending marker becomes the owner's
+PAT = re.compile(r"pending (NT-\d+(?:(?:, | and )NT-\d+)*)")
+total = 0
+for name in ("2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md", "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md",
+             "2026-10-14-build-PLAY-dClosedLoop-1-foundations.md", "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md",
+             "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md", "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md",
+             "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md", "2026-10-16-build-PLAY-dClosedLoop-1-systems.md",
+             "2026-10-18-build-PLAY-dClosedLoop-1-fates.md", "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md",
+             "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md"):
+    p = pathlib.Path(B + name)
+    t = p.read_text(encoding="utf-8")
+    t2, n = PAT.subn(r"the owner's \1", t)
+    if n:
+        p.write_text(t2, encoding="utf-8", newline="\n")
+    total += n
+    print(f"{name}: {n} markers")
+print(f"folded the answers; {total} pending markers now the owner's")
+````
+
+### `log_answers.py`
+
+The session log's event for the owner's answers to NT-1 to NT-28.
+
+````python
+"""The session log's event for the owner's answers to NT-1 to NT-28."""
+import pathlib, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: the owner asked for a detailed account of points 2 and 3, given in the session, then
+  "put the forks to me", and answered NT-1 to NT-28 in seven batches, each with its recommendation first
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[answers]`). Twenty-two took the recommendation, and
+  NT-22 took the per-cap pins. Five answers are the owner's own words:
+  - NT-12: effort is the owner's setting, medium by default, and never lowered by an agent;
+  - NT-14: a cloud relational database is an accounted extension, behind a change feed and a memory-mirror point;
+  - NT-17: notices come at every item by default;
+  - NT-19: branches are pushed at every pass commit by default, the owner's question on contention and gate runs
+    answered from the push log and the CI file;
+  - NT-28: the agent limit defaults to 6, and a spawn over it waits in a queue instead of being refused.
+  The answers are folded, adding `gap-mem-46` and `gap-rt-36`.
+""", "the answers' event")
+L.save()
 ````
 
 ### `preset_check_canonical.py`
@@ -17593,6 +17976,10 @@ MINE = [
     ("night2/log_review.py", "The session log's event for the compared and folded review, and the report's link."),
     ("night2/report/gen_report.py", "The owner's report on the night pass two, rendered from the records: the "
      "seven points, the 28 forks read from [forks], the reviews and the project's state."),
+    ("night2/fold_answers.py", "The owner's answers to NT-1 to NT-28, folded: the answers verbatim in the night "
+     "record, the six departures from the recommendation in v2, the layer records, coordination, the memory plan "
+     "and the register, and every pending marker turned into the owner's."),
+    ("night2/log_answers.py", "The session log's event for the owner's answers to NT-1 to NT-28."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
@@ -18571,10 +18958,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:823 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:833 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:823 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:833 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -18622,13 +19009,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2509 nodes in 30 namespaces; 31466 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1722, derived 292, pending 495
+map: 2516 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1727, derived 294, pending 495
 map: no stale facts read 58 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 202 records, 3382 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 202 records, 3386 sections, 202 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -18646,7 +19033,7 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 466 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+chain rows 21 · owned nodes read 469 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
 left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 106 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
@@ -18679,7 +19066,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 351 · chain builds 21
+register keys 353 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -18687,13 +19074,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 241 · presettable 218 · preset rows 218
+catalogue keys 243 · presettable 218 · preset rows 218
 no findings
 rc 0
 
 $ critical path
-critical path: 236 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 10, dSafePassage 22, dFairHearing 38, dOrderedCharter 57, dDeclaredLoop 86, dPlacedRequest 97, dWitnessedBar 115, dKeptSession 119, dTotalRecall 138, dBoundRoles 140, dRankedPlan 154, dFurnishedOrders 160, dLinkedLibrary 163, dIndexedDesign 177, dWellOiledMachine 183, dScopedBuild 196, dTendedCadence 199, dMindYourWords 200, dShippedRelease 210, dCalibratedLens 214, dConvergedCharter 236
+critical path: 238 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 10, dSafePassage 22, dFairHearing 38, dOrderedCharter 57, dDeclaredLoop 86, dPlacedRequest 98, dWitnessedBar 115, dKeptSession 121, dTotalRecall 139, dBoundRoles 140, dRankedPlan 154, dFurnishedOrders 160, dLinkedLibrary 164, dIndexedDesign 178, dWellOiledMachine 185, dScopedBuild 198, dTendedCadence 201, dMindYourWords 202, dShippedRelease 212, dCalibratedLens 216, dConvergedCharter 238
 rc 0
 ````
 
