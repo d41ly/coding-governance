@@ -25,6 +25,14 @@ One of three reviewers wrote about 110 record snapshots into the parent's scratc
 replaced files already there. It reported the overwrite itself. No script of the parent's read those 8, so
 nothing that counted was lost.
 
+It bit again in the stall-and-loop round, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md`).
+Five researchers were told to probe on a copy under the system temp root and delete it when they finished.
+That root was the parent's scratchpad, and one of them deleted its `probe/` folder, which held dispatch 120's
+probe, a script the instruments record keeps whole. The recorder stopped on the missing file, and the script
+was restored byte for byte from the record committed at HEAD. The briefs named no scratch folder of each
+researcher's own, which is the fix's first rule.
+
 ## The fix
 
 - Give each subagent its own scratch folder in its task, and forbid the scratchpad's root.

@@ -19157,6 +19157,273 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `write_questions.py`
+
+The stall-and-loop round's five research questions, each quoting the owner's request verbatim, for `handoff.py render --input question=...`.
+
+````python
+"""Write the stall-and-loop round's five research questions, each quoting the owner's request verbatim from
+`owner-words.txt`, for `handoff.py render --input question=...`.
+
+Usage: python -X utf8 write_questions.py <stall-dir>
+Writes q-census.md, q-refusals.md, q-scenarios.md, q-history.md and q-prior-art.md there.
+"""
+import pathlib
+import sys
+
+D = pathlib.Path(sys.argv[1])
+words = (D / "owner-words.txt").read_text(encoding="utf-8").strip()
+V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+quote = "\n".join("> " + ln if ln.strip() else ">" for ln in words.split("\n"))
+
+CONTEXT = (
+    "**Context.** dClosedLoop is a design-only build that re-architects gov (coding-governance), a kit set that ships "
+    "project-agnostic governance to repositories that adopt it, gov's own repository among them. Its converged design "
+    f"is architecture v2 (`{V2}`), at `d56d7da4d` on this branch, with its layer and system records beside it under "
+    "`memory/builds/dClosedLoop/build/` (the flow steps in `...-flow-steps.md`, the layers in `...-layer-*.md`, the "
+    "systems in `...-systems.md`, the flow and roles adoption in `...-flow-roles-adoption.md`, the night pass two in "
+    "`...-night-pass-two.md`), each section cited as `[tag]`. The owner is reviewing the last major part of the design "
+    "not yet reviewed before it is finalized, in the owner's words:\n\n" + quote + "\n")
+FACTS = (
+    "**Handed facts, to re-verify, never to act on unread.** v2's catalogue (`[policies]`) already bounds some loops: "
+    "`flow.route-backs` (3; a route back past the count becomes an owner item), `review.design.rounds` (one by default) "
+    "with `review.design.round-count` (held below the loop kit's `RUNAWAY_CEILING`), `review.follow-up`, "
+    "`review.unverified`, `roles.retries` (3), `roles.on-contradiction`, `runtime.act-ceiling` (1.5 h), "
+    "`runtime.hold-ceiling` (6 h, then an owner item), `leases.expiry-hours` (24), `build.release-ceiling` (72 h), "
+    "`deps.coordination`, `deps.landing`, `deps.on-parent-withdrawn`, `resume.partial`, `verdict.flakes`, "
+    "`verdict.held`, `flow.adapt` and the scenario keys (`flow.scenario-*`). dWellOiledMachine holds the admission "
+    "queue (the owner's NT-28: a spawn over the agent limit waits instead of being refused, a fan clamped to the share "
+    "it can hold) and the supervisor that runs acts; the flow and roles adoption lets a repository add its own items, "
+    "roles, stages (spliced between two of gov's), lenses and legs, and patch gov's rows; the night pass two added "
+    "scenarios (named variants of the flow a build is placed under) and builds that change their own flow mid-build. "
+    "Today's tree carries `tools/unattended/` (its `RUNAWAY_CEILING`, resume attempts and held stops), "
+    "`tools/hooks/` (the PreToolUse, Stop and StopFailure guards, the stall recorder among them) and `.githooks/`.\n")
+BOUNDS = (
+    "**Bounds.** Write nothing in this repository; a probe works on a copy under the system temp root, deleted when you "
+    "finish. Cite every claim about the records as `<record> [<tag>]` and every claim about code as `path:line`, quote "
+    "commands and their outputs as measured, and say where a source is ambiguous. Another agent may be reading this "
+    "tree while you work: modify nothing in it. Run no gate leg and no test suite.\n")
+OUTSIDE = BOUNDS.replace("Cite every claim about the records", "Cite every claim about an outside system to its source "
+                         "(URL and the date you read it); cite every claim about the records")
+TEAM = ("Five researchers serve this request, one question each: a census of the design's cycles and waits, its "
+        "refusals, concrete stall scenarios, gov's measured history, and prior art outside gov. Yours is {mine}; stay "
+        "inside it, and name a finding that belongs to another only in one line.\n")
+
+Q = {}
+Q["q-census.md"] = CONTEXT + "\n" + FACTS + "\n" + TEAM.format(mine="THE CENSUS") + """
+**Your question.** Every cycle, retry, wait and hold the converged design plans: where it is, what bounds it, what
+happens at the bound, and who sees it.
+1. **Inventory** every place work can repeat or wait: route-backs between steps and items (Test to Build or Design,
+   Build to Design, a reviewer's finding back to its author), review rounds (spec audits, closing reviews, follow-ups,
+   fix passes, the reuse check's re-entries), role retries and contradictions, probes, `flow.adapt` changes and
+   scenario switches, owner items and asks, dependency waits between builds, leases and their reclaim, resume,
+   relaunch and compaction, the admission queue, held and flaky verdict legs, release holds, update re-application
+   (`instructions.stale`), Maintain's and the Loop Review's cadence programs re-filing the same finding, and anything
+   else you find.
+2. **For each:** the bound (key and default, or none), what it counts and per what (item, build, session, node,
+   repository), whether anything resets it (a scenario switch, a resume, a new pass), the progress measure it relies
+   on if any, what happens at the bound (another wait, an owner item, a park, a proceed-with-debt, a refusal), and
+   who notices (journal, card, owner item, Loop Review, nothing).
+3. **Classify** each as bounded with a terminal outcome, bounded but ending in another wait that is itself
+   unbounded (an owner item nobody answers), or unbounded.
+4. **Compose:** for one feature under the defaults, the worst-case number of passes, rounds, retries and resumes the
+   bounds allow together (for example route-backs times review rounds times role retries times resume attempts), and
+   the wall time the ceilings allow; say which products have no ceiling at all.
+
+**Return.** A table, one row per cycle or wait: id, where (`<record> [<tag>]`), what repeats or waits, bound and
+default, counted per, reset by, outcome at the bound, who notices, class. Then the worst-case arithmetic with its
+inputs, then the list of unbounded ones, each with the clause that leaves it unbounded.
+""" + "\n" + BOUNDS
+
+Q["q-refusals.md"] = CONTEXT + "\n" + FACTS + "\n" + TEAM.format(mine="THE REFUSALS") + """
+**Your question.** Every refusal the design plans or today's tree enforces, and whether the actor it refuses can act on
+it, so that a refusal ends in progress and never in a stall.
+1. **Inventory** every refusal: in v2's chain clauses and catalogue (every "refused", "refuse" value and "red" that
+   stops work), the composition and step-gate checks, the write guards, schema refusals, `budgets.enforce` and
+   `instructions.checks`, the roles pack's spawn guard and shape checks, the pre-commit and pre-push hooks, and in
+   today's tree the hooks under `tools/hooks/` and `.githooks/` (PreToolUse, Stop, StopFailure, SubagentStart).
+2. **For each:** who it refuses (a role agent, the driver, an unattended run, the owner), what it tells them, whether
+   the remedy it names is one that actor can perform within its allowance and grant (actionable), what happens on the
+   same refusal again (counted, escalated, routed, or nothing), and whether two refusals can send an actor between them
+   (a guard whose remedy another guard refuses).
+3. **Measure today:** count repeated refusals in this node's own evidence, read-only: the run logs under `.git/` and
+   `tools/runlog/`'s records, the stall recorder's entries, and, for counts and refusal messages only, the session
+   transcripts for this repository under `C:/Users/d41ly/.claude/projects/` whose names start with
+   `C--projects-coding-governance`. Report how often one session met the same refusal twice or more in a row, which
+   guards those were, and how such runs ended.
+4. **Classes:** name the classes of non-actionable refusal you find, for example a remedy that needs a grant the actor
+   lacks, a fact the actor cannot change (another unit's red), a stale state the actor cannot refresh, or a refusal
+   cycle between two guards.
+
+**Return.** A table, one row per refusal: id, where (`<record> [<tag>]` or `path:line`), refuses whom, says what,
+actionable (yes, no, depends), on repeat, cycle partner if any. Then the measured counts with their commands, then the
+non-actionable classes, each with its members.
+""" + "\n" + BOUNDS
+
+Q["q-scenarios.md"] = CONTEXT + "\n" + FACTS + "\n" + TEAM.format(mine="THE SCENARIOS") + """
+**Your question.** Construct concrete scenarios in which the converged design stalls or loops without end, including
+those only a repository's own composition can create.
+1. **Per layer:** for each of instruction, flow, roles, memory and runtime, and the expansions (observability,
+   integrations, distribution), at least four scenarios. Each names its trigger, the cycle or the wait, why the design
+   as written does not stop it (cite the clause, or the missing one), what each turn consumes (agents, tokens, wall
+   time, the bar), and the signal a detector could read (the same finding raised again, the same refusal, no new
+   witness or commit since the last pass, a value oscillating, a state hash repeating, a wait past its deadline).
+2. **Composition:** the chains only a repository's overlay, its stages, scenarios and `flow.adapt` changes can make: a
+   repository stage whose routes lead back into itself, two scenarios handing a build back and forth at step
+   boundaries, additive changes that keep adding items, a repository role whose return the driver can never accept, an
+   item whose witness can never be computed, routes forming a cycle over an acyclic `needs` graph, a patch widening a
+   bound, a repository lens that always finds something.
+3. **Between builds and nodes:** two builds each waiting on the other's interface or landing, lease contention and
+   reclaim cycles, parent withdrawal and replan loops, re-landing after merge conflicts, an inherited red that blocks
+   every landing.
+4. **The owner in the loop:** owner items and asks nobody answers, unattended runs waiting on an absent owner, chains
+   of asks.
+5. **Rank** every scenario by likelihood times cost under the defaults.
+
+**Return.** A table, one row per scenario: id (`SC-<layer>-<n>`), layer, trigger, the cycle or wait, the guard today
+(`<record> [<tag>]`, or none), the detector signal, the cost of one turn, likelihood. Then the top ten by rank, each
+with the one sentence that makes it likely.
+""" + "\n" + BOUNDS
+
+Q["q-history.md"] = CONTEXT + "\n" + FACTS + "\n" + TEAM.format(mine="THE HISTORY") + """
+**Your question.** What stalls and loops has gov actually suffered, and what stopped each, measured from its history?
+1. **Reviews that did not converge:** find the records that moved spec reviews to opt-in and made the closing diff
+   review run once and promote its findings to build units (decision rows, protocol text, the build-method guide, the
+   review protocol), and measure from the review records under `memory/builds/*/reviews/`: rounds per subject,
+   findings per round, how many of a later round's findings the previous round's fold caused, and where the count
+   stopped falling.
+2. **Unattended runs:** from the runs' records (RUN.md files, `tools/runlog/`'s grammar and records, held stops), how
+   many runs stopped held, ran into `RUNAWAY_CEILING` or exhausted resume attempts, how long they ran and what they
+   cost, and why each stopped.
+3. **Stalls the hooks caused:** the stall recorder's entries and any record of an agent unable to satisfy a hook;
+   repeated red bars, inherited reds that blocked landings, flaky legs retried.
+4. **What stopped them:** each mechanism that ended a loop or a stall (a ceiling, an opt-in, an owner decision, a
+   kill) and what it cost; and the loops that ended only because a person noticed.
+
+**Return.** A measured table: case, source (`path` or `<record> [<tag>]`), what looped or stalled, how long or how
+many times, what stopped it, cost. Then the review-convergence curve with its numbers, then the mechanisms that worked
+and those that did not, each with its evidence.
+""" + "\n" + BOUNDS
+
+Q["q-prior-art.md"] = CONTEXT + "\n" + FACTS + "\n" + TEAM.format(mine="PRIOR ART") + """
+**Your question.** How do other systems keep work from stalling or looping without end, and which of their mechanisms
+fit a governed, agentic build loop like gov's?
+1. **Survey** mechanisms in: workflow engines (Temporal's timeouts and retry policies with backoff and maximum
+   attempts, heartbeats; Airflow and Argo retries, timeouts and SLAs), CI systems, Kubernetes (backoff limits, active
+   deadlines, liveness probes, crash-loop backoff), distributed systems (watchdogs, wait-for-graph deadlock detection,
+   circuit breakers, leases with fencing), agent frameworks (LangGraph's recursion limit, AutoGen's termination
+   conditions, CrewAI's iteration and time limits, the OpenAI Agents SDK's and the Claude Agent SDK's turn and budget
+   limits), stuck detection in agentic coding tools (repeated actions or observations, as in OpenHands or SWE-agent),
+   iterative review and its stopping rules (diminishing returns), termination proofs (variant or ranking functions),
+   and workflow-net soundness (the option to complete, proper completion, no dead transitions) with livelock checks.
+2. **For each mechanism:** what it guarantees, how it fails, and the smallest test in gov's setting that would make it
+   lose (a review whose findings never reach zero, a route back that alternates, a hook an agent cannot satisfy, an
+   owner who does not answer).
+3. **Static against dynamic:** which properties can be checked on the composed flow before a build runs (every cycle
+   in the transition graph passes a bounded counter, every wait carries a deadline and an outcome) and which only at
+   run time (no progress in N turns, a repeating state), and what each costs.
+
+**Return.** Candidates, one per mechanism family: mechanism, guarantee, failure mode, losing test and its result where
+you could run one, fit for gov (static check, runtime watchdog, policy bound, escalation). Then a recommended
+combination with the reason each part is in it.
+""" + "\n" + OUTSIDE
+
+for name, text in Q.items():
+    (D / name).write_text(text, encoding="utf-8", newline="\n")
+    print(f"{name}: {len(text)} chars")
+````
+
+### `log_stall_research.py`
+
+The session log's dispatch rows 143 to 147, the derived agent lines and the round's event.
+
+````python
+"""Record the stall-and-loop round's research in the session log: dispatch rows 143 to 147, every agent and returned
+line as the roles kit derived them, and the round's event.
+
+Usage: python -X utf8 log_stall_research.py <agent-lines-143-147.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+got = [ln for ln in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+       if ln.startswith(("- agent —", "- returned —"))]
+if len(got) != 10:
+    sys.exit(f"10 agent and returned lines expected, read {len(got)}")
+F = "`" * 3
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row142 = [ln for ln in L.text.split("\n") if ln.startswith("| 142 |")]
+if len(row142) != 1:
+    sys.exit("no single dispatch row 142")
+WHO = "gov-researcher, at the owner's medium effort"
+P = "`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-{}-researcher.md`"
+R = "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-{}.md`"
+Q = "Stall and loop prevention: "
+ROWS = [
+    (143, Q + "every cycle, retry, wait and hold in the converged design, its bound and its outcome", 18,
+     "returned, 9m13s, 47.4k out: 54 cycles and waits, 19 kinds unbounded; 384 return attempts on one chain before an "
+     "owner item", "census"),
+    (144, Q + "every refusal, and whether its target can act on it", 19,
+     "returned, 12m58s, 60.5k out: no refusal counted; six classes its target cannot act on; one rule refusing a "
+     "builder 10 times in a row", "refusals"),
+    (145, Q + "concrete stall and loop scenarios, a repository's own compositions included", 20,
+     "returned, 11m27s, 60.1k out: 68 scenarios, the top ten ranked by likelihood times cost", "scenarios"),
+    (146, Q + "gov's measured history of stalls and loops, and what stopped each", 21,
+     "returned, 9m05s, 50.7k out: findings flat across rounds, a fold causing 68% to 97% of the next; "
+     "`RUNAWAY_CEILING` never fired; all 23 resumes manual", "history"),
+    (147, Q + "how other systems bound loops and waits, and which mechanisms fit gov", 22,
+     "returned, 9m21s, 45.3k out: a per-build budget, the strict-decrease rule, deadlines, a refusal breaker and a "
+     "static check, each probed", "prior-art"),
+]
+new = "".join(f"| {n} | {WHO} | {what} | {P.format(p)} | 1799cb98 | {out} | {R.format(r)} |\n"
+              for n, what, p, out, r in ROWS)
+L.sub(row142[0] + "\n", row142[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n",
+                "\nThe stall-and-loop round's research, dispatches 143 to 147, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(got) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner asked for the last major part of the design not yet reviewed, stall
+  prevention and loop detection, in words recorded verbatim in `{REC}` `[words]`. Five researchers took one question
+  each, dispatches 143 to 147, at the owner's medium effort, and their returns are saved beside the record. The record
+  answers the owner's two questions: no single system exists, and the one it recommends is a core contract that Flow
+  owns and Runtime enforces. It recommends P39 and eleven mechanisms placed on ten builds, proposes seven gaps, and
+  puts SL-1 to SL-8 to the owner.
+""", "the round's event")
+L.save()
+````
+
+### `restore_c2.py`
+
+Restores dispatch 120's probe, `probe/c2.py`, from the instruments record committed at HEAD, after a researcher of the stall-and-loop round deleted the scratchpad's `probe/` folder.
+
+````python
+"""Restore probe/c2.py, dispatch 120's probe, from the instruments record committed at HEAD, where it is kept whole.
+A researcher of the stall-and-loop round deleted the scratchpad's `probe/` folder, which held it.
+
+Usage: python -X utf8 restore_c2.py <instruments record at HEAD> <scratchpad>
+"""
+import pathlib
+import sys
+
+text = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+head = "### `c2.py`, dispatch 120\n\n"
+if text.count(head) != 1:
+    sys.exit(f"the c2.py heading matches {text.count(head)} times")
+rest = text.split(head, 1)[1]
+fence = "`" * 4
+if not rest.startswith(fence + "python\n"):
+    sys.exit("no python fence after the heading")
+body = rest[len(fence + "python\n"):].split("\n" + fence + "\n", 1)[0]
+out = pathlib.Path(sys.argv[2]) / "probe" / "c2.py"
+out.parent.mkdir(exist_ok=True)
+out.write_text(body + "\n", encoding="utf-8", newline="\n")
+print(f"restored {out}: {len(body) + 1} bytes")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -19532,6 +19799,9 @@ MINE = [
     ('night2/tag/where_keys.py', 'Each use of the four `policy.*` keys with its section, to judge living text from a dated note.'),
     ('night2/tag/fold_tag_grammar.py', "The owner's second tag-grammar answer: the four keys renamed `policy-file.*` in the living text, the core shape check and its arming over the catalogue, the lexicon's tag-name check widened, `gap-lex-10`, dry-run on a full copy of the tree first."),
     ('night2/tag/log_tag_grammar.py', "The session log's event for the owner's second tag-grammar answer."),
+    ('stall/write_questions.py', "The stall-and-loop round's five research questions, each quoting the owner's request verbatim, for `handoff.py render --input question=...`."),
+    ('stall/log_stall_research.py', "The session log's dispatch rows 143 to 147, the derived agent lines and the round's event."),
+    ('stall/restore_c2.py', "Restores dispatch 120's probe, `probe/c2.py`, from the instruments record committed at HEAD, after a researcher of the stall-and-loop round deleted the scratchpad's `probe/` folder."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -20593,13 +20863,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2529 nodes in 30 namespaces; 31568 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1739, derived 295, pending 495
-map: no stale facts read 60 records and 23 quotes of a map count or the critical path
+map: 2540 nodes in 30 namespaces; 31663 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1750, derived 295, pending 495
+map: no stale facts read 61 records and 23 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 208 records, 3491 sections, 202 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 214 records, 3540 sections, 205 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state

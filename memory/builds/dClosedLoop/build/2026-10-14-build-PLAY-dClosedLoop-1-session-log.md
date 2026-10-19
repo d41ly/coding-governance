@@ -204,6 +204,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 140 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The flow and roles adoption, reviewed twice at the owner's word: `e1a54ac67` over `67995cb6f`, the design, the owner's FA-1 to FA-7 folded and the namespaces | the args, built by `build_args_pairs.py` | 1799cb98 | returned as `wf_75d61367-fe8`, CLEAN WITH FIXES, 18 of 21 confirmed, 14 items, 1 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-flow-adoption-b.md` |
 | 141 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The owner's answers to the night pass two's forks, reviewed twice at the owner's word: `f8ad789e1` over `f064bf378`, NT-1 to NT-28 folded | the args, built by `build_args_pairs.py` | 1799cb98 | returned as `wf_19434550-87a`, CLEAN WITH FIXES, 21 of 27 confirmed, 17 items, 1 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-answers-a.md` |
 | 142 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The owner's answers to the night pass two's forks, reviewed twice at the owner's word: `f8ad789e1` over `f064bf378`, NT-1 to NT-28 folded | the args, built by `build_args_pairs.py` | 1799cb98 | returned as `wf_035611d1-d5f`, CLEAN WITH FIXES, 17 of 27 confirmed, 15 items, 1 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-answers-b.md` |
+| 143 | gov-researcher, at the owner's medium effort | Stall and loop prevention: every cycle, retry, wait and hold in the converged design, its bound and its outcome | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-18-researcher.md` | 1799cb98 | returned, 9m13s, 47.4k out: 54 cycles and waits, 19 kinds unbounded; 384 return attempts on one chain before an owner item | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-census.md` |
+| 144 | gov-researcher, at the owner's medium effort | Stall and loop prevention: every refusal, and whether its target can act on it | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-19-researcher.md` | 1799cb98 | returned, 12m58s, 60.5k out: no refusal counted; six classes its target cannot act on; one rule refusing a builder 10 times in a row | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-refusals.md` |
+| 145 | gov-researcher, at the owner's medium effort | Stall and loop prevention: concrete stall and loop scenarios, a repository's own compositions included | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-20-researcher.md` | 1799cb98 | returned, 11m27s, 60.1k out: 68 scenarios, the top ten ranked by likelihood times cost | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-scenarios.md` |
+| 146 | gov-researcher, at the owner's medium effort | Stall and loop prevention: gov's measured history of stalls and loops, and what stopped each | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-21-researcher.md` | 1799cb98 | returned, 9m05s, 50.7k out: findings flat across rounds, a fold causing 68% to 97% of the next; `RUNAWAY_CEILING` never fired; all 23 resumes manual | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-history.md` |
+| 147 | gov-researcher, at the owner's medium effort | Stall and loop prevention: how other systems bound loops and waits, and which mechanisms fit gov | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-22-researcher.md` | 1799cb98 | returned, 9m21s, 45.3k out: a per-build budget, the strict-decrease rule, deadlines, a refusal breaker and a static check, each probed | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-prior-art.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1621,6 +1626,21 @@ The owner's answers' closing review, dispatches 141 and 142, derived from each r
 - returned — gov-synthesizer · wrote 1 file · 2m24s · 20.2k out · run wf_035611d1-d5f/abf46e5ba7f566d63
 ```
 
+The stall-and-loop round's research, dispatches 143 to 147, derived from each run the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-18-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-18-researcher.md) · writes none · gates none · run direct/a5bf213f4f75794bb
+- returned — gov-researcher · wrote 0 files · 9m13s · 47.4k out · run direct/a5bf213f4f75794bb
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-19-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-19-researcher.md) · writes none · gates none · run direct/ac8b50e4a7d24adf7
+- returned — gov-researcher · wrote 0 files · 12m58s · 60.5k out · run direct/ac8b50e4a7d24adf7
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-20-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-20-researcher.md) · writes none · gates none · run direct/aa2b847f9e18fa488
+- returned — gov-researcher · wrote 0 files · 11m27s · 60.1k out · run direct/aa2b847f9e18fa488
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-21-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-21-researcher.md) · writes none · gates none · run direct/a5ee4a8122bc3022e
+- returned — gov-researcher · wrote 0 files · 9m05s · 50.7k out · run direct/a5ee4a8122bc3022e
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-22-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-22-researcher.md) · writes none · gates none · run direct/a78b20e7c94aff2eb
+- returned — gov-researcher · wrote 0 files · 9m21s · 45.3k out · run direct/a78b20e7c94aff2eb
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2716,6 +2736,13 @@ The owner's answers' closing review, dispatches 141 and 142, derived from each r
   the name-check point, now grades every tag's name and policy key, answers tag names through `--suggest` and reads
   the namespace words from the same registry. `gap-lex-10` records that today's lexicon grades four code surfaces
   only.
+
+- 2026-10-19, session 1799cb98: the owner asked for the last major part of the design not yet reviewed, stall
+  prevention and loop detection, in words recorded verbatim in `build/2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md` `[words]`. Five researchers took one question
+  each, dispatches 143 to 147, at the owner's medium effort, and their returns are saved beside the record. The record
+  answers the owner's two questions: no single system exists, and the one it recommends is a core contract that Flow
+  owns and Runtime enforces. It recommends P39 and eleven mechanisms placed on ten builds, proposes seven gaps, and
+  puts SL-1 to SL-8 to the owner.
 
 ## Instruments
 
