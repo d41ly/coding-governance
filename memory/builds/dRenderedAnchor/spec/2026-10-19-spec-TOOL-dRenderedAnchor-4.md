@@ -8,6 +8,7 @@
 |---|---|---|
 | [2026-10-19-build-TOOL-dRenderedAnchor-4-1-acceptance-ledger.md](../build/2026-10-19-build-TOOL-dRenderedAnchor-4-1-acceptance-ledger.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-4-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-4-brief.md) | research | — |
+| [2026-10-19-review-TOOL-dRenderedAnchor-4-closing-diff-round4.md](../reviews/2026-10-19-review-TOOL-dRenderedAnchor-4-closing-diff-round4.md) | diff-review | TOOL-dRenderedAnchor-3 |
 
 <!-- /gen:spec-records -->
 
