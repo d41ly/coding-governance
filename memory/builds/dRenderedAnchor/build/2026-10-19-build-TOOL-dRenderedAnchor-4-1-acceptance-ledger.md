@@ -52,3 +52,11 @@ built as the suite's `build_fixture` builds one, at short `%TEMP%` paths.
   commit holds, every leading docstring dropped, and printed `equal`; line 626 is unmoved. The
   adopter diff from `340be90b` piped to `grep -c '^[-+][^-+#]'` printed 0. Red half: the same
   program over the fixture's copy with line 626 staged as `here = kit` printed `DIFFER`.
+
+## The close's observations
+
+Run by the main loop at `6d560aed2`, before the closing review.
+
+- `New arm:` arm 17 — RED with `tools/roles/roles_lib.py:626` written as `here = kit`, the C2
+  break: `adopt-roles.test.sh` exited 1, `FAIL (1 of 62)`, on arm 17 alone. GREEN with the file
+  restored by `git checkout`: exit 0, `PASS (62 assertions)`.
