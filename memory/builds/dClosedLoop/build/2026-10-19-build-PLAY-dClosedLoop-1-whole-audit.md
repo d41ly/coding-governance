@@ -280,6 +280,46 @@ Each goes to the walk as a lead beside Stage 0's reds, and to the audit's fold:
   the working tree but the brief itself. The scoring reports walker 5's hits with this noted. Run A's returns wait
   outside the scratchpad, where run B's walkers keep their own scratch folders.
 
+### [walk-run-a] Run A, returned
+
+Five walks, 73 findings, every walk table complete: walker 1 11, walker 2 11, walker 3 20, walker 4 20 and walker 5 11.
+A read audit of each walker's transcript (`read_audit.py`, every Read, Grep, Glob and Bash call) found that walker 3
+read nothing outside the copy but folder listings and its own brief. Walker 1 also read lines of two of the copy's
+comparison records, the parked-debt and the layers ones, which run A's brief allowed and which describe earlier findings
+and their fixes. Walkers 2, 4 and 5 read the working tree's round record, whose `[recall]` then named the two
+mechanical plants' kinds, and only walker 5 said so. No walker of run A read the sealed key, its script or another
+walker's return, none read the copy's reviews, and none read anything in the scratchpad but its own files. The two mechanical plants are
+therefore scored as Stage 0's, which caught both on the copy, and the walkers' recall over the ten judgement plants.
+
+### [walk-run-b] Run B's first dispatch, and the seal repaired
+
+Walker 2 walked its band, 20 findings over 168 cells, disclosing that it read the working tree's round record first.
+Walkers 1, 3, 4 and 5 reviewed their briefs instead of walking: the reading rule added before run B drew them to the
+brief's seal, and they found its holes, each real.
+- The key, the seeding script and run A's returns sat in the temp root beside the copy. Walkers 4 and 5 listed them and
+  hashed the key, and walker 4 read the plant labels in the script; none of them walked.
+- The copy's reviews and comparison records describe the plants' original findings and their fixes, so a walker that
+  reads the history can find a plant without walking to it.
+- The scratchpad held Stage 0's run on the copy, unplanted copies of the design from dry runs, and older snapshots,
+  beside the walkers' scratch folders.
+- The brief named no item tags, so the expansions' items, and `test.seed`'s place in the adopt step, were guesses.
+- The walk's failure-mode and STRIDE readings have no slot in the return and no check.
+
+Repaired before the re-dispatch: the key, the script and every return, and run A's scratch folders, moved out of the
+temp root, and the scratchpad's dry-run trees, snapshots, atlas pages and Stage 0's run on the copy with them. The
+brief now opens with its task, lists the only places a walker may read (the copy's design records but its comparison,
+instruments and session-log records, its reviews and its prompts; the map; Stage 0's leads; code; the walker's own
+scratch folder, outside the scratchpad), names every item its table owes, and asks for a line naming any read outside
+the list. Walkers 1, 3, 4 and 5 walk again as dispatches 170 to 173, their handoffs
+`prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-11-spec-reviewer.md` to `...-14-spec-reviewer.md`, on the same copy. The
+missing failure-mode and STRIDE slots are the walk kit's defect, for the fold to route to dFairHearing's walk preset.
+
+The working tree is an unplanted copy of every design record, and no move can take it out of a walker's reach, so the
+seal is the allow-list and the read audit, not distance. The audit gained two classes for it: any path into the
+scratchpad, and any path into the temp root outside `seed-dcl/`, where the copy and the walkers' scratch now live. Both
+red on walkers 4 and 5's brief reviews, which listed the temp root and found the key there. The four brief reviews are
+kept apart from the walk returns, so the walks take the returns' names, and are committed beside them after the scoring.
+
 ## [stage0-classes] Stage 0's classes
 
 Empty until the audit's fold classes what it does not fix.

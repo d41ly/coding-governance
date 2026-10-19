@@ -2,33 +2,38 @@
 
 **Serves:** research PLAY-dClosedLoop-1
 
-You are one of five walkers in run B of the whole-design audit of dClosedLoop's design
-(`C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`, whose `[scenarios]`, `[walk-table]` and `[rubric]` you follow). Walk the design as the slice below says,
-item by item, and report every defect you can show. A second run walks the same design sliced the other way; you
-will not see its findings, and it will not see yours.
+**Your task is to walk dClosedLoop's design and report its defects.** This brief is your instructions, not the
+subject of your review: do not review it, the audit's seal or its instruments. A defect you see in them goes in one line
+at the end of your return, and nowhere else.
 
-## Where you read
+You are one of five walkers in run B of the whole-design audit. Walk the design in the sealed copy as the slice
+below says, item by item, following the copy's round record (`C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`, its `[scenarios]`, `[walk-table]` and
+`[rubric]`), and report every defect you can show. A second run walks the same design sliced the other way.
 
-- **Nothing under `memory/` in the working tree but this brief:** not the round record, not the other briefs, not
-  the reviews. The working tree's records differ from the copy's, and reading them spoils the walk.
-- **Every design record from the sealed copy only:** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/memory/builds/dClosedLoop/build/`. The copy is the
-  design under audit. Never read the design records in the working tree, never diff the copy against it, and never read
-  git history for them: the copy differs on purpose, and a finding cited from anywhere else is not scored.
-- **Code** under `tools/`, `skills/` and `.githooks/` from the working tree, to test a claim the design makes about
-  today.
-- **The design map at level 0:** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/design-map.txt`, as your index.
-- **Stage 0's leads for your slice:** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/stage0-leads.md`, the mechanical checks' reds and what they do not read.
+## What you may read, and nothing else
 
-Known defects were planted in the copy before you started, and a sealed key lists them; its SHA-256, fixed before
-launch, is `505c52433040b18b95d5da9021b5ad0feada756b88290857a1b9eee9c4b837b7`. Look for every defect the same way: a planted one is scored like any other finding.
+1. **The sealed copy's design records,** under `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/memory/builds/dClosedLoop/build/`, but not its
+   `*-compared.md`, `*-instruments.md` or session-log records, and nothing in the copy's `reviews/` or `prompts/`: the
+   walk reads the design, never its review history.
+2. **The design map,** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/design-map.txt`, as your index, and **Stage 0's leads,** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/stage0-leads.md`, its whole run on
+   the working tree: take the leads your slice reaches.
+3. **Code** under the working tree's `tools/`, `skills/` and `.githooks/`, to test a claim the design makes about
+   today, and the working tree's `memory/guides/` where your role's protocol sends you.
+4. **This brief,** and your own scratch folder, `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/scratch/walk-b5/`.
+
+Read nothing else: not the working tree's other records, not the session's scratchpad or temp folders, not other
+briefs, not git history, and run no instrument from the copy against the copy. The copy differs from the working tree
+on purpose: known defects were planted in it before you started, and a sealed key lists them, its SHA-256 fixed before
+launch as `505c52433040b18b95d5da9021b5ad0feada756b88290857a1b9eee9c4b837b7`. Look for every defect the same way, since a planted one is scored like any other finding.
 
 Read `flow-steps` whole, then v2 (`architecture-v2`): the `[chain]` rows of your builds, the `[policies]` keys your
-items read, and `[principles]` and `[enforcement]` for your principles. For S2 read `layer-runtime`, `cloud-and-scale` and `stall-and-loop` too. For S4 read `adopter-instructions`, `flow-roles-adoption`, `fates` and `layer-expansions` too.
+items read, and `[principles]` and `[enforcement]` for your principles. For S2 read `layer-runtime`, `cloud-and-scale` and `stall-and-loop` too. For S4 read `adopter-instructions`, `flow-roles-adoption`, `fates` and `layer-expansions` too. The expansions' items are the rows of `layer-expansions`' Item tables: read it for them.
 
 ## Your slice
 
 - **Scenarios:** S1, S2, S3, S4, S5, S6, S7
 - **Steps:** adopt (5 items), expansions (26 items)
+- **Items, each a row in every scenario of your slice:** adopt: `adopt.census`, `test.seed`, `adopt.practices`, `adopt.decisions`, `adopt.reconstruct`; expansions: `maintain.lease`, `maintain.read`, `maintain.direct`, `maintain.patch`, `maintain.file`, `maintain.levels`, `maintain.record`, `loop.lease`, `loop.gather`, `loop.price`, `loop.propose`, `loop.file`, `loop.record`, `release.pick`, `release.approve`, `release.promote`, `release.verify`, `release.route`, `release.record`, `kits.version`, `kits.cut`, `kits.currency`, `kits.adopters`, `kits.offer`, `kits.install`, `kits.update`
 - **Builds you give a verdict:** dLinkedLibrary, dTotalRecall, dTendedCadence, dMindYourWords, dOrderedCharter
 - **Principles you give a verdict:** P6, P13, P14, P28, P30, P32, P33, P34, P35
 
@@ -72,6 +77,7 @@ Your final message, in this order, nothing else:
    `| item | S<n> | actor | needs | witness | route | verdict |`, a cell that reads as declared written `=`.
 4. **Build verdicts,** `| <build> | holds |` or `| <build> | <finding ids> |`.
 5. **Principle verdicts,** `| P<n> | holds |` or `| P<n> | <finding ids> |`.
+6. **Read outside the list above:** `none`, or each path you read outside it and why.
 
 A row missing, an empty cell, or a verdict outside the grammar fails your return. Write nothing to the repository;
-any probe you run writes under `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/walk-b5/` only. Your effort is the owner's medium.
+any probe you run writes under `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/scratch/walk-b5/` only. Your effort is the owner's medium.

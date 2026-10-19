@@ -9,8 +9,10 @@ step and the expansions' items, read through the atlas's derivation.
 
 Usage (from the worktree root):
   python walk.py brief --run A|B --seeded <tree> --leads <file> --key-sha <hex> --out <dir> [--scratch <dir>]
-      writes the run's five walker briefs into <dir>, each naming the sealed copy it reads, Stage 0's leads and the
-      sealed key's SHA-256, which no brief renders without.
+                      [--walkers 1,3]
+      writes the run's walker briefs into <dir>, all five or those --walkers names, each naming the sealed copy, the
+      only places its walker may read, every item its table owes, Stage 0's leads and the sealed key's SHA-256, which
+      no brief renders without.
   python walk.py check --run A|B --walker <n> <return.md> [--plant <case>]
       one walker's return: every cell of its slice, every build and principle it owes, each in the grammar.
   python walk.py check --run A|B --report <report.md> [--plant <case>]
@@ -185,25 +187,29 @@ TEMPLATE = """# Walk brief: run {run}, walker {walker}
 
 **Serves:** research PLAY-dClosedLoop-1
 
-You are one of five walkers in run {run} of the whole-design audit of dClosedLoop's design
-(`{seeded}/{round}`, whose `[scenarios]`, `[walk-table]` and `[rubric]` you follow). Walk the design as the slice below says,
-item by item, and report every defect you can show. A second run walks the same design sliced the other way; you
-will not see its findings, and it will not see yours.
+**Your task is to walk dClosedLoop's design and report its defects.** This brief is your instructions, not the
+subject of your review: do not review it, the audit's seal or its instruments. A defect you see in them goes in one line
+at the end of your return, and nowhere else.
 
-## Where you read
+You are one of five walkers in run {run} of the whole-design audit. Walk the design in the sealed copy as the slice
+below says, item by item, following the copy's round record (`{seeded}/{round}`, its `[scenarios]`, `[walk-table]` and
+`[rubric]`), and report every defect you can show. A second run walks the same design sliced the other way.
 
-- **Nothing under `memory/` in the working tree but this brief:** not the round record, not the other briefs, not
-  the reviews. The working tree's records differ from the copy's, and reading them spoils the walk.
-- **Every design record from the sealed copy only:** `{seeded}/memory/builds/dClosedLoop/build/`. The copy is the
-  design under audit. Never read the design records in the working tree, never diff the copy against it, and never read
-  git history for them: the copy differs on purpose, and a finding cited from anywhere else is not scored.
-- **Code** under `tools/`, `skills/` and `.githooks/` from the working tree, to test a claim the design makes about
-  today.
-- **The design map at level 0:** `{seeded}/design-map.txt`, as your index.
-- **Stage 0's leads for your slice:** `{leads}`, the mechanical checks' reds and what they do not read.
+## What you may read, and nothing else
 
-Known defects were planted in the copy before you started, and a sealed key lists them; its SHA-256, fixed before
-launch, is `{key_sha}`. Look for every defect the same way: a planted one is scored like any other finding.
+1. **The sealed copy's design records,** under `{seeded}/memory/builds/dClosedLoop/build/`, but not its
+   `*-compared.md`, `*-instruments.md` or session-log records, and nothing in the copy's `reviews/` or `prompts/`: the
+   walk reads the design, never its review history.
+2. **The design map,** `{seeded}/design-map.txt`, as your index, and **Stage 0's leads,** `{leads}`, its whole run on
+   the working tree: take the leads your slice reaches.
+3. **Code** under the working tree's `tools/`, `skills/` and `.githooks/`, to test a claim the design makes about
+   today, and the working tree's `memory/guides/` where your role's protocol sends you.
+4. **This brief,** and your own scratch folder, `{scratch}`.
+
+Read nothing else: not the working tree's other records, not the session's scratchpad or temp folders, not other
+briefs, not git history, and run no instrument from the copy against the copy. The copy differs from the working tree
+on purpose: known defects were planted in it before you started, and a sealed key lists them, its SHA-256 fixed before
+launch as `{key_sha}`. Look for every defect the same way, since a planted one is scored like any other finding.
 
 Read `flow-steps` whole, then v2 (`architecture-v2`): the `[chain]` rows of your builds, the `[policies]` keys your
 items read, and `[principles]` and `[enforcement]` for your principles. {extra}
@@ -212,6 +218,7 @@ items read, and `[principles]` and `[enforcement]` for your principles. {extra}
 
 - **Scenarios:** {scenarios}
 - **Steps:** {steps}
+- **Items, each a row in every scenario of your slice:** {items}
 - **Builds you give a verdict:** {builds}
 - **Principles you give a verdict:** {principles}
 
@@ -249,15 +256,17 @@ Your final message, in this order, nothing else:
    `| item | S<n> | actor | needs | witness | route | verdict |`, a cell that reads as declared written `=`.
 4. **Build verdicts,** `| <build> | holds |` or `| <build> | <finding ids> |`.
 5. **Principle verdicts,** `| P<n> | holds |` or `| P<n> | <finding ids> |`.
+6. **Read outside the list above:** `none`, or each path you read outside it and why.
 
 A row missing, an empty cell, or a verdict outside the grammar fails your return. Write nothing to the repository;
 any probe you run writes under `{scratch}` only. Your effort is the owner's medium.
 """
 EXTRA = {"S2": "For S2 read `layer-runtime`, `cloud-and-scale` and `stall-and-loop` too.",
-         "S4": "For S4 read `adopter-instructions`, `flow-roles-adoption`, `fates` and `layer-expansions` too."}
+         "S4": "For S4 read `adopter-instructions`, `flow-roles-adoption`, `fates` and `layer-expansions` too.",
+         "expansions": "The expansions' items are the rows of `layer-expansions`' Item tables: read it for them."}
 
 
-def brief(run, seeded, leads, out_dir, scratch, key_sha):
+def brief(run, seeded, leads, out_dir, scratch, key_sha, walkers=None):
     if not key_sha or not re.fullmatch(r"[0-9a-f]{64}", key_sha):
         fail("--key-sha takes the sealed key's SHA-256, 64 hex digits, pinned before any brief is rendered")
     text, scen, slices = load()
@@ -265,14 +274,15 @@ def brief(run, seeded, leads, out_dir, scratch, key_sha):
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     for (r, w), sl in sorted(slices.items()):
-        if r != run:
+        if r != run or (walkers and w not in walkers):
             continue
         steps = list(by_step) if sl["steps"] == ["all"] else sl["steps"]
-        extra = " ".join(EXTRA[s] for s in sl["scenarios"] if s in EXTRA)
+        extra = " ".join(EXTRA[s] for s in sl["scenarios"] + steps if s in EXTRA)
         scenario_text = "\n".join(f"- **{s}, {scen[s][1]}:** {scen[s][2]} Injected or probed: {scen[s][3]}"
                                   for s in sl["scenarios"])
+        items = "; ".join(f"{s}: " + ", ".join(f"`{t}`" for t in by_step[s]) for s in steps)
         body = TEMPLATE.format(run=run, walker=w, round=ROUND, seeded=Path(seeded).as_posix(), leads=leads, key_sha=key_sha,
-                               extra=extra, scenarios=", ".join(sl["scenarios"]),
+                               extra=extra, scenarios=", ".join(sl["scenarios"]), items=items,
                                steps=", ".join(f"{s} ({len(by_step[s])} items)" for s in steps),
                                builds=", ".join(sl["builds"]), principles=", ".join(sl["principles"]),
                                scenario_text=scenario_text, scratch=f"{Path(scratch).as_posix()}/walk-{run.lower()}{w}/")
@@ -434,8 +444,9 @@ def main(argv):
     if run not in ("A", "B"):
         fail("--run is A or B")
     if argv[0] == "brief":
+        walkers = [int(w) for w in opt(argv, "--walkers").split(",")] if opt(argv, "--walkers") else None
         return brief(run, opt(argv, "--seeded"), opt(argv, "--leads"), opt(argv, "--out"),
-                     opt(argv, "--scratch") or "<the session's scratchpad>", opt(argv, "--key-sha"))
+                     opt(argv, "--scratch") or "<the session's scratchpad>", opt(argv, "--key-sha"), walkers)
     if argv[0] == "skeptic":
         return skeptic(run, opt(argv, "--returns"), opt(argv, "--seeded"), opt(argv, "--out"),
                        opt(argv, "--scratch") or "<the session's scratchpad>")
