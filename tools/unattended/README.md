@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.108 -->
+<!-- gov:kit unattended@1.109 -->
 # The unattended-run kit
 
 The binding contract is not here. It is `UNATTENDED-PROTOCOL.md` together with
@@ -55,6 +55,19 @@ nested and the flat spelling, and refuses when git tracks neither. Nothing is wr
 `MEMORY_TREE_DIR=<dir>` in the environment overrides the probe, and it must name a directory whose
 `gotchas.py` is tracked. The review-harness kit's build harness carries the same command and fills
 it the same way.
+
+**The Skill's harness citations resolve through the install receipt first** (`TOOL-dRenderedAnchor-6`).
+Its `{{TOOL_ROOT}}<home>/<file>` citations name the review-harness kit's build harness and the child
+it hands out, and govkit homes that kit by its entry id, so the tool root plus gov's home for them
+names nothing in an adopter. The adopter derives them with `derive_kit_paths` over the Skill's
+template, the receipt row first, and applies each held one whole before the plain `{{TOOL_ROOT}}`.
+`--check` derives the same way, so it grades exactly what a render writes. A harness the
+review-harness kit's hand render has not written yet is not held, so run this adopter after that
+render; run before it, `--check` reads the Skill out of sync and names the re-render.
+A held citation whose path is empty or holds a character outside `[A-Za-z0-9._/+@-]` is refused at
+exit 2, in both modes and before anything is written, with one line naming the citation and its
+path (`TOOL-dRenderedAnchor-7`): the Skill tells an agent to run it, where a space splits the
+command. Fix the install receipt row that places it.
 
 ## The fixture is rendered, and this is the one thing to know about it
 

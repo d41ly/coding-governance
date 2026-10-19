@@ -24,6 +24,16 @@
 # would answer for the wrong tree in one of the two callers, which is how the second spelling was
 # born in the first place.
 # DEPL-dCarriedReceipt-15 S6.
+#
+# THE THIRD BLOCK, `render_kit_cites` (TOOL-dRenderedAnchor-6 S1), is `render_doc`'s apply loop with
+# one filter, for a renderer that owns none of the conf facts above: the review-harness kit's parity
+# script and the unattended adopter each carry it inline, after `{{KIT_DIR}}` and before their own
+# `{{TOOL_ROOT}}`, so a harness citation names the path the install receipt holds.
+#
+# THE FOURTH BLOCK, `check_kit_cites` (TOOL-dRenderedAnchor-7 S3), is the charset guard over exactly
+# the lines `render_kit_cites` applies. A receipt row's `path` is what a citation's value is made of,
+# and both renderers already refuse their own substituted paths outside the same set, so each carries
+# it inline and calls it right after its derivation, before anything is written.
 
 # >>> render_doc — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 render_doc() {
@@ -149,7 +159,7 @@ def emit(p, v):
     print("%s\t%s" % (p, v))
 
 
-kit = pathlib.Path(sys.argv[1]).resolve()
+kit = pathlib.Path(sys.argv[1]).absolute()
 root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
 cites = []
 seen = ""
@@ -266,3 +276,35 @@ if pfx and pfx != ".":
 ' "$2" "${@:3}"
 }
 # <<< derive_kit_paths
+
+# >>> render_kit_cites — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `render_kit_cites` rewrites the CALLER's `out`, by dynamic scope as `render_doc` reads the caller's
+# KIT_REL, with every `{{TOOL_ROOT}}<home>/<file><TAB><path>` line of KIT_PATHS, each cite replaced
+# whole. A bare `{{TOOL_ROOT}}` line and an adopter-placeholder line are left unapplied: the caller
+# derives its tool root from its own location, and a receipt prefix beside it is a second answer.
+render_kit_cites() {
+  local kp kv
+  while IFS=$'\t' read -r kp kv; do
+    case "$kp" in '{{TOOL_ROOT}}'?*) out=${out//"$kp"/"$kv"} ;; esac
+  done <<<"${KIT_PATHS//$'\r'/}"
+}
+# <<< render_kit_cites
+
+# >>> check_kit_cites — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `check_kit_cites <label> <kit paths>` returns 2 at the first `{{TOOL_ROOT}}<home>/<file>` line
+# whose path is empty or holds a character outside [A-Za-z0-9._/+@-], printing one line naming the
+# cite and the path, and 0 otherwise. It reads exactly the lines `render_kit_cites` applies: a bare
+# `{{TOOL_ROOT}}` line and an adopter-placeholder line carry phrases with spaces, never applied here.
+check_kit_cites() {
+  local kp kv
+  while IFS=$'\t' read -r kp kv; do
+    case "$kp" in '{{TOOL_ROOT}}'?*) ;; *) continue ;; esac
+    case "$kv" in
+      ''|*[!A-Za-z0-9._/+@-]*)
+        echo "$1: the citation $kp resolves to '$kv', which is empty or holds a character outside [A-Za-z0-9._/+@-]. A citation lands in a JS string literal and in commands an agent runs, where a quote ends the string and a space splits the command. Fix the install receipt row that places it."
+        return 2 ;;
+    esac
+  done <<<"${2//$'\r'/}"
+  return 0
+}
+# <<< check_kit_cites

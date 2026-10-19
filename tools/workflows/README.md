@@ -52,6 +52,32 @@ which skips by name any pair whose live copy is absent and untracked, because go
 a regenerate writes. So an install that never took `REVIEW-PROTOCOL.md` does not receive one from
 an update. To install it, run `--render` by hand and commit what it writes.
 
+**A harness citation resolves through the install receipt first** (`TOOL-dRenderedAnchor-6`).
+govkit homes this kit by its entry id, so an adopter's directory need not carry gov's name for it,
+and the tool root plus gov's home for a harness names nothing there. So before the plain
+`{{TOOL_ROOT}}` substitution, the render applies each `{{TOOL_ROOT}}<home>/<file>` citation the
+install HOLDS, as `derive_kit_paths` resolves it: the receipt row first, then the probe beside this
+kit. Only a citation nothing holds renders as the tool root plus its home. A receipt's top-level
+`prefix` is not applied, because the tool root is this kit's own parent and a second answer to it
+would disagree.
+
+**A held citation's path is checked before anything is written** (`TOOL-dRenderedAnchor-7`). The
+receipt row writes it, and it lands in a JS string literal and in commands an agent runs, so a path
+that is empty or holds a character outside `[A-Za-z0-9._/+@-]` is exit 2 with one line naming the
+citation and its path, the same set this script refuses for the kit path. Fix the receipt row.
+
+**`--render` derives the citations twice.** A rendered harness is held only once it is a file, and
+on a fresh install this render is what writes them, so the first derivation cannot see them. After
+writing, the render derives again, and when the citations moved it runs itself once more with the
+same arguments, printing one line that says so, and exits with the re-run's status.
+`PROTOCOL_PARITY_REPASS` bounds that to one re-run. `--tracked-only` creates only a live copy this
+install already tracks: on a tree that holds every rendered harness the two derivations agree and it
+does not re-run, and a tracked harness deleted from the worktree is written again, and then the run
+re-runs once, like a fresh render. When the citations moved and an inherited
+`PROTOCOL_PARITY_REPASS=1` suppressed the re-run, the render prints one line naming
+`PROTOCOL_PARITY_REPASS` and exits 1, because a rendered copy may name a stale path; run `--render`
+again with it unset.
+
 **`MEMORY_TREE_DIR` is probed, not derived.** An adopter may install the memory-tree kit flat in
 its tool root, so the tool root plus `memory-tree/` is not an answer. The render takes the first
 TRACKED of `{{TOOL_ROOT}}memory-tree/gotchas.py` and `{{TOOL_ROOT}}gotchas.py`. When neither is

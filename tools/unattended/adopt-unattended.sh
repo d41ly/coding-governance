@@ -112,7 +112,10 @@ esac
 # Skill names the harness scripts, which live BESIDE this kit rather than inside it. Spelled as a
 # literal they were gov's prefix plus `workflows/…` in every render, which resolves to nothing in a root install
 # and disagreed with the build-method carrier that already spelled the same two paths through this
-# placeholder. Two carriers, one route, two answers. Closing-review F6.
+# placeholder. Two carriers, one route, two answers. Closing-review F6. That carrier now renders those
+# citations through `derive_kit_paths`, the install receipt first, so this render does too
+# (TOOL-dRenderedAnchor-6): `render_kit_cites` applies every citation the install holds, and the
+# value below answers only a citation nothing holds. One route again, one answer.
 TOOL_ROOT=${KIT_REL%/*}; [ "$TOOL_ROOT" = "$KIT_REL" ] && TOOL_ROOT=""   # "tools" at a prefix, "" at the root
 [ -z "$TOOL_ROOT" ] || TOOL_ROOT="$TOOL_ROOT/"                          # trailing slash so a root install renders clean
 
@@ -308,6 +311,242 @@ except LookupError as e:
 r = next((p for p in (d, *d.parents) if (p / ".git").exists()), d.anchor)
 print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
+# THE CITATION RESOLVER AND ITS APPLY STEP (TOOL-dRenderedAnchor-6 S5), INLINED byte-identically from
+# the canonical copies named on their marker lines and gated by the resolve-python self-test's parity
+# table. `derive_kit_paths` prints one `<cite><TAB><path>` line per `{{TOOL_ROOT}}<home>/<file>`
+# citation of the Skill's template that this install HOLDS, its receipt row first; `render_kit_cites`
+# applies those lines alone to `render`'s buffer, so the Skill names the harness paths govkit wrote.
+# `check_kit_cites` (TOOL-dRenderedAnchor-7 S4) refuses, before anything is written, a line of those
+# whose path holds a character outside the path set this file refuses for its own values.
+# >>> derive_kit_paths — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `derive_kit_paths <python> <kit dir> <template>...` prints the KIT_PATHS `render_doc` applies: one
+# `{{TOOL_ROOT}}<home>/<file><TAB><path>` line per such citation in the templates that this install
+# RESOLVES through `resolve_kit_dir`, receipt row first, so a per-entry `prefix` or `kit` override
+# is honoured where govkit records it, per row. Then one bare `{{TOOL_ROOT}}<TAB><prefix>/` line when
+# the receipt carries a top-level `prefix`, read as JSON and never grepped, because a FLAT install's
+# kit directory has an empty parent (TOOL-aRepatriatedFork-10 S6). A citation nothing resolves gets
+# no line and falls through to that prefix, or to the caller's parent-derived `TOOL_ROOT`.
+# TOOL-aRepatriatedFork-42: between the two, one line per ADOPTER-DECLARED placeholder the templates
+# cite. Its value is the answer the playbook-render engine gives through `--answers`, reached through
+# `resolve_kit_dir`, so the render and the charter state one answer and nothing here re-reads
+# deploy.toml. A kit the tree did not select, a tree with no deploy.toml and an install with no
+# engine each render the placeholder's stated phrase, which names no path; a selected kickoff kit
+# with no answer, and every refusal of the engine's, is a named refusal.
+# rev-3, the closing review. Every printed value is ONE line or a named refusal (C1). An engine
+# below 1.11, whose `--answers` cannot speak the keys asked here, counts as no engine (C2, I1). Both
+# pipes are UTF-8 whatever the code page (C3, I2). The kickoff answers take govkit's per-entry
+# overlay, and a memory root declared apart from the conf must equal it (C4). A repo-relative skill
+# renders only where git tracks it (I3). The two protocols render the path of their kit's
+# `rendered` receipt row, the destination govkit wrote, or a phrase (C5, I4). The source repo, with
+# no row to answer, renders the review protocol at the memory root's guides/REVIEW-PROTOCOL.md.
+derive_kit_paths() {
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+  MT_MEMORY_ROOT="${MEMORY_ROOT:-}" "$1" -c "${_rkd%$'\n'}"'
+import json
+import os
+import pathlib
+import re
+import subprocess
+import sys
+sys.stdout.reconfigure(encoding="utf-8")
+sys.stderr.reconfigure(encoding="utf-8", errors="backslashreplace")
+
+
+def emit(p, v):
+    if re.search(r"[\t\r\n]", v):
+        sys.exit("memory-tree render: REFUSED, the value for %s carries a tab, CR or newline (%r), "
+                 "and a render line holds one line, so it would cut every doc it reaches. Answer "
+                 "it on one line" % (p, v))
+    print("%s\t%s" % (p, v))
+
+
+kit = pathlib.Path(sys.argv[1]).absolute()
+root = next((p for p in (kit, *kit.parents) if (p / ".git").exists()), kit)
+cites = []
+seen = ""
+for t in sys.argv[2:]:
+    try:
+        text = pathlib.Path(t).read_text(encoding="utf-8")
+    except OSError:
+        continue
+    seen += text
+    for m in re.finditer(r"\{\{TOOL_ROOT\}\}([\w.-]+)/([\w.-]+)", text):
+        if m.group(0) not in cites:
+            cites.append(m.group(0))
+for cite in cites:
+    home, anchor = cite[len("{{TOOL_ROOT}}"):].split("/")
+    try:
+        path = (resolve_kit_dir(home, anchor, kit) / anchor).relative_to(root)
+    except (LookupError, ValueError):
+        continue
+    emit(cite, path.as_posix())
+try:
+    receipt = json.loads((root / ".governance" / "install.json").read_text(encoding="utf-8"))
+    rows, pfx = list(receipt.get("files") or []), receipt.get("prefix")
+except (OSError, ValueError, AttributeError, TypeError):
+    rows, pfx = [], None
+
+
+def rendered_at(eid, template):
+    for row in rows:
+        if not isinstance(row, dict) or row.get("kit") != eid or row.get("role") != "rendered":
+            continue
+        if str(row.get("source") or "").split("/")[-1] != template:
+            continue
+        dest = pathlib.PurePosixPath(str(row.get("path") or ""))
+        if dest.parts and not dest.is_absolute() and ".." not in dest.parts and ":" not in str(dest):
+            return dest.as_posix()
+    return None
+
+
+said = {
+    "{{GATE_RUNNER}}": "the merge bar of this repo",
+    "{{MANIFEST_PATH}}": "the kickoff manifest of this repo",
+    "{{KICKOFF_SKILL}}": "the session-kickoff skill",
+    "{{REVIEW_PROTOCOL}}": "the review protocol of this repo",
+    "{{UNATTENDED_PROTOCOL}}": "the unattended-run protocol of this repo",
+    "{{SPEC_TOKEN_CHECKER}}": "The spec-token checker of the shipping repo, not installed here,",
+}
+floor = (1, 11)
+need = [p for p in said if p in seen]
+got = {
+    "{{REVIEW_PROTOCOL}}": rendered_at("review-harness", "REVIEW-PROTOCOL.template.md"),
+    "{{UNATTENDED_PROTOCOL}}": rendered_at("unattended", "PROTOCOL.template.md"),
+}
+eng = None
+if need and (root / ".governance" / "deploy.toml").is_file():
+    try:
+        eng = resolve_kit_dir("playbook", "render_playbook.py", kit) / "render_playbook.py"
+    except LookupError as e:
+        sys.stderr.write("memory-tree render: %s, so each adopter path states its phrase\n" % e)
+if eng is not None:
+    m = re.search(r"^KIT_PLAYBOOK_RENDER_VERSION = \"([0-9.]+)\"",
+                  eng.read_text(encoding="utf-8", errors="replace"), re.M)
+    if not m or tuple(int(x) for x in m.group(1).split(".") if x) < floor:
+        sys.stderr.write("memory-tree render: the playbook-render engine at %s is %s, below the %s "
+                         "whose --answers this render asks, so each adopter path states its phrase. "
+                         "Update it: govkit update --kits playbook-render\n"
+                         % (eng.as_posix(), m.group(1) if m else "unversioned",
+                            ".".join(str(x) for x in floor)))
+        eng = None
+if eng is not None:
+    ek = "kit.kickoff-manifest."
+    r = subprocess.run([sys.executable, str(eng), "--target", str(root), "--answers", "GATE_RUNNER",
+                        "MEMORY_ROOT", "kit.memory-tree.memory_root", "kits", "gov_source",
+                        ek + "manifest_path", ek + "user_skills"],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env=dict(os.environ, PYTHONUTF8="1", PYTHONIOENCODING="utf-8"))
+    if r.returncode:
+        sys.exit("memory-tree render: REFUSED, the playbook-render engine gave no answers: %s"
+                 % ((r.stderr or "").strip() or (r.stdout or "").strip() or "exit %d" % r.returncode))
+    ans = json.loads(r.stdout)
+    kits = set(ans["kits"])
+    conf = os.environ.get("MT_MEMORY_ROOT", "")
+    for key in ("MEMORY_ROOT", "kit.memory-tree.memory_root"):
+        if conf and ans[key] and ans[key] != conf:
+            sys.exit("memory-tree render: REFUSED, the memory root has two values: .memory-tree.conf "
+                     "says MEMORY_ROOT=%s and the playbook engine answers %s = %s from "
+                     ".governance/deploy.toml. These docs land under the conf root, so make the two "
+                     "one value" % (conf, key, ans[key]))
+    if "kickoff-manifest" in kits:
+        for key, p in ((ek + "manifest_path", "{{MANIFEST_PATH}}"), (ek + "user_skills", "{{KICKOFF_SKILL}}")):
+            if p in need and not ans[key]:
+                sys.exit("memory-tree render: REFUSED, kickoff-manifest is selected and "
+                         ".governance/deploy.toml answers no %s, under [answers] or "
+                         "[kit.kickoff-manifest], so %s has no declared path. Answer it there; this "
+                         "render does not guess one" % (key[len(ek):], p))
+    skill = None
+    if "kickoff-manifest" in kits and ans[ek + "user_skills"]:
+        skill = "%s/session-kickoff/SKILL.md" % ans[ek + "user_skills"]
+        if not re.match(r"~|/|[A-Za-z]:[/\\]", skill):
+            tracked = subprocess.run(["git", "-C", str(root), "ls-files", "--", skill],
+                                     capture_output=True, text=True, encoding="utf-8", errors="replace")
+            skill = skill if (tracked.stdout or "").strip() else None
+    got.update({
+        "{{GATE_RUNNER}}": ans["GATE_RUNNER"],
+        "{{MANIFEST_PATH}}": "kickoff-manifest" in kits and ans[ek + "manifest_path"],
+        "{{KICKOFF_SKILL}}": skill,
+        "{{SPEC_TOKEN_CHECKER}}": ans["gov_source"] == "." and "{{TOOL_ROOT}}check-spec-tokens.py",
+        "{{REVIEW_PROTOCOL}}": got["{{REVIEW_PROTOCOL}}"] or (ans["gov_source"] == "." and "{{MEMORY_ROOT}}/guides/REVIEW-PROTOCOL.md"),
+    })
+for p in need:
+    emit(p, "`%s`" % got[p] if got.get(p) else said[p])
+pfx = str(pfx or "").strip("/")
+if pfx and pfx != ".":
+    emit("{{TOOL_ROOT}}", "%s/" % pfx)
+' "$2" "${@:3}"
+}
+# <<< derive_kit_paths
+# >>> render_kit_cites — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `render_kit_cites` rewrites the CALLER's `out`, by dynamic scope as `render_doc` reads the caller's
+# KIT_REL, with every `{{TOOL_ROOT}}<home>/<file><TAB><path>` line of KIT_PATHS, each cite replaced
+# whole. A bare `{{TOOL_ROOT}}` line and an adopter-placeholder line are left unapplied: the caller
+# derives its tool root from its own location, and a receipt prefix beside it is a second answer.
+render_kit_cites() {
+  local kp kv
+  while IFS=$'\t' read -r kp kv; do
+    case "$kp" in '{{TOOL_ROOT}}'?*) out=${out//"$kp"/"$kv"} ;; esac
+  done <<<"${KIT_PATHS//$'\r'/}"
+}
+# <<< render_kit_cites
+# >>> check_kit_cites — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `check_kit_cites <label> <kit paths>` returns 2 at the first `{{TOOL_ROOT}}<home>/<file>` line
+# whose path is empty or holds a character outside [A-Za-z0-9._/+@-], printing one line naming the
+# cite and the path, and 0 otherwise. It reads exactly the lines `render_kit_cites` applies: a bare
+# `{{TOOL_ROOT}}` line and an adopter-placeholder line carry phrases with spaces, never applied here.
+check_kit_cites() {
+  local kp kv
+  while IFS=$'\t' read -r kp kv; do
+    case "$kp" in '{{TOOL_ROOT}}'?*) ;; *) continue ;; esac
+    case "$kv" in
+      ''|*[!A-Za-z0-9._/+@-]*)
+        echo "$1: the citation $kp resolves to '$kv', which is empty or holds a character outside [A-Za-z0-9._/+@-]. A citation lands in a JS string literal and in commands an agent runs, where a quote ends the string and a space splits the command. Fix the install receipt row that places it."
+        return 2 ;;
+    esac
+  done <<<"${2//$'\r'/}"
+  return 0
+}
+# <<< check_kit_cites
 check_tracked() { git ls-files --error-unmatch -- ":(literal)$1" >/dev/null 2>&1; }
 MEMORY_TREE_DIR=""
 if [ -n "$_MTD_OVERRIDE" ]; then
@@ -341,6 +580,17 @@ else
     exit 2
   fi
 fi
+
+# THE SKILL'S HARNESS CITATIONS (TOOL-dRenderedAnchor-6 S5), derived over the Skill's template alone:
+# it is the one template this adopter renders that takes `TOOL_ROOT`, the fixture templates carry
+# `{{KIT_DIR}}` only and the copied ones no placeholder. Derived here, before both modes, so
+# `--check` grades exactly what a render writes. No python, or a derivation that fails, is exit 2,
+# the misconfigured code; the resolver or the derivation prints the reason. So is a citation whose
+# receipt-held path leaves [A-Za-z0-9._/+@-], which `check_kit_cites` names: the Skill tells an agent
+# to run it, where a space splits the command (TOOL-dRenderedAnchor-7 S4).
+_cite_py=$(resolve_python) || exit 2
+KIT_PATHS=$(derive_kit_paths "$_cite_py" "$KIT_DIR" "$TEMPLATE") || exit 2
+check_kit_cites unattended "$KIT_PATHS" || exit 2
 
 # THE STAMP — TOOL-aRepatriatedFork-24 S3. The shipped example spells `{{TOOL_ROOT}}` in LANDER,
 # GATE_CMD and WIRING_CHECK, and `{{MEMORY_TREE_DIR}}` for the generator in GENERATED_INDEXES. It
@@ -449,6 +699,7 @@ render() { # [template] -> stdout; LF only (the render is pinned eol=lf in .gita
   out=${out%X}
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}
+  render_kit_cites
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOL_ROOT"}
   out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MEMORY_TREE_DIR"}
   out=${out//\{\{MEMORY_ROOT\}\}/"$MEMORY_ROOT"}

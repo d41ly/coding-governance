@@ -5,7 +5,7 @@ opened: 2026-10-19
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5
+ids: TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5 TOOL-dRenderedAnchor-6 TOOL-dRenderedAnchor-7
 ---
 
 # dRenderedAnchor — an adopter's role index names the harnesses where the review-harness kit landed
@@ -46,6 +46,8 @@ own review and build harnesses. The measurement is
   /build Skill's harness paths, a pre-existing gap the review refuted as not introduced, ride it too.
 - Owner, 2026-10-19, after review round 4 (2 lows, precision 0.71): promote them as unit 5 and
   run no further review round; the build closes on unit 5 and one full bar.
+- Owner, 2026-10-19, after unit 6's review (1 high, 1 medium, 4 lows): promote them as unit 7 and
+  run no further review round.
 - Scratch installs live under the system temp root; no adopter repository is written.
 
 ## Parked decisions
@@ -61,11 +63,13 @@ None.
 | 3 | `TOOL-dRenderedAnchor-3` | the closing review's round-2 findings on unit 2 closed as one batch |
 | 4 | `TOOL-dRenderedAnchor-4` | the closing review's round-3 findings on unit 3 closed as one batch |
 | 5 | `TOOL-dRenderedAnchor-5` | the closing review's round-4 findings on unit 4 closed as one batch, with no review round after it |
+| 6 | `TOOL-dRenderedAnchor-6` | the review protocol and the unattended Skill resolve their harness citations through the receipt-aware resolver |
+| 7 | `TOOL-dRenderedAnchor-7` | unit 6's closing-review findings closed as one batch, with no review round after it |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 5 unit(s) · node d · opened 2026-10-19 · streams tooling
-ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5
+**Build status:** CLOSED · 7 unit(s) · node d · opened 2026-10-19 · streams tooling
+ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5 TOOL-dRenderedAnchor-6 TOOL-dRenderedAnchor-7
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -75,13 +79,15 @@ ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dR
 | [TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch](spec/2026-10-19-spec-TOOL-dRenderedAnchor-3.md) | — | 2 | CLOSED | rev-2 | 2026-10-19 |
 | [TOOL-dRenderedAnchor-4 — the closing review's round-3 findings on unit 3 closed as one batch](spec/2026-10-19-spec-TOOL-dRenderedAnchor-4.md) | — | 1 | CLOSED | rev-1 | 2026-10-19 |
 | [TOOL-dRenderedAnchor-5 — the closing review's round-4 findings on unit 4 closed as one batch, with no review round after it](spec/2026-10-19-spec-TOOL-dRenderedAnchor-5.md) | — | 1 | CLOSED | rev-1 | 2026-10-19 |
+| [TOOL-dRenderedAnchor-6 — the review protocol and the unattended Skill resolve their harness citations through the receipt-aware resolver](spec/2026-10-19-spec-TOOL-dRenderedAnchor-6.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
+| [TOOL-dRenderedAnchor-7 — unit 6's closing-review findings closed as one batch, with no review round after it](spec/2026-10-19-spec-TOOL-dRenderedAnchor-7.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
 <!-- /gen:build-units -->
 
-Records: 18 bound to this build, across 4 record folder(s).
+Records: 23 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5.
+Ids no `spec-audit` record has ever named: TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5 TOOL-dRenderedAnchor-6 TOOL-dRenderedAnchor-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
