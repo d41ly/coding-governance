@@ -1,6 +1,6 @@
 # TOOL-dRenderedAnchor-7 — unit 6's closing-review findings closed as one batch, with no review round after it
 
-**Status:** SPECCED · rev-1 · 2026-10-19 · node d · Tier-2 · base 05357638 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-10-19 · node d · Tier-2 · base 05357638 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -475,6 +475,7 @@ New arm: tools/workflows/unattended-build.test.sh, RA7-4 · covers AC8 · `|| ex
   - Recommendation: (b). It satisfies all of the brief's L4 acceptance, gives a clearer message on
     the same failure, and needs no new surface. (a) is the smaller diff and leaves one brief
     criterion half-observed.
+  - RESOLVED (owner, 2026-10-19): (b).
 
 ## 9. Revision log
 
