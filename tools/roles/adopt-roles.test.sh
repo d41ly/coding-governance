@@ -588,8 +588,8 @@ check_arm "arm 14 ...and --check over that install exits 0" "$([ "$rc" = 0 ] && 
 [ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
 
 # ---- arm 15: a citation that is no harness never resolves above the tool root -------------------
-# TOOL-dRenderedAnchor-3 S7, the closing review's M1: a citation that is
-# no `workflow`-driver harness of the workflow table resolves from the kit directory, the call
+# TOOL-dRenderedAnchor-3 S7, the closing review's M1: a citation that is not
+# a `workflow`-driver harness of the workflow table resolves from the kit directory, the call
 # `derive_kit_paths` makes, so at a prefixed install, this arm's fixture, a file of its name at the
 # repository root is never named. The arm finds each backticked span of the template holding
 # `{{TOOL_ROOT}}` with its own pattern, skips each whose `<home>/<file>` HARNESS_PAIRS_READ lists,
@@ -671,9 +671,12 @@ check_arm "arm 16 ...and --scaffold exits 0 naming each such harness by its plai
 # ---- arm 17: a harness held only above the tool root is named where the role index lists it ---
 # TOOL-dRenderedAnchor-4 S1, the closing review's round-3 M1: the citation pass resolves a
 # `workflow`-driver harness with the tool root as `here` and every other citation from the kit
-# directory, and the two values of `here` part on one layout only: a harness held only in the
-# directory above the tool root, with no receipt row. The arm builds that layout. Each pair
-# HARNESS_PAIRS_READ lists is written there, with nothing under `<tool root>/<home>/` and no receipt.
+# directory. With no receipt row the two values of `here` part on two layouts, which the probes of
+# `resolve_kit_dir` give (TOOL-dRenderedAnchor-5, the closing review's round-4 L1): a harness held
+# at `<kit>/<home>/`, which only the kit directory reaches and probes first, or one held only in the
+# directory above the tool root, which only the tool root reaches. The arm builds the second and
+# leaves the first unbuilt. Each pair HARNESS_PAIRS_READ lists is written there, with nothing under
+# `<tool root>/<home>/` and no receipt.
 # After `--scaffold` the Skill must name each pair there, backticked, never under the tool root, and
 # the `harnesses` list of the role index must hold the same path. The expected path is built from
 # the pair and the kit path, never read from either output the arm grades. The fixture's

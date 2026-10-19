@@ -30,8 +30,8 @@
 # THE HARNESS CITATIONS (TOOL-dRenderedAnchor-2, TOOL-dRenderedAnchor-3). Before the plain
 # `{{TOOL_ROOT}}` substitution, every `{{TOOL_ROOT}}<home>/<file>` citation of the template that
 # `roles_lib.resolve_cited_paths` holds is replaced by the path it resolves, one whole citation at a
-# time, so a held citation never rewrites a longer one it prefixes. Only a
-# `workflow`-driver harness of the workflow table resolves through the role index's call, with the
+# time, so a held citation never rewrites a longer one it prefixes. Only
+# a `workflow`-driver harness of the workflow table resolves through the role index's call, with the
 # tool root as `here`, so `/build` names each harness where the role index lists it, a kit landed
 # under its id behind a `rendered` receipt row included. Every other citation resolves from the kit
 # directory, the call `derive_kit_paths` makes, so its probes stop at `<tool root>/<home>/`, and at a

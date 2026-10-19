@@ -127,8 +127,8 @@ needs the kickoff and memory-tree kits.
 - `adopt-roles.sh --scaffold` renders the `/build` Skill, the agent types and `roles.json`. With no
   governing doc at the memory-tree conf's `CHARTER`, it renders the Skill alone and exits 3, and no
   hook check turns on.
-- The `/build` Skill names each harness where the install holds it. Only a
-  `workflow`-driver harness of the workflow table resolves as the role index does, from the tool
+- The `/build` Skill names each harness where the install holds it. Only
+  a `workflow`-driver harness of the workflow table resolves as the role index does, from the tool
   root, so a kit govkit landed under its id is named there. Every other tool-root citation of the
   template, the merge bar's among them, resolves from the roles kit directory as `derive_kit_paths`
   resolves a rendered guide's: a receipt row can place it, and at a prefixed install a file at the

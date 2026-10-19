@@ -66,6 +66,26 @@ wrote "a `workflow`-driver harness of the workflow table" into all of them and a
 on one line: the phrase had wrapped at the help page and the adopter header, so the review's own
 one-line grep could not see those two carriers.
 
+`TOOL-dRenderedAnchor-4`'s arm 17 comment in `tools/roles/adopt-roles.test.sh`, and its spec, said
+the two values of `here` part on one layout only, copied from the round-3 record's "only one case"
+(round 4, L1, ids 2, 4, 5 and 6). The probe tuple of `resolve_kit_dir` gives two: a harness held at
+<kit>/<home>/, which only the kit directory reaches, and one held only in the directory above the
+tool root. `TOOL-dRenderedAnchor-5` named both in the comment. The check: a comment or spec line
+that states which layouts a resolver call reaches is derived from the probe tuple, each probe's
+reach listed for every value of `here`, never copied from a prior record. This read-only probe
+prints each value of `here` beside its two probes:
+
+```
+python -I -c "import pathlib;k=pathlib.PurePosixPath('/fx/tools/roles');[print(h,[str(h/'workflows'),str(h.parent/'workflows')]) for h in (k.parent,k)]"
+```
+
+Round 4 found the round-3 L2 entry above false for the phrase it quotes (L2, id 3): the fold had
+moved each break to just before the article, so the phrase still wrapped at the help page, the
+adopter header and arm 15's comment, and only a grep that dropped the article found every carrier.
+`TOOL-dRenderedAnchor-5` reflowed the help page and the adopter header, and arm 15 now reads "not
+a". The check: a record that says a phrase sits on one line is checked by a grep for the exact
+literal it quotes, article included, whose hit count equals the carrier count.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index
