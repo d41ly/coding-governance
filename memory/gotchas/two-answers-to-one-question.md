@@ -43,6 +43,12 @@ record's unit schema beside v2's registry clause; a `[[retired]]` row and a chan
 unit field named `owner` beside the `owner` edge; the adopter record's `[chain]` and `[folded]` on gov's update of
 itself; two scopes for one house-file move; and two legacy lists for one install.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+The mail ref was keyed by node in coordination and v2 and by sender in the memory plan. Point 7's account said both
+harness settings queue where its return says the direct one refuses. A Workflow's agents were counted once as a
+reservation and again as started agents.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

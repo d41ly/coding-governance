@@ -25,6 +25,10 @@ the same slip. The round's review
 (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md`, M11) caught it
 after the owner had answered.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+Point 6 gave its population as 47 reviews with a classes column, where 66 carry one and 47 of them a range.
+
 ## The fix
 
 - State a rate as its numerator over its denominator, naming each population, before the quotient.

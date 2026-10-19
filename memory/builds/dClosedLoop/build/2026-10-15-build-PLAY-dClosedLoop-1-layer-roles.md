@@ -73,7 +73,8 @@ researchers of 2026-10-14 cover the field, and their records are cited where use
   - one namespaced tag system, with `role` among its namespaces;
   - a role's static instructions and a work order are each assembled from units by their tags;
   - protocols and templates are views sliced by tag;
-  - R-C's render refuses a set over budget, and a set missing a unit it requires.
+  - R-C's render refuses a set missing a unit it requires, and warns or refuses a set over budget as
+    `budgets.enforce` says (revised 2026-10-19, the night pass two, point 5).
 - **The layers** (P28): the deployer's and the maintainer's items live in the integrations and
   observability expansions, and core Deploy has no role (step definitions).
 
@@ -377,8 +378,9 @@ at the spawn, not because another agent said it. The design keeps three boundari
   unit that slices them re-points that machinery in the same unit: `CARRIED_SECTIONS`, `check_roles.py`
   R0 (a charter with no Protocols section), R5 and R10 (a body or overlay naming a protocol file), and
   `render_agents.py`'s self-test arm 4, which asserts the carried text.
-- **Budgets both ways.** R-C's render refusals apply per role and per item. A block over its budget is
-  refused, and so is a block missing a unit its items require. The static block's budget is
+- **Budgets both ways.** R-C's render checks apply per role and per item. A block over its budget warns or
+  refuses as `budgets.enforce` says, and a block missing a unit its items require is refused (revised
+  2026-10-19, the night pass two, point 5). The static block's budget is
   `check_roles.py`'s `BODY_CEILINGS` (1,536 to 4,096 bytes per role, rule R5), one carrier. The
   block's growth raises a ceiling only by an owner-approved change to it.
 - **Joins:**

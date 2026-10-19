@@ -32,6 +32,11 @@ superseded parts through ratified proposals, and only the owner's yes was routed
 join red with no exit. A decline now amends the part's row through the ratification record, and the join reads the
 amended row.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+A declined scenario promotion had no record and would be raised again every Loop Review, and a reuse check's disputed
+row had no route but another fix pass.
+
 ## The fix
 
 List every owner item's dispositions, the refusal included, and say what each leaves on the default

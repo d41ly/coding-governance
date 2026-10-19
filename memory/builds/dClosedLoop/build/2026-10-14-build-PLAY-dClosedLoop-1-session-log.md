@@ -188,6 +188,18 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 124 | gov-researcher, at the owner's medium effort | The pass: what the converged design decides about an adopter's own flow and roles, and what it leaves open | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | returned, 8m21s, 45.8k out: breakpoints, probe points, presets, playbooks, policy values and role prose decided; an item or role in a core step, and amending, replacing, disabling or surviving a change to a gov row, open; six contradictions | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-design.md` |
 | 125 | gov-researcher, at the owner's medium effort | The pass: prior art outside gov for adding and changing steps, checks and roles through upstream updates | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 7m57s, 39.2k out: eight families; an own namespace, pinned edges, a typed graph checked when composed and roles that declare their shapes; a meaning change under an unchanged type passes every mechanism | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-prior-art.md` |
 | 126 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The closing review of the last three folds, run twice at the owner's word: `320c79646` over `dd1ebb01b`, the shape audit's fold, the Skills' and the adopter instructions' | the args, built by `build_args_folds.py` | 1799cb98 | returned as `wf_a3ab6ac1-aba`, CLEAN WITH FIXES, 21 of 23 confirmed, 17 items, 0 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-folds-closing-b.md` |
+| 127 | gov-researcher, at the owner's medium effort | The night pass two, point 1: what the converged design lets bend per kind of work, and where it cannot | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-8-researcher.md` | 1799cb98 | returned, 7m03s, 40.8k out: six seams each carry part of a variant and none selects one; nothing records what kind of work a build is | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scenarios-design.md` |
+| 128 | gov-researcher, at the owner's medium effort | Point 1: prior art outside gov for flows that vary per case and adapt mid-run | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-9-researcher.md` | 1799cb98 | returned, 7m57s, 37.5k out: eight families, none covering every case; pinned templates and late-bound repertoires with recorded rejections the closest | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scenarios-prior-art.md` |
+| 129 | gov-researcher, at the owner's medium effort | Point 2: aScoutedSeam's measured workflow shape and prompt principles, re-derived and applied to gov's flow and roles | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-10-researcher.md` | 1799cb98 | returned, 9m32s, 55.2k out: 33 of 35 at medium from an orientation scout and an enumerated diff check; the rows moved the catch into the step that gates | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scoutedseam-apply.md` |
+| 130 | gov-researcher, at the owner's medium effort | Point 3: storage and coordination today and as designed, measured at one and ten times today's tree | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-11-researcher.md` | 1799cb98 | returned, 17m33s, 62.8k out: markdown holds as the record; the designed JSON index fails at ten times; read points, not transport, make news late | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` |
+| 131 | gov-researcher, at the owner's medium effort | Point 3: prior art outside gov for a typed record graph shared by several nodes | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-12-researcher.md` | 1799cb98 | returned, 8m11s, 32.2k out: files in git with one derived SQLite index, per-sender refs and an ids-only doorbell | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-prior-art.md` |
+| 132 | gov-researcher, at the owner's medium effort | Point 4: every hand-off in the converged design, end to end, and whether one contract holds them | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-13-researcher.md` | 1799cb98 | returned, 7m28s, 37.9k out: five carriers and no one contract; twelve contradictions; commitment rows on the record graph | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-design.md` |
+| 133 | gov-researcher, at the owner's medium effort | Point 4: prior art outside gov for hand-offs between agents and sessions | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md` | 1799cb98 | returned, 8m30s, 36.0k out: eight families; a schema rendered per work order and create-only registers keyed by derived keys | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` |
+| 134 | gov-researcher, at the owner's medium effort | Point 5: every size cap gov enforces, its history, and what an advisory cap needs | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md` | 1799cb98 | returned, 10m56s, 52.5k out: 24 caps, 18 refusing; one switch at warn, shown on a passing run, priced and trended | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` |
+| 135 | gov-researcher, at the owner's medium effort | Point 6: whether the bug-class lookup serves the right class at the right moment, measured on gov's closed reviews | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md` | 1799cb98 | returned, 12m44s, 58.5k out: 6.2% precision on code reviews and 18% at the moment of the edit; serving by path loses | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` |
+| 136 | gov-researcher, at the owner's medium effort | Point 7: what agent-cap enforces, measured on synthetic payloads, and where an owner-set limit belongs | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md` | 1799cb98 | returned, 8m57s, 48.5k out: five claims per prompt id, never agents in flight; one Runtime key at three scopes | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` |
+| 137 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The night pass two's folds, reviewed twice at the owner's word: `ad54fe388` over `e1a54ac67`, the seven points' folds and the record that opens them | the args, built by `build_args_night2.py` | 1799cb98 | returned as `wf_4e7e18b8-a33`, CLEAN WITH FIXES, 31 of 41 confirmed, 25 items, 1 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-a.md` |
+| 138 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The night pass two's folds, reviewed twice at the owner's word: `ad54fe388` over `e1a54ac67`, the seven points' folds and the record that opens them | the args, built by `build_args_night2.py` | 1799cb98 | returned as `wf_9c278556-e2c`, CLEAN WITH FIXES, 26 of 30 confirmed, 23 items, 2 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1445,6 +1457,76 @@ The flow and roles adoption research, dispatches 123 to 125, derived from each r
 - returned — gov-researcher · wrote 0 files · 7m57s · 39.2k out · run direct/ae6048ba5070cc4da
 ```
 
+The night pass two's research, dispatches 127 to 136, derived from each run the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-8-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-8-researcher.md) · writes none · gates none · run direct/a9336f9127f75aae4
+- returned — gov-researcher · wrote 0 files · 7m03s · 40.8k out · run direct/a9336f9127f75aae4
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-9-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-9-researcher.md) · writes none · gates none · run direct/a8088d6076cc684a6
+- returned — gov-researcher · wrote 0 files · 7m57s · 37.5k out · run direct/a8088d6076cc684a6
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-10-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-10-researcher.md) · writes none · gates none · run direct/a590f8c4313322285
+- returned — gov-researcher · wrote 0 files · 9m32s · 55.2k out · run direct/a590f8c4313322285
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-11-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-11-researcher.md) · writes none · gates none · run direct/aa47dd2e295ad2df7
+- returned — gov-researcher · wrote 0 files · 17m33s · 62.8k out · run direct/aa47dd2e295ad2df7
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-12-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-12-researcher.md) · writes none · gates none · run direct/aaa70c0f7d1e0c8fb
+- returned — gov-researcher · wrote 0 files · 8m11s · 32.2k out · run direct/aaa70c0f7d1e0c8fb
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-13-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-13-researcher.md) · writes none · gates none · run direct/ac7b2d78edc791a5d
+- returned — gov-researcher · wrote 0 files · 7m28s · 37.9k out · run direct/ac7b2d78edc791a5d
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md) · writes none · gates none · run direct/ae0a8b8e5ed7d45f1
+- returned — gov-researcher · wrote 0 files · 8m30s · 36.0k out · run direct/ae0a8b8e5ed7d45f1
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md) · writes none · gates none · run direct/a57629d3a5ab9bee3
+- returned — gov-researcher · wrote 0 files · 10m56s · 52.5k out · run direct/a57629d3a5ab9bee3
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md) · writes none · gates none · run direct/acd0ccf6210a25ac0
+- returned — gov-researcher · wrote 0 files · 12m44s · 58.5k out · run direct/acd0ccf6210a25ac0
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md) · writes none · gates none · run direct/aba7eb1e10683c911
+- returned — gov-researcher · wrote 0 files · 8m57s · 48.5k out · run direct/aba7eb1e10683c911
+```
+
+The night pass two's closing review, dispatches 137 and 138, derived from each run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/a155c69e591b165ec
+- returned — workflow-subagent · wrote 0 files · 16s · 1.6k out · run wf_4e7e18b8-a33/a155c69e591b165ec
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/a4cac81e5b33e10f3
+- returned — gov-diff-reviewer · wrote 0 files · 7m39s · 42.6k out · run wf_4e7e18b8-a33/a4cac81e5b33e10f3
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/a5b2d93d78626f353
+- returned — gov-diff-reviewer · wrote 0 files · 5m08s · 27.9k out · run wf_4e7e18b8-a33/a5b2d93d78626f353
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/ab697b53fddcaf53a
+- returned — gov-diff-reviewer · wrote 0 files · 4m11s · 22.2k out · run wf_4e7e18b8-a33/ab697b53fddcaf53a
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-9 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/ac4ce157aecad2ed9
+- returned — gov-skeptic · wrote 0 files · 2m50s · 15.6k out · run wf_4e7e18b8-a33/ac4ce157aecad2ed9
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-10-18 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/a4d4fba46e884126b
+- returned — gov-skeptic · wrote 0 files · 2m08s · 11.0k out · run wf_4e7e18b8-a33/a4d4fba46e884126b
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-19-27 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/a6458ce866a518a1d
+- returned — gov-skeptic · wrote 0 files · 1m40s · 8.7k out · run wf_4e7e18b8-a33/a6458ce866a518a1d
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-28-36 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/a0ebe25c4d7154c4e
+- returned — gov-skeptic · wrote 0 files · 2m03s · 11.3k out · run wf_4e7e18b8-a33/a0ebe25c4d7154c4e
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-37-41 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_4e7e18b8-a33/a219ad7493970183e
+- returned — gov-skeptic · wrote 0 files · 1m53s · 9.5k out · run wf_4e7e18b8-a33/a219ad7493970183e
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_4e7e18b8-a33/aaf8b959d7603d77f
+- returned — gov-synthesizer · wrote 1 file · 3m16s · 27.2k out · run wf_4e7e18b8-a33/aaf8b959d7603d77f
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/a7d92862818cf1b56
+- returned — workflow-subagent · wrote 0 files · 10s · 952 out · run wf_9c278556-e2c/a7d92862818cf1b56
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/a4e5506da57fab531
+- returned — gov-diff-reviewer · wrote 0 files · 6m23s · 36.7k out · run wf_9c278556-e2c/a4e5506da57fab531
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/a3a18f7a419eb2dec
+- returned — gov-diff-reviewer · wrote 0 files · 5m40s · 30.5k out · run wf_9c278556-e2c/a3a18f7a419eb2dec
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/a1ac137101dd88a96
+- returned — gov-diff-reviewer · wrote 0 files · 2m43s · 14.9k out · run wf_9c278556-e2c/a1ac137101dd88a96
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-6 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/abc869a25b7271f67
+- returned — gov-skeptic · wrote 0 files · 1m30s · 8.7k out · run wf_9c278556-e2c/abc869a25b7271f67
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-7-12 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/aa7da60acea8a6c94
+- returned — gov-skeptic · wrote 0 files · 1m47s · 9.7k out · run wf_9c278556-e2c/aa7da60acea8a6c94
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-13-18 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/a2a85ffb80657ebf8
+- returned — gov-skeptic · wrote 0 files · 1m21s · 7.4k out · run wf_9c278556-e2c/a2a85ffb80657ebf8
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-19-24 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/a43ac12984d294724
+- returned — gov-skeptic · wrote 0 files · 1m09s · 6.4k out · run wf_9c278556-e2c/a43ac12984d294724
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-25-30 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_9c278556-e2c/ae686350e3125d49b
+- returned — gov-skeptic · wrote 0 files · 1m42s · 9.3k out · run wf_9c278556-e2c/ae686350e3125d49b
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_9c278556-e2c/a1908c904cffe088c
+- returned — gov-synthesizer · wrote 1 file · 3m02s · 25.1k out · run wf_9c278556-e2c/a1908c904cffe088c
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2462,6 +2544,27 @@ The flow and roles adoption research, dispatches 123 to 125, derived from each r
   `[answers]`), six with the recommendation. FA-3 chose repository stages, inserted between two adjacent gov stages,
   so P20 is amended. The answers are folded into v2, the systems record, the memory plan, the register, the fates
   record and the design record's `[folded]`.
+
+- 2026-10-19, session 1799cb98: the owner stepped away for the night and handed over seven points, recorded verbatim
+  in `build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[words]`, asking: "Go through each of them separately, one after another, understand them and their fit
+  into the current design. Run agents/workflows at medium effort to assist you in research and design, park all the
+  forks for me to go at for when I return." Ten researchers took one question each, dispatches 127 to 136, in two
+  waves of five. Each return is saved beside the record, and their commands and probes are in
+  `build/2026-10-19-build-PLAY-dClosedLoop-1-research-night2-instruments.md`.
+- 2026-10-19, session 1799cb98: each point was folded in its own commit, its recommendation marked pending on its
+  forks: scenarios `43bd58baa` (NT-1 to NT-9), aScoutedSeam `f27b6e3b2` (NT-10 to NT-13), storage `dff70c5f8`
+  (NT-14 to NT-17), handoffs `da51d45c4` (NT-18 to NT-21), caps `d171bcb47` (NT-22 and NT-23), bug classes
+  `723abc12b` (NT-24 to NT-26) and agent-cap `ad54fe388` (NT-27 and NT-28). The 28 forks are parked in the record's
+  `[forks]`.
+- 2026-10-19, session 1799cb98: dispatch 134 ran `check-template-size.sh` six times on its scratch clone before it
+  learned that a researcher may run no gate; the scratch guard refused its next gate run, and nothing was written. The
+  harness flagged dispatches 135's and 136's returns for a settings-file pattern; both cite `.claude/settings.json`
+  only as a file they read, and both were kept as data.
+- 2026-10-19, session 1799cb98: the owner's "Run tier2 reviews on the folds twice": two light diff reviews of
+  `ad54fe388` over `e1a54ac67` ran one after the other, dispatches 137 and 138, their args differing only in the run
+  label, the report path and the scratch path. Run A's report was moved out of the tree while run B ran, so run B
+  could not read it, and restored byte for byte after (sha256 `2ed7e7563b28`). The comparison is `build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`. The folds
+  made before the night, the flow and roles adoption's `caca7a636` and `cf6f1434c`, have had no closing review.
 
 ## Instruments
 

@@ -440,7 +440,9 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - agent-cap's per-prompt total retires with agent-cap (revised 2026-10-19, the night pass two, point 7).
     The harness's own concurrency settings, rendered from the key, bound one session's direct spawns and
     one Workflow run. A hook pack claiming a slot at SubagentStart and releasing it at SubagentStop bounds
-    the session's total, once the spike shows SubagentStop firing for every way an agent ends.
+    the session's total, once the spike shows SubagentStop firing for every way an agent ends. A Workflow
+    agent's claim converts one slot of its call's reservation, matched by its run, so it is never counted
+    twice (the night pass two's review).
 - **Supervision.** On each beat, the supervisor:
   - runs `reap.py --sweep` under `PROCMON_REAP_MODE` (reap-orphans here);
   - reaps act sessions past `runtime.act-ceiling`;
@@ -1054,6 +1056,9 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`spike`**, the first unit. A `claude -p --json-schema` act session runs one role-typed Workflow
   `agent()` in the foreground. It is red if any of these fails:
   - SubagentStart and SubagentStop fire with `agent_type`;
+  - SubagentStop fires for a Workflow agent, for an agent the owner stopped, for one failed after six stalls
+    and for a killed session, each a red case of its own, since the in-flight ledger arms on them (the
+    night pass two's review);
   - the persisted return byte-matches what `agent()` resolved to;
   - the session's `structured_output` carries the act's return;
   - on 2.1.292, an ask rule on the Workflow tool sends the call to the dispatcher's PermissionRequest
@@ -1106,7 +1111,10 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - with `runtime.agents-in-flight` at 3 (`FANOUT_CAP=3` until the night pass two's point 7), the supervisor queues an act whose declared fan exceeds the free slots, and the
     attended PreToolUse entry refuses the same call;
   - killing an act session that holds slots releases them once the reap runs;
-  - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep.
+  - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep;
+  - with the limit at 3, two direct spawns and a two-agent Workflow admit one Workflow agent until a slot
+    frees, and a three-agent Workflow under a limit of 5 still admits two direct spawns (the night pass
+    two's review).
 - **`returns`:**
   - a schema-forced agent's persisted return byte-matches what `agent()` resolved to;
   - a payload whose final text is valid JSON, while its `StructuredOutput` call is not, is refused;

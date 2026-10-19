@@ -164,7 +164,8 @@ writes the repository's rows. This is the instruction round's "compose, never ed
    - **A workflow** is an entry of a registered shape kind (single, per-unit, panel, twin, experiment), naming its
      roles. The kinds stay fixed.
    - **A lens** is a catalogue row whose brief is a unit, selected by `review.opt-in`. The harness keeps its
-     five-slot literal and fills each slot from the catalogue as data, so agent-cap counts slots, never names.
+     five-slot literal and fills each slot from the catalogue as data, so the merge bar's harness check counts slots,
+     never names (agent-cap's count until the night pass two's point 7).
    - **A gate leg** is `leg.repo.<name>`, in the leg-pack schema, registered at Test's leg-pack point as the
      repository's pack, generated into the manifest by the leg factory like any pack's, and counted only once its
      seen-red record exists. After adoption has converted today's hand-added rows, a manifest row with no source
@@ -195,7 +196,8 @@ writes the repository's rows. This is the instruction round's "compose, never ed
      among them), and every step's exit item. In any gov item, its tag, its step, its witness and its outcome set.
    - Roles: the matrix arms, each core role's write class and return schema, and the cycle roles, the prompt writer
      and the driver, whole.
-   - Shapes: the kinds, `FANOUT_CAP`'s bound and the five lens slots.
+   - Shapes: the kinds, each stage's cap at or under `runtime.agents-in-flight` (revised 2026-10-19, the night
+     pass two, point 7, pending NT-27: it was `FANOUT_CAP`'s bound) and the five lens slots.
    - Legs: the canary's key set, and the legs that check the composition itself.
    - Every other row and field is open. The class is derived, never typed, as the closing review settled for units.
 10. **Widening.** A patch may widen an open field, a role's tools or gate grant among them. The overlay's write
@@ -282,7 +284,7 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
   `instructions.exclude` over any registered kind's tags, pins over a row's canonical form, and the change
   record's marks and successors covering rows. Each kind's own build admits its rows, below.
 - **dFairHearing:** the lens catalogue as data in the review kit, the harness's five slots filled from it, and
-  agent-cap counting slots.
+  the merge bar's harness check counting slots (agent-cap's until the night pass two's point 7).
 - **dDeclaredLoop:** the `item` kind in the kinds register with its factory, repository items composed with the
   loop definition at the landed revision, the composition's graph and typed-input checks, item tags joined to the
   step gate, a build's composition pinned per step, and every policy value naming a boundary re-pointed on a rename.
@@ -329,7 +331,8 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 
 - The catalogue and render-wiring legs run on a fixture holding an adopter role, confirming the verdicts dispatch
   123 read from the code, since the scratch-guard refused that researcher the legs.
-- agent-cap admitting a harness whose five lens slots are filled from data, tested at dFairHearing.
+- the roles pack admitting a harness whose five lens slots are filled from data, where agent-cap admitted it
+  until the night pass two's point 7, tested at dFairHearing.
 - The whole-row pin's noise for structured rows, measured over gov's history of `workflows.toml`, the leg manifest
   and the role files. The prior-art pass measured it on a model only.
 - A build positioned on an item that an update renames, splits or retires, run end to end at dDeclaredLoop.

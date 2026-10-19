@@ -96,9 +96,10 @@ build beside the policy and transition features rather than after them.
 5. **Offline**, as `leases.offline` says (warn by default): an acquisition made offline is recorded
    locally and pushed by compare-and-swap on reconnection; if another holder won meanwhile, the
    offline one yields, and the conflict is recorded and posted.
-6. **The mailbox.** One ref per sender per build on the shared remote,
-   `refs/gov/mail/<slug>/<fleet tag>` (revised 2026-10-19, the night pass two, point 3, pending NT-16: one
-   ref per build took 4.5 times the ideal attempts at eight writers): an append-only
+6. **The mailbox.** One ref per writing session per build on the shared remote,
+   `refs/gov/mail/<slug>/<fleet tag>/<session>` (revised 2026-10-19, the night pass two, point 3, pending
+   NT-16: one ref per build took 4.5 times the ideal attempts at eight writers; keyed by session by its
+   review, since one node's sessions would otherwise share a ref): an append-only
    chain of commits, one per message, appended by compare-and-swap. A message carries its id, its
    sender (fleet tag, session, build), its recipient (a build, or one of its units), its kind, its
    references (unit ids, interface names, SHAs), a body, and the id it answers. Its kind comes from a

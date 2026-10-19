@@ -35,6 +35,11 @@ were typed rather than run: the causes, pins and work-order gates armed over tod
 where a run over the tree would have shown almost no record carrying a cause; the region-parser factory's typed five,
 beside which a query finds two more; and the floor inventory's grep for one version, which missed a `py>=3.10`.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+The problem register's ref template was never run through `git check-ref-format` over real paths, which refuses every
+dotfile, and the index's keying assumed a tree is a set of blobs, where one blob sat at 24 paths.
+
 ## The fix
 
 - Before a design states a predicate, run it over the real tree, as the charter's class rule says, and

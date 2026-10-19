@@ -55,6 +55,11 @@ dependency on a VALUE — a count of rows a builder placed, a time it chose, a d
 leaves no token behind. It is a reader all the same, and it is the one that fails last, after the
 retirement has landed and the diff has been reviewed.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+`gov-session` retired with an upgrade step only, though nine files read it by value. Point 6 retired the per-pass
+checklist and the prebuild with no build owning the retirement.
+
 ## The fix
 
 Make the dependency impossible rather than findable. Where an assertion is about what a shared builder

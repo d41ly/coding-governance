@@ -185,17 +185,21 @@ run found on its own, with each run's line cited. The returns are filed verbatim
     - The index is one SQLite file per node, at `<git-common-dir>/gov/index.db`, shared across
       worktrees (revised 2026-10-19, the night pass two, point 3, pending NT-15; it was one JSON file
       per tree, which measured about 30 s to rebuild and 1.6 GB to load at ten times today's tree).
-    - Its rows are keyed by blob, and a tree is a set of blobs, so a commit re-parses only the blobs
-      it changed: a one-file update took 9 ms and an inverse query about 1 ms at ten times today's
+    - A tree is a set of paths, each naming a blob, so the index keeps a table from tree and path to
+      blob, keys what a blob holds by blob and what a path names (a document's tag, a symbol's address, a
+      citation) by path and blob (revised by the night pass two's review: one blob sat at 24 paths at
+      `e1a54ac67`). A commit then re-parses only the blobs it changed: a one-file update took 9 ms and an inverse query about 1 ms at ten times today's
       tree (`build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` section 2). The
       tree id is only its freshness key, and JSON is only `gov tag`'s output.
-    - Only the extractors write it, and a deleted file rebuilds to identical rows. SQLite's own lock
+    - Only the extractors write it, and a deleted file rebuilds to identical rows, seen on a planted tree
+      where one blob sits at two paths and one of them is deleted. SQLite's own lock
       serialises concurrent writers, so a reader never sees a torn row.
     - memory-recall's FTS5 tables move into the same file, keyed the same way, so an edit no longer
       rebuilds a whole per-worktree cache.
   - **An uncommitted edit.** A working tree with uncommitted edits is served HEAD's tree, overlaid
     with the working-tree blobs of its modified tracked files. Those rows are marked `dirty`, and
-    the freshness check exempts them.
+    the freshness check exempts them. Each worktree's overlay is its own, never served to another worktree,
+    since every worktree shares the one file (revised by the night pass two's review).
   - **Probe:** five concurrent `gov tag show` calls on a cold cache, then a query after an
     uncommitted edit.
 
@@ -263,7 +267,7 @@ once dTotalRecall registers it (P33).
   that write path's change record, and the index derives the redirect from it, a split redirecting to no single
   successor. A retired name is never reused (revised 2026-10-19, the folds' closing review).
 - **Index and resolver.** The index is the one derived SQLite file `[cross]` places, its rows keyed by
-  blob and fresh per tree, re-parsing only changed blobs, never committed and never loaded whole (revised
+  blob, or by path and blob for what a path names, fresh per tree, re-parsing only changed blobs, never committed and never loaded whole (revised
   2026-10-19, the night pass two, point 3, pending NT-15). `gov tag show|where|refs|check <address>` returns the
   smallest leaf slice in one call.
 - **Joins.** `compute_coverage` moves to `tools/lib` as the join factory, because the map that holds it
@@ -423,7 +427,8 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
     fan, its checklist and orientation template (both instruction unit tags), its merge, its twin
     rule, and its agent cap. A per-call intensity is a named variant row. That is run A's pick
     (`research-role-shapes-a.md:15,116`).
-  - **The agent cap** is bounded by agent-cap's `FANOUT_CAP`, never a new value.
+  - **The agent cap** of each stage is at or under `runtime.agents-in-flight` (revised 2026-10-19, the night
+    pass two, point 7, pending NT-27: it was agent-cap's `FANOUT_CAP`).
   - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which
     `resolve_stage_efforts` already reads (`roles_lib.py:561`), until dConvergedCharter folds them into
     `roles.effort.<role>` and `roles.effort.<workflow>.<stage>`, beside `roles.model.<role>` (revised
@@ -436,7 +441,7 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
     - `handoff.py stage-efforts` and `harness-args`;
     - check_roles.py R6 to R9;
     - adopt-roles.sh, render_agents.py and check-wiring.sh;
-    - agent-cap's `args.roles` refusal;
+    - the roles pack's `args.roles` refusal, agent-cap's until the night pass two's point 7;
     - the build Skill's calls.
 - **Kinds.** Five role harnesses registered at Runtime's role-harness point: `single`, `per-unit`,
   `panel` (finders, at most five skeptic batches, one synthesizer), `twin` (two runs of one shape,

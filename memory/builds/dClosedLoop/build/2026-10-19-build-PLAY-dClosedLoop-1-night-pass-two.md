@@ -33,8 +33,8 @@ what the design held on each point, the research, the design worked in, and the 
 - **One point at a time.** Each point gets its own section: what the design already holds, what the research found,
   the design worked in, and its forks. Research runs ahead in waves, since a point's design waits on its returns.
 - **Research.** Researchers run at the owner's medium effort, read-only, one question each. Each handoff is in
-  `prompts/`, and each return is saved verbatim beside this record. Agent-cap admits five direct spawns at a time, so
-  the questions go out in waves of at most five.
+  `prompts/`, and each return is saved verbatim beside this record. Agent-cap admits five direct spawns per prompt, so
+  the questions go out in waves of at most five (point 7 measures how it counts, and retires it).
 - **Forks.** Each fork's first option is the recommendation. The design as folded shows the recommendation, marked
   pending on its fork, as the first night pass did. The `NT` family numbers them.
 - **Reviews.** The night's folds are reviewed twice, as two independent Tier-2 runs compared defect by defect, and
@@ -57,7 +57,7 @@ arrives.
 | 131 | 3, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-12-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-prior-art.md` | files in git, one derived SQLite index, per-sender refs, an ids-only doorbell |
 | 132 | 4, the converged design | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-13-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-design.md` | five carriers and no one contract; commitment rows on the record graph, the branch pushed per witnessed item |
 | 133 | 4, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` | eight families; a schema rendered per work order, and create-only registers keyed by derived keys |
-| 134 | 5, caps | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | 24 caps, 18 refusing; one switch at warn, made visible on a passing run, priced and trended, with consumer limits and correctness checks kept outside it |
+| 134 | 5, caps | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | 24 caps, 18 refusing; one switch at warn, made visible on a passing run, priced and trended, with consumer limits, correctness checks and limits that define a format kept outside it |
 | 135 | 6, gotchas | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` | 6.2% precision on code reviews and 18% at the moment of the edit; retire writing-time serving by anchors, keep classes on review, gate the syntactic ones |
 | 136 | 7, agent-cap | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` | it counts claims per prompt, never agents in flight, and a notification resets it; one Runtime key enforced at three scopes |
 
@@ -142,7 +142,7 @@ it was placed under and its own recorded changes, pinned per step and checked wh
 | Add or remove a lens | a catalogue row, swapped or excluded |
 
 **What it leaves for later.** Scenarios per feature or per unit wait on the feature and unit transition tables. Caps
-above five wait on point 7. A change of meaning in prose (a lens brief reworded for one call) leaves no structural
+above five wait on point 7, which makes the limit the owner's `runtime.agents-in-flight`. A change of meaning in prose (a lens brief reworded for one call) leaves no structural
 deviation for the step-boundary comparison to see, the same limit the adoption pass found.
 
 **Folded.** v2's P8, four `flow.*` keys with their preset rows, and clauses on dDeclaredLoop, dPlacedRequest,
@@ -256,14 +256,14 @@ register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
 **The design worked in.**
 1. **Text in git stays the store of record** (NT-14).
 2. **The index becomes one SQLite file per node** (NT-15). dOrderedCharter's index clause, the systems record's
-   `[cross]` and its index bullet are revised: rows keyed by blob, the tree id only a freshness key, JSON only as
+   `[cross]` and its index bullet are revised: rows keyed by blob, or by path and blob for what a path names, the tree id only a freshness key, JSON only as
    `gov tag`'s output, and a deleted file rebuilt to identical rows. dTotalRecall moves memory-recall's FTS5 tables
    into the same file, and its memory legs read the index for unchanged blobs, an index read and a full read agreeing
    on a planted tree.
 3. **Relations checked per target after merge.** dTotalRecall declares each edge type's cardinality per target as
    well as per source and checks it over the merged tree, seen red on probe D's two supersessions.
-4. **One mail ref per sender** (NT-16): `refs/gov/mail/<slug>/<fleet tag>`, revised in v2, coordination and the
-   memory plan.
+4. **One mail ref per writing session** (NT-16): `refs/gov/mail/<slug>/<fleet tag>/<session>`, revised in v2,
+   coordination and the memory plan, keyed by session after the review found one node's sessions sharing a ref.
 5. **News read at every tool call** (NT-17). dKeptSession gains `mailbox.notice` (`every-tool-call`, `every-item` or
    `off`) and `mailbox.fetch-seconds` (60). The doorbell carries ids only, and the disposal still happens at items
    and transitions, as `mailbox.reads` says.
@@ -320,10 +320,12 @@ probes decide the shape:
   alone runs transitions (NT-20).
 - **Decisions.** A decision is written once to `refs/gov/decisions/<build>/<key>`, keyed by the work-order slot that
   raised it, never by its wording. A second session deciding the same slot is refused and reads the first (NT-18).
-- **Problems.** A problem is written to `refs/gov/problems/<subject key>`, keyed by a path, a definition, a tag or a
-  node fact. A work order cut later is handed the problems whose subject meets its item's seed (NT-18).
-- **Messages.** The mailbox keeps only traffic that crosses a lease, each message's id derived from its sender's act,
-  item, kind and subject, so a retry is refused as a duplicate. Its closed set of kinds is one list.
+- **Problems.** A problem is written to `refs/gov/problems/<encoded subject>/<problem id>`: the subject is a path, a
+  definition, a tag or a node fact encoded into a legal ref name, and the id is derived from the filing act and
+  the problem, so two problems on one path both land. A work order cut later is handed the problems whose subject meets its item's seed (NT-18).
+- **Messages.** The mailbox keeps only traffic that crosses a lease, each message's id derived from its sender's act or
+  session, item and pass, kind, subject and the id it answers, so a retry is refused as a duplicate while two answers
+  both land. Its closed set of kinds is one list.
 
 **The contradictions, as folded.**
 1. dBoundRoles' work order still read "its inputs as record fields at their SHAs": now "handed as content".
@@ -396,6 +398,10 @@ of instructions, and past them text is silently lost.
    too, so they fall under the switch. Two things stay outside it:
    - a consumer's own limit, which fits or refuses, because over it text is lost;
    - a check of correctness, which is no cap.
+
+   Dispatch 134 kept a third class outside: the limits that define a format, such as a one-line rule's 200
+   characters and an index entry's length, which never moved. The fold departs from that pick, since the owner's
+   words remove every hard cap, and NT-22 offers it as its second option (the review's correction).
 2. **Correctness split out.** `instructions.checks` now governs only a load set missing a required unit. P27, the
    systems record's slot budget and dOrderedCharter's load-set and composition clauses read the size half under
    `budgets.enforce`.
@@ -439,8 +445,8 @@ about to trip. Can it take a better shape, in the orientation agents or the runt
   charter's "run it before any review".
 - **The design.** v2 hands classes to the builder's work order by the unit's write set (SA-7).
 
-**What it measured.** The lookup ran again at the head of each of 47 closed reviews whose appendices carry a classes
-column, and its selections were compared with the classes of the confirmed findings:
+**What it measured.** The lookup ran again at the head of each of the 47 closed reviews that record a range, of the 66
+whose appendices carry a classes column, and its selections were compared with the classes of the confirmed findings:
 - **Precision.** On code reviews it was 6.2%: 82 hits in 1,317 classes selected. On a diff of 85 files or more it
   selected 60 to 95% of the catalogue, and twelve classes were selected on every code review.
 - **Use.** Sessions ran the lookup 1,127 times on this node, and a class's body was opened 45 times.
@@ -462,11 +468,11 @@ column, and its selections were compared with the classes of the confirmed findi
 
    A trigger precise enough to stay quiet is a gate, and that is the next point.
 3. **Syntactic classes become gates.** Under `review.left-shift`, a syntactic class becomes a gate at its second
-   occurrence, and a gated class leaves every checklist. dLinkedLibrary records each class's gate status, and marks
-   its anchors as where it bit, never what triggers it.
+   occurrence, and a gated class leaves every checklist. dLinkedLibrary derives each class's gate status, gated only where the
+   class names a leg seen to refuse a planted case of it, and marks its anchors as where it bit, never what triggers it.
 4. **Classes stay on review** (NT-25). There they are the only source of labels and left-shift dispositions.
-   dFairHearing's checklist is still selected by the pinned range, minus every fully gated class, which cuts 29% of
-   the items for 5% of the labels. A replay with the checklist and without it, over the known-defect corpus, decides
+   dFairHearing's checklist is still selected by the pinned range, and dLinkedLibrary, once it derives the status,
+   takes every fully gated class off it, which cuts 29% of the items for 5% of the labels. A replay with the checklist and without it, over the known-defect corpus, decides
    between that selection and every ungated class. The charter's "run it before any review" retires, since the harness
    hands the checklist itself.
 5. **Orientation may serve by intent, if it earns it** (NT-26). dIndexedDesign's reuse scout already reads a unit's
@@ -512,11 +518,14 @@ and binary now contradict.
 SubagentStop. The key belongs to the policy file, so dGroundRules declares it and every build may read it. It is
 enforced at three scopes:
 1. **The harness's own settings**, rendered from the key, for one session's direct spawns and one Workflow run. They
-   are the only reliable in-flight counters today, and they queue where agent-cap refused. dGroundRules lands them
+   are the only reliable in-flight counters today. A Workflow agent over the limit queues, but a direct spawn over
+   it is refused with "Do not retry", and the harness does not enforce the direct bound under ultracode (`gap-rt-35`, the
+   review's correction). dGroundRules lands them
    with the key, and agent-cap's slot ledger, its conf, its `AGENT_CAP` refusal and its print mode retire in that
    unit.
 2. **An in-flight ledger**, dWellOiledMachine's hook pack, for the session's total: a slot claimed at SubagentStart,
-   released at SubagentStop, and swept when a session dies. It is armed only once the spike shows SubagentStop firing
+   released at SubagentStop, and swept when a session dies. A Workflow agent's claim converts one slot of its
+   call's reservation, so it counts once. It is armed only once the spike shows SubagentStop firing
    for every way an agent ends. Otherwise the limit splits into direct and Workflow budgets, with one live run per
    session.
 3. **The supervisor's reservation** under the lease, for act sessions and nodes, as layer-runtime designed it.
@@ -549,6 +558,23 @@ revised; dGroundRules, dFairHearing, dBoundRoles and dWellOiledMachine clauses, 
 bound, per-prompt total, script rules, agent-cap's arm, the owner-pack row, the carriers table, the roster and the
 in-flight test; and the register's `gap-rt-34` and `gap-roles-30`, with `gap-rt-05` amended.
 
+## [reviewed] The night's folds, reviewed twice and folded
+
+The owner's "Run tier2 reviews on the folds twice": two independent light diff reviews read `ad54fe388` over
+`e1a54ac67`, dispatches 137 and 138, and `build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md` compares them defect by defect. They confirmed 31 defects, three of
+them high, and none needed the owner: where the runs left two routes, the owner's words or an earlier answer chose
+one. Most were folds that landed in v2 and nowhere else, which this record's sections above now state as folded. The
+rest tightened the design itself:
+- a problem keyed per problem under its encoded subject, a message id that includes the id it answers, and mail refs
+  keyed per writing session;
+- index rows for what a path names keyed by path and blob, and each worktree's uncommitted rows its own;
+- a Workflow agent counted once, the spike red on each way an agent can end, and the interim agent limit recorded as
+  `gap-rt-35`;
+- a class's gated status derived from a leg seen to refuse it, never declared;
+- every catalogued value of the new flow and unit keys given its arm.
+
+NT-22 gains the caps research's own pick as an option. NT-27 and NT-28 drop the options the owner's words rule out.
+
 ## [forks] Parked for the owner, 2026-10-19
 
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
@@ -572,16 +598,16 @@ decision.
 | NT-13 | Does the reuse check run a second, independent pass? | off by default, on where a miss is expensive; always; never | `build.reuse-check.second-pass`'s default: off, on |
 | NT-14 | What is the store of record for instructions and memory? | text in git, markdown and TOML, as today; a git-backed database such as Dolt; a cloud relational database | a structural decision |
 | NT-15 | What shape does the derived index take? | one SQLite file per node keyed by blob, memory-recall's tables inside it and the memory legs reading it; one JSON file per tree, as designed; per-worktree caches, as today | a structural decision |
-| NT-16 | How do senders share a build's mailbox? | one ref per sender per build; one ref per build, as designed | a structural decision |
+| NT-16 | How do senders share a build's mailbox? | one ref per writing session per build; one ref per build, as designed | a structural decision |
 | NT-17 | When does a session learn of a message? | at every tool call, from a local copy a detached fetch keeps fresh, with the live channel ringing ids only; at every item, as `mailbox.reads` alone; never between reads | `mailbox.notice`'s default: every-tool-call, every-item, off |
 | NT-18 | How are decisions, problems and messages kept between sessions and nodes? | create-only registers keyed by derived keys: decisions by their work-order slot, problems by subject, and message ids derived so a retry is refused; the mailbox's chain alone, as designed | a structural decision |
 | NT-19 | When is a build's branch pushed? | at every witnessed item; at every pass commit; at every transition; at the landing | `build.push`'s default: every-item, every-pass, every-transition, at-landing |
 | NT-20 | May another session drive one unit of a build it does not hold? | yes, under that unit's lease, the build's driver alone running transitions; no, one driver per build, as designed | `build.unit-holders`' default: any-session, driver-only |
 | NT-21 | What replaces `gov-session`? | the `intake` message or a unit offered at placement, with the receiving session's prompt writer rendering its work order; the prompt writer, as designed; `gov-session` kept | a structural decision |
-| NT-22 | What does the one cap switch cover? | every size cap on a document or record, line and entry lengths included, with a consumer's own limit and every check of correctness left outside it; the same, with the owner able to pin one cap to refuse; every check, correctness included | a structural decision; its default is the owner's: warn |
+| NT-22 | What does the one cap switch cover? | every size cap on a document or record, line and entry lengths included, with a consumer's own limit and every check of correctness left outside it; every size cap but the limits that define a format, which keep refusing, as dispatch 134 picked; the same as the first, with the owner able to pin one cap to refuse; every check, correctness included | a structural decision; its default is the owner's: warn |
 | NT-23 | How does an advisory cap keep a brake? | shown on a passing run, attributed to its unit, priced by its reads, and trended into an owner item by the Loop Review; shown on a passing run only; printed by its leg, as today | a structural decision |
 | NT-24 | Does the builder's work order carry the classes its write set selects? | no: serving by path retires, with the per-pass checklist and the prebuild; yes, as designed; yes, without fully gated classes | a structural decision |
 | NT-25 | How does a review get its classes? | the checklist its range selects, minus fully gated classes, until a replay with and without the checklist decides between that and every ungated class; every ungated class; no checklist at review | a structural decision |
 | NT-26 | Who serves classes while code is written? | the reuse scout by intent, at most five with reasons, armed only after it wins its replay, else no one; a runtime hook by path or content; no one | a structural decision |
-| NT-27 | Where does the agent limit live, and what enforces it? | one Runtime key, enforced by the harness's own settings now, an in-flight ledger on SubagentStart and SubagentStop once the spike passes, and the supervisor's reservation, every other agent-cap rule moved to its home; the harness's settings alone; agent-cap kept, re-keyed per session | a structural decision |
-| NT-28 | May the owner raise the agent limit? | yes, by a policy write, which leaves a diff; no, lower-only as today | a structural decision; the key's default stays 5 |
+| NT-27 | Where does the agent limit live, and what enforces it? | one Runtime key, enforced by the harness's own settings now, an in-flight ledger on SubagentStart and SubagentStop once the spike passes, and the supervisor's reservation, every other agent-cap rule moved to its home; the harness's settings alone; the limit split between direct and Workflow budgets with one live run per session, the research's fallback | a structural decision |
+| NT-28 | How far may the owner raise the agent limit? | to any count, by a policy write, which leaves a diff; only up to the harness's own defaults, 20 direct agents and up to 16 per Workflow run | a structural decision; the key's default stays 5 |

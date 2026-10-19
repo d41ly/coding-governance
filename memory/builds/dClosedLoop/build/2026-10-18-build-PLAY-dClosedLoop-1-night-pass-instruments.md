@@ -15891,6 +15891,897 @@ R.save()
 print("folded point 7")
 ````
 
+### `fill_134_135.py`
+
+The research table's outcomes for dispatches 134 and 135, filled when they returned.
+
+````python
+"""Fill the research table's outcomes for dispatches 134 and 135 in the night pass two's record."""
+import pathlib, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.sub("| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | running |",
+      "| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | 24 caps, 18 refusing; one switch at warn, made "
+      "visible on a passing run, priced and trended, with consumer limits and correctness checks kept outside it |",
+      "research: 134")
+R.sub("| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` | running |",
+      "| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` | 6.2% precision on code reviews and 18% at the "
+      "moment of the edit; retire writing-time serving by anchors, keep classes on review, gate the syntactic ones |",
+      "research: 135")
+R.save()
+````
+
+### `build_args_night2.py`
+
+The night's closing review: both runs' args, differing only in the run label, the report path and the scratch path.
+
+````python
+"""Build the args of the night pass two's closing review, run twice at the owner's word ("Run tier2 reviews on the
+folds twice", 2026-10-19): two independent light Tier-2 diff reviews of e1a54ac67..ad54fe388, every role at medium,
+the shape of the last folds' closing review (`adopt/build_args_folds.py`). The two runs differ only in the run label,
+the report path and the scratch path.
+
+Usage: python -X utf8 build_args_night2.py <scratch-dir> <base> <head>   (from the worktree root)
+Writes <scratch-dir>/night2/args-night2-a.json and args-night2-b.json, and a compact copy of each.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S, BASE, HEAD = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+B = "memory/builds/dClosedLoop/build/"
+R = "memory/builds/dClosedLoop/reviews/2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-{}.md"
+base = json.loads((S / "adopt" / "args-folds-a.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+base["base"], base["head"] = full(BASE), full(HEAD)
+base["intensity"], base["round"] = "light", 1
+base["efforts"] = {"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"}
+D = "2026-10-1{}-build-PLAY-dClosedLoop-1-{}.md"
+base["specs"] = [B + D.format(d, n) for d, n in (
+    (4, "architecture-v2"), (4, "gap-register"), (4, "coordination"), (4, "flow-interactions"), (4, "foundations"),
+    (5, "layer-instruction"), (5, "layer-flow"), (5, "flow-steps"), (5, "flow-roles"), (5, "layer-roles"),
+    (5, "layer-memory"), (6, "layer-library"), (5, "layer-runtime"), (6, "layer-expansions"), (5, "review-system"),
+    (6, "systems"), (7, "ownership"), (8, "recut"), (8, "fates"), (8, "memory-plan"), (9, "flow-roles-adoption"),
+    (9, "adopter-instructions"), (9, "night-pass-two"))] + [
+    B + "2026-10-19-build-PLAY-dClosedLoop-1-research-" + n + ".md" for n in (
+        "scenarios-design", "scenarios-prior-art", "scoutedseam-apply", "storage-measured", "storage-prior-art",
+        "handoffs-design", "handoffs-prior-art", "caps", "gotchas", "agent-cap")]
+if len(set(base["specs"])) != len(base["specs"]):
+    sys.exit("a spec repeats")
+for p in base["specs"]:
+    if not pathlib.Path(p).exists():
+        sys.exit(f"missing: {p}")
+base["checklist"] = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", f"{BASE}..{HEAD}"],
+                                   capture_output=True, text=True, encoding="utf-8", check=True).stdout
+base["byDesign"] = "\n".join([
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- The night pass two ran unattended at the owner's word. Its forks NT-1 to NT-28 are parked for the owner, each "
+    "first option the recommendation, folded into the design and marked pending. A finding may show a fold "
+    "contradicting the owner's words, a record, the research it cites or the tree, or a pending recommendation stated "
+    "differently in two records. It may not re-argue a recommendation the owner has yet to rule on.",
+    "- The owner's words are decisions where they direct, recorded verbatim in the night pass two's [words]: point 5's "
+    "single switch set to warn by default, point 7's retirement of agent-cap with an owner-adjustable limit.",
+    "- Every earlier answer stands: FA-1 to FA-7, SA-1 to SA-12, SK-1 and SK-2, IA-1 to IA-6, AP-1 to AP-35, NP-1 to "
+    "NP-24, SP-1 and SP-2, WK-1 to WK-8, PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, FL1, FR-1 to FR-8, CX-1 to CX-3, "
+    "RT-1 to RT-4, and every round's before them.",
+    "- Research returns are verbatim and dated, dispatches 127 to 136's, and their prompts are rendered handoffs: "
+    "neither is under review, though a record that misstates its return is.",
+    "- Dated records keep what held when they were written: revision notes, the walk records and the ownership "
+    "record's snapshot rows, apart from the four rows the night revised.",
+    "- The instruments record holds the scripts as they ran; a script is reviewed only for whether it did what the "
+    "records say it did.",
+    "- Generated files (memory/LIVE.md and the build README's generated regions) are rendered, not reviewed.",
+])
+CONTEXT = (
+    "The diff is " + base["head"][:9] + " over " + base["base"][:9] + ": the night pass two, worked unattended at the "
+    "owner's word, its record " + B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md. 0657a8667 opens it with "
+    "the owner's seven points verbatim ([words]) and the research handoffs, and one commit per point folds that "
+    "point's design, each part pending its NT fork ([forks]). "
+    "(1) 43bd58baa, scenarios ([p1-scenarios], NT-1 to NT-9): a registered scenario kind, chosen at placement, "
+    "composed per build and pinned per step, with four flow keys. "
+    "(2) f27b6e3b2, aScoutedSeam ([p2-scoutedseam], NT-10 to NT-13): dScopedBuild's `build.reuse-check`, the reuse "
+    "scout's M1c contract, the `upstream` field with rows gating only where measured, the prompt writer's skeleton, an "
+    "effort floor. "
+    "(3) dff70c5f8, storage ([p3-storage], NT-14 to NT-17): text in git stays the record, the index one SQLite file per "
+    "node keyed by blob, per-target relation checks after merge, one mail ref per sender, `mailbox.notice` and "
+    "`mailbox.fetch-seconds`, lease parent chains. "
+    "(4) da51d45c4, handoffs ([p4-handoffs], NT-18 to NT-21): returns declaring their rows and a schema rendered per "
+    "order, create-only registers for decisions and problems, derived message ids, `build.push`, "
+    "`build.unit-holders`, `gov-session` retired into the intake message, and twelve contradictions corrected. "
+    "(5) d171bcb47, caps ([p5-caps], NT-22 and NT-23): `budgets.enforce` warning by default, `instructions.checks` "
+    "narrowed to correctness, `annotations.budget` retired, warnings shown on a passing run and trended. "
+    "(6) 723abc12b, bug classes ([p6-gotchas], NT-24 to NT-26): no selection by write set, the review checklist "
+    "without fully gated classes, intent-based selection armed only after a replay. "
+    "(7) ad54fe388, agent-cap ([p7-agent-cap], NT-27 and NT-28): `runtime.agents-in-flight` on the never-touch list, "
+    "enforced by the harness's settings, an in-flight ledger and the supervisor, every agent-cap rule moved. "
+    "Review it as a design change. Does each fold land the same way in every record it touches, and does any text "
+    "still state what a fold replaced: the index as one JSON file per tree, one mail ref per build, the mailbox read "
+    "only at items, `annotations.budget`, a cap's own mode under `budgets.*`, `instructions.checks` refusing an "
+    "over-budget load, bug classes selected by a write set, `gov-session` folding into the prompt writer, agent-cap's "
+    "`FANOUT_CAP` as a live carrier or its per-prompt total as kept? Does every new clause sit on its own build or an "
+    "ancestor, naming no later build's key or kind? Are the new keys consistent with the presets, the never-touch list "
+    "and the owner's words? Does each pending marker name a fork whose row exists, with the options the section "
+    "describes? Does each new gap state a fact its research supports, owned by the build whose unit closes it? Does "
+    "each section report its research faithfully, its figures matching the return it cites? A fold's own text is new "
+    "surface: check it as hard as the text it replaced. This is run {run} of two independent runs on the same diff; "
+    "read no other run's report. Write the report to {report}. Its head carries an H1, then, within its first twelve "
+    "lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose "
+    "token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.")
+for run in ("A", "B"):
+    report = R.format(run.lower())
+    if pathlib.Path(report).exists():
+        sys.exit(f"{report} exists")
+    a = dict(base, scratch=(S / f"review-night2-{run.lower()}").as_posix(),
+             context=CONTEXT.replace("{run}", run).replace("{report}", report))
+    out = S / "night2" / f"args-night2-{run.lower()}.json"
+    out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+    (S / "night2" / f"args-night2-{run.lower()}.compact.json").write_text(json.dumps(a, ensure_ascii=False),
+                                                                         encoding="utf-8", newline="\n")
+    print(f"run {run}: {a['kind']} {a['base'][:9]}..{a['head'][:9]}, {a['intensity']}, {len(a['specs'])} specs, "
+          f"checklist {len(a['checklist'].splitlines())} lines, efforts {a['efforts']}, context "
+          f"{len(a['context'].split())} words, report {report.rsplit('/', 1)[1]}")
+````
+
+### `log_night2.py`
+
+The session log's dispatch rows 127 to 138, the derived agent lines and the night's events.
+
+````python
+"""Record the night pass two in the session log: dispatch rows 127 to 138 (the ten researchers, then the closing
+review's runs A and B), every agent and returned line as the roles kit derived them, and the night's events.
+
+Usage: python -X utf8 log_night2.py <agent-lines-127-136.txt> <agent-lines-runA.txt> <agent-lines-runB.txt>
+       (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+
+def lines_of(path, n):
+    got = [ln for ln in pathlib.Path(path).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+           if ln.startswith(("- agent —", "- returned —"))]
+    if len(got) != n:
+        sys.exit(f"{path}: {n} agent and returned lines expected, read {len(got)}")
+    return got
+
+
+research, run_a, run_b = lines_of(sys.argv[1], 20), lines_of(sys.argv[2], 20), lines_of(sys.argv[3], 20)
+F = "`" * 3
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md"
+CMP = "build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row126 = [ln for ln in L.text.split("\n") if ln.startswith("| 126 |")]
+if len(row126) != 1:
+    sys.exit("no single dispatch row 126")
+WHO = "gov-researcher, at the owner's medium effort"
+P = "`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-{}-researcher.md`"
+R = "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-{}.md`"
+ROWS = [
+    (127, WHO, "The night pass two, point 1: what the converged design lets bend per kind of work, and where it cannot",
+     P.format(8), "returned, 7m03s, 40.8k out: six seams each carry part of a variant and none selects one; nothing "
+     "records what kind of work a build is", R.format("scenarios-design")),
+    (128, WHO, "Point 1: prior art outside gov for flows that vary per case and adapt mid-run",
+     P.format(9), "returned, 7m57s, 37.5k out: eight families, none covering every case; pinned templates and "
+     "late-bound repertoires with recorded rejections the closest", R.format("scenarios-prior-art")),
+    (129, WHO, "Point 2: aScoutedSeam's measured workflow shape and prompt principles, re-derived and applied to gov's "
+     "flow and roles", P.format(10), "returned, 9m32s, 55.2k out: 33 of 35 at medium from an orientation scout and an "
+     "enumerated diff check; the rows moved the catch into the step that gates", R.format("scoutedseam-apply")),
+    (130, WHO, "Point 3: storage and coordination today and as designed, measured at one and ten times today's tree",
+     P.format(11), "returned, 17m33s, 62.8k out: markdown holds as the record; the designed JSON index fails at ten "
+     "times; read points, not transport, make news late", R.format("storage-measured")),
+    (131, WHO, "Point 3: prior art outside gov for a typed record graph shared by several nodes",
+     P.format(12), "returned, 8m11s, 32.2k out: files in git with one derived SQLite index, per-sender refs and an "
+     "ids-only doorbell", R.format("storage-prior-art")),
+    (132, WHO, "Point 4: every hand-off in the converged design, end to end, and whether one contract holds them",
+     P.format(13), "returned, 7m28s, 37.9k out: five carriers and no one contract; twelve contradictions; commitment "
+     "rows on the record graph", R.format("handoffs-design")),
+    (133, WHO, "Point 4: prior art outside gov for hand-offs between agents and sessions",
+     P.format(14), "returned, 8m30s, 36.0k out: eight families; a schema rendered per work order and create-only "
+     "registers keyed by derived keys", R.format("handoffs-prior-art")),
+    (134, WHO, "Point 5: every size cap gov enforces, its history, and what an advisory cap needs",
+     P.format(15), "returned, 10m56s, 52.5k out: 24 caps, 18 refusing; one switch at warn, shown on a passing run, "
+     "priced and trended", R.format("caps")),
+    (135, WHO, "Point 6: whether the bug-class lookup serves the right class at the right moment, measured on gov's "
+     "closed reviews", P.format(16), "returned, 12m44s, 58.5k out: 6.2% precision on code reviews and 18% at the "
+     "moment of the edit; serving by path loses", R.format("gotchas")),
+    (136, WHO, "Point 7: what agent-cap enforces, measured on synthetic payloads, and where an owner-set limit belongs",
+     P.format(17), "returned, 8m57s, 48.5k out: five claims per prompt id, never agents in flight; one Runtime key at "
+     "three scopes", R.format("agent-cap")),
+]
+SHAPE = ("`tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), "
+         "five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run {} of two")
+WHAT = ("The night pass two's folds, reviewed twice at the owner's word: `ad54fe388` over `e1a54ac67`, the seven "
+        "points' folds and the record that opens them")
+ROWS += [
+    (137, SHAPE.format("A"), WHAT, "the args, built by `build_args_night2.py`",
+     "returned as `wf_4e7e18b8-a33`, CLEAN WITH FIXES, 31 of 41 confirmed, 25 items, 1 high",
+     "`reviews/2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-a.md`"),
+    (138, SHAPE.format("B"), WHAT, "the args, built by `build_args_night2.py`",
+     "returned as `wf_9c278556-e2c`, CLEAN WITH FIXES, 26 of 30 confirmed, 23 items, 2 high",
+     "`reviews/2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-b.md`"),
+]
+new = "".join(f"| {n} | {who} | {what} | {brief} | 1799cb98 | {out} | {rec} |\n" for n, who, what, brief, out, rec in ROWS)
+L.sub(row126[0] + "\n", row126[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n",
+                "\nThe night pass two's research, dispatches 127 to 136, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(research) + "\n" + F + "\n"
+                + "\nThe night pass two's closing review, dispatches 137 and 138, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(run_a + run_b) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner stepped away for the night and handed over seven points, recorded verbatim
+  in `{REC}` `[words]`, asking: "Go through each of them separately, one after another, understand them and their fit
+  into the current design. Run agents/workflows at medium effort to assist you in research and design, park all the
+  forks for me to go at for when I return." Ten researchers took one question each, dispatches 127 to 136, in two
+  waves of five. Each return is saved beside the record, and their commands and probes are in
+  `build/2026-10-19-build-PLAY-dClosedLoop-1-research-night2-instruments.md`.
+- 2026-10-19, session 1799cb98: each point was folded in its own commit, its recommendation marked pending on its
+  forks: scenarios `43bd58baa` (NT-1 to NT-9), aScoutedSeam `f27b6e3b2` (NT-10 to NT-13), storage `dff70c5f8`
+  (NT-14 to NT-17), handoffs `da51d45c4` (NT-18 to NT-21), caps `d171bcb47` (NT-22 and NT-23), bug classes
+  `723abc12b` (NT-24 to NT-26) and agent-cap `ad54fe388` (NT-27 and NT-28). The 28 forks are parked in the record's
+  `[forks]`.
+- 2026-10-19, session 1799cb98: dispatch 134 ran `check-template-size.sh` six times on its scratch clone before it
+  learned that a researcher may run no gate; the scratch guard refused its next gate run, and nothing was written. The
+  harness flagged dispatches 135's and 136's returns for a settings-file pattern; both cite `.claude/settings.json`
+  only as a file they read, and both were kept as data.
+- 2026-10-19, session 1799cb98: the owner's "Run tier2 reviews on the folds twice": two light diff reviews of
+  `ad54fe388` over `e1a54ac67` ran one after the other, dispatches 137 and 138, their args differing only in the run
+  label, the report path and the scratch path. Run A's report was moved out of the tree while run B ran, so run B
+  could not read it, and restored byte for byte after (sha256 `2ed7e7563b28`). The comparison is `{CMP}`. The folds
+  made before the night, the flow and roles adoption's `caca7a636` and `cf6f1434c`, have had no closing review.
+""", "events")
+L.save()
+````
+
+### `fold_review_a.py`
+
+The closing review's fold, run A's defects and the record's own corrections, dry-run on a scratch copy of the records before run B returned.
+
+````python
+"""The night pass two's closing review, folded: run A's confirmed defects (and run B's, in fold_review_b.py), each in
+the records its [map] row names. Every substitution matches exactly once or the script exits.
+
+Usage: python -X utf8 fold_review_a.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+RV = "the night pass two's review"
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+# problem-keys (H1): one problem per path, and no dotfile path
+V.sub("and problems at `refs/gov/problems/<subject key>`, keyed by a path, a definition, a tag or a node fact, seen red "
+      "on two clones deciding one slot (the night pass two, point 4, pending NT-18)",
+      "and problems at `refs/gov/problems/<encoded subject>/<problem id>`, the subject a path, a definition, a tag or a "
+      "node fact encoded into a legal ref name (a leading dot, a `.lock` ending, a space, `:` and `~` escaped) and the "
+      "id derived from the filing act and the problem's content, so two problems on one path both land and a retried "
+      "filing is refused, seen red on two clones deciding one slot, on two problems filed against one path and on a "
+      f"dotfile path (the night pass two, point 4, pending NT-18, keyed per problem by {RV})",
+      "problem-keys")
+# clamp-kept (M1), direct-unbounded (M15)
+V.sub("agent-cap's slot ledger retired in the same unit with `.agent-cap.conf`, its refusal of a set `AGENT_CAP` and its "
+      "print mode, their readers re-pointed to the policy reader, seen on a fixture repository whose Workflow run of four "
+      "agents overlaps at most two under a limit of two (the night pass two, point 7, pending NT-27 and NT-28)",
+      "agent-cap's slot ledger, its ban on raw `parallel` and `pipeline`, the concurrency half of its bound rule and its "
+      "clamp of every bound to 1 to 5 retired in the same unit with `.agent-cap.conf`, its refusal of a set `AGENT_CAP` "
+      "and its print mode, their readers re-pointed to the policy reader, seen on a fixture repository whose Workflow "
+      "run of four agents overlaps at most two under a limit of two, whose three background Agents never run more than "
+      "two at once under that limit, the third refused, and in which, under a limit of eight, a direct spawn and a "
+      "registered harness call are both admitted, the rendered settings holding both values at the key and again "
+      "after a policy write raises it to six, and two concurrent Workflow runs each held to the limit, the session's "
+      f"total left to the in-flight ledger (the night pass two, point 7, pending NT-27 and NT-28, completed by {RV})",
+      "clamp-kept")
+# switch-census (M18)
+V.sub("seen on a planted over-cap file that warns under `warn` and refuses under `refuse` (the night pass two, point 5, "
+      "pending NT-22)",
+      "seen on every cap the caps research lists, each planted over its cap under each value and red where one ignores "
+      "the switch, and on a load set missing a required unit and a composition over a harness's own limit, both still "
+      f"refused under `warn` (the night pass two, point 5, pending NT-22, made a census by {RV})", "switch-census")
+# record-unrouted (M9)
+V.sub("| `budgets.enforce` | warn, refuse, record | warn |", "| `budgets.enforce` | warn, refuse | warn |",
+      "record-unrouted")
+V.sub("enforcing switch is set to WARN by default instead of refuse\"; what it covers is NT-22's | dGroundRules |",
+      "enforcing switch is set to WARN by default instead of refuse\"; what it covers is NT-22's; `record`, carried "
+      f"over from the retired `annotations.budget` with no arm, dropped by {RV} | dGroundRules |", "record-unrouted: source")
+# direct-unbounded (M15), direct-refuses (M3): the interim, stated where the key is
+V.sub("agents in flight in one session, its direct spawns and Workflow agents together, raised or lowered by a policy "
+      "write, pending NT-27 and NT-28 |",
+      "agents in flight in one session, its direct spawns and Workflow agents together, raised or lowered by a policy "
+      "write, pending NT-27 and NT-28. Until the in-flight ledger arms, it binds direct spawns and each Workflow run "
+      "separately, each up to the key: a direct spawn over it is refused, a Workflow agent over it queues, and the "
+      f"harness does not enforce the direct bound under ultracode ({RV}, `gap-rt-35`) |", "direct-unbounded: the key")
+# mail-ref-node (M6, L4)
+V.sub("one append-only ref per sender (`refs/gov/mail/<slug>/<fleet tag>`, revised by the night pass two, point 3, "
+      "pending NT-16)",
+      "one append-only ref per writing session (`refs/gov/mail/<slug>/<fleet tag>/<session>`, revised by the night "
+      f"pass two, point 3, pending NT-16, and keyed by session by {RV}, since a node's sessions would share a node's ref)",
+      "mail-ref-node")
+# message-id-collides (M7)
+V.sub("each message's id derived from its sender's act, its item, its kind and its subject, so a retried post is refused "
+      "as a duplicate, seen on a post retried after a crash (the night pass two, point 4, pending NT-18)",
+      "each message's id derived from its sender's session, and its act once Runtime mints acts, its item and pass, its "
+      "kind, its subject and the id "
+      "it answers, so a retried post is refused as a duplicate while two answers to two messages both land, seen on a "
+      f"post retried after a crash and on two acknowledgements from one item (the night pass two, point 4, pending NT-18, "
+      f"the answered id added by {RV})", "message-id-collides")
+# blob-keys-paths (M8)
+V.sub("its rows keyed by blob so a commit re-parses only the blobs it changed, the tree id only its freshness key and "
+      "JSON only `gov tag`'s output, written by its extractors alone and rebuilt from nothing to identical rows",
+      "a table from tree and path to blob beside rows keyed by blob for what a blob holds and by path and blob for what "
+      "a path names, so a commit re-parses only the blobs it changed, the tree id only its freshness key and JSON only "
+      "`gov tag`'s output, written by its extractors alone and rebuilt from nothing to identical rows, seen on a planted "
+      f"tree where one blob sits at two paths and one of them is deleted ({RV} keying path rows by path and blob)",
+      "blob-keys-paths")
+# ledger-double-counts (M14), fallback-unnamed (M15)
+V.sub("a Workflow call reserving its harness's declared fan, and a sweep keyed to the session's liveness in place of a "
+      "claim's expiry, armed only once the spike shows SubagentStop firing for a Workflow agent, an agent the owner "
+      "stopped, one failed by stalls and a killed session, and, if it does not, the limit split between direct and "
+      "Workflow budgets with one live run per session (the night pass two, point 7, pending NT-27)",
+      "a Workflow call reserving its harness's declared fan, each of its agents' SubagentStart claims converting one "
+      "slot of that reservation, matched by its run, so no agent is counted twice, and a sweep keyed to the session's "
+      "liveness in place of a claim's expiry, armed only once the spike shows SubagentStop firing for a Workflow agent, "
+      "an agent the owner stopped, one failed by stalls and a killed session, and, if it does not, the limit split as "
+      "half, rounded up, for direct spawns and the rest for one live Workflow run per session, a Workflow call refused "
+      "while the session's previous run has no saved result, seen on a limit of five with a three-agent Workflow "
+      "running and one direct spawn admitted, and on the session's combined total red before the ledger and green "
+      f"after it (the night pass two, point 7, pending NT-27, completed by {RV})", "ledger-double-counts")
+# session-readers (M19)
+V.sub("offered at placement, and the receiving session's prompt writer renders the work order the prose prompt was "
+      "(the night pass two, point 4, pending NT-21)",
+      "offered at placement, and the receiving session's prompt writer renders the work order the prose prompt was, its "
+      "readers inventoried by value (the charter's roster line, the hooks' tests, the roles kit's README, its adopter "
+      "test, agent file, role check, kit descriptor and workflow registry) and each re-pointed in the same unit, seen "
+      f"red on a planted leftover reference to its agent file (the night pass two, point 4, pending NT-21, its readers "
+      f"named by {RV})", "session-readers")
+# decline-unrecorded (M16)
+V.sub("builds in flight moving to it only at a step boundary and only if they comply (the night pass two, point 1, "
+      "pending NT-5 and NT-9)",
+      "builds in flight moving to it only at a step boundary and only if they comply, a declined proposal recorded, "
+      "keyed by the change's content, and not proposed again until a build carries a changed form, under `owner-only` "
+      "no proposal raised and the owner promoting through `instructions.edit` alone, and under `off` any promotion "
+      "refused, each value seen on its planted case, a declined proposal the next review does not raise among them "
+      f"(the night pass two, point 1, pending NT-5 and NT-9, the decline and each value's arm added by {RV})", "decline-unrecorded")
+# reuse-dispute (M17), overflow-clean (M20)
+V.sub("and its acceptance a reproduction of aScoutedSeam's measured figures through gov's own route on its 23 tuning "
+      "and 12 held-out cases",
+      "a row the fix pass disputes, with its reason, going to the closing review, re-entries bounded by "
+      "`flow.route-backs`, and an overflow past sixty never read clean, its remainder taken by a further pass, seen on a "
+      "planted false `duplicate` and on sixty-one added units whose last is a duplicate, and its acceptance a "
+      "reproduction of aScoutedSeam's measured figures through gov's own route on its 23 tuning and 12 held-out cases",
+      "reuse-dispute")
+# checklist-unowned (M5)
+V.sub("bug classes rendered as a core field from the classes the unit's spec names, never selected by its write set "
+      "(SA-7,",
+      "bug classes rendered as a core field from the classes the unit's spec names, never selected by its write set, "
+      "the per-pass checklist, the default-off prebuild and every call of the lookup by a write set's paths retired "
+      "with that selection, in the build method's and the unattended Skill's text among them, their readers "
+      f"inventoried by value, with an upgrade step ({RV}) (SA-7,", "checklist-unowned: the retirement")
+V.sub("; the checklist witnessed;",
+      "; the per-pass checklist's retirement witnessed at Build, a planted pass that calls the lookup by a write set's "
+      f"paths red ({RV}, pending NT-24);", "checklist-unowned: dScopedBuild")
+V.save()
+
+# ---------------------------------------------------------------- over-budget-stale (M2)
+LI = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md")
+LI.sub("  - **Rendered**, which gov writes: the charter, role files, Skills and work orders. The render refuses\n"
+       "    a set over budget, which is too much. It refuses a set missing a unit that a role or item names in\n"
+       "    `required-by`, which is too little.\n",
+       "  - **Rendered**, which gov writes: the charter, role files, Skills and work orders. A set over budget,\n"
+       "    which is too much, warns or refuses as `budgets.enforce` says, and one over a harness's own limit is\n"
+       "    refused. A set missing a unit that a role or item names in `required-by`, which is too little, is\n"
+       "    refused (revised 2026-10-19, the night pass two, point 5, pending NT-22).\n", "R-C: the classes")
+LI.sub("- A refusal leaves the spawn undone, and the caller files an ask naming the overage. Under\n"
+       "  `instructions.checks=warn`, the set loads whole and the reader sees the breach; under `record`, the\n"
+       "  breach is recorded. Neither skips the check (LR-1).\n",
+       "- A refusal leaves the spawn undone, and the caller files an ask naming the overage. Under\n"
+       "  `instructions.checks=warn`, a set missing a unit loads whole and the reader sees the gap; under `record`,\n"
+       "  the gap is recorded. Neither skips the check (LR-1). A set over budget follows `budgets.enforce` instead:\n"
+       "  under `warn`, its default, it loads and the breach is shown and priced (revised 2026-10-19, the night\n"
+       "  pass two, point 5).\n", "R-C: the refusal")
+LI.save()
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+LR.sub("  - R-C's render refuses a set over budget, and a set missing a unit it requires.\n",
+       "  - R-C's render refuses a set missing a unit it requires, and warns or refuses a set over budget as\n"
+       "    `budgets.enforce` says (revised 2026-10-19, the night pass two, point 5).\n", "layer-roles: the render")
+LR.sub("- **Budgets both ways.** R-C's render refusals apply per role and per item. A block over its budget is\n"
+       "  refused, and so is a block missing a unit its items require.",
+       "- **Budgets both ways.** R-C's render checks apply per role and per item. A block over its budget warns or\n"
+       "  refuses as `budgets.enforce` says, and a block missing a unit its items require is refused (revised\n"
+       "  2026-10-19, the night pass two, point 5).", "layer-roles: both ways")
+LR.save()
+AI = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md")
+AI.sub("12. **Budgets and harnesses.** The repository's units count against each document's budget. Over budget, the render\n"
+       "    refuses and names the largest contributors by owner, never truncating.",
+       "12. **Budgets and harnesses.** The repository's units count against each document's budget. Over budget, the render\n"
+       "    warns or refuses as `budgets.enforce` says, and over a harness's own limit it refuses, naming the largest\n"
+       "    contributors by owner either way, never truncating (revised 2026-10-19, the night pass two, point 5).",
+       "adopter: item 12")
+AI.sub("| The adopter's units overflow a budget | not checked | the render refuses, naming the largest contributors |",
+       "| The adopter's units overflow a budget | not checked | the render warns or refuses as `budgets.enforce` says, "
+       "refusing over a harness's own limit, naming the largest contributors (revised 2026-10-19, the night pass two, "
+       "point 5) |", "adopter: the table")
+AI.save()
+
+# ---------------------------------------------------------------- mail-ref-node (M6, L4)
+CO = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md")
+CO.sub("6. **The mailbox.** One ref per sender per build on the shared remote,\n"
+       "   `refs/gov/mail/<slug>/<fleet tag>` (revised 2026-10-19, the night pass two, point 3, pending NT-16: one\n"
+       "   ref per build took 4.5 times the ideal attempts at eight writers): an append-only\n",
+       "6. **The mailbox.** One ref per writing session per build on the shared remote,\n"
+       "   `refs/gov/mail/<slug>/<fleet tag>/<session>` (revised 2026-10-19, the night pass two, point 3, pending\n"
+       "   NT-16: one ref per build took 4.5 times the ideal attempts at eight writers; keyed by session by its\n"
+       "   review, since one node's sessions would otherwise share a ref): an append-only\n", "coordination: item 6")
+CO.save()
+MP = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+MP.sub("The durable copy is `refs/gov/mail/<slug>/<sender>`, one\n  ref per sender (revised 2026-10-19, the night pass two, point 3),",
+       "The durable copy is `refs/gov/mail/<slug>/<fleet tag>/<session>`, one\n"
+       "  ref per writing session (revised 2026-10-19, the night pass two, point 3, and its review),", "memory plan")
+MP.save()
+
+# ---------------------------------------------------------------- blob-keys-paths (M8), fanout-stale (M12)
+SY = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+SY.sub("    - Its rows are keyed by blob, and a tree is a set of blobs, so a commit re-parses only the blobs\n"
+       "      it changed:",
+       "    - A tree is a set of paths, each naming a blob, so the index keeps a table from tree and path to\n"
+       "      blob, keys what a blob holds by blob and what a path names (a document's tag, a symbol's address, a\n"
+       "      citation) by path and blob (revised by the night pass two's review: one blob sat at 24 paths at\n"
+       "      `e1a54ac67`). A commit then re-parses only the blobs it changed:", "systems: the keys")
+SY.sub("    - Only the extractors write it, and a deleted file rebuilds to identical rows.",
+       "    - Only the extractors write it, and a deleted file rebuilds to identical rows, seen on a planted tree\n"
+       "      where one blob sits at two paths and one of them is deleted.", "systems: the rebuild")
+SY.sub("its rows keyed by\n  blob and fresh per tree, re-parsing only changed blobs,",
+       "its rows keyed by\n  blob, or by path and blob for what a path names, fresh per tree, re-parsing only changed blobs,",
+       "systems: the index bullet")
+SY.sub("  - **The agent cap** is bounded by agent-cap's `FANOUT_CAP`, never a new value.\n",
+       "  - **The agent cap** of each stage is at or under `runtime.agents-in-flight` (revised 2026-10-19, the night\n"
+       "    pass two, point 7, pending NT-27: it was agent-cap's `FANOUT_CAP`).\n", "systems: the shapes' cap")
+SY.save()
+FA = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+FA.sub("   - Shapes: the kinds, `FANOUT_CAP`'s bound and the five lens slots.\n",
+       "   - Shapes: the kinds, each stage's cap at or under `runtime.agents-in-flight` (revised 2026-10-19, the night\n"
+       "     pass two, point 7, pending NT-27: it was `FANOUT_CAP`'s bound) and the five lens slots.\n",
+       "adoption: the fixed set")
+FA.save()
+
+# ---------------------------------------------------------------- fates (M10, M11)
+FT = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+FT.sub("| memory-tree | `gotchas.py` | bug classes | STAYS | handed by write set through `gotchas.py --for-paths` "
+       "(dFurnishedOrders); check-18 probe becomes an optional slot |",
+       "| memory-tree | `gotchas.py` | bug classes | RESHAPED | classes ride the work order as the unit's spec names them, "
+       "and serving by a write set's paths retires with the per-pass checklist and the prebuild (dFurnishedOrders, the "
+       "night pass two, point 6, pending NT-24); review keeps selection by range (dFairHearing), every class whose gate "
+       "status dLinkedLibrary derives as gated left off (NT-25); check-18 probe becomes an optional slot |", "fates: gotchas.py")
+FT.sub("| hooks | `agent-cap.js` | fan-out guard | STAYS | spawn-guard pack; its arm becomes a fragment; slot reservation "
+       "added (dWellOiledMachine) | layer-runtime `[enforce]` |",
+       "| hooks | `agent-cap.js` | fan-out guard | RETIRED | its rules moved as the night pass two's point 7 lists them "
+       "(the agent limit to `runtime.agents-in-flight`, the review rules to the review kit, the spawn guard and "
+       "admission to the roles pack) and the file retired with an upgrade step in dBoundRoles, pending NT-27 | "
+       "layer-runtime `[enforce]`; the night pass two, point 7 |", "fates: agent-cap.js")
+FT.sub("Counts: 24 stay,\n73 reshaped, 25 merged and 17 retired, over 139 rows.",
+       "Counts: 22 stay,\n74 reshaped, 25 merged and 18 retired, over 139 rows.", "fates: counts")
+FT.save()
+
+# ---------------------------------------------------------------- flow-steps: reuse-dispute (M17), overflow-clean (M20)
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+FS.sub("clean → the unit built; a `duplicate` or `bypassed` row → a fix pass on the unit; under "
+       "`build.reuse-check.second-pass: on`, a second independent pass, its rows unioned (the night pass two, point 2) |",
+       "clean → the unit built; a `duplicate` or `bypassed` row → a fix pass on the unit, which may answer a row "
+       "`disputed` with its reason, and a disputed row → the closing review; re-entries past `flow.route-backs` → the "
+       "owner; an overflow past sixty → a further pass over the remainder, never clean; under "
+       "`build.reuse-check.second-pass: on`, a second independent pass, its rows unioned (the night pass two, point 2, "
+       "the dispute and the overflow added by its review) |", "flow-steps: reuse-check's routes")
+FS.save()
+
+# ---------------------------------------------------------------- review-system: hook-counts (L1)
+RS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-review-system.md")
+RS.sub("unit, and the harness keeps a five-slot literal filled from it, so the hook counts slots, never names;",
+       "unit, and the harness keeps a five-slot literal filled from it, so the merge bar's harness check counts slots,\n"
+       "    never names (agent-cap's count until the night pass two's point 7);", "review-system: the count")
+RS.save()
+
+# ---------------------------------------------------------------- layer-runtime: ledger-double-counts (M14)
+LT = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+LT.sub("    one Workflow run. A hook pack claiming a slot at SubagentStart and releasing it at SubagentStop bounds\n"
+       "    the session's total, once the spike shows SubagentStop firing for every way an agent ends.\n",
+       "    one Workflow run. A hook pack claiming a slot at SubagentStart and releasing it at SubagentStop bounds\n"
+       "    the session's total, once the spike shows SubagentStop firing for every way an agent ends. A Workflow\n"
+       "    agent's claim converts one slot of its call's reservation, matched by its run, so it is never counted\n"
+       "    twice (the night pass two's review).\n", "layer-runtime: the conversion")
+LT.save()
+
+# ---------------------------------------------------------------- the night record's own text
+N = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+# hook-counts (L1)
+N.sub("Agent-cap admits five direct spawns at a time, so\n  the questions go out in waves of at most five.",
+      "Agent-cap admits five direct spawns per prompt, so\n  the questions go out in waves of at most five (point 7 "
+      "measures how it counts, and retires it).", "night: method")
+N.sub("Caps\nabove five wait on point 7.", "Caps\nabove five wait on point 7, which makes the limit the owner's "
+      "`runtime.agents-in-flight`.", "night: p1 later")
+# grammar-class-dropped (M4)
+N.sub("priced and trended, with consumer limits and correctness checks kept outside it |",
+      "priced and trended, with consumer limits, correctness checks and limits that define a format kept outside it |",
+      "night: dispatch 134's row")
+N.sub("   - a check of correctness, which is no cap.\n",
+      "   - a check of correctness, which is no cap.\n\n"
+      "   Dispatch 134 kept a third class outside: the limits that define a format, such as a one-line rule's 200\n"
+      "   characters and an index entry's length, which never moved. The fold departs from that pick, since the owner's\n"
+      "   words remove every hard cap, and NT-22 offers it as its second option (the review's correction).\n",
+      "night: p5 third class")
+N.sub("| NT-22 | What does the one cap switch cover? | every size cap on a document or record, line and entry lengths "
+      "included, with a consumer's own limit and every check of correctness left outside it; the same, with",
+      "| NT-22 | What does the one cap switch cover? | every size cap on a document or record, line and entry lengths "
+      "included, with a consumer's own limit and every check of correctness left outside it; every size cap but the "
+      "limits that define a format, which keep refusing, as dispatch 134 picked; the same as the first, with",
+      "night: NT-22's options")
+# population-misstated (L2)
+N.sub("The lookup ran again at the head of each of 47 closed reviews whose appendices carry a classes\ncolumn,",
+      "The lookup ran again at the head of each of the 47 closed reviews that record a range, of the 66\nwhose "
+      "appendices carry a classes column,", "night: p6 population")
+# direct-refuses (M3), ledger-double-counts (M14)
+N.sub("They\n   are the only reliable in-flight counters today, and they queue where agent-cap refused.",
+      "They\n   are the only reliable in-flight counters today. A Workflow agent over the limit queues, but a direct spawn "
+      "over\n   it is refused with \"Do not retry\", and the harness does not enforce the direct bound under ultracode "
+      "(`gap-rt-35`, the\n   review's correction).", "night: p7 queue")
+N.sub("released at SubagentStop, and swept when a session dies.",
+      "released at SubagentStop, and swept when a session dies. A Workflow agent's claim converts one slot of its\n"
+      "   call's reservation, so it counts once.", "night: p7 ledger")
+# mail-ref-node (M6), problem-keys (H1), message-id-collides (M7), blob-keys-paths (M8)
+N.sub("4. **One mail ref per sender** (NT-16): `refs/gov/mail/<slug>/<fleet tag>`, revised in v2, coordination and the\n"
+      "   memory plan.",
+      "4. **One mail ref per writing session** (NT-16): `refs/gov/mail/<slug>/<fleet tag>/<session>`, revised in v2,\n"
+      "   coordination and the memory plan, keyed by session after the review found one node's sessions sharing a ref.",
+      "night: p3 mail ref")
+N.sub("rows keyed by blob, the tree id only a freshness key,",
+      "rows keyed by blob, or by path and blob for what a path names, the tree id only a freshness key,",
+      "night: p3 index keys")
+N.sub("- **Problems.** A problem is written to `refs/gov/problems/<subject key>`, keyed by a path, a definition, a tag or a\n"
+      "  node fact.",
+      "- **Problems.** A problem is written to `refs/gov/problems/<encoded subject>/<problem id>`: the subject is a path, a\n"
+      "  definition, a tag or a node fact encoded into a legal ref name, and the id is derived from the filing act and\n"
+      "  the problem, so two problems on one path both land.", "night: p4 problems")
+N.sub("each message's id derived from its sender's act,\n  item, kind and subject, so a retry is refused as a duplicate.",
+      "each message's id derived from its sender's act or\n  session, item and pass, kind, subject and the id it answers, so "
+      "a retry is refused as a duplicate while two answers\n  both land.", "night: p4 message ids")
+N.sub("| NT-16 | How do senders share a build's mailbox? | one ref per sender per build;",
+      "| NT-16 | How do senders share a build's mailbox? | one ref per writing session per build;", "night: NT-16")
+N.save()
+print("folded run A's defects")
+````
+
+### `patch_fold_a.py`
+
+Run B's refinements to the same fixes, patched into fold_review_a.py's texts before it ran.
+
+````python
+"""Patch fold_review_a.py's replacement texts where run B's findings refine the same fix (keys-later-kinds,
+direct-unbounded, preset-values-unrouted, gated-self-declared). Each old string must occur exactly once."""
+import pathlib, sys
+p = pathlib.Path(sys.argv[1])
+t = p.read_text(encoding="utf-8")
+PAIRS = [
+    ('"each message\'s id derived from its sender\'s act or session, its item and pass, its kind, its subject and the id "',
+     '"each message\'s id derived from its sender\'s session, and its act once Runtime mints acts, its item and pass, its "\n'
+     '      "kind, its subject and the id "'),
+    ('"two at once under that limit, the third refused, and in which, under a limit of eight, a direct spawn and a "\n'
+     '      f"registered harness call are both admitted (the night pass two, point 7, pending NT-27 and NT-28, completed by {RV})",',
+     '"two at once under that limit, the third refused, and in which, under a limit of eight, a direct spawn and a "\n'
+     '      "registered harness call are both admitted, the rendered settings holding both values at the key and again "\n'
+     '      "after a policy write raises it to six, and two concurrent Workflow runs each held to the limit, the session\'s "\n'
+     '      f"total left to the in-flight ledger (the night pass two, point 7, pending NT-27 and NT-28, completed by {RV})",'),
+    ('"builds in flight moving to it only at a step boundary and only if they comply, and a declined proposal recorded, "\n'
+     '      "keyed by the change\'s content, and not proposed again until a build carries a changed form, seen on a declined "\n'
+     '      f"proposal the next review does not raise (the night pass two, point 1, pending NT-5 and NT-9, the decline added "\n'
+     '      f"by {RV})",',
+     '"builds in flight moving to it only at a step boundary and only if they comply, a declined proposal recorded, "\n'
+     '      "keyed by the change\'s content, and not proposed again until a build carries a changed form, under `owner-only` "\n'
+     '      "no proposal raised and the owner promoting through `instructions.edit` alone, and under `off` any promotion "\n'
+     '      "refused, each value seen on its planted case, a declined proposal the next review does not raise among them "\n'
+     '      f"(the night pass two, point 1, pending NT-5 and NT-9, the decline and each value\'s arm added by {RV})",'),
+    ('"night pass two, point 6, pending NT-24); review keeps selection by range without fully gated classes "\n'
+     '       "(dFairHearing, NT-25);',
+     '"night pass two, point 6, pending NT-24); review keeps selection by range (dFairHearing), every class whose gate "\n'
+     '       "status dLinkedLibrary derives as gated left off (NT-25);'),
+]
+for old, new in PAIRS:
+    n = t.count(old)
+    if n != 1:
+        sys.exit(f"{n} matches for: {old[:80]}")
+    t = t.replace(old, new, 1)
+p.write_text(t, encoding="utf-8", newline="\n")
+print("patched", len(PAIRS))
+````
+
+### `fold_review_b.py`
+
+The closing review's fold, second part: run B's defects, `gap-rt-35`, the bug classes' instances and the record's review note and fork corrections.
+
+````python
+"""The night pass two's closing review, folded, second part: the defects run B found alone and run B's additions to
+shared ones, `gap-rt-35`, the bug classes' instances, and the night record's review note and fork corrections. Runs
+after fold_review_a.py. Every substitution matches exactly once or the script exits.
+
+Usage: python -X utf8 fold_review_b.py   (from the worktree root)
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+RV = "the night pass two's review"
+CMP = "build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md"
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+# gated-field-later (B7): the cut moves to dLinkedLibrary
+V.sub("the review's bug-class checklist selected by the pinned range and ordered by anchors, with every fully gated class "
+      "left off, and a replay",
+      "the review's bug-class checklist selected by the pinned range and ordered by anchors, the cut of fully gated "
+      f"classes left to dLinkedLibrary's derived status ({RV}), and a replay", "gated-field-later")
+# gated-self-declared (B24)
+V.sub("each bug class carrying its gate status, gated, partly gated or ungated, a syntactic class turned into a gate at "
+      "its second occurrence and leaving every checklist once gated, and its anchors marked as where it bit, never what "
+      "triggers it (the night pass two, point 6, pending NT-25)",
+      "each bug class's gate status derived, never declared: gated only where the class names a leg in the leg manifest "
+      "and a planted case of the class that the leg is seen to refuse, partly gated or ungated otherwise, a class so "
+      "gated left off every checklist, the review's among them, a syntactic class turned into a gate at its second "
+      "occurrence, and its anchors marked as where it bit, never what triggers it, seen red on a class marked gated "
+      "whose leg is absent or whose planted case passes the leg "
+      f"(the night pass two, point 6, pending NT-25, the status derived by {RV})", "gated-self-declared")
+# keys-later-kinds (B8): the decision key before work-order slots exist
+V.sub("the key derived from the work-order slot that raised the question, its item and declared fork slot, never from "
+      "its wording,",
+      "the key derived from the item that raised the question and its declared fork, the work-order slot joining it "
+      "once work orders carry slots, never from its wording,", "keys-later-kinds")
+# preset-values-unrouted (B13)
+V.sub("and red on two conflicting scenarios placed together (the night pass two, point 1, pending NT-1, NT-6 and NT-7)",
+      "red on two conflicting scenarios placed together under `refuse`, and under `declared-order` settled by the "
+      "declared order and recorded (the night pass two, point 1, pending NT-1, NT-6 and NT-7, each value's arm added by "
+      "its review)", "preset-values: scenario-conflict")
+V.sub("seen on a planted unrecorded skip and a planted additive change (the night pass two, point 1, pending NT-4)",
+      "seen on a planted unrecorded skip and on a planted additive change, applied under `additive-recorded`, held for "
+      "the owner under `owner-approves` and refused under `off` (the night pass two, point 1, pending NT-4, each value's "
+      "arm added by its review)", "preset-values: adapt")
+V.sub("the driver alone running transitions (the night pass two, point 4, pending NT-20)",
+      "the driver alone running transitions, a unit offered to a session that does not hold the build refused under "
+      f"`driver-only`, each value seen on its planted case (the night pass two, point 4, pending NT-20, its arms added "
+      f"by {RV})", "preset-values: unit-holders")
+# over-budget-exempt-stale (B20)
+V.sub("memory slices over the cap are exempt from `instructions.checks`' refusal and roles' route-back (P27) |",
+      "memory slices over the cap are exempt from `budgets.enforce`'s refusal and roles' route-back (P27; the switch "
+      f"named by {RV}) |", "over-budget-exempt-stale")
+# per-tree-stale (B4)
+V.sub("read beside the per-tree index from the binding records", "read beside the one index from the binding records",
+      "per-tree-stale: dWellOiledMachine")
+V.sub("its rows for uncommitted edits marked `dirty` (revised by the night pass two, point 3,",
+      "each worktree's uncommitted edits recorded as its own path-to-blob rows marked `dirty`, never served to another "
+      "worktree, seen on two worktrees editing one path (revised by the night pass two, point 3,",
+      "per-tree-stale: dirty rows")
+# direct-refuses (A4, A24, B9), direct-unbounded: the window recorded as a gap the ledger closes
+row = [ln for ln in V.text.split("\n") if ln.startswith("| dWellOiledMachine |") and ln.count(" | ") == 4]
+if len(row) != 1:
+    sys.exit("dWellOiledMachine row")
+V.sub(row[0], row[0][:-2] + ", gap-rt-35 |", "gap-rt-35 on dWellOiledMachine")
+V.save()
+
+# ---------------------------------------------------------------- layer-instruction: over-budget-stale (B19)
+LI = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md")
+LI.sub("  - P27's is the load-set render check. Its refusal softens by `instructions.checks`, which\n"
+       "    foundations C6 allows since LR-1:",
+       "  - P27's is the load-set render check. Its refusal of a set missing a unit softens by\n"
+       "    `instructions.checks`, and its size half follows `budgets.enforce` (revised 2026-10-19, the night pass\n"
+       "    two, point 5), which foundations C6 allows since LR-1:", "layer-instruction: P27's check")
+LI.save()
+
+# ---------------------------------------------------------------- systems: fanout-systems (B2), per-tree-stale (B4)
+SY = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+SY.sub("    - agent-cap's `args.roles` refusal;\n",
+       "    - the roles pack's `args.roles` refusal, agent-cap's until the night pass two's point 7;\n",
+       "systems: args.roles")
+SY.sub("    the freshness check exempts them.\n",
+       "    the freshness check exempts them. Each worktree's overlay is its own, never served to another worktree,\n"
+       "    since every worktree shares the one file (revised by the night pass two's review).\n", "systems: dirty rows")
+SY.save()
+
+# ---------------------------------------------------------------- flow-roles-adoption: hook-counts (B3)
+FA = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+FA.sub("five-slot literal and fills each slot from the catalogue as data, so agent-cap counts slots, never names.",
+       "five-slot literal and fills each slot from the catalogue as data, so the merge bar's harness check counts slots,\n"
+       "     never names (agent-cap's count until the night pass two's point 7).", "adoption: the count")
+FA.sub("- **dFairHearing:** the lens catalogue as data in the review kit, the harness's five slots filled from it, and\n"
+       "  agent-cap counting slots.",
+       "- **dFairHearing:** the lens catalogue as data in the review kit, the harness's five slots filled from it, and\n"
+       "  the merge bar's harness check counting slots (agent-cap's until the night pass two's point 7).",
+       "adoption: dFairHearing")
+FA.sub("- agent-cap admitting a harness whose five lens slots are filled from data, tested at dFairHearing.",
+       "- the roles pack admitting a harness whose five lens slots are filled from data, where agent-cap admitted it\n"
+       "  until the night pass two's point 7, tested at dFairHearing.", "adoption: the admission")
+FA.save()
+
+# ---------------------------------------------------------------- layer-memory: fates-stale (B18)
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LM.sub("| gotcha | dLinkedLibrary | gotchas handed by write set; writer item not named |",
+       "| gotcha | dLinkedLibrary | gotchas handed as the unit's spec names them, never by write set (revised 2026-10-19, "
+       "the night pass two, point 6, pending NT-24); writer item not named |", "layer-memory: gotcha")
+LM.save()
+
+# ---------------------------------------------------------------- layer-runtime: spike-cannot-fail (B23)
+LT = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+LT.sub("  - SubagentStart and SubagentStop fire with `agent_type`;\n",
+       "  - SubagentStart and SubagentStop fire with `agent_type`;\n"
+       "  - SubagentStop fires for a Workflow agent, for an agent the owner stopped, for one failed after six stalls\n"
+       "    and for a killed session, each a red case of its own, since the in-flight ledger arms on them (the\n"
+       "    night pass two's review);\n", "the spike's end kinds")
+LT.sub("  - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep.\n",
+       "  - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep;\n"
+       "  - with the limit at 3, two direct spawns and a two-agent Workflow admit one Workflow agent until a slot\n"
+       "    frees, and a three-agent Workflow under a limit of 5 still admits two direct spawns (the night pass\n"
+       "    two's review).\n", "the in-flight mixed cases")
+LT.save()
+
+# ---------------------------------------------------------------- the gap register: gap-rt-35
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+lines = G.text.split("\n")
+idx = [i for i, ln in enumerate(lines) if ln.startswith("| gap-rt-34 |")]
+if len(idx) != 1:
+    sys.exit("gap-rt-34")
+lines.insert(idx[0] + 1, "| gap-rt-35 | Runtime | MED | Until the in-flight ledger arms, the agent limit binds direct "
+             "spawns and each Workflow run separately, so one session can hold the limit in direct agents plus the "
+             "limit per Workflow run, a direct spawn over it is refused rather than queued, and the harness does not "
+             "enforce the direct bound under ultracode. | `research-agent-cap.md` section 3; the night pass two's "
+             "review (`" + CMP + "`) | — |")
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 351 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's closing review added `gap-rt-35` (`" + CMP + "`), same instrument,\n"
+    f"over {len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night record
+N = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+# gated-self-declared, gated-field-later: the record's own account
+N.sub("dLinkedLibrary records each class's gate status, and marks\n   its anchors as where it bit, never what triggers it.",
+      "dLinkedLibrary derives each class's gate status, gated only where the\n   class names a leg seen to refuse a planted "
+      "case of it, and marks its anchors as where it bit, never what triggers it.", "night: p6 gate status")
+N.sub("dFairHearing's checklist is still selected by the pinned range, minus every fully gated class, which cuts 29% of\n"
+      "   the items for 5% of the labels.",
+      "dFairHearing's checklist is still selected by the pinned range, and dLinkedLibrary, once it derives the status,\n"
+      "   takes every fully gated class off it, which cuts 29% of the items for 5% of the labels.", "night: p6 the cut")
+# fork-options-excluded (B11)
+N.sub("every other agent-cap rule moved to its home; the harness's settings alone; agent-cap kept, re-keyed per session |",
+      "every other agent-cap rule moved to its home; the harness's settings alone; the limit split between direct and "
+      "Workflow budgets with one live run per session, the research's fallback |", "night: NT-27")
+N.sub("| NT-28 | May the owner raise the agent limit? | yes, by a policy write, which leaves a diff; no, lower-only as "
+      "today |",
+      "| NT-28 | How far may the owner raise the agent limit? | to any count, by a policy write, which leaves a diff; "
+      "only up to the harness's own defaults, 20 direct agents and up to 16 per Workflow run |", "night: NT-28")
+N.insert_before("\n## [forks] Parked for the owner, 2026-10-19\n", f"""
+## [reviewed] The night's folds, reviewed twice and folded
+
+The owner's "Run tier2 reviews on the folds twice": two independent light diff reviews read `ad54fe388` over
+`e1a54ac67`, dispatches 137 and 138, and `{CMP}` compares them defect by defect. They confirmed 31 defects, three of
+them high, and none needed the owner: where the runs left two routes, the owner's words or an earlier answer chose
+one. Most were folds that landed in v2 and nowhere else, which this record's sections above now state as folded. The
+rest tightened the design itself:
+- a problem keyed per problem under its encoded subject, a message id that includes the id it answers, and mail refs
+  keyed per writing session;
+- index rows for what a path names keyed by path and blob, and each worktree's uncommitted rows its own;
+- a Workflow agent counted once, the spike red on each way an agent can end, and the interim agent limit recorded as
+  `gap-rt-35`;
+- a class's gated status derived from a leg seen to refuse it, never declared;
+- every catalogued value of the new flow and unit keys given its arm.
+
+NT-22 gains the caps research's own pick as an option. NT-27 and NT-28 drop the options the owner's words rule out.
+""", "night: [reviewed]")
+N.save()
+
+# ---------------------------------------------------------------- the bug classes' instances
+INSTANCES = {
+    "amendment-leaves-its-other-half-standing":
+        "Folds landed in v2 and stopped there. The over-budget refusal survived in layer-instruction, layer-roles and the "
+        "adopter record; `FANOUT_CAP` in the systems and adoption records; agent-cap as the slot counter in the "
+        "review-system and adoption records; and the replaced fates of `agent-cap.js` and `gotchas.py`. dGroundRules "
+        "also never carried the two agent-cap rules point 7's table gave it.",
+    "two-answers-to-one-question":
+        "The mail ref was keyed by node in coordination and v2 and by sender in the memory plan. Point 7's account said "
+        "both harness settings queue where its return says the direct one refuses. A Workflow's agents were counted once "
+        "as a reservation and again as started agents.",
+    "retirement-inventory-misses-readers-by-value":
+        "`gov-session` retired with an upgrade step only, though nine files read it by value. Point 6 retired the "
+        "per-pass checklist and the prebuild with no build owning the retirement.",
+    "rule-stated-with-no-check-that-fails":
+        "`budgets.enforce`, read by every size gate, was proven on one file. The spike that arms the in-flight ledger "
+        "never planted the four end kinds it certifies. A bug class's gated mark, which takes it off review, was "
+        "self-declared and checked by nothing.",
+    "policy-value-with-no-route":
+        "`budgets.enforce`'s `record` had no meaning or arm, and the presets selected `flow.scenario-conflict: "
+        "declared-order`, `flow.adapt: owner-approves`, `flow.promote: owner-only` and `build.unit-holders: driver-only`, "
+        "which no reading clause routed or witnessed.",
+    "owner-item-without-its-reject-outcome":
+        "A declined scenario promotion had no record and would be raised again every Loop Review, and a reuse check's "
+        "disputed row had no route but another fix pass.",
+    "append-without-an-idempotence-key":
+        "The opposite edge: keys that were declared but coarser than the events. Two answers from one item derived one "
+        "message id, and a create-only problem ref per path kept the first problem filed against a file and refused the "
+        "rest.",
+    "predicate-designed-without-a-run-over-the-tree":
+        "The problem register's ref template was never run through `git check-ref-format` over real paths, which "
+        "refuses every dotfile, and the index's keying assumed a tree is a set of blobs, where one blob sat at 24 paths.",
+    "zero-witness-over-an-unnamed-population":
+        "The reuse check capped its listed units at sixty and read clean on the rest, so a large unit's unlisted units "
+        "passed unchecked.",
+    "rate-quoted-without-its-denominator":
+        "Point 6 gave its population as 47 reviews with a classes column, where 66 carry one and 47 of them a range.",
+    "step-depends-on-a-later-build":
+        "dFairHearing's checklist cut read a gate status only dLinkedLibrary creates, dKeptSession keyed message ids on "
+        "acts Runtime mints, and dPlacedRequest keyed decisions on work-order slots dBoundRoles brings.",
+}
+import textwrap  # noqa: E402
+
+for name, text in INSTANCES.items():
+    C = Record(f"memory/gotchas/{name}.md")
+    C.sub("\n## The fix\n",
+          f"\nIt bit again in the night pass two's closing review, 2026-10-19\n(`memory/builds/dClosedLoop/{CMP}`).\n"
+          + textwrap.fill(text, 118, break_long_words=False, break_on_hyphens=False) + "\n\n## The fix\n",
+          f"{name}: instance")
+    C.save()
+print("folded run B's defects and the instances")
+````
+
+### `fill_summary.py`
+
+The comparison record's [summary], compare_rounds.py's output verbatim.
+
+````python
+"""Fill the comparison record's [summary] with compare_rounds.py's output, verbatim, and the reading of it."""
+import pathlib, sys
+rec = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md")
+out = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+F = "`" * 3
+block = (F + "text\n$ python compare_rounds.py night-pass-two-a.md night-pass-two-b.md night-pass-two-reviews-compared.md "
+         "session-log.md wf_4e7e18b8-a33 wf_9c278556-e2c\n" + out + "\n" + F + """
+
+- **Every defect sits in the night's own text.** None reaches shipped code. Most are folds that landed in v2 and
+  stopped there: point 5's over-budget refusal, and point 7's `FANOUT_CAP` and agent-cap, still stood in the layer,
+  systems, adoption and fates records.
+- **One run finds about seven in ten.** Run A alone covers 23 of the 31 and run B 21, an overlap of 0.42, inside the
+  range of the earlier pairs. Chapman's estimate puts about six more beyond both.
+- **Each run caught a high the other missed.** Run A alone found the problem register's per-path key. Run B alone
+  confirmed the self-declared gated mark, which run A's skeptic refuted as unit detail, and graded the stale fates
+  high where run A graded them medium.
+- **Precision held at 0.76 and 0.87.** Five of the 14 refuted findings sit on defects another finding confirmed. Three
+  are conflicts between the runs' skeptics: `gated-self-declared` and `gated-field-later`, refuted in run A and
+  confirmed in run B, and `message-id-collides`, confirmed in run A and refuted in run B for want of a defined subject.""")
+t = rec.read_text(encoding="utf-8")
+if t.count("\nSUMMARY\n") != 1:
+    sys.exit("no single SUMMARY placeholder")
+rec.write_text(t.replace("\nSUMMARY\n", "\n" + block + "\n", 1), encoding="utf-8", newline="\n")
+print("summary filled")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before.
@@ -16237,6 +17128,13 @@ MINE = [
     ("night2/fold_p7.py", "Point 7, agent-cap: the point's section and forks NT-27 and NT-28, "
      "`runtime.agents-in-flight` and its three scopes, and every agent-cap rule moved, folded into v2, "
      "layer-runtime and the gap register."),
+    ("night2/fill_134_135.py", "The research table's outcomes for dispatches 134 and 135, filled when they returned."),
+    ("night2/build_args_night2.py", "The night's closing review: both runs' args, differing only in the run label, the report path and the scratch path."),
+    ("night2/log_night2.py", "The session log's dispatch rows 127 to 138, the derived agent lines and the night's events."),
+    ("night2/fold_review_a.py", "The closing review's fold, run A's defects and the record's own corrections, dry-run on a scratch copy of the records before run B returned."),
+    ("night2/patch_fold_a.py", "Run B's refinements to the same fixes, patched into fold_review_a.py's texts before it ran."),
+    ("night2/fold_review_b.py", "The closing review's fold, second part: run B's defects, `gap-rt-35`, the bug classes' instances and the record's review note and fork corrections."),
+    ("night2/fill_summary.py", "The comparison record's [summary], compare_rounds.py's output verbatim."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
@@ -16721,19 +17619,20 @@ code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalR
 witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
+act                      4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
+review                   3  dGroundRules (dFairHearing's), dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
+census                   3  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
 spec                     3  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
-act                      3  dDeclaredLoop (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
-review                   2  dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
-census                   2  dOrderedCharter (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
+roster                   2  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's)
 baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 decision                 2  dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
 override                 1  dGroundRules (dOrderedCharter's)
@@ -16751,11 +17650,10 @@ overlap                  1  dPlacedRequest (dIndexedDesign's)
 fleet                    1  dPlacedRequest (dShippedRelease's)
 routing                  1  dKeptSession (dWitnessedBar's)
 ask                      1  dKeptSession (dTotalRecall's)
-roster                   1  dBoundRoles (dIndexedDesign's)
 seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 102, over 41 kinds
+plain-word hits on a non-ancestor's record kind: 106, over 41 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -17113,15 +18011,15 @@ atlas: 0 records named fates-absent-plant
 rc 1
 $ python map.py --check --plant fates-drop
 FINDING fates: kit.agent-instructions has no [table] row
-FINDING fates: the rows count [24, 72, 25, 17, 138], and the record states [24, 73, 25, 17, 139]
+FINDING fates: the rows count [22, 73, 25, 18, 138], and the record states [22, 74, 25, 18, 139]
 rc 1
 $ python map.py --check --plant fates-ghost
 FINDING fates: a row names ghostkit, which is no kit
-FINDING fates: the rows count [25, 73, 25, 17, 140], and the record states [24, 73, 25, 17, 139]
+FINDING fates: the rows count [23, 74, 25, 18, 140], and the record states [22, 74, 25, 18, 139]
 rc 1
 $ python map.py --check --plant fates-bad
 FINDING fates: agent-instructions · harness wiring has the fate MAYBE, outside the set
-FINDING fates: the rows count [24, 72, 25, 17, 139], and the record states [24, 73, 25, 17, 139]
+FINDING fates: the rows count [22, 73, 25, 18, 139], and the record states [22, 74, 25, 18, 139]
 rc 1
 $ python map.py --check --plant fates-unbuilt
 FINDING fates: agent-instructions · harness wiring names no chain build where it goes
@@ -17141,11 +18039,11 @@ $ python map.py --check --plant fates-kit-ghost
 FINDING fates: [kits] names ghostkit, which is no kit node
 rc 1
 $ python map.py --check --plant fates-count
-FINDING fates: the rows count [23, 74, 25, 17, 139], and the record states [24, 73, 25, 17, 139]
+FINDING fates: the rows count [21, 75, 25, 18, 139], and the record states [22, 74, 25, 18, 139]
 rc 1
 $ python map.py --check --plant fates-absorbed-stays
 FINDING fates: agent-instructions · harness wiring stays, yet its kit is absorbed
-FINDING fates: the rows count [25, 72, 25, 17, 139], and the record states [24, 73, 25, 17, 139]
+FINDING fates: the rows count [23, 73, 25, 18, 139], and the record states [22, 74, 25, 18, 139]
 rc 1
 $ python map.py --check --plant fates-bare-none
 FINDING fates: playbook · the seeded charter template retires naming neither a replacement nor a reason
@@ -17193,7 +18091,7 @@ FINDING fates: kit.unattended has no [kits] row
 FINDING fates: kit.unattended has no [table] row
 FINDING fates: kit.workflows has no [kits] row
 FINDING fates: kit.workflows has no [table] row
-FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [24, 73, 25, 17, 139]
+FINDING fates: the rows count [0, 0, 0, 0, 0], and the record states [22, 74, 25, 18, 139]
 FINDING fates: kit.agent-instructions carries fate=absorbed, and [kits] says None
 FINDING fates: kit.branch-reconcile carries fate=optional, and [kits] says None
 FINDING fates: kit.codebase-map carries fate=optional, and [kits] says None
@@ -17215,10 +18113,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:814 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:823 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:814 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:823 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -17266,13 +18164,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2499 nodes in 30 namespaces; 31466 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1712, derived 292, pending 495
-map: no stale facts read 57 records and 21 quotes of a map count or the critical path
+map: 2508 nodes in 30 namespaces; 31466 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1721, derived 292, pending 495
+map: no stale facts read 58 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 198 records, 3313 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 202 records, 3380 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -17291,7 +18189,7 @@ rc 0
 
 $ reconciliation probe
 chain rows 21 · owned nodes read 466 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 102 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 106 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -17323,7 +18221,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 350 · chain builds 21
+register keys 351 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none

@@ -168,7 +168,8 @@ repository's. Nobody edits a rendered file, and an update never writes the repos
 11. **New gov units beside the repository's.** The update lists every new gov unit at a level and `select` where the
     repository has units, for the owner's review. This is advisory: a contradiction under different tags is semantic.
 12. **Budgets and harnesses.** The repository's units count against each document's budget. Over budget, the render
-    refuses and names the largest contributors by owner, never truncating. One unit renders for every harness the
+    warns or refuses as `budgets.enforce` says, and over a harness's own limit it refuses, naming the largest
+    contributors by owner either way, never truncating (revised 2026-10-19, the night pass two, point 5). One unit renders for every harness the
     same way, so an alias is a render, never a copy.
 13. **Edited renders.** The render gate already refuses a hand edit at the push. An update that finds a rendered file
     edited since its last render names it and holds that file with an order, never overwriting it as `re-rendered`.
@@ -199,7 +200,7 @@ repository's. Nobody edits a rendered file, and an update never writes the repos
 | Gov renames it | lost | the edge re-points by the change record's successor |
 | Gov splits or retires it | lost | an order; an amendment held, a replacement kept on its own |
 | Gov adds a rule that contradicts the adopter's | both load silently | listed for review; no mechanism can see the contradiction |
-| The adopter's units overflow a budget | not checked | the render refuses, naming the largest contributors |
+| The adopter's units overflow a budget | not checked | the render warns or refuses as `budgets.enforce` says, refusing over a harness's own limit, naming the largest contributors (revised 2026-10-19, the night pass two, point 5) |
 | Two harnesses | aliases copied and go stale | each harness renders the same units |
 | The adopter edits a rendered file | overwritten as `re-rendered` | refused at the push; held with an order at update |
 | A repository adopts gov with its own `CLAUDE.md` | left unwired until `--force` overwrites it | its text becomes a legacy block, wired at once, then proposed unit by unit |

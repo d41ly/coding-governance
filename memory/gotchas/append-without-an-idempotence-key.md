@@ -22,6 +22,11 @@ declared neither idempotence nor reconciliation, against the `[rules]` of the st
 (`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-library.md`, M5) caught it. The
 fold moved the append to `build.distill`, idempotent and keyed by build and fork.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+The opposite edge: keys that were declared but coarser than the events. Two answers from one item derived one message
+id, and a create-only problem ref per path kept the first problem filed against a file and refused the rest.
+
 ## The fix
 
 - Declare the key that makes a row unique, and skip a row whose key is already present.

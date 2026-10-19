@@ -41,6 +41,12 @@ gate's later classes joined with no build arming them; an edited render held at 
 target that no edge check parses; `adopt.instructions`' no-overwrite and wiring promises with no fixture; and a
 repository's own policy keys with no schema or reader.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+`budgets.enforce`, read by every size gate, was proven on one file. The spike that arms the in-flight ledger never
+planted the four end kinds it certifies. A bug class's gated mark, which takes it off review, was self-declared and
+checked by nothing.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

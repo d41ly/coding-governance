@@ -52,6 +52,11 @@ dSafePassage's walk and gov first read the receipt's `steps` field, which only d
 dOrderedCharter's native-id edge named only classes three later builds register. The field now moves with the clauses
 that read it, and dOrderedCharter plants the edge on the FAMILY ids it owns.
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+dFairHearing's checklist cut read a gate status only dLinkedLibrary creates, dKeptSession keyed message ids on acts
+Runtime mints, and dPlacedRequest keyed decisions on work-order slots dBoundRoles brings.
+
 ## The fix
 
 - Check every kind of dependency, not only citations:

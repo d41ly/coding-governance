@@ -287,6 +287,7 @@ extends.
 | gap-rt-32 | Runtime | MED | Which bash a harness hook runs in is not pinned: under a fresh terminal's PATH, Git's `usr/bin/bash.exe` sees no sed, awk, grep or mktemp, and `timeout` resolves to Windows' own. | `research-python-floor.md` section 4 | — |
 | gap-rt-33 | Runtime | HIGH | No rule pushes a build's branch before its landing, so a take-over on another node cannot read the witnesses the design says it reads. | `research-handoffs-design.md` section 5, item 8 | — |
 | gap-rt-34 | Runtime | MED | The agent limit can only be lowered, never above 5, so the owner cannot raise it by policy, and its carrier is a kit conf, not the policy file. | `research-agent-cap.md` sections 1 and 6 | — |
+| gap-rt-35 | Runtime | MED | Until the in-flight ledger arms, the agent limit binds direct spawns and each Workflow run separately, so one session can hold the limit in direct agents plus the limit per Workflow run, a direct spawn over it is refused rather than queued, and the harness does not enforce the direct bound under ultracode. | `research-agent-cap.md` section 3; the night pass two's review (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`) | — |
 | gap-spine-01 | Spine | HIGH | No stage model: no kit, leg, dossier, role or hook declares the stage it serves, and the loop exists only implicitly. | design §4.1 (0 of 31 dossiers carry a stage); `tools/roles/workflows.toml` covers stages 0–7 only | — |
 | gap-spine-02 | Spine | HIGH | Guards read agent-written state across stages, against `[class]`. | build §4 (write gate), design §4.4 (INPROGRESS), test §5 C (pusher-written receipt), deploy §5 C | — |
 | gap-spine-03 | Spine | HIGH | Attended and unattended builds run different exit contracts. | build §3, §4 (DoD needs RUN.md) | — |
@@ -809,4 +810,12 @@ Re-measured after the night pass two's point 7 added `gap-rt-34` and `gap-roles-
 ```text
 Roles=30 Deploy=28 Plan=8 Spine=21 Orient=21 Test=22 Runtime=34 Lexicon=10 Tooling=24 Review=20 Foundation=34 Build=6 Memory=44 Flow=22 Maintain=15 Design=11
 LOW=58 MED=175 HIGH=117
+```
+
+Re-measured after the night pass two's closing review added `gap-rt-35` (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`), same instrument,
+over 351 keys:
+
+```text
+Roles=30 Deploy=28 Plan=8 Spine=21 Orient=21 Test=22 Runtime=35 Lexicon=10 Tooling=24 Review=20 Foundation=34 Build=6 Memory=44 Flow=22 Maintain=15 Design=11
+LOW=58 MED=176 HIGH=117
 ```

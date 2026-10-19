@@ -234,8 +234,8 @@ plan keeps each where its writer keeps it and joins them by the act.
 - **A session is a node derived from bindings.** It joins its act by `runs-in` and its predecessor by `after`, through
   a resume or a fork. Its transcript is a witness the binding points at; it never leaves its node, so another node
   renders it `not-local: node <x>`.
-- **Inter-session messages are the mailbox first.** The durable copy is `refs/gov/mail/<slug>/<sender>`, one
-  ref per sender (revised 2026-10-19, the night pass two, point 3), and the live copy
+- **Inter-session messages are the mailbox first.** The durable copy is `refs/gov/mail/<slug>/<fleet tag>/<session>`, one
+  ref per writing session (revised 2026-10-19, the night pass two, point 3, and its review), and the live copy
   goes to a session's inbox where the harness has one (`deps.messaging`). A script can resume, fork, read
   transcripts and list sessions (`claude agents --json`); only a model sends to another session's inbox.
 

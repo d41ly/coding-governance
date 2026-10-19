@@ -67,8 +67,8 @@ A kit's fate is one of four:
 
 The fate is one of STAYS, RESHAPED, MERGED and RETIRED. "Where it goes" names the chain build that keeps or receives
 it. "Decided by" names the record that decides it, a line-number citation of dispatch 104's resolved to its section
-tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and the owner decided row by row. Counts: 24 stay,
-73 reshaped, 25 merged and 17 retired, over 139 rows.
+tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and the owner decided row by row. Counts: 22 stay,
+74 reshaped, 25 merged and 18 retired, over 139 rows.
 
 | Kit | Function | Today's job | Fate | Where it goes | Decided by |
 |---|---|---|---|---|---|
@@ -100,7 +100,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | memory-tree | `gen_build_index.py` | index, README regions | RESHAPED | generated views (dLinkedLibrary), README schema and routing region (dTotalRecall); drift import becomes an optional slot (dOrderedCharter) | v2 `[chain]` dLinkedLibrary; v2 `[chain]` dTotalRecall; v2 `[chain]` dOrderedCharter |
 | memory-tree | hygiene gate, `HYGIENE.md` | structural checks | RESHAPED | the kind registry generates the schema checks; `HYGIENE.md` becomes its view (dTotalRecall) | v2 `[chain]` dTotalRecall; layer-memory `[revised]` |
 | memory-tree | `backlog.py` | asks | STAYS | grammar kept; acceptance at filing and counter-ref ids added (dTotalRecall) | layer-memory `[tools]`; v2 `[chain]` dTotalRecall |
-| memory-tree | `gotchas.py` | bug classes | STAYS | handed by write set through `gotchas.py --for-paths` (dFurnishedOrders); check-18 probe becomes an optional slot | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dOrderedCharter; the owner, SA-7, 2026-10-19 |
+| memory-tree | `gotchas.py` | bug classes | RESHAPED | classes ride the work order as the unit's spec names them, and serving by a write set's paths retires with the per-pass checklist and the prebuild (dFurnishedOrders, the night pass two, point 6, pending NT-24); review keeps selection by range (dFairHearing), every class whose gate status dLinkedLibrary derives as gated left off (NT-25); check-18 probe becomes an optional slot | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dOrderedCharter; the owner, SA-7, 2026-10-19 |
 | memory-tree | `corpus_ids.py` | id grammar | RESHAPED | one exported slug and id grammar, with recall's parser moved in (dOrderedCharter, dTotalRecall) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dTotalRecall |
 | memory-tree | merge-rows | row-keyed merge driver | STAYS | also merges ledger TSVs (dWitnessedBar) | v2 `[chain]` dWitnessedBar |
 | memory-tree | `transition_audit.py` | check 26 | STAYS | an append-only history population; `read_modes` re-pointed (dConvergedCharter) | retrofit `[ledger]`; v2 `[chain]` dConvergedCharter |
@@ -157,7 +157,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | unattended | guide templates (PROTOCOL, VERBS, STOPS, ASKS) | the protocol text | RESHAPED | rendered views of the loop's checklists (dConvergedCharter) | v2 `[chain]` dConvergedCharter |
 | unattended | `.unattended.conf` extension vocabularies (`PHASES_EXTRA`, `DOD_EXTRA`, `DIRECTIVES_EXTRA`, `HALT_CODES_EXTRA`, `HOLD_CODES_EXTRA`) | an adopter's run vocabulary | RESHAPED | the repository's own items and stages in its overlay, proposed by `adopt.declarations` (dShippedRelease), the keys retired with the kit (dConvergedCharter) | the owner, FA-1 and FA-3, 2026-10-19 |
 | unattended | the `/unattended` Skill | starts, resumes or closes a run | RETIRED | a client of `run` until dConvergedCharter retires it, unattended being the default state (NP-4) | the owner's point 1 (night pass) |
-| hooks | `agent-cap.js` | fan-out guard | STAYS | spawn-guard pack; its arm becomes a fragment; slot reservation added (dWellOiledMachine) | layer-runtime `[enforce]` |
+| hooks | `agent-cap.js` | fan-out guard | RETIRED | its rules moved as the night pass two's point 7 lists them (the agent limit to `runtime.agents-in-flight`, the review rules to the review kit, the spawn guard and admission to the roles pack) and the file retired with an upgrade step in dBoundRoles, pending NT-27 | layer-runtime `[enforce]`; the night pass two, point 7 |
 | hooks | `scratch-guard.js` | write gate | STAYS | roles write-gate pack (dBoundRoles, packed by dWellOiledMachine), its card and route reads re-pointed to the session binding (dWellOiledMachine) | layer-runtime `[enforce]` |
 | hooks | `format-guard.js` | final-message format | RESHAPED | statement-grammar check (dOrderedCharter) | layer-instruction `[recommendations]`; layer-runtime `[enforce]` |
 | process-monitor | reap, scope, classify | reaping | STAYS | Runtime, at the act ceiling (dWellOiledMachine) | layer-runtime `[supervise]`; layer-runtime `[contract]` |

@@ -163,7 +163,8 @@ where each defect's fix sits.
     harness's literal catalogue, made in the expansion's own build. "Registers its lenses through its
     layer contract" means a declared catalogue entry plus that edit. Revised 2026-10-19 (the flow and roles
     adoption, FA-1, and the night pass two): the catalogue is data, a lens is a catalogue row whose brief is a
-    unit, and the harness keeps a five-slot literal filled from it, so the hook counts slots, never names; an
+    unit, and the harness keeps a five-slot literal filled from it, so the merge bar's harness check counts slots,
+    never names (agent-cap's count until the night pass two's point 7); an
     expansion's or a repository's lens is a row, never an edit to the harness.
   - **Each lens ships on its test.** Each catalogue lens's losing test, from the lens research's
     `[catalogue]`, is owed. On a blind replay, a swapped-in lens must raise more unique confirmed

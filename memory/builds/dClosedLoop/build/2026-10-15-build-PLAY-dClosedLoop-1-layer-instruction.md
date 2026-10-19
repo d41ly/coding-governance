@@ -458,15 +458,18 @@ Proposed gaps, each with its proposed owner build. The register holds them as `g
   - The role block is the exception: its carrier is `check_roles.py`'s `BODY_CEILINGS` (roles
     `[tags]`), which the render reads for a role file. Each load point has one carrier.
 - Load points come in two classes:
-  - **Rendered**, which gov writes: the charter, role files, Skills and work orders. The render refuses
-    a set over budget, which is too much. It refuses a set missing a unit that a role or item names in
-    `required-by`, which is too little.
+  - **Rendered**, which gov writes: the charter, role files, Skills and work orders. A set over budget,
+    which is too much, warns or refuses as `budgets.enforce` says, and one over a harness's own limit is
+    refused. A set missing a unit that a role or item names in `required-by`, which is too little, is
+    refused (revised 2026-10-19, the night pass two, point 5, pending NT-22).
   - **Injected**, which the harness or a hook places: the auto-memory index, the harness's agent and
     Skill lists, and hook output. Gov cannot refuse these, so they are measured at session start and a
     breach is reported. Hook text is composed from registered units (`gap-rt-13`).
 - A refusal leaves the spawn undone, and the caller files an ask naming the overage. Under
-  `instructions.checks=warn`, the set loads whole and the reader sees the breach; under `record`, the
-  breach is recorded. Neither skips the check (LR-1).
+  `instructions.checks=warn`, a set missing a unit loads whole and the reader sees the gap; under `record`,
+  the gap is recorded. Neither skips the check (LR-1). A set over budget follows `budgets.enforce` instead:
+  under `warn`, its default, it loads and the breach is shown and priced (revised 2026-10-19, the night
+  pass two, point 5).
 - Field loads are measured from the roles' runs.
 - The act session is a load point. Its set is a role's set: driver-scoped units never reach it
   (`gap-rt-12`).
@@ -653,8 +656,9 @@ side, and its kits became memory's optional components, which fill optional slot
 - P28 says layers are capabilities and the core never depends on an expansion.
 - All four are owner-ratified in this round: the owner's own principles, and the layer framing they
   chose. Each will need its enforcing check in the principle registry (P16):
-  - P27's is the load-set render check. Its refusal softens by `instructions.checks`, which
-    foundations C6 allows since LR-1: `warn` and `record` still run the check and show every breach,
+  - P27's is the load-set render check. Its refusal of a set missing a unit softens by
+    `instructions.checks`, and its size half follows `budgets.enforce` (revised 2026-10-19, the night pass
+    two, point 5), which foundations C6 allows since LR-1: `warn` and `record` still run the check and show every breach,
     and no switch skips it;
   - P28's is the one-way dependency check and the layer contract's conformance gate, the gate of the
     layer kind (foundations C3).

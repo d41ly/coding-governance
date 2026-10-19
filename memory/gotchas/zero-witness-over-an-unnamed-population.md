@@ -31,6 +31,11 @@ closing review then found the moved scan claiming a population its boundary neve
 at the lander's prepare while the core pushes its mailbox, card and claim refs at other times, and its
 fixture planted in three of its seven populations (H2 and M8 of `memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold.md`).
 
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+The reuse check capped its listed units at sixty and read clean on the rest, so a large unit's unlisted units passed
+unchecked.
+
 ## The fix
 
 - A zero-count witness names its population: what it read, and how many of each.
