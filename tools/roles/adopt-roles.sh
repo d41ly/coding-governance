@@ -27,6 +27,20 @@
 # sides of the compare are CR-normalised. NO `fail()` HELPER, for that adopter's reason: check-arms
 # grades a script defining one as a gate, and an adopter is not a gate.
 #
+# THE HARNESS CITATIONS (TOOL-dRenderedAnchor-2, TOOL-dRenderedAnchor-3). Before the plain
+# `{{TOOL_ROOT}}` substitution, every `{{TOOL_ROOT}}<home>/<file>` citation of the template that
+# `roles_lib.resolve_cited_paths` holds is replaced by the path it resolves, one whole citation at a
+# time, so a held citation never rewrites a longer one it prefixes. Only
+# a `workflow`-driver harness of the workflow table resolves through the role index's call, with the
+# tool root as `here`, so `/build` names each harness where the role index lists it, a kit landed
+# under its id behind a `rendered` receipt row included. Every other citation resolves from the kit
+# directory, the call `derive_kit_paths` makes, so its probes stop at `<tool root>/<home>/`, and at a
+# prefixed install an adopter's file at the repository root is never named. A citation neither call
+# holds falls through to the plain substitution. In gov every citation is held at
+# `<tool root>/<home>/`, so the render is unchanged.
+# The answer reads the disk at render time: an `apply` that runs this before the harnesses are
+# rendered writes the plain path, and `--check` then reads the Skill out of sync until `--scaffold`.
+#
 # THE STAGE BINDING. Each `## Stage <n> — <workflow>` heading of the template must name a
 # `[[workflow]]` of the catalogue whose `stage` is <n>, the headings run in strictly ascending stage
 # order, and every workflow of stage 1 or more is named by exactly one heading. It runs inside
@@ -154,7 +168,22 @@ render_skill() { # -> the render on stdout; 1 a stage disagreement or a survivin
   [ "$rc" -eq 0 ] || { printf '%s\n' "$bind" >&2; return "$rc"; }
   # The `X` sentinel keeps trailing newlines `$( )` would strip. The replacements are QUOTED, because
   # bash 5.1+ reads an unquoted `&` in one as the matched text.
-  out=$(cat "$TEMPLATE" && printf X) || return 2
+  # THE CITATION PASS (TOOL-dRenderedAnchor-2, TOOL-dRenderedAnchor-3): the template's text, with each
+  # `{{TOOL_ROOT}}` citation `resolve_cited_paths` holds replaced through `TOOL_ROOT_CITE_RE.sub`, one
+  # whole match at a time: the pattern's `[\w.-]+` is greedy, so a longer citation is its own match and
+  # never takes a shorter one's path. The path is relative to the first directory above the kit
+  # holding `.git`, the walk that derived TOOL_ROOT. The bytes go out through `sys.stdout.buffer`, so
+  # a Windows python writes no CRLF. The plain substitution then answers every citation not held.
+  out=$("$PY" -B -c 'import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+kit = pathlib.Path(sys.argv[1]).absolute()
+root = next((d for d in (kit, *kit.parents) if (d / ".git").exists()), kit)
+text = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")
+held = dict(roles_lib.resolve_cited_paths(text, kit, root, roles_lib.load_workflows(kit)))
+sys.stdout.buffer.write(roles_lib.TOOL_ROOT_CITE_RE.sub(
+    lambda m: held.get(m.group(0), m.group(0)), text).encode("utf-8"))' "$KIT_DIR" "$TEMPLATE" && printf X) \
+    || { echo "roles: the citation pass over $KIT_REL/SKILL.template.md failed" >&2; return 2; }
   out=${out%X}
   out=${out//$'\r'/}
   out=${out//\{\{KIT_DIR\}\}/"$KIT_REL"}

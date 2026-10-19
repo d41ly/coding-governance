@@ -108,9 +108,10 @@ resolve_kit_dir() {
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
     2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
     3. refuse — LookupError naming the three places looked; never a guessed prefix.
     A receipt row whose path escapes the tree or does not exist is skipped, never followed.
@@ -127,7 +128,9 @@ def resolve_kit_dir(home, anchor, here):
     for row in rows:
         if not isinstance(row, dict) or not row.get("path"):
             continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
             continue
         hit = (root / str(row["path"])).absolute()
         if hit.is_file() and root in hit.parents and ".." not in hit.parts:
@@ -2168,6 +2171,11 @@ if [ -n "$ROLES_DIR" ]; then
      "$([ "$rc" = 0 ] && [ "$_n" -gt 0 ] && printf '%s' "$out" | grep -q "^ok       roles     — $_n agent types" && echo 1 || echo 0)"
   ck "OC8 AC6 ...with one note for the harness the role index names and the tree lacks" \
      "$([ "$(printf '%s\n' "$out" | grep -c '^note     roles     — nowhere/absent-harness.js is named by the role index')" = 1 ] && echo 1 || echo 0)"
+  # TOOL-dRenderedAnchor-3 S11: the note's whole remedy tail, read on the printed line, as the UNWIRED
+  # arms read `--scaffold`, so a tail dropped from the echo or an empty kit path reds here.
+  _nl=$(printf '%s\n' "$out" | grep '^note     roles     — nowhere/absent-harness.js is named by the role index')
+  ck "OC8 AC6 ...and the note ends with the remedy naming the adopter's --check" \
+     "$([[ $_nl == *"; bash ${KP}$RL/adopt-roles.sh --check says whether its kit holds it elsewhere" ]] && echo 1 || echo 0)"
   ck "OC8 AC6 ...and an absent harness never reads UNWIRED" \
      "$(printf '%s' "$out" | grep -q '^UNWIRED  roles' && echo 0 || echo 1)"
   # TOOL-aOrientedCast-15 S7 — an index every hook refuses is UNWIRED, never ok with a note. RED

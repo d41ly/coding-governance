@@ -25,6 +25,67 @@ Python side still excluded left a file under no cap at all.
 Here, `tools/memory-tree/SPEC-TEMPLATE.template.md` described a nine-section canon while the
 installed copy and the gate had required ten for four days. Nothing connected them.
 
+TOOL-dRenderedAnchor-1 changed the rule for an absent harness in the role render's docstring, the
+roles README and `help/roles.md`, while `memory/map/features/roles.md`, the dossier claiming
+`tools/roles/**`, still called such a harness a note, not a defect (its closing review round 1, L4,
+id 11). TOOL-dRenderedAnchor-2 rewrote the map's rule in the same diff as the rule's final form. No
+gate here compares a dossier's stated rule with the code it claims.
+
+The same unit's `MISPLACED_LINE` said the harness `is installed`, and its comment and the help page
+said `kit directory`, while the scan matched any directory under the tool root by file name alone
+(L5, id 12). TOOL-dRenderedAnchor-2 wrote the predicate it ships, a file beside the harness's
+template or a `kit.toml` declaring its home, into the line, its comment, the docstring, the README
+and the help page together. No selftest matches the line's text, so no gate holds the wording to
+the scan.
+
+TOOL-dRenderedAnchor-2's `help/roles.md` listed two tools that print the missing-harness note,
+`render_agents.py` and check-wiring's report, while `tools/roles/README.md` listed three, the
+catalogue checker `check_roles.py` among them (its closing review round 2, L1, ids 2, 4, 6 and 11).
+TOOL-dRenderedAnchor-3 named all three on the help page. No machine gate compares a help page's list
+with the README's.
+
+The same unit's help page and render docstring said a file of a harness's name beside neither mark
+of its kit is the adopter's own, and the README and the map said so too, while the scan establishes
+only that it is not counted: `unattended-unit.js` ships with no template, so a copy-install that
+pruned its `kit.toml` holds the kit's own file there (round 2, L7, id 13). TOOL-dRenderedAnchor-3
+wrote what the scan counts into all four. No machine gate compares a page's account of a
+predicate's outcome with the predicate.
+
+TOOL-dRenderedAnchor-3's `help/roles.md`, `tools/roles/README.md` and adopter header said a file at
+the repository root never answers a citation that is no harness, which holds only at a prefixed
+install: at a root install the tool root is the repository, so the kit directory's second probe
+reaches that file (its closing review round 3, L1, ids 4 and 6). `TOOL-dRenderedAnchor-4` wrote "at
+a prefixed install" into those three and into arm 15's comment in
+`tools/roles/adopt-roles.test.sh`. The check: a docs claim about resolver reach states the install
+shape it holds for.
+
+The same three carriers and the `resolve_cited_paths` docstring in `tools/roles/roles_lib.py` said
+"a harness of the workflow table", while the predicate that ships keeps only a `workflow` driver and
+the table's merge bar is a `program`-driver harness (round 3, L2, id 7). `TOOL-dRenderedAnchor-4`
+wrote "a `workflow`-driver harness of the workflow table" into all of them and arm 15's comment, each
+on one line: the phrase had wrapped at the help page and the adopter header, so the review's own
+one-line grep could not see those two carriers.
+
+`TOOL-dRenderedAnchor-4`'s arm 17 comment in `tools/roles/adopt-roles.test.sh`, and its spec, said
+the two values of `here` part on one layout only, copied from the round-3 record's "only one case"
+(round 4, L1, ids 2, 4, 5 and 6). The probe tuple of `resolve_kit_dir` gives two: a harness held at
+<kit>/<home>/, which only the kit directory reaches, and one held only in the directory above the
+tool root. `TOOL-dRenderedAnchor-5` named both in the comment. The check: a comment or spec line
+that states which layouts a resolver call reaches is derived from the probe tuple, each probe's
+reach listed for every value of `here`, never copied from a prior record. This read-only probe
+prints each value of `here` beside its two probes:
+
+```
+python -I -c "import pathlib;k=pathlib.PurePosixPath('/fx/tools/roles');[print(h,[str(h/'workflows'),str(h.parent/'workflows')]) for h in (k.parent,k)]"
+```
+
+Round 4 found the round-3 L2 entry above false for the phrase it quotes (L2, id 3): the fold had
+moved each break to just before the article, so the phrase still wrapped at the help page, the
+adopter header and arm 15's comment, and only a grep that dropped the article found every carrier.
+`TOOL-dRenderedAnchor-5` reflowed the help page and the adopter header, and arm 15 now reads "not
+a". The check: a record that says a phrase sits on one line is checked by a grep for the exact
+literal it quotes, article included, whose hit count equals the carrier count.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

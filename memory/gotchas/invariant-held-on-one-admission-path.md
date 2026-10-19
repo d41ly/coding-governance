@@ -19,6 +19,15 @@ TOOL-aPairedSlots-5 kept one bar per worktree on the turnstile's slot claim in
 `tools/run-gates/run-gates.sh`. The docs key TOOL-aPairedSlots-4 had added never asked, so a doc-only
 bar ran beside its own worktree's holder (aPairedSlots closing review, M3).
 
+## Where it bit
+
+TOOL-dRenderedAnchor-1 gave `render_agents.py`, one of two readers of the role index, a `misplaced`
+verdict, while check-wiring's session-start roles arm read the same index and still called the
+install ok with a note asking for a kit already installed (its closing review round 1, L3, id 6).
+TOOL-dRenderedAnchor-2 named the one reader that gives the verdict in `help/roles.md` and pointed
+check-wiring's note at `adopt-roles.sh --check`, rather than adding a shell twin of the marker test.
+No gate here holds the two readers to one verdict.
+
 ## The remedy
 
 When an invariant is added, list every admission path, the claim, the docs key, nesting and any

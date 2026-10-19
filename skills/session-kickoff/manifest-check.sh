@@ -43,7 +43,7 @@
 #          READY line pins a BASE that is not HEAD, an id reader that could not answer, or a route
 #          the tree cannot check: no MEMORY_ROOT, or no defined-id set).
 set -u
-KIT_MANIFEST_VERSION="1.30"   # gov:kit kickoff-manifest@1.30 — the registry id
+KIT_MANIFEST_VERSION="1.31"   # gov:kit kickoff-manifest@1.31 — the registry id
 # TWO NUMBERS, not one (TOOL-aRepatriatedFork-15 S4). KIT_MANIFEST_VERSION above is the kit's
 # VINTAGE: it bumps whenever a shipped byte of this kit moves, which is what `govkit.py epoch` grades.
 # MANIFEST_FORMAT is the manifest FORMAT, the only number an adopter's `kickoff-manifest: v<N>`
@@ -795,9 +795,10 @@ resolve_kit_dir() {
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
     2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
     3. refuse — LookupError naming the three places looked; never a guessed prefix.
     A receipt row whose path escapes the tree or does not exist is skipped, never followed.
@@ -814,7 +815,9 @@ def resolve_kit_dir(home, anchor, here):
     for row in rows:
         if not isinstance(row, dict) or not row.get("path"):
             continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
             continue
         hit = (root / str(row["path"])).absolute()
         if hit.is_file() and root in hit.parents and ".." not in hit.parts:

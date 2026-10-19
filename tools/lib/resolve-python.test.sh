@@ -110,9 +110,10 @@ resolve_kit_dir() {
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
     2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
     3. refuse — LookupError naming the three places looked; never a guessed prefix.
     A receipt row whose path escapes the tree or does not exist is skipped, never followed.
@@ -129,7 +130,9 @@ def resolve_kit_dir(home, anchor, here):
     for row in rows:
         if not isinstance(row, dict) or not row.get("path"):
             continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
             continue
         hit = (root / str(row["path"])).absolute()
         if hit.is_file() and root in hit.parents and ".." not in hit.parts:
@@ -324,6 +327,67 @@ while IFS='|' read -r fx envset want; do
   [ "$rr_sh" = "$want" ] || bad "remote ladder row $rr_k ($fx ${envset:-no env}): shell printed '$rr_sh', the table says '$want'"; ok
 done <<<"$RR_ROWS"
 [ "$rr_k" = 12 ] || bad "the remote ladder table read as $rr_k rows, not 12"; ok
+
+# ---- 2e. THE KIT RESOLVER'S RECEIPT JOIN, BEHAVIOUR (TOOL-dRenderedAnchor-2) ----------------------
+# Parity holds each inline copy of `resolve_kit_dir` to its canonical; this holds the canonical to the
+# six receipt rows of TOOL-dRenderedAnchor-1's section 4 and a seventh, one query each with `here` at
+# the tool root `p`. Rows 1 and 2 are held. Row 3 is the one only the join's role term rejects, a
+# `merged` row, and row 4 the one only its home term rejects, a `rendered` row from another home's
+# template. Row 5, `../out/w.js`, is the one only the `..` term rejects: `absolute()` keeps the `..`,
+# so it passes `root in hit.parents`. Row 6 holds the existence test. Row 7 is the one only the
+# outside-the-tree term `root in hit.parents` rejects (TOOL-dRenderedAnchor-3 S10): an absolute path
+# to a file beside `w.js`, written by the python program in posix form, because a shell `/tmp/...`
+# path inside JSON is not converted by MSYS and would name no file on Windows, and the join splits
+# `path` on `/` before either term is read. The canonical is imported from beside this file, so a
+# staged break of it reaches here. Every name is neutral, home `h`, other home `o`, kit directory
+# `k`, because a kit name in a fixture path is an install-prefix hit.
+# WHAT THIS DOES NOT CHECK: the probe rungs, which no row reaches, or any copy's call site.
+RK="$TMP/rk"; mkdir -p "$RK/.git" "$RK/.governance" "$RK/p/k" "$RK/c" "$TMP/out"
+for f in p/k/t.js p/k/u.js c/s.json p/k/v.js; do printf 'x\n' > "$RK/$f"; done
+printf 'x\n' > "$TMP/out/w.js"; printf 'x\n' > "$TMP/out/y.js"
+printf '%s\n' '{"files": [
+ {"role": "rendered", "source": "p/h/t.template.js", "path": "p/k/t.js"},
+ {"role": "engine", "source": "p/h/u.js", "path": "p/k/u.js"},
+ {"role": "merged", "source": "p/h/s.fragment.json", "path": "c/s.json"},
+ {"role": "rendered", "source": "p/o/v.template.js", "path": "p/k/v.js"},
+ {"role": "rendered", "source": "p/h/w.template.js", "path": "../out/w.js"},
+ {"role": "rendered", "source": "p/h/x.template.js", "path": "p/k/x.js"}]}' > "$RK/.governance/install.json"
+rk_got=$("$REALPY" -B -c '
+import json, pathlib, sys
+sys.path.insert(0, sys.argv[1])
+from resolve_kit_dir import resolve_kit_dir
+root = pathlib.Path(sys.argv[2]).absolute()
+receipt = root / ".governance" / "install.json"
+data = json.loads(receipt.read_text(encoding="utf-8"))
+data["files"].append({"role": "rendered", "source": "p/h/y.template.js",
+                      "path": (root.parent / "out" / "y.js").absolute().as_posix()})
+receipt.write_text(json.dumps(data), encoding="utf-8")
+for anchor in ("t.js", "u.js", "s.json", "v.js", "w.js", "x.js", "y.js"):
+    try:
+        print(resolve_kit_dir("h", anchor, root / "p").relative_to(root).as_posix())
+    except LookupError:
+        print("LookupError")' "$HERE" "$RK" 2>&1 | tr -d '\r')
+rk_want=$(printf '%s\n' p/k p/k LookupError LookupError LookupError LookupError LookupError)
+mapfile -t rk_rows <<<"$rk_got"; rk_n=0
+for rk_l in "${rk_rows[@]}"; do [ -z "$rk_l" ] || rk_n=$((rk_n+1)); done
+[ "$rk_n" = 7 ] || bad "the receipt-join table did not read as seven rows: ${rk_got//$'\n'/ }"; ok
+[ "$rk_got" = "$rk_want" ] || bad "the canonical resolve_kit_dir disagrees with the receipt-join table, rows 1 to 7: ${rk_got//$'\n'/ }"; ok
+
+# ---- 2f. A TEMPLATE CITATION UNDER A RENDERED ROW, BEHAVIOUR (TOOL-dRenderedAnchor-2) -------------
+# `derive_kit_paths` resolves every `{{TOOL_ROOT}}<home>/<file>` citation of the templates it is given
+# through its inline `resolve_kit_dir`, so the receipt join decides what every rendered doc citing a
+# harness names. The canonical in render-doc.sh, sourced, runs over a fixture whose receipt holds one
+# `rendered` row, no `prefix` key and no adopter placeholder, and must print that citation's one line.
+# Red on the a60b0c7d block, which printed nothing, so the citation fell through to the plain prefix.
+# WHAT THIS DOES NOT CHECK: the adopter-placeholder answers and the prefix line, which no row reaches.
+RD="$TMP/rd"; RD_CITE='{{TOOL_ROOT}}h/t.js'
+mkdir -p "$RD/.git" "$RD/.governance" "$RD/p/mt" "$RD/p/k"
+printf 'x\n' > "$RD/p/k/t.js"
+printf 'cites %s here\n' "$RD_CITE" > "$RD/p/mt/x.template.md"
+printf '%s\n' '{"files": [{"role": "rendered", "source": "p/h/t.template.js", "path": "p/k/t.js"}]}' \
+  > "$RD/.governance/install.json"
+rd_got=$(bash -c '. "$1"; derive_kit_paths "$2" "$3/p/mt" "$3/p/mt/x.template.md"' _ "$HERE/render-doc.sh" "$REALPY" "$RD" 2>&1 | tr -d '\r')
+[ "$rd_got" = "$RD_CITE"$'\t'"p/k/t.js" ] || bad "derive_kit_paths over one rendered receipt row did not print its citation's one line: '$rd_got'"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

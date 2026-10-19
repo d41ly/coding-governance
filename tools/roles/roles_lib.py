@@ -24,7 +24,7 @@ import pathlib
 import re
 import tomllib
 
-KIT_ROLES_VERSION = "1.6"
+KIT_ROLES_VERSION = "1.7"
 
 #: Every front-matter key a role file may carry: Claude Code's own, then gov's.
 #: Split from one string, because a quoted `"tools"` beside a quoted segment reads to the
@@ -71,6 +71,8 @@ LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and
                "so no role's rules resolve and no agent type or handoff carries the charter; reseed "
                "the charter template from gov, then re-render")
 HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
+#: A `{{TOOL_ROOT}}<home>/<file>` citation, the shape `derive_kit_paths` reads (render-doc.sh:162).
+TOOL_ROOT_CITE_RE = re.compile(r"\{\{TOOL_ROOT\}\}([\w.-]+)/([\w.-]+)")
 #: A build slug, as `handoff.py render --build` takes it and a stand-in waiver row names it.
 SLUG_RE = re.compile(r"^[A-Za-z]+$")
 #: The rendered handoff's marker line; `handoff.py` reads this one pattern (TOOL-aOrientedCast-19).
@@ -95,9 +97,10 @@ class RolesError(Exception):
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
     2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
     3. refuse — LookupError naming the three places looked; never a guessed prefix.
     A receipt row whose path escapes the tree or does not exist is skipped, never followed.
@@ -114,7 +117,9 @@ def resolve_kit_dir(home, anchor, here):
     for row in rows:
         if not isinstance(row, dict) or not row.get("path"):
             continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
             continue
         hit = (root / str(row["path"])).absolute()
         if hit.is_file() and root in hit.parents and ".." not in hit.parts:
@@ -345,6 +350,11 @@ def load_workflows(kit_dir):
     if not isinstance(entries, list) or not all(isinstance(e, dict) for e in entries):
         raise RolesError("%s: R6 — 'workflow' is not an array of tables" % path.as_posix())
     return entries
+
+
+def extract_workflow_harnesses(workflows):
+    """The `harness` value of each `[[workflow]]` entry whose `driver` is `workflow`, in table order."""
+    return [w.get("harness") for w in workflows if w.get("driver") == "workflow"]
 
 
 def load_gate_leg_names(tool_root):
@@ -592,3 +602,31 @@ def resolve_harness_path(tool_root, harness):
         return resolve_kit_dir(home, anchor, tool_root) / anchor, True
     except LookupError:
         return pathlib.Path(tool_root).absolute() / home / anchor, False
+
+
+def resolve_cited_paths(text, kit_dir, target_root, workflows):
+    """`[(cite, rel)]` in first-seen order, one per distinct citation in text that this install
+    holds, rel repo-relative. A citation of a `workflow`-driver harness of workflows resolves as
+    `resolve_harness_path` does, with `here` at the tool root, so the Skill names a harness where the
+    role index lists it (TOOL-dRenderedAnchor-2). Only a `workflow`-driver harness of the workflow table
+    resolves through the role index's call: every other citation resolves with `here` at kit_dir, the
+    call `derive_kit_paths` makes, so its probes stop at `<tool root>/<home>/` and a receipt row still
+    places it (TOOL-dRenderedAnchor-3). A citation nothing holds, or held outside target_root, is
+    not listed, and the caller's plain prefix substitution answers it; a path outside target_root
+    could not be named repo-relative."""
+    kit = pathlib.Path(kit_dir).absolute()
+    root = pathlib.Path(target_root).absolute()
+    harnesses = {m.groups() for m in (HARNESS_RE.match(h) for h in extract_workflow_harnesses(workflows)
+                                      if isinstance(h, str)) if m}
+    found, seen = [], set()
+    for m in TOOL_ROOT_CITE_RE.finditer(text):
+        if m.group(0) in seen:
+            continue
+        seen.add(m.group(0))
+        here = kit.parent if m.groups() in harnesses else kit
+        try:
+            path = (resolve_kit_dir(m.group(1), m.group(2), here) / m.group(2)).relative_to(root)
+        except (LookupError, ValueError):
+            continue
+        found.append((m.group(0), path.as_posix()))
+    return found

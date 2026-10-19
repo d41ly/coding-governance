@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """drift_report.py — does this repo's own RECORD of its state still describe reality?
 
-gov:kit drift-audit@1.29
+gov:kit drift-audit@1.30
 
     python <prefix>/drift-audit/drift_report.py            # human table, always exits 0
     python <prefix>/drift-audit/drift_report.py --json     # machine-readable, always exits 0
@@ -56,9 +56,10 @@ sys.dont_write_bytecode = True
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
     2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
     3. refuse — LookupError naming the three places looked; never a guessed prefix.
     A receipt row whose path escapes the tree or does not exist is skipped, never followed.
@@ -75,7 +76,9 @@ def resolve_kit_dir(home, anchor, here):
     for row in rows:
         if not isinstance(row, dict) or not row.get("path"):
             continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
             continue
         hit = (root / str(row["path"])).absolute()
         if hit.is_file() and root in hit.parents and ".." not in hit.parts:
@@ -89,7 +92,7 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
-KIT_DRIFT_AUDIT_VERSION = "1.29"
+KIT_DRIFT_AUDIT_VERSION = "1.30"
 
 CONF_NAME = ".memory-tree.conf"
 

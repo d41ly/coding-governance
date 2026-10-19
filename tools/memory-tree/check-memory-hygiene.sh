@@ -61,7 +61,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.148   # gov:kit memory-tree@2.148 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.149   # gov:kit memory-tree@2.149 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory

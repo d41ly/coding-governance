@@ -48,7 +48,7 @@
 # GIT_SSH, which the `ok` and `note` cases grade as they find it because the arm cannot tell who
 # wrote it; HTTPS remotes, which hold no ssh socket; and whether the remote's own idle timeout is
 # shorter than the silence the keepalive tolerates.
-KIT_CHECK_WIRING_VERSION=1.33   # gov:kit check-wiring@1.33 — the deployer's read
+KIT_CHECK_WIRING_VERSION=1.34   # gov:kit check-wiring@1.34 — the deployer's read
 set -u
 # ---- S6: this file's own install prefix, DERIVED ------------------------------------------------
 # TOOL-dRetiredFork-8. Six `tools/<kit>/` literals were spelled here, and `govkit apply` ships these
@@ -333,7 +333,10 @@ first_of() { local c; _first_of=""; for c in "$@"; do [ -f "$c" ] && { _first_of
 # The arguments are the Python `resolve_kit_dir`'s own pair, the kit's HOME and a file in it (a
 # tool-root file passes an empty home), joined and matched as a whole-segment SUFFIX of the row's
 # `source`: the whole source would spell gov's tool root, which ships verbatim and means nothing here,
-# and the last two segments are exactly that reader's join, which the self-test holds this one equal to.
+# and the last two segments are the exact `<home>/<file>` half of that reader's join, which the
+# self-test holds this one equal to. This reader joins that exact row only, while the Python reader
+# also joins a `rendered` row, whose `source` is its template, on the home and the `path`'s file name
+# (TOOL-dRenderedAnchor-1); no caller of this reader passes a rendered anchor, so it stays exact.
 # ONE awk pass, no python: this runs as a SessionStart hook on a host that may have none. The writer
 # is `json.dumps(indent=2)`, so a row is `{` alone on a line, its keys one per line, `}` alone; the
 # pair is collected per object, so key order does not matter. A row whose path is absolute or climbs
@@ -492,9 +495,10 @@ resolve_kit_dir() {
 def resolve_kit_dir(home, anchor, here):
     """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
 
-    1. receipt — the `.governance/install.json` row whose `source` ends in <home>/<anchor> and
-       whose `path` exists inside this tree. The only record of a RENAMED kit dir: no probe finds
-       a memory-recall kit an adopter homed at `scripts/recall/`.
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
     2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
     3. refuse — LookupError naming the three places looked; never a guessed prefix.
     A receipt row whose path escapes the tree or does not exist is skipped, never followed.
@@ -511,7 +515,9 @@ def resolve_kit_dir(home, anchor, here):
     for row in rows:
         if not isinstance(row, dict) or not row.get("path"):
             continue
-        if str(row.get("source") or "").split("/")[-2:] != [home, anchor]:
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
             continue
         hit = (root / str(row["path"])).absolute()
         if hit.is_file() and root in hit.parents and ".." not in hit.parts:
@@ -1679,6 +1685,9 @@ try {
 # The harness half reads the role index with the resolved python and prints one `note` per harness
 # it lists that this tree does not hold: `/build` drives those through the review harness, which is
 # not a default kit, so its absence is a fact to print and never a gate (the spec's section 8 F1).
+# Whether the kit holds such a harness elsewhere, the `misplaced` verdict, is `render_agents.py`'s
+# alone, which `adopt-roles.sh --check` prints, so the note names that command: a shell twin of its
+# marker test here would derive one decision twice, where python may be absent (TOOL-dRenderedAnchor-2).
 #
 # WHAT THIS DOES NOT CHECK: whether a rendered file is FRESH, which is the `roles render wiring`
 # leg's byte compare; and whether a house overlay is sensible, which is `roles catalogue`'s. Presence
@@ -1734,7 +1743,7 @@ for h in json.load(open(sys.argv[1], encoding="utf-8")).get("harnesses") or []:
     while IFS= read -r h; do
       h=${h%$'\r'}   # a Windows python writes CRLF to a pipe, and a CR kept here names no file
       [ -n "$h" ] && [ ! -f "$h" ] || continue
-      echo "note     roles     — $h is named by the role index and absent here; /build cannot drive it until the review harness is installed"
+      echo "note     roles     — $h is named by the role index and absent here; /build cannot drive it; bash $kit/adopt-roles.sh --check says whether its kit holds it elsewhere"
     done <<EOF
 $harn
 EOF

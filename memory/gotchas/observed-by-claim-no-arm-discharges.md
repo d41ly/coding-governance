@@ -38,6 +38,15 @@ in a scratch edit whose bytes were restored. The arm in the tree runs undelayed,
 spawn poll to a fixed wait leaves it green. A staged condition that is not in the shipped arm is an
 observation by hand: say so on the line.
 
+It bit again in `TOOL-dRenderedAnchor-3`, whose S1 named AC1 and AC13 as the observers of the
+citation pass's harness branch in `tools/roles/roles_lib.py`, the tool root as `here` for a
+`workflow`-driver harness. Both criteria hold their harnesses under the tool root, which either value
+of `here` reaches, so staging the branch as `here = kit` left them and arms 14 to 16 green (the
+closing review's round 3, M1, ids 1, 3 and 5). `TOOL-dRenderedAnchor-4` added arm 17 to
+`tools/roles/adopt-roles.test.sh`, whose harnesses sit only above the tool root with no receipt. The
+check: each branch of a conditional resolver needs a fixture whose answer depends on that branch,
+observed red against the collapsed branch.
+
 ## The fix
 
 Stage the break of the scope item's OWN surface and watch the cited arm go red. Never read the arm

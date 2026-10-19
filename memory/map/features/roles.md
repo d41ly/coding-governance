@@ -5,7 +5,7 @@ feature = "roles"
 title = "The role catalogue: one owner-editable agent definition per role with an empty house overlay beside it, the table of the workflows a governed session runs its LLM work through, the library every consumer reads them by, and the leg that holds the three and the governing doc to one another"
 status = "building"
 streams = ["tooling"]
-decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11", "TOOL-aOrientedCast-16", "TOOL-aOrientedCast-17", "TOOL-aOrientedCast-20", "TOOL-aOrientedCast-27"]
+decisions = ["TOOL-aOrientedCast-1", "TOOL-aOrientedCast-2", "TOOL-aOrientedCast-3", "KICK-aOrientedCast-2", "TOOL-aOrientedCast-8", "TOOL-aOrientedCast-10", "TOOL-aOrientedCast-11", "TOOL-aOrientedCast-16", "TOOL-aOrientedCast-17", "TOOL-aOrientedCast-20", "TOOL-aOrientedCast-27", "TOOL-dRenderedAnchor-1", "TOOL-dRenderedAnchor-2"]
 
 [claims]
 gate-legs = ["roles adopter self-test", "roles catalogue", "roles render selftest", "roles render wiring"]
@@ -98,8 +98,16 @@ bounds moves with the thing it bounds; a constant moves only by a reviewed chang
 row is refused, so a new role is priced when it is added. Overlays are never bounded: they are the
 adopter's own text, and their bytes are printed on every run.
 
-**A well-formed harness the tree does not hold is a note, not a defect.** An adopter may install the
-catalogue without the review or build harness kits; whether it should is the wiring check's question.
+**A harness found nowhere in the install is a note; one its kit holds elsewhere is `misplaced`.** An
+adopter may install the catalogue without the review or build harness kits, so a well-formed harness
+the tree does not hold prints a note and never reds; whether the kit should be installed is the
+wiring check's question. A harness the resolver did not hold, while a file of its name sits directly
+inside another directory under the tool root beside the harness's template or a `kit.toml`
+declaring its home, is one the install holds where the index does not look: the agent render prints
+`misplaced` and its `--check` exits 1. A file of its name beside neither mark is
+not counted as its kit's, and reads as the note. The render alone gives that verdict;
+`check-wiring.sh` prints the note and names `adopt-roles.sh --check` (TOOL-dRenderedAnchor-1,
+TOOL-dRenderedAnchor-2).
 
 **The README's catalogue region is rendered, never typed.** A table stated beside the source that
 owns it rots; `--write` renders it and every run compares it, so a table edit without a re-render
@@ -137,7 +145,9 @@ CRLF working copy hashes like its blob.
   - contract: the kickoff checker's `--card --path` and `--task-skeleton` output, and the card field
     grammar ported from it (TOOL-aOrientedCast-2, TOOL-aOrientedCast-15).
   - contract: the install receipt's rows naming a kit's source and installed path, through
-    `resolve_kit_dir`.
+    `resolve_kit_dir`. The join also matches a `rendered` row on its role, its template's home and
+    its path's file name (TOOL-dRenderedAnchor-1), which is how the role index and the `/build`
+    Skill's harness citations name a harness govkit landed under its kit id (TOOL-dRenderedAnchor-2).
   - contract: the hooks kit's spawn guard's reading of a prompt's marker line, which
     `extract_prompt_marker` mirrors and the adopter self-test's arm 11 compares
     (TOOL-aOrientedCast-25).

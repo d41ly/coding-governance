@@ -1,4 +1,4 @@
-<!-- gov:kit roles@1.6 -->
+<!-- gov:kit roles@1.7 -->
 # roles — the role catalogue: one agent definition per role, the workflow table, and the checker
 
 A governed session runs its LLM work through ten declared WORKFLOWS — `orient`, `research`, `reuse`,
@@ -220,8 +220,16 @@ handoff carries the blocks twice, which is the accepted cost. A pre-tag (v3.x) c
 `## §<n> — ` headings and no rule tag, renders every type with no `## Charter` and prints one note
 asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
 with its `workflow`, `writes` and `agent`, `agent: false` roles included, and `harnesses`, the
-repo-relative scripts of every workflow whose `driver` is `workflow`. A harness the tree does not
-hold is listed where the resolver places it and printed on a `note` line; it refuses nothing.
+repo-relative scripts of every workflow whose `driver` is `workflow`. The kit resolver finds a
+harness govkit rendered from its template through that file's `rendered` receipt row, so a kit
+landed under its id rather than its home is listed where it sits. A harness the tree does not hold
+is listed where the resolver places it. Where a file of its name sits directly inside a directory
+under the tool root beside a mark of its kit, the harness's template `<stem>.template<suffix>` or a
+`kit.toml` declaring the home its listed path names, its kit holds it where the index does not look:
+it prints on a `misplaced` line naming each such file, and `--check` exits 1 (TOOL-dRenderedAnchor-1,
+TOOL-dRenderedAnchor-2). The scan reads the disk, never the receipt. A file of its name beside
+neither mark is not counted as its kit's, so like no file at all it prints on a `note` line and
+refuses nothing.
 
 **Ownership.** The renderer owns the types its catalogue names plus every name the on-disk index
 lists, which is the set a previous render wrote. `--write` unlinks an owned type the catalogue no
@@ -275,6 +283,9 @@ name of any protocol the charter's Protocols section lists.
 - `/build` drives the three harnesses the workflow table names, which ship in the `review-harness`
   kit, not a default. Without it the role agents, the handoffs and the gates still work, and the
   catalogue checker, the agent render and `check-wiring.sh` each print a `note` per absent harness.
+  The agent render is the one reader that prints `misplaced`, for a harness its kit holds elsewhere
+  under the tool root; `check-wiring.sh`'s note names `adopt-roles.sh --check` as the command that
+  says which.
 
 With no governing doc at `CHARTER` the adopter renders the Skill alone and exits 3, naming the doc
 and the key; the descriptor accepts that exit as `no-governing-doc`, so the install succeeds and no
@@ -298,6 +309,21 @@ The render substitutes three tokens literally: `{{KIT_DIR}}` and `{{TOOL_ROOT}}`
 same `.git` walk the unattended adopter uses, and `{{MEMORY_ROOT}}`, read from `.memory-tree.conf`.
 An empty derivation, an absent conf or a blank key exits 2; a `{{` surviving the render exits 1
 naming its line.
+
+Before the plain `{{TOOL_ROOT}}` substitution, each `{{TOOL_ROOT}}<home>/<file>` citation that
+`roles_lib.resolve_cited_paths` holds is replaced by the path it resolves, one whole citation at a
+time, so a held citation never rewrites a longer one it prefixes (TOOL-dRenderedAnchor-2,
+TOOL-dRenderedAnchor-3). Only a `workflow`-driver harness of the workflow table resolves through the
+role index's call, from the tool root, so the Skill names each harness where the role index lists
+it, a kit govkit landed under its id behind a `rendered` receipt row included. Every other
+citation, the merge bar's among them, resolves from the roles kit directory, the call
+`derive_kit_paths` makes: a receipt row can place it, and its probes stop at `<tool root>/<home>/`,
+so at a prefixed install an adopter's file at the repository root is never named. The plain
+substitution answers a citation neither call holds. In this repository every citation is held at
+`<tool root>/<home>/`, so the render is unchanged. The
+answer reads the disk at render time: `apply` runs the adopter before the harnesses are rendered, so
+a first install names the plain path, `--check` reads the Skill out of sync, and the next
+`--scaffold`, which `govkit update` runs, corrects it. A failed citation pass exits 2.
 
 The render also BINDS the Skill's stages to `workflows.toml`: each `## Stage <n> — <workflow>`
 heading must name a workflow whose `stage` is `<n>`, the headings ascend strictly, and every
