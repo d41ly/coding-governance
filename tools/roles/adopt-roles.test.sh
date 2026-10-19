@@ -21,15 +21,23 @@
 # the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14 and R0 (arm 10);
 # the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
 # against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does); a `--scaffold` whose
-# agent render refuses, which exits 1 naming the refusal and writes no Skill (arm 13); and the cited
+# agent render refuses, which exits 1 naming the refusal and writes no Skill (arm 13); the cited
 # harnesses moved into a renamed directory behind `rendered` receipt rows, which the Skill then names
-# there (arm 14). Every arm is a self-contained block below the prologue, so a slice of the prologue
-# and one block runs that arm alone.
+# there, and a citation extending a held one, which keeps its own plain path (arm 14); a decoy at the
+# repository root for each citation that is no harness, which the Skill never names, and a receipt
+# row placing the first of them, which it does (arm 15); and a root install whose repository has a
+# sibling directory holding each cited harness, which the citation pass lists nowhere (arm 16). Every
+# arm is a self-contained block below the prologue, so a slice of the prologue and one block runs
+# that arm alone.
 #
-# WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond arm 14's harness
-# paths, which the catalogue checker and the renderer's own self-test grade; the `--scaffold`
-# restart notice's wording; or an adopter run at another install prefix, since the fixture mirrors
-# this repository's own. Arm 14 does not check a citation that is no harness. Arm 11 does not
+# WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond the citation paths
+# of arms 14 to 16, which the catalogue checker and the renderer's own self-test grade; the
+# `--scaffold` restart notice's wording; or an adopter run at another install prefix, since the
+# fixture mirrors this repository's own, arm 16's root install aside. Arms 14 to 16 read only the
+# citations the shipped template holds, so a harness the table lists and the template does not cite
+# is in none of them, and arm 15 reads only a citation inside backticks. Arm 16 does not check what
+# the role index lists at its root install, where the index's own probe names each sibling harness
+# as `../<home>/<file>`, outside the repository (TOOL-dRenderedAnchor-3 section 3). Arm 11 does not
 # compare a refusal's wording, any marker field beyond the whole line, or any micro-format head but
 # `agent` and `returned`. Arm 13 does not check which rule refused: any non-zero exit of the agent
 # render takes the same branch, so it grades the adopter's handling of a refusal, and R10 only as
@@ -65,21 +73,45 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # for arm 10 (TOOL-aOrientedCast-25); arm 11 is out of the floor, as arm 6 is. +1 for arm 6's named
 # spawn and +4 for arm 12 (TOOL-aOrientedCast-27): arm 6's one floored assertion is taken back off the
 # floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
-# +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2).
-FLOOR_ASSERTIONS=43
+# +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2). +1 for arm 14, +3
+# for arm 15 and +2 for arm 16 (TOOL-dRenderedAnchor-3).
+FLOOR_ASSERTIONS=49
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
-FX=""
-build_fixture() { # -> $FX: a repo holding this kit with $ADOPTER as its adopter, scaffolded; rc of the scaffold
-  FX="$TMP_ROOT/fx$n"
-  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$KREL" "$FX/$_chd" || return 2
+FX=""; FXK="$KREL"
+build_fixture() { # [kit path] [fixture dir] -> $FX: a repo holding this kit at the kit path, $KREL
+  # unless given, with $ADOPTER as its adopter, scaffolded; rc of the scaffold. The fixture directory
+  # is $TMP_ROOT/fx<n> unless given, and run_adopter reads the kit path the last call used.
+  FXK=${1:-$KREL}; FX=${2:-$TMP_ROOT/fx$n}
+  _chd=.; [[ $CH == */* ]] && _chd=${CH%/*}; mkdir -p "$FX/$FXK" "$FX/$_chd" || return 2
   git init -q "$FX" || return 2
-  cp -R "$HERE"/. "$FX/$KREL"/ && cp "$ADOPTER" "$FX/$KREL/adopt-roles.sh" || return 2
+  cp -R "$HERE"/. "$FX/$FXK"/ && cp "$ADOPTER" "$FX/$FXK/adopt-roles.sh" || return 2
   printf 'MEMORY_ROOT=%s\nCHARTER=%s\n' "$MR" "$CH" > "$FX/.memory-tree.conf"
   cp "$REPO/$CH" "$FX/$CH" || return 2
-  (cd "$FX" && bash "$KREL/adopt-roles.sh" --scaffold >/dev/null 2>&1)
+  (cd "$FX" && bash "$FXK/adopt-roles.sh" --scaffold >/dev/null 2>&1)
 }
-run_adopter() { (cd "$FX" && bash "$KREL/adopt-roles.sh" "$@" 2>&1); }
+run_adopter() { (cd "$FX" && bash "$FXK/adopt-roles.sh" "$@" 2>&1); }
+# THE CITED HARNESS PAIRS, read by this suite and never through `roles_lib` (TOOL-dRenderedAnchor-3
+# S5): the `harness` of each `[[workflow]]` entry of `<kit>/workflows.toml` whose `driver` is
+# `workflow`, split after a literal `{prefix}/` into home and file, kept when `<kit>/SKILL.template.md`
+# holds `{{TOOL_ROOT}}<home>/<file>`; one `<home>/<file>` line per distinct pair, in table order. An
+# arm guarding the citation pass never takes its population from the pattern that pass reads, so a
+# pattern that stops matching a harness reds the arm rather than shrinking it.
+HARNESS_PAIRS_READ='import pathlib, sys, tomllib
+kit = pathlib.Path(sys.argv[1])
+with open(kit / "workflows.toml", "rb") as fh:
+    table = tomllib.load(fh).get("workflow") or []
+text = (kit / "SKILL.template.md").read_text(encoding="utf-8")
+pairs = []
+for w in table:
+    harness = w.get("harness") if isinstance(w, dict) and w.get("driver") == "workflow" else None
+    if not isinstance(harness, str) or not harness.startswith("{prefix}/"):
+        continue
+    pair = harness[len("{prefix}/"):]
+    home, _, name = pair.partition("/")
+    if home and name and "/" not in name and "{{TOOL_ROOT}}" + pair in text and pair not in pairs:
+        pairs.append(pair)
+sys.stdout.buffer.write("".join(p + "\n" for p in pairs).encode("utf-8"))'
 
 # ---- arm 1: a stage heading naming a workflow at the wrong stage --------------------------------
 build_fixture; check_arm "arm 1 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
@@ -504,28 +536,24 @@ check_arm "arm 13 a refused agent render stops the scaffold, naming the refusal,
 # TOOL-dRenderedAnchor-2 S12: the shape govkit leaves when it lands a kit under its id rather than
 # its home. Each harness the template cites sits in a renamed directory behind one `rendered`
 # receipt row whose `source` is its template under the cited home, and `render_skill` resolves each
-# citation through the kit resolver before the plain `{{TOOL_ROOT}}` substitution. A cited harness is
-# a citation the workflow table names as a `workflow`-driver harness, so the homes and file names are
-# read from the template and the table, never typed. Red against an adopter with the citation pass
-# taken out, whose Skill names each harness under the home the template cites.
+# citation through the kit resolver before the plain `{{TOOL_ROOT}}` substitution. The population is
+# HARNESS_PAIRS_READ's (TOOL-dRenderedAnchor-3 S5): the asserted count must equal the cited count and
+# be at least 2, PINNED from the template's two harness citations at TOOL-dRenderedAnchor-3's base,
+# and each path is matched with its backticks, the form the template cites it in. One line appended
+# to the template cites the first pair with `x` added to its file name, which nothing holds, and it
+# must keep its own plain path (S6). Red against an adopter with the citation pass taken out, whose
+# Skill names each harness under the home the template cites; against a citation pattern narrowed
+# so a harness drops out of it; and against held citations applied as unanchored substrings, which
+# write the extended citation under the renamed directory.
 build_fixture; check_arm "arm 14 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
+A14P=$("$PY" -B -c "$HARNESS_PAIRS_READ" "$FX/$KREL"); A14P=${A14P//$'\r'/}; A14P=${A14P%$'\n'}
+_p14=(); [ -z "$A14P" ] || mapfile -t _p14 <<< "$A14P"
 A14=$("$PY" -B -c 'import json, pathlib, sys
-sys.path.insert(0, sys.argv[1])
-import roles_lib
-fx, krel = pathlib.Path(sys.argv[2]), sys.argv[3]
-tool = pathlib.PurePosixPath(krel).parent
-table = set()
-for w in roles_lib.load_workflows(fx / krel):
-    m = roles_lib.HARNESS_RE.match(w.get("harness") or "") if w.get("driver") == "workflow" else None
-    if m:
-        table.add(m.groups())
-text = (fx / krel / "SKILL.template.md").read_text(encoding="utf-8")
+fx, tool = pathlib.Path(sys.argv[1]), pathlib.PurePosixPath(sys.argv[2]).parent
 rows, said = [], []
-for m in roles_lib.TOOL_ROOT_CITE_RE.finditer(text):
-    home, name = m.groups()
+for pair in sys.argv[3:]:
+    home, name = pair.split("/", 1)
     held = tool / "renamed" / name
-    if m.groups() not in table or held.as_posix() in said:
-        continue
     (fx / held).parent.mkdir(parents=True, exist_ok=True)
     (fx / held).write_text("// harness\n", encoding="utf-8")
     stem, ext = name.rsplit(".", 1)
@@ -534,21 +562,106 @@ for m in roles_lib.TOOL_ROOT_CITE_RE.finditer(text):
     said += [held.as_posix(), (tool / home / name).as_posix()]
 (fx / ".governance").mkdir(exist_ok=True)
 (fx / ".governance" / "install.json").write_text(json.dumps({"files": rows}), encoding="utf-8")
-sys.stdout.buffer.write("\n".join(said).encode("utf-8"))' "$HERE" "$FX" "$KREL")
+sys.stdout.buffer.write("\n".join(said).encode("utf-8"))' "$FX" "$KREL" "${_p14[@]}")
+printf '`{{TOOL_ROOT}}%sx`\n' "${_p14[0]-}" >> "$FX/$KREL/SKILL.template.md"
 out=$(run_adopter --scaffold); rc=$?
+SK14="$FX/.claude/skills/build/SKILL.md"
 mapfile -t _a14 <<< "${A14//$'\r'/}"
 _ok=1; _i=0
 while [ "$_i" -lt "${#_a14[@]}" ]; do
   [ -n "${_a14[$_i]}" ] || { _ok=0; break; }
-  grep -qF -- "${_a14[$_i]}" "$FX/.claude/skills/build/SKILL.md" || _ok=0
-  grep -qF -- "${_a14[$((_i+1))]:-x}" "$FX/.claude/skills/build/SKILL.md" && _ok=0
+  grep -qF -- "\`${_a14[$_i]}\`" "$SK14" || _ok=0
+  grep -qF -- "\`${_a14[$((_i+1))]:-x}\`" "$SK14" && _ok=0
   _i=$((_i+2))
 done
 check_arm "arm 14 a --scaffold names each cited harness under the renamed directory, and none under its cited home" \
-   "$([ "$rc" = 0 ] && [ "$_i" -ge 2 ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
+   "$([ "$rc" = 0 ] && [ "${#_p14[@]}" -ge 2 ] && [ "$((_i / 2))" = "${#_p14[@]}" ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
 [ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+check_arm "arm 14 ...and a citation extending the first by one character keeps its own plain path" \
+   "$([ "$rc" = 0 ] && [ -n "${_a14[1]-}" ] && grep -qF -- "\`${_a14[1]}x\`" "$SK14" \
+      && ! grep -qF -- "\`${_a14[0]}x\`" "$SK14" && echo 1 || echo 0)"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 14 ...and --check over that install exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+
+# ---- arm 15: a citation that is no harness never resolves above the tool root -------------------
+# TOOL-dRenderedAnchor-3 S7, the closing review's M1: a citation that is no harness of the workflow
+# table resolves from the kit directory, the call `derive_kit_paths` makes, so a file of its name at
+# the repository root is never named. The arm finds each backticked span of the template holding
+# `{{TOOL_ROOT}}` with its own pattern, skips each whose `<home>/<file>` HARNESS_PAIRS_READ lists,
+# writes a decoy at `<repo>/<home>/<file>` for every other one, and the Skill must carry each such
+# span under the plain prefix: at least 2, PINNED from the merge bar's and `unattended.sh`'s
+# citations at TOOL-dRenderedAnchor-3's base. A receipt row then places the first one at
+# `ci/<file>`, and the Skill must name it there, as `derive_kit_paths` does. Red against a library
+# that resolves every citation with the tool root as `here`, whose Skill names each decoy.
+build_fixture; _rc15=$?
+A15P=$("$PY" -B -c "$HARNESS_PAIRS_READ" "$FX/$KREL"); A15P=${A15P//$'\r'/}
+A15=$("$PY" -B -c 'import pathlib, re, sys
+fx, krel, pairs = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3].split("\n")
+tool = krel.rpartition("/")[0]
+tool = tool + "/" if tool else ""
+text = (fx / krel / "SKILL.template.md").read_text(encoding="utf-8")
+said = []
+for span in re.findall(r"`([^`\n]*)`", text):
+    if "{{TOOL_ROOT}}" not in span:
+        continue
+    cite = re.split(r"[ `]", span.split("{{TOOL_ROOT}}", 1)[1], maxsplit=1)[0]
+    home, _, name = cite.partition("/")
+    plain = "`%s`" % span.replace("{{TOOL_ROOT}}", tool)
+    if not home or not name or cite in pairs or any(plain == s[0] for s in said):
+        continue
+    (fx / home).mkdir(parents=True, exist_ok=True)
+    (fx / home / name).write_text("# a decoy at the repository root\n", encoding="utf-8")
+    placed = "`%s`" % span.replace("{{TOOL_ROOT}}" + cite, "ci/" + name).replace("{{TOOL_ROOT}}", tool)
+    said.append((plain, placed, cite))
+sys.stdout.buffer.write("".join("%s\t%s\t%s\n" % s for s in said).encode("utf-8"))' "$FX" "$KREL" "$A15P")
+_s15=(); [ -z "$A15" ] || mapfile -t _s15 <<< "${A15//$'\r'/}"
+out=$(run_adopter --scaffold); rc=$?
+SK15="$FX/.claude/skills/build/SKILL.md"
+_ok=1; _k=0
+for _l in "${_s15[@]}"; do
+  [ -n "$_l" ] || continue
+  _k=$((_k+1)); grep -qF -- "${_l%%$'\t'*}" "$SK15" || _ok=0
+done
+check_arm "arm 15 a --scaffold with a decoy at the repository root for each citation that is no harness names each under the plain prefix" \
+   "$([ "$_rc15" = 0 ] && [ "$rc" = 0 ] && [ "$_k" -ge 2 ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+out=$(run_adopter --check); rc=$?
+check_arm "arm 15 ...and --check over that install exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+IFS=$'\t' read -r _w15 _c15 _q15 <<< "${_s15[0]-}"
+mkdir -p "$FX/ci" "$FX/.governance" && printf '# placed by the receipt\n' > "$FX/ci/${_q15#*/}"
+printf '{"files": [{"kit": "fixture", "source": "%s", "path": "ci/%s"}]}\n' "$_q15" "${_q15#*/}" > "$FX/.governance/install.json"
+out=$(run_adopter --scaffold); rc=$?
+check_arm "arm 15 ...and a receipt row placing the first of them at ci/ names it there" \
+   "$([ "$rc" = 0 ] && [ -n "${_c15-}" ] && grep -qF -- "$_c15" "$SK15" && echo 1 || echo 0)"
+[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+
+# ---- arm 16: a harness a sibling of the repository holds is listed nowhere at a root install -----
+# TOOL-dRenderedAnchor-3 S8, the closing review's L6: with the kit at `<repo>/roles` the tool root is
+# the repository, so a harness citation's second probe is `<repo>/../<home>/<file>`. A directory
+# beside the repository holding each pair HARNESS_PAIRS_READ lists makes the path's `relative_to`
+# raise, and `resolve_cited_paths` must list nothing rather than fail the pass, so `--scaffold` exits
+# 0 with each citation plain. Red against a library whose `except` names `LookupError` alone: the
+# call raises, and the adopter exits 2 naming the citation pass.
+build_fixture roles "$TMP_ROOT/a16/repo"; _rc16=$?
+A16P=$("$PY" -B -c "$HARNESS_PAIRS_READ" "$FX/roles"); A16P=${A16P//$'\r'/}; A16P=${A16P%$'\n'}
+_p16=(); [ -z "$A16P" ] || mapfile -t _p16 <<< "$A16P"
+for _q in "${_p16[@]}"; do mkdir -p "$TMP_ROOT/a16/${_q%/*}" && printf '// harness\n' > "$TMP_ROOT/a16/$_q"; done
+out=$("$PY" -B -c 'import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+kit = pathlib.Path(sys.argv[1]).absolute()
+text = (kit / "SKILL.template.md").read_text(encoding="utf-8")
+for cite, rel in roles_lib.resolve_cited_paths(text, kit, kit.parent, roles_lib.load_workflows(kit)):
+    print(cite, rel)' "$FX/roles" 2>&1); rc=$?
+check_arm "arm 16 at a root install, resolve_cited_paths lists no harness a sibling of the repository holds" \
+   "$([ "$_rc16" = 0 ] && [ "${#_p16[@]}" -ge 2 ] && [ "$rc" = 0 ] && [ -z "$out" ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] && [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/    /'
+out=$(run_adopter --scaffold); rc=$?
+_ok=1; for _q in "${_p16[@]}"; do grep -qF -- "\`$_q\`" "$FX/.claude/skills/build/SKILL.md" || _ok=0; done
+check_arm "arm 16 ...and --scaffold exits 0 naming each such harness by its plain citation" \
+   "$([ "$rc" = 0 ] && [ "${#_p16[@]}" -ge 2 ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
 [ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }

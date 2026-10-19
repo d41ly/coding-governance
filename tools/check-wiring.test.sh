@@ -2171,6 +2171,11 @@ if [ -n "$ROLES_DIR" ]; then
      "$([ "$rc" = 0 ] && [ "$_n" -gt 0 ] && printf '%s' "$out" | grep -q "^ok       roles     — $_n agent types" && echo 1 || echo 0)"
   ck "OC8 AC6 ...with one note for the harness the role index names and the tree lacks" \
      "$([ "$(printf '%s\n' "$out" | grep -c '^note     roles     — nowhere/absent-harness.js is named by the role index')" = 1 ] && echo 1 || echo 0)"
+  # TOOL-dRenderedAnchor-3 S11: the note's whole remedy tail, read on the printed line, as the UNWIRED
+  # arms read `--scaffold`, so a tail dropped from the echo or an empty kit path reds here.
+  _nl=$(printf '%s\n' "$out" | grep '^note     roles     — nowhere/absent-harness.js is named by the role index')
+  ck "OC8 AC6 ...and the note ends with the remedy naming the adopter's --check" \
+     "$([[ $_nl == *"; bash ${KP}$RL/adopt-roles.sh --check says whether its kit holds it elsewhere" ]] && echo 1 || echo 0)"
   ck "OC8 AC6 ...and an absent harness never reads UNWIRED" \
      "$(printf '%s' "$out" | grep -q '^UNWIRED  roles' && echo 0 || echo 1)"
   # TOOL-aOrientedCast-15 S7 — an index every hook refuses is UNWIRED, never ok with a note. RED

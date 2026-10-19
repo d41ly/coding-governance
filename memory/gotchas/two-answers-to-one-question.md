@@ -38,6 +38,19 @@ template or a `kit.toml` declaring its home, into the line, its comment, the doc
 and the help page together. No selftest matches the line's text, so no gate holds the wording to
 the scan.
 
+TOOL-dRenderedAnchor-2's `help/roles.md` listed two tools that print the missing-harness note,
+`render_agents.py` and check-wiring's report, while `tools/roles/README.md` listed three, the
+catalogue checker `check_roles.py` among them (its closing review round 2, L1, ids 2, 4, 6 and 11).
+TOOL-dRenderedAnchor-3 named all three on the help page. No machine gate compares a help page's list
+with the README's.
+
+The same unit's help page and render docstring said a file of a harness's name beside neither mark
+of its kit is the adopter's own, and the README and the map said so too, while the scan establishes
+only that it is not counted: `unattended-unit.js` ships with no template, so a copy-install that
+pruned its `kit.toml` holds the kit's own file there (round 2, L7, id 13). TOOL-dRenderedAnchor-3
+wrote what the scan counts into all four. No machine gate compares a page's account of a
+predicate's outcome with the predicate.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

@@ -1,11 +1,12 @@
 # TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch
 
-**Status:** INPROGRESS · rev-2 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-19-build-TOOL-dRenderedAnchor-3-1-acceptance-ledger.md](../build/2026-10-19-build-TOOL-dRenderedAnchor-3-1-acceptance-ledger.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-3-1-revision.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-1-revision.md) | research | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-3-2-spec-writer.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-2-spec-writer.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-3-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-3-brief.md) | research | — |

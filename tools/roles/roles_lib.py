@@ -352,6 +352,11 @@ def load_workflows(kit_dir):
     return entries
 
 
+def extract_workflow_harnesses(workflows):
+    """The `harness` value of each `[[workflow]]` entry whose `driver` is `workflow`, in table order."""
+    return [w.get("harness") for w in workflows if w.get("driver") == "workflow"]
+
+
 def load_gate_leg_names(tool_root):
     """The leg names of `<tool root>/gate-legs.json`, or None when it is absent, unreadable, not
     JSON, or not a list of objects each carrying a string `name`."""
@@ -599,22 +604,28 @@ def resolve_harness_path(tool_root, harness):
         return pathlib.Path(tool_root).absolute() / home / anchor, False
 
 
-def resolve_cited_paths(text, tool_root, target_root):
-    """`[(cite, rel)]` in first-seen order, one per distinct citation in text that `resolve_kit_dir`
-    holds, rel repo-relative; a citation it does not hold is not listed, so the caller's plain
-    prefix substitution answers it.
-
-    The resolver is the one `resolve_harness_path` calls, so a rendered page names a harness where
-    the role index lists it (TOOL-dRenderedAnchor-2). A held path outside target_root is not listed
-    either: the line it would print could not be repo-relative."""
+def resolve_cited_paths(text, kit_dir, target_root, workflows):
+    """`[(cite, rel)]` in first-seen order, one per distinct citation in text that this install
+    holds, rel repo-relative. A citation of a `workflow`-driver harness of workflows resolves as
+    `resolve_harness_path` does, with `here` at the tool root, so the Skill names a harness where
+    the role index lists it (TOOL-dRenderedAnchor-2). Only a harness of the workflow table resolves
+    through the role index's call: every other citation resolves with `here` at kit_dir, the call
+    `derive_kit_paths` makes, so its probes stop at `<tool root>/<home>/` and a receipt row still
+    places it (TOOL-dRenderedAnchor-3). A citation nothing holds, or held outside target_root, is
+    not listed, and the caller's plain prefix substitution answers it; a path outside target_root
+    could not be named repo-relative."""
+    kit = pathlib.Path(kit_dir).absolute()
+    root = pathlib.Path(target_root).absolute()
+    harnesses = {m.groups() for m in (HARNESS_RE.match(h) for h in extract_workflow_harnesses(workflows)
+                                      if isinstance(h, str)) if m}
     found, seen = [], set()
     for m in TOOL_ROOT_CITE_RE.finditer(text):
         if m.group(0) in seen:
             continue
         seen.add(m.group(0))
+        here = kit.parent if m.groups() in harnesses else kit
         try:
-            path = (resolve_kit_dir(m.group(1), m.group(2), tool_root) / m.group(2)).relative_to(
-                pathlib.Path(target_root).absolute())
+            path = (resolve_kit_dir(m.group(1), m.group(2), here) / m.group(2)).relative_to(root)
         except (LookupError, ValueError):
             continue
         found.append((m.group(0), path.as_posix()))

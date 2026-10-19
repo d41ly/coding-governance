@@ -104,9 +104,10 @@ the tree does not hold prints a note and never reds; whether the kit should be i
 wiring check's question. A harness the resolver did not hold, while a file of its name sits directly
 inside another directory under the tool root beside the harness's template or a `kit.toml`
 declaring its home, is one the install holds where the index does not look: the agent render prints
-`misplaced` and its `--check` exits 1. A file of its name beside neither mark is the adopter's own
-and reads as the note. The render alone gives that verdict; `check-wiring.sh` prints the note and
-names `adopt-roles.sh --check` (TOOL-dRenderedAnchor-1, TOOL-dRenderedAnchor-2).
+`misplaced` and its `--check` exits 1. A file of its name beside neither mark is
+not counted as its kit's, and reads as the note. The render alone gives that verdict;
+`check-wiring.sh` prints the note and names `adopt-roles.sh --check` (TOOL-dRenderedAnchor-1,
+TOOL-dRenderedAnchor-2).
 
 **The README's catalogue region is rendered, never typed.** A table stated beside the source that
 owns it rots; `--write` renders it and every run compares it, so a table edit without a re-render
@@ -146,7 +147,7 @@ CRLF working copy hashes like its blob.
   - contract: the install receipt's rows naming a kit's source and installed path, through
     `resolve_kit_dir`. The join also matches a `rendered` row on its role, its template's home and
     its path's file name (TOOL-dRenderedAnchor-1), which is how the role index and the `/build`
-    Skill's citations name a harness govkit landed under its kit id (TOOL-dRenderedAnchor-2).
+    Skill's harness citations name a harness govkit landed under its kit id (TOOL-dRenderedAnchor-2).
   - contract: the hooks kit's spawn guard's reading of a prompt's marker line, which
     `extract_prompt_marker` mirrors and the adopter self-test's arm 11 compares
     (TOOL-aOrientedCast-25).

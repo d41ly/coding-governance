@@ -8413,6 +8413,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "extract_workflow_harnesses",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
       "id": "fact",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"

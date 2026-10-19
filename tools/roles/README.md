@@ -228,8 +228,8 @@ under the tool root beside a mark of its kit, the harness's template `<stem>.tem
 `kit.toml` declaring the home its listed path names, its kit holds it where the index does not look:
 it prints on a `misplaced` line naming each such file, and `--check` exits 1 (TOOL-dRenderedAnchor-1,
 TOOL-dRenderedAnchor-2). The scan reads the disk, never the receipt. A file of its name beside
-neither mark is the adopter's own, so like no file at all it prints on a `note` line and refuses
-nothing.
+neither mark is not counted as its kit's, so like no file at all it prints on a `note` line and
+refuses nothing.
 
 **Ownership.** The renderer owns the types its catalogue names plus every name the on-disk index
 lists, which is the set a previous render wrote. `--write` unlinks an owned type the catalogue no
@@ -310,15 +310,19 @@ same `.git` walk the unattended adopter uses, and `{{MEMORY_ROOT}}`, read from `
 An empty derivation, an absent conf or a blank key exits 2; a `{{` surviving the render exits 1
 naming its line.
 
-Before the plain `{{TOOL_ROOT}}` substitution, every `{{TOOL_ROOT}}<home>/<file>` citation the kit
-resolver holds is replaced by the path it resolves, through `roles_lib.resolve_cited_paths`, the
-resolver the role index calls (TOOL-dRenderedAnchor-2). So the Skill names each harness where the
-install holds it, a kit govkit landed under its id behind a `rendered` receipt row included, and the
-plain substitution answers only a citation the resolver does not hold. In this repository every
-citation is held at `<tool root>/<home>/`, so the render is unchanged. The answer reads the disk at
-render time: `apply` runs the adopter before the harnesses are rendered, so a first install names
-the plain path, `--check` reads the Skill out of sync, and the next `--scaffold`, which `govkit
-update` runs, corrects it. A failed citation pass exits 2.
+Before the plain `{{TOOL_ROOT}}` substitution, each `{{TOOL_ROOT}}<home>/<file>` citation that
+`roles_lib.resolve_cited_paths` holds is replaced by the path it resolves, one whole citation at a
+time, so a held citation never rewrites a longer one it prefixes (TOOL-dRenderedAnchor-2,
+TOOL-dRenderedAnchor-3). Only a harness of the workflow table resolves through the role index's
+call, from the tool root, so the Skill names each harness where the role index lists it, a kit
+govkit landed under its id behind a `rendered` receipt row included. Every other citation, the
+merge bar's among them, resolves from the roles kit directory, the call `derive_kit_paths` makes:
+a receipt row can place it, and its probes stop at `<tool root>/<home>/`, so an adopter's file at
+the repository root is never named. The plain substitution answers a citation neither call holds.
+In this repository every citation is held at `<tool root>/<home>/`, so the render is unchanged. The
+answer reads the disk at render time: `apply` runs the adopter before the harnesses are rendered, so
+a first install names the plain path, `--check` reads the Skill out of sync, and the next
+`--scaffold`, which `govkit update` runs, corrects it. A failed citation pass exits 2.
 
 The render also BINDS the Skill's stages to `workflows.toml`: each `## Stage <n> — <workflow>`
 heading must name a workflow whose `stage` is `<n>`, the headings ascend strictly, and every

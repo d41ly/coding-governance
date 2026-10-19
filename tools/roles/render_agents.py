@@ -36,8 +36,8 @@ sits directly inside a directory under the tool root, beside the harness's templ
 `<stem>.template<suffix>` or a `kit.toml` declaring the home its listed path names, that is a
 `misplaced` line naming each such file, and `--check` exits 1 on it, because the index then lists a
 path the install does not hold while its kit holds the harness elsewhere (TOOL-dRenderedAnchor-1,
-TOOL-dRenderedAnchor-2). A file of its name beside neither mark is an adopter's namesake and not the
-kit's, so it reads like no file at all: a note that the kit is not installed, which never reds.
+TOOL-dRenderedAnchor-2). A file of its name beside neither mark is not counted as its kit's, so it
+reads like no file at all: a note that the kit is not installed, which never reds.
 
 The kit directory is `git rev-parse --show-prefix` run in this script's own directory, the tool root
 is its parent, and the target root is `git rev-parse --show-toplevel`; an empty derivation refuses.
@@ -158,10 +158,8 @@ def render_agent_file(kit_dir, slot, role, memory_root, charter, notes, effort):
 def derive_harness_paths(workflows, tool_root, target_root):
     """`(harnesses, absent)`: each `workflow`-driver harness resolved, repo-relative, sorted and unique."""
     found, absent = set(), set()
-    for w in workflows:
-        if w.get("driver") != "workflow":
-            continue
-        path, held = lib.resolve_harness_path(tool_root, w.get("harness"))
+    for harness in lib.extract_workflow_harnesses(workflows):
+        path, held = lib.resolve_harness_path(tool_root, harness)
         rel = pathlib.Path(os.path.relpath(str(path), str(target_root))).as_posix()
         found.add(rel)
         if not held:

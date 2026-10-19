@@ -127,20 +127,24 @@ needs the kickoff and memory-tree kits.
 - `adopt-roles.sh --scaffold` renders the `/build` Skill, the agent types and `roles.json`. With no
   governing doc at the memory-tree conf's `CHARTER`, it renders the Skill alone and exits 3, and no
   hook check turns on.
-- The `/build` Skill names each harness where the install holds it. Each tool-root citation of its
-  template is resolved through the kit resolver the role index uses, so a kit govkit landed under its
-  id is named there, and the plain prefix fills only what the resolver does not hold. `apply` runs the
-  adopter before the harnesses are rendered, so a first install names the plain path until the next
-  `--scaffold`, which `govkit update` runs; `--check` reads the Skill out of sync until then.
+- The `/build` Skill names each harness where the install holds it. Only a harness of the
+  workflow table resolves as the role index does, from the tool root, so a kit govkit landed under
+  its id is named there. Every other tool-root citation of the template, the merge bar's among them,
+  resolves from the roles kit directory as `derive_kit_paths` resolves a rendered guide's: a receipt
+  row can place it, and a file at the repository root never answers it. The plain prefix fills
+  whatever neither holds. `apply` runs the adopter before the harnesses are rendered, so a first
+  install names the plain path until the next `--scaffold`, which `govkit update` runs; `--check`
+  reads the Skill out of sync until then.
 - `/build`'s harnesses ship in the `review-harness` kit, which is not a default. Without it the role
-  agents and handoffs still work, and each tool prints a note naming the missing harness:
-  `render_agents.py`, and check-wiring's session-start report. `render_agents.py`, run by
-  `adopt-roles.sh --check` and the `roles render wiring` leg, is the one reader that prints
-  `misplaced`. It does so for a harness the index lists where it is absent, while a file of its name
-  sits directly inside a directory under the tool root beside the harness's template or a `kit.toml`
-  declaring its home: its kit holds it elsewhere, and the leg fails on it. A file of its name beside
-  neither mark is your own and reads as the note. check-wiring's note names `adopt-roles.sh --check`
-  as the command that says which.
+  agents and handoffs still work, and three tools print a note naming the missing harness: the
+  catalogue checker `check_roles.py`, `render_agents.py`, and check-wiring's session-start report.
+  `render_agents.py`, run by `adopt-roles.sh --check` and the `roles render wiring` leg, is the one
+  reader that prints `misplaced`. It does so for a harness the index lists where it is absent, while
+  a file of its name sits directly inside a directory under the tool root beside the harness's
+  template or a `kit.toml` declaring its home: its kit holds it elsewhere, and the leg fails on it.
+  A harness its kit ships with no template, `unattended-unit.js`, is marked by `kit.toml` alone. A
+  file of its name beside neither mark is not counted as its kit's, and reads as the note.
+  check-wiring's note names `adopt-roles.sh --check` as the command that says which.
 - The `[roles]` rule and the Agent roles section ship with template v4.4. A template seeded earlier
   keeps rendering without them: merge the `[roles]` rule, the shortened Tools bullet and the Agent
   roles section from gov's template into yours, then re-render. Without the playbook renderer,
