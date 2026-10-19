@@ -376,7 +376,9 @@ gov's, and P20 is amended. The foundations record's closed set of extension kind
   - dConvergedCharter gains the seed's retirement and the census.
   - `[owed]` carries this record's four checks, and a revision note records the answers.
 - **The systems record:** `workflow` is dBoundRoles' namespace and `lens` dCalibratedLens', the unit's row grammar
-  admits the overlay's flow and role rows, and the role shapes' effort names its destination keys.
+  admits the overlay's flow and role rows, and the role shapes' effort names its destination keys. The design map
+  first left both namespaces out, since it reads their names from the namespaces' "plus" line, which now names
+  them.
 - **The memory plan:** the instruction overlay's pocket and the unit site take the flow and role rows.
 - **The gap register:** `gap-flow-19`, `gap-roles-24` to `gap-roles-26`, `gap-test-21`, `gap-review-17`,
   `gap-deploy-28` and `gap-found-32`, each on its owning build's row.

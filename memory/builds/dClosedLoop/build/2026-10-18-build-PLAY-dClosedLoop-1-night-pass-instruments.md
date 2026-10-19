@@ -13378,6 +13378,39 @@ D.sub("    and the house file's `[gates]` folds into each role definition's gate
 D.save()
 ````
 
+### `fold_flow_ns.py`
+
+The design map left out `workflow` and `lens`; the systems record's namespaces line now names them.
+
+````python
+"""The design map did not list the two namespaces the FA fold added: it reads namespace names from v2's twelve and
+the systems record's "plus" line, and owners from the owner lines. The owner lines name `workflow` and `lens`; the
+"plus" line now names them too, as it named `repo` after the adopter-instructions fold.
+
+Usage: python -X utf8 fold_flow_ns.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+Y = Record("memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("and `repo`, a repository's own\n  units (the adopter-instructions answers, IA-1). Each namespace is a row\n",
+      "and `repo`, a repository's own\n  units (the adopter-instructions answers, IA-1), and `workflow` and `lens`, the "
+      "workflow entries and review lenses a\n  repository adds beside gov's (the flow and roles adoption answers, FA-1). "
+      "Each namespace is a row\n", "the plus line")
+Y.save()
+D = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+D.sub("- **The systems record:** `workflow` is dBoundRoles' namespace and `lens` dCalibratedLens', the unit's row grammar\n"
+      "  admits the overlay's flow and role rows, and the role shapes' effort names its destination keys.\n",
+      "- **The systems record:** `workflow` is dBoundRoles' namespace and `lens` dCalibratedLens', the unit's row grammar\n"
+      "  admits the overlay's flow and role rows, and the role shapes' effort names its destination keys. The design map\n"
+      "  first left both namespaces out, since it reads their names from the namespaces' \"plus\" line, which now names\n"
+      "  them.\n", "folded: the map's namespaces")
+D.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -13695,6 +13728,8 @@ MINE = [
      "plan, the gap register, the fates record and the design record, with the session log's event."),
     ("adopt/fold_flow_model.py", "The preset check reddened on `roles.model.<role>`'s preset row; the key joins "
      "the keys presets never touch, as `runtime.act-harness` does."),
+    ("adopt/fold_flow_ns.py", "The design map left out `workflow` and `lens`; the systems record's namespaces "
+     "line now names them."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -14721,13 +14756,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2440 nodes in 30 namespaces; 31159 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1666, derived 282, pending 492
+map: 2442 nodes in 30 namespaces; 31267 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1666, derived 282, pending 494
 map: no stale facts read 56 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 187 records, 3184 sections, 199 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 187 records, 3185 sections, 199 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -14745,7 +14780,7 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 452 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+chain rows 21 · owned nodes read 454 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
 left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 90 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance

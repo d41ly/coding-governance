@@ -236,7 +236,8 @@ once dTotalRecall registers it (P33).
   as `chain.dTotalRecall` and `principle.P27`, and by its tag otherwise. The resolver accepts both.
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
   `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`), and `repo`, a repository's own
-  units (the adopter-instructions answers, IA-1). Each namespace is a row
+  units (the adopter-instructions answers, IA-1), and `workflow` and `lens`, the workflow entries and review lenses a
+  repository adds beside gov's (the flow and roles adoption answers, FA-1). Each namespace is a row
   in its owning layer's contract: its declaring source, its extractor, and whether it selects or
   describes. An expansion mints only under its own prefix, at a core point.
 - **A leg keeps its name** (revised 2026-10-17, the audit's M26).
