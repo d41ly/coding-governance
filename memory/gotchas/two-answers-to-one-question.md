@@ -59,6 +59,12 @@ It bit again in the owner's answers' closing review, 2026-10-19
 The queue's start rule counted the agents in flight where the ledger in the same row counted reservations too, and the
 effort rows read both the role's declared effort and medium by default.
 
+It bit again in the parked debt's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
+`run.on-owner-question` and `run.on-owner-silence` both resolved an open owner item with no precedence, one
+release served both a hand-over and a terminal end, and `runtime.no-progress` read "past it" in its row and
+"this many" in its clause.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

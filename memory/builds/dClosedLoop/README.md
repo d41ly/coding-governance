@@ -52,12 +52,10 @@ asks, 435 of them unlabelled. The owner's prompt is recorded verbatim under `pro
 
 ## Parked decisions
 
-- **Closing reviews owed, parked by the owner on 2026-10-19:** "Record the review debt (and any
-  previous ones still owed) for now". At `7e0322a5c`, eight design commits after the whole-design audit
-  sit outside every closing review's range, as `review_debt.py` derives them: the review folds
-  `67995cb6f`, `6310bda3d`, `1edb2d167` and `a09f1a3b0`, the tag-grammar changes `98f0439ab` and
-  `d56d7da4d`, and the stall-and-loop round `ad530a80c` and `7e0322a5c`. One A/B pair over them pays
-  it; later design commits join it until then.
+- **Closing reviews owed:** none through `6ba4eaaa1`. The pair the owner asked for on 2026-10-19, "run the
+  review pair on the 11 commits, medium effort", covered the parked debt, and its 35 defects are folded
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`). That fold is unreviewed, and
+  `review_debt.py` counts it until a closing review covers it.
 
 <!-- roster:units -->
 
@@ -74,7 +72,7 @@ ids PLAY-dClosedLoop-1
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 312 bound to this build, across 3 record folder(s).
+Records: 315 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -147,7 +147,7 @@ Smaller ones, each found by reading:
 | Headless through a lease service (etcd, Consul, Postgres locks) | a service's lock cannot fence a write it never sees, and a node offline for a day can neither renew nor queue (dispatch 149, families 2 and 3) | rejected as the store; a lease-store adapter only if it passes the fence fixture |
 | An agentless head that assigns | +29% makespan during a four-hour outage; with a 30-minute stale report it dispatched onto a drained plan 289,128 times (dispatch 150, C1) | rejected |
 | An agentless head that offers, units claiming | equal makespan with the head up, nothing lost with it down, 1.00 claim attempts per unit (dispatch 150, C2) | recommended |
-| Admission by a ledger keyed by plan | on a shared, tight plan, plain pull and node-local admission finished 48 to 54% of the work, and a ledger with a live reading finished all of it (dispatch 150, C5) | the real balancing gain, which every node can run with no head |
+| Admission by a ledger keyed by plan | on a shared, tight plan, plain pull and node-local admission finished 48 to 54% of the work, and a ledger with a live reading and reservations sized at p90 finished all of it, 63% with a 30-minute-stale reading and 49% at p50 (dispatch 150, C5) | the real balancing gain, which every node can run with no head |
 | Cutting builds into streams | median parallelism inside a build 1.00 (dispatch 150, C6) | rejected; offers pay across builds |
 | An agent head that drives | 11 identical runs: no hard rule broken, no injection followed, two different placements; $0.064 to $0.113 and 12.5 to 20.9 s per decision (dispatch 151, F1) | rejected as a driver |
 | A model-free head calling an LLM judge role | 6 runs, the same route every time; $0.080 to $0.090 per call, and no call at all on a fully typed fixture (dispatch 151, F5) | recommended where a record has no type |
@@ -202,17 +202,21 @@ costs latency and never correctness.
    its `landed` notice, carries the holder's new lease beat in one `git push --atomic` under
    `--force-with-lease=<lease>:<tip seen>`. This replaces re-reading the epoch before the push, and merges two pushes
    into one.
-3. **A lease is never deleted.** A release writes a terminal tombstone, and the epoch rises monotonically for the
-   lease's whole life. A claim queued offline longer than `leases.queued-claim-days` is refused on reconnection, and a
-   tombstone may be pruned only after that age.
+3. **A lease is never deleted.** A release writes a hand-over, which any node may take with the epoch bumped, or a
+   terminal tombstone for a unit landed or withdrawn, which refuses every acquisition, and the epoch rises
+   monotonically for the lease's whole life. A claim queued offline carries its node's last fetch of the lease refs
+   and is refused on reconnection once that fetch is older than `leases.queued-claim-days`, and a terminal tombstone
+   may be pruned only that long after its release, so no queued claim outlives the tombstone it would race (the
+   parked debt's review).
 4. **Expiry is judged by a declared clock:** the holder's stamp corrected by the clock offset the node registry
    records, or an observer seeing the tip unchanged for `leases.expiry-hours`, never the reader's raw clock against
-   the writer's stamp.
+   the writer's stamp. The observer's rule lands with the leases, and the corrected stamp with dWellOiledMachine,
+   which records each node's clock offset (the parked debt's review).
 5. **Messages are causal and keyed.** Each carries its session's sequence number, a take-over names its predecessor's
    last message, and `confirmed` and `changed` carry the interface's content key. A dependent acts on the recomputed
    key, never on arrival order.
 6. **Each node beats its presence and capacity.** The supervisor's beat, already pushed with each pass, carries the
-   node's fleet tag, its free agent slots against `runtime.agents-in-flight`, any limit hold with its reset time, its
+   node's fleet tag, its free agent slots against the node profile's capacity, any limit hold with its reset time, its
    hardware load read with the standard library (about 1 ms on Windows, never a PowerShell CIM call per item), its
    plan allowance with the reading's source and age, and its pool label: the name of the account, seat or workspace
    its acts draw on, never the credential. Membership is derived from live beats.
@@ -220,10 +224,13 @@ costs latency and never correctness.
    reservation against the plan's ledger and the node's hardware ledger, sized by an estimate per item kind that
    falls back to `runtime.act-ceiling` until `trace.cost` rows give a p90 (`runtime.admission-scope: pool`). Both
    ledgers are kept at the node, outside any one repository, so every project the node serves charges the same
-   ones; a plan shared with another machine is charged through the shared store by compare-and-swap.
+   ones, whatever each project's `runtime.admission-scope`, which narrows only what that project's own admission
+   checks, and the ledger weighs the node's projects by their shares when reservations contend. A plan shared with
+   another machine is the fleet's, planned as its pool ledger (the parked debt's review).
 8. **A node finds and picks its own work.** One read gives the claimable ready set across builds: ready, unleased
-   units whose dependencies are confirmed, and released or expired leases. A pure, replaceable pick function chooses
-   what this node claims next, by plan priority and then the oldest released, from a spread start (dispatch 149, P6).
+   units whose dependencies are confirmed, and hand-over releases and expired leases, never a terminal one. A pure,
+   replaceable pick function chooses what this node claims next, by plan priority and then the oldest released,
+   keeping a recorded stream plan's units in its order, from a spread start (dispatch 149, P6).
 9. **Work can be offered, never assigned.** Lease acquisition takes an optional offer naming the node it was made for
    and its deadline, `leases.offer-seconds`; past the deadline anyone may claim the unit, so an offer is a wait with a
    deadline, as P39 requires. An offer source registers at a core point, and the built-in source is the node's own
@@ -232,7 +239,9 @@ costs latency and never correctness.
 10. **A request can travel beyond its node.** A request that is not yet a build is written as a project-level record
     any node may claim by lease, and a mailbox recipient may name a node or the project. The owner's words are written
     verbatim where the owner types them, and a head relays only the record's id (the owner's FR-1). A relayed request
-    is data with provenance, never consent, and only the owner's own session confirms a breakpoint.
+    is data with provenance, never consent, and only the owner's own session confirms a breakpoint. The record
+    reaches the remote with only its content key until the scan of item 13 lands, then with its redacted text,
+    bound to its intake by the owner binding's proof (the parked debt's review).
 11. **Coordination has transport points.** Runtime's `[extend]` gains a lease-store point, git refs its only adapter,
     with a conformance fixture holding the probes above, and a doorbell point, `deps.messaging` taking registered
     names. Each host declares whether it can write custom refs and which auth class it needs; a host that cannot
@@ -242,8 +251,9 @@ costs latency and never correctness.
     through Roles' resolver, as effort and model do, so a judge role or a head can run on another subscription or key
     without drawing on the workers' plan; `api-key` stays last and only the owner adds it. A harness row records how
     its adapter reads the credential, and the act launch is pinned out of bare mode.
-13. **New publishing boundaries are scanned.** The secret scan covers lease, mail, beat and mirror payloads and every
-    adapter's publishing boundary, and the record door refuses a token shape in a coordination record.
+13. **New publishing boundaries are scanned.** The secret scan covers lease, mail, beat, mirror and request-record
+    payloads and every adapter's publishing boundary, and the record door refuses a token shape in a coordination
+    record.
 14. **Every lease holder has a budget.** A cadence run, Maintain's, the Loop Review's or a registered program's, draws
     on a rework budget of its own, keyed to its period lease, and ends as `flow.on-exhausted` says.
 15. **Cadence lease kinds are names, never a list,** so a cadence item an expansion registers, a head's cycle among
@@ -256,8 +266,11 @@ costs latency and never correctness.
     every node unit on it, holds the node's fleet tag, its hardware, its harnesses with each one's plan tier and pool
     label, and the projects it serves with the owner's share for each, equal unless the owner sets them, never a
     credential. A pick or an offer first drops work whose roles need a harness, model or hardware the node lacks,
-    then weighs the node's projects by their shares. Its beat to each project carries its free capacity across all
-    of them, and nothing of another project's names or work ([fleet]).
+    and the node's ledger weighs its projects by their shares. Its beat to each project carries its free capacity
+    across all of them, and nothing of another project's names or work ([fleet]). The profile is one of the
+    floor's owner-only writes, written only through its guarded owner command and validated against its versioned
+    schema, and every project charges the node's ledgers through their one local writer (the parked debt's
+    review).
 
 The keys the fold would add, each with its preset row:
 - `leases.queued-claim-days`, in days, default 7, dPlacedRequest;
@@ -274,8 +287,9 @@ dWellOiledMachine arms it with the doorbell point.
 |---|---|---|
 | flow (core) | dPlacedRequest | the fenced effect push, tombstoned leases and monotonic epochs, the declared expiry clock, offers with a deadline, cadence lease kinds as names, project-level requests |
 | flow (core) | dKeptSession | causal, keyed messages, and recipients that name a node or the project |
+| memory (core) | dTotalRecall | the stream-plan kind, which Design's planner writes and Runtime's pick reads |
 | runtime (core) | dWellOiledMachine | the node profile, the node beat, admission by plan across a node's projects, discovery and the pick with capability filtering and project shares, the lease-store, doorbell and offer points, host capabilities and adapter tenancy, harness and credential per role, the scanned boundaries and the record door, a budget for every cadence run, and the fenced push in the commit queue and the lander |
-| distribution (expansion) | dShippedRelease | the adopter register, renamed |
+| distribution (expansion) | dShippedRelease | the adopter register, the `adopters` kind and `kits.adopters`, renamed |
 | observability (expansion) | dCalibratedLens | the beats and the pools' ledgers trended, and the reservation estimate re-derived |
 | integrations (expansion) | planned | endpoint and cloud-host adapters at the core points |
 | `fleet` (new expansion) | planned | the head, its judge role, the dispatch record and the request relay |
@@ -294,40 +308,53 @@ Proposed for v2 `[planned]`, counting in no build's planned units:
   - cloud-host adapters, each declaring its auth class and whether it writes refs;
   - a dispatch record of each offer's inputs, proposer and validation, replayed by re-running the program and
     re-validating the judge's choice;
-  - the owner's request relayed by reference.
+  - the owner's request relayed by reference;
+  - a pool ledger for a plan shared across machines, at a point the core declares and an endpoint adapter fills,
+    naming its owner, its tenancy and a rule that it carries no other project's names or work, charged by
+    compare-and-swap (the parked debt's review).
 
   Its test: a four-hour head outage costs no throughput, an offer reaches a node only through that node's own lease,
-  and a replay reproduces the program's offers byte for byte.
+  a replay reproduces the program's offers byte for byte, and two machines charging one plan at once admit nothing
+  past it.
 
 ## [chain] Where it lands
 
 Each clause sits on the build that registers its kind, or on a descendant of every build whose schema it reads:
 - **dPlacedRequest:**
-  - the fenced effect push, seen red on a stale holder's push after a take-over;
-  - leases never deleted, epochs monotonic, and queued claims past their age refused, seen red on a pruned lease
-    and on a stale queued claim;
-  - expiry judged by a declared clock;
+  - the fenced effect push, seen red on a holder taken over between its read of the tip and its push;
+  - leases never deleted, a release a hand-over or terminal, epochs monotonic, and queued claims refused once their
+    node's last fetch is past their age, seen red on a pruned lease, on a stale queued claim and on a claim queued
+    after a release by a node whose last fetch preceded the lease;
+  - expiry judged by an observer's clock, the corrected stamp moved to dWellOiledMachine;
   - cadence lease kinds as names;
-  - a project-level request record any node claims by lease;
+  - a project-level request record any node claims by lease, pushed with only its content key until the scan
+    lands;
   - an offer with a deadline on lease acquisition, an expired offer a free claim.
 - **dKeptSession:** messages carrying a session sequence number, a take-over's predecessor and the interface's content
   key, seen red on the reorder test; recipients that name a node or the project.
+- **dTotalRecall:** the stream-plan kind, which Design's planner writes and Runtime's pick reads (the
+  parked debt's review).
 - **dWellOiledMachine:**
-  - the node profile, read by every node unit on the node;
+  - the node profile, read by every node unit on the node, one of the floor's owner-only writes;
   - the node beat, to every project the node serves;
-  - admission by plan, through ledgers kept at the node across its projects;
+  - admission by plan, through guarded, versioned ledgers kept at the node, which every project charges whatever
+    its scope;
   - discovery of released and expired leases, and the pure pick function, filtering by capability and weighing
     projects by the owner's shares;
   - the lease-store, doorbell and offer points, the lease store's conformance fixture, and `deps.messaging` armed;
   - host capabilities and adapter tenancy;
   - harness and credential per role, and the act launch pinned out of bare mode;
-  - the scan of coordination payloads and adapter boundaries, and the record door;
+  - the scan of coordination payloads, request records and adapter boundaries, and the record door;
   - a budget for every cadence run;
-  - the commit queue and the lander pushing through the fenced push.
+  - the commit queue and the lander pushing through the fenced push, a landing's release and notice in the same
+    push;
+  - the node's clock offset correcting a lease's expiry.
 
-  Each is seen red on a planted case: two nodes sharing one pool, a hosted host refused a ref push, a token in a
-  lease payload, a cadence run that never converges.
-- **dShippedRelease:** the adopter register, renamed.
+  Each is seen red on a planted case of its own, v2's row naming every one: two planted projects on one node
+  draining one plan, a hosted host refused a ref push, a token in each scanned payload and a cadence run that never
+  converges among them (the parked debt's review).
+- **dShippedRelease:** the adopter register, the `adopters` kind and `kits.adopters`, built under those names, and
+  `deploy.unlease` closing a build's leases terminal.
 - **dCalibratedLens:** the beats and the pools' ledgers trended, and the reservation estimate re-derived from
   `trace.cost`.
 
@@ -343,11 +370,11 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 | `gap-conc-17` | Spine | MED | An owner's request reaches only the node it was typed on: intake is bound to the owner's session, mailbox recipients are a build or its units, and no request record exists that another node can claim. | dPlacedRequest |
 | `gap-conc-18` | Spine | LOW | The cadence lease grammar lists its kinds literally, `maintain` and `review`, against Runtime's rule that a registered name never meets a literal list, so a cadence item an expansion registers cannot hold a lease. | dPlacedRequest |
 | `gap-conc-19` | Spine | MED | Nothing outside a node can offer it work: no lease takes an offer with a deadline and no point registers an offer source, so any head would have to assign, which lost 29% of makespan in a simulated head outage. | dPlacedRequest |
-| `gap-rt-40` | Runtime | HIGH | No node publishes its presence, capacity or plan, and no ledger spans the projects one node serves: admission counts one session's agents, every project's gov on a node draws on the same plan and cores unaware of the others, and a limit is seen only after it is hit; with several consumers on one tight plan, admission that sees only its own share finished 48 to 54% of the work where one shared ledger finished all of it. | dWellOiledMachine |
+| `gap-rt-40` | Runtime | HIGH | No node publishes its presence, capacity or plan, and no ledger spans the projects one node serves: admission counts one session's agents, every project's gov on a node draws on the same plan and cores unaware of the others, and a limit is seen only after it is hit; with several consumers on one tight plan, admission that sees only its own share finished 48 to 54% of the work where one shared ledger with a live reading and reservations sized at p90 finished all of it, 63% with a 30-minute-stale reading and 49% at p50 estimates. | dWellOiledMachine |
 | `gap-rt-41` | Runtime | MED | Coordination has no transport point: leases and mail are written to `refs/gov/*` directly, which Anthropic's hosted cloud sessions and routines cannot push, and no host declares whether it can. | dWellOiledMachine |
 | `gap-rt-42` | Runtime | MED | The harness and its credential are set once for the repository, so a head or a judge role cannot run on another subscription or key without drawing on the workers' plan. | dWellOiledMachine |
 | `gap-rt-43` | Runtime | MED | Headless acts lose the subscription login once `--bare` becomes `-p`'s default, since bare mode reads neither the OAuth login nor the setup token, and no harness row records how an adapter reads its credential. | dWellOiledMachine |
-| `gap-rt-44` | Runtime | MED | New publishing boundaries go unscanned: lease, mail and mirror payloads sit outside the secret scan's population, and no door refuses a token shape in a coordination record. | dWellOiledMachine |
+| `gap-rt-44` | Runtime | MED | New publishing boundaries go unscanned: lease, mail and mirror payloads, and the request records P40 adds, sit outside the secret scan's population, and no door refuses a token shape in a coordination record. | dWellOiledMachine |
 | `gap-rt-45` | Runtime | MED | P39's rework budget is keyed to builds and intake content only, so a cadence run's loop, Maintain's, the Loop Review's or any head's re-planning, has no bound. | dWellOiledMachine |
 | `gap-rt-46` | Runtime | MED | Nothing describes a node outside one repository: its hardware, its harnesses and their plans, and the projects it serves with the owner's share for each live nowhere a node unit can read, so no unit can match work to what a node can run or split a node between its projects. | dWellOiledMachine |
 | `gap-deploy-29` | Deploy | LOW | "Fleet" names two things: the fleet register lists adopters while a fleet tag names a node. | dShippedRelease |
@@ -411,7 +438,8 @@ What it changes, folded the same day:
   projects. The pool stays the account a node's acts draw on, and the ledger keyed by it moves to the node, outside any
   one repository, so every project's gov on the node charges the same ledger. The simulation's finding carries over:
   consumers of one tight plan that each saw only their own share finished 48 to 54% of the work, and one shared ledger
-  finished all of it (dispatch 150, C5).
+  with a live reading and reservations sized at p90 finished all of it, 63% with a 30-minute-stale reading and 49% at
+  p50 estimates (dispatch 150, C5).
 - **Nodes differ, and work must fit them.** A node is described once, in a node profile at its home: its hardware,
   from 4 to 16 cores; its harnesses and their plans, Claude Max or Pro, or a ChatGPT plan through the Codex harness for
   node x; and the projects it serves with the owner's share for each. A pick or an offer first drops work whose roles
@@ -427,7 +455,9 @@ The fold restates `gap-rt-40`, adds `gap-rt-46`, gives `runtime.admission-scope`
 
 ## [owed] Owed
 
-- **The review debt grows.** This record and its fold join the commits the parked closing-review pair must cover.
+- **The review debt, paid.** This record and its folds joined the commits the parked closing-review pair covered,
+  and the pair's 35 defects are folded (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`). Among them were
+  layer-runtime's fence and flow-steps' unlease items, which this record's folds had left standing.
 - **Two records disagreed with v2,** and the fold corrected them: the coordination record's `[design]` title says
   dDeclaredLoop builds the feature, where v2 gives the leases to dPlacedRequest and the mailbox to dKeptSession; and
   layer-memory lists the lease and the mailbox message among Runtime's kinds, where P5 makes them flow's (dispatch 148).

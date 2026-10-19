@@ -60,6 +60,11 @@ It bit again in the owner's answers' closing review, 2026-10-19
 (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
 `memory.mirror` named an adapter that answers other nodes' reads, and no session-side read was routed to it.
 
+It bit again in the parked debt's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
+`run.on-owner-silence` offered `remind-then-park` and `wait` with no route, `wait` never ended, and a set
+`build.spend-cap` had no outcome at the cap.
+
 ## The fix
 
 - For each key an item reads, write each catalogued value's arm into the item: its witness, its route,

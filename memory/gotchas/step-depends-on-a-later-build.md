@@ -61,6 +61,12 @@ It bit again in the flow and roles adoption's closing review, 2026-10-19
 (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
 dBoundRoles named a widening in the update's report, which only dShippedRelease, a later build, extends to rows.
 
+It bit again in the parked debt's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
+dPlacedRequest's expiry read a clock offset dWellOiledMachine records, its default renewal mode was armed only
+by a later build's ledger, its pushed request record waited on a later build's scan, and its fence's red case
+planted a landing only later builds can stage.
+
 ## The fix
 
 - Check every kind of dependency, not only citations:

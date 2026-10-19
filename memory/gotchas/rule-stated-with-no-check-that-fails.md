@@ -64,6 +64,12 @@ The grammar forbade a namespace word as a name's first segment, and nothing chec
 policy keys that broke it and called renaming them free, and three days later four keys and every repository row's
 owner segment still broke it. The core's shape check now refuses one, each rule planted red.
 
+It bit again in the parked debt's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
+Both rounds' records said each clause was seen red, yet the relayed-consent rule, the stale acquisition, the
+declared clock, the twice-reaped instance, the card's budget and the `review.max-rounds` ceiling had no plant
+that only they could fail, and the static check's planted stage was one its completion half already caught.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

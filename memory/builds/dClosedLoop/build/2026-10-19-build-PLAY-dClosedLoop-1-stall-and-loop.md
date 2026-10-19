@@ -167,9 +167,10 @@ progress is stopped by a detector, never by a person noticing.
    - a research or probe round trip;
    - a patch build raised by the build's own landing, which shares the originating build's budget, so a chain of
      patch builds draws on one budget.
-   The budget is keyed to the build, never to an item instance, so units a loop mints cannot reset it. Before
-   `entry.claim`, loops draw on a budget keyed to the intake's content key. `flow.route-backs` stays as the per-item
-   early limit. The remaining budget is on the card.
+   The budget is keyed to the build, never to an item instance, so units a loop mints cannot reset it. Until
+   Design's exit freezes the per-unit shares, the budget is the base alone, as it is for a build with no units (the
+   parked debt's review). Before `entry.claim`, loops draw on a budget keyed to the intake's content key.
+   `flow.route-backs` stays as the per-item early limit. The remaining budget is on the card.
 2. **Contention is queued, never counted.** A verdict staled by another build's landing, a prepared merge that
    conflicts after another landing, and a wait for an admission slot are contention. They wait in order in the landing
    queue (`gap-flow-08`) or the admission queue and draw nothing from the budget, so a busy main never turns a healthy
@@ -194,24 +195,32 @@ progress is stopped by a detector, never by a person noticing.
    its rule. Then:
    - **no progress:** `runtime.no-progress` acts on one instance with no new witness make the item stuck; it draws on
      the budget and routes to its producer;
-   - **repeat:** the same verdict digest or the same refusal rule twice in a row on one instance fires the loop
-     detector before the budget runs out; a wait that declares its own deadline is exempt, so a poll is no loop;
+   - **repeat:** a repeat of the act before's verdict digest or refusal rule on one instance is no new witness, so
+     it counts toward `runtime.no-progress`, and the loop detector journals it; a wait that declares its own
+     deadline is exempt, so a poll is no loop. Revised by the parked debt's review: it fired at a fixed two, with no
+     outcome;
    - **relaunch:** the cap counts lifetime relaunches of one instance, reset only by a new witness, never by a
      transcript entry; an instance reaped twice at the act ceiling with no new witness routes to its producer to split;
    - **lease:** a build's lease renews on witnessed progress at item boundaries and on declared waits inside their
-     deadline, never on activity alone, so a looping holder's lease expires.
+     deadline, never on activity alone, so a looping holder's lease expires. The supervisor's beat is liveness and
+     renews nothing, and until the ledger lands the transition record's item boundaries stand in for it (the parked
+     debt's review).
 6. **Every wait has a deadline and an outcome.** Every `awaiting`, hold, park, dependency hold, mailbox disposal,
    queue wait, quarantine, release hold and owner item declares both:
-   - **owner items:** a deadline (`run.owner-deadline`), then the outcome `run.on-owner-silence` says. A
-     ratification or an owner-only write is never decided for the owner;
-   - **the session-limit hold:** at `runtime.hold-ceiling` the lease is released, so a node with quota takes the build
-     over, and the wake tick stops firing into a refused turn;
+   - **owner items:** a deadline (`run.owner-deadline`), then the outcome `run.on-owner-silence` says for an item
+     `run.on-owner-question` left open. A ratification or an owner-only write is never decided for the owner, and an
+     approval that would loosen a value recommends the decline, so silence never applies a loosening (the parked
+     debt's review);
+   - **the session-limit hold:** at `runtime.hold-ceiling` the lease is released as a hand-over, so a node with quota
+     takes the build over, and the wake tick stops firing into a refused turn;
    - **the admission queue:** a wait past the act ceiling, `runtime.act-ceiling`, with no release writes a stall
-     record naming the holders, since every act ends by that ceiling; a slot held past it is reclaimed;
+     record naming the holders; a slot an act session the supervisor launched holds past it is reclaimed, since
+     every act ends by that ceiling, and an attended session's slots only by the liveness sweep (the parked debt's
+     review);
    - **dependency and mailbox waits:** past their deadline, the waiter takes its declared default (replan, or the
      asker's default answer);
    - **quarantine:** its threshold gets a default, and a held leg runs at least once each period;
-   - **release hold:** each "keep waiting" is counted, and the third parks the build;
+   - **release hold:** each "keep waiting" is counted per build and landed SHA, and the third parks the build;
    - **supervisor restarts:** more than a set number in an hour stop the supervisor and raise an owner item, as an
      Erlang supervisor escalates; `invalid-input` raises an owner item at once instead of only journaling.
 7. **Refusals are actionable, or they escalate.** Every refusal is a typed record: its rule, its remedy, and the
@@ -239,7 +248,9 @@ progress is stopped by a detector, never by a person noticing.
    naming every build in it, and a parent that ends incomplete releases its dependents to `deps.on-parent-withdrawn`.
 10. **Owner items reach the owner.** Progress keeps reaching the owner as the owner's FR-3 settled, by the micro-format
     lines at each turn's end. While no owner session is open, owner items alone are also pushed through the
-    registered channel, as the owner's SL-6 settled it, and `notify.owner-items` lets the owner change that.
+    registered channel, as the owner's SL-6 settled it, and `notify.owner-items` lets the owner change that. A push
+    reaches an absent owner only through a channel other than the terminal, so a core-only install reports that it
+    has none (the parked debt's review).
 11. **Observability trends, never decides.** Runtime journals every stall and loop event with its class: no progress,
     repeat, budget spent, deadline passed, breaker open, cycle across builds. The Loop Review trends them per
     scenario, item and rule, and re-derives the budget, the deadlines and the thresholds from that evidence (P9).
@@ -271,7 +282,7 @@ progress is stopped by a detector, never by a person noticing.
 | SC-flow-4 and SC-x-4, landing races and re-conflicts | item 2: contention queues, and draws nothing |
 | SC-rt-3, the session-limit hold | item 6: the lease released at the hold ceiling |
 | SC-rt-4, a leaked admission slot | item 6's stall check and reclaim; item 8's reservation rule |
-| SC-own-5, owner items unseen | item 10, as the owner's SL-6 settled it |
+| SC-own-5, owner items unseen | item 10, as the owner's SL-6 settled it, where a push channel other than the terminal is registered; a core-only install reports `push-when-away` with none |
 | Patch-build chains (C48) | item 1: one budget along the chain |
 | Waits with no ceiling (C20, C22, C36, C40, C43) | item 6, checked by item 8 |
 | Composition chains (SC-comp-1 to 8) | item 8; item 1 for what the check cannot see |
@@ -285,27 +296,33 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 - **dGroundRules:** each loop bound and deadline key declares that raising it is a loosening.
 - **dPlacedRequest:** the pre-claim budget keyed by intake content, seen red on a planted placement loop.
 - **dFairHearing:** each round's state in the review report, computed against the round before, seen red on a planted
-  flat and an oscillating sequence.
+  flat and an oscillating sequence, and on falling ones that reach and pass the caller's limit.
 - **dDeclaredLoop:**
-  - the rework budget in the transition record, every repetition kind drawing on it, seen red on a planted loop that
-    mints a new unit each lap;
+  - the rework budget in the transition record, the base alone before Design's exit, every repetition kind drawing
+    on it, seen red on a planted loop that mints a new unit each lap and on one that spends the base before
+    Design's exit;
   - contention routed to the queues and never counted, seen on a planted stale verdict;
   - `flow.on-exhausted`, each ending planted, and a best-effort choice to loop again refused;
-  - the convergence routing for every `until-*` and `while-*` value, and `review.max-rounds`;
-  - the static termination check, seen red on a planted repository stage that routes back into itself, a wait with no
-    deadline, a scenario successor cycle and an unattended raise of a loop bound.
-- **dKeptSession:** mailbox question deadlines with the asker's default; the remaining budget on the card.
+  - the convergence routing for every `until-*` and `while-*` value, and `review.max-rounds`, seen red on a falling
+    sequence run past it;
+  - the static termination check, seen red on a planted repository stage that routes back into itself with an exit,
+    a stage with no path to a terminal, an unreachable item, an empty state set, a wait with no deadline, a
+    scenario successor cycle, an unattended raise of a loop bound and an approval item recommending a loosening.
+- **dKeptSession:** mailbox question deadlines with the asker's default; the remaining budget on the card, seen red
+  on a card without it; the pair rule holding `review.design.round-count` at or below `review.max-rounds`.
 - **dBoundRoles:** the typed refusal return with its rule, remedy and actor in every role's template, and remedy
   routing in the outcome table.
 - **dWitnessedBar:** quarantine's default threshold and a held leg run each period; a quiet host defined.
 - **dWellOiledMachine:** the progress ledger; the no-progress and repeat detectors; the lifetime relaunch cap; lease
   renewal on progress; every held wait's deadline and outcome; the refusal breaker and the remedy-actor check at hook
   registration; the reservation rule and the queue stall check; the wait graph across builds; restart intensity and
-  `invalid-input` raised; owner items' deadlines and their push; the spend record. Each is seen red on a planted
-  case, the 115-wake limit loop among them.
+  `invalid-input` raised; owner items' deadlines, their push and every silence value; the spend record and the cap's
+  outcome. Each is seen red on a planted case of its own, v2's row naming every one, the 115-wake limit loop among
+  them (the parked debt's review).
 - **dShippedRelease:** patch-build chains on the originating build's budget; release retries and "keep waiting"
   counted; the landing queue, already `gap-flow-08`'s.
-- **dCalibratedLens:** the stall and loop classes trended, and the budget, deadlines and thresholds re-derived.
+- **dCalibratedLens:** the stall and loop classes trended, seen red on a class left out of the trend, and the
+  budget, deadlines and thresholds re-derived.
 
 ## [gaps] Gaps this adds to the register
 
@@ -384,6 +401,10 @@ each a policy value the owner may change, and SL-7's count may be any the owner 
 - **The chain:** nineteen clauses join ten rows, and the critical path grows from 239 units at `ad530a80c` to 253,
   its fourteen new units one on dGroundRules, four on dDeclaredLoop, one on dWitnessedBar, one on dBoundRoles, six on
   dWellOiledMachine and one on dCalibratedLens.
+- **The parked debt's review, 2026-10-19:** its pair found the route-back rule's two other homes in
+  flow-steps, two layer-runtime fixtures and the supervisor's beat still carrying the outcomes P39
+  replaced, and several clauses with no check that can fail. All are folded
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
 
 ## [owed] Owed to later builds
 

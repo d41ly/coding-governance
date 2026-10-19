@@ -71,6 +71,13 @@ The answers' fold added an admission queue to dWellOiledMachine and left the sam
 Workflow call the queue now holds, at the limit of five that NT-28 replaced. The night record's analysis kept the
 tool-call notice and the doorbell-only database that the answers replaced.
 
+It bit again in the parked debt's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
+The cloud fold put the fenced push and the tombstone on dPlacedRequest and stopped there: layer-runtime still
+called the re-read before the push safe, flow-steps' unlease items still deleted the lease, and the cloud
+record's own `[chain]` kept a plant from before the owner's fleet. The stall fold left the route-back rule's
+owner item standing twice in flow-steps, and two layer-runtime fixtures asserting the outcomes it replaced.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth

@@ -322,7 +322,7 @@ for instructions:
   or the ask's content key, so `entry.claim` is idempotent: a claim ref carrying its own key is its
   claim, not one made elsewhere. The records a build writes before its lease (dupes, triage, plan) mint
   under that claim, and every later one under the build's lease, taken at `plan.lease`, or at
-  `entry.claim` for a patch build, until `deploy.unlease` deletes it. A record written after that,
+  `entry.claim` for a patch build, until `deploy.unlease` closes it with a terminal tombstone (P40). A record written after that,
   such as `deploy.close`'s transition under `close-only`, mints under the build's claim ref. The intake record mints nothing: it is keyed by its session and
   content. Nor does a triage pass outside any build: its triage records are keyed by the entry's
   content. Every ask minted outside a build, whoever files it (`entry.place`, the owner, a surfaced
@@ -330,7 +330,8 @@ for instructions:
   each mint advances it by a compare-and-swap push leased on its observed value
   (`--force-with-lease`) that writes the new id into it, as unattended already leases its claim
   pushes, so it serialises every mint, not only the first. dTotalRecall owes both refs (`gap-mem-13`). A slug's claim
-  ref is never pruned, so a slug is minted once; the supervisor prunes run claims only. So two clones
+  ref is never pruned, so a slug is minted once; the supervisor prunes only run claims, each a terminal tombstone
+  older than `leases.queued-claim-days` (P40). So two clones
   never mint one id, and the charter's `[ids]` rule holds: the session that owns an id mints it;
 - it is idempotent and content-addressed: a write is keyed by its kind's key, an id or a content key
   such as a return's task-sha. Replaying an equal write is a no-op. A different value under an
@@ -410,6 +411,7 @@ layer that registers a kind adds its row.
 | overlap | dIndexedDesign | its writer is `design.overlaps` |
 | diff | dIndexedDesign | its writer is `design.reentry`, classifying an amendment by a structural diff |
 | roster | dIndexedDesign | its writer is `design.decompose`, with the interface schema check; not the README's derived `roster` field |
+| stream plan | dTotalRecall | its writer is `design.streams`, the planner's item, which dIndexedDesign builds, and its reader dWellOiledMachine's pick, both descendants of this build: a build's units grouped into streams, each stream's units in order (the parked debt's review, the owner's CL-3) |
 | inventory | dIndexedDesign | its writer is `design.inventory`, joined to every built unit |
 | playbook | dIndexedDesign | a design record kind carrying dScriptedRepeat's canon, which an ordinary build authors and the `repeat` disposition follows (night pass, point 1); writer item not named |
 | acceptance | dDeclaredLoop | its writer is `build.acceptance`; dDeclaredLoop builds the witnesses computed rather than typed, the acceptance re-run by the executor among them (PM-12) |
@@ -429,10 +431,10 @@ layer that registers a kind adds its row.
 | kit release | dShippedRelease | its writer is `kits.cut`: the annotated tag and its notes blob |
 | receipt | dShippedRelease | its writers are `kits.install` and `kits.update`, with the wiring verdict |
 | currency | dShippedRelease | its writer is `kits.currency`, keyed by HEAD SHA |
-| fleet | dShippedRelease | its writer is `kits.fleet`: gov's reading of each adopter, per release |
-| fleet register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.fleet` |
+| adopters | dShippedRelease | its writer is `kits.adopters`: gov's reading of each adopter, per release, named for adopters since the fleet names nodes (P40) |
+| adopter register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.adopters` |
 | transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
-| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; writer item not named |
+| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a terminal tombstone and never deleting the ref (P40); writer item not named |
 | mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not named |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
 | return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named: the commit queue, which is no item, writes it into the build's trail at its item's witness and pushes it with the build's branch (revised 2026-10-19, the night pass two, point 4) |
@@ -440,6 +442,8 @@ layer that registers a kind adds its row.
 | session binding | dWellOiledMachine | sessions bound on every source; writer item not named |
 | journal | dWellOiledMachine | the journal grammar moved into the core; writer item not named |
 | workspace | dWellOiledMachine | its writer is `life.unlease`; workspaces by `build.worktree` |
+| node profile | dWellOiledMachine | the node's one description, kept at the node's home outside every repository: written only through its guarded owner command, one of the floor's owner-only writes, and validated against its versioned schema at write and at read (the parked debt's review); writer item not named |
+| node ledger | dWellOiledMachine | the plan and hardware ledgers at the node's home, under a versioned schema, each project charging and releasing only its own reservations through their one local writer, a reader refusing a newer major version (the parked debt's review); writer item not named |
 | run record | dTendedCadence | observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says (layer-expansions; PM-12); writer item not named |
 | work order | dBoundRoles | the work order rendered per item; writer item not named |
 | review | dFairHearing | its writer is `review.report`, the harness's, under the proposal for the breakpoint's items |
@@ -1230,7 +1234,7 @@ and its map's `disposition` cells point here. Each defect's fix sits in place, i
   declares each kind's home, and the layer's tag names the folder, so the home is derived (EX-2,
   `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md`).
 - **The kinds that need one so far:** maintenance, Loop Review and keep records under
-  `memory/observability/`, release records under `memory/integrations/`, and currency and fleet
+  `memory/observability/`, release records under `memory/integrations/`, and currency and adopter
   records under `memory/distribution/`. The release slot's exit records, a flow kind keyed by SHA
   that integrations writes and core Deploy reads, live under `memory/flow/` (the expansion round's
   review, `build/2026-10-16-build-PLAY-dClosedLoop-1-expansions-reviews-compared.md`).

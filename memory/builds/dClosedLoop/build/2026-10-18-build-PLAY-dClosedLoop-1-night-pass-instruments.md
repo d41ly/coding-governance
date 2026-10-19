@@ -21007,9 +21007,1338 @@ L.save()
 print("folded the owner's fleet")
 ````
 
+### `build_args_debt.py`
+
+The args of the parked debt's review pair, dispatches 153 and 154: two full Tier-2 diff reviews of 6ba4eaaa1 over 320c79646 at the owner's medium effort, differing only in the run label, the report path and the scratch path.
+
+````python
+"""Build the args of the review pair the owner asked for ("run the review pair on the 11 commits, medium effort",
+2026-10-19): the eleven design commits the README's parked decisions list, reviewed as the one range that holds them
+all, 6ba4eaaa1 over 320c79646. Two independent full Tier-2 diff reviews, every role at medium; the runs differ only in
+the run label, the report path and the scratch path. Full, not the earlier pairs' light, because the range holds two
+whole design rounds whose security seams and owner answers are what the two lenses light skips check.
+
+Usage: python -X utf8 build_args_debt.py <scratch-dir>   (from the worktree root)
+Writes <scratch-dir>/cloud/args-parked-debt-<run>.json and a compact copy of each.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S = pathlib.Path(sys.argv[1])
+B = "memory/builds/dClosedLoop/build/"
+REV = "memory/builds/dClosedLoop/reviews/2026-10-19-review-PLAY-dClosedLoop-1-parked-debt-{}.md"
+base = json.loads((S / "night2" / "args-night2-a.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+D = lambda d, n: B + f"2026-10-1{d}-build-PLAY-dClosedLoop-1-{n}.md"
+COMMON = [D(4, "architecture-v2"), D(4, "gap-register"), D(4, "foundations"), D(5, "layer-instruction"),
+          D(5, "layer-flow"), D(5, "flow-steps"), D(5, "flow-roles"), D(5, "layer-roles"), D(5, "layer-memory"),
+          D(5, "layer-runtime"), D(6, "layer-expansions"), D(5, "review-system"), D(6, "systems"), D(8, "recut"),
+          D(8, "fates"), D(8, "memory-plan"), D(4, "coordination")]
+ROUND = [D(9, "stall-and-loop"), D(9, "cloud-and-scale"), D(9, "night-pass-two"), D(9, "flow-roles-adoption"),
+         D(9, "adopter-instructions"), D(9, "folds-reviews-compared"), D(9, "flow-adoption-reviews-compared"),
+         D(9, "night-pass-two-reviews-compared"), D(9, "night-pass-two-answers-reviews-compared")]
+RESEARCH = ([D(9, f"research-stall-{n}") for n in ("census", "refusals", "scenarios", "history", "prior-art")]
+            + [D(9, f"research-cloud-{n}") for n in ("census", "headless", "mechanical-head", "agent-head", "platform")])
+EARLIER = ("FA-1 to FA-7, NT-1 to NT-28, SA-1 to SA-12, SK-1 and SK-2, IA-1 to IA-6, AP-1 to AP-35, NP-1 to NP-24, "
+           "SP-1 and SP-2, WK-1 to WK-8, PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, FL1, FR-1 to FR-12, CX-1 to CX-3, "
+           "RT-1 to RT-4")
+BY_DESIGN = [
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- Research returns are verbatim and dated, and their prompts are rendered handoffs: neither is under review, "
+    "though a record that misstates its return is.",
+    "- Dated records keep what held when they were written: revision notes, the walk records and the ownership "
+    "record's snapshot rows.",
+    "- The instruments record holds the scripts as they ran; a script is reviewed only for whether it did what the "
+    "records say it did.",
+    "- Generated files (memory/LIVE.md and the build README's generated regions) are rendered, not reviewed; the "
+    "README's parked decisions are the owner's, parked on the owner's words.",
+    "- The owner's answers are decisions, recorded verbatim: SL-1 to SL-8 in the stall-and-loop record's [answers], "
+    "CL-1 to CL-4 in the cloud record's [answers], the owner's fleet in its [fleet], and the owner's words that renamed "
+    "the `repo` owner segment `adopter` and the four `policy.*` keys `policy-file.*` with a first-segment check. A "
+    "finding may show a fold contradicting the owner's words, a record, the research it cites or the tree, not "
+    "re-argue an answer.",
+    "- CL-3's reading, the Plan stage's planner given `design.streams`, is held in v2 [open] for the owner to confirm; "
+    "a finding may show it contradicting the owner's words, not re-open the choice.",
+    "- v2 [planned] holds capabilities planned and not built by design, the fleet among them; their absence from the "
+    "chain is no defect.",
+    f"- Every earlier answer stands: {EARLIER}, and every round's before them.",
+    "- The range also holds rounds two earlier pairs already reviewed: caca7a636 and cf6f1434c (the flow adoption), "
+    "0657a8667 to ad54fe388 (the night pass two's seven points) and f8ad789e1 (the owner's NT answers). Their text is "
+    "context, in scope only where their folds (1edb2d167, 6310bda3d, a09f1a3b0) or a later commit changed it. Judge "
+    "every finding against the records as they stand at the head, and drop one a later commit already fixed.",
+]
+TAIL = ("A fold's own text is new surface: check it as hard as the text it replaced. This is run {run} of two "
+        "independent runs on the same diff; read no other run's report. Write the report to {report}. Its head carries "
+        "an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries "
+        "exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.")
+CONTEXT = (
+    "The diff is 6ba4eaaa1 over 320c79646: every design commit since the folds' closing review that no closing review "
+    "has covered, which the owner parked as review debt and now asks to pay. Eleven commits are under review. "
+    "67995cb6f folds the last three folds' review: the receipt's steps move to dSafePassage, the overlay's checks "
+    "complete. 6310bda3d folds the night pass two's review, 31 defects. 1edb2d167 folds the flow adoption's review, "
+    "19 defects. a09f1a3b0 folds the review of the owner's NT answers, 24 defects. 98f0439ab renames the repository's "
+    "owner segment `adopter` to conform to the tag grammar. d56d7da4d renames the four `policy.*` keys "
+    "`policy-file.*`, adds the tag grammar's first-segment check and has the lexicon read one registry "
+    "(`gap-lex-10`). ad530a80c researches and designs stall and loop prevention: P39 and eleven mechanisms. 7e0322a5c "
+    "folds the owner's SL-1 to SL-8: eleven keys, nineteen clauses on ten builds, seven gaps. ace51f4a7 researches and "
+    "designs cloud features, scalability and load balancing: P40, a `fleet` expansion, seventeen seams. b398ab226 folds "
+    "the owner's CL-1 to CL-4: six keys, the seams on six builds, sixteen gaps, the planner's `design.streams`, v2 "
+    "[planned] and [open]. 6ba4eaaa1 folds the owner's fleet as it runs: each node has a plan of its own, so a plan's "
+    "ledger moves to the node across its projects, with a node profile and capability filtering. The rest of the range "
+    "is context or records only: dbabaa1fd, e1a54ac67, f064bf378 and a7e85f424. Start from `git diff --stat`, then "
+    "read each design record's diff by path; the instruments record, the research returns, the prompts and the review "
+    "records are covered by the by-design notes. Review it as a design change. Does each owner answer land the same "
+    "way in every record it touches, and does any text still state what a fold replaced, such as a route back past "
+    "its count raising an owner item, `owner.deadline` or `runtime.queue-stall`, or nodes sharing one account? Does "
+    "every new clause sit on its own build or an ancestor, naming no later build's key or kind? Are the new keys "
+    "consistent with the presets, the never-touch list, the tag grammar's first-segment rule and the owner's words? "
+    "Do P39's mechanisms bound every loop and wait they claim to, a budget no repetition escapes and a deadline with an "
+    "outcome on every wait? Do P40's seams keep the truth in git, the verdict local and the core free of the planned "
+    "fleet (P3, P28)? Do the clauses that claim to fix the two reproduced lease defects, check-then-act fencing and a "
+    "pruned lease's restarted epoch, fix them? Do the security seams hold: no credential in a coordination record, a "
+    "relayed prompt never consent, each adopter's records kept from another's? Does each review fold fix its findings "
+    "without adding defects? Does each new gap state a fact its evidence supports, owned by the build whose unit closes "
+    "it? Do the design records report their research faithfully? " + TAIL)
+specs = COMMON + ROUND + RESEARCH
+if len(set(specs)) != len(specs):
+    sys.exit("a spec repeats")
+for f in specs:
+    if not pathlib.Path(f).exists():
+        sys.exit(f"missing {f}")
+checklist = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", "320c79646..6ba4eaaa1"],
+                           capture_output=True, text=True, encoding="utf-8", check=True).stdout
+for run in ("A", "B"):
+    report = REV.format(run.lower())
+    if pathlib.Path(report).exists():
+        sys.exit(f"{report} exists")
+    a = dict(base, base=full("320c79646"), head=full("6ba4eaaa1"), specs=specs, checklist=checklist,
+             byDesign="\n".join(BY_DESIGN), intensity="full", round=1,
+             efforts={"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"},
+             scratch=(S / f"review-parked-debt-{run.lower()}").as_posix(),
+             context=CONTEXT.replace("{run}", run).replace("{report}", report))
+    out = S / "cloud" / f"args-parked-debt-{run.lower()}.json"
+    out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+    (S / "cloud" / f"args-parked-debt-{run.lower()}.compact.json").write_text(json.dumps(a, ensure_ascii=False),
+                                                                             encoding="utf-8", newline="\n")
+    print(f"{run}: {a['base'][:9]}..{a['head'][:9]}, {len(specs)} specs, checklist {len(checklist.splitlines())} lines, "
+          f"context {len(a['context'].split())} words, {len(json.dumps(a, ensure_ascii=False))} bytes, "
+          f"report {report.rsplit('/', 1)[1]}, roles {a['roles']}, intensity {a['intensity']}")
+````
+
+### `log_debt_pair.py`
+
+The session log's dispatch rows 153 and 154, the derived agent lines of both runs and the pair's event.
+
+````python
+"""Record the parked debt's review pair in the session log: dispatch rows 153 and 154 (runs A and B), every agent and
+returned line as the roles kit derived them, and the pair's event.
+
+Usage: python -X utf8 log_debt_pair.py <lines-run-a> <lines-run-b>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+
+def lines_of(path, n=24):
+    got = [ln for ln in pathlib.Path(path).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+           if ln.startswith(("- agent —", "- returned —"))]
+    if len(got) != n:
+        sys.exit(f"{path}: {n} agent and returned lines expected, read {len(got)}")
+    return got
+
+
+runs = [lines_of(p) for p in sys.argv[1:3]]
+F = "`" * 3
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row152 = [ln for ln in L.text.split("\n") if ln.startswith("| 152 |")]
+if len(row152) != 1:
+    sys.exit("no single dispatch row 152")
+SHAPE = ("`tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses (security, correctness, seams, "
+         "verification, intent), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run "
+         "{} of two")
+WHAT = ("The parked review debt, reviewed twice at the owner's word: `6ba4eaaa1` over `320c79646`, the eleven design "
+        "commits no closing review covered")
+BRIEF = "the args, built by `build_args_debt.py`"
+REV = "`reviews/2026-10-19-review-PLAY-dClosedLoop-1-parked-debt-{}.md`"
+ROWS = [
+    (153, SHAPE.format("A"), WHAT, BRIEF,
+     "returned as `wf_aeec13f0-079`, CLEAN WITH FIXES, 27 of 34 confirmed, 25 items, 7 high", REV.format("a")),
+    (154, SHAPE.format("B"), WHAT, BRIEF,
+     "returned as `wf_e27db12b-1f9`, CLEAN WITH FIXES, 43 of 48 confirmed, 28 items, 3 high", REV.format("b")),
+]
+new = "".join(f"| {n} | {who} | {what} | {brief} | 1799cb98 | {out} | {rec} |\n" for n, who, what, brief, out, rec in ROWS)
+L.sub(row152[0] + "\n", row152[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n",
+                "\nThe parked debt's closing review, dispatches 153 and 154, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(runs[0] + runs[1]) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: the owner's "run the review pair on the 11 commits, medium effort": two full diff
+  reviews, one after the other, over `6ba4eaaa1` against `320c79646`, the one range that holds all eleven parked
+  commits. The three rounds already reviewed inside it were named to the reviewers as context. Full, not the earlier
+  pairs' light, because the security and intent lenses that light skips are the ones the cloud round's seams and the
+  owner's answers need. Run A's report was moved out of the tree while run B ran, and restored byte for byte after
+  (sha256 `6a8baab0c76c`).
+""", "the pair's event")
+L.save()
+````
+
+### `show_clauses.py`
+
+Prints one chain row's clauses, numbered and optionally filtered: how the clauses the pair's findings touch were read before the fold.
+
+````python
+"""Print one chain row's clauses, numbered, optionally filtered by a regex.
+
+Usage: python -X utf8 show_clauses.py <slug> [regex]   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+V = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+slug = sys.argv[1]
+pat = re.compile(sys.argv[2]) if len(sys.argv) > 2 else None
+for n, ln in enumerate(V.read_text(encoding="utf-8").split("\n"), 1):
+    if ln.startswith(f"| {slug} | "):
+        cells = ln.split(" | ")
+        print(f"line {n}, {len(cells)} cells; deps: {cells[2]}")
+        for i, c in enumerate(cells[3].split("; ")):
+            if pat is None or pat.search(c):
+                print(f"[{i}] {c}\n")
+        print("GAPS:", cells[4][:400] if pat is None else "")
+````
+
+### `fold_debt_pair.py`
+
+The parked debt's review pair folded: all 35 confirmed defects into v2's rows, pair rules, chain clauses, [planned] and [open], the four layer records, the cloud and stall records and the gap register, the comparison record's [summary], [fold] and [folded], the README's parked decisions and five bug classes, dry-run first on a full copy of the tree with the eight checks green there.
+
+````python
+"""The parked debt's closing review pair, folded: all 35 confirmed defects, as the comparison record's [map] disposes
+them, into v2's rows, pair rules, chain clauses, [planned] and [open], the four layer records, the cloud and stall
+records, the gap register, the comparison record's [summary], [fold] and [folded], the README's parked decisions and
+five bug classes.
+
+Usage: python -X utf8 fold_debt_pair.py   (from the worktree root, or a full copy of it)
+"""
+import pathlib
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+CMP = "build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md"
+DR = "the parked debt's review"
+
+
+# ---- chain rows: one clause at a time, so a split on "; " still counts each unit once ----------------------------
+
+def _row(rec, slug):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {slug} | ")]
+    if len(idx) != 1:
+        sys.exit(f"{slug}: {len(idx)} chain rows")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5:
+        sys.exit(f"{slug}: {len(cells)} cells")
+    return lines, idx[0], cells
+
+
+def _put(rec, lines, i, cells, clauses):
+    for c in clauses:
+        if "; " in c or "|" in c:
+            sys.exit(f"a clause holds '; ' or '|': {c[:80]}")
+    cells[3] = "; ".join(clauses)
+    lines[i] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def cedit(rec, slug, prefix, old, new, label):
+    """Within the one clause of `slug` that starts with `prefix`, replace `old`, which it holds once, by `new`."""
+    lines, i, cells = _row(rec, slug)
+    clauses = cells[3].split("; ")
+    hits = [k for k, c in enumerate(clauses) if c.startswith(prefix)]
+    if len(hits) != 1:
+        sys.exit(f"{slug}: {label}: the prefix starts {len(hits)} clauses")
+    c = clauses[hits[0]]
+    if c.count(old) != 1:
+        sys.exit(f"{slug}: {label}: the clause holds the anchor {c.count(old)} times")
+    clauses[hits[0]] = c.replace(old, new, 1)
+    _put(rec, lines, i, cells, clauses)
+
+
+def cset(rec, slug, old, new, label):
+    """Replace the clause of `slug` that is exactly `old`."""
+    lines, i, cells = _row(rec, slug)
+    clauses = cells[3].split("; ")
+    if clauses.count(old) != 1:
+        sys.exit(f"{slug}: {label}: {clauses.count(old)} clauses equal the old text")
+    clauses[clauses.index(old)] = new
+    _put(rec, lines, i, cells, clauses)
+
+
+def cadd(rec, slug, new, label):
+    lines, i, cells = _row(rec, slug)
+    clauses = cells[3].split("; ")
+    if any(c.startswith(new[:60]) for c in clauses):
+        sys.exit(f"{slug}: {label}: already there")
+    _put(rec, lines, i, cells, clauses + [new])
+
+
+# ---- v2 -----------------------------------------------------------------------------------------------------------
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+
+V.sub("since a looping holder renews for ever under `activity` (P39) | dPlacedRequest |",
+      "since a looping holder renews for ever under `activity` (P39); until that ledger lands, `progress` renews at each "
+      "item boundary dDeclaredLoop's transition record witnesses and on a declared wait inside its deadline, never on a "
+      f"beat alone, journaled as the interim ({DR}) | dPlacedRequest |", "leases.renewal")
+V.sub("| `leases.expiry-hours` | hours | 24 | walk C2; judged by a declared clock, the holder's stamp corrected by the clock "
+      "offset the node registry records, or the tip seen unchanged this long, never the reader's raw clock (P40) | "
+      "dPlacedRequest |",
+      "| `leases.expiry-hours` | hours | 24 | walk C2; judged by a declared clock, never the reader's raw clock: an "
+      "observer seeing the tip unchanged this long, and, once dWellOiledMachine records each node's clock offset, the "
+      f"holder's stamp corrected by it (P40, {DR}) | dPlacedRequest |", "leases.expiry-hours")
+V.sub("| the cloud round: a claim queued offline longer than this is refused on reconnection, and a released lease's "
+      "tombstone may be pruned only after it, so a pruned lease never restarts its epoch (P40) | dPlacedRequest |",
+      "| the cloud round: a claim queued offline carries its node's last fetch of the lease refs and is refused on "
+      "reconnection once that fetch is older than this, and a terminal tombstone may be pruned only this long after its "
+      "release, so no queued claim outlives the tombstone it would race and a pruned lease never restarts its epoch "
+      f"(P40, {DR}) | dPlacedRequest |", "leases.queued-claim-days")
+V.sub("| the stall-and-loop round: past it the item is stuck, draws on the build's rework budget and routes to its "
+      "producer (P39) | dWellOiledMachine |",
+      "| the stall-and-loop round: this many acts with no new witness make the item stuck, which draws on the build's "
+      "rework budget and routes to its producer, a repeat of the act before's verdict digest or refusal rule counting "
+      f"as an act with no new witness (P39, {DR}) | dWellOiledMachine |", "runtime.no-progress")
+V.sub("the plan's ledger and the node's hardware ledger are kept at the node outside any one repository, so a node's "
+      "projects charge the same ones (P40) | dWellOiledMachine |",
+      "the plan's ledger and the node's hardware ledger are kept at the node outside any one repository, and every "
+      "project the node serves charges both whatever its scope, `session`, `project` and `node` narrowing only what "
+      "that project's own admission checks, so no project's scope undercounts another's; the node's capacity is the "
+      f"node profile's, never one project's `runtime.agents-in-flight` (P40, {DR}) | dWellOiledMachine |",
+      "runtime.admission-scope")
+V.sub("progress staying `notify.owner`'s as FR-3 set it (P39) | dWellOiledMachine |",
+      "progress staying `notify.owner`'s as FR-3 set it (P39); a push reaches an absent owner only through a registered "
+      "channel other than the terminal, so on a core-only install the loader reports `push-when-away` as having no "
+      f"push channel and never refuses it ({DR}) | dWellOiledMachine |", "notify.owner-items")
+V.sub("| the owner's SL-4: \"Apply recommendation\"; past the deadline the item's recommended option applies, and a "
+      "ratification or an owner-only write parks its build as `remind-then-park` does, never decided for the owner "
+      "(P39) | dWellOiledMachine |",
+      "| the owner's SL-4: \"Apply recommendation\"; it decides only an owner item still open at `run.owner-deadline`, "
+      "one `run.on-owner-question` left open, and every value ends the wait: past the deadline the item's recommended "
+      "option applies, recorded with the deadline as the item's witness, and a ratification or an owner-only write "
+      "parks its build as `remind-then-park` does, never decided for the owner; an approval that would loosen a value, "
+      "a `flow.adapt` change under `owner-approves` or a raised loop bound or deadline, recommends the decline, so "
+      "silence never applies a loosening; `remind-then-park` sends one reminder through `notify.channel`, then parks "
+      "the build, its lease released and the item open; `wait` parks it the same way at the deadline with no reminder "
+      f"(P39, {DR}) | dWellOiledMachine |", "run.on-owner-silence")
+V.sub("| flow-roles FR-4, FR-12; once a build's rework budget is spent, best effort chooses only among endings, never "
+      "another lap (the owner's SL-2) | dBoundRoles |",
+      "| flow-roles FR-4, FR-12; once a build's rework budget is spent, best effort chooses only among endings, never "
+      "another lap (the owner's SL-2); it decides an owner item when the item is raised, and `run.on-owner-silence` "
+      "decides only what it leaves open at `run.owner-deadline`: a held or parked item, a ratification or an "
+      f"owner-only write ({DR}) | dBoundRoles |", "run.on-owner-question")
+V.sub("and a cap set from that evidence, as `memory.item-budget` was measured first (P39) | dWellOiledMachine |",
+      "and a cap set from that evidence, as `memory.item-budget` was measured first (P39); a build that reaches a set "
+      f"cap ends as `flow.on-exhausted` says, never running on ({DR}) | dWellOiledMachine |", "build.spend-cap")
+V.sub("patch build of the build's own landing draws on, and contention never does; raising it is a loosening, the "
+      "owner's alone (P39) | dDeclaredLoop |",
+      "patch build of the build's own landing draws on, and contention never does; until Design's exit freezes the "
+      "per-unit shares the budget is the base alone, as it is for a build with no units; raising it is a loosening, "
+      f"the owner's alone (P39, {DR}) | dDeclaredLoop |", "flow.rework-budget")
+V.sub("currency and the fleet register |", "currency and the adopter register |", "distribution layer row")
+V.sub("the period of the currency probe, the fleet reading, and the cut", "the period of the currency probe, the "
+      "adopter reading, and the cut", "kits.watch-cadence")
+V.sub("journaled for the fleet view;", "journaled for the adopter view;", "install.on-shim-call")
+V.sub("  closing review, M1).\n- Presets never touch",
+      "  closing review, M1). `review.design.round-count` is at most `review.max-rounds`, so a fixed-count design\n"
+      f"  review never asks for a round the ceiling refuses ({DR}).\n- Presets never touch", "pair rule")
+V.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):\n",
+    f"Revised: 2026-10-19, after the parked debt's closing review (`{CMP}`):\n"
+    "the pair the owner asked for read the eleven commits no closing review had covered, and its 35 defects are folded.\n"
+    "A lease's release is a hand-over or terminal, never a deletion, in every record that releases one, and the fence\n"
+    "travels with the effect in layer-runtime too. Owner silence never applies a loosening, every silence value ends\n"
+    "the wait, and the two owner keys state their precedence. The node profile and the node's ledgers are guarded,\n"
+    "versioned and charged by every project, a plan shared across machines moves to the fleet's `[planned]` pool\n"
+    "ledger, and the stream plan becomes dTotalRecall's kind. Every P39 and P40 clause the pair found with no check\n"
+    "that can fail names its planted red, and `fleet` names only nodes.\n\n", "revised paragraph")
+V.sub("  and the owner's request relayed by reference. Its test: a four-hour head outage costs no throughput, an offer\n"
+      "  reaches a node only through that node's own lease, and a replay reproduces the program's offers byte for byte\n"
+      "  (`build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[planned]`).\n",
+      "  the owner's request relayed by reference; and a pool ledger for a plan shared across machines, at a point the\n"
+      "  core declares and an endpoint adapter fills, naming its owner, its tenancy and a rule that it carries no other\n"
+      f"  project's names or work, charged by compare-and-swap ({DR}). Its test: a four-hour head outage costs no\n"
+      "  throughput, an offer reaches a node only through that node's own lease, a replay reproduces the program's\n"
+      "  offers byte for byte, and two machines charging one plan at once admit nothing past it\n"
+      "  (`build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[planned]`).\n", "planned fleet")
+V.sub("  floor's owner-only writes carry a signature from a key that needs user presence, a hardware key or an OS\n"
+      "  prompt, checked at the push and by the off-node verifier. Its test: a pty-wrapped call of the guarded command\n",
+      "  floor's owner-only writes, the node profile among them, carry a signature from a key that needs user presence, a\n"
+      "  hardware key or an OS prompt, checked at the push and by the off-node verifier. Its test: a pty-wrapped call of\n"
+      "  the guarded command\n", "planned owner proof")
+V.insert_before(
+    "\n## [owed] Owed to the chain re-cut",
+    f"\nOpen, 2026-10-19, from the parked debt's closing review (`{CMP}`):\n"
+    "- `run.on-owner-silence: wait`, SL-4's third option, \"wait, as today\", is read as waiting parked: at the deadline\n"
+    "  the build parks with its lease released and the item open for the owner's answer, since P39 gives every wait an\n"
+    "  outcome. No preset selects it.\n", "open reading")
+
+# dPlacedRequest
+cedit(V, "dPlacedRequest", "the coordination feature: one lease grammar",
+      "acquired, renewed, released and taken over through CLI verbs the step checklists call,",
+      "acquired, renewed, released and taken over through CLI verbs the step checklists call, renewal under "
+      "`leases.renewal`'s default `progress` made at each item boundary dDeclaredLoop's transition record witnesses "
+      "until dWellOiledMachine's progress ledger arms it, never on a beat alone, seen on the default preset loaded with "
+      "no ledger,", "renewal interim")
+cset(V, "dPlacedRequest",
+     "the fenced effect push: every effect push, a pass push, the lander's push to main and a release with its landed "
+     "notice, carrying the holder's new lease beat in one atomic push under a compare-and-swap on the lease tip it read, "
+     "never a re-read before the push, seen red on a stale holder's push after a take-over and on a landing whose "
+     "release the remote dropped (P40)",
+     "the fenced effect push: every effect push carrying the holder's new lease beat in one atomic push under a "
+     "compare-and-swap on the lease tip it read, never a re-read before the push, a re-push of an unchanged lease ref "
+     "never counting as the fence, seen red on a holder whose lease is taken over after it read the tip and before it "
+     "pushes, the branch left unchanged, and on a holder that re-pushes its unchanged lease ref beside a stale effect "
+     f"(P40, {DR})", "fenced push")
+cset(V, "dPlacedRequest",
+     "a lease never deleted: a release writing a terminal tombstone, the epoch rising for the lease's whole life, a "
+     "claim queued offline longer than `leases.queued-claim-days` refused on reconnection and a tombstone pruned only "
+     "after that age, seen red on a pruned lease and a stale queued claim (P40)",
+     "a lease never deleted: each release a hand-over, which any node may take with the epoch bumped, or terminal, for "
+     "a build or unit landed or withdrawn, which refuses every acquisition, the epoch rising for the lease's whole "
+     "life, a claim queued offline carrying its node's last fetch of the lease refs and refused on reconnection once "
+     "that fetch is older than `leases.queued-claim-days`, and a terminal tombstone pruned only that long after its "
+     "release, seen red on a pruned lease, on a stale queued claim, on a claim queued after a release by a node whose "
+     "last fetch preceded the lease, on a hand-over no node can take and on a terminal tombstone acquired "
+     f"(P40, {DR})", "tombstone")
+cset(V, "dPlacedRequest",
+     "a lease's expiry judged by a declared clock, the holder's stamp corrected by the recorded clock offset or the tip "
+     "seen unchanged for `leases.expiry-hours`, never the reader's raw clock (P40)",
+     "a lease's expiry judged by a declared clock, never the reader's raw clock: here an observer seeing the tip "
+     "unchanged for `leases.expiry-hours`, seen red on a reader whose clock runs a day ahead, which must not expire a "
+     f"lease whose tip moved within the hour (P40, {DR})", "expiry")
+cset(V, "dPlacedRequest",
+     "a request that is not yet a build written as a project-level record any node may claim by lease, the owner's "
+     "words recorded verbatim where the owner types them and relayed only by the record's id, a relayed request being "
+     "data with provenance and never consent (P40, the owner's CL-4 and FR-1)",
+     "a request that is not yet a build written as a project-level record any node may claim by lease, the owner's "
+     "words recorded verbatim where the owner types them, the record pushed with only its content key and its text "
+     "kept on that node until dWellOiledMachine publishes it redacted, and relayed only by the record's id, a relayed "
+     "request being data with provenance and never consent, seen red on a request record's text found on the remote "
+     "and on a relayed request offered as a breakpoint's disposition, which the breakpoint refuses "
+     f"(P40, the owner's CL-4 and FR-1, {DR})", "request record")
+cedit(V, "dPlacedRequest", "lease acquisition taking an optional offer",
+      "compare-and-swap with the epoch refusing a stale acquisition (P40, the owner's CL-2)",
+      "compare-and-swap with the epoch refusing a stale acquisition, seen red on an acquisition carrying an old epoch "
+      f"and on an expired offer that still holds its unit for the node it named (P40, the owner's CL-2, {DR})",
+      "acquisition plants")
+
+# dKeptSession
+cedit(V, "dKeptSession", "the named presets and their completeness check",
+      "the named presets and their completeness check, with its pair rules, and each shipped preset",
+      "the named presets and their completeness check, with its pair rules, `review.design.round-count` held at or "
+      "below `review.max-rounds` among them, seen red on a planted override past it, and each shipped preset",
+      "round-count pair rule")
+cset(V, "dKeptSession", "the card showing the build's remaining rework budget beside its pointers (P39)",
+     "the card showing the build's remaining rework budget beside its pointers, seen red on a planted card that omits "
+     f"it (P39, {DR})", "card budget")
+
+# dDeclaredLoop
+cedit(V, "dDeclaredLoop", "the rework budget: one per build",
+      "`flow.rework-budget`'s base plus its per-unit share for each unit frozen at Design's exit,",
+      "`flow.rework-budget`'s base plus its per-unit share for each unit frozen at Design's exit, the base alone before "
+      "that freeze and for a build with no units,", "budget before the freeze")
+cedit(V, "dDeclaredLoop", "the rework budget: one per build",
+      "and green on a planted stale verdict that draws nothing (P39, the owner's SL-1)",
+      "and on a planted loop before Design's exit that spends the base, and green on a planted stale verdict that "
+      f"draws nothing (P39, the owner's SL-1, {DR})", "budget plant")
+cedit(V, "dDeclaredLoop", "the convergence routing:",
+      "seen red on a planted flat follow-up sequence that runs another round (P39, the owner's SL-3, keeping FR-9)",
+      "seen red on a planted flat follow-up sequence that runs another round and on a planted sequence whose blocker "
+      "and high count falls every round past `review.max-rounds`, the round after the limit refused and the report "
+      f"reading CEILING (P39, the owner's SL-3, keeping FR-9, {DR})", "max-rounds plant")
+cedit(V, "dDeclaredLoop", "the static termination check",
+      "scenario successor chains acyclic, and a raise of a loop bound read as a loosening that waits for the owner "
+      "under `flow.adapt` and is named as a widening in the overlay's update report, seen red on a planted repository "
+      "stage routing back into itself, a wait declaring no deadline, a scenario successor cycle and an unattended raise "
+      "of the budget (P39)",
+      "scenario successor chains acyclic, a raise of a loop bound read as a loosening that waits for the owner under "
+      "`flow.adapt` and is named as a widening in the overlay's update report, and every approval item that would "
+      "loosen a value recommending the decline, seen red on a planted repository stage routing back into itself with "
+      "an exit, which only the counted-edge rule catches, a stage with no path to a terminal, an item no transition "
+      "reaches, an empty state set, which never passes, a wait declaring no deadline, a scenario successor cycle, an "
+      f"unattended raise of the budget and an approval item recommending a loosening (P39, {DR})", "static check")
+
+# dFairHearing
+cedit(V, "dFairHearing", "each round's state in the review report",
+      "seen red on a planted flat sequence and an oscillating one (P39, the owner's SL-3)",
+      "seen red on a planted flat sequence and an oscillating one, and on a strictly falling sequence that reaches its "
+      f"caller's limit, read BOUNDED, and one run past it, read CEILING (P39, the owner's SL-3, {DR})", "round states")
+
+# dTotalRecall
+cadd(V, "dTotalRecall",
+     "the stream-plan kind: a build's units grouped into streams, each stream's units in order, registered here so "
+     "that Design's planner, which writes it, and Runtime's pick, which reads it, both descend from its registration, "
+     f"seen red on a planted stream plan whose stream has no order ({DR}, the owner's CL-3)", "stream-plan kind")
+
+# dWellOiledMachine
+cedit(V, "dWellOiledMachine", "the owner's pause, resume, withdraw and supersede",
+      "mapped onto unattended's verbs,",
+      "mapped onto unattended's verbs, a withdrawal or supersession closing the build's leases with terminal "
+      "tombstones, seen red on a queued claim replayed against a withdrawn build, which is refused,", "withdraw")
+cset(V, "dWellOiledMachine", "the node registry's runtime facts",
+     "the node registry's runtime facts, the node's clock offset among them correcting a holder's stamp when a lease's "
+     "expiry is judged, as `leases.expiry-hours` says, seen red on a planted holder stamp skewed by an hour "
+     f"(P40, {DR})", "clock offset")
+cedit(V, "dWellOiledMachine", "the progress ledger per item instance",
+      "the same verdict digest or refusal rule twice in a row on one instance firing the loop detector, a wait inside "
+      "its declared deadline exempt,",
+      "a repeat of the act before's verdict digest or refusal rule on one instance counting as an act with no new "
+      "witness, so `runtime.no-progress` governs it, and journaled by the loop detector, a wait inside its declared "
+      "deadline exempt,", "repeat")
+cedit(V, "dWellOiledMachine", "the progress ledger per item instance",
+      "never on activity alone, seen red on a planted act that writes its transcript every turn and never finishes, a "
+      "planted repeat and a planted holder that loops while active (P39)",
+      "never on activity alone, the supervisor's liveness beat renewing nothing, seen red on a planted act that writes "
+      "its transcript every turn and never finishes, a planted repeat under a raised `runtime.no-progress`, stuck at "
+      "that count and not before, an item at exactly that many acts with no new witness, an instance reaped twice and "
+      "relaunched instead of routed, and a planted holder that loops while active, its lease lost after "
+      f"`leases.expiry-hours` (P39, {DR})", "ledger plants")
+cedit(V, "dWellOiledMachine", "every wait the supervisor holds",
+      "the session-limit hold releasing the build's lease at `runtime.hold-ceiling`",
+      "the session-limit hold releasing the build's lease as a hand-over at `runtime.hold-ceiling`", "hold hand-over")
+cedit(V, "dWellOiledMachine", "every wait the supervisor holds",
+      "and reclaiming a slot held past it,",
+      "and reclaiming a slot held past it only where an act session the supervisor launched holds it, an attended "
+      "session's slots reclaimed only by the liveness sweep,", "reclaim")
+cedit(V, "dWellOiledMachine", "every wait the supervisor holds",
+      "seen red on the 115-wake limit loop replayed, a planted leaked slot, six acts each spawning a nested fan of two "
+      "at saturation, and a planted crash loop (P39)",
+      "seen red on the 115-wake limit loop replayed, the lease still held or the tick firing again past the ceiling, a "
+      "hand-over no second node takes, a planted leaked act slot, an attended Workflow past the act ceiling losing its "
+      "slots, six acts each spawning a nested fan of two at saturation, a planted crash loop and an `invalid-input` "
+      f"that only journals (P39, {DR})", "waits plants")
+cset(V, "dWellOiledMachine",
+     "owner items, each carrying `run.owner-deadline`, past which `run.on-owner-silence` applies, the item's "
+     "recommended option by default and a ratification or an owner-only write parked, never decided for the owner, and "
+     "each pushed through `notify.channel` while no owner session is open as `notify.owner-items` says, seen on a "
+     "planted silent owner of each kind (P39, the owner's SL-4, SL-5 and SL-6)",
+     "owner items, each carrying `run.owner-deadline`, past which `run.on-owner-silence` decides an item "
+     "`run.on-owner-question` left open, the item's recommended option by default, recorded with the deadline as its "
+     "witness, a ratification or an owner-only write parked, never decided for the owner, an approval that would "
+     "loosen a value recommending the decline, `remind-then-park` reminding once through `notify.channel` and then "
+     "parking the build, its lease released and the item open, and `wait` parking it the same way at the deadline with "
+     "no reminder, each item pushed through `notify.channel` while no owner session is open as `notify.owner-items` "
+     "says, a core-only install's loader reporting `push-when-away` as having no push channel and never refusing it, "
+     "seen red on a planted silent owner under each value of `run.on-owner-silence`, `notify.owner-items` and "
+     "`run.on-owner-question`, on an `owner-approves` loosening under `guarded` left unanswered past the deadline and "
+     "applied, and on the default preset loaded with the core only and refused "
+     f"(P39, the owner's SL-4, SL-5 and SL-6, {DR})", "owner items")
+cset(V, "dWellOiledMachine",
+     "each build's spend recorded from its `trace.cost` rows and trended, `build.spend-cap` measured by default and set "
+     "from that evidence, as `memory.item-budget` was (P39, the owner's SL-8)",
+     "each build's spend recorded from its `trace.cost` rows and trended, `build.spend-cap` measured by default and set "
+     "from that evidence, as `memory.item-budget` was, a build that reaches a set cap ending as `flow.on-exhausted` "
+     "says, seen red on a planted build whose spend goes unrecorded and on one that crosses a set cap and runs on "
+     f"(P39, the owner's SL-8, {DR})", "spend")
+cedit(V, "dWellOiledMachine", "the node beat:",
+      "its free agent slots against `runtime.agents-in-flight` and its hardware load",
+      "its free agent slots against the node profile's capacity and its hardware load", "beat capacity")
+cset(V, "dWellOiledMachine",
+     "admission under `runtime.admission-scope`, by default charging a reservation before a launch against the plan's "
+     "ledger and the node's hardware ledger, both kept at the node outside any one repository so every project the "
+     "node serves charges the same ones, a plan shared with another machine charged through the shared store by "
+     "compare-and-swap, each reservation sized by an estimate per item kind that falls back to `runtime.act-ceiling` "
+     "until `trace.cost` rows give a p90, seen red on two planted projects on one node draining one plan "
+     "(P40, the owner's fleet)",
+     "admission under `runtime.admission-scope`, every project the node serves charging a reservation before each "
+     "launch against the plan's ledger and the node's hardware ledger whatever its scope, the scope narrowing only "
+     "what that project's own admission checks, both ledgers kept at the node outside any one repository under a "
+     "versioned schema and written only through their one local writer, through which each project charges and "
+     "releases only its own reservations, a reader refusing a newer major version with a journaled reason, a project "
+     "whose gov predates the ledgers counted by its beat or reported unaccounted, the ledger weighing the node's "
+     "projects by the profile's shares when reservations contend and counting free slots against the profile's "
+     "capacity, each reservation sized by an estimate per item kind that falls back to `runtime.act-ceiling` until "
+     "`trace.cost` rows give a p90, and each admission witnessing the plan reading it used and that reading's age, "
+     "seen red on two planted projects on one node draining one plan, one of them scoped to `session`, on each scope "
+     "value planted with what its project's admission checks, on two projects with shares of 3 and 1 admitted as if "
+     "equal, on a forged reservation for another project and on two installs at different schema versions on one node "
+     f"(P40, the owner's fleet, {DR})", "admission")
+cset(V, "dWellOiledMachine",
+     "discovery and the pick: one read giving the claimable ready set across builds, ready unleased units whose "
+     "dependencies are confirmed and released or expired leases, and a pure, replaceable pick function choosing what "
+     "the node claims next across every project it serves, first dropping work whose roles need a harness, model or "
+     "hardware the node profile lacks, then weighing projects by the profile's shares and each project's work by plan "
+     "priority then the oldest released, from a spread start, an offer only reordering it, seen red on a released "
+     "lease no node picks up and on a unit offered to a node without its harness (P40, the owner's CL-3 and fleet)",
+     "discovery and the pick: one read giving a project's claimable ready set across its builds, ready unleased units "
+     "whose dependencies are confirmed, hand-over releases and expired leases whose build has work ready, never a "
+     "terminal tombstone and never a build parked on an open owner item, each project's gov reading only its own set "
+     "and the node's ledgers, never another project's leases, and a pure, replaceable pick function choosing what the "
+     "node claims next for that project, first dropping work whose roles need a harness, model or hardware the node "
+     "profile lacks, then by plan priority then the oldest released, keeping a recorded stream plan's units in its "
+     "order, from a spread start, an offer only reordering it, seen red on a released lease no node picks up, on a "
+     "unit offered to a node without its harness, on a terminal tombstone offered as claimable and on a stream's units "
+     f"picked out of its order (P40, the owner's CL-3 and fleet, {DR})", "pick")
+cedit(V, "dWellOiledMachine", "`runtime.act-harness` and `runtime.act-auth` resolved per role",
+      "and the act launch pinned out of bare mode (P40)",
+      "and the act launch pinned out of bare mode, seen red on a role resolving another role's credential and on a "
+      f"launch in bare mode (P40, {DR})", "harness plants")
+cset(V, "dWellOiledMachine",
+     "the secret scan covering lease, mail, beat and mirror payloads and every adapter's publishing boundary, and the "
+     "record door refusing a token shape in a coordination record, seen red on a planted token in a lease payload (P40)",
+     "the secret scan covering lease, mail, beat, mirror and request-record payloads and every adapter's publishing "
+     "boundary, and the record door refusing a token shape in a coordination record, a request record then published "
+     "with its redacted text and bound to its hook-written intake by the owner binding's proof, which a claiming node "
+     "checks, seen red on a planted token in a lease payload, a mail message, a beat, a mirror event, an adapter's "
+     f"boundary and a request record, and on an agent-forged request record (P40, {DR})", "scan")
+cset(V, "dWellOiledMachine", "the commit queue and the lander pushing through dPlacedRequest's fenced effect push (P40)",
+     "the commit queue and the lander pushing through dPlacedRequest's fenced effect push, the lander's push to main "
+     "and the build's release with its landed notice carried in one atomic push, seen red on a landing whose release "
+     "the remote dropped and on a lander stubbed back to re-read the epoch and then push after a take-over "
+     f"(P40, {DR})", "lander")
+cset(V, "dWellOiledMachine",
+     "the node profile, kept at the node's home outside every repository and read by every node unit on it: its fleet "
+     "tag, hardware, harnesses with each one's plan tier and pool label, and the projects it serves with the owner's "
+     "share for each, equal unless the owner sets them, an owner-held fact that no preset and no repository sets, "
+     "never holding a credential (P40, the owner's fleet)",
+     "the node profile, kept at the node's home outside every repository and read whole by every node unit on it: its "
+     "fleet tag, hardware, agent capacity, harnesses with each one's plan tier and pool label, and the projects it "
+     "serves with the owner's share for each, equal unless the owner sets them, an owner-held fact that no preset and "
+     "no repository sets, never holding a credential, one of the floor's owner-only writes, written only through its "
+     "guarded owner command as the policy file is and validated against its versioned schema at write and at read, "
+     "seen red on an agent's write to it, on a malformed profile read as anything but invalid input and on a "
+     f"credential written into it (P40, the owner's fleet, {DR})", "profile")
+
+# dIndexedDesign
+cedit(V, "dIndexedDesign", "the planner's `design.streams` item",
+      "its stream plan read by any node's pick and by a head where one exists, needing no head, seen red on a planted "
+      "stream pairing two units whose write sets overlap (the owner's CL-3)",
+      "its stream plan written as dTotalRecall's stream-plan kind, which dWellOiledMachine's pick and a head where one "
+      "exists read, needing no head, seen red on a planted stream pairing two units whose write sets overlap and on "
+      "each value of `design.streams` planted, `off` running no planning workflow, `always` one on every build and "
+      f"`opt-in` one only where the brief or the owner asks (the owner's CL-3, {DR})", "streams")
+
+# dShippedRelease
+cset(V, "dShippedRelease", "the deploy engine",
+     "the deploy engine, its `deploy.unlease` closing each of a build's leases with a terminal tombstone and never "
+     "deleting it, seen red on a queued claim replayed against an unleased build, which is refused "
+     f"(P40, {DR})", "unlease")
+cset(V, "dShippedRelease", "the fleet register and currency watch", "the adopter register and currency watch",
+     "adopter register")
+cedit(V, "dShippedRelease", "the receipt's schema 5", "`kits.currency` and the fleet register reading steps pending",
+      "`kits.currency` and the adopter register reading steps pending", "receipt readers")
+cedit(V, "dShippedRelease", "a patch build raised by a landing",
+      "and a release hold's third keep-waiting answer parking the build, seen red on a planted patch chain (P39)",
+      "and each keep-waiting answer to a release hold counted per build and landed SHA, the third parking the build, "
+      f"seen red on a planted patch chain and on a planted owner who answers keep-waiting three times (P39, {DR})",
+      "keep waiting")
+cset(V, "dShippedRelease",
+     "the register of adopters named the adopter register, leaving the word fleet to node units (P40, the owner's CL-1)",
+     "the word fleet left to node units: the register of adopters built as the adopter register, gov's reading of "
+     "each adopter as the `adopters` kind and its program as `kits.adopters` "
+     f"(P40, the owner's CL-1, {DR})", "fleet rename")
+
+# dCalibratedLens
+cedit(V, "dCalibratedLens", "the stall and loop classes Runtime journals",
+      "re-derived from that evidence once 30 builds have run under them (P39, P9)",
+      "re-derived from that evidence once 30 builds have run under them, seen red on a planted class journaled and "
+      f"left out of the trend (P39, P9, {DR})", "trend plant")
+V.save()
+
+# ---- flow-steps ---------------------------------------------------------------------------------------------------
+
+F = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+F.sub("re-entries past `flow.route-backs` → the owner;",
+      "re-entries past `flow.route-backs` → that item's loop ends non-converging and its open rows go to asks, each "
+      "re-entry drawing on `flow.rework-budget` (revised 2026-10-19 by the owner's SL-1 and SL-2, "
+      f"{DR}: they went to the owner);", "reuse-check route-back")
+F.sub("or wait for a later release; no exit record within",
+      "or wait for a later release, each keep-waiting answer counted per (build, landed SHA) and the third parking the "
+      "build (P39); no exit record within", "keep waiting")
+F.sub("| deletes the build's lease refs, a missing ref counting as done, and closes its mailbox (`[rules]`) | the deleted "
+      "refs, and the mailbox's messages in the folder |",
+      "| closes each of the build's leases with a terminal tombstone, never deleting the ref, a lease already terminal "
+      "counting as done, and closes its mailbox (`[rules]`) (P40) | the terminal tombstones, and the mailbox's messages "
+      "in the folder |", "deploy.unlease")
+F.sub("  slot's exit record, and deletes the lease refs and the mailbox ref.\n",
+      "  slot's exit record, closes the lease refs with terminal tombstones, never deleting them (P40), and deletes the\n"
+      "  mailbox ref.\n", "Deploy memory")
+F.sub("record (DA-H1, FH1). Once dBoundRoles lands `run.on-owner-question`, that key resolves it, never for a\n"
+      "ratification (LR-3): the supervisor's recorded choice under `best-effort-recorded`, the item or the build\n"
+      "parked under `park-item` or `park-build`, and the run stopped under `stop-run`. Its witness is one of two:\n"
+      "- the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal\n"
+      "  command or a prompt;\n"
+      "- under `best-effort-recorded`, the supervisor's recorded choice, never for a ratification.\n",
+      "record (DA-H1, FH1). Once dBoundRoles lands `run.on-owner-question`, that key resolves it when it is raised,\n"
+      "never for a ratification (LR-3): the supervisor's recorded choice under `best-effort-recorded`, the item or the\n"
+      "build parked under `park-item` or `park-build`, and the run stopped under `stop-run`. Once dWellOiledMachine\n"
+      "lands `run.on-owner-silence`, that key decides only an item still open at `run.owner-deadline` (P39). Its witness\n"
+      "is one of three:\n"
+      "- the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal\n"
+      "  command or a prompt;\n"
+      "- under `best-effort-recorded`, the supervisor's recorded choice, never for a ratification;\n"
+      "- under `run.on-owner-silence: apply-recommendation`, the item's recommended option applied past the deadline\n"
+      f"  and recorded with it, never for a ratification, an owner-only write or a loosening ({DR}).\n",
+      "breakpoint")
+F.sub("  skeptic with a fresh probe, and counts against `flow.route-backs`. Past that bound it becomes an\n"
+      "  owner item, resolved as the owner gate above is (FH1).\n",
+      "  skeptic with a fresh probe, draws on `flow.rework-budget` and counts against `flow.route-backs`. Past that\n"
+      "  bound the finding's loop ends non-converging, and the finding is filed as an ask with its evidence. Revised\n"
+      f"  2026-10-19 by the owner's SL-1 and SL-2, {DR}: it became an owner item, resolved as the owner gate\n"
+      "  above is (FH1).\n", "unverified finding")
+F.sub("| deletes the leases, closes the mailbox (`[rules]`), and reclaims the build's workspaces | the deleted refs, the "
+      "mailbox's messages in the folder, and the workspace record |",
+      "| closes each lease with a terminal tombstone, never deleting the ref (P40), closes the mailbox (`[rules]`), and "
+      "reclaims the build's workspaces | the terminal tombstones, the mailbox's messages in the folder, and the "
+      "workspace record |", "life.unlease")
+F.sub("fleet reading (`kits.fleet`)", "adopter reading (`kits.adopters`)", "adopter reading")
+F.save()
+
+# ---- layer-runtime ------------------------------------------------------------------------------------------------
+
+R = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+R.sub("one whose lease `deploy.unlease` deleted holds none",
+      "one whose lease `deploy.unlease` closed with a terminal tombstone holds none", "awaiting")
+R.sub("- **Each beat:** read the owner's controls, ask `next`, act on its answer, renew the lease, and journal.\n",
+      "- **Each beat:** read the owner's controls, ask `next`, act on its answer, renew the lease as `leases.renewal`\n"
+      "  says, and journal. The beat is liveness and renews nothing by itself: under the default `progress` the lease\n"
+      "  renews on a witnessed item boundary or a declared wait inside its deadline (P39). Revised 2026-10-19 by the\n"
+      "  parked debt's review: every beat renewed the lease, so a looping supervisor kept it for ever.\n", "beat")
+R.sub("    keeps renewing its lease.\n",
+      "    keeps renewing its lease, the hold being a declared wait inside its deadline.\n", "hold renewal")
+R.sub("raises an owner item and releases the build's lease, so a node with quota takes the build over,",
+      "raises an owner item and releases the build's lease as a hand-over, so a node with quota takes the build over,",
+      "hold hand-over")
+start = "- **Fencing.** Revised: 2026-10-17, the debt round's fold.\n"
+end = "  its next refused call.\n"
+if R.text.count(start) != 1:
+    sys.exit("layer-runtime: the Fencing bullet's head matches %d times" % R.text.count(start))
+a = R.text.index(start)
+b = R.text.index(end, a) + len(end)
+old_fence = R.text[a:b]
+if "re-read the epoch from the remote before they commit or push" not in old_fence or old_fence.count("\n") != 20:
+    sys.exit("layer-runtime: the Fencing block is not the one this fold read")
+R.sub(old_fence,
+      "- **Fencing.** Revised: 2026-10-17, the debt round's fold, and 2026-10-19 by the parked debt's review (P40).\n"
+      "  - Each lease carries an epoch in dPlacedRequest's lease grammar, bumped at every take-over and never reset,\n"
+      "    since a release writes a hand-over or a terminal tombstone and never deletes the ref. One name per lease:\n"
+      "    the build lease (which the first draft also called the run lease), the unit lease, and the cadence lease,\n"
+      "    which an event wake takes for its instance (`[schedule]`).\n"
+      "  - Each act session's `--session-id` is recorded with the epoch it serves.\n"
+      "  - **The fence travels with the effect.** Every push the commit queue and the lander make carries the\n"
+      "    holder's new lease beat in one `git push --atomic` under `--force-with-lease=<lease>:<tip seen>`, so a\n"
+      "    holder replaced between its read of the lease and its push lands nothing, and the branch is left unchanged.\n"
+      "    A re-read of the epoch before the push is evidence only, never the fence, and a re-push of an unchanged\n"
+      "    lease ref is no fence either, since the remote never sees it (P2(c′)).\n"
+      "  - **Where the epoch is read.** The dispatcher's PermissionRequest decision reads the lease ref in its clone,\n"
+      "    which the supervisor refreshes from the remote at each beat, since `next` reads the lease witnesses, and\n"
+      "    refuses a gated call once that ref shows the epoch stale, within one node-tick period across nodes\n"
+      "    (`[act]`). A supervisor that finds its lease taken over kills the act sessions it launched under the old\n"
+      "    epoch. With no supervisor beating there, the node tick restarts one within its period, and that one does\n"
+      "    the same. Until then an old session's gated calls touch only its own workspace, and the fence refuses its\n"
+      "    push.\n"
+      "\n"
+      "  So a take-over is safe while the old node's act sessions still run, because nothing they did reaches the\n"
+      "  remote without the fence. Expiry is judged by a declared clock, never by the reader's clock against the\n"
+      "  holder's stamp (P40). On the same node, a take-over kills the old process tree first. Across nodes, an old\n"
+      "  session stops at its next refused call or push. Revised 2026-10-19 by the parked debt's review: the commit\n"
+      "  queue and the lander's prepare re-read the epoch from the remote and then pushed, which P2(a) showed landing\n"
+      "  a replaced holder's stale work (`gap-conc-12`), and the clock-skew claim rested on two clocks.\n", "fencing")
+R.sub("  - expires leases past `leases.expiry-hours` and prunes terminal run claims (`refs/gov/runs/*`),\n"
+      "    through dDeclaredLoop's coordination verbs. It never prunes `refs/gov/claims/*`, where a slug's\n"
+      "    claim lives (layer-memory `[contract]`);\n",
+      "  - expires leases past `leases.expiry-hours`, judged by the declared clock, and prunes a terminal tombstone, a\n"
+      "    run claim's (`refs/gov/runs/*`) among them, only once it is older than `leases.queued-claim-days` (P40),\n"
+      "    through dPlacedRequest's coordination verbs. It never prunes `refs/gov/claims/*`, where a slug's claim lives\n"
+      "    (layer-memory `[contract]`);\n", "prune")
+R.sub("currency probe and fleet reading", "currency probe and adopter reading", "adopter reading")
+R.sub("A stale epoch is refused at the commit queue and the lander at once, and at the dispatcher once its lease ref "
+      "refreshes, within one node-tick period across nodes.",
+      "A stale holder's push is refused at the remote by the fenced effect push, never by a re-read before it, and a "
+      "stale epoch is refused at the dispatcher once its lease ref refreshes, within one node-tick period across nodes "
+      "(P40).", "named-acts")
+R.sub("  - an unleased build waiting at `deploy.released` answers `awaiting`, and no lease ref is written;\n",
+      "  - a build whose lease is terminal, waiting at `deploy.released`, answers `awaiting`, and no lease is acquired;\n",
+      "next fixture")
+R.sub("  - on a StopFailure limit record, the supervisor parses the reset time, holds, renews its lease, and\n"
+      "    raises an owner item once `runtime.hold-ceiling` passes.\n",
+      "  - on a StopFailure limit record, the supervisor parses the reset time, holds and renews its lease inside the\n"
+      "    hold's deadline. Once `runtime.hold-ceiling` passes, it raises an owner item and releases the lease as a\n"
+      "    hand-over, a second node takes the build over, and the wake tick stops. It is red while the lease is still\n"
+      "    held or the tick fires again. Revised 2026-10-19 by the parked debt's review: it asserted the hold kept and\n"
+      "    the lease renewed past the ceiling, which P39 replaced.\n", "limits")
+fstart = "- **`fencing`:** run across two nodes, or with the old act session outside the killed tree. Kill only the\n"
+fend = "this fixture once asserted the next gated call refused at once.\n"
+if R.text.count(fstart) != 1:
+    sys.exit("layer-runtime: the fencing fixture's head matches %d times" % R.text.count(fstart))
+a = R.text.index(fstart)
+b = R.text.index(fend, a) + len(fend)
+old_fix = R.text[a:b]
+if old_fix.count("\n") != 6:
+    sys.exit("layer-runtime: the fencing fixture is not the one this fold read")
+R.sub(old_fix,
+      "- **`fencing`:** run across two nodes, or with the old act session outside the killed tree. The old holder\n"
+      "  reads the lease tip, and a second supervisor takes the build over with a new epoch before the holder pushes.\n"
+      "  The holder's push, carrying its lease beat under `--force-with-lease` on the tip it read, is refused at the\n"
+      "  remote, and the branch is unchanged. It is red on a push that re-reads the epoch and then pushes, and on one\n"
+      "  that re-pushes its unchanged lease ref in place of a new beat, which the remote never checks (P2(c′)). Until\n"
+      "  the old node's tick restarts a supervisor, the old act session's gated calls are approved in its own\n"
+      "  workspace. Once the restarted supervisor reads the take-over, it kills the old session, and a gated call made\n"
+      "  after the refresh is refused. One witness and one commit result. Revised 2026-10-17, the folds' closing\n"
+      "  review: this fixture once asserted the next gated call refused at once. Revised 2026-10-19 by the parked\n"
+      "  debt's review: the take-over came before the old session's commit, never between its read and its push.\n",
+      "fencing fixture")
+R.sub("- **`relaunch-cap`:** a stub CLI that always exits at `--max-turns` parks the item after\n"
+      "  `RESUME_ATTEMPTS` launches, with a journaled reason and an owner item.\n",
+      "- **`relaunch-cap`:** a stub CLI writes a transcript entry every turn, always exits at `--max-turns` and never\n"
+      "  produces a witness. Relaunches stop at `RESUME_ATTEMPTS` over the instance's life, never reset by a transcript\n"
+      "  entry, and the item draws on the build's rework budget and routes to its producer, with no park. An instance\n"
+      "  reaped twice at `runtime.act-ceiling` with no new witness routes to its producer to be split. It is red on a\n"
+      "  cap that a transcript entry resets, on a park or an owner item past the cap, and on a third launch after two\n"
+      "  reaps. Revised 2026-10-19 by the parked debt's review: it asserted the park and the owner item P39 replaced.\n"
+      "- **`renewal`:** a planted holder whose acts write commits and transcripts but never a witness loses its lease\n"
+      "  after `leases.expiry-hours` while its supervisor keeps beating. It is red while the lease renews (the parked\n"
+      "  debt's review).\n", "relaunch-cap")
+R.sub("- **`act-ceiling`:** a stub act session sleeping past a lowered `runtime.act-ceiling` is reaped,\n"
+      "  journaled and relaunched under the cap.\n",
+      "- **`act-ceiling`:** a stub act session sleeping past a lowered `runtime.act-ceiling` is reaped,\n"
+      "  journaled and relaunched under the cap. A slot a launched act holds past the ceiling is reclaimed with a stall\n"
+      "  record, and an attended Workflow running past it keeps its slots, its stall record written and nothing\n"
+      "  reclaimed (the parked debt's review).\n", "act-ceiling")
+R.save()
+
+# ---- layer-memory -------------------------------------------------------------------------------------------------
+
+M = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+M.sub("`entry.claim` for a patch build, until `deploy.unlease` deletes it. A record written after that,",
+      "`entry.claim` for a patch build, until `deploy.unlease` closes it with a terminal tombstone (P40). A record "
+      "written after that,", "lease contract")
+M.sub("ref is never pruned, so a slug is minted once; the supervisor prunes run claims only. So two clones",
+      "ref is never pruned, so a slug is minted once; the supervisor prunes only run claims, each a terminal tombstone\n"
+      "  older than `leases.queued-claim-days` (P40). So two clones", "claim prune")
+M.sub("| fleet | dShippedRelease | its writer is `kits.fleet`: gov's reading of each adopter, per release |\n"
+      "| fleet register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.fleet` |\n",
+      "| adopters | dShippedRelease | its writer is `kits.adopters`: gov's reading of each adopter, per release, named for "
+      "adopters since the fleet names nodes (P40) |\n"
+      "| adopter register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.adopters` |\n",
+      "adopter kinds")
+M.sub("| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; writer item not named |",
+      "| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a "
+      "terminal tombstone and never deleting the ref (P40); writer item not named |", "lease kind")
+roster = [ln for ln in M.text.split("\n") if ln.startswith("| roster | dIndexedDesign | ")]
+work = [ln for ln in M.text.split("\n") if ln.startswith("| workspace | dWellOiledMachine | ")]
+if len(roster) != 1 or len(work) != 1:
+    sys.exit("layer-memory: the roster or workspace kind row is not single")
+M.sub(roster[0] + "\n",
+      roster[0] + "\n| stream plan | dTotalRecall | its writer is `design.streams`, the planner's item, which dIndexedDesign "
+      "builds, and its reader dWellOiledMachine's pick, both descendants of this build: a build's units grouped into "
+      f"streams, each stream's units in order ({DR}, the owner's CL-3) |\n", "stream plan kind")
+M.sub(work[0] + "\n",
+      work[0] + "\n| node profile | dWellOiledMachine | the node's one description, kept at the node's home outside every "
+      "repository: written only through its guarded owner command, one of the floor's owner-only writes, and validated "
+      f"against its versioned schema at write and at read ({DR}); writer item not named |\n"
+      "| node ledger | dWellOiledMachine | the plan and hardware ledgers at the node's home, under a versioned schema, "
+      "each project charging and releasing only its own reservations through their one local writer, a reader refusing "
+      f"a newer major version ({DR}); writer item not named |\n", "node kinds")
+M.sub("release records under `memory/integrations/`, and currency and fleet\n  records under `memory/distribution/`.",
+      "release records under `memory/integrations/`, and currency and adopter\n  records under `memory/distribution/`.",
+      "distribution homes")
+M.save()
+
+# ---- layer-expansions ---------------------------------------------------------------------------------------------
+
+X = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+X.sub("for the fleet view;", "for the adopter view;", "currency row")
+X.sub("| The fleet register |", "| The adopter register |", "register row")
+X.sub("- `deploy.unlease`, the core item that deletes a build's lease refs and closes its mailbox;\n",
+      "- `deploy.unlease`, the core item that closes a build's lease refs with terminal tombstones, never deleting them\n"
+      "  (P40), and closes its mailbox;\n", "three senses")
+X.sub("the currency probe and the fleet reading, on `kits.host`", "the currency probe and the adopter reading, on "
+      "`kits.host`", "cadence items")
+X.sub("release records, fleet rows and currency observations", "release records, adopter rows and currency observations",
+      "record homes")
+X.sub("`adopters.toml`, grown into the fleet register |", "`adopters.toml`, grown into the adopter register |",
+      "engine kits")
+X.sub("`fleet` (gov's reading of each adopter, per release); the fleet register's rows;",
+      "`adopters` (gov's reading of each adopter, per release); the adopter register's rows;", "record kinds")
+X.sub("| `kits.fleet` | command, a cadence program in gov,", "| `kits.adopters` | command, a cadence program in gov,",
+      "kits.adopters item")
+X.sub("| the fleet record, per release |", "| the adopter record, per release |", "adopter record")
+X.sub("| daily | the period of the currency probe, the fleet reading, and the cut",
+      "| daily | the period of the currency probe, the adopter reading, and the cut", "watch cadence")
+X.sub("  `life.unlease`, which mean the same thing: delete the build's leases and close its mailbox.",
+      "  `life.unlease`, which mean the same thing: close the build's leases and its mailbox, each lease with a\n"
+      "  terminal tombstone since P40, never deleted.", "unlease meaning")
+X.sub("the probe and the fleet reading every", "the probe and the adopter reading every", "programs")
+X.save()
+
+# ---- the gap register ---------------------------------------------------------------------------------------------
+
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+COND = ("where one shared ledger with a live reading and reservations sized at p90 finished all of it, 63% with a "
+        "30-minute-stale reading and 49% at p50 estimates.")
+G.sub("where one shared ledger finished all of it. |", COND + " |", "gap-rt-40")
+G.sub("New publishing boundaries go unscanned: lease, mail and mirror payloads sit outside",
+      "New publishing boundaries go unscanned: lease, mail and mirror payloads, and the request records P40 adds, sit "
+      "outside", "gap-rt-44")
+G.sub("`update` is pull-only; no fleet register. |", "`update` is pull-only; no adopter register. |", "gap-deploy-04")
+G.save()
+
+# ---- the cloud record ---------------------------------------------------------------------------------------------
+
+C = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md")
+C.sub("and a ledger with a live reading finished all of it (dispatch 150, C5) |",
+      "and a ledger with a live reading and reservations sized at p90 finished all of it, 63% with a 30-minute-stale "
+      "reading and 49% at p50 (dispatch 150, C5) |", "shapes")
+C.sub("3. **A lease is never deleted.** A release writes a terminal tombstone, and the epoch rises monotonically for the\n"
+      "   lease's whole life. A claim queued offline longer than `leases.queued-claim-days` is refused on reconnection, and a\n"
+      "   tombstone may be pruned only after that age.\n",
+      "3. **A lease is never deleted.** A release writes a hand-over, which any node may take with the epoch bumped, or a\n"
+      "   terminal tombstone for a unit landed or withdrawn, which refuses every acquisition, and the epoch rises\n"
+      "   monotonically for the lease's whole life. A claim queued offline carries its node's last fetch of the lease refs\n"
+      "   and is refused on reconnection once that fetch is older than `leases.queued-claim-days`, and a terminal tombstone\n"
+      "   may be pruned only that long after its release, so no queued claim outlives the tombstone it would race (the\n"
+      "   parked debt's review).\n", "item 3")
+C.sub("   the writer's stamp.\n",
+      "   the writer's stamp. The observer's rule lands with the leases, and the corrected stamp with dWellOiledMachine,\n"
+      "   which records each node's clock offset (the parked debt's review).\n", "item 4")
+C.sub("its free agent slots against `runtime.agents-in-flight`, any limit hold",
+      "its free agent slots against the node profile's capacity, any limit hold", "item 6")
+C.sub("   ones; a plan shared with another machine is charged through the shared store by compare-and-swap.\n",
+      "   ones, whatever each project's `runtime.admission-scope`, which narrows only what that project's own admission\n"
+      "   checks, and the ledger weighs the node's projects by their shares when reservations contend. A plan shared with\n"
+      "   another machine is the fleet's, planned as its pool ledger (the parked debt's review).\n", "item 7")
+C.sub("   units whose dependencies are confirmed, and released or expired leases. A pure, replaceable pick function chooses\n"
+      "   what this node claims next, by plan priority and then the oldest released, from a spread start (dispatch 149, P6).\n",
+      "   units whose dependencies are confirmed, and hand-over releases and expired leases, never a terminal one. A pure,\n"
+      "   replaceable pick function chooses what this node claims next, by plan priority and then the oldest released,\n"
+      "   keeping a recorded stream plan's units in its order, from a spread start (dispatch 149, P6).\n", "item 8")
+C.sub("    is data with provenance, never consent, and only the owner's own session confirms a breakpoint.\n",
+      "    is data with provenance, never consent, and only the owner's own session confirms a breakpoint. The record\n"
+      "    reaches the remote with only its content key until the scan of item 13 lands, then with its redacted text,\n"
+      "    bound to its intake by the owner binding's proof (the parked debt's review).\n", "item 10")
+C.sub("13. **New publishing boundaries are scanned.** The secret scan covers lease, mail, beat and mirror payloads and every\n"
+      "    adapter's publishing boundary, and the record door refuses a token shape in a coordination record.\n",
+      "13. **New publishing boundaries are scanned.** The secret scan covers lease, mail, beat, mirror and request-record\n"
+      "    payloads and every adapter's publishing boundary, and the record door refuses a token shape in a coordination\n"
+      "    record.\n", "item 13")
+C.sub("    credential. A pick or an offer first drops work whose roles need a harness, model or hardware the node lacks,\n"
+      "    then weighs the node's projects by their shares. Its beat to each project carries its free capacity across all\n"
+      "    of them, and nothing of another project's names or work ([fleet]).\n",
+      "    credential. A pick or an offer first drops work whose roles need a harness, model or hardware the node lacks,\n"
+      "    and the node's ledger weighs its projects by their shares. Its beat to each project carries its free capacity\n"
+      "    across all of them, and nothing of another project's names or work ([fleet]). The profile is one of the\n"
+      "    floor's owner-only writes, written only through its guarded owner command and validated against its versioned\n"
+      "    schema, and every project charges the node's ledgers through their one local writer (the parked debt's\n"
+      "    review).\n", "item 18")
+flow_ks = [ln for ln in C.text.split("\n") if ln.startswith("| flow (core) | dKeptSession | ")]
+if len(flow_ks) != 1:
+    sys.exit("cloud: the dKeptSession layer row is not single")
+C.sub(flow_ks[0] + "\n", flow_ks[0] + "\n| memory (core) | dTotalRecall | the stream-plan kind, which Design's planner "
+      "writes and Runtime's pick reads |\n", "layers memory row")
+C.sub("| distribution (expansion) | dShippedRelease | the adopter register, renamed |",
+      "| distribution (expansion) | dShippedRelease | the adopter register, the `adopters` kind and `kits.adopters`, "
+      "renamed |", "layers distribution row")
+C.sub("  - the owner's request relayed by reference.\n\n  Its test: a four-hour head outage costs no throughput, an offer "
+      "reaches a node only through that node's own lease,\n  and a replay reproduces the program's offers byte for byte.\n",
+      "  - the owner's request relayed by reference;\n"
+      "  - a pool ledger for a plan shared across machines, at a point the core declares and an endpoint adapter fills,\n"
+      "    naming its owner, its tenancy and a rule that it carries no other project's names or work, charged by\n"
+      "    compare-and-swap (the parked debt's review).\n\n"
+      "  Its test: a four-hour head outage costs no throughput, an offer reaches a node only through that node's own lease,\n"
+      "  a replay reproduces the program's offers byte for byte, and two machines charging one plan at once admit nothing\n"
+      "  past it.\n", "planned")
+C.sub("  - the fenced effect push, seen red on a stale holder's push after a take-over;\n"
+      "  - leases never deleted, epochs monotonic, and queued claims past their age refused, seen red on a pruned lease\n"
+      "    and on a stale queued claim;\n"
+      "  - expiry judged by a declared clock;\n"
+      "  - cadence lease kinds as names;\n"
+      "  - a project-level request record any node claims by lease;\n",
+      "  - the fenced effect push, seen red on a holder taken over between its read of the tip and its push;\n"
+      "  - leases never deleted, a release a hand-over or terminal, epochs monotonic, and queued claims refused once their\n"
+      "    node's last fetch is past their age, seen red on a pruned lease, on a stale queued claim and on a claim queued\n"
+      "    after a release by a node whose last fetch preceded the lease;\n"
+      "  - expiry judged by an observer's clock, the corrected stamp moved to dWellOiledMachine;\n"
+      "  - cadence lease kinds as names;\n"
+      "  - a project-level request record any node claims by lease, pushed with only its content key until the scan\n"
+      "    lands;\n", "chain dPlacedRequest")
+C.insert_before("- **dWellOiledMachine:**\n  - the node profile,",
+                "- **dTotalRecall:** the stream-plan kind, which Design's planner writes and Runtime's pick reads (the\n"
+                "  parked debt's review).\n", "chain dTotalRecall")
+C.sub("  - the node profile, read by every node unit on the node;\n",
+      "  - the node profile, read by every node unit on the node, one of the floor's owner-only writes;\n",
+      "chain profile")
+C.sub("  - admission by plan, through ledgers kept at the node across its projects;\n",
+      "  - admission by plan, through guarded, versioned ledgers kept at the node, which every project charges whatever\n"
+      "    its scope;\n", "chain admission")
+C.sub("  - the scan of coordination payloads and adapter boundaries, and the record door;\n",
+      "  - the scan of coordination payloads, request records and adapter boundaries, and the record door;\n",
+      "chain scan")
+C.sub("  - the commit queue and the lander pushing through the fenced push.\n\n"
+      "  Each is seen red on a planted case: two nodes sharing one pool, a hosted host refused a ref push, a token in a\n"
+      "  lease payload, a cadence run that never converges.\n",
+      "  - the commit queue and the lander pushing through the fenced push, a landing's release and notice in the same\n"
+      "    push;\n"
+      "  - the node's clock offset correcting a lease's expiry.\n\n"
+      "  Each is seen red on a planted case of its own, v2's row naming every one: two planted projects on one node\n"
+      "  draining one plan, a hosted host refused a ref push, a token in each scanned payload and a cadence run that never\n"
+      "  converges among them (the parked debt's review).\n", "chain plants")
+C.sub("- **dShippedRelease:** the adopter register, renamed.\n",
+      "- **dShippedRelease:** the adopter register, the `adopters` kind and `kits.adopters`, built under those names, and\n"
+      "  `deploy.unlease` closing a build's leases terminal.\n", "chain dShippedRelease")
+C.sub("where one shared ledger finished all of it. | dWellOiledMachine |", COND + " | dWellOiledMachine |",
+      "gaps rt-40")
+C.sub("New publishing boundaries go unscanned: lease, mail and mirror payloads sit outside",
+      "New publishing boundaries go unscanned: lease, mail and mirror payloads, and the request records P40 adds, sit "
+      "outside", "gaps rt-44")
+C.sub("  consumers of one tight plan that each saw only their own share finished 48 to 54% of the work, and one shared ledger\n"
+      "  finished all of it (dispatch 150, C5).\n",
+      "  consumers of one tight plan that each saw only their own share finished 48 to 54% of the work, and one shared ledger\n"
+      "  with a live reading and reservations sized at p90 finished all of it, 63% with a 30-minute-stale reading and 49% at\n"
+      "  p50 estimates (dispatch 150, C5).\n", "fleet")
+C.sub("- **The review debt grows.** This record and its fold join the commits the parked closing-review pair must cover.\n",
+      "- **The review debt, paid.** This record and its folds joined the commits the parked closing-review pair covered,\n"
+      f"  and the pair's 35 defects are folded (`{CMP}`). Among them were\n"
+      "  layer-runtime's fence and flow-steps' unlease items, which this record's folds had left standing.\n", "owed")
+C.save()
+
+# ---- the stall record ---------------------------------------------------------------------------------------------
+
+T = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-stall-and-loop.md")
+T.sub("   The budget is keyed to the build, never to an item instance, so units a loop mints cannot reset it. Before\n"
+      "   `entry.claim`, loops draw on a budget keyed to the intake's content key. `flow.route-backs` stays as the per-item\n"
+      "   early limit. The remaining budget is on the card.\n",
+      "   The budget is keyed to the build, never to an item instance, so units a loop mints cannot reset it. Until\n"
+      "   Design's exit freezes the per-unit shares, the budget is the base alone, as it is for a build with no units (the\n"
+      "   parked debt's review). Before `entry.claim`, loops draw on a budget keyed to the intake's content key.\n"
+      "   `flow.route-backs` stays as the per-item early limit. The remaining budget is on the card.\n", "item 1")
+T.sub("   - **repeat:** the same verdict digest or the same refusal rule twice in a row on one instance fires the loop\n"
+      "     detector before the budget runs out; a wait that declares its own deadline is exempt, so a poll is no loop;\n",
+      "   - **repeat:** a repeat of the act before's verdict digest or refusal rule on one instance is no new witness, so\n"
+      "     it counts toward `runtime.no-progress`, and the loop detector journals it; a wait that declares its own\n"
+      "     deadline is exempt, so a poll is no loop. Revised by the parked debt's review: it fired at a fixed two, with no\n"
+      "     outcome;\n", "item 5 repeat")
+T.sub("   - **lease:** a build's lease renews on witnessed progress at item boundaries and on declared waits inside their\n"
+      "     deadline, never on activity alone, so a looping holder's lease expires.\n",
+      "   - **lease:** a build's lease renews on witnessed progress at item boundaries and on declared waits inside their\n"
+      "     deadline, never on activity alone, so a looping holder's lease expires. The supervisor's beat is liveness and\n"
+      "     renews nothing, and until the ledger lands the transition record's item boundaries stand in for it (the parked\n"
+      "     debt's review).\n", "item 5 lease")
+T.sub("   - **owner items:** a deadline (`run.owner-deadline`), then the outcome `run.on-owner-silence` says. A\n"
+      "     ratification or an owner-only write is never decided for the owner;\n",
+      "   - **owner items:** a deadline (`run.owner-deadline`), then the outcome `run.on-owner-silence` says for an item\n"
+      "     `run.on-owner-question` left open. A ratification or an owner-only write is never decided for the owner, and an\n"
+      "     approval that would loosen a value recommends the decline, so silence never applies a loosening (the parked\n"
+      "     debt's review);\n", "item 6 owner items")
+T.sub("   - **the session-limit hold:** at `runtime.hold-ceiling` the lease is released, so a node with quota takes the build\n"
+      "     over, and the wake tick stops firing into a refused turn;\n",
+      "   - **the session-limit hold:** at `runtime.hold-ceiling` the lease is released as a hand-over, so a node with quota\n"
+      "     takes the build over, and the wake tick stops firing into a refused turn;\n", "item 6 hold")
+T.sub("     record naming the holders, since every act ends by that ceiling; a slot held past it is reclaimed;\n",
+      "     record naming the holders; a slot an act session the supervisor launched holds past it is reclaimed, since\n"
+      "     every act ends by that ceiling, and an attended session's slots only by the liveness sweep (the parked debt's\n"
+      "     review);\n", "item 6 queue")
+T.sub("   - **release hold:** each \"keep waiting\" is counted, and the third parks the build;\n",
+      "   - **release hold:** each \"keep waiting\" is counted per build and landed SHA, and the third parks the build;\n",
+      "item 6 release hold")
+T.sub("    registered channel, as the owner's SL-6 settled it, and `notify.owner-items` lets the owner change that.\n",
+      "    registered channel, as the owner's SL-6 settled it, and `notify.owner-items` lets the owner change that. A push\n"
+      "    reaches an absent owner only through a channel other than the terminal, so a core-only install reports that it\n"
+      "    has none (the parked debt's review).\n", "item 10")
+T.sub("| SC-own-5, owner items unseen | item 10, as the owner's SL-6 settled it |",
+      "| SC-own-5, owner items unseen | item 10, as the owner's SL-6 settled it, where a push channel other than the "
+      "terminal is registered; a core-only install reports `push-when-away` with none |", "coverage")
+T.sub("  flat and an oscillating sequence.\n",
+      "  flat and an oscillating sequence, and on falling ones that reach and pass the caller's limit.\n",
+      "chain dFairHearing")
+T.sub("  - the rework budget in the transition record, every repetition kind drawing on it, seen red on a planted loop that\n"
+      "    mints a new unit each lap;\n",
+      "  - the rework budget in the transition record, the base alone before Design's exit, every repetition kind drawing\n"
+      "    on it, seen red on a planted loop that mints a new unit each lap and on one that spends the base before\n"
+      "    Design's exit;\n", "chain budget")
+T.sub("  - the convergence routing for every `until-*` and `while-*` value, and `review.max-rounds`;\n",
+      "  - the convergence routing for every `until-*` and `while-*` value, and `review.max-rounds`, seen red on a falling\n"
+      "    sequence run past it;\n", "chain convergence")
+T.sub("  - the static termination check, seen red on a planted repository stage that routes back into itself, a wait with no\n"
+      "    deadline, a scenario successor cycle and an unattended raise of a loop bound.\n",
+      "  - the static termination check, seen red on a planted repository stage that routes back into itself with an exit,\n"
+      "    a stage with no path to a terminal, an unreachable item, an empty state set, a wait with no deadline, a\n"
+      "    scenario successor cycle, an unattended raise of a loop bound and an approval item recommending a loosening.\n",
+      "chain static check")
+T.sub("- **dKeptSession:** mailbox question deadlines with the asker's default; the remaining budget on the card.\n",
+      "- **dKeptSession:** mailbox question deadlines with the asker's default; the remaining budget on the card, seen red\n"
+      "  on a card without it; the pair rule holding `review.design.round-count` at or below `review.max-rounds`.\n",
+      "chain dKeptSession")
+T.sub("  `invalid-input` raised; owner items' deadlines and their push; the spend record. Each is seen red on a planted\n"
+      "  case, the 115-wake limit loop among them.\n",
+      "  `invalid-input` raised; owner items' deadlines, their push and every silence value; the spend record and the cap's\n"
+      "  outcome. Each is seen red on a planted case of its own, v2's row naming every one, the 115-wake limit loop among\n"
+      "  them (the parked debt's review).\n", "chain dWellOiledMachine")
+T.sub("- **dCalibratedLens:** the stall and loop classes trended, and the budget, deadlines and thresholds re-derived.\n",
+      "- **dCalibratedLens:** the stall and loop classes trended, seen red on a class left out of the trend, and the\n"
+      "  budget, deadlines and thresholds re-derived.\n", "chain dCalibratedLens")
+T.insert_before("\n## [owed] Owed to later builds",
+                "- **The parked debt's review, 2026-10-19:** its pair found the route-back rule's two other homes in\n"
+                "  flow-steps, two layer-runtime fixtures and the supervisor's beat still carrying the outcomes P39\n"
+                "  replaced, and several clauses with no check that can fail. All are folded\n"
+                f"  (`{CMP}`).\n", "folded")
+T.save()
+
+# ---- the comparison record ----------------------------------------------------------------------------------------
+
+K = Record("memory/builds/dClosedLoop/" + CMP)
+out = (HERE.parent / "cloud" / "compare-debt.out").read_text(encoding="utf-8").replace("\r\n", "\n").strip("\n")
+FENCE = "`" * 3
+FOLD_ROWS = [
+    ("fence-still-check-then-act", "layer-runtime's Fencing, rewritten so the fence travels with the effect, its "
+     "`named-acts` invariant, and its `fencing` fixture, which now takes the lease over between the holder's read and "
+     "its push"),
+    ("release-deletes-lease", "flow-steps' `deploy.unlease`, Deploy's Memory bullet and `life.unlease`, each closing a "
+     "lease with a terminal tombstone; layer-runtime's `awaiting` row, prune bullet and `next` fixture; layer-memory's "
+     "lease contract and lease kind; layer-expansions' naming; red cases on dShippedRelease and dWellOiledMachine"),
+    ("tombstone-prune-outrun", "`leases.queued-claim-days` and dPlacedRequest's tombstone clause: a queued claim's age "
+     "counts from its node's last fetch of the lease refs, red on a claim queued after a release by a node whose fetch "
+     "preceded the lease; the cloud record's item 3"),
+    ("route-back-owner-item-stands", "flow-steps' `build.reuse-check` and the unverified-finding rule: past "
+     "`flow.route-backs` the loop ends non-converging and its open work goes to asks"),
+    ("fixtures-assert-replaced", "layer-runtime's `limits` and `relaunch-cap` fixtures, restated with the hand-over "
+     "release, the lifetime cap and the twice-reaped split; dWellOiledMachine's ledger and waits clauses"),
+    ("renewal-progress-no-interim", "`leases.renewal` and dPlacedRequest's lease clause: until the progress ledger "
+     "lands, `progress` renews at each item boundary the transition record witnesses, seen on the default preset "
+     "loaded with no ledger"),
+    ("request-record-unscanned", "dPlacedRequest's request clause pushes only the content key; dWellOiledMachine's scan "
+     "clause adds request records, publishes the redacted text and binds it by the owner binding's proof; the cloud "
+     "record's items 10 and 13, and `gap-rt-44`"),
+    ("shared-store-undefined", "dWellOiledMachine's admission clause drops the shared store; the fleet in v2's and the "
+     "cloud record's `[planned]` gains the pool ledger across machines; the cloud record's item 7"),
+    ("node-profile-unguarded", "the profile clause: one of the floor's owner-only writes, behind the guarded command, "
+     "validated at write and at read; the admission clause's one local writer; layer-memory's two node kinds; "
+     "`[planned]`'s layered proof covers the profile"),
+    ("silence-values-no-route", "`run.on-owner-silence` and the owner-item clause: `remind-then-park` and `wait` each "
+     "park the build with its lease released, and v2 `[open]` holds the reading of `wait`"),
+    ("spend-cap-no-outcome", "`build.spend-cap` and the spend clause: a build at a set cap ends as `flow.on-exhausted` "
+     "says"),
+    ("repeat-detector-unkeyed", "`runtime.no-progress`, the ledger clause and the stall record's item 5: a repeat is "
+     "no new witness"),
+    ("ledger-result-overstated", "`gap-rt-40` in the register and the cloud record, and the cloud record's `[shapes]` "
+     "and `[fleet]`: the result carries its live reading and p90 sizing; the admission clause witnesses the reading's "
+     "age"),
+    ("node-ledger-no-schema", "the admission and profile clauses: a versioned schema, a reader refusing a newer major "
+     "version, a project predating the ledgers counted by its beat; layer-memory's node kinds"),
+    ("p40-clauses-no-plant", "dPlacedRequest's request, acquisition and expiry clauses, and dWellOiledMachine's "
+     "harness, profile, scan and lander clauses, each with a red of its own"),
+    ("p39-clauses-no-plant", "dKeptSession's card clause, dCalibratedLens's trend clause, and dWellOiledMachine's "
+     "spend, ledger and waits clauses"),
+    ("max-rounds-no-red", "dDeclaredLoop's convergence clause and dFairHearing's round states: a falling sequence past "
+     "the limit reads CEILING, and one at it BOUNDED"),
+    ("termination-soundness-no-red", "dDeclaredLoop's static check: the self-routing stage with an exit, a dead-end "
+     "stage, an unreachable item and an empty state set"),
+    ("values-no-arm", "dWellOiledMachine's owner-item and admission clauses, and dIndexedDesign's `design.streams` "
+     "clause, each value planted"),
+    ("expiry-reads-later-fact", "dPlacedRequest keeps the observer's clock and the fence primitive; the corrected "
+     "stamp joins dWellOiledMachine's node-registry clause, and the landing red its lander clause; "
+     "`leases.expiry-hours` and the cloud record's item 4"),
+    ("node-arbitration-undefined", "`runtime.admission-scope` and the admission clause: every project charges the "
+     "node's ledgers, which weigh projects by share; each project's gov reads only its own claimable set; the beat "
+     "counts free slots against the profile's capacity"),
+    ("chain-plant-shared-account", "the cloud record's `[chain]`, its plants restated as v2's"),
+    ("silence-applies-loosening", "`run.on-owner-silence`, the owner-item clause and dDeclaredLoop's static check: an "
+     "approval that would loosen a value recommends the decline"),
+    ("push-to-closed-terminal", "`notify.owner-items`, the owner-item clause, and the stall record's item 10 and "
+     "SC-own-5 row: a core-only install reports `push-when-away` with no push channel"),
+    ("reclaim-attended-slots", "dWellOiledMachine's waits clause, the stall record's item 6 and layer-runtime's "
+     "`act-ceiling` fixture: only a launched act's slots are reclaimed at the ceiling"),
+    ("release-kinds-merged", "dPlacedRequest's lease clause: a release is a hand-over or terminal; the hold ceiling "
+     "writes the hand-over and both unlease items the terminal; discovery takes only hand-overs"),
+    ("keep-waiting-uncounted", "flow-steps' `deploy.released` and dShippedRelease's patch-chain clause: the third "
+     "keep-waiting answer per build and landed SHA parks the build, planted"),
+    ("stream-plan-unread", "dTotalRecall registers the stream-plan kind, dIndexedDesign writes it and "
+     "dWellOiledMachine's pick reads it, red on a stream picked out of order; layer-memory's kind row"),
+    ("owner-keys-no-precedence", "both owner keys' rows and flow-steps' `[breakpoint]`: the question key decides when "
+     "the item is raised, the silence key only what stays open at the deadline, its applied recommendation a third "
+     "witness"),
+    ("fence-red-no-interleaving", "dPlacedRequest's fence clause and layer-runtime's `fencing` fixture: the take-over "
+     "between the read and the push, and an unchanged lease ref re-pushed"),
+    ("round-count-no-pair-rule", "`[presets]`' pair rules, dKeptSession's preset clause and the preset check, which "
+     "holds `review.design.round-count` at or below `review.max-rounds`"),
+    ("no-progress-off-by-one", "`runtime.no-progress`'s row reads \"this many\", and the ledger clause plants an item "
+     "at exactly that count"),
+    ("budget-before-design-exit", "`flow.rework-budget`, dDeclaredLoop's budget clause and the stall record's item 1: "
+     "the base alone before Design's exit"),
+    ("fleet-rename-half", "the `adopters` kind, `kits.adopters` and the adopter register in v2, layer-memory, "
+     "layer-expansions, flow-steps, layer-runtime and the gap register; dShippedRelease's rename clause and its two "
+     "readers"),
+    ("beat-renews-lease", "layer-runtime's beat renews only as `leases.renewal` says, with a `renewal` fixture; the "
+     "ledger clause"),
+]
+mapped = [ln.split(" | ")[0].strip("| `") for ln in K.text.split("\n")
+          if ln.startswith("| `") and ln.rstrip().endswith("| fold |") or ln.startswith("| `") and "| fold: " in ln]
+if sorted(mapped) != sorted(d for d, _ in FOLD_ROWS) or len(FOLD_ROWS) != 35:
+    sys.exit(f"the [fold] rows and the [map]'s folds differ: {sorted(set(mapped) ^ {d for d, _ in FOLD_ROWS})}")
+K.text = K.text.rstrip("\n") + "\n" + f"""
+## [summary] The two runs side by side
+
+{FENCE}text
+$ python compare_rounds.py parked-debt-a.md parked-debt-b.md parked-debt-reviews-compared.md session-log.md wf_aeec13f0-079 wf_e27db12b-1f9
+{out}
+{FENCE}
+
+- **Every defect sits in the design text.** None reaches shipped code. Most are an amendment's other half: the cloud and
+  stall folds changed v2 and stopped there, leaving layer-runtime's fence and fixtures, flow-steps' unlease items and
+  route-back rule, and the cloud record's own `[chain]` stating the replaced design.
+- **One run finds about two thirds.** Run A alone covers 22 of the 35 and run B 28, an overlap of 0.43. Chapman's
+  estimate puts about six more beyond both.
+- **Eight defects are high.** Both runs found the fence and the deleted lease high. Run A alone found the tombstone's
+  prune age outrun and the renewal default with no interim, and run B alone found owner silence applying a loosening.
+- **Precision held at 0.79 and 0.90.** Eight refuted findings, on seven defects, have no confirmed twin: the pool
+  label twice, the relaunch cap, the open reading, the coordination record, the two limits on one loop, the clock lag
+  and the proposed key list, each refuted on the record.
+- **The skeptics rewrote four fixes.** All four were run B's, ids 1, 2, 4 and 11, and their corrections fold: the
+  loosening's decline, the profile's guard, the request record's content key and the push channel's report. Run A's
+  skeptics judged all 27 of its fixes sound.
+
+## [fold] The fold plan
+
+Each defect folds as its `[map]` row says, into the records named here. None needs the owner. One reading joins v2
+`[open]` for the owner to confirm: `run.on-owner-silence: wait`, SL-4's "wait, as today", becomes a wait parked with
+the lease released, since P39 gives every wait an outcome, and no preset selects it.
+
+| Defect | Where it folds |
+|---|---|
+""" + "".join(f"| `{d}` | {w} |\n" for d, w in FOLD_ROWS) + f"""
+**Offered and not folded.** Run B's L1 also offered holding `flow.route-backs` beneath `flow.rework-budget`'s base. No
+record states that bound, and wherever the budget is the lower it ends the loop first, as the ceiling does for the round
+count, so there is no stated bound to check.
+
+## [folded] Every defect folded, 2026-10-19
+
+All 35 are folded: in v2's catalogue rows, pair rules, chain rows, `[planned]` and `[open]`; in flow-steps,
+layer-runtime, layer-memory and layer-expansions; in the cloud and stall records; and in the gap register. No key joins
+the catalogue and no gap joins the register. Three kinds join layer-memory: the stream plan, the node profile and the
+node ledger. dTotalRecall gains one clause, the stream-plan kind, off the critical path, which stays at 263 units as at `6ba4eaaa1`.
+The preset check's pair rules gained the round-count rule, seen red first on a planted override. Five bug classes
+record the instances. Every final check passed over the folded records.
+"""
+K.done += 1
+K.save()
+
+# ---- the README's parked decisions --------------------------------------------------------------------------------
+
+RM = Record("memory/builds/dClosedLoop/README.md")
+RM.sub("- **Closing reviews owed, parked by the owner on 2026-10-19:** \"Record the review debt (and any\n"
+       "  previous ones still owed) for now\". At `7e0322a5c`, eight design commits after the whole-design audit\n"
+       "  sit outside every closing review's range, as `review_debt.py` derives them: the review folds\n"
+       "  `67995cb6f`, `6310bda3d`, `1edb2d167` and `a09f1a3b0`, the tag-grammar changes `98f0439ab` and\n"
+       "  `d56d7da4d`, and the stall-and-loop round `ad530a80c` and `7e0322a5c`. One A/B pair over them pays\n"
+       "  it; later design commits join it until then.\n",
+       "- **Closing reviews owed:** none through `6ba4eaaa1`. The pair the owner asked for on 2026-10-19, \"run the\n"
+       "  review pair on the 11 commits, medium effort\", covered the parked debt, and its 35 defects are folded\n"
+       "  (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`). That fold is unreviewed, and\n"
+       "  `review_debt.py` counts it until a closing review covers it.\n", "parked decisions")
+RM.save()
+
+# ---- the bug classes ----------------------------------------------------------------------------------------------
+
+WHERE = (f"It bit again in the parked debt's closing review, 2026-10-19\n"
+         f"(`memory/builds/dClosedLoop/{CMP}`).\n")
+CLASSES = {
+    "amendment-leaves-its-other-half-standing":
+        "The cloud fold put the fenced push and the tombstone on dPlacedRequest and stopped there: layer-runtime still\n"
+        "called the re-read before the push safe, flow-steps' unlease items still deleted the lease, and the cloud\n"
+        "record's own `[chain]` kept a plant from before the owner's fleet. The stall fold left the route-back rule's\n"
+        "owner item standing twice in flow-steps, and two layer-runtime fixtures asserting the outcomes it replaced.\n",
+    "rule-stated-with-no-check-that-fails":
+        "Both rounds' records said each clause was seen red, yet the relayed-consent rule, the stale acquisition, the\n"
+        "declared clock, the twice-reaped instance, the card's budget and the `review.max-rounds` ceiling had no plant\n"
+        "that only they could fail, and the static check's planted stage was one its completion half already caught.\n",
+    "policy-value-with-no-route":
+        "`run.on-owner-silence` offered `remind-then-park` and `wait` with no route, `wait` never ended, and a set\n"
+        "`build.spend-cap` had no outcome at the cap.\n",
+    "step-depends-on-a-later-build":
+        "dPlacedRequest's expiry read a clock offset dWellOiledMachine records, its default renewal mode was armed only\n"
+        "by a later build's ledger, its pushed request record waited on a later build's scan, and its fence's red case\n"
+        "planted a landing only later builds can stage.\n",
+    "two-answers-to-one-question":
+        "`run.on-owner-question` and `run.on-owner-silence` both resolved an open owner item with no precedence, one\n"
+        "release served both a hand-over and a terminal end, and `runtime.no-progress` read \"past it\" in its row and\n"
+        "\"this many\" in its clause.\n",
+}
+for name, body in CLASSES.items():
+    g = Record(f"memory/gotchas/{name}.md")
+    g.insert_before("\n## The fix\n", "\n" + WHERE + body, name)
+    g.save()
+````
+
+### `fix_summary.py`
+
+The comparison record's [summary] corrected once a partition of the 35 counted nine amendments' other halves, where the fold had said most.
+
+````python
+"""The comparison record's [summary] corrected: its first bullet said most defects were an amendment's other half,
+where a partition of the 35 counts nine, beside seven clauses with no check that can fail, four placed on a build that
+cannot yet name what they read, and fifteen holes in what the two rounds designed.
+
+Usage: python -X utf8 fix_summary.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+K = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md")
+K.sub("- **Every defect sits in the design text.** None reaches shipped code. Most are an amendment's other half: the cloud and\n"
+      "  stall folds changed v2 and stopped there, leaving layer-runtime's fence and fixtures, flow-steps' unlease items and\n"
+      "  route-back rule, and the cloud record's own `[chain]` stating the replaced design.\n",
+      "- **Every defect sits in the design text.** None reaches shipped code. Nine are an amendment's other half: the cloud\n"
+      "  and stall folds changed v2 and stopped there, leaving layer-runtime's fence, beat and fixtures, flow-steps' unlease\n"
+      "  items and route-back rule, and the cloud record's own `[chain]` stating the replaced design. Seven are clauses with\n"
+      "  no check that can fail, four sit on a build that cannot yet name what they read, and fifteen are holes in what the\n"
+      "  two rounds designed, among them the node's profile and ledgers, owner silence and the lease's release kinds.\n",
+      "first bullet")
+K.save()
+````
+
+### `log_debt_fold.py`
+
+The session log's event for the pair's comparison and fold.
+
+````python
+"""Record the parked debt's review pair's comparison and fold in the session log's events.
+
+Usage: python -X utf8 log_debt_fold.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: the parked debt's review pair compared and folded, with no agent dispatched
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`). Run A confirmed 27 of its 34
+  findings and run B 43 of 48, on 35 defects, eight of them high, with an overlap of 0.43. All 35 fold into v2, the
+  four layer records, the cloud and stall records and the gap register, and five bug classes record them. The preset
+  check gained the round-count pair rule, seen red on a planted override first. None needs the owner, and v2 `[open]`
+  holds one reading for the owner to confirm: `run.on-owner-silence: wait` waits parked.
+""", "the fold's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
-The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
+The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
 
 ````python
 """Check architecture v2's preset table against its policy catalogue: every presettable key assigned
@@ -21075,15 +22404,17 @@ for k, vals in presets.items():
         if vals[1] != default:
             findings.append(f"{k}: standard = '{vals[1]}' but the catalogue default is '{default}'")
 
-# The away pass's pair rule (its closing review, M1): the deprecation window is at least the currency budget in every
-# preset, so an adopter inside its budget never meets a removed surface. Skipped, and said so, before both keys exist.
-PAIR = ("install.deprecation-window", "currency.max-behind")
-if all(k in presets for k in PAIR):
-    for name, w, b in zip(NAMES, presets[PAIR[0]], presets[PAIR[1]]):
-        if w.isdigit() and b.isdigit() and int(w) < int(b):
-            findings.append(f"pair rule: {name} sets {PAIR[0]} {w} under {PAIR[1]} {b}")
-else:
-    print(f"pair rule {PAIR[0]} >= {PAIR[1]}: not checked, a key is absent")
+# The pair rules, each (higher, lower) in every preset, skipped, and said so, before both keys exist: the away pass's
+# (its closing review, M1), the deprecation window at least the currency budget, so an adopter inside its budget never
+# meets a removed surface; and the parked debt's review's, the round ceiling at least the design review's fixed count.
+PAIRS = [("install.deprecation-window", "currency.max-behind"), ("review.max-rounds", "review.design.round-count")]
+for PAIR in PAIRS:
+    if all(k in presets for k in PAIR):
+        for name, w, b in zip(NAMES, presets[PAIR[0]], presets[PAIR[1]]):
+            if w.isdigit() and b.isdigit() and int(w) < int(b):
+                findings.append(f"pair rule: {name} sets {PAIR[0]} {w} under {PAIR[1]} {b}")
+    else:
+        print(f"pair rule {PAIR[0]} >= {PAIR[1]}: not checked, a key is absent")
 print(f"catalogue keys {len(catalogue)} · presettable {len(expected)} · preset rows {len(presets)}")
 print("\n".join(findings) if findings else "no findings")
 sys.exit(1 if findings else 0)
@@ -21395,9 +22726,15 @@ MINE = [
     ('cloud/fold_cloud_answers.py', "The owner's CL-1 to CL-4 folded: P40, the planned `fleet` expansion, six keys and four preset rows, the seams on six chain rows, sixteen gaps, the planner's `design.streams` item, the two stale statements corrected, and the record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there."),
     ('cloud/log_cloud_answers.py', "The session log's event for the cloud answers and their fold."),
     ('cloud/fold_fleet_shape.py', "The owner's fleet as it runs, folded: a plan's ledger moved to the node across its projects, the node profile and capability filtering, gap-rt-40 restated and gap-rt-46 added, dry-run first on a full copy of the tree with the eight checks green there."),
+    ('cloud/build_args_debt.py', "The args of the parked debt's review pair, dispatches 153 and 154: two full Tier-2 diff reviews of 6ba4eaaa1 over 320c79646 at the owner's medium effort, differing only in the run label, the report path and the scratch path."),
+    ('cloud/log_debt_pair.py', "The session log's dispatch rows 153 and 154, the derived agent lines of both runs and the pair's event."),
+    ('debt/show_clauses.py', "Prints one chain row's clauses, numbered and optionally filtered: how the clauses the pair's findings touch were read before the fold."),
+    ('debt/fold_debt_pair.py', "The parked debt's review pair folded: all 35 confirmed defects into v2's rows, pair rules, chain clauses, [planned] and [open], the four layer records, the cloud and stall records and the gap register, the comparison record's [summary], [fold] and [folded], the README's parked decisions and five bug classes, dry-run first on a full copy of the tree with the eight checks green there."),
+    ('debt/fix_summary.py', "The comparison record's [summary] corrected once a partition of the 35 counted nine amendments' other halves, where the fold had said most."),
+    ('debt/log_debt_fold.py', "The session log's event for the pair's comparison and fold."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
-     "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
+     "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -21559,6 +22896,25 @@ check was designed in, and again after the fold, the check's own planted red lis
 
 """ + block("text", "$ python first_segment_probe.py\n" + read(S / "night2/tag/probe-before.keep") + "\nrc 1")
     + "\n" + block("text", "$ python first_segment_probe.py\n" + read(S / "night2/tag/probe-after.out") + "\nrc 0"))
+# The parked debt's review: the round-count pair rule, re-run red on an override planted in a copy of v2.
+V2 = pathlib.Path(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md").read_text(encoding="utf-8")
+ROW = "| `review.design.round-count` | 2 | 2 | 2 | 2 |"
+if V2.count(ROW) != 1:
+    sys.exit("v2's round-count preset row is not the one the pair-rule plant overrides")
+PLANT = S / "debt/plant/v2-round-count-over.md"
+PLANT.parent.mkdir(parents=True, exist_ok=True)
+PLANT.write_text(V2.replace(ROW, "| `review.design.round-count` | 3 | 2 | 2 | 2 |"), encoding="utf-8", newline="\n")
+out, rc = run(str(S / "preset_check_canonical.py"), str(PLANT))
+if rc != 1 or "pair rule: velocity sets review.max-rounds 2 under review.design.round-count 3" not in out:
+    sys.exit("the round-count pair rule did not red on its plant")
+parts.append("""
+## [pair-rule] The round-count pair rule, red on a planted override
+
+The parked debt's review added `review.design.round-count <= review.max-rounds` to the preset check's pair rules,
+beside the deprecation window's. Planted in a copy of v2: velocity's round count 3, over its ceiling of 2. The check's
+green run on the real table is in `[final]`.
+
+""" + block("text", "$ python preset_check_canonical.py v2-round-count-over.md\n" + out + f"\nrc {rc}"))
 parts.append("""
 ## [plants] The map's and the atlas's plants, re-run
 
@@ -21884,9 +23240,9 @@ landing                 10  dGroundRules (dShippedRelease's), dSafePassage (dShi
 plan                     9  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
 seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
 census                   6  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dPlacedRequest (dLinkedLibrary's), dKeptSession (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
+scope                    6  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dWellOiledMachine (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
-scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
 release                  4  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 spec                     4  dFairHearing (dIndexedDesign's), dDeclaredLoop (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
@@ -21896,9 +23252,9 @@ fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dInd
 review                   3  dGroundRules (dFairHearing's), dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
 commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
-fleet                    3  dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
+adopters                 2  dOrderedCharter (dShippedRelease's), dWitnessedBar (dShippedRelease's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
 routing                  2  dDeclaredLoop (dWitnessedBar's), dKeptSession (dWitnessedBar's)
 ask                      2  dDeclaredLoop (dTotalRecall's), dKeptSession (dTotalRecall's)
@@ -22292,6 +23648,20 @@ rc 0
 ````
 
 
+## [pair-rule] The round-count pair rule, red on a planted override
+
+The parked debt's review added `review.design.round-count <= review.max-rounds` to the preset check's pair rules,
+beside the deprecation window's. Planted in a copy of v2: velocity's round count 3, over its ceiling of 2. The check's
+green run on the real table is in `[final]`.
+
+````text
+$ python preset_check_canonical.py v2-round-count-over.md
+catalogue keys 261 · presettable 235 · preset rows 235
+pair rule: velocity sets review.max-rounds 2 under review.design.round-count 3
+rc 1
+````
+
+
 ## [plants] The map's and the atlas's plants, re-run
 
 ````text
@@ -22456,13 +23826,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2601 nodes in 30 namespaces; 31881 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1794, derived 312, pending 495
-map: no stale facts read 62 records and 26 quotes of a map count or the critical path
+map: 2609 nodes in 30 namespaces; 32065 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1799, derived 312, pending 498
+map: no stale facts read 63 records and 27 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 220 records, 3613 sections, 210 decision sections, 16 comparison areas, 40 principles
+atlas: derived — 223 records, 3694 sections, 210 decision sections, 16 comparison areas, 40 principles
 rc 0
 
 $ fold state
@@ -22480,7 +23850,7 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 488 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+chain rows 21 · owned nodes read 491 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
 left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 118 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
@@ -22527,7 +23897,7 @@ rc 0
 
 $ critical path
 critical path: 263 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 111, dWitnessedBar 122, dKeptSession 138, dTotalRecall 146, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 171, dIndexedDesign 186, dWellOiledMachine 208, dScopedBuild 221, dTendedCadence 224, dMindYourWords 225, dShippedRelease 237, dCalibratedLens 241, dConvergedCharter 263
+each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 111, dWitnessedBar 122, dKeptSession 138, dTotalRecall 147, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 172, dIndexedDesign 187, dWellOiledMachine 208, dScopedBuild 221, dTendedCadence 224, dMindYourWords 225, dShippedRelease 237, dCalibratedLens 241, dConvergedCharter 263
 rc 0
 ````
 

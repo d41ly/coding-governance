@@ -214,6 +214,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 150 | gov-researcher, at the owner's medium effort | Cloud coordination: the agentless head, placing work by load and plan limits with no LLM | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-25-researcher.md` | 1799cb98 | returned, 10m14s, 46.1k out: a head that offers and never assigns; a ledger keyed by plan the real gain; median parallelism inside a build 1.00 | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-mechanical-head.md` |
 | 151 | gov-researcher, at the owner's medium effort | Cloud coordination: the agent-driven head, against a hybrid that calls an LLM role only where judgment is needed | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-26-researcher.md` | 1799cb98 | returned, 11m28s, 51.4k out: a hybrid; an LLM head placed 11 identical runs two ways; its probe ran 17 headless model calls and made one folder outside its scratch, which it removed | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-agent-head.md` |
 | 152 | gov-researcher, at the owner's medium effort | Cloud coordination: the platform's limits, terms, cloud runtimes and security | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-27-researcher.md` | 1799cb98 | returned, 6m56s, 30.5k out: limits per account, not per node; hosted cloud sessions cannot push `refs/gov`; the terms ambiguous, an owner action | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-platform.md` |
+| 153 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses (security, correctness, seams, verification, intent), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The parked review debt, reviewed twice at the owner's word: `6ba4eaaa1` over `320c79646`, the eleven design commits no closing review covered | the args, built by `build_args_debt.py` | 1799cb98 | returned as `wf_aeec13f0-079`, CLEAN WITH FIXES, 27 of 34 confirmed, 25 items, 7 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-parked-debt-a.md` |
+| 154 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses (security, correctness, seams, verification, intent), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The parked review debt, reviewed twice at the owner's word: `6ba4eaaa1` over `320c79646`, the eleven design commits no closing review covered | the args, built by `build_args_debt.py` | 1799cb98 | returned as `wf_e27db12b-1f9`, CLEAN WITH FIXES, 43 of 48 confirmed, 28 items, 3 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-parked-debt-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1661,6 +1663,59 @@ The cloud round's research, dispatches 148 to 152, derived from each run the sam
 - returned — gov-researcher · wrote 0 files · 6m56s · 30.5k out · run direct/a396db6bf0d317394
 ```
 
+The parked debt's closing review, dispatches 153 and 154, derived from each run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/ad2a1b99aa03f23f6
+- returned — workflow-subagent · wrote 0 files · 11s · 1.1k out · run wf_aeec13f0-079/ad2a1b99aa03f23f6
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:security · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/ad1074ba9dbd7b54d
+- returned — gov-diff-reviewer · wrote 0 files · 2m24s · 12.8k out · run wf_aeec13f0-079/ad1074ba9dbd7b54d
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/af8248cdc32367caf
+- returned — gov-diff-reviewer · wrote 0 files · 5m13s · 29.0k out · run wf_aeec13f0-079/af8248cdc32367caf
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/a01d1c251cfc500a0
+- returned — gov-diff-reviewer · wrote 0 files · 5m47s · 29.5k out · run wf_aeec13f0-079/a01d1c251cfc500a0
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/a705d8c4d9c8d827a
+- returned — gov-diff-reviewer · wrote 0 files · 2m35s · 13.8k out · run wf_aeec13f0-079/a705d8c4d9c8d827a
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:intent · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/a3015e74820cef101
+- returned — gov-diff-reviewer · wrote 0 files · 5m08s · 27.2k out · run wf_aeec13f0-079/a3015e74820cef101
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-7 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/aa0a81156345a6331
+- returned — gov-skeptic · wrote 0 files · 1m39s · 9.4k out · run wf_aeec13f0-079/aa0a81156345a6331
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-8-14 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/aa9f4e5a5c0e405c4
+- returned — gov-skeptic · wrote 0 files · 1m32s · 7.8k out · run wf_aeec13f0-079/aa9f4e5a5c0e405c4
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-15-21 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/a2778d332bd1bb330
+- returned — gov-skeptic · wrote 0 files · 1m33s · 8.5k out · run wf_aeec13f0-079/a2778d332bd1bb330
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-22-28 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/abd3df4e397d59cba
+- returned — gov-skeptic · wrote 0 files · 1m27s · 7.3k out · run wf_aeec13f0-079/abd3df4e397d59cba
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-29-34 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_aeec13f0-079/a96b46a9bbde32525
+- returned — gov-skeptic · wrote 0 files · 1m40s · 8.8k out · run wf_aeec13f0-079/a96b46a9bbde32525
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_aeec13f0-079/ab913430cdca9ae18
+- returned — gov-synthesizer · wrote 1 file · 3m01s · 24.9k out · run wf_aeec13f0-079/ab913430cdca9ae18
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/ae172d2e3a0f45a9d
+- returned — workflow-subagent · wrote 0 files · 15s · 1.4k out · run wf_e27db12b-1f9/ae172d2e3a0f45a9d
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:security · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/afeae962dfb351441
+- returned — gov-diff-reviewer · wrote 0 files · 3m12s · 17.6k out · run wf_e27db12b-1f9/afeae962dfb351441
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/af6139df4eb00e0f9
+- returned — gov-diff-reviewer · wrote 0 files · 5m18s · 30.5k out · run wf_e27db12b-1f9/af6139df4eb00e0f9
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/a5201bca321ff26fe
+- returned — gov-diff-reviewer · wrote 0 files · 5m33s · 29.8k out · run wf_e27db12b-1f9/a5201bca321ff26fe
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/a459d07a6ad7350ef
+- returned — gov-diff-reviewer · wrote 0 files · 4m09s · 20.1k out · run wf_e27db12b-1f9/a459d07a6ad7350ef
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:intent · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/a0ef0ed2f9c5e1bde
+- returned — gov-diff-reviewer · wrote 0 files · 6m43s · 35.6k out · run wf_e27db12b-1f9/a0ef0ed2f9c5e1bde
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-10 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/aec4286341af3fdeb
+- returned — gov-skeptic · wrote 0 files · 2m15s · 12.6k out · run wf_e27db12b-1f9/aec4286341af3fdeb
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-11-20 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/a96d29b48b62d6ac7
+- returned — gov-skeptic · wrote 0 files · 2m33s · 14.0k out · run wf_e27db12b-1f9/a96d29b48b62d6ac7
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-21-30 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/a882d85431b333960
+- returned — gov-skeptic · wrote 0 files · 2m12s · 10.4k out · run wf_e27db12b-1f9/a882d85431b333960
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-31-40 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/a3f50e57e22aa9e0a
+- returned — gov-skeptic · wrote 0 files · 2m04s · 11.5k out · run wf_e27db12b-1f9/a3f50e57e22aa9e0a
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-41-48 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_e27db12b-1f9/a5ce7dc9df7e9a8f7
+- returned — gov-skeptic · wrote 0 files · 2m24s · 12.6k out · run wf_e27db12b-1f9/a5ce7dc9df7e9a8f7
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_e27db12b-1f9/a9a2219aa0744a7c6
+- returned — gov-synthesizer · wrote 1 file · 3m36s · 30.2k out · run wf_e27db12b-1f9/a9a2219aa0744a7c6
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2795,6 +2850,20 @@ The cloud round's research, dispatches 148 to 152, derived from each run the sam
   each node has a subscription of its own, at its own tier, and serves the same or different projects. The design had
   assumed nodes sharing one account. The fold moves a plan's ledger to the node, spanning its projects, adds the node
   profile and capability filtering to dWellOiledMachine, restates `gap-rt-40` and adds `gap-rt-46`.
+
+- 2026-10-19, session 1799cb98: the owner's "run the review pair on the 11 commits, medium effort": two full diff
+  reviews, one after the other, over `6ba4eaaa1` against `320c79646`, the one range that holds all eleven parked
+  commits. The three rounds already reviewed inside it were named to the reviewers as context. Full, not the earlier
+  pairs' light, because the security and intent lenses that light skips are the ones the cloud round's seams and the
+  owner's answers need. Run A's report was moved out of the tree while run B ran, and restored byte for byte after
+  (sha256 `6a8baab0c76c`).
+
+- 2026-10-19, session 1799cb98: the parked debt's review pair compared and folded, with no agent dispatched
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`). Run A confirmed 27 of its 34
+  findings and run B 43 of 48, on 35 defects, eight of them high, with an overlap of 0.43. All 35 fold into v2, the
+  four layer records, the cloud and stall records and the gap register, and five bug classes record them. The preset
+  check gained the round-count pair rule, seen red on a planted override first. None needs the owner, and v2 `[open]`
+  holds one reading for the owner to confirm: `run.on-owner-silence: wait` waits parked.
 
 ## Instruments
 

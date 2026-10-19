@@ -327,7 +327,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   | Answer | What it carries | What the supervisor does |
   |---|---|---|
   | `act` | the frontier's items, each with its act: the item, its actor kind, its work order's key and `task-sha`, its harness, and the outcome table it routes on | runs each act |
-  | `awaiting` | each awaited item, with the event or record it waits on | holds, and asks again when that event fires. A build that still holds its lease renews it; one whose lease `deploy.unlease` deleted holds none, and its wait belongs to its event wake and the ceiling sweep (`[schedule]`). It raises no owner item itself: a wait with a ceiling is raised by the supervisor's sweep (`[supervise]`) |
+  | `awaiting` | each awaited item, with the event or record it waits on | holds, and asks again when that event fires. A build that still holds its lease renews it; one whose lease `deploy.unlease` closed with a terminal tombstone holds none, and its wait belongs to its event wake and the ceiling sweep (`[schedule]`). It raises no owner item itself: a wait with a ceiling is raised by the supervisor's sweep (`[supervise]`) |
   | `blocked` | each blocked item, with what blocks it | raises an owner item once nothing the item waits on is in flight |
   | `terminal` | all work terminal | closes the run; the two runs left at BUILDING were this case |
   | `stuck` | no frontier, while the build is not terminal | raises an owner item at once |
@@ -369,7 +369,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - Preflight refuses a node that declares itself a run host without that registration.
   - A desktop scheduled task wakes a model session, so it can host an act but never the supervisor.
   - The desktop durable-restart task (`RESUME_SCHEDULE_*`) retires.
-- **Each beat:** read the owner's controls, ask `next`, act on its answer, renew the lease, and journal.
+- **Each beat:** read the owner's controls, ask `next`, act on its answer, renew the lease as `leases.renewal`
+  says, and journal. The beat is liveness and renews nothing by itself: under the default `progress` the lease
+  renews on a witnessed item boundary or a declared wait inside its deadline (P39). Revised 2026-10-19 by the
+  parked debt's review: every beat renewed the lease, so a looping supervisor kept it for ever.
 - **Act sessions.** For each role act, the supervisor first cuts the work order fresh through
   dBoundRoles' renderer (P29). Then it launches one `claude -p`:
   - in the act's workspace (`[isolate]`), since a launch fixes its working directory;
@@ -398,31 +401,36 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 - **Session limits.**
   - stall-recorder's StopFailure record is the limit signal.
   - The supervisor parses the reset time from the limit message, holds new launches until then, and
-    keeps renewing its lease.
+    keeps renewing its lease, the hold being a declared wait inside its deadline.
   - A weekly limit can hold for days. So once the hold passes `runtime.hold-ceiling`, the supervisor
-    raises an owner item and releases the build's lease, so a node with quota takes the build over, and its wake
+    raises an owner item and releases the build's lease as a hand-over, so a node with quota takes the build over, and its wake
     tick stops firing into the refused turn. Revised 2026-10-19 (P39): it kept holding, and today's held run
     woke a session 115 times over 4.8 days.
-- **Fencing.** Revised: 2026-10-17, the debt round's fold.
-  - Each lease carries an epoch in dDeclaredLoop's lease grammar, bumped at every take-over. One name
-    per lease: the build lease (which the first draft also called the run lease), the unit lease, and
-    the cadence lease, which an event wake takes for its instance (`[schedule]`).
+- **Fencing.** Revised: 2026-10-17, the debt round's fold, and 2026-10-19 by the parked debt's review (P40).
+  - Each lease carries an epoch in dPlacedRequest's lease grammar, bumped at every take-over and never reset,
+    since a release writes a hand-over or a terminal tombstone and never deletes the ref. One name per lease:
+    the build lease (which the first draft also called the run lease), the unit lease, and the cadence lease,
+    which an event wake takes for its instance (`[schedule]`).
   - Each act session's `--session-id` is recorded with the epoch it serves.
-  - The commit queue and the lander's prepare refuse a stale epoch at once, since each re-reads the
-    lease from the remote. The dispatcher's PermissionRequest decision refuses a gated call once the
-    lease ref it reads shows the epoch stale, which across nodes is no later than the refresh below
-    (`[act]`). Revised 2026-10-17, the folds' closing review: this bullet once claimed the dispatcher refused at once.
-  - **Where the epoch is read.** The dispatcher reads the lease ref in its clone, which the supervisor
-    refreshes from the remote at each beat, since `next` reads the lease witnesses. A supervisor that
-    finds its lease taken over kills the act sessions it launched under the old epoch. With no
-    supervisor beating there, the node tick restarts one within its period, and that one does the
-    same. Until then an old session's gated calls touch only its own workspace: the commit queue and
-    the lander's prepare re-read the epoch from the remote before they commit or push.
+  - **The fence travels with the effect.** Every push the commit queue and the lander make carries the
+    holder's new lease beat in one `git push --atomic` under `--force-with-lease=<lease>:<tip seen>`, so a
+    holder replaced between its read of the lease and its push lands nothing, and the branch is left unchanged.
+    A re-read of the epoch before the push is evidence only, never the fence, and a re-push of an unchanged
+    lease ref is no fence either, since the remote never sees it (P2(c′)).
+  - **Where the epoch is read.** The dispatcher's PermissionRequest decision reads the lease ref in its clone,
+    which the supervisor refreshes from the remote at each beat, since `next` reads the lease witnesses, and
+    refuses a gated call once that ref shows the epoch stale, within one node-tick period across nodes
+    (`[act]`). A supervisor that finds its lease taken over kills the act sessions it launched under the old
+    epoch. With no supervisor beating there, the node tick restarts one within its period, and that one does
+    the same. Until then an old session's gated calls touch only its own workspace, and the fence refuses its
+    push.
 
-  So a take-over is safe while the old node's act sessions still run. It is safe under clock skew too
-  (node d runs 8 to 13 s slow), because correctness rests on the epoch, never on two clocks agreeing.
-  On the same node, a take-over kills the old process tree first. Across nodes, an old session stops at
-  its next refused call.
+  So a take-over is safe while the old node's act sessions still run, because nothing they did reaches the
+  remote without the fence. Expiry is judged by a declared clock, never by the reader's clock against the
+  holder's stamp (P40). On the same node, a take-over kills the old process tree first. Across nodes, an old
+  session stops at its next refused call or push. Revised 2026-10-19 by the parked debt's review: the commit
+  queue and the lander's prepare re-read the epoch from the remote and then pushed, which P2(a) showed landing
+  a replaced holder's stale work (`gap-conc-12`), and the clock-skew claim rested on two clocks.
 - **Every command item is idempotent, or it reconciles.** Each command adapter's witness contract
   declares which. A reconcile probe detects an effect that landed without its witness:
   - the lander checks whether origin already holds the expected sha;
@@ -451,9 +459,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 - **Supervision.** On each beat, the supervisor:
   - runs `reap.py --sweep` under `PROCMON_REAP_MODE` (reap-orphans here);
   - reaps act sessions past `runtime.act-ceiling`;
-  - expires leases past `leases.expiry-hours` and prunes terminal run claims (`refs/gov/runs/*`),
-    through dDeclaredLoop's coordination verbs. It never prunes `refs/gov/claims/*`, where a slug's
-    claim lives (layer-memory `[contract]`);
+  - expires leases past `leases.expiry-hours`, judged by the declared clock, and prunes a terminal tombstone, a
+    run claim's (`refs/gov/runs/*`) among them, only once it is older than `leases.queued-claim-days` (P40),
+    through dPlacedRequest's coordination verbs. It never prunes `refs/gov/claims/*`, where a slug's claim lives
+    (layer-memory `[contract]`);
   - raises the release hold's owner item for each `deploy.released` wait that has outlived
     `build.release-ceiling`, counted from the landing record or from the owner's last keep-waiting
     answer, through the notification adapter. The item is keyed by (build, landed SHA), and the sweep
@@ -766,7 +775,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 ### [schedule] The scheduler
 
 - **Runtime runs the cadence items that their layers declare.** These are Maintain's detectors, the
-  weekly Loop Review, distribution's kit release, currency probe and fleet reading, lease and claim
+  weekly Loop Review, distribution's kit release, currency probe and adopter reading, lease and claim
   sweeps, and the nightly held bar. Each runs where its owner's key says:
   - `maintain.host` (session-start, os-scheduler, cloud-routine) for Maintain's items and the Loop
     Review;
@@ -893,7 +902,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 | Tag | Guarantee | Observed by |
 |---|---|---|
 | `pure-position` | Position is a pure function of the declaration, the witnesses and the policy, the same in every mode. It is Flow's, and Runtime relies on it. | `next` |
-| `named-acts` | Every act was named by `next`. An unnamed Workflow, Agent or transition call is refused, and so is a shell call outside the act's allowance. An unnamed agent inside an admitted script voids its act's witness. A stale epoch is refused at the commit queue and the lander at once, and at the dispatcher once its lease ref refreshes, within one node-tick period across nodes. | `binding`, `fencing` |
+| `named-acts` | Every act was named by `next`. An unnamed Workflow, Agent or transition call is refused, and so is a shell call outside the act's allowance. An unnamed agent inside an admitted script voids its act's witness. A stale holder's push is refused at the remote by the fenced effect push, never by a re-read before it, and a stale epoch is refused at the dispatcher once its lease ref refreshes, within one node-tick period across nodes (P40). | `binding`, `fencing` |
 | `once-per-instance` | An item instance whose witness is current never runs again, and an unwitnessed one can always be dispatched again. Every command is idempotent or reconciles. | `relaunch`, `idempotence`, `act-ceiling`, `coverage` |
 | `persisted-returns` | No result exists only in memory: every return is persisted through `record` before its item counts as done. | `spike`, `returns` |
 | `no-model-context` | Neither the decider nor the supervisor holds model context. | by construction: both are programs |
@@ -1080,7 +1089,7 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - an empty frontier with all work terminal answers `terminal`, and one with work open answers `stuck`;
   - a corrupt witness answers `invalid-input`, naming its path;
   - a frontier holding only a hook item answers `awaiting`;
-  - an unleased build waiting at `deploy.released` answers `awaiting`, and no lease ref is written;
+  - a build whose lease is terminal, waiting at `deploy.released`, answers `awaiting`, and no lease is acquired;
   - a blocked item whose blocker is in flight raises no owner item until the blocker ends, then raises
     exactly one;
   - an unreadable lease ref answers `stale-remote`, and the item parks once `leases.expiry-hours`
@@ -1113,8 +1122,11 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`limits`:**
   - in a partial fan where some of k agents return null, the returns persist, the nulls become
     `deferred-platform`, and the relaunch re-pays only the nulls;
-  - on a StopFailure limit record, the supervisor parses the reset time, holds, renews its lease, and
-    raises an owner item once `runtime.hold-ceiling` passes.
+  - on a StopFailure limit record, the supervisor parses the reset time, holds and renews its lease inside the
+    hold's deadline. Once `runtime.hold-ceiling` passes, it raises an owner item and releases the lease as a
+    hand-over, a second node takes the build over, and the wake tick stops. It is red while the lease is still
+    held or the tick fires again. Revised 2026-10-19 by the parked debt's review: it asserted the hold kept and
+    the lease renewed past the ceiling, which P39 replaced.
 - **`in-flight`:**
   - with `runtime.agents-in-flight` at 3 (`FANOUT_CAP=3` until the night pass two's point 7), the supervisor queues an act whose declared fan exceeds the free slots, and the
     attended PreToolUse entry queues the same call, held there within the spike's hold case and past it sent through the executor's queue, red when a call outliving the hold starts over the limit or is refused without a reason (the owner's NT-28, the answers' review);
@@ -1170,7 +1182,9 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
 - **`cadence`:** node A runs a period's item, and node B, waking late, skips it. A missed period runs at
   the next wake. Two supervisors released together on one period make one run and one witness.
 - **`act-ceiling`:** a stub act session sleeping past a lowered `runtime.act-ceiling` is reaped,
-  journaled and relaunched under the cap.
+  journaled and relaunched under the cap. A slot a launched act holds past the ceiling is reclaimed with a stall
+  record, and an attended Workflow running past it keeps its slots, its stall record written and nothing
+  reclaimed (the parked debt's review).
 - **`grant`:** an adapter whose granted scope is wider than its declared one is refused at registration,
   seen red on a probe stubbed to accept it.
 - **`journal-retention`:** under `runtime.journal: N`, entries planted at N-1 and N+1 days: the node
@@ -1211,16 +1225,27 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   fresh session. If it is red, the remedy is a leaner launch, since one session per act is structural.
 - **`no-skip`:** a class check over every launcher's argv fails on `--dangerously-skip-permissions`. It
   is seen red on today's `resume-tick.sh:385`.
-- **`fencing`:** run across two nodes, or with the old act session outside the killed tree. Kill only the
-  supervisor mid-act, and let a second supervisor take over with a new epoch. Until the old node's tick
-  restarts a supervisor, the old act session's gated calls are approved in its own workspace, and its
-  commit and push are each refused, the refusal the one in its journal. Once the restarted supervisor
-  reads the take-over, it kills the old session, and a gated call made after the refresh is refused.
-  One witness and one commit result. Revised 2026-10-17, the folds' closing review: this fixture once asserted the next gated call refused at once.
+- **`fencing`:** run across two nodes, or with the old act session outside the killed tree. The old holder
+  reads the lease tip, and a second supervisor takes the build over with a new epoch before the holder pushes.
+  The holder's push, carrying its lease beat under `--force-with-lease` on the tip it read, is refused at the
+  remote, and the branch is unchanged. It is red on a push that re-reads the epoch and then pushes, and on one
+  that re-pushes its unchanged lease ref in place of a new beat, which the remote never checks (P2(c′)). Until
+  the old node's tick restarts a supervisor, the old act session's gated calls are approved in its own
+  workspace. Once the restarted supervisor reads the take-over, it kills the old session, and a gated call made
+  after the refresh is refused. One witness and one commit result. Revised 2026-10-17, the folds' closing
+  review: this fixture once asserted the next gated call refused at once. Revised 2026-10-19 by the parked
+  debt's review: the take-over came before the old session's commit, never between its read and its push.
 - **`idempotence`:** kill the supervisor after the lander's push and before its witness. The take-over's
   reconcile probe finds origin at the expected sha, and nothing pushes twice.
-- **`relaunch-cap`:** a stub CLI that always exits at `--max-turns` parks the item after
-  `RESUME_ATTEMPTS` launches, with a journaled reason and an owner item.
+- **`relaunch-cap`:** a stub CLI writes a transcript entry every turn, always exits at `--max-turns` and never
+  produces a witness. Relaunches stop at `RESUME_ATTEMPTS` over the instance's life, never reset by a transcript
+  entry, and the item draws on the build's rework budget and routes to its producer, with no park. An instance
+  reaped twice at `runtime.act-ceiling` with no new witness routes to its producer to be split. It is red on a
+  cap that a transcript entry resets, on a park or an owner item past the cap, and on a third launch after two
+  reaps. Revised 2026-10-19 by the parked debt's review: it asserted the park and the owner item P39 replaced.
+- **`renewal`:** a planted holder whose acts write commits and transcripts but never a witness loses its lease
+  after `leases.expiry-hours` while its supervisor keeps beating. It is red while the lease renews (the parked
+  debt's review).
 - **`host`:**
   - kill the supervisor, then reboot the node, and the node tick restarts it within one period;
   - preflight refuses a run-host node without the tick's registration.
