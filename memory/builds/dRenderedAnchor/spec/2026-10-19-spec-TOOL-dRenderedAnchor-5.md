@@ -1,6 +1,6 @@
 # TOOL-dRenderedAnchor-5 — the closing review's round-4 findings on unit 4 closed as one batch, with no review round after it
 
-**Status:** SPECCED · rev-1 · 2026-10-19 · node d · Tier-1 · base 2ac25483 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-10-19 · node d · Tier-1 · base 2ac25483 · streams tooling
 
 <!-- gen:spec-records -->
 
