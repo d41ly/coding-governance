@@ -216,6 +216,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 152 | gov-researcher, at the owner's medium effort | Cloud coordination: the platform's limits, terms, cloud runtimes and security | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-27-researcher.md` | 1799cb98 | returned, 6m56s, 30.5k out: limits per account, not per node; hosted cloud sessions cannot push `refs/gov`; the terms ambiguous, an owner action | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-platform.md` |
 | 153 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses (security, correctness, seams, verification, intent), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The parked review debt, reviewed twice at the owner's word: `6ba4eaaa1` over `320c79646`, the eleven design commits no closing review covered | the args, built by `build_args_debt.py` | 1799cb98 | returned as `wf_aeec13f0-079`, CLEAN WITH FIXES, 27 of 34 confirmed, 25 items, 7 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-parked-debt-a.md` |
 | 154 | `tier2-review.js`, diff review, full: five `gov-diff-reviewer` lenses (security, correctness, seams, verification, intent), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The parked review debt, reviewed twice at the owner's word: `6ba4eaaa1` over `320c79646`, the eleven design commits no closing review covered | the args, built by `build_args_debt.py` | 1799cb98 | returned as `wf_e27db12b-1f9`, CLEAN WITH FIXES, 43 of 48 confirmed, 28 items, 3 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-parked-debt-b.md` |
+| 155 | gov-researcher, at the owner's medium effort | The final questions: the whole-design audit, what earlier audits covered and the workflow that walks the design step by step | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-28-researcher.md` | 1799cb98 | returned, 14m53s, 73.7k out: a paired walk sliced by scenario and by step, graded on planted past defects; 41% of the design records' lines read by no review; it rebuilt memory-recall's derived cache under the git common directory, outside its scratch folder | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-audit.md` |
+| 156 | gov-researcher, at the owner's medium effort | The final questions: the control that the whole design is specced as planned | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-29-researcher.md` | 1799cb98 | returned, 18m11s, 76.0k out: no join from a clause to its spec; minted clause ids pinned by hash and a join, its prototype red on eight plants; 218 owned nodes named in no clause of their owner | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-coverage.md` |
+| 157 | gov-researcher, at the owner's medium effort | The final questions: spec deviation, its log and its reflection in what ships | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-30-researcher.md` | 1799cb98 | returned, 13m00s, 61.4k out: deviations recorded in four places and gated in none; a typed record, a frozen baseline and a generated as-built view | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-deviation.md` |
+| 158 | gov-researcher, at the owner's medium effort | The final questions: human-readable help, the plan as designed and when its gate lands | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-31-researcher.md` | 1799cb98 | returned, 11m06s, 52.7k out: help gated only at the chain's last build; a fingerprinted docs leg on dSafePassage, generated reference, rendered rationale for the owner to rule on | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-help.md` |
+| 159 | gov-researcher, at the owner's medium effort | The final questions: the atlas in the repository, what it shows and how it stays current | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-32-researcher.md` | 1799cb98 | returned, 9m33s, 46.4k out: generated Markdown and Mermaid pages under `help/atlas/` from the node table, owned by dTotalRecall, 275 KB measured | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-atlas.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1716,6 +1721,21 @@ The parked debt's closing review, dispatches 153 and 154, derived from each run 
 - returned — gov-synthesizer · wrote 1 file · 3m36s · 30.2k out · run wf_e27db12b-1f9/a9a2219aa0744a7c6
 ```
 
+The final questions' research, dispatches 155 to 159, derived from each run the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-28-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-28-researcher.md) · writes none · gates none · run direct/a888f19c4297c3b99
+- returned — gov-researcher · wrote 0 files · 14m53s · 73.7k out · run direct/a888f19c4297c3b99
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-29-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-29-researcher.md) · writes none · gates none · run direct/a8b1ad91de5cf0a85
+- returned — gov-researcher · wrote 0 files · 18m11s · 76.0k out · run direct/a8b1ad91de5cf0a85
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-30-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-30-researcher.md) · writes none · gates none · run direct/a135ed6baa07eb4b6
+- returned — gov-researcher · wrote 0 files · 13m00s · 61.4k out · run direct/a135ed6baa07eb4b6
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-31-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-31-researcher.md) · writes none · gates none · run direct/a8539c60e3b183f4a
+- returned — gov-researcher · wrote 0 files · 11m06s · 52.7k out · run direct/a8539c60e3b183f4a
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-32-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-32-researcher.md) · writes none · gates none · run direct/a1c84ad8ef2319584
+- returned — gov-researcher · wrote 0 files · 9m33s · 46.4k out · run direct/a1c84ad8ef2319584
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2864,6 +2884,14 @@ The parked debt's closing review, dispatches 153 and 154, derived from each run 
   four layer records, the cloud and stall records and the gap register, and five bug classes record them. The preset
   check gained the round-count pair rule, seen red on a planted override first. None needs the owner, and v2 `[open]`
   holds one reading for the owner to confirm: `run.on-owner-silence: wait` waits parked.
+
+- 2026-10-19, session 1799cb98: the owner closed the design pass with five questions, recorded verbatim in `build/2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md`
+  `[words]`. Five researchers took one question each, dispatches 155 to 159, at the owner's medium effort, and their
+  returns are saved beside the record. The record answers the five, shows the mechanism under questions 2 to 5
+  (minted clause ids, what each spec carries, a design baseline, deviation records and an as-built view), sets the
+  order from here to the first chain spec, proposes seven gaps, and puts FQ-1 to FQ-8 to the owner. Dispatch 155
+  rebuilt memory-recall's derived cache under the git common directory, outside its scratch folder; nothing tracked
+  changed. The atlas stands at version 69, published after the parked debt's fold.
 
 ## Instruments
 

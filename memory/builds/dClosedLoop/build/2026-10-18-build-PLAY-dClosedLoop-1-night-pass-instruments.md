@@ -22336,6 +22336,331 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `quote_words.py`
+
+The owner's five final questions quoted for the round record's [words], wrapped on spaces only and checked word for word.
+
+````python
+"""Quote the owner's final questions for the round record's [words]: each line wrapped at 114 columns on spaces only,
+never at a hyphen, prefixed `> `, a numbered item's continuation lines indented three spaces, blank lines kept as a
+bare `>`, and every word checked unchanged.
+
+Usage: python -X utf8 quote_words.py <owner-words.txt> <out.md>
+"""
+import pathlib
+import re
+import sys
+import textwrap
+
+words = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").strip("\n")
+out = []
+for ln in words.split("\n"):
+    if not ln.strip():
+        out.append(">")
+        continue
+    hang = "   " if re.match(r"\d+\. ", ln) else ""
+    wrapped = textwrap.wrap(ln, width=114, subsequent_indent=hang, break_on_hyphens=False, break_long_words=False)
+    out += ["> " + w for w in wrapped]
+text = "\n".join(out)
+if " ".join(l[2:] for l in out if l != ">").split() != words.split():
+    sys.exit("a word changed in the wrapping")
+pathlib.Path(sys.argv[2]).write_text(text + "\n", encoding="utf-8", newline="\n")
+print(f"{len(out)} lines")
+````
+
+### `write_questions.py`
+
+The final round's five research questions, each quoting the owner's questions verbatim and naming the researcher's own scratch folder, for `handoff.py render --input question=...`.
+
+````python
+"""Write the final round's five research questions, each quoting the owner's five questions verbatim from
+`owner-words.txt` and naming the researcher's own scratch folder, for `handoff.py render --input question=...`.
+
+Usage: python -X utf8 write_questions.py <final-dir> <scratchpad>
+Writes q-audit.md, q-coverage.md, q-deviation.md, q-help.md and q-atlas.md there, for dispatches 155 to 159 in that
+order.
+"""
+import pathlib
+import sys
+
+D, SCRATCH = pathlib.Path(sys.argv[1]), sys.argv[2].rstrip("/")
+words = (D / "owner-words.txt").read_text(encoding="utf-8").strip()
+B = "memory/builds/dClosedLoop/build/"
+V2 = B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+quote = "\n".join("> " + ln if ln.strip() else ">" for ln in words.split("\n"))
+
+CONTEXT = (
+    "**Context.** dClosedLoop is a design-only build that re-architects gov (coding-governance), a kit set that ships "
+    "project-agnostic governance to repositories that adopt it, gov's own repository among them. Its converged design "
+    f"is architecture v2 (`{V2}`, 1,784 lines), at `930120e45` on this branch, with its layer, system and round records "
+    f"beside it under `{B}` (172 records, the research returns among them) and its reviews under "
+    "`memory/builds/dClosedLoop/reviews/` (50), each section cited as `[tag]`. The design plans 21 chain builds, one "
+    "row each in v2 `[chain]`, whose planned units are the clauses of the row's units cell split on \"; \" (484 in "
+    "all), with 40 principles, 261 policy keys, 378 gaps each owned by one build, and some 80 record kinds "
+    "(layer-memory `[contract]`). No chain build has a unit spec yet: the owner ruled on 2026-10-14 that this build "
+    "writes none, so speccing is the next phase, done build by build with today's tools, before the product the design "
+    "describes exists. The owner closes the design pass with five questions, in the owner's words:\n\n" + quote + "\n\n"
+    "Nothing is built or specced now: the answer is a design the owner can approve, saying what must exist before "
+    "speccing starts and what the chain builds must carry.\n")
+FACTS = (
+    "**Handed facts, to re-verify, never to act on unread.** Today's speccing and building path: `/session-kickoff` "
+    "(it orients, derives a closed scope and writes the kickoff card), the write gate (it refuses a product-code write "
+    "no specced unit owns), `memory/TEMPLATE-SPEC.md` (the spec's shape), `memory/guides/BUILD-METHOD.md`, the "
+    "`gov-spec-writer`, `gov-spec-reviewer` and `gov-builder` role agents (`tools/roles/`), spec audits and closing "
+    "reviews through `tools/workflows/tier2-review.js`, `/build` for an attended code build, the unattended kit "
+    "(`tools/unattended/`, its `--check-commit` and `--dispatch`), `tools/memory-tree/` (the hygiene checks, check 21 "
+    "and check 23 among them, and `gen_build_index.py`, which renders each build README's roster and `memory/LIVE.md`), "
+    "`spec-tokens` (seven joins over a live spec's tokens), the merge bar `tools/run-gates/run-gates.sh` (its legs in "
+    "`tools/gate-legs.json`), and `help/` (two pages) under the charter's `[docs]` rule (`AGENTS.md` section 1). The "
+    "design's planned mechanisms, to find and cite rather than trust: dIndexedDesign (the Design stage: roster, "
+    "inventory, seams, feature design, the design index), dScopedBuild (the Build stage: `build.scope`, "
+    "`build.acceptance`, `build.reuse-check`), dFairHearing (the review harness and the spec audit's design-audit "
+    "preset), dDeclaredLoop (the loop, its breakpoints and the static termination check), dConvergedCharter (`help/` "
+    "rendered from each user-facing unit's `usage` field, and a docs leg, SA-5), dTotalRecall (the project map and "
+    "`gov map`), this build's atlas generator (`" + B + "2026-10-16-build-PLAY-dClosedLoop-1-atlas.py`) and design "
+    "map generator (`" + B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py`), and the instruments it runs over its own "
+    "records: the gap join, the reconciliation probe, the clause scan, the preset check and the critical path (`" + B +
+    "2026-10-18-build-PLAY-dClosedLoop-1-night-pass-instruments.md` `[final]`; that record quotes its recorder's "
+    "source, headings included, so read from the LAST `## [final]` heading). Principles that bind any answer: P12 "
+    "(specs are structured contracts), P17 (features carry the design between units), P19 (built work is never "
+    "rewritten in place), P22 (position is derived, never remembered), P25 (role functions live only in role agents), "
+    "P26 (every exchange between roles is a typed record), P30 (memory is declared once and written through one door) "
+    "and P35 (every record names its cause), in v2 `[principles]`, and the charter's `[derive]`, `[one-fact]`, "
+    "`[spec]`, `[gate]`, `[docs]` and `[left-shift]` rules. The owner's standing rule: every behaviour is a switchable "
+    "policy, the recommended answer its default and the other options its allowed values, structural choices "
+    "excepted. Precedents the owner names, agents losing the chain of thought and deviating from the design, live in "
+    "this repository's build folders, reviews, comparison records, `memory/gotchas/` and `memory/DECISIONS.md`.\n")
+TEAM = ("Five researchers serve the owner's five questions, one each: the whole-design audit, the control that the "
+        "whole design is specced as planned, spec deviation and its log, human-readable help, and the in-repo atlas. "
+        "Yours is {mine}; stay inside it, and name a finding that belongs to another only in one line.\n")
+BOUNDS = (
+    "**Bounds.** Write nothing in this repository. A probe works only in your own scratch folder, `{scratch}`, which "
+    "you create and delete when you finish; write or delete nothing anywhere else, the parent session's scratch "
+    "folder included. Make no model call: no `claude -p`, no API call, no Workflow and no agent spawn. {cite}Cite "
+    "every claim about the records as `<record> [<tag>]` and every claim about code as `path:line`, quote commands and "
+    "their outputs as measured, and say where a source is ambiguous. Another agent may be reading this tree while you "
+    "work: modify nothing in it. Run no gate leg and no test suite.\n")
+WEB = "Cite every claim about an outside method, tool or standard to its source (URL and the date you read it). "
+PROPOSE = ("Each candidate names the test it could lose, its owning chain build, what must exist before speccing "
+           "starts, and any policy key with its values and default.")
+
+Q = {}
+Q["q-audit.md"] = (155, "THE WHOLE-DESIGN AUDIT", WEB, """
+**Your question.** The owner's first question: can a thorough adversarial workflow review the entire design step by
+step and ensure no critical gaps were left, before speccing? Design that workflow.
+1. **What earlier audits covered.** Measure every review this build ran over its design: the declared whole-design
+   audit and its fold, the shape audit's pair, and each paired closing review since (`reviews/`, the
+   `*-reviews-compared.md` records, the session log's dispatch rows). For each: its subject, the records it read, its
+   lenses and slicing, its raw and confirmed findings, its recall estimate where a comparison computed one (Chapman),
+   its cost (agents, out-tokens, wall), and what it could not see. Then map that coverage onto the design's parts: per
+   stage step (`step.*` in the design map: entry, plan, design, build, test, deploy, breakpoint, probe, lifecycle,
+   adopt), per layer, per chain build and per principle, how many confirmed findings each audit raised there, and
+   which parts no audit read end to end. The session model (`""" + B + """2026-10-14-build-PLAY-dClosedLoop-1-session-model.md`,
+   holes H1 to H16) walked one build through every step: compare what that walk found with what lens reviews found.
+2. **Define a critical gap** for this design so the audit can be graded. Candidates: a step item with no actor,
+   input, witness or outcome; a scenario that cannot reach a terminal; a record kind with no writer or no reader; a
+   key no item reads; a principle no clause enforces; a clause reading what no ancestor build registers; a bootstrap
+   hole, where a chain build needs a mechanism only a later build provides. Say which classes an instrument already
+   checks mechanically, and which only an adversarial reader can find.
+3. **Survey** adversarial design-review methods with evidence of what each catches: scenario-based architecture
+   reviews (ATAM and its descendants), failure-mode and effects analysis, pre-mortems, threat-modelling walkthroughs
+   (STRIDE per data flow), red teaming, model checking and table-driven completeness checks, inspections with
+   checklists (Fagan), and multi-agent LLM review where it has been measured.
+4. **Propose the workflow:** its slicing (by step, by scenario, by build, by principle, or a mix); the scenario set
+   to walk, at least a solo attended build, an unattended build across nodes, a patch build of a landing, an
+   adopter's update, a withdrawal and a failure at every stage; its lenses; finder and skeptic counts inside the
+   bounds (at most 5 verify agents in total; the owner's workflow size guideline keeps one workflow near 10 agents;
+   effort medium, the owner's NT-12); pairing, two independent runs as the paired closing reviews ran; what each
+   agent reads; how findings are graded critical; what witnesses "no critical gap left", such as a coverage table in
+   which every step, layer, build and principle was read by a finder with its verdict; its cost; how its recall is
+   tested, such as gaps planted in a copy of the records that it must find; and when it runs relative to the folds the
+   other four questions will add. Use `tools/workflows/tier2-review.js` where it fits, and say where it does not.
+
+**Return.** The coverage table of past audits; the critical-gap classes, each with its existing check or none; the
+methods table with sources; the proposed workflow with its cost and its recall test. """ + PROPOSE + "\n")
+Q["q-coverage.md"] = (156, "THE CONTROL THAT THE WHOLE DESIGN IS SPECCED AS PLANNED", WEB, """
+**Your question.** The owner's second question: how will the build stage control and verify that the entire design
+is specced as planned, when agents have lost the chain of thought and deviated from designs before? A control
+mechanism is required.
+1. **Precedents.** Find the cases in this repository where a spec or a build dropped, merged or reinterpreted what its
+   design or a ratified decision said. For each: what was lost, at which hand-off (design to spec, spec to revised
+   spec, spec to build), how it was caught and how late, and what would have caught it at once.
+2. **What exists:** today's controls (the write gate, the kickoff card and its scope, the spec template, spec audits,
+   check 23, `spec-tokens`, `gen_build_index.py`'s ids no record names, the unit roster) and the design's planned ones
+   (dIndexedDesign's roster, inventory, seams, feature design and design index; dScopedBuild's scope and acceptance;
+   dFairHearing's spec audit and its design-audit preset; the gap join and the critical path this build runs over v2),
+   each with what it checks and what it cannot see. Is there any join from a design clause to the spec that carries it?
+3. **The unit of control.** The chain's planned units are v2's 484 clauses, each with the gaps its row owns, the
+   principles it serves and the parents it reads, while the layer and round records carry detail a clause only names.
+   Say what a spec must cite so a join can grade it (a clause id, the clause text's hash, the record sections it rests
+   on); how clauses get stable ids that are never renumbered (the charter's `[ids]` rule); how a clause split across
+   specs, or two clauses carried by one spec, are declared; and how the join stays honest while the design is amended
+   (P19, a clause's own revision).
+4. **Survey** requirements traceability and spec-driven development: bidirectional traceability in safety standards
+   (DO-178C, ISO 26262) and its failure modes, traceability tools (Doorstop, OpenFastTrace, sphinx-needs), and
+   spec-driven coding-agent tools (for example GitHub Spec Kit, Kiro's specs, OpenSpec, Tessl) as documented: how each
+   ties a requirement to its spec, task and code, and how it detects drift.
+5. **Propose the control:** one that works at speccing time with today's tools, since the chain builds are specced
+   before the product exists, and the clause that carries it into the product; what it witnesses; its gate and leg;
+   the planted cases that make it red (a dropped clause, a spec citing no clause, two specs carrying one clause and
+   disagreeing, a spec revised away from its clause with no recorded decision); and the coverage report the owner
+   reads at each chain build's Design exit.
+
+**Return.** The precedents table; the existing-controls table; the candidates, each with the test it could lose; the
+recommendation. """ + PROPOSE + "\n")
+Q["q-deviation.md"] = (157, "SPEC DEVIATION AND ITS LOG", WEB, """
+**Your question.** The owner's third question: how will specs be kept from deviating without reason, and every
+deviation be logged accurately and reflected in the final artifact?
+1. **Precedents:** cases where a spec, a build or a fold departed from what it was handed without saying so, or said
+   so where nobody reads it: a review fold that changed a clause, a builder's free-text divergence, a spec amended
+   mid-build, an owner's ruling carried into one record and not another. Measure how deviations are recorded today
+   (divergence notes, decision rows, spec amendments and revision logs, the `Revised:` paragraphs these design records
+   carry, review dispositions) and whether any of them reaches what a reader of the finished product reads.
+2. **What exists:** today's controls (the write gate, unattended's `--check-commit`, check 23, spec audits, the
+   closing review's intent lens, decision rows) and the design's planned ones (dScopedBuild's `build.scope` and
+   `build.acceptance`, the typed refusal return and remedy routing on dBoundRoles, the decision kinds on
+   dLinkedLibrary, the composition check that files an order when a build's witnessed path departs from its pinned
+   composition, `flow.adapt`, P19, P35's causes), each with what it catches and misses.
+3. **Define a deviation** at each hand-off: design to spec, spec to revised spec, spec to code, code to landed record.
+   Say which are legitimate (a design defect the spec writer finds, an owner's ruling, a builder's discovery) and
+   which are drift; who may approve each, by risk (the charter's `[risk]` rule); and what a deviation record must
+   carry: the clause or criterion departed from, the change, the reason, the evidence, the approver, and the
+   follow-through (the design record amended, a gap or an ask filed).
+4. **"Reflected in the final artifact":** how a logged deviation reaches the as-built record, so the finished
+   product's design records, help and atlas match what was built: the design record amended in the same commit, an
+   as-built view derived from the design plus its deviations, release notes, or other means.
+5. **Survey** how other disciplines log and gate deviation: architecture decision records and their supersession,
+   engineering change orders, waivers and deviation permits in regulated engineering, drift detection in spec-driven
+   agent tools, and contract tests between a spec and its code.
+6. **Propose:** the deviation record kind and its writer, the gate that refuses an unlogged deviation at each
+   hand-off and its planted red, the approval route, the reflection mechanism, and what works now, with today's
+   tools, for the chain builds' own speccing and building.
+
+**Return.** The precedents table; the existing-controls table; the hand-off table; the candidates, each with the test
+it could lose; the recommendation. """ + PROPOSE + "\n")
+Q["q-help.md"] = (158, "HUMAN-READABLE HELP", WEB, """
+**Your question.** The owner's fourth question: the product must be fully documented for its human owners and must
+not be a black box when the build is complete; what is the current plan?
+1. **Today:** measure gov's human-facing documentation: `help/`, `README.md`, each kit's README and runbook,
+   `WIRE-INTO-PROJECT.md`, `memory/guides/`, the charter template, `--help` texts, and how currency is enforced today
+   (the charter's `[docs]` rule, any leg). List the user-facing surfaces with no page.
+2. **The design's plan:** find every clause and record on documentation: dConvergedCharter's `help/` rendered from
+   each user-facing unit's `usage` field with render parity and a docs leg (SA-5, and v2 `[open]`), the units' `help`
+   fields carrying rationale, the retired guides' rationale moving into those fields, the derived runbook on
+   dShippedRelease, the charter's render, kit runbooks and Skills at the instruction levels, and anything else. Say
+   when each lands in the chain, and so which chain builds ship user-facing surfaces before any docs gate exists.
+3. **What a human owner needs** to run, configure, trust and debug the finished product: concepts (the loop, stages,
+   roles, records, policies and presets, leases and nodes), tasks (adopt, choose a preset, attend or leave a run,
+   read why a build stopped, answer an owner item, recover), reference (every command, policy key, preset, gate leg,
+   record kind, hook and extension point), and explanation (why each part is as it is). Compare with documentation
+   frameworks such as Diátaxis and with docs-as-code practice (reference generated from the same source as the code,
+   doc tests, link checks).
+4. **Gaps and proposal:** the surfaces the plan leaves undocumented; which pages can be generated from the product's
+   registries (the catalogue and presets, step tables, kinds, legs, hooks) under `[one-fact]` and which must be
+   authored; how currency is gated from the first chain build on, not only at dConvergedCharter; how a page is
+   tested, with a planted stale page red; and how the help pages and the in-repo atlas the fifth question asks for
+   link to each other.
+
+**Return.** The inventory of today's docs and surfaces; the plan as designed, with its timing in the chain; the gaps;
+the proposal. """ + PROPOSE + "\n")
+Q["q-atlas.md"] = (159, "THE IN-REPO ATLAS", WEB, """
+**Your question.** The owner's fifth point is a requirement: once the build is complete, another version of the Atlas
+is maintained in the repository, not as an online artifact, beside the help pages, to visualize the product's design
+and architecture, and kept current through every future update. Research how.
+1. **Today's atlas:** read the generator (`""" + B + """2026-10-16-build-PLAY-dClosedLoop-1-atlas.py`), its template `""" + B + """2026-10-16-build-PLAY-dClosedLoop-1-atlas.html` and its `--check`, and measure what the
+   page shows (its views and diagrams, every record whole, today against target), what it derives from (the design
+   records, not the product), its size (13.4 MB at version 69), its dependencies and its checks. Read the design map
+   generator and the project-map system the design plans (dTotalRecall's `gov map`, its node table, and v2's "the
+   atlas re-rendered from the same node table"): what is already planned for an in-repo view.
+2. **What an in-repo atlas should show and derive from once built:** the as-built product, from its registries (the
+   step tables, the policy catalogue and presets, record kinds, roles, legs, hooks, extension points, kits and the
+   code record) rather than the design records; how it shows the design against what was built, and the deviations
+   the third question logs; and how it and `help/` link to each other.
+3. **Formats:** a generated static HTML page with its script inlined under `help/`, Markdown with Mermaid diagrams
+   that GitHub renders, generated SVG, or diagrams as code in the C4 style (Structurizr, D2): each one's size, diff
+   stability, offline reading and review cost.
+4. **Kept current:** how it regenerates (a `[[regenerate]]` row and `run-gates.sh --regen`'s stale-output check, a
+   leg red on a stale atlas), how a hand edit is refused, its size budget and what degrades past it, and whether an
+   adopter gets one of its own through distribution.
+5. **Propose:** the format, the sources, the regeneration and its gate with a planted stale case, the size budget,
+   the owning chain build and unit, and whether any part should land before the chain completes, so that each chain
+   build keeps it current as it lands.
+
+**Return.** Today's atlas and map, measured; the candidates, each with the test it could lose; the recommendation.
+""" + PROPOSE + "\n")
+for name, (n, mine, cite, body) in Q.items():
+    text = (CONTEXT + "\n" + FACTS + "\n" + TEAM.format(mine=mine) + body + "\n"
+            + BOUNDS.format(scratch=f"{SCRATCH}/d{n}/", cite=cite))
+    (D / name).write_text(text, encoding="utf-8", newline="\n")
+    print(f"{name}: dispatch {n}, {len(text)} chars")
+````
+
+### `log_final_research.py`
+
+The session log's dispatch rows 155 to 159, the derived agent lines and the round's event.
+
+````python
+"""Record the final questions' research in the session log: dispatch rows 155 to 159, every agent and returned line
+as the roles kit derived them, and the round's event.
+
+Usage: python -X utf8 log_final_research.py <agent-lines-155-159.txt>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+got = [ln for ln in pathlib.Path(sys.argv[1]).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+       if ln.startswith(("- agent —", "- returned —"))]
+if len(got) != 10:
+    sys.exit(f"10 agent and returned lines expected, read {len(got)}")
+F = "`" * 3
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row154 = [ln for ln in L.text.split("\n") if ln.startswith("| 154 |")]
+if len(row154) != 1:
+    sys.exit("no single dispatch row 154")
+WHO = "gov-researcher, at the owner's medium effort"
+P = "`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-{}-researcher.md`"
+R = "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-final-{}.md`"
+Q = "The final questions: "
+ROWS = [
+    (155, Q + "the whole-design audit, what earlier audits covered and the workflow that walks the design step by step", 28,
+     "returned, 14m53s, 73.7k out: a paired walk sliced by scenario and by step, graded on planted past defects; 41% of "
+     "the design records' lines read by no review; it rebuilt memory-recall's derived cache under the git common "
+     "directory, outside its scratch folder", "audit"),
+    (156, Q + "the control that the whole design is specced as planned", 29,
+     "returned, 18m11s, 76.0k out: no join from a clause to its spec; minted clause ids pinned by hash and a join, its "
+     "prototype red on eight plants; 218 owned nodes named in no clause of their owner", "coverage"),
+    (157, Q + "spec deviation, its log and its reflection in what ships", 30,
+     "returned, 13m00s, 61.4k out: deviations recorded in four places and gated in none; a typed record, a frozen "
+     "baseline and a generated as-built view", "deviation"),
+    (158, Q + "human-readable help, the plan as designed and when its gate lands", 31,
+     "returned, 11m06s, 52.7k out: help gated only at the chain's last build; a fingerprinted docs leg on "
+     "dSafePassage, generated reference, rendered rationale for the owner to rule on", "help"),
+    (159, Q + "the atlas in the repository, what it shows and how it stays current", 32,
+     "returned, 9m33s, 46.4k out: generated Markdown and Mermaid pages under `help/atlas/` from the node table, owned "
+     "by dTotalRecall, 275 KB measured", "atlas"),
+]
+new = "".join(f"| {n} | {WHO} | {what} | {P.format(p)} | 1799cb98 | {out} | {R.format(r)} |\n"
+              for n, what, p, out, r in ROWS)
+L.sub(row154[0] + "\n", row154[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n",
+                "\nThe final questions' research, dispatches 155 to 159, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(got) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner closed the design pass with five questions, recorded verbatim in `{REC}`
+  `[words]`. Five researchers took one question each, dispatches 155 to 159, at the owner's medium effort, and their
+  returns are saved beside the record. The record answers the five, shows the mechanism under questions 2 to 5
+  (minted clause ids, what each spec carries, a design baseline, deviation records and an as-built view), sets the
+  order from here to the first chain spec, proposes seven gaps, and puts FQ-1 to FQ-8 to the owner. Dispatch 155
+  rebuilt memory-recall's derived cache under the git common directory, outside its scratch folder; nothing tracked
+  changed. The atlas stands at version 69, published after the parked debt's fold.
+""", "the round's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -22732,6 +23057,9 @@ MINE = [
     ('debt/fold_debt_pair.py', "The parked debt's review pair folded: all 35 confirmed defects into v2's rows, pair rules, chain clauses, [planned] and [open], the four layer records, the cloud and stall records and the gap register, the comparison record's [summary], [fold] and [folded], the README's parked decisions and five bug classes, dry-run first on a full copy of the tree with the eight checks green there."),
     ('debt/fix_summary.py', "The comparison record's [summary] corrected once a partition of the 35 counted nine amendments' other halves, where the fold had said most."),
     ('debt/log_debt_fold.py', "The session log's event for the pair's comparison and fold."),
+    ('final/quote_words.py', "The owner's five final questions quoted for the round record's [words], wrapped on spaces only and checked word for word."),
+    ('final/write_questions.py', "The final round's five research questions, each quoting the owner's questions verbatim and naming the researcher's own scratch folder, for `handoff.py render --input question=...`."),
+    ('final/log_final_research.py', "The session log's dispatch rows 155 to 159, the derived agent lines and the round's event."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -23826,13 +24154,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2609 nodes in 30 namespaces; 32065 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1799, derived 312, pending 498
-map: no stale facts read 63 records and 27 quotes of a map count or the critical path
+map: 2620 nodes in 30 namespaces; 32160 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1810, derived 312, pending 498
+map: no stale facts read 64 records and 27 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 223 records, 3694 sections, 210 decision sections, 16 comparison areas, 40 principles
+atlas: derived — 229 records, 3750 sections, 213 decision sections, 16 comparison areas, 40 principles
 rc 0
 
 $ fold state
