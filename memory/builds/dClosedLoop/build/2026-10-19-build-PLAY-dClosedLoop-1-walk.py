@@ -203,7 +203,7 @@ below says, item by item, following the copy's round record (`{seeded}/{round}`,
 2. **The design map,** `{seeded}/design-map.txt`, as your index, and **Stage 0's leads,** `{leads}`, its whole run on
    the working tree: take the leads your slice reaches.
 3. **Code** under the working tree's `tools/`, `skills/` and `.githooks/`, to test a claim the design makes about
-   today, and the working tree's `memory/guides/` where your role's protocol sends you.
+   today, and the protocol files your charter names: `memory/guides/`, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`.
 4. **This brief,** and your own scratch folder, `{scratch}`.
 
 Read nothing else: not the working tree's other records, not the session's scratchpad or temp folders, not other
@@ -296,14 +296,28 @@ SKEPTIC = """# Skeptic brief: run {run}, batch {batch}
 
 **Serves:** research PLAY-dClosedLoop-1
 
+**Your task is to refute each finding below, and then to break each clean cell after them.** This brief is your
+instructions, not the subject of your review: do not review it, the audit's seal or its instruments. A defect you see
+in them goes in one line at the end of your return, and nowhere else.
+
 You are one of four skeptics in run {run} of the whole-design audit (`{seeded}/{round}`, whose `[rubric]` grades
 what you confirm). Each finding below was returned by a walker reading the sealed copy of the design at
 `{seeded}/memory/builds/dClosedLoop/build/`. Try to refute each one: re-read its address in the copy, and confirm it
 only when the defect is there and does what the finding says. Then try to break each clean cell listed after them, a
 cell a walker judged to hold.
 
-Read the design only from the sealed copy, never from the working tree, and never diff the two; read code under
-`tools/` from the working tree.
+## What you may read, and nothing else
+
+1. **The sealed copy's design records,** under `{seeded}/memory/builds/dClosedLoop/build/`, but not its
+   `*-compared.md`, `*-instruments.md` or session-log records, and nothing in the copy's `reviews/` or `prompts/`.
+2. **The design map,** `{seeded}/design-map.txt`, as your index.
+3. **Code** under the working tree's `tools/`, `skills/` and `.githooks/`, to test a claim the design makes about
+   today, and the protocol files your charter names: `memory/guides/`, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`.
+4. **This brief,** and your own scratch folder, `{scratch}`.
+
+Read nothing else: not the working tree's other records, not the walkers' returns, not the session's scratchpad or
+temp folders, not other briefs, not git history. The copy is the subject: judge every finding against it alone, since
+the working tree may differ from it.
 
 ## Findings to refute
 
@@ -319,7 +333,8 @@ Your final message, nothing else:
 - for each finding, `- <id>: confirmed <severity>` or `- <id>: refuted`, then one line with the reason you observed,
   quoting its address; a severity the rubric grades otherwise than the walker did, said so;
 - for each clean cell, `- <item> <scenario>: holds`, or `- <item> <scenario>: defect` with the defect written as a new
-  finding in the walkers' grammar, its id `{run}S{batch}-F<n>`.
+  finding in the walkers' grammar, its id `{run}S{batch}-F<n>`;
+- last, `- **Read outside the list above:** none`, or each path you read outside it and why.
 
 Write nothing to the repository; any probe you run writes under `{scratch}` only. Your effort is the one the owner's
 role definition sets.
@@ -328,10 +343,21 @@ SYNTH = """# Synthesis brief: run {run}
 
 **Serves:** research PLAY-dClosedLoop-1
 
-Merge run {run} of the whole-design audit into one report, written to `{report}`. Read the round record's
-`[walk-table]` and `[rubric]` (`{round}`), the five walker returns and the four skeptics' verdicts:
+**Your task is to merge run {run} of the whole-design audit into one report, written to `{report}`.** This brief is
+your instructions, not the subject of your review: do not review it, the audit's seal or its instruments. A defect you
+see in them goes in one line at the end of your return, and nowhere else.
+
+## What you may read, and nothing else
+
+1. **The round record's** `[walk-table]` and `[rubric]` (`{round}`).
+2. **The five walker returns and the four skeptics' verdicts:**
 
 {inputs}
+
+3. **This brief.**
+
+Read nothing else, and judge no finding against a design record: the skeptics judged each against the sealed copy,
+and the report carries their verdicts as they gave them.
 
 Write the report in this shape, and nothing else into the repository:
 1. `**Serves:** spec-audit PLAY-dClosedLoop-1`, a blank line, and `# Whole-design walk, run {run}: <its slicing>`.
@@ -345,18 +371,22 @@ Write the report in this shape, and nothing else into the repository:
 7. `## Walk table`: the five walkers' tables joined, every item in every scenario, verdicts as the walkers gave them.
 8. `## Build verdicts` and `## Principle verdicts`: every build and every principle, joined.
 9. `review-shape kind=spec-audit round=1 intensity=full at=synth raw=<n> confirmed=<n> refuted=<n> unverified=0
-   blocker=<n> high=<n> medium=<n> low=<n> agents=11 out-tokens=0`, on one line; the main loop fills `out-tokens` from
-   the runs' returned lines.
+   blocker=<n> high=<n> medium=<n> low=<n> agents=0 out-tokens=0`, on one line; the main loop fills `agents` and
+   `out-tokens` from the run's returned lines, every dispatch of the run counted.
 
 `walk.py check --run {run} --report` must pass on it: every cell, every build and principle, and every id a verdict
-names carried by a heading. Return the report's path and the critical findings' ids. Your effort is the one the owner's
+names carried by a heading. Return the report's path, the critical findings' ids and, last,
+`**Read outside the list above:** none`, or each path you read outside it and why. Your effort is the one the owner's
 role definition sets.
 """
 
 
 def findings_of(text):
     out = []
-    for m in re.finditer(r"^### (" + ID + r")\b[^\n]*\n(.*?)(?=^### |^\| Item |^## |\Z)", text, flags=re.M | re.S):
+    # A finding ends at the next heading, at any table row, or at a numbered bold label such as `3. **The walk
+    # table**`: a return that sets its table under no heading would otherwise hand its last finding's skeptic the
+    # walker's whole table and verdicts.
+    for m in re.finditer(r"^### (" + ID + r")\b[^\n]*\n(.*?)(?=^#{1,3} |^\||^\d+\. \*\*|\Z)", text, flags=re.M | re.S):
         addr = re.search(r"^- \*\*Address:\*\* (.+)$", m.group(2), flags=re.M)
         out.append({"id": m.group(1), "text": m.group(0).strip(), "address": addr.group(1).strip() if addr else ""})
     return out

@@ -18,7 +18,7 @@ below says, item by item, following the copy's round record (`C:/Users/d41ly/App
 2. **The design map,** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/design-map.txt`, as your index, and **Stage 0's leads,** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/stage0-leads.md`, its whole run on
    the working tree: take the leads your slice reaches.
 3. **Code** under the working tree's `tools/`, `skills/` and `.githooks/`, to test a claim the design makes about
-   today, and the working tree's `memory/guides/` where your role's protocol sends you.
+   today, and the protocol files your charter names: `memory/guides/`, `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`.
 4. **This brief,** and your own scratch folder, `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/scratch/walk-b4/`.
 
 Read nothing else: not the working tree's other records, not the session's scratchpad or temp folders, not other

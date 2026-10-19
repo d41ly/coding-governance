@@ -24376,6 +24376,18 @@ rc, out = run(a, b, "--plant", "miss")
 checks.append(("the miss plant costs one", "plants hit 8 of 12" in out.split("\n")[0]))
 rc, out = run(a)
 checks.append(("refuted findings never hit", "P10" not in out and "P11" not in out and "P12" not in out))
+# Stage 0's catch of the mechanical plants on the copy, counted in every run: six and six judgement hits whose union is
+# eight miss the bar alone and clear it with Stage 0's two, and a walker's hit on a mechanical plant adds nothing.
+six_a, six_b = report("six-a.md", [1, 2, 3, 4, 5, 6]), report("six-b.md", [3, 4, 5, 6, 7, 8])
+rc, out = run(six_a, six_b)
+checks.append(("six and six miss the bar without Stage 0", rc == 1 and "NOT MET" in out))
+rc, out = run(six_a, six_b, "--stage0-caught")
+checks.append(("six and six clear it with Stage 0's two", rc == 0 and "union: plants hit 10 of 12" in out
+               and "P11 <- Stage 0" in out))
+mixed = report("mixed.md", [1, 2, 3, 4, 5, 11])
+rc, out = run(mixed, "--stage0-caught")
+checks.append(("a walker's mechanical hit adds nothing", "plants hit 7 of 12" in out.split("\n")[0]
+               and "P11 <- Stage 0, and A1-F6 besides" in out))
 for name, ok in checks:
     print(f"{'ok  ' if ok else 'FAIL'} {name}")
 sys.exit(0 if all(ok for _, ok in checks) else 1)
@@ -24969,6 +24981,9 @@ CLASSES = [
     # the temp root's own files are too, but for the copy and the walkers' scratch, which both live under seed-dcl/.
     ("the scratchpad", re.compile(r"1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad", re.I)),
     ("the temp root outside seed-dcl", re.compile(r"AppData/Local/Temp/claude(?!/seed-dcl\b)(?:[/\"';\s]|$)", re.I)),
+    # The home .claude folder holds every walker's transcript, one of which printed the plant labels, and the owner's
+    # memory, which names the mechanical plants' kinds.
+    ("the home .claude folder", re.compile(r"(?:~|\$HOME|\$\{HOME\}|Users/[^/\"']+)/\.claude(?:[/\"';\s]|$)", re.I)),
 ]
 DESIGN = re.compile(r"(?<!seed-dcl/tree/)(?<!seed-dcl/tree)memory/builds/dClosedLoop/?([^\s\"'*]*)", re.I)
 BRIEF = re.compile(r"(?:build/2026-10-20-build-PLAY-dClosedLoop-1-walk-brief-|prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-\d+-spec-reviewer)")
@@ -25000,8 +25015,12 @@ for arg in [a for a in sys.argv[2:] if "=" in a]:
         for cls, pat in CLASSES:
             if pat.search(own.sub("", text) if cls in ("the scratchpad", "the temp root outside seed-dcl") else text):
                 hits.setdefault(cls, []).append(f"{name}: {text[:160]}")
+        in_seed = re.search(r"cd [\"']?[^;&|]*seed-dcl\b", text)
         for m in DESIGN.finditer(text):
-            if cwd_copy:
+            pre = text[max(0, m.start() - 40):m.start()]
+            # A path spelled through the working tree is a hit wherever the shell stands; a relative one is the copy's
+            # when the call stands in the copy, or names `tree/` after a cd into seed-dcl/.
+            if "e34297/" not in pre and (cwd_copy or (pre.endswith("tree/") and in_seed)):
                 continue
             tail = m.group(1)
             if BRIEF.match(tail):
@@ -25013,6 +25032,10 @@ for arg in [a for a in sys.argv[2:] if "=" in a]:
         others = [w for w in re.findall(r"(walk-[ab]\d)", text, flags=re.I) if w.lower() != f"walk-{me}"]
         if others:
             hits.setdefault("another walker's scratch", []).append(f"{name}: {text[:160]}")
+        # The walkers' scratch folders share one parent since run B's re-dispatch: a listing or a glob of the parent
+        # names no other walker, yet shows or reads their notes.
+        if re.search(r"seed-dcl/scratch(?!/walk-" + re.escape(me) + r"\b)", own.sub("", text), flags=re.I):
+            hits.setdefault("the shared scratch outside its own folder", []).append(f"{name}: {text[:160]}")
     bad = {k: v for k, v in hits.items() if k != "the working tree's briefs"}
     print(f"{label}: {'clean' if not bad else 'READ OUTSIDE ITS BRIEF'}" +
           (f" (also its brief or siblings' briefs, {len(hits['the working tree' + chr(39) + 's briefs'])} calls)"
@@ -25153,6 +25176,179 @@ L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
 for t in ("returned, 6m57s, 39.2k out: 11 findings, its table complete", "returned, 13m25s, 78.1k out: 20 findings, its table complete"):
     L.sub(t + " |", t + "; the read audit found it read the working tree's round record |", t[:19])
 L.save()
+````
+
+### `log_dispatch.py`
+
+The session log's dispatch rows kept from the roles kit: a row added as dispatched, and an outcome whose wall time and output tokens are read off the returned line handoff.py derives.
+
+````python
+"""The session log's dispatch rows, kept from the roles kit rather than typed: `add` appends a row as dispatched, and
+`outcome` turns a dispatched row's status into `returned, <wall>, <tokens> out: <text>`, its wall time and output
+tokens read off the returned line `handoff.py agents` derives for the row's handoff.
+
+Usage (from the worktree root):
+  python -X utf8 log_dispatch.py add <row> "<role and effort>" "<what>" <prompt path under the build> "<use>"
+  python -X utf8 log_dispatch.py outcome <row> "<text>" [<row> "<text>" ...]
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+BUILD = "memory/builds/dClosedLoop/"
+L = Record(BUILD + "build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+ANCHOR = "\nMaintain, and the machinery by which the loop corrects itself, is researched by"
+verb, args = sys.argv[1], sys.argv[2:]
+
+
+def row_line(n):
+    start = L.text.find(f"\n| {n} | ")
+    if start < 0:
+        return None
+    return L.text[start + 1:L.text.index("\n", start + 1)]
+
+
+if verb == "add":
+    n, who, what, prompt, use = args
+    if row_line(n) is not None:
+        sys.exit(f"row {n} exists already")
+    if not pathlib.Path(BUILD + prompt).is_file():
+        sys.exit(f"no handoff at {BUILD + prompt}")
+    # The anchor opens with the blank line under the table, so the row goes in above it, ending in its own newline.
+    L.insert_before(ANCHOR, f"| {n} | {who} | {what} | `{prompt}` | 1799cb98 | dispatched | {use} |\n", f"row {n}")
+elif verb == "outcome":
+    for n, text in zip(args[::2], args[1::2]):
+        line = row_line(n)
+        if line is None or line.count("| dispatched |") != 1:
+            sys.exit(f"row {n} is not one dispatched row")
+        prompt = re.search(r"`(prompts/[^`]+)`", line).group(1)
+        out = subprocess.run([sys.executable, "-X", "utf8", "tools/roles/handoff.py", "agents", "--handoff",
+                              BUILD + prompt], capture_output=True, text=True, encoding="utf-8").stdout
+        m = re.search(r"^- returned — [^·]+·[^·]+· (\S+) · (\S+) out ·", out, flags=re.M)
+        if not m:
+            sys.exit(f"row {n}: handoff.py derived no returned line for {prompt}")
+        L.sub(line, line.replace("| dispatched |", f"| returned, {m.group(1)}, {m.group(2)} out: {text} |"),
+              f"row {n}")
+else:
+    sys.exit("verb is add or outcome")
+L.save()
+````
+
+### `check_skeptic_split.py`
+
+Whether any skeptic brief hands its skeptic a walker's table or verdicts: table rows and numbered bold labels inside a brief's findings section, seen on all four of run A's batches before findings_of's fix and on none after.
+
+````python
+"""Whether any skeptic brief hands its skeptic a walker's table or verdicts: every line of each brief's
+`## Findings to refute` section that is a table row or a numbered bold label is a leak. Exit 1 on any.
+
+Usage: python -X utf8 check_skeptic_split.py <brief> ...
+"""
+import re
+import sys
+
+bad = 0
+for path in sys.argv[1:]:
+    text = open(path, encoding="utf-8").read()
+    part = text.split("## Findings to refute", 1)[1].split("## Clean cells to attack", 1)[0]
+    leaks = [ln for ln in part.split("\n") if re.match(r"\||\d+\. \*\*", ln)]
+    bad += bool(leaks)
+    print(f"{path.rsplit('/', 1)[-1]}: {len(leaks)} table or label lines" + (f", first {leaks[0][:80]!r}" if leaks else ""))
+sys.exit(1 if bad else 0)
+````
+
+### `plant_transcript.py`
+
+A planted transcript for the read audit: three reads into the home .claude folder spelled three ways and one read inside the copy, which the home-folder class must flag three times.
+
+````python
+"""A planted transcript for read_audit.py: three reads into the home .claude folder, each spelled a different way, and
+one read inside the copy that no class may flag. The audit must name the home-folder class with three calls.
+
+Usage: python -X utf8 plant_transcript.py <out dir>
+"""
+import json
+import sys
+from pathlib import Path
+
+out = Path(sys.argv[1])
+out.mkdir(parents=True, exist_ok=True)
+calls = [("Read", {"file_path": "C:/Users/d41ly/.claude/projects/C--projects-coding-governance/memory/x.md"}),
+         ("Bash", {"command": "ls ~/.claude/projects | head"}),
+         ("Grep", {"pattern": "P0", "path": "$HOME/.claude"}),
+         ("Bash", {"command": "ls " + "/c/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree"})]
+with open(out / "agent-plant.jsonl", "w", encoding="utf-8", newline="\n") as f:
+    for name, inp in calls:
+        f.write(json.dumps({"type": "assistant", "message": {"content": [{"type": "tool_use", "name": name,
+                                                                          "input": inp}]}}) + "\n")
+print(f"planted {len(calls)} calls")
+````
+
+### `record_run_b_again.py`
+
+Run B walked again: the round record's [walk-run-b-again] and [recall]'s bar as scored, fixed before any score was read.
+
+````python
+"""Run B walked again: the round record's [walk-run-b-again] (dispatches 170 to 174, walker 4's second brief review and
+what each of its six defects changed, the handoff brief that names the specs and the lens), and [recall]'s bar as
+scored, fixed before any score is read.
+
+Usage: python -X utf8 record_run_b_again.py "<walker 4's third outcome, one paragraph>"   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B4 = sys.argv[1].strip()
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.insert_before("## [stage0-classes] ", f"""### [walk-run-b-again] Run B, walked again
+
+Walkers 1, 3 and 5 walked as dispatches 170, 171 and 173: 12, 13 and 15 findings, every table complete. Each disclosed
+what it read outside its list before it took the brief as its instructions: the working tree's round record (walker 1
+lines 90 to 328, walker 3 whole, walker 5 from `[scenarios]` on), diffs against sibling briefs, and folder listings.
+The read audit agrees, and none of them read the key, the script, a return or the copy's reviews. Walker 4 reviewed
+its brief a second time (172) and found six defects, each now answered:
+- **Review history the list admits:** fold and review records, and revision notes inside design records, describe the
+  fixes the plants revert. Recall stays an upper bound, as `[recall]` says, and each hit is read by hand for a
+  revision note as its evidence.
+- **The copy's `[recall]` names Stage 0's arms for the mechanical plants.** Both runs count those plants as Stage 0's,
+  which `score.py --stage0-caught` now does, a walker's hit on one adding nothing (`[recall]`, the bar as scored).
+- **A build verdict can rest on items its walker does not walk,** since `[slicing]` deals builds by scenario and band,
+  not by the items they own. The report joins build verdicts as the walkers gave them, and the fold reads each against
+  its items' owners.
+- **`findings_of` handed a batch's last finding the walker's whole table** when the table sat under no heading. It now
+  ends a finding at any table row or numbered bold label, seen red first on all four of run A's dry-rendered batches
+  (127 to 252 table lines each) and on none after.
+- **The walkers' scratch folders share a parent the read audit did not watch.** A class for it is added.
+- **The protocol files the charter names sat outside the list:** `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`
+  are on it now, for the skeptics too.
+
+The cause, which walkers 1 and 5 named as well: the spec-reviewer role reviews the spec it is handed, and the walk
+brief is handed as `input:spec`. Walker 4 walked a third time (174), its handoff's goal and non-goals rendered from
+`build/2026-10-20-build-PLAY-dClosedLoop-1-walk-handoff-brief.md`, which names the sealed copy's records as the specs
+and the brief as the lens. {B4}
+
+The skeptic and synthesis briefs gained the walkers' list of what may be read and the line for any read outside it,
+and the synthesis's shape line now leaves `agents` to the main loop, which counts every dispatch of the run from its
+returned lines, where the template had typed eleven.
+
+""", "[walk-run-b-again]")
+R.sub("""- **The bar:** each run finds at least eight of the twelve, and the two together at least ten. A run under the bar
+  comes to the owner before anything is folded.
+""", """- **The bar:** each run finds at least eight of the twelve, and the two together at least ten. A run under the bar
+  comes to the owner before anything is folded.
+- **The bar, as scored** (fixed 2026-10-20, before any score was read): Stage 0 caught both mechanical plants on the
+  copy (`[walk]`), so `score.py --stage0-caught` counts both in each run, and the walkers' hits on the ten judgement
+  plants make the rest. Each run needs six of them, and the two together eight. A walker's hit on a mechanical plant
+  is shown and adds nothing, since the copy's own records name the arms that catch them.
+""", "[recall] the bar as scored")
+R.save()
 ````
 
 ### `preset_check_canonical.py`
@@ -25586,6 +25782,10 @@ MINE = [
     ('audit-run/read_audit.py', "Which files each walker read or listed outside its brief, from every tool call in its transcript: the sealed material, the copy's reviews and comparison records, the working tree's design folder by an absolute or a relative path, the scratchpad's leak files and other walkers' scratch."),
     ('audit-run/record_run_b_redo.py', "Run A's returns, run B's first dispatch and the seal's repairs in the round record's [walk-run-a] and [walk-run-b], and the session log's outcomes 160 to 169, rows 170 to 173 and event."),
     ('audit-run/record_run_b_redo2.py', "The run B redo record corrected against the read audit: walker 1's comparison reads, walkers 2 and 4's undisclosed reads, the seal as allow-list and audit, the brief reviews kept apart."),
+    ('audit-run/log_dispatch.py', "The session log's dispatch rows kept from the roles kit: a row added as dispatched, and an outcome whose wall time and output tokens are read off the returned line handoff.py derives."),
+    ('audit-run/check_skeptic_split.py', "Whether any skeptic brief hands its skeptic a walker's table or verdicts: table rows and numbered bold labels inside a brief's findings section, seen on all four of run A's batches before findings_of's fix and on none after."),
+    ('audit-run/plant_transcript.py', 'A planted transcript for the read audit: three reads into the home .claude folder spelled three ways and one read inside the copy, which the home-folder class must flag three times.'),
+    ('audit-run/record_run_b_again.py', "Run B walked again: the round record's [walk-run-b-again] and [recall]'s bar as scored, fixed before any score was read."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -26906,9 +27106,9 @@ K4: keys 265 · findings 55
 K5: principles 42, clauses 496, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 75 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 86 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 240 records, 3856 sections, 215 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 251 records, 4024 sections, 217 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -26924,9 +27124,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 60 · lines 31911 · unreviewed 14036 (44%)
+  design records 71 · lines 31975 · unreviewed 14100 (44%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 9
+  design commits after the floor that no closing review covers: 10
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -26936,6 +27136,7 @@ rerun review debt: rc 0
     747a2af22  2 design record(s)  records(dClosedLoop): the audit's step 2 — the owner confirms v2's four open readings, and where deviation rec
     47de3dc82  11 design record(s)  records(dClosedLoop): the whole-design walk dispatched — the sealed copy, Stage 0 on it and on the tree, and t
     abbc8c76d  6 design record(s)  records(dClosedLoop): run B sealed tighter — the round record names no plant's kind, and its briefs forbid the
+    8b51f1f39  5 design record(s)  records(dClosedLoop): run B's four brief reviews answered — the seal is an allow-list and a read audit, and wa
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27154,13 +27355,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2662 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1841, derived 321, pending 500
-map: no stale facts read 75 records and 28 quotes of a map count or the critical path
+map: 2677 nodes in 30 namespaces; 32762 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1856, derived 321, pending 500
+map: no stale facts read 86 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 240 records, 3857 sections, 215 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 251 records, 4028 sections, 217 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

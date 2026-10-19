@@ -205,6 +205,10 @@ many it finds (final-questions `[audit]`).
   the gate. Each hit is read by hand too, since an address can carry a neighbour of the plant.
 - **The bar:** each run finds at least eight of the twelve, and the two together at least ten. A run under the bar
   comes to the owner before anything is folded.
+- **The bar, as scored** (fixed 2026-10-20, before any score was read): Stage 0 caught both mechanical plants on the
+  copy (`[walk]`), so `score.py --stage0-caught` counts both in each run, and the walkers' hits on the ten judgement
+  plants make the rest. Each run needs six of them, and the two together eight. A walker's hit on a mechanical plant
+  is shown and adds nothing, since the copy's own records name the arms that catch them.
 
 ## [instruments] The instruments questions 2 and 3 rest on
 
@@ -319,6 +323,37 @@ seal is the allow-list and the read audit, not distance. The audit gained two cl
 scratchpad, and any path into the temp root outside `seed-dcl/`, where the copy and the walkers' scratch now live. Both
 red on walkers 4 and 5's brief reviews, which listed the temp root and found the key there. The four brief reviews are
 kept apart from the walk returns, so the walks take the returns' names, and are committed beside them after the scoring.
+
+### [walk-run-b-again] Run B, walked again
+
+Walkers 1, 3 and 5 walked as dispatches 170, 171 and 173: 12, 13 and 15 findings, every table complete. Each disclosed
+what it read outside its list before it took the brief as its instructions: the working tree's round record (walker 1
+lines 90 to 328, walker 3 whole, walker 5 from `[scenarios]` on), diffs against sibling briefs, and folder listings.
+The read audit agrees, and none of them read the key, the script, a return or the copy's reviews. Walker 4 reviewed
+its brief a second time (172) and found six defects, each now answered:
+- **Review history the list admits:** fold and review records, and revision notes inside design records, describe the
+  fixes the plants revert. Recall stays an upper bound, as `[recall]` says, and each hit is read by hand for a
+  revision note as its evidence.
+- **The copy's `[recall]` names Stage 0's arms for the mechanical plants.** Both runs count those plants as Stage 0's,
+  which `score.py --stage0-caught` now does, a walker's hit on one adding nothing (`[recall]`, the bar as scored).
+- **A build verdict can rest on items its walker does not walk,** since `[slicing]` deals builds by scenario and band,
+  not by the items they own. The report joins build verdicts as the walkers gave them, and the fold reads each against
+  its items' owners.
+- **`findings_of` handed a batch's last finding the walker's whole table** when the table sat under no heading. It now
+  ends a finding at any table row or numbered bold label, seen red first on all four of run A's dry-rendered batches
+  (127 to 252 table lines each) and on none after.
+- **The walkers' scratch folders share a parent the read audit did not watch.** A class for it is added.
+- **The protocol files the charter names sat outside the list:** `memory/HYGIENE.md` and `memory/TEMPLATE-SPEC.md`
+  are on it now, for the skeptics too.
+
+The cause, which walkers 1 and 5 named as well: the spec-reviewer role reviews the spec it is handed, and the walk
+brief is handed as `input:spec`. Walker 4 walked a third time (174), its handoff's goal and non-goals rendered from
+`build/2026-10-20-build-PLAY-dClosedLoop-1-walk-handoff-brief.md`, which names the sealed copy's records as the specs
+and the brief as the lens. It walked: 15 findings, its table complete, and the only walker of either run whose read audit is clean. The audit now reads a relative path by where its call stands, which cleared two false hits on it.
+
+The skeptic and synthesis briefs gained the walkers' list of what may be read and the line for any read outside it,
+and the synthesis's shape line now leaves `agents` to the main loop, which counts every dispatch of the run from its
+returned lines, where the template had typed eleven.
 
 ## [stage0-classes] Stage 0's classes
 

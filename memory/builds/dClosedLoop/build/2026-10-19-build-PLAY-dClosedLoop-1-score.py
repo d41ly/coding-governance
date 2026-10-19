@@ -13,12 +13,15 @@ a plant when its address names the plant's record and one of its tags, one of it
 where it has any) appears in the finding, and so does one of its words. A plant counts once per run. A finding under
 `## Refuted` never hits.
 
-Usage: python score.py --key <key.json> --sha256 <hex> <report-a.md> [<report-b.md>] [--plant tamper|blind|miss]
+Usage: python score.py --key <key.json> --sha256 <hex> <report-a.md> [<report-b.md>] [--stage0-caught]
+                       [--plant tamper|blind|miss]
 Prints each run's hits, its recall and the union's, Mills's estimate of the real defects left, from the share of
 plants found, and Chapman's over the two runs' real findings, matched by full address. The bar (final-questions
 `[audit]`): each run finds at least two thirds of the plants and the two together at least ten of twelve. Stage 0 must
 also catch the mechanical plants on the copy itself, every time, which `stage0.py --root <copy>` shows and this script
-does not. Exit 0 when the bar is met, 1 when it is not, 2 on a key whose hash moved or a report with nothing to score.
+does not; `--stage0-caught` says it did, and counts every mechanical plant in every run as Stage 0's, a walker's hit on
+one adding nothing. Exit 0 when the bar is met, 1 when it is not, 2 on a key whose hash moved or a report with nothing
+to score.
 
 What it does not judge: whether a hit's finding describes the plant's defect rather than a neighbour at the same
 address, which the round record's `[recall]` reads each hit for by hand; and whether two runs' findings at one address
@@ -84,6 +87,11 @@ def main():
     key = json.loads(raw)
     plants = key["plants"]
     judged = [p for p in plants if not p.get("mechanical")]
+    # Under --stage0-caught every mechanical plant is in every run's count as Stage 0's catch on the copy, which the
+    # round record's [walk] holds the evidence of: a walker's hit on one is shown beside it and adds nothing, since the
+    # copy's own records name the Stage 0 arms that catch them.
+    stage0 = "--stage0-caught" in sys.argv
+    mech = {p["id"] for p in plants if p.get("mechanical")} if stage0 else set()
     runs = []
     for r in reports:
         found = findings(r)
@@ -97,13 +105,19 @@ def main():
             print(f"score: REFUSED — {Path(r).name}: no confirmed finding carries an address to score")
             return 2
         runs.append((Path(r).name, found, hits(key, found)))
+
+    def counted(h):
+        return set(h) | mech
+
     for name, found, h in runs:
+        c = counted(h)
         n = sum(1 for p in judged if p["id"] in h)
-        print(f"{name}: confirmed {len(found)}, plants hit {len(h)} of {len(plants)} ({100 * len(h) / len(plants):.0f}%), "
-              f"of them judgement plants {n} of {len(judged)}")
-        for pid, fid in sorted(h.items()):
-            print(f"  {pid} <- {fid}")
-    union = set().union(*(set(h) for _, _, h in runs)) if runs else set()
+        print(f"{name}: confirmed {len(found)}, plants hit {len(c)} of {len(plants)} ({100 * len(c) / len(plants):.0f}%), "
+              f"of them judgement plants {n} of {len(judged)}" + (f", and Stage 0's {len(mech)}" if stage0 else ""))
+        for pid in sorted(c):
+            src = "Stage 0" + (f", and {h[pid]} besides" if pid in h else "") if pid in mech else h[pid]
+            print(f"  {pid} <- {src}")
+    union = set().union(*(counted(h) for _, _, h in runs)) if runs else set()
     print(f"union: plants hit {len(union)} of {len(plants)}")
 
     def real(found, h):
@@ -122,7 +136,7 @@ def main():
         print(f"chapman: run A {len(a)}, run B {len(b)}, both {m}, estimated {chapman:.0f}, found by neither "
               f"{chapman - len(a | b):.0f} (a trend, never the gate)")
     need, both_need = -(-2 * len(plants) // 3), -(-10 * len(plants) // 12)
-    each = all(len(h) >= need for _, _, h in runs)
+    each = all(len(counted(h)) >= need for _, _, h in runs)
     both = len(union) >= both_need if len(runs) == 2 else True
     met = each and both
     print(f"bar: each run at least {need} of {len(plants)} plants, the two together at least {both_need}: "
