@@ -24986,7 +24986,8 @@ CLASSES = [
     ("the home .claude folder", re.compile(r"(?:~|\$HOME|\$\{HOME\}|Users/[^/\"']+)/\.claude(?:[/\"';\s]|$)", re.I)),
 ]
 DESIGN = re.compile(r"(?<!seed-dcl/tree/)(?<!seed-dcl/tree)memory/builds/dClosedLoop/?([^\s\"'*]*)", re.I)
-BRIEF = re.compile(r"(?:build/2026-10-20-build-PLAY-dClosedLoop-1-walk-brief-|prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-\d+-spec-reviewer)")
+BRIEF = re.compile(r"(?:build/2026-10-20-build-PLAY-dClosedLoop-1-(?:walk|skeptic|synth)-brief-"
+                   r"|prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-\d+-(?:spec-reviewer|skeptic|synthesizer))")
 
 
 def calls(path):
@@ -25006,10 +25007,11 @@ def calls(path):
 folder = Path(sys.argv[1])
 for arg in [a for a in sys.argv[2:] if "=" in a]:
     label, aid = arg.split("=", 1)
-    me = label.lower()
+    # A label is the agent's own scratch folder (`skeptic-a1`), or a walker's label (`A1`) for `walk-a1`.
+    me = label.lower() if "-" in label else "walk-" + label.lower()
     hits = {}
     # A walker's own scratch folder, in the scratchpad before run B's re-dispatch and under seed-dcl/ since, is its own.
-    own = re.compile(r"[^\s\"';=]*(?:scratchpad|seed-dcl/scratch)/walk-" + re.escape(me) + r"\b[^\s\"';]*", re.I)
+    own = re.compile(r"[^\s\"';=]*(?:scratchpad|seed-dcl/scratch)/" + re.escape(me) + r"\b[^\s\"';]*", re.I)
     for name, text in calls(folder / f"agent-{aid}.jsonl"):
         cwd_copy = "seed-dcl/tree" in text and re.search(r"cd [\"']?[^;&|]*seed-dcl/tree", text)
         for cls, pat in CLASSES:
@@ -25029,12 +25031,12 @@ for arg in [a for a in sys.argv[2:] if "=" in a]:
                 cls = "the working tree's design folder"
             hits.setdefault(cls, []).append(f"{name}: {text[:160]}")
             break
-        others = [w for w in re.findall(r"(walk-[ab]\d)", text, flags=re.I) if w.lower() != f"walk-{me}"]
+        others = [w for w in re.findall(r"((?:walk|skeptic)-[ab]\d)", text, flags=re.I) if w.lower() != me]
         if others:
             hits.setdefault("another walker's scratch", []).append(f"{name}: {text[:160]}")
         # The walkers' scratch folders share one parent since run B's re-dispatch: a listing or a glob of the parent
         # names no other walker, yet shows or reads their notes.
-        if re.search(r"seed-dcl/scratch(?!/walk-" + re.escape(me) + r"\b)", own.sub("", text), flags=re.I):
+        if re.search(r"seed-dcl/scratch(?!/" + re.escape(me) + r"\b)", own.sub("", text), flags=re.I):
             hits.setdefault("the shared scratch outside its own folder", []).append(f"{name}: {text[:160]}")
     bad = {k: v for k, v in hits.items() if k != "the working tree's briefs"}
     print(f"{label}: {'clean' if not bad else 'READ OUTSIDE ITS BRIEF'}" +
@@ -25349,6 +25351,39 @@ R.sub("""- **The bar:** each run finds at least eight of the twelve, and the two
   is shown and adds nothing, since the copy's own records name the arms that catch them.
 """, "[recall] the bar as scored")
 R.save()
+````
+
+### `check_verdicts.py`
+
+Whether a skeptic's return gives a verdict to every finding and every clean cell its brief handed it, in the brief's grammar; seen red on a dropped verdict line, and on skeptic 1's verdict on A2-F3, whose line opens with stray words.
+
+````python
+"""Whether a skeptic's return gives a verdict to every finding its brief handed it, and to every clean cell: each id
+in the brief's `## Findings to refute` must head a `- <id>: confirmed` or `- <id>: refuted` line, and each clean cell
+a `holds` or `defect` line. Exit 1 on any finding or cell left without one.
+
+Usage: python -X utf8 check_verdicts.py <skeptic brief> <skeptic return> [--plant drop]
+`--plant drop` removes the return's first verdict line, which must red.
+"""
+import re
+import sys
+
+ID = r"[AB](?:[1-5]|S[1-4])-F\d+"
+brief, ret = open(sys.argv[1], encoding="utf-8").read(), open(sys.argv[2], encoding="utf-8").read()
+if "--plant" in sys.argv:
+    first = re.search(r"^- \**(" + ID + r")\**: (?:confirmed|refuted)[^\n]*\n", ret, flags=re.M)
+    ret = ret.replace(first.group(0), "", 1) if first else ret
+part = brief.split("## Findings to refute", 1)[1].split("## Clean cells to attack", 1)
+handed = re.findall(r"^### (" + ID + r")\b", part[0], flags=re.M)
+cells = re.findall(r"^- `([^`]+)` in (S\d)", part[1], flags=re.M)
+judged = set(re.findall(r"^- \**(" + ID + r")\**: (?:confirmed|refuted)", ret, flags=re.M))
+missing = [i for i in handed if i not in judged]
+cell_missing = [f"{i} {s}" for i, s in cells
+                if not re.search(r"^- `?" + re.escape(i) + r"`? " + s + r"\**: (?:holds|defect)", ret, flags=re.M)]
+print(f"{sys.argv[2].rsplit('/', 1)[-1]}: findings {len(handed)}, judged {len(judged & set(handed))}, "
+      f"cells {len(cells)}, cells judged {len(cells) - len(cell_missing)}"
+      + (f" · MISSING {missing + cell_missing}" if missing or cell_missing else ""))
+sys.exit(1 if missing or cell_missing else 0)
 ````
 
 ### `preset_check_canonical.py`
@@ -25786,6 +25821,7 @@ MINE = [
     ('audit-run/check_skeptic_split.py', "Whether any skeptic brief hands its skeptic a walker's table or verdicts: table rows and numbered bold labels inside a brief's findings section, seen on all four of run A's batches before findings_of's fix and on none after."),
     ('audit-run/plant_transcript.py', 'A planted transcript for the read audit: three reads into the home .claude folder spelled three ways and one read inside the copy, which the home-folder class must flag three times.'),
     ('audit-run/record_run_b_again.py', "Run B walked again: the round record's [walk-run-b-again] and [recall]'s bar as scored, fixed before any score was read."),
+    ('audit-run/check_verdicts.py', "Whether a skeptic's return gives a verdict to every finding and every clean cell its brief handed it, in the brief's grammar; seen red on a dropped verdict line, and on skeptic 1's verdict on A2-F3, whose line opens with stray words."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -27106,9 +27142,9 @@ K4: keys 265 · findings 55
 K5: principles 42, clauses 496, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 86 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 99 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 251 records, 4024 sections, 217 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 264 records, 4222 sections, 219 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27124,9 +27160,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 71 · lines 31975 · unreviewed 14100 (44%)
+  design records 84 · lines 35644 · unreviewed 17769 (50%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 10
+  design commits after the floor that no closing review covers: 11
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27137,6 +27173,7 @@ rerun review debt: rc 0
     47de3dc82  11 design record(s)  records(dClosedLoop): the whole-design walk dispatched — the sealed copy, Stage 0 on it and on the tree, and t
     abbc8c76d  6 design record(s)  records(dClosedLoop): run B sealed tighter — the round record names no plant's kind, and its briefs forbid the
     8b51f1f39  5 design record(s)  records(dClosedLoop): run B's four brief reviews answered — the seal is an allow-list and a read audit, and wa
+    69b111f9e  13 design record(s)  records(dClosedLoop): both walks whole — run B's walkers 1, 3, 4 and 5 walk at last, and the ten returns join
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27355,13 +27392,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2677 nodes in 30 namespaces; 32762 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1856, derived 321, pending 500
-map: no stale facts read 86 records and 28 quotes of a map count or the critical path
+map: 2695 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1874, derived 321, pending 500
+map: no stale facts read 99 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 251 records, 4028 sections, 217 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 264 records, 4223 sections, 219 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
