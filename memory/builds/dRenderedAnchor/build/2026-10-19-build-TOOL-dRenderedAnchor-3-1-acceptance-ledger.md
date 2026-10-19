@@ -80,3 +80,31 @@ reads section 2e's python program out of the suite. Each adopter fixture was bui
   printed 2; at `8a0e0b59` it reads 0.
 - AC15 — `tools/roles/adopt-roles.test.sh` — `grep -c '^FLOOR_ASSERTIONS='` printed 1, on
   `FLOOR_ASSERTIONS=49`: arm 14 gained one floored `check_arm`, arm 15 has three and arm 16 two.
+
+## The close's observations
+
+Run by the main loop at `052b43a24`, before the closing review. Each staged break was written by a
+script into the one file it names, or into a scratch copy of the adopter passed as
+`ROLES_ADOPTER`, the suite run, and the file restored by `git checkout`; the tree read clean after
+the last one.
+
+- `New arm:` arm 14, AC4 — RED with `TOOL_ROOT_CITE_RE` narrowed to `[A-Za-z.-]+`:
+  `adopt-roles.test.sh` exited 1, `FAIL (1 of 61)`, on arm 14's first check alone.
+- `New arm:` arm 14, AC6 — RED with `.relative_to(root)` dropped in `resolve_cited_paths`: exit 1
+  on arm 14's first check, with arms 15 and 16 redding beside it on the same absolute paths.
+- `New arm:` arm 14, AC5 — RED with a copy of the adopter applying the held lines through the
+  unanchored bash loop of `8a0e0b59` and calling the four-argument `resolve_cited_paths`: exit 1,
+  arm 14's extended-citation check failing beside its first check and arm 15's receipt row.
+- `New arm:` arm 15 — RED with every citation resolved with `here` at the tool root:
+  `FAIL (1 of 61)`, arm 15's decoy check.
+- `New arm:` arm 16 — RED with `except LookupError` alone in `resolve_cited_paths`:
+  `FAIL (2 of 61)`, both arm 16 checks.
+- `New arm:` section 2e row 7 — RED with `root in hit.parents` cut from
+  `tools/lib/resolve_kit_dir.py`: both section 2e checks failed, beside 70 inline-parity rows. The
+  red reads as a traceback, not a mismatched row: row 7's answer is outside the fixture, so the
+  section's program raises on `.relative_to` before it prints.
+- `New arm:` the check-wiring remedy check — RED with the remedy tail dropped from the echo in
+  `tools/check-wiring.sh`: `FAIL OC8 AC6 ...and the note ends with the remedy naming the adopter's --check`.
+- GREEN, all restored: `adopt-roles.test.sh` `PASS (61 assertions)`, `resolve-python.test.sh`
+  `PASS — resolve-python: 343 assertions held`, `check-wiring.test.sh` `253 passed, 0 failed`, each
+  exit 0.
