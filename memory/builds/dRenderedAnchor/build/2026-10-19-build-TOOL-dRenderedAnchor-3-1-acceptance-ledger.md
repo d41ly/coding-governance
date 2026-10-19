@@ -121,9 +121,10 @@ no-fork form and changes no other line of either suite. It does not touch
 - Section 2e's row-count check now reads the rows with `mapfile -t rk_rows <<<"$rk_got"` and counts
   the non-empty ones in a `for` loop, which is what `grep -c .` counted. Its two messages join the
   rows with `${rk_got//$'\n'/ }` in place of `tr '\n' ' '`. A `while read` count over
-  `<<<"$rk_got"` was tried first. The loop classifier of `shell hygiene (a loop fed by a command
-  substitution)` graded it a `loop-var-sub` site, which raised the suite's `<<<` count to 2 against
-  its row of 1 in `memory/project/substitution-fed-loops.txt`. The `mapfile` line is the idiom that
+  `<<<"$rk_got"` was tried first. The loop classifier of the leg
+  `shell hygiene (a loop fed by a command substitution)` graded it a `loop-var-sub` site. That
+  raised the suite's `<<<` count to 2 against its row of 1 in
+  `memory/project/substitution-fed-loops.txt`. The `mapfile` line is the idiom that
   section 3a of the same suite already uses, and neither line is a loop fed by a here-string.
 - Section 2f's `| tr -d '\r'` capture pipes a command's output, not a variable's, so the lint counts
   no site there. It is unchanged.
@@ -138,8 +139,8 @@ Observed by probes. No leg or suite was run.
   file. `resolve-python.test.sh` read `path-subst` 4 and `var-pipe` 8, and `adopt-roles.test.sh`
   read no site. Both equal the registry's rows for each file. Before this pass they read 11 and 8
   `var-pipe`. Its `scan_file` over the same files read one `<<<` `loop-var-sub` site for
-  `resolve-python.test.sh`, which equals its row, and none for `adopt-roles.test.sh`. `git diff
-  a60b0c7dc` over both registries was empty.
+  `resolve-python.test.sh`, which equals its row, and none for `adopt-roles.test.sh`.
+  `git diff a60b0c7dc` over both registries was empty.
 - `probe_fix3.sh` in the session scratchpad ran each old form and its replacement over seven values.
   They were: empty, one row, section 2e's seven rows, a blank row between two, leading and trailing
   whitespace with a tab, a backslash and `%s`, a trailing newline, and a three-line traceback. It
