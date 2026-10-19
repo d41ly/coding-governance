@@ -110,8 +110,8 @@ The 47 flagged rows, in one table:
 | `retrofit.slot-bytes` | key | dBoundRoles | it caps the work order's legacy slot, which dBoundRoles renders; the retrofit system is dWitnessedBar's; system retrofit (dWitnessedBar) |
 | intake | record kind | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9); dRankedPlan's row also describes that hook, which the re-cut reconciles |
 | fork | record kind | dIndexedDesign | a flow record kind (layer-memory `[decisions]`); fork resolution by `design.forks` is dIndexedDesign's, though forks arise in every step |
-| lease | record kind | dDeclaredLoop | dDeclaredLoop's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds |
-| mailbox message | record kind | dDeclaredLoop | dDeclaredLoop's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds |
+| lease | record kind | dPlacedRequest | dDeclaredLoop's row built the one lease grammar until NP-24 moved it to dPlacedRequest (revised 2026-10-19, the night pass two, point 4); layer-memory lists the lease among Runtime's kinds |
+| mailbox message | record kind | dKeptSession | dDeclaredLoop's row built the mailbox and its message kinds until NP-24 moved them to dKeptSession (revised 2026-10-19, the night pass two, point 4); layer-memory lists it among Runtime's kinds |
 | run record | record kind | dWellOiledMachine | `RUN.md` belongs to the unattended run, which the supervisor executes; observability's `observability.run-record` reads it |
 | review | record kind | dFairHearing | its writer is `review.report`, the harness's, under the proposal for the breakpoint's items |
 | design record | record kind | dTotalRecall | a core memory kind with no writer item; the memory contract declares it |
@@ -503,8 +503,8 @@ The 78 keys that nothing names take their namespace's owner:
 | flake | dWitnessedBar | stage | its writer is `test.flakes`; flake quarantine |  |
 | landing | dShippedRelease | row | the landing record; its writer is `deploy.record` |  |
 | transition | dDeclaredLoop | row | the transition record three ways; every step's exit item writes it |  |
-| lease | dDeclaredLoop | judgment | dDeclaredLoop's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds | yes |
-| mailbox message | dDeclaredLoop | judgment | dDeclaredLoop's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds | yes |
+| lease | dPlacedRequest | judgment | dPlacedRequest's row builds the one lease grammar since NP-24 (revised 2026-10-19, the night pass two, point 4); layer-memory lists the lease among Runtime's kinds | yes |
+| mailbox message | dKeptSession | judgment | dKeptSession's row builds the mailbox and its message kinds since NP-24 (revised 2026-10-19, the night pass two, point 4); layer-memory lists it among Runtime's kinds | yes |
 | return | dWellOiledMachine | row | the persisted-return store, keyed per spawn site |  |
 | act | dWellOiledMachine | row | one act session per role act; act binding and the epoch check |  |
 | session binding | dWellOiledMachine | row | sessions bound on every source |  |

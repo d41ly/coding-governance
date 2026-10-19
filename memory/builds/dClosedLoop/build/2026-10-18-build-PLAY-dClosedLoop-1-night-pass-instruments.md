@@ -14830,6 +14830,344 @@ R.save()
 print("folded point 3")
 ````
 
+### `fold_p4.py`
+
+Point 4, handoffs: the point's section and forks NT-18 to NT-21, the row contract, registers, branch push and unit holders folded into v2, and the contradictions corrected in coordination, flow-roles, flow-interactions, ownership, layer-memory, fates and the gap register.
+
+````python
+"""The night pass two, point 4: handoffs between agents, sessions and nodes. Writes the point's section and its forks
+(NT-18 to NT-21) into the night pass two's record and folds the design, marked pending where a fork decides it, into
+v2, coordination, flow-roles, flow-interactions, ownership, layer-memory, fates and the gap register, fixing the
+contradictions dispatch 132 found.
+
+Usage: python -X utf8 fold_p4.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+NP2 = "the night pass two"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def add_key(rec, after, cat_row, preset_row, label):
+    rows = [ln for ln in rec.text.split("\n") if ln.startswith(f"| `{after}` |")]
+    if len(rows) != 2:
+        sys.exit(f"{len(rows)} {after} rows, two expected")
+    rec.sub(rows[0] + "\n", rows[0] + "\n" + cat_row + "\n", f"catalogue: {label}")
+    rec.sub(rows[1] + "\n", rows[1] + "\n" + preset_row + "\n", f"presets: {label}")
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("the work order rendered per item (the item, its inputs as record fields at their SHAs, its allowance",
+      "the work order rendered per item (the item, its inputs handed as content, its allowance",
+      "dBoundRoles: inputs handed as content")
+V.sub("renamed as the two reviewer roles merge and `gov-session` folds into the prompt writer, and the role index "
+      "re-rendered (P38)",
+      "renamed as the two reviewer roles merge, and the role index re-rendered (P38, the night pass two's point 4 "
+      "moving `gov-session`'s retirement to Runtime, pending NT-21)",
+      "dBoundRoles: gov-session moves")
+add_clauses(V, "dBoundRoles", [
+    "the prompt writer's framing checked at render, every anchor it points at resolving to a fact the work order "
+    f"hands, seen red on a planted anchor to nothing ({NP2}, point 4)"], ["gap-roles-28"])
+add_clauses(V, "dFurnishedOrders", [
+    "every role return declaring the rows it establishes (seams, criteria, interfaces, resolved forks, findings and "
+    "repairs), which the next work orders hand on as their upstream rows, and each work order's return schema "
+    "rendered from its own rows, each row id an allowed value and each required once, so a dropped, invented or "
+    "doubled row fails the return and is retried as `roles.retries` says, seen red on a planted return of each kind "
+    f"({NP2}, point 4, pending NT-10)",
+    "the problems whose subject intersects an item's seed handed in its work order as rows, read from the problem "
+    f"register when the order is cut ({NP2}, point 4, pending NT-18)"], ["gap-roles-29", "gap-conc-10"])
+add_clauses(V, "dPlacedRequest", [
+    "create-only registers on the remote, each ref written once by compare-and-swap and refused when it exists: "
+    "decisions at `refs/gov/decisions/<build>/<key>`, the key derived from the work-order slot that raised the "
+    "question, its item and declared fork slot, never from its wording, so a second session deciding that slot is "
+    "refused and reads the first, and problems at `refs/gov/problems/<subject key>`, keyed by a path, a definition, "
+    "a tag or a node fact, seen red on two clones deciding one slot "
+    f"({NP2}, point 4, pending NT-18)"], ["gap-conc-08"])
+add_clauses(V, "dKeptSession", [
+    "each message's id derived from its sender's act, its item, its kind and its subject, so a retried post is "
+    f"refused as a duplicate, seen on a post retried after a crash ({NP2}, point 4, pending NT-18)"], ["gap-conc-09"])
+add_clauses(V, "dScopedBuild", [
+    "the closing review handed, beside its range, each unit's acceptance criteria and the MUST seams its spec carried "
+    "as rows each finder answers, recorded, and gating once a measurement passes "
+    f"({NP2}, point 4, pending NT-10)"], ["gap-flow-22"])
+add_clauses(V, "dWellOiledMachine", [
+    "the commit queue committing each role return into the build's trail at its item's witness and pushing the "
+    "build's branch as `build.push` says, so a take-over on any node reads the witnesses the lease's holder wrote and "
+    "another node derives the card's pointers from the pushed branch, seen on a node that commits three of five units "
+    "and dies, whose successor's `next` names the fourth and whose closing review receives the first three's rows "
+    f"({NP2}, point 4, pending NT-19)",
+    "a unit of a leased build offered at placement to another session or node as `build.unit-holders` says, its "
+    "holder driving only that unit's passes on its own branch, pushed the same way, its returns' rows and registered "
+    "decisions reaching the build's driver through the branch and the registers, the driver alone running "
+    f"transitions ({NP2}, point 4, pending NT-20)",
+    "`gov-session` retired with an upgrade step: a hand-off to another session becomes an `intake` message or a unit "
+    "offered at placement, and the receiving session's prompt writer renders the work order the prose prompt was "
+    f"({NP2}, point 4, pending NT-21)"], ["gap-rt-33", "gap-conc-11"])
+add_key(V, "build.worktree",
+        "| `build.push` | every-item, every-pass, every-transition, at-landing | every-item | " + NP2 + ", point 4: when "
+        "the commit queue pushes a build's branch, its returns included, so another node reads its witnesses, "
+        "pending NT-19 | dWellOiledMachine |",
+        "| `build.push` | every-item | every-item | every-item | every-item |", "build.push")
+add_key(V, "build.push",
+        "| `build.unit-holders` | any-session, driver-only | any-session | " + NP2 + ", point 4: whether a session "
+        "that does not hold a build may drive one of its units under that unit's lease, pending NT-20 | "
+        "dWellOiledMachine |",
+        "| `build.unit-holders` | any-session | any-session | driver-only | any-session |", "build.unit-holders")
+V.save()
+
+# ---------------------------------------------------------------- coordination
+CO = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md")
+CO.sub("`landed`, `question`, `answer`, `ack`.\n",
+       "`landed`, `question`, `answer`, `ack`. Revised 2026-10-19 (the night pass two, point 4): the closed\n"
+       "   set is one list, declared once in the loop definition, the nine above with `intake` (flow-roles FR-8)\n"
+       "   and `withdrawn` and `superseded` (flow-steps `life.notify`). Completed work and decisions are not\n"
+       "   messages: `next` derives done-ness from witnesses, a decision is its register's entry, and a problem\n"
+       "   is the problem register's, keyed by its subject.\n", "item 6: one closed list")
+CO.save()
+
+# ---------------------------------------------------------------- flow-roles: the closing review's packet
+FR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-roles.md")
+FR.sub("| 8 | review roles, diff lens | the build's range | findings, then a report |",
+       "| 8 | review roles, diff lens | the build's range, and each unit's acceptance criteria and MUST seams as rows "
+       "each finder answers (revised 2026-10-19, the night pass two, point 4) | findings, then a report |",
+       "Build 8: the packet")
+FR.save()
+
+# ---------------------------------------------------------------- flow-interactions: unreachability
+FI = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-flow-interactions.md")
+FI.sub("  read at each transition; no reply within a bound means unreachable, and the dependent then waits for\n"
+       "  the parent's landing.\n",
+       "  read at each transition; no reply within a bound means unreachable, and the dependent then waits for\n"
+       "  the parent's landing. Revised 2026-10-19 (the night pass two, point 4): the owner settled this\n"
+       "  otherwise. No timeout applies, since the parent's lease decides whether it is reachable (coordination\n"
+       "  `[interpretations]` 1, confirmed as RC-5), and the mailbox is read at every item (flow-roles FR-8).\n",
+       "FI-6: unreachability")
+FI.save()
+
+# ---------------------------------------------------------------- ownership: the mailbox's and the lease's owners
+OW = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+OW.sub("| lease | record kind | dDeclaredLoop | dDeclaredLoop's row builds the one lease grammar; layer-memory lists the "
+       "lease among Runtime's kinds |",
+       "| lease | record kind | dPlacedRequest | dDeclaredLoop's row built the one lease grammar until NP-24 moved it to "
+       "dPlacedRequest (revised 2026-10-19, the night pass two, point 4); layer-memory lists the lease among Runtime's "
+       "kinds |", "ownership: lease, first table")
+OW.sub("| mailbox message | record kind | dDeclaredLoop | dDeclaredLoop's row builds the mailbox and its message kinds; "
+       "layer-memory lists it among Runtime's kinds |",
+       "| mailbox message | record kind | dKeptSession | dDeclaredLoop's row built the mailbox and its message kinds "
+       "until NP-24 moved them to dKeptSession (revised 2026-10-19, the night pass two, point 4); layer-memory lists it "
+       "among Runtime's kinds |", "ownership: mailbox, first table")
+OW.sub("| lease | dDeclaredLoop | judgment | dDeclaredLoop's row builds the one lease grammar;",
+       "| lease | dPlacedRequest | judgment | dPlacedRequest's row builds the one lease grammar since NP-24 (revised "
+       "2026-10-19, the night pass two, point 4);", "ownership: lease, second table")
+OW.sub("| mailbox message | dDeclaredLoop | judgment | dDeclaredLoop's row builds the mailbox and its message kinds;",
+       "| mailbox message | dKeptSession | judgment | dKeptSession's row builds the mailbox and its message kinds since "
+       "NP-24 (revised 2026-10-19, the night pass two, point 4);", "ownership: mailbox, second table")
+OW.save()
+
+# ---------------------------------------------------------------- layer-memory: the return's writer
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LM.sub("| return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named |",
+       "| return | dWellOiledMachine | the persisted-return store, keyed per spawn site; written by the commit queue "
+       "into the build's trail at its item's witness and pushed with the build's branch (revised 2026-10-19, the night "
+       "pass two, point 4) |", "the return's writer")
+LM.save()
+
+# ---------------------------------------------------------------- fates: gov-session's destination
+FA = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+FA.sub("| roles | gov-session | hands work to another session | MERGED | the prompt writer (\"session-handoff template "
+       "folds\") (dBoundRoles) |",
+       "| roles | gov-session | hands work to another session | MERGED | the `intake` message, or a unit offered at "
+       "placement, with the work order the receiving session's prompt writer renders (dWellOiledMachine; revised "
+       "2026-10-19, the night pass two, point 4, pending NT-21: it was the prompt writer, which acts in no item) |",
+       "fates: gov-session")
+FA.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+HD = "`research-handoffs-design.md`"
+HP = "`research-handoffs-prior-art.md`"
+NEW = {
+    "gap-rt-32": [("gap-rt-33", "Runtime", "HIGH", "No rule pushes a build's branch before its landing, so a take-over "
+                   "on another node cannot read the witnesses the design says it reads.", f"{HD} section 5, item 8")],
+    "gap-roles-27": [("gap-roles-28", "Roles", "MED", "The prompt writer's prose framing has no checker: its rule to "
+                      "point at handed facts by anchor is checked nowhere.", f"{HD} section 1, hop 4, and section 5, "
+                      "item 11"),
+                     ("gap-roles-29", "Roles", "MED", "Returns declare nothing they establish for the next step, and a "
+                      "static return schema passes a dropped, invented or doubled row.",
+                      f"{HD} section 6; {HP} probe 1")],
+    "gap-conc-07": [("gap-conc-08", "Spine", "HIGH", "Nothing keys a decision by the question it answers: two sessions "
+                     "deciding one question differently both land, under two content-addressed ids.",
+                     f"{HP} probe 2")],
+    "gap-flow-21": [("gap-flow-22", "Flow", "MED", "The closing review is handed the build's range alone, never the "
+                     "criteria or seams its finders must answer, though the verifier's packet allows them.",
+                     f"{HD} section 5, item 6")],
+}
+NEW["gap-conc-08"] = [("gap-conc-09", "Spine", "MED", "A retried mailbox post lands twice, because a commit's id "
+                       "changes with its time.", f"{HP} probe 3"),
+                      ("gap-conc-10", "Spine", "MED", "No channel addresses a problem by its subject: one found on one "
+                       "node reaches another only if its finder addresses that build.", f"{HP} scenario S3"),
+                      ("gap-conc-11", "Spine", "MED", "No item lets a session that does not hold a build drive one of "
+                       "its units, though unit leases carry host and session fields.", f"{HD} section 3")]
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 341 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's point 4 added `gap-rt-33`, `gap-roles-28`, `gap-roles-29`,\n"
+    "`gap-conc-08` to `gap-conc-11` and `gap-flow-22` (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md`\n"
+    f"`[p4-handoffs]`), same instrument, over {len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER)
+    + "\n" + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night pass two's record
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.insert_before("\n## [forks] Parked for the owner, 2026-10-19\n", """
+## [p4-handoffs] Point 4: handoffs between agents, sessions and nodes
+
+**What the design held.** Dispatch 132 traced one build's hand-offs end to end: eleven hops over five carriers, the
+work order and its return, the records `next` reads, the card, the mailbox and the coordination refs. They share keys
+but no contract. Inside one item the hand-off is typed and checked: a schema-forced return, the witness computed and
+never typed. Between items, between nodes, and for the owner's "completed work, decisions taken, problems
+encountered", it is not:
+- **Between items and steps** no commitment crosses as a row the next step must answer. Point 2 folded the rows.
+- **Between nodes** no rule pushes a build's branch before its landing, so another node cannot see finished units,
+  and a take-over cannot read the witnesses the runtime record says it reads.
+- **Completed work, decisions and problems** have no message kind, and nothing keys a decision by its question.
+  Dispatch 133's probe 2 showed two sessions deciding one question differently: both landed in the mailbox's chain,
+  and only a reader would notice.
+
+It also found twelve contradictions between the records, folded below where a record could be corrected.
+
+**What prior art adds.** Dispatch 133 read eight families, from transcript transfer to durable workflows. Two of its
+probes decide the shape:
+- A static return schema passed a dropped, an invented and a doubled commitment row. A schema rendered per work order,
+  with the order's row ids as its only allowed values and each one required, refused all three.
+- A create-only ref keyed by a derived key refused the second of two conflicting decisions, and turned a retried post
+  into a no-op. An append-only chain kept both.
+
+**How agents shape and pass data.** One contract: every commitment crosses an edge as a row the receiver answers.
+1. Each role return declares what it establishes: seams, criteria, interfaces, resolved forks, findings and repairs.
+2. The next work orders hand those on as upstream rows (point 2's `upstream` field).
+3. Each order's return schema is rendered from its own rows, so a dropped, invented or doubled row fails the return
+   and is retried. A `bypassed` row is a finding that routes. Rows gate only where a measurement passed, as point 2
+   set.
+
+**How work moves between sessions on one build.** Through the trail, pushed, and through registers:
+- **The branch.** The commit queue commits each role return into the trail at its item's witness and pushes the
+  build's branch as `build.push` says, every item by default. Another node then reads the same witnesses, derives the
+  card's pointers from the branch, and can take over (NT-19).
+- **Units across sessions.** A session that does not hold the build may take one of its units under that unit's
+  lease, as `build.unit-holders` says. It drives only that unit's passes on its own branch, and the build's driver
+  alone runs transitions (NT-20).
+- **Decisions.** A decision is written once to `refs/gov/decisions/<build>/<key>`, keyed by the work-order slot that
+  raised it, never by its wording. A second session deciding the same slot is refused and reads the first (NT-18).
+- **Problems.** A problem is written to `refs/gov/problems/<subject key>`, keyed by a path, a definition, a tag or a
+  node fact. A work order cut later is handed the problems whose subject meets its item's seed (NT-18).
+- **Messages.** The mailbox keeps only traffic that crosses a lease, each message's id derived from its sender's act,
+  item, kind and subject, so a retry is refused as a duplicate. Its closed set of kinds is one list.
+
+**The contradictions, as folded.**
+1. dBoundRoles' work order still read "its inputs as record fields at their SHAs": now "handed as content".
+2. `gov-session` folded into the prompt writer, which acts in no item: it now retires into the `intake` message or a
+   unit offered at placement, in dWellOiledMachine, with the fates row moved (NT-21).
+3. The mailbox's closed set was three lists: coordination's item 6 now declares one.
+4. flow-interactions' FI-6 still said no reply within a bound means unreachable: revised to the owner's RC-5 and
+   FR-8.
+5. The ownership record named dDeclaredLoop for the mailbox and the lease: now dKeptSession and dPlacedRequest, as
+   NP-24 moved them.
+6. The closing review was handed the range alone: flow-roles' Build 8 and dScopedBuild now hand it the criteria and
+   MUST seams as rows, recorded until measured.
+7. No P7 rows at any edge: point 2's fold.
+8. A take-over assumed pushed witnesses: `build.push`.
+9. The return's writer was unnamed: the commit queue, at its item's witness.
+10. The card's per-item pointers had no store: derived from the pushed branch.
+11. The prompt writer's framing had no checker: dBoundRoles checks every anchor at render.
+12. Live delivery cannot reach an act, since an act makes one call. That stays: an act hears news when its next work
+    order is cut, with the problems that meet its seed. Interrupting an act mid-item is left open.
+
+**Left open.** The worst case dispatch 133 names: two sessions meeting a question no work-order slot declares derive
+different keys, and both decisions land. Only a lease overlap or the closing review catches it. The build that owns
+the registers must run that fixture as its losing test.
+
+**Folded.** v2's dBoundRoles, dFurnishedOrders, dPlacedRequest, dKeptSession, dScopedBuild and dWellOiledMachine
+rows, with eight gaps, and the keys `build.push` and `build.unit-holders` with their preset rows; coordination's item
+6; flow-roles' Build 8; flow-interactions' FI-6; four ownership rows; layer-memory's return row; the fates row for
+`gov-session`; and the register's `gap-rt-33`, `gap-roles-28`, `gap-roles-29`, `gap-conc-08` to `gap-conc-11` and
+`gap-flow-22`.
+""", "point 4's section")
+R.text = R.text.rstrip("\n") + "\n" + (
+    "| NT-18 | How are decisions, problems and messages kept between sessions and nodes? | create-only registers keyed "
+    "by derived keys: decisions by their work-order slot, problems by subject, and message ids derived so a retry is "
+    "refused; the mailbox's chain alone, as designed | a structural decision |\n"
+    "| NT-19 | When is a build's branch pushed? | at every witnessed item; at every pass commit; at every transition; at "
+    "the landing | `build.push`'s default: every-item, every-pass, every-transition, at-landing |\n"
+    "| NT-20 | May another session drive one unit of a build it does not hold? | yes, under that unit's lease, the "
+    "build's driver alone running transitions; no, one driver per build, as designed | `build.unit-holders`' default: "
+    "any-session, driver-only |\n"
+    "| NT-21 | What replaces `gov-session`? | the `intake` message or a unit offered at placement, with the receiving "
+    "session's prompt writer rendering its work order; the prompt writer, as designed; `gov-session` kept | a "
+    "structural decision |\n")
+R.done += 1
+R.save()
+print("folded point 4")
+````
+
+### `fold_p4_marker.py`
+
+The atlas stopped on point 4: the return row had lost its kind marker, so it keeps 'writer item not named' and names the commit queue after it.
+
+````python
+"""Point 4's return row lost the atlas's kind marker: the commit queue that writes a return is no flow item, so the
+row keeps "writer item not named" and says who writes it after the marker."""
+import pathlib, sys
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record
+LM = Record("memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LM.sub("| return | dWellOiledMachine | the persisted-return store, keyed per spawn site; written by the commit queue "
+       "into the build's trail at its item's witness and pushed with the build's branch (revised 2026-10-19, the night "
+       "pass two, point 4) |",
+       "| return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named: the "
+       "commit queue, which is no item, writes it into the build's trail at its item's witness and pushes it with the "
+       "build's branch (revised 2026-10-19, the night pass two, point 4) |", "the return's marker")
+LM.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before.
@@ -15162,6 +15500,11 @@ MINE = [
     ("night2/fold_p3.py", "Point 3, storage and coordination: the point's section and forks NT-14 to NT-17, "
      "the index, the mailbox and the notice keys folded into v2, systems, coordination, the memory plan and the "
      "gap register, and 'seconds' added to the preset check's free values."),
+    ("night2/fold_p4.py", "Point 4, handoffs: the point's section and forks NT-18 to NT-21, the row contract, "
+     "registers, branch push and unit holders folded into v2, and the contradictions corrected in coordination, "
+     "flow-roles, flow-interactions, ownership, layer-memory, fates and the gap register."),
+    ("night2/fold_p4_marker.py", "The atlas stopped on point 4: the return row had lost its kind marker, so it "
+     "keeps 'writer item not named' and names the commit queue after it."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
@@ -15647,17 +15990,17 @@ witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTot
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
+fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
-fork                     3  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
+act                      3  dDeclaredLoop (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 review                   2  dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 census                   2  dOrderedCharter (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
 spec                     2  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's)
-act                      2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 decision                 2  dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
@@ -15676,9 +16019,10 @@ fleet                    1  dPlacedRequest (dShippedRelease's)
 routing                  1  dKeptSession (dWitnessedBar's)
 ask                      1  dKeptSession (dTotalRecall's)
 roster                   1  dBoundRoles (dIndexedDesign's)
+seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 97, over 39 kinds
+plain-word hits on a non-ancestor's record kind: 100, over 40 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -16138,10 +16482,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:763 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:780 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:763 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:780 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -16189,13 +16533,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2479 nodes in 30 namespaces; 31437 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1695, derived 289, pending 495
+map: 2489 nodes in 30 namespaces; 31438 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1703, derived 291, pending 495
 map: no stale facts read 57 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 198 records, 3304 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 198 records, 3307 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -16213,8 +16557,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 463 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 97 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 21 · owned nodes read 465 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 100 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -16246,7 +16590,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 333 · chain builds 21
+register keys 341 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -16254,13 +16598,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 238 · presettable 216 · preset rows 216
+catalogue keys 240 · presettable 218 · preset rows 218
 no findings
 rc 0
 
 $ critical path
-critical path: 226 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 34, dOrderedCharter 55, dDeclaredLoop 84, dPlacedRequest 94, dWitnessedBar 112, dKeptSession 115, dBoundRoles 135, dTotalRecall 135, dRankedPlan 149, dFurnishedOrders 153, dLinkedLibrary 159, dIndexedDesign 172, dWellOiledMachine 174, dScopedBuild 186, dTendedCadence 190, dMindYourWords 191, dShippedRelease 201, dCalibratedLens 204, dConvergedCharter 226
+critical path: 230 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 34, dOrderedCharter 55, dDeclaredLoop 84, dPlacedRequest 95, dWitnessedBar 112, dKeptSession 117, dTotalRecall 135, dBoundRoles 136, dRankedPlan 150, dFurnishedOrders 156, dLinkedLibrary 159, dIndexedDesign 172, dWellOiledMachine 178, dScopedBuild 191, dTendedCadence 194, dMindYourWords 195, dShippedRelease 205, dCalibratedLens 208, dConvergedCharter 230
 rc 0
 ````
 

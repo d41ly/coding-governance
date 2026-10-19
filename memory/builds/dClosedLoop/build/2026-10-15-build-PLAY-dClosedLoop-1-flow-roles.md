@@ -85,7 +85,7 @@ reviewer with the step's lens, then the skeptic, then the synthesizer.
 | 3 to 5 | builder, one per unit, in order; disjoint units in parallel | the spec at its SHA, the write set, the acceptance commands, the bug classes | `committed` with SHA and checks, or `diverged` as spec-wrong, interface-change or fork | spec-wrong goes to the spec writer (the unit is unbuilt); interface-change to the architect (feature re-entry); a fork by `design.forks`; then READY again and back to the builder |
 | 6 | driver | — | the routes above | — |
 | 7 | command | the commits; the write sets | the scope report | a stray path warns and files an ask |
-| 8 | review roles, diff lens | the build's range | findings, then a report | `review.findings` disposes: the spec writer specs new units (built specs stay frozen), the builder builds them |
+| 8 | review roles, diff lens | the build's range, and each unit's acceptance criteria and MUST seams as rows each finder answers (revised 2026-10-19, the night pass two, point 4) | findings, then a report | `review.findings` disposes: the spec writer specs new units (built specs stay frozen), the builder builds them |
 | 9, 10 | commands | — | core checks; the transition | — |
 
 ### Test

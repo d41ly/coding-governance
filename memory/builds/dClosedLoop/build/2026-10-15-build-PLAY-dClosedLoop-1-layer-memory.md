@@ -434,7 +434,7 @@ layer that registers a kind adds its row.
 | lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds; writer item not named |
 | mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds; writer item not named |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
-| return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named |
+| return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named: the commit queue, which is no item, writes it into the build's trail at its item's witness and pushes it with the build's branch (revised 2026-10-19, the night pass two, point 4) |
 | act | dWellOiledMachine | one act session per role act; act binding and the epoch check; writer item not named |
 | session binding | dWellOiledMachine | sessions bound on every source; writer item not named |
 | journal | dWellOiledMachine | the journal grammar moved into the core; writer item not named |

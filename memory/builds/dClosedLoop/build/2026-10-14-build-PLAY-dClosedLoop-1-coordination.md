@@ -104,7 +104,11 @@ build beside the policy and transition features rather than after them.
    references (unit ids, interface names, SHAs), a body, and the id it answers. Its kind comes from a
    closed set the loop definition declares and the loop's schema checks on every write, so a new kind
    is a change to the loop kit, never an adopter's extension: `confirm-request`, `confirmed`,
-   `changed` (additive or breaking), `overlap`, `takeover`, `landed`, `question`, `answer`, `ack`.
+   `changed` (additive or breaking), `overlap`, `takeover`, `landed`, `question`, `answer`, `ack`. Revised 2026-10-19 (the night pass two, point 4): the closed
+   set is one list, declared once in the loop definition, the nine above with `intake` (flow-roles FR-8)
+   and `withdrawn` and `superseded` (flow-steps `life.notify`). Completed work and decisions are not
+   messages: `next` derives done-ness from witnesses, a decision is its register's entry, and a problem
+   is the problem register's, keyed by its subject.
    Every transition reads the build's mailbox and is refused while a message addressed to the build
    is neither answered nor acknowledged, the reply being the witness; the card shows unread messages,
    and `next` lists them as next actions. Each transition writes the messages it disposed, with their

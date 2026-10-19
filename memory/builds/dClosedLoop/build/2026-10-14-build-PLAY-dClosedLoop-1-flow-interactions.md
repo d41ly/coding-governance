@@ -131,7 +131,9 @@ start. Answer: Re-rendered at each transition (Recommended).
 - **Messaging** (`deps.messaging`): sessions on one machine message each other live; every message is
   also written to a durable mailbox on the shared remote, keyed by build, which sessions on other nodes
   read at each transition; no reply within a bound means unreachable, and the dependent then waits for
-  the parent's landing.
+  the parent's landing. Revised 2026-10-19 (the night pass two, point 4): the owner settled this
+  otherwise. No timeout applies, since the parent's lease decides whether it is reachable (coordination
+  `[interpretations]` 1, confirmed as RC-5), and the mailbox is read at every item (flow-roles FR-8).
 - **Landing order** (`landing.order`): the plan's priority orders landings, ties to the build verified
   first; each landing makes the others' verdicts stale, and they re-verify against the new tip.
 - **The card follows the build** (`card.follows`): each transition re-renders the card's slice (the

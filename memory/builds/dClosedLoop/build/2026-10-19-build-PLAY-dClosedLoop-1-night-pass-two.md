@@ -281,6 +281,79 @@ Runtime's to propose.
 bullet; coordination's items 6 and 7; the memory plan's mail ref; and the register's `gap-found-33`, `gap-mem-41` to
 `gap-mem-43` and `gap-conc-04` to `gap-conc-07`. The preset check's free values gain "seconds", the class of "hours".
 
+## [p4-handoffs] Point 4: handoffs between agents, sessions and nodes
+
+**What the design held.** Dispatch 132 traced one build's hand-offs end to end: eleven hops over five carriers, the
+work order and its return, the records `next` reads, the card, the mailbox and the coordination refs. They share keys
+but no contract. Inside one item the hand-off is typed and checked: a schema-forced return, the witness computed and
+never typed. Between items, between nodes, and for the owner's "completed work, decisions taken, problems
+encountered", it is not:
+- **Between items and steps** no commitment crosses as a row the next step must answer. Point 2 folded the rows.
+- **Between nodes** no rule pushes a build's branch before its landing, so another node cannot see finished units,
+  and a take-over cannot read the witnesses the runtime record says it reads.
+- **Completed work, decisions and problems** have no message kind, and nothing keys a decision by its question.
+  Dispatch 133's probe 2 showed two sessions deciding one question differently: both landed in the mailbox's chain,
+  and only a reader would notice.
+
+It also found twelve contradictions between the records, folded below where a record could be corrected.
+
+**What prior art adds.** Dispatch 133 read eight families, from transcript transfer to durable workflows. Two of its
+probes decide the shape:
+- A static return schema passed a dropped, an invented and a doubled commitment row. A schema rendered per work order,
+  with the order's row ids as its only allowed values and each one required, refused all three.
+- A create-only ref keyed by a derived key refused the second of two conflicting decisions, and turned a retried post
+  into a no-op. An append-only chain kept both.
+
+**How agents shape and pass data.** One contract: every commitment crosses an edge as a row the receiver answers.
+1. Each role return declares what it establishes: seams, criteria, interfaces, resolved forks, findings and repairs.
+2. The next work orders hand those on as upstream rows (point 2's `upstream` field).
+3. Each order's return schema is rendered from its own rows, so a dropped, invented or doubled row fails the return
+   and is retried. A `bypassed` row is a finding that routes. Rows gate only where a measurement passed, as point 2
+   set.
+
+**How work moves between sessions on one build.** Through the trail, pushed, and through registers:
+- **The branch.** The commit queue commits each role return into the trail at its item's witness and pushes the
+  build's branch as `build.push` says, every item by default. Another node then reads the same witnesses, derives the
+  card's pointers from the branch, and can take over (NT-19).
+- **Units across sessions.** A session that does not hold the build may take one of its units under that unit's
+  lease, as `build.unit-holders` says. It drives only that unit's passes on its own branch, and the build's driver
+  alone runs transitions (NT-20).
+- **Decisions.** A decision is written once to `refs/gov/decisions/<build>/<key>`, keyed by the work-order slot that
+  raised it, never by its wording. A second session deciding the same slot is refused and reads the first (NT-18).
+- **Problems.** A problem is written to `refs/gov/problems/<subject key>`, keyed by a path, a definition, a tag or a
+  node fact. A work order cut later is handed the problems whose subject meets its item's seed (NT-18).
+- **Messages.** The mailbox keeps only traffic that crosses a lease, each message's id derived from its sender's act,
+  item, kind and subject, so a retry is refused as a duplicate. Its closed set of kinds is one list.
+
+**The contradictions, as folded.**
+1. dBoundRoles' work order still read "its inputs as record fields at their SHAs": now "handed as content".
+2. `gov-session` folded into the prompt writer, which acts in no item: it now retires into the `intake` message or a
+   unit offered at placement, in dWellOiledMachine, with the fates row moved (NT-21).
+3. The mailbox's closed set was three lists: coordination's item 6 now declares one.
+4. flow-interactions' FI-6 still said no reply within a bound means unreachable: revised to the owner's RC-5 and
+   FR-8.
+5. The ownership record named dDeclaredLoop for the mailbox and the lease: now dKeptSession and dPlacedRequest, as
+   NP-24 moved them.
+6. The closing review was handed the range alone: flow-roles' Build 8 and dScopedBuild now hand it the criteria and
+   MUST seams as rows, recorded until measured.
+7. No P7 rows at any edge: point 2's fold.
+8. A take-over assumed pushed witnesses: `build.push`.
+9. The return's writer was unnamed: the commit queue, at its item's witness.
+10. The card's per-item pointers had no store: derived from the pushed branch.
+11. The prompt writer's framing had no checker: dBoundRoles checks every anchor at render.
+12. Live delivery cannot reach an act, since an act makes one call. That stays: an act hears news when its next work
+    order is cut, with the problems that meet its seed. Interrupting an act mid-item is left open.
+
+**Left open.** The worst case dispatch 133 names: two sessions meeting a question no work-order slot declares derive
+different keys, and both decisions land. Only a lease overlap or the closing review catches it. The build that owns
+the registers must run that fixture as its losing test.
+
+**Folded.** v2's dBoundRoles, dFurnishedOrders, dPlacedRequest, dKeptSession, dScopedBuild and dWellOiledMachine
+rows, with eight gaps, and the keys `build.push` and `build.unit-holders` with their preset rows; coordination's item
+6; flow-roles' Build 8; flow-interactions' FI-6; four ownership rows; layer-memory's return row; the fates row for
+`gov-session`; and the register's `gap-rt-33`, `gap-roles-28`, `gap-roles-29`, `gap-conc-08` to `gap-conc-11` and
+`gap-flow-22`.
+
 ## [forks] Parked for the owner, 2026-10-19
 
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
@@ -306,3 +379,7 @@ decision.
 | NT-15 | What shape does the derived index take? | one SQLite file per node keyed by blob, memory-recall's tables inside it and the memory legs reading it; one JSON file per tree, as designed; per-worktree caches, as today | a structural decision |
 | NT-16 | How do senders share a build's mailbox? | one ref per sender per build; one ref per build, as designed | a structural decision |
 | NT-17 | When does a session learn of a message? | at every tool call, from a local copy a detached fetch keeps fresh, with the live channel ringing ids only; at every item, as `mailbox.reads` alone; never between reads | `mailbox.notice`'s default: every-tool-call, every-item, off |
+| NT-18 | How are decisions, problems and messages kept between sessions and nodes? | create-only registers keyed by derived keys: decisions by their work-order slot, problems by subject, and message ids derived so a retry is refused; the mailbox's chain alone, as designed | a structural decision |
+| NT-19 | When is a build's branch pushed? | at every witnessed item; at every pass commit; at every transition; at the landing | `build.push`'s default: every-item, every-pass, every-transition, at-landing |
+| NT-20 | May another session drive one unit of a build it does not hold? | yes, under that unit's lease, the build's driver alone running transitions; no, one driver per build, as designed | `build.unit-holders`' default: any-session, driver-only |
+| NT-21 | What replaces `gov-session`? | the `intake` message or a unit offered at placement, with the receiving session's prompt writer rendering its work order; the prompt writer, as designed; `gov-session` kept | a structural decision |
