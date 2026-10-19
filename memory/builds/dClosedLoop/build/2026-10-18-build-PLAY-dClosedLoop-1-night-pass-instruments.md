@@ -23173,6 +23173,206 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `clause_ids.py`
+
+The draft of the clause-id instrument the build folder now holds as `2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py`: it minted 496 ids in [chain] order and checks one id per clause, none minted twice, none retired and none past the recorded next number, red before the minting and on four plants.
+
+````python
+"""v2's clause ids (the owner's FQ-2): every clause of [chain] ends with its minted id, `cl-<minting-slug>-NNNN` in
+backticks, never renumbered or reused; [clause-ids] states the grammar, the next free number and the retired ids.
+
+Usage: python -X utf8 2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py [--mint] [--plant missing|duplicate|retired|next]
+       (from the worktree root)
+  (no flag)  check: exit 1 on a clause with no id or two, an id minted twice, a retired id in use, an id past the
+             recorded next number, or no clause read; prints what it read
+  --mint     appends an id to each clause that has none, numbered on from the highest in use, writes [clause-ids]
+             (created on first use, before [planned]) with the next free number, then checks
+  --plant    runs the check on an in-memory copy holding one planted defect, which must red
+It reads only v2's [chain] rows, split on "; " as the clause scan splits them; it does not check that a spec carries a
+clause (that is the carries join), nor that an id names the same clause it named before a rewrite.
+"""
+import pathlib
+import re
+import sys
+
+V = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+SLUG = "dClosedLoop"
+ID = re.compile(r"`(cl-d[A-Z]\w+-\d{4})`")
+ROW = re.compile(r"^\| (d[A-Z]\w+) \| [^|]+ \| [^|]+ \| (.+) \| [^|]+ \|$")
+
+
+def section(text, tag):
+    m = re.search(r"^## \[" + re.escape(tag) + r"\].*?(?=^## \[|\Z)", text, flags=re.M | re.S)
+    return m.group(0) if m else ""
+
+
+def clauses(text):
+    chain = section(text, "chain")
+    out = []
+    for ln in chain.split("\n"):
+        m = ROW.match(ln)
+        if m:
+            out += [(m.group(1), c) for c in m.group(2).split("; ") if c.strip()]
+    return out
+
+
+def check(text):
+    found, cl = [], clauses(text)
+    if not cl:
+        return ["read no clause"], cl
+    seen = {}
+    for build, c in cl:
+        ids = ID.findall(c)
+        if len(ids) != 1 or not c.rstrip().endswith(f"`{ids[0]}`" if ids else "\0"):
+            found.append(f"{build}: a clause holds {len(ids)} ids or none at its end: {c[:70]}...")
+            continue
+        if ids[0] in seen:
+            found.append(f"{ids[0]} minted twice: {seen[ids[0]]} and {build}")
+        seen[ids[0]] = build
+    sec = section(text, "clause-ids")
+    retired = set(ID.findall(sec.split("Retired:", 1)[1])) if "Retired:" in sec else set()
+    for r in sorted(retired & set(seen)):
+        found.append(f"{r} is retired and in use on {seen[r]}")
+    nxt = re.search(r"the next it mints is\s+`cl-" + SLUG + r"-(\d{4})`", sec)
+    if sec and not nxt:
+        found.append("[clause-ids] names no next free number")
+    if nxt:
+        top = max((int(i.rsplit("-", 1)[1]) for i in seen if i.startswith(f"cl-{SLUG}-")), default=0)
+        if top >= int(nxt.group(1)):
+            found.append(f"an id reaches {top}, past the recorded next number {int(nxt.group(1))}")
+    if not sec:
+        found.append("v2 holds no [clause-ids] section")
+    return found, cl
+
+
+def mint(text):
+    lines = text.split("\n")
+    top = max((int(i.rsplit("-", 1)[1]) for i in ID.findall(section(text, "chain"))), default=0)
+    start = top + 1
+    in_chain = False
+    for k, ln in enumerate(lines):
+        if ln.startswith("## [chain]"):
+            in_chain = True
+        elif ln.startswith("## [") and in_chain:
+            break
+        m = ROW.match(ln) if in_chain else None
+        if not m:
+            continue
+        cells = ln.split(" | ")
+        out = []
+        for c in cells[3].split("; "):
+            if not ID.search(c):
+                top += 1
+                c = f"{c} `cl-{SLUG}-{top:04d}`"
+            out.append(c)
+        cells[3] = "; ".join(out)
+        lines[k] = " | ".join(cells)
+    text = "\n".join(lines)
+    minted = top - start + 1
+    body = (f"Every clause of `[chain]` ends with its id, `cl-<minting-slug>-NNNN`, minted once by the session that adds the\n"
+            "clause and never renumbered or reused (the charter's `[ids]` rule, the owner's FQ-2). A clause keeps its id\n"
+            "through every amendment, its text's hash being its revision, and a spec that carries it pins both. A clause\n"
+            "split across specs keeps its id, each carrier marking `part k/n`, a clause moved to another build keeps its id,\n"
+            "and a retired clause's id is listed below and never minted again.\n"
+            "`build/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py` mints and checks them, and the next it mints is\n"
+            f"`cl-{SLUG}-{top + 1:04d}`.\n\nRetired: none.\n")
+    if section(text, "clause-ids"):
+        text = re.sub(r"(the next it mints is\s+)`cl-" + SLUG + r"-\d{4}`", rf"\g<1>`cl-{SLUG}-{top + 1:04d}`",
+                      text)
+    else:
+        anchor = "\n## [planned] "
+        if text.count(anchor) != 1:
+            sys.exit("v2's [planned] heading is not single")
+        text = text.replace(anchor, "\n## [clause-ids] Clause ids\n\n" + body + anchor, 1)
+    return text, minted
+
+
+def plant(text, case):
+    cl = [c for _, c in clauses(text)]
+    if case == "missing":
+        return text.replace(cl[0], re.sub(r" `cl-[^`]+`$", "", cl[0]), 1)
+    if case == "duplicate":
+        a, b = ID.findall(cl[0])[0], ID.findall(cl[1])[0]
+        return text.replace(f"`{b}`", f"`{a}`", 1)
+    if case == "retired":
+        a = ID.findall(cl[0])[0]
+        return text.replace("Retired: none.", f"Retired: `{a}`.", 1)
+    if case == "next":
+        return re.sub(r"(the next it mints is\s+)`cl-" + SLUG + r"-\d{4}`", rf"\g<1>`cl-{SLUG}-0001`", text)
+    sys.exit(f"no plant {case}")
+
+
+text = V.read_text(encoding="utf-8")
+args = sys.argv[1:]
+if args[:1] == ["--mint"]:
+    text, n = mint(text)
+    V.write_text(text, encoding="utf-8", newline="\n")
+    print(f"minted {n} ids")
+elif args[:1] == ["--plant"]:
+    text = plant(text, args[1])
+found, cl = check(text)
+print(f"clause ids: read {len(cl)} clauses in {len({b for b, _ in cl})} builds; findings {len(found)}")
+for f in found[:12]:
+    print("  " + f)
+if len(found) > 12:
+    print(f"  ... and {len(found) - 12} more")
+sys.exit(1 if found else 0)
+````
+
+### `place_clause_ids.py`
+
+Places the clause-id draft in the build folder with its Serves line, byte for byte otherwise.
+
+````python
+"""Place the clause-id instrument in the build folder, where the chain builds' sessions can run it: the scratch draft
+with the Serves line instruments carry, byte for byte otherwise.
+
+Usage: python -X utf8 place_clause_ids.py   (from the worktree root)
+"""
+import pathlib
+
+src = (pathlib.Path(__file__).resolve().parent / "clause_ids.py").read_text(encoding="utf-8")
+out = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py")
+out.write_text("# **Serves:** research PLAY-dClosedLoop-1\n" + src, encoding="utf-8", newline="\n")
+print(f"{out}: {out.stat().st_size} bytes")
+````
+
+### `mint_record.py`
+
+The round record's [folded] and the session log's event for the minted clause ids.
+
+````python
+"""Record the minted clause ids: the round record's [folded] gains the minting and loses it from what is not yet folded,
+and the session log gains its event.
+
+Usage: python -X utf8 mint_record.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+INS = "build/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py"
+K = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-final-questions.md")
+K.sub("- **Not yet folded:** the clause ids, minted in a commit of their own by the instrument that mints them; the audit's\n"
+      "  instruments; the audit; and the baseline after it.\n",
+      f"- **The clause ids, minted in a commit of their own:** 496, `cl-dClosedLoop-0001` to `cl-dClosedLoop-0496` in\n"
+      f"  `[chain]` order, and v2's `[clause-ids]`, by `{INS}`, whose check was seen red on the\n"
+      "  tree before the minting and on four plants: a clause with no id, an id minted twice, a retired id in use and a\n"
+      "  next number behind the ids. It joins the final checks.\n"
+      "- **Not yet folded:** the audit's instruments, the audit, and the baseline after it.\n", "folded")
+K.save()
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the clause ids minted, the owner's FQ-2: 496 ids, `cl-dClosedLoop-0001` to
+  `cl-dClosedLoop-0496`, one at the end of each clause of v2's `[chain]`, and v2's `[clause-ids]` stating their
+  grammar and the next number. The instrument, `{INS}`, mints and checks them; its check
+  was seen red on the tree before the minting and on four plants, and joins the final checks.
+""", "the minting's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -23575,6 +23775,9 @@ MINE = [
     ('final/chain_lib.py', "Clause-level edits of v2's [chain] rows over a fold_lib Record, extracted at their second use: edit, replace, drop and add a clause, append owned gaps, insert a row and set its parents, each clause checked for a '; ' or a pipe."),
     ('final/fold_final_answers.py', "The owner's FQ-1 to FQ-8 folded: P41 and P42, dTrueNorth at the chain's root, nine keys and their preset rows, nine chain rows' parts, dLinkedLibrary's atlas clause moved to dTotalRecall, seven gaps and the register's re-measure, the help plan in systems, fates and the memory plan, and the round record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there."),
     ('final/log_final_answers.py', "The session log's event for the owner's final answers and their fold."),
+    ('final/clause_ids.py', "The draft of the clause-id instrument the build folder now holds as `2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py`: it minted 496 ids in [chain] order and checks one id per clause, none minted twice, none retired and none past the recorded next number, red before the minting and on four plants."),
+    ('final/place_clause_ids.py', "Places the clause-id draft in the build folder with its Serves line, byte for byte otherwise."),
+    ('final/mint_record.py', "The round record's [folded] and the session log's event for the minted clause ids."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -23758,6 +23961,24 @@ beside the deprecation window's. Planted in a copy of v2: velocity's round count
 green run on the real table is in `[final]`.
 
 """ + block("text", "$ python preset_check_canonical.py v2-round-count-over.md\n" + out + f"\nrc {rc}"))
+# The owner's FQ-2: the clause ids, red on the tree before they were minted and on each plant, re-run.
+CIDS = B + "2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py"
+cid_runs = []
+for p in ("missing", "duplicate", "retired", "next"):
+    out, rc = run(CIDS, "--plant", p)
+    if rc != 1:
+        sys.exit(f"clause-id plant {p} did not red")
+    cid_runs.append(f"$ python clause-ids.py --plant {p}\n{out}\nrc {rc}")
+before = read(S / "final/runs/before.out").split("\n")
+parts.append("""
+## [clause-ids] The clause ids, red before they were minted and on each plant
+
+The owner's FQ-2 gives every clause of v2's `[chain]` a minted id. The check ran on the tree before the ids were
+minted, as captured (its first four lines), then each planted defect is re-run on an in-memory copy. The green run is
+in `[final]`.
+
+""" + block("text", "$ python clause-ids.py\n" + "\n".join(before[:4] + before[-1:])) + "\n"
+    + block("text", "\n".join(cid_runs)))
 parts.append("""
 ## [plants] The map's and the atlas's plants, re-run
 
@@ -23768,6 +23989,7 @@ FINAL = (("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--ch
          ("reconciliation probe", [B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py",
                                    B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md"]),
          ("clause scan", [str(S / "walk/paren_semis.py")]),
+         ("clause ids", [B + "2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py"]),
          ("gap join", [str(S / "join_canonical.py"), B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md",
                        B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"]),
          ("preset check", [str(S / "preset_check_canonical.py"),
@@ -24506,6 +24728,41 @@ rc 1
 ````
 
 
+## [clause-ids] The clause ids, red before they were minted and on each plant
+
+The owner's FQ-2 gives every clause of v2's `[chain]` a minted id. The check ran on the tree before the ids were
+minted, as captured (its first four lines), then each planted defect is re-run on an in-memory copy. The green run is
+in `[final]`.
+
+````text
+$ python clause-ids.py
+clause ids: read 496 clauses in 22 builds; findings 497
+  dTrueNorth: a clause holds 0 ids or none at its end: the clause ids: each clause of the design read with its minted `cl-` i...
+  dTrueNorth: a clause holds 0 ids or none at its end: the carries join, a ninth join of the spec tokens leg behind that cuto...
+  dTrueNorth: a clause holds 0 ids or none at its end: the coverage report rendered into each chain build's README beside its...
+rc 1
+````
+
+````text
+$ python clause-ids.py --plant missing
+clause ids: read 496 clauses in 22 builds; findings 1
+  dTrueNorth: a clause holds 0 ids or none at its end: the clause ids: each clause of the design read with its minted `cl-` i...
+rc 1
+$ python clause-ids.py --plant duplicate
+clause ids: read 496 clauses in 22 builds; findings 1
+  cl-dClosedLoop-0001 minted twice: dTrueNorth and dTrueNorth
+rc 1
+$ python clause-ids.py --plant retired
+clause ids: read 496 clauses in 22 builds; findings 1
+  cl-dClosedLoop-0001 is retired and in use on dTrueNorth
+rc 1
+$ python clause-ids.py --plant next
+clause ids: read 496 clauses in 22 builds; findings 1
+  an id reaches 496, past the recorded next number 1
+rc 1
+````
+
+
 ## [plants] The map's and the atlas's plants, re-run
 
 ````text
@@ -24670,13 +24927,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2643 nodes in 30 namespaces; 32520 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1822, derived 321, pending 500
+map: 2644 nodes in 30 namespaces; 32520 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1823, derived 321, pending 500
 map: no stale facts read 64 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 229 records, 3755 sections, 214 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 229 records, 3760 sections, 214 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
@@ -24724,6 +24981,10 @@ rc 0
 
 $ clause scan
 splits inside a clause: 0
+rc 0
+
+$ clause ids
+clause ids: read 496 clauses in 22 builds; findings 0
 rc 0
 
 $ gap join

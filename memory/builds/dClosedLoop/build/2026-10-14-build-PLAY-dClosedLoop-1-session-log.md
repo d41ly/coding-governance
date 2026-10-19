@@ -2900,6 +2900,11 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   register; and systems, fates and the memory plan follow FQ-5, FQ-6 and FQ-8. The chain holds 22 builds. The clause
   ids, the audit's instruments, the audit and the baseline follow, in that order.
 
+- 2026-10-19, session 1799cb98: the clause ids minted, the owner's FQ-2: 496 ids, `cl-dClosedLoop-0001` to
+  `cl-dClosedLoop-0496`, one at the end of each clause of v2's `[chain]`, and v2's `[clause-ids]` stating their
+  grammar and the next number. The instrument, `build/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py`, mints and checks them; its check
+  was seen red on the tree before the minting and on four plants, and joins the final checks.
+
 ## Instruments
 
 ### The gap-ownership join

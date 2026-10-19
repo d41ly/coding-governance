@@ -395,5 +395,8 @@ renders, but only into its own tree, which no agent loads.
 - **systems, fates and the memory plan:** the `usage` field named, the rationale's own tree, and the help pages' fate
   and node.
 - **The chain:** 22 builds, the critical path growing from 263 units at `590305b02` to 272.
-- **Not yet folded:** the clause ids, minted in a commit of their own by the instrument that mints them; the audit's
-  instruments; the audit; and the baseline after it.
+- **The clause ids, minted in a commit of their own:** 496, `cl-dClosedLoop-0001` to `cl-dClosedLoop-0496` in
+  `[chain]` order, and v2's `[clause-ids]`, by `build/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py`, whose check was seen red on the
+  tree before the minting and on four plants: a clause with no id, an id minted twice, a retired id in use and a
+  next number behind the ids. It joins the final checks.
+- **Not yet folded:** the audit's instruments, the audit, and the baseline after it.
