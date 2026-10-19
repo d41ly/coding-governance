@@ -1,6 +1,6 @@
 # TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch
 
-**Status:** SPECCED · rev-1 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
+**Status:** INPROGRESS · rev-1 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
 
 <!-- gen:spec-records -->
 
@@ -477,6 +477,7 @@ New arm: tools/check-wiring.test.sh, the absent-harness remedy check · covers A
     role-index agreement for every harness. It leaves one follow-up open, the role index's own
     probe in §3, against C1's two. Neither option trips veto 2 or 3. This run holds no mandate, so
     the owner decides.
+  - RESOLVED (owner, 2026-10-19): C4.
 
 ## 9. Revision log
 
