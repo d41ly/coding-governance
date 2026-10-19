@@ -24995,7 +24995,7 @@ CLASSES = [
     ("the home .claude folder", re.compile(r"(?:~|\$HOME|\$\{HOME\}|Users/[^/\"']+)/\.claude(?:[/\"';\s]|$)", re.I)),
 ]
 DESIGN = re.compile(r"(?<!seed-dcl/tree/)(?<!seed-dcl/tree)memory/builds/dClosedLoop/?([^\s\"'*]*)", re.I)
-BRIEF = re.compile(r"(?:build/2026-10-20-build-PLAY-dClosedLoop-1-(?:walk|skeptic|synth)-brief-"
+BRIEF = re.compile(r"(?:build/2026-10-20-build-PLAY-dClosedLoop-1-(?:walk|skeptic|synth|recheck)-brief-"
                    r"|prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-\d+-(?:spec-reviewer|skeptic|synthesizer))")
 
 
@@ -27611,9 +27611,9 @@ K4: keys 265 · findings 55
 K5: principles 42, clauses 496, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 110 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 277 records, 4453 sections, 219 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 290 records, 4721 sections, 230 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27629,9 +27629,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 95 · lines 38472 · unreviewed 7318 (19%)
+  design records 108 · lines 42224 · unreviewed 11071 (26%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 14
+  design commits after the floor that no closing review covers: 17
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27646,6 +27646,9 @@ rerun review debt: rc 0
     cca97c487  13 design record(s)  records(dClosedLoop): run A's four skeptics returned, run B's sent, and run A's synthesis dispatched
     4a93b33bd  5 design record(s)  records(dClosedLoop): run B's four skeptics returned, and run B's synthesis dispatched
     bb68f583d  1 design record(s)  records(dClosedLoop): both walks scored — two BLOCKED reports, and the recall bar not met
+    e24afd0ec  7 design record(s)  records(dClosedLoop): the owner's word — run C, a clause walk, and a second skeptic on every refutation
+    ebf2e5fc7  2 design record(s)  records(dClosedLoop): the second looks at runs A's and B's refutations, dispatched
+    bf51d88ef  11 design record(s)  records(dClosedLoop): the second looks applied, run C's five clause walks back, and its skeptics dispatched
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27864,13 +27867,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2709 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1888, derived 321, pending 500
-map: no stale facts read 110 records and 28 quotes of a map count or the critical path
+map: 2738 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1917, derived 321, pending 500
+map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 277 records, 4457 sections, 219 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 290 records, 4721 sections, 230 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

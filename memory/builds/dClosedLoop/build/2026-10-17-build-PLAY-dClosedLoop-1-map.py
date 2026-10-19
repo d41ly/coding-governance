@@ -546,7 +546,9 @@ def census():
 # inside an open fence, which would mute every line after the fence.
 COUNT = re.compile(r"\b\d{1,3}(?:,\d{3})+ (?:nodes\b|of (?:its |the )?32,768\b)|critical path\b[^|.]{0,80}?\b\d{2,3}\b")
 PIN = re.compile(r"\b(?=[0-9a-f]*[a-f])(?=[0-9a-f]*\d)[0-9a-f]{7,40}\b|`[^`]*research-[^`]*\.md:\d+`")
-DATED = ("-research-", "-instruments", "-session-log")
+# Dated snapshots, never graded for stale quotes: the whole-design audit's briefs and agent returns quote a moment's
+# numbers verbatim, as a research return does (walker 4's return of run C quoted the map's headroom, 2026-10-20).
+DATED = ("-research-", "-instruments", "-session-log", "-return-", "-brief")
 UNPINNED = {"unpinned-count": "The level-0 map stands at 31,203 of its 32,768 B.",
             "unpinned-path": "The critical path is 211 units."}
 STALE_FLOOR = 15   # the quotes it must see; 21, in 51 records, were counted at a66c855f3, when the floor was declared
