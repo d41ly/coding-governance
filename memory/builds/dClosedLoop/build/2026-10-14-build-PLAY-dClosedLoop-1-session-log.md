@@ -2371,6 +2371,10 @@ The adopter-instructions research, dispatches 118 to 121, derived from each run 
   a commit on main rather than this branch, and the map was re-read only after the first fold. This is evidence for
   dWellOiledMachine's default load (PM-7, PM-12), which injects the card and the map at startup, resume and compaction.
 
+- 2026-10-19, session 1799cb98: the owner answered the adopter-instructions forks, IA-1 to IA-6, each with its
+  recommendation (`build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md` `[answers]`), and the answers are folded into v2, the memory plan, the gap register and the
+  fates record.
+
 ## Instruments
 
 ### The gap-ownership join

@@ -235,7 +235,8 @@ once dTotalRecall registers it (P33).
 - **Map keys** (revised 2026-10-17, PM-11): a map line keys a node by its native id where one exists,
   as `chain.dTotalRecall` and `principle.P27`, and by its tag otherwise. The resolver accepts both.
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
-  `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`). Each namespace is a row
+  `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`), and `repo`, a repository's own
+  units (the adopter-instructions answers, IA-1). Each namespace is a row
   in its owning layer's contract: its declaring source, its extractor, and whether it selects or
   describes. An expansion mints only under its own prefix, at a core point.
 - **A leg keeps its name** (revised 2026-10-17, the audit's M26).
@@ -273,7 +274,7 @@ once dTotalRecall registers it (P33).
   | positional | a new `§n`, `Mn` or `check n` in live text |
 - **Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter. Each registration
   carries its extractor. Six namespaces gained an owner (revised 2026-10-17, the audit's M10):
-  - dOrderedCharter registers `doc` and `unit`, and, declared at PM-10 (2026-10-17), `reader`, `level`, `layer`, `practice`, `principle`, `kind` and `kit`;
+  - dOrderedCharter registers `doc` and `unit`, and, declared at PM-10 (2026-10-17), `reader`, `level`, `layer`, `practice`, `principle`, `kind` and `kit`, and, declared by the adopter-instructions answers (2026-10-19), `repo`;
   - dDeclaredLoop `step`, `item`, `policy` and `command`;
   - dBoundRoles `role` and `field`;
   - dTotalRecall `section`, `record`, `feature`, `class` and `marker`;

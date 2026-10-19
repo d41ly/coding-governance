@@ -244,3 +244,36 @@ repository's. Nobody edits a rendered file, and an update never writes the repos
 
 - The pin's noise re-measured at dOrderedCharter's first unit, over units of one line, against gov's history.
 - The map every restructuring release ships, checked by the step gate from the first release that moves a unit.
+
+## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in two batches, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| IA-1 | "One overlay (Recommended)" |
+| IA-2 | "Own units, typed edges (Recommended)" |
+| IA-3 | "Render both, file order (Recommended)" |
+| IA-4 | "All but a fixed set (Recommended)" |
+| IA-5 | "Legacy block, then proposals (Recommended)" |
+| IA-6 | "Yes, by census (Recommended)" |
+
+Every answer took the recommendation, as `[forks]` words it.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **v2:** P8 says how a repository changes gov's units; the catalogue gains `instructions.exclude` and
+  `instructions.stale`, the first among the keys presets never touch and the second with a preset row; dGroundRules'
+  minimal guard names the overlay; dSafePassage's step gate takes gov's unit tags and its update holds an edited
+  render; dOrderedCharter's registry gains a unit's owner and class and the `repo` namespace, and three units: the
+  overlay and its operations, pins and drift, and composition with the census of gov-only rules; dBoundRoles moves the
+  house files into the overlay; dLinkedLibrary gains `adopt.instructions`; dShippedRelease installs every kit in one
+  pass; `[owed]` keeps the pin's noise to re-measure; and a revision note.
+- **The memory plan:** the deploy overlay's adopter rules move to a new instruction-overlay pocket, and the unit site
+  carries the pinned target.
+- **The gap register:** `gap-found-29`, `gap-found-30`, `gap-found-31`, `gap-deploy-26` and `gap-deploy-27`.
+- **The fates record:** the seeded charter template retires, and the house files become overlay units.
+
+The design map reddened once on the fold: the `repo` namespace named no owning build, since a namespace's owner
+is declared on the systems record's `[design-tags]` owner lines. `repo` is declared there now, beside the
+namespaces that record lists, and v2's tag-system list keeps R-B's twelve.

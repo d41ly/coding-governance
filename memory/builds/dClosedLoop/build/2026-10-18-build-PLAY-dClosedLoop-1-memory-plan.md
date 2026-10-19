@@ -61,7 +61,8 @@ reader needs. The counts are the returns' measurements.
 | Pocket | Family | Where | Today | Becomes | Key | Owner |
 |---|---|---|---|---|---|---|
 | charter | instruction | `AGENTS.md`, rendered from the template | 45 rule tags; 0 of 9 headings tagged | node: units at level 0, `practice.<tag>` | tag | dOrderedCharter |
-| deploy overlay | instruction | `.governance/deploy.toml`, committed | the repository's answers and adopter rules, rendered into the charter; no node, door or guard | node: units at level 0, written only through `instructions.edit`, under dGroundRules' minimal guard (SA-12) | tag | dOrderedCharter |
+| deploy overlay | instruction | `.governance/deploy.toml`, committed | the repository's install answers and kit selection, and today its adopter rules, rendered into the charter | node: units at level 0, written only through `instructions.edit`, under dGroundRules' minimal guard (SA-12), its adopter rules moving into the instruction overlay (IA-1) | tag | dOrderedCharter |
+| instruction overlay | instruction | `.governance/instructions.toml`, committed | designed: the repository's own units, today spread across `deploy.toml`'s adopter rules and the roles' house files | node: the repository's units, tagged `repo.`, changing gov's only by `amends` and `supersedes` edges pinned to gov's text (IA-1, IA-2) | tag | dOrderedCharter |
 | policy values | instruction | the policy file, and today each kit's conf | keys typed per kit | node: units at level 2; the file, its schema and its reader dGroundRules', the presets dKeptSession's | `policy.<key>` | dGroundRules |
 | protocols and guides | instruction | `memory/guides/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` | 0 of 138 headings tagged; positional citations by number | node: protocol slices at level 3 | `doc.<name> [<seg>]` | dConvergedCharter |
 | kickoff manifest | instruction | `memory/guides/SESSION-KICKOFF.md` | no kind and no unit | node: units at level 2 that the card reads | tag | dPlacedRequest |
@@ -146,7 +147,7 @@ The shared grammar of an edge, at every site: `type=target[,target]`.
 |---|---|---|
 | a record's header | `**Serves:** <kind> <unit>`, as today; `**Made-by:** <act or owner>`; `**Caused-by:** <id>` | `record` |
 | a record's section | the `## [tag] Title` heading, then one `**Edges:**` line per edge type, `**Edges:** type=target[,target]`, a target holding no space, comma or bracket, a section target written `<doc>#<seg>` | `record` |
-| an instruction unit | its row's `select`, `required-by` and `enforced-by` fields, as today, and `edges` in the same grammar | `instructions.edit` |
+| an instruction unit | its row's `select`, `required-by` and `enforced-by` fields, as today, and `edges` in the same grammar, an `amends` or `supersedes` target pinned as `<tag>@<hash>` | `instructions.edit` |
 | code | `gov:note <tags> — <definition> → <pointer> [refs=…]`, its refs in the edge-target form, and `gov:feature <tag>` | the builder, under the annotation grammar |
 | a commit | one trailer key per edge: `Gov-Unit:` and `Gov-Item:` for `serves`, `Gov-Act:` for `made-by`, `Gov-Session:` for `runs-in` as `trace.identity` says, with `Pass:` and `Decided:` kept as registered keys, `Pass:` mapped to `serves` and `Decided:` to `decides` | the commit queue from the act binding; a `prepare-commit-msg` filler in the owner's session; the lander, for its own merge, reconcile, `mint:` and `regen:` commits, from the binding it runs under |
 | a work order | the `gov:handoff` marker (role, build, unit, path, `role-sha`, `task-sha`), gaining `item=` | the handoff renderer |

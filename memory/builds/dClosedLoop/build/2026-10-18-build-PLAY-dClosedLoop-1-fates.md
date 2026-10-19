@@ -68,15 +68,16 @@ A kit's fate is one of four:
 The fate is one of STAYS, RESHAPED, MERGED and RETIRED. "Where it goes" names the chain build that keeps or receives
 it. "Decided by" names the record that decides it, a line-number citation of dispatch 104's resolved to its section
 tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and the owner decided row by row. Counts: 24 stay,
-72 reshaped, 25 merged and 16 retired, over 137 rows.
+72 reshaped, 25 merged and 17 retired, over 138 rows.
 
 | Kit | Function | Today's job | Fate | Where it goes | Decided by |
 |---|---|---|---|---|---|
 | agent-instructions | harness wiring | one charter file, aliased per harness | RESHAPED | dOrderedCharter's one renderer absorbs the wiring; each harness's files come from dWellOiledMachine's harness adapters | v2 `[chain]` dOrderedCharter; layer-instruction `[layers]` |
 | playbook | `render_playbook.py` | renders the charter template | RESHAPED | dOrderedCharter: the one renderer, the charter in its level-0 envelope | v2 `[chain]` dOrderedCharter |
 | playbook | `adopt-playbook --check` | checks the render's wiring | MERGED | into the one renderer (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
+| playbook | the seeded charter template | an adopter's copy of the template, frozen at its install vintage | RETIRED | units the one renderer composes, the repository's changes in its own overlay (dOrderedCharter) | the owner, IA-1, 2026-10-19 |
 | playbook | `fleet.toml`, `--claim-node` | node registry | RESHAPED | node registry's runtime facts (dWellOiledMachine); fleet identity in the lease grammar (dPlacedRequest) | v2 `[chain]` dPlacedRequest; v2 `[chain]` dWellOiledMachine |
-| roles | `agents/*`, `house/*.md` | role definitions | RESHAPED | twelve core roles with structured fields and typed returns (dBoundRoles) | v2 `[chain]` dBoundRoles |
+| roles | `agents/*`, `house/*.md` | role definitions | RESHAPED | twelve core roles with structured fields and typed returns, the house files becoming the repository's overlay units selecting their role (dBoundRoles, IA-1) | v2 `[chain]` dBoundRoles |
 | roles | spec-reviewer, diff-reviewer | two reviewer roles | MERGED | one reviewer with a lens per step (dBoundRoles) | roles `[forks]`; v2 `[chain]` dBoundRoles |
 | roles | gov-session | hands work to another session | MERGED | the prompt writer ("session-handoff template folds") (dBoundRoles) | roles `[forks]` |
 | roles | gov-orienter | orientation | RESHAPED | the orientation scout, composing the card in a sidechain (dFurnishedOrders) | roles `[forks]`; v2 `[chain]` dFurnishedOrders |

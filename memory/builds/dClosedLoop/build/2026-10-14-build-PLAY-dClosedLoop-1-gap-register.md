@@ -93,6 +93,9 @@ extends.
 | gap-found-26 | Foundation | MED | file:line citations go stale unseen: 10,655 code citations sit in memory, and of a sample of 60, 6 still point at the same line. | `research-relational-syntax.md` section 2 | — |
 | gap-found-27 | Foundation | MED | The charter's `[docs]` rule binds every user-facing change to its page under `help/`, and nothing checks it: `help/` holds two hand-written pages, and no unit keeps `help/roles.md` current while the chain rewrites the roles it describes. | the shape audit, run A's M13 and run B's M10 | — |
 | gap-found-28 | Foundation | LOW | gov's rendered Skills carry bare names, `/build`, `/cleanup`, `/lexicon`, `/runlog` and the rest, which nothing marks as gov's beside a repository's or a user's own Skills. | the owner, SK-2, 2026-10-19 | — |
+| gap-found-29 | Foundation | HIGH | No seam changes or removes a gov instruction and keeps the change: the overlay slot and the roles' house files only add, an edit to a rendered instruction is overwritten at update and named only `re-rendered`, a tagged edit is lost the same way, and an edit to gov's own source holds the whole kit back on a conflict. | `research-adopter-today.md` sections 2 and 5 | — |
+| gap-found-30 | Foundation | MED | A seeded charter template freezes at its install vintage, edited or not, graded `reseed-available`. | `research-adopter-today.md` section 2 | — |
+| gap-found-31 | Foundation | MED | Gov's own rules ship in the set every adopter receives: their move to gov's own overlay, decided by the walk, was dropped at `aa0d778b1`. | `research-adopter-design.md`, contradiction 4 | — |
 | gap-found-06 | Foundation | HIGH | No tool names the next step: six adopt scripts print install hints and nothing else ends with the caller's next command, so the loop advances only by agents re-deriving it. Raised by the owner. | foundations step 1 continued, current state | — |
 | gap-flow-01 | Flow | HIGH | No feature level between build and unit: the interfaces between a feature's units have no record, so a change that breaks a feature cannot be told from one that touches a unit, and re-design has no granularity but the unit. Raised by the owner. | flow FL-D2, FL-D4, FL-D5 | — |
 | gap-flow-02 | Flow | HIGH | The decision principles that resolve unattended forks (the most feature-rich option, then the most expandable, fully recorded) are stated nowhere; M3 names feature-rich only, and nothing ranks them above the charter's adjustable practices. Raised by the owner. | flow FL-D3, FL-D6; `memory/guides/BUILD-METHOD.md` M3 | — |
@@ -341,6 +344,8 @@ extends.
 | gap-deploy-23 | Deploy | LOW | A publication records no tree: the atlas is published by hand, and nothing names what it showed. | `research-git-pockets.md` section 3 | — |
 | gap-deploy-24 | Deploy | MED | Nothing forwards a moved command or hook path: an adopter's call to a retired surface fails outright, and no window keeps the old surface working while the adopter catches up. | `research-supersession.md` section 4 (candidate B, kept as a bounded window); the away pass's closing review, H2 | — |
 | gap-deploy-25 | Deploy | HIGH | Nothing reds a landing that changes what an adopter can see with no upgrade step: a renamed or retired installed file, hook entry, command, agent or conf key reaches adopters with nothing to carry them across, and a removed registry entry refuses their update whole. | the shape audit, run A's M20 and run B's H1 and M3 | — |
+| gap-deploy-26 | Deploy | MED | An adopter's own `CLAUDE.md`, `GEMINI.md` and Copilot instructions stay unwired at install until `--force` overwrites them, and a copy-mode alias goes stale at every charter change with no check at update. | `research-adopter-today.md` sections 2 and 3 | — |
+| gap-deploy-27 | Deploy | MED | A fresh install of every kit needs manual steps: on an empty repository the kickoff seed creates `memory/` before the memory tree's adopter, which then refuses, and the agent-instructions adopter runs before the charter exists. | `research-adopter-today.md`, its fixture notes | — |
 | gap-maint-01 | Maintain | HIGH | No cadence: no declared cadence item runs on a schedule. The only scheduled actors are the OS-scheduled resume tick, the desktop durable-restart task and CI's read-only cron, and in-session cron expires after 7 days; corrected by the runtime layer's review. | maintain §4; runtime `[current]` | — |
 | gap-maint-02 | Maintain | HIGH | Detectors without owners: 15 of 27 drift signals nonzero, most report-only, 2 dead probes. | maintain §4, instrument 1 | — |
 | gap-maint-03 | Maintain | HIGH | The governing surface only grows, and nothing prices or retires a leg, rule or bug class. | maintain §4, instrument 2 | — |
@@ -687,4 +692,12 @@ Re-measured after the owner's SK-2 added `gap-found-28` (`build/2026-10-18-build
 ```text
 Roles=23 Deploy=25 Plan=8 Spine=13 Orient=21 Test=20 Runtime=32 Lexicon=10 Tooling=23 Review=16 Foundation=28 Build=5 Memory=39 Flow=18 Maintain=15 Design=10
 LOW=57 MED=145 HIGH=104
+```
+
+Re-measured after the adopter-instructions answers added `gap-found-29`, `gap-found-30`, `gap-found-31`,
+`gap-deploy-26` and `gap-deploy-27` (`build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md` `[folded]`), same instrument, over 311 keys:
+
+```text
+Roles=23 Deploy=27 Plan=8 Spine=13 Orient=21 Test=20 Runtime=32 Lexicon=10 Tooling=23 Review=16 Foundation=31 Build=5 Memory=39 Flow=18 Maintain=15 Design=10
+LOW=57 MED=149 HIGH=105
 ```
