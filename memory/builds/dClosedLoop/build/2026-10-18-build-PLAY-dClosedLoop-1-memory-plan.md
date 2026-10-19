@@ -20,7 +20,9 @@ returns become memory, and memory renders the card and every work order. The pla
 - **Every piece is a node.** A node has an address: a tag (`<ns>.<seg>`), a section (`<doc> [<seg>]` in prose,
   `<doc>#<seg>` in an edge target, which holds no space), or a native id (a commit's SHA, an id
   `FAMILY-<slug>-<seq>`, a gap key, an act, session or landing id), each native-id class registered with its owner
-  (P33). Instruction units, record sections, code regions, commits, acts and sessions are all nodes of one index,
+  (P33): FAMILY ids by dOrderedCharter, gap keys by dTotalRecall, and every other class by the build that brings
+  it. An `amends` or `supersedes` target may pin its tag as `<tag>@<hash>`, the hash of the text it was written
+  against, and no other edge carries a pin (IA-2, the folds' closing review). Instruction units, record sections, code regions, commits, acts and sessions are all nodes of one index,
   resolved by one resolver; acts and sessions are read beside a tree's index from the binding records.
 - **Every relation is a typed edge.** Its type comes from one closed set, it is declared once at the site that owns
   its fact, and its inverse is derived (P33). A reference written as prose is a derived `cites`, never a typed fact.
@@ -61,7 +63,7 @@ reader needs. The counts are the returns' measurements.
 | Pocket | Family | Where | Today | Becomes | Key | Owner |
 |---|---|---|---|---|---|---|
 | charter | instruction | `AGENTS.md`, rendered from the template | 45 rule tags; 0 of 9 headings tagged | node: units at level 0, `practice.<tag>` | tag | dOrderedCharter |
-| deploy overlay | instruction | `.governance/deploy.toml`, committed | the repository's install answers and kit selection, and today its adopter rules, rendered into the charter | node: units at level 0, written only through `instructions.edit`, under dGroundRules' minimal guard (SA-12), its adopter rules moving into the instruction overlay (IA-1) | tag | dOrderedCharter |
+| deploy overlay | instruction | `.governance/deploy.toml`, committed | the repository's install answers and kit selection, and today its adopter rules, rendered into the charter | node: the install answers and the kit selection, never units, written by govkit's `intake`, install and update and by the owner's edit under dGroundRules' minimal guard (SA-12), its answers rendering into level 0 and its adopter rules moving into the instruction overlay (IA-1, the folds' closing review) | tag | dOrderedCharter |
 | instruction overlay | instruction | `.governance/instructions.toml`, committed | designed: the repository's own units, today spread across `deploy.toml`'s adopter rules and the roles' house files | node: the repository's units, tagged `repo.`, changing gov's only by `amends` and `supersedes` edges pinned to gov's text (IA-1, IA-2) | tag | dOrderedCharter |
 | policy values | instruction | the policy file, and today each kit's conf | keys typed per kit | node: units at level 2; the file, its schema and its reader dGroundRules', the presets dKeptSession's | `policy.<key>` | dGroundRules |
 | protocols and guides | instruction | `memory/guides/`, `HYGIENE.md`, `TEMPLATE-SPEC.md` | 0 of 138 headings tagged; positional citations by number | node: protocol slices at level 3 | `doc.<name> [<seg>]` | dConvergedCharter |
@@ -130,12 +132,12 @@ Every rule applies to an instruction unit and to a record section alike. Each ha
 |---|---|---|
 | address | a node is named by its tag, its section or its native id, never by position | `positional` (tags pack), shrink-only over today's population |
 | one subject | a unit or a section holds one subject, and its tag is unique in its document | `unique` |
-| typed relations | every relation to another node is an edge of a registered type, declared once at the site that owns the fact | the edge checks: type registered, target resolves, from and to namespaces allowed, inverse rendered |
+| typed relations | every relation to another node is an edge of a registered type, declared once at the site that owns the fact | the edge checks: type registered, target resolves, a pinned target's hash well-formed and found in its unit's history, a pin on any other type refused, from and to namespaces allowed, inverse rendered |
 | pinned facts | a quoted derived fact (a count, a size, a path's length) carries its pin on its line: a SHA or a cited line | `pinned-at`; the map's no-stale-facts arm, generalized from the design records to every record, its predicate naming the shapes it reads and what it does not, today's unpinned facts a keyed legacy population |
 | statement types | loaded text is one of P11's six statement types; a record's prose is evidence and never loads | statement-type check on loaded units only |
 | rationale apart | why a unit says what it says lives in its `help` field; a record keeps its reasoning in its own sections | render parity: `help` never renders into a load set |
 | one door | each node has one writer, a door `[doors]` lists | the one-door check, reading the one door list; a write by an unlisted writer reds |
-| one owner | every node names one owning build or layer | `one-owner`, a check of its own, never the tags pack's `owned` |
+| one owner | every node gov ships names one owning build or layer, and a repository's own rows name their origin instead | `one-owner`, a check of its own, never the tags pack's `owned` |
 | retire, never vanish | a retired node leaves `retired → <new>` and its tag is never reused | `retired`, over tags and sections |
 | levels decide | a conflict resolves by level; memory at level 7 never instructs | the envelope (P13); promotion only through `instructions.edit` |
 
@@ -252,7 +254,7 @@ So Codex can do the same for ids, resume and transcripts, and joins inter-sessio
 
 **Writing.** Every writer of a node is a door, and nothing else writes one. The doors are listed once, in the
 registry's writer column, the edge sites' doors until dTotalRecall's kind registry lands, and the one-door check
-reads that list, seen red on a planted write by an unlisted writer and green on a lease acquisition. Five doors
+reads that list, seen red on a planted write by an unlisted writer and green on a lease acquisition and on a planted kit install. Five doors
 serve the edge sites:
 - `instructions.edit` writes instruction units and their change records, promotion included;
 - `record` writes every record, its header and its edge lines, and refuses a missing `caused-by` on a kind that is
@@ -263,7 +265,7 @@ serve the edge sites:
 - the handoff renderer writes work orders with their marker;
 - the supervisor writes acts and session bindings, and pushes each act's minimal binding record.
 
-The other doors write the other node kinds: the builder writes code annotations under the grammar;
+The other doors write the other node kinds: the builder writes code annotations under the grammar; govkit's `intake`, install and update write `.governance/deploy.toml`'s answers and kit selection; the upgrade-step kind writes the instruction overlay for a step that moves a repository's text into it, dBoundRoles' house files and dOrderedCharter's adopter rules among them;
 dTotalRecall's registry writes registry rows; the coordination verbs write refs, claims, leases and mail; the
 renderers write views; the release writes `kit-release` tags; and the lander writes its own commits, their
 trailers from the binding it runs under.

@@ -26,6 +26,12 @@ round caught it (H1 of
 `memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`).
 A probe recorded green prints how many rows its predicate matched beside how many it read.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). The retired-edited
+check pointed at arm 3c, which loops over descriptor rules and never reads a receipt row, so a planted receipt row would
+pass whatever update did. It now reads update's role-to-verdict mapping and is seen red on that mapping stubbed to
+`forked`.
+
 ## The fix
 
 Every arm asserts the SPECIFIC message its branch emits, never a process exit code, and the fixture

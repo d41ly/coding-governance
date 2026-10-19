@@ -40,6 +40,11 @@ It bit again in the shape audit, 2026-10-19
 no route: `commits.edge-check: commit-msg` and `commits.squash: refuse`, both in the strict preset, `accept-loss`,
 `trace.identity: salted`, which no record defined, and `memory.legacy-anchors: retag`, whose adopter step had no owner.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`).
+`instructions.stale`'s `refuse`, which the strict preset selects, and `warn` had no arm: only the default `order` was
+planted. Each value now has its arm and its planted semantic change.
+
 ## The fix
 
 - For each key an item reads, write each catalogued value's arm into the item: its witness, its route,

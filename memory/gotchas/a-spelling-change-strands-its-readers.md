@@ -34,6 +34,11 @@ the Serves kind `journal` to `log` with no reader inventory: the hygiene check's
 index's kind tokens, runlog's writer and the rendered docs all pin the old spelling, over 1,443 records at `dd1ebb01b`.
 The fold keeps `journal` as a read-only alias and re-points every reader by value in the rename's unit.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). The `gov-<name>`
+Skill renames shipped steps with forwards and no reader inventory, while kit rows, adopt scripts and self-tests pin the
+old spellings by value. Each rename now re-points its readers in its own unit.
+
 ## Cause
 
 A migration's inventory is built by asking where the value is RESOLVED, because that is the code

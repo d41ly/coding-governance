@@ -46,6 +46,12 @@ mechanism; steps landed before dShippedRelease never ran on gov first; adopter s
 (hook unwiring, retired-edit orders, the stale lock) existed; and a deprecation window counted releases before the first
 was cut.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). Two more:
+dSafePassage's walk and gov first read the receipt's `steps` field, which only dShippedRelease's schema 4 added, and
+dOrderedCharter's native-id edge named only classes three later builds register. The field now moves with the clauses
+that read it, and dOrderedCharter plants the edge on the FAMILY ids it owns.
+
 ## The fix
 
 - Check every kind of dependency, not only citations:

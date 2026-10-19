@@ -12058,6 +12058,870 @@ for rec in (V, Y):
     rec.save()
 ````
 
+### `build_args_folds.py`
+
+The args of the last three folds' closing review, runs A and B, differing only in the run label, the report path and the scratch path.
+
+````python
+"""Build the args of the closing review of the last three folds, run twice at the owner's word ("Run the reviews of the
+same shape (medium effort, twice) for the last three folds", 2026-10-19): two independent light Tier-2 diff reviews of
+dd1ebb01b..320c79646, every role at medium, the shape of the answers fold's closing review
+(`away/build_args_answers.py`). The two runs differ only in the run label, the report path and the scratch path.
+
+Usage: python -X utf8 build_args_folds.py <scratch-dir> <base> <head>   (from the worktree root)
+Writes <scratch-dir>/adopt/args-folds-a.json and args-folds-b.json, and a compact copy of each.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S, BASE, HEAD = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3]
+B = "memory/builds/dClosedLoop/build/"
+R = "memory/builds/dClosedLoop/reviews/2026-10-19-review-PLAY-dClosedLoop-1-folds-closing-{}.md"
+base = json.loads((S / "away" / "args-answers-a.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+base["base"], base["head"] = full(BASE), full(HEAD)
+base["intensity"], base["round"] = "light", 1
+base["efforts"] = {"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"}
+base["specs"] = base["specs"] + [
+    B + "2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md",
+    B + "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md",
+    B + "2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-today.md",
+    B + "2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-design.md",
+    B + "2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-prior-art.md",
+    B + "2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-history.md",
+    "memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-shape-audit-a.md",
+    "memory/builds/dClosedLoop/reviews/2026-10-18-review-PLAY-dClosedLoop-1-shape-audit-b.md",
+]
+if len(set(base["specs"])) != len(base["specs"]):
+    sys.exit("a spec repeats")
+for p in base["specs"]:
+    if not pathlib.Path(p).exists():
+        sys.exit(f"missing: {p}")
+base["checklist"] = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", f"{BASE}..{HEAD}"],
+                                   capture_output=True, text=True, encoding="utf-8", check=True).stdout
+base["byDesign"] = "\n".join([
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- The owner's words are decisions where they direct, recorded verbatim: the answers to the shape audit's forks "
+    "SA-1 to SA-12 (the shape comparison record's [answers]), to SK-1 and SK-2 with the confirmed names (its [skills]), "
+    "and to IA-1 to IA-6 (the adopter-instructions record's [answers]). A finding may show a fold contradicting the "
+    "owner's words, a record or the tree, not re-argue the owner's direction.",
+    "- Two readings stay open for the owner in v2's [open]: SA-1's \"layer date\" read as \"a later date\", and SA-5's "
+    "field named `usage`. A finding may show that one contradicts the owner's words or a record, not argue a "
+    "preference.",
+    "- Every earlier answer stands: SA-1 to SA-12, SK-1 and SK-2, IA-1 to IA-6, AP-1 to AP-35, NP-1 to NP-24, SP-1 and "
+    "SP-2, WK-1 to WK-8, PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, FL1, CX-1 to CX-3, RT-1 to RT-4, and every round's "
+    "before them.",
+    "- Research returns are verbatim and dated, dispatches 118 to 121's among them, and their prompts are rendered "
+    "handoffs: neither is under review, though a record that misstates its return is. The shape audit's two reports "
+    "are reviews of their own subjects, not under review.",
+    "- Dated records keep what held when they were written: revision notes, the session log's past entries, and the "
+    "shape comparison record's [map], [summary] and [forks], which state the design at dd1ebb01b.",
+    "- The instruments record holds the scripts as they ran; a script is reviewed only for whether it did what the "
+    "records say it did.",
+    "- Generated files (memory/LIVE.md, the build README's generated regions and memory/gotchas/INDEX.md) are "
+    "rendered, not reviewed. The nineteen bug-class instances are reviewed for faithfulness to the defects they name.",
+])
+CONTEXT = (
+    "The diff is " + base["head"][:9] + " over " + base["base"][:9] + ": three folds. "
+    "(1) 23baa12de folds the whole-design shape audit: its 66 confirmed defects, each by the comparison record's "
+    "[fold] (" + B + "2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md), and the owner's answers to its "
+    "twelve forks ([answers]). Among them: dSafePassage gains the step gate (SA-11), the step's isolation contract, "
+    "gov first for every step (SA-3), the hook unwiring, the retired-edited state and the stale lock moved from "
+    "dShippedRelease (SA-2), a walk that recovers from a killed step, frozen landed steps, and windows counted from the "
+    "first cut release (SA-8); act bindings are pushed for checks on any node (SA-10); `salted` is defined (SA-4); "
+    "deploy.toml joins the minimal guard (SA-12); the finder is dTotalRecall's (SA-6) and the selector dFurnishedOrders' "
+    "(SA-7); dConvergedCharter renders help/ from units (SA-5), retires /session-kickoff (SA-9) and walks the cycle by "
+    "key; every set-valued key declares an empty-set rule; and nineteen bug classes record instances. "
+    "(2) 17355b8b1 and a0b1a06c4 fold the owner's answers on the rest of the Skills: /build retires (SK-1), and the "
+    "five question Skills stay as generated thin entries named gov-<name>, /gov-drift among them (SK-2). "
+    "(3) 926106e87 records the adopter-instructions research, four returns and the design record " + B +
+    "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md, and 320c79646 folds the owner's answers IA-1 to IA-6: "
+    "one guarded overlay, `.governance/instructions.toml`, tagged repo.; gov's units changed only by `amends` and "
+    "`supersedes` edges pinned as <tag>@<hash>, or excluded by `instructions.exclude`; stale pins filed as orders by "
+    "`instructions.stale`; a fixed set; a legacy block at install; and gov-only rules moved to gov's overlay by census. "
+    "Review it as a design change. Does each fold land as the owner's answers and the [fold] plan say, the same way in "
+    "every record it touches, and does any text still state what a fold replaced: /build or /session-kickoff as kept "
+    "entries, /gov-drift-audit, the per-session card read after its retirement, `journal` renamed without its alias, "
+    "`forked` for an edited retired file, the record finder or the bug-class selector on two builds, or deploy.toml as "
+    "the home of adopter rules? Does every new clause sit on its own build or an ancestor, naming no later build's key "
+    "or kind? Are the new catalogue keys consistent with the presets, the never-touch list and the owner's answers? "
+    "Does each new gap state a fact its evidence supports, owned by the build whose unit closes it? Do dSafePassage's "
+    "additions hold together within its ancestry? Is the adopter-instructions design consistent with the systems "
+    "record's unit schema, the memory plan's edge grammar, P8, the step gate and the render gate? Does each bug-class "
+    "instance describe its defect faithfully? A fold's own text is new surface: check it as hard as the text it "
+    "replaced. This is run {run} of two independent runs on the same diff; read no other run's report. Write the "
+    "report to {report}. Its head carries an H1, then, within its first twelve lines, the line `**Serves:** "
+    "diff-review PLAY-dClosedLoop-1`. It carries exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES "
+    "or BLOCKED and nothing else.")
+for run in ("A", "B"):
+    report = R.format(run.lower())
+    if pathlib.Path(report).exists():
+        sys.exit(f"{report} exists")
+    a = dict(base, scratch=(S / f"review-folds-{run.lower()}").as_posix(),
+             context=CONTEXT.replace("{run}", run).replace("{report}", report))
+    out = S / "adopt" / f"args-folds-{run.lower()}.json"
+    out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+    (S / "adopt" / f"args-folds-{run.lower()}.compact.json").write_text(json.dumps(a, ensure_ascii=False),
+                                                                       encoding="utf-8", newline="\n")
+    print(f"run {run}: {a['kind']} {a['base'][:9]}..{a['head'][:9]}, {a['intensity']}, {len(a['specs'])} specs, "
+          f"checklist {len(a['checklist'].splitlines())} lines, efforts {a['efforts']}, context "
+          f"{len(a['context'].split())} words, report {report.rsplit('/', 1)[1]}")
+````
+
+### `gather_instruments.py`
+
+Gathers research passes' shell commands, written files and web calls from their transcripts into one instruments record.
+
+````python
+"""Gather research passes' instruments from their transcripts: every shell command each researcher ran, every file it
+wrote, and every web query and page it read, in order, as fenced text in one instruments record. The retrofit pass's
+gatherer (`retrofit/gather_instruments.py`), widened to any number of runs and to the web calls a prior-art pass rests
+on.
+
+Usage: python -X utf8 gather_instruments.py <out-record-name> <title> <returns-line> <run>...   (from the worktree root)
+  out-record-name  e.g. research-flow-instruments, saved as build/2026-10-19-build-PLAY-dClosedLoop-1-<name>.md
+  title            the record's H1, after "Research instruments: "
+  returns-line     one sentence naming the returns, written under the H1
+  run              <tag>:<dispatch>:<question>:<transcript.jsonl>, one per research pass, in dispatch order
+
+The transcript holds each call as the run sent it, whatever the shared scratch directory holds now. Fences are four
+backticks, and a body holding a line that opens a fence is refused, to be filed by hand. Refuses to overwrite.
+
+Edited after both runs, its output unchanged: the fence is built as FENCE, as the recorder's own is, because the
+recorder refuses to embed a source holding the four-backtick string.
+"""
+import json
+import pathlib
+import sys
+
+name, title, returns = sys.argv[1:4]
+runs = [a.split(":", 3) for a in sys.argv[4:]]
+OUT = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-%s.md" % name)
+if OUT.exists():
+    sys.exit("%s exists" % OUT)
+KEEP = ("Bash", "Write", "WebSearch", "WebFetch")
+FENCE = "`" * 4
+
+
+def calls(src):
+    for raw in pathlib.Path(src).read_text(encoding="utf-8").splitlines():
+        try:
+            ev = json.loads(raw)
+        except json.JSONDecodeError:
+            continue
+        msg = ev.get("message") if isinstance(ev, dict) else None
+        if ev.get("type") != "assistant" or not isinstance(msg, dict):
+            continue
+        for c in msg.get("content", []):
+            if isinstance(c, dict) and c.get("type") == "tool_use" and c.get("name") in KEEP:
+                yield c["name"], c.get("input") or {}
+
+
+parts = ["# Research instruments: %s\n" % title,
+         "**Serves:** research PLAY-dClosedLoop-1\n",
+         "Each pass's shell commands, written files, web queries and pages read, taken in order from its transcript, so "
+         "nothing is retyped. The passes shared the session scratch directory, so a file there may hold another pass's "
+         "content; these are what each pass sent. Reads of the tree (Read, Grep, Glob) are left out, as the retrofit "
+         "pass's instruments left them out. %s\n" % returns]
+total = {}
+for tag, dispatch, question, src in runs:
+    parts.append("## [%s] Dispatch %s: %s\n" % (tag, dispatch, question))
+    k = 0
+    for kind, inp in calls(src):
+        k += 1
+        if kind == "Write":
+            body = inp.get("content", "")
+            label = "Write `%s`" % pathlib.PurePosixPath(str(inp.get("file_path", "")).replace(chr(92), "/")).name
+        elif kind == "WebSearch":
+            body, label = inp.get("query", ""), "WebSearch"
+        elif kind == "WebFetch":
+            body, label = "%s\n%s" % (inp.get("url", ""), inp.get("prompt", "")), "WebFetch"
+        else:
+            body, label = inp.get("command", ""), "Bash"
+        body = body.replace("\r\n", "\n").rstrip("\n")
+        if any(ln.lstrip().startswith("```") for ln in body.split("\n")):
+            sys.exit("%s call %d holds a fence line; file it by hand" % (tag, k))
+        parts.append("%d. %s\n\n%stext\n%s\n%s\n" % (k, label, FENCE, body, FENCE))
+    total[tag] = k
+text = "\n".join(parts)
+OUT.write_bytes(text.encode("utf-8"))
+print("%s: %d bytes; calls %s" % (OUT, len(text.encode("utf-8")), total))
+````
+
+### `log_flow.py`
+
+The session log's dispatch 122 to 126 rows, both runs' and the three researchers' agent lines, and three events.
+
+````python
+"""Record the paired closing review of the last three folds and the flow-and-roles adoption research in the session
+log: dispatch rows 122 to 126 (run A 122, the three researchers 123 to 125, run B 126), every agent and returned line
+as the roles kit derived them, and three events: the paired review, with run A's report set aside while run B ran; the
+research pass; and the defect the today pass measured outside its question, flagged as a separate task.
+
+Usage: python -X utf8 log_flow.py <agent-lines-runA.txt> <agent-lines-123-125.txt> <agent-lines-runB.txt>
+       (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+
+def lines_of(path, n):
+    got = [ln for ln in pathlib.Path(path).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+           if ln.startswith(("- agent —", "- returned —"))]
+    if len(got) != n:
+        sys.exit(f"{path}: {n} agent and returned lines expected, read {len(got)}")
+    return got
+
+
+run_a, research, run_b = lines_of(sys.argv[1], 20), lines_of(sys.argv[2], 6), lines_of(sys.argv[3], 20)
+F = "`" * 3
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row121 = [ln for ln in L.text.split("\n") if ln.startswith("| 121 |")]
+if len(row121) != 1:
+    sys.exit("no single dispatch row 121")
+SHAPE = ("`tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), "
+         "five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run {} of two")
+WHAT = ("The closing review of the last three folds, run twice at the owner's word: `320c79646` over `dd1ebb01b`, the "
+        "shape audit's fold, the Skills' and the adopter instructions'")
+ROWS = [
+    (122, SHAPE.format("A"), WHAT, "the args, built by `build_args_folds.py`",
+     "returned as `wf_32d759cc-d9a`, CLEAN WITH FIXES, 24 of 30 confirmed, 20 items, 1 high",
+     "`reviews/2026-10-19-review-PLAY-dClosedLoop-1-folds-closing-a.md`"),
+    (123, "gov-researcher, at the owner's medium effort",
+     "The flow and roles adoption pass: how an adopter adds to or changes gov's flow and roles today, and what the next "
+     "update does, measured on a scratch install",
+     "`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-5-researcher.md`",
+     "returned, 15m16s, 62.0k out: legs, run vocabularies and role files add beside gov's; tables typed into gov's code "
+     "refuse an adopter role or workflow; an edited leg argv withholds the manifest, and a deleted gov leg returns "
+     "unreported", "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-today.md`"),
+    (124, "gov-researcher, at the owner's medium effort",
+     "The pass: what the converged design decides about an adopter's own flow and roles, and what it leaves open",
+     "`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-6-researcher.md`",
+     "returned, 8m21s, 45.8k out: breakpoints, probe points, presets, playbooks, policy values and role prose decided; "
+     "an item or role in a core step, and amending, replacing, disabling or surviving a change to a gov row, open; six "
+     "contradictions", "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-design.md`"),
+    (125, "gov-researcher, at the owner's medium effort",
+     "The pass: prior art outside gov for adding and changing steps, checks and roles through upstream updates",
+     "`prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-7-researcher.md`",
+     "returned, 7m57s, 39.2k out: eight families; an own namespace, pinned edges, a typed graph checked when composed "
+     "and roles that declare their shapes; a meaning change under an unchanged type passes every mechanism",
+     "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-prior-art.md`"),
+    (126, SHAPE.format("B"), WHAT, "the args, built by `build_args_folds.py`",
+     "returned as `wf_a3ab6ac1-aba`, CLEAN WITH FIXES, 21 of 23 confirmed, 17 items, 0 high",
+     "`reviews/2026-10-19-review-PLAY-dClosedLoop-1-folds-closing-b.md`"),
+]
+new = "".join(f"| {n} | {who} | {what} | {brief} | 1799cb98 | {out} | {rec} |\n"
+              for n, who, what, brief, out, rec in ROWS)
+L.sub(row121[0] + "\n", row121[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n",
+                "\nThe last three folds' closing review, dispatches 122 and 126, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(run_a + run_b) + "\n" + F + "\n"
+                + "\nThe flow and roles adoption research, dispatches 123 to 125, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(research) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner asked, "Run the reviews of the same shape (medium effort, twice) for the
+  last three folds. While they're running, we'll review the next piece of the Flow and Role layers." Two light diff
+  reviews of `320c79646` over `dd1ebb01b` ran one after the other, dispatches 122 and 126, their args differing only in
+  the run label, the report path and the scratch path. Run A's report was moved out of the tree while run B ran, so run
+  B could not read it, and restored byte for byte after (sha256 `af2916008b87`). The comparison is
+  `build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`.
+- 2026-10-19, session 1799cb98: the owner chose "Adoption and customization (Recommended)" as the Flow and Role layers'
+  next piece. Three researchers took one question each, dispatches 123 to 125, and `{REC}` answers the question,
+  recommends a design and puts its forks to the owner. Each pass's commands and probes are in
+  `build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-instruments.md`, and the adopter-instructions passes'
+  (118 to 121), never gathered before, in `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-instruments.md`.
+- 2026-10-19, session 1799cb98: the today pass measured a defect outside its question: in a default adopter install,
+  `.claude/roles.json` names the review harnesses at `tools/workflows/`, where the kit is not installed, and the spawn
+  guard refuses gov's own `tier2-review.js` (rc 2). This build writes no product code, so the fix was offered to the
+  owner as a separate task, and the register records the gap.
+""", "events")
+L.save()
+````
+
+### `clauses.py`
+
+Prints a v2 chain row's clauses whole, the fold's reading aid.
+
+````python
+"""Print a v2 chain row's clauses whole, numbered, filtered by a regex: the fold's reading aid.
+
+Usage: python -X utf8 clauses.py <build> [<regex>]   (from the worktree root)
+Clauses split at '; ' outside parentheses, as the planned-unit count splits them.
+"""
+import re
+import sys
+
+V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+build, pat = sys.argv[1], (sys.argv[2] if len(sys.argv) > 2 else ".")
+rows = [ln for ln in open(V2, encoding="utf-8").read().split("\n") if ln.startswith(f"| {build} |")]
+if len(rows) != 1:
+    sys.exit(f"{len(rows)} rows for {build}")
+cells = rows[0].split(" | ")
+body = cells[3]
+depth, cur, out = 0, "", []
+i = 0
+while i < len(body):
+    ch = body[i]
+    if ch == "(":
+        depth += 1
+    elif ch == ")":
+        depth -= 1
+    if depth == 0 and body.startswith("; ", i):
+        out.append(cur)
+        cur = ""
+        i += 2
+        continue
+    cur += ch
+    i += 1
+out.append(cur)
+for k, c in enumerate(out):
+    if re.search(pat, c):
+        print(f"[{k}] {c}\n")
+print(f"{len(out)} clauses; gaps cell: {cells[4][:200]}")
+````
+
+### `fold_review.py`
+
+The closing review's 25 defects folded into v2, the memory plan, the systems record, the fates record, the gap register and the adopter record, with nine bug classes' instances.
+
+````python
+"""Fold the last three folds' closing review, run twice: all 25 confirmed defects of
+`build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md` `[map]`, each by its `[fold]` row, into v2, the
+memory plan, the systems record, the fates record, the gap register and the adopter-instructions record; one session-log
+event; and the instances on nine bug classes. Every substitution matches exactly once or the script exits.
+
+Usage: python -X utf8 fold_review.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+CMP = "build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md"
+TAG = "the folds' closing review"
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("  repository's own rules render from its own overlay as a separate project block (walk CV1). A repository changes\n"
+      "  gov's units only through its own units' typed edges, pinned to the gov text they were written against, so an\n"
+      "  update never overwrites or silently drops a repository's change (IA-1 to IA-6).\n",
+      "  repository's own rules render from its own overlay, its level-0 units as a separate project block (walk CV1) and\n"
+      "  its higher levels in a marked part of their documents. A repository adds units at their level, changes gov's\n"
+      "  units only through its own units' `amends` and `supersedes` edges, pinned to the gov text they were written\n"
+      "  against, and drops one only through `instructions.exclude`, so an update never overwrites or silently drops a\n"
+      "  repository's change (IA-1 to IA-6).\n", "P8 (p8-only)")
+V.sub("  working, or warns, until its window closes (the owner's point 6, the away pass). A landing that changes such a\n"
+      "  surface with no step reds at dSafePassage's step gate (SA-11).\n",
+      "  working, or warns, until its window closes (the owner's point 6, the away pass). A landing that removes, renames\n"
+      "  or retires such a surface with no step reds at dSafePassage's step gate (SA-11), and a change of meaning behind\n"
+      "  an unchanged name is the review's to catch.\n", "P38 (p38-wording)")
+# dSafePassage
+V.sub("once its holder is dead (the shape audit, SA-2); down steps run in reverse",
+      "once its holder is dead (the shape audit, SA-2); the receipt's schema 4 gaining `steps`, the per-step progress the "
+      "walk and gov first record, the `gov_oid` back-fill pinned to schemas below 3 so a schema-3 receipt is never "
+      "back-filled, its messages and the constant's comment updated, the receipt's readers inventoried by value, govkit, "
+      "matrix's schema fixtures and `check-receipt.py`, the change shipped as an upgrade step whose down restores schema "
+      f"3, and a planted schema-3 receipt whose row carries `commit` and no `gov_oid` still red at S9 after the bump "
+      f"(SA-3, {TAG}); down steps run in reverse", "dSafePassage: the receipt's steps (receipt-steps-later)")
+V.sub("recorded in gov's source-mode receipt with gov's deploy plan accepted, the receipt listing every declared step id,",
+      "recorded in gov's source-mode receipt, which this clause creates, gov's deploy plan accepted and `update` run on "
+      "gov's own tree as an adopter runs it, the receipt's `steps` listing every declared step id,",
+      "dSafePassage: gov first creates gov's receipt (self-update-unplaced)")
+V.sub("and a planted row of the state not graded as a fork by arm 3c, and an edited rendered file named at update and held "
+      "with an order, never reported as `re-rendered` (P38, SA-2, IA-2)",
+      "and a planted `retired-edited` receipt row graded the order by update's role-to-verdict mapping, never `forked`, "
+      "seen red on that mapping stubbed to `forked`, and an edited rendered file named at update and held with an order, "
+      "never reported as `re-rendered`, seen on a planted render edited since its last render and red on today's mapping "
+      f"(P38, SA-2, IA-2, {TAG})", "dSafePassage: arm 3c and the edited render (arm-3c, edited-render-unplanted)")
+V.sub("conf keys, CLI verbs and the registry's entries, each later class, record-kind schemas, policy keys and gov's "
+      "instruction-unit tags among them, joining when its owning build lands it, a unit tag vanishing only with a change "
+      "record naming its successor, and reds a landing that removes, renames or retires a member with no `[[upgrade]]` or "
+      "`[[retired]]` row naming it in `surfaces`, a content-only edit a plain update delivers needing none, seen red on a "
+      "planted rename of an installed file, a planted agent rename and a planted registry removal, each with no row, and "
+      "green with one and on a planted content-only edit (P38, SA-11)",
+      "conf keys, the policy keys dGroundRules' schema holds, CLI verbs and the registry's entries, each later class "
+      "joining when the build that registers it lands it, that build's row arming the join and planting its red, and reds "
+      "a landing that removes, renames or retires a member with no `[[upgrade]]` or `[[retired]]` row naming it in "
+      "`surfaces`, a class whose own change record names its successor reading that record as its one witness in place "
+      "of the row, a content-only edit a plain update delivers needing none, seen red on a planted rename of an installed "
+      "file, a planted agent rename, a planted registry removal and a planted policy key removed, each with no row, and "
+      "green with one and on a planted content-only edit, and refusing green while a registered class's population is "
+      f"empty (P38, SA-11, {TAG})", "dSafePassage: the step gate (joins-unarmed, two-successions)")
+# dOrderedCharter
+V.sub("source, owner, a kit or the repository, and class, fixed or open)",
+      "source, origin, a kit or the repository, apart from the `owner` edge, which names a chain build, and class, fixed "
+      "or open)", "dOrderedCharter: the registry's origin (owner-field)")
+V.sub("the native-id classes registered beside the namespaces with their owners, commits dDeclaredLoop's, acts and "
+      "sessions dWellOiledMachine's and landings dShippedRelease's, one edge per address form, tag, section and native "
+      "id, planted and resolved, and the edge checks in the tags leg pack (P33, P34)",
+      "the native-id mechanism registered beside the namespaces with the one class this build owns, the "
+      "`FAMILY-<slug>-<seq>` ids the charter's ids practice mints, each later class registered and its resolution armed "
+      "by the build that brings it, the pinned tag `<tag>@<hash>` registered as an address form legal only as an "
+      "`amends` or `supersedes` target, one edge per address form, tag, pinned tag, section and FAMILY id, planted and "
+      "resolved, a pinned target missing its `@`, one with a malformed hash, one whose hash matches no text in its "
+      "unit's history and a pin on any other edge type each seen red, and the edge checks in the tags leg pack (P33, "
+      f"P34, {TAG})", "dOrderedCharter: native ids and the pin (native-id-later, pin-grammar)")
+V.sub("root `README.md`'s line among them, and the `map_lib` re-export declared as a deprecation (P38)",
+      "root `README.md`'s line among them, the `map_lib` re-export declared as a deprecation, each `[charter] "
+      "adopter_rules` entry of `.governance/deploy.toml` converted into a level-0 `repo.` unit of the overlay by a step "
+      "whose down restores it, a `[[retired]]` row for the seeded charter template with its readers inventoried by path "
+      "and by value and an edited copy ordered, never deleted, and a change record for every unit the census moves out "
+      "of the shipped set naming its successor or `none`, each seen red at the step gate without its row and green with "
+      f"it (P38, {TAG})", "dOrderedCharter: its own steps (own-steps-missing)")
+V.sub("its rows owned by the repository and tagged in the `repo.` namespace",
+      "its rows' origin the repository and their tags in the `repo.` namespace", "dOrderedCharter: overlay origin")
+V.sub("every gov unit declaring its class, a fixed one (the core principles, the floor's invariants and every unit a gov "
+      "tool parses) refusing all three",
+      "every gov unit's class derived, never typed, fixed for the core principles, the floor's invariants and every unit "
+      "a registered parser or extractor reads, an undeclared class read as fixed and a parsed unit declared `open` seen "
+      "red, and a fixed unit refusing all three", "dOrderedCharter: the class derived (fixed-class-typed)")
+V.sub("and a repository's own keys under `repo.` read only by its units, each operation seen on a planted overlay and "
+      "each refusal red (IA-1, IA-2, IA-4)",
+      "and a repository's own policy keys, each declared in the overlay with its allowed values and default, set under "
+      "`repo.` in `.governance/policy.toml`, tagged `policy.repo.<key>` and read only by its units through dGroundRules' "
+      "one reader, which this build extends to validate them as it validates catalogue keys and to leave them outside "
+      "the presets' completeness check, a planted repository key beside a same-named repository unit both resolving, "
+      f"each operation seen on a planted overlay and each refusal red (IA-1, IA-2, IA-4, {TAG})",
+      "dOrderedCharter: repository keys (repo-keys-unread)")
+V.sub("pins and drift: each gov change record marked `editorial` or `semantic`, a pin behind editorial changes alone "
+      "standing, a semantic change rendering gov's new text and the repository's change and filing an order as "
+      "`instructions.stale` says, a rename re-pointing the edge to the change record's successor, a split or a "
+      "retirement orphaning it, an orphaned amendment held out of the render and an orphaned replacement rendered on its "
+      "own, each with an order, and the update listing every new gov unit at a level and `select` the repository has "
+      "units in, each case seen on a planted release (IA-3)",
+      "pins and drift: each gov change record marked `editorial` or `semantic`, `editorial` admitted only where the "
+      "normalised before-and-after diff falls in a mechanical class (whitespace, punctuation, a declared spelling map) "
+      "or a review breakpoint's recorded ruling says so, any other change read as `semantic`, seen red on a planted "
+      "meaning change marked `editorial` and green on a punctuation-only one, a pin behind editorial changes alone "
+      "standing, a semantic change acting as `instructions.stale` says (`order` rendering gov's new text and the "
+      "repository's change and filing an order, `refuse` holding the update and naming each stale edge until "
+      "`instructions.edit` re-pins it, `warn` rendering both and printing and journaling the stale edge with no order), "
+      "each value seen on a planted semantic change, a rename re-pointing the edge to the change record's successor, a "
+      "split, whose successor is a list, or a retirement, whose successor is `none`, orphaning it, an orphaned "
+      "amendment held out of the render and an orphaned replacement rendered on its own, each filing an order, or "
+      "holding the update under `refuse`, gov's instruction-unit tags joined to dSafePassage's step gate with the change "
+      "record as their one witness, seen red on a planted unit tag removed with no change record and green on one "
+      "naming its successor, and the update listing every new gov unit at a level and `select` the repository has "
+      f"units in, each case seen on a planted release (IA-3, {TAG})",
+      "dOrderedCharter: pins and drift (stale-values-unrouted, editorial-unchecked, joins-unarmed)")
+V.sub("an overflow refused naming the largest contributors by owner, never truncated",
+      "an overflow refused naming the largest contributors by origin, never truncated", "dOrderedCharter: by origin")
+# dBoundRoles
+V.sub("the roles kit's house files moved into the repository's overlay as level-5 units selecting their role, with "
+      "their own upgrade step (IA-1, P38)",
+      "the roles kit's house text files, `house/*.md`, moved into the repository's overlay as level-5 units selecting "
+      "their role, with their own upgrade step, `house/policy.toml` keeping the route this row's shapes give it (IA-1, "
+      f"P38, {TAG})", "dBoundRoles: the house glob (house-glob)")
+# dTotalRecall
+V.sub("a kind registered before it, dPlacedRequest's `probe`, joining it here and a later one landing its row with its "
+      "conformance arm (P16)",
+      "a kind registered before it, dPlacedRequest's `probe`, joining it here and a later one landing its row with its "
+      "conformance arm, record-kind schemas joined to dSafePassage's step gate, seen red on a planted kind's schema "
+      f"removed with no row, and gap keys registered as a native-id class, their resolution planted (P16, {TAG})",
+      "dTotalRecall: the record-kind join and gap keys (joins-unarmed, native-id-later)")
+# dLinkedLibrary
+V.sub("`adopt.instructions`: at install an adopter's own instruction files rendered verbatim as a legacy block after "
+      "the project block, on a shrink-only list, every harness file wired at once and none overwritten, then each "
+      "paragraph proposed as a repository unit, an amendment of a gov unit or a drop, for the owner to rule once (IA-5)",
+      "`adopt.instructions`: at install an adopter's own instruction files rendered verbatim as a legacy block after "
+      "the project block, the block a member of `instructions.legacy`'s population, admitted at install only and "
+      "shrink-only after, under `refuse` admitted only with every paragraph ruled before the first landing, every "
+      "harness file wired at once and none overwritten, then each paragraph proposed as a repository unit, an amendment "
+      "of a gov unit or a drop, for the owner to rule once, seen on a fixture repository holding its own `CLAUDE.md`, "
+      "`GEMINI.md` and Copilot instructions, each file's bytes kept in the block and each harness file wired, red on "
+      "today's installer, on a planted row added to the legacy list, and on a planted strict install carrying an "
+      f"existing `CLAUDE.md` (IA-5, {TAG})", "dLinkedLibrary: adopt.instructions (adopt-unfixtured, legacy-block-key)")
+# dShippedRelease
+V.sub("the receipt's schema 4 gaining `steps`, `superseded`, `deprecations` and `prior_commit`, the `gov_oid` back-fill "
+      "pinned to schemas below 3 so a schema-3 receipt is never back-filled, its messages and the constant's comment "
+      "updated, the receipt's readers inventoried by value, govkit, matrix's schema fixtures and `check-receipt.py`, and "
+      "the change shipped as an upgrade step whose down restores schema 3, a planted schema-3 receipt whose row carries "
+      "`commit` and no `gov_oid` still red at S9 after the bump, `kits.currency`",
+      "the receipt's schema 5 gaining `superseded`, `deprecations` and `prior_commit` beside dSafePassage's `steps`, its "
+      "messages and the constant's comment updated, the receipt's readers inventoried by value, govkit, matrix's schema "
+      "fixtures and `check-receipt.py`, and the change shipped as an upgrade step whose down restores schema 4, "
+      "`kits.currency`", "dShippedRelease: schema 5 (receipt-steps-later)")
+V.sub("a fresh install of every kit in one pass, the kits' adopters ordered by their declared dependencies and seen on "
+      "an empty repository",
+      "a fresh install of every kit in one pass, the kits' adopters ordered by their declared dependencies and seen on "
+      "an empty repository; every release updating gov's own install first, through the `update` dSafePassage runs on "
+      "gov, so the survival path runs on gov before it reaches an adopter (P8, the adopter-instructions record's design "
+      f"item 16, {TAG})", "dShippedRelease: gov's update of itself (self-update-unplaced)")
+# dConvergedCharter
+V.sub("each rename shipped as an upgrade step with the old name forwarded for `install.deprecation-window` releases, and "
+      "the Skill kind's conformance gate",
+      "each rename shipped as an upgrade step with the old name forwarded for `install.deprecation-window` releases and "
+      "its readers inventoried by path and by value and re-pointed in the rename's unit, each kit's `to`, `probe` and "
+      "`pattern` rows, the adopt scripts and the self-tests' line-ending rows among them, a planted stale probe path "
+      "seen red, and the Skill kind's conformance gate", "dConvergedCharter: SK-2's readers (sk2-readers)")
+V.sub("a `[[retired]]` row with an inventory of its readers by value, the charter's two `/session-kickoff` lines, the "
+      "write gate's refusal text, `memory/guides/SESSION-KICKOFF.md`, the junction rule in the charter's repository "
+      "section and the runbook's link step, a forwarding stub in `skills/session-kickoff/` for "
+      "`install.deprecation-window` releases, then the directory removed, and the node preflight reporting a link whose "
+      "target is gone, seen red on a planted node whose link targets a removed directory (SA-9)",
+      "a `[[retired]]` row with an inventory of its readers by path and by value over the tree, the charter's two "
+      "`/session-kickoff` lines, the write gate's refusal text, `memory/guides/SESSION-KICKOFF.md`, the junction rule in "
+      "the charter's repository section, the runbook's link step, the session hooks in `.claude/settings.json` that run "
+      "its `manifest-check.sh`, the leg rows and the kit entry that name the directory, the registry's glob and "
+      "check-wiring's link arm, `manifest-check.sh` and its fragments moved to a kit home of their own and their readers "
+      "re-pointed before the directory goes, a forwarding stub in `skills/session-kickoff/` for "
+      "`install.deprecation-window` releases, then the directory removed, the removal seen red on a scratch clone where "
+      "a path reader survives, and the node preflight reporting a link whose target is gone, seen red on a planted node "
+      f"whose link targets a removed directory (SA-9, {TAG})", "dConvergedCharter: SA-9's readers (kickoff-path-readers)")
+# owed and the revision note
+V.sub("  - the pin's noise, re-measured at dOrderedCharter's first unit over units of one line against gov's history\n"
+      "    (`build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md` `[owed]`);\n",
+      "  - the pin's noise, re-measured at dOrderedCharter's first unit over units of one line against gov's history\n"
+      "    (`build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md` `[owed]`);\n"
+      "  - the map every restructuring release ships, its renames, splits and retirements, checked by the step gate from\n"
+      "    the first release that moves a unit (`build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md`\n"
+      "    `[owed]`, dropped by its fold and restored by the folds' closing review);\n", "owed (joins-unarmed)")
+V.insert_before("Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-"
+                "folds.md`):\n",
+                f"Revised: 2026-10-19, after the last three folds' closing review, run twice (`{CMP}`): dSafePassage's\n"
+                "receipt gains `steps`, which its walk and gov first read, gov first creates gov's receipt and runs\n"
+                "`update` on gov, and dShippedRelease's bump becomes schema 5; the step gate takes the policy keys\n"
+                "dGroundRules holds, each later class is armed by its own build's row, and a class's change record is\n"
+                "its one witness; dOrderedCharter's unit field is `origin`, its fixed class derived, its pinned tag an\n"
+                "address form with malformed cases, its `editorial` mark checked, each `instructions.stale` value given\n"
+                "its arm, its FAMILY ids its native-id class, its repository keys declared and read, and its own steps\n"
+                "listed; `/session-kickoff` and the `gov-<name>` renames inventory readers by path and by value; P8 and\n"
+                "P38 say what the mechanisms do; and the restructure map returns to `[owed]`.\n\n",
+                "revision note")
+V.save()
+
+# ---------------------------------------------------------------- the memory plan
+P = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+P.sub("  `FAMILY-<slug>-<seq>`, a gap key, an act, session or landing id), each native-id class registered with its owner\n"
+      "  (P33). Instruction units,",
+      "  `FAMILY-<slug>-<seq>`, a gap key, an act, session or landing id), each native-id class registered with its owner\n"
+      "  (P33): FAMILY ids by dOrderedCharter, gap keys by dTotalRecall, and every other class by the build that brings\n"
+      "  it. An `amends` or `supersedes` target may pin its tag as `<tag>@<hash>`, the hash of the text it was written\n"
+      "  against, and no other edge carries a pin (IA-2, the folds' closing review). Instruction units,",
+      "frame: owners and the pin (native-id-later, pin-grammar)")
+P.sub("| node: units at level 0, written only through `instructions.edit`, under dGroundRules' minimal guard (SA-12), its "
+      "adopter rules moving into the instruction overlay (IA-1) |",
+      "| node: the install answers and the kit selection, never units, written by govkit's `intake`, install and update "
+      "and by the owner's edit under dGroundRules' minimal guard (SA-12), its answers rendering into level 0 and its "
+      "adopter rules moving into the instruction overlay (IA-1, the folds' closing review) |",
+      "pockets: the deploy overlay (deploy-row-units)")
+P.sub("| typed relations | every relation to another node is an edge of a registered type, declared once at the site "
+      "that owns the fact | the edge checks: type registered, target resolves, from and to namespaces allowed, inverse "
+      "rendered |",
+      "| typed relations | every relation to another node is an edge of a registered type, declared once at the site "
+      "that owns the fact | the edge checks: type registered, target resolves, a pinned target's hash well-formed and "
+      "found in its unit's history, a pin on any other type refused, from and to namespaces allowed, inverse rendered |",
+      "practice: the pinned target (pin-grammar)")
+P.sub("| one owner | every node names one owning build or layer |",
+      "| one owner | every node gov ships names one owning build or layer, and a repository's own rows name their origin "
+      "instead |", "practice: one owner (owner-field)")
+P.sub("reads that list, seen red on a planted write by an unlisted writer and green on a lease acquisition.",
+      "reads that list, seen red on a planted write by an unlisted writer and green on a lease acquisition and on a "
+      "planted kit install.", "doors: the planted install (deploy-row-units)")
+P.sub("The other doors write the other node kinds: the builder writes code annotations under the grammar;",
+      "The other doors write the other node kinds: the builder writes code annotations under the grammar; govkit's "
+      "`intake`, install and update write `.governance/deploy.toml`'s answers and kit selection; the upgrade-step kind "
+      "writes the instruction overlay for a step that moves a repository's text into it, dBoundRoles' house files and "
+      "dOrderedCharter's adopter rules among them;", "doors: the deploy file's writers (deploy-row-units)")
+P.save()
+
+# ---------------------------------------------------------------- the systems record
+Y = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("  A rename or retirement writes `retired → <new>` or `→ none` into that write path's change record, and\n"
+      "  the index derives the redirect from it. A retired name is never reused.\n",
+      "  A rename, split or retirement writes `retired → <new>`, a list of successors for a split, or `→ none` into\n"
+      "  that write path's change record, and the index derives the redirect from it, a split redirecting to no single\n"
+      "  successor. A retired name is never reused (revised 2026-10-19, the folds' closing review).\n",
+      "design-tags: the successor list (unit-schema-stale)")
+Y.sub("- **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the adopter's in\n"
+      "  `.governance/instructions.toml`, merged by row key. Its fields: `tag`, `type` (directive, constraint,\n"
+      "  definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one line, at most 200 B) or\n"
+      "  `source` (derived), `required-by`, `enforced-by`, `budget`, `status` (`active` or\n"
+      "  `retired:<forward-tag>`), and `help` for the rationale, which never loads. `status` is derived from the\n"
+      "  `instructions.edit` change record that `[design-tags]` reads for every retirement, and is never typed\n"
+      "  (revised 2026-10-17, the audit's L7).\n",
+      "- **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the repository's in\n"
+      "  `.governance/instructions.toml`, composed with every kit's manifest: the repository's rows tagged `repo.`,\n"
+      "  gov's rows changed only through the repository's edges, never by row key (IA-1, IA-2). Its fields: `tag`,\n"
+      "  `type` (directive, constraint, definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one\n"
+      "  line, at most 200 B) or `source` (derived), `required-by`, `enforced-by`, `budget`, `origin` (a kit or the\n"
+      "  repository, apart from the `owner` edge, which names a chain build), `class` (`fixed` or `open`, derived from\n"
+      "  the parsers and the floor, never typed), `edges` (the shared grammar, an `amends` or `supersedes` target\n"
+      "  pinned as `<tag>@<hash>`), `status` (`active`, `retired:<tag>[,<tag>]` or `retired:none`), and `help` for the\n"
+      "  rationale, which never loads. `status` is derived from the `instructions.edit` change record that\n"
+      "  `[design-tags]` reads for every retirement, and is never typed (revised 2026-10-17, the audit's L7; revised\n"
+      "  2026-10-19, the folds' closing review, after IA-2, IA-4 and the adopter-instructions record's items 8 and 10).\n",
+      "design-instruction-writing: the unit (unit-schema-stale)")
+Y.save()
+
+# ---------------------------------------------------------------- fates, register
+FT = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+FT.sub("| handed by write set (dLinkedLibrary); check-18 probe becomes an optional slot | v2 `[chain]` dLinkedLibrary; v2 "
+       "`[chain]` dOrderedCharter |",
+       "| handed by write set through `gotchas.py --for-paths` (dFurnishedOrders); check-18 probe becomes an optional "
+       "slot | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dOrderedCharter; the owner, SA-7, 2026-10-19 |",
+       "gotchas.py's row (selector-fates)")
+FT.save()
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+G.sub("the chain opens; the build's acceptance (c) joins that column against the chain READMEs, so every\n"
+      "key below must end up owned by exactly one chain build.\n",
+      "the chain opens; the build's acceptance (c) joins that column against the chain READMEs, so every\n"
+      "key below must end up owned by exactly one chain build. A gap two builds close is owned by the one whose\n"
+      "landing completes the closure, which descends from the other in the chain table; a gap whose closers do not\n"
+      "descend one from the other is split, one key per build (written down by the folds' closing review, 2026-10-19).\n",
+      "the rule for a gap two builds close (deploy-26-halves)")
+G.save()
+
+# ---------------------------------------------------------------- the adopter-instructions record
+A = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md")
+A.sub("   units selecting their role. `deploy.toml` keeps the install answers and the kit selection. Each row's owner is "
+      "the\n   repository.\n",
+      "   units selecting their role. `deploy.toml` keeps the install answers and the kit selection. Each row's origin "
+      "is\n   the repository, a field apart from the `owner` edge, which names a chain build.\n", "item 1 (owner-field)")
+A.sub("8. **Fixed units.** A gov unit declares its class.", "8. **Fixed units.** A gov unit's class is derived, never typed.",
+      "item 8 (fixed-class-typed)")
+A.sub("- **dSafePassage:** the step gate's population takes gov's unit tags when dOrderedCharter lands them; an update "
+      "holds\n  an edited render with an order.\n",
+      "- **dSafePassage:** the step gate's population takes gov's unit tags when dOrderedCharter lands them and arms the\n"
+      "  join; an update holds an edited render with an order; gov first creates gov's source-mode receipt, with its\n"
+      "  `steps`, and runs `update` on gov.\n", "chain: dSafePassage (self-update-unplaced)")
+A.sub("- **dShippedRelease:** gov's receipt and its self-update every release, beside dSafePassage's gov-first, and a "
+      "fresh\n  install in a single pass.\n",
+      "- **dShippedRelease:** every release updating gov's own install before any adopter's, and a fresh install in a\n"
+      "  single pass.\n", "chain: dShippedRelease (self-update-unplaced)")
+A.text = A.text.rstrip("\n") + f"""
+
+## [reviewed] The closing review, folded, 2026-10-19
+
+The last three folds' closing review, run twice (`{CMP}`), changed this design where v2 now reads differently, and
+v2 is the design of record:
+- **Item 1:** a row's origin is the repository, a field apart from the `owner` edge (`owner-field`).
+- **Item 7:** a repository's own policy keys are declared in the overlay, set in `.governance/policy.toml`, tagged
+  `policy.repo.<key>` and validated by dGroundRules' reader (`repo-keys-unread`).
+- **Item 8:** the fixed class is derived from the parsers and the floor, never typed (`fixed-class-typed`).
+- **Item 9:** `editorial` is admitted only for a mechanical diff or a review's ruling, and each `instructions.stale`
+  value has its arm: `order` renders both and files an order, `refuse` holds the update, and `warn` renders both
+  with no order (`editorial-unchecked`, `stale-values-unrouted`).
+- **Item 10:** the change record is the unit tags' one witness at the step gate, and dOrderedCharter arms their join
+  (`two-successions`, `joins-unarmed`).
+- **Item 15:** the legacy block joins `instructions.legacy`'s population, admitted at install only
+  (`legacy-block-key`).
+- **`[chain]`:** dSafePassage creates gov's receipt and runs `update` on gov, and dShippedRelease updates gov's own
+  install first at every release (`receipt-steps-later`, `self-update-unplaced`).
+"""
+A.done += 1
+A.save()
+
+# ---------------------------------------------------------------- the session log
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the last three folds' closing review, compared (`{CMP}`): 25 confirmed defects, one
+  high, both runs finding 10 of them, an overlap of 0.40. Every defect folds, none needing the owner: where the
+  reviewers left two routes, the owner's earlier answers chose one, and the receipt's `steps` field moves to
+  dSafePassage with the clauses SA-3 placed there. Run A refuted `gap-deploy-26`'s split and run B confirmed it; the
+  register now writes down the rule both readings rest on.
+""", "events")
+L.save()
+
+# ---------------------------------------------------------------- bug classes
+INST = {
+    "step-depends-on-a-later-build": "Two more: dSafePassage's walk and gov first read the receipt's `steps` field, "
+    "which only dShippedRelease's schema 4 added, and dOrderedCharter's native-id edge named only classes three later "
+    "builds register. The field now moves with the clauses that read it, and dOrderedCharter plants the edge on the "
+    "FAMILY ids it owns.",
+    "amendment-leaves-its-other-half-standing": "Four more: the memory plan's deploy-overlay row kept "
+    "`deploy.toml`'s level-0 units after IA-1 moved them out; dOrderedCharter's own upgrade steps kept their old list "
+    "after the fold gave the row three adopter-visible moves; the fates row kept the bug-class selector on "
+    "dLinkedLibrary after SA-7 moved it; and P8's \"only through edges\" and P38's \"changes\" outlived the exclusion "
+    "list and the gate's narrower predicate.",
+    "policy-value-with-no-route": "`instructions.stale`'s `refuse`, which the strict preset selects, and `warn` had "
+    "no arm: only the default `order` was planted. Each value now has its arm and its planted semantic change.",
+    "retirement-inventory-misses-readers-by-value": "The converse: `/session-kickoff`'s retirement inventoried its "
+    "readers by value and missed those by path, the session hooks that run its `manifest-check.sh`, the leg rows, the "
+    "kit entry, the registry's glob and check-wiring's link arm. Every retirement now inventories by path and by value.",
+    "a-spelling-change-strands-its-readers": "The `gov-<name>` Skill renames shipped steps with forwards and no reader "
+    "inventory, while kit rows, adopt scripts and self-tests pin the old spellings by value. Each rename now "
+    "re-points its readers in its own unit.",
+    "inputs-inside-the-subjects-reach": "Two more: the `editorial` mark that exempts a pin from drift is written by "
+    "gov's own author on gov's own change record, and the fixed class a refusal reads was typed by hand. `editorial` is "
+    "now admitted only for a mechanical diff or a review's ruling, and the class is derived from the parsers.",
+    "two-answers-to-one-question": "Six more: the systems record's unit schema beside v2's registry clause; a "
+    "`[[retired]]` row and a change record as witnesses of one rename; a unit field named `owner` beside the `owner` "
+    "edge; the adopter record's `[chain]` and `[folded]` on gov's update of itself; two scopes for one house-file move; "
+    "and two legacy lists for one install.",
+    "rule-stated-with-no-check-that-fails": "Five more: the step gate's later classes joined with no build arming "
+    "them; an edited render held at update with no planted case; a pinned target that no edge check parses; "
+    "`adopt.instructions`' no-overwrite and wiring promises with no fixture; and a repository's own policy keys with "
+    "no schema or reader.",
+    "fixture-passes-by-finding-nothing": "The retired-edited check pointed at arm 3c, which loops over descriptor rules "
+    "and never reads a receipt row, so a planted receipt row would pass whatever update did. It now reads update's "
+    "role-to-verdict mapping and is seen red on that mapping stubbed to `forked`.",
+}
+for name, body in INST.items():
+    K = Record(f"memory/gotchas/{name}.md")
+    head = re.search(r"^## Where it bit\n", K.text, flags=re.M)
+    nxt = re.search(r"^## ", K.text[head.end():], flags=re.M) if head else None
+    if not nxt:
+        sys.exit(f"{name}: no section records where it bit")
+    at = head.end() + nxt.start()
+    para = f"It bit again in the last three folds' closing review, 2026-10-19 (`memory/builds/dClosedLoop/{CMP}`). {body}"
+    lines, cur = [], ""
+    for w in para.split(" "):
+        if cur and len(cur) + 1 + len(w) > 120:
+            lines.append(cur)
+            cur = w
+        else:
+            cur = f"{cur} {w}" if cur else w
+    lines.append(cur)
+    K.text = K.text[:at] + "\n".join(lines) + "\n\n" + K.text[at:]
+    K.done += 1
+    K.save()
+print("folded")
+````
+
+### `add_mine_review.py`
+
+Registers these scripts here.
+
+````python
+"""Register the closing review's and the flow research's scripts in the recorder's MINE list, after the adopter fold's."""
+import pathlib
+import sys
+
+p = pathlib.Path(sys.argv[1]) / "night" / "record_instruments.py"
+t = p.read_text(encoding="utf-8")
+anchor = '    ("preset_check_canonical.py", "The preset check [final] runs,'
+rows = '''    ("adopt/build_args_folds.py", "The args of the last three folds' closing review, runs A and B, differing only in "
+     "the run label, the report path and the scratch path."),
+    ("adopt/gather_instruments.py", "Gathers research passes' shell commands, written files and web calls from their "
+     "transcripts into one instruments record."),
+    ("adopt/log_flow.py", "The session log's dispatch 122 to 126 rows, both runs' and the three researchers' agent "
+     "lines, and three events."),
+    ("adopt/clauses.py", "Prints a v2 chain row's clauses whole, the fold's reading aid."),
+    ("adopt/fold_review.py", "The closing review's 25 defects folded into v2, the memory plan, the systems record, the "
+     "fates record, the gap register and the adopter record, with nine bug classes' instances."),
+    ("adopt/add_mine_review.py", "Registers these scripts here."),
+'''
+if t.count(anchor) != 1 or "adopt/fold_review.py" in t:
+    sys.exit("the recorder's list moved, or already holds the review scripts")
+p.write_text(t.replace(anchor, rows + anchor), encoding="utf-8", newline="\n")
+print("registered")
+````
+
+### `fold_review_probe.py`
+
+The reconciliation probe reddened on two clauses of the review's fold: a route into the breakpoint program, and a citation that matched one of its names. Both fixed.
+
+````python
+"""The reconciliation probe reddened on the closing review's fold, on two clauses, and both reds are fixed here.
+
+- dOrderedCharter's `editorial` mark was admitted on "a review breakpoint's recorded ruling", a route into the
+  breakpoint program, which only dDeclaredLoop and dFairHearing bring: a real later-build dependency. The ruling is
+  now the owner's, carried by `instructions.edit`'s proof, which dOrderedCharter owns.
+- The chain rows cited the fold as "the folds' closing review", and `closing review` is one of the breakpoint
+  program's declared names, so the probe read the citation as a route. The chain rows now cite "the folds' review".
+
+The records that describe the fix follow: the comparison record's [fold] and [folded], the adopter record's
+[reviewed], and the bug-class instance. Every substitution matches the counted number of times or the script exits.
+
+Usage: python -X utf8 fold_review_probe.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("or a review breakpoint's recorded ruling says so",
+      "or the owner's ruling, carried by `instructions.edit`'s proof and recorded on the change record, says so",
+      "dOrderedCharter: the editorial ruling")
+lines = V.text.split("\n")
+n = 0
+for i, ln in enumerate(lines):
+    if ln.startswith("| d") and "the folds' closing review" in ln:
+        n += ln.count("the folds' closing review")
+        lines[i] = ln.replace("the folds' closing review", "the folds' review")
+if n != 12:
+    sys.exit(f"{n} chain-row citations, 12 expected")
+V.text = "\n".join(lines)
+V.done += 1
+V.save()
+
+C = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md")
+C.sub("v2: `editorial` only for a mechanical diff or a review's ruling, seen red on a mislabelled meaning change",
+      "v2: `editorial` only for a mechanical diff or the owner's proof-carrying ruling, seen red on a mislabelled "
+      "meaning change", "fold row: editorial")
+C.sub("dShippedRelease one, gov's update of itself every release.\n",
+      "dShippedRelease one, gov's update of itself every release.\n\nThe reconciliation probe reddened once on the fold, "
+      "on two clauses. dOrderedCharter first admitted\n`editorial` on a review breakpoint's ruling, a route into the "
+      "breakpoint program that only later builds bring;\nthe ruling is now the owner's, carried by "
+      "`instructions.edit`'s proof. The chain rows also cited the fold as \"the\nfolds' closing review\", one of the "
+      "breakpoint program's declared names, so they now cite \"the folds' review\".\n",
+      "folded: the probe's red")
+C.save()
+A = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md")
+A.sub("- **Item 9:** `editorial` is admitted only for a mechanical diff or a review's ruling,",
+      "- **Item 9:** `editorial` is admitted only for a mechanical diff or the owner's proof-carrying ruling,",
+      "reviewed: item 9")
+A.save()
+K = Record("memory/gotchas/inputs-inside-the-subjects-reach.md")
+K.sub("`editorial` is\nnow admitted only for a mechanical diff or a review's ruling,", "`editorial` is\nnow admitted only "
+      "for a mechanical diff or the owner's proof-carrying ruling,", "instance") if (
+    "`editorial` is\nnow admitted only for a mechanical diff or a review's ruling," in K.text) else None
+if K.done == 0:
+    t = re.sub(r"only for a mechanical\s+diff or a review's ruling", "only for a mechanical diff or the owner's "
+               "proof-carrying ruling", K.text, count=1)
+    if t == K.text:
+        sys.exit("the bug-class instance's ruling was not found")
+    K.text = t
+    K.done += 1
+K.save()
+````
+
+### `fold_review_homonym.py`
+
+The probe's last red: the receipt's `commit` field, moved into dSafePassage, read as dDeclaredLoop's `commit` kind; named in plain words.
+
+````python
+"""The reconciliation probe's last red on the review's fold: the receipt field `commit`, moved with the schema-4 bump
+into dSafePassage's row, reads as dDeclaredLoop's `commit` kind, a homonym. In dShippedRelease, a descendant of
+dDeclaredLoop, it never reddened. The field is named in plain words in dSafePassage's clause.
+
+Usage: python -X utf8 fold_review_homonym.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+V = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("and a planted schema-3 receipt whose row carries `commit` and no `gov_oid` still red at S9 after the bump (SA-3, "
+      "the folds' review)",
+      "and a planted schema-3 receipt whose row carries a commit field and no `gov_oid` still red at S9 after the bump "
+      "(SA-3, the folds' review)", "dSafePassage: the commit field")
+V.save()
+C = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md")
+C.sub("so they now cite \"the folds' review\".\n",
+      "so they now cite \"the folds' review\". A second run then reddened on the receipt's `commit` field, moved into\n"
+      "dSafePassage's row with the schema-4 bump, which reads as dDeclaredLoop's `commit` kind; the row now names the\n"
+      "field in plain words.\n", "folded: the homonym")
+C.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -12355,6 +13219,20 @@ MINE = [
      "register, the fates record, the design record and the session log."),
     ("adopt/fold_adopt_ns.py", "The design map reddened on `repo` with no owning build: the namespace "
      "declared on the systems record's owner line, beside the other namespaces it lists."),
+    ("adopt/build_args_folds.py", "The args of the last three folds' closing review, runs A and B, differing only in "
+     "the run label, the report path and the scratch path."),
+    ("adopt/gather_instruments.py", "Gathers research passes' shell commands, written files and web calls from their "
+     "transcripts into one instruments record."),
+    ("adopt/log_flow.py", "The session log's dispatch 122 to 126 rows, both runs' and the three researchers' agent "
+     "lines, and three events."),
+    ("adopt/clauses.py", "Prints a v2 chain row's clauses whole, the fold's reading aid."),
+    ("adopt/fold_review.py", "The closing review's 25 defects folded into v2, the memory plan, the systems record, the "
+     "fates record, the gap register and the adopter record, with nine bug classes' instances."),
+    ("adopt/add_mine_review.py", "Registers these scripts here."),
+    ("adopt/fold_review_probe.py", "The reconciliation probe reddened on two clauses of the review's fold: a route "
+     "into the breakpoint program, and a citation that matched one of its names. Both fixed."),
+    ("adopt/fold_review_homonym.py", "The probe's last red: the receipt's `commit` field, moved into dSafePassage, "
+     "read as dDeclaredLoop's `commit` kind; named in plain words."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -12831,17 +13709,18 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 
 ````text
 $ python plain_cites.py
+landing                  8  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's), dLinkedLibrary (dShippedRelease's) …
 plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
-landing                  7  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's), dWellOiledMachine (dShippedRelease's) …
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 seen red                 4  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dKeptSession (dWitnessedBar's)
-fork                     4  dSafePassage (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 code                     4  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 witness                  4  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
 return                   3  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
+fork                     3  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
+review                   2  dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
 commit                   2  dSafePassage (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
@@ -12854,6 +13733,8 @@ baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (
 override                 1  dGroundRules (dOrderedCharter's)
 receipt                  1  dSafePassage (dShippedRelease's)
 card                     1  dOrderedCharter (dPlacedRequest's)
+diff                     1  dOrderedCharter (dIndexedDesign's)
+ruling                   1  dOrderedCharter (dLinkedLibrary's)
 disposition              1  dFairHearing (dDeclaredLoop's)
 verdict                  1  dDeclaredLoop (dWitnessedBar's)
 attribution              1  dDeclaredLoop (dWitnessedBar's)
@@ -12867,7 +13748,7 @@ roster                   1  dBoundRoles (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 decision                 1  dWellOiledMachine (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 83, over 36 kinds
+plain-word hits on a non-ancestor's record kind: 87, over 39 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -13327,10 +14208,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:705 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:707 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:705 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:707 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -13378,13 +14259,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2410 nodes in 30 namespaces; 31059 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1639, derived 279, pending 492
-map: no stale facts read 54 records and 21 quotes of a map count or the critical path
+map: 2422 nodes in 30 namespaces; 31059 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1651, derived 279, pending 492
+map: no stale facts read 55 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 178 records, 3085 sections, 195 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 186 records, 3166 sections, 195 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -13403,7 +14284,7 @@ rc 0
 
 $ reconciliation probe
 chain rows 21 · owned nodes read 449 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 83 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 87 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -13448,8 +14329,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 210 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 19, dFairHearing 31, dOrderedCharter 53, dDeclaredLoop 76, dPlacedRequest 84, dKeptSession 103, dWitnessedBar 103, dBoundRoles 122, dTotalRecall 123, dRankedPlan 136, dFurnishedOrders 140, dLinkedLibrary 147, dIndexedDesign 159, dWellOiledMachine 162, dScopedBuild 173, dTendedCadence 178, dMindYourWords 179, dShippedRelease 186, dCalibratedLens 190, dConvergedCharter 210
+critical path: 211 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dTotalRecall > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 32, dOrderedCharter 54, dDeclaredLoop 77, dPlacedRequest 85, dKeptSession 104, dWitnessedBar 104, dBoundRoles 123, dTotalRecall 124, dRankedPlan 137, dFurnishedOrders 141, dLinkedLibrary 148, dIndexedDesign 160, dWellOiledMachine 163, dScopedBuild 174, dTendedCadence 179, dMindYourWords 180, dShippedRelease 188, dCalibratedLens 191, dConvergedCharter 211
 rc 0
 ````
 

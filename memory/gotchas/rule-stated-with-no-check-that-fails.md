@@ -35,6 +35,12 @@ and `pruned` states, P34's rationale apart, three of P37's seven legs, the plan'
 closes, the `[docs]` rule over `help/`, and two settled owner answers no clause carried. Each now names its arm, the
 step gate first.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). Five more: the step
+gate's later classes joined with no build arming them; an edited render held at update with no planted case; a pinned
+target that no edge check parses; `adopt.instructions`' no-overwrite and wiring promises with no fixture; and a
+repository's own policy keys with no schema or reader.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

@@ -183,6 +183,11 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 119 | gov-researcher, at the owner's medium effort | The pass: what the converged design decides about adopter instructions, and what it leaves open | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-2-researcher.md` | 1799cb98 | returned, 5m54s, 31.8k out: who writes and the project block decided; amending, replacing, masking and surviving an update open; six contradictions | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-design.md` |
 | 120 | gov-researcher, at the owner's medium effort | The pass: prior art outside gov for customizing shipped defaults through upstream updates | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-3-researcher.md` | 1799cb98 | returned, 5m31s, 25.9k out: eight families; an overlay plus tag-keyed amendments pinned to their base; a contradicting new unit passes every mechanical check | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-prior-art.md` |
 | 121 | gov-researcher, at the owner's medium effort | The pass: the owner's hypothesis, tag every edit and render around it, against gov's own history | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-4-researcher.md` | 1799cb98 | returned, 27m37s, 62.0k out: 778 of 797 landed edits kept their anchor, so a bare tag misses them; a tag plus a base-text hash, and a map with every restructure | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-history.md` |
+| 122 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The closing review of the last three folds, run twice at the owner's word: `320c79646` over `dd1ebb01b`, the shape audit's fold, the Skills' and the adopter instructions' | the args, built by `build_args_folds.py` | 1799cb98 | returned as `wf_32d759cc-d9a`, CLEAN WITH FIXES, 24 of 30 confirmed, 20 items, 1 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-folds-closing-a.md` |
+| 123 | gov-researcher, at the owner's medium effort | The flow and roles adoption pass: how an adopter adds to or changes gov's flow and roles today, and what the next update does, measured on a scratch install | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-5-researcher.md` | 1799cb98 | returned, 15m16s, 62.0k out: legs, run vocabularies and role files add beside gov's; tables typed into gov's code refuse an adopter role or workflow; an edited leg argv withholds the manifest, and a deleted gov leg returns unreported | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-today.md` |
+| 124 | gov-researcher, at the owner's medium effort | The pass: what the converged design decides about an adopter's own flow and roles, and what it leaves open | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-6-researcher.md` | 1799cb98 | returned, 8m21s, 45.8k out: breakpoints, probe points, presets, playbooks, policy values and role prose decided; an item or role in a core step, and amending, replacing, disabling or surviving a change to a gov row, open; six contradictions | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-design.md` |
+| 125 | gov-researcher, at the owner's medium effort | The pass: prior art outside gov for adding and changing steps, checks and roles through upstream updates | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-7-researcher.md` | 1799cb98 | returned, 7m57s, 39.2k out: eight families; an own namespace, pinned edges, a typed graph checked when composed and roles that declare their shapes; a meaning change under an unchanged type passes every mechanism | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-prior-art.md` |
+| 126 | `tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The closing review of the last three folds, run twice at the owner's word: `320c79646` over `dd1ebb01b`, the shape audit's fold, the Skills' and the adopter instructions' | the args, built by `build_args_folds.py` | 1799cb98 | returned as `wf_a3ab6ac1-aba`, CLEAN WITH FIXES, 21 of 23 confirmed, 17 items, 0 high | `reviews/2026-10-19-review-PLAY-dClosedLoop-1-folds-closing-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -1384,6 +1389,62 @@ The adopter-instructions research, dispatches 118 to 121, derived from each run 
 - returned — gov-researcher · wrote 0 files · 27m37s · 62.0k out · run direct/a52576de3dd4f80e6
 ```
 
+The last three folds' closing review, dispatches 122 and 126, derived from each run the same way:
+
+```text
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/a2de5f50af5cd57ee
+- returned — workflow-subagent · wrote 0 files · 14s · 1.4k out · run wf_32d759cc-d9a/a2de5f50af5cd57ee
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/a84a2973d2d9f0d48
+- returned — gov-diff-reviewer · wrote 0 files · 7m32s · 40.4k out · run wf_32d759cc-d9a/a84a2973d2d9f0d48
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/a8e87487e47fae407
+- returned — gov-diff-reviewer · wrote 0 files · 6m02s · 32.2k out · run wf_32d759cc-d9a/a8e87487e47fae407
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/afb221dd205e33bdb
+- returned — gov-diff-reviewer · wrote 0 files · 2m55s · 14.6k out · run wf_32d759cc-d9a/afb221dd205e33bdb
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-6 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/a034b38eac495a8fc
+- returned — gov-skeptic · wrote 0 files · 2m02s · 9.5k out · run wf_32d759cc-d9a/a034b38eac495a8fc
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-7-12 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/a7916759c6a2adf57
+- returned — gov-skeptic · wrote 0 files · 1m28s · 8.2k out · run wf_32d759cc-d9a/a7916759c6a2adf57
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-13-18 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/ab954820c2627dc4f
+- returned — gov-skeptic · wrote 0 files · 1m17s · 6.0k out · run wf_32d759cc-d9a/ab954820c2627dc4f
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-19-24 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/aa951f93c6e766b8e
+- returned — gov-skeptic · wrote 0 files · 1m37s · 8.4k out · run wf_32d759cc-d9a/aa951f93c6e766b8e
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-25-30 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_32d759cc-d9a/a67c0451fb6671132
+- returned — gov-skeptic · wrote 0 files · 1m44s · 9.3k out · run wf_32d759cc-d9a/a67c0451fb6671132
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_32d759cc-d9a/a5062da9902857c78
+- returned — gov-synthesizer · wrote 1 file · 2m46s · 22.8k out · run wf_32d759cc-d9a/a5062da9902857c78
+- agent — workflow-subagent · effort max · model claude-opus-5-5 · dClosedLoop, diff-review round 1, resume:probe · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/abbe21f90d58a90f1
+- returned — workflow-subagent · wrote 0 files · 12s · 1.1k out · run wf_a3ab6ac1-aba/abbe21f90d58a90f1
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:correctness · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/acdb6eda14007a0cb
+- returned — gov-diff-reviewer · wrote 0 files · 8m25s · 43.8k out · run wf_a3ab6ac1-aba/acdb6eda14007a0cb
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:seams · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/a70734bce2e6757b4
+- returned — gov-diff-reviewer · wrote 0 files · 5m09s · 27.1k out · run wf_a3ab6ac1-aba/a70734bce2e6757b4
+- agent — gov-diff-reviewer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, find:verification · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/a69e7251fd1ca79ba
+- returned — gov-diff-reviewer · wrote 0 files · 3m22s · 17.0k out · run wf_a3ab6ac1-aba/a69e7251fd1ca79ba
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-1-5 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/a842f176c62abd521
+- returned — gov-skeptic · wrote 0 files · 1m42s · 9.1k out · run wf_a3ab6ac1-aba/a842f176c62abd521
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-6-10 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/ac24ef418705ff57f
+- returned — gov-skeptic · wrote 0 files · 1m05s · 5.9k out · run wf_a3ab6ac1-aba/ac24ef418705ff57f
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-11-15 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/a102e5277f352c01b
+- returned — gov-skeptic · wrote 0 files · 1m19s · 6.8k out · run wf_a3ab6ac1-aba/a102e5277f352c01b
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-16-20 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/adf72194e67eca583
+- returned — gov-skeptic · wrote 0 files · 1m29s · 8.4k out · run wf_a3ab6ac1-aba/adf72194e67eca583
+- agent — gov-skeptic · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, verify:ids-21-23 · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes none · gates none · run wf_a3ab6ac1-aba/afc8ba5beaea4f660
+- returned — gov-skeptic · wrote 0 files · 55s · 4.9k out · run wf_a3ab6ac1-aba/afc8ba5beaea4f660
+- agent — gov-synthesizer · effort medium · model claude-opus-5-5 · dClosedLoop, diff-review round 1, synth · prompt [tier2-review.js](tools/workflows/tier2-review.js) · writes review · gates none · run wf_a3ab6ac1-aba/a678bec2a59ba2771
+- returned — gov-synthesizer · wrote 1 file · 2m19s · 18.9k out · run wf_a3ab6ac1-aba/a678bec2a59ba2771
+```
+
+The flow and roles adoption research, dispatches 123 to 125, derived from each run the same way:
+
+```text
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-5-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-5-researcher.md) · writes none · gates none · run direct/a2f3093be03f82e00
+- returned — gov-researcher · wrote 0 files · 15m16s · 62.0k out · run direct/a2f3093be03f82e00
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-6-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-6-researcher.md) · writes none · gates none · run direct/a0ef4b782ccb186f9
+- returned — gov-researcher · wrote 0 files · 8m21s · 45.8k out · run direct/a0ef4b782ccb186f9
+- agent — gov-researcher · effort medium · model claude-opus-5-5 · PLAY-dClosedLoop-1 · prompt [2026-10-19-prompt-PLAY-dClosedLoop-1-7-researcher.md](memory/builds/dClosedLoop/prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-7-researcher.md) · writes none · gates none · run direct/ae6048ba5070cc4da
+- returned — gov-researcher · wrote 0 files · 7m57s · 39.2k out · run direct/ae6048ba5070cc4da
+```
+
 ## Events
 
 - 2026-10-14, session b73dcb0a: the kickoff manifest failed checks 5 and 9; re-read §B, nothing
@@ -2374,6 +2435,28 @@ The adopter-instructions research, dispatches 118 to 121, derived from each run 
 - 2026-10-19, session 1799cb98: the owner answered the adopter-instructions forks, IA-1 to IA-6, each with its
   recommendation (`build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md` `[answers]`), and the answers are folded into v2, the memory plan, the gap register and the
   fates record.
+
+- 2026-10-19, session 1799cb98: the owner asked, "Run the reviews of the same shape (medium effort, twice) for the
+  last three folds. While they're running, we'll review the next piece of the Flow and Role layers." Two light diff
+  reviews of `320c79646` over `dd1ebb01b` ran one after the other, dispatches 122 and 126, their args differing only in
+  the run label, the report path and the scratch path. Run A's report was moved out of the tree while run B ran, so run
+  B could not read it, and restored byte for byte after (sha256 `af2916008b87`). The comparison is
+  `build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`.
+- 2026-10-19, session 1799cb98: the owner chose "Adoption and customization (Recommended)" as the Flow and Role layers'
+  next piece. Three researchers took one question each, dispatches 123 to 125, and `build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md` answers the question,
+  recommends a design and puts its forks to the owner. Each pass's commands and probes are in
+  `build/2026-10-19-build-PLAY-dClosedLoop-1-research-flow-instruments.md`, and the adopter-instructions passes'
+  (118 to 121), never gathered before, in `build/2026-10-19-build-PLAY-dClosedLoop-1-research-adopter-instruments.md`.
+- 2026-10-19, session 1799cb98: the today pass measured a defect outside its question: in a default adopter install,
+  `.claude/roles.json` names the review harnesses at `tools/workflows/`, where the kit is not installed, and the spawn
+  guard refuses gov's own `tier2-review.js` (rc 2). This build writes no product code, so the fix was offered to the
+  owner as a separate task, and the register records the gap.
+
+- 2026-10-19, session 1799cb98: the last three folds' closing review, compared (`build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`): 25 confirmed defects, one
+  high, both runs finding 10 of them, an overlap of 0.40. Every defect folds, none needing the owner: where the
+  reviewers left two routes, the owner's earlier answers chose one, and the receipt's `steps` field moves to
+  dSafePassage with the clauses SA-3 placed there. Run A refuted `gap-deploy-26`'s split and run B confirmed it; the
+  register now writes down the rule both readings rest on.
 
 ## Instruments
 

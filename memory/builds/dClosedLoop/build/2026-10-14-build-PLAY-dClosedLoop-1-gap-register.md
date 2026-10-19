@@ -7,7 +7,9 @@ each gap appears once, under the stage whose contract must close it. Severity is
 unless the row says `(main loop)`. Evidence points at the record and section holding the
 measurement; the records hold the file:line citations. The `Owner build` column stays `—` until
 the chain opens; the build's acceptance (c) joins that column against the chain READMEs, so every
-key below must end up owned by exactly one chain build.
+key below must end up owned by exactly one chain build. A gap two builds close is owned by the one whose
+landing completes the closure, which descends from the other in the chain table; a gap whose closers do not
+descend one from the other is split, one key per build (written down by the folds' closing review, 2026-10-19).
 
 Record shorthand: `plan`, `design`, `build`, `test`, `deploy`, `maintain` name
 `build/2026-10-14-build-PLAY-dClosedLoop-1-research-<stage>.md`.

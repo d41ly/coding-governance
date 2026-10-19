@@ -45,6 +45,13 @@ It bit again in the shape audit, 2026-10-19
 plan's `[migration]` opened "Nothing is rewritten by hand" above a bullet that routes decision rows by hand, and
 dOrderedCharter held `map_lib`'s re-export for one release after the deprecation window became a policy of two.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). Four more: the memory
+plan's deploy-overlay row kept `deploy.toml`'s level-0 units after IA-1 moved them out; dOrderedCharter's own upgrade
+steps kept their old list after the fold gave the row three adopter-visible moves; the fates row kept the bug-class
+selector on dLinkedLibrary after SA-7 moved it; and P8's "only through edges" and P38's "changes" outlived the exclusion
+list and the gate's narrower predicate.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth

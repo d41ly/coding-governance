@@ -41,6 +41,12 @@ kit while a catalogue bound still read it; the per-session orientation card reti
 unattended kit's retirement named its README and missed its legs, size rows and pointers; and `/session-kickoff`'s
 per-machine link had no fate at all.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). The converse:
+`/session-kickoff`'s retirement inventoried its readers by value and missed those by path, the session hooks that run
+its `manifest-check.sh`, the leg rows, the kit entry, the registry's glob and check-wiring's link arm. Every retirement
+now inventories by path and by value.
+
 ## Cause
 
 Inventorying is a search, and a search needs a term. The name is the only term available, so the

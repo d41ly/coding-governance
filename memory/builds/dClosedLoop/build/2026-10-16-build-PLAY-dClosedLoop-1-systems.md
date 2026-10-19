@@ -249,8 +249,9 @@ once dTotalRecall registers it (P33).
     - the run-log history.
   - 139 of today's 140 leg names fail the tag shape.
 - **Mint, rename, retire.** A tag is minted by writing its declaring site through that site's write path.
-  A rename or retirement writes `retired → <new>` or `→ none` into that write path's change record, and
-  the index derives the redirect from it. A retired name is never reused.
+  A rename, split or retirement writes `retired → <new>`, a list of successors for a split, or `→ none` into
+  that write path's change record, and the index derives the redirect from it, a split redirecting to no single
+  successor. A retired name is never reused (revised 2026-10-19, the folds' closing review).
 - **Index and resolver.** The index is the one derived JSON file `[cross]` places, keyed by tree id,
   rebuilt on a miss, never committed and never loaded whole. `gov tag show|where|refs|check <address>` returns the
   smallest leaf slice in one call.
@@ -345,13 +346,17 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
 
 ### [design-instruction-writing] Instruction writing
 
-- **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the adopter's in
-  `.governance/instructions.toml`, merged by row key. Its fields: `tag`, `type` (directive, constraint,
-  definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one line, at most 200 B) or
-  `source` (derived), `required-by`, `enforced-by`, `budget`, `status` (`active` or
-  `retired:<forward-tag>`), and `help` for the rationale, which never loads. `status` is derived from the
-  `instructions.edit` change record that `[design-tags]` reads for every retirement, and is never typed
-  (revised 2026-10-17, the audit's L7).
+- **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the repository's in
+  `.governance/instructions.toml`, composed with every kit's manifest: the repository's rows tagged `repo.`,
+  gov's rows changed only through the repository's edges, never by row key (IA-1, IA-2). Its fields: `tag`,
+  `type` (directive, constraint, definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one
+  line, at most 200 B) or `source` (derived), `required-by`, `enforced-by`, `budget`, `origin` (a kit or the
+  repository, apart from the `owner` edge, which names a chain build), `class` (`fixed` or `open`, derived from
+  the parsers and the floor, never typed), `edges` (the shared grammar, an `amends` or `supersedes` target
+  pinned as `<tag>@<hash>`), `status` (`active`, `retired:<tag>[,<tag>]` or `retired:none`), and `help` for the
+  rationale, which never loads. `status` is derived from the `instructions.edit` change record that
+  `[design-tags]` reads for every retirement, and is never typed (revised 2026-10-17, the audit's L7; revised
+  2026-10-19, the folds' closing review, after IA-2, IA-4 and the adopter-instructions record's items 8 and 10).
 - **Per type.** A directive carries a modal. A constraint carries a value and its enforcer. A fact
   carries a source and never typed text. A pointer's target resolves to a unit, a slice or a command,
   never a whole document.

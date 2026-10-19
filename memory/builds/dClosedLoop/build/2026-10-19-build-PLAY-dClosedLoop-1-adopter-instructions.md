@@ -131,8 +131,8 @@ repository's. Nobody edits a rendered file, and an update never writes the repos
 1. **One home.** The repository's overlay is `.governance/instructions.toml`, the systems round's home, in the same
    row grammar as each kit's `instructions.toml`, and it is the instruction manifest dGroundRules' minimal guard names.
    It absorbs `deploy.toml`'s `[charter] adopter_rules`, as level-0 units, and the roles' house files, as level-5
-   units selecting their role. `deploy.toml` keeps the install answers and the kit selection. Each row's owner is the
-   repository.
+   units selecting their role. `deploy.toml` keeps the install answers and the kit selection. Each row's origin is
+   the repository, a field apart from the `owner` edge, which names a chain build.
 2. **Its own namespace.** Repository units are tagged `repo.<segment>`, a namespace gov never ships, so no repository
    tag can collide with a present or future gov tag. A unit contributed upstream is re-tagged when gov ships it, and
    the release maps the repository's unit to gov's.
@@ -148,7 +148,7 @@ repository's. Nobody edits a rendered file, and an update never writes the repos
    requires, naming the requirer.
 7. **Parameterize.** Gov's units read policy values and install answers, as designed. A repository may declare its
    own keys under `repo.`, read only by its own units and outside the presets' completeness check.
-8. **Fixed units.** A gov unit declares its class. A fixed unit cannot be amended, replaced or excluded: the core
+8. **Fixed units.** A gov unit's class is derived, never typed. A fixed unit cannot be amended, replaced or excluded: the core
    principles, the floor's invariants, and every unit a gov tool parses, such as the micro-format grammar and the
    loop's contracts. Every other unit is open.
 9. **Pins.** The `@<hash>` in an edge is a whitespace-normalised hash of gov's unit text when the edge was written.
@@ -209,15 +209,16 @@ repository's. Nobody edits a rendered file, and an update never writes the repos
 
 - **dGroundRules:** the minimal guard's instruction manifest is the repository's overlay,
   `.governance/instructions.toml`.
-- **dSafePassage:** the step gate's population takes gov's unit tags when dOrderedCharter lands them; an update holds
-  an edited render with an order.
+- **dSafePassage:** the step gate's population takes gov's unit tags when dOrderedCharter lands them and arms the
+  join; an update holds an edited render with an order; gov first creates gov's source-mode receipt, with its
+  `steps`, and runs `update` on gov.
 - **dOrderedCharter:** the overlay, its `repo.` namespace and the four operations; fixed units; pins, the change
   records' editorial and semantic marks, stale and orphaned edges; composition, the budget refusal and the report;
   gov's own rules moved to gov's overlay; the seeded template retired, and aliases rendered.
 - **dBoundRoles:** the house files become overlay units selecting their role.
 - **dLinkedLibrary:** `adopt.instructions`, the legacy block and its proposals.
-- **dShippedRelease:** gov's receipt and its self-update every release, beside dSafePassage's gov-first, and a fresh
-  install in a single pass.
+- **dShippedRelease:** every release updating gov's own install before any adopter's, and a fresh install in a
+  single pass.
 
 ## [gaps] Gaps this adds to the register
 
@@ -277,3 +278,21 @@ Every answer took the recommendation, as `[forks]` words it.
 The design map reddened once on the fold: the `repo` namespace named no owning build, since a namespace's owner
 is declared on the systems record's `[design-tags]` owner lines. `repo` is declared there now, beside the
 namespaces that record lists, and v2's tag-system list keeps R-B's twelve.
+
+## [reviewed] The closing review, folded, 2026-10-19
+
+The last three folds' closing review, run twice (`build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`), changed this design where v2 now reads differently, and
+v2 is the design of record:
+- **Item 1:** a row's origin is the repository, a field apart from the `owner` edge (`owner-field`).
+- **Item 7:** a repository's own policy keys are declared in the overlay, set in `.governance/policy.toml`, tagged
+  `policy.repo.<key>` and validated by dGroundRules' reader (`repo-keys-unread`).
+- **Item 8:** the fixed class is derived from the parsers and the floor, never typed (`fixed-class-typed`).
+- **Item 9:** `editorial` is admitted only for a mechanical diff or the owner's proof-carrying ruling, and each `instructions.stale`
+  value has its arm: `order` renders both and files an order, `refuse` holds the update, and `warn` renders both
+  with no order (`editorial-unchecked`, `stale-values-unrouted`).
+- **Item 10:** the change record is the unit tags' one witness at the step gate, and dOrderedCharter arms their join
+  (`two-successions`, `joins-unarmed`).
+- **Item 15:** the legacy block joins `instructions.legacy`'s population, admitted at install only
+  (`legacy-block-key`).
+- **`[chain]`:** dSafePassage creates gov's receipt and runs `update` on gov, and dShippedRelease updates gov's own
+  install first at every release (`receipt-steps-later`, `self-update-unplaced`).

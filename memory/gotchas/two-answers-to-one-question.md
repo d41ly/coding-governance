@@ -37,6 +37,12 @@ grammar said one line and one line per type; the refs and policy-values pockets 
 disagreed with its own table; and three consolidations (the bash resolver, the ledger's merge driver, the `Pass:`
 reader) ignored the seams that exist.
 
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). Six more: the systems
+record's unit schema beside v2's registry clause; a `[[retired]]` row and a change record as witnesses of one rename; a
+unit field named `owner` beside the `owner` edge; the adopter record's `[chain]` and `[folded]` on gov's update of
+itself; two scopes for one house-file move; and two legacy lists for one install.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index
