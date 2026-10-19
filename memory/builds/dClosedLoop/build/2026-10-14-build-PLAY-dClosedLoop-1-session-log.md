@@ -2912,6 +2912,13 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   and the state record. v2 gains `[enforcement]`, the clauses that enforce each principle. The final-questions
   record's `[sequence]` gains the three instruments questions 2 and 3 rest on, which no step had scheduled.
 
+- 2026-10-19, session 1799cb98: the whole-design audit's step 1 built, beside Stage 0: the walk kit, its scenarios,
+  slices, table grammar and rubric in the round record and `build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py`, which
+  renders the walker, skeptic and synthesis briefs and checks every walk table complete; the `[tag]`-address scorer;
+  the carries join with its coverage report, the deviation population and the as-built renderer, which questions 2
+  and 3 rest on; and wall-time capture. Each is seen red on its plants, 37 runs in all. The sealed copy waits for the
+  owner's word on v2's four open readings.
+
 ## Instruments
 
 ### The gap-ownership join

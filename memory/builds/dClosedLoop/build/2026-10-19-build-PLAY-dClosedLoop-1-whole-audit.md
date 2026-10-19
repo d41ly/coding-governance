@@ -39,6 +39,10 @@ pair reviews them, and `[sequence]` now says so.
 "No critical gap left" is claimed only when Stage 0 is green with every check seen red, both walk tables are
 complete, the recall bar is met, no critical finding is open, and the closing pair finds no new critical one.
 
+**Step 1, built:** Stage 0 (`[stage0]`), the walk kit (`[scenarios]` to `[briefs]`), the scorer (`[recall]`), the three
+instruments questions 2 and 3 rest on (`[instruments]`) and wall-time capture (`[walltime]`), each seen red. The sealed
+copy is made after step 2's fold, so it carries the design the walk reads.
+
 ## [stage0] Stage 0: the mechanical checks
 
 `build/2026-10-19-build-PLAY-dClosedLoop-1-stage0.py` runs five new arms, one per class research-final-audit `[2]`
@@ -81,6 +85,155 @@ record's `[stage0]`:
 **K5's leads.** Two principles have rows that name clauses carrying only part of them: no clause builds P3's
 remote-CI verdict slot, and none names P18's ranking of a fork's options, the most feature-rich and then the most
 expandable.
+
+## [scenarios] The seven scenarios
+
+Each walker walks its items through its scenarios (final-questions `[audit]`, research-final-audit `[5]`):
+
+| Scenario | Name | Walks | Injected or probed |
+|---|---|---|---|
+| S1 | a solo attended feature build on gov | The owner, attending one session on one node, asks for a feature that changes a kit under `tools/`. The build runs from `entry.intake` through Plan, Design, Build, Test and Deploy to `deploy.close`, with the announcements, the confirmations at breakpoints and the live questions attendance adds. | the owner's answers arriving late; a spec audit the owner declares; the closing review's findings arriving as new units |
+| S2 | an unattended build across two nodes | Build X runs unattended on node d. Node x, on another account and harness, takes one of X's units by lease. Build Y on node x depends on X's interface and asks through X's mailbox, and both land in order. | node d's session limit mid-unit and its lease handed over; a lease whose beat goes stale; two nodes racing on the remote's refs; node x's clock skewed; a mailbox question unanswered past its deadline |
+| S3 | a patch build of a landing | A landed build's post-merge bar, or a Maintain reading, goes red. Maintain files a patch intake, `entry.place` places it `patch`, and it is claimed with its lease and runs from Design to landing on the originating build's rework budget. | the patch's own landing red again; the originating build's budget spent |
+| S4 | an adopter's update | An adopter two releases behind runs `update` to the newest: two upgrade steps, one moving a hook path behind a shim; its overlay amending a gov unit; its receipt's schema migrating; a new check seeded by `test.seed`; its declarations proposed as overlay rows. | a step killed after its first write; an adopter-edited file that gov retires; a step whose witness passes without its work; gov's code running in the adopter's tree |
+| S5 | a withdrawal or a supersession | The owner withdraws build X mid-Build, with units in flight and leases held, while build Y waits on X's interface. Separately, X is superseded by Z. | a queued claim replayed after the withdrawal; Y's wait outlasting its deadline |
+| S6 | a failure at every stage | One build meets a failure at each stage in turn: a refused lease at `entry.claim`, the owner's silence on Plan's ratification, a red unit at `build.acceptance`, a flake at Test, a landing conflict at `deploy.land`, an unreachable remote, a review at its CEILING, and its rework budget spent. | each failure's route to an outcome, its witness, and what it draws from the budget |
+| S7 | the bootstrap | Chain build k is specced and built with only the builds before it landed, for k from dTrueNorth to dConvergedCharter: what its Design exit, its gates and its items run on, today's tools standing in for every later build. | a clause needing a node of a later build; a gate that does not exist yet when k lands; dTrueNorth's own specs checked by this build's instruments |
+
+## [slicing] The two runs' slices
+
+Run A slices by scenario, run B by step band, and each run gives every build and every principle one verdict.
+`build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py` renders each walker's brief from this table and checks each
+return against it. The steps are flow-steps' sections, and `expansions` is the expansions' items.
+
+| Run | Walker | Scenarios | Steps | Builds | Principles |
+|---|---|---|---|---|---|
+| A | 1 | S1 | all | dRankedPlan, dIndexedDesign, dScopedBuild, dWitnessedBar, dOrderedCharter | P1, P2, P11, P12, P13, P14, P15, P17, P24 |
+| A | 2 | S2 | all | dPlacedRequest, dKeptSession, dWellOiledMachine, dBoundRoles, dFurnishedOrders | P5, P21, P22, P23, P25, P26, P27, P29, P36, P40 |
+| A | 3 | S3, S5 | all | dTendedCadence, dDeclaredLoop, dCalibratedLens, dTotalRecall | P6, P7, P9, P19, P20, P30, P33, P34, P35 |
+| A | 4 | S4, S7 | all | dTrueNorth, dGroundRules, dSafePassage, dShippedRelease, dConvergedCharter, dMindYourWords | P3, P8, P10, P16, P28, P37, P38, P41, P42 |
+| A | 5 | S6 | all | dFairHearing, dLinkedLibrary | P4, P18, P31, P32, P39 |
+| B | 1 | all | entry, plan | dPlacedRequest, dRankedPlan, dKeptSession, dGroundRules | P4, P10, P11, P15, P21, P22, P23, P40 |
+| B | 2 | all | design, build | dIndexedDesign, dScopedBuild, dBoundRoles, dFurnishedOrders, dTrueNorth | P12, P17, P18, P19, P24, P25, P26, P41 |
+| B | 3 | all | test, deploy | dWitnessedBar, dShippedRelease, dSafePassage, dConvergedCharter | P2, P3, P8, P9, P16, P37, P38, P42 |
+| B | 4 | all | breakpoint, probe, lifecycle | dFairHearing, dDeclaredLoop, dWellOiledMachine, dCalibratedLens | P1, P5, P7, P20, P27, P29, P31, P36, P39 |
+| B | 5 | all | adopt, expansions | dLinkedLibrary, dTotalRecall, dTendedCadence, dMindYourWords, dOrderedCharter | P6, P13, P14, P28, P30, P32, P33, P34, P35 |
+
+## [walk-table] The walk table's grammar
+
+A walker returns one row per item and scenario of its slice:
+
+| Item | Scenario | Actor | Needs | Witness | Route | Verdict |
+|---|---|---|---|---|---|---|
+| `plan.input` | S1 | = | = | = | = | holds |
+
+- **Item:** the item's tag as flow-steps or layer-expansions writes it. **Scenario:** S1 to S7.
+- **Actor, Needs, Witness, Route:** what the scenario finds there, `=` where it reads as declared. Never empty.
+- **Verdict:** `holds`; the ids of the findings the cell shows, `A1-F3` or `A1-F3, A1-F7`; or `not on path: <reason>`
+  where the scenario never reaches the item.
+- **Build and principle verdicts:** `| <build> | holds |` or the finding ids, and likewise `| P<n> | ... |`.
+- **A finding id** is `<run><walker>-F<n>`, unique across both runs, and heads its finding as `### <id> — <title>`,
+  its address `<record> [<section tag>]` with the clause id or item tag that carries it.
+
+`walk.py check` reds a missing row, an empty cell, a verdict outside the grammar, a finding id no heading carries, a
+cell outside the slice, two rows for one cell, and a build or principle with no verdict. A run's joined table, the
+synthesizer's, is checked whole: every item in every scenario, every build and every principle.
+
+## [rubric] The critical rubric
+
+A finding is critical when its severity is blocker or high and its consequence is one of these
+(research-final-audit `[2]`):
+- **c1:** a chain build cannot be specced, or cannot land, in order;
+- **c2:** a scenario cannot reach a terminal, or reaches one without its witness;
+- **c3:** a guard or a check silently loosens, or certifies what it does not check;
+- **c4:** built work or adopter data is overwritten or lost (P19, P38);
+- **c5:** a principle has no clause that enforces it.
+
+| Class | What it is | What checks it mechanically |
+|---|---|---|
+| K1 | a step item with no actor, input, witness, route or owner | Stage 0's K1 |
+| K2 | a scenario that cannot reach a terminal | Stage 0's K2 |
+| K3 | a record kind with no writer or no reader | Stage 0's K3 |
+| K4 | a key no unit reads | Stage 0's K4 |
+| K5 | a principle no clause enforces | Stage 0's K5 |
+| K6 | a clause reading what no ancestor registers | the reconciliation probe, on backticked citations |
+| K7 | a bootstrap hole | the reconciliation probe, for named shapes only |
+| K8 | a gap owned by no build, or by two | the gap join |
+| K9 | a preset or catalogue hole | the preset check |
+| K10 | a judgement class: a fail-open, a trust boundary, a race across nodes, a migration across a drain, a retirement by value | none |
+
+**Severity.** Blocker: the design cannot be specced as written. High: a scenario fails, or a guard certifies what it
+does not check. Medium: a defect a spec writer would trip over. Low: wording, a stale count, a dead pointer.
+
+## [briefs] The briefs
+
+`walk.py brief --run A|B --seeded <copy> --leads <file> --out <dir>` renders the run's five walker briefs from
+`[scenarios]` and `[slicing]`. Each names the sealed copy as the only place its walker reads the design, Stage 0's
+leads (the run on the working tree, never on the copy, whose two mechanical plants Stage 0 must catch on its own),
+the pre-mortem line, the FMEA columns on every item a failure reaches, the STRIDE reading of S2's and S4's trust
+boundaries, the K1 to K10 checklist and this rubric, and the return's order: the pre-mortem line, the findings, the
+walk table, the build verdicts and the principle verdicts. Each walker is a `gov-spec-reviewer` handed its brief as
+its `input:spec` (the audit's dispatch, final-questions `[audit]`). A brief renders only with the sealed key's SHA-256
+(`--key-sha`), which it states.
+
+`walk.py skeptic` renders the run's four skeptic briefs: the walkers' findings sorted by their full address and cut into
+four contiguous batches, the largest as small as whole addresses allow, never one address split, each batch with eight
+clean cells to attack, drawn the same way on every render. `walk.py synth` renders the synthesis brief, naming the
+report's path under `reviews/` and its `Subjects (round 1):` line, which the line-coverage instrument reads. Skeptics
+are `gov-skeptic` and the synthesizer `gov-synthesizer`, each handed its brief the same way.
+
+## [recall] The recall: the sealed copy and its scorer
+
+The walk reads a copy of the design with twelve fixed past defects reverted into it, and each run is graded on how
+many it finds (final-questions `[audit]`).
+- **The copy** is made from the commit that folds step 2, as a fresh repository holding that tree in one commit, so no
+  history shows what changed, kept in the session's scratchpad outside the repository. Every sentence of the copy's
+  records that names a candidate plant is cut from the copy too.
+- **The plants** are escapes: defects a later review found after an earlier one had passed them, each fixed by a fold
+  since, and each reverted into today's text. Two are mechanical, a kind's writer dropped and a principle's enforcing
+  clause dropped, and Stage 0 must catch both on the copy itself (`stage0.py --root <copy> --arms K3,K5`), as it must
+  every time.
+- **The key,** the plants and the seeding script stay outside the repository until both runs are scored. The key's
+  SHA-256 is pinned in every walker's brief before launch, and the scorer refuses a key whose hash moved. After the
+  scoring all three are committed here, and the instruments record carries the script.
+- **The scorer,** `build/2026-10-19-build-PLAY-dClosedLoop-1-score.py`, reads each run's confirmed findings by their
+  `[tag]` addresses, where today's replay scorer reads only `§<n>`, and prints each run's recall, the union's, Mills's
+  estimate of the real defects left from the share of plants found, and Chapman's over the two runs as a trend, never
+  the gate. Each hit is read by hand too, since an address can carry a neighbour of the plant.
+- **The bar:** each run finds at least eight of the twelve, and the two together at least ten. A run under the bar
+  comes to the owner before anything is folded.
+
+## [instruments] The instruments questions 2 and 3 rest on
+
+dTrueNorth builds the product controls; until it lands, these check its specs and every chain build's after it
+(final-questions `[bootstrap]`). Each is green on a fixture built in memory and red on each of its plants, and on the
+tree each says it measured nothing and is never green until its input exists.
+- **`build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py`, the carries join and its coverage report** (FQ-2, clauses
+  `cl-dClosedLoop-0001` to `cl-dClosedLoop-0003`). A spec declares what it carries, one line each:
+  `**Carries:** <clause-id>@<hash8> whole` or `... part k/n`, `**Carries:** node:<namespace>.<key>`,
+  `**Derived:** <decision id>`, and `**Moved:**`, `**Retired:**` or `**Deferred:** <clause-id> ... by <decision id>`.
+  A clause's hash is the first eight hex digits of the SHA-256 of its text, its id cut off and its whitespace folded.
+  It reds a ghost id, an unbound spec, a stale pin, a clause carried whole twice or pinned to two hashes, a revision
+  that drops a clause with no move recorded, a token of a clause missing from its carriers, and, at a Design exit, an
+  uncarried clause or owned node; a run that measured no spec exits 2. `--report <build>` renders the owner's report.
+- **`build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py`, the deviation population and its join** (FQ-3, clauses
+  `cl-dClosedLoop-0004` and `cl-dClosedLoop-0005`). A record departs from `<clause-id>@<hash8>` or `<unit>@rev-N`, and
+  names its hand-off, before and after, cause, reason, evidence, risk, approver and follow-through. The population is
+  each clause whose hash moved since the baseline, each spec revision after its unit's first pass but a status-only
+  one, and each `AMENDED` acceptance line, which names its record; each joins a record whose approver meets its risk.
+- **`build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py`, the as-built view** (FQ-3, clause `cl-dClosedLoop-0006`):
+  `[chain]` at the baseline with each record's `amends` or `supersedes` row applied, each changed clause citing its
+  record, re-rendered and compared byte for byte, red on a hand edit, a record with no row and a changed clause with
+  no citation.
+- **The baseline** is recorded as ``Baseline: `<sha>` `` in v2's `[clause-ids]`, which the last two read.
+- **Where the records and the view live once this build closes** is the owner's to settle with step 2's readings.
+  Until then a record sits in its departing build's `build/` folder and the view beside v2.
+
+## [walltime] Wall time
+
+`build/2026-10-19-build-PLAY-dClosedLoop-1-walltime.py` reads each agent's transcript for its first and last timestamp
+and prints each agent's wall and each stage's span, from its first agent's start to its last agent's end. No review
+had recorded its wall time (`gap-rt-26`), and the audit records every stage's.
 
 ## [stage0-classes] Stage 0's classes
 

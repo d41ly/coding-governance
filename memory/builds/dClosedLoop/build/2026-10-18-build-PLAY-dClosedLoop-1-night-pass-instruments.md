@@ -24094,6 +24094,518 @@ R.write_text(t, encoding="utf-8", newline="\n")
 print(f"patched {R}")
 ````
 
+### `fold_walk_kit.py`
+
+The walk kit's records in the round record: [scenarios], [slicing], [walk-table], [rubric] and [briefs].
+
+````python
+"""The walk kit's records: the round record's [scenarios], [slicing], [walk-table], [rubric] and [briefs], placed
+before [stage0-classes].
+
+Usage: python -X utf8 fold_walk_kit.py   (from the worktree root, or a full copy of it)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.insert_before("## [stage0-classes] ", """## [scenarios] The seven scenarios
+
+Each walker walks its items through its scenarios (final-questions `[audit]`, research-final-audit `[5]`):
+
+| Scenario | Name | Walks | Injected or probed |
+|---|---|---|---|
+| S1 | a solo attended feature build on gov | The owner, attending one session on one node, asks for a feature that changes a kit under `tools/`. The build runs from `entry.intake` through Plan, Design, Build, Test and Deploy to `deploy.close`, with the announcements, the confirmations at breakpoints and the live questions attendance adds. | the owner's answers arriving late; a spec audit the owner declares; the closing review's findings arriving as new units |
+| S2 | an unattended build across two nodes | Build X runs unattended on node d. Node x, on another account and harness, takes one of X's units by lease. Build Y on node x depends on X's interface and asks through X's mailbox, and both land in order. | node d's session limit mid-unit and its lease handed over; a lease whose beat goes stale; two nodes racing on the remote's refs; node x's clock skewed; a mailbox question unanswered past its deadline |
+| S3 | a patch build of a landing | A landed build's post-merge bar, or a Maintain reading, goes red. Maintain files a patch intake, `entry.place` places it `patch`, and it is claimed with its lease and runs from Design to landing on the originating build's rework budget. | the patch's own landing red again; the originating build's budget spent |
+| S4 | an adopter's update | An adopter two releases behind runs `update` to the newest: two upgrade steps, one moving a hook path behind a shim; its overlay amending a gov unit; its receipt's schema migrating; a new check seeded by `test.seed`; its declarations proposed as overlay rows. | a step killed after its first write; an adopter-edited file that gov retires; a step whose witness passes without its work; gov's code running in the adopter's tree |
+| S5 | a withdrawal or a supersession | The owner withdraws build X mid-Build, with units in flight and leases held, while build Y waits on X's interface. Separately, X is superseded by Z. | a queued claim replayed after the withdrawal; Y's wait outlasting its deadline |
+| S6 | a failure at every stage | One build meets a failure at each stage in turn: a refused lease at `entry.claim`, the owner's silence on Plan's ratification, a red unit at `build.acceptance`, a flake at Test, a landing conflict at `deploy.land`, an unreachable remote, a review at its CEILING, and its rework budget spent. | each failure's route to an outcome, its witness, and what it draws from the budget |
+| S7 | the bootstrap | Chain build k is specced and built with only the builds before it landed, for k from dTrueNorth to dConvergedCharter: what its Design exit, its gates and its items run on, today's tools standing in for every later build. | a clause needing a node of a later build; a gate that does not exist yet when k lands; dTrueNorth's own specs checked by this build's instruments |
+
+## [slicing] The two runs' slices
+
+Run A slices by scenario, run B by step band, and each run gives every build and every principle one verdict.
+`build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py` renders each walker's brief from this table and checks each
+return against it. The steps are flow-steps' sections, and `expansions` is the expansions' items.
+
+| Run | Walker | Scenarios | Steps | Builds | Principles |
+|---|---|---|---|---|---|
+| A | 1 | S1 | all | dRankedPlan, dIndexedDesign, dScopedBuild, dWitnessedBar, dOrderedCharter | P1, P2, P11, P12, P13, P14, P15, P17, P24 |
+| A | 2 | S2 | all | dPlacedRequest, dKeptSession, dWellOiledMachine, dBoundRoles, dFurnishedOrders | P5, P21, P22, P23, P25, P26, P27, P29, P36, P40 |
+| A | 3 | S3, S5 | all | dTendedCadence, dDeclaredLoop, dCalibratedLens, dTotalRecall | P6, P7, P9, P19, P20, P30, P33, P34, P35 |
+| A | 4 | S4, S7 | all | dTrueNorth, dGroundRules, dSafePassage, dShippedRelease, dConvergedCharter, dMindYourWords | P3, P8, P10, P16, P28, P37, P38, P41, P42 |
+| A | 5 | S6 | all | dFairHearing, dLinkedLibrary | P4, P18, P31, P32, P39 |
+| B | 1 | all | entry, plan | dPlacedRequest, dRankedPlan, dKeptSession, dGroundRules | P4, P10, P11, P15, P21, P22, P23, P40 |
+| B | 2 | all | design, build | dIndexedDesign, dScopedBuild, dBoundRoles, dFurnishedOrders, dTrueNorth | P12, P17, P18, P19, P24, P25, P26, P41 |
+| B | 3 | all | test, deploy | dWitnessedBar, dShippedRelease, dSafePassage, dConvergedCharter | P2, P3, P8, P9, P16, P37, P38, P42 |
+| B | 4 | all | breakpoint, probe, lifecycle | dFairHearing, dDeclaredLoop, dWellOiledMachine, dCalibratedLens | P1, P5, P7, P20, P27, P29, P31, P36, P39 |
+| B | 5 | all | adopt, expansions | dLinkedLibrary, dTotalRecall, dTendedCadence, dMindYourWords, dOrderedCharter | P6, P13, P14, P28, P30, P32, P33, P34, P35 |
+
+## [walk-table] The walk table's grammar
+
+A walker returns one row per item and scenario of its slice:
+
+| Item | Scenario | Actor | Needs | Witness | Route | Verdict |
+|---|---|---|---|---|---|---|
+| `plan.input` | S1 | = | = | = | = | holds |
+
+- **Item:** the item's tag as flow-steps or layer-expansions writes it. **Scenario:** S1 to S7.
+- **Actor, Needs, Witness, Route:** what the scenario finds there, `=` where it reads as declared. Never empty.
+- **Verdict:** `holds`; the ids of the findings the cell shows, `A1-F3` or `A1-F3, A1-F7`; or `not on path: <reason>`
+  where the scenario never reaches the item.
+- **Build and principle verdicts:** `| <build> | holds |` or the finding ids, and likewise `| P<n> | ... |`.
+- **A finding id** is `<run><walker>-F<n>`, unique across both runs, and heads its finding as `### <id> — <title>`,
+  its address `<record> [<section tag>]` with the clause id or item tag that carries it.
+
+`walk.py check` reds a missing row, an empty cell, a verdict outside the grammar, a finding id no heading carries, a
+cell outside the slice, two rows for one cell, and a build or principle with no verdict. A run's joined table, the
+synthesizer's, is checked whole: every item in every scenario, every build and every principle.
+
+## [rubric] The critical rubric
+
+A finding is critical when its severity is blocker or high and its consequence is one of these
+(research-final-audit `[2]`):
+- **c1:** a chain build cannot be specced, or cannot land, in order;
+- **c2:** a scenario cannot reach a terminal, or reaches one without its witness;
+- **c3:** a guard or a check silently loosens, or certifies what it does not check;
+- **c4:** built work or adopter data is overwritten or lost (P19, P38);
+- **c5:** a principle has no clause that enforces it.
+
+| Class | What it is | What checks it mechanically |
+|---|---|---|
+| K1 | a step item with no actor, input, witness, route or owner | Stage 0's K1 |
+| K2 | a scenario that cannot reach a terminal | Stage 0's K2 |
+| K3 | a record kind with no writer or no reader | Stage 0's K3 |
+| K4 | a key no unit reads | Stage 0's K4 |
+| K5 | a principle no clause enforces | Stage 0's K5 |
+| K6 | a clause reading what no ancestor registers | the reconciliation probe, on backticked citations |
+| K7 | a bootstrap hole | the reconciliation probe, for named shapes only |
+| K8 | a gap owned by no build, or by two | the gap join |
+| K9 | a preset or catalogue hole | the preset check |
+| K10 | a judgement class: a fail-open, a trust boundary, a race across nodes, a migration across a drain, a retirement by value | none |
+
+**Severity.** Blocker: the design cannot be specced as written. High: a scenario fails, or a guard certifies what it
+does not check. Medium: a defect a spec writer would trip over. Low: wording, a stale count, a dead pointer.
+
+## [briefs] The briefs
+
+`walk.py brief --run A|B --seeded <copy> --leads <file> --out <dir>` renders the run's five walker briefs from
+`[scenarios]` and `[slicing]`. Each names the sealed copy as the only place its walker reads the design, Stage 0's
+leads (the run on the working tree, never on the copy, whose two mechanical plants Stage 0 must catch on its own),
+the pre-mortem line, the FMEA columns on every item a failure reaches, the STRIDE reading of S2's and S4's trust
+boundaries, the K1 to K10 checklist and this rubric, and the return's order: the pre-mortem line, the findings, the
+walk table, the build verdicts and the principle verdicts. Each walker is a `gov-spec-reviewer` handed its brief as
+its `input:spec` (the audit's dispatch, final-questions `[audit]`).
+
+""", "the walk kit")
+R.save()
+````
+
+### `synth_return.py`
+
+A synthetic walker return, or a whole run's joined report, in the walk table's grammar, to see walk.py's check green and its plants red.
+
+````python
+"""A synthetic walker return in the walk table's grammar, for seeing walk.py's check green on a well-formed return and
+red on each plant. Also a synthetic joined report for a whole run, from five synthetic returns.
+
+Usage: python -X utf8 synth_return.py <run> <walker|joined> <out.md>   (from the worktree root)
+"""
+import importlib.util
+import sys
+
+B = "memory/builds/dClosedLoop/build/"
+spec = importlib.util.spec_from_file_location("walk", B + "2026-10-19-build-PLAY-dClosedLoop-1-walk.py")
+walk = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(walk)
+run, who, out = sys.argv[1], sys.argv[2], sys.argv[3]
+_, _, slices = walk.load()
+by_step, _, _ = walk.derive_items()
+walkers = range(1, 6) if who == "joined" else [int(who)]
+parts = ["The chain shipped and failed in this scenario because a synthetic walker said so.", ""]
+rows, builds, principles = [], [], []
+for w in walkers:
+    sl = slices[(run, w)]
+    parts += [f"### {run}{w}-F1 — a synthetic finding", "- **Address:** flow-steps [plan] `plan.input`",
+              "- **Class:** K1", "- **Severity:** low", "- **Scenario:** S1", "- **Evidence:** none",
+              "- **Consequence:** none", "- **Fix:** none", ""]
+    for i, (item, s) in enumerate(walk.cells_of(sl, by_step)):
+        verdict = f"{run}{w}-F1" if i == 0 else ("not on path: synthetic" if i == 1 else "holds")
+        rows.append(f"| `{item}` | {s} | = | = | = | = | {verdict} |")
+    builds += sl["builds"]
+    principles += sl["principles"]
+parts += ["| Item | Scenario | Actor | Needs | Witness | Route | Verdict |", "|---|---|---|---|---|---|---|"] + rows
+parts += ["", "| Build | Verdict |", "|---|---|"] + [f"| {b} | holds |" for b in builds]
+parts += ["", "| Principle | Verdict |", "|---|---|"] + [f"| {p} | holds |" for p in principles]
+open(out, "w", encoding="utf-8", newline="\n").write("\n".join(parts) + "\n")
+print(f"wrote {out}: rows {len(rows)}")
+````
+
+### `test_briefs.py`
+
+The skeptic and synthesis briefs rendered from synthetic returns: every finding in one batch, no address split.
+
+````python
+"""Render the skeptic and synthesis briefs from synthetic walker and skeptic returns: five returns for run A, each with
+three findings at different addresses, and four skeptic returns. Checks each batch is non-empty, no address is split
+across batches, and every finding lands in exactly one batch.
+
+Usage: python -X utf8 test_briefs.py   (from the worktree root)
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+S = pathlib.Path(__file__).resolve().parent
+W = "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py"
+ret = S / "test-returns"
+ret.mkdir(exist_ok=True)
+ADDR = ["flow-steps [plan] `plan.input`", "flow-steps [build] `build.scope`", "architecture-v2 [chain] `cl-dClosedLoop-0120`",
+        "layer-runtime [design-supervisor]", "architecture-v2 [policies]", "flow-steps [deploy] `deploy.land`",
+        "fates [rows]", "flow-steps [plan] `plan.input`"]
+k = 0
+for w in range(1, 6):
+    subprocess.run([sys.executable, "-X", "utf8", str(S / "synth_return.py"), "A", str(w),
+                    str(ret / f"x-walk-return-a{w}.md")], check=True, capture_output=True)
+    p = ret / f"x-walk-return-a{w}.md"
+    t = p.read_text(encoding="utf-8")
+    extra = ""
+    for n in (2, 3):
+        extra += (f"### A{w}-F{n} — synthetic\n- **Address:** {ADDR[k % len(ADDR)]}\n- **Class:** K2\n"
+                  f"- **Severity:** medium\n- **Scenario:** S1\n- **Evidence:** x\n- **Consequence:** x\n- **Fix:** x\n\n")
+        k += 1
+    p.write_text(t.replace("| Item | Scenario |", extra + "| Item | Scenario |", 1), encoding="utf-8", newline="\n")
+for b in range(1, 5):
+    (ret / f"x-skeptic-return-a{b}.md").write_text(f"- A1-F1: refuted\n  synthetic, batch {b}\n", encoding="utf-8")
+(S / "subjects.txt").write_text("Subjects (round 1): memory/builds/dClosedLoop/build/x.md@" + "0" * 40 + "\n",
+                                encoding="utf-8")
+out = S / "test-briefs"
+r1 = subprocess.run([sys.executable, "-X", "utf8", W, "skeptic", "--run", "A", "--returns", str(ret), "--seeded",
+                     "SEEDED", "--out", str(out), "--scratch", "SCRATCH"], capture_output=True, text=True)
+print(r1.stdout + r1.stderr)
+r2 = subprocess.run([sys.executable, "-X", "utf8", W, "synth", "--run", "A", "--returns", str(ret), "--verdicts", str(ret),
+                     "--report", "memory/builds/dClosedLoop/reviews/x.md", "--subjects", str(S / "subjects.txt"),
+                     "--out", str(out)], capture_output=True, text=True)
+print(r2.stdout + r2.stderr)
+ids = {}
+for b in range(1, 5):
+    text = (out / f"2026-10-19-build-PLAY-dClosedLoop-1-skeptic-brief-a{b}.md").read_text(encoding="utf-8")
+    for m in re.finditer(r"^### (A\d-F\d+)[^\n]*\n- \*\*Address:\*\* ([^\n]+)", text, flags=re.M):
+        ids.setdefault(m.group(1), []).append((b, m.group(2).split("]")[0]))
+split = {}
+for i, places in ids.items():
+    for b, a in places:
+        split.setdefault(a, set()).add(b)
+bad = [a for a, bs in split.items() if len(bs) > 1]
+dup = [i for i, p in ids.items() if len(p) > 1]
+print(f"findings placed {len(ids)} of 15, addresses split across batches {bad or 'none'}, findings twice {dup or 'none'}")
+sys.exit(0 if len(ids) == 15 and not bad and not dup and r1.returncode == 0 and r2.returncode == 0 else 1)
+````
+
+### `test_score.py`
+
+The scorer on a synthetic key of twelve plants: the bar met and missed, a tampered key and a blind report refused, a refuted finding never hitting, the miss plant costing one.
+
+````python
+"""The scorer on a synthetic key of twelve plants and synthetic reports: green when both runs clear the bar, red when one
+does not, refusing a tampered key and a blind report, a refuted finding never hitting, and the miss plant costing one.
+
+Usage: python -X utf8 test_score.py   (from the worktree root)
+"""
+import hashlib
+import json
+import pathlib
+import subprocess
+import sys
+
+S = pathlib.Path(__file__).resolve().parent / "test-score"
+S.mkdir(exist_ok=True)
+SCORE = "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-score.py"
+plants = [{"id": f"P{i:02d}", "record": "flow-steps", "tag": t, "anchor": a, "words": [w], "mechanical": i > 10,
+           "source": "synthetic"} for i, (t, a, w) in enumerate(
+    [("entry", "entry.claim", "unreachable"), ("plan", "plan.exit", "ratification"), ("design", "design.ready", "audit"),
+     ("build", "build.scope", "stray"), ("test", "test.route", "flake"), ("deploy", "deploy.land", "conflict"),
+     ("breakpoint", "review.fold", "rounds"), ("probe", "probe.return", "verdict"), ("lifecycle", "life.close", "lease"),
+     ("adopt", "test.seed", "seed"), ("plan", "plan.record", "writer"), ("entry", "entry.intake", "principle")], 1)]
+key = S / "key.json"
+key.write_bytes(json.dumps({"base": "0" * 40, "plants": plants}, indent=1).encode())
+sha = hashlib.sha256(key.read_bytes()).hexdigest()
+
+
+def report(name, ids, refuted=()):
+    lines = ["**Serves:** spec-audit PLAY-dClosedLoop-1", "", "# x", "", "## High", ""]
+    for n, i in enumerate(ids, 1):
+        p = plants[i - 1]
+        lines += [f"### A1-F{n} — x", f"- **Address:** flow-steps [{p['tag']}] `{p['anchor']}`",
+                  f"- **Evidence:** the {p['words'][0]} case", ""]
+    lines += ["### A1-F90 — a real one", "- **Address:** architecture-v2 [chain] `cl-dClosedLoop-0001`", ""]
+    lines += ["## Refuted", ""]
+    for n, i in enumerate(refuted, 100):
+        p = plants[i - 1]
+        lines += [f"### A1-F{n} — x", f"- **Address:** flow-steps [{p['tag']}] `{p['anchor']}`",
+                  f"- **Evidence:** the {p['words'][0]} case", ""]
+    (S / name).write_text("\n".join(lines) + "\n", encoding="utf-8")
+    return str(S / name)
+
+
+def run(*args):
+    r = subprocess.run([sys.executable, "-X", "utf8", SCORE, "--key", str(key), "--sha256", sha, *args],
+                       capture_output=True, text=True, encoding="utf-8")
+    return r.returncode, r.stdout
+
+
+a = report("a.md", [1, 2, 3, 4, 5, 6, 7, 8, 9], refuted=[10, 11, 12])
+b = report("b.md", [3, 4, 5, 6, 7, 8, 9, 10, 11])
+weak = report("weak.md", [1, 2, 3, 4, 5, 6, 7])
+checks = []
+rc, out = run(a, b)
+checks.append(("both clear the bar", rc == 0 and "union: plants hit 11 of 12" in out and "MET" in out))
+rc, out = run(a, weak)
+checks.append(("one run under eight", rc == 1 and "NOT MET" in out))
+rc, out = run(a, b, "--plant", "tamper")
+checks.append(("a tampered key refused", rc == 2 and "REFUSED" in out))
+rc, out = run(a, b, "--plant", "blind")
+checks.append(("a blind report refused", rc == 2 and "no confirmed finding carries an address" in out))
+rc, out = run(a, b, "--plant", "miss")
+checks.append(("the miss plant costs one", "plants hit 8 of 12" in out.split("\n")[0]))
+rc, out = run(a)
+checks.append(("refuted findings never hit", "P10" not in out and "P11" not in out and "P12" not in out))
+for name, ok in checks:
+    print(f"{'ok  ' if ok else 'FAIL'} {name}")
+sys.exit(0 if all(ok for _, ok in checks) else 1)
+````
+
+### `run_kit_plants.py`
+
+Every walk-kit, scorer and instrument run in one pass, each checked against the exit code and the line it wants: 37 runs.
+
+````python
+"""Every plant of the walk kit, the scorer and the three bootstrap instruments, run in one pass, each checked red for
+its own reason, and each clean run checked green (or, on the tree, never green before its input exists).
+
+Usage: python -X utf8 run_kit_plants.py   (from the worktree root); prints one line per run and a summary
+"""
+import pathlib
+import subprocess
+import sys
+
+S = pathlib.Path(__file__).resolve().parent
+B = "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-"
+
+
+def run(*args):
+    r = subprocess.run([sys.executable, "-X", "utf8", *args], capture_output=True, text=True, encoding="utf-8")
+    return r.returncode, r.stdout + r.stderr
+
+
+CASES = []
+ret = str(S / "ret-a3.md")
+CASES.append(("walk check, a well-formed return", [B + "walk.py", "check", "--run", "A", "--walker", "3", ret], 0, "problems 0"))
+CASES.append(("walk check, a joined run", [B + "walk.py", "check", "--run", "B", "--report", str(S / "report-b.md")], 0,
+              "cells 812, rows 812"))
+for p, want in [("drop-cell", "no row"), ("bad-verdict", "is not holds"), ("ghost-finding", "which no finding heading"),
+                ("no-reason", "'not on path:'"), ("drop-build", "no build verdict"), ("drop-principle", "no principle verdict"),
+                ("extra-cell", "a cell outside the slice"), ("dup-cell", "two rows")]:
+    CASES.append((f"walk check --plant {p}", [B + "walk.py", "check", "--run", "A", "--walker", "3", ret, "--plant", p], 1, want))
+CASES.append(("walk brief with no key hash", [B + "walk.py", "brief", "--run", "A", "--seeded", "x", "--leads", "x", "--out",
+                                              str(S / "briefs")], 2, "--key-sha takes the sealed key's SHA-256"))
+CASES.append(("skeptic and synthesis briefs", [str(S / "test_briefs.py")], 0, "addresses split across batches none"))
+CASES.append(("scorer", [str(S / "test_score.py")], 0, "ok   refuted findings never hit"))
+CASES.append(("carries on the tree", [B + "carries.py"], 2, "never green"))
+CASES.append(("carries on a clean fixture", [B + "carries.py", "--fixture"], 0, "findings 0"))
+for p, want in [("ghost", "a ghost id"), ("unbound", "(unbound)"), ("stale", "a stale pin"), ("ambiguous", "carried whole by 2"),
+                ("dropped", "stopped carrying"), ("uncarried", "(uncarried)"), ("token", "appears in none of its carriers"),
+                ("unmeasured", "never green")]:
+    CASES.append((f"carries --plant {p}", [B + "carries.py", "--fixture", "--plant", p], 2 if p == "unmeasured" else 1, want))
+CASES.append(("carries --plant node", [B + "carries.py", "--fixture", "--build", "dGroundRules", "--plant", "node"], 1,
+              "is named by no spec"))
+CASES.append(("deviations on the tree", [B + "deviations.py"], 2, "never green"))
+CASES.append(("deviations on a clean fixture", [B + "deviations.py", "--fixture"], 0, "findings 0"))
+for p, want, rc in [("clause", "since the baseline: joins no deviation record", 1),
+                    ("pass-revision", "after its first pass: joins no deviation record", 1),
+                    ("amended", "AMENDED acceptance line", 1), ("pin", "departing from PLAY-dTrueNorth-2@rev-2", 1),
+                    ("approver", "needs the spec writer", 1), ("status", "findings 0", 0)]:
+    CASES.append((f"deviations --plant {p}", [B + "deviations.py", "--fixture", "--plant", p], rc, want))
+CASES.append(("asbuilt on the tree", [B + "asbuilt.py", "--check"], 2, "nothing to render"))
+CASES.append(("asbuilt on a clean fixture", [B + "asbuilt.py", "--fixture"], 0, "findings 0"))
+for p, want in [("hand-edit", "(a hand edit)"), ("no-row", "carries no amends or supersedes row"),
+                ("no-citation", "cites no record")]:
+    CASES.append((f"asbuilt --plant {p}", [B + "asbuilt.py", "--fixture", "--plant", p], 1, want))
+
+failed = []
+for label, args, rc_want, want in CASES:
+    rc, out = run(*args)
+    ok = rc == rc_want and want in out
+    print(f"{'ok  ' if ok else 'FAIL'} rc {rc} (wants {rc_want}) {label}")
+    if not ok:
+        failed.append(label)
+print(f"runs {len(CASES)}, as wanted {len(CASES) - len(failed)}" + (f", failed: {failed}" if failed else ""))
+sys.exit(1 if failed else 0)
+````
+
+### `fold_kit_records.py`
+
+The round record's [plan] status, [briefs] widened, [recall], [instruments] and [walltime], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there.
+
+````python
+"""The rest of step 1's records: the round record's [plan] status, [briefs] widened to the skeptic and synthesis
+renderers, and [recall], [instruments] and [walltime]; the session log's event. No plant is named: the copy the walk
+reads holds this record.
+
+Usage: python -X utf8 fold_kit_records.py   (from the worktree root, or a full copy of it)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.sub('''"No critical gap left" is claimed only when Stage 0 is green with every check seen red, both walk tables are
+complete, the recall bar is met, no critical finding is open, and the closing pair finds no new critical one.
+''', '''"No critical gap left" is claimed only when Stage 0 is green with every check seen red, both walk tables are
+complete, the recall bar is met, no critical finding is open, and the closing pair finds no new critical one.
+
+**Step 1, built:** Stage 0 (`[stage0]`), the walk kit (`[scenarios]` to `[briefs]`), the scorer (`[recall]`), the three
+instruments questions 2 and 3 rest on (`[instruments]`) and wall-time capture (`[walltime]`), each seen red. The sealed
+copy is made after step 2's fold, so it carries the design the walk reads.
+''', "[plan] status")
+R.sub('''its `input:spec` (the audit's dispatch, final-questions `[audit]`).
+''', '''its `input:spec` (the audit's dispatch, final-questions `[audit]`). A brief renders only with the sealed key's SHA-256
+(`--key-sha`), which it states.
+
+`walk.py skeptic` renders the run's four skeptic briefs: the walkers' findings sorted by their full address and cut into
+four contiguous batches, the largest as small as whole addresses allow, never one address split, each batch with eight
+clean cells to attack, drawn the same way on every render. `walk.py synth` renders the synthesis brief, naming the
+report's path under `reviews/` and its `Subjects (round 1):` line, which the line-coverage instrument reads. Skeptics
+are `gov-skeptic` and the synthesizer `gov-synthesizer`, each handed its brief the same way.
+''', "[briefs]")
+R.insert_before("## [stage0-classes] ", """## [recall] The recall: the sealed copy and its scorer
+
+The walk reads a copy of the design with twelve fixed past defects reverted into it, and each run is graded on how
+many it finds (final-questions `[audit]`).
+- **The copy** is made from the commit that folds step 2, as a fresh repository holding that tree in one commit, so no
+  history shows what changed, kept in the session's scratchpad outside the repository. Every sentence of the copy's
+  records that names a candidate plant is cut from the copy too.
+- **The plants** are escapes: defects a later review found after an earlier one had passed them, each fixed by a fold
+  since, and each reverted into today's text. Two are mechanical, a kind's writer dropped and a principle's enforcing
+  clause dropped, and Stage 0 must catch both on the copy itself (`stage0.py --root <copy> --arms K3,K5`), as it must
+  every time.
+- **The key,** the plants and the seeding script stay outside the repository until both runs are scored. The key's
+  SHA-256 is pinned in every walker's brief before launch, and the scorer refuses a key whose hash moved. After the
+  scoring all three are committed here, and the instruments record carries the script.
+- **The scorer,** `build/2026-10-19-build-PLAY-dClosedLoop-1-score.py`, reads each run's confirmed findings by their
+  `[tag]` addresses, where today's replay scorer reads only `§<n>`, and prints each run's recall, the union's, Mills's
+  estimate of the real defects left from the share of plants found, and Chapman's over the two runs as a trend, never
+  the gate. Each hit is read by hand too, since an address can carry a neighbour of the plant.
+- **The bar:** each run finds at least eight of the twelve, and the two together at least ten. A run under the bar
+  comes to the owner before anything is folded.
+
+## [instruments] The instruments questions 2 and 3 rest on
+
+dTrueNorth builds the product controls; until it lands, these check its specs and every chain build's after it
+(final-questions `[bootstrap]`). Each is green on a fixture built in memory and red on each of its plants, and on the
+tree each says it measured nothing and is never green until its input exists.
+- **`build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py`, the carries join and its coverage report** (FQ-2, clauses
+  `cl-dClosedLoop-0001` to `cl-dClosedLoop-0003`). A spec declares what it carries, one line each:
+  `**Carries:** <clause-id>@<hash8> whole` or `... part k/n`, `**Carries:** node:<namespace>.<key>`,
+  `**Derived:** <decision id>`, and `**Moved:**`, `**Retired:**` or `**Deferred:** <clause-id> ... by <decision id>`.
+  A clause's hash is the first eight hex digits of the SHA-256 of its text, its id cut off and its whitespace folded.
+  It reds a ghost id, an unbound spec, a stale pin, a clause carried whole twice or pinned to two hashes, a revision
+  that drops a clause with no move recorded, a token of a clause missing from its carriers, and, at a Design exit, an
+  uncarried clause or owned node; a run that measured no spec exits 2. `--report <build>` renders the owner's report.
+- **`build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py`, the deviation population and its join** (FQ-3, clauses
+  `cl-dClosedLoop-0004` and `cl-dClosedLoop-0005`). A record departs from `<clause-id>@<hash8>` or `<unit>@rev-N`, and
+  names its hand-off, before and after, cause, reason, evidence, risk, approver and follow-through. The population is
+  each clause whose hash moved since the baseline, each spec revision after its unit's first pass but a status-only
+  one, and each `AMENDED` acceptance line, which names its record; each joins a record whose approver meets its risk.
+- **`build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py`, the as-built view** (FQ-3, clause `cl-dClosedLoop-0006`):
+  `[chain]` at the baseline with each record's `amends` or `supersedes` row applied, each changed clause citing its
+  record, re-rendered and compared byte for byte, red on a hand edit, a record with no row and a changed clause with
+  no citation.
+- **The baseline** is recorded as ``Baseline: `<sha>` `` in v2's `[clause-ids]`, which the last two read.
+- **Where the records and the view live once this build closes** is the owner's to settle with step 2's readings.
+  Until then a record sits in its departing build's `build/` folder and the view beside v2.
+
+## [walltime] Wall time
+
+`build/2026-10-19-build-PLAY-dClosedLoop-1-walltime.py` reads each agent's transcript for its first and last timestamp
+and prints each agent's wall and each stage's span, from its first agent's start to its last agent's end. No review
+had recorded its wall time (`gap-rt-26`), and the audit records every stage's.
+
+""", "[recall] [instruments] [walltime]")
+R.save()
+L = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: the whole-design audit's step 1 built, beside Stage 0: the walk kit, its scenarios,
+  slices, table grammar and rubric in the round record and `build/2026-10-19-build-PLAY-dClosedLoop-1-walk.py`, which
+  renders the walker, skeptic and synthesis briefs and checks every walk table complete; the `[tag]`-address scorer;
+  the carries join with its coverage report, the deviation population and the as-built renderer, which questions 2
+  and 3 rest on; and wall-time capture. Each is seen red on its plants, 37 runs in all. The sealed copy waits for the
+  owner's word on v2's four open readings.
+""", "the step's event")
+L.save()
+````
+
+### `patch_recorder.py`
+
+This record's writer patched for the walk kit: the scripts registered and [walk-kit].
+
+````python
+"""The instruments recorder for the rest of step 1: the walk kit's scripts registered, and a [walk-kit] section running
+every kit and instrument plant in one pass.
+
+Usage: python -X utf8 patch_recorder.py   (anywhere)
+"""
+import pathlib
+import sys
+
+S = pathlib.Path(__file__).resolve().parent.parent
+R = S / "night/record_instruments.py"
+t = R.read_text(encoding="utf-8")
+
+
+def sub(old, new, label):
+    global t
+    if t.count(old) != 1:
+        sys.exit(f"{label}: the anchor matches {t.count(old)} times")
+    t = t.replace(old, new, 1)
+
+
+sub("""    ("preset_check_canonical.py", "The preset check [final] runs""",
+    """    ('stage0/fold_walk_kit.py', "The walk kit's records in the round record: [scenarios], [slicing], [walk-table], [rubric] and [briefs]."),
+    ('walkkit/synth_return.py', "A synthetic walker return, or a whole run's joined report, in the walk table's grammar, to see walk.py's check green and its plants red."),
+    ('walkkit/test_briefs.py', "The skeptic and synthesis briefs rendered from synthetic returns: every finding in one batch, no address split."),
+    ('walkkit/test_score.py', "The scorer on a synthetic key of twelve plants: the bar met and missed, a tampered key and a blind report refused, a refuted finding never hitting, the miss plant costing one."),
+    ('walkkit/run_kit_plants.py', "Every walk-kit, scorer and instrument run in one pass, each checked against the exit code and the line it wants: 37 runs."),
+    ('walkkit/fold_kit_records.py', "The round record's [plan] status, [briefs] widened, [recall], [instruments] and [walltime], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there."),
+    ('walkkit/patch_recorder.py', "This record's writer patched for the walk kit: the scripts registered and [walk-kit]."),
+    ("preset_check_canonical.py", "The preset check [final] runs""", "MINE")
+sub('''parts.append("""
+## [plants] The map's and the atlas's plants, re-run
+''', '''kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))
+if kit_rc != 0:
+    sys.exit("a walk-kit or instrument run did not go as wanted:\\n" + kit_out[-800:])
+parts.append("""
+## [walk-kit] The walk kit, the scorer and the three instruments, each seen red
+
+`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[briefs]`, `[recall]`, `[instruments]` and `[walltime]` describe
+them. Each run below is checked against the exit code it wants and the line it must print: a clean input green, each
+plant red for its own reason, and each instrument on the tree, before its input exists, never green.
+
+""" + block("text", "$ python run_kit_plants.py\\n" + kit_out.strip()))
+parts.append("""
+## [plants] The map's and the atlas's plants, re-run
+''', "[walk-kit] section")
+R.write_text(t, encoding="utf-8", newline="\n")
+print(f"patched {R}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -24508,6 +25020,13 @@ MINE = [
     ('stage0/fold_stage0.py', "Stage 0's records: v2's [enforcement] and its revision note, the atlas's view for it, the round record, the final-questions record's [sequence] and [folded], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there."),
     ('stage0/note_first_run.py', "The round record's note of Stage 0's first run, its counts read from the captured run, corrected by one inline edit (`[inline]` 18)."),
     ('stage0/patch_recorder.py', "This record's writer patched for Stage 0: the round's scripts, [final] from the promoted copies, and [stage0]."),
+    ('stage0/fold_walk_kit.py', "The walk kit's records in the round record: [scenarios], [slicing], [walk-table], [rubric] and [briefs]."),
+    ('walkkit/synth_return.py', "A synthetic walker return, or a whole run's joined report, in the walk table's grammar, to see walk.py's check green and its plants red."),
+    ('walkkit/test_briefs.py', "The skeptic and synthesis briefs rendered from synthetic returns: every finding in one batch, no address split."),
+    ('walkkit/test_score.py', "The scorer on a synthetic key of twelve plants: the bar met and missed, a tampered key and a blind report refused, a refuted finding never hitting, the miss plant costing one."),
+    ('walkkit/run_kit_plants.py', "Every walk-kit, scorer and instrument run in one pass, each checked against the exit code and the line it wants: 37 runs."),
+    ('walkkit/fold_kit_records.py', "The round record's [plan] status, [briefs] widened, [recall], [instruments] and [walltime], and the session log's event, dry-run first on a full copy of the tree with the nine checks green there."),
+    ('walkkit/patch_recorder.py', "This record's writer patched for the walk kit: the scripts registered and [walk-kit]."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -24740,6 +25259,17 @@ run reds (the plant `k2-deploy-land` above):
 The first run on the real tree, the audit's first leads, whole:
 
 """ + block("text", "$ python stage0.py\n" + real.strip() + f"\nrc {real_rc}"))
+kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))
+if kit_rc != 0:
+    sys.exit("a walk-kit or instrument run did not go as wanted:\n" + kit_out[-800:])
+parts.append("""
+## [walk-kit] The walk kit, the scorer and the three instruments, each seen red
+
+`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[briefs]`, `[recall]`, `[instruments]` and `[walltime]` describe
+them. Each run below is checked against the exit code it wants and the line it must print: a clean input green, each
+plant red for its own reason, and each instrument on the tree, before its input exists, never green.
+
+""" + block("text", "$ python run_kit_plants.py\n" + kit_out.strip()))
 parts.append("""
 ## [plants] The map's and the atlas's plants, re-run
 
@@ -25811,7 +26341,7 @@ K5: principles 42, clauses 496, retired 0 · findings 0
 rerun design map: rc 0
   map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 230 records, 3766 sections, 215 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 230 records, 3784 sections, 215 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -25827,15 +26357,65 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 50 · lines 30824 · unreviewed 12947 (42%)
+  design records 50 · lines 30976 · unreviewed 13099 (42%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 4
+  design commits after the floor that no closing review covers: 5
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
     0e5d54a79  2 design record(s)  records(dClosedLoop): the clause ids minted — cl-dClosedLoop-0001 to -0496, one per chain clause, and their ch
+    94f9607ca  3 design record(s)  records(dClosedLoop): the whole-design audit's Stage 0 — five checks over items, routes, kinds, keys and princ
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
+````
+
+
+## [walk-kit] The walk kit, the scorer and the three instruments, each seen red
+
+`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[briefs]`, `[recall]`, `[instruments]` and `[walltime]` describe
+them. Each run below is checked against the exit code it wants and the line it must print: a clean input green, each
+plant red for its own reason, and each instrument on the tree, before its input exists, never green.
+
+````text
+$ python run_kit_plants.py
+ok   rc 0 (wants 0) walk check, a well-formed return
+ok   rc 0 (wants 0) walk check, a joined run
+ok   rc 1 (wants 1) walk check --plant drop-cell
+ok   rc 1 (wants 1) walk check --plant bad-verdict
+ok   rc 1 (wants 1) walk check --plant ghost-finding
+ok   rc 1 (wants 1) walk check --plant no-reason
+ok   rc 1 (wants 1) walk check --plant drop-build
+ok   rc 1 (wants 1) walk check --plant drop-principle
+ok   rc 1 (wants 1) walk check --plant extra-cell
+ok   rc 1 (wants 1) walk check --plant dup-cell
+ok   rc 2 (wants 2) walk brief with no key hash
+ok   rc 0 (wants 0) skeptic and synthesis briefs
+ok   rc 0 (wants 0) scorer
+ok   rc 2 (wants 2) carries on the tree
+ok   rc 0 (wants 0) carries on a clean fixture
+ok   rc 1 (wants 1) carries --plant ghost
+ok   rc 1 (wants 1) carries --plant unbound
+ok   rc 1 (wants 1) carries --plant stale
+ok   rc 1 (wants 1) carries --plant ambiguous
+ok   rc 1 (wants 1) carries --plant dropped
+ok   rc 1 (wants 1) carries --plant uncarried
+ok   rc 1 (wants 1) carries --plant token
+ok   rc 2 (wants 2) carries --plant unmeasured
+ok   rc 1 (wants 1) carries --plant node
+ok   rc 2 (wants 2) deviations on the tree
+ok   rc 0 (wants 0) deviations on a clean fixture
+ok   rc 1 (wants 1) deviations --plant clause
+ok   rc 1 (wants 1) deviations --plant pass-revision
+ok   rc 1 (wants 1) deviations --plant amended
+ok   rc 1 (wants 1) deviations --plant pin
+ok   rc 1 (wants 1) deviations --plant approver
+ok   rc 0 (wants 0) deviations --plant status
+ok   rc 2 (wants 2) asbuilt on the tree
+ok   rc 0 (wants 0) asbuilt on a clean fixture
+ok   rc 1 (wants 1) asbuilt --plant hand-edit
+ok   rc 1 (wants 1) asbuilt --plant no-row
+ok   rc 1 (wants 1) asbuilt --plant no-citation
+runs 37, as wanted 37
 ````
 
 
@@ -26003,13 +26583,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2648 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1827, derived 321, pending 500
+map: 2649 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1828, derived 321, pending 500
 map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 230 records, 3776 sections, 215 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 230 records, 3792 sections, 215 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
