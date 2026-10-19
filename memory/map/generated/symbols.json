@@ -19763,6 +19763,11 @@
       "file": "tools/runlog/prose.py"
     },
     {
+      "id": "scan_misplaced_harnesses",
+      "kind": "function",
+      "file": "tools/roles/render_agents.py"
+    },
+    {
       "id": "scan_missing_citations",
       "kind": "function",
       "file": "tools/memory-tree/tree_lib.py"

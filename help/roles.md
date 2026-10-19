@@ -128,7 +128,9 @@ needs the kickoff and memory-tree kits.
   governing doc at the memory-tree conf's `CHARTER`, it renders the Skill alone and exits 3, and no
   hook check turns on.
 - `/build`'s harnesses ship in the `review-harness` kit, which is not a default. Without it the role
-  agents and handoffs still work, and each tool prints a note naming the missing harness.
+  agents and handoffs still work, and each tool prints a note naming the missing harness. A harness
+  the index lists where it is absent, while a file of its name sits in another kit directory, reads
+  `misplaced` instead, and `adopt-roles.sh --check`, the `roles render wiring` leg, fails on it.
 - The `[roles]` rule and the Agent roles section ship with template v4.4. A template seeded earlier
   keeps rendering without them: merge the `[roles]` rule, the shortened Tools bullet and the Agent
   roles section from gov's template into yours, then re-render. Without the playbook renderer,

@@ -1,12 +1,13 @@
 # TOOL-dRenderedAnchor-1 — the kit resolver finds a rendered file through its receipt row, and the role render reds a harness listed where it is not installed
 
-**Status:** INPROGRESS · rev-1 · 2026-10-19 · node d · Tier-2 · base a60b0c7d · streams tooling
+**Status:** CLOSED · rev-1 · 2026-10-19 · node d · Tier-2 · base a60b0c7d · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-19-build-TOOL-dRenderedAnchor-1-1-repro.md](../build/2026-10-19-build-TOOL-dRenderedAnchor-1-1-repro.md) | research | — |
+| [2026-10-19-build-TOOL-dRenderedAnchor-1-2-acceptance-ledger.md](../build/2026-10-19-build-TOOL-dRenderedAnchor-1-2-acceptance-ledger.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-1-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-1-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

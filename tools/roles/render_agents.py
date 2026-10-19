@@ -31,19 +31,27 @@ owned path, comparing with carriage returns stripped from the on-disk side, beca
 check a pinned path out CRLF while git reports it clean. `--selftest` runs this script's arms over a
 catalogue it builds in a temporary directory, never the repository's files.
 
+A HARNESS the kit resolver did not hold prints one line under either mode. Where a file of its name
+sits directly inside a directory under the tool root, that is a `misplaced` line naming each such
+file, and `--check` exits 1 on it, because the index then lists a path the install does not hold
+while the harness is installed elsewhere (TOOL-dRenderedAnchor-1). Where no such file exists, it is
+a note that the kit is not installed, which never reds.
+
 The kit directory is `git rev-parse --show-prefix` run in this script's own directory, the tool root
 is its parent, and the target root is `git rev-parse --show-toplevel`; an empty derivation refuses.
 Every file is read through the kit's own `roles_lib.py`; nothing here parses a role, an overlay, the
 workflow table, the conf or the governing doc itself.
 
-Exit 0 when written, fresh or passing; 1 on drift or a failed arm, every offending path named; 2 on
-usage, a `RolesError` from the library (a policy defect among them), or a catalogue holding zero roles, since a render of nothing
-compares clean against an empty directory.
+Exit 0 when written, fresh or passing; 1 on drift, a misplaced harness under `--check` or a failed
+arm, every offending path named; 2 on usage, a `RolesError` from the library (a policy defect among
+them), or a catalogue holding zero roles, since a render of nothing compares clean against an empty
+directory.
 
 WHAT THIS DOES NOT CHECK: whether a role's text is any good, or whether its front matter obeys the
 catalogue's grammar, which `check_roles.py` grades; whether the Claude Code that spawns a type honours
 `omitClaudeMd`, which rests on the CLI version and a server flag and is observed only by a live probe;
-and whether a running session has restarted since the last write.
+whether a running session has restarted since the last write; and a harness copy anywhere but
+directly inside a directory under the tool root, which the misplaced scan does not read.
 """
 import argparse
 import contextlib
@@ -69,6 +77,9 @@ RESTART_LINE = ("render_agents: %d agent type(s) changed — a Claude Code sessi
                 "write cannot spawn the change; start a new session in this repository before spawning one.")
 NOTE_LINE = ("render_agents: note — %s is named by the workflow table and absent here; "
              "its kit is not installed")
+#: A harness the resolver did not hold while a file of its name sits in a kit directory.
+MISPLACED_LINE = ("render_agents: misplaced %s — the workflow table names it and it is absent "
+                  "here, while %s is installed; the kit resolver did not find it")
 MANIFEST_NOTE = ("render_agents: note — %s is absent, so the index names no gate manifest and a role "
                  "agent's gate-leg row is unarmed")
 #: The self-test fixture's two workflow-driver harnesses, spelled as its own table writes them. The
@@ -150,6 +161,20 @@ def derive_harness_paths(workflows, tool_root, target_root):
         if not held:
             absent.add(rel)
     return sorted(found), sorted(absent)
+
+
+def scan_misplaced_harnesses(absent, tool_root, target_root):
+    """`{rel: [found rel, ...]}` for each absent harness whose file name sits directly inside a
+    directory under the tool root; a harness with no such file is not a key."""
+    misplaced = {}
+    for rel in absent:
+        name = rel.split("/")[-1]
+        hits = [pathlib.Path(os.path.relpath(str(d / name), str(target_root))).as_posix()
+                for d in sorted(pathlib.Path(tool_root).iterdir())
+                if d.is_dir() and (d / name).is_file()]
+        if hits:
+            misplaced[rel] = hits
+    return misplaced
 
 
 def resolve_gate_manifest(tool_root, target_root):
@@ -236,8 +261,9 @@ def run_mode(mode, kit_dir, tool_root, target_root):
     except lib.RolesError as e:
         print("\n".join("render_agents: " + ln for ln in str(e).split("\n")), file=sys.stderr)
         return 2
+    misplaced = scan_misplaced_harnesses(absent, tool_root, target_root)
     for rel in absent:
-        print(NOTE_LINE % rel)
+        print(MISPLACED_LINE % (rel, ", ".join(misplaced[rel])) if rel in misplaced else NOTE_LINE % rel)
     if manifest is None:
         print(MANIFEST_NOTE % (pathlib.Path(tool_root) / lib.GATE_MANIFEST).as_posix())
     for line in cat["notes"]:
@@ -251,7 +277,7 @@ def run_mode(mode, kit_dir, tool_root, target_root):
         if offenders:
             print_drift(offenders, remedy)
             return 1
-        return 0
+        return 1 if misplaced else 0
     stale = [rel for kind, rel in offenders if kind == "stale"]
     written, unlinked = write_rendered(target_root, rendered, stale)
     for rel in written:
@@ -506,6 +532,57 @@ def run_selftest():
                           "a bare tag the charter lacks exited %d without naming it and R4" % rc)
                 after = {p: p.read_bytes() for p in (root / ".claude").rglob("*") if p.is_file()}
                 check_arm(state, 15, bool(before) and after == before, "a refused rule tag wrote a file")
+    # Arms 16 and 17 (TOOL-dRenderedAnchor-1): the adopter shape, where govkit lands a kit under its
+    # id rather than its home, so the stub directory is renamed and `.git` at the root is where the
+    # resolver reads the receipt. Arm 16 holds the harness through its rendered row; arm 17 has no
+    # receipt, so the harness is misplaced while the file sits in the renamed directory and a note
+    # once it sits nowhere.
+    listed = pathlib.PurePosixPath(FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT))
+    held = listed.parent.parent / "renamed" / listed.name
+    for arm in (16, 17):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            kit, tool_root = build_fixture(root, {"r-one": roles["r-one"]})
+            (root / listed.parent).rename(root / held.parent)
+            (root / ".git").mkdir()
+            if arm == 16:
+                (root / ".governance").mkdir()
+                (root / ".governance" / "install.json").write_text(json.dumps({"files": [
+                    {"role": "rendered", "kit": "fixture", "path": held.as_posix(),
+                     "source": FIXTURE_HARNESS.replace(".js", ".template.js")}]}), encoding="utf-8")
+            outs, rcs = [], []
+            for mode in ("write", "check"):
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                    rcs.append(run_mode(mode, kit, tool_root, root))
+                outs.append(out.getvalue().splitlines())
+            index_path = root / ".claude" / "roles.json"
+            index = json.loads(index_path.read_text(encoding="utf-8")) if index_path.is_file() else {}
+            wrong = [ln for lines in outs for ln in lines if ln.startswith("render_agents: misplaced")
+                     or ln in (NOTE_LINE % listed, NOTE_LINE % held)]
+            if arm == 16:
+                check_arm(state, 16, rcs == [0, 0] and index.get("harnesses") == [held.as_posix()],
+                          "a harness held by its rendered receipt row exited %r with harnesses %r, not "
+                          "0, 0 and %s" % (rcs, index.get("harnesses"), held))
+                check_arm(state, 16, not wrong, "a harness held by its rendered receipt row printed %r"
+                          % wrong)
+                continue
+            line = MISPLACED_LINE % (listed, held)
+            check_arm(state, 17, rcs[0] == 0 and [ln for ln in outs[0] if ln.startswith(
+                "render_agents: misplaced")] == [line] and (NOTE_LINE % listed) not in outs[0],
+                "a harness absent where listed and installed in a kit directory did not write with "
+                "exactly its misplaced line and no note")
+            check_arm(state, 17, rcs[1] == 1 and line in outs[1],
+                      "--check on a misplaced harness exited %d without its misplaced line" % rcs[1])
+            (root / held).unlink()
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                rc = run_mode("check", kit, tool_root, root)
+            lines = out.getvalue().splitlines()
+            check_arm(state, 17, rc == 0 and (NOTE_LINE % listed) in lines
+                      and not any(ln.startswith("render_agents: misplaced") for ln in lines),
+                      "a harness found nowhere exited %d under --check, or did not read as its note "
+                      "alone" % rc)
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

@@ -220,8 +220,13 @@ handoff carries the blocks twice, which is the accepted cost. A pre-tag (v3.x) c
 `## §<n> — ` headings and no rule tag, renders every type with no `## Charter` and prints one note
 asking for a reseed; a doc of neither shape refuses. Beside the types sits `.claude/roles.json`, the generated index the hooks read: every role
 with its `workflow`, `writes` and `agent`, `agent: false` roles included, and `harnesses`, the
-repo-relative scripts of every workflow whose `driver` is `workflow`. A harness the tree does not
-hold is listed where the resolver places it and printed on a `note` line; it refuses nothing.
+repo-relative scripts of every workflow whose `driver` is `workflow`. The kit resolver finds a
+harness govkit rendered from its template through that file's `rendered` receipt row, so a kit
+landed under its id rather than its home is listed where it sits. A harness the tree does not hold
+is listed where the resolver places it. With no file of its name directly inside a directory under
+the tool root, it prints on a `note` line and refuses nothing. With one there, the install holds it
+where the index does not look: it prints on a `misplaced` line naming each such file, and `--check`
+exits 1 (TOOL-dRenderedAnchor-1).
 
 **Ownership.** The renderer owns the types its catalogue names plus every name the on-disk index
 lists, which is the set a previous render wrote. `--write` unlinks an owned type the catalogue no
