@@ -5,7 +5,7 @@ opened: 2026-10-19
 streams: tooling
 roster: TOOL
 authorized-by: prompt
-ids: TOOL-dRenderedAnchor-1
+ids: TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2
 ---
 
 # dRenderedAnchor — an adopter's role index names the harnesses where the review-harness kit landed
@@ -42,6 +42,8 @@ own review and build harnesses. The measurement is
   accepted absence of review-harness declares; the new red is a listed harness absent while a file
   of its name is installed elsewhere.
 - Owner, 2026-10-19: no spec audit.
+- Owner, 2026-10-19: unit 1's closing review promoted its 3 mediums and 5 lows as unit 2 (M4), and the
+  /build Skill's harness paths, a pre-existing gap the review refuted as not introduced, ride it too.
 - Scratch installs live under the system temp root; no adopter repository is written.
 
 ## Parked decisions
@@ -53,11 +55,12 @@ None.
 | # | Unit | Mechanism |
 |---|---|---|
 | 1 | `TOOL-dRenderedAnchor-1` | the resolver finds a rendered file through its receipt row, and the role render reds a harness listed where it is not installed |
+| 2 | `TOOL-dRenderedAnchor-2` | unit 1's closing-review findings closed as one batch, and the /build Skill's harness citations resolved like the role index |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
 **Build status:** CLOSED · 1 unit(s) · node d · opened 2026-10-19 · streams tooling
-ids TOOL-dRenderedAnchor-1
+ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -65,7 +68,7 @@ ids TOOL-dRenderedAnchor-1
 | [TOOL-dRenderedAnchor-1 — the kit resolver finds a rendered file through its receipt row, and the role render reds a harness listed where it is not installed](spec/2026-10-19-spec-TOOL-dRenderedAnchor-1.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
 <!-- /gen:build-units -->
 
-Records: 3 bound to this build, across 3 record folder(s).
+Records: 5 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
