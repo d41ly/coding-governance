@@ -277,10 +277,11 @@ once dTotalRecall registers it (P33).
   carries its extractor. Six namespaces gained an owner (revised 2026-10-17, the audit's M10):
   - dOrderedCharter registers `doc` and `unit`, and, declared at PM-10 (2026-10-17), `reader`, `level`, `layer`, `practice`, `principle`, `kind` and `kit`, and, declared by the adopter-instructions answers (2026-10-19), `repo`;
   - dDeclaredLoop `step`, `item`, `policy` and `command`;
-  - dBoundRoles `role` and `field`;
+  - dBoundRoles `role` and `field`, and, declared by the flow and roles adoption answers (2026-10-19), `workflow`;
   - dTotalRecall `section`, `record`, `feature`, `class` and `marker`;
   - dWitnessedBar `leg`, `check` and `pack`;
-  - dWellOiledMachine `hook` and `point`.
+  - dWellOiledMachine `hook` and `point`;
+  - dCalibratedLens `lens`, declared by the flow and roles adoption answers (2026-10-19).
 - **Keys.**
 
   | Key | Values | Default |
@@ -348,7 +349,8 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
 
 - **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the repository's in
   `.governance/instructions.toml`, composed with every kit's manifest: the repository's rows tagged `repo.`,
-  gov's rows changed only through the repository's edges, never by row key (IA-1, IA-2). Its fields: `tag`,
+  gov's rows changed only through the repository's edges, never by row key (IA-1, IA-2). The repository's flow and role rows sit beside its units, each in its kind's
+  schema (FA-1). A unit's fields: `tag`,
   `type` (directive, constraint, definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one
   line, at most 200 B) or `source` (derived), `required-by`, `enforced-by`, `budget`, `origin` (a kit or the
   repository, apart from the `owner` edge, which names a chain build), `class` (`fixed` or `open`, derived from
@@ -409,7 +411,9 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
     (`research-role-shapes-a.md:15,116`).
   - **The agent cap** is bounded by agent-cap's `FANOUT_CAP`, never a new value.
   - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which
-    `resolve_stage_efforts` already reads (`roles_lib.py:561`).
+    `resolve_stage_efforts` already reads (`roles_lib.py:561`), until dConvergedCharter folds them into
+    `roles.effort.<role>` and `roles.effort.<workflow>.<stage>`, beside `roles.model.<role>` (revised
+    2026-10-19, FA-6).
   - **Why.** The first design added `tools/roles/shapes.toml` beside `workflows.toml`, which already
     declares each workflow's roles and stages (`workflows.toml:37-67`). That made two registries over
     one fact.

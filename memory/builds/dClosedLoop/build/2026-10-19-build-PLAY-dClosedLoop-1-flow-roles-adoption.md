@@ -157,7 +157,7 @@ writes the repository's rows. This is the instruction round's "compose, never ed
      amendment of that item's `needs`.
    - **A step:** the five stages stay fixed (P20). A repository's own step is a group of its items inside a stage, a
      program at item boundaries that `review.breakpoints` and `probe.points` place, or a cadence program at
-     Runtime's cadence-item point (FA-3).
+     Runtime's cadence-item point (FA-3). The owner chose repository stages instead; `[folded]` gives the design.
    - **A role** is `role.repo.<name>`, with the structured fields, a typed return template and its ceiling, and
      declares the shape kinds it runs in. It acts in repository items, and in a gov item only through an amendment
      of that item's actor (FA-4).
@@ -332,3 +332,53 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 - The whole-row pin's noise for structured rows, measured over gov's history of `workflows.toml`, the leg manifest
   and the role files. The prior-art pass measured it on a model only.
 - A build positioned on an item that an update renames, splits or retires, run end to end at dDeclaredLoop.
+
+## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in two batches, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| FA-1 | "One overlay (Recommended)" |
+| FA-2 | "Re-apply, file order (Recommended)" |
+| FA-3 | "Repository stages" |
+| FA-4 | "Yes, by amendment (Recommended)" |
+| FA-5 | "Yes, reported (Recommended)" |
+| FA-6 | "Keys + role field (Recommended)" |
+| FA-7 | "Next step boundary (Recommended)" |
+
+Six took the recommendation. FA-3 chose the alternative: a repository may insert a stage of its own between two of
+gov's, and P20 is amended. The foundations record's closed set of extension kinds already lists `stage`.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **A repository stage (FA-3).** A repository stage is spliced between two adjacent gov stages by pinned rows of the
+  build's transition table. Gov's five stages stay whole and in order, so the splice can neither remove, reorder nor
+  replace one, and the transitions between gov's stages stay fixed except where a splice sits. The stage's items and
+  its exit item are witnessed as a gov step's are, and its boundaries are reviewed through `review.breakpoints`.
+  Every build that passes its two neighbours passes it, unless a route of its own skips it. dDeclaredLoop builds it,
+  seen red on a planted stage that removes, reorders or replaces a gov stage, and green on one spliced between Test
+  and Deploy. P20 reads: "A build passes gov's five steps, Plan, Design, Build, Test and Deploy, with any stage its
+  repository inserts between two adjacent ones (FA-3)."
+- **v2:**
+  - P8 says the composition covers every kind, and P20 admits repository stages.
+  - The distribution layer only seeds overlays, which the core composes, closing the sixth contradiction.
+  - `instructions.exclude` takes any kind's tag, and `instructions.stale` reads rows as FA-2 says.
+  - The catalogue and presets gain `roles.effort.<role>`, `roles.effort.<workflow>.<stage>` and `roles.model.<role>`,
+    and the house file's `[gates]` folds into each role definition's gate grant, closing the first contradiction.
+    `roles.model.<role>` joins the keys presets never touch, since its values are the harness adapter's, as
+    `runtime.act-harness`'s are; the preset check reddened on it once, before that.
+  - dOrderedCharter gains the overlay's row mechanism, and dFairHearing the lens catalogue as data.
+  - dDeclaredLoop gains repository items, repository stages and the per-step composition pin.
+  - dBoundRoles gains repository roles and workflows, the harness-path check and the tuning keys.
+  - dWitnessedBar gains repository legs, and dCalibratedLens repository lenses.
+  - dShippedRelease gains `adopt.declarations` and the report over every kind.
+  - dConvergedCharter gains the seed's retirement and the census.
+  - `[owed]` carries this record's four checks, and a revision note records the answers.
+- **The systems record:** `workflow` is dBoundRoles' namespace and `lens` dCalibratedLens', the unit's row grammar
+  admits the overlay's flow and role rows, and the role shapes' effort names its destination keys.
+- **The memory plan:** the instruction overlay's pocket and the unit site take the flow and role rows.
+- **The gap register:** `gap-flow-19`, `gap-roles-24` to `gap-roles-26`, `gap-test-21`, `gap-review-17`,
+  `gap-deploy-28` and `gap-found-32`, each on its owning build's row.
+- **The fates record:** `house/policy.toml` folds as FA-6 says, and `workflows.toml`, `tier2-review.js` and the leg
+  manifest take a repository's rows. `.unattended.conf`'s extension vocabularies gain a row of their own.

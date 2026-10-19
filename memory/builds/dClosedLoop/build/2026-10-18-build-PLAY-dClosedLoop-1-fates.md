@@ -68,7 +68,7 @@ A kit's fate is one of four:
 The fate is one of STAYS, RESHAPED, MERGED and RETIRED. "Where it goes" names the chain build that keeps or receives
 it. "Decided by" names the record that decides it, a line-number citation of dispatch 104's resolved to its section
 tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and the owner decided row by row. Counts: 24 stay,
-72 reshaped, 25 merged and 17 retired, over 138 rows.
+73 reshaped, 25 merged and 17 retired, over 139 rows.
 
 | Kit | Function | Today's job | Fate | Where it goes | Decided by |
 |---|---|---|---|---|---|
@@ -82,14 +82,14 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | roles | gov-session | hands work to another session | MERGED | the prompt writer ("session-handoff template folds") (dBoundRoles) | roles `[forks]` |
 | roles | gov-orienter | orientation | RESHAPED | the orientation scout, composing the card in a sidechain (dFurnishedOrders) | roles `[forks]`; v2 `[chain]` dFurnishedOrders |
 | roles | `workflows.toml` stages | stage order 0 to 7 | MERGED | the loop kit; its seven readers re-pointed (dDeclaredLoop) | v2 `[chain]` dDeclaredLoop |
-| roles | `workflows.toml` entries | workflow table | RESHAPED | shapes registry: kind, fan, checklist, merge, cap (dBoundRoles) | v2 `[chain]` dBoundRoles |
+| roles | `workflows.toml` entries | workflow table | RESHAPED | shapes registry: kind, fan, checklist, merge, cap, a repository's own entries beside gov's (dBoundRoles) | v2 `[chain]` dBoundRoles; the owner, FA-1, 2026-10-19 |
 | roles | `handoff.py` | hashed prompt file | RESHAPED | a work order per item, hashed into the spawn marker (dBoundRoles) | v2 `[chain]` dBoundRoles; layer-runtime `[current]` |
 | roles | `render_agents.py` | renders agent types | MERGED | the one renderer ("roles render wiring") (dOrderedCharter) | v2 `[chain]` dOrderedCharter |
 | roles | `check_roles.py` | role, table and doc agree | RESHAPED | role-by-step matrix joined both ways (dFurnishedOrders); policy reader re-pointed (dConvergedCharter) | v2 `[chain]` dFurnishedOrders; v2 `[chain]` dConvergedCharter |
-| roles | `house/policy.toml` | effort and gates | MERGED | into `.governance/policy.toml` (dConvergedCharter); on dGroundRules's legacy list until then | v2 `[chain]` dGroundRules; v2 `[chain]` dBoundRoles |
+| roles | `house/policy.toml` | effort and gates | MERGED | `[effort]` into `roles.effort.*`, beside `roles.model.*`, and `[gates]` into each role definition's gate grant, the seed retired (dConvergedCharter); on dGroundRules's legacy list until then | v2 `[chain]` dGroundRules; v2 `[chain]` dBoundRoles; the owner, FA-6, 2026-10-19 |
 | roles | `.claude/roles.json` | the rendered role index | RESHAPED | the role index beyond every worker's reach, `role-sha` compared at spawn (dBoundRoles) | v2 `[chain]` dBoundRoles; the shape audit, run B's M10 |
 | roles | the `/build` Skill | drives an attended build through the harness pipeline | RETIRED | a client of `run` once the supervisor drives attended builds (dWellOiledMachine), removed after the deprecation window (dConvergedCharter) | the owner, SK-1, 2026-10-19 |
-| workflows | `tier2-review.js` | review harness | RESHAPED | presets, opt-in lenses, skeptic batches (dFairHearing), run at breakpoints (dDeclaredLoop) | v2 `[chain]` dFairHearing; v2 `[chain]` dDeclaredLoop |
+| workflows | `tier2-review.js` | review harness | RESHAPED | presets, opt-in lenses, skeptic batches, its five lens slots filled from the catalogue as data (dFairHearing), run at breakpoints (dDeclaredLoop), a repository's lenses from its overlay (dCalibratedLens) | v2 `[chain]` dFairHearing; v2 `[chain]` dDeclaredLoop; the owner, FA-1, 2026-10-19 |
 | workflows | `REVIEW-PROTOCOL.template.md` | protocol text | RESHAPED | corrected by dFairHearing, then a rendered view (dConvergedCharter) | v2 `[chain]` dFairHearing; v2 `[chain]` dConvergedCharter |
 | workflows | `unattended-build.js`, `unattended-unit.js` | unit harnesses | RESHAPED | role harnesses inside act sessions, the deferral block, persisted returns (dWellOiledMachine) | layer-runtime `[contract]`; v2 `[chain]` dWellOiledMachine |
 | workflows | `review_replay.py` | recall scorer | STAYS | dFairHearing's replays use it | v2 `[chain]` dFairHearing |
@@ -155,6 +155,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | unattended | `check-arms-groups` | lints the batched self-test's groups | RETIRED | none: it lints the kit's own self-test file, which dissolves with the kit (dConvergedCharter) | the owner, NP-22, 2026-10-18 |
 | unattended | drift and runlog calls, `read_policy_key` | cross-kit edges | RESHAPED | optional slots (dOrderedCharter); re-pointed (dConvergedCharter) | v2 `[chain]` dOrderedCharter; v2 `[chain]` dConvergedCharter |
 | unattended | guide templates (PROTOCOL, VERBS, STOPS, ASKS) | the protocol text | RESHAPED | rendered views of the loop's checklists (dConvergedCharter) | v2 `[chain]` dConvergedCharter |
+| unattended | `.unattended.conf` extension vocabularies (`PHASES_EXTRA`, `DOD_EXTRA`, `DIRECTIVES_EXTRA`, `HALT_CODES_EXTRA`, `HOLD_CODES_EXTRA`) | an adopter's run vocabulary | RESHAPED | the repository's own items and stages in its overlay, proposed by `adopt.declarations` (dShippedRelease), the keys retired with the kit (dConvergedCharter) | the owner, FA-1 and FA-3, 2026-10-19 |
 | unattended | the `/unattended` Skill | starts, resumes or closes a run | RETIRED | a client of `run` until dConvergedCharter retires it, unattended being the default state (NP-4) | the owner's point 1 (night pass) |
 | hooks | `agent-cap.js` | fan-out guard | STAYS | spawn-guard pack; its arm becomes a fragment; slot reservation added (dWellOiledMachine) | layer-runtime `[enforce]` |
 | hooks | `scratch-guard.js` | write gate | STAYS | roles write-gate pack (dBoundRoles, packed by dWellOiledMachine), its card and route reads re-pointed to the session binding (dWellOiledMachine) | layer-runtime `[enforce]` |
@@ -166,7 +167,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | gate-lint | `encoding_posture.py` and the shell-hygiene mode | Python text IO and shell hygiene | MERGED | the core portability pack, so every P37 rule has a core leg (dWitnessedBar) | v2 `[chain]` dWitnessedBar; the shape audit, run B's M11 |
 | pytest-parallel-guardrails | xdist guard | bounded parallel tests | STAYS | an adopter-only Flow leg pack, declared so in gov, which runs no xdist suite (dWitnessedBar) | the owner, NP-22, 2026-10-18 |
 | run-gates | `run-gates.sh` | the bar | RESHAPED | runner-written verdict, attribution, held legs by policy, leg factory (dWitnessedBar) | v2 `[chain]` dWitnessedBar |
-| run-gates | `gate-legs.json` | leg manifest | RESHAPED | `tag` and `purpose` fields, and one manifest whose rows the leg factory generates from the packs' declarations (dWitnessedBar) | v2 `[chain]` dWitnessedBar; the owner, NP-22, 2026-10-18 |
+| run-gates | `gate-legs.json` | leg manifest | RESHAPED | `tag` and `purpose` fields, and one manifest whose rows the leg factory generates from the packs' declarations, a repository's own legs from its overlay among them (dWitnessedBar) | v2 `[chain]` dWitnessedBar; the owner, NP-22, 2026-10-18; the owner, FA-1, 2026-10-19 |
 | run-gates | turnstile | bar semaphore | STAYS | core (dWitnessedBar) | layer-instruction `[layers]` |
 | run-gates | `post-merge.sh` | landed-SHA bar | RESHAPED | `deploy.core`; core checks before release (dShippedRelease) | v2 `[chain]` dShippedRelease; layer-expansions `[design-integrations]` |
 | run-gates | held halves, WSL, selftests, profile, ceilings | bar tooling | STAYS | `held_halves` re-pointed (dConvergedCharter) | v2 `[chain]` dConvergedCharter |

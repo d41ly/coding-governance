@@ -2458,6 +2458,11 @@ The flow and roles adoption research, dispatches 123 to 125, derived from each r
   dSafePassage with the clauses SA-3 placed there. Run A refuted `gap-deploy-26`'s split and run B confirmed it; the
   register now writes down the rule both readings rest on.
 
+- 2026-10-19, session 1799cb98: the owner answered the flow and roles adoption forks, FA-1 to FA-7 (`build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md`
+  `[answers]`), six with the recommendation. FA-3 chose repository stages, inserted between two adjacent gov stages,
+  so P20 is amended. The answers are folded into v2, the systems record, the memory plan, the register, the fates
+  record and the design record's `[folded]`.
+
 ## Instruments
 
 ### The gap-ownership join
