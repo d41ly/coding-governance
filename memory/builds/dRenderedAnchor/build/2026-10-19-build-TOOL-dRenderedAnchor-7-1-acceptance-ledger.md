@@ -96,3 +96,26 @@ once, like a fresh render. The workflows README and the parity script's comment 
 - `FLOOR_ASSERTIONS` at 686 is counted by hand off the blocks and not measured by a run.
 - `kit epoch` and `kit version markers`: three kits' shipped bytes moved, and the lander's `mint`
   writes their versions.
+
+## The close's observations
+
+Run by the main loop at `a7490d599`. Each staged break was written byte-preserving into the one
+file it names, the suite run, and the file restored by `git checkout`; the tree read clean after the
+last one. The four shell hygiene legs exit 0 at this tip.
+
+- `New arm:` section 2h — RED with `.absolute()` reverted to `.resolve()` in the canonical
+  `derive_kit_paths`: the junction kit cited `tools/wf/t.js`, not the logical `.gov/wf/t.js`.
+- `New arm:` section 2i — RED with the value case taken out of `check_kit_cites` (inputs 2 and 3
+  returned 0), and separately with its cite filter taken out (input 1 refused a bare line).
+- `New arm:` the `check_kit_cites` parity row — RED with one byte changed in the parity script's
+  copy: one `drifted` row naming `tools/workflows/check-protocol-parity.test.sh`.
+- `New arm:` RA7-3 — RED with the `check_kit_cites` call taken out of the parity script, and
+  separately out of `tools/unattended/adopt-unattended.sh`: each wrote its document at rc 0.
+- `New arm:` RA7-2 — RED with the suppression branch's `exit 1` taken out (rc 0), and separately with
+  the guard reverted to the `+set` test (an inherited empty value suppressed the re-run).
+- `New arm:` RA6-1's new checks and RA7-1 — RED with the re-run announcement taken out, and
+  separately with `exit $?` changed to `exit 0` (the child's rc 2 read 0).
+- `New arm:` RA7-4 — RED with `|| exit 2` made `|| :` on the adopter's resolver line, and separately
+  on the parity script's: in each the last line was not the `resolve_python` reason.
+- GREEN, all restored: `unattended-build.test.sh` `PASS (1038 assertions)` and
+  `resolve-python.test.sh` `PASS — resolve-python: 360 assertions held`, each exit 0.
