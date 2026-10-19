@@ -153,3 +153,15 @@ Owed to the close and not run here: `shell hygiene (a fork spent on builtin work
 registry unchanged, `shell hygiene (a loop fed by a command substitution)` green,
 `adopt-roles.test.sh` `PASS (62 assertions)`, `resolve-python.test.sh` green, arms 14 to 17 and
 sections 2e and 2f RED on their staged breaks, and then the full bar.
+
+## The close's observations after the fix pass
+
+Run by the main loop at `a73090d7c`. `shell hygiene (a fork spent on builtin work)` and
+`shell hygiene (a loop fed by a command substitution)` each exited 0, and
+`git diff --quiet a60b0c7dc HEAD -- memory/project/spawn-idiom-sites.txt memory/project/substitution-fed-loops.txt`
+exited 0. Every arm whose lines the pass rewrote was observed RED again on its staged break:
+arm 14 (narrowed regex, dropped `.relative_to`, the unanchored adopter copy), arm 15, arm 16,
+arm 17 (`here = kit`), section 2e (role term, home term, and row 7's `root in hit.parents`) and the
+check-wiring remedy check. GREEN restored: `adopt-roles.test.sh` `PASS (62 assertions)`,
+`resolve-python.test.sh` `PASS — resolve-python: 343 assertions held`, `check-wiring.test.sh`
+`253 passed, 0 failed`.
