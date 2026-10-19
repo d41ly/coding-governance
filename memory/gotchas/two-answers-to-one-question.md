@@ -54,6 +54,11 @@ It bit again in the flow and roles adoption's closing review, 2026-10-19
 The memory plan pinned the overlay's rows to gov's text, where v2 and the adoption record pinned them to their
 canonical form, and role effort had two live homes with no precedence between them.
 
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The queue's start rule counted the agents in flight where the ledger in the same row counted reservations too, and the
+effort rows read both the role's declared effort and medium by default.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

@@ -2692,6 +2692,13 @@ The owner's answers' closing review, dispatches 141 and 142, derived from each r
   its tag, and `roles.model.<role>` returned to the keys presets set, as the owner's FA-6 chose. One defect found
   while folding, the tag grammar's first-segment rule against the `repo` owner segment, waits for the owner.
 
+- 2026-10-19, session 1799cb98: the owner's answers' closing review, compared (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`): 24 confirmed
+  defects, two high, both runs finding nine of them, an overlap of 0.38. Every defect folds, none needing the owner:
+  where the runs left two routes, the owner's NT-28 and NT-17 and the NT-19 answer chose them. The admission queue
+  clamps a fan to the share it can hold and holds what the fallback refused. The notice fetches once at each item. The
+  change feed has a key, an order, a population and a census, and the mirror has named readers and a check that no
+  verdict reads it. A pass push leaves a landing's verdict files alone.
+
 ## Instruments
 
 ### The gap-ownership join

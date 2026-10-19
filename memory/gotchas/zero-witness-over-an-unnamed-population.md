@@ -36,6 +36,11 @@ It bit again in the night pass two's closing review, 2026-10-19
 The reuse check capped its listed units at sixty and read clean on the rest, so a large unit's unlisted units passed
 unchecked.
 
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The change feed was rebuilt equal from git over a population and an order nobody named, so pruned refs and hand
+commits fell outside it unseen.
+
 ## The fix
 
 - A zero-count witness names its population: what it read, and how many of each.

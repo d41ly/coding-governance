@@ -65,6 +65,12 @@ FA-6's fold gave dBoundRoles the `roles.effort.*` keys and left the same row, an
 in the house file until dConvergedCharter. The record's `[chain]` kept its lines from before FA-3, and
 `instructions.stale` was read for rows with only `order` defined.
 
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The answers' fold added an admission queue to dWellOiledMachine and left the same row's ledger fallback refusing the
+Workflow call the queue now holds, at the limit of five that NT-28 replaced. The night record's analysis kept the
+tool-call notice and the doorbell-only database that the answers replaced.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth

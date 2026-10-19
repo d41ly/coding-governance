@@ -92,8 +92,8 @@ reader needs. The counts are the returns' measurements.
 | refs: mail | git | `refs/gov/mail` | designed | node: the mailbox's durable copy | ref name | dKeptSession |
 | refs: decisions | git | `refs/gov/decisions` | designed | node: a decision's write-once register entry, keyed by the item and fork that raised it (the owner's NT-18) | ref name | dPlacedRequest |
 | refs: problems | git | `refs/gov/problems` | designed | node: a problem's register entry, keyed per problem under its encoded subject (the owner's NT-18) | ref name | dPlacedRequest |
-| change feed | runtime | the git common dir | designed | node-local node: every lease, claim, register, mail and record write in order, replayable and rebuilt equal from git (the owner's NT-14) | — | dPlacedRequest |
-| memory mirror | outside | a registered adapter's store, a cloud relational database first | designed | out: a real-time copy of the change feed for other nodes, never read by a verdict (the owner's NT-14) | — | dWellOiledMachine |
+| change feed | runtime | the git common dir | designed | node-local node: every `refs/gov/*` write and every commit that touches a record, appended once each lands, ordered per ref, replayable and rebuilt equal from git over the refs git still holds (the owner's NT-14, the answers' review) | ref or record, blob and commit | dPlacedRequest |
+| memory mirror | outside | a registered adapter's store, a cloud relational database first | designed | witness: a real-time copy of the change feed that other nodes' `record show`, `record find`, mail notice and card pointers read before their next fetch, never read by a verdict (the owner's NT-14, the answers' review) | the feed's event key | dWellOiledMachine |
 | refs: bar-red | git | `refs/gov/bar-red` | written and read by the pre-push hook | node: the red verdict's marker | ref name | dWitnessedBar |
 | refs: bindings | git | `refs/gov/bindings` | designed (SA-10) | node: each act's minimal binding record, read by the checks on any node | act id | dWellOiledMachine |
 | tags | git | kit releases, archive tags | 3 archive tags | node: `kit-release` | tag name | dShippedRelease |

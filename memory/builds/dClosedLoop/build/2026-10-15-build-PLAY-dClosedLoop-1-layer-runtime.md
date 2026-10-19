@@ -434,7 +434,7 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     against a counter under the lease. When slots are short, it queues the act.
   - It releases the slots when the act session exits, or when the reap kills its tree.
   - In the owner's session, while it hosts the driver, the PreToolUse entry on Workflow and Agent reserves
-    the same way, and queues the call instead of refusing it (the owner's NT-28). Both calls run in the background, so the reservation is released when the call's work
+    the same way, and queues the call instead of refusing it, held at that entry for as long as the spike's hold case shows a hook can hold a call and past that sent through the executor's queue, never a silent denial and never a start over the limit (the owner's NT-28, made conditional by the answers' review). Both calls run in the background, so the reservation is released when the call's work
     ends: at SubagentStop for an Agent call, and at the run's saved result for a Workflow call. A sweep
     keyed to the session's liveness frees what a dead session held.
   - agent-cap's per-prompt total retires with agent-cap (revised 2026-10-19, the night pass two, point 7).
@@ -1062,6 +1062,8 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
     night pass two's review);
   - the persisted return byte-matches what `agent()` resolved to;
   - the session's `structured_output` carries the act's return;
+  - a PreToolUse entry holding a call is measured, the longest hold it survives on the pinned harness version and
+    what the harness does when the hold times out, recorded as the hold case the admission queue reads (the answers' review);
   - on 2.1.292, an ask rule on the Workflow tool sends the call to the dispatcher's PermissionRequest
     entry, as dispatch 36 showed for Agent.
 
@@ -1110,7 +1112,7 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
     raises an owner item once `runtime.hold-ceiling` passes.
 - **`in-flight`:**
   - with `runtime.agents-in-flight` at 3 (`FANOUT_CAP=3` until the night pass two's point 7), the supervisor queues an act whose declared fan exceeds the free slots, and the
-    attended PreToolUse entry queues the same call (the owner's NT-28);
+    attended PreToolUse entry queues the same call, held there within the spike's hold case and past it sent through the executor's queue, red when a call outliving the hold starts over the limit or is refused without a reason (the owner's NT-28, the answers' review);
   - killing an act session that holds slots releases them once the reap runs;
   - an attended Workflow call's slots are freed when its run ends, and a dead session's by the sweep;
   - with the limit at 3, two direct spawns and a two-agent Workflow admit one Workflow agent until a slot

@@ -312,6 +312,7 @@ dead probe as green.
 | verdict backend: `remote-ci` | Flow's verdict backends, in Test | `local-hook`, or the core's `peer-node` (P3) |
 | host: `cloud-routine` | Runtime's host adapters | the node tick |
 | notification channel | Runtime's notification adapters | the terminal |
+| memory mirror: a cloud relational database, planned (the owner's NT-14) | Runtime's memory mirrors | git and the local index |
 | deploy engine and verify, per environment | Flow's release slot, in Deploy | no release; the build closes at landing |
 | tracker | none: the ask backlog is the tracker. An optional one-way mirror registers as a journal reader | the ask backlog |
 
@@ -322,7 +323,7 @@ dead probe as green.
 | engine kits | the `integrations` kit: the header factory and the registry check; `verdict:remote-ci`, extracted from `read_held_reds`; `host:cloud-routine`; notification channels; the release runner. Each engine adapter is named for the engine it drives, never for an adopter, and an adopter's values live in that adopter's own policy file (WK-8); the first is a dShippedRelease unit |
 | record kinds | `remote-verdict` (SHA, tree, writer, run id, workflow blob, conclusion); `release` (one per SHA and environment, with its outcome: verified, held, rolled forward, rolled back, halted or unverified); `delivery` (a notification and its receipt); `grant` (declared scopes, never values) |
 | extension points declared | none: every kind registers at a core point (`[core-points]`) |
-| extension points used | Flow's verdict backends and release slot; Runtime's command, host, notification and journal-reader points, and the grant field on adapter rows |
+| extension points used | Flow's verdict backends and release slot; Runtime's command, host, notification, memory-mirror and journal-reader points, and the grant field on adapter rows |
 | policies | the new keys below, and the catalogue's `verdict`, `run.host`, `maintain.host`, `notify.owner`, `deploy.runs`, `deploy.promotion`, `deploy.on-verify-fail` and `build.closes`, and Runtime's `runtime.secret-home` and `runtime.secret-scan` |
 | gates | every adapter's header complete and its probe live; the remote verdict's pinned files equal to the owner's pin. The granted scopes and the secret value scan are Runtime's gates, which every adapter passes |
 

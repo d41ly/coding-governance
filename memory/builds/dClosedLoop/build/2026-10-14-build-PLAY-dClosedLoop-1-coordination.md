@@ -119,10 +119,10 @@ build beside the policy and transition features rather than after them.
    first, then delivers live, citing the message id; any other harness, and the owner by hand, use
    the same CLI verbs on the mailbox. `deps.messaging` picks the channels. Revised 2026-10-19 (the night
    pass two, point 3, the owner's NT-17): the live message carries only the message's ref and id, never a
-   fact, so a lost ring costs only latency. A session is also shown unread ids at every item, or at every tool call where policy
-   sets it (the owner's NT-17), read
-   from the node's local copy of the mail refs, which a detached fetch keeps fresh, because the read
-   points, not the transport, set how late news arrives.
+   fact, so a lost ring costs only latency. A session is also shown unread ids at every item, after one fetch of the mail refs bounded by a
+   timeout, or at every tool call where policy sets it (the owner's NT-17), read there from the node's local
+   copy of the mail refs, which a detached fetch keeps fresh, because the read points, not the transport, set
+   how late news arrives (the item's fetch added by the answers' review).
 8. **Dependency coordination.** A build depends on its `parents:`. A parent is reachable while its
    build lease is live. At Design's exit a build posts each frozen feature's declared interfaces to
    every dependent's mailbox as `confirmed`; a dependent's unit that consumes an interface enters

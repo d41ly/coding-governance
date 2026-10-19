@@ -53,6 +53,11 @@ The flow and roles adoption's fixed set, its headline guarantee, had no check th
 `supersedes` touching it, only an exclusion. Its widened exclude refusals, its four new step-gate joins and FA-5's
 every widening reported had no red case either.
 
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The change feed's ordered, rebuilt-equal promise, the mirror's never-read-by-a-verdict invariant and the pass push's
+freedom from the lander's lock each landed with no case that could fail.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

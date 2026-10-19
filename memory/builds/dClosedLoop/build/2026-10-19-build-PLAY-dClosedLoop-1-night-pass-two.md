@@ -240,9 +240,10 @@ register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
    one decision merged clean in git, and only the index saw the conflict.
 3. *Coordinating several nodes in real time?* The transport is not the delay. A fetch takes 0.6 s, and the median
    gap between pass commits is 7.5 minutes. A node learns news only when it reads, and the design reads at items and
-   transitions. So the fix is the read point. A hook shows unread message ids at every tool call (a median of 10.5 s
-   apart), read from the node's local copy of the refs, which a detached fetch refreshes, so no tool call waits on the
-   network. The live message becomes a doorbell carrying only the message's ref and id, so a lost ring costs latency,
+   transitions. So the fix is the read point. A session is shown unread message ids at every item, after one fetch bounded by a
+   timeout, and at every tool call (a median of 10.5 s apart) where policy sets it, read there from the node's local
+   copy of the refs, which a detached fetch refreshes, so no tool call waits on the network (revised 2026-10-19 for
+   the owner's NT-17 and the answers' review). The live message becomes a doorbell carrying only the message's ref and id, so a lost ring costs latency,
    never a fact. The mailbox's single chain per build is the part that does not last: eight concurrent writers took
    4.5 times the ideal compare-and-swap attempts. One ref per sender took none extra.
 4. *A cloud relational database?* Not as the store of record, and not as the transport. A node offline for a day
@@ -250,7 +251,9 @@ register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
    (P2). Every node would hold a new connection secret, and a git-only adopter could not run gov. A synced SQLite
    (cr-sqlite, libSQL) silently keeps one of two concurrent decisions. A git-backed database (Dolt) needs a binary on
    every node and splits the repository into two stores. A database or a bus fits only behind the doorbell, as an
-   optional adapter: Postgres `NOTIFY`, ntfy or NATS ringing with ids. The agent-friendly approach is the one gov
+   optional adapter: Postgres `NOTIFY`, ntfy or NATS ringing with ids. Since the owner's NT-14, a cloud relational
+   database also fits as an accounted mirror behind the change feed, answering other nodes' reads before their
+   next fetch and never read by a verdict (revised 2026-10-19 by the answers' review). The agent-friendly approach is the one gov
    already has, made fast: files in git, one derived index, and the CLI over it. An MCP server over the index stays
    possible as an optional read surface and is not built, since the CLI is the floor (P36).
 
@@ -317,8 +320,10 @@ probes decide the shape:
 **How work moves between sessions on one build.** Through the trail, pushed, and through registers:
 - **The branch.** The commit queue commits each role return into the trail at its item's witness and pushes the
   build's branch as `build.push` says, every pass commit by default (the owner's NT-19). A push takes no lock the
-  lander holds and runs no gate: a build branch's push skips the bar (110 pushes, median 0.44 s), and CI runs only
-  on `main`. Another node then reads the same witnesses, derives the
+  lander holds and runs no bar but a branch bar the repository declares, none in this repository: a build branch's push
+  skips the bar (110 pushes, median 0.44 s), and CI runs only on `main`. The pre-push hook leaves the lander's
+  verdict files alone on such a push, so a push from the lander's own git dir never clears a landing's verdicts
+  (the answers' review). Another node then reads the same witnesses, derives the
   card's pointers from the branch, and can take over (NT-19).
 - **Units across sessions.** A session that does not hold the build may take one of its units under that unit's
   lease, as `build.unit-holders` says. It drives only that unit's passes on its own branch, and the build's driver
@@ -664,8 +669,11 @@ Twenty-two took the recommendation. NT-22 took another listed option, and five a
 - **NT-17.** `mailbox.notice` defaults to every item, and every tool call stays a value the owner's policy may set.
 - **NT-19.** `build.push` defaults to every pass commit, settable by policy. The owner's question on contention and
   gate runs, answered from the tree: a build branch has one writer, a unit branch one each, and a push of a branch
-  other than the default one skips the bar (110 pushes, median 0.44 s), while remote CI runs only on `main`. The one
-  real contention was the lander's lock, which a push no longer takes.
+  other than the default one skips the bar, running only a branch bar the repository declares, none here (110 pushes,
+  median 0.44 s), while remote CI runs only on `main`. The one
+  real contention was the lander's lock, which a push no longer takes. A push from the lander's own git dir would
+  still clear a landing's verdict files, which the pre-push hook keeps in the git dir it runs in, so the hook
+  leaves them alone on a push that is not to the default branch (revised 2026-10-19 by the answers' review).
 - **NT-22.** Every size cap sits under the one switch, and the owner may pin named caps to refuse.
 - **NT-28.** The limit takes any count by a policy write and defaults to 6, and a spawn over it waits in a queue
   instead of being refused.
@@ -692,3 +700,11 @@ Twenty-two took the recommendation. NT-22 took another listed option, and five a
   - `gap-rt-36`.
 - **The review's leftover.** `[p5-caps]` still listed `record` among `budgets.enforce`'s values, which the review had
   dropped. It is corrected.
+
+## [answers-reviewed] The answers' closing review, 2026-10-19
+
+The owner asked, "run the review pair on both folds, medium effort." Two independent light diff reviews read
+`f064bf378..f8ad789e1`, and `build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md` compares them. Every confirmed defect is folded, by the owner's own words where
+the reviewers left two routes. The admission queue now clamps a fan to the share it can hold and holds what the
+fallback refused (NT-28). The notice fetches once at each item (NT-17). The pass push leaves a landing's verdict files
+alone, so it stays free of the lander's lock (NT-19).

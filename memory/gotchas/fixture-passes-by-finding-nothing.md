@@ -38,6 +38,12 @@ The repository-stage splice check planted a stage that removes, reorders or repl
 Plan, after Deploy or across non-adjacent stages, so a checker that accepted any insertion keeping gov's five whole
 passed every case.
 
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The admission queue's one witness, seven spawns under a limit of six, passed with no queue installed, since the
+harness already queues the agents inside one Workflow run. NT-12's effort check was planted only red, so a check
+refusing every low effort, the owner's own included, passed it.
+
 ## The fix
 
 Every arm asserts the SPECIFIC message its branch emits, never a process exit code, and the fixture

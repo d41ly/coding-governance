@@ -18275,6 +18275,403 @@ instances. Every final check passed over the folded records.
 C.save()
 ````
 
+### `fold_answers_review.py`
+
+The owner's answers' closing review, folded: both runs' confirmed defects in v2, layer-runtime, layer-expansions, coordination, the memory plan, the register, the night record and the bug classes' instances, dry-run on a full copy of the tree after the flow adoption's fold landed.
+
+````python
+"""The owner's answers' closing review, folded: both runs' confirmed defects (the comparison record's [map]), each in
+the records its [fold] row names. Every substitution matches exactly once, or as many times as stated, or the script
+exits.
+
+Usage: python -X utf8 fold_answers_review.py   (from the worktree root)
+"""
+import pathlib
+import sys
+import textwrap
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+RV = "the answers' review"
+CMP = "build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md"
+
+
+def sub_n(rec, old, new, n, label):
+    got = rec.text.count(old)
+    if got != n:
+        sys.exit(f"{rec.path.name}: {label}: the anchor matches {got} times, {n} expected")
+    rec.text = rec.text.replace(old, new)
+    rec.done += 1
+
+
+# ---------------------------------------------------------------- v2: the catalogue and the principles
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+# fallback-refuses: the key's row says what the queue counts under the fallback
+V.sub("A spawn over it waits in Runtime's admission queue once that lands.",
+      "A spawn over it waits in Runtime's admission queue once that lands, the queue reading the in-flight ledger where "
+      f"it is armed and the split's two halves under its fallback ({RV}).", "agents-in-flight row")
+# notice-every-item-hollow
+V.sub("when a session is shown unread message ids, read from the node's local copy of the mail refs, never over the "
+      "network, the owner's NT-17:",
+      "when a session is shown unread message ids, read at an item boundary after one bounded fetch of the mail refs and "
+      f"at a tool call from the node's local copy, with no network call there ({RV}), the owner's NT-17:",
+      "mailbox.notice row")
+# pinned-outside-switch
+V.sub("| `budgets.pinned` | none, or a set of named caps, each refusing whatever `budgets.enforce` says | none | the owner's "
+      "NT-22: \"Plus per-cap pins\"; each cap's value stays under `budgets.*` | dGroundRules |",
+      "| `budgets.pinned` | none, or a set of named caps under `budgets.enforce`, each refusing whatever the switch says, a "
+      "name outside the switch, exempt from it or matching no cap the caps census lists refused at the schema | none | "
+      "the owner's NT-22: \"Plus per-cap pins\"; each cap's value stays under `budgets.*`, and memory slices, which "
+      f"`memory.over-budget` answers, stay outside it ({RV}) | dGroundRules |", "budgets.pinned row")
+V.sub("decides whether a breach warns or refuses, warning by\n  default; a warning is shown",
+      f"decides whether a breach warns or refuses, warning by\n  default, a cap the owner names in `budgets.pinned` always "
+      f"refusing ({RV}); a warning is shown", "P9")
+V.sub("and one over its budget warns or refuses as `budgets.enforce` says (revised\n  2026-10-19, the night pass two, "
+      "point 5, the owner's NT-22).",
+      "and one over its budget warns or refuses as `budgets.enforce` says, a cap `budgets.pinned` names always\n  refusing "
+      f"(revised 2026-10-19, the night pass two, point 5, the owner's NT-22, and {RV}).", "instruction paragraph")
+# effort-two-defaults
+sub_n(V, "medium by default, and below medium only by the owner's explicit authorization, never an agent's (the owner's "
+         "NT-12)",
+      "medium by default, every role declaring medium or more, and below medium only by the owner's explicit "
+      f"authorization in the guarded policy file, never an agent's (the owner's NT-12, {RV})", 3, "effort rows")
+
+# ---------------------------------------------------------------- v2: the chain rows
+# dGroundRules: pinned-outside-switch
+V.sub("a pinned cap refusing under `warn`, and on a load set",
+      "a pinned cap refusing under `warn`, a pinned name outside the switch, exempt from it or matching no listed cap "
+      f"refused at the schema ({RV}), and on a load set", "dGroundRules pins")
+# dPlacedRequest: feed-unrebuildable, feed-unwitnessed
+V.sub("the change feed: an ordered, append-only feed on each node that every lease, claim and register write joins, each "
+      "event naming its ref or record, its kind, its blob and its commit, replayable from any point and rebuilt equal "
+      "from git, so a real-time mirror needs no change to the core (the owner's NT-14)",
+      "the change feed: an ordered, append-only feed on each node that every lease, claim and register write joins, each "
+      "event naming its ref or record, its kind, its blob and its commit, the ref or record, the blob and the commit "
+      "its key, appended only once the ref update or the commit lands and idempotent on that key, ordered per ref by "
+      "commit with a node-local sequence across refs, its population every `refs/gov/*` write and the writes each later "
+      "build joins, replayable from any point and rebuilt equal from git over the refs git still holds, a pruned ref's "
+      "past events kept in the feed and out of that comparison, so a real-time mirror needs no change to the core, seen "
+      "on a census of every registered lease, claim and register writer, each planted write's event found, red on a "
+      "planted writer that skips the append and on a retried write appending twice, and on the feed deleted and "
+      "rebuilt from git on a planted clone, equal to the live feed, red on one dropped event (the owner's NT-14, "
+      f"{RV})", "dPlacedRequest feed")
+# dKeptSession: notice-every-item-hollow, feed-unwitnessed
+V.sub("at every item by default and at every tool call where the owner's policy sets it: a hook lists the unread message "
+      "ids addressed to the session's build or item from the node's local copy of the mail refs, with no network call, "
+      "starting a detached fetch when the copy is older than `mailbox.fetch-seconds`,",
+      "at every item by default and at every tool call where the owner's policy sets it: at an item boundary the notice "
+      "runs one fetch of the mail refs, bounded by a timeout, before it lists the unread message ids addressed to the "
+      "session's build or item, falling back to the node's local copy and naming its age when the fetch fails, and at a "
+      "tool call a hook lists them from the node's local copy, with no network call, starting a detached fetch when the "
+      "copy is older than `mailbox.fetch-seconds`,", "dKeptSession notice")
+V.sub("seen on a message posted on one node shown on another at its next item, and under `every-tool-call` at its next "
+      "tool call within twice the fetch interval (the night pass two, point 3, the owner's NT-17)",
+      "seen on a message posted on one node shown on another at its next item boundary after the post, red where the "
+      "boundary's fetch misses it, on that fetch planted to fail, the local copy shown with its age, and under "
+      "`every-tool-call` at its next tool call within twice the fetch interval (the night pass two, point 3, the "
+      f"owner's NT-17, {RV})", "dKeptSession notice witness")
+V.sub("every mail write appended to the change feed (the owner's NT-14)",
+      "every mail write appended to the change feed once its ref update lands, in the feed's census, red on a planted "
+      f"mail write that skips the append (the owner's NT-14, {RV})", "dKeptSession feed")
+# dTotalRecall: feed-commit-missing, feed-unrebuildable, feed-unwitnessed
+V.sub("every write through `record` appended to the change feed with its edges (the owner's NT-14)",
+      "every commit that touches a record appended to the change feed with its edges once it lands, carrying that "
+      "commit, whether `record` or a hand commit made it, an uncommitted write never in the feed, in the feed's census, "
+      "red on a planted record write that skips the append and on a hand-committed record the live feed lacks (the "
+      f"owner's NT-14, {RV})", "dTotalRecall feed")
+# dBoundRoles: floor-unguarded-file, floor-one-carrier, floor-no-green-arm
+V.sub("and effort the owner's setting under `roles.effort.<role>`, medium by default with no role declaring less, set "
+      "below medium only by the owner's explicit authorization in the policy file and never by an agent, a role's "
+      "proposal, a scenario or a build's own change, seen red on a planted effort below medium that no owner write "
+      "carries (the night pass two, point 2, the owner's NT-10 and NT-12)",
+      "and effort the owner's setting under the `roles.effort.*` keys, medium by default with no role declaring less, "
+      "set below medium only by the owner's explicit authorization in `.governance/policy.toml`, the guarded policy "
+      "file, and never by an agent, a role's proposal, a scenario or a build's own change, the check reading an "
+      "effort's provenance from that file alone and refusing a house-file effort below medium while the house file "
+      "stays a fallback, seen red on a planted effort below medium that no owner write carries, on a role key, a stage "
+      "key and `roles.effort.default` each, and on a planted house-file effort below medium, and green on a low effort "
+      "the owner writes to the policy file under its guard and proof, which runs at low (the night pass two, point 2, "
+      f"the owner's NT-10 and NT-12, {RV})", "dBoundRoles floor")
+# dWellOiledMachine: hold-unspiked (the spike's hold case)
+V.sub("the platform spike first: a role-typed Workflow agent run inside a headless act session, with the headless backend "
+      "measured beside it",
+      "the platform spike first: a role-typed Workflow agent run inside a headless act session, with the headless backend "
+      "measured beside it, and its hold case, the longest a PreToolUse entry holds a call on the pinned harness version "
+      f"and what the harness does when the hold times out, which the admission queue reads ({RV})", "spike")
+# dWellOiledMachine: push-unwitnessed, push-clears-verdicts
+V.sub("each push taking no lock the lander holds and running no bar but a branch bar the repository declares, so a "
+      "take-over on any node",
+      "each push taking no lock the lander holds and running no bar but a branch bar the repository declares, the "
+      "pre-push hook leaving the lander's verdict files alone on a push that is not to the default branch, which keeps a "
+      "pass push from the lander's own git dir from clearing a landing's verdicts, so a take-over on any node",
+      "push clause")
+V.sub("whose successor's `next` names the fourth and whose closing review receives the first three's rows (the night pass "
+      "two, point 4, the owner's NT-19)",
+      "whose successor's `next` names the fourth and whose closing review receives the first three's rows, on a pass push "
+      "made while the lander's lock is held on another node, which completes without waiting, its run-log line "
+      "`decision=skip-nondefault` or the declared branch bar's and red on `decision=full`, and on a build-branch push "
+      "from the lander's git dir during a landing, which leaves the landing's verdict files intact (the night pass two, "
+      f"point 4, the owner's NT-19, {RV})", "push witness")
+# dWellOiledMachine: fallback-refuses
+V.sub("a Workflow call refused while the session's previous run has no saved result, seen on a limit of five with a "
+      "three-agent Workflow running and one direct spawn admitted, and on the session's combined total red before the "
+      "ledger and green after it (the night pass two, point 7, the owner's NT-27, completed by the night pass two's "
+      "review)",
+      "a Workflow call held in the admission queue, never refused, while the session's previous run has no saved result, "
+      "its slots released at that result or by the sweep keyed to the session's liveness, seen on a limit of six with a "
+      "three-agent Workflow running and one direct spawn admitted, on a second Workflow call in that session held and "
+      "started once the first run saves its result, red where it is refused, and on the session's combined total red "
+      "before the ledger and green after it (the night pass two, point 7, the owner's NT-27 and NT-28, completed by the "
+      f"night pass two's review and {RV})", "ledger fallback")
+# dWellOiledMachine: mirror-no-reader, mirror-verdict-unchecked
+V.sub("answering other nodes' sessions as `memory.mirror` says, git staying the store of record and every verdict computed "
+      "locally, an adapter's loss degrading to git and the local index, seen on a stand-in adapter that drops events "
+      "and is rebuilt equal from the feed, and on a record written on one node read on another through it before that "
+      "node's next fetch (the owner's NT-14)",
+      "answering other nodes' sessions as `memory.mirror` says through the reads this build extends to consult it, "
+      "`record show` and `record find`, the mail notice and the card's pointers, never a verdict's, each falling back "
+      "to git and the local index when the adapter is absent, git staying the store of record and every verdict "
+      "computed locally, an adapter's loss degrading to git and the local index, seen on a stand-in adapter that drops "
+      "events and is rebuilt equal from the feed, on a record written on one node read on another through it before "
+      "that node's next fetch, on the same reads answered from git and the local index with the adapter absent, and red "
+      "when any verdict, `next` answer, gate or transition output differs with the mirror on and off, a stand-in "
+      "adapter answering a planted record the local git lacks, green when they are byte-equal (the owner's NT-14, "
+      f"{RV})", "mirror")
+# dWellOiledMachine: oversize-fan-hangs, start-omits-reservations, fallback-refuses, queue-witness-vacuous,
+# hold-unspiked
+V.sub("waits in Runtime's queue, in order, and starts when the agents in flight fall under `runtime.agents-in-flight` with "
+      "room for its declared fan, never refused for want of a slot, the harness's own settings kept as the backstop "
+      "above it, an attended session's call held at its PreToolUse entry for as long as the spike shows a hook can hold "
+      "a call and otherwise sent through the executor's queue, seen on seven spawns under a limit of six, the seventh "
+      "starting when the first ends (the owner's NT-28)",
+      "waits in Runtime's queue, in order, and starts when the agents in flight and the outstanding reservations leave "
+      "room for its reservation under `runtime.agents-in-flight`, the in-flight ledger's one admission rule, never "
+      "refused for want of a slot, a call's reservation its declared fan or, when that is larger, the largest share it "
+      "can ever hold, the key or under the ledger's split fallback the Workflow share, re-read at admission, the "
+      "harness's per-run setting, rendered at the key and under the fallback at the Workflow share, throttling the "
+      "run's agents to it, so no call waits on room it can never have, the queue reading the ledger where it is armed "
+      "and the split's two halves where it is not, a slot released at SubagentStop where the ledger is armed and at the "
+      "run's saved result or by the liveness sweep where it is not, the harness's own settings kept as the backstop "
+      "above it, an attended session's call held at its PreToolUse entry for as long as the spike's hold case shows a "
+      "hook can hold a call, and past that sent through the executor's queue, the session starting an executor where "
+      "it hosts none and the call's return carried back to it, never a silent denial and never a start over the limit, "
+      "a notice naming the wait shown while it waits, seen on six in flight across direct and Workflow spawns, then a "
+      "seventh direct Agent spawn and a seventh Workflow call, each held, not refused, and started when a slot frees, "
+      "red with the queue stubbed out, where the direct spawn is refused, on two fan-four Workflow calls under a limit "
+      "of six, submitted before the first run's first SubagentStart, the second waiting until the first's slots free, "
+      "on a fan of four enqueued under a limit of three, clamped and started when the three free, a fan-one spawn "
+      "behind it starting after it, and on a first agent that outlives the hold, red when the held call starts over "
+      f"the limit or is refused without a reason (the owner's NT-28, {RV})", "queue")
+V.save()
+
+# ---------------------------------------------------------------- layer-runtime and layer-expansions
+R = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+R.sub("and queues the call instead of refusing it (the owner's NT-28).",
+      "and queues the call instead of refusing it, held at that entry for as long as the spike's hold case shows a hook "
+      "can hold a call and past that sent through the executor's queue, never a silent denial and never a start over "
+      f"the limit (the owner's NT-28, made conditional by {RV}).", "attended entry")
+R.sub("    attended PreToolUse entry queues the same call (the owner's NT-28);",
+      "    attended PreToolUse entry queues the same call, held there within the spike's hold case and past it sent "
+      "through the executor's queue, red when a call outliving the hold starts over the limit or is refused without a "
+      f"reason (the owner's NT-28, {RV});", "in-flight fixture")
+R.sub("  - on 2.1.292, an ask rule on the Workflow tool sends the call to the dispatcher's PermissionRequest\n",
+      "  - a PreToolUse entry holding a call is measured, the longest hold it survives on the pinned harness version and\n"
+      f"    what the harness does when the hold times out, recorded as the hold case the admission queue reads ({RV});\n"
+      "  - on 2.1.292, an ask rule on the Workflow tool sends the call to the dispatcher's PermissionRequest\n",
+      "spike fixture")
+R.save()
+X = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+X.sub("| notification channel | Runtime's notification adapters | the terminal |\n",
+      "| notification channel | Runtime's notification adapters | the terminal |\n"
+      "| memory mirror: a cloud relational database, planned (the owner's NT-14) | Runtime's memory mirrors | git and the "
+      "local index |\n", "integrations kinds")
+X.sub("Runtime's command, host, notification and journal-reader points,",
+      "Runtime's command, host, notification, memory-mirror and journal-reader points,", "integrations points")
+X.save()
+
+# ---------------------------------------------------------------- coordination, the memory plan, the register
+C = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md")
+C.sub("A session is also shown unread ids at every item, or at every tool call where policy\n   sets it (the owner's "
+      "NT-17), read\n   from the node's local copy of the mail refs, which a detached fetch keeps fresh, because the read\n"
+      "   points, not the transport, set how late news arrives.",
+      "A session is also shown unread ids at every item, after one fetch of the mail refs bounded by a\n   timeout, or at "
+      "every tool call where policy sets it (the owner's NT-17), read there from the node's local\n   copy of the mail "
+      "refs, which a detached fetch keeps fresh, because the read points, not the transport, set\n   how late news arrives "
+      f"(the item's fetch added by {RV}).", "item 7")
+C.save()
+M = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+M.sub("| node-local node: every lease, claim, register, mail and record write in order, replayable and rebuilt equal from "
+      "git (the owner's NT-14) | — | dPlacedRequest |",
+      "| node-local node: every `refs/gov/*` write and every commit that touches a record, appended once each lands, "
+      "ordered per ref, replayable and rebuilt equal from git over the refs git still holds (the owner's NT-14, "
+      f"{RV}) | ref or record, blob and commit | dPlacedRequest |", "change feed pocket")
+M.sub("| out: a real-time copy of the change feed for other nodes, never read by a verdict (the owner's NT-14) | — | "
+      "dWellOiledMachine |",
+      "| witness: a real-time copy of the change feed that other nodes' `record show`, `record find`, mail notice and "
+      f"card pointers read before their next fetch, never read by a verdict (the owner's NT-14, {RV}) | the feed's "
+      "event key | dWellOiledMachine |", "mirror pocket")
+M.save()
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+G.sub("| the owner's NT-14 (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[answers]`); "
+      "`research-storage-prior-art.md` family F4 | — |",
+      "| the owner's NT-14 (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[answers]`) for the need; "
+      "layer-runtime's `[extend]` table, which held no mirror point before the answers' fold, for the absence; "
+      "`research-storage-prior-art.md` family F4 for the constraint the point must meet, git the store of record and "
+      f"the verdict local ({RV}) | — |", "gap-mem-46")
+G.sub("| A spawn over the agent limit is refused, never queued: agent-cap refuses a sixth direct spawn, and the harness "
+      "refuses a direct spawn over its setting with \"Do not retry\". |",
+      "| A direct spawn over the agent limit is refused, never queued: the harness refuses it with \"Do not retry\", and "
+      "agent-cap refuses a sixth claim in its window even with every slot idle. Only the agents inside one Workflow run "
+      f"queue, by the harness's own per-run setting ({RV}). |", "gap-rt-36")
+G.save()
+
+# ---------------------------------------------------------------- the night record
+N = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+N.sub("So the fix is the read point. A hook shows unread message ids at every tool call (a median of 10.5 s\n   apart), "
+      "read from the node's local copy of the refs, which a detached fetch refreshes, so no tool call waits on the\n"
+      "   network.",
+      "So the fix is the read point. A session is shown unread message ids at every item, after one fetch bounded by a\n"
+      "   timeout, and at every tool call (a median of 10.5 s apart) where policy sets it, read there from the node's local\n"
+      "   copy of the refs, which a detached fetch refreshes, so no tool call waits on the network (revised 2026-10-19 for\n"
+      f"   the owner's NT-17 and {RV}).", "point 3 analysis")
+N.sub("optional adapter: Postgres `NOTIFY`, ntfy or NATS ringing with ids.",
+      "optional adapter: Postgres `NOTIFY`, ntfy or NATS ringing with ids. Since the owner's NT-14, a cloud relational\n"
+      "   database also fits as an accounted mirror behind the change feed, answering other nodes' reads before their\n"
+      f"   next fetch and never read by a verdict (revised 2026-10-19 by {RV}).", "point 4 analysis")
+N.sub("A push takes no lock the\n  lander holds and runs no gate: a build branch's push skips the bar (110 pushes, median "
+      "0.44 s), and CI runs only\n  on `main`.",
+      "A push takes no lock the\n  lander holds and runs no bar but a branch bar the repository declares, none in this "
+      "repository: a build branch's push\n  skips the bar (110 pushes, median 0.44 s), and CI runs only on `main`. The "
+      "pre-push hook leaves the lander's\n  verdict files alone on such a push, so a push from the lander's own git dir "
+      f"never clears a landing's verdicts\n  ({RV}).", "point 4 push")
+N.sub("and a push of a branch\n  other than the default one skips the bar (110 pushes, median 0.44 s),",
+      "and a push of a branch\n  other than the default one skips the bar, running only a branch bar the repository "
+      "declares, none here (110 pushes,\n  median 0.44 s),", "NT-19 bar")
+N.sub("The one\n  real contention was the lander's lock, which a push no longer takes.",
+      "The one\n  real contention was the lander's lock, which a push no longer takes. A push from the lander's own git dir "
+      "would\n  still clear a landing's verdict files, which the pre-push hook keeps in the git dir it runs in, so the "
+      "hook\n  leaves them alone on a push that is not to the default branch (revised 2026-10-19 by the answers' "
+      "review).", "NT-19 contention")
+N.text = N.text.rstrip("\n") + f"""
+
+## [answers-reviewed] The answers' closing review, 2026-10-19
+
+The owner asked, "run the review pair on both folds, medium effort." Two independent light diff reviews read
+`f064bf378..f8ad789e1`, and `{CMP}` compares them. Every confirmed defect is folded, by the owner's own words where
+the reviewers left two routes. The admission queue now clamps a fan to the share it can hold and holds what the
+fallback refused (NT-28). The notice fetches once at each item (NT-17). The pass push leaves a landing's verdict files
+alone, so it stays free of the lander's lock (NT-19).
+"""
+N.done += 1
+N.save()
+
+# ---------------------------------------------------------------- the bug classes' instances
+INSTANCES = {
+    "amendment-leaves-its-other-half-standing":
+        "The answers' fold added an admission queue to dWellOiledMachine and left the same row's ledger fallback "
+        "refusing the Workflow call the queue now holds, at the limit of five that NT-28 replaced. The night record's "
+        "analysis kept the tool-call notice and the doorbell-only database that the answers replaced.",
+    "rule-stated-with-no-check-that-fails":
+        "The change feed's ordered, rebuilt-equal promise, the mirror's never-read-by-a-verdict invariant and the pass "
+        "push's freedom from the lander's lock each landed with no case that could fail.",
+    "fixture-passes-by-finding-nothing":
+        "The admission queue's one witness, seven spawns under a limit of six, passed with no queue installed, since the "
+        "harness already queues the agents inside one Workflow run. NT-12's effort check was planted only red, so a check "
+        "refusing every low effort, the owner's own included, passed it.",
+    "route-names-an-output-its-actor-never-emits":
+        "The attended queue held a call for as long as the spike shows a hook can hold one, and no spike case measured "
+        "the hold. A fan larger than its share waited for room it could never have.",
+    "two-answers-to-one-question":
+        "The queue's start rule counted the agents in flight where the ledger in the same row counted reservations too, "
+        "and the effort rows read both the role's declared effort and medium by default.",
+    "policy-value-with-no-route":
+        "`memory.mirror` named an adapter that answers other nodes' reads, and no session-side read was routed to it.",
+    "zero-witness-over-an-unnamed-population":
+        "The change feed was rebuilt equal from git over a population and an order nobody named, so pruned refs and hand "
+        "commits fell outside it unseen.",
+}
+for name, text in INSTANCES.items():
+    K = Record(f"memory/gotchas/{name}.md")
+    K.sub("\n## The fix\n",
+          f"\nIt bit again in the owner's answers' closing review, 2026-10-19\n(`memory/builds/dClosedLoop/{CMP}`).\n"
+          + textwrap.fill(text, 118, break_long_words=False, break_on_hyphens=False) + "\n\n## The fix\n",
+          f"{name}: instance")
+    K.save()
+print("folded the answers' review")
+````
+
+### `log_answers_review.py`
+
+The session log's event for the owner's answers' compared and folded review.
+
+````python
+"""The session log's event for the owner's answers' compared and folded review."""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+CMP = "build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner's answers' closing review, compared (`{CMP}`): 24 confirmed
+  defects, two high, both runs finding nine of them, an overlap of 0.38. Every defect folds, none needing the owner:
+  where the runs left two routes, the owner's NT-28 and NT-17 and the NT-19 answer chose them. The admission queue
+  clamps a fan to the share it can hold and holds what the fallback refused. The notice fetches once at each item. The
+  change feed has a key, an order, a population and a census, and the mirror has named readers and a check that no
+  verdict reads it. A pass push leaves a landing's verdict files alone.
+""", "the answers' review event")
+L.save()
+````
+
+### `fill_answers_review.py`
+
+The answers' comparison record: compare_rounds.py's output verbatim and the folded section.
+
+````python
+"""The answers' comparison record: [summary], compare_rounds.py's output verbatim with what it shows, and [folded],
+written once the fold's checks passed.
+
+Usage: python -X utf8 fill_answers_review.py <compare_rounds output>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+out = pathlib.Path(sys.argv[1]).read_bytes().decode("utf-8").replace("\r\n", "\n").strip("\n")
+F = "`" * 3
+C = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md")
+C.sub("\nSUMMARY\n", f"""
+{F}text
+$ python compare_rounds.py night-pass-two-answers-a.md night-pass-two-answers-b.md night-pass-two-answers-reviews-compared.md session-log.md wf_19434550-87a wf_035611d1-d5f
+{out}
+{F}
+
+- **Every defect sits in the answers' design text.** None reaches shipped code. Most are NT-28's queue and NT-14's
+  feed and mirror: new mechanisms whose clauses stated a promise with no case that could fail.
+- **One run finds about two thirds.** Run A alone covers 17 of the 24 and run B 16, an overlap of 0.38. Chapman's
+  estimate puts about six more beyond both.
+- **Each run graded a different high.** Run A graded the fallback's refusal high, and run B the queue's hang on an
+  oversize fan. Each run found the other's high and graded it medium.
+- **Precision fell to 0.78 and 0.63.** Sixteen findings were refuted, eight of them on defects another finding
+  confirmed. Four are conflicts inside one run, where one skeptic refuted what another confirmed: the gap-rt-36
+  wording in run A, and in run B the feed's witness, the mirror's verdict check and the attended hold.
+""", "summary")
+C.sub("\nFOLDED\n", """
+All 24 are folded: in v2's catalogue, principles and chain rows, layer-runtime, layer-expansions, coordination, the
+memory plan, the register and the night record. The folds edited clauses in place and added no key and no gap, so
+the critical path stays at 239 units, as at `1edb2d167`. Seven bug classes record the instances. Every final check
+passed over the folded records.
+""", "folded")
+C.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -18640,6 +19037,9 @@ MINE = [
     ('night2/fold_adoption.py', "The flow adoption's closing review, folded: both runs' confirmed defects in v2, the adoption, systems, memory-plan, fates and layer-roles records, the bug classes' instances, and the preset check's free values, dry-run on a full copy of the tree while the answers pair ran."),
     ('night2/log_pairs.py', "The session log's dispatch rows 139 to 142, the derived agent lines and the pairs' events."),
     ('night2/fill_adoption.py', "The flow adoption's comparison record: compare_rounds.py's output verbatim and the folded section."),
+    ('night2/fold_answers_review.py', "The owner's answers' closing review, folded: both runs' confirmed defects in v2, layer-runtime, layer-expansions, coordination, the memory plan, the register, the night record and the bug classes' instances, dry-run on a full copy of the tree after the flow adoption's fold landed."),
+    ('night2/log_answers_review.py', "The session log's event for the owner's answers' compared and folded review."),
+    ('night2/fill_answers_review.py', "The answers' comparison record: compare_rounds.py's output verbatim and the folded section."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -19120,6 +19520,7 @@ $ python plain_cites.py
 landing                  9  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's) …
 plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
 seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
+census                   6  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dPlacedRequest (dLinkedLibrary's), dKeptSession (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
@@ -19128,7 +19529,6 @@ act                      4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest 
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 review                   3  dGroundRules (dFairHearing's), dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
-census                   3  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
@@ -19152,13 +19552,14 @@ attribution              1  dDeclaredLoop (dWitnessedBar's)
 view                     1  dDeclaredLoop (dTotalRecall's)
 triage                   1  dPlacedRequest (dRankedPlan's)
 overlap                  1  dPlacedRequest (dIndexedDesign's)
+comparison               1  dPlacedRequest (dShippedRelease's)
 fleet                    1  dPlacedRequest (dShippedRelease's)
 routing                  1  dKeptSession (dWitnessedBar's)
 ask                      1  dKeptSession (dTotalRecall's)
 seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 106, over 41 kinds
+plain-word hits on a non-ancestor's record kind: 110, over 42 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -19669,13 +20070,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2524 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1734, derived 295, pending 495
-map: no stale facts read 59 records and 22 quotes of a map count or the critical path
+map: 2526 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1736, derived 295, pending 495
+map: no stale facts read 60 records and 23 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 207 records, 3471 sections, 202 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 208 records, 3482 sections, 202 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -19694,7 +20095,7 @@ rc 0
 
 $ reconciliation probe
 chain rows 21 · owned nodes read 470 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 106 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 110 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym

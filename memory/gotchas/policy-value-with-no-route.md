@@ -56,6 +56,10 @@ It bit again in the flow and roles adoption's closing review, 2026-10-19
 Excluding a gov item that `review.breakpoints` names, or a lens `review.opt-in` selects, composed green, so the
 breakpoint or the lens would never fire.
 
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+`memory.mirror` named an adapter that answers other nodes' reads, and no session-side read was routed to it.
+
 ## The fix
 
 - For each key an item reads, write each catalogued value's arm into the item: its witness, its route,

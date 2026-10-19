@@ -45,6 +45,11 @@ The expansion round's two reviews (`memory/builds/dClosedLoop/build/2026-10-16-b
 - the cadence-items point required a host key that distribution's programs never named;
 - DI-1's "source, 0 behind" was a reading `kits.currency` had no arm to produce.
 
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The attended queue held a call for as long as the spike shows a hook can hold one, and no spike case measured the
+hold. A fan larger than its share waited for room it could never have.
+
 ## The fix
 
 Before a route names an outcome, read the actor's code on that path:
