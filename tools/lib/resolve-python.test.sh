@@ -328,6 +328,55 @@ while IFS='|' read -r fx envset want; do
 done <<<"$RR_ROWS"
 [ "$rr_k" = 12 ] || bad "the remote ladder table read as $rr_k rows, not 12"; ok
 
+# ---- 2e. THE KIT RESOLVER'S RECEIPT JOIN, BEHAVIOUR (TOOL-dRenderedAnchor-2) ----------------------
+# Parity holds each inline copy of `resolve_kit_dir` to its canonical; this holds the canonical to the
+# six receipt rows of TOOL-dRenderedAnchor-1's section 4, one query each with `here` at the tool root
+# `p`. Rows 1 and 2 are held. Row 3 is the one only the join's role term rejects, a `merged` row, and
+# row 4 the one only its home term rejects, a `rendered` row from another home's template; rows 5 and
+# 6 hold the escape and existence tests. The canonical is imported from beside this file, so a staged
+# break of it reaches here. Every name is neutral, home `h`, other home `o`, kit directory `k`,
+# because a kit name in a fixture path is an install-prefix hit.
+# WHAT THIS DOES NOT CHECK: the probe rungs, which no row reaches, or any copy's call site.
+RK="$TMP/rk"; mkdir -p "$RK/.git" "$RK/.governance" "$RK/p/k" "$RK/c" "$TMP/out"
+for f in p/k/t.js p/k/u.js c/s.json p/k/v.js; do printf 'x\n' > "$RK/$f"; done
+printf 'x\n' > "$TMP/out/w.js"
+printf '%s\n' '{"files": [
+ {"role": "rendered", "source": "p/h/t.template.js", "path": "p/k/t.js"},
+ {"role": "engine", "source": "p/h/u.js", "path": "p/k/u.js"},
+ {"role": "merged", "source": "p/h/s.fragment.json", "path": "c/s.json"},
+ {"role": "rendered", "source": "p/o/v.template.js", "path": "p/k/v.js"},
+ {"role": "rendered", "source": "p/h/w.template.js", "path": "../out/w.js"},
+ {"role": "rendered", "source": "p/h/x.template.js", "path": "p/k/x.js"}]}' > "$RK/.governance/install.json"
+rk_got=$("$REALPY" -B -c '
+import pathlib, sys
+sys.path.insert(0, sys.argv[1])
+from resolve_kit_dir import resolve_kit_dir
+root = pathlib.Path(sys.argv[2]).absolute()
+for anchor in ("t.js", "u.js", "s.json", "v.js", "w.js", "x.js"):
+    try:
+        print(resolve_kit_dir("h", anchor, root / "p").relative_to(root).as_posix())
+    except LookupError:
+        print("LookupError")' "$HERE" "$RK" 2>&1 | tr -d '\r')
+rk_want=$(printf '%s\n' p/k p/k LookupError LookupError LookupError LookupError)
+[ "$(printf '%s\n' "$rk_got" | grep -c .)" = 6 ] || bad "the receipt-join table did not read as six rows: $(printf '%s' "$rk_got" | tr '\n' ' ')"; ok
+[ "$rk_got" = "$rk_want" ] || bad "the canonical resolve_kit_dir disagrees with the receipt-join table, rows 1 to 6: $(printf '%s' "$rk_got" | tr '\n' ' ')"; ok
+
+# ---- 2f. A TEMPLATE CITATION UNDER A RENDERED ROW, BEHAVIOUR (TOOL-dRenderedAnchor-2) -------------
+# `derive_kit_paths` resolves every `{{TOOL_ROOT}}<home>/<file>` citation of the templates it is given
+# through its inline `resolve_kit_dir`, so the receipt join decides what every rendered doc citing a
+# harness names. The canonical in render-doc.sh, sourced, runs over a fixture whose receipt holds one
+# `rendered` row, no `prefix` key and no adopter placeholder, and must print that citation's one line.
+# Red on the a60b0c7d block, which printed nothing, so the citation fell through to the plain prefix.
+# WHAT THIS DOES NOT CHECK: the adopter-placeholder answers and the prefix line, which no row reaches.
+RD="$TMP/rd"; RD_CITE='{{TOOL_ROOT}}h/t.js'
+mkdir -p "$RD/.git" "$RD/.governance" "$RD/p/mt" "$RD/p/k"
+printf 'x\n' > "$RD/p/k/t.js"
+printf 'cites %s here\n' "$RD_CITE" > "$RD/p/mt/x.template.md"
+printf '%s\n' '{"files": [{"role": "rendered", "source": "p/h/t.template.js", "path": "p/k/t.js"}]}' \
+  > "$RD/.governance/install.json"
+rd_got=$(bash -c '. "$1"; derive_kit_paths "$2" "$3/p/mt" "$3/p/mt/x.template.md"' _ "$HERE/render-doc.sh" "$REALPY" "$RD" 2>&1 | tr -d '\r')
+[ "$rd_got" = "$RD_CITE"$'\t'"p/k/t.js" ] || bad "derive_kit_paths over one rendered receipt row did not print its citation's one line: '$rd_got'"; ok
+
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver
 # both EXPLAIN the idiom they replace, and a predicate that fires on the prose documenting the fix is

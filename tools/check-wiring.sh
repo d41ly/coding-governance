@@ -1685,6 +1685,9 @@ try {
 # The harness half reads the role index with the resolved python and prints one `note` per harness
 # it lists that this tree does not hold: `/build` drives those through the review harness, which is
 # not a default kit, so its absence is a fact to print and never a gate (the spec's section 8 F1).
+# Whether the kit holds such a harness elsewhere, the `misplaced` verdict, is `render_agents.py`'s
+# alone, which `adopt-roles.sh --check` prints, so the note names that command: a shell twin of its
+# marker test here would derive one decision twice, where python may be absent (TOOL-dRenderedAnchor-2).
 #
 # WHAT THIS DOES NOT CHECK: whether a rendered file is FRESH, which is the `roles render wiring`
 # leg's byte compare; and whether a house overlay is sensible, which is `roles catalogue`'s. Presence
@@ -1740,7 +1743,7 @@ for h in json.load(open(sys.argv[1], encoding="utf-8")).get("harnesses") or []:
     while IFS= read -r h; do
       h=${h%$'\r'}   # a Windows python writes CRLF to a pipe, and a CR kept here names no file
       [ -n "$h" ] && [ ! -f "$h" ] || continue
-      echo "note     roles     — $h is named by the role index and absent here; /build cannot drive it until the review harness is installed"
+      echo "note     roles     — $h is named by the role index and absent here; /build cannot drive it; bash $kit/adopt-roles.sh --check says whether its kit holds it elsewhere"
     done <<EOF
 $harn
 EOF

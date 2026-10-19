@@ -32,10 +32,12 @@ check a pinned path out CRLF while git reports it clean. `--selftest` runs this 
 catalogue it builds in a temporary directory, never the repository's files.
 
 A HARNESS the kit resolver did not hold prints one line under either mode. Where a file of its name
-sits directly inside a directory under the tool root, that is a `misplaced` line naming each such
-file, and `--check` exits 1 on it, because the index then lists a path the install does not hold
-while the harness is installed elsewhere (TOOL-dRenderedAnchor-1). Where no such file exists, it is
-a note that the kit is not installed, which never reds.
+sits directly inside a directory under the tool root, beside the harness's template
+`<stem>.template<suffix>` or a `kit.toml` declaring the home its listed path names, that is a
+`misplaced` line naming each such file, and `--check` exits 1 on it, because the index then lists a
+path the install does not hold while its kit holds the harness elsewhere (TOOL-dRenderedAnchor-1,
+TOOL-dRenderedAnchor-2). A file of its name beside neither mark is an adopter's namesake and not the
+kit's, so it reads like no file at all: a note that the kit is not installed, which never reds.
 
 The kit directory is `git rev-parse --show-prefix` run in this script's own directory, the tool root
 is its parent, and the target root is `git rev-parse --show-toplevel`; an empty derivation refuses.
@@ -51,7 +53,8 @@ WHAT THIS DOES NOT CHECK: whether a role's text is any good, or whether its fron
 catalogue's grammar, which `check_roles.py` grades; whether the Claude Code that spawns a type honours
 `omitClaudeMd`, which rests on the CLI version and a server flag and is observed only by a live probe;
 whether a running session has restarted since the last write; and a harness copy anywhere but
-directly inside a directory under the tool root, which the misplaced scan does not read.
+directly inside a directory under the tool root beside its template or a `kit.toml` declaring its
+home, which the misplaced scan does not count, nor whether a marked copy holds the kit's bytes.
 """
 import argparse
 import contextlib
@@ -63,6 +66,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import tomllib
 
 KIT_DIR = pathlib.Path(__file__).absolute().parent
 sys.path.insert(0, str(KIT_DIR))
@@ -77,9 +81,11 @@ RESTART_LINE = ("render_agents: %d agent type(s) changed — a Claude Code sessi
                 "write cannot spawn the change; start a new session in this repository before spawning one.")
 NOTE_LINE = ("render_agents: note — %s is named by the workflow table and absent here; "
              "its kit is not installed")
-#: A harness the resolver did not hold while a file of its name sits in a kit directory.
+#: A harness the resolver did not hold while its kit's own copy sits elsewhere under the tool root:
+#: a file of its name directly inside a directory there, beside the harness's template or a
+#: `kit.toml` declaring the home its listed path names.
 MISPLACED_LINE = ("render_agents: misplaced %s — the workflow table names it and it is absent "
-                  "here, while %s is installed; the kit resolver did not find it")
+                  "here, while its kit holds it at %s; the kit resolver did not find it")
 MANIFEST_NOTE = ("render_agents: note — %s is absent, so the index names no gate manifest and a role "
                  "agent's gate-leg row is unarmed")
 #: The self-test fixture's two workflow-driver harnesses, spelled as its own table writes them. The
@@ -163,15 +169,32 @@ def derive_harness_paths(workflows, tool_root, target_root):
     return sorted(found), sorted(absent)
 
 
+def read_kit_home(descriptor):
+    """The `home` a `kit.toml` declares, or None when it is absent, unreadable or not TOML."""
+    try:
+        with open(descriptor, "rb") as fh:
+            home = tomllib.load(fh).get("home")
+    except (OSError, UnicodeDecodeError, tomllib.TOMLDecodeError):
+        return None
+    return home if isinstance(home, str) else None
+
+
 def scan_misplaced_harnesses(absent, tool_root, target_root):
-    """`{rel: [found rel, ...]}` for each absent harness whose file name sits directly inside a
-    directory under the tool root; a harness with no such file is not a key."""
+    """`{rel: [found rel, ...]}` for each absent harness whose file sits directly inside a directory
+    under the tool root beside a mark of its kit: the harness's template, `<stem>.template<suffix>`,
+    or a `kit.toml` declaring the home its listed path names. Any other harness is not a key.
+
+    It reads the disk, never the receipt or the resolver it guards (TOOL-dRenderedAnchor-2). The
+    listed path's home is its parent's name, because `resolve_harness_path` spells an unheld
+    harness `<tool root>/<home>/<file>`."""
     misplaced = {}
     for rel in absent:
-        name = rel.split("/")[-1]
-        hits = [pathlib.Path(os.path.relpath(str(d / name), str(target_root))).as_posix()
+        listed = pathlib.PurePosixPath(rel)
+        template = listed.stem + ".template" + listed.suffix
+        hits = [pathlib.Path(os.path.relpath(str(d / listed.name), str(target_root))).as_posix()
                 for d in sorted(pathlib.Path(tool_root).iterdir())
-                if d.is_dir() and (d / name).is_file()]
+                if d.is_dir() and (d / listed.name).is_file()
+                and ((d / template).is_file() or read_kit_home(d / "kit.toml") == listed.parent.name)]
         if hits:
             misplaced[rel] = hits
     return misplaced
@@ -535,10 +558,12 @@ def run_selftest():
     # Arms 16 and 17 (TOOL-dRenderedAnchor-1): the adopter shape, where govkit lands a kit under its
     # id rather than its home, so the stub directory is renamed and `.git` at the root is where the
     # resolver reads the receipt. Arm 16 holds the harness through its rendered row; arm 17 has no
-    # receipt, so the harness is misplaced while the file sits in the renamed directory and a note
-    # once it sits nowhere.
+    # receipt, so the harness is misplaced while the file sits in the renamed directory beside a mark
+    # of its kit, and a note once it sits nowhere. Every mark and decoy is derived from the listed
+    # path, never typed: a literal kit segment followed by a file is an install-prefix hit.
     listed = pathlib.PurePosixPath(FIXTURE_HARNESS.format(prefix=FIXTURE_ROOT))
     held = listed.parent.parent / "renamed" / listed.name
+    template = listed.stem + ".template" + listed.suffix
     for arm in (16, 17):
         with tempfile.TemporaryDirectory() as tmp:
             root = pathlib.Path(tmp)
@@ -546,10 +571,25 @@ def run_selftest():
             (root / listed.parent).rename(root / held.parent)
             (root / ".git").mkdir()
             if arm == 16:
+                # TOOL-dRenderedAnchor-2 S4: two decoy rows ahead of the real one, each backed by a
+                # file of the harness's name under `.claude`. Only the join's role term rejects the
+                # `merged` row, and only its home term the `rendered` row from another home's
+                # template, so a resolver missing either term lists the decoy.
+                decoy = pathlib.PurePosixPath(".claude") / listed.name
+                (root / decoy).parent.mkdir(parents=True, exist_ok=True)
+                (root / decoy).write_text("// decoy\n", encoding="utf-8")
+                fixture = pathlib.PurePosixPath(FIXTURE_HARNESS)
+                elsewhere = (fixture.parent.parent / "other" / fixture.name).as_posix()
                 (root / ".governance").mkdir()
                 (root / ".governance" / "install.json").write_text(json.dumps({"files": [
+                    {"role": "merged", "kit": "fixture", "path": decoy.as_posix(),
+                     "source": FIXTURE_HARNESS.replace(".js", ".fragment.json")},
+                    {"role": "rendered", "kit": "fixture", "path": decoy.as_posix(),
+                     "source": elsewhere.replace(".js", ".template.js")},
                     {"role": "rendered", "kit": "fixture", "path": held.as_posix(),
                      "source": FIXTURE_HARNESS.replace(".js", ".template.js")}]}), encoding="utf-8")
+            else:
+                (root / held.parent / template).write_text("// template\n", encoding="utf-8")
             outs, rcs = [], []
             for mode in ("write", "check"):
                 out = io.StringIO()
@@ -567,22 +607,67 @@ def run_selftest():
                 check_arm(state, 16, not wrong, "a harness held by its rendered receipt row printed %r"
                           % wrong)
                 continue
+            # 17a, the template beside the file (TOOL-dRenderedAnchor-2 S2).
             line = MISPLACED_LINE % (listed, held)
             check_arm(state, 17, rcs[0] == 0 and [ln for ln in outs[0] if ln.startswith(
                 "render_agents: misplaced")] == [line] and (NOTE_LINE % listed) not in outs[0],
-                "a harness absent where listed and installed in a kit directory did not write with "
+                "a harness absent where listed and held beside its template did not write with "
                 "exactly its misplaced line and no note")
-            check_arm(state, 17, rcs[1] == 1 and line in outs[1],
-                      "--check on a misplaced harness exited %d without its misplaced line" % rcs[1])
-            (root / held).unlink()
-            out = io.StringIO()
-            with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
-                rc = run_mode("check", kit, tool_root, root)
-            lines = out.getvalue().splitlines()
-            check_arm(state, 17, rc == 0 and (NOTE_LINE % listed) in lines
-                      and not any(ln.startswith("render_agents: misplaced") for ln in lines),
-                      "a harness found nowhere exited %d under --check, or did not read as its note "
-                      "alone" % rc)
+            check_arm(state, 17, rcs[1] == 1 and line in outs[1] and (NOTE_LINE % listed) not in outs[1],
+                      "--check on a harness held beside its template exited %d without its misplaced "
+                      "line alone" % rcs[1])
+            # 17b, the template unlinked and a kit.toml declaring the listed home; 17c, the file
+            # unlinked as well, so the harness sits nowhere.
+            (root / held.parent / template).unlink()
+            (root / held.parent / "kit.toml").write_text('home = "%s"\n' % listed.parent.name,
+                                                         encoding="utf-8")
+            for row in ("17b", "17c"):
+                if row == "17c":
+                    (root / held).unlink()
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                    rc = run_mode("check", kit, tool_root, root)
+                lines = out.getvalue().splitlines()
+                said = [ln for ln in lines if ln.startswith("render_agents: misplaced")]
+                if row == "17b":
+                    check_arm(state, 17, rc == 1 and said == [line] and (NOTE_LINE % listed) not in lines,
+                              "--check on a harness held beside a kit.toml declaring its home exited %d "
+                              "without its misplaced line alone" % rc)
+                else:
+                    check_arm(state, 17, rc == 0 and (NOTE_LINE % listed) in lines and not said,
+                              "a harness found nowhere exited %d under --check, or did not read as its "
+                              "note alone" % rc)
+    # Arm 18 (TOOL-dRenderedAnchor-2 S2): a namesake beside no mark of the harness's kit is the
+    # adopter's own file and reads as the note, exit 0: 18a with no mark, 18b beside a kit.toml
+    # declaring another home, under the fixture's prefix, and 18c at a root install, where the tool
+    # root is the repository root and the scan walks every top-level directory.
+    for cases in (("18a", "18b"), ("18c",)):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = pathlib.Path(tmp)
+            kit, tool_root = build_fixture(root, {"r-one": roles["r-one"]})
+            (root / ".git").mkdir()
+            want, namesake = listed, listed.parent.parent / "ci" / listed.name
+            if cases == ("18c",):
+                tool_root = root
+                want, namesake = (p.relative_to(FIXTURE_ROOT) for p in (want, namesake))
+            else:
+                (root / listed).unlink()
+            (root / namesake.parent).mkdir()
+            (root / namesake).write_text("// the adopter's own file\n", encoding="utf-8")
+            with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(io.StringIO()):
+                run_mode("write", kit, tool_root, root)
+            for case in cases:
+                if case == "18b":
+                    (root / namesake.parent / "kit.toml").write_text(
+                        'home = "%s"\n' % namesake.parent.name, encoding="utf-8")
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out), contextlib.redirect_stderr(io.StringIO()):
+                    rc = run_mode("check", kit, tool_root, root)
+                lines = out.getvalue().splitlines()
+                check_arm(state, 18, rc == 0 and (NOTE_LINE % want) in lines
+                          and not any(ln.startswith("render_agents: misplaced") for ln in lines),
+                          "%s: a namesake at %s beside no mark of its kit exited %d under --check, or "
+                          "did not read as the note alone" % (case, namesake, rc))
     for line in state["fail"]:
         print("render_agents selftest: FAIL %s" % line)
     print("%s (%d assertions)" % ("FAIL" if state["fail"] else "PASS", state["n"]))

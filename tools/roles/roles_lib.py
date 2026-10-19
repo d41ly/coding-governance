@@ -71,6 +71,8 @@ LEGACY_NOTE = ("%s is a pre-tag charter: it carries `## §<n> — ` headings and
                "so no role's rules resolve and no agent type or handoff carries the charter; reseed "
                "the charter template from gov, then re-render")
 HARNESS_RE = re.compile(r"^\{prefix\}/([^/{}\s]+)/([^/{}\s]+)$")
+#: A `{{TOOL_ROOT}}<home>/<file>` citation, the shape `derive_kit_paths` reads (render-doc.sh:162).
+TOOL_ROOT_CITE_RE = re.compile(r"\{\{TOOL_ROOT\}\}([\w.-]+)/([\w.-]+)")
 #: A build slug, as `handoff.py render --build` takes it and a stand-in waiver row names it.
 SLUG_RE = re.compile(r"^[A-Za-z]+$")
 #: The rendered handoff's marker line; `handoff.py` reads this one pattern (TOOL-aOrientedCast-19).
@@ -595,3 +597,25 @@ def resolve_harness_path(tool_root, harness):
         return resolve_kit_dir(home, anchor, tool_root) / anchor, True
     except LookupError:
         return pathlib.Path(tool_root).absolute() / home / anchor, False
+
+
+def resolve_cited_paths(text, tool_root, target_root):
+    """`[(cite, rel)]` in first-seen order, one per distinct citation in text that `resolve_kit_dir`
+    holds, rel repo-relative; a citation it does not hold is not listed, so the caller's plain
+    prefix substitution answers it.
+
+    The resolver is the one `resolve_harness_path` calls, so a rendered page names a harness where
+    the role index lists it (TOOL-dRenderedAnchor-2). A held path outside target_root is not listed
+    either: the line it would print could not be repo-relative."""
+    found, seen = [], set()
+    for m in TOOL_ROOT_CITE_RE.finditer(text):
+        if m.group(0) in seen:
+            continue
+        seen.add(m.group(0))
+        try:
+            path = (resolve_kit_dir(m.group(1), m.group(2), tool_root) / m.group(2)).relative_to(
+                pathlib.Path(target_root).absolute())
+        except (LookupError, ValueError):
+            continue
+        found.append((m.group(0), path.as_posix()))
+    return found

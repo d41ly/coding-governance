@@ -25,6 +25,19 @@ Python side still excluded left a file under no cap at all.
 Here, `tools/memory-tree/SPEC-TEMPLATE.template.md` described a nine-section canon while the
 installed copy and the gate had required ten for four days. Nothing connected them.
 
+TOOL-dRenderedAnchor-1 changed the rule for an absent harness in the role render's docstring, the
+roles README and `help/roles.md`, while `memory/map/features/roles.md`, the dossier claiming
+`tools/roles/**`, still called such a harness a note, not a defect (its closing review round 1, L4,
+id 11). TOOL-dRenderedAnchor-2 rewrote the map's rule in the same diff as the rule's final form. No
+gate here compares a dossier's stated rule with the code it claims.
+
+The same unit's `MISPLACED_LINE` said the harness `is installed`, and its comment and the help page
+said `kit directory`, while the scan matched any directory under the tool root by file name alone
+(L5, id 12). TOOL-dRenderedAnchor-2 wrote the predicate it ships, a file beside the harness's
+template or a `kit.toml` declaring its home, into the line, its comment, the docstring, the README
+and the help page together. No selftest matches the line's text, so no gate holds the wording to
+the scan.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

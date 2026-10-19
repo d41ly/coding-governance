@@ -20,14 +20,16 @@
 # agent lines and one returned line, and a prompt opening with a blank line still matching (arm 9);
 # the stand-in render's refusal, R15 both ways and over eight bad rows, R13, R14 and R0 (arm 10);
 # the roles kit's reading of a prompt's marker line and of the charter's micro-format fence
-# against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does); and a `--scaffold` whose
-# agent render refuses, which exits 1 naming the refusal and writes no Skill (arm 13). Every arm is a
-# self-contained block below the prologue, so a slice of the prologue and one
-# block runs that arm alone.
+# against the hooks kit's own (arm 11, which SKIPs out loud as arm 6 does); a `--scaffold` whose
+# agent render refuses, which exits 1 naming the refusal and writes no Skill (arm 13); and the cited
+# harnesses moved into a renamed directory behind `rendered` receipt rows, which the Skill then names
+# there (arm 14). Every arm is a self-contained block below the prologue, so a slice of the prologue
+# and one block runs that arm alone.
 #
-# WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS, which the catalogue checker
-# and the renderer's own self-test grade; the `--scaffold` restart notice's wording; or an adopter run
-# at another install prefix, since the fixture mirrors this repository's own. Arm 11 does not
+# WHAT THIS DOES NOT CHECK: what the rendered Skill or an agent type SAYS beyond arm 14's harness
+# paths, which the catalogue checker and the renderer's own self-test grade; the `--scaffold`
+# restart notice's wording; or an adopter run at another install prefix, since the fixture mirrors
+# this repository's own. Arm 14 does not check a citation that is no harness. Arm 11 does not
 # compare a refusal's wording, any marker field beyond the whole line, or any micro-format head but
 # `agent` and `returned`. Arm 13 does not check which rule refused: any non-zero exit of the agent
 # render takes the same branch, so it grades the adopter's handling of a refusal, and R10 only as
@@ -63,8 +65,8 @@ trap 'rm -rf "$TMP_ROOT"' EXIT
 # for arm 10 (TOOL-aOrientedCast-25); arm 11 is out of the floor, as arm 6 is. +1 for arm 6's named
 # spawn and +4 for arm 12 (TOOL-aOrientedCast-27): arm 6's one floored assertion is taken back off the
 # floor by the SKIP that announces the arm unrun, so a skip still cannot red it.
-# +2 for arm 13 (TOOL-dRedressedBar-6).
-FLOOR_ASSERTIONS=40
+# +2 for arm 13 (TOOL-dRedressedBar-6). +3 for arm 14 (TOOL-dRenderedAnchor-2).
+FLOOR_ASSERTIONS=43
 n=0; fail=0
 check_arm() { n=$((n+1)); if [ "$2" = 1 ]; then echo "ok   $1"; else echo "FAIL $1"; fail=$((fail+1)); fi; }
 FX=""
@@ -497,6 +499,57 @@ check_arm "arm 13 a refused agent render stops the scaffold, naming the refusal,
    "$([ "$rc" = 1 ] \
       && [[ $out == *'roles: the agent render refused, so nothing more was written — fix what it named and re-run'* ]] \
       && [[ $out == *'{{UNKNOWN_TOKEN}}'* ]] && [ ! -e "$FX/.claude/skills/build/SKILL.md" ] && echo 1 || echo 0)"
+
+# ---- arm 14: the Skill names each cited harness where the install holds it ----------------------
+# TOOL-dRenderedAnchor-2 S12: the shape govkit leaves when it lands a kit under its id rather than
+# its home. Each harness the template cites sits in a renamed directory behind one `rendered`
+# receipt row whose `source` is its template under the cited home, and `render_skill` resolves each
+# citation through the kit resolver before the plain `{{TOOL_ROOT}}` substitution. A cited harness is
+# a citation the workflow table names as a `workflow`-driver harness, so the homes and file names are
+# read from the template and the table, never typed. Red against an adopter with the citation pass
+# taken out, whose Skill names each harness under the home the template cites.
+build_fixture; check_arm "arm 14 the fixture scaffolds and checks clean" "$([ $? = 0 ] && run_adopter --check >/dev/null && echo 1 || echo 0)"
+A14=$("$PY" -B -c 'import json, pathlib, sys
+sys.path.insert(0, sys.argv[1])
+import roles_lib
+fx, krel = pathlib.Path(sys.argv[2]), sys.argv[3]
+tool = pathlib.PurePosixPath(krel).parent
+table = set()
+for w in roles_lib.load_workflows(fx / krel):
+    m = roles_lib.HARNESS_RE.match(w.get("harness") or "") if w.get("driver") == "workflow" else None
+    if m:
+        table.add(m.groups())
+text = (fx / krel / "SKILL.template.md").read_text(encoding="utf-8")
+rows, said = [], []
+for m in roles_lib.TOOL_ROOT_CITE_RE.finditer(text):
+    home, name = m.groups()
+    held = tool / "renamed" / name
+    if m.groups() not in table or held.as_posix() in said:
+        continue
+    (fx / held).parent.mkdir(parents=True, exist_ok=True)
+    (fx / held).write_text("// harness\n", encoding="utf-8")
+    stem, ext = name.rsplit(".", 1)
+    rows.append({"role": "rendered", "kit": "fixture", "path": held.as_posix(),
+                 "source": (tool / home / ("%s.template.%s" % (stem, ext))).as_posix()})
+    said += [held.as_posix(), (tool / home / name).as_posix()]
+(fx / ".governance").mkdir(exist_ok=True)
+(fx / ".governance" / "install.json").write_text(json.dumps({"files": rows}), encoding="utf-8")
+sys.stdout.buffer.write("\n".join(said).encode("utf-8"))' "$HERE" "$FX" "$KREL")
+out=$(run_adopter --scaffold); rc=$?
+mapfile -t _a14 <<< "${A14//$'\r'/}"
+_ok=1; _i=0
+while [ "$_i" -lt "${#_a14[@]}" ]; do
+  [ -n "${_a14[$_i]}" ] || { _ok=0; break; }
+  grep -qF -- "${_a14[$_i]}" "$FX/.claude/skills/build/SKILL.md" || _ok=0
+  grep -qF -- "${_a14[$((_i+1))]:-x}" "$FX/.claude/skills/build/SKILL.md" && _ok=0
+  _i=$((_i+2))
+done
+check_arm "arm 14 a --scaffold names each cited harness under the renamed directory, and none under its cited home" \
+   "$([ "$rc" = 0 ] && [ "$_i" -ge 2 ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+out=$(run_adopter --check); rc=$?
+check_arm "arm 14 ...and --check over that install exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
+[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

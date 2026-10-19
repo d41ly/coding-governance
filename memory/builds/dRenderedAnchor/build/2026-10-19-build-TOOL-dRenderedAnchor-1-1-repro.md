@@ -77,3 +77,12 @@ file names the template it was rendered from, so the resolver's receipt step, ke
 `<home>/<anchor>` in `source`, cannot see any rendered anchor. The resolver's probe step then misses
 too, because the directory is renamed. Any caller passing a rendered anchor fails the same way; the
 role render is the only one today.
+
+**TOOL-dRenderedAnchor-2, a correction.** The last sentence counted literal calls only. The citation
+resolver `derive_kit_paths`, canonical in `tools/lib/render-doc.sh` and carried inline by the
+memory-tree adopter and its dogfood parity suite, passes every `{{TOOL_ROOT}}<home>/<file>` citation
+of the templates it renders as an anchor, so `BUILD-METHOD.template.md`'s harness citations are
+rendered anchors. `WF_DIR` in `tools/check-kit-versions.sh` passes `tier2-review.js`, one too. Both
+reach the resolver with rendered anchors, and the full callers table is section 4 of
+[TOOL-dRenderedAnchor-2's spec](../spec/2026-10-19-spec-TOOL-dRenderedAnchor-2.md). The text above
+is left as measured.

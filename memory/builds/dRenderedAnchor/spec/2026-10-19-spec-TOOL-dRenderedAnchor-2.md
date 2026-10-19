@@ -1,11 +1,12 @@
 # TOOL-dRenderedAnchor-2 — unit 1's closing-review findings closed as one batch, and the /build Skill's harness citations resolved like the role index
 
-**Status:** INPROGRESS · rev-1 · 2026-10-19 · node d · Tier-2 · base 2f7a67b0 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-10-19 · node d · Tier-2 · base 2f7a67b0 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-19-build-TOOL-dRenderedAnchor-2-1-acceptance-ledger.md](../build/2026-10-19-build-TOOL-dRenderedAnchor-2-1-acceptance-ledger.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-2-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-2-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
