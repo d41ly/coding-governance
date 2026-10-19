@@ -13411,6 +13411,861 @@ D.sub("- **The systems record:** `workflow` is dBoundRoles' namespace and `lens`
 D.save()
 ````
 
+### `write_questions_w1.py`
+
+The night pass two's first research wave: points 1 to 3, each question quoting its point verbatim.
+
+````python
+"""Write the night pass two's first research wave: five questions, each quoting its point of the owner's message
+verbatim from `point-<n>.txt`, for `handoff.py render --input question=...`.
+
+Usage: python -X utf8 write_questions_w1.py <night2-dir>
+Writes q-p1-design.md, q-p1-prior-art.md, q-p2-apply.md, q-p3-current.md and q-p3-prior-art.md there.
+"""
+import pathlib
+import sys
+
+N = pathlib.Path(sys.argv[1])
+pt = {k: (N / f"point-{k}.txt").read_text(encoding="utf-8").strip() for k in range(1, 8)}
+V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+
+
+def quote(text):
+    return "\n".join("> " + ln if ln.strip() else ">" for ln in text.split("\n"))
+
+
+CONTEXT = (
+    "**Context.** dClosedLoop is a design-only build that re-architects gov (coding-governance), a kit set that ships "
+    "project-agnostic governance to repositories that adopt it, gov's own repository among them. Its converged design "
+    f"is architecture v2 (`{V2}`), at `e1a54ac67` on this branch, with layer records beside it under "
+    "`memory/builds/dClosedLoop/build/`, each section cited as `[tag]`. The owner has stepped away for the night and "
+    "handed over seven review points, to be worked one after another while the session runs unattended; the owner "
+    "decides every fork on return. This question serves point {n}, in the owner's words:\n\n{quote}\n")
+BOUNDS = (
+    "**Bounds.** Write nothing in this repository; a probe works on a copy under the system temp root, deleted when you "
+    "finish. Cite every claim about the records as `<record> [<tag>]` and every claim about code as `path:line`, quote "
+    "commands and their outputs as measured, and say where a source is ambiguous. Another agent may be reading this "
+    "tree while you work: modify nothing in it.")
+
+FA = (
+    "**Handed facts.** Settled; act on them as given. The owner's answers to the flow and roles adoption forks "
+    "(`build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md` `[answers]` and `[folded]`): a repository's own "
+    "items, roles, workflows, lenses and legs live in its one overlay, `.governance/instructions.toml`, in each kind's "
+    "shipped schema, tagged with a `repo` segment (FA-1); a gov row changes only by a pinned field patch, a pinned "
+    "replacement or exclusion, and a semantic change re-applies the patch and files an order (FA-2); a repository may "
+    "insert a stage of its own between two adjacent gov stages, P20 amended (FA-3); a repository role may act in a gov "
+    "item through a pinned patch of its actor (FA-4); a patch may widen an open field, every widening reported (FA-5); "
+    "effort and model are `roles.effort.*` and `roles.model.*` keys and the gate grant a role field (FA-6); and a build "
+    "moves to a new composition at its next step boundary (FA-7). The shapes registry's kinds are single, per-unit, "
+    "panel, twin and experiment, each workflow's agent cap bounded by agent-cap's `FANOUT_CAP`; a review run's lenses "
+    "fill five slots from a catalogue that becomes data.")
+
+Q = {}
+Q["q-p1-design.md"] = CONTEXT.format(n=1, quote=quote(pt[1])) + "\n" + FA + """
+
+Three researchers serve this point and the next; yours is THE CONVERGED DESIGN. Another covers prior art outside gov.
+
+**Your question.** What does the converged design already let gov, a repository or the runtime do toward what the
+owner calls scenarios, and what is missing for one cohesive method?
+1. **A scenario declared:** a named variant of the flow, saying which stages, items, order, roles, workflow shapes,
+   lenses, legs and policy values it runs. Which existing parts already act as one or carry part of one: the entry-point
+   table, playbooks and `repeat`, presets, the repository stages FA-3 settled, routes, `review.breakpoints`, the
+   shapes registry, the lens catalogue, the leg packs. Cite each.
+2. **Selection:** who or what picks one or several scenarios for a build from the work it drives (the orientation
+   scout's placement, the planner, triage, a policy value), when, with what witness, and how a wrong pick is caught.
+3. **Pipelines:** scenarios composed in order or in parallel, within one build or across builds (`after`, child or
+   patch builds, dependencies), and what the transition tables and the position engine need for it.
+4. **Adaptation on the fly:** a build's own flow changed mid-build for an edge case (steps in another order, a role
+   added and inserted), then recorded and promoted to a reusable scenario. What the design allows today (FA-1 to FA-7,
+   playbook promotion, the re-design inventory, supersede), and what it refuses.
+5. **A pre-shipped set:** which scenarios gov itself should ship, judged from the records' own build kinds (features,
+   amendments, patch builds, playbook runs, design-only builds such as this one) and the expansions.
+6. **Workflow shapes:** a single agent, parallel agents, one step, two or more steps, mixed roles, variable agent caps:
+   which the registry's kinds and fields express, which they cannot, and where caps are set and enforced.
+7. **Lenses:** what adding or removing one takes once the catalogue is data.
+8. **Cohesion:** do the answers to 1 to 7 meet in one mechanism, or several that overlap?
+
+**Return**, in this order:
+- the decided list, every item cited;
+- the undecided list, each with the record evidence that nothing decides it;
+- contradictions between records, if any;
+- candidates for one cohesive method, each with its mechanism, the smallest test that would make it LOSE and that
+  test's result against the records;
+- your pick, and what it leaves undecided.
+
+""" + BOUNDS
+Q["q-p1-prior-art.md"] = CONTEXT.format(n=1, quote=quote(pt[1])) + "\n" + FA + """
+
+Two researchers serve this point; yours is PRIOR ART OUTSIDE GOV. Another covers the converged design.
+
+**Your question.** How do systems that run a default process let their users define variants of it (the owner's
+scenarios), pick one or several per piece of work, compose them into pipelines, adapt one on the fly and record the
+adaptation for reuse, and reshape the workers that run it?
+1. Find the mechanism families, plural and differing in mechanism. Look at least at: adaptive case management (CMMN's
+   stages, discretionary tasks and sentries; Camunda or Flowable); configurable or variant process models in BPMN;
+   workflow engines with dynamic structure (Temporal child workflows and versioning, Airflow dynamic task mapping, Argo
+   or Prefect); CI pipelines with templates, matrices and conditional stages (GitHub Actions reusable workflows and
+   `strategy.matrix`, GitLab `rules` and `include`, Azure stage templates); agent frameworks (LangGraph subgraphs,
+   conditional edges and `Send`, CrewAI Flows with routers and crews, AutoGen's GraphFlow and Swarm, the OpenAI Agents
+   SDK's handoffs, the Claude Agent SDK's subagents); runbook and playbook systems; and process mining that turns
+   recorded runs into models.
+2. For each family: how a variant is declared; how one is chosen for a piece of work, by whom, and how a wrong choice
+   surfaces; how variants compose into pipelines; how an on-the-fly change is made, recorded and promoted; how worker
+   shapes vary (one agent, parallel agents, single or multi-step, mixed roles, caps); and what keeps the whole coherent.
+3. Map the families onto gov's target (the handed facts): for each, the scenarios it loses: an edge case needing steps
+   reordered and a role inserted; work that fits two scenarios at once; a mid-build adaptation nobody records; a
+   recorded adaptation promoted that breaks the builds already using it; a variant that bypasses a gate gov requires.
+
+**Return**, in this order:
+- each family: its mechanism, two or more real systems with a source (URL and the date you read it), and points 2
+  and 3;
+- candidates for gov, a single family or a combination, each with the smallest scenario that would make it LOSE and
+  how it fares;
+- your pick, and the scenario it handles worst.
+
+""" + BOUNDS.replace("Cite every claim about the records", "Cite every claim about an outside system to its source; "
+                     "cite every claim about the records")
+Q["q-p2-apply.md"] = CONTEXT.format(n=2, quote=quote(pt[2])) + """
+**Handed facts.** The owner's `origin/main` is at `a60b0c7dc`, fetched into this worktree. Read aScoutedSeam's
+records with `git show origin/main:<path>`. Its session handoff,
+`memory/builds/aScoutedSeam/prompts/2026-10-19-prompt-DEPL-aScoutedSeam-1-1-session.md`, names the reading order:
+`memory/builds/aScoutedSeam/build/2026-10-19-build-TOOL-aScoutedSeam-3-3-agent-prompt-principles.md` (P1 to P13, each
+MEASURED or TRANSFER, a skeleton, a procedure, a measurement method and limits), then `...-3-2-workflow-design-set.md`,
+`...-1-11-prompt-method.md`, and the prompt texts as code in `...-1-10-d1v2.py` (`render_question`, `extract_units`)
+and `...-1-13-system.py` (`render_orient_question`, `ORIENT_STEPS`, `WIRING`). v2 already cites an earlier stage of
+aScoutedSeam: the reuse scout as one M1c scout with the house index handed first, the `experiment` shape kind, and its
+benchmark landing at dFairHearing.
+
+You are the one researcher on this point.
+
+**Your question.** Apply aScoutedSeam's measured principles to gov's target flow and roles, as its handoff asks of
+the development flow it reaches, and say what the design should adopt.
+1. **Inventory** every agent call in the target flow: each role item of the step programs (flow-steps), each cycle role,
+   the review panel's stages, research, orientation and the prompt writer. For each: step, role, input, output, the
+   step that reads the output, and effort (v2, the shapes registry, the systems round's RS-2).
+2. **Classify** each call's question as coverage, creation or single-item judgement, with the principles that apply.
+3. **Listers:** for each coverage call, the deterministic lister that can supply its population, in gov today or in the
+   design, or "none" with what you searched.
+4. **Edges:** for each edge between steps, what the earlier step commits to and the rows the later step must answer
+   about it (used, bypassed or not applicable, or the flow's equivalent), and whether the design's typed returns and
+   work orders carry it today. The handoff calls this the largest measured gain; give it priority.
+5. **The shape:** the best-performing workflow shape aScoutedSeam measured, mapped onto the shapes registry's kinds,
+   and what in v2 is stale against the new results.
+6. **Ranked changes:** the prompt and shape changes this implies, each tied to its principle, and a measurement plan for
+   the top one or two before any broad rollout: cases with objective evidence, a frozen held-out set, one variable per
+   arm, a blind judge.
+
+**Ground rules.** Re-verify every figure against aScoutedSeam's records before relying on it. Keep MEASURED apart from
+TRANSFER: only reuse finding was measured, and applying a principle to another kind of step is a hypothesis to measure.
+Never edit aScoutedSeam's records; cite them.
+
+**Return**, in this order: the inventory table; the classification; the listers; the edge table; the shape mapping
+and what is stale; the ranked changes with the measurement plan; and what the design should adopt now, as against what
+waits on measurement.
+
+""" + BOUNDS
+Q["q-p3-current.md"] = CONTEXT.format(n=3, quote=quote(pt[3])) + """
+**Handed facts.** The memory plan (`build/2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md`) makes memory and
+instruction one graph: every piece a node with an address (tag, section or native id), every relation a typed edge
+declared once at the site that owns its fact, one derived index per tree at `<git-common-dir>/gov/index/<tree>.json`,
+one resolver (`gov tag show|where|refs|bundle`), and doors as the only writers. Coordination between sessions and
+nodes runs through leases, claims, act bindings and a mailbox on refs (dPlacedRequest, dKeptSession,
+dWellOiledMachine). Witnesses are computed from history (P2), the verdict is local-first (P3), and every record names
+its cause (P35).
+
+Two researchers serve this point; yours is TODAY AND THE DESIGN, MEASURED. Another covers prior art outside gov.
+
+**Your question.** Is plaintext and markdown the right storage for instruction and memory data at the scale of a large
+adopting repository, and is the designed coordination fast enough for several nodes on one build?
+1. **Today, measured:** the instruction and memory data's formats (markdown records, TOML and JSON registries, git
+   refs), counts and bytes by kind from `git ls-files`, growth over the last 30 days from `git log`, how each tool reads
+   them (time `gen_build_index.py`, `gotchas.py --for-diff`, memory-recall's query and the design map over this tree),
+   and where relations live today (citations, tags, Serves lines, ids).
+2. **The design, projected:** the index's size, rebuild cost and query cost, extrapolated to an adopter with 10x and
+   100x today's records, with the extrapolation's basis stated.
+3. **Coordination, measured:** what a message, a lease or a claim costs as designed (git round trips, refs written,
+   fetch latency), using read-only probes only (`git ls-remote`, timing a fetch); what is real-time and what is not;
+   how a node learns of another's completed work, decision or problem, and how late.
+4. **Where it breaks:** each point where the current or designed storage or coordination fails at scale, with
+   evidence.
+
+**Return**, in this order: the measured tables, each with its command; the projections; the coordination
+measurements; the breaking points; candidates (markdown with a derived index as designed, a derived embedded database
+such as SQLite as a cache, a committed database file, a cloud relational database, a sync service), each with the
+smallest test that would make it LOSE against the measured facts; and your pick, and what it leaves open.
+
+""" + BOUNDS + " Never push or write a ref on a remote; a read-only `git ls-remote` or `git fetch` into a scratch clone is the limit."
+Q["q-p3-prior-art.md"] = CONTEXT.format(n=3, quote=quote(pt[3])) + """
+**Handed facts.** As the other researcher on this point was told: the memory plan makes memory and instruction one
+graph of addressed nodes and typed edges, with one derived index per tree and doors as the only writers; sessions and
+nodes coordinate through leases, claims, act bindings and a mailbox on git refs; witnesses are computed from history
+(P2), the verdict is local-first (P3), and every record names its cause (P35). Adopters' repositories are of any size;
+nodes are intermittently online; secrets never live in files.
+
+Two researchers serve this point; yours is PRIOR ART OUTSIDE GOV. Another measures today's product and the design.
+
+**Your question.** For an agentic development system whose memory is a typed graph of records and instructions shared
+by several machines working one repository, which storage and coordination mechanisms fit, and which is the most
+agent-friendly?
+1. Find the families, plural and differing in mechanism. Look at least at: plain files in git with a derived index
+   (git itself, Fossil's SQLite store, git-backed databases such as Dolt or TerminusDB); embedded databases kept in sync
+   (SQLite with Litestream or LiteFS, cr-sqlite's CRDTs, ElectricSQL or PowerSync, libSQL embedded replicas); a cloud
+   relational database (Postgres with LISTEN and NOTIFY, Supabase realtime, Neon); message buses and event logs (NATS
+   JetStream, Redis streams, Kafka) and event sourcing; graph and agent memory systems (Zep and Graphiti's temporal
+   knowledge graph, Letta, mem0, Neo4j); agent-native access layers (MCP servers, A2A for agent messaging); and
+   git-native coordination (refs and notes as a bus: git-bug, git-appraise).
+2. For each family: how relations are kept consistent mechanically; local-first and offline behaviour; real-time
+   latency; conflict handling; agent-friendliness (whether an agent can read and verify it with ordinary tools, and at
+   what token cost); auditability and diffs in code review; the service an adopter must run and its credentials; cost.
+3. Map the families onto gov's constraints: a verdict computed locally (P3), witnesses from history (P2), records that
+   name their cause (P35), any repository size, nodes offline at times, no secrets in files. For each family, the
+   scenarios it loses: two nodes deciding at once; a node offline for a day; a large adopter's history; an agent that
+   must verify a fact without a service; an adopter that will not run a database.
+
+**Return**, in this order:
+- each family: its mechanism, two or more real systems with a source (URL and the date you read it), and points 2
+  and 3;
+- candidates for gov, a single family or a combination, each with the smallest scenario that would make it LOSE and
+  how it fares;
+- your pick, and the scenario it handles worst.
+
+""" + BOUNDS.replace("Cite every claim about the records", "Cite every claim about an outside system to its source; "
+                     "cite every claim about the records")
+for name, text in Q.items():
+    (N / name).write_text(text.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
+    print(name, len(text))
+````
+
+### `write_questions_w2.py`
+
+The second wave: points 4 to 7.
+
+````python
+"""Write the night pass two's second research wave: points 4 to 7, five questions, each quoting its point verbatim.
+
+Usage: python -X utf8 write_questions_w2.py <night2-dir>
+Writes q-p4-design.md, q-p4-prior-art.md, q-p5-caps.md, q-p6-gotchas.md and q-p7-agent-cap.md there.
+"""
+import pathlib
+import sys
+
+N = pathlib.Path(sys.argv[1])
+pt = {k: (N / f"point-{k}.txt").read_text(encoding="utf-8").strip() for k in range(1, 8)}
+V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+
+
+def quote(text):
+    return "\n".join("> " + ln if ln.strip() else ">" for ln in text.split("\n"))
+
+
+CONTEXT = (
+    "**Context.** dClosedLoop is a design-only build that re-architects gov (coding-governance), a kit set that ships "
+    "project-agnostic governance to repositories that adopt it, gov's own repository among them. Its converged design "
+    f"is architecture v2 (`{V2}`), at `e1a54ac67` on this branch, with layer records beside it under "
+    "`memory/builds/dClosedLoop/build/`, each section cited as `[tag]`. The owner has stepped away for the night and "
+    "handed over seven review points, to be worked one after another while the session runs unattended; the owner "
+    "decides every fork on return. This question serves point {n}, in the owner's words:\n\n{quote}\n")
+BOUNDS = (
+    "**Bounds.** Write nothing in this repository; a probe works on a copy under the system temp root, deleted when you "
+    "finish. Cite every claim about the records as `<record> [<tag>]` and every claim about code as `path:line`, quote "
+    "commands and their outputs as measured, and say where a source is ambiguous. Another agent may be reading this "
+    "tree while you work: modify nothing in it.")
+OUTSIDE = BOUNDS.replace("Cite every claim about the records", "Cite every claim about an outside system to its "
+                         "source (URL and the date you read it); cite every claim about the records")
+P7 = (
+    "aScoutedSeam's measured finding, on the owner's `origin/main` (`memory/builds/aScoutedSeam/build/"
+    "2026-10-19-build-TOOL-aScoutedSeam-3-3-agent-prompt-principles.md`, its P7): when one step commits to something, the "
+    "next step receives it as rows to answer, `{item, used|bypassed|not-applicable, why}`, never as prose. Handing the "
+    "diff check the orientation scout's MUST seams as such rows took it from 13 to 20 of 23 cases, the largest gain the "
+    "build measured; other edges are a hypothesis to measure.")
+
+Q = {}
+Q["q-p4-design.md"] = CONTEXT.format(n=4, quote=quote(pt[4])) + f"""
+The owner's point 3, which this point continues, asks how nodes on one build "coordinate and update each other on
+completed work, decisions taken, problems encountered in real time", and calls the mailbox "not a long-term solution".
+
+**Handed facts.** Settled; act on them as given. In v2 a role acts on a work order rendered per item (its item, inputs
+as record fields at their SHAs, allowance, return template and witness), hashed into the spawn marker and bound to its
+act (dBoundRoles); the prompt writer composes every role's task from the driver's details; a return arrives through a
+schema-forced channel and names the work order it `answers`; witnesses are computed, never typed (P2); every record
+names its cause (P35); the card, session bindings, act records, a mailbox on refs, leases and claims carry state
+between sessions and nodes (dPlacedRequest, dKeptSession, dWellOiledMachine); and the compact and resume hooks
+re-inject the card and the map. {P7}
+
+Two researchers serve this point; yours is THE CONVERGED DESIGN. Another covers prior art outside gov.
+
+**Your question.** Is there one handoff system in the design, between agents and between sessions, and is it good
+enough for the work the owner describes?
+1. **Agent to agent, inside an item's cycle:** the driver, the prompt writer, the role, its return, the witness and the
+   next work order. What data moves, in what shape, typed how, checked by whom, and what is lost.
+2. **Item to item and step to step:** what an earlier item commits to, and how the next item receives it: as rows to
+   answer, as record fields at SHAs, or as prose. Which edges of the flow-steps programs carry commitments today.
+3. **Session to session on one build:** resume, compaction, two sessions on different units of one build, and a hand-off
+   to another session (`gov-session`). What each session learns of the others' completed work, decisions and problems,
+   through what, and how late.
+4. **Node to node:** the same for sessions on different machines: what propagates, by what mechanism, with what latency
+   and what failure modes.
+5. **Gaps and contradictions** between the records on any of 1 to 4.
+
+**Return**, in this order: a walk of one build's hand-offs end to end, each hop with its payload, its type, its
+checker and its record; the gaps and contradictions, cited; candidates for one handoff system, each with its mechanism,
+the smallest test that would make it LOSE and that test's result against the records; and your pick, and what it
+leaves open.
+
+""" + BOUNDS
+Q["q-p4-prior-art.md"] = CONTEXT.format(n=4, quote=quote(pt[4])) + f"""
+**Handed facts.** In gov's target, a role acts on a typed work order rendered per item and returns through a
+schema-forced channel; witnesses are computed, never typed; every record names its cause; sessions and nodes share
+state through a card, session bindings, act records, a mailbox on refs, leases and claims. {P7}
+
+Two researchers serve this point; yours is PRIOR ART OUTSIDE GOV. Another walks the converged design.
+
+**Your question.** How do multi-agent systems shape and pass data between agents, and between sessions or runs working
+on pieces of one job, and how do they catch a hand-off that lost or bent information?
+1. Find the families, plural and differing in mechanism. Look at least at: the OpenAI Agents SDK's handoffs and
+   context; LangGraph's shared state, reducers, checkpointers and cross-thread store; CrewAI's task context and typed
+   outputs; AutoGen's messages and saved team state; the A2A protocol's tasks, messages and artifacts; MCP resources;
+   the Claude Agent SDK's subagents and structured outputs; Temporal's workflow state, signals and queries; blackboard
+   architectures; issue trackers as the hand-off medium in agentic coding tools; and the research on how multi-agent
+   systems fail at hand-offs (for example the MAST taxonomy of "Why Do Multi-Agent LLM Systems Fail?").
+2. For each family: the payload's shape and typing; what the receiver must acknowledge or answer; persistence across
+   sessions and machines; latency; and how a lost, withheld or misread item is detected.
+3. Map the families onto gov's target (the handed facts): for each, the scenarios it loses: a commitment the next step
+   silently drops; two sessions on one build that each decide the same question differently; a problem found on one
+   node that another node walks into an hour later; a session resumed after compaction that redoes finished work.
+
+**Return**, in this order:
+- each family: its mechanism, two or more real systems or papers with a source, and points 2 and 3;
+- candidates for gov, a single family or a combination, each with the smallest scenario that would make it LOSE and
+  how it fares;
+- your pick, and the scenario it handles worst.
+
+""" + OUTSIDE
+Q["q-p5-caps.md"] = CONTEXT.format(n=5, quote=quote(pt[5])) + """
+**Handed facts.** v2 carries `budgets.*` keys whose presets read "every cap soft", "each cap's evidence-derived mode"
+and "every cap hard" (`[presets]`), principle P9 (measured weight: a value ledger prices gates, rules and caps), and the
+adopter-instructions design's render budget, which refuses an over-budget render naming the largest contributors. The
+charter's `[cost]` and the build README's slot contract are caps gov enforces today.
+
+You are the one researcher on this point.
+
+**Your question.** Which hard caps on instructions and records does gov enforce, what have they cost, and what should
+replace them?
+1. **Inventory, derived:** every cap on a document's or a record's size, lines, rows or bytes that a gate, hook or
+   renderer enforces today: the charter, methods, protocols, prompts and role bodies, the build README, help pages,
+   records, registries and indexes. For each: the cap, the enforcer (`path:line`), its mode (refuse, warn, record), and
+   whether a policy value or a constant sets it. Derive the population by searching the enforcers, never by recall.
+2. **History, measured:** how often each cap blocked a commit or a build and how often it was raised or relaxed, from
+   `git log` (its subjects, `-S` on the constants, and the records that cite a cap), with the commits cited.
+3. **The design's plan:** what v2 and its layer records decide for caps (`budgets.*`, the render budget, P9, the value
+   ledger, the level-0 map's byte budget), and what already defaults to advisory.
+4. **Prior art:** how other systems keep budgets advisory yet effective: performance budgets in Lighthouse CI,
+   `size-limit` or `bundlesize` with warn and error levels; ESLint's severities and `max-lines`; ratchets such as
+   betterer; and guidance on prompt and context length for agents. Cite each source with its URL and date.
+5. **The owner's direction:** remove every hard cap and make caps advisory, owner-defined limits kept, one enforcing
+   switch defaulting to warn. Test it: what does a cap still need in order to bite, such as being visible, priced and
+   trended, and where would an advisory cap fail?
+
+**Return**, in this order: the inventory table; the history table; the design's plan, cited; the prior-art families;
+candidates for the owner's direction and anything better, each with the smallest test that would make it LOSE and
+that test's result; and your pick.
+
+""" + OUTSIDE
+Q["q-p6-gotchas.md"] = CONTEXT.format(n=6, quote=quote(pt[6])) + """
+**Handed facts.** Today `tools/memory-tree/gotchas.py` files bug classes under `memory/gotchas/`, each with anchors, and
+`--for-diff <base>..<head>` or `--for-paths` selects the classes a diff or a path set can hit, with six universal
+classes always selected. In v2 bug classes are core on memory's library side (dLinkedLibrary), dFurnishedOrders hands
+them to work orders through `gotchas.py --for-paths` (SA-7), and `review.left-shift` turns findings into classes or
+gates. The register's `gap-review-10` records that most confirmed review findings carry no class.
+
+You are the one researcher on this point.
+
+**Your question.** Does gov's bug-class lookup serve the right class at the right moment, and if not, what shape would,
+or should it retire?
+1. **How it selects today:** the anchors, their specificity tiers, the universal set, and its callers, cited.
+2. **Measured on gov's history:** for the closed Tier-2 reviews whose appendices carry a classes column, compute what
+   `--for-diff` would have selected for each reviewed range (run it at those commits in a scratch clone), and compare
+   with the classes of the findings confirmed: hits, misses, and noise (selected and never relevant). Count how many
+   classes exist, how many ever matched a confirmed finding, and how often sessions call the lookup, from the session
+   logs and records.
+3. **Where a gotcha bites:** for a sample of confirmed findings with a class, the moment the mistake was made (an edit
+   to which kind of file, which command, which operation), and whether any input available at that moment could have
+   selected the class.
+4. **Alternatives:** serving a class just in time when an agent is about to perform the risky operation (a PreToolUse
+   hook matching the class's trigger), the orientation scout handing selected classes in the work order, the runtime
+   injecting them per act, converting classes into gates and retiring the lookup, or retiring it outright. Include prior
+   art: path-scoped rules (Cursor rules' globs, Copilot's `applyTo`, Claude Code's path-scoped rules), linters and
+   Semgrep rules, and lessons-learned systems. Cite each outside source with its URL and date.
+
+**Return**, in this order: the selection mechanics; the measured table of hits, misses and noise per review, with the
+commands; the moment-of-mistake sample; the candidates, including retirement, each with the smallest test that would
+make it LOSE and that test's result; and your pick.
+
+""" + OUTSIDE
+Q["q-p7-agent-cap.md"] = CONTEXT.format(n=7, quote=quote(pt[7])) + """
+**Handed facts.** v2 bounds a workflow's agent cap by agent-cap's `FANOUT_CAP`; the register's `gap-rt-05` records that
+fan-out is bounded per prompt, not in flight; Runtime's supervisor tracks acts and their sessions (dWellOiledMachine);
+the shapes registry declares each workflow's fan and cap (dBoundRoles); and a review run's lenses fill five slots that
+agent-cap counts. A session note on this node says agent-cap gives each prompt five direct `Agent` spawns, a slot frees
+45 minutes after its claim, and task notifications have reset the budget: re-verify each claim, never act on it.
+
+You are the one researcher on this point.
+
+**Your question.** What does `tools/hooks/agent-cap.js` actually do, and what should replace it?
+1. **Inventory:** every rule agent-cap enforces, with `path:line`, what each protects, and the configuration it reads
+   (`.agent-cap.conf`, `FANOUT_CAP` and others).
+2. **Measured behaviour:** on a copy under the temp root, pipe synthetic `PreToolUse` payloads through it and show the
+   slot ledger's behaviour: per prompt or per window, the 45-minute expiry, what resets it, and what it never counts
+   (agents in flight, Workflow agents, background agents). Quote the commands and outputs.
+3. **Why per window:** whether a `PreToolUse` hook can know when an agent ends, and which hook events the harness
+   offers that could count agents in flight (for example `SubagentStart` and `SubagentStop`), from the harness's
+   documentation and this repository's own hook wiring.
+4. **The design:** where an owner-adjustable limit on agents in flight belongs: its policy key and owning build, its
+   enforcer (Runtime's supervisor, a hook pack, the harness's own settings), how it counts in flight reliably, and how
+   each of agent-cap's other rules moves elsewhere on retirement, such as the Workflow script checks, harness admission,
+   the spec-audit opt-in and the lens count.
+
+**Return**, in this order: the rule inventory; the measured ledger behaviour with commands; the hook events available,
+cited; candidates for the replacement, each with the smallest test that would make it LOSE and that test's result,
+measured where possible; the relocation of each rule; and your pick.
+
+""" + OUTSIDE
+for name, text in Q.items():
+    (N / name).write_text(text.rstrip("\n") + "\n", encoding="utf-8", newline="\n")
+    print(name, len(text))
+````
+
+### `start_record.py`
+
+Opens the night pass two's record with the owner's words, verbatim and whole.
+
+````python
+"""Open the night pass two's record: the owner's words, verbatim and whole, and how the pass runs. Later steps add the
+research table, a section per point, the chain's impact, the parked forks and the closing review.
+
+Usage: python -X utf8 start_record.py <night2-dir>   (from the worktree root); refuses to overwrite
+"""
+import pathlib
+import sys
+
+N = pathlib.Path(sys.argv[1])
+OUT = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+if OUT.exists():
+    sys.exit(f"{OUT} exists")
+words = (N / "owner-words-raw.txt").read_text(encoding="utf-8").rstrip("\n")
+quoted = "\n".join("> " + ln if ln.strip() else ">" for ln in words.split("\n"))
+text = f"""# The night pass two: the owner's seven points, worked unattended
+
+**Serves:** research PLAY-dClosedLoop-1
+
+While two review runs read the last three folds, the owner reviewed the Flow and Role layers' adoption piece, answered
+its forks, and then handed over seven points to be worked unattended through the night. This record holds the words,
+what the design held on each point, the research, the design worked in, and the forks parked for the owner's return.
+
+## [words] The owner's words, 2026-10-19
+
+{quoted}
+
+## [method] How the pass runs
+
+- **One point at a time.** Each point gets its own section: what the design already holds, what the research found,
+  the design worked in, and its forks. Research runs ahead in waves, since a point's design waits on its returns.
+- **Research.** Researchers run at the owner's medium effort, read-only, one question each. Each handoff is in
+  `prompts/`, and each return is saved verbatim beside this record. Agent-cap admits five direct spawns at a time, so
+  the questions go out in waves of at most five.
+- **Forks.** Each fork's first option is the recommendation. The design as folded shows the recommendation, marked
+  pending on its fork, as the first night pass did. The `NT` family numbers them.
+- **Reviews.** The night's folds are reviewed twice, as two independent Tier-2 runs compared defect by defect, and
+  the defects are folded before the report.
+- **Bounds.** No product code, no merge and no push, as the build's brief says; the design map and the atlas are
+  regenerated after each design change.
+"""
+OUT.write_text(text, encoding="utf-8", newline="\n")
+print(OUT, len(text))
+````
+
+### `fold_p1.py`
+
+Point 1, scenarios: the point's section, the research and fork tables, and the fold into v2 and eight layer records, pending NT-1 to NT-9.
+
+````python
+"""The night pass two, point 1: scenarios. Writes the point's section, the research table and the fork table into the
+night pass two's record, and folds the recommendation, marked pending on its forks, into v2, the foundations record,
+flow-steps, the review-system record, the systems record, the flow-roles adoption record, layer-roles, the memory plan
+and the gap register.
+
+Usage: python -X utf8 fold_p1.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+NP2 = "the night pass two"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("  the position engine and every render read the composition of gov's rows and the repository's (FA-1 to FA-7).\n",
+      "  the position engine and every render read the composition of gov's rows and the repository's (FA-1 to FA-7). A\n"
+      "  build's composition adds the scenarios it was placed under and its own recorded changes, pinned per step (the\n"
+      "  night pass two, pending NT-1).\n", "P8")
+rb = [ln for ln in V.text.split("\n") if ln.startswith("| `flow.route-backs` |")]
+if len(rb) != 2:
+    sys.exit(f"{len(rb)} flow.route-backs rows, two expected")
+V.sub(rb[0] + "\n", rb[0] + "\n"
+      "| `flow.scenario-default` | feature, amendment, patch, playbook-run, design-only, or a registered scenario | "
+      f"feature | {NP2}, point 1: the scenario a build runs when no scenario's admission predicate holds, pending NT-2 | "
+      "dDeclaredLoop |\n"
+      "| `flow.scenario-conflict` | refuse, declared-order | refuse | "
+      f"{NP2}, point 1: two placed scenarios setting one field differently, refused for the owner to order, or settled "
+      "by the repository's declared order and recorded, pending NT-7 | dDeclaredLoop |\n"
+      "| `flow.adapt` | additive-recorded, owner-approves, off | additive-recorded | "
+      f"{NP2}, point 1: who changes a build's own flow mid-build, a change that only adds applying unattended and "
+      "recorded under the default, pending NT-4 | dDeclaredLoop |\n"
+      "| `flow.promote` | loop-proposes, owner-only, off | loop-proposes | "
+      f"{NP2}, point 1: how a build's recorded change becomes a reusable scenario, pending NT-5 | dCalibratedLens |\n",
+      "catalogue: the flow keys")
+V.sub(rb[1] + "\n", rb[1] + "\n"
+      "| `flow.scenario-default` | feature | feature | feature | feature |\n"
+      "| `flow.scenario-conflict` | declared-order | refuse | refuse | refuse |\n"
+      "| `flow.adapt` | additive-recorded | additive-recorded | owner-approves | owner-approves |\n"
+      "| `flow.promote` | loop-proposes | loop-proposes | owner-only | loop-proposes |\n", "presets: the flow keys")
+add_clauses(V, "dDeclaredLoop", [
+    "the `scenario` kind in the kinds register and its namespace: gov's shipped scenarios, feature, amendment, patch, "
+    "playbook-run and design-only, and a repository's in its overlay, each naming the scenario it extends, its "
+    "admission predicate over a request's facts, its entry, and the rows of registered kinds it activates, each later "
+    "build admitting its own kind's rows, a build's composition being gov's packs, the repository's overlay, the "
+    "scenarios it was placed under in their declared order and its own recorded changes, pinned in its claim and in "
+    "each step's transition record, two scenarios setting one field differently resolved as `flow.scenario-conflict` "
+    "says, a switch of scenario only at a step boundary, in-build sequencing by a scenario naming the one that takes "
+    "over at a step's exit, and `flow.scenario-default` when none admits the request, seen on two builds pinned to "
+    "different scenarios positioned at once, red on a planted scenario that removes, reorders or replaces a gov stage, "
+    f"and red on two conflicting scenarios placed together ({NP2}, point 1, pending NT-1, NT-6 and NT-7)",
+    "a build's recorded changes: rows a role proposes for its own build, applied at its next step boundary as "
+    "`flow.adapt` says, a change that only adds items, roles, stages or stricter values applying unattended and "
+    "recorded, one that removes, reorders or loosens waiting for the owner while the build carries on under its pinned "
+    "composition, every change kept in the build folder, and at each step boundary the build's witnessed path compared "
+    "with its pinned composition, a deviation filing an order, seen on a planted unrecorded skip and a planted additive "
+    f"change ({NP2}, point 1, pending NT-4)"], ["gap-flow-20", "gap-flow-21"])
+add_clauses(V, "dPlacedRequest", [
+    "a build's scenarios chosen at `entry.place`: the orientation scout's return naming each scenario whose admission "
+    "predicate holds over the request's facts, with those facts, `placement.check` re-evaluating every predicate, and a "
+    "request no scenario admits placed under the default, seen red on a planted placement whose predicate fails "
+    f"({NP2}, point 1, pending NT-2)"], [])
+add_clauses(V, "dRankedPlan", [
+    "the plan record's scenario field, set from the placement and revisable by the planner at Plan with its reason, a "
+    f"later re-pick only at a step boundary through a plan revision ({NP2}, point 1, pending NT-2)"], [])
+add_clauses(V, "dKeptSession", [
+    "a scenario's preset slot: a named preset and overrides scoped to the builds placed under the scenario, read "
+    "through the one reader before the repository's own values, never a key presets never touch, seen on two builds "
+    f"under scenarios with different presets ({NP2}, point 1, pending NT-3)"], [])
+add_clauses(V, "dBoundRoles", [
+    "workflow entries as data: each entry's ordered stages, every stage naming its role, fan, cap, effort and the rows "
+    "it receives and returns, the five kinds kept as named defaults over them, a stage's cap at or under the "
+    "repository's agent limit, and a scenario's workflow entries and role rows composed per build, seen on a planted "
+    f"two-stage entry of mixed roles and red on a stage whose cap exceeds the limit ({NP2}, point 1, pending NT-8)"], [])
+add_clauses(V, "dCalibratedLens", [
+    "lens removal by a swap or by excluding a default lens, its slot then filled by an opt-in, a repository lens "
+    "recording a replay result when one ran and never owing one, and scenario promotion as `flow.promote` says: the "
+    "Loop Review proposing a scenario from a recorded change two or more builds carried, the owner ratifying it through "
+    "`instructions.edit` with `promoted-from` edges to those changes, builds in flight moving to it only at a step "
+    f"boundary and only if they comply ({NP2}, point 1, pending NT-5 and NT-9)"], ["gap-review-18"])
+V.save()
+
+# ---------------------------------------------------------------- the layer and systems records
+FD = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-foundations.md")
+FD.sub("- **C3. A closed set of extension kinds**: kit, command, instruction unit, policy key, preset, gate\n"
+       "  leg, role, workflow, hook, Skill, practice, record kind, stage, layer. Each lists the principles\n"
+       "  that bind it; a part of a kind nobody registered reds, so a new kind cannot appear outside the\n"
+       "  mechanism.\n",
+       "- **C3. A closed set of extension kinds**: kit, command, instruction unit, policy key, preset, gate\n"
+       "  leg, role, workflow, hook, Skill, practice, record kind, stage, layer, item, lens and scenario, the\n"
+       "  last three registered by the chain (item and lens by the flow and roles adoption, FA-1; scenario by\n"
+       "  the night pass two, pending NT-1; revised 2026-10-19). Each lists the principles that bind it; a part\n"
+       "  of a kind nobody registered reds, so a new kind cannot appear outside the mechanism.\n", "C3")
+FD.save()
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+FS.sub("- **Extension points:** lens packs, which `review.opt-in` fills by swapping a named default lens of a\n"
+       "  preset; an expansion's lens enters the harness's literal catalogue by an edit in its own build\n"
+       "  (review-system `[lenses]`); the value ledger (observability).",
+       "- **Extension points:** lens packs, which `review.opt-in` fills by swapping a named default lens of a\n"
+       "  preset; a lens, gov's, an expansion's or a repository's, is a catalogue row whose brief is a unit, and\n"
+       "  the harness fills its five slots from that data (the flow and roles adoption, FA-1; revised 2026-10-19,\n"
+       "  the night pass two); the value ledger (observability).", "breakpoint extension points")
+FS.save()
+RS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-review-system.md")
+RS.sub("    layer contract\" means a declared catalogue entry plus that edit.\n",
+       "    layer contract\" means a declared catalogue entry plus that edit. Revised 2026-10-19 (the flow and roles\n"
+       "    adoption, FA-1, and the night pass two): the catalogue is data, a lens is a catalogue row whose brief is a\n"
+       "    unit, and the harness keeps a five-slot literal filled from it, so the hook counts slots, never names; an\n"
+       "    expansion's or a repository's lens is a row, never an edit to the harness.\n", "lenses: the extension point")
+RS.save()
+Y = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("- **Kinds.** Four role harnesses registered at Runtime's role-harness point: `single`, `per-unit`,\n"
+      "  `panel` (finders, at most five skeptic batches, one synthesizer) and `twin` (two runs of one shape,\n"
+      "  merged).\n",
+      "- **Kinds.** Five role harnesses registered at Runtime's role-harness point: `single`, `per-unit`,\n"
+      "  `panel` (finders, at most five skeptic batches, one synthesizer), `twin` (two runs of one shape,\n"
+      "  merged) and `experiment` (the night pass's point 2). A workflow entry declares its ordered stages as\n"
+      "  data, each with its role, fan, cap, effort and the rows it receives and returns, and the five kinds are\n"
+      "  named defaults over them (revised 2026-10-19, the night pass two, pending NT-8).\n", "role shapes: kinds")
+Y.sub("repository adds beside gov's (the flow and roles adoption answers, FA-1). Each namespace is a row\n",
+      "repository adds beside gov's (the flow and roles adoption answers, FA-1), and `scenario`, the flow's named\n"
+      "  variants (the night pass two, pending NT-1). Each namespace is a row\n", "namespaces: scenario")
+Y.sub("  - dDeclaredLoop `step`, `item`, `policy` and `command`;\n",
+      "  - dDeclaredLoop `step`, `item`, `policy` and `command`, and, declared by the night pass two (pending NT-1),\n"
+      "    `scenario`;\n", "owners: scenario")
+Y.save()
+FA = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+FA.sub("   - The flow's frame: the five stages and their order, each level's transitions between stages, the terminal and\n"
+       "     disposition sets, and the position engine's answer set.\n",
+       "   - The flow's frame: the five stages and their order, each level's transitions between gov's stages except\n"
+       "     where a repository stage is spliced (FA-3, revised 2026-10-19), the terminal and disposition sets, and the\n"
+       "     position engine's answer set.\n", "item 9: the frame")
+FA.save()
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+LR.sub("  - no core item names an expansion role (P28).\n",
+       "  - no core item names an expansion role (P28).\n"
+       "  - Revised 2026-10-19 (the flow and roles adoption, FA-4, and the night pass two): a repository role is a\n"
+       "    declared item role of the composition, and every arm reads the composition, never gov's rows alone.\n",
+       "matrix: repository roles")
+LR.save()
+P = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+P.sub("| `promoted-from` | instruction unit → memory node | `instructions.edit`'s change record | `promoted-to` | new | "
+      "memory to instruction (no route today) |",
+      "| `promoted-from` | instruction unit → memory node; scenario → a build's recorded change | `instructions.edit`'s "
+      "change record | `promoted-to` | new; the scenario source added by the night pass two, pending NT-5 | memory to "
+      "instruction (no route today), and a build's adaptation to a reusable scenario |", "edges: promoted-from")
+P.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+NEW = {
+    "gap-flow-19": [
+        ("gap-flow-20", "Flow", "HIGH", "No unit names a variant of the flow: entry kinds, playbooks, presets, the "
+         "overlay, per-boundary policy sets and the shape and lens registries are six seams with no common selector, "
+         "every composition and policy value is repository-wide, and no build records what kind of work it is.",
+         "`research-scenarios-design.md`, its undecided items 1 to 3; `research-scenarios-prior-art.md`, candidate K1"),
+        ("gap-flow-21", "Flow", "MED", "A build cannot change its own flow mid-build: a structural change goes only "
+         "through the repository-wide overlay and moves every build, and no record keeps one build's adaptation.",
+         "`research-scenarios-design.md`, its undecided items 6 and 7; `research-scenarios-prior-art.md`, case E3")],
+    "gap-review-17": [
+        ("gap-review-18", "Review", "MED", "No route turns a build's adaptation into a reusable variant: "
+         "`promoted-from` covers only memory promoted to instruction, and the Loop Review proposes only retirements, "
+         "merges and caps.", "`research-scenarios-design.md`, its undecided item 5")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 322 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's point 1 added `gap-flow-20`, `gap-flow-21` and `gap-review-18`\n"
+    "(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p1-scenarios]`), same instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night pass two's record
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.text = R.text.rstrip("\n") + """
+
+## [research] Dispatched, 2026-10-19
+
+Researchers ran at the owner's medium effort, read-only, one question each, never more than five at once. Each handoff
+is in `prompts/`, and each return is saved verbatim beside this record. A row's outcome is filled when its return
+arrives.
+
+| Dispatch | Point | Handoff | Return | Outcome |
+|---|---|---|---|---|
+| 127 | 1, the converged design | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-8-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scenarios-design.md` | six seams carry parts of a variant and none selects; a `scenario` kind over the composition |
+| 128 | 1, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-9-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scenarios-prior-art.md` | eight families, none whole; pinned fragments chosen per build, recorded and promoted |
+| 129 | 2, aScoutedSeam applied | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-10-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-scoutedseam-apply.md` | 23 agent calls inventoried; the diff-time reuse check missing; most edges carry no rows |
+| 130 | 3, today and the design, measured | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-11-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` | running |
+| 131 | 3, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-12-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-prior-art.md` | files in git, one derived SQLite index, per-sender refs, an ids-only doorbell |
+| 132 | 4, the converged design | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-13-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-design.md` | five carriers and no one contract; commitment rows on the record graph, the branch pushed per witnessed item |
+| 133 | 4, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` | running |
+| 134 | 5, caps | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | running |
+| 135 | 6, gotchas | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` | running |
+| 136 | 7, agent-cap | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` | running |
+
+## [p1-scenarios] Point 1: scenarios, one method for flexible flows and workers
+
+**What the design held** (dispatch 127). Six seams each carry part of a variant, and none of them selects one:
+- the entry-point table, which picks only where a build starts;
+- playbooks and `repeat`, a content recipe that enters at Design;
+- presets, one per repository;
+- the composition with its repository stages, one per repository (FA-1 to FA-7);
+- the per-boundary policy sets, `review.breakpoints` and `probe.points`, repository-wide;
+- the shape and lens registries.
+
+Nothing records what kind of work a build is: none of the 173 build READMEs carries a kind, and the plan record has no
+field for one. A structural change mid-build goes only through the overlay, and it moves every build at its next step
+boundary. The shapes registry already expresses one agent (`single`), parallel agents (`per-unit`), mixed roles over
+stages (`panel`), twin runs and experiments, with caps per workflow under agent-cap's fixed five, and a lens has been a
+catalogue row since FA-1. The pass also found records disagreeing: the lens entering by an edit to the harness in
+flow-steps and the review-system record, four shape kinds in the systems record against five, the closed kind set
+without `item` or `lens`, the frame's transitions fixed though a splice may sit between stages, and the role matrix
+silent on repository roles. Each is folded below.
+
+**What outside systems teach** (dispatch 128). Eight families, none covering every case:
+- configurable superset models (C-YAWL, GitLab `rules`), which only switch parts off;
+- pinned templates included by reference (Azure `extends` with its required-template check, GitHub reusable
+  workflows), safe but unrecorded mid-run;
+- late-bound repertoires chosen per work item and refined by recorded rejections (YAWL worklets, Camunda ad-hoc
+  subprocesses);
+- case plans with discretionary items and sentries (CMMN);
+- structure computed by code with versioned execution (Temporal, LangGraph): a probe ran a reordered variant to a
+  run-time `KeyError` and compiled an orphan role without complaint;
+- instance change with migration of compliant instances (ADEPT2, Camunda migration);
+- model-chosen handoffs (the OpenAI Agents SDK, Claude's subagents), recorded only as transcripts;
+- process mining, which sees a deviation only after the fact.
+
+**The answer.** Today the flow bends in five places but has no unit for a variant, so none of the owner's cases has
+one home. The recommendation gives it one: a build runs one composition, gov's rows, the repository's, the scenarios
+it was placed under and its own recorded changes, pinned per step and checked whole.
+1. **A scenario is a registered kind** (NT-1). A `scenario` row names the scenario it extends, an admission predicate
+   over a request's facts, its entry, the rows of registered kinds it activates (stages, items, field patches,
+   exclusions, roles, workflow entries, lens opt-ins, leg packs), a preset slot and caps. Gov ships some, a repository
+   adds its own in its overlay, and every check runs on the composed result, so a scenario cannot reorder or drop a gov
+   stage or touch the fixed set.
+2. **Selection at placement** (NT-2). The orientation scout names the scenarios whose predicates hold over the request,
+   with the facts; `placement.check` re-evaluates every predicate; the planner may re-pick at Plan; a later re-pick
+   happens only at a step boundary. A request no scenario admits runs `flow.scenario-default`.
+3. **Policy per scenario** (NT-3). A scenario's preset slot scopes a preset and overrides to its builds, never a key
+   presets never touch, so a high-precision scenario can run strict while the repository runs standard.
+4. **Changing a build's flow mid-build** (NT-4). A role proposes rows for its own build. Under `flow.adapt`'s default, a
+   change that only adds items, roles, stages or stricter values applies unattended at the next step boundary and is
+   recorded; one that removes, reorders or loosens waits for the owner while the build carries on. At each step
+   boundary the build's witnessed path is compared with its pinned composition, so an unrecorded deviation files an
+   order.
+5. **Recording and promotion** (NT-5). Every change is kept in the build's folder. The Loop Review proposes a scenario
+   from a change two or more builds carried, the owner ratifies it through `instructions.edit` with `promoted-from`
+   edges to those changes, and builds in flight move to it only at a step boundary and only if they comply.
+6. **The shipped set** (NT-6). Gov ships the scenarios its records already know: feature, amendment, patch,
+   playbook-run and design-only, the last passing all five stages with record units, so P20 stands. Expansions
+   register their own, and domain scenarios, a mobile application or a high-precision data system, are a repository's.
+7. **Several scenarios and pipelines** (NT-7). A build may run several, unioned in a declared order. Two that set one
+   field differently red at composition and wait for the owner, as `flow.scenario-conflict` says. A scenario may name
+   the one that takes over at a step's exit, which makes an in-build pipeline, and a cross-build pipeline is builds
+   filed with `depends-on`. Scenarios per feature or per unit wait on the owed feature and unit tables (`gap-flow-15`).
+8. **Workflow shapes as data** (NT-8). A workflow entry declares its ordered stages, each with its role, fan, cap,
+   effort and the rows it receives and returns, and the five kinds become named defaults over them. One agent, a
+   parallel set, one step, several steps, mixed roles and variable caps are then all data, each cap at or under the
+   repository's agent limit (point 7).
+9. **Lenses** (NT-9). A lens is added as a catalogue row whose brief is a unit and removed by a swap or an exclusion;
+   a repository lens records a replay result when one ran and never owes one.
+10. **Cohesion.** One selector, the scenario, sits over one composition; one pin per step records what ran; one door,
+    `instructions.edit`, writes every structural row; one check runs the whole. The six seams become fields of it.
+
+**The owner's cases.**
+
+| Case | Under the recommendation |
+|---|---|
+| An edge case needs its steps in another order and a new role inserted | a recorded change: `needs` patches reorder items, a repository role item is inserted, a repository stage may be spliced between gov's; gov's stages keep their order |
+| A scenario per kind of work, picked by the runtime | `scenario` rows with admission predicates, chosen at placement and re-checked mechanically |
+| Create or adapt a scenario on the fly, and record it | a build's recorded change, applied at a step boundary, kept in its folder, promoted by the Loop Review and the owner |
+| Pick from a shipped set and build pipelines | gov's five, extended by the repository's; in-build successors at a step's exit, and cross-build `depends-on` |
+| Reshape workflows | a workflow entry's ordered stages as data, the five kinds named defaults, caps under the agent limit |
+| Add or remove a lens | a catalogue row, swapped or excluded |
+
+**What it leaves for later.** Scenarios per feature or per unit wait on the feature and unit transition tables. Caps
+above five wait on point 7. A change of meaning in prose (a lens brief reworded for one call) leaves no structural
+deviation for the step-boundary comparison to see, the same limit the adoption pass found.
+
+**Folded.** v2's P8, four `flow.*` keys with their preset rows, and clauses on dDeclaredLoop, dPlacedRequest,
+dRankedPlan, dKeptSession, dBoundRoles and dCalibratedLens, each pending its fork; the foundations record's C3 gains
+`item`, `lens` and `scenario`; flow-steps and the review-system record say a lens is data; the systems record has five
+kinds, workflow stages as data and the `scenario` namespace; the adoption record's frame admits a splice; layer-roles'
+matrix reads the composition; the memory plan's `promoted-from` takes a scenario source; and the register gains
+`gap-flow-20`, `gap-flow-21` and `gap-review-18`.
+
+## [forks] Parked for the owner, 2026-10-19
+
+Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
+sets a key's default, the options are the key's allowed values (P10); where it is a structural choice, it is a
+decision.
+
+| Fork | Question | Options, the recommendation first | What the answer sets |
+|---|---|---|---|
+| NT-1 | What is a scenario? | a registered kind: named, pinned overlay rows with a preset slot, chosen per build; presets and playbooks extended to carry structure; no scenarios, one composition per repository | a structural decision |
+| NT-2 | Who picks a build's scenario? | the orientation scout at placement, `placement.check` re-evaluating its predicates, the planner able to re-pick at Plan; the owner, always; a table mapping request labels to scenarios | a structural decision, and `flow.scenario-default`'s value |
+| NT-3 | May a scenario set policy for its builds? | yes, a preset and overrides scoped to its builds, never a key presets never touch; no, policy stays repository-wide | a structural decision |
+| NT-4 | Who may change a build's own flow mid-build? | a role proposes, a change that only adds applies unattended at the next step boundary and is recorded, one that removes, reorders or loosens waits for the owner; the owner approves every change; no changes | `flow.adapt`'s default: additive-recorded, owner-approves, off |
+| NT-5 | How does a recorded change become reusable? | the Loop Review proposes a scenario from a change two or more builds carried, and the owner ratifies it; only the owner promotes; never | `flow.promote`'s default: loop-proposes, owner-only, off |
+| NT-6 | How does a design-only build end? | a `design-only` scenario passes all five stages with record units, P20 unchanged; P20 amended with a transition from Design to a terminal state | a structural decision |
+| NT-7 | Can a build run several scenarios? | yes, unioned in a declared order, a conflict refused for the owner to order, with in-build successors at a step's exit; one scenario per build | `flow.scenario-conflict`'s default: refuse, declared-order |
+| NT-8 | How are workflows reshaped? | each workflow entry's ordered stages as data, the five kinds named defaults; the five kinds only | a structural decision |
+| NT-9 | How is a lens removed, and must a repository lens prove itself? | a swap or an exclusion, and a repository lens records a replay result when one ran but never owes one; swaps only; every repository lens owes the blind replay | a structural decision |
+"""
+R.done += 1
+R.save()
+print("folded point 1")
+````
+
+### `fold_p1_owner.py`
+
+The design map reddened on point 1: dDeclaredLoop's namespace owner line was wrapped in two; it is one line again.
+
+````python
+"""The design map reddened on point 1's fold: it reads each namespace owner line of the systems record as one line,
+and the fold wrapped dDeclaredLoop's in two, so `step`, `item`, `policy`, `command` and `scenario` lost their owner.
+The line is one line again.
+
+Usage: python -X utf8 fold_p1_owner.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+Y = Record("memory/builds/dClosedLoop/build/2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("  - dDeclaredLoop `step`, `item`, `policy` and `command`, and, declared by the night pass two (pending NT-1),\n"
+      "    `scenario`;\n",
+      "  - dDeclaredLoop `step`, `item`, `policy` and `command`, and, declared by the night pass two (pending NT-1), "
+      "`scenario`;\n", "the owner line")
+Y.save()
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.sub("`gap-flow-20`, `gap-flow-21` and `gap-review-18`.\n\n## [forks]",
+      "`gap-flow-20`, `gap-flow-21` and `gap-review-18`. The design map reddened once on the fold: it reads each namespace\n"
+      "owner line as one line, and the fold had wrapped dDeclaredLoop's in two; it is one line again.\n\n## [forks]",
+      "the map's red")
+R.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -13730,6 +14585,14 @@ MINE = [
      "the keys presets never touch, as `runtime.act-harness` does."),
     ("adopt/fold_flow_ns.py", "The design map left out `workflow` and `lens`; the systems record's namespaces "
      "line now names them."),
+    ("night2/write_questions_w1.py", "The night pass two's first research wave: points 1 to 3, each question quoting "
+     "its point verbatim."),
+    ("night2/write_questions_w2.py", "The second wave: points 4 to 7."),
+    ("night2/start_record.py", "Opens the night pass two's record with the owner's words, verbatim and whole."),
+    ("night2/fold_p1.py", "Point 1, scenarios: the point's section, the research and fork tables, and the fold into v2 "
+     "and eight layer records, pending NT-1 to NT-9."),
+    ("night2/fold_p1_owner.py", "The design map reddened on point 1: dDeclaredLoop's namespace owner line was "
+     "wrapped in two; it is one line again."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -14208,14 +15071,14 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 $ python plain_cites.py
 landing                  8  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's), dLinkedLibrary (dShippedRelease's) …
 plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
-seen red                 6  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dKeptSession (dWitnessedBar's)
+seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 witness                  4  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
+return                   4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
-return                   3  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's)
 fork                     3  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 review                   2  dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
 commit                   2  dSafePassage (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
@@ -14245,7 +15108,7 @@ roster                   1  dBoundRoles (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 decision                 1  dWellOiledMachine (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 90, over 39 kinds
+plain-word hits on a non-ancestor's record kind: 92, over 39 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -14705,10 +15568,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:724 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:735 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:724 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:735 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -14756,13 +15619,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2442 nodes in 30 namespaces; 31267 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1666, derived 282, pending 494
-map: no stale facts read 56 records and 21 quotes of a map count or the critical path
+map: 2459 nodes in 30 namespaces; 31434 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1678, derived 286, pending 495
+map: no stale facts read 57 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 187 records, 3185 sections, 199 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 193 records, 3250 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -14780,8 +15643,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 454 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 90 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 21 · owned nodes read 459 · flow items read 88 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 92 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -14813,7 +15676,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 319 · chain builds 21
+register keys 322 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -14821,13 +15684,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 231 · presettable 209 · preset rows 209
+catalogue keys 235 · presettable 213 · preset rows 213
 no findings
 rc 0
 
 $ critical path
-critical path: 220 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 33, dOrderedCharter 55, dDeclaredLoop 81, dPlacedRequest 89, dKeptSession 108, dWitnessedBar 109, dTotalRecall 129, dBoundRoles 130, dRankedPlan 143, dFurnishedOrders 148, dLinkedLibrary 153, dIndexedDesign 165, dWellOiledMachine 169, dScopedBuild 180, dTendedCadence 185, dMindYourWords 186, dShippedRelease 196, dCalibratedLens 198, dConvergedCharter 220
+critical path: 224 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 33, dOrderedCharter 55, dDeclaredLoop 83, dPlacedRequest 92, dWitnessedBar 111, dKeptSession 112, dTotalRecall 131, dBoundRoles 133, dRankedPlan 147, dFurnishedOrders 151, dLinkedLibrary 155, dIndexedDesign 167, dWellOiledMachine 172, dScopedBuild 183, dTendedCadence 188, dMindYourWords 189, dShippedRelease 199, dCalibratedLens 202, dConvergedCharter 224
 rc 0
 ````
 

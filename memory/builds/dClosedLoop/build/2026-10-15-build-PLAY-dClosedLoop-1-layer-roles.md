@@ -428,6 +428,8 @@ matrix from the step definitions as folded:
   - every item's actor is a command, the executor, a hook, the owner, or a declared item role;
   - every core item role acts in at least one core item;
   - no core item names an expansion role (P28).
+  - Revised 2026-10-19 (the flow and roles adoption, FA-4, and the night pass two): a repository role is a
+    declared item role of the composition, and every arm reads the composition, never gov's rows alone.
 - **Seen red:** each arm on a planted copy of the step definitions, one line changed: a misspelled
   role, a core role left with no item, an expansion role in a core item, a cycle role in an item, and
   a step's heading renamed. On the records as written it exits 0.

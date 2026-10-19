@@ -288,9 +288,10 @@ Code first. Answer: CLI-first (Recommended).
   enforces (legs gain an `enforces` key); a principle nothing enforces reds; a check naming an unknown
   principle reds. Each check is seen red before it is trusted.
 - **C3. A closed set of extension kinds**: kit, command, instruction unit, policy key, preset, gate
-  leg, role, workflow, hook, Skill, practice, record kind, stage, layer. Each lists the principles
-  that bind it; a part of a kind nobody registered reds, so a new kind cannot appear outside the
-  mechanism.
+  leg, role, workflow, hook, Skill, practice, record kind, stage, layer, item, lens and scenario, the
+  last three registered by the chain (item and lens by the flow and roles adoption, FA-1; scenario by
+  the night pass two, pending NT-1; revised 2026-10-19). Each lists the principles that bind it; a part
+  of a kind nobody registered reds, so a new kind cannot appear outside the mechanism.
 - **C4. One factory per kind.** A `new` verb per kind produces an instance that already conforms
   (descriptor and drive table, stage claim, envelope, `next —` line, schema entry with a default and a
   value in every preset, armed checks, map claim, lexicon-conforming names); the gates still check

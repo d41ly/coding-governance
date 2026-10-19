@@ -486,8 +486,9 @@ multi-agent act. The items are its witnessed stages:
   - the reviewer, skeptic and synthesizer schemas;
   - the policies: `review.<stage>`, `review.breakpoints`, `review.blocks`, `review.findings`, `review.left-shift`, `review.unclassed`, `review.follow-up`, `review.unverified`, `review.design.rounds`, `review.design.round-count`, `review.recommendation`, `review.opt-in`, `flow.route-backs` and `run.on-owner-question`.
 - **Extension points:** lens packs, which `review.opt-in` fills by swapping a named default lens of a
-  preset; an expansion's lens enters the harness's literal catalogue by an edit in its own build
-  (review-system `[lenses]`); the value ledger (observability). The bug-class catalogue is core
+  preset; a lens, gov's, an expansion's or a repository's, is a catalogue row whose brief is a unit, and
+  the harness fills its five slots from that data (the flow and roles adoption, FA-1; revised 2026-10-19,
+  the night pass two); the value ledger (observability). The bug-class catalogue is core
   since KN-1.
 
 ## [probe] The probe: testing at any boundary

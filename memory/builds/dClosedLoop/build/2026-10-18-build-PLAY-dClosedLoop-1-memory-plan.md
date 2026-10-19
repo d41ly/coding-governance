@@ -191,7 +191,7 @@ derived.
 | `pinned-at` | record, probe, claim → commit or tree | "Derived at", a probe's pin | `pinned-by` | new: today's pins, now typed apart from `cites` | staleness |
 | `reads` | item, role → record kind | the role definition's `reads:` field and the item's declaration; the kind's registry row renders its readers from them | `read-by` | new | who reads a kind |
 | `writes` | item, role → record kind | the role definition's `writes:` field and the item's declaration; the kind's registry row names the door it writes through | `written-by` | new | who writes a kind |
-| `promoted-from` | instruction unit → memory node | `instructions.edit`'s change record | `promoted-to` | new | memory to instruction (no route today) |
+| `promoted-from` | instruction unit → memory node; scenario → a build's recorded change | `instructions.edit`'s change record | `promoted-to` | new; the scenario source added by the night pass two, pending NT-5 | memory to instruction (no route today), and a build's adaptation to a reusable scenario |
 | `cites` | any text → any node | derived from the text | `cited-by` | derived | prose references |
 
 An unregistered type reds, and so does an edge whose source or target sits outside its row's namespaces.

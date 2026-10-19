@@ -188,8 +188,9 @@ writes the repository's rows. This is the instruction round's "compose, never ed
    gate legs, changed by a patch (FA-6).
 9. **Fixed rows and fields.** IA-4's three sources carry over: what the principles fix, the floor, and what gov's
    tools parse.
-   - The flow's frame: the five stages and their order, each level's transitions between stages, the terminal and
-     disposition sets, and the position engine's answer set.
+   - The flow's frame: the five stages and their order, each level's transitions between gov's stages except
+     where a repository stage is spliced (FA-3, revised 2026-10-19), the terminal and disposition sets, and the
+     position engine's answer set.
    - Items: every floor item whole, its witness written by a runner or a hook (`test.verdict` and `entry.intake`
      among them), and every step's exit item. In any gov item, its tag, its step, its witness and its outcome set.
    - Roles: the matrix arms, each core role's write class and return schema, and the cycle roles, the prompt writer

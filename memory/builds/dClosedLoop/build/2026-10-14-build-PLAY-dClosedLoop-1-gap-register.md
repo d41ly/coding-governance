@@ -119,6 +119,8 @@ extends.
 | gap-flow-17 | Flow | MED | Playbook mode has no seat in the chain: v2 runs Maintain as never a recipe-mode playbook, and nothing carries the unattended kit's recipe half (`--record-piece`, `--record-set`, `check-playbook`), which has run 0 times. | `research-unattended-core.md` sections 3 and 6 | — |
 | gap-flow-18 | Flow | HIGH | No testing outside Test: an owner's observation cannot be verified before placement, a reported bug cannot be made red before its fix, and no experiment can set a measured reference; 61 of 81 items have no role that could ask for a test. The unattended driver's pre-spec TESTING position (`tools/unattended/unattended.sh:852`) never reached the design. Raised by the owner. | night pass `[p2-testing]`; `research-testing-anywhere.md` sections 1 and 3 | — |
 | gap-flow-19 | Flow | HIGH | An adopter cannot add an item to a step or change one of gov's: the unattended run's extra phases are vocabulary with no position, and its extra definition-of-done items are satisfied by attested facts. | `research-flow-today.md` sections 2 and 3, the `.unattended.conf` row | — |
+| gap-flow-20 | Flow | HIGH | No unit names a variant of the flow: entry kinds, playbooks, presets, the overlay, per-boundary policy sets and the shape and lens registries are six seams with no common selector, every composition and policy value is repository-wide, and no build records what kind of work it is. | `research-scenarios-design.md`, its undecided items 1 to 3; `research-scenarios-prior-art.md`, candidate K1 | — |
+| gap-flow-21 | Flow | MED | A build cannot change its own flow mid-build: a structural change goes only through the repository-wide overlay and moves every build, and no record keeps one build's adaptation. | `research-scenarios-design.md`, its undecided items 6 and 7; `research-scenarios-prior-art.md`, case E3 | — |
 | gap-orient-01 | Orient | HIGH | Placement is unaided and unrecorded: kickoff tells the agent to derive a request's scope itself, an unattended run handed a prompt always opens a new build, and only 6 of 131 recent builds name a predecessor, so a mis-placement cannot be audited; path overlap cannot decide placement (the named predecessor ranked first 0 of 5 times). Raised by the owner. | orientation research, routing; `skills/session-kickoff/SKILL.md:126-131`; `tools/unattended/SKILL.template.md:28-32` | — |
 | gap-orient-02 | Orient | HIGH | Nothing binds a session to its build: the route check verifies existence and pairing only, so a route to a terminal build or to another session's build lands, and a resumed route is never re-checked. Raised by the owner. | orientation research, routing; `skills/session-kickoff/manifest-check.sh:995-1001` | — |
 | gap-orient-03 | Orient | HIGH | A build's position is read from typed state: a unit's step and pass come from status headers and RUN.md's phase, all 10 INPROGRESS units sat idle 8 days or more, no resolver says which pass is due, and `LIVE.md` inherits 7 of 30 stale non-terminal headers. Raised by the owner. | orientation research, routing (c) and trust | — |
@@ -387,6 +389,7 @@ extends.
 | gap-review-15 | Review | LOW | The Loop Review names no delivery metrics: lead time, landing frequency, change failure rate, time to restore, first-pass verdict rate, route-backs per build and scope drift. | night pass `[p6-sdlc]` | — |
 | gap-review-16 | Review | LOW | No reading measures the owner queue's depth, so parallel work cannot be weighed against the owner's capacity to review it. | night pass `[p6-sdlc]`, the playbook's practice 10; the owner's NP-18 (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`) | — |
 | gap-review-17 | Review | MED | A lens exists only as a literal in the harness, so an adopter's lens has no home beyond per-call notes. | `research-flow-today.md` section 3; `research-flow-design.md`, its undecided list | — |
+| gap-review-18 | Review | MED | No route turns a build's adaptation into a reusable variant: `promoted-from` covers only memory promoted to instruction, and the Loop Review proposes only retirements, merges and caps. | `research-scenarios-design.md`, its undecided item 5 | — |
 
 The counts are derived, never typed: a first draft typed 59 rows here over a table holding 56. The
 instrument, run against this file, and its output when the register was written:
@@ -719,4 +722,12 @@ over 319 keys:
 ```text
 Roles=26 Deploy=28 Plan=8 Spine=13 Orient=21 Test=21 Runtime=32 Lexicon=10 Tooling=23 Review=17 Foundation=32 Build=5 Memory=39 Flow=19 Maintain=15 Design=10
 LOW=57 MED=153 HIGH=109
+```
+
+Re-measured after the night pass two's point 1 added `gap-flow-20`, `gap-flow-21` and `gap-review-18`
+(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p1-scenarios]`), same instrument, over 322 keys:
+
+```text
+Roles=26 Deploy=28 Plan=8 Spine=13 Orient=21 Test=21 Runtime=32 Lexicon=10 Tooling=23 Review=18 Foundation=32 Build=5 Memory=39 Flow=21 Maintain=15 Design=10
+LOW=57 MED=155 HIGH=110
 ```

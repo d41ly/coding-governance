@@ -237,7 +237,8 @@ once dTotalRecall registers it (P33).
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
   `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`), and `repo`, a repository's own
   units (the adopter-instructions answers, IA-1), and `workflow` and `lens`, the workflow entries and review lenses a
-  repository adds beside gov's (the flow and roles adoption answers, FA-1). Each namespace is a row
+  repository adds beside gov's (the flow and roles adoption answers, FA-1), and `scenario`, the flow's named
+  variants (the night pass two, pending NT-1). Each namespace is a row
   in its owning layer's contract: its declaring source, its extractor, and whether it selects or
   describes. An expansion mints only under its own prefix, at a core point.
 - **A leg keeps its name** (revised 2026-10-17, the audit's M26).
@@ -277,7 +278,7 @@ once dTotalRecall registers it (P33).
 - **Owners.** The instruction layer, kit `playbook`, chain build dOrderedCharter. Each registration
   carries its extractor. Six namespaces gained an owner (revised 2026-10-17, the audit's M10):
   - dOrderedCharter registers `doc` and `unit`, and, declared at PM-10 (2026-10-17), `reader`, `level`, `layer`, `practice`, `principle`, `kind` and `kit`, and, declared by the adopter-instructions answers (2026-10-19), `repo`;
-  - dDeclaredLoop `step`, `item`, `policy` and `command`;
+  - dDeclaredLoop `step`, `item`, `policy` and `command`, and, declared by the night pass two (pending NT-1), `scenario`;
   - dBoundRoles `role` and `field`, and, declared by the flow and roles adoption answers (2026-10-19), `workflow`;
   - dTotalRecall `section`, `record`, `feature`, `class` and `marker`;
   - dWitnessedBar `leg`, `check` and `pack`;
@@ -425,9 +426,11 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
     - adopt-roles.sh, render_agents.py and check-wiring.sh;
     - agent-cap's `args.roles` refusal;
     - the build Skill's calls.
-- **Kinds.** Four role harnesses registered at Runtime's role-harness point: `single`, `per-unit`,
-  `panel` (finders, at most five skeptic batches, one synthesizer) and `twin` (two runs of one shape,
-  merged).
+- **Kinds.** Five role harnesses registered at Runtime's role-harness point: `single`, `per-unit`,
+  `panel` (finders, at most five skeptic batches, one synthesizer), `twin` (two runs of one shape,
+  merged) and `experiment` (the night pass's point 2). A workflow entry declares its ordered stages as
+  data, each with its role, fan, cap, effort and the rows it receives and returns, and the five kinds are
+  named defaults over them (revised 2026-10-19, the night pass two, pending NT-8).
 - **Binding.** The work order carries the resolved shape's digest. Act binding refuses a Workflow call
   whose roles, efforts or fan differ from it, and the supervisor reconciles the journal against the shape
   afterwards. A verifier stage whose role wrote the artifact it verifies is refused.
