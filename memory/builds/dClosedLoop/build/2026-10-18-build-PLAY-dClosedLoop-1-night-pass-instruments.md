@@ -25518,6 +25518,72 @@ for p in key["plants"]:
     print("\n".join(rows[:8]))
 ````
 
+### `record_scored.py`
+
+Both runs scored: the round record's [walk-scored], the aggregate only, its numbers read from the reports' shape lines, score.py's saved output and walltime.py's stage lines; which plants were hit stays sealed until the owner's word.
+
+````python
+"""Both runs scored: the round record's [walk-scored], the aggregate only, its numbers read from the two reports' shape
+lines, score.py's saved output and walltime.py's saved stage lines, and the session log's event. Which plants were
+hit stays sealed beside the key until the owner's word, since one option before the owner is a third run on this copy.
+
+Usage: python -X utf8 record_scored.py <score.txt> <walltime.txt>   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+score, wall = (open(p, encoding="utf-8").read() for p in sys.argv[1:3])
+rev = "memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-{}.md"
+shape = {r: dict(re.findall(r"(\w[\w-]*)=(\d+)", re.search(r"^review-shape .*$", open(rev.format(r), encoding="utf-8")
+                                                               .read(), flags=re.M).group(0))) for r in "ab"}
+runs = re.findall(r"whole-walk-(\w)\.md: confirmed \d+, plants hit (\d+) of 12 \(\d+%\), of them judgement plants (\d+) of 10",
+                  score)
+union = re.search(r"union: plants hit (\d+) of 12", score).group(1)
+bar = re.search(r"bar: .*?: (MET|NOT MET)", score).group(1)
+chap = re.search(r"chapman: run A (\d+), run B (\d+), both (\d+), estimated (\d+), found by neither (-?\d+)", score)
+stages = dict(re.findall(r"^([AB]-\w+): agents \d+, from \S+ to \S+ UTC, span (\S+),", wall, flags=re.M))
+total = re.search(r"^total: .*, (\S+)$", wall, flags=re.M).group(1)
+if len(runs) != 2 or len(stages) != 6:
+    sys.exit("record_scored: the score or the stage lines did not parse")
+(ra, ha, ja), (rb, hb, jb) = runs
+tok = int(shape["a"]["out-tokens"]) + int(shape["b"]["out-tokens"])
+agents = int(shape["a"]["agents"]) + int(shape["b"]["agents"])
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.insert_before("## [stage0-classes] ", f"""### [walk-scored] Both runs, scored
+
+- **The reports:** run A's reads BLOCKED with {shape['a']['confirmed']} of {shape['a']['raw']} findings confirmed, and run
+  B's reads BLOCKED with {shape['b']['confirmed']} of {shape['b']['raw']} confirmed. Each passes `walk.py check --report`
+  over all 812 cells, 22 builds and 42 principles.
+- **The recall bar is {bar}.** Run A finds {ja} of the ten judgement plants, run B {jb}, and the two together the same
+  as run A. With Stage 0's two, that is {ha}, {hb} and {union} of twelve, against eight a run and ten together. Chapman's
+  trend over the two runs' real findings, matched by full address, is {chap.group(4)}, {chap.group(5)} of them found by
+  neither ({chap.group(1)} and {chap.group(2)} real, {chap.group(3)} shared). The count is inflated, since one defect
+  named at two addresses counts twice.
+- **A hand reading of every unhit plant's near findings changes no count.** It finds a pattern in what the walk misses,
+  and one true plant lost at a skeptic. Both stay sealed with the key until the owner's word, since one option before
+  the owner is a third run on this copy.
+- **Cost:** {agents} dispatches and {tok:,} output tokens, {total} from the first walker to the last report. Run A's walk
+  spanned {stages['A-walk']}, its skeptics {stages['A-skeptics']} and its synthesis {stages['A-synth']}. Run B's walk spanned
+  {stages['B-walk']} over its ten dispatches, its skeptics {stages['B-skeptics']} and its synthesis {stages['B-synth']}.
+- **By `[recall]`, a run under the bar comes to the owner before anything is folded.** The owner's word is asked.
+
+""", "[walk-scored]")
+R.save()
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-20, session 1799cb98: both runs synthesized and scored. Run A reads BLOCKED, {shape['a']['confirmed']} of
+  {shape['a']['raw']} confirmed; run B reads BLOCKED, {shape['b']['confirmed']} of {shape['b']['raw']}; both walk checks
+  are clean. The recall bar is {bar} ({ha}, {hb} and {union} of twelve). The plant-level reading is sealed until the
+  owner's word on what follows (`whole-audit.md` `[walk-scored]`).
+""", "the event")
+L.save()
+print(f"A {ha}/{ja}, B {hb}/{jb}, union {union}, bar {bar}, {agents} dispatches, {tok} tokens, {total}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -25956,6 +26022,7 @@ MINE = [
     ('audit-run/check_verdicts.py', "Whether a skeptic's return gives a verdict to every finding and every clean cell its brief handed it, in the brief's grammar; seen red on a dropped verdict line, and on skeptic 1's verdict on A2-F3, whose line opens with stray words."),
     ('audit-run/fill_shape.py', "A walk report's review-shape line filled from the report and the run's transcripts: raw severities by each confirmed heading's grade, the run's dispatch count, and their output tokens through the roles kit's own transcript reader; refuses when grades and the confirmed count disagree, seen on a planted count."),
     ('audit-run/near_hits.py', "For each plant a report's scorer did not hit, the findings naming one of its anchors, confirmed or refuted, with its words: the candidates a hand reading weighs; it scores nothing."),
+    ('audit-run/record_scored.py', "Both runs scored: the round record's [walk-scored], the aggregate only, its numbers read from the reports' shape lines, score.py's saved output and walltime.py's stage lines; which plants were hit stays sealed until the owner's word."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -27278,7 +27345,7 @@ K5: principles 42, clauses 496, retired 0 · findings 0
 rerun design map: rc 0
   map: no stale facts read 104 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 270 records, 4324 sections, 219 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 271 records, 4421 sections, 219 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27528,13 +27595,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2701 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1880, derived 321, pending 500
+map: 2703 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1882, derived 321, pending 500
 map: no stale facts read 104 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 270 records, 4326 sections, 219 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 271 records, 4422 sections, 219 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

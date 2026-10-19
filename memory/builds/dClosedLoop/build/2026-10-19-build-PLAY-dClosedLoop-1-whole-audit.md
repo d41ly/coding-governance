@@ -355,6 +355,24 @@ The skeptic and synthesis briefs gained the walkers' list of what may be read an
 and the synthesis's shape line now leaves `agents` to the main loop, which counts every dispatch of the run from its
 returned lines, where the template had typed eleven.
 
+### [walk-scored] Both runs, scored
+
+- **The reports:** run A's reads BLOCKED with 72 of 78 findings confirmed, and run
+  B's reads BLOCKED with 69 of 84 confirmed. Each passes `walk.py check --report`
+  over all 812 cells, 22 builds and 42 principles.
+- **The recall bar is NOT MET.** Run A finds 3 of the ten judgement plants, run B 2, and the two together the same
+  as run A. With Stage 0's two, that is 5, 4 and 5 of twelve, against eight a run and ten together. Chapman's
+  trend over the two runs' real findings, matched by full address, is 396, 281 of them found by
+  neither (62 and 62 real, 9 shared). The count is inflated, since one defect
+  named at two addresses counts twice.
+- **A hand reading of every unhit plant's near findings changes no count.** It finds a pattern in what the walk misses,
+  and one true plant lost at a skeptic. Both stay sealed with the key until the owner's word, since one option before
+  the owner is a third run on this copy.
+- **Cost:** 25 dispatches and 1,190,395 output tokens, 1h30m26s from the first walker to the last report. Run A's walk
+  spanned 14m07s, its skeptics 8m11s and its synthesis 10m14s. Run B's walk spanned
+  41m18s over its ten dispatches, its skeptics 18m52s and its synthesis 9m30s.
+- **By `[recall]`, a run under the bar comes to the owner before anything is folded.** The owner's word is asked.
+
 ## [stage0-classes] Stage 0's classes
 
 Empty until the audit's fold classes what it does not fix.

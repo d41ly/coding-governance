@@ -245,7 +245,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 181 | gov-skeptic, at its definition's high effort | The whole-design walk, run B, skeptic 3: 19 findings and eight clean cells | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-22-skeptic.md` | 1799cb98 | returned, 9m39s, 53.8k out: 19 findings judged, 15 confirmed and 4 refuted; its clean cells give 7 holds and 1 defect, yet it attaches four new findings, BS3-F1 to BS3-F4, three of them to cells it calls held, read by hand as defects; outside its list only listings, which it disclosed | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
 | 182 | gov-skeptic, at its definition's high effort | The whole-design walk, run B, skeptic 4: 18 findings and eight clean cells | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-23-skeptic.md` | 1799cb98 | returned, 8m43s, 48.5k out: 18 findings judged, 14 confirmed and 4 refuted, and 1 of its 8 clean cells a defect, BS4-F1; outside its list only a listing of the shared scratch folder, which it disclosed | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk]` |
 | 183 | gov-synthesizer, at its definition's high effort | The whole-design walk, run A's synthesis: its report under reviews/ | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-24-synthesizer.md` | 1799cb98 | returned, 10m14s, 81.9k out: the report, BLOCKED, 78 findings raised, 72 confirmed and 6 refuted, its walk check clean; its shape line counted severities over 61 distinct defects, refilled over the raw findings by fill_shape.py with the run's 10 agents and their output tokens | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-a.md` |
-| 184 | gov-synthesizer, at its definition's high effort | The whole-design walk, run B's synthesis: its report under reviews/ | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-25-synthesizer.md` | 1799cb98 | dispatched | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-b.md` |
+| 184 | gov-synthesizer, at its definition's high effort | The whole-design walk, run B's synthesis: its report under reviews/ | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-25-synthesizer.md` | 1799cb98 | returned, 9m29s, 72.7k out: the report, BLOCKED, 84 findings raised, 69 confirmed and 15 refuted, its walk check clean; its shape line counted raw findings already, and fill_shape.py added the run's 15 dispatches and their output tokens | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-b.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -2963,6 +2963,11 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   returns are in the build folder. The skeptic and synthesis briefs gained the walkers' read list, `findings_of`
   stopped handing a skeptic a walker's table, and `score.py` counts the mechanical plants as Stage 0's, fixed before
   any score was read.
+
+- 2026-10-20, session 1799cb98: both runs synthesized and scored. Run A reads BLOCKED, 72 of
+  78 confirmed; run B reads BLOCKED, 69 of 84; both walk checks
+  are clean. The recall bar is NOT MET (5, 4 and 5 of twelve). The plant-level reading is sealed until the
+  owner's word on what follows (`whole-audit.md` `[walk-scored]`).
 
 ## Instruments
 
