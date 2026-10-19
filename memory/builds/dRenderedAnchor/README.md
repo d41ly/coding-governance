@@ -64,7 +64,7 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 4 unit(s) · node d · opened 2026-10-19 · streams tooling
+**Build status:** SPECCED · 5 unit(s) · node d · opened 2026-10-19 · streams tooling
 ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5
 
 <!-- gen:build-units -->
@@ -74,13 +74,14 @@ ids TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dR
 | [TOOL-dRenderedAnchor-2 — unit 1's closing-review findings closed as one batch, and the /build Skill's harness citations resolved like the role index](spec/2026-10-19-spec-TOOL-dRenderedAnchor-2.md) | — | 2 | CLOSED | rev-1 | 2026-10-19 |
 | [TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch](spec/2026-10-19-spec-TOOL-dRenderedAnchor-3.md) | — | 2 | CLOSED | rev-2 | 2026-10-19 |
 | [TOOL-dRenderedAnchor-4 — the closing review's round-3 findings on unit 3 closed as one batch](spec/2026-10-19-spec-TOOL-dRenderedAnchor-4.md) | — | 1 | CLOSED | rev-1 | 2026-10-19 |
+| [TOOL-dRenderedAnchor-5 — the closing review's round-4 findings on unit 4 closed as one batch, with no review round after it](spec/2026-10-19-spec-TOOL-dRenderedAnchor-5.md) | — | 1 | SPECCED | rev-1 | 2026-10-19 |
 <!-- /gen:build-units -->
 
 Records: 16 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4.
+Ids no `spec-audit` record has ever named: TOOL-dRenderedAnchor-1 TOOL-dRenderedAnchor-2 TOOL-dRenderedAnchor-3 TOOL-dRenderedAnchor-4 TOOL-dRenderedAnchor-5.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
