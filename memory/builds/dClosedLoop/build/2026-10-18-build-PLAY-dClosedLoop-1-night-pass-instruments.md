@@ -25407,6 +25407,117 @@ print(f"{sys.argv[2].rsplit('/', 1)[-1]}: findings {len(handed)}, judged {len(ju
 sys.exit(1 if missing or cell_missing else 0)
 ````
 
+### `fill_shape.py`
+
+A walk report's review-shape line filled from the report and the run's transcripts: raw severities by each confirmed heading's grade, the run's dispatch count, and their output tokens through the roles kit's own transcript reader; refuses when grades and the confirmed count disagree, seen on a planted count.
+
+````python
+"""A walk report's review-shape line, filled from what it and the run's transcripts say rather than typed: the four
+severities counted over RAW confirmed findings by grade (tools/workflows/README.md's grammar), each heading's grade
+read from its own Severity line, else its skeptic's "Confirmed <grade>", else its Same-as primary's; `agents` the
+run's dispatches; `out-tokens` their summed output tokens, read by the roles kit's own transcript reader.
+
+Usage: python -X utf8 fill_shape.py <report.md> <subagents dir> <agent id> ... [--check]
+Refuses when the grades do not sum to the confirmed count, or a heading has no grade. --check prints, writes nothing.
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, "tools/roles")
+import handoff  # noqa: E402
+
+ID = r"[AB](?:[1-5]|S[1-4])-F\d+"
+GRADES = ("blocker", "high", "medium", "low")
+args = [a for a in sys.argv[1:] if a != "--check"]
+report, folder, ids = pathlib.Path(args[0]), pathlib.Path(args[1]), args[2:]
+text = report.read_text(encoding="utf-8")
+grade, primary, section = {}, {}, None
+for block in re.split(r"(?m)^(?=## |### )", text):
+    h2 = re.match(r"## (\w+)", block)
+    if h2:
+        section = h2.group(1)
+        continue
+    m = re.match(r"### (" + ID + r")\b", block)
+    if not m or section not in ("Critical", "High", "Medium", "Low"):
+        continue
+    sev = re.search(r"^- \*\*Severity:\*\* (\w+)", block, flags=re.M)
+    sk = re.search(r"^- \*\*Skeptic:\*\* Confirmed (" + "|".join(GRADES) + r")", block, flags=re.M | re.I)
+    same = re.search(r"^- \*\*Same as:\*\* (" + ID + r")", block, flags=re.M)
+    grade[m.group(1)] = (sev.group(1).lower() if sev else sk.group(1).lower() if sk else None)
+    if same:
+        primary[m.group(1)] = same.group(1)
+for fid, g in grade.items():
+    if g is None and fid in primary:
+        grade[fid] = grade.get(primary[fid])
+missing = [f for f, g in grade.items() if g not in GRADES]
+if missing:
+    sys.exit(f"fill_shape: REFUSED — no grade for {missing}")
+counts = {g: sum(1 for v in grade.values() if v == g) for g in GRADES}
+shape = re.search(r"^review-shape [^\n]*$", text, flags=re.M)
+confirmed = int(re.search(r"confirmed=(\d+)", shape.group(0)).group(1))
+if sum(counts.values()) != confirmed or len(grade) != confirmed:
+    sys.exit(f"fill_shape: REFUSED — {len(grade)} confirmed headings graded {counts}, the line says confirmed={confirmed}")
+tokens = 0
+for aid in ids:
+    t = handoff.load_agent_transcript(folder / f"agent-{aid}.jsonl")["tokens"]
+    if t is None:
+        sys.exit(f"fill_shape: REFUSED — no tokens in agent-{aid}.jsonl")
+    tokens += t
+line = shape.group(0)
+for g in GRADES:
+    line = re.sub(rf"\b{g}=\d+", f"{g}={counts[g]}", line)
+line = re.sub(r"agents=\d+", f"agents={len(ids)}", line)
+line = re.sub(r"out-tokens=\w+", f"out-tokens={tokens}", line)
+print(f"was: {shape.group(0)}\nnow: {line}")
+if "--check" not in sys.argv:
+    report.write_text(text.replace(shape.group(0), line, 1), encoding="utf-8", newline="\n")
+    print(f"wrote {report.as_posix()}")
+````
+
+### `near_hits.py`
+
+For each plant a report's scorer did not hit, the findings naming one of its anchors, confirmed or refuted, with its words: the candidates a hand reading weighs; it scores nothing.
+
+````python
+"""For each plant a report's scorer did not hit, the report's findings that name one of its anchors anywhere in their
+text, confirmed or refuted, with whether one of its words appears: the candidates a hand reading weighs as the plant
+described at another address, or refuted. It scores nothing; score.py is the bar's verdict.
+
+Usage: python -X utf8 near_hits.py <key.json> <report.md> [<plant id> ...]
+"""
+import json
+import re
+import sys
+
+ID = r"[AB](?:[1-5]|S[1-4])-F\d+"
+key = json.load(open(sys.argv[1], encoding="utf-8"))
+text = open(sys.argv[2], encoding="utf-8").read()
+want = set(sys.argv[3:])
+found, section = [], None
+for block in re.split(r"(?m)^(?=## |### )", text):
+    h2 = re.match(r"## (\w+)", block)
+    if h2:
+        section = h2.group(1)
+        continue
+    m = re.match(r"### (" + ID + r")\b[^\n]*", block)
+    if m and section in ("Critical", "High", "Medium", "Low", "Refuted"):
+        addr = re.search(r"^- \*\*Address:\*\* (.+)$", block, flags=re.M)
+        found.append((m.group(1), section, addr.group(1) if addr else "", m.group(0)[len(m.group(1)) + 7:], block))
+for p in key["plants"]:
+    if want and p["id"] not in want:
+        continue
+    anchors = p.get("anchors") or ([p["anchor"]] if p.get("anchor") else [])
+    rows = []
+    for fid, sec, addr, title, block in found:
+        named = [a for a in anchors if a in block]
+        if named:
+            words = [w for w in p["words"] if w.lower() in block.lower()]
+            rows.append(f"    {fid} [{sec}] {addr[:70]} | names {','.join(a[-4:] for a in named)} | words {words} | {title[:80]}")
+    print(f"{p['id']} ({p['record']} {p['tag']}; {p['source']}): {len(rows)} candidates")
+    print("\n".join(rows[:8]))
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -25843,6 +25954,8 @@ MINE = [
     ('audit-run/plant_transcript.py', 'A planted transcript for the read audit: three reads into the home .claude folder spelled three ways and one read inside the copy, which the home-folder class must flag three times.'),
     ('audit-run/record_run_b_again.py', "Run B walked again: the round record's [walk-run-b-again] and [recall]'s bar as scored, fixed before any score was read."),
     ('audit-run/check_verdicts.py', "Whether a skeptic's return gives a verdict to every finding and every clean cell its brief handed it, in the brief's grammar; seen red on a dropped verdict line, and on skeptic 1's verdict on A2-F3, whose line opens with stray words."),
+    ('audit-run/fill_shape.py', "A walk report's review-shape line filled from the report and the run's transcripts: raw severities by each confirmed heading's grade, the run's dispatch count, and their output tokens through the roles kit's own transcript reader; refuses when grades and the confirmed count disagree, seen on a planted count."),
+    ('audit-run/near_hits.py', "For each plant a report's scorer did not hit, the findings naming one of its anchors, confirmed or refuted, with its words: the candidates a hand reading weighs; it scores nothing."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -27181,9 +27294,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 89 · lines 38034 · unreviewed 6880 (18%)
+  design records 89 · lines 38454 · unreviewed 7300 (19%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 12
+  design commits after the floor that no closing review covers: 13
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27196,6 +27309,7 @@ rerun review debt: rc 0
     8b51f1f39  5 design record(s)  records(dClosedLoop): run B's four brief reviews answered — the seal is an allow-list and a read audit, and wa
     69b111f9e  13 design record(s)  records(dClosedLoop): both walks whole — run B's walkers 1, 3, 4 and 5 walk at last, and the ten returns join 
     cca97c487  13 design record(s)  records(dClosedLoop): run A's four skeptics returned, run B's sent, and run A's synthesis dispatched
+    4a93b33bd  5 design record(s)  records(dClosedLoop): run B's four skeptics returned, and run B's synthesis dispatched
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27420,7 +27534,7 @@ map: no stale facts read 104 records and 28 quotes of a map count or the critica
 rc 0
 
 $ atlas
-atlas: derived — 270 records, 4324 sections, 219 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 270 records, 4326 sections, 219 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
