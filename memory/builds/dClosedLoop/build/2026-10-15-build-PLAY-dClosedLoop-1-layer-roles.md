@@ -399,7 +399,7 @@ matrix from the step definitions as folded:
 | Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle | adopt |
 |---|---|---|---|---|---|---|---|---|---|
 | orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — | — | — |
-| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | — | — | — | — | — | — | — |
+| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | `design.streams` | — | — | — | — | — | — |
 | researcher | — | `plan.research` | `design.research` | — | — | — | — | — | — |
 | reuse scout | — | — | `design.seams` | — | — | — | — | — | — |
 | architect | — | — | `design.inventory`, `design.decompose`, `design.reason` | — | — | — | — | — | — |

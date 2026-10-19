@@ -20290,6 +20290,453 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `fold_cloud_answers.py`
+
+The owner's CL-1 to CL-4 folded: P40, the planned `fleet` expansion, six keys and four preset rows, the seams on six chain rows, sixteen gaps, the planner's `design.streams` item, the two stale statements corrected, and the record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there.
+
+````python
+"""The owner's answers to CL-1 to CL-4, folded with the cloud round's design: P40, the `fleet` expansion planned, six
+keys and four preset rows, three revised rows, the seams on six chain rows, sixteen gaps, the planner's `design.streams`
+item in flow-steps and layer-roles, the two stale statements corrected in layer-memory and coordination, an `[open]`
+entry for CL-3's reading, and the record's [answers] and [folded].
+
+Usage: python -X utf8 fold_cloud_answers.py   (from the worktree root, or a full copy of it for a dry run)
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md"
+CL3 = ("Whole units, across builds by default, but also a new headless-first 'planner' role by default, with a planning "
+       "workflow at medium effort, opt-in by default to assist for complex builds (like this one, for example).")
+R1 = "`build/2026-10-19-build-PLAY-dClosedLoop-1-research-cloud-{}.md`"
+
+
+def bounds(rec, section):
+    lines = rec.text.split("\n")
+    start = [i for i, ln in enumerate(lines) if ln.startswith(f"## [{section}]")]
+    if len(start) != 1:
+        sys.exit(f"{section}: {len(start)} headings")
+    end = next((i for i in range(start[0] + 1, len(lines)) if lines[i].startswith("## [")), len(lines))
+    return lines, start[0], end
+
+
+def row_index(rec, key, section):
+    lines, a, b = bounds(rec, section)
+    idx = [i for i in range(a, b) if lines[i].startswith(f"| `{key}` |")]
+    if len(idx) != 1:
+        sys.exit(f"{key} in [{section}]: {len(idx)} rows")
+    return lines, idx[0]
+
+
+def insert_after_key(rec, key, section, rows):
+    lines, i = row_index(rec, key, section)
+    lines[i + 1:i + 1] = rows
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def edit_cells(rec, key, section, fn):
+    lines, i = row_index(rec, key, section)
+    cells = lines[i].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{key}: row shape")
+    fn(cells)
+    lines[i] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    if any("; " in c for c in clauses):
+        sys.exit(f"{build}: a clause holds '; '")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+
+# ---------------------------------------------------------------- the revision note, P40, [layers]
+V.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):\n",
+    "Revised: 2026-10-19, the owner's answers to the cloud round's forks (`" + REC + "`\n"
+    "`[answers]`): P40 is added, every unit claiming its own work and anything above it only offering. Cloud\n"
+    "coordination, scheduling and load balancing go to a new expansion, `fleet`, planned in `[planned]` and attached only\n"
+    "at points the core declares (CL-1). Headless is the floor, a model-free head only offers, and an LLM serves as a\n"
+    "judge role only (CL-2). The head offers whole units across builds, and the planner gains an opt-in planning workflow\n"
+    "for complex builds (CL-3). An owner's request travels by reference and is claimed by lease (CL-4). Six keys join\n"
+    "the catalogue, four of them every preset, six chain rows gain the seams, and sixteen gaps are added.\n\n",
+    "revision note")
+V.sub("  noticing. Flow owns the contract and Runtime enforces it (the owner's stall-and-loop review, SL-1 to SL-8).\n",
+      "  noticing. Flow owns the contract and Runtime enforces it (the owner's stall-and-loop review, SL-1 to SL-8).\n"
+      "- **P40 A unit claims its own work; anything above it only offers.** Each node unit carries a build from request to\n"
+      "  landing alone and offline. Across units, the one grant is a lease the unit acquires itself, fenced in the same\n"
+      "  atomic push as the work it covers. A head, an endpoint or a scheduler may offer, relay and measure, but it never\n"
+      "  assigns, never decides a position or a verdict, and never holds the only copy of anything, so losing it costs\n"
+      "  latency and never correctness (the owner's cloud round, CL-1 to CL-4).\n", "P40")
+V.sub("named, never empty (layer-library `[consult]`). The kit-to-layer map is in the layer record. The layers are reviewed one\n"
+      "by one with the owner, each in its own layer record.\n",
+      "named, never empty (layer-library `[consult]`). The kit-to-layer map is in the layer record. The layers are reviewed one\n"
+      "by one with the owner, each in its own layer record.\n\n"
+      "One expansion is planned and not built: `fleet`, node units coordinating in real time, attached only at points the\n"
+      "core declares (P40, `[planned]`, the owner's CL-1).\n", "layers")
+
+# ---------------------------------------------------------------- the catalogue: six keys, four revised rows
+insert_after_key(V, "leases.offline", "policies", [
+    "| `leases.queued-claim-days` | days | 7 | the cloud round: a claim queued offline longer than this is refused on "
+    "reconnection, and a released lease's tombstone may be pruned only after it, so a pruned lease never restarts its "
+    "epoch (P40) | dPlacedRequest |",
+    "| `leases.offer-seconds` | seconds | 300 | the owner's CL-2: how long an offered unit waits for the node it was "
+    "offered to before any node may claim it, an offer being a wait with a deadline (P39, P40) | dPlacedRequest |"])
+insert_after_key(V, "runtime.agents-in-flight", "policies", [
+    "| `runtime.admission-scope` | session, node, pool | pool | the cloud round: what admission counts before a launch; "
+    "under `pool` a reservation is charged against the ledger of the account, seat or workspace the node's acts draw "
+    "on, which on a node alone in its pool is the in-flight ledger (P40) | dWellOiledMachine |"])
+insert_after_key(V, "roles.model.<role>", "policies", [
+    "| `roles.harness.<role>` | the harness adapters that pass the act rows | `runtime.act-harness` | the cloud round: "
+    "a role's harness, so a judge role or a head runs on its own; never set by a preset (P40) | dWellOiledMachine |",
+    "| `roles.auth.<role>` | an ordered list drawn from `runtime.act-auth`'s values, api-key only last and only when "
+    "the owner adds it | `runtime.act-auth` | the cloud round: a role's credential class, so a judge role or a head "
+    "draws on another subscription or key than the workers' plan; gov reads and copies no credential file, and a "
+    "preset never sets it (P40) | dWellOiledMachine |"])
+insert_after_key(V, "design.overlap", "policies", [
+    "| `design.streams` | opt-in, always, off | opt-in | the owner's CL-3: \"" + CL3 + "\"; the planner's "
+    "`design.streams` item runs the planning workflow, under `opt-in` only when the build's brief or the owner asks | "
+    "dIndexedDesign |"])
+
+
+def note(text):
+    def fn(cells):
+        cells[3] = cells[3] + "; " + text
+    return fn
+
+
+def expiry(cells):
+    cells[3] += ("; judged by a declared clock, the holder's stamp corrected by the clock offset the node registry "
+                 "records, or the tip seen unchanged this long, never the reader's raw clock (P40)")
+
+
+def doorbell(cells):
+    if cells[1] != "live-and-mailbox, live-only, mailbox-only":
+        sys.exit("deps.messaging: allowed cell moved")
+    cells[1] = "live-and-mailbox, live-only, mailbox-only, or a registered doorbell"
+    cells[3] += ("; a registered doorbell attaches at the doorbell point dWellOiledMachine declares in Runtime's "
+                 "`[extend]` (P40)")
+
+
+edit_cells(V, "leases.expiry-hours", "policies", expiry)
+edit_cells(V, "deps.messaging", "policies", doorbell)
+edit_cells(V, "runtime.act-harness", "policies", note("overridable per role by `roles.harness.<role>` (P40)"))
+edit_cells(V, "runtime.act-auth", "policies", note("overridable per role by `roles.auth.<role>` (P40)"))
+
+# ---------------------------------------------------------------- the presets
+insert_after_key(V, "leases.offline", "presets", ["| `leases.queued-claim-days` | 7 | 7 | 7 | 7 |",
+                                                  "| `leases.offer-seconds` | 120 | 300 | 600 | 300 |"])
+insert_after_key(V, "runtime.restarts", "presets", ["| `runtime.admission-scope` | pool | pool | pool | pool |"])
+insert_after_key(V, "design.overlap", "presets", ["| `design.streams` | opt-in | opt-in | opt-in | opt-in |"])
+V.sub("`runtime.owner-harness`, `runtime.act-harness`, `runtime.act-auth`, `platforms.supported` or",
+      "`runtime.owner-harness`, `runtime.act-harness`, `runtime.act-auth`,\n"
+      "  `roles.harness.<role>`, `roles.auth.<role>`, `platforms.supported` or", "never-touch list")
+
+# ---------------------------------------------------------------- the chain rows
+add_clauses(V, "dPlacedRequest", [
+    "the fenced effect push: every effect push, a pass push, the lander's push to main and a release with its landed "
+    "notice, carrying the holder's new lease beat in one atomic push under a compare-and-swap on the lease tip it read, "
+    "never a re-read before the push, seen red on a stale holder's push after a take-over and on a landing whose "
+    "release the remote dropped (P40)",
+    "a lease never deleted: a release writing a terminal tombstone, the epoch rising for the lease's whole life, a claim "
+    "queued offline longer than `leases.queued-claim-days` refused on reconnection and a tombstone pruned only after "
+    "that age, seen red on a pruned lease and a stale queued claim (P40)",
+    "a lease's expiry judged by a declared clock, the holder's stamp corrected by the recorded clock offset or the tip "
+    "seen unchanged for `leases.expiry-hours`, never the reader's raw clock (P40)",
+    "the cadence segment of the lease grammar taking any name the tag grammar admits, never a literal list, so a "
+    "cadence item an expansion registers holds a lease (P40)",
+    "a request that is not yet a build written as a project-level record any node may claim by lease, the owner's "
+    "words recorded verbatim where the owner types them and relayed only by the record's id, a relayed request being "
+    "data with provenance and never consent (P40, the owner's CL-4 and FR-1)",
+    "lease acquisition taking an optional offer, the node it was made for and its deadline, `leases.offer-seconds`, an "
+    "offer only reordering a claim and an expired offer a free claim, compare-and-swap with the epoch refusing a stale "
+    "acquisition (P40, the owner's CL-2)"],
+    ["gap-conc-12", "gap-conc-13", "gap-conc-14", "gap-conc-17", "gap-conc-18", "gap-conc-19"])
+add_clauses(V, "dKeptSession", [
+    "each message carrying its session's sequence number, a take-over naming its predecessor's last message, and "
+    "`confirmed` and `changed` carrying the interface's content key, a dependent acting on the recomputed key and never "
+    "on arrival order, seen red on a relayed `changed` that arrives before the `confirmed` it supersedes (P40)",
+    "a mailbox recipient naming a node by its fleet tag, or the whole project (P40, the owner's CL-4)"],
+    ["gap-conc-15"])
+add_clauses(V, "dIndexedDesign", [
+    "the planner's `design.streams` item after `design.overlaps`, run as `design.streams` says, opt-in by default: a "
+    "planning workflow, its agents at the planner's effort, medium unless the owner sets another, grouping the "
+    "roster's units into streams that several node units can take at once, by their declared order, write sets and "
+    "the overlap record, its stream plan read by any node's pick and by a head where one exists, needing no head, "
+    "seen red on a planted stream pairing two units whose write sets overlap (the owner's CL-3)"],
+    ["gap-design-12"])
+add_clauses(V, "dWellOiledMachine", [
+    "the node beat: the supervisor's beat, pushed with each pass, carrying the node's fleet tag, its free agent slots "
+    "against `runtime.agents-in-flight`, any limit hold with its reset time, its hardware load read with the standard "
+    "library, its plan allowance with the reading's source and age, and its pool label, the account, seat or workspace "
+    "its acts draw on and never the credential, membership derived from live beats, seen red on two planted nodes "
+    "sharing one pool (P40)",
+    "admission under `runtime.admission-scope`, by default charging a reservation against the pool's ledger by "
+    "compare-and-swap before a launch, sized by an estimate per item kind that falls back to `runtime.act-ceiling` "
+    "until `trace.cost` rows give a p90 (P40)",
+    "discovery and the pick: one read giving the claimable ready set across builds, ready unleased units whose "
+    "dependencies are confirmed and released or expired leases, and a pure, replaceable pick function choosing what "
+    "the node claims next, by plan priority then the oldest released, from a spread start, an offer only reordering "
+    "it, seen red on a released lease no node picks up (P40, the owner's CL-3)",
+    "the transport points in Runtime's `[extend]`: a lease store, git refs its only adapter, with a conformance "
+    "fixture holding the fence, tombstone and atomic-landing probes, a doorbell, arming `deps.messaging`'s registered "
+    "names, and an offer source, the node's own pick built in, each host declaring whether it can write custom refs "
+    "and which auth class it needs, a host that cannot write refs taking a branch-namespaced fallback or acquiring "
+    "nothing, and every adapter row declaring its tenancy, retention and region, seen red on a planted host refused a "
+    "ref push (P40, the owner's CL-1)",
+    "`runtime.act-harness` and `runtime.act-auth` resolved per role through Roles' resolver, as "
+    "`roles.harness.<role>` and `roles.auth.<role>`, so a judge role or a head draws on its own subscription or key, a "
+    "harness row recording how its adapter reads the credential, and the act launch pinned out of bare mode (P40)",
+    "the secret scan covering lease, mail, beat and mirror payloads and every adapter's publishing boundary, and the "
+    "record door refusing a token shape in a coordination record, seen red on a planted token in a lease payload "
+    "(P40)",
+    "a cadence run, Maintain's, the Loop Review's or a registered program's, drawing on a rework budget of its own "
+    "keyed to its period lease and ending as `flow.on-exhausted` says, seen red on a planted cadence run that never "
+    "converges (P39, P40)",
+    "the commit queue and the lander pushing through dPlacedRequest's fenced effect push (P40)"],
+    ["gap-conc-16", "gap-rt-40", "gap-rt-41", "gap-rt-42", "gap-rt-43", "gap-rt-44", "gap-rt-45"])
+add_clauses(V, "dShippedRelease", [
+    "the register of adopters named the adopter register, leaving the word fleet to node units (P40, the owner's "
+    "CL-1)"], ["gap-deploy-29"])
+add_clauses(V, "dCalibratedLens", [
+    "the node beats and the pools' ledgers trended, and the reservation estimate per item kind re-derived from "
+    "`trace.cost` (P40, P9)"], [])
+
+# ---------------------------------------------------------------- [planned] and [open]
+V.insert_before("\n## [open] Interpretations to confirm at chain approval\n", """
+One capability is planned the same way, and counts in no build's planned units (the owner's CL-1 to CL-4):
+- **The fleet: node units coordinating in real time.** Trigger: the owner's word that work must be scheduled across
+  nodes as it happens. Layer: `fleet`, an expansion (P28, P40). Units: the head, a model-free function from every
+  node's beat, the pools' ledgers, the claimable ready set and any stream plan to offers of whole units across builds,
+  hosted as a lease-held cadence item that any node may run; the judge role it calls for a record no rule types,
+  registered by the expansion, choosing within a closed set of routes the program computed; endpoint adapters at the
+  lease-store, doorbell and memory-mirror points, each passing the core's conformance fixture and declaring its
+  tenancy; cloud-host adapters, each declaring its auth class and whether it writes refs; a dispatch record of each
+  offer's inputs, proposer and validation, replayed by re-running the program and re-validating the judge's choice;
+  and the owner's request relayed by reference. Its test: a four-hour head outage costs no throughput, an offer
+  reaches a node only through that node's own lease, and a replay reproduces the program's offers byte for byte
+  (`""" + REC + """` `[planned]`).
+""", "planned")
+V.insert_before("\n## [owed] Owed to the chain re-cut\n", """
+Open, 2026-10-19, from the owner's answers to the cloud round's forks (`""" + REC + """` `[answers]`):
+- CL-3's "new headless-first 'planner' role" is read as the planner the Plan stage already binds, given a Design item
+  of its own, `design.streams`, since two roles cannot share one name. "Headless-first" is read as needing no head: any
+  node unit runs the item, and a head, where one exists, reads its stream plan.
+""", "open")
+V.save()
+
+# ---------------------------------------------------------------- flow-steps, layer-roles, layer-memory, coordination
+F = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+F.sub("| the overlap record | `design.unit-spec` | dIndexedDesign |",
+      "| the overlap record | `design.streams` where `design.streams` holds for the build, else `design.unit-spec` | "
+      "dIndexedDesign |\n"
+      "| `design.streams` | planner, through the planning workflow | `design.overlaps`, where `design.streams` holds for "
+      "the build | groups the roster's units into streams that several node units can take at once, by their declared "
+      "order, write sets and the overlap record, the workflow's agents at the planner's effort, medium by default, and "
+      "needing no head (the owner's CL-3) | the stream plan, each stream's units re-derived against the order and the "
+      "overlap record | `design.unit-spec` | dIndexedDesign |", "design.streams row")
+F.sub("| `design.overlaps`, or the input's unit |", "| `design.overlaps` or `design.streams`, or the input's unit |",
+      "unit-spec needs")
+F.save()
+RL = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+RL.sub("| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | — | — | — | — | — | — | — |",
+       "| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | `design.streams` | — | — | — | — | — | — |",
+       "planner row")
+RL.save()
+M = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+M.sub("  declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its\n"
+      "  flake, dupes and scope records. Runtime registers its return, act (launch, epoch, outcome), lease,\n"
+      "  session binding, mailbox message and journal records.",
+      "  declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its\n"
+      "  flake, dupes and scope records, and its lease and mailbox message (P5, moved from Runtime's list by the cloud\n"
+      "  round, 2026-10-19). Runtime registers its return, act (launch, epoch, outcome), session binding and journal\n"
+      "  records.", "kinds by layer")
+M.sub("dPlacedRequest's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds; writer item "
+      "not named |", "dPlacedRequest's row builds the one lease grammar; writer item not named |", "lease row")
+M.sub("dKeptSession's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds; writer "
+      "item not named |", "dKeptSession's row builds the mailbox and its message kinds; writer item not named |",
+      "mailbox row")
+M.save()
+C = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md")
+C.sub("## [design] The coordination feature, built by dDeclaredLoop\n\n",
+      "## [design] The coordination feature, built by dDeclaredLoop\n\n"
+      "Revised 2026-10-19 (the cloud round): the chain re-cut moved the leases to dPlacedRequest and the mailbox and\n"
+      "dependency notices to dKeptSession (v2 `[chain]`), so dDeclaredLoop below reads as those two builds.\n\n",
+      "coordination title")
+C.save()
+
+# ---------------------------------------------------------------- the register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+NEW = {
+    "gap-conc-11": [
+        ("gap-conc-12", "Spine", "HIGH", "Fencing is check-then-act: the commit queue and the lander re-read a lease's "
+         "epoch and then push, so a holder replaced between the read and the push still lands its write; one atomic "
+         "push carrying the lease beat was refused at the remote instead.", R1.format("headless") + " P2(a) and P2(b)"),
+        ("gap-conc-13", "Spine", "HIGH", "A released lease that is pruned restarts its epoch: a claim queued offline "
+         "then wins a unit another node has already landed, at epoch 1.", R1.format("headless") + " P3, case 3"),
+        ("gap-conc-14", "Spine", "LOW", "A lease's expiry is judged by the reader's clock against the holder's own "
+         "stamp, so clock skew moves every expiry.", "`tools/unattended/unattended.sh:2152-2185`; "
+         + R1.format("headless") + " S4"),
+        ("gap-conc-15", "Spine", "MED", "Messages carry no order across one build's session refs: a take-over's "
+         "`changed` relayed ahead of its predecessor's `confirmed` leaves a dependent on the older interface.",
+         R1.format("headless") + " family 5"),
+        ("gap-conc-16", "Spine", "MED", "No node can find work it does not hold: nothing reads released or expired "
+         "leases across builds, a node \"with quota takes the build over\" with no way to find it, and today's resume "
+         "tick skips every lease another node hosts.", R1.format("census") + " row 2; `tools/unattended/resume-tick.sh:"
+         "281-285`"),
+        ("gap-conc-17", "Spine", "MED", "An owner's request reaches only the node it was typed on: intake is bound to "
+         "the owner's session, mailbox recipients are a build or its units, and no request record exists that another "
+         "node can claim.", R1.format("census") + " rows 5 and 26; " + R1.format("mechanical-head") + " S8"),
+        ("gap-conc-18", "Spine", "LOW", "The cadence lease grammar lists its kinds literally, against Runtime's rule "
+         "that a registered name never meets a literal list, so a cadence item an expansion registers cannot hold a "
+         "lease.", R1.format("agent-head") + " seam 4"),
+        ("gap-conc-19", "Spine", "MED", "Nothing outside a node can offer it work: no lease takes an offer with a "
+         "deadline and no point registers an offer source, so any head would have to assign, which lost 29% of "
+         "makespan in a simulated head outage.", R1.format("mechanical-head") + " C1 and C2; " + R1.format("census")
+         + " row 13")],
+    "gap-rt-39": [
+        ("gap-rt-40", "Runtime", "HIGH", "No node publishes its presence, capacity or plan: admission counts one "
+         "session's agents, a plan limit is per account and shared by every node signed into it, and a limit is seen "
+         "only after it is hit; on a shared, tight plan, node-local admission finished 48 to 54% of the work where a "
+         "ledger keyed by plan finished all of it.", R1.format("census") + " rows 16 and 19; " + R1.format("platform")
+         + " section 1; " + R1.format("mechanical-head") + " C5"),
+        ("gap-rt-41", "Runtime", "MED", "Coordination has no transport point: leases and mail are written to "
+         "`refs/gov/*` directly, which Anthropic's hosted cloud sessions and routines cannot push, and no host declares "
+         "whether it can.", R1.format("platform") + " section 3; " + R1.format("headless") + " S3"),
+        ("gap-rt-42", "Runtime", "MED", "The harness and its credential are set once for the repository, so a head or "
+         "a judge role cannot run on another subscription or key without drawing on the workers' plan.",
+         R1.format("agent-head") + " seam 6"),
+        ("gap-rt-43", "Runtime", "MED", "Headless acts lose the subscription login once `--bare` becomes `-p`'s "
+         "default, since bare mode reads neither the OAuth login nor the setup token, and no harness row records how an "
+         "adapter reads its credential.", R1.format("platform") + " section 3"),
+        ("gap-rt-44", "Runtime", "MED", "New publishing boundaries go unscanned: lease, mail and mirror payloads sit "
+         "outside the secret scan's population, and no door refuses a token shape in a coordination record.",
+         R1.format("census") + " row 29; " + R1.format("platform") + " S5"),
+        ("gap-rt-45", "Runtime", "MED", "P39's rework budget is keyed to builds and intake content only, so a cadence "
+         "run's loop, Maintain's, the Loop Review's or any head's re-planning, has no bound.",
+         R1.format("agent-head") + " seam 5")],
+    "gap-deploy-28": [
+        ("gap-deploy-29", "Deploy", "LOW", "\"Fleet\" names two things: the fleet register lists adopters while a fleet "
+         "tag names a node.", R1.format("census") + " rows 19 and 20")],
+    "gap-design-11": [
+        ("gap-design-12", "Design", "MED", "No item plans a complex build's work into parallel streams: Design's roster "
+         "orders units, and nothing groups them by order, write sets and the overlap record for several node units to "
+         "take at once.", "the owner's CL-3; " + R1.format("mechanical-head") + " C6")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    for off, (k, st_, sv_, gap, ev) in enumerate(rows, 1):
+        lines.insert(idx[0] + off, f"| {k} | {st_} | {sv_} | {gap} | {ev} | — |")
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 377 or set(st) - set(ORDER) or len({k[0] for k in keys}) != len(keys):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the cloud round added `gap-conc-12` to `gap-conc-19`, `gap-rt-40` to `gap-rt-45`,\n"
+    "`gap-deploy-29` and `gap-design-12` (`" + REC + "` `[gaps]`),\nsame instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the design record
+D = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md")
+D.sub("- **Two records disagree with v2,** and the fold corrects them:",
+      "- **Two records disagreed with v2,** and the fold corrected them:", "owed records")
+D.insert_before("## [owed] Owed\n", """## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in one batch, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| CL-1 | "New fleet expansion (Recommended)" |
+| CL-2 | "Headless + offering head (Recommended)" |
+| CL-3 | "%s" |
+| CL-4 | "By reference, claimed (Recommended)" |
+
+Three took the recommendation as offered. CL-3 kept it as the default and added a planner: a planning workflow at
+medium effort, opt-in by default, to assist complex builds. The design already binds a planner in the Plan stage, so
+the fold reads CL-3 as giving that planner a Design item of its own, `design.streams`, and reads "headless-first" as
+needing no head. v2 `[open]` holds that reading for the owner to confirm.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **v2:** P40 joins the principles, and `[layers]` names `fleet` as the one planned expansion. Six keys join the
+  catalogue: `leases.queued-claim-days`, `leases.offer-seconds`, `runtime.admission-scope` and `design.streams` in
+  every preset, and `roles.harness.<role>` and `roles.auth.<role>` beside the never-touch keys they override.
+  `leases.expiry-hours`, `deps.messaging`, `runtime.act-harness` and `runtime.act-auth` say their part. Six chain rows
+  gain the seams: dPlacedRequest, dKeptSession, dIndexedDesign, dWellOiledMachine, dShippedRelease and dCalibratedLens.
+  `[planned]` holds the fleet itself, and `[open]` the reading of CL-3.
+- **flow-steps and layer-roles:** the planner's `design.streams` item, after `design.overlaps` and before
+  `design.unit-spec`, run only where `design.streams` holds for the build.
+- **layer-memory and coordination:** the two stale statements [owed] names are corrected.
+- **The gap register:** the sixteen gaps, the fifteen in [gaps] and `gap-design-12` for CL-3's planner, each on its
+  owning build's chain row.
+- **The chain:** the critical path grows from 253 units at `ace51f4a7` to 262, its nine new units eight on
+  dWellOiledMachine and one on dCalibratedLens.
+
+""" % CL3, "answers and folded")
+D.save()
+print("folded the owner's CL-1 to CL-4")
+````
+
+### `log_cloud_answers.py`
+
+The session log's event for the cloud answers and their fold.
+
+````python
+"""Record the owner's cloud-round answers and their fold in the session log's events.
+
+Usage: python -X utf8 log_cloud_answers.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+REC = "build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner answered CL-1 to CL-4, recorded verbatim in `{REC}` `[answers]`, and the
+  answers were folded (`[folded]`) with no agent dispatched. P40 joins v2, the `fleet` expansion is planned in
+  `[planned]`, six keys join the catalogue, six chain rows gain the seams, and sixteen gaps join the register. CL-3
+  kept the recommendation as the default and added a planner with an opt-in planning workflow: the fold gives the Plan
+  stage's planner a Design item, `design.streams`, a reading v2 `[open]` holds for the owner to confirm.
+""", "the fold's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -20675,6 +21122,8 @@ MINE = [
     ('cloud/write_questions.py', "The cloud round's five research questions, each quoting the owner's request verbatim and naming the researcher's own scratch folder, for `handoff.py render --input question=...`."),
     ('cloud/wrap_words.py', "The owner's request quoted for the design record's [words], wrapped on spaces only and checked word for word."),
     ('cloud/log_cloud_research.py', "The session log's dispatch rows 148 to 152, the derived agent lines and the round's event."),
+    ('cloud/fold_cloud_answers.py', "The owner's CL-1 to CL-4 folded: P40, the planned `fleet` expansion, six keys and four preset rows, the seams on six chain rows, sixteen gaps, the planner's `design.streams` item, the two stale statements corrected, and the record's [answers] and [folded], dry-run first on a full copy of the tree with the eight checks green there."),
+    ('cloud/log_cloud_answers.py', "The session log's event for the cloud answers and their fold."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -21161,21 +21610,22 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 ````text
 $ python plain_cites.py
 landing                 10  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dDeclaredLoop (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's) …
-plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
+plan                     9  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
 seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
 census                   6  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dPlacedRequest (dLinkedLibrary's), dKeptSession (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
+release                  4  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 spec                     4  dFairHearing (dIndexedDesign's), dDeclaredLoop (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
 act                      4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 review                   3  dGroundRules (dFairHearing's), dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
-release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
+fleet                    3  dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
@@ -21198,11 +21648,10 @@ view                     1  dDeclaredLoop (dTotalRecall's)
 triage                   1  dPlacedRequest (dRankedPlan's)
 overlap                  1  dPlacedRequest (dIndexedDesign's)
 comparison               1  dPlacedRequest (dShippedRelease's)
-fleet                    1  dPlacedRequest (dShippedRelease's)
 seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 114, over 42 kinds
+plain-word hits on a non-ancestor's record kind: 118, over 42 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -21685,10 +22134,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:858 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:883 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:858 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:883 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -21736,13 +22185,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2573 nodes in 30 namespaces; 31817 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1772, derived 306, pending 495
-map: no stale facts read 62 records and 24 quotes of a map count or the critical path
+map: 2599 nodes in 30 namespaces; 31881 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1792, derived 312, pending 495
+map: no stale facts read 62 records and 25 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 220 records, 3607 sections, 209 decision sections, 16 comparison areas, 39 principles
+atlas: derived — 220 records, 3611 sections, 210 decision sections, 16 comparison areas, 40 principles
 rc 0
 
 $ fold state
@@ -21760,8 +22209,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 481 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 114 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 21 · owned nodes read 488 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 118 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -21793,7 +22242,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 361 · chain builds 21
+register keys 377 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -21801,13 +22250,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 255 · presettable 231 · preset rows 231
+catalogue keys 261 · presettable 235 · preset rows 235
 no findings
 rc 0
 
 $ critical path
-critical path: 253 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 105, dWitnessedBar 122, dKeptSession 130, dTotalRecall 146, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 171, dIndexedDesign 185, dWellOiledMachine 199, dScopedBuild 212, dTendedCadence 215, dMindYourWords 216, dShippedRelease 227, dCalibratedLens 231, dConvergedCharter 253
+critical path: 262 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 11, dSafePassage 23, dFairHearing 40, dOrderedCharter 59, dDeclaredLoop 92, dPlacedRequest 111, dWitnessedBar 122, dKeptSession 138, dTotalRecall 146, dBoundRoles 148, dRankedPlan 162, dFurnishedOrders 168, dLinkedLibrary 171, dIndexedDesign 186, dWellOiledMachine 207, dScopedBuild 220, dTendedCadence 223, dMindYourWords 224, dShippedRelease 236, dCalibratedLens 240, dConvergedCharter 262
 rc 0
 ````
 

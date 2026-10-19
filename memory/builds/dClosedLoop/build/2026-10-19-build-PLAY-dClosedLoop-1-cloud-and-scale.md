@@ -352,10 +352,42 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 | CL-3 | How should the head break work down? | it offers whole ready units across builds, and Design's unit roster stays the cut; it also cuts each build's units into streams by their declared order and files; an LLM planner role re-cuts builds for it |
 | CL-4 | How should an owner's prompt reach another node unit? | written verbatim where the owner types it, as a request record a head offers by reference and a unit claims by lease; the head forwards the prompt's text to the unit it picks; only on the node where it was typed, as today |
 
+## [answers] The owner's answers, 2026-10-19
+
+Put to the owner in one batch, each question with its recommendation first. The owner's words, verbatim:
+
+| Fork | The owner's answer |
+|---|---|
+| CL-1 | "New fleet expansion (Recommended)" |
+| CL-2 | "Headless + offering head (Recommended)" |
+| CL-3 | "Whole units, across builds by default, but also a new headless-first 'planner' role by default, with a planning workflow at medium effort, opt-in by default to assist for complex builds (like this one, for example)." |
+| CL-4 | "By reference, claimed (Recommended)" |
+
+Three took the recommendation as offered. CL-3 kept it as the default and added a planner: a planning workflow at
+medium effort, opt-in by default, to assist complex builds. The design already binds a planner in the Plan stage, so
+the fold reads CL-3 as giving that planner a Design item of its own, `design.streams`, and reads "headless-first" as
+needing no head. v2 `[open]` holds that reading for the owner to confirm.
+
+## [folded] Where the answers went, 2026-10-19
+
+- **v2:** P40 joins the principles, and `[layers]` names `fleet` as the one planned expansion. Six keys join the
+  catalogue: `leases.queued-claim-days`, `leases.offer-seconds`, `runtime.admission-scope` and `design.streams` in
+  every preset, and `roles.harness.<role>` and `roles.auth.<role>` beside the never-touch keys they override.
+  `leases.expiry-hours`, `deps.messaging`, `runtime.act-harness` and `runtime.act-auth` say their part. Six chain rows
+  gain the seams: dPlacedRequest, dKeptSession, dIndexedDesign, dWellOiledMachine, dShippedRelease and dCalibratedLens.
+  `[planned]` holds the fleet itself, and `[open]` the reading of CL-3.
+- **flow-steps and layer-roles:** the planner's `design.streams` item, after `design.overlaps` and before
+  `design.unit-spec`, run only where `design.streams` holds for the build.
+- **layer-memory and coordination:** the two stale statements [owed] names are corrected.
+- **The gap register:** the sixteen gaps, the fifteen in [gaps] and `gap-design-12` for CL-3's planner, each on its
+  owning build's chain row.
+- **The chain:** the critical path grows from 253 units at `ace51f4a7` to 262, its nine new units eight on
+  dWellOiledMachine and one on dCalibratedLens.
+
 ## [owed] Owed
 
 - **The review debt grows.** This record and its fold join the commits the parked closing-review pair must cover.
-- **Two records disagree with v2,** and the fold corrects them: the coordination record's `[design]` title says
+- **Two records disagreed with v2,** and the fold corrected them: the coordination record's `[design]` title says
   dDeclaredLoop builds the feature, where v2 gives the leases to dPlacedRequest and the mailbox to dKeptSession; and
   layer-memory lists the lease and the mailbox message among Runtime's kinds, where P5 makes them flow's (dispatch 148).
 - **Probes the researchers could not run,** owed to the builds that carry the seams: whether GitHub accepts

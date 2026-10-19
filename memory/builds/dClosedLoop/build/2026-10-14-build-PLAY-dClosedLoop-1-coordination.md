@@ -53,6 +53,9 @@ takes on it (confirming its track), not a reliance.
 
 ## [design] The coordination feature, built by dDeclaredLoop
 
+Revised 2026-10-19 (the cloud round): the chain re-cut moved the leases to dPlacedRequest and the mailbox and
+dependency notices to dKeptSession (v2 `[chain]`), so dDeclaredLoop below reads as those two builds.
+
 **Why the flow's build.** The owner set the flow as the layer that governs what builds do and how the
 steps interact (the flow record's `[layering]`); leases and messages are how builds interact, so they
 are the flow's own mechanics, and dDeclaredLoop is the build that implements the flow. Its primitives

@@ -373,8 +373,9 @@ set. The kinds sort by P28:
   work order, decision (each resolved fork's, its class declared, a major one
   becoming a log row), and one witness record per witness the flow
   declares (acceptance, verdict, attribution, transition, landing among them). Flow registers its
-  flake, dupes and scope records. Runtime registers its return, act (launch, epoch, outcome), lease,
-  session binding, mailbox message and journal records. The night pass adds the `code` record, the `probe` record, the
+  flake, dupes and scope records, and its lease and mailbox message (P5, moved from Runtime's list by the cloud
+  round, 2026-10-19). Runtime registers its return, act (launch, epoch, outcome), session binding and journal
+  records. The night pass adds the `code` record, the `probe` record, the
   playbook and playbook set kinds, and the attendance override (points 1 to 3).
 - **Optional components** (KN-1; Knowledge's before it): the dossier and the map's owner views; the
   lexicon; the recall index. Code depth left this list in the night pass (point 3): the core `code` record replaces
@@ -431,8 +432,8 @@ layer that registers a kind adds its row.
 | fleet | dShippedRelease | its writer is `kits.fleet`: gov's reading of each adopter, per release |
 | fleet register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.fleet` |
 | transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
-| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; layer-memory lists the lease among Runtime's kinds; writer item not named |
-| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; layer-memory lists it among Runtime's kinds; writer item not named |
+| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar; writer item not named |
+| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not named |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
 | return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named: the commit queue, which is no item, writes it into the build's trail at its item's witness and pushes it with the build's branch (revised 2026-10-19, the night pass two, point 4) |
 | act | dWellOiledMachine | one act session per role act; act binding and the epoch check; writer item not named |

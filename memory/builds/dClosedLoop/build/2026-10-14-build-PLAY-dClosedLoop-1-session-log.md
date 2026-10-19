@@ -2785,6 +2785,12 @@ The cloud round's research, dispatches 148 to 152, derived from each run the sam
   CL-1 to CL-4 to the owner. Dispatch 151's probe ran 17 headless model calls, and made one folder outside its scratch,
   which it removed.
 
+- 2026-10-19, session 1799cb98: the owner answered CL-1 to CL-4, recorded verbatim in `build/2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md` `[answers]`, and the
+  answers were folded (`[folded]`) with no agent dispatched. P40 joins v2, the `fleet` expansion is planned in
+  `[planned]`, six keys join the catalogue, six chain rows gain the seams, and sixteen gaps join the register. CL-3
+  kept the recommendation as the default and added a planner with an opt-in planning workflow: the fold gives the Plan
+  stage's planner a Design item, `design.streams`, a reading v2 `[open]` holds for the owner to confirm.
+
 ## Instruments
 
 ### The gap-ownership join
