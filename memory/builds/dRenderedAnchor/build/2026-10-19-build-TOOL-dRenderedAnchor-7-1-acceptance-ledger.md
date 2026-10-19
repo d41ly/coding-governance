@@ -47,16 +47,16 @@ once, like a fresh render. The workflows README and the parity script's comment 
 - AC2 — the four `derive_kit_paths` diffs — each copy's block, CRs dropped, compared equal to the
   canonical's: `adopt-memory-tree.sh`, `kit-dogfood-parity.test.sh`, `adopt-unattended.sh` and the
   parity script. The red half is the parity row's, owed to the close.
-- AC3 — `0, 2, 2` — the canonical, sourced, returned 0 with nothing printed over the first input. It
-  returned 2 over the second, with one line naming `{{TOOL_ROOT}}h/u.js` and `p/u';x;'/u.js`, and 2
+- AC3 — `check_kit_cites` — the canonical, sourced, returned 0, 2 and 2. It printed nothing over the
+  first input. It returned 2 over the second, with one line naming `{{TOOL_ROOT}}h/u.js` and `p/u';x;'/u.js`, and 2
   over the third, with one line naming `{{TOOL_ROOT}}h/v.js` and `p/q r/v.js`. Red halves: with the
   value case made to match nothing, all three returned 0. With the cite filter taken out, all three
   returned 2 on the bare line's `q r/`.
 - AC4 — the two `check_kit_cites` diffs — the parity script's copy and the adopter's, CRs dropped,
   compared equal to the canonical's. The one-byte red half is the parity row's, owed to the close.
-- AC5 — RA7-3's layout — the parity script's `--render` printed `protocol-parity: the citation
-  {{TOOL_ROOT}}workflows/check-verifier-fanout.sh resolves to 'q r/check-verifier-fanout.sh'` and
-  `rc=2`, and no protocol existed afterwards. The adopter then printed the line naming
+- AC5 — `q r/check-verifier-fanout.sh` — in RA7-3's layout, the parity script's render mode printed
+  `protocol-parity: the citation {{TOOL_ROOT}}workflows/check-verifier-fanout.sh resolves to 'q r/check-verifier-fanout.sh'`
+  and the rest of its refusal, at `rc=2`, and no protocol existed afterwards. The adopter then printed the line naming
   `{{TOOL_ROOT}}workflows/unattended-unit.js` and `'q r/unattended-unit.js'` and `rc=2`, and no
   Skill existed. Red half: with both calls taken out (copy A), the parity script exited 0 and wrote
   the protocol, and the adopter exited 0 and wrote the Skill.
