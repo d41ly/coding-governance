@@ -254,7 +254,8 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the trailer and builder-return schemas;
   - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `reuse.propose`, `decisions.major`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial`, `run.on-owner-question` and `flow.route-backs`.
 - **Memory:**
-  - reads the specs at their SHAs, the write sets, and the bug classes those write sets select;
+  - reads the specs at their SHAs, the write sets, and the bug classes the specs name (revised 2026-10-19,
+    the night pass two, point 6, pending NT-24: no longer those the write sets select);
   - writes the commits, the acceptance records, the scope reports, the review report, the core result,
     the reuse lines and proposals, the fix units' class records, the fork records of forks resolved in
     Build, each with its id, resolver and class, written by whoever `design.forks` names to resolve
@@ -268,8 +269,8 @@ posted to dependents. The build moves through Design whole (FL-D1).
   `decisions.major: author-owner-ratifies`, before `build.distill`; the owner's gate at `build.exit` under `every-stage`.
 - **Extension points:**
   - the lexicon, an optional memory component (KN-1). The bug-class checklist left this list at KN-1:
-    bug classes are core, on memory's library side, and ride the builder's work order by its unit's
-    write set;
+    bug classes are core, on memory's library side, and ride the builder's work order as its unit's spec
+    names them, never by its write set (revised 2026-10-19, the night pass two, point 6, pending NT-24);
   - review cost (observability).
 
 ## [test] Test: does the merged result hold?
@@ -662,7 +663,8 @@ Expansions meet only through the core (EX-1), so each item below attaches at a c
   distribution and verify judgment for integrations, so it registers under both. So does the
   maintainer, under observability. Layer 3 sorts the roster by layer.
 - **The bug-class checklist** was made an extension point of Build here. Since KN-1 it is core again:
-  it rides the builder's work order from memory's library side, by the unit's write set.
+  it rides the builder's work order from memory's library side, as the unit's spec names it, never by the
+  unit's write set (revised 2026-10-19, the night pass two, point 6, pending NT-24).
 - **Ratification is not an item:**
   - under `plan.ratification: request`, `plan.exit`'s witness carries it;
   - under any other value, it is an owner breakpoint at `plan.exit`.

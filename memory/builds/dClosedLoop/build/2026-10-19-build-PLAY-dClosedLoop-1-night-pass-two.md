@@ -426,6 +426,65 @@ revised, with four gaps; the keys `budgets.enforce`, new, `budgets.*` and `instr
 `annotations.budget` retired, with their preset rows; the systems record's slot budget and annotation keys;
 layer-instruction's charter cap; and the register's `gap-tool-24`, `gap-test-22`, `gap-found-34` and `gap-review-19`.
 
+## [p6-gotchas] Point 6: the bug-class lookup, reshaped where it works and retired where it does not
+
+**The owner's question.** The lookup files classes and finds them well, but does not serve the class a session is
+about to trip. Can it take a better shape, in the orientation agents or the runtime, or should it retire?
+
+**What it does.** Dispatch 135 read `gotchas.py`:
+- **Anchors.** A class's anchors are harvested from the paths its body mentions.
+- **Selection.** A path selects a class by substring or basename, and tiers only order the list.
+- **Universals.** Six universal classes ride every checklist.
+- **Callers.** The unattended build's per-pass checklist, the default-off prebuild, the review harness and the
+  charter's "run it before any review".
+- **The design.** v2 hands classes to the builder's work order by the unit's write set (SA-7).
+
+**What it measured.** The lookup ran again at the head of each of 47 closed reviews whose appendices carry a classes
+column, and its selections were compared with the classes of the confirmed findings:
+- **Precision.** On code reviews it was 6.2%: 82 hits in 1,317 classes selected. On a diff of 85 files or more it
+  selected 60 to 95% of the catalogue, and twelve classes were selected on every code review.
+- **Use.** Sessions ran the lookup 1,127 times on this node, and a class's body was opened 45 times.
+- **At the moment of the mistake.** Run on the one file a confirmed finding cites, the selector picked the right
+  class 18 times in 98. It picked nothing 68 times.
+- **Recall.** The selector never missed a class that existed and fit. Its failure is noise, and the wrong moment.
+- **What a class is.** The classes that carry the hits are shaped by an act, not a path: amending a rule, answering
+  one question twice, routing an output, an observed-by claim no arm discharges. A spec or an intent shows them. A
+  file path does not.
+- **Coverage of findings.** Of 1,771 confirmed findings, 1,371 carry no class.
+
+**The answer.**
+1. **Writing-time serving by path retires** (NT-24). The builder's work order no longer carries classes its write
+   set selects, and the unattended per-pass checklist and the prebuild go with it.
+2. **Runtime is rejected, measured.** Three ways were tested:
+   - A hook serving classes by the edited path inherits the 18%.
+   - A content trigger, such as a text-mode `open`, fires on 53 of 111 Python files.
+   - A pre-tool hook's context arrives beside the tool's result, after the write.
+
+   A trigger precise enough to stay quiet is a gate, and that is the next point.
+3. **Syntactic classes become gates.** Under `review.left-shift`, a syntactic class becomes a gate at its second
+   occurrence, and a gated class leaves every checklist. dLinkedLibrary records each class's gate status, and marks
+   its anchors as where it bit, never what triggers it.
+4. **Classes stay on review** (NT-25). There they are the only source of labels and left-shift dispositions.
+   dFairHearing's checklist is still selected by the pinned range, minus every fully gated class, which cuts 29% of
+   the items for 5% of the labels. A replay with the checklist and without it, over the known-defect corpus, decides
+   between that selection and every ungated class. The charter's "run it before any review" retires, since the harness
+   hands the checklist itself.
+5. **Orientation may serve by intent, if it earns it** (NT-26). dIndexedDesign's reuse scout already reads a unit's
+   needs and sketch under the measured contract point 2 adopted. It also names at most five classes from the
+   catalogue's one-line index, each with a reason, for the unit's spec to carry. That is armed only once a replay
+   over the closed code reviews beats the anchor ranking's top five, at a precision of at least 20%. Each scout gets
+   its unit's spec and the index as they stood before the build, never the review. If the scout loses, serving
+   while code is written retires outright, as the owner allowed.
+
+**Left open.** Two figures leave doubt:
+- Fifteen review records state a smaller checklist than the lookup re-selects over their recorded range. Their
+  callers passed another range or tool version, so the noise figures describe the recorded ranges.
+- The design reviews' precision, 19.9%, is inflated by classes anchored on this build's own records.
+
+**Folded.** dFurnishedOrders' bug-class field revised; dIndexedDesign, dFairHearing and dLinkedLibrary clauses,
+with three gaps; flow-steps' Build memory and extension points and the checklist's note; and the register's
+`gap-mem-44`, `gap-mem-45` and `gap-review-20`.
+
 ## [forks] Parked for the owner, 2026-10-19
 
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
@@ -457,3 +516,6 @@ decision.
 | NT-21 | What replaces `gov-session`? | the `intake` message or a unit offered at placement, with the receiving session's prompt writer rendering its work order; the prompt writer, as designed; `gov-session` kept | a structural decision |
 | NT-22 | What does the one cap switch cover? | every size cap on a document or record, line and entry lengths included, with a consumer's own limit and every check of correctness left outside it; the same, with the owner able to pin one cap to refuse; every check, correctness included | a structural decision; its default is the owner's: warn |
 | NT-23 | How does an advisory cap keep a brake? | shown on a passing run, attributed to its unit, priced by its reads, and trended into an owner item by the Loop Review; shown on a passing run only; printed by its leg, as today | a structural decision |
+| NT-24 | Does the builder's work order carry the classes its write set selects? | no: serving by path retires, with the per-pass checklist and the prebuild; yes, as designed; yes, without fully gated classes | a structural decision |
+| NT-25 | How does a review get its classes? | the checklist its range selects, minus fully gated classes, until a replay with and without the checklist decides between that and every ungated class; every ungated class; no checklist at review | a structural decision |
+| NT-26 | Who serves classes while code is written? | the reuse scout by intent, at most five with reasons, armed only after it wins its replay, else no one; a runtime hook by path or content; no one | a structural decision |

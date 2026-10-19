@@ -217,6 +217,8 @@ extends.
 | gap-mem-41 | Memory | MED | memory-recall's cache is per worktree and rebuilt whole after any edit: 478 MB in the git directory today, about 1.7 GB and a minute per worktree at ten times today's tree. | `research-storage-measured.md` section 4, item 1 | — |
 | gap-mem-42 | Memory | MED | Git merges conflicting relations clean, such as two records superseding one decision on separate branches, and the planned gates check edges per source, never per target. | `research-storage-prior-art.md` probe D | — |
 | gap-mem-43 | Memory | MED | The memory legs re-read the whole tree on every run: memory hygiene took 83 s at 54 MB, about 18 minutes at ten times today's tree. | `research-storage-measured.md` sections 1 and 4, item 4 | — |
+| gap-mem-44 | Memory | HIGH | Bug classes selected by the files a change touches miss at the moment of the mistake: the edited file selects the confirmed class 18% of the time, code reviews' checklists run at 6.2% precision, and 1,127 checklist runs led to 45 reads of a class. | `research-gotchas.md` sections 2 and 3 | — |
+| gap-mem-45 | Memory | MED | A class's anchors record where it bit, not what triggers it: classes filed by one build anchor on its own records, so its later reviews hit them by path. | `research-gotchas.md` section 2 | — |
 | gap-tool-01 | Tooling | MED | Gate legs are declared twice: 81 of 140 legs exist only in `tools/gate-legs.json`, beside 67 `[[gate_leg]]` rows in kit packs. | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
 | gap-tool-02 | Tooling | MED | Wiring is judged three ways (check-wiring, eleven `adopt-*.sh --check` legs, `govkit check`) and version lockstep five ways (check-kit-versions, check-placeholders, `govkit epoch`, check-verdict-epoch, and govkit selfcheck's arm 5c at `tools/govkit/govkit.py:2162`, the expansion round's review). All 11 `[check]` argvs also duplicate their own gate legs (the expansion round). | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
 | gap-tool-03 | Tooling | MED | The hook surface spans five kits: hooks, unattended (three hooks), process-monitor and memory-recall each wire their own entries in `.claude/settings.json`. | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
@@ -413,6 +415,7 @@ extends.
 | gap-review-17 | Review | MED | A lens exists only as a literal in the harness, so an adopter's lens has no home beyond per-call notes. | `research-flow-today.md` section 3; `research-flow-design.md`, its undecided list | — |
 | gap-review-18 | Review | MED | No route turns a build's adaptation into a reusable variant: `promoted-from` covers only memory promoted to instruction, and the Loop Review proposes only retirements, merges and caps. | `research-scenarios-design.md`, its undecided item 5 | — |
 | gap-review-19 | Review | MED | A cap's breach is priced nowhere and trended nowhere, so an advisory cap has no brake: curation-debt rows drained only through raises. | `research-caps.md` section 5, test B1 | — |
+| gap-review-20 | Review | MED | A review's checklist carries fully gated classes, 29% of its items for 5% of its labels, and on a large diff it selects 60 to 95% of the catalogue. | `research-gotchas.md` section 2 | — |
 
 The counts are derived, never typed: a first draft typed 59 rows here over a table holding 56. The
 instrument, run against this file, and its output when the register was written:
@@ -788,4 +791,12 @@ Re-measured after the night pass two's point 5 added `gap-tool-24`, `gap-test-22
 ```text
 Roles=29 Deploy=28 Plan=8 Spine=21 Orient=21 Test=22 Runtime=33 Lexicon=10 Tooling=24 Review=19 Foundation=34 Build=6 Memory=42 Flow=22 Maintain=15 Design=11
 LOW=58 MED=171 HIGH=116
+```
+
+Re-measured after the night pass two's point 6 added `gap-mem-44`, `gap-mem-45` and `gap-review-20`
+(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p6-gotchas]`), same instrument, over 348 keys:
+
+```text
+Roles=29 Deploy=28 Plan=8 Spine=21 Orient=21 Test=22 Runtime=33 Lexicon=10 Tooling=24 Review=20 Foundation=34 Build=6 Memory=44 Flow=22 Maintain=15 Design=11
+LOW=58 MED=173 HIGH=117
 ```

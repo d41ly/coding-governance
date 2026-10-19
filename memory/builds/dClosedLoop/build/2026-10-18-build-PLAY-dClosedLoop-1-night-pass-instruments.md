@@ -15435,6 +15435,208 @@ R.save()
 print("folded point 5")
 ````
 
+### `fold_p6.py`
+
+Point 6, the bug-class lookup: the point's section and forks NT-24 to NT-26, classes no longer selected by a write set, kept on review and served by intent only after a replay, folded into v2, flow-steps and the gap register.
+
+````python
+"""The night pass two, point 6: the bug-class lookup. Writes the point's section and its forks (NT-24 to NT-26) into
+the night pass two's record and folds the design, marked pending, into v2, flow-steps and the gap register: classes no
+longer selected by a unit's write set, kept on review without fully gated classes, and served while code is written
+only by intent and only after a replay test.
+
+Usage: python -X utf8 fold_p6.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+NP2 = "the night pass two"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def add_gaps(rec, build, keys):
+    row = [ln for ln in rec.text.split("\n") if ln.startswith(f"| {build} |") and ln.count(" | ") == 4]
+    if len(row) != 1:
+        sys.exit(f"{build}: {len(row)} rows")
+    rec.sub(row[0], row[0][:-2] + ", " + ", ".join(keys) + " |", f"gaps on {build}")
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("bug classes rendered as a core field by the unit's write set, selected by `gotchas.py --for-paths`, the one "
+      "selector (SA-7)",
+      "bug classes rendered as a core field from the classes the unit's spec names, never selected by its write set "
+      f"(SA-7, revised by {NP2}, point 6, pending NT-24: the edited file selected the confirmed class 18% of the time)",
+      "dFurnishedOrders: the bug-class field")
+add_gaps(V, "dFurnishedOrders", ["gap-mem-44"])
+add_clauses(V, "dIndexedDesign", [
+    "the reuse scout's return also naming at most five bug classes by intent, read from the catalogue's one-line "
+    "index against the unit's needs and sketch, each with its reason, for the unit's spec to carry, armed only once a "
+    "replay over the closed code reviews, each scout given its unit's spec and the index as they stood before the "
+    "build and never the review, scores above the anchor ranking's top five with a precision of at least 20%, and "
+    f"retired unarmed if it does not ({NP2}, point 6, pending NT-26)"], [])
+add_clauses(V, "dFairHearing", [
+    "the review's bug-class checklist selected by the pinned range and ordered by anchors, with every fully gated class "
+    "left off, and a replay with the checklist and without it over the known-defect corpus deciding whether review "
+    "keeps that selection or takes every ungated class, the lookup's charter line retired as the harness hands the "
+    f"checklist itself ({NP2}, point 6, pending NT-25)"], ["gap-review-20"])
+add_clauses(V, "dLinkedLibrary", [
+    "each bug class carrying its gate status, gated, partly gated or ungated, a syntactic class turned into a gate at "
+    "its second occurrence and leaving every checklist once gated, and its anchors marked as where it bit, never what "
+    f"triggers it ({NP2}, point 6, pending NT-25)"], ["gap-mem-45"])
+V.save()
+
+# ---------------------------------------------------------------- flow-steps
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+FS.sub("  - reads the specs at their SHAs, the write sets, and the bug classes those write sets select;\n",
+       "  - reads the specs at their SHAs, the write sets, and the bug classes the specs name (revised 2026-10-19,\n"
+       "    the night pass two, point 6, pending NT-24: no longer those the write sets select);\n", "Build: memory reads")
+FS.sub("    bug classes are core, on memory's library side, and ride the builder's work order by its unit's\n"
+       "    write set;\n",
+       "    bug classes are core, on memory's library side, and ride the builder's work order as its unit's spec\n"
+       "    names them, never by its write set (revised 2026-10-19, the night pass two, point 6, pending NT-24);\n",
+       "Build: extension points")
+FS.sub("  it rides the builder's work order from memory's library side, by the unit's write set.\n",
+       "  it rides the builder's work order from memory's library side, as the unit's spec names it, never by the\n"
+       "  unit's write set (revised 2026-10-19, the night pass two, point 6, pending NT-24).\n", "the checklist's note")
+FS.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+RG = "`research-gotchas.md`"
+NEW = {
+    "gap-mem-43": [("gap-mem-44", "Memory", "HIGH", "Bug classes selected by the files a change touches miss at the "
+                    "moment of the mistake: the edited file selects the confirmed class 18% of the time, code reviews' "
+                    "checklists run at 6.2% precision, and 1,127 checklist runs led to 45 reads of a class.",
+                    f"{RG} sections 2 and 3"),
+                   ("gap-mem-45", "Memory", "MED", "A class's anchors record where it bit, not what triggers it: "
+                    "classes filed by one build anchor on its own records, so its later reviews hit them by path.",
+                    f"{RG} section 2")],
+    "gap-review-19": [("gap-review-20", "Review", "MED", "A review's checklist carries fully gated classes, 29% of its "
+                       "items for 5% of its labels, and on a large diff it selects 60 to 95% of the catalogue.",
+                       f"{RG} section 2")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 348 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's point 6 added `gap-mem-44`, `gap-mem-45` and `gap-review-20`\n"
+    "(`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p6-gotchas]`), same instrument, over "
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night pass two's record
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.insert_before("\n## [forks] Parked for the owner, 2026-10-19\n", """
+## [p6-gotchas] Point 6: the bug-class lookup, reshaped where it works and retired where it does not
+
+**The owner's question.** The lookup files classes and finds them well, but does not serve the class a session is
+about to trip. Can it take a better shape, in the orientation agents or the runtime, or should it retire?
+
+**What it does.** Dispatch 135 read `gotchas.py`:
+- **Anchors.** A class's anchors are harvested from the paths its body mentions.
+- **Selection.** A path selects a class by substring or basename, and tiers only order the list.
+- **Universals.** Six universal classes ride every checklist.
+- **Callers.** The unattended build's per-pass checklist, the default-off prebuild, the review harness and the
+  charter's "run it before any review".
+- **The design.** v2 hands classes to the builder's work order by the unit's write set (SA-7).
+
+**What it measured.** The lookup ran again at the head of each of 47 closed reviews whose appendices carry a classes
+column, and its selections were compared with the classes of the confirmed findings:
+- **Precision.** On code reviews it was 6.2%: 82 hits in 1,317 classes selected. On a diff of 85 files or more it
+  selected 60 to 95% of the catalogue, and twelve classes were selected on every code review.
+- **Use.** Sessions ran the lookup 1,127 times on this node, and a class's body was opened 45 times.
+- **At the moment of the mistake.** Run on the one file a confirmed finding cites, the selector picked the right
+  class 18 times in 98. It picked nothing 68 times.
+- **Recall.** The selector never missed a class that existed and fit. Its failure is noise, and the wrong moment.
+- **What a class is.** The classes that carry the hits are shaped by an act, not a path: amending a rule, answering
+  one question twice, routing an output, an observed-by claim no arm discharges. A spec or an intent shows them. A
+  file path does not.
+- **Coverage of findings.** Of 1,771 confirmed findings, 1,371 carry no class.
+
+**The answer.**
+1. **Writing-time serving by path retires** (NT-24). The builder's work order no longer carries classes its write
+   set selects, and the unattended per-pass checklist and the prebuild go with it.
+2. **Runtime is rejected, measured.** Three ways were tested:
+   - A hook serving classes by the edited path inherits the 18%.
+   - A content trigger, such as a text-mode `open`, fires on 53 of 111 Python files.
+   - A pre-tool hook's context arrives beside the tool's result, after the write.
+
+   A trigger precise enough to stay quiet is a gate, and that is the next point.
+3. **Syntactic classes become gates.** Under `review.left-shift`, a syntactic class becomes a gate at its second
+   occurrence, and a gated class leaves every checklist. dLinkedLibrary records each class's gate status, and marks
+   its anchors as where it bit, never what triggers it.
+4. **Classes stay on review** (NT-25). There they are the only source of labels and left-shift dispositions.
+   dFairHearing's checklist is still selected by the pinned range, minus every fully gated class, which cuts 29% of
+   the items for 5% of the labels. A replay with the checklist and without it, over the known-defect corpus, decides
+   between that selection and every ungated class. The charter's "run it before any review" retires, since the harness
+   hands the checklist itself.
+5. **Orientation may serve by intent, if it earns it** (NT-26). dIndexedDesign's reuse scout already reads a unit's
+   needs and sketch under the measured contract point 2 adopted. It also names at most five classes from the
+   catalogue's one-line index, each with a reason, for the unit's spec to carry. That is armed only once a replay
+   over the closed code reviews beats the anchor ranking's top five, at a precision of at least 20%. Each scout gets
+   its unit's spec and the index as they stood before the build, never the review. If the scout loses, serving
+   while code is written retires outright, as the owner allowed.
+
+**Left open.** Two figures leave doubt:
+- Fifteen review records state a smaller checklist than the lookup re-selects over their recorded range. Their
+  callers passed another range or tool version, so the noise figures describe the recorded ranges.
+- The design reviews' precision, 19.9%, is inflated by classes anchored on this build's own records.
+
+**Folded.** dFurnishedOrders' bug-class field revised; dIndexedDesign, dFairHearing and dLinkedLibrary clauses,
+with three gaps; flow-steps' Build memory and extension points and the checklist's note; and the register's
+`gap-mem-44`, `gap-mem-45` and `gap-review-20`.
+""", "point 6's section")
+R.text = R.text.rstrip("\n") + "\n" + (
+    "| NT-24 | Does the builder's work order carry the classes its write set selects? | no: serving by path retires, "
+    "with the per-pass checklist and the prebuild; yes, as designed; yes, without fully gated classes | a structural "
+    "decision |\n"
+    "| NT-25 | How does a review get its classes? | the checklist its range selects, minus fully gated classes, until a "
+    "replay with and without the checklist decides between that and every ungated class; every ungated class; no "
+    "checklist at review | a structural decision |\n"
+    "| NT-26 | Who serves classes while code is written? | the reuse scout by intent, at most five with reasons, armed "
+    "only after it wins its replay, else no one; a runtime hook by path or content; no one | a structural decision |\n")
+R.done += 1
+R.save()
+print("folded point 6")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before.
@@ -15775,6 +15977,9 @@ MINE = [
     ("night2/fold_p5.py", "Point 5, caps: the point's section and forks NT-22 and NT-23, `budgets.enforce` "
      "with its clauses, `instructions.checks` narrowed and `annotations.budget` retired, folded into v2, the "
      "systems record, layer-instruction and the gap register."),
+    ("night2/fold_p6.py", "Point 6, the bug-class lookup: the point's section and forks NT-24 to NT-26, "
+     "classes no longer selected by a write set, kept on review and served by intent only after a replay, "
+     "folded into v2, flow-steps and the gap register."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
@@ -16264,13 +16469,13 @@ fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dInd
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
+spec                     3  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
 act                      3  dDeclaredLoop (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 review                   2  dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 census                   2  dOrderedCharter (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 probe                    2  dOrderedCharter (dPlacedRequest's), dDeclaredLoop (dPlacedRequest's)
-spec                     2  dFairHearing (dIndexedDesign's), dBoundRoles (dIndexedDesign's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 decision                 2  dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
@@ -16279,6 +16484,7 @@ receipt                  1  dSafePassage (dShippedRelease's)
 card                     1  dOrderedCharter (dPlacedRequest's)
 diff                     1  dOrderedCharter (dIndexedDesign's)
 ruling                   1  dOrderedCharter (dLinkedLibrary's)
+selection                1  dFairHearing (dWitnessedBar's)
 disposition              1  dFairHearing (dDeclaredLoop's)
 verdict                  1  dDeclaredLoop (dWitnessedBar's)
 attribution              1  dDeclaredLoop (dWitnessedBar's)
@@ -16292,7 +16498,7 @@ roster                   1  dBoundRoles (dIndexedDesign's)
 seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 100, over 40 kinds
+plain-word hits on a non-ancestor's record kind: 102, over 41 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -16752,10 +16958,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:793 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:804 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:793 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:804 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -16803,13 +17009,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2493 nodes in 30 namespaces; 31451 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1707, derived 291, pending 495
+map: 2496 nodes in 30 namespaces; 31452 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1710, derived 291, pending 495
 map: no stale facts read 57 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 198 records, 3309 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 198 records, 3311 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -16828,7 +17034,7 @@ rc 0
 
 $ reconciliation probe
 chain rows 21 · owned nodes read 465 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 100 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 102 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -16860,7 +17066,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 345 · chain builds 21
+register keys 348 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -16874,7 +17080,7 @@ rc 0
 
 $ critical path
 critical path: 233 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 9, dSafePassage 21, dFairHearing 35, dOrderedCharter 56, dDeclaredLoop 85, dPlacedRequest 96, dWitnessedBar 114, dKeptSession 118, dTotalRecall 137, dBoundRoles 138, dRankedPlan 152, dFurnishedOrders 158, dLinkedLibrary 161, dIndexedDesign 174, dWellOiledMachine 180, dScopedBuild 193, dTendedCadence 196, dMindYourWords 197, dShippedRelease 207, dCalibratedLens 211, dConvergedCharter 233
+each build's earliest finish, in units: dGroundRules 9, dSafePassage 21, dFairHearing 36, dOrderedCharter 56, dDeclaredLoop 85, dPlacedRequest 96, dWitnessedBar 114, dKeptSession 118, dTotalRecall 137, dBoundRoles 138, dRankedPlan 152, dFurnishedOrders 158, dLinkedLibrary 162, dIndexedDesign 176, dWellOiledMachine 180, dScopedBuild 193, dTendedCadence 196, dMindYourWords 197, dShippedRelease 207, dCalibratedLens 211, dConvergedCharter 233
 rc 0
 ````
 
