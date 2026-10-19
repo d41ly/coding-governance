@@ -191,11 +191,10 @@ are `gov-skeptic` and the synthesizer `gov-synthesizer`, each handed its brief t
 The walk reads a copy of the design with twelve fixed past defects reverted into it, and each run is graded on how
 many it finds (final-questions `[audit]`).
 - **The copy** is made from the commit that folds step 2, as a fresh repository holding that tree in one commit, so no
-  history shows what changed, kept in the session's scratchpad outside the repository. Every sentence of the copy's
+  history shows what changed, kept in the session's temp root, outside the repository and its scratchpad. Every sentence of the copy's
   records that names a candidate plant is cut from the copy too.
 - **The plants** are escapes: defects a later review found after an earlier one had passed them, each fixed by a fold
-  since, and each reverted into today's text. Two are mechanical, a kind's writer dropped and a principle's enforcing
-  clause dropped, and Stage 0 must catch both on the copy itself (`stage0.py --root <copy> --arms K3,K5`), as it must
+  since, and each reverted into today's text. Two are mechanical, and Stage 0 must catch both on the copy itself (`stage0.py --root <copy> --arms K3,K5`), as it must
   every time.
 - **The key,** the plants and the seeding script stay outside the repository until both runs are scored. The key's
   SHA-256 is pinned in every walker's brief before launch, and the scorer refuses a key whose hash moved. After the
@@ -275,6 +274,11 @@ Each goes to the walk as a lead beside Stage 0's reds, and to the audit's fold:
 - **Dispatches** 160 to 164 are run A's walkers and 165 to 169 run B's, their handoffs
   `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-1-spec-reviewer.md` to `...-10-spec-reviewer.md`, each handed its brief,
   `build/2026-10-20-build-PLAY-dClosedLoop-1-walk-brief-<run><walker>.md`, as its `input:spec`.
+- **A breach in run A,** disclosed by its walker 5: before it switched to the copy, it read this record in the working
+  tree from `[scenarios]` on, where `[recall]` then named the two mechanical plants' kinds, which the copy's record
+  had cut. That sentence is cut here too before run B, and run B's briefs forbid reading anything under `memory/` in
+  the working tree but the brief itself. The scoring reports walker 5's hits with this noted. Run A's returns wait
+  outside the scratchpad, where run B's walkers keep their own scratch folders.
 
 ## [stage0-classes] Stage 0's classes
 

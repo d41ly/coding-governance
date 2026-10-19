@@ -24823,6 +24823,120 @@ L.insert_before("\n## Instruments\n", f"""
 L.save()
 ````
 
+### `save_walk_return.py`
+
+Saves one walk agent's final return verbatim from its transcript, any H1 demoted, to the sealed returns folder while the other run's walkers still run.
+
+````python
+"""Save one walk agent's final return, verbatim, as a record: a walker's, a skeptic's or a synthesizer's message, from its
+transcript's last assistant message, any H1 demoted to bold. Written where --out says: the audit's scratch folder while
+the other run's walkers still run, the build folder after.
+
+Usage: python -X utf8 save_walk_return.py <transcript.jsonl> <out.md> <title> <dispatch> <prompt file> [--force]
+Prints the path, its size and the return's first line. Refuses to overwrite unless --force.
+"""
+import json
+import pathlib
+import re
+import sys
+
+src, out, title, dispatch, prompt = sys.argv[1:6]
+last = None
+with open(src, encoding="utf-8") as f:
+    for line in f:
+        try:
+            ev = json.loads(line)
+        except ValueError:
+            continue
+        msg = ev.get("message") if isinstance(ev, dict) else None
+        if ev.get("type") == "assistant" and isinstance(msg, dict):
+            texts = [b.get("text", "") for b in msg.get("content", []) if isinstance(b, dict) and b.get("type") == "text"]
+            if any(t.strip() for t in texts):
+                last = "\n".join(t for t in texts if t.strip())
+if not last:
+    sys.exit("no assistant text in " + src)
+body = re.sub(r"^# (.+)$", r"**\1**", last.replace("\r\n", "\n").strip("\n"), flags=re.M)
+path = pathlib.Path(out)
+if path.exists() and "--force" not in sys.argv:
+    sys.exit(f"{path} exists")
+path.parent.mkdir(parents=True, exist_ok=True)
+path.write_text(f"""# {title}
+
+**Serves:** research PLAY-dClosedLoop-1
+
+Dispatch {dispatch}'s return, verbatim, any H1 demoted to bold. Its handoff is `prompts/{prompt}`, and its use is in
+`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`.
+
+---
+
+{body}
+""", encoding="utf-8", newline="\n")
+print(f"{path.as_posix()}: {path.stat().st_size} bytes; first line: {body.splitlines()[0][:120]}")
+````
+
+### `make_subjects.py`
+
+The walk reports' Subjects line: every design record the line-coverage instrument counts, at its blob in the commit the sealed copy was made from.
+
+````python
+"""The walk reports' Subjects line: every design record the line-coverage instrument counts, at its blob in the commit
+the sealed copy was made from, which is what the walk read but for the plants.
+
+Usage: python -X utf8 make_subjects.py <base sha> <out.txt>   (from the worktree root)
+"""
+import re
+import subprocess
+import sys
+
+base, out = sys.argv[1], sys.argv[2]
+SKIP = re.compile(r"-1-(research-|session-log|compaction-)|compared|instruments")
+names = subprocess.run(["git", "ls-tree", "--name-only", base, "memory/builds/dClosedLoop/build/"], capture_output=True,
+                       text=True, check=True).stdout.split()
+pairs = []
+for path in names:
+    if path.endswith(".md") and not SKIP.search(path.rsplit("/", 1)[-1]):
+        blob = subprocess.run(["git", "rev-parse", f"{base}:{path}"], capture_output=True, text=True, check=True).stdout.strip()
+        pairs.append(f"{path}@{blob}")
+line = "Subjects (round 1): " + ", ".join(pairs)
+open(out, "w", encoding="utf-8", newline="\n").write(line + "\n")
+print(f"subjects {len(pairs)} at {base[:9]}, {len(line)} characters")
+````
+
+### `seal_run_b.py`
+
+Before run B: the round record's [recall] stops naming the mechanical plants' kinds, which a run A walker read in the working tree, and [walk] records the breach.
+
+````python
+"""Before run B: the round record's [recall] stops naming the mechanical plants' kinds, which a run A walker read in the
+working tree before it switched to the copy, and states where the copy lives; [walk] records the breach and the brief's
+tightened reading rule.
+
+Usage: python -X utf8 seal_run_b.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.sub("""  since, and each reverted into today's text. Two are mechanical, a kind's writer dropped and a principle's enforcing
+  clause dropped, and Stage 0 must catch both on the copy itself""", """  since, and each reverted into today's text. Two are mechanical, and Stage 0 must catch both on the copy itself""",
+      "[recall] mechanical plants")
+R.sub("history shows what changed, kept in the session's scratchpad outside the repository.",
+      "history shows what changed, kept in the session's temp root, outside the repository and its scratchpad.",
+      "[recall] where the copy lives")
+R.sub("""  `build/2026-10-20-build-PLAY-dClosedLoop-1-walk-brief-<run><walker>.md`, as its `input:spec`.
+""", """  `build/2026-10-20-build-PLAY-dClosedLoop-1-walk-brief-<run><walker>.md`, as its `input:spec`.
+- **A breach in run A,** disclosed by its walker 5: before it switched to the copy, it read this record in the working
+  tree from `[scenarios]` on, where `[recall]` then named the two mechanical plants' kinds, which the copy's record
+  had cut. That sentence is cut here too before run B, and run B's briefs forbid reading anything under `memory/` in
+  the working tree but the brief itself. The scoring reports walker 5's hits with this noted. Run A's returns wait
+  outside the scratchpad, where run B's walkers keep their own scratch folders.
+""", "[walk] the breach")
+R.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -25248,6 +25362,9 @@ MINE = [
     ('walkkit/register.py', "Registers scripts in this record's writer, each before the preset check's entry."),
     ('audit-run/make_leads.py', "The walk's leads: Stage 0's run on the working tree, never on the sealed copy, the round record's [found] and line coverage, written beside the copy's design as stage0-leads.md."),
     ('audit-run/record_dispatch.py', "The walk as dispatched: the round record's [walk] and step 3's status, and the session log's dispatch rows 160 to 169 and event."),
+    ('audit-run/save_walk_return.py', "Saves one walk agent's final return verbatim from its transcript, any H1 demoted, to the sealed returns folder while the other run's walkers still run."),
+    ('audit-run/make_subjects.py', "The walk reports' Subjects line: every design record the line-coverage instrument counts, at its blob in the commit the sealed copy was made from."),
+    ('audit-run/seal_run_b.py', "Before run B: the round record's [recall] stops naming the mechanical plants' kinds, which a run A walker read in the working tree, and [walk] records the breach."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -25653,6 +25770,9 @@ During the whole-design audit's Stage 0, before its commit:
     are rendered. Its re-run read only that run's files.
 21. `walk.py`'s skeptic and synthesis templates: "Your effort is the owner's medium" replaced by "the one the owner's
     role definition sets", once the rendered definitions read `gov-skeptic` and `gov-synthesizer` at high.
+22. `walk.py`'s walker template gained, by one Edit before run B was dispatched, the bullet "Nothing under `memory/` in
+    the working tree but this brief", once run A's walker 5 disclosed reading the working tree's round record first;
+    run B's five briefs were rendered again from it, their handoffs unchanged, since a handoff carries the brief's path.
 ````
 
 ## [red] The red runs, as captured
@@ -26583,9 +26703,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 60 · lines 31157 · unreviewed 13282 (43%)
+  design records 60 · lines 31897 · unreviewed 14022 (44%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 7
+  design commits after the floor that no closing review covers: 8
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -26593,6 +26713,7 @@ rerun review debt: rc 0
     94f9607ca  3 design record(s)  records(dClosedLoop): the whole-design audit's Stage 0 — five checks over items, routes, kinds, keys and princ
     1d5799a45  1 design record(s)  records(dClosedLoop): the audit's walk kit, its scorer and the instruments questions 2 and 3 rest on — each se
     747a2af22  2 design record(s)  records(dClosedLoop): the audit's step 2 — the owner confirms v2's four open readings, and where deviation rec
+    47de3dc82  11 design record(s)  records(dClosedLoop): the whole-design walk dispatched — the sealed copy, Stage 0 on it and on the tree, and t
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -26817,7 +26938,7 @@ map: no stale facts read 75 records and 28 quotes of a map count or the critical
 rc 0
 
 $ atlas
-atlas: derived — 240 records, 3849 sections, 215 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 240 records, 3852 sections, 215 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

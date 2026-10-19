@@ -9,6 +9,8 @@ will not see its findings, and it will not see yours.
 
 ## Where you read
 
+- **Nothing under `memory/` in the working tree but this brief:** not the round record, not the other briefs, not
+  the reviews. The working tree's records differ from the copy's, and reading them spoils the walk.
 - **Every design record from the sealed copy only:** `C:/Users/d41ly/AppData/Local/Temp/claude/seed-dcl/tree/memory/builds/dClosedLoop/build/`. The copy is the
   design under audit. Never read the design records in the working tree, never diff the copy against it, and never read
   git history for them: the copy differs on purpose, and a finding cited from anywhere else is not scored.
