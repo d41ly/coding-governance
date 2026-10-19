@@ -6,7 +6,6 @@ streams: tooling
 roster: TOOL
 authorized-by: prompt
 ids: TOOL-dRenderedAnchor-1
-status: OPEN
 ---
 
 # dRenderedAnchor — an adopter's role index names the harnesses where the review-harness kit landed
@@ -57,18 +56,20 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-19 · streams tooling
+**Build status:** SPECCED · 1 unit(s) · node d · opened 2026-10-19 · streams tooling
 ids TOOL-dRenderedAnchor-1
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dRenderedAnchor-1 — the kit resolver finds a rendered file through its receipt row, and the role render reds a harness listed where it is not installed](spec/2026-10-19-spec-TOOL-dRenderedAnchor-1.md) | — | 2 | SPECCED | rev-1 | 2026-10-19 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 2 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dRenderedAnchor-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
