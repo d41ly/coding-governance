@@ -147,7 +147,8 @@ repository's. Nobody edits a rendered file, and an update never writes the repos
    `charter.practices` does for practices. Exclusion is refused for a fixed unit and for one another active unit
    requires, naming the requirer.
 7. **Parameterize.** Gov's units read policy values and install answers, as designed. A repository may declare its
-   own keys under `repo.`, read only by its own units and outside the presets' completeness check.
+   own keys under `adopter.`, read only by its own units and outside the presets' completeness check (the segment
+   renamed from `repo`, the owner's tag-grammar answer, 2026-10-19).
 8. **Fixed units.** A gov unit's class is derived, never typed. A fixed unit cannot be amended, replaced or excluded: the core
    principles, the floor's invariants, and every unit a gov tool parses, such as the micro-format grammar and the
    loop's contracts. Every other unit is open.
@@ -286,7 +287,7 @@ The last three folds' closing review, run twice (`build/2026-10-19-build-PLAY-dC
 v2 is the design of record:
 - **Item 1:** a row's origin is the repository, a field apart from the `owner` edge (`owner-field`).
 - **Item 7:** a repository's own policy keys are declared in the overlay, set in `.governance/policy.toml`, tagged
-  `policy.repo.<key>` and validated by dGroundRules' reader (`repo-keys-unread`).
+  `policy.adopter.<key>` and validated by dGroundRules' reader (`repo-keys-unread`).
 - **Item 8:** the fixed class is derived from the parsers and the floor, never typed (`fixed-class-typed`).
 - **Item 9:** `editorial` is admitted only for a mechanical diff or the owner's proof-carrying ruling, and each `instructions.stale`
   value has its arm: `order` renders both and files an order, `refuse` holds the update, and `warn` renders both

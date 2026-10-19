@@ -145,22 +145,23 @@ writes the repository's rows. This is the instruction round's "compose, never ed
    its units, each in its kind's shipped schema: item, role, workflow, lens and leg, and a repository stage's splice rows (FA-3, revised 2026-10-19, the flow adoption's review). The layer-instruction record's
    R-I already counts these structured sources as instruction sources. One file keeps one guard, one door
    (`instructions.edit`), one report and one exclusion list (FA-1).
-2. **Tags.** A repository row carries its kind's tag with the `repo` segment where an owner would sit:
-   `item.<step>.repo.<name>`, `role.repo.<name>`, `workflow.repo.<name>`, `lens.repo.<name>` and `leg.repo.<name>`,
-   and for a repository stage `step.repo.<name>`, its items `item.repo.<stage>.<name>` (FA-3, revised 2026-10-19,
+2. **Tags.** A repository row carries its kind's tag with the `adopter` segment where an owner would sit:
+   `item.<step>.adopter.<name>`, `role.adopter.<name>`, `workflow.adopter.<name>`, `lens.adopter.<name>` and `leg.adopter.<name>`,
+   and for a repository stage `step.adopter.<name>`, its items `item.adopter.<stage>.<name>` (FA-3, revised 2026-10-19,
    the flow adoption's review).
    Gov never ships the segment, so no repository tag collides with a gov tag. `owned` admits the segment for the
    repository, and the row's `origin` is the repository, outside the `owner` edge and `one-owner`. Prose units keep
-   IA's `repo.<segment>`. Two namespaces join: `workflow`, owned by dBoundRoles, and `lens`, by dCalibratedLens.
+   IA's `repo.<segment>`. The segment is `adopter`, never `repo`, since `repo` names the units' namespace and the tag
+   grammar forbids a namespace word as a name's first segment (renamed 2026-10-19, the owner's tag-grammar answer). Two namespaces join: `workflow`, owned by dBoundRoles, and `lens`, by dCalibratedLens.
 3. **Add.**
-   - **An item** sits in a gov step as `item.<step>.repo.<name>`, with every field an item declares: actor, needs,
+   - **An item** sits in a gov step as `item.<step>.adopter.<name>`, with every field an item declares: actor, needs,
      inputs, allowance, return template, a closed outcome set with `probe`, witness and routes. Its witness is
      computed, never typed (P2). Its routes may lead to gov items, and a gov item waits for it only through an
      amendment of that item's `needs`.
    - **A step:** the five stages stay fixed (P20). A repository's own step is a group of its items inside a stage, a
      program at item boundaries that `review.breakpoints` and `probe.points` place, or a cadence program at
      Runtime's cadence-item point (FA-3). The owner chose repository stages instead; `[folded]` gives the design.
-   - **A role** is `role.repo.<name>`, with the structured fields, a typed return template and its ceiling, and
+   - **A role** is `role.adopter.<name>`, with the structured fields, a typed return template and its ceiling, and
      declares the shape kinds it runs in. It acts in repository items, and in a gov item only through an amendment
      of that item's actor (FA-4).
    - **A workflow** is an entry of a registered shape kind (single, per-unit, panel, twin, experiment), naming its
@@ -168,7 +169,7 @@ writes the repository's rows. This is the instruction round's "compose, never ed
    - **A lens** is a catalogue row whose brief is a unit, selected by `review.opt-in`. The harness keeps its
      five-slot literal and fills each slot from the catalogue as data, so the merge bar's harness check counts slots,
      never names (agent-cap's count until the night pass two's point 7).
-   - **A gate leg** is `leg.repo.<name>`, in the leg-pack schema, registered at Test's leg-pack point as the
+   - **A gate leg** is `leg.adopter.<name>`, in the leg-pack schema, registered at Test's leg-pack point as the
      repository's pack, generated into the manifest by the leg factory like any pack's, and counted only once its
      seen-red record exists. After adoption has converted today's hand-added rows, a manifest row with no source
      reds.
@@ -261,11 +262,11 @@ writes the repository's rows. This is the instruction round's "compose, never ed
     version reds at composition.
 17. **Adoption of today's customizations.** At install and update, the `adopt` program proposes each of today's
     customizations as overlay rows, for the owner to rule once:
-    - a hand-added manifest leg as a `leg.repo.*` row;
+    - a hand-added manifest leg as a `leg.adopter.*` row;
     - a leg's ceiling or argument override as a patch;
     - the house file's efforts as `roles.effort.*` values, and its grants as patches;
     - `.unattended.conf`'s extension vocabularies as items with computed witnesses, or drops;
-    - an adopter's role files as `role.repo.*` rows with their workflow entries.
+    - an adopter's role files as `role.adopter.*` rows with their workflow entries.
 18. **Gov as its own adopter.** IA-6's census extends to flow and roles: the 73 legs no descriptor declares, gov's
     own efforts and grants, and its `.unattended.conf` and `gate-env.sh` values. The owner rules on each, and the
     gov-only ones move to gov's overlay and policy file, so a gov retune stops becoming every adopter's default.
@@ -278,8 +279,8 @@ writes the repository's rows. This is the instruction round's "compose, never ed
 | Case | Today | Under the recommendation |
 |---|---|---|
 | The adopter adds a check before landing | a run vocabulary with no position, satisfied by an attested fact | an item in Test, with a computed witness, and a patch adding it to the landing item's `needs` |
-| The adopter adds a role | the file renders, the catalogue reds it, and registering it edits gov's engine and holds the kit back | a `role.repo.*` row declaring its shapes, checked at composition, with no engine edit |
-| The adopter adds a gate leg | a manifest row, kept by name and never registered | a `leg.repo.*` row in its pack, generated into the manifest, counted once seen red |
+| The adopter adds a role | the file renders, the catalogue reds it, and registering it edits gov's engine and holds the kit back | a `role.adopter.*` row declaring its shapes, checked at composition, with no engine edit |
+| The adopter adds a gate leg | a manifest row, kept by name and never registered | a `leg.adopter.*` row in its pack, generated into the manifest, counted once seen red |
 | The adopter adds a lens | per-call notes only | a catalogue row whose brief is a unit, chosen by `review.opt-in` |
 | The adopter changes a gov leg's arguments | the whole manifest withheld, rc 1 | a patch, while every other leg lands |
 | The adopter drops a gov leg | re-appended with no line naming it | excluded and reported, refused if fixed or required |
@@ -297,7 +298,7 @@ writes the repository's rows. This is the instruction round's "compose, never ed
 
 Each clause sits on the build that registers its kind, or on a descendant of every build whose schema it reads:
 - **dOrderedCharter:** the overlay's row mechanism for any kind a later build registers: `owned` admitting the
-  `repo` segment in a registered namespace, field patches as `amends`, whole rows as `supersedes`,
+  `adopter` segment in a registered namespace, field patches as `amends`, whole rows as `supersedes`,
   `instructions.exclude` over any registered kind's tags, pins over a row's canonical form, and the change
   record's marks and successors covering rows, and the row checks over a fixture kind: the fixed set refused to
   every patch, widening, supersession and exclusion, the exclude refusals naming the requirer or the key, and the
@@ -308,7 +309,7 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 - **dDeclaredLoop:** the `item` kind in the kinds register with its factory, repository items composed with the
   loop definition at the landed revision, the composition's graph and typed-input checks, item tags joined to the
   step gate, a build's composition pinned per step, every policy value naming a boundary re-pointed on a rename, and
-  repository stages spliced between adjacent gov stages, tagged `step.repo.<name>`, seen red on a planted remove,
+  repository stages spliced between adjacent gov stages, tagged `step.adopter.<name>`, seen red on a planted remove,
   reorder or replace and on a stage before Plan, after Deploy or across non-adjacent stages.
 - **dBoundRoles:** repository roles and workflow entries, roles declaring their shape kinds, `BODY_CEILINGS` and
   `WORKFLOW_NAMES` turned into declarations, the matrix arms reading the composition, role and workflow tags joined
@@ -420,3 +421,12 @@ The owner asked, "run the review pair on both folds, medium effort." Two indepen
 `67995cb6f..e1a54ac67`, and `build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md` compares them. Every confirmed defect is folded. The fixed set gained its row
 checks, effort one home with a blanket default, a repository stage its tag, and `roles.model.<role>` its place among
 the keys presets set, as FA-6 chose.
+
+## [renamed] The owner segment, renamed, 2026-10-19
+
+The flow adoption's review left one fork, found while folding: the tag grammar forbids a namespace word as the first
+segment of a tag's name, and `repo`, a namespace since IA-1, was the owner segment of every repository row. Put to the
+owner with the recommendation to admit the segment as an exception, the owner answered, verbatim:
+"rename that segment to conform to tag grammar". The segment is `adopter` in every tag form above, in v2, the systems
+record, the memory plan and the adopter-instructions record, and a repository's own policy keys sit under `adopter.`
+in the policy file. The `repo` namespace keeps a repository's prose units.

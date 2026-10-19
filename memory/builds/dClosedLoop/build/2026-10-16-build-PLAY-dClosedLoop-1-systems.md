@@ -243,7 +243,9 @@ once dTotalRecall registers it (P33).
 
 - **Grammar.** `tag := <ns>.<seg>(.<seg>)*`, `seg := [a-z0-9][a-z0-9-]*`, at most 64 B. A section is
   `<doc> [<seg>]`, unique within its document. Ids keep memory's grammar: `FAMILY-<slug>-<seq>` and
-  `gap-<area>-NN`. A first segment may not be a namespace word.
+  `gap-<area>-NN`. A first segment may not be a namespace word, so a repository row's tag carries the owner segment
+  `adopter`, never `repo`, which names the namespace of a repository's units (revised 2026-10-19, the owner's answer:
+  "rename that segment to conform to tag grammar").
 - **Map keys** (revised 2026-10-17, PM-11): a map line keys a node by its native id where one exists,
   as `chain.dTotalRecall` and `principle.P27`, and by its tag otherwise. The resolver accepts both.
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
@@ -368,8 +370,8 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
 - **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the repository's in
   `.governance/instructions.toml`, composed with every kit's manifest: the repository's rows tagged `repo.`,
   gov's rows changed only through the repository's edges, never by row key (IA-1, IA-2). The repository's flow and role rows sit beside its units, each in its kind's
-  schema, tagged with the `repo` segment where an owner would sit, a repository stage as `step.repo.<name>` and its
-  items as `item.repo.<stage>.<name>` (FA-1, FA-3, the flow adoption's review). A unit's fields: `tag`,
+  schema, tagged with the `adopter` segment where an owner would sit, a repository stage as `step.adopter.<name>` and its
+  items as `item.adopter.<stage>.<name>` (FA-1, FA-3, the flow adoption's review). A unit's fields: `tag`,
   `type` (directive, constraint, definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one
   line, at most 200 B) or `source` (derived), `required-by`, `enforced-by`, `budget`, `origin` (a kit or the
   repository, apart from the `owner` edge, which names a chain build), `class` (`fixed` or `open`, derived from

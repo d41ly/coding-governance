@@ -18672,6 +18672,190 @@ passed over the folded records.
 C.save()
 ````
 
+### `scan_repo_segment.py`
+
+The owner's tag-grammar answer: lists every place the design records use `repo` as a segment in another namespace's tag, or as the policy file's table for a repository's own keys.
+
+````python
+"""List every place the design records use `repo` as a segment inside another namespace's tag, or as the policy
+file's table for a repository's own keys: the population the owner's rename covers. Prints each with context.
+
+Usage: python -X utf8 scan_repo_segment.py <file>...   (from the worktree root)
+"""
+import re
+import sys
+
+PAT = re.compile(r"\b(?:item|role|workflow|lens|leg|step|policy|kind|field|check|point|hook|command|pack|scenario)"
+                 r"(?:\.<[a-z]+>)?\.repo\.(?:<[a-z]+>|\*|[a-z0-9-]+)"
+                 r"|`repo` segment|repo segment|under `repo\.`|`\[repo\]`")
+total = 0
+for path in sys.argv[1:]:
+    text = open(path, encoding="utf-8", newline="").read()
+    for n, line in enumerate(text.split("\n"), 1):
+        for m in PAT.finditer(line):
+            total += 1
+            a, b = max(0, m.start() - 70), min(len(line), m.end() + 50)
+            print(f"{path.rsplit('/', 1)[-1][:60]}:{n}: ...{line[a:b]}...")
+print(f"matches {total}")
+````
+
+### `rename_repo_segment.py`
+
+The owner's tag-grammar answer, "rename that segment to conform to tag grammar": the owner segment renamed `adopter` in the design records, counts asserted, the scan finding none left, dry-run on a full copy of the tree first.
+
+````python
+"""The owner's answer to the tag-grammar fork, 2026-10-19, verbatim: "rename that segment to conform to tag grammar".
+
+The tag grammar (the systems record's [design-tags]) forbids a namespace word as the first segment of a tag's name.
+`repo` has been a namespace since IA-1, so the owner segment a repository row carried in another kind's namespace,
+`role.repo.<name>`, `policy.repo.<key>` and the rest, broke the rule. The segment becomes `adopter`, a word no
+namespace uses and gov never ships, as P8's "every adopter is an adopter, gov included" names the repository whose rows
+these are. The `repo` namespace itself, which holds a repository's prose units (IA-1), is unchanged.
+
+The population is what scan_repo_segment.py lists in the design records of record; dated records (the review and
+comparison records, research returns, rendered prompts, the session log) keep what held when they were written.
+Every count is asserted, and the scan must find none left.
+
+Usage: python -X utf8 rename_repo_segment.py   (from the worktree root)
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+WORDS = "the owner's tag-grammar answer"
+SEG = re.compile(r"\b((?:item|role|workflow|lens|leg|step|policy)(?:\.<[a-z]+>)?)\.repo\.(?=<[a-z]+>|\*|[a-z0-9-])")
+
+
+def rename(rec, n_seg, extra, label):
+    got = len(SEG.findall(rec.text))
+    if got != n_seg:
+        sys.exit(f"{rec.path.name}: {label}: {got} tag segments, {n_seg} expected")
+    rec.text = SEG.sub(r"\1.adopter.", rec.text)
+    rec.done += 1
+    for old, new in extra:
+        rec.sub(old, new, f"{label}: {old[:40]}")
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+rename(V, 3, [
+    ("set under `repo.` in `.governance/policy.toml`, tagged `policy.adopter.<key>`",
+     f"set under `adopter.` in `.governance/policy.toml`, tagged `policy.adopter.<key>` (renamed from `repo`, {WORDS})"),
+    ("`owned` admitting the `repo` segment in a registered namespace",
+     f"`owned` admitting the `adopter` segment in a registered namespace ({WORDS})"),
+], "v2")
+V.save()
+
+# ---------------------------------------------------------------- the systems record
+Y = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+rename(Y, 2, [
+    ("schema, tagged with the `repo` segment where an owner would sit,",
+     "schema, tagged with the `adopter` segment where an owner would sit,"),
+    ("  `gap-<area>-NN`. A first segment may not be a namespace word.",
+     "  `gap-<area>-NN`. A first segment may not be a namespace word, so a repository row's tag carries the owner segment\n"
+     "  `adopter`, never `repo`, which names the namespace of a repository's units (revised 2026-10-19, the owner's answer:\n"
+     "  \"rename that segment to conform to tag grammar\")."),
+], "systems")
+Y.save()
+
+# ---------------------------------------------------------------- the adopter-instructions record
+I = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md")
+rename(I, 1, [
+    ("   own keys under `repo.`, read only by its own units and outside the presets' completeness check.",
+     "   own keys under `adopter.`, read only by its own units and outside the presets' completeness check (the segment\n"
+     f"   renamed from `repo`, {WORDS}, 2026-10-19)."),
+], "adopter-instructions")
+I.save()
+
+# ---------------------------------------------------------------- the memory plan
+M = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+rename(M, 0, [
+    ("a `repo` segment in their tags,", "an `adopter` segment in their tags,"),
+], "memory plan")
+M.save()
+
+# ---------------------------------------------------------------- the adoption record
+A = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+rename(A, 15, [
+    ("2. **Tags.** A repository row carries its kind's tag with the `repo` segment where an owner would sit:",
+     "2. **Tags.** A repository row carries its kind's tag with the `adopter` segment where an owner would sit:"),
+    ("   IA's `repo.<segment>`. Two namespaces join:",
+     "   IA's `repo.<segment>`. The segment is `adopter`, never `repo`, since `repo` names the units' namespace and the tag\n"
+     f"   grammar forbids a namespace word as a name's first segment (renamed 2026-10-19, {WORDS}). Two namespaces join:"),
+    ("  `repo` segment in a registered namespace, field patches as `amends`,",
+     "  `adopter` segment in a registered namespace, field patches as `amends`,"),
+], "adoption")
+A.text = A.text.rstrip("\n") + """
+
+## [renamed] The owner segment, renamed, 2026-10-19
+
+The flow adoption's review left one fork, found while folding: the tag grammar forbids a namespace word as the first
+segment of a tag's name, and `repo`, a namespace since IA-1, was the owner segment of every repository row. Put to the
+owner with the recommendation to admit the segment as an exception, the owner answered, verbatim:
+"rename that segment to conform to tag grammar". The segment is `adopter` in every tag form above, in v2, the systems
+record, the memory plan and the adopter-instructions record, and a repository's own policy keys sit under `adopter.`
+in the policy file. The `repo` namespace keeps a repository's prose units.
+"""
+A.done += 1
+A.save()
+
+# ---------------------------------------------------------------- the comparison record that raised the fork
+C = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md")
+C.sub("owner segment or a rename, and both change the grammar the owner's IA-1 and FA-1 answers use, so it waits for the\n"
+      "owner.",
+      "owner segment or a rename, and both change the grammar the owner's IA-1 and FA-1 answers use, so it waits for the\n"
+      "owner.\n\n"
+      "**The owner's answer, 2026-10-19, verbatim:** \"rename that segment to conform to tag grammar\". The segment is\n"
+      "`adopter`, renamed in every design record that carried it; the adoption record's `[renamed]` gives the account. The\n"
+      "four `policy.*` keys are a separate question, put to the owner with the answer.", "owner's answer")
+C.save()
+
+# ---------------------------------------------------------------- none left
+scan = HERE / "scan_repo_segment.py"
+files = [B + f for f in ("2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md",
+                         "2026-10-16-build-PLAY-dClosedLoop-1-systems.md",
+                         "2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md",
+                         "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md",
+                         "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")]
+out = subprocess.run([sys.executable, "-X", "utf8", str(scan), *files], capture_output=True, text=True,
+                     encoding="utf-8").stdout
+print(out.strip().splitlines()[-1])
+if not out.strip().endswith("matches 0"):
+    sys.exit("the scan still finds the repo segment:\n" + out)
+print("renamed the owner segment to adopter")
+````
+
+### `log_rename.py`
+
+The session log's event for the owner's tag-grammar answer.
+
+````python
+"""The session log's event for the owner's tag-grammar answer and the segment's rename."""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-19, session 1799cb98: the tag-grammar fork the flow adoption's review raised while folding was put to the
+  owner, the recommendation first: admit `repo` as an owner segment, or rename the segment. The owner answered,
+  verbatim: "rename that segment to conform to tag grammar". The owner segment a repository row carries in another
+  kind's namespace is now `adopter`, in v2, the systems, memory-plan and adopter-instructions records and the adoption
+  record's `[renamed]`, and a repository's own policy keys sit under `adopter.` in the policy file. The `repo`
+  namespace keeps a repository's prose units. The catalogue's four `policy.*` keys, which break the same rule, are a
+  separate question put to the owner.
+""", "the rename's event")
+L.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
@@ -19040,6 +19224,9 @@ MINE = [
     ('night2/fold_answers_review.py', "The owner's answers' closing review, folded: both runs' confirmed defects in v2, layer-runtime, layer-expansions, coordination, the memory plan, the register, the night record and the bug classes' instances, dry-run on a full copy of the tree after the flow adoption's fold landed."),
     ('night2/log_answers_review.py', "The session log's event for the owner's answers' compared and folded review."),
     ('night2/fill_answers_review.py', "The answers' comparison record: compare_rounds.py's output verbatim and the folded section."),
+    ('night2/tag/scan_repo_segment.py', "The owner's tag-grammar answer: lists every place the design records use `repo` as a segment in another namespace's tag, or as the policy file's table for a repository's own keys."),
+    ('night2/tag/rename_repo_segment.py', 'The owner\'s tag-grammar answer, "rename that segment to conform to tag grammar": the owner segment renamed `adopter` in the design records, counts asserted, the scan finding none left, dry-run on a full copy of the tree first.'),
+    ('night2/tag/log_rename.py', "The session log's event for the owner's tag-grammar answer."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
@@ -20070,13 +20257,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2526 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1736, derived 295, pending 495
+map: 2527 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1737, derived 295, pending 495
 map: no stale facts read 60 records and 23 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 208 records, 3482 sections, 202 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 208 records, 3486 sections, 202 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state

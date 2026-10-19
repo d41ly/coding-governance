@@ -2699,6 +2699,14 @@ The owner's answers' closing review, dispatches 141 and 142, derived from each r
   change feed has a key, an order, a population and a census, and the mirror has named readers and a check that no
   verdict reads it. A pass push leaves a landing's verdict files alone.
 
+- 2026-10-19, session 1799cb98: the tag-grammar fork the flow adoption's review raised while folding was put to the
+  owner, the recommendation first: admit `repo` as an owner segment, or rename the segment. The owner answered,
+  verbatim: "rename that segment to conform to tag grammar". The owner segment a repository row carries in another
+  kind's namespace is now `adopter`, in v2, the systems, memory-plan and adopter-instructions records and the adoption
+  record's `[renamed]`, and a repository's own policy keys sit under `adopter.` in the policy file. The `repo`
+  namespace keeps a repository's prose units. The catalogue's four `policy.*` keys, which break the same rule, are a
+  separate question put to the owner.
+
 ## Instruments
 
 ### The gap-ownership join

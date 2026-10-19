@@ -144,6 +144,10 @@ tags research found free to rename, never were renamed. Neither run raised eithe
 owner segment or a rename, and both change the grammar the owner's IA-1 and FA-1 answers use, so it waits for the
 owner.
 
+**The owner's answer, 2026-10-19, verbatim:** "rename that segment to conform to tag grammar". The segment is
+`adopter`, renamed in every design record that carried it; the adoption record's `[renamed]` gives the account. The
+four `policy.*` keys are a separate question, put to the owner with the answer.
+
 ## [folded] Every defect folded, 2026-10-19
 
 All 19 are folded: in v2's catalogue, presets and chain rows, the adoption record's design items, `[chain]` and
