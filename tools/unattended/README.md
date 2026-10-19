@@ -56,6 +56,15 @@ nested and the flat spelling, and refuses when git tracks neither. Nothing is wr
 `gotchas.py` is tracked. The review-harness kit's build harness carries the same command and fills
 it the same way.
 
+**The Skill's harness citations resolve through the install receipt first** (`TOOL-dRenderedAnchor-6`).
+Its `{{TOOL_ROOT}}<home>/<file>` citations name the review-harness kit's build harness and the child
+it hands out, and govkit homes that kit by its entry id, so the tool root plus gov's home for them
+names nothing in an adopter. The adopter derives them with `derive_kit_paths` over the Skill's
+template, the receipt row first, and applies each held one whole before the plain `{{TOOL_ROOT}}`.
+`--check` derives the same way, so it grades exactly what a render writes. A harness the
+review-harness kit's hand render has not written yet is not held, so run this adopter after that
+render; run before it, `--check` reads the Skill out of sync and names the re-render.
+
 ## The fixture is rendered, and this is the one thing to know about it
 
 `playbook.fixture.md` is a **generated artifact**. Do not edit it — edit

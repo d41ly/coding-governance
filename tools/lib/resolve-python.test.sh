@@ -172,6 +172,7 @@ render_doc|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 resolve_kit_dir|$ROOT/$KIT_REL/resolve_kit_dir.py|$KIT_REL/resolve_kit_dir
 derive_self_rel|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 derive_kit_paths|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
+render_kit_cites|$ROOT/$KIT_REL/render-doc.sh|$KIT_REL/render-doc
 resolve_prefix_token|$ROOT/$KIT_REL/resolve_prefix_token.py|$KIT_REL/resolve_prefix_token
 resolve_prefix_sh|$ROOT/$KIT_REL/kit-rel.sh|$KIT_REL/kit-rel
 mempause_sh|$ROOT/$RUNGATES_DIR/run-gates.sh|$RUNGATES_DIR/run-gates.sh
@@ -189,6 +190,9 @@ remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 # that ships carries it inline because `<prefix>/lib/` travels to nobody.
 # derive_kit_paths (TOOL-aRepatriatedFork-10, closing review round 1 L4) is the receipt read the two
 # memory-tree renderers each used to spell as their own grep, with nothing comparing the two.
+# render_kit_cites (TOOL-dRenderedAnchor-6) is the filtered apply step of the two renderers that own
+# none of render_doc's conf facts, the review-harness parity script and the unattended adopter; both
+# carry it inline beside a copy of derive_kit_paths, and §2g below holds the canonical to its filter.
 # resolve_prefix_token and resolve_prefix_sh (TOOL-aRepatriatedFork-47) are the `{prefix}` token's
 # two canonicals, one per language; §2b below holds them to one answer. mempause_sh
 # (TOOL-aGraftedHelix-7) is the memory pause both of the run-gates kit's dispatchers carry inline; like
@@ -388,6 +392,18 @@ printf '%s\n' '{"files": [{"role": "rendered", "source": "p/h/t.template.js", "p
   > "$RD/.governance/install.json"
 rd_got=$(bash -c '. "$1"; derive_kit_paths "$2" "$3/p/mt" "$3/p/mt/x.template.md"' _ "$HERE/render-doc.sh" "$REALPY" "$RD" 2>&1 | tr -d '\r')
 [ "$rd_got" = "$RD_CITE"$'\t'"p/k/t.js" ] || bad "derive_kit_paths over one rendered receipt row did not print its citation's one line: '$rd_got'"; ok
+
+# ---- 2g. THE FILTERED APPLY STEP, BEHAVIOUR (TOOL-dRenderedAnchor-6) --------------------------------
+# `render_kit_cites` applies only the `{{TOOL_ROOT}}<home>/<file>` lines of KIT_PATHS to the caller's
+# `out`, with every CR dropped first. The canonical in render-doc.sh, sourced, runs over three CRLF
+# lines, one cite, one bare `{{TOOL_ROOT}}` line and one adopter-placeholder line, and must apply the
+# cite alone. Red with the case filter taken out, which reads `q/c` and `x`, and with the CR drop
+# taken out, which leaves a CR after `t.js`. The output is compared raw, never through a CR strip.
+# WHAT THIS DOES NOT CHECK: either inline copy's call site, which the renderers' own arms read.
+RC_PATHS=$'{{TOOL_ROOT}}h/t.js\tp/k/t.js\r\n{{TOOL_ROOT}}\tq/\r\n{{GATE_RUNNER}}\tx\r\n'
+RC_OUT='a {{TOOL_ROOT}}h/t.js b {{TOOL_ROOT}}c {{GATE_RUNNER}}'
+rc_got=$(KIT_PATHS="$RC_PATHS" out="$RC_OUT" bash -c '. "$1"; render_kit_cites; printf %s "$out"' _ "$HERE/render-doc.sh" 2>&1)
+[ "$rc_got" = 'a p/k/t.js b {{TOOL_ROOT}}c {{GATE_RUNNER}}' ] || bad "render_kit_cites applied a line that is no cite, or kept a CR: '${rc_got//$'\r'/<CR>}'"; ok
 
 # ---- 3. THE BAN ---------------------------------------------------------------------------------
 # The retired idiom, in any tracked `*.sh`. Comments are stripped first: this file and the resolver

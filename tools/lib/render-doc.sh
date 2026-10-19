@@ -24,6 +24,11 @@
 # would answer for the wrong tree in one of the two callers, which is how the second spelling was
 # born in the first place.
 # DEPL-dCarriedReceipt-15 S6.
+#
+# THE THIRD BLOCK, `render_kit_cites` (TOOL-dRenderedAnchor-6 S1), is `render_doc`'s apply loop with
+# one filter, for a renderer that owns none of the conf facts above: the review-harness kit's parity
+# script and the unattended adopter each carry it inline, after `{{KIT_DIR}}` and before their own
+# `{{TOOL_ROOT}}`, so a harness citation names the path the install receipt holds.
 
 # >>> render_doc — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
 render_doc() {
@@ -266,3 +271,16 @@ if pfx and pfx != ".":
 ' "$2" "${@:3}"
 }
 # <<< derive_kit_paths
+
+# >>> render_kit_cites — canonical copy: render-doc.sh in gov's lib dir (byte-identical; gated)
+# `render_kit_cites` rewrites the CALLER's `out`, by dynamic scope as `render_doc` reads the caller's
+# KIT_REL, with every `{{TOOL_ROOT}}<home>/<file><TAB><path>` line of KIT_PATHS, each cite replaced
+# whole. A bare `{{TOOL_ROOT}}` line and an adopter-placeholder line are left unapplied: the caller
+# derives its tool root from its own location, and a receipt prefix beside it is a second answer.
+render_kit_cites() {
+  local kp kv
+  while IFS=$'\t' read -r kp kv; do
+    case "$kp" in '{{TOOL_ROOT}}'?*) out=${out//"$kp"/"$kv"} ;; esac
+  done <<<"${KIT_PATHS//$'\r'/}"
+}
+# <<< render_kit_cites

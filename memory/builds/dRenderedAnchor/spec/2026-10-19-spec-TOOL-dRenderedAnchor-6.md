@@ -1,11 +1,12 @@
 # TOOL-dRenderedAnchor-6 — the review protocol and the unattended Skill resolve their harness citations through the receipt-aware resolver
 
-**Status:** INPROGRESS · rev-1 · 2026-10-19 · node d · Tier-2 · base 05357638 · streams tooling
+**Status:** CLOSED · rev-1 · 2026-10-19 · node d · Tier-2 · base 05357638 · streams tooling
 
 <!-- gen:spec-records -->
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-19-build-TOOL-dRenderedAnchor-6-1-acceptance-ledger.md](../build/2026-10-19-build-TOOL-dRenderedAnchor-6-1-acceptance-ledger.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-6-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-6-brief.md) | research | — |
 
 <!-- /gen:spec-records -->

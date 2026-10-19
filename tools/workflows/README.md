@@ -52,6 +52,21 @@ which skips by name any pair whose live copy is absent and untracked, because go
 a regenerate writes. So an install that never took `REVIEW-PROTOCOL.md` does not receive one from
 an update. To install it, run `--render` by hand and commit what it writes.
 
+**A harness citation resolves through the install receipt first** (`TOOL-dRenderedAnchor-6`).
+govkit homes this kit by its entry id, so an adopter's directory need not carry gov's name for it,
+and the tool root plus gov's home for a harness names nothing there. So before the plain
+`{{TOOL_ROOT}}` substitution, the render applies each `{{TOOL_ROOT}}<home>/<file>` citation the
+install HOLDS, as `derive_kit_paths` resolves it: the receipt row first, then the probe beside this
+kit. Only a citation nothing holds renders as the tool root plus its home. A receipt's top-level
+`prefix` is not applied, because the tool root is this kit's own parent and a second answer to it
+would disagree.
+
+**`--render` derives the citations twice.** A rendered harness is held only once it is a file, and
+on a fresh install this render is what writes them, so the first derivation cannot see them. After
+writing, the render derives again, and when the citations moved it runs itself once more with the
+same arguments, printing one line that says so. `PROTOCOL_PARITY_REPASS` bounds that to one re-run.
+`--tracked-only` creates nothing, so the regenerate's two derivations agree and it never re-runs.
+
 **`MEMORY_TREE_DIR` is probed, not derived.** An adopter may install the memory-tree kit flat in
 its tool root, so the tool root plus `memory-tree/` is not an answer. The render takes the first
 TRACKED of `{{TOOL_ROOT}}memory-tree/gotchas.py` and `{{TOOL_ROOT}}gotchas.py`. When neither is

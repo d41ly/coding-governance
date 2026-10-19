@@ -2271,8 +2271,53 @@ if [ -f "$UK/adopt-unattended.sh" ]; then
       echo "FAIL PV-AC12 $shape: the harness hands out '$hc' and the Skill tells the run '$sc'"; st=1
     fi
   done
+  # ---- RA6-1, RA6-2 (TOOL-dRenderedAnchor-6): A RENAMED KIT BEHIND A RECEIPT. govkit homes the
+  # ---- review-harness kit by its entry id, so the protocol and the Skill cited harnesses at the tool
+  # ---- root plus gov's home, which the install does not hold. One layout: the kit at `scripts/rh`,
+  # ---- the four receipt rows a real install writes, each `source` under a neutral `g/` and this
+  # ---- kit's own segment, and its `tier2-review.js` deleted, which is the fresh install the parity
+  # ---- script's second pass exists for, since the first derivation cannot see a render the same run
+  # ---- writes. Each document's absence count sits beside a positive count, and its check mode runs
+  # ---- after. RA6-1 reds with the parity script's `render_kit_cites` call taken out, and separately
+  # ---- with its second pass taken out; RA6-2 reds with the adopter's call taken out.
+  R6="$LAY/renamed"; build_layout "$R6" scripts/rh scripts/$UNK scripts/gotchas.py
+  rm -f "$R6/scripts/rh/tier2-review.js"; mkdir -p "$R6/.governance"
+  printf '{"files": [\n {"role": "rendered", "source": "g/%s/tier2-review.template.js", "path": "scripts/rh/tier2-review.js"},\n {"role": "rendered", "source": "g/%s/unattended-build.template.js", "path": "scripts/rh/unattended-build.js"},\n {"role": "engine", "source": "g/%s/unattended-unit.js", "path": "scripts/rh/unattended-unit.js"},\n {"role": "engine", "source": "g/%s/check-verifier-fanout.sh", "path": "scripts/rh/check-verifier-fanout.sh"}]}\n' \
+    "$WFK" "$WFK" "$WFK" "$WFK" > "$R6/.governance/install.json"
+  ( cd "$R6" && git add -A )
+  run_layout "$R6" scripts/rh --render >/dev/null
+  P6="$R6/memory/guides/REVIEW-PROTOCOL.md"
+  same "RA6-1 a renamed kit behind a receipt: the protocol names its tier2-review.js on both lines" "$(grep -cF 'scripts/rh/tier2-review.js' "$P6")" 2
+  same "RA6-1 ...and its check-verifier-fanout.sh once" "$(grep -cF 'scripts/rh/check-verifier-fanout.sh' "$P6")" 1
+  same "RA6-1 ...and the tool root plus gov's home for them nowhere" "$(grep -cF "scripts/$WFK/" "$P6")" 0
+  o=$(run_layout "$R6" scripts/rh)
+  has "RA6-1 ...and the check mode reads that render in parity" "$o" "protocol-parity: in parity"
+  has "RA6-1 ...at exit 0" "$o" "rc=0"
+  cp "$UK/adopt-unattended.sh" "$UK/unattended.sh" "$UK/lib-unattended.sh" "$UK/check-unattended.sh" \
+     "$UK"/*.template.md "$UK"/*.fragment.json "$UK"/*.js "$R6/scripts/$UNK/"
+  printf 'MEMORY_ROOT=memory\nLANDER="true"\nKEEPALIVE_CREATE="c"\nKEEPALIVE_DELETE="d"\nKEEPALIVE_INTERVAL="i"\nRESUME_SCHEDULE_CREATE="rc"\nRESUME_SCHEDULE_DELETE="rd"\n' \
+    > "$R6/.unattended.conf"
+  # `--check` grades every hook fragment the kit ships WIRED, so the layout's settings file carries one
+  # entry per fragment under its own event and matcher, each read off the fragment, never spelled.
+  mkdir -p "$R6/.claude"; _r6_sj=""; _r6_re='"(event|matcher|marker)":[[:space:]]*"([^"]*)"'
+  for _fr in "$UK"/*.fragment.json; do
+    _ev=""; _ma=""; _mk=""
+    while IFS= read -r _ln || [ -n "$_ln" ]; do
+      [[ $_ln =~ $_r6_re ]] || continue
+      case ${BASH_REMATCH[1]} in event) _ev=${BASH_REMATCH[2]} ;; matcher) _ma=${BASH_REMATCH[2]} ;; *) _mk=${BASH_REMATCH[2]} ;; esac
+    done < "$_fr"
+    _r6_sj="${_r6_sj:+$_r6_sj,}\"$_ev\":[{\"matcher\":\"$_ma\",\"hooks\":[{\"type\":\"command\",\"command\":\"node scripts/$UNK/$_mk\"}]}]"
+  done
+  printf '{"hooks":{%s}}\n' "$_r6_sj" > "$R6/.claude/settings.json"
+  ( cd "$R6" && git add -A && bash scripts/$UNK/adopt-unattended.sh >/dev/null 2>&1 )
+  S6="$R6/.claude/skills/unattended/SKILL.md"
+  same "RA6-2 the unattended Skill in that layout names its unattended-build.js" "$(grep -cF 'scripts/rh/unattended-build.js' "$S6")" 1
+  same "RA6-2 ...and its unattended-unit.js" "$(grep -cF 'scripts/rh/unattended-unit.js' "$S6")" 1
+  same "RA6-2 ...and the tool root plus gov's home for them nowhere" "$(grep -cF "scripts/$WFK/" "$S6")" 0
+  o=$( (cd "$R6" && GOV_SETTINGS_JSON= bash scripts/$UNK/adopt-unattended.sh --check 2>&1; echo "rc=$?") )
+  has "RA6-2 ...and the adopter's --check reads that Skill in sync, at exit 0" "$o" "rc=0"
 else
-  echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run"
+  echo "SKIP PV-AC12 -- no unattended adopter at $UK, so the two carriers were NOT compared on this run, and RA6-1 and RA6-2 did not run"
 fi
 
 # ---- TOOL-aGraftedHelix-16: THE SPEC COMMIT BLOCK, RUN FOR REAL. Every GH15 arm grades the stage through
@@ -2898,7 +2943,11 @@ has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n'
 # and the build harness's three identities and returns (6). Its loop runs the three twice, so it
 # executes 18. Its moved trace reads were counted already, and the above-cap writer read is one site
 # still. Not measured by a run: the pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=658
+# RAISED 658 -> 667 by TOOL-dRenderedAnchor-6: its 9 static sites, counted by hand off the RA6 block —
+# RA6-1's three counts and its check mode's two, RA6-2's three counts and its --check. Each runs once,
+# inside the unattended-adopter guard PV-AC12 shares. Not measured by a run: the pass that wrote it
+# runs no suite.
+FLOOR_ASSERTIONS=667
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The
