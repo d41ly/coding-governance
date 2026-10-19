@@ -54,6 +54,12 @@ did not set, a trigger wider than the answer, a reason that failed on the floor 
 as a declaration count, a correction drawn from a census of one language, an evidence sentence that measured another
 gap, and a separator lost inside an edited sentence. Run A alone found the one that was high.
 
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+FA-6's fold narrowed the owner's chosen option, putting `roles.model.<role>` on the keys presets never touch, and
+dropped the house file's required `[effort] default` with no destination. Both sat in fold prose the owner's answer
+did not cover.
+
 ## The fix
 
 **No machine gate**, and this is a documented check rather than an unwritten one. Nothing static can

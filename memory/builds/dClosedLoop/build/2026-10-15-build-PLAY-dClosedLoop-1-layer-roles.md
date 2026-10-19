@@ -478,7 +478,9 @@ expansions: release notes for distribution, and verify judgment for integrations
   - its return template;
   - its packet budget, beside its static block's ceiling in `BODY_CEILINGS`.
 - Its effort stays in the adopter-owned `tools/roles/house/policy.toml`, per role and per workflow
-  stage, read by `handoff.py stage-efforts` (TOOL-aOrientedCast-10).
+  stage, read by `handoff.py stage-efforts` (TOOL-aOrientedCast-10), until dBoundRoles moves it to the
+  `roles.effort.*` policy keys, read first, the house file a fallback until dConvergedCharter retires it (revised
+  2026-10-19, the owner's FA-6 and the flow adoption's review).
 - Each role composes with the adopter-owned seeds the kit never rewrites: its house overlay,
   `tools/roles/house/<role>.md`, rendered as `## House rules`, and that effort policy.
 - The agent files, the charter's role index, the matrix, the spawn guard's table and the return

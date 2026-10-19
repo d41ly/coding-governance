@@ -49,6 +49,11 @@ The mail ref was keyed by node in coordination and v2 and by sender in the memor
 harness settings queue where its return says the direct one refuses. A Workflow's agents were counted once as a
 reservation and again as started agents.
 
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+The memory plan pinned the overlay's rows to gov's text, where v2 and the adoption record pinned them to their
+canonical form, and role effort had two live homes with no precedence between them.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

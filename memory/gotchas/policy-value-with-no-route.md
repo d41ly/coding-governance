@@ -51,6 +51,11 @@ It bit again in the night pass two's closing review, 2026-10-19
 `flow.adapt: owner-approves`, `flow.promote: owner-only` and `build.unit-holders: driver-only`, which no reading
 clause routed or witnessed.
 
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+Excluding a gov item that `review.breakpoints` names, or a lens `review.opt-in` selects, composed green, so the
+breakpoint or the lens would never fire.
+
 ## The fix
 
 - For each key an item reads, write each catalogued value's arm into the item: its witness, its route,

@@ -142,11 +142,13 @@ existing check runs on the composition. Nobody edits a shipped declaration or a 
 writes the repository's rows. This is the instruction round's "compose, never edit", carried from text to structure.
 
 1. **One home.** The repository's flow and role rows live in its overlay, `.governance/instructions.toml`, beside
-   its units, each in its kind's shipped schema: item, role, workflow, lens and leg. The layer-instruction record's
+   its units, each in its kind's shipped schema: item, role, workflow, lens and leg, and a repository stage's splice rows (FA-3, revised 2026-10-19, the flow adoption's review). The layer-instruction record's
    R-I already counts these structured sources as instruction sources. One file keeps one guard, one door
    (`instructions.edit`), one report and one exclusion list (FA-1).
 2. **Tags.** A repository row carries its kind's tag with the `repo` segment where an owner would sit:
-   `item.<step>.repo.<name>`, `role.repo.<name>`, `workflow.repo.<name>`, `lens.repo.<name>` and `leg.repo.<name>`.
+   `item.<step>.repo.<name>`, `role.repo.<name>`, `workflow.repo.<name>`, `lens.repo.<name>` and `leg.repo.<name>`,
+   and for a repository stage `step.repo.<name>`, its items `item.repo.<stage>.<name>` (FA-3, revised 2026-10-19,
+   the flow adoption's review).
    Gov never ships the segment, so no repository tag collides with a gov tag. `owned` admits the segment for the
    repository, and the row's `origin` is the repository, outside the `owner` edge and `one-owner`. Prose units keep
    IA's `repo.<segment>`. Two namespaces join: `workflow`, owned by dBoundRoles, and `lens`, by dCalibratedLens.
@@ -173,19 +175,23 @@ writes the repository's rows. This is the instruction round's "compose, never ed
    - **Already decided:** breakpoints, probe points, presets, playbooks, policy values, practices and lexicon packs.
 4. **Amend, by a field patch.** A repository row with `amends=<tag>@<hash>` names gov's row and the fields it
    changes. A set field takes `add` and `remove`, and a scalar takes a value. Every field the patch leaves alone keeps
-   flowing from gov's row. Typical patches: a gov item's `needs` gains a repository item, an allowance narrows, an
+   flowing from gov's row. A patch touching a fixed field (item 9), or widening one, is refused (revised
+   2026-10-19, the flow adoption's review). Typical patches: a gov item's `needs` gains a repository item, an allowance narrows, an
    actor becomes a repository role, a leg's ceiling or arguments change.
 5. **Replace.** A repository row with `supersedes=<tag>@<hash>` answers to gov's tag in the composition, so
    dependents' `needs` and the witnesses keyed by gov's tag resolve to it. Gov's later changes no longer reach it, so
-   its pin matters most.
+   its pin matters most. A replacement of a fixed row (item 9) is refused (revised 2026-10-19, the flow adoption's review).
 6. **Exclude.** `instructions.exclude` takes any gov tag in the overlay's kinds. It refuses a fixed row, and a row
-   another active row needs, names as its actor or grants, naming the requirer. A role left acting in no item is
+   another active row needs, names as its actor or grants, or a policy value names, naming the requirer or the key
+   (the policy value revised 2026-10-19, the flow adoption's review). A role left acting in no item is
    excluded with it, or the matrix arm reds.
 7. **Reorder** only through `needs`. The stages keep P20's order, item numbers are display order only, and the
    composition's graph checks hold.
 8. **Parameterize** by policy values, as designed. The tunables today's house file holds get destination keys:
-   `roles.effort.<role>`, `roles.effort.<workflow>.<stage>` and `roles.model.<role>`, each defaulting to the role's
-   declared value, so a preset can set them. A role's gate grant stays a field of its definition, v2's ceiling of
+   `roles.effort.<role>`, `roles.effort.<workflow>.<stage>`, `roles.effort.default` and `roles.model.<role>`, so a
+   preset can set them, a stage's effort defaulting to its role's key, then to the blanket `roles.effort.default`,
+   then to the role's declared value, as today's resolver reads, and a role's model to its declared value (revised
+   2026-10-19, the flow adoption's review). A role's gate grant stays a field of its definition, v2's ceiling of
    gate legs, changed by a patch (FA-6).
 9. **Fixed rows and fields.** IA-4's three sources carry over: what the principles fix, the floor, and what gov's
    tools parse.
@@ -200,8 +206,14 @@ writes the repository's rows. This is the instruction round's "compose, never ed
      pass two, point 7, the owner's NT-27: it was `FANOUT_CAP`'s bound) and the five lens slots.
    - Legs: the canary's key set, and the legs that check the composition itself.
    - Every other row and field is open. The class is derived, never typed, as the closing review settled for units.
+   - Each kind's build declares its fixed list, and dOrderedCharter's row checks refuse an `amends`, a widening, a
+     `supersedes` or an exclusion touching it, each seen red on that kind's own planted row (revised 2026-10-19, the
+     flow adoption's review).
 10. **Widening.** A patch may widen an open field, a role's tools or gate grant among them. The overlay's write
-    already carries the owner's proof, and the update's report names every widening (FA-5).
+    already carries the owner's proof, and the update's report names every widening (FA-5). Each kind declares the
+    direction that widens each open field: `add` on a permission set, `remove` on a constraint set such as `needs`,
+    and a declared order on a scalar, so a ceiling widens as it rises. The report's widening list is compared with
+    the classifier's (revised 2026-10-19, the flow adoption's review).
 11. **The composition, checked and rendered.** One composer per kind reads gov's packs and the overlay at the
     landed revision, never the working tree. Every check runs on its output:
     - the schema, `owned` and `unique`;
@@ -210,6 +222,7 @@ writes the repository's rows. This is the instruction round's "compose, never ed
     - the matrix arms and the floor;
     - typed inputs: every input an item declares is produced by an item it needs, at its record kind's version;
     - a role spawned only in the shape kinds it declares;
+    - the fixed set: no `amends`, widening, `supersedes` or exclusion touching a fixed row or field;
     - every leg's seen-red record.
     A row that fails reds at the push, as the render gate does for text. The renders follow the composition: the
     checklist views, the agent files, the role index, the manifest and the review briefs, each marking the
@@ -227,11 +240,15 @@ writes the repository's rows. This is the instruction round's "compose, never ed
       is gone or the composition fails a check, the patch is held, gov's row runs as shipped, and the order says why.
       A replacement keeps running, stale, with an order;
     - `refuse` holds the update until the owner re-pins;
-    - `warn` re-applies the patch and files no order.
+    - `warn` re-applies the patch, prints and journals the stale edge, and files no order. Where the patch no longer
+      applies, it is held and gov's row runs, as under `order`, with a warning line saying why (revised 2026-10-19,
+      the flow adoption's review).
 14. **Maps.** Gov's change records carry the successors of structured tags as they do units'. A rename re-points the
     repository's edges, needs, routes and grants, and every policy value that names the boundary, `review.breakpoints`
     and `probe.points` among them. A split or retirement orphans them with an order. The step gate's population takes
-    item, role, workflow, lens and leg tags, each joined by the build that registers its namespace.
+    item, step, role, workflow, lens and leg tags, a repository stage's among them, each joined by the build that
+    registers its namespace and seen red there on a planted tag removed with no change record (revised 2026-10-19,
+    the flow adoption's review).
 15. **Builds in flight.** A build moves to a new composition at its next step boundary. Its transition record into a
     step pins the composition's revision, its position derives from that revision inside the step, and the change
     records' successors carry its witnesses across. An item retired under it files an order for its owner (FA-7).
@@ -282,22 +299,28 @@ Each clause sits on the build that registers its kind, or on a descendant of eve
 - **dOrderedCharter:** the overlay's row mechanism for any kind a later build registers: `owned` admitting the
   `repo` segment in a registered namespace, field patches as `amends`, whole rows as `supersedes`,
   `instructions.exclude` over any registered kind's tags, pins over a row's canonical form, and the change
-  record's marks and successors covering rows. Each kind's own build admits its rows, below.
+  record's marks and successors covering rows, and the row checks over a fixture kind: the fixed set refused to
+  every patch, widening, supersession and exclusion, the exclude refusals naming the requirer or the key, and the
+  widening classifier. Each kind's own build admits its rows, declares its fixed list and widening directions, and
+  plants its own reds, below.
 - **dFairHearing:** the lens catalogue as data in the review kit, the harness's five slots filled from it, and
   the merge bar's harness check counting slots (agent-cap's until the night pass two's point 7).
 - **dDeclaredLoop:** the `item` kind in the kinds register with its factory, repository items composed with the
   loop definition at the landed revision, the composition's graph and typed-input checks, item tags joined to the
-  step gate, a build's composition pinned per step, and every policy value naming a boundary re-pointed on a rename.
+  step gate, a build's composition pinned per step, every policy value naming a boundary re-pointed on a rename, and
+  repository stages spliced between adjacent gov stages, tagged `step.repo.<name>`, seen red on a planted remove,
+  reorder or replace and on a stage before Plan, after Deploy or across non-adjacent stages.
 - **dBoundRoles:** repository roles and workflow entries, roles declaring their shape kinds, `BODY_CEILINGS` and
   `WORKFLOW_NAMES` turned into declarations, the matrix arms reading the composition, role and workflow tags joined
-  to the step gate, the `workflow` namespace, `roles.effort.*` and `roles.model.*`, and the gate grant as a role
-  field.
+  to the step gate, the `workflow` namespace with gov's entries tagged in it, `roles.effort.*` and `roles.model.*`
+  read before the house file, which stays a fallback until the seed retires, the gate grant as a role field, and
+  the harness paths `roles.json` names resolved in the install.
 - **dWitnessedBar:** repository legs from the overlay through the leg factory, a manifest row with no source red,
   leg tags joined to the step gate, and a gov leg's patched arguments and ceiling.
 - **dCalibratedLens:** the `lens` kind and namespace, gov's lenses tagged in it and their briefs made units,
   repository lenses from the overlay, and lens tags joined to the step gate.
 - **dShippedRelease:** `adopt.declarations`, proposing today's flow and role customizations as overlay rows, and the
-  update's report extended to every kind.
+  update's report extended to every kind, its widening list compared with the classifier's.
 - **dConvergedCharter:** `house/policy.toml`'s seed retired, its values folded into the keys and patches above, the
   closed tables' last readers re-pointed, `.unattended.conf`'s extension keys retired with the kit, and the census
   of gov's own flow and role settings.
@@ -371,7 +394,9 @@ gov's, and P20 is amended. The foundations record's closed set of extension kind
   - The catalogue and presets gain `roles.effort.<role>`, `roles.effort.<workflow>.<stage>` and `roles.model.<role>`,
     and the house file's `[gates]` folds into each role definition's gate grant, closing the first contradiction.
     `roles.model.<role>` joins the keys presets never touch, since its values are the harness adapter's, as
-    `runtime.act-harness`'s are; the preset check reddened on it once, before that.
+    `runtime.act-harness`'s are; the preset check reddened on it once, before that. The flow adoption's review took
+    it off again: the owner's FA-6 chose keys that presets can set, so every shipped preset keeps the role's model
+    and a repository's own preset may name one (revised 2026-10-19).
   - dOrderedCharter gains the overlay's row mechanism, and dFairHearing the lens catalogue as data.
   - dDeclaredLoop gains repository items, repository stages and the per-step composition pin.
   - dBoundRoles gains repository roles and workflows, the harness-path check and the tuning keys.
@@ -388,3 +413,10 @@ gov's, and P20 is amended. The foundations record's closed set of extension kind
   `gap-deploy-28` and `gap-found-32`, each on its owning build's row.
 - **The fates record:** `house/policy.toml` folds as FA-6 says, and `workflows.toml`, `tier2-review.js` and the leg
   manifest take a repository's rows. `.unattended.conf`'s extension vocabularies gain a row of their own.
+
+## [reviewed] The closing review, 2026-10-19
+
+The owner asked, "run the review pair on both folds, medium effort." Two independent light diff reviews read
+`67995cb6f..e1a54ac67`, and `build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md` compares them. Every confirmed defect is folded. The fixed set gained its row
+checks, effort one home with a blanket default, a repository stage its tag, and `roles.model.<role>` its place among
+the keys presets set, as FA-6 chose.

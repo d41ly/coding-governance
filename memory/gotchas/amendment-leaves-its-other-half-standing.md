@@ -59,6 +59,12 @@ adopter record; `FANOUT_CAP` in the systems and adoption records; agent-cap as t
 and adoption records; and the replaced fates of `agent-cap.js` and `gotchas.py`. dGroundRules also never carried the
 two agent-cap rules point 7's table gave it.
 
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+FA-6's fold gave dBoundRoles the `roles.effort.*` keys and left the same row, and the systems record, keeping effort
+in the house file until dConvergedCharter. The record's `[chain]` kept its lines from before FA-3, and
+`instructions.stale` was read for rows with only `order` defined.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth

@@ -32,6 +32,12 @@ check pointed at arm 3c, which loops over descriptor rules and never reads a rec
 pass whatever update did. It now reads update's role-to-verdict mapping and is seen red on that mapping stubbed to
 `forked`.
 
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+The repository-stage splice check planted a stage that removes, reorders or replaces a gov stage, never one before
+Plan, after Deploy or across non-adjacent stages, so a checker that accepted any insertion keeping gov's five whole
+passed every case.
+
 ## The fix
 
 Every arm asserts the SPECIFIC message its branch emits, never a process exit code, and the fixture

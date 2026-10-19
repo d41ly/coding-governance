@@ -47,6 +47,12 @@ It bit again in the night pass two's closing review, 2026-10-19
 planted the four end kinds it certifies. A bug class's gated mark, which takes it off review, was self-declared and
 checked by nothing.
 
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+The flow and roles adoption's fixed set, its headline guarantee, had no check that refused an `amends` or a
+`supersedes` touching it, only an exclusion. Its widened exclude refusals, its four new step-gate joins and FA-5's
+every widening reported had no red case either.
+
 ## The fix
 
 - A rule lands with the check that fails on its breach, named in the same commit: a pair rule in the

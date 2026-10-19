@@ -17620,9 +17620,664 @@ L.insert_before("\n## Instruments\n", """
 L.save()
 ````
 
+### `build_args_pairs.py`
+
+The owner's "run the review pair on both folds, medium effort": both pairs' args, the flow adoption's and the answers', each pair's runs differing only in the run label, the report path and the scratch path.
+
+````python
+"""Build the args of two review pairs the owner asked for ("run the review pair on both folds, medium effort",
+2026-10-19): the flow and roles adoption folds, 67995cb6f..e1a54ac67, and the owner's answers to the night pass two's
+forks, f064bf378..f8ad789e1. Each pair is two independent light Tier-2 diff reviews, every role at medium, the shape of
+the night's closing review (`build_args_night2.py`); a pair's runs differ only in the run label, the report path and
+the scratch path.
+
+Usage: python -X utf8 build_args_pairs.py <scratch-dir>   (from the worktree root)
+Writes <scratch-dir>/night2/args-<pair>-<run>.json and a compact copy of each.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S = pathlib.Path(sys.argv[1])
+B = "memory/builds/dClosedLoop/build/"
+REV = "memory/builds/dClosedLoop/reviews/2026-10-19-review-PLAY-dClosedLoop-1-{}-{}.md"
+base = json.loads((S / "night2" / "args-night2-a.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+D = lambda d, n: B + f"2026-10-1{d}-build-PLAY-dClosedLoop-1-{n}.md"
+COMMON = [D(4, "architecture-v2"), D(4, "gap-register"), D(4, "foundations"), D(5, "layer-instruction"),
+          D(5, "layer-flow"), D(5, "flow-steps"), D(5, "flow-roles"), D(5, "layer-roles"), D(5, "layer-memory"),
+          D(5, "layer-runtime"), D(6, "layer-expansions"), D(5, "review-system"), D(6, "systems"), D(8, "recut"),
+          D(8, "fates"), D(8, "memory-plan"), D(4, "coordination")]
+EARLIER = ("SA-1 to SA-12, SK-1 and SK-2, IA-1 to IA-6, AP-1 to AP-35, NP-1 to NP-24, SP-1 and SP-2, WK-1 to WK-8, "
+           "PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, FL1, FR-1 to FR-8, CX-1 to CX-3, RT-1 to RT-4")
+SHARED = [
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- Research returns are verbatim and dated, and their prompts are rendered handoffs: neither is under review, "
+    "though a record that misstates its return is.",
+    "- Dated records keep what held when they were written: revision notes, the walk records and the ownership "
+    "record's snapshot rows.",
+    "- The instruments record holds the scripts as they ran; a script is reviewed only for whether it did what the "
+    "records say it did.",
+    "- Generated files (memory/LIVE.md and the build README's generated regions) are rendered, not reviewed.",
+]
+TAIL = ("A fold's own text is new surface: check it as hard as the text it replaced. This is run {run} of two "
+        "independent runs on the same diff; read no other run's report. Write the report to {report}. Its head carries "
+        "an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries "
+        "exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.")
+PAIRS = {
+    "flow-adoption": {
+        "base": "67995cb6f", "head": "e1a54ac67",
+        "specs": COMMON + [D(9, "flow-roles-adoption"), D(9, "adopter-instructions"), D(9, "research-flow-today"),
+                           D(9, "research-flow-design"), D(9, "research-flow-prior-art")],
+        "byDesign": SHARED + [
+            "- The owner's answers FA-1 to FA-7 are decisions, recorded verbatim in the adoption record's [answers]; "
+            "FA-3 chose repository stages, inserted between two of gov's, and amended P20. A finding may show a fold "
+            "contradicting the owner's words, a record, the research it cites or the tree, not re-argue an answer.",
+            f"- Every earlier answer stands: {EARLIER}, and every round's before them.",
+            "- Later commits, the night pass two through f8ad789e1, revised several of these records. Judge each "
+            "finding against the records as they stand now, and drop one a later commit already fixed.",
+        ],
+        "context": (
+            "The diff is e1a54ac67 over 67995cb6f: the flow and roles adoption, designed and settled. caca7a636 records "
+            "three researchers' returns (dispatches 123 to 125) and the design record " + D(9, "flow-roles-adoption") +
+            ": one composition of gov's rows and the repository's for every kind (steps and items, roles, workflow "
+            "entries, lenses, legs, policy), the repository's rows in one overlay, gov's rows changed only by pinned "
+            "patches, a fixed set no patch may widen, and an update's report naming every change. cf6f1434c folds the "
+            "owner's FA-1 to FA-7 into v2, the systems record, the memory plan, the register, the fates and the design "
+            "record: one overlay (FA-1), patches re-applied in file order (FA-2), repository stages between gov's, with "
+            "P20 amended (FA-3), supersession by amendment (FA-4), the report (FA-5), keys plus a role field for "
+            "effort and grants (FA-6), and changes taking effect at the next step boundary (FA-7). dbabaa1fd records "
+            "the fold's final checks, and e1a54ac67 adds the `workflow` and `lens` namespaces to the systems record. "
+            "Review it as a design change. Does each answer land the same way in every record it touches, and does "
+            "any text still state what a fold replaced? Does every new clause sit on its own build or an ancestor, "
+            "naming no later build's key or kind? Are the new keys consistent with the presets, the never-touch list "
+            "and the owner's answers? Is the composition's fixed set enforceable, and does every patch kind have a "
+            "check that can fail? Does each new gap state a fact its research supports, owned by the build whose unit "
+            "closes it? Does the design record report its research faithfully? " + TAIL)},
+    "night-pass-two-answers": {
+        "base": "f064bf378", "head": "f8ad789e1",
+        "specs": COMMON + [D(9, "night-pass-two"), D(9, "flow-roles-adoption"), D(9, "research-agent-cap"),
+                           D(9, "research-storage-measured"), D(9, "research-storage-prior-art"), D(9, "research-caps"),
+                           D(9, "research-handoffs-design"), D(9, "night-pass-two-reviews-compared")],
+        "byDesign": SHARED + [
+            "- The owner's answers to NT-1 to NT-28 are decisions, recorded verbatim in the night pass two's [answers]. "
+            "Twenty-two took the recommendation, which the records already showed as pending; NT-22 took the per-cap "
+            "pins; NT-12, NT-14, NT-17, NT-19 and NT-28 are the owner's own words. A finding may show a fold "
+            "contradicting the owner's words, a record, the research it cites or the tree, not re-argue an answer.",
+            f"- Every earlier answer stands: FA-1 to FA-7, {EARLIER}, and every round's before them.",
+        ],
+        "context": (
+            "The diff is f8ad789e1 over f064bf378: the owner's answers to the night pass two's forks, folded. Every "
+            "\"pending NT-x\" in v2 and the layer records becomes \"the owner's NT-x\". Six answers change the "
+            "design. NT-12: effort is the owner's setting, medium by default, never lowered by an agent (dBoundRoles "
+            "and the `roles.effort.*` rows). NT-14: text in git stays the record, and a cloud relational database "
+            "becomes an accounted extension: a change feed in dPlacedRequest that dTotalRecall's record writes and "
+            "dKeptSession's mail writes join, a memory-mirror point in dWellOiledMachine and Runtime's [extend] table, "
+            "`memory.mirror`, the database planned in v2's [planned], the memory plan's new pockets and "
+            "`gap-mem-46`. NT-17: `mailbox.notice` defaults to every item. NT-19: `build.push` defaults to every pass "
+            "commit, a push free of the lander's lock. NT-22: `budgets.pinned`. NT-28: `runtime.agents-in-flight` "
+            "defaults to 6, with an admission queue in dWellOiledMachine, layer-runtime's attended entry and fixture "
+            "queueing, and `gap-rt-36`. Review it as a design change. Does each answer land the same way in every "
+            "record it touches, and does any text still state the recommendation an answer replaced: the effort floor "
+            "by experiment record, every tool call as the notice's default, every item as the push's, a limit of 5, a "
+            "refusal where the queue now holds a spawn? Does every new clause sit on its own build or an ancestor, "
+            "naming no later build's key or kind? Are the new keys consistent with the presets, the never-touch list "
+            "and the owner's words? Does the change feed and the mirror keep git the store of record, the verdict "
+            "local and the core free of an expansion (P2, P3, P28), and does the queue fit the harness's own settings "
+            "and the in-flight ledger without counting an agent twice? Does each new gap state a fact its evidence "
+            "supports, owned by the build whose unit closes it? Does the [answers] section quote the owner faithfully? "
+            + TAIL)},
+}
+for pair, p in PAIRS.items():
+    specs = p["specs"]
+    if len(set(specs)) != len(specs):
+        sys.exit(f"{pair}: a spec repeats")
+    for f in specs:
+        if not pathlib.Path(f).exists():
+            sys.exit(f"{pair}: missing {f}")
+    checklist = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", f"{p['base']}..{p['head']}"],
+                               capture_output=True, text=True, encoding="utf-8", check=True).stdout
+    for run in ("A", "B"):
+        report = REV.format(pair, run.lower())
+        if pathlib.Path(report).exists():
+            sys.exit(f"{report} exists")
+        a = dict(base, base=full(p["base"]), head=full(p["head"]), specs=specs, checklist=checklist,
+                 byDesign="\n".join(p["byDesign"]), intensity="light", round=1,
+                 efforts={"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"},
+                 scratch=(S / f"review-{pair}-{run.lower()}").as_posix(),
+                 context=p["context"].replace("{run}", run).replace("{report}", report))
+        out = S / "night2" / f"args-{pair}-{run.lower()}.json"
+        out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+        (S / "night2" / f"args-{pair}-{run.lower()}.compact.json").write_text(json.dumps(a, ensure_ascii=False),
+                                                                             encoding="utf-8", newline="\n")
+        print(f"{pair} {run}: {a['base'][:9]}..{a['head'][:9]}, {len(specs)} specs, checklist "
+              f"{len(checklist.splitlines())} lines, context {len(a['context'].split())} words, "
+              f"{len(json.dumps(a, ensure_ascii=False))} bytes, report {report.rsplit('/', 1)[1]}")
+````
+
+### `rows.py`
+
+Prints a chain row's planned-units clauses, numbered, to find each clause a finding touches.
+
+````python
+import sys, re
+lines = open(sys.argv[1], encoding="utf-8", newline="").read().split("\n")
+for n in map(int, sys.argv[2:]):
+    row = lines[n - 1]
+    cells = row.strip().strip("|").split(" | ")
+    print(f"=== line {n}: {cells[0].strip()} · cells {len(cells)}")
+    for ci, c in enumerate(cells):
+        parts = c.split("; ")
+        if len(parts) > 1:
+            for pi, p in enumerate(parts, 1):
+                print(f"  [{ci}.{pi}] {p}")
+        else:
+            print(f"  [{ci}] {c}")
+````
+
+### `fold_adoption.py`
+
+The flow adoption's closing review, folded: both runs' confirmed defects in v2, the adoption, systems, memory-plan, fates and layer-roles records, the bug classes' instances, and the preset check's free values, dry-run on a full copy of the tree while the answers pair ran.
+
+````python
+"""The flow and roles adoption's closing review, folded: both runs' confirmed defects (the comparison record's [map]),
+each in the records its [fold] row names, plus the preset check's free values for `roles.model.<role>`. Every
+substitution matches exactly once or the script exits.
+
+Usage: python -X utf8 fold_adoption.py   (from the worktree root; PC= names another preset check, for a dry run)
+"""
+import os
+import pathlib
+import sys
+import textwrap
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+RV = "the flow adoption's review"
+CMP = "build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md"
+
+# ---------------------------------------------------------------- v2: the catalogue and the presets
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+# effort-two-homes, effort-default-homeless: the preamble's fold sentence
+V.sub("`tools/roles/house/policy.toml`'s `[effort]`, into `roles.effort.*`, and `[gates]`, into each role definition's "
+      "gate grant, their readers re-pointed in the fold's own unit (DA-H5, FA-6).",
+      "`tools/roles/house/policy.toml`'s `[effort]`, into `roles.effort.*` with its `default` into "
+      "`roles.effort.default`, and `[gates]`, into each role definition's gate grant, dBoundRoles having re-pointed "
+      "their readers to the keys and the grant first, the house file read only where neither is set, so the fold "
+      f"retires that fallback (DA-H5, FA-6, {RV}).", "preamble")
+# stage-default-skips-role, effort-default-homeless
+V.sub("| `roles.effort.<role>` | the role efforts | the role's declared effort |",
+      "| `roles.effort.<role>` | the role efforts | `roles.effort.default`, then the role's declared effort |",
+      "role default")
+V.sub("| `roles.effort.<workflow>.<stage>` | the role efforts | the role's declared effort | FA-6: the house file's "
+      "`[effort.stages.<workflow>]`;",
+      "| `roles.effort.<workflow>.<stage>` | the role efforts | `roles.effort.<role>` for the stage's role, then "
+      "`roles.effort.default`, then that role's declared effort | FA-6: the house file's `[effort.stages.<workflow>]`, "
+      f"its default chain the one `resolve_stage_efforts` reads today, stage, then role, then blanket ({RV});",
+      "stage default")
+# effort-default-homeless, model-preset-proof
+V.sub("| `roles.model.<role>` | the models the harness adapter offers | the role's declared model | FA-6: a role's model, "
+      "which no key held; never set by a preset, its values the harness adapter's | dBoundRoles |",
+      "| `roles.effort.default` | the role efforts, or unset | unset | the flow adoption's review: the house file's "
+      "required `[effort] default`, the blanket every role and stage no key names takes, so an adopter's blanket "
+      "survives the fold and reaches a role gov adds later; `default` reserved as a role name; medium by default, and "
+      "below medium only by the owner's explicit authorization, never an agent's (the owner's NT-12) | dBoundRoles |\n"
+      "| `roles.model.<role>` | the models the harness adapter offers | the role's declared model | FA-6: a role's model, "
+      "which no key held, so a preset can set it, as the owner's FA-6 chose, its values the harness adapter's "
+      f"({RV} took it off the keys presets never touch, where the fold had put it) | dBoundRoles |", "model row")
+# policy-names-excluded
+V.sub("a fixed one and one another active row needs, names as its actor or grants refused | none |",
+      "a fixed one, one another active row needs, names as its actor or grants, and one a policy value names refused, "
+      "each refusal naming the requirer or the key | none |", "exclude row")
+# stale-row-values, warn-row-silent
+V.sub("the owner's IA-3, read for rows by FA-2, `order` re-applying a row's patch over gov's new row | dOrderedCharter |",
+      "the owner's IA-3, read for rows by FA-2: `order` re-applying a row's patch over gov's new row and filing an "
+      "order, `warn` re-applying it and printing and journaling the stale edge with no order, `refuse` holding the "
+      "update until `instructions.edit` re-pins, and under `order` and `warn` a patch that no longer applies held, "
+      f"gov's row running as shipped, the order or the warning saying why ({RV}) | dOrderedCharter |", "stale row")
+# model-preset-proof: off the never-touch list, onto the preset table
+V.sub("`runtime.act-auth`, `roles.model.<role>`, `platforms.supported` or",
+      "`runtime.act-auth`, `platforms.supported` or", "never-touch")
+V.sub("| `roles.effort.<workflow>.<stage>` | the role's effort | the role's effort | the role's effort | the role's effort |\n",
+      "| `roles.effort.<workflow>.<stage>` | the role's effort | the role's effort | the role's effort | the role's effort |\n"
+      "| `roles.effort.default` | unset | unset | unset | unset |\n"
+      "| `roles.model.<role>` | the role's model | the role's model | the role's model | the role's model |\n",
+      "preset rows")
+
+# ---------------------------------------------------------------- v2: the chain rows
+# dOrderedCharter: stale-row-values, warn-row-silent; the row checks (fixed-set-unchecked, exclude-unplanted,
+# policy-names-excluded, widening-unchecked), one new clause
+V.sub("and a semantic change re-applying the patch over gov's new row and filing an order as `instructions.stale` says, "
+      "the patch held where it no longer applies, each seen on a planted row of a fixture kind (FA-1, FA-2)",
+      "and a semantic change acting on a row as `instructions.stale` says, `order` re-applying the patch over gov's new "
+      "row and filing an order, `warn` re-applying it and printing and journaling the stale edge with no order, "
+      "`refuse` holding the update until `instructions.edit` re-pins, and under `order` and `warn` a patch that no "
+      "longer applies held, gov's row running as shipped, each seen on a planted row of a fixture kind, each value on "
+      f"a planted semantic row change and `warn` also on a patch of a vanished field (FA-1, FA-2, {RV}); the row checks "
+      "over every registered kind, each seen red on a planted row of a fixture kind and naming no later build's kind, "
+      "each kind's own build declaring its lists and planting its own reds: the fixed set, each kind's schema "
+      "declaring its fixed rows and fields from IA-4's three sources, never typed, an undeclared class read as fixed, "
+      "and an `amends` touching a fixed field, a widening of one, and a `supersedes` or `instructions.exclude` of a "
+      "fixed row each refused, the exclude refusals, an exclusion of a row another active row needs, names as its "
+      "actor or grants, or a tag-valued policy key names each refused, naming the requirer or the key, and the "
+      "widening classifier, each kind's schema declaring the direction that widens each open field, `add` on a "
+      "permission set, `remove` on a constraint set and a declared order on a scalar, every patch classified from "
+      f"those declarations and a field with no declared direction red (FA-1, FA-5, {RV})", "dOrderedCharter")
+# dDeclaredLoop: fixed-set-unchecked, exclude-unplanted, policy-names-excluded, joins-unplanted
+V.sub("and the floor, a gov item's `needs` and routes changed only by a pinned patch, and item tags joined to "
+      "dSafePassage's step gate, each seen red on a planted repository item (FA-1, FA-2)",
+      "and the floor, a gov item's `needs` and routes changed only by a pinned patch, the item kind's fixed set "
+      "declared, every floor item and every step's exit item whole and in any gov item its tag, step, witness and "
+      "outcome set, its open fields' widening directions declared, `needs` a constraint set, and item tags joined to "
+      "dSafePassage's step gate, each seen red on a planted repository item, a planted patch of a gov item's witness "
+      "or outcome set, a planted `supersedes` of a floor item and of an exit item, a planted exclusion of an item "
+      "another active item needs, naming the requirer, and of an item `review.breakpoints` names, naming the key, and "
+      f"a planted item tag removed with no change record, green on one naming its successor (FA-1, FA-2, FA-5, {RV})",
+      "dDeclaredLoop items")
+# dDeclaredLoop: repo-stage-untagged, splice-ends-unplanted
+V.sub("gov's five kept whole and in order, a repository stage's items and exit item witnessed as a gov step's are, its "
+      "boundaries reviewed through `review.breakpoints`, seen red on a planted stage that removes, reorders or replaces "
+      "a gov stage and green on one spliced between Test and Deploy (FA-3, P20)",
+      "gov's five kept whole and in order, a repository stage tagged `step.repo.<name>` and its items "
+      "`item.repo.<stage>.<name>`, the splice row an overlay kind, stage tags joined to dSafePassage's step gate, a gov "
+      "stage's rename beside a splice re-pointing its transition rows, a repository stage's items and exit item "
+      "witnessed as a gov step's are, its boundaries reviewed through `review.breakpoints`, seen red on a planted stage "
+      "that removes, reorders or replaces a gov stage, one before Plan, one after Deploy, a splice whose rows join two "
+      "non-adjacent gov stages and a stage tag removed with no change record, and green on one spliced between Test "
+      f"and Deploy and on a gov rename beside a splice (FA-3, P20, {RV})", "dDeclaredLoop stages")
+# dBoundRoles: effort-two-homes
+V.sub("with effort kept in `tools/roles/house/policy.toml` by workflow and stage until dConvergedCharter folds it (M7), "
+      "the orientation scout at medium",
+      "with effort read from the `roles.effort.*` keys first and from `tools/roles/house/policy.toml` by workflow and "
+      f"stage only where no key is set, until dConvergedCharter retires the seed (M7, FA-6, {RV}), the orientation "
+      "scout at medium", "dBoundRoles shapes")
+# dBoundRoles: gov-workflows-untagged, fixed-set-unchecked, widening-report-later, widening-unchecked,
+# exclude-unplanted, joins-unplanted
+V.sub("a repository's roles and workflow entries, in the `workflow` namespace, each role",
+      "a repository's roles and workflow entries, in the `workflow` namespace, gov's `workflows.toml` entries tagged "
+      "in it beside them, each role", "dBoundRoles workflow")
+V.sub("its ceiling covers the item's allowance and it declares the item's shape kind, a widening patch named in the "
+      "update's report, role and workflow tags joined to dSafePassage's step gate, and the harness paths `roles.json` "
+      "names resolved in the install, each seen red on a planted role in a shape kind it does not declare, an actor "
+      "patch whose role lacks the item's template and a harness path the install lacks (FA-1, FA-4, FA-5)",
+      "its ceiling covers the item's allowance and it declares the item's shape kind, the role kind's fixed set "
+      "declared, the matrix arms, each core role's write class and return schema, and the cycle roles, the prompt "
+      "writer and the driver, whole, its open fields' widening directions declared, tools, write classes and the gate "
+      "grant widening on `add` and a ceiling as it rises, role and workflow tags joined to dSafePassage's step gate, "
+      "and the harness paths `roles.json` names resolved in the install, each seen red on a planted role in a shape "
+      "kind it does not declare, an actor patch whose role lacks the item's template, a harness path the install "
+      "lacks, a planted patch or widening of a core role's write class or return schema, a planted `supersedes` of "
+      "the driver, a planted exclusion of a role an active item names as its actor and of a leg a role's gate grant "
+      "names, each naming the requirer, a planted exclusion leaving a role acting in no item, the role excluded with "
+      "it or the matrix arm red, a planted role or workflow tag removed with no change record, green on one naming "
+      "its successor, and an `amends` naming a workflow tag gov does not ship, green on one resolving to a gov "
+      f"workflow entry (FA-1, FA-4, FA-5, {RV})", "dBoundRoles roles")
+# dBoundRoles: effort-two-homes, effort-default-homeless, stage-default-skips-role
+V.sub("`roles.effort.<role>`, `roles.effort.<workflow>.<stage>` and `roles.model.<role>`, each defaulting to the role's "
+      "declared value, and the gate grant a field of each role's definition, patched in the overlay (FA-6)",
+      "`roles.effort.<role>`, `roles.effort.<workflow>.<stage>`, `roles.effort.default` and `roles.model.<role>`, a "
+      "stage's effort read from its stage key, then its role's key, then `roles.effort.default`, then the role's "
+      "declared value, as `resolve_stage_efforts` reads today, a role's model from its key, then its declared value, "
+      "`default` reserved as a role name, and the gate grant a field of each role's definition, patched in the "
+      "overlay, `resolve_stage_efforts`, R12, `handoff.py`'s `stage-efforts` and `harness-args` and the gate check "
+      "re-pointed in the same unit to the keys through dGroundRules's reader and to the grant, the house file's "
+      "`[effort]` and `[gates]` read only where no key or grant field is set, until dConvergedCharter retires the "
+      "seed, each seen red on a planted house-file effort that differs from a set key, the key's value read, on a "
+      "planted role-level effort a stage must inherit, and on a planted house-file `[gates]` row that differs from a "
+      f"role's grant, the grant read (FA-6, {RV})", "dBoundRoles keys")
+# dWitnessedBar: fixed-set-unchecked, widening-unchecked, joins-unplanted
+V.sub("and leg tags joined to dSafePassage's step gate, each seen red on a planted unsourced row, a patch on a vanished "
+      "leg and a dropped fixed leg (FA-1, FA-2)",
+      "the leg kind's fixed set declared, the canary's key set and the legs that check the composition, its open "
+      "fields' widening directions declared, a ceiling widening as it rises, and leg tags joined to dSafePassage's "
+      "step gate, each seen red on a planted unsourced row, a patch on a vanished leg, a dropped fixed leg, a patched "
+      "fixed leg and a planted leg tag removed with no change record, green on one naming its successor (FA-1, FA-2, "
+      f"FA-5, {RV})", "dWitnessedBar")
+# dShippedRelease: effort-default-homeless
+V.sub("the house file's efforts as `roles.effort.*` values and its grants as patches,",
+      "the house file's efforts as `roles.effort.*` values, its `default` as `roles.effort.default`, and its grants as "
+      "patches,", "adopt.declarations")
+V.sub("and an adopter's role files as repository roles with their workflow entries, seen on a fixture holding each "
+      "(FA-1)",
+      "and an adopter's role files as repository roles with their workflow entries, seen on a fixture holding each, a "
+      f"house file setting a `default` other than medium among them (FA-1, {RV})", "adopt fixture")
+# dShippedRelease: widening-report-later, widening-unchecked
+V.sub("and every new gov row upstream of a repository item in the needs graph listed for review, seen on a planted "
+      "release (FA-2, FA-5)",
+      "and every new gov row upstream of a repository item in the needs graph listed for review, seen on a planted "
+      "release, its widening list compared with dOrderedCharter's classifier over the release's patches, seen red on a "
+      "planted release whose report drops a widening of each direction, an `add` to a permission set, a `remove` from "
+      f"a constraint set and a raised scalar, and green on one naming all three (FA-2, FA-5, {RV})", "report")
+# dCalibratedLens: fixed-set-unchecked, policy-names-excluded, joins-unplanted
+V.sub("a repository's lenses from its overlay, chosen by `review.opt-in`, and lens tags joined to dSafePassage's step "
+      "gate, seen on a planted repository lens swapped into a run (FA-1)",
+      "a repository's lenses from its overlay, chosen by `review.opt-in`, the lens kind's fixed set declared, the five "
+      "lens slots among it, and lens tags joined to dSafePassage's step gate, seen on a planted repository lens "
+      "swapped into a run, and red on a planted patch adding a sixth slot, a planted exclusion of a lens "
+      "`review.opt-in` names, naming the key, and a planted lens tag removed with no change record, green on one "
+      f"naming its successor (FA-1, FA-5, {RV})", "dCalibratedLens")
+# dConvergedCharter: gates-two-targets
+V.sub("`tools/run-gates/held_halves.py`, and `roles_lib.load_policy` with `check_roles.py`, `handoff.py` and "
+      "`render_agents.py`, proven in a scratch clone where `INHERITED_RED=park` is folded, `.githooks/pre-push "
+      "--decide` reading `land` before the re-point and `park` after it (DA-H5, DA-M6)",
+      "and `tools/run-gates/held_halves.py`, proven in a scratch clone where `INHERITED_RED=park` is folded, "
+      "`.githooks/pre-push --decide` reading `land` before the re-point and `park` after it (DA-H5, DA-M6), and "
+      "`roles_lib.load_policy`'s house-file fallback retired with the seed, its `[effort]` readers, `check_roles.py`, "
+      "`handoff.py` and `render_agents.py` among them, already on the `roles.effort.*` keys through dGroundRules's "
+      "reader since dBoundRoles, and its `[gates]` readers on each role definition's gate grant, never the policy "
+      f"reader, seen red on a planted reader still reading the house file (FA-6, {RV})", "load_policy")
+# dConvergedCharter: never-policy-file, effort-default-homeless
+V.sub("`tools/roles/house/policy.toml` retired as a seed: its `[effort]` folded into `roles.effort.*` and its `[gates]` "
+      "into each role definition's gate grant, the one legacy home that folds into role definitions, never the policy "
+      "file, gov's defaults shipped in the role definitions every release updates, its readers re-pointed, with an "
+      "upgrade step (FA-6, P38)",
+      "`tools/roles/house/policy.toml` retired as a seed: a repository's efforts folded into the `roles.effort.*` "
+      "policy keys, its `default` into `roles.effort.default`, its `[gates]` into each role definition's gate grant, "
+      "gov's default efforts and grants shipped in the role definitions every release updates, and the readers "
+      f"dBoundRoles re-pointed losing their house-file fallback, with an upgrade step (FA-6, P38, {RV})",
+      "seed retired")
+V.save()
+
+# ---------------------------------------------------------------- the adoption record
+A = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+A.sub("shipped schema: item, role, workflow, lens and leg.",
+      f"shipped schema: item, role, workflow, lens and leg, and a repository stage's splice rows (FA-3, revised "
+      f"2026-10-19, {RV}).", "item 1")
+A.sub("`item.<step>.repo.<name>`, `role.repo.<name>`, `workflow.repo.<name>`, `lens.repo.<name>` and `leg.repo.<name>`.",
+      "`item.<step>.repo.<name>`, `role.repo.<name>`, `workflow.repo.<name>`, `lens.repo.<name>` and `leg.repo.<name>`,\n"
+      "   and for a repository stage `step.repo.<name>`, its items `item.repo.<stage>.<name>` (FA-3, revised 2026-10-19,\n"
+      f"   {RV}).", "item 2")
+A.sub("flowing from gov's row. Typical patches:",
+      f"flowing from gov's row. A patch touching a fixed field (item 9), or widening one, is refused (revised\n"
+      f"   2026-10-19, {RV}). Typical patches:", "item 4")
+A.sub("its pin matters most.",
+      f"its pin matters most. A replacement of a fixed row (item 9) is refused (revised 2026-10-19, {RV}).", "item 5")
+A.sub("another active row needs, names as its actor or grants, naming the requirer.",
+      "another active row needs, names as its actor or grants, or a policy value names, naming the requirer or the key\n"
+      f"   (the policy value revised 2026-10-19, {RV}).", "item 6")
+A.sub("`roles.effort.<role>`, `roles.effort.<workflow>.<stage>` and `roles.model.<role>`, each defaulting to the role's\n"
+      "   declared value, so a preset can set them.",
+      "`roles.effort.<role>`, `roles.effort.<workflow>.<stage>`, `roles.effort.default` and `roles.model.<role>`, so a\n"
+      "   preset can set them, a stage's effort defaulting to its role's key, then to the blanket `roles.effort.default`,\n"
+      "   then to the role's declared value, as today's resolver reads, and a role's model to its declared value (revised\n"
+      f"   2026-10-19, {RV}).", "item 8")
+A.sub("   - Every other row and field is open. The class is derived, never typed, as the closing review settled for units.",
+      "   - Every other row and field is open. The class is derived, never typed, as the closing review settled for units.\n"
+      "   - Each kind's build declares its fixed list, and dOrderedCharter's row checks refuse an `amends`, a widening, a\n"
+      "     `supersedes` or an exclusion touching it, each seen red on that kind's own planted row (revised 2026-10-19, the\n"
+      "     flow adoption's review).", "item 9")
+A.sub("    already carries the owner's proof, and the update's report names every widening (FA-5).",
+      "    already carries the owner's proof, and the update's report names every widening (FA-5). Each kind declares the\n"
+      "    direction that widens each open field: `add` on a permission set, `remove` on a constraint set such as `needs`,\n"
+      "    and a declared order on a scalar, so a ceiling widens as it rises. The report's widening list is compared with\n"
+      f"    the classifier's (revised 2026-10-19, {RV}).", "item 10")
+A.sub("    - every leg's seen-red record.",
+      "    - the fixed set: no `amends`, widening, `supersedes` or exclusion touching a fixed row or field;\n"
+      "    - every leg's seen-red record.", "item 11")
+A.sub("    - `warn` re-applies the patch and files no order.",
+      "    - `warn` re-applies the patch, prints and journals the stale edge, and files no order. Where the patch no longer\n"
+      "      applies, it is held and gov's row runs, as under `order`, with a warning line saying why (revised 2026-10-19,\n"
+      f"      {RV}).", "item 13")
+A.sub("    item, role, workflow, lens and leg tags, each joined by the build that registers its namespace.",
+      "    item, step, role, workflow, lens and leg tags, a repository stage's among them, each joined by the build that\n"
+      "    registers its namespace and seen red there on a planted tag removed with no change record (revised 2026-10-19,\n"
+      f"    {RV}).", "item 14")
+A.sub("  record's marks and successors covering rows. Each kind's own build admits its rows, below.",
+      "  record's marks and successors covering rows, and the row checks over a fixture kind: the fixed set refused to\n"
+      "  every patch, widening, supersession and exclusion, the exclude refusals naming the requirer or the key, and the\n"
+      "  widening classifier. Each kind's own build admits its rows, declares its fixed list and widening directions, and\n"
+      "  plants its own reds, below.", "chain dOrderedCharter")
+A.sub("  step gate, a build's composition pinned per step, and every policy value naming a boundary re-pointed on a rename.",
+      "  step gate, a build's composition pinned per step, every policy value naming a boundary re-pointed on a rename, and\n"
+      "  repository stages spliced between adjacent gov stages, tagged `step.repo.<name>`, seen red on a planted remove,\n"
+      "  reorder or replace and on a stage before Plan, after Deploy or across non-adjacent stages.", "chain dDeclaredLoop")
+A.sub("  to the step gate, the `workflow` namespace, `roles.effort.*` and `roles.model.*`, and the gate grant as a role\n"
+      "  field.",
+      "  to the step gate, the `workflow` namespace with gov's entries tagged in it, `roles.effort.*` and `roles.model.*`\n"
+      "  read before the house file, which stays a fallback until the seed retires, the gate grant as a role field, and\n"
+      "  the harness paths `roles.json` names resolved in the install.", "chain dBoundRoles")
+A.sub("  update's report extended to every kind.",
+      "  update's report extended to every kind, its widening list compared with the classifier's.", "chain dShippedRelease")
+A.sub("    `runtime.act-harness`'s are; the preset check reddened on it once, before that.",
+      "    `runtime.act-harness`'s are; the preset check reddened on it once, before that. The flow adoption's review took\n"
+      "    it off again: the owner's FA-6 chose keys that presets can set, so every shipped preset keeps the role's model\n"
+      "    and a repository's own preset may name one (revised 2026-10-19).", "folded model")
+A.text = A.text.rstrip("\n") + f"""
+
+## [reviewed] The closing review, 2026-10-19
+
+The owner asked, "run the review pair on both folds, medium effort." Two independent light diff reviews read
+`67995cb6f..e1a54ac67`, and `{CMP}` compares them. Every confirmed defect is folded. The fixed set gained its row
+checks, effort one home with a blanket default, a repository stage its tag, and `roles.model.<role>` its place among
+the keys presets set, as FA-6 chose.
+"""
+A.done += 1
+A.save()
+
+# ---------------------------------------------------------------- the systems record
+Y = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+Y.sub("`workflow` and `lens`, the workflow entries and review lenses a\n  repository adds beside gov's (the flow and roles "
+      "adoption answers, FA-1)",
+      "`workflow` and `lens`, gov's workflow entries and review lenses and those a\n  repository adds beside them (the "
+      f"flow and roles adoption answers, FA-1, gov's own tagged since {RV})", "namespaces")
+Y.sub("The repository's flow and role rows sit beside its units, each in its kind's\n  schema (FA-1).",
+      "The repository's flow and role rows sit beside its units, each in its kind's\n  schema, tagged with the `repo` "
+      "segment where an owner would sit, a repository stage as `step.repo.<name>` and its\n  items as "
+      f"`item.repo.<stage>.<name>` (FA-1, FA-3, {RV}).", "row grammar")
+Y.sub("  - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which\n"
+      "    `resolve_stage_efforts` already reads (`roles_lib.py:561`), until dConvergedCharter folds them into\n"
+      "    `roles.effort.<role>` and `roles.effort.<workflow>.<stage>`, beside `roles.model.<role>` (revised\n"
+      "    2026-10-19, FA-6).",
+      "  - **Effort moves to the `roles.effort.*` keys at dBoundRoles,** which re-points `resolve_stage_efforts`\n"
+      "    (`roles_lib.py:561`) to read a stage's key, then its role's key, then `roles.effort.default`, then the role's\n"
+      "    declared effort, the house file's `[effort.roles]` and `[effort.stages.<workflow>]` read only where no key is\n"
+      "    set until dConvergedCharter retires the seed, beside `roles.model.<role>` (revised 2026-10-19, FA-6 and the\n"
+      "    flow adoption's review).", "effort bullet")
+Y.save()
+
+# ---------------------------------------------------------------- the memory plan, the fates, layer-roles
+M = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+M.sub("changing gov's only by `amends` and `supersedes` edges pinned to gov's text, a row's amendment a field patch "
+      "(IA-1, IA-2, FA-1)",
+      "changing gov's only by `amends` and `supersedes` edges pinned to gov's text for units and to a row's canonical "
+      f"form for rows, a row's amendment a field patch (IA-1, IA-2, FA-1, {RV})", "overlay pin")
+M.save()
+F = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+F.sub("`[effort]` into `roles.effort.*`, beside `roles.model.*`, and `[gates]` into each role definition's gate grant, "
+      "the seed retired (dConvergedCharter); on dGroundRules's legacy list until then",
+      "`[effort]` into `roles.effort.*`, its `default` into `roles.effort.default`, beside `roles.model.*`, and "
+      "`[gates]` into each role definition's gate grant, their readers re-pointed by dBoundRoles with the house file a "
+      "fallback, the seed retired (dConvergedCharter); on dGroundRules's legacy list until then", "house file fate")
+F.save()
+L = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+L.sub("  stage, read by `handoff.py stage-efforts` (TOOL-aOrientedCast-10).",
+      "  stage, read by `handoff.py stage-efforts` (TOOL-aOrientedCast-10), until dBoundRoles moves it to the\n"
+      "  `roles.effort.*` policy keys, read first, the house file a fallback until dConvergedCharter retires it (revised\n"
+      "  2026-10-19, the owner's FA-6 and the flow adoption's review).", "effort home")
+L.save()
+
+# ---------------------------------------------------------------- the preset check's free values
+PC = pathlib.Path(os.environ.get("PC", str(HERE.parent / "preset_check_canonical.py")))
+pc = PC.read_text(encoding="utf-8")
+old = "|the role efforts|"
+if pc.count(old) != 1:
+    sys.exit(f"{PC}: the free-values anchor matches {pc.count(old)} times")
+PC.write_text(pc.replace(old, "|the role efforts|the models the harness adapter offers|", 1), encoding="utf-8",
+              newline="\n")
+print(f"{PC.name}: 'the models the harness adapter offers' joined the free values")
+
+# ---------------------------------------------------------------- the bug classes' instances
+INSTANCES = {
+    "rule-stated-with-no-check-that-fails":
+        "The flow and roles adoption's fixed set, its headline guarantee, had no check that refused an `amends` or a "
+        "`supersedes` touching it, only an exclusion. Its widened exclude refusals, its four new step-gate joins and "
+        "FA-5's every widening reported had no red case either.",
+    "amendment-leaves-its-other-half-standing":
+        "FA-6's fold gave dBoundRoles the `roles.effort.*` keys and left the same row, and the systems record, keeping "
+        "effort in the house file until dConvergedCharter. The record's `[chain]` kept its lines from before FA-3, and "
+        "`instructions.stale` was read for rows with only `order` defined.",
+    "two-answers-to-one-question":
+        "The memory plan pinned the overlay's rows to gov's text, where v2 and the adoption record pinned them to their "
+        "canonical form, and role effort had two live homes with no precedence between them.",
+    "fold-text-is-unreviewed-surface":
+        "FA-6's fold narrowed the owner's chosen option, putting `roles.model.<role>` on the keys presets never touch, "
+        "and dropped the house file's required `[effort] default` with no destination. Both sat in fold prose the "
+        "owner's answer did not cover.",
+    "step-depends-on-a-later-build":
+        "dBoundRoles named a widening in the update's report, which only dShippedRelease, a later build, extends to "
+        "rows.",
+    "policy-value-with-no-route":
+        "Excluding a gov item that `review.breakpoints` names, or a lens `review.opt-in` selects, composed green, so the "
+        "breakpoint or the lens would never fire.",
+    "fixture-passes-by-finding-nothing":
+        "The repository-stage splice check planted a stage that removes, reorders or replaces a gov stage, never one "
+        "before Plan, after Deploy or across non-adjacent stages, so a checker that accepted any insertion keeping "
+        "gov's five whole passed every case.",
+}
+for name, text in INSTANCES.items():
+    C = Record(f"memory/gotchas/{name}.md")
+    C.sub("\n## The fix\n",
+          f"\nIt bit again in the flow and roles adoption's closing review, 2026-10-19\n(`memory/builds/dClosedLoop/{CMP}`).\n"
+          + textwrap.fill(text, 118, break_long_words=False, break_on_hyphens=False) + "\n\n## The fix\n",
+          f"{name}: instance")
+    C.save()
+print("folded the flow adoption's review")
+````
+
+### `log_pairs.py`
+
+The session log's dispatch rows 139 to 142, the derived agent lines and the pairs' events.
+
+````python
+"""Record the two review pairs in the session log: dispatch rows 139 to 142 (the flow adoption's runs A and B, then
+the answers' runs A and B), every agent and returned line as the roles kit derived them, and the pairs' events.
+
+Usage: python -X utf8 log_pairs.py <lines-139> <lines-140> <lines-141> <lines-142>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+
+def lines_of(path, n=20):
+    got = [ln for ln in pathlib.Path(path).read_text(encoding="utf-8").replace("\r\n", "\n").split("\n")
+           if ln.startswith(("- agent —", "- returned —"))]
+    if len(got) != n:
+        sys.exit(f"{path}: {n} agent and returned lines expected, read {len(got)}")
+    return got
+
+
+runs = [lines_of(p) for p in sys.argv[1:5]]
+F = "`" * 3
+CMP_A = "build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md"
+CMP_N = "build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md"
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+row138 = [ln for ln in L.text.split("\n") if ln.startswith("| 138 |")]
+if len(row138) != 1:
+    sys.exit("no single dispatch row 138")
+SHAPE = ("`tier2-review.js`, diff review, light: three `gov-diff-reviewer` lenses (correctness, seams, verification), "
+         "five `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run {} of two")
+ADOPT = ("The flow and roles adoption, reviewed twice at the owner's word: `e1a54ac67` over `67995cb6f`, the design, "
+         "the owner's FA-1 to FA-7 folded and the namespaces")
+ANSW = ("The owner's answers to the night pass two's forks, reviewed twice at the owner's word: `f8ad789e1` over "
+        "`f064bf378`, NT-1 to NT-28 folded")
+BRIEF = "the args, built by `build_args_pairs.py`"
+REV = "`reviews/2026-10-19-review-PLAY-dClosedLoop-1-{}.md`"
+ROWS = [
+    (139, SHAPE.format("A"), ADOPT, BRIEF,
+     "returned as `wf_319e98b7-dc6`, CLEAN WITH FIXES, 14 of 14 confirmed, 11 items, 2 high",
+     REV.format("flow-adoption-a")),
+    (140, SHAPE.format("B"), ADOPT, BRIEF,
+     "returned as `wf_75d61367-fe8`, CLEAN WITH FIXES, 18 of 21 confirmed, 14 items, 1 high",
+     REV.format("flow-adoption-b")),
+    (141, SHAPE.format("A"), ANSW, BRIEF,
+     "returned as `wf_19434550-87a`, CLEAN WITH FIXES, 21 of 27 confirmed, 17 items, 1 high",
+     REV.format("night-pass-two-answers-a")),
+    (142, SHAPE.format("B"), ANSW, BRIEF, "returned as `wf_035611d1-d5f`, CLEAN WITH FIXES, 17 of 27 confirmed, 15 items, 1 high", REV.format("night-pass-two-answers-b")),
+]
+if any("RUN_B" in r[4] for r in ROWS):
+    sys.exit("run B's outcome is not filled in")
+new = "".join(f"| {n} | {who} | {what} | {brief} | 1799cb98 | {out} | {rec} |\n" for n, who, what, brief, out, rec in ROWS)
+L.sub(row138[0] + "\n", row138[0] + "\n" + new, "dispatch rows")
+L.insert_before("\n## Events\n",
+                "\nThe flow adoption's closing review, dispatches 139 and 140, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(runs[0] + runs[1]) + "\n" + F + "\n"
+                + "\nThe owner's answers' closing review, dispatches 141 and 142, derived from each run the same way:\n\n"
+                + F + "text\n" + "\n".join(runs[2] + runs[3]) + "\n" + F + "\n", "agent lines")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-19, session 1799cb98: the owner's "run the review pair on both folds, medium effort": two pairs of light
+  diff reviews, one run after another. The flow and roles adoption, `e1a54ac67` over `67995cb6f`, took dispatches 139
+  and 140. The owner's answers to the night pass two's forks, `f8ad789e1` over `f064bf378`, took dispatches 141 and
+  142. Each pair's args differ only in the run label, the report path and the scratch path. Each run A's report was
+  moved out of the tree while its run B ran, and restored byte for byte after (sha256 `ffaf542b78d7` and
+  `15006db0cb60`).
+- 2026-10-19, session 1799cb98: the flow adoption's closing review, compared (`{CMP_A}`): 19 confirmed defects, two
+  high, both runs finding six of them, an overlap of 0.32. Every defect folds, none needing the owner: the fixed set
+  gained row checks with each kind's reds on its own build, effort one home and a blanket default, a repository stage
+  its tag, and `roles.model.<role>` returned to the keys presets set, as the owner's FA-6 chose. One defect found
+  while folding, the tag grammar's first-segment rule against the `repo` owner segment, waits for the owner.
+""", "events")
+L.save()
+````
+
+### `fill_adoption.py`
+
+The flow adoption's comparison record: compare_rounds.py's output verbatim and the folded section.
+
+````python
+"""The flow adoption's comparison record: [summary], compare_rounds.py's output verbatim with what it shows, and
+[folded], written once the fold's checks passed. The design map's stale-facts check reddened on the first [folded], whose critical-path quote carried no pin; the text below is the re-pinned one, applied in place.
+
+Usage: python -X utf8 fill_adoption.py <compare_rounds output>   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+out = pathlib.Path(sys.argv[1]).read_bytes().decode("utf-8").replace("\r\n", "\n").strip("\n")
+F = "`" * 3
+C = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md")
+C.sub("\nSUMMARY\n", f"""
+{F}text
+$ python compare_rounds.py flow-adoption-a.md flow-adoption-b.md flow-adoption-reviews-compared.md session-log.md wf_319e98b7-dc6 wf_75d61367-fe8
+{out}
+{F}
+
+- **Every defect sits in the adoption's design text.** None reaches shipped code. Most are clauses the FA fold placed
+  with no check that can fail: the fixed set, the exclude refusals, four step-gate joins and the widening report.
+- **One run finds about two thirds.** Run A alone covers 11 of the 19 and run B 14, an overlap of 0.32, the lowest of
+  the paired rounds so far. Chapman's estimate puts about six more beyond both.
+- **Both runs found the fixed set high, and both found effort's two homes.** Run A graded the two homes high and run B
+  medium. Run B alone found that the fold had narrowed the owner's FA-6 answer.
+- **Precision held at 1.00 and 0.86.** Run B's three refuted findings have no confirmed twin: the stale item 3, the
+  lens gap and the seed-count reader, each refuted on the record or the tree.
+- **The skeptics rewrote nine fixes.** Three in run A and six in run B were judged unsound, and the skeptics'
+  corrections fold. Most move a red case from a build that cannot yet name the kind onto the kind's own build, and one
+  widens the widening rule to a `remove` from a constraint set.
+""", "summary")
+C.sub("\nFOLDED\n", """
+All 19 are folded: in v2's catalogue, presets and chain rows, the adoption record's design items, `[chain]` and
+`[folded]`, the systems record, the memory plan, the fates and layer-roles. `roles.effort.default` joins the catalogue,
+now 244 keys, and `roles.model.<role>` joins the preset table. dOrderedCharter gains one clause, the row checks.
+The critical path grows by that unit, from 238 at `f8ad789e1` to 239. The preset check's free values gained the
+adapter's model set, after the check was seen red on that key's four preset values. Seven bug classes record the
+instances. Every final check passed over the folded records.
+""", "folded")
+C.save()
+````
+
 ### `preset_check_canonical.py`
 
-The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before.
+The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before.
 
 ````python
 """Check architecture v2's preset table against its policy catalogue: every presettable key assigned
@@ -17675,7 +18330,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"seconds|hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count|KB per role")
+FREE = re.compile(r"seconds|hours|days|set of named|each cap|any subset|the role efforts|the models the harness adapter offers|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count|KB per role")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -17980,9 +18635,14 @@ MINE = [
      "record, the six departures from the recommendation in v2, the layer records, coordination, the memory plan "
      "and the register, and every pending marker turned into the owner's."),
     ("night2/log_answers.py", "The session log's event for the owner's answers to NT-1 to NT-28."),
+    ('night2/build_args_pairs.py', 'The owner\'s "run the review pair on both folds, medium effort": both pairs\' args, the flow adoption\'s and the answers\', each pair\'s runs differing only in the run label, the report path and the scratch path.'),
+    ('night2/pairs/rows.py', "Prints a chain row's planned-units clauses, numbered, to find each clause a finding touches."),
+    ('night2/fold_adoption.py', "The flow adoption's closing review, folded: both runs' confirmed defects in v2, the adoption, systems, memory-plan, fates and layer-roles records, the bug classes' instances, and the preset check's free values, dry-run on a full copy of the tree while the answers pair ran."),
+    ('night2/log_pairs.py', "The session log's dispatch rows 139 to 142, the derived agent lines and the pairs' events."),
+    ('night2/fill_adoption.py', "The flow adoption's comparison record: compare_rounds.py's output verbatim and the folded section."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
-     "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
+     "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -19009,13 +19669,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2516 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1727, derived 294, pending 495
-map: no stale facts read 58 records and 21 quotes of a map count or the critical path
+map: 2524 nodes in 30 namespaces; 31563 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1734, derived 295, pending 495
+map: no stale facts read 59 records and 22 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 202 records, 3386 sections, 202 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 207 records, 3471 sections, 202 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -19033,7 +19693,7 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 469 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+chain rows 21 · owned nodes read 470 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
 left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 106 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
@@ -19074,13 +19734,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 243 · presettable 218 · preset rows 218
+catalogue keys 244 · presettable 220 · preset rows 220
 no findings
 rc 0
 
 $ critical path
-critical path: 238 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 10, dSafePassage 22, dFairHearing 38, dOrderedCharter 57, dDeclaredLoop 86, dPlacedRequest 98, dWitnessedBar 115, dKeptSession 121, dTotalRecall 139, dBoundRoles 140, dRankedPlan 154, dFurnishedOrders 160, dLinkedLibrary 164, dIndexedDesign 178, dWellOiledMachine 185, dScopedBuild 198, dTendedCadence 201, dMindYourWords 202, dShippedRelease 212, dCalibratedLens 216, dConvergedCharter 238
+critical path: 239 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 10, dSafePassage 22, dFairHearing 38, dOrderedCharter 58, dDeclaredLoop 87, dPlacedRequest 99, dWitnessedBar 116, dKeptSession 122, dTotalRecall 140, dBoundRoles 141, dRankedPlan 155, dFurnishedOrders 161, dLinkedLibrary 165, dIndexedDesign 179, dWellOiledMachine 186, dScopedBuild 199, dTendedCadence 202, dMindYourWords 203, dShippedRelease 213, dCalibratedLens 217, dConvergedCharter 239
 rc 0
 ````
 

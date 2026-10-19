@@ -248,8 +248,8 @@ once dTotalRecall registers it (P33).
   as `chain.dTotalRecall` and `principle.P27`, and by its tag otherwise. The resolver accepts both.
 - **Namespaces.** R-B's twelve, plus `section`, `doc`, `unit`, `field`, `leg`, `check`, `point`, `hook`,
   `command`, `pack`, `feature` and `class`, and `marker` (`[design-annotations]`), and `repo`, a repository's own
-  units (the adopter-instructions answers, IA-1), and `workflow` and `lens`, the workflow entries and review lenses a
-  repository adds beside gov's (the flow and roles adoption answers, FA-1), and `scenario`, the flow's named
+  units (the adopter-instructions answers, IA-1), and `workflow` and `lens`, gov's workflow entries and review lenses and those a
+  repository adds beside them (the flow and roles adoption answers, FA-1, gov's own tagged since the flow adoption's review), and `scenario`, the flow's named
   variants (the night pass two, the owner's NT-1). Each namespace is a row
   in its owning layer's contract: its declaring source, its extractor, and whether it selects or
   describes. An expansion mints only under its own prefix, at a core point.
@@ -368,7 +368,8 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
 - **The unit.** One TOML row in `tools/<kit>/instructions.toml`, the repository's in
   `.governance/instructions.toml`, composed with every kit's manifest: the repository's rows tagged `repo.`,
   gov's rows changed only through the repository's edges, never by row key (IA-1, IA-2). The repository's flow and role rows sit beside its units, each in its kind's
-  schema (FA-1). A unit's fields: `tag`,
+  schema, tagged with the `repo` segment where an owner would sit, a repository stage as `step.repo.<name>` and its
+  items as `item.repo.<stage>.<name>` (FA-1, FA-3, the flow adoption's review). A unit's fields: `tag`,
   `type` (directive, constraint, definition, pointer, policy, fact), `level`, `select`, `when`, `text` (one
   line, at most 200 B) or `source` (derived), `required-by`, `enforced-by`, `budget`, `origin` (a kit or the
   repository, apart from the `owner` edge, which names a chain build), `class` (`fixed` or `open`, derived from
@@ -429,10 +430,11 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
     (`research-role-shapes-a.md:15,116`).
   - **The agent cap** of each stage is at or under `runtime.agents-in-flight` (revised 2026-10-19, the night
     pass two, point 7, the owner's NT-27: it was agent-cap's `FANOUT_CAP`).
-  - **Effort stays in `policy.toml`,** under `[effort.roles]` and `[effort.stages.<workflow>]`, which
-    `resolve_stage_efforts` already reads (`roles_lib.py:561`), until dConvergedCharter folds them into
-    `roles.effort.<role>` and `roles.effort.<workflow>.<stage>`, beside `roles.model.<role>` (revised
-    2026-10-19, FA-6).
+  - **Effort moves to the `roles.effort.*` keys at dBoundRoles,** which re-points `resolve_stage_efforts`
+    (`roles_lib.py:561`) to read a stage's key, then its role's key, then `roles.effort.default`, then the role's
+    declared effort, the house file's `[effort.roles]` and `[effort.stages.<workflow>]` read only where no key is
+    set until dConvergedCharter retires the seed, beside `roles.model.<role>` (revised 2026-10-19, FA-6 and the
+    flow adoption's review).
   - **Why.** The first design added `tools/roles/shapes.toml` beside `workflows.toml`, which already
     declares each workflow's roles and stages (`workflows.toml:37-67`). That made two registries over
     one fact.

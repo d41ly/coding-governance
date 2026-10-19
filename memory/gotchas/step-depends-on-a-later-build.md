@@ -57,6 +57,10 @@ It bit again in the night pass two's closing review, 2026-10-19
 dFairHearing's checklist cut read a gate status only dLinkedLibrary creates, dKeptSession keyed message ids on acts
 Runtime mints, and dPlacedRequest keyed decisions on work-order slots dBoundRoles brings.
 
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+dBoundRoles named a widening in the update's report, which only dShippedRelease, a later build, extends to rows.
+
 ## The fix
 
 - Check every kind of dependency, not only citations:
