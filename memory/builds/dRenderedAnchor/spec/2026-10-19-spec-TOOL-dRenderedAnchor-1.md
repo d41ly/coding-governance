@@ -10,6 +10,7 @@
 | [2026-10-19-build-TOOL-dRenderedAnchor-1-2-acceptance-ledger.md](../build/2026-10-19-build-TOOL-dRenderedAnchor-1-2-acceptance-ledger.md) | journal | — |
 | [2026-10-19-prompt-TOOL-dRenderedAnchor-1-brief.md](../prompts/2026-10-19-prompt-TOOL-dRenderedAnchor-1-brief.md) | research | — |
 | [2026-10-19-review-TOOL-dRenderedAnchor-1-closing-diff-round1.md](../reviews/2026-10-19-review-TOOL-dRenderedAnchor-1-closing-diff-round1.md) | diff-review | — |
+| [2026-10-19-review-TOOL-dRenderedAnchor-2-closing-diff-round2.md](../reviews/2026-10-19-review-TOOL-dRenderedAnchor-2-closing-diff-round2.md) | diff-review | TOOL-dRenderedAnchor-2 |
 
 <!-- /gen:spec-records -->
 
