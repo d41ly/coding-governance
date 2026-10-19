@@ -59,7 +59,7 @@ arrives.
 | 133 | 4, prior art | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-14-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-handoffs-prior-art.md` | eight families; a schema rendered per work order, and create-only registers keyed by derived keys |
 | 134 | 5, caps | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-15-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-caps.md` | 24 caps, 18 refusing; one switch at warn, made visible on a passing run, priced and trended, with consumer limits and correctness checks kept outside it |
 | 135 | 6, gotchas | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-16-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-gotchas.md` | 6.2% precision on code reviews and 18% at the moment of the edit; retire writing-time serving by anchors, keep classes on review, gate the syntactic ones |
-| 136 | 7, agent-cap | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` | running |
+| 136 | 7, agent-cap | `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-17-researcher.md` | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` | it counts claims per prompt, never agents in flight, and a notification resets it; one Runtime key enforced at three scopes |
 
 ## [p1-scenarios] Point 1: scenarios, one method for flexible flows and workers
 
@@ -354,6 +354,78 @@ rows, with eight gaps, and the keys `build.push` and `build.unit-holders` with t
 `gov-session`; and the register's `gap-rt-33`, `gap-roles-28`, `gap-roles-29`, `gap-conc-08` to `gap-conc-11` and
 `gap-flow-22`.
 
+## [p5-caps] Point 5: caps advisory, under one switch
+
+**The owner's direction, taken as decided.** Caps become advisory. Their values stay the owner's. One switch decides
+enforcement, and it warns by default. What the night had to work out is what the switch covers, and how a warning
+avoids becoming noise.
+
+**What exists.** Dispatch 134 inventoried 24 size caps, and 18 of them refuse a commit, a push or a render. They
+cover the charter template, the rendered charter, the kickoff engine, the guides, every live spec, line lengths,
+index entries, build READMEs and their five slots, dossiers, role bodies, one-line rules, roster lines, the kickoff
+manifest, the card, the count of universal bug classes and the recall export. Their history bears out the owner's
+complaint:
+- The read-path ceiling moved 26 times in 17 days, then retired, its own header saying the movements "bought no
+  trim".
+- The method guide was raised four times, and the unattended protocol, pinned with no headroom, three times in three
+  days.
+- Caps forced a cut three times, and blocked a merge where neither branch alone was over.
+
+The design already leaned this way:
+- P9 re-derives caps from evidence.
+- Walk R4 defined a soft cap.
+- `budgets.*` gave each cap a mode, hard or soft.
+- `orient.budget` and `memory.over-budget` were already advisory.
+
+But `instructions.checks` and `annotations.budget` still refused by default, and each cap carried its own mode.
+
+**What a plain warning costs.** Two of dispatch 134's losing tests decide the shape:
+- **A warning in a passing leg reaches nobody.** The runner prints only `GATE ok <name>`, and two size warnings fire
+  unseen today. Prior art agrees: Google's experience is that developers ignore warnings they are not shown at the
+  moment of review.
+- **One switch over everything would loosen correctness too.** `instructions.checks` refuses a load set missing a
+  required unit under the same switch as its size budget.
+
+A consumer's own limit also differs from a cap. The harness keeps 10,000 characters of hook context and Codex 32 KiB
+of instructions, and past them text is silently lost.
+
+**The design worked in.**
+1. **One switch** (NT-22). dGroundRules builds `budgets.enforce`, read by every gate that enforces a size cap on a
+   document or record: `warn` by default, as the owner set it, with `refuse` and `record` the other values. Each cap's
+   value stays the owner's under `budgets.*`, which loses its per-cap mode. Line and entry lengths are size caps
+   too, so they fall under the switch. Two things stay outside it:
+   - a consumer's own limit, which fits or refuses, because over it text is lost;
+   - a check of correctness, which is no cap.
+2. **Correctness split out.** `instructions.checks` now governs only a load set missing a required unit. P27, the
+   systems record's slot budget and dOrderedCharter's load-set and composition clauses read the size half under
+   `budgets.enforce`.
+3. **`annotations.budget` retired into the switch.** Its budget is a value under `budgets.*`, still counted over the
+   blocks a commit touches. `memory.over-budget` stays as the owner's MS-3 set it: memory slices are reported, never
+   refused, whatever the switch says.
+4. **A warning that bites** (NT-23). Four parts:
+   - dWitnessedBar shows every size warning on a passing run, in the runner's summary and its verdict record,
+     attributed to the unit that grew the file.
+   - dCalibratedLens prices each breach in the value ledger by its bytes and its reads.
+   - The Loop Review raises an owner item for a breach that persists or grows, counting only new or grown breaches,
+     so the warnings never turn into noise.
+   - The advisory caps keep the brake they lose at the commit.
+5. **One record corrected.** layer-instruction's "the charter's 32 KiB cap" is the rendered charter's 20 KiB. The
+   32 KiB is Codex's own limit.
+
+**Where an advisory cap still fails.** It fails where no Loop Review runs, as under `velocity` or in a repository
+without one. It fails in unattended runs, whose output nobody reads until the review. At a consumer's limit, the
+refusal stays. Dispatch 134 also found the slot-limits file saying its values "bind nothing today" while the README
+contract binds 98 READMEs. That is a product file, left to the build that owns it.
+
+**A note on the research.** Dispatch 134 ran `check-template-size.sh` six times on its scratch clone before it
+learned that a researcher's gate grant is empty. The scratch guard then refused its next gate run. The six runs wrote
+nothing, and the return says so.
+
+**Folded.** P9 and P27; dGroundRules, dWitnessedBar and dCalibratedLens clauses, and dOrderedCharter's two clauses
+revised, with four gaps; the keys `budgets.enforce`, new, `budgets.*` and `instructions.checks` revised, and
+`annotations.budget` retired, with their preset rows; the systems record's slot budget and annotation keys;
+layer-instruction's charter cap; and the register's `gap-tool-24`, `gap-test-22`, `gap-found-34` and `gap-review-19`.
+
 ## [forks] Parked for the owner, 2026-10-19
 
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
@@ -383,3 +455,5 @@ decision.
 | NT-19 | When is a build's branch pushed? | at every witnessed item; at every pass commit; at every transition; at the landing | `build.push`'s default: every-item, every-pass, every-transition, at-landing |
 | NT-20 | May another session drive one unit of a build it does not hold? | yes, under that unit's lease, the build's driver alone running transitions; no, one driver per build, as designed | `build.unit-holders`' default: any-session, driver-only |
 | NT-21 | What replaces `gov-session`? | the `intake` message or a unit offered at placement, with the receiving session's prompt writer rendering its work order; the prompt writer, as designed; `gov-session` kept | a structural decision |
+| NT-22 | What does the one cap switch cover? | every size cap on a document or record, line and entry lengths included, with a consumer's own limit and every check of correctness left outside it; the same, with the owner able to pin one cap to refuse; every check, correctness included | a structural decision; its default is the owner's: warn |
+| NT-23 | How does an advisory cap keep a brake? | shown on a passing run, attributed to its unit, priced by its reads, and trended into an owner item by the Loop Review; shown on a passing run only; printed by its leg, as today | a structural decision |

@@ -100,6 +100,7 @@ extends.
 | gap-found-31 | Foundation | MED | Gov's own rules ship in the set every adopter receives: their move to gov's own overlay, decided by the walk, was dropped at `aa0d778b1`. | `research-adopter-design.md`, contradiction 4 | — |
 | gap-found-32 | Foundation | MED | Gov's own flow and role settings ship as every adopter's defaults: its retunes edit the shipped `workflows.toml` and the seeded `house/policy.toml` in place, and legs no descriptor declares sit in its manifest. | `research-flow-today.md` section 4; the census at `67995cb6f` | — |
 | gap-found-33 | Foundation | HIGH | The designed tag index is one JSON file per tree, rebuilt whole on every tree miss: at ten times today's tree a rebuild took about 30 s and a load 1.6 GB, and every commit is a miss. | `research-storage-measured.md` sections 2 and 4 | — |
+| gap-found-34 | Foundation | MED | `instructions.checks` holds a correctness refusal, a load set missing a required unit, under the same switch as its size budget, so loosening one loosens the other. | `research-caps.md` section 5, test A2 | — |
 | gap-found-06 | Foundation | HIGH | No tool names the next step: six adopt scripts print install hints and nothing else ends with the caller's next command, so the loop advances only by agents re-deriving it. Raised by the owner. | foundations step 1 continued, current state | — |
 | gap-flow-01 | Flow | HIGH | No feature level between build and unit: the interfaces between a feature's units have no record, so a change that breaks a feature cannot be told from one that touches a unit, and re-design has no granularity but the unit. Raised by the owner. | flow FL-D2, FL-D4, FL-D5 | — |
 | gap-flow-02 | Flow | HIGH | The decision principles that resolve unattended forks (the most feature-rich option, then the most expandable, fully recorded) are stated nowhere; M3 names feature-rich only, and nothing ranks them above the charter's adjustable practices. Raised by the owner. | flow FL-D3, FL-D6; `memory/guides/BUILD-METHOD.md` M3 | — |
@@ -239,6 +240,7 @@ extends.
 | gap-tool-21 | Tooling | HIGH | The interpreter floor is tested nowhere: no node runs the declared floor, and a version-flagged parse accepts syntax the floor refuses. | `research-python-floor.md` section 2 | — |
 | gap-tool-22 | Tooling | MED | The interpreter floor is stated at 3.11 in five tracked files outside `memory/` and mentioned in two more, by `git grep -l '3\.11' -- ':!memory'` at `fe3d09aba`, against the owner's 3.15 (AP-31), and raising it ships no upgrade step. A query for every floor statement, whatever version it names, also finds `tools/settings-merge.py`'s `py>=3.10`, which that grep misses. | `research-python-floor.md` section 2; the query; the shape audit, run B's L10 | — |
 | gap-tool-23 | Tooling | MED | gov's own remote CI sets up no Python: `.github/workflows/remote-ci.yml` runs `windows-latest` with no setup-python step, and its jobs take whatever `resolve-python.sh` finds, so a raised floor reaches no runner. | the answers fold's closing review, run A's M5 and run B's M1 | — |
+| gap-tool-24 | Tooling | HIGH | Eighteen of 24 size caps refuse a commit, a push or a render, and a refusal bought raises, not trims: one file's ceiling moved 26 times in 17 days before it retired. | `research-caps.md` sections 1 and 2 | — |
 | gap-lex-01 | Lexicon | HIGH | No class for forced names: every extracted definition is graded by its leading subtoken alone, so host-forced names (four pytest hooks, `__str__`, a command shim) and 22 names gov's own readers key on count as debt; the only exits are a pin raise or a corpus-wide text waiver, and history shows 19 raises and 0 waivers. Raised by the owner. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` | — |
 | gap-lex-02 | Lexicon | HIGH | `--suggest` proposes renames that break overrides: `do_GET` to `cmd_get`, `emit` to `print`, `handle` to `run`, `get_queryset` to `read_queryset`, which breaks a Django view, and `setUp` to `set_up`, which silently stops unittest calling it; P29 would hand these answers to builders. Raised by the owner. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-population.md` | — |
 | gap-lex-03 | Lexicon | HIGH | Naming is enforced only as a corpus count at the bar: nothing judges a name at commit or by name, a fixed offender plus a new one nets to zero, and landings absorbed raises instead of holding the equality: 19 raises (+814) in the pin's history. Revised 2026-10-17, the debt round: this row once cited main's 1,088 against 1,087 since `8ddc0a482`, a red gone since `ef9c3fbab`. Raised by the owner. | kit review, lexicon (`build/2026-10-15-build-PLAY-dClosedLoop-1-lexicon.md`), `[current]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-lexicon-kit.md` | — |
@@ -348,6 +350,7 @@ extends.
 | gap-test-19 | Test | HIGH | A fix pass may edit the check that reds it: nothing keeps a red leg's own test files or gate script out of the fix pass's write set. | night pass `[p6-sdlc]` | — |
 | gap-test-20 | Test | MED | A failing leg's output lives in its worktree's run directory and dies with the worktree. | `research-observability-trace.md` section 2 | — |
 | gap-test-21 | Test | HIGH | An override of a gov leg other than its ceiling withholds the whole manifest, a deleted gov leg is re-appended with no line naming it, and an adopter's own leg is registered and checked by nothing. | `research-flow-today.md` section 2, the `gate-legs.json` rows | — |
+| gap-test-22 | Test | MED | A warning inside a passing leg reaches nobody: the runner prints only `GATE ok <name>`, and two size warnings fire unseen today. | `research-caps.md` section 5, test A1 | — |
 | gap-deploy-01 | Deploy | HIGH | An adopter's own release, environments, rollout, rollback and post-deploy verification are not addressed; one adopter built all of it outside gov. The release slot after the landing, its environments and its exit record are this gap's (the expansion round). | deploy §4; the expansion round, `build/2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md` | — |
 | gap-deploy-02 | Deploy | HIGH | The post-landing verdict is inert: `GATE_POST_MERGE` declared in 0 of 3 trees, `refs/gov/bar-red` absent, CI cannot publish. Its verdict sits in one last-verdict file a later landing overwrites, with no record keyed by the landed SHA. Revised 2026-10-17, the debt round: the per-SHA verdict record carries the verdict and the publication state apart, on every exit path, a failed publication included. | deploy §4 | — |
 | gap-deploy-03 | Deploy | HIGH | No CI job is emitted into adopters; one adopter's six workflows never call the bar. | deploy §4 | — |
@@ -409,6 +412,7 @@ extends.
 | gap-review-16 | Review | LOW | No reading measures the owner queue's depth, so parallel work cannot be weighed against the owner's capacity to review it. | night pass `[p6-sdlc]`, the playbook's practice 10; the owner's NP-18 (`build/2026-10-18-build-PLAY-dClosedLoop-1-night-pass.md` `[answers]`) | — |
 | gap-review-17 | Review | MED | A lens exists only as a literal in the harness, so an adopter's lens has no home beyond per-call notes. | `research-flow-today.md` section 3; `research-flow-design.md`, its undecided list | — |
 | gap-review-18 | Review | MED | No route turns a build's adaptation into a reusable variant: `promoted-from` covers only memory promoted to instruction, and the Loop Review proposes only retirements, merges and caps. | `research-scenarios-design.md`, its undecided item 5 | — |
+| gap-review-19 | Review | MED | A cap's breach is priced nowhere and trended nowhere, so an advisory cap has no brake: curation-debt rows drained only through raises. | `research-caps.md` section 5, test B1 | — |
 
 The counts are derived, never typed: a first draft typed 59 rows here over a table holding 56. The
 instrument, run against this file, and its output when the register was written:
@@ -775,4 +779,13 @@ Re-measured after the night pass two's point 4 added `gap-rt-33`, `gap-roles-28`
 ```text
 Roles=29 Deploy=28 Plan=8 Spine=21 Orient=21 Test=21 Runtime=33 Lexicon=10 Tooling=23 Review=18 Foundation=33 Build=6 Memory=42 Flow=22 Maintain=15 Design=11
 LOW=58 MED=168 HIGH=115
+```
+
+Re-measured after the night pass two's point 5 added `gap-tool-24`, `gap-test-22`, `gap-found-34` and
+`gap-review-19` (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p5-caps]`), same instrument, over
+345 keys:
+
+```text
+Roles=29 Deploy=28 Plan=8 Spine=21 Orient=21 Test=22 Runtime=33 Lexicon=10 Tooling=24 Review=19 Foundation=34 Build=6 Memory=42 Flow=22 Maintain=15 Design=11
+LOW=58 MED=171 HIGH=116
 ```

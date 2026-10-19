@@ -204,8 +204,9 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 - **One work order, one budget per slot** (revised 2026-10-17, the audit's M1). A role item's work order carries its
   instruction units, its memory sections, its code-note rows and its legacy rows, each selected by tag.
   The instruction layer renders it (P27). Each slot has one key and one answer when it runs over:
-  - **The instruction load set** is budgeted by P27. Over its budget, it is refused at render, as
-    `instructions.checks` says, or routed back by the roles layer.
+  - **The instruction load set** is budgeted by P27. Over its budget, it warns or refuses at render as
+    `budgets.enforce` says, and is routed back by the roles layer only under `refuse` (revised 2026-10-19,
+    the night pass two, point 5, pending NT-22).
   - **The memory slices** are priced by `memory.item-budget`. Over it, they are answered by
     `memory.over-budget`: counted and reported under the default `report` (MS-3), never refused and
     never routed back.
@@ -349,11 +350,14 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
 
   | Key | Values | Default |
   |---|---|---|
-  | `annotations.budget` | refuse, warn, record | refuse, on touched blocks |
   | `annotations.resolve-scope` | notes, every-comment-ref | every-comment-ref |
   | `annotations.delivery` | work-order, on-demand, off | work-order |
   | `annotations.lookup` | query-and-map, query, map-index | query-and-map (AN-1) |
   | `annotations.grammar` | voluntary, required, pushed-at-read | voluntary; `pushed-at-read` kept and redefined for shell reads (AN-2) |
+
+  `annotations.budget` retired on 2026-10-19 (the night pass two, point 5, pending NT-22). The annotation budget is a
+  value under `budgets.*`, still counted over the blocks a commit touches. Whether a breach warns or refuses is the
+  one switch `budgets.enforce`.
 
 ### [design-instruction-writing] Instruction writing
 

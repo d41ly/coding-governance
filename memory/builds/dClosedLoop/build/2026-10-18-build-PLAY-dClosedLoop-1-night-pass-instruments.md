@@ -15168,6 +15168,273 @@ LM.sub("| return | dWellOiledMachine | the persisted-return store, keyed per spa
 LM.save()
 ````
 
+### `fold_p5.py`
+
+Point 5, caps: the point's section and forks NT-22 and NT-23, `budgets.enforce` with its clauses, `instructions.checks` narrowed and `annotations.budget` retired, folded into v2, the systems record, layer-instruction and the gap register.
+
+````python
+"""The night pass two, point 5: caps advisory under one switch. Writes the point's section and its forks (NT-22 and
+NT-23) into the night pass two's record and folds the design into v2, the systems record, layer-instruction and the gap
+register: `budgets.enforce`, warning by default as the owner set it; `instructions.checks` narrowed to correctness;
+`annotations.budget` retired into the switch; and the four things that make a warning bite.
+
+Usage: python -X utf8 fold_p5.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+NP2 = "the night pass two"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def add_gaps(rec, build, keys):
+    row = [ln for ln in rec.text.split("\n") if ln.startswith(f"| {build} |") and ln.count(" | ") == 4]
+    if len(row) != 1:
+        sys.exit(f"{build}: {len(row)} rows")
+    rec.sub(row[0], row[0][:-2] + ", " + ", ".join(keys) + " |", f"gaps on {build}")
+
+
+def one_row(rec, prefix, n):
+    rows = [ln for ln in rec.text.split("\n") if ln.startswith(prefix)]
+    if len(rows) != n:
+        sys.exit(f"{len(rows)} rows start {prefix!r}, {n} expected")
+    return rows
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("- **P9 Measured weight.** A value ledger prices gates, rules and bug classes; caps are re-derived\n"
+      "  from evidence of when they blocked work and when they stopped bloat (walk R4).\n",
+      "- **P9 Measured weight.** A value ledger prices gates, rules and bug classes; caps are re-derived\n"
+      "  from evidence of when they blocked work and when they stopped bloat (walk R4). A cap's value is the\n"
+      "  owner's, and one switch, `budgets.enforce`, decides whether a breach warns or refuses, warning by\n"
+      "  default; a warning is shown on a passing run, priced by its reads and trended by the Loop Review\n"
+      "  (revised 2026-10-19, the night pass two, point 5, pending NT-22 and NT-23).\n", "P9")
+V.sub("  A load set over its budget, or missing a unit its role or item requires, is refused at render as\n"
+      "  `instructions.checks` says (layers round one).",
+      "  A load set missing a unit its role or item requires is refused at render as `instructions.checks`\n"
+      "  says (layers round one), and one over its budget warns or refuses as `budgets.enforce` says (revised\n"
+      "  2026-10-19, the night pass two, point 5, pending NT-22).", "P27")
+V.sub("refused at render when over budget or missing a required unit (`instructions.checks`)",
+      "warned or refused at render when over budget as `budgets.enforce` says and refused when missing a required "
+      f"unit (`instructions.checks`, narrowed by {NP2}, point 5, pending NT-22)", "dOrderedCharter: load sets")
+V.sub("its units counted against each budget and an overflow refused naming the largest contributors by origin, never "
+      "truncated",
+      "its units counted against each budget, an overflow warned or refused as `budgets.enforce` says and one over a "
+      "harness's own limit refused, each naming the largest contributors by origin, never truncated "
+      f"({NP2}, point 5)", "dOrderedCharter: composition")
+add_gaps(V, "dOrderedCharter", ["gap-found-34"])
+add_clauses(V, "dGroundRules", [
+    "`budgets.enforce`, the one switch every gate enforcing a size cap on a document or record reads, warning by "
+    "default as the owner set it, each cap's value read from its one declaration, and a limit its consumer enforces "
+    "by dropping what is over, or a check of correctness, left outside it, seen on a planted over-cap file that warns "
+    f"under `warn` and refuses under `refuse` ({NP2}, point 5, pending NT-22)"], ["gap-tool-24"])
+add_clauses(V, "dWitnessedBar", [
+    "every size warning shown on a passing run, in the runner's summary and its verdict record, attributed to the "
+    f"unit that grew the file, seen on a planted breach under a green bar ({NP2}, point 5, pending NT-23)"],
+    ["gap-test-22"])
+add_clauses(V, "dCalibratedLens", [
+    "each size breach priced in the value ledger by its bytes and its reads, and the Loop Review raising an owner "
+    "item for a breach that persists or grows across reviews, counting only new or grown breaches, so an advisory cap "
+    f"keeps a brake ({NP2}, point 5, pending NT-23)"], ["gap-review-19"])
+cat, pre = one_row(V, "| `budgets.*` |", 2)
+V.sub(cat + "\n",
+      "| `budgets.*` | each cap's value, the owner's; whether a breach warns or refuses is `budgets.enforce`'s | "
+      "re-derived from evidence | walk R4; the mode moved to one switch by " + NP2 + ", point 5, pending NT-22 | "
+      "dCalibratedLens |\n"
+      "| `budgets.enforce` | warn, refuse, record | warn | " + NP2 + ", point 5, the owner's words: \"a single "
+      "enforcing switch is set to WARN by default instead of refuse\"; what it covers is NT-22's | dGroundRules |\n",
+      "catalogue: budgets")
+V.sub(pre + "\n",
+      "| `budgets.*` | each cap's evidence-derived value | each cap's evidence-derived value | each cap's evidence-derived "
+      "value | each cap's evidence-derived value |\n"
+      "| `budgets.enforce` | warn | warn | refuse | warn |\n", "presets: budgets")
+ic = one_row(V, "| `instructions.checks` |", 2)[0]
+V.sub(ic, ic.replace("| layers round one, the owner's \"enforced wherever possible\" |",
+                     "| layers round one, the owner's \"enforced wherever possible\"; since " + NP2 + ", point 5, a "
+                     "load set missing a required unit only, the over-budget half read under `budgets.enforce`, "
+                     "pending NT-22 |"), "catalogue: instructions.checks")
+for row in one_row(V, "| `annotations.budget` |", 2):
+    V.sub(row + "\n", "", "annotations.budget retired")
+V.save()
+
+# ---------------------------------------------------------------- systems
+SY = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+SY.sub("  - **The instruction load set** is budgeted by P27. Over its budget, it is refused at render, as\n"
+       "    `instructions.checks` says, or routed back by the roles layer.\n",
+       "  - **The instruction load set** is budgeted by P27. Over its budget, it warns or refuses at render as\n"
+       "    `budgets.enforce` says, and is routed back by the roles layer only under `refuse` (revised 2026-10-19,\n"
+       "    the night pass two, point 5, pending NT-22).\n", "one budget per slot")
+SY.sub("  | `annotations.budget` | refuse, warn, record | refuse, on touched blocks |\n", "",
+       "annotations.budget's row")
+SY.sub("  | `annotations.grammar` | voluntary, required, pushed-at-read | voluntary; `pushed-at-read` kept and redefined "
+       "for shell reads (AN-2) |\n",
+       "  | `annotations.grammar` | voluntary, required, pushed-at-read | voluntary; `pushed-at-read` kept and redefined "
+       "for shell reads (AN-2) |\n\n"
+       "  `annotations.budget` retired on 2026-10-19 (the night pass two, point 5, pending NT-22). The annotation budget is a\n"
+       "  value under `budgets.*`, still counted over the blocks a commit touches. Whether a breach warns or refuses is the\n"
+       "  one switch `budgets.enforce`.\n", "annotations.budget's note")
+SY.save()
+
+# ---------------------------------------------------------------- layer-instruction
+LI = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md")
+LI.sub("| HOW MUCH: precise loads | the charter's 32 KiB cap;",
+       "| HOW MUCH: precise loads | the charter's 20 KiB cap (32 KiB is Codex's own limit, on which gov warns; corrected "
+       "2026-10-19, the night pass two, point 5);", "the charter's cap")
+LI.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+RC = "`research-caps.md`"
+NEW = {
+    "gap-tool-23": [("gap-tool-24", "Tooling", "HIGH", "Eighteen of 24 size caps refuse a commit, a push or a render, "
+                     "and a refusal bought raises, not trims: one file's ceiling moved 26 times in 17 days before it "
+                     "retired.", f"{RC} sections 1 and 2")],
+    "gap-test-21": [("gap-test-22", "Test", "MED", "A warning inside a passing leg reaches nobody: the runner prints only "
+                     "`GATE ok <name>`, and two size warnings fire unseen today.", f"{RC} section 5, test A1")],
+    "gap-found-33": [("gap-found-34", "Foundation", "MED", "`instructions.checks` holds a correctness refusal, a load "
+                      "set missing a required unit, under the same switch as its size budget, so loosening one loosens "
+                      "the other.", f"{RC} section 5, test A2")],
+    "gap-review-18": [("gap-review-19", "Review", "MED", "A cap's breach is priced nowhere and trended nowhere, so an "
+                       "advisory cap has no brake: curation-debt rows drained only through raises.",
+                       f"{RC} section 5, test B1")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 345 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's point 5 added `gap-tool-24`, `gap-test-22`, `gap-found-34` and\n"
+    "`gap-review-19` (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p5-caps]`), same instrument, over\n"
+    f"{len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the night pass two's record
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.sub("| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` | running |",
+      "| `build/2026-10-19-build-PLAY-dClosedLoop-1-research-agent-cap.md` | it counts claims per prompt, never agents in "
+      "flight, and a notification resets it; one Runtime key enforced at three scopes |", "research: 136")
+R.insert_before("\n## [forks] Parked for the owner, 2026-10-19\n", """
+## [p5-caps] Point 5: caps advisory, under one switch
+
+**The owner's direction, taken as decided.** Caps become advisory. Their values stay the owner's. One switch decides
+enforcement, and it warns by default. What the night had to work out is what the switch covers, and how a warning
+avoids becoming noise.
+
+**What exists.** Dispatch 134 inventoried 24 size caps, and 18 of them refuse a commit, a push or a render. They
+cover the charter template, the rendered charter, the kickoff engine, the guides, every live spec, line lengths,
+index entries, build READMEs and their five slots, dossiers, role bodies, one-line rules, roster lines, the kickoff
+manifest, the card, the count of universal bug classes and the recall export. Their history bears out the owner's
+complaint:
+- The read-path ceiling moved 26 times in 17 days, then retired, its own header saying the movements "bought no
+  trim".
+- The method guide was raised four times, and the unattended protocol, pinned with no headroom, three times in three
+  days.
+- Caps forced a cut three times, and blocked a merge where neither branch alone was over.
+
+The design already leaned this way:
+- P9 re-derives caps from evidence.
+- Walk R4 defined a soft cap.
+- `budgets.*` gave each cap a mode, hard or soft.
+- `orient.budget` and `memory.over-budget` were already advisory.
+
+But `instructions.checks` and `annotations.budget` still refused by default, and each cap carried its own mode.
+
+**What a plain warning costs.** Two of dispatch 134's losing tests decide the shape:
+- **A warning in a passing leg reaches nobody.** The runner prints only `GATE ok <name>`, and two size warnings fire
+  unseen today. Prior art agrees: Google's experience is that developers ignore warnings they are not shown at the
+  moment of review.
+- **One switch over everything would loosen correctness too.** `instructions.checks` refuses a load set missing a
+  required unit under the same switch as its size budget.
+
+A consumer's own limit also differs from a cap. The harness keeps 10,000 characters of hook context and Codex 32 KiB
+of instructions, and past them text is silently lost.
+
+**The design worked in.**
+1. **One switch** (NT-22). dGroundRules builds `budgets.enforce`, read by every gate that enforces a size cap on a
+   document or record: `warn` by default, as the owner set it, with `refuse` and `record` the other values. Each cap's
+   value stays the owner's under `budgets.*`, which loses its per-cap mode. Line and entry lengths are size caps
+   too, so they fall under the switch. Two things stay outside it:
+   - a consumer's own limit, which fits or refuses, because over it text is lost;
+   - a check of correctness, which is no cap.
+2. **Correctness split out.** `instructions.checks` now governs only a load set missing a required unit. P27, the
+   systems record's slot budget and dOrderedCharter's load-set and composition clauses read the size half under
+   `budgets.enforce`.
+3. **`annotations.budget` retired into the switch.** Its budget is a value under `budgets.*`, still counted over the
+   blocks a commit touches. `memory.over-budget` stays as the owner's MS-3 set it: memory slices are reported, never
+   refused, whatever the switch says.
+4. **A warning that bites** (NT-23). Four parts:
+   - dWitnessedBar shows every size warning on a passing run, in the runner's summary and its verdict record,
+     attributed to the unit that grew the file.
+   - dCalibratedLens prices each breach in the value ledger by its bytes and its reads.
+   - The Loop Review raises an owner item for a breach that persists or grows, counting only new or grown breaches,
+     so the warnings never turn into noise.
+   - The advisory caps keep the brake they lose at the commit.
+5. **One record corrected.** layer-instruction's "the charter's 32 KiB cap" is the rendered charter's 20 KiB. The
+   32 KiB is Codex's own limit.
+
+**Where an advisory cap still fails.** It fails where no Loop Review runs, as under `velocity` or in a repository
+without one. It fails in unattended runs, whose output nobody reads until the review. At a consumer's limit, the
+refusal stays. Dispatch 134 also found the slot-limits file saying its values "bind nothing today" while the README
+contract binds 98 READMEs. That is a product file, left to the build that owns it.
+
+**A note on the research.** Dispatch 134 ran `check-template-size.sh` six times on its scratch clone before it
+learned that a researcher's gate grant is empty. The scratch guard then refused its next gate run. The six runs wrote
+nothing, and the return says so.
+
+**Folded.** P9 and P27; dGroundRules, dWitnessedBar and dCalibratedLens clauses, and dOrderedCharter's two clauses
+revised, with four gaps; the keys `budgets.enforce`, new, `budgets.*` and `instructions.checks` revised, and
+`annotations.budget` retired, with their preset rows; the systems record's slot budget and annotation keys;
+layer-instruction's charter cap; and the register's `gap-tool-24`, `gap-test-22`, `gap-found-34` and `gap-review-19`.
+""", "point 5's section")
+R.text = R.text.rstrip("\n") + "\n" + (
+    "| NT-22 | What does the one cap switch cover? | every size cap on a document or record, line and entry lengths "
+    "included, with a consumer's own limit and every check of correctness left outside it; the same, with the owner "
+    "able to pin one cap to refuse; every check, correctness included | a structural decision; its default is the "
+    "owner's: warn |\n"
+    "| NT-23 | How does an advisory cap keep a brake? | shown on a passing run, attributed to its unit, priced by its "
+    "reads, and trended into an owner item by the Loop Review; shown on a passing run only; printed by its leg, as "
+    "today | a structural decision |\n")
+R.done += 1
+R.save()
+print("folded point 5")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before.
@@ -15505,6 +15772,9 @@ MINE = [
      "flow-roles, flow-interactions, ownership, layer-memory, fates and the gap register."),
     ("night2/fold_p4_marker.py", "The atlas stopped on point 4: the return row had lost its kind marker, so it "
      "keeps 'writer item not named' and names the commit queue after it."),
+    ("night2/fold_p5.py", "Point 5, caps: the point's section and forks NT-22 and NT-23, `budgets.enforce` "
+     "with its clauses, `instructions.checks` narrowed and `annotations.budget` retired, folded into v2, the "
+     "systems record, layer-instruction and the gap register."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
@@ -16482,10 +16752,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:780 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:793 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:780 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:793 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -16533,13 +16803,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2489 nodes in 30 namespaces; 31438 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1703, derived 291, pending 495
+map: 2493 nodes in 30 namespaces; 31451 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1707, derived 291, pending 495
 map: no stale facts read 57 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 198 records, 3307 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 198 records, 3309 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -16590,7 +16860,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 341 · chain builds 21
+register keys 345 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -16603,8 +16873,8 @@ no findings
 rc 0
 
 $ critical path
-critical path: 230 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 34, dOrderedCharter 55, dDeclaredLoop 84, dPlacedRequest 95, dWitnessedBar 112, dKeptSession 117, dTotalRecall 135, dBoundRoles 136, dRankedPlan 150, dFurnishedOrders 156, dLinkedLibrary 159, dIndexedDesign 172, dWellOiledMachine 178, dScopedBuild 191, dTendedCadence 194, dMindYourWords 195, dShippedRelease 205, dCalibratedLens 208, dConvergedCharter 230
+critical path: 233 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dGroundRules 9, dSafePassage 21, dFairHearing 35, dOrderedCharter 56, dDeclaredLoop 85, dPlacedRequest 96, dWitnessedBar 114, dKeptSession 118, dTotalRecall 137, dBoundRoles 138, dRankedPlan 152, dFurnishedOrders 158, dLinkedLibrary 161, dIndexedDesign 174, dWellOiledMachine 180, dScopedBuild 193, dTendedCadence 196, dMindYourWords 197, dShippedRelease 207, dCalibratedLens 211, dConvergedCharter 233
 rc 0
 ````
 
