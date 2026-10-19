@@ -14537,9 +14537,302 @@ R.save()
 print("folded point 2")
 ````
 
+### `fold_p3.py`
+
+Point 3, storage and coordination: the point's section and forks NT-14 to NT-17, the index, the mailbox and the notice keys folded into v2, systems, coordination, the memory plan and the gap register, and 'seconds' added to the preset check's free values.
+
+````python
+"""The night pass two, point 3: storage and coordination. Writes the point's section and its forks (NT-14 to NT-17)
+into the night pass two's record and folds the design, marked pending where a fork decides it, into v2, the systems,
+coordination and memory-plan records and the gap register. Extends the preset check's free values with "seconds",
+the class of "hours" and "days", for `mailbox.fetch-seconds`.
+
+Usage: python -X utf8 fold_p3.py   (from the worktree root)
+Every substitution matches exactly once or the script exits.
+"""
+import collections
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = "memory/builds/dClosedLoop/build/"
+NP2 = "the night pass two"
+
+
+def add_clauses(rec, build, clauses, gaps):
+    lines = rec.text.split("\n")
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {build} |")]
+    if len(idx) != 1:
+        sys.exit(f"{len(idx)} chain rows for {build}")
+    cells = lines[idx[0]].split(" | ")
+    if len(cells) != 5 or not cells[4].endswith(" |"):
+        sys.exit(f"{build}: row shape")
+    cells[3] += "".join("; " + c for c in clauses)
+    if gaps:
+        cells[4] = cells[4][:-2] + ", " + ", ".join(gaps) + " |"
+    lines[idx[0]] = " | ".join(cells)
+    rec.text = "\n".join(lines)
+    rec.done += 1
+
+
+def add_gaps(rec, gaps):
+    rows = [ln for ln in rec.text.split("\n") if ln.startswith("| d") and ln.count(" | ") == 4]
+    for build, keys in gaps.items():
+        row = [ln for ln in rows if ln.startswith(f"| {build} |")]
+        if len(row) != 1:
+            sys.exit(f"{build}: {len(row)} rows")
+        new = row[0][:-2] + ", " + ", ".join(keys) + " |"
+        rec.sub(row[0], new, f"gaps on {build}")
+
+
+# ---------------------------------------------------------------- v2
+V = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+V.sub("the derived tag index, one JSON file per tree at `<git-common-dir>/gov/index/<tree>.json` written atomically, "
+      "its rows for uncommitted edits marked `dirty`",
+      "the derived tag index, one SQLite file per node at `<git-common-dir>/gov/index.db` that every worktree shares, "
+      "its rows keyed by blob so a commit re-parses only the blobs it changed, the tree id only its freshness key and "
+      "JSON only `gov tag`'s output, written by its extractors alone and rebuilt from nothing to identical rows, its "
+      "rows for uncommitted edits marked `dirty` (revised by the night pass two, point 3, pending NT-15: one JSON file "
+      "per tree took about 30 s to rebuild and 1.6 GB to load at ten times today's tree)",
+      "dOrderedCharter: the index's shape")
+V.sub("the mailbox per build, its closed set of message kinds checked on write",
+      "the mailbox per build, one append-only ref per sender (`refs/gov/mail/<slug>/<fleet tag>`, revised by the night "
+      "pass two, point 3, pending NT-16), its closed set of message kinds checked on write",
+      "dKeptSession: the mailbox's refs")
+add_clauses(V, "dKeptSession", [
+    "news shown as `mailbox.notice` says: at every tool call a hook lists the unread message ids addressed to the "
+    "session's build or item from the node's local copy of the mail refs, with no network call, starting a detached "
+    "fetch when the copy is older than `mailbox.fetch-seconds`, the live channel `deps.messaging` picks carrying only "
+    "a message's ref and id so a lost ring costs only latency, and the disposal still at items and transitions, seen "
+    "on a message posted on one node shown on another's next tool call within twice the fetch interval "
+    f"({NP2}, point 3, pending NT-17)"], [])
+add_clauses(V, "dTotalRecall", [
+    "memory-recall's FTS5 tables moved into the one index file, keyed by blob, the whole-corpus digest that rebuilds "
+    f"every worktree's cache after any edit retired with them ({NP2}, point 3, pending NT-15)",
+    "each edge type's cardinality declared per target as well as per source in the kind registry and checked over the "
+    "merged tree after every merge, seen red on two records superseding one decision on separate branches, which git "
+    f"merges clean ({NP2}, point 3)",
+    "the memory legs reading the index's rows for unchanged blobs and re-parsing only changed ones, an index read and a "
+    f"full read agreeing on a planted tree ({NP2}, point 3, pending NT-15)"], [])
+add_clauses(V, "dPlacedRequest", [
+    "each lease and claim written as a commit whose parent is its ref's previous tip, so the remote keeps the history "
+    "the design names as the witness, and lease, claim and mail writes taking no lock the lander holds, seen on a "
+    f"planted landing that holds its lock while a lease renews ({NP2}, point 3)"], [])
+add_gaps(V, {"dOrderedCharter": ["gap-found-33"], "dTotalRecall": ["gap-mem-41", "gap-mem-42", "gap-mem-43"],
+             "dKeptSession": ["gap-conc-04", "gap-conc-05"], "dPlacedRequest": ["gap-conc-06", "gap-conc-07"]})
+mr = [ln for ln in V.text.split("\n") if ln.startswith("| `mailbox.reads` |")]
+if len(mr) != 2:
+    sys.exit(f"{len(mr)} mailbox.reads rows, two expected")
+V.sub(mr[0] + "\n", mr[0] + "\n"
+      "| `mailbox.notice` | every-tool-call, every-item, off | every-tool-call | " + NP2 + ", point 3: when a session is "
+      "shown unread message ids, read from the node's local copy of the mail refs, never over the network, pending "
+      "NT-17 | dKeptSession |\n"
+      "| `mailbox.fetch-seconds` | seconds, at least 10 | 60 | " + NP2 + ", point 3: how old the local copy of the mail "
+      "refs may grow before a notice starts a detached fetch, pending NT-17 | dKeptSession |\n",
+      "catalogue: the notice keys")
+V.sub(mr[1] + "\n", mr[1] + "\n"
+      "| `mailbox.notice` | every-tool-call | every-tool-call | every-tool-call | every-tool-call |\n"
+      "| `mailbox.fetch-seconds` | 60 | 60 | 60 | 60 |\n", "presets: the notice keys")
+V.save()
+
+# ---------------------------------------------------------------- systems
+SY = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+SY.sub("| one JSON index, as `[cross]` names it (revised 2026-10-17, the audit's L3) |",
+       "| one JSON index, as `[cross]` names it (revised 2026-10-17, the audit's L3), since one SQLite file per node "
+       "keyed by blob (revised 2026-10-19, the night pass two, point 3, pending NT-15) |", "the table's index row")
+SY.sub("    - The index is one JSON file per tree, at `<git-common-dir>/gov/index/<tree>.json`, shared\n"
+       "      across worktrees.\n"
+       "    - It is written atomically, with a temp file and a rename. So concurrent rebuilds on a cold\n"
+       "      cache race to one identical file, and a reader never sees a torn one.\n",
+       "    - The index is one SQLite file per node, at `<git-common-dir>/gov/index.db`, shared across\n"
+       "      worktrees (revised 2026-10-19, the night pass two, point 3, pending NT-15; it was one JSON file\n"
+       "      per tree, which measured about 30 s to rebuild and 1.6 GB to load at ten times today's tree).\n"
+       "    - Its rows are keyed by blob, and a tree is a set of blobs, so a commit re-parses only the blobs\n"
+       "      it changed: a one-file update took 9 ms and an inverse query about 1 ms at ten times today's\n"
+       "      tree (`build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` section 2). The\n"
+       "      tree id is only its freshness key, and JSON is only `gov tag`'s output.\n"
+       "    - Only the extractors write it, and a deleted file rebuilds to identical rows. SQLite's own lock\n"
+       "      serialises concurrent writers, so a reader never sees a torn row.\n"
+       "    - memory-recall's FTS5 tables move into the same file, keyed the same way, so an edit no longer\n"
+       "      rebuilds a whole per-worktree cache.\n", "[cross]: where it lives")
+SY.sub("- **Index and resolver.** The index is the one derived JSON file `[cross]` places, keyed by tree id,\n"
+       "  rebuilt on a miss, never committed and never loaded whole.",
+       "- **Index and resolver.** The index is the one derived SQLite file `[cross]` places, its rows keyed by\n"
+       "  blob and fresh per tree, re-parsing only changed blobs, never committed and never loaded whole (revised\n"
+       "  2026-10-19, the night pass two, point 3, pending NT-15).", "the index and resolver")
+SY.save()
+
+# ---------------------------------------------------------------- coordination
+CO = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-coordination.md")
+CO.sub("6. **The mailbox.** One ref per build on the shared remote, `refs/gov/mail/<slug>`: an append-only\n"
+       "   chain of commits, one per message, appended by compare-and-swap.",
+       "6. **The mailbox.** One ref per sender per build on the shared remote,\n"
+       "   `refs/gov/mail/<slug>/<fleet tag>` (revised 2026-10-19, the night pass two, point 3, pending NT-16: one\n"
+       "   ref per build took 4.5 times the ideal attempts at eight writers): an append-only\n"
+       "   chain of commits, one per message, appended by compare-and-swap.", "item 6: per sender")
+CO.sub("   the same CLI verbs on the mailbox. `deps.messaging` picks the channels.\n",
+       "   the same CLI verbs on the mailbox. `deps.messaging` picks the channels. Revised 2026-10-19 (the night\n"
+       "   pass two, point 3, pending NT-17): the live message carries only the message's ref and id, never a\n"
+       "   fact, so a lost ring costs only latency. A session is also shown unread ids at every tool call, read\n"
+       "   from the node's local copy of the mail refs, which a detached fetch keeps fresh, because the read\n"
+       "   points, not the transport, set how late news arrives.\n", "item 7: the doorbell")
+CO.save()
+
+# ---------------------------------------------------------------- memory-plan
+MP = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+MP.sub("- **Inter-session messages are the mailbox first.** The durable copy is `refs/gov/mail/<slug>`, and the live copy\n",
+       "- **Inter-session messages are the mailbox first.** The durable copy is `refs/gov/mail/<slug>/<sender>`, one\n"
+       "  ref per sender (revised 2026-10-19, the night pass two, point 3), and the live copy\n", "sessions: the mail ref")
+MP.save()
+
+# ---------------------------------------------------------------- the gap register
+G = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+SM = "`research-storage-measured.md`"
+SP = "`research-storage-prior-art.md`"
+NEW = {
+    "gap-found-32": [("gap-found-33", "Foundation", "HIGH", "The designed tag index is one JSON file per tree, rebuilt "
+                      "whole on every tree miss: at ten times today's tree a rebuild took about 30 s and a load "
+                      "1.6 GB, and every commit is a miss.", f"{SM} sections 2 and 4")],
+    "gap-mem-40": [("gap-mem-41", "Memory", "MED", "memory-recall's cache is per worktree and rebuilt whole after any "
+                    "edit: 478 MB in the git directory today, about 1.7 GB and a minute per worktree at ten times "
+                    "today's tree.", f"{SM} section 4, item 1"),
+                   ("gap-mem-42", "Memory", "MED", "Git merges conflicting relations clean, such as two records "
+                    "superseding one decision on separate branches, and the planned gates check edges per source, "
+                    "never per target.", f"{SP} probe D"),
+                   ("gap-mem-43", "Memory", "MED", "The memory legs re-read the whole tree on every run: memory "
+                    "hygiene took 83 s at 54 MB, about 18 minutes at ten times today's tree.",
+                    f"{SM} sections 1 and 4, item 4")],
+    "gap-conc-03": [("gap-conc-04", "Spine", "MED", "One mailbox ref per build serialises its writers: eight writers "
+                     "took 4.5 times the ideal compare-and-swap attempts, against 1.0 with one ref per sender.",
+                     f"{SM} section 3; {SP} probes B and B'"),
+                    ("gap-conc-05", "Spine", "HIGH", "News between sessions and nodes waits for the reader's read "
+                     "points, not the transport: a fetch takes 0.6 s, the median gap between pass commits is 7.5 "
+                     "minutes, and a running act hears a message only at its next item boundary.", f"{SM} section 3"),
+                    ("gap-conc-06", "Spine", "MED", "A lease's ref history is designed as its witness, but today's "
+                     "claim is a parentless commit, so the remote keeps only its latest state.",
+                     f"{SM} section 4, item 9"),
+                    ("gap-conc-07", "Spine", "LOW", "No claim, lease or mail write leaves a git directory while the "
+                     "lander holds its lock, a median 334 s per landing.", f"{SM} section 4, item 8")],
+}
+lines = G.text.split("\n")
+for after, rows in NEW.items():
+    idx = [i for i, ln in enumerate(lines) if ln.startswith(f"| {after} |")]
+    if len(idx) != 1:
+        sys.exit(f"{after}: {len(idx)} rows")
+    lines[idx[0] + 1:idx[0] + 1] = [f"| {k} | {st} | {sv} | {gap} | {ev} | — |" for k, st, sv, gap, ev in rows]
+G.text = "\n".join(lines)
+keys = re.findall(r"^\| (gap-[a-z]+-\d+) \| ([A-Za-z]+) \| (LOW|MED|HIGH) \|", G.text, flags=re.M)
+ORDER = ["Roles", "Deploy", "Plan", "Spine", "Orient", "Test", "Runtime", "Lexicon", "Tooling", "Review", "Foundation",
+         "Build", "Memory", "Flow", "Maintain", "Design"]
+st, sv = collections.Counter(k[1] for k in keys), collections.Counter(k[2] for k in keys)
+if len(keys) != 333 or set(st) - set(ORDER):
+    sys.exit(f"{len(keys)} keys")
+F3 = "`" * 3
+G.text = G.text.rstrip("\n") + (
+    "\n\nRe-measured after the night pass two's point 3 added `gap-found-33`, `gap-mem-41` to `gap-mem-43` and\n"
+    "`gap-conc-04` to `gap-conc-07` (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p3-storage]`),\n"
+    f"same instrument, over {len(keys)} keys:\n\n{F3}text\n" + " ".join(f"{s}={st[s]}" for s in ORDER) + "\n"
+    + " ".join(f"{s}={sv[s]}" for s in ("LOW", "MED", "HIGH")) + f"\n{F3}\n")
+G.done += 1
+G.save()
+
+# ---------------------------------------------------------------- the preset check's free values
+PC = HERE.parent / "preset_check_canonical.py"
+pc = PC.read_text(encoding="utf-8")
+old = 'FREE = re.compile(r"hours|days|'
+if pc.count(old) != 1:
+    sys.exit("preset check: the FREE anchor")
+if 'r"seconds|hours|days|' not in pc:
+    PC.write_text(pc.replace(old, 'FREE = re.compile(r"seconds|hours|days|', 1), encoding="utf-8", newline="\n")
+    print("preset check: seconds joins the free values")
+
+# ---------------------------------------------------------------- the night pass two's record
+R = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md")
+R.insert_before("\n## [forks] Parked for the owner, 2026-10-19\n", """
+## [p3-storage] Point 3: storage, a relational structure, and news between nodes
+
+**The owner's four questions, answered.**
+1. *Is it time for a different format than markdown?* Not for the store of record. Dispatch 130 measured `memory/`
+   at 4,375 files and 72.7 MB, growing 2.3 times in the last month. Storing it is not the problem: every reader, the
+   verdict and the design map ran with no remote, cat, grep and git read it, and a review reads its diffs. What does
+   not scale is how it is read. The designed index, one JSON file per tree rebuilt on every tree miss, took about 30 s
+   to rebuild and 1.6 GB to load at ten times today's tree. memory-recall's per-worktree cache is already 478 MB and is
+   rebuilt whole after any edit. The memory legs re-read the whole tree on every run, 83 s at 54 MB.
+2. *A relational structure that maintains the connections mechanically?* Yes, and it is the derived index, done as
+   a database: one SQLite file per node in the git common directory, rows keyed by blob, so a commit re-parses only
+   the blobs it changed. At ten times today's tree a one-file update took 9 ms and an inverse query about 1 ms, on
+   the standard library's `sqlite3`, the engine memory-recall already uses. Only extractors write it, so it can never
+   disagree with the records the way beads' writable SQLite and JSONL did. Connections stay correct by two rules:
+   relations are derived from the records, never typed beside them, and each edge type's cardinality is checked per
+   target over the merged tree. Dispatch 131's probe D showed why the second is owed: two branches each superseding
+   one decision merged clean in git, and only the index saw the conflict.
+3. *Coordinating several nodes in real time?* The transport is not the delay. A fetch takes 0.6 s, and the median
+   gap between pass commits is 7.5 minutes. A node learns news only when it reads, and the design reads at items and
+   transitions. So the fix is the read point. A hook shows unread message ids at every tool call (a median of 10.5 s
+   apart), read from the node's local copy of the refs, which a detached fetch refreshes, so no tool call waits on the
+   network. The live message becomes a doorbell carrying only the message's ref and id, so a lost ring costs latency,
+   never a fact. The mailbox's single chain per build is the part that does not last: eight concurrent writers took
+   4.5 times the ideal compare-and-swap attempts. One ref per sender took none extra.
+4. *A cloud relational database?* Not as the store of record, and not as the transport. A node offline for a day
+   could neither read nor write. The verdict would stop being local (P3). The witness would leave committed history
+   (P2). Every node would hold a new connection secret, and a git-only adopter could not run gov. A synced SQLite
+   (cr-sqlite, libSQL) silently keeps one of two concurrent decisions. A git-backed database (Dolt) needs a binary on
+   every node and splits the repository into two stores. A database or a bus fits only behind the doorbell, as an
+   optional adapter: Postgres `NOTIFY`, ntfy or NATS ringing with ids. The agent-friendly approach is the one gov
+   already has, made fast: files in git, one derived index, and the CLI over it. An MCP server over the index stays
+   possible as an optional read surface and is not built, since the CLI is the floor (P36).
+
+**The design worked in.**
+1. **Text in git stays the store of record** (NT-14).
+2. **The index becomes one SQLite file per node** (NT-15). dOrderedCharter's index clause, the systems record's
+   `[cross]` and its index bullet are revised: rows keyed by blob, the tree id only a freshness key, JSON only as
+   `gov tag`'s output, and a deleted file rebuilt to identical rows. dTotalRecall moves memory-recall's FTS5 tables
+   into the same file, and its memory legs read the index for unchanged blobs, an index read and a full read agreeing
+   on a planted tree.
+3. **Relations checked per target after merge.** dTotalRecall declares each edge type's cardinality per target as
+   well as per source and checks it over the merged tree, seen red on probe D's two supersessions.
+4. **One mail ref per sender** (NT-16): `refs/gov/mail/<slug>/<fleet tag>`, revised in v2, coordination and the
+   memory plan.
+5. **News read at every tool call** (NT-17). dKeptSession gains `mailbox.notice` (`every-tool-call`, `every-item` or
+   `off`) and `mailbox.fetch-seconds` (60). The doorbell carries ids only, and the disposal still happens at items
+   and transitions, as `mailbox.reads` says.
+6. **Leases with a history, and writes free of the lander.** dPlacedRequest writes each lease and claim as a commit
+   whose parent is the ref's previous tip, so the history the design names as the witness exists. Lease, claim and
+   mail writes take no lock the lander holds, which today blocks them for a median 334 s per landing.
+
+**Left open, each measured by the build that owns it.** The push latency to the real remote, and the host's rate
+limit on a fetch a minute, are unmeasured. The rebuild-equality test is owed. The 100-times figures are a linear
+extrapolation. The lease expiry stays at its ratified 24 hours. The tick-renewed lease that would let it drop is
+Runtime's to propose.
+
+**Folded.** v2's dOrderedCharter, dKeptSession, dTotalRecall and dPlacedRequest rows, with eight gaps, and the keys
+`mailbox.notice` and `mailbox.fetch-seconds` with their preset rows; the systems record's table, `[cross]` and index
+bullet; coordination's items 6 and 7; the memory plan's mail ref; and the register's `gap-found-33`, `gap-mem-41` to
+`gap-mem-43` and `gap-conc-04` to `gap-conc-07`. The preset check's free values gain "seconds", the class of "hours".
+""", "point 3's section")
+R.text = R.text.rstrip("\n") + "\n" + (
+    "| NT-14 | What is the store of record for instructions and memory? | text in git, markdown and TOML, as today; a "
+    "git-backed database such as Dolt; a cloud relational database | a structural decision |\n"
+    "| NT-15 | What shape does the derived index take? | one SQLite file per node keyed by blob, memory-recall's tables "
+    "inside it and the memory legs reading it; one JSON file per tree, as designed; per-worktree caches, as today | a "
+    "structural decision |\n"
+    "| NT-16 | How do senders share a build's mailbox? | one ref per sender per build; one ref per build, as designed | "
+    "a structural decision |\n"
+    "| NT-17 | When does a session learn of a message? | at every tool call, from a local copy a detached fetch keeps "
+    "fresh, with the live channel ringing ids only; at every item, as `mailbox.reads` alone; never between reads | "
+    "`mailbox.notice`'s default: every-tool-call, every-item, off |\n")
+R.done += 1
+R.save()
+print("folded point 3")
+````
+
 ### `preset_check_canonical.py`
 
-The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
+The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before.
 
 ````python
 """Check architecture v2's preset table against its policy catalogue: every presettable key assigned
@@ -14592,7 +14885,7 @@ for k in sorted(expected - set(presets)):
 for k in sorted(set(presets) - expected):
     findings.append(f"preset table names a key that is excluded or not in the catalogue: {k}")
 
-FREE = re.compile(r"hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count|KB per role")
+FREE = re.compile(r"seconds|hours|days|set of named|each cap|any subset|the role efforts|a repo-declared|a retry count|a share of the window|a round count|a word range|a route-back count|KB per role")
 for k, vals in presets.items():
     if k not in catalogue:
         continue
@@ -14866,8 +15159,12 @@ MINE = [
      "wrapped in two; it is one line again."),
     ("night2/fold_p2.py", "Point 2, aScoutedSeam: the point's section and forks NT-10 to NT-13, the reuse check "
      "folded into v2, flow-steps, layer-roles and the gap register, and two research rows filled."),
+    ("night2/fold_p3.py", "Point 3, storage and coordination: the point's section and forks NT-14 to NT-17, "
+     "the index, the mailbox and the notice keys folded into v2, systems, coordination, the memory plan and the "
+     "gap register, and 'seconds' added to the preset check's free values."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
-     "away pass's closing review and seen red on a66c855f3's velocity row."),
+     "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
+     "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before."),
     ("night/record_instruments.py", "This record's own writer."),
 ]
 PROBES = [("p4rel/" + n, "dispatch 103") for n in ("census.py", "sec.py", "fl_drift.py", "dossier.py", "regions.py",
@@ -15342,19 +15639,19 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 
 ````text
 $ python plain_cites.py
-landing                  8  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's), dLinkedLibrary (dShippedRelease's) …
+landing                  9  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's), dTotalRecall (dShippedRelease's) …
 plan                     8  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
 seen red                 7  dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's), dPlacedRequest (dWitnessedBar's) …
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
+witness                  5  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    5  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dCalibratedLens (dScopedBuild's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
-witness                  4  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dBoundRoles (dTotalRecall's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 release                  3  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
+commit                   3  dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
 fork                     3  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 review                   2  dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
-commit                   2  dSafePassage (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 inventory                2  dOrderedCharter (dIndexedDesign's), dTotalRecall (dIndexedDesign's)
 playbook                 2  dOrderedCharter (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 census                   2  dOrderedCharter (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
@@ -15363,6 +15660,7 @@ spec                     2  dFairHearing (dIndexedDesign's), dBoundRoles (dIndex
 act                      2  dDeclaredLoop (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 baseline                 2  dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
+decision                 2  dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
 override                 1  dGroundRules (dOrderedCharter's)
 receipt                  1  dSafePassage (dShippedRelease's)
 card                     1  dOrderedCharter (dPlacedRequest's)
@@ -15380,8 +15678,7 @@ ask                      1  dKeptSession (dTotalRecall's)
 roster                   1  dBoundRoles (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-decision                 1  dWellOiledMachine (dLinkedLibrary's)
-plain-word hits on a non-ancestor's record kind: 93, over 39 kinds
+plain-word hits on a non-ancestor's record kind: 97, over 39 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -15841,10 +16138,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:746 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:763 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:746 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:763 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -15892,13 +16189,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2468 nodes in 30 namespaces; 31435 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1686, derived 287, pending 495
+map: 2479 nodes in 30 namespaces; 31437 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1695, derived 289, pending 495
 map: no stale facts read 57 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 197 records, 3294 sections, 201 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 198 records, 3304 sections, 201 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
@@ -15916,8 +16213,8 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 21 · owned nodes read 461 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 93 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 21 · owned nodes read 463 · flow items read 89 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 97 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
@@ -15949,7 +16246,7 @@ splits inside a clause: 0
 rc 0
 
 $ gap join
-register keys 325 · chain builds 21
+register keys 333 · chain builds 21
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -15957,13 +16254,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 236 · presettable 214 · preset rows 214
+catalogue keys 238 · presettable 216 · preset rows 216
 no findings
 rc 0
 
 $ critical path
 critical path: 226 units, dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 34, dOrderedCharter 55, dDeclaredLoop 84, dPlacedRequest 93, dWitnessedBar 112, dKeptSession 113, dTotalRecall 132, dBoundRoles 135, dRankedPlan 149, dFurnishedOrders 153, dLinkedLibrary 156, dIndexedDesign 169, dWellOiledMachine 174, dScopedBuild 186, dTendedCadence 190, dMindYourWords 191, dShippedRelease 201, dCalibratedLens 204, dConvergedCharter 226
+each build's earliest finish, in units: dGroundRules 8, dSafePassage 20, dFairHearing 34, dOrderedCharter 55, dDeclaredLoop 84, dPlacedRequest 94, dWitnessedBar 112, dKeptSession 115, dBoundRoles 135, dTotalRecall 135, dRankedPlan 149, dFurnishedOrders 153, dLinkedLibrary 159, dIndexedDesign 172, dWellOiledMachine 174, dScopedBuild 186, dTendedCadence 190, dMindYourWords 191, dShippedRelease 201, dCalibratedLens 204, dConvergedCharter 226
 rc 0
 ````
 

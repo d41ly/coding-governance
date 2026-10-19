@@ -99,6 +99,7 @@ extends.
 | gap-found-30 | Foundation | MED | A seeded charter template freezes at its install vintage, edited or not, graded `reseed-available`. | `research-adopter-today.md` section 2 | — |
 | gap-found-31 | Foundation | MED | Gov's own rules ship in the set every adopter receives: their move to gov's own overlay, decided by the walk, was dropped at `aa0d778b1`. | `research-adopter-design.md`, contradiction 4 | — |
 | gap-found-32 | Foundation | MED | Gov's own flow and role settings ship as every adopter's defaults: its retunes edit the shipped `workflows.toml` and the seeded `house/policy.toml` in place, and legs no descriptor declares sit in its manifest. | `research-flow-today.md` section 4; the census at `67995cb6f` | — |
+| gap-found-33 | Foundation | HIGH | The designed tag index is one JSON file per tree, rebuilt whole on every tree miss: at ten times today's tree a rebuild took about 30 s and a load 1.6 GB, and every commit is a miss. | `research-storage-measured.md` sections 2 and 4 | — |
 | gap-found-06 | Foundation | HIGH | No tool names the next step: six adopt scripts print install hints and nothing else ends with the caller's next command, so the loop advances only by agents re-deriving it. Raised by the owner. | foundations step 1 continued, current state | — |
 | gap-flow-01 | Flow | HIGH | No feature level between build and unit: the interfaces between a feature's units have no record, so a change that breaks a feature cannot be told from one that touches a unit, and re-design has no granularity but the unit. Raised by the owner. | flow FL-D2, FL-D4, FL-D5 | — |
 | gap-flow-02 | Flow | HIGH | The decision principles that resolve unattended forks (the most feature-rich option, then the most expandable, fully recorded) are stated nowhere; M3 names feature-rich only, and nothing ranks them above the charter's adjustable practices. Raised by the owner. | flow FL-D3, FL-D6; `memory/guides/BUILD-METHOD.md` M3 | — |
@@ -209,6 +210,9 @@ extends.
 | gap-mem-38 | Memory | LOW | "journal" names two kinds: a Serves kind on 1,436 records and Runtime's journal. | `research-memory-pockets.md` section 2 | — |
 | gap-mem-39 | Memory | MED | Decision rows and bug classes relate to nothing they decide or came from: a feature edge on 0 of 200 decision rows, and `from:` on 0 of 149 bug classes. | `research-memory-pockets.md` sections 2 and 4 | — |
 | gap-mem-40 | Memory | LOW | A design-only build's records name a unit no spec defines, so the bindings check reports a row for each of them. | `research-memory-pockets.md` section 2 | — |
+| gap-mem-41 | Memory | MED | memory-recall's cache is per worktree and rebuilt whole after any edit: 478 MB in the git directory today, about 1.7 GB and a minute per worktree at ten times today's tree. | `research-storage-measured.md` section 4, item 1 | — |
+| gap-mem-42 | Memory | MED | Git merges conflicting relations clean, such as two records superseding one decision on separate branches, and the planned gates check edges per source, never per target. | `research-storage-prior-art.md` probe D | — |
+| gap-mem-43 | Memory | MED | The memory legs re-read the whole tree on every run: memory hygiene took 83 s at 54 MB, about 18 minutes at ten times today's tree. | `research-storage-measured.md` sections 1 and 4, item 4 | — |
 | gap-tool-01 | Tooling | MED | Gate legs are declared twice: 81 of 140 legs exist only in `tools/gate-legs.json`, beside 67 `[[gate_leg]]` rows in kit packs. | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
 | gap-tool-02 | Tooling | MED | Wiring is judged three ways (check-wiring, eleven `adopt-*.sh --check` legs, `govkit check`) and version lockstep five ways (check-kit-versions, check-placeholders, `govkit epoch`, check-verdict-epoch, and govkit selfcheck's arm 5c at `tools/govkit/govkit.py:2162`, the expansion round's review). All 11 `[check]` argvs also duplicate their own gate legs (the expansion round). | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
 | gap-tool-03 | Tooling | MED | The hook surface spans five kits: hooks, unattended (three hooks), process-monitor and memory-recall each wire their own entries in `.claude/settings.json`. | layer review, memory, `[tools]`; `build/2026-10-15-build-PLAY-dClosedLoop-1-research-memory-tooling.md` | — |
@@ -286,6 +290,10 @@ extends.
 | gap-conc-01 | Spine | HIGH | Cross-build and cross-node overlap is advisory: the probe always returns 0 and sees only pushed refs; no unit or path claim exists. | build §4, design §4.2 (41 pairs across 22 build pairs) | — |
 | gap-conc-02 | Spine | MED | Claims never age, name a user rather than a fleet tag, and cover unattended runs only; slug uniqueness is checked against local history only. | plan §4 (8 of 17 held, 17 of 17 user names) | — |
 | gap-conc-03 | Spine | MED | `[isolate]` has no mechanism: harness passes share one worktree and meet git's index lock. | build §4 | — |
+| gap-conc-04 | Spine | MED | One mailbox ref per build serialises its writers: eight writers took 4.5 times the ideal compare-and-swap attempts, against 1.0 with one ref per sender. | `research-storage-measured.md` section 3; `research-storage-prior-art.md` probes B and B' | — |
+| gap-conc-05 | Spine | HIGH | News between sessions and nodes waits for the reader's read points, not the transport: a fetch takes 0.6 s, the median gap between pass commits is 7.5 minutes, and a running act hears a message only at its next item boundary. | `research-storage-measured.md` section 3 | — |
+| gap-conc-06 | Spine | MED | A lease's ref history is designed as its witness, but today's claim is a parentless commit, so the remote keeps only its latest state. | `research-storage-measured.md` section 4, item 9 | — |
+| gap-conc-07 | Spine | LOW | No claim, lease or mail write leaves a git directory while the lander holds its lock, a median 334 s per landing. | `research-storage-measured.md` section 4, item 8 | — |
 | gap-plan-01 | Plan | HIGH | No priority, order or dependency record across builds and asks. | plan §4 (absent; TOOL-aBoundedVerdict-7 DEFERRED) | — |
 | gap-plan-02 | Plan | HIGH | Triage is never drained: 435 of 521 live asks unlabelled; 297 deferred onto one owner-triage ask open since 2026-10-05; no role owns triage. | plan §4 | — |
 | gap-plan-03 | Plan | HIGH | The asks pipeline is not the real intake: 165 of 167 builds came from prompts, and a prompt yields a one-build brief, never a plan. | plan §2, §4 | — |
@@ -741,4 +749,13 @@ Re-measured after the night pass two's point 2 added `gap-build-06`, `gap-roles-
 ```text
 Roles=27 Deploy=28 Plan=8 Spine=13 Orient=21 Test=21 Runtime=32 Lexicon=10 Tooling=23 Review=18 Foundation=32 Build=6 Memory=39 Flow=21 Maintain=15 Design=11
 LOW=57 MED=157 HIGH=111
+```
+
+Re-measured after the night pass two's point 3 added `gap-found-33`, `gap-mem-41` to `gap-mem-43` and
+`gap-conc-04` to `gap-conc-07` (`build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two.md` `[p3-storage]`),
+same instrument, over 333 keys:
+
+```text
+Roles=27 Deploy=28 Plan=8 Spine=17 Orient=21 Test=21 Runtime=32 Lexicon=10 Tooling=23 Review=18 Foundation=33 Build=6 Memory=42 Flow=21 Maintain=15 Design=11
+LOW=58 MED=162 HIGH=113
 ```

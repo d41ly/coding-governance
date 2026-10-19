@@ -161,7 +161,7 @@ run found on its own, with each run's line cited. The returns are filed verbatim
 | Question | Both runs | Where they differ | The design takes |
 |---|---|---|---|
 | The mechanism | keyed sections, read through one command and handed out by the work order (`research-memory-structure-a.md:13`, `research-memory-structure-b.md:15`) | A calls it a catalogue, B a section index | both, as one index with the tags' (`[cross]`) |
-| The index | generated, keyed by tree hash, never tracked and never loaded whole (`research-memory-structure-a.md:119`, `research-memory-structure-b.md:18`) | A: JSONL, 0.9 s; B: TSV, 0.44 s | one JSON index, as `[cross]` names it (revised 2026-10-17, the audit's L3) |
+| The index | generated, keyed by tree hash, never tracked and never loaded whole (`research-memory-structure-a.md:119`, `research-memory-structure-b.md:18`) | A: JSONL, 0.9 s; B: TSV, 0.44 s | one JSON index, as `[cross]` names it (revised 2026-10-17, the audit's L3), since one SQLite file per node keyed by blob (revised 2026-10-19, the night pass two, point 3, pending NT-15) |
 | Default load | the card only, under a budget (`research-memory-structure-a.md:17`, `research-memory-structure-b.md:22`) | A: 6 KB or less; B: 8 KB | 8 KB |
 | Why | reads run too wide rather than miss: an id grep returns a median 15.5 files (`research-memory-structure-a.md:56`), and a spec's median section is 715 B, 4% of its file (`research-memory-structure-b.md:81`) | different measures | both |
 | Rejected: summaries and ranked retrieval | summaries drop identifiers, and recall's read-through is under 6% (`research-memory-structure-a.md:83`, `research-memory-structure-b.md:153`) | — | rejected |
@@ -182,10 +182,17 @@ run found on its own, with each run's line cited. The returns are filed verbatim
     views over that index;
   - `gov tag show <address>` and `record show <id>#<tag>` resolve through one resolver.
   - **Where it lives** (revised 2026-10-17, the audit's M17 and L3).
-    - The index is one JSON file per tree, at `<git-common-dir>/gov/index/<tree>.json`, shared
-      across worktrees.
-    - It is written atomically, with a temp file and a rename. So concurrent rebuilds on a cold
-      cache race to one identical file, and a reader never sees a torn one.
+    - The index is one SQLite file per node, at `<git-common-dir>/gov/index.db`, shared across
+      worktrees (revised 2026-10-19, the night pass two, point 3, pending NT-15; it was one JSON file
+      per tree, which measured about 30 s to rebuild and 1.6 GB to load at ten times today's tree).
+    - Its rows are keyed by blob, and a tree is a set of blobs, so a commit re-parses only the blobs
+      it changed: a one-file update took 9 ms and an inverse query about 1 ms at ten times today's
+      tree (`build/2026-10-19-build-PLAY-dClosedLoop-1-research-storage-measured.md` section 2). The
+      tree id is only its freshness key, and JSON is only `gov tag`'s output.
+    - Only the extractors write it, and a deleted file rebuilds to identical rows. SQLite's own lock
+      serialises concurrent writers, so a reader never sees a torn row.
+    - memory-recall's FTS5 tables move into the same file, keyed the same way, so an edit no longer
+      rebuilds a whole per-worktree cache.
   - **An uncommitted edit.** A working tree with uncommitted edits is served HEAD's tree, overlaid
     with the working-tree blobs of its modified tracked files. Those rows are marked `dirty`, and
     the freshness check exempts them.
@@ -254,8 +261,9 @@ once dTotalRecall registers it (P33).
   A rename, split or retirement writes `retired → <new>`, a list of successors for a split, or `→ none` into
   that write path's change record, and the index derives the redirect from it, a split redirecting to no single
   successor. A retired name is never reused (revised 2026-10-19, the folds' closing review).
-- **Index and resolver.** The index is the one derived JSON file `[cross]` places, keyed by tree id,
-  rebuilt on a miss, never committed and never loaded whole. `gov tag show|where|refs|check <address>` returns the
+- **Index and resolver.** The index is the one derived SQLite file `[cross]` places, its rows keyed by
+  blob and fresh per tree, re-parsing only changed blobs, never committed and never loaded whole (revised
+  2026-10-19, the night pass two, point 3, pending NT-15). `gov tag show|where|refs|check <address>` returns the
   smallest leaf slice in one call.
 - **Joins.** `compute_coverage` moves to `tools/lib` as the join factory, because the map that holds it
   today is optional.

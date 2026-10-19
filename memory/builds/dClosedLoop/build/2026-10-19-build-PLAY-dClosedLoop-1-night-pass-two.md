@@ -220,6 +220,67 @@ dBoundRoles, dIndexedDesign and dScopedBuild, and the key `build.reuse-check.sec
 flow-steps' Build table gains `build.reuse-check` and its route; layer-roles' two stale passages are revised; and the
 register gains `gap-build-06`, `gap-roles-27` and `gap-design-11`.
 
+## [p3-storage] Point 3: storage, a relational structure, and news between nodes
+
+**The owner's four questions, answered.**
+1. *Is it time for a different format than markdown?* Not for the store of record. Dispatch 130 measured `memory/`
+   at 4,375 files and 72.7 MB, growing 2.3 times in the last month. Storing it is not the problem: every reader, the
+   verdict and the design map ran with no remote, cat, grep and git read it, and a review reads its diffs. What does
+   not scale is how it is read. The designed index, one JSON file per tree rebuilt on every tree miss, took about 30 s
+   to rebuild and 1.6 GB to load at ten times today's tree. memory-recall's per-worktree cache is already 478 MB and is
+   rebuilt whole after any edit. The memory legs re-read the whole tree on every run, 83 s at 54 MB.
+2. *A relational structure that maintains the connections mechanically?* Yes, and it is the derived index, done as
+   a database: one SQLite file per node in the git common directory, rows keyed by blob, so a commit re-parses only
+   the blobs it changed. At ten times today's tree a one-file update took 9 ms and an inverse query about 1 ms, on
+   the standard library's `sqlite3`, the engine memory-recall already uses. Only extractors write it, so it can never
+   disagree with the records the way beads' writable SQLite and JSONL did. Connections stay correct by two rules:
+   relations are derived from the records, never typed beside them, and each edge type's cardinality is checked per
+   target over the merged tree. Dispatch 131's probe D showed why the second is owed: two branches each superseding
+   one decision merged clean in git, and only the index saw the conflict.
+3. *Coordinating several nodes in real time?* The transport is not the delay. A fetch takes 0.6 s, and the median
+   gap between pass commits is 7.5 minutes. A node learns news only when it reads, and the design reads at items and
+   transitions. So the fix is the read point. A hook shows unread message ids at every tool call (a median of 10.5 s
+   apart), read from the node's local copy of the refs, which a detached fetch refreshes, so no tool call waits on the
+   network. The live message becomes a doorbell carrying only the message's ref and id, so a lost ring costs latency,
+   never a fact. The mailbox's single chain per build is the part that does not last: eight concurrent writers took
+   4.5 times the ideal compare-and-swap attempts. One ref per sender took none extra.
+4. *A cloud relational database?* Not as the store of record, and not as the transport. A node offline for a day
+   could neither read nor write. The verdict would stop being local (P3). The witness would leave committed history
+   (P2). Every node would hold a new connection secret, and a git-only adopter could not run gov. A synced SQLite
+   (cr-sqlite, libSQL) silently keeps one of two concurrent decisions. A git-backed database (Dolt) needs a binary on
+   every node and splits the repository into two stores. A database or a bus fits only behind the doorbell, as an
+   optional adapter: Postgres `NOTIFY`, ntfy or NATS ringing with ids. The agent-friendly approach is the one gov
+   already has, made fast: files in git, one derived index, and the CLI over it. An MCP server over the index stays
+   possible as an optional read surface and is not built, since the CLI is the floor (P36).
+
+**The design worked in.**
+1. **Text in git stays the store of record** (NT-14).
+2. **The index becomes one SQLite file per node** (NT-15). dOrderedCharter's index clause, the systems record's
+   `[cross]` and its index bullet are revised: rows keyed by blob, the tree id only a freshness key, JSON only as
+   `gov tag`'s output, and a deleted file rebuilt to identical rows. dTotalRecall moves memory-recall's FTS5 tables
+   into the same file, and its memory legs read the index for unchanged blobs, an index read and a full read agreeing
+   on a planted tree.
+3. **Relations checked per target after merge.** dTotalRecall declares each edge type's cardinality per target as
+   well as per source and checks it over the merged tree, seen red on probe D's two supersessions.
+4. **One mail ref per sender** (NT-16): `refs/gov/mail/<slug>/<fleet tag>`, revised in v2, coordination and the
+   memory plan.
+5. **News read at every tool call** (NT-17). dKeptSession gains `mailbox.notice` (`every-tool-call`, `every-item` or
+   `off`) and `mailbox.fetch-seconds` (60). The doorbell carries ids only, and the disposal still happens at items
+   and transitions, as `mailbox.reads` says.
+6. **Leases with a history, and writes free of the lander.** dPlacedRequest writes each lease and claim as a commit
+   whose parent is the ref's previous tip, so the history the design names as the witness exists. Lease, claim and
+   mail writes take no lock the lander holds, which today blocks them for a median 334 s per landing.
+
+**Left open, each measured by the build that owns it.** The push latency to the real remote, and the host's rate
+limit on a fetch a minute, are unmeasured. The rebuild-equality test is owed. The 100-times figures are a linear
+extrapolation. The lease expiry stays at its ratified 24 hours. The tick-renewed lease that would let it drop is
+Runtime's to propose.
+
+**Folded.** v2's dOrderedCharter, dKeptSession, dTotalRecall and dPlacedRequest rows, with eight gaps, and the keys
+`mailbox.notice` and `mailbox.fetch-seconds` with their preset rows; the systems record's table, `[cross]` and index
+bullet; coordination's items 6 and 7; the memory plan's mail ref; and the register's `gap-found-33`, `gap-mem-41` to
+`gap-mem-43` and `gap-conc-04` to `gap-conc-07`. The preset check's free values gain "seconds", the class of "hours".
+
 ## [forks] Parked for the owner, 2026-10-19
 
 Each fork's first option is the recommendation, and the design as folded shows it, marked pending. Where the answer
@@ -241,3 +302,7 @@ decision.
 | NT-11 | Where does the diff-time reuse check run? | a Build item per unit before the closing review, its duplicates and bypassed MUSTs fix passes; a reuse lens in the closing review's panel; once per build at Test | a structural decision |
 | NT-12 | May a coverage step run below medium effort? | only with an experiment record that shows the lower effort holds; freely, as the effort keys say | a structural decision: a check on the effort keys' values |
 | NT-13 | Does the reuse check run a second, independent pass? | off by default, on where a miss is expensive; always; never | `build.reuse-check.second-pass`'s default: off, on |
+| NT-14 | What is the store of record for instructions and memory? | text in git, markdown and TOML, as today; a git-backed database such as Dolt; a cloud relational database | a structural decision |
+| NT-15 | What shape does the derived index take? | one SQLite file per node keyed by blob, memory-recall's tables inside it and the memory legs reading it; one JSON file per tree, as designed; per-worktree caches, as today | a structural decision |
+| NT-16 | How do senders share a build's mailbox? | one ref per sender per build; one ref per build, as designed | a structural decision |
+| NT-17 | When does a session learn of a message? | at every tool call, from a local copy a detached fetch keeps fresh, with the live channel ringing ids only; at every item, as `mailbox.reads` alone; never between reads | `mailbox.notice`'s default: every-tool-call, every-item, off |
