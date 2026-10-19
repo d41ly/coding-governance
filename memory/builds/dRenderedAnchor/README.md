@@ -56,13 +56,13 @@ None.
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 1 unit(s) · node d · opened 2026-10-19 · streams tooling
+**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-10-19 · streams tooling
 ids TOOL-dRenderedAnchor-1
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dRenderedAnchor-1 — the kit resolver finds a rendered file through its receipt row, and the role render reds a harness listed where it is not installed](spec/2026-10-19-spec-TOOL-dRenderedAnchor-1.md) | — | 2 | SPECCED | rev-1 | 2026-10-19 |
+| [TOOL-dRenderedAnchor-1 — the kit resolver finds a rendered file through its receipt row, and the role render reds a harness listed where it is not installed](spec/2026-10-19-spec-TOOL-dRenderedAnchor-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-19 |
 <!-- /gen:build-units -->
 
 Records: 2 bound to this build, across 3 record folder(s).
