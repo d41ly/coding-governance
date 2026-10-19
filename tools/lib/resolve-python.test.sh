@@ -368,8 +368,10 @@ for anchor in ("t.js", "u.js", "s.json", "v.js", "w.js", "x.js", "y.js"):
     except LookupError:
         print("LookupError")' "$HERE" "$RK" 2>&1 | tr -d '\r')
 rk_want=$(printf '%s\n' p/k p/k LookupError LookupError LookupError LookupError LookupError)
-[ "$(printf '%s\n' "$rk_got" | grep -c .)" = 7 ] || bad "the receipt-join table did not read as seven rows: $(printf '%s' "$rk_got" | tr '\n' ' ')"; ok
-[ "$rk_got" = "$rk_want" ] || bad "the canonical resolve_kit_dir disagrees with the receipt-join table, rows 1 to 7: $(printf '%s' "$rk_got" | tr '\n' ' ')"; ok
+mapfile -t rk_rows <<<"$rk_got"; rk_n=0
+for rk_l in "${rk_rows[@]}"; do [ -z "$rk_l" ] || rk_n=$((rk_n+1)); done
+[ "$rk_n" = 7 ] || bad "the receipt-join table did not read as seven rows: ${rk_got//$'\n'/ }"; ok
+[ "$rk_got" = "$rk_want" ] || bad "the canonical resolve_kit_dir disagrees with the receipt-join table, rows 1 to 7: ${rk_got//$'\n'/ }"; ok
 
 # ---- 2f. A TEMPLATE CITATION UNDER A RENDERED ROW, BEHAVIOUR (TOOL-dRenderedAnchor-2) -------------
 # `derive_kit_paths` resolves every `{{TOOL_ROOT}}<home>/<file>` citation of the templates it is given

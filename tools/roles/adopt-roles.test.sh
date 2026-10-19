@@ -579,13 +579,13 @@ while [ "$_i" -lt "${#_a14[@]}" ]; do
 done
 check_arm "arm 14 a --scaffold names each cited harness under the renamed directory, and none under its cited home" \
    "$([ "$rc" = 0 ] && [ "${#_p14[@]}" -ge 2 ] && [ "$((_i / 2))" = "${#_p14[@]}" ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
-[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$rc" = 0 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 check_arm "arm 14 ...and a citation extending the first by one character keeps its own plain path" \
    "$([ "$rc" = 0 ] && [ -n "${_a14[1]-}" ] && grep -qF -- "\`${_a14[1]}x\`" "$SK14" \
       && ! grep -qF -- "\`${_a14[0]}x\`" "$SK14" && echo 1 || echo 0)"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 14 ...and --check over that install exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
-[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$rc" = 0 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 
 # ---- arm 15: a citation that is no harness never resolves above the tool root -------------------
 # TOOL-dRenderedAnchor-3 S7, the closing review's M1: a citation that is not
@@ -629,17 +629,17 @@ for _l in "${_s15[@]}"; do
 done
 check_arm "arm 15 a --scaffold with a decoy at the repository root for each citation that is no harness names each under the plain prefix" \
    "$([ "$_rc15" = 0 ] && [ "$rc" = 0 ] && [ "$_k" -ge 2 ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
-[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$rc" = 0 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 out=$(run_adopter --check); rc=$?
 check_arm "arm 15 ...and --check over that install exits 0" "$([ "$rc" = 0 ] && echo 1 || echo 0)"
-[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$rc" = 0 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 IFS=$'\t' read -r _w15 _c15 _q15 <<< "${_s15[0]-}"
 mkdir -p "$FX/ci" "$FX/.governance" && printf '# placed by the receipt\n' > "$FX/ci/${_q15#*/}"
 printf '{"files": [{"kit": "fixture", "source": "%s", "path": "ci/%s"}]}\n' "$_q15" "${_q15#*/}" > "$FX/.governance/install.json"
 out=$(run_adopter --scaffold); rc=$?
 check_arm "arm 15 ...and a receipt row placing the first of them at ci/ names it there" \
    "$([ "$rc" = 0 ] && [ -n "${_c15-}" ] && grep -qF -- "$_c15" "$SK15" && echo 1 || echo 0)"
-[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$rc" = 0 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 
 # ---- arm 16: a harness a sibling of the repository holds is listed nowhere at a root install -----
 # TOOL-dRenderedAnchor-3 S8, the closing review's L6: with the kit at `<repo>/roles` the tool root is
@@ -661,12 +661,12 @@ for cite, rel in roles_lib.resolve_cited_paths(text, kit, kit.parent, roles_lib.
     print(cite, rel)' "$FX/roles" 2>&1); rc=$?
 check_arm "arm 16 at a root install, resolve_cited_paths lists no harness a sibling of the repository holds" \
    "$([ "$_rc16" = 0 ] && [ "${#_p16[@]}" -ge 2 ] && [ "$rc" = 0 ] && [ -z "$out" ] && echo 1 || echo 0)"
-[ "$rc" = 0 ] && [ -z "$out" ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$rc" = 0 ] && [ -z "$out" ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 out=$(run_adopter --scaffold); rc=$?
 _ok=1; for _q in "${_p16[@]}"; do grep -qF -- "\`$_q\`" "$FX/.claude/skills/build/SKILL.md" || _ok=0; done
 check_arm "arm 16 ...and --scaffold exits 0 naming each such harness by its plain citation" \
    "$([ "$rc" = 0 ] && [ "${#_p16[@]}" -ge 2 ] && [ "$_ok" = 1 ] && echo 1 || echo 0)"
-[ "$rc" = 0 ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$rc" = 0 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 
 # ---- arm 17: a harness held only above the tool root is named where the role index lists it ---
 # TOOL-dRenderedAnchor-4 S1, the closing review's round-3 M1: the citation pass resolves a
@@ -709,7 +709,7 @@ done
 _v17=$([[ $KREL == */* ]] && [ "$_rc17" = 0 ] && [ "$rc" = 0 ] && [ "${#_p17[@]}" -ge 2 ] \
    && [ ! -e "$FX/.governance/install.json" ] && [ "$_ok" = 1 ] && echo 1 || echo 0)
 check_arm "arm 17 a harness held only above the tool root is named there by the Skill and by roles.json" "$_v17"
-[ "$_v17" = 1 ] || printf '%s\n' "$out" | sed 's/^/    /'
+[ "$_v17" = 1 ] || printf '    %s\n' "${out//$'\n'/$'\n'    }"
 
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL the suite executed $n assertions, under its floor of $FLOOR_ASSERTIONS — a block of arms was skipped"; fail=$((fail+1)); }
 [ "$fail" = 0 ] && echo "PASS ($n assertions)"

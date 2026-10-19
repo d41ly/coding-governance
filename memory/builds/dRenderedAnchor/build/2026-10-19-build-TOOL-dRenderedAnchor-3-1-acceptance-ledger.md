@@ -108,3 +108,47 @@ the last one.
 - GREEN, all restored: `adopt-roles.test.sh` `PASS (61 assertions)`, `resolve-python.test.sh`
   `PASS — resolve-python: 343 assertions held`, `check-wiring.test.sh` `253 passed, 0 failed`, each
   exit 0.
+
+## The fix pass for the closing bar's own red
+
+The bar at `b4b79004d` read `shell hygiene (a fork spent on builtin work)` red on this unit's suite
+lines. `tools/lib/resolve-python.test.sh` measured 11 `var-pipe` sites against the registry's 8,
+and `tools/roles/adopt-roles.test.sh` measured 8 that no row declares. The fix record is
+`2026-10-19-prompt-TOOL-dRenderedAnchor-3-3-fix.md`. This pass converts those eleven sites to the
+no-fork form and changes no other line of either suite. It does not touch
+`memory/project/spawn-idiom-sites.txt`.
+
+- Section 2e's row-count check now reads the rows with `mapfile -t rk_rows <<<"$rk_got"` and counts
+  the non-empty ones in a `for` loop, which is what `grep -c .` counted. Its two messages join the
+  rows with `${rk_got//$'\n'/ }` in place of `tr '\n' ' '`. A `while read` count over
+  `<<<"$rk_got"` was tried first. The loop classifier of `shell hygiene (a loop fed by a command
+  substitution)` graded it a `loop-var-sub` site, which raised the suite's `<<<` count to 2 against
+  its row of 1 in `memory/project/substitution-fed-loops.txt`. The `mapfile` line is the idiom that
+  section 3a of the same suite already uses, and neither line is a loop fed by a here-string.
+- Section 2f's `| tr -d '\r'` capture pipes a command's output, not a variable's, so the lint counts
+  no site there. It is unchanged.
+- The eight diagnostic lines of adopter arms 14 to 17 now print
+  `printf '    %s\n' "${out//$'\n'/$'\n'    }"` in place of `printf '%s\n' "$out" | sed 's/^/    /'`.
+  That is the indent form section 3a of `resolve-python.test.sh` already uses. Each line keeps its
+  own guard, so no `check_arm` value moves.
+
+Observed by probes. No leg or suite was run.
+
+- The lint's own `scan_spawn_file`, imported from `tools/gate-lint/sh_hygiene.py`, ran over each
+  file. `resolve-python.test.sh` read `path-subst` 4 and `var-pipe` 8, and `adopt-roles.test.sh`
+  read no site. Both equal the registry's rows for each file. Before this pass they read 11 and 8
+  `var-pipe`. Its `scan_file` over the same files read one `<<<` `loop-var-sub` site for
+  `resolve-python.test.sh`, which equals its row, and none for `adopt-roles.test.sh`. `git diff
+  a60b0c7dc` over both registries was empty.
+- `probe_fix3.sh` in the session scratchpad ran each old form and its replacement over seven values.
+  They were: empty, one row, section 2e's seven rows, a blank row between two, leading and trailing
+  whitespace with a tab, a backslash and `%s`, a trailing newline, and a three-line traceback. It
+  read 0 differences for the count, the join and the indent. The guarded indent printed nothing on
+  `rc` 0, and printed both lines indented on `rc` 1. A copy that counted blank rows read 3
+  differences, and a copy that indented by three spaces read 7, so the probe can read red.
+- `bash -n` parsed both suites.
+
+Owed to the close and not run here: `shell hygiene (a fork spent on builtin work)` green with the
+registry unchanged, `shell hygiene (a loop fed by a command substitution)` green,
+`adopt-roles.test.sh` `PASS (62 assertions)`, `resolve-python.test.sh` green, arms 14 to 17 and
+sections 2e and 2f RED on their staged breaks, and then the full bar.

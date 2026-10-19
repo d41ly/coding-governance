@@ -1,6 +1,6 @@
 # TOOL-dRenderedAnchor-3 — the closing review's round-2 findings on unit 2 closed as one batch
 
-**Status:** INPROGRESS · rev-2 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
+**Status:** CLOSED · rev-2 · 2026-10-19 · node d · Tier-2 · base 8a0e0b59 · streams tooling
 
 <!-- gen:spec-records -->
 
