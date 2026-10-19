@@ -12922,6 +12922,51 @@ C.sub("so they now cite \"the folds' review\".\n",
 C.save()
 ````
 
+### `fix_flow_record.py`
+
+The flow-roles adoption record corrected before its commit: chain placements that read a non-ancestor's schema, and the `gap-flow-15` citation.
+
+````python
+"""Correct the flow-roles adoption record before its commit: the chain placements that read a non-ancestor's schema
+(dFairHearing does not descend from dOrderedCharter, so it registers no namespace and makes no unit; each kind joins
+the kinds register in its own build's row), and the `gap-flow-15` citation, which names the routes-to-table join.
+
+Usage: python -X utf8 fix_flow_record.py   (from the worktree root)
+"""
+import pathlib
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md")
+R.sub("IA's `repo.<segment>`. Two namespaces join: `workflow`, owned by dBoundRoles, and `lens`, by dFairHearing.",
+      "IA's `repo.<segment>`. Two namespaces join: `workflow`, owned by dBoundRoles, and `lens`, by dCalibratedLens.",
+      "item 2: the lens namespace's owner")
+R.sub("    - the needs graph, acyclic and complete, under the `gap-flow-15` join;\n",
+      "    - the needs graph acyclic, every need resolving, and every route joined to its level's transition table\n"
+      "      both ways, the join `gap-flow-15` owes;\n", "item 11: the gap-flow-15 citation")
+R.sub("- **dOrderedCharter:** the overlay takes rows of every kind in their kinds' schemas. `owned` admits the `repo` segment\n"
+      "  in any registered namespace. Field patches are `amends`, whole rows `supersedes`, and `instructions.exclude` takes\n"
+      "  any overlay kind's tag. Pins are taken over a row's canonical form, and the change record's marks and successors\n"
+      "  cover rows. The kinds register gains `item` and `lens`.\n"
+      "- **dFairHearing:** the lens catalogue as data, the harness's five slots filled from it, agent-cap counting slots,\n"
+      "  and the `lens` namespace.\n",
+      "- **dOrderedCharter:** the overlay's row mechanism for any kind a later build registers: `owned` admitting the\n"
+      "  `repo` segment in a registered namespace, field patches as `amends`, whole rows as `supersedes`,\n"
+      "  `instructions.exclude` over any registered kind's tags, pins over a row's canonical form, and the change\n"
+      "  record's marks and successors covering rows. Each kind's own build admits its rows, below.\n"
+      "- **dFairHearing:** the lens catalogue as data in the review kit, the harness's five slots filled from it, and\n"
+      "  agent-cap counting slots.\n", "chain: dOrderedCharter and dFairHearing")
+R.sub("- **dDeclaredLoop:** repository items composed with the loop definition at the landed revision,",
+      "- **dDeclaredLoop:** the `item` kind in the kinds register with its factory, repository items composed with the\n"
+      "  loop definition at the landed revision,", "chain: dDeclaredLoop's kind")
+R.sub("- **dCalibratedLens:** repository lenses from the overlay, and lens tags joined to the step gate.\n",
+      "- **dCalibratedLens:** the `lens` kind and namespace, gov's lenses tagged in it and their briefs made units,\n"
+      "  repository lenses from the overlay, and lens tags joined to the step gate.\n", "chain: dCalibratedLens")
+R.save()
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row.
@@ -13233,6 +13278,8 @@ MINE = [
      "into the breakpoint program, and a citation that matched one of its names. Both fixed."),
     ("adopt/fold_review_homonym.py", "The probe's last red: the receipt's `commit` field, moved into dSafePassage, "
      "read as dDeclaredLoop's `commit` kind; named in plain words."),
+    ("adopt/fix_flow_record.py", "The flow-roles adoption record corrected before its commit: chain placements "
+     "that read a non-ancestor's schema, and the `gap-flow-15` citation."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row."),
     ("night/record_instruments.py", "This record's own writer."),
@@ -14259,13 +14306,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2422 nodes in 30 namespaces; 31059 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1651, derived 279, pending 492
-map: no stale facts read 55 records and 21 quotes of a map count or the critical path
+map: 2427 nodes in 30 namespaces; 31158 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1656, derived 279, pending 492
+map: no stale facts read 56 records and 21 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 186 records, 3166 sections, 195 decision sections, 16 comparison areas, 38 principles
+atlas: derived — 187 records, 3180 sections, 198 decision sections, 16 comparison areas, 38 principles
 rc 0
 
 $ fold state
