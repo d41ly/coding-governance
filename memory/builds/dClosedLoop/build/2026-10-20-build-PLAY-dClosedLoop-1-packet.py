@@ -8,8 +8,9 @@ prompt=<packet>` reads its `brief:*`: Goal, Items, Acceptance, Gates and Non-goa
 Its twelve fields, derived and never typed:
   1  Pins: the baseline sha, `deviations.BASELINE` (P0.1 row 5) and never v2's `Baseline:` line, which
      `deviations.py` checks against it; the blobs at HEAD of v2 and of the as-built view; each instrument's pinned blob
-     (`carries.py`, `deviations.py`, `asbuilt.py`, this file, the schedule script and the opening script, those
-     tracked at the first render); the HEAD it was rendered at; and the generator's version, this file's blob at HEAD.
+     (`carries.py`, `deviations.py`, `asbuilt.py`, this file, the schedule script, the opening script and
+     `bare-ids.py`, whose `read_roster` reads field 9's roster, those tracked at the first render); the HEAD it was
+     rendered at; and the generator's version, this file's blob at HEAD.
   2  Items: each clause of the row, its id at its baseline hash, its hash now in the as-built view with the record
      behind any change, its tokens as `carries.py`'s token arm reads them (a clause that arm cannot see is flagged),
      and its text.
@@ -81,7 +82,8 @@ SELF = B + "2026-10-20-build-PLAY-dClosedLoop-1-packet.py"
 INSTRUMENTS = (B + "2026-10-19-build-PLAY-dClosedLoop-1-carries.py",
                B + "2026-10-19-build-PLAY-dClosedLoop-1-deviations.py",
                B + "2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py", SELF,
-               B + "2026-10-20-build-PLAY-dClosedLoop-1-schedule.py", B + "2026-10-20-build-PLAY-dClosedLoop-1-open.py")
+               B + "2026-10-20-build-PLAY-dClosedLoop-1-schedule.py", B + "2026-10-20-build-PLAY-dClosedLoop-1-open.py",
+               B + "2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py")
 GR = B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md"
 DECISIONS = "memory/DECISIONS.md"
 # P0.8 row 1's id, fixed for Phase 0 (dispatch 236's brief): the decision an EXTRA unit derives from. Written
