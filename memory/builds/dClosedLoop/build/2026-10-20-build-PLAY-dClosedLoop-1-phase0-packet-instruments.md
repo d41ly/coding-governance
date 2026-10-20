@@ -166,3 +166,177 @@ Probes of the instrument over the whole chain, in the work clone, writing nothin
   adds its pin later.
 - An open ask in dClosedLoop's `BACKLOG.md`: the file is absent, so the real ask arm read an empty population. Only the
   fixture's seeded ask was seen red.
+
+## The pinned baseline and one roster reader
+
+Dispatch 243's evidence for its brief (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-brief-packet-2.md`): the two
+defects dispatch 241 found outside its paths (`build/…-phase0-deviations-instruments.md`, `## P0.1 and P0.2`). Built in
+a `--shared` clone of the main loop's branch at `db3ea9981`, committed on `p0-packet-2` as `93c1d481d`. The old code is
+the two files at `db3ea9981`, `packet.py` blob `986dd43f0` and `bare-ids.py` blob `50d0385f1`; the new is `bc8d65536`
+and `ea671312d`. Every command ran from a tree's root with `python -B`, under a bounded timeout, and a script named
+`d243/…` is in this session's scratch folder. Ids follow this record's rule above: a unit no build has minted is
+written `missing:<id>`, though each output held it bare, and `<packet>` is the packet `--write` names.
+
+**What changed.** `packet.py`'s `read_tree` takes the baseline from `deviations.BASELINE`, through the module
+`asbuilt.py` loads, so the packet and the as-built view render from one pin. It no longer reads v2's `Baseline:` line,
+so its refusal for a v2 with no such line is deleted, and the Pins line reads "the pin `deviations.py` carries (P0.1 row
+5)". On a moved line the packet renders from the pin; it does not refuse. `bare-ids.py`'s new `read_roster(text, id_re,
+slug=None)` is the `roster:units` pair's one reader. `read_roster_units`, which `deviations.py` calls, and
+`packet.read_roster`, which the opening calls, are adapters over it, so neither caller changed. It lives in
+`bare-ids.py` because that file cannot load `packet.py`: `packet.py` loads it, by path, through `asbuilt.py` and
+`deviations.py`. Where the two old readers agreed, on the markers, it keeps their reading. Where they differed it takes
+the generator's id grammar from `bare-ids.py` (declared families only, and a `missing:` citation is no unit) and one
+unit per table row, the row's first id, from `packet.py`.
+
+**1. Both instruments' modes, before and after** (`d243/runs.py`, which logs each command's exit and output): at
+`db3ea9981`, then with the change uncommitted, then at `93c1d481d`. The three logs are byte-identical (`diff` exit 0).
+
+| Command | Exit | The line that proves it |
+|---|---|---|
+| `packet.py --fixture` | 0 | byte compare green · completeness 0 findings over clauses 6, gaps 3, parents 1, owed 1, roster 6, asks 1 · pin arm 6 instruments, 0 findings |
+| `packet.py --fixture --plant clause` | 1 | clause arm: `cl-dClosedLoop-0004@c374ccd0` of dTrueNorth's row is not in Items; the byte compare green |
+| `… --plant gap` | 1 | gap arm: `gap-mem-47`, which dTrueNorth owns, is not in Gaps; the byte compare green |
+| `… --plant parent` | 1 | parent arm: dClosedLoop is not in Parents; the byte compare green |
+| `… --plant owed` | 1 | owed arm: v2:fixture `[owed]`, naming dTrueNorth, is not in Obligations; the byte compare green |
+| `… --plant roster` | 1 | roster arm: `FIXTURE-dTrueNorth-6` of the opened README is not in Obligations; the byte compare green |
+| `… --plant ask` | 1 | ask arm: `FIXTURE-dClosedLoop-1` (fixture) is not in Obligations; the byte compare green |
+| `… --plant hand-edit` | 1 | byte compare: the packet differs from its render from line 15: A hand edit. |
+| `… --plant pin` | 1 | pin arm: instrument …-carries.py moved: pinned 0b5fab9cc06d, HEAD holds 5b44b718e5ed; the byte compare green |
+| `… --plant pin --control no-pin-arm` | 0 | byte compare green · completeness 0 findings over … owed 2 … · pin arm removed |
+| `… --plant pin --control repin` | 0 | byte compare green · completeness 0 findings over … owed 2 … · pin arm 6 instruments, 0 findings |
+| `… --plant run-live` | 1 | --repin refused: memory/builds/dTrueNorth/RUN.md (phase BUILDING) |
+| `… --plant run-landed` | 0 | --repin not refused: no live chain run |
+| `packet.py --check dTrueNorth` | 2 | dTrueNorth has no packet under memory/builds/dTrueNorth/prompts/, so there is nothing to check |
+| `packet.py --repin carries.py` | 2 | no chain build has a packet, so there is nothing to re-pin |
+| `bare-ids.py` | 0 | nothing printed |
+| `bare-ids.py --opened` | 0 | nothing printed |
+
+The fixture never reads a README's roster: the tree holds no chain build's README, so the fixture seeds one. Item 4's
+rows C1 and C2 run the roster arm over real opened READMEs.
+
+**2. The baseline plant** (item 1). The control, in a worktree at `db3ea9981` with nothing planted: a minimal
+`memory/builds/dTrueNorth/README.md`, untracked, then `packet.py --write dTrueNorth --unit missing:TOOL-dTrueNorth-1`,
+exit 0, "packet: wrote <packet>"; `grep -n '^- baseline:' <packet>`, "50:- baseline:
+`59ff8f2ac04a967751eae00de6856afbea66c033`, v2's `[clause-ids]` `Baseline:`"; `d243/baseline_probe.py <packet>`, exit
+0, "departures from the pin 0". The folder was then removed. The probe compares the packet's Pins baseline and each
+Items pin with `deviations.BASELINE` and with the hashes `deviations.read_chain_clauses` gives v2 at that sha, and
+exits 1 listing each departure.
+
+The plant, `d243/plant_baseline.py`, ran in a worktree at `db3ea9981` and in one at `93c1d481d`. It loosened
+cl-dClosedLoop-0004's text in v2 from "green on a status-only edit" to "green on a status-only edit or on any edit" and
+committed that (scratch: `f708a45d8` on the old code, `baed32c15` on the new). It then re-pointed v2's `Baseline:` line
+to that commit in the working tree and wrote the minimal README. Then, in each tree:
+
+| Command | Old code | New code |
+|---|---|---|
+| `packet.py --write dTrueNorth --unit missing:TOOL-dTrueNorth-1` | exit 0, "packet: wrote <packet>" | exit 0, the same |
+| `grep -n '^- baseline:' <packet>` | "50:- baseline: `f708a45d8…`, v2's `[clause-ids]` `Baseline:`": it followed the moved line | "50:- baseline: `59ff8f2ac…`, the pin `deviations.py` carries (P0.1 row 5)" |
+| the packet's line 24, Items 4 | "4. `cl-dClosedLoop-0004@19b7aa97` · now `c374ccd0` ·": the loosened text pinned as the baseline's, and the frozen hash, which the as-built view renders from the pin, read as its change | "4. `cl-dClosedLoop-0004@c374ccd0` · now `c374ccd0`, as at the baseline; v2's text now hashes `19b7aa97`, a departure from the frozen design" |
+| `d243/baseline_probe.py <packet>` | exit 1, "Pins baseline f708a45d8, not the pin 59ff8f2ac" and "Items pins cl-dClosedLoop-0004@19b7aa97, and v2 at the pin hashes it c374ccd0" | exit 0, "departures from the pin 0" |
+| `packet.py --check dTrueNorth` | exit 0, "byte compare green · completeness 0 findings over clauses 6, gaps 3, parents 1, owed 0, roster 0, asks 0 · pin arm 6 instruments, 0 findings" | exit 0, the same |
+
+`--check` is green in both trees, because the renderer and the arms read one tree. Comparing v2's line with the pin
+is `deviations.py`'s job, which lists the move, and `asbuilt.py --check` reports it (dispatch 241's item 2).
+
+**3. The two old readers against the merged one** (`d243/roster_probe.py`, exit 0). It ran on the new tree, with the
+old blobs of both files at `db3ea9981` loaded beside it.
+
+- Over the README that `open.py`'s `render_readme` writes for each of the 22 chain builds: `packet.read_roster` gave the
+  same rows on all 22, and `read_roster_units` gave the same units on 21. The one that differs is dTrueNorth. Its row 7
+  carries "**Derived:** missing:PLAY-dClosedLoop-2", and the opening writes that id bare (`open.py`'s
+  `derive_decision_id`). The old `read_roster_units` read it as an eighth unit; the merged reader reads 7.
+- Over the deviation fixture's README (`render_fixture_readme`, family `FIX`), both read `FIX-dTrueNorth-80` and
+  `FIX-dTrueNorth-81`.
+- One row planted in the pair for each case where the two old readers disagreed (`packet.read_roster` under dTrueNorth's
+  slug):
+
+| Row in the pair | `packet.read_roster`, old | new | `read_roster_units`, old | new |
+|---|---|---|---|---|
+| a unit in its `missing:` form | the unit | none | none | none |
+| row 7's shape, the decision id bare | unit 7 | unit 7 | unit 7 and the decision id | unit 7 |
+| a unit of `FIXTURE`, a family no conf declares | the unit | none | none | none |
+| two units in one row | the first | the first | both | the first |
+| a prose line inside the pair | none | none | its id | none |
+
+**4. `bare-ids.py` plain and `--opened`, with their plants** (`d243/bareids_plants.py`), in a fresh worktree at
+`db3ea9981` and in one at `93c1d481d`. Each planted file is restored after its run. The two logs are byte-identical
+(`diff` exit 0).
+
+| Step | Command | Exit | Output |
+|---|---|---|---|
+| A1 | `bare-ids.py`, nothing opened | 0 | nothing |
+| A2 | the same, a bare missing:TOOL-dTrueNorth-1 appended to `…-recheck-brief-a.md` | 1 | one line, `…-recheck-brief-a.md:112: missing:TOOL-dTrueNorth-1` |
+| A3 | the same id behind `x:` | 1 | the same line |
+| A4 | control: the same id in its `missing:` form | 0 | nothing |
+| B0 | `d243/opened.py dTrueNorth dGroundRules`, the opening script's own `render_readme` and `render_backlog`; both folders staged; `gen_build_index.py --write` | 0, 0 | dTrueNorth roster units 1 to 7 and no ask; dGroundRules units 1 to 11 and ask 12; "build-index: wrote 1541 artifact(s)" |
+| B1 | `bare-ids.py` | 1 | two lines, `memory/builds/dGroundRules/BACKLOG.md:5: missing:TOOL-dGroundRules-12` and `:9:`, the ask the opening minted |
+| B2 | `bare-ids.py --opened` | 0 | nothing |
+| B3 | `--opened`, a bare missing:TOOL-dGroundRules-40 appended | 1 | one line, `…-recheck-brief-a.md:112: missing:TOOL-dGroundRules-40` |
+| B4 | `--opened`, control: roster unit missing:TOOL-dGroundRules-3 cited | 0 | nothing |
+| B5 | `--opened`, the same citation, its row removed from `roster:units` | 1 | one line, `…-recheck-brief-a.md:112: missing:TOOL-dGroundRules-3` |
+| B6 | `--opened`, both files restored | 0 | nothing |
+| C1 | `packet.py --write dTrueNorth`, then `--check dTrueNorth` | 0, 0 | "packet: wrote <packet>"; "… owed 0, roster 7, asks 0 · pin arm 6 instruments, 0 findings" |
+| C2 | `packet.py --write dGroundRules`, then `--check dGroundRules` | 0, 0 | "packet: wrote …"; "… clauses 11, gaps 3, parents 1, owed 1, roster 11, asks 0 · pin arm 6 instruments, 0 findings" |
+
+Rows C1 and C2 run the packet's roster arm over a real opened README through the merged reader, and the packet's name
+comes from the roster's first row.
+
+**5. The readers of what changed.**
+
+- `deviations.py`'s run kind (`derive_run_kind`), probed with `python -c` over each opened tree's index, as a
+  `git write-tree` object, so nothing was committed. On the old code, dTrueNorth gave "kind build asks [] units with no
+  spec 8", the last two being missing:TOOL-dTrueNorth-7 and missing:PLAY-dClosedLoop-2. On the new code it gave "kind
+  build asks [] units with no spec 7". dGroundRules gave the same on both: "kind spec asks
+  [missing:TOOL-dGroundRules-12] units with no spec 11". The departures report prints that list as "units with no
+  spec". On dTrueNorth's real opening, the old reader would have listed the decision id there for good, since no spec
+  defines it. The run kind is unchanged, because dTrueNorth has no carry-forward ask.
+- `d243/readers_runs.py`, in the clone's own checkout at `db3ea9981` and in the new tree:
+  - `deviations.py`: exit 0, "baseline 59ff8f2ac read, chain-build specs 0, members 0 (0 unjoined), records 0 ·
+    refused 0 · policy report".
+  - `--fixture`: exit 0, "chain-build specs 16, members 25 (10 unjoined), records 15 · refused 6 · policy report ·
+    fixture".
+  - `--report dTrueNorth --fixture`: exit 0, "build run · …-departures-build.md · entries 34 · byte compare green ·
+    validating arm green".
+  - Its plants: `kind-spec` exit 0 ("spec run", entries 15); `kind-build` and `kind-whole` exit 0 ("build run",
+    entries 14); `kind-norun` exit 2 ("nothing measured: memory/builds/dTrueNorth/RUN.md is absent").
+  - `open.py --summary`: exit 0, "summary of the 22 chain builds".
+
+  With each run of 9 to 40 hex digits replaced, the two logs are identical. The raw logs differ only in the fixture
+  repository's shas, which move with the `packet.py` bytes the fixture copies.
+- `open.py` takes the "at the baseline" sha it writes in each README from `packet.read_tree()`, so it now writes the
+  pin. On today's tree v2's line names the pin, so its output is unchanged.
+- The naming lexicon: `lexicon.py --suggest read_roster --as py.function`, exit 0, "OK — read_roster leads with `read`,
+  which the declaration carries, and satisfies snake for cell `py.function`". The plain run after the commit graded
+  `py.function` 3869 (3868 before) with P1 offenders still 1211. It exits 1 on the pin mismatch "verb offenders 1211
+  UNDER pin 1219", which dispatch 241 handed back.
+
+**6. What these runs do not show.**
+
+- The packet flagging a v2 whose `Baseline:` line moved. `--check` stays green on the planted tree (item 2);
+  `deviations.py` and `asbuilt.py --check` see the move.
+- An edit of `bare-ids.py`'s reader as a moved pin. The packet now reads its roster through `bare-ids.py`, which is not
+  among its pinned instruments, and `deviations.py` already loaded it unpinned.
+- An indented marker. The merged reader keeps the old readers' `ln.strip()` read of the markers rather than the
+  generator's column-0 `check_marker_line`, so it still reads a marker that the generator's structure check refuses.
+- A row whose first id is not its own unit. Under `read_roster_units`, which takes no slug, that id is the row's unit;
+  no README the opening renders has such a row.
+
+**After the commit, the M6 checklist.** `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` over
+`93c1d481d`: exit 0, 16 classes, 10 by anchor and 6 universal. Five were checked:
+
+- **A fixture that passes by finding nothing.** `packet.py --fixture` seeds its roster, so its unchanged verdicts say
+  nothing about the reader. Items 3 and 4 (C1, C2) read real READMEs.
+- **Two answers to one question.** That is the defect fixed here. The roster's readers are now `bare-ids.py`'s
+  `read_roster` and its two adapters. For the baseline, `asbuilt.py` and `packet.py` take `deviations.BASELINE` through
+  one module object, and `open.py` takes it from `packet.read_tree()`. `deviations.read_baseline_line` alone reads v2's
+  line, and only to check it against the pin.
+- **A retirement inventory that misses readers by value.** The deleted refusal's text, "records no Baseline": a
+  `grep -rn` over the tree's `.py`, `.md` and `.sh` files finds nothing. Its exit 2 had no reader but `open.py`'s
+  generic `Unmeasured` catch.
+- **An amendment that leaves its other half standing.** Each was amended with the code: `packet.py`'s docstring fields
+  1 and 9, its "What it does not check", its `genindex` comment and the Pins line, and `bare-ids.py`'s docstring.
+- **A synthetic value standing in.** The plant moves the real line in a real tree to a real commit, and the opened
+  trees are the opening script's own renders.
+
+The remaining classes concern heredocs, fences, table cells split on a pipe, ledgers, merge ranges and owner items.
+None of them applies here.
