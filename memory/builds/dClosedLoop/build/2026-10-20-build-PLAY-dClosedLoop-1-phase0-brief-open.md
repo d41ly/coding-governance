@@ -59,8 +59,10 @@ clone; the opening itself is NOT committed by this unit (the main loop commits i
   clause reds the arm that reads every clause in exactly one row; a `parents:` typo raises; a removed contract row
   reds `gen_build_index.py --check-format`; a planted README whose family differs from its summary row reds
   `open.py --check`; a planted new kit directory reds `--carriers --check`.
-- The generator-grammar bare-id predicate `build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` (a sibling unit's;
-  run it if your tree has it) prints nothing after the clone's `--write`.
+- The generator-grammar bare-id predicate `build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py`: run it after the
+  clone's `--write` and record what it prints. As written it also prints the ids the opening mints, a known plan
+  defect awaiting the owner (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision-brief.md`, finding 11), so
+  output naming only ids the opening itself minted is recorded, not chased; anything else is a finding.
 - `packet.py --check <slug>` exits 0 for all 22 in the clone.
 - A record `build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-open-instruments.md` (first line
   `**Serves:** research PLAY-dClosedLoop-1`) lists every command you ran for an acceptance check or red test, in
