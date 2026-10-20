@@ -103,5 +103,5 @@ Answer: Go
 <!-- the card's route: once every spec it names is tracked, pipe from the heading down to --card --append --session <sid>; append again when that set changes -->
 ## route
 - build: dClosedLoop
-- unit: PLAY-dClosedLoop-1 · spec memory/builds/dClosedLoop/spec/2026-10-14-spec-PLAY-dClosedLoop-1.md
+- unit: PLAY-dClosedLoop-1 · spec memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md
 - brief: memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md
