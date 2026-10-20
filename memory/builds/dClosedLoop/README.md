@@ -74,7 +74,7 @@ ids PLAY-dClosedLoop-16 PLAY-dClosedLoop-17
 | [2026-10-20-spec-PLAY-dClosedLoop-1](spec/2026-10-20-spec-PLAY-dClosedLoop-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-20 |
 <!-- /gen:build-units -->
 
-Records: 583 bound to this build, across 4 record folder(s).
+Records: 584 bound to this build, across 4 record folder(s).
 
 Ids no record names: 2026-10-20-spec-PLAY-dClosedLoop-1.
 
@@ -88,5 +88,5 @@ Ids no `spec-audit` record has ever named: 2026-10-20-spec-PLAY-dClosedLoop-1.
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [dTrueNorth](../dTrueNorth/README.md)
 <!-- /gen:build-edges -->

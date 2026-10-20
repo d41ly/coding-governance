@@ -42,3 +42,4 @@ Cite ids, never line numbers.
 | [DEPL-dSealedTally-6](../builds/dSealedTally/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-04 | THE _decided LOOP EXISTS TWICE and only an arm keeps the copies honest:… |
 | [DEPL-dSettledRoster-1](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | govkit apply appends its eol=lf pins LAST to a target's .gitattributes… |
 | [DEPL-dSettledRoster-2](../builds/dSettledRoster/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | a govkit apply against a kind = "manifest" target runs that target's… |
+| [DEPL-dShippedRelease-32](../builds/dShippedRelease/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |

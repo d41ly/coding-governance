@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-20, the newest record date in this tree (dClosedLoop).
+Dormant: no record dated within 21 days of 2026-10-21, the newest record date in this tree (dBoundRoles).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -13,7 +13,29 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-10-16 | active | 0 |
 | [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | active | 0 |
 | [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 0 |
-| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 17 | 2026-10-20 | active | 0 |
+| [dBoundRoles](builds/dBoundRoles/README.md) | OPEN | d | 2026-10-21 | tooling | 27 | 2026-10-21 | active | 0 |
+| [dCalibratedLens](builds/dCalibratedLens/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
+| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 17 | 2026-10-21 | active | 0 |
+| [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
+| [dDeclaredLoop](builds/dDeclaredLoop/README.md) | OPEN | d | 2026-10-21 | tooling | 35 | 2026-10-21 | active | 0 |
+| [dFairHearing](builds/dFairHearing/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-21 | active | 0 |
+| [dFurnishedOrders](builds/dFurnishedOrders/README.md) | OPEN | d | 2026-10-21 | tooling | 21 | 2026-10-21 | active | 0 |
+| [dGroundRules](builds/dGroundRules/README.md) | OPEN | d | 2026-10-21 | tooling | 12 | 2026-10-21 | active | 0 |
+| [dIndexedDesign](builds/dIndexedDesign/README.md) | OPEN | d | 2026-10-21 | tooling | 17 | 2026-10-21 | active | 0 |
+| [dKeptSession](builds/dKeptSession/README.md) | OPEN | d | 2026-10-21 | kickoff | 29 | 2026-10-21 | active | 0 |
+| [dLinkedLibrary](builds/dLinkedLibrary/README.md) | OPEN | d | 2026-10-21 | tooling | 26 | 2026-10-21 | active | 0 |
+| [dMindYourWords](builds/dMindYourWords/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
+| [dOrderedCharter](builds/dOrderedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 38 | 2026-10-21 | active | 0 |
+| [dPlacedRequest](builds/dPlacedRequest/README.md) | OPEN | d | 2026-10-21 | tooling | 22 | 2026-10-21 | active | 0 |
+| [dRankedPlan](builds/dRankedPlan/README.md) | OPEN | d | 2026-10-21 | tooling | 17 | 2026-10-21 | active | 0 |
+| [dSafePassage](builds/dSafePassage/README.md) | OPEN | d | 2026-10-21 | tooling | 14 | 2026-10-21 | active | 0 |
+| [dScopedBuild](builds/dScopedBuild/README.md) | OPEN | d | 2026-10-21 | tooling | 16 | 2026-10-21 | active | 0 |
+| [dShippedRelease](builds/dShippedRelease/README.md) | OPEN | d | 2026-10-21 | deployer | 32 | 2026-10-21 | active | 0 |
+| [dTendedCadence](builds/dTendedCadence/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-21 | active | 0 |
+| [dTotalRecall](builds/dTotalRecall/README.md) | OPEN | d | 2026-10-21 | tooling | 27 | 2026-10-21 | active | 0 |
+| [dTrueNorth](builds/dTrueNorth/README.md) | OPEN | d | 2026-10-21 | tooling | 7 | 2026-10-21 | active | 0 |
+| [dWellOiledMachine](builds/dWellOiledMachine/README.md) | OPEN | d | 2026-10-21 | tooling | 62 | 2026-10-21 | active | 0 |
+| [dWitnessedBar](builds/dWitnessedBar/README.md) | OPEN | d | 2026-10-21 | tooling | 31 | 2026-10-21 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 | 2026-08-18 | dormant | 0 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 | 2026-07-12 | dormant | 0 |
