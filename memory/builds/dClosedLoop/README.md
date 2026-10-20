@@ -5,7 +5,6 @@ opened: 2026-10-14
 streams: playbook+kickoff+tooling+deployer
 roster: PLAY
 ids: PLAY-dClosedLoop-1
-status: OPEN
 spec-audit: 2026-10-14
 authorized-by: prompt
 ---
@@ -65,18 +64,20 @@ asks, 435 of them unlabelled. The owner's prompt is recorded verbatim under `pro
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-14 · streams playbook+kickoff+tooling+deployer
+**Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-10-14 · streams playbook+kickoff+tooling+deployer
 ids PLAY-dClosedLoop-1
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [2026-10-20-spec-PLAY-dClosedLoop-1](spec/2026-10-20-spec-PLAY-dClosedLoop-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-20 |
 <!-- /gen:build-units -->
 
-Records: 550 bound to this build, across 3 record folder(s).
+Records: 552 bound to this build, across 4 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: 2026-10-20-spec-PLAY-dClosedLoop-1.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: 2026-10-20-spec-PLAY-dClosedLoop-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
