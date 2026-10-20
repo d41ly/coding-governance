@@ -372,6 +372,8 @@
 | [2026-10-20-build-PLAY-dClosedLoop-1-walk-return-c5.md](../build/2026-10-20-build-PLAY-dClosedLoop-1-walk-return-c5.md) | research | — |
 | [2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py](../build/2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-agent-ledger.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-agent-ledger.md) | journal | — |
+| [2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-answers-builder.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-answers-builder.md) | research | — |
+| [2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-answers-writer.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-answers-writer.md) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-packet-name.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-packet-name.md) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-spec.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-spec.md) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md) | research | — |
@@ -539,6 +541,8 @@
 | [2026-10-20-prompt-PLAY-dClosedLoop-1-9-spec-reviewer.md](../prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-9-spec-reviewer.md) | journal | — |
 | [2026-10-21-prompt-PLAY-dClosedLoop-1-1-builder.md](../prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-1-builder.md) | journal | — |
 | [2026-10-21-prompt-PLAY-dClosedLoop-1-2-spec-writer.md](../prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-2-spec-writer.md) | journal | — |
+| [2026-10-21-prompt-PLAY-dClosedLoop-1-3-spec-writer.md](../prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-3-spec-writer.md) | journal | — |
+| [2026-10-21-prompt-PLAY-dClosedLoop-1-4-builder.md](../prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-4-builder.md) | journal | — |
 | [2026-10-15-review-PLAY-dClosedLoop-1-flow-a.md](../reviews/2026-10-15-review-PLAY-dClosedLoop-1-flow-a.md) | spec-audit | — |
 | [2026-10-15-review-PLAY-dClosedLoop-1-flow-b.md](../reviews/2026-10-15-review-PLAY-dClosedLoop-1-flow-b.md) | spec-audit | — |
 | [2026-10-15-review-PLAY-dClosedLoop-1-instruction-a.md](../reviews/2026-10-15-review-PLAY-dClosedLoop-1-instruction-a.md) | spec-audit | — |
