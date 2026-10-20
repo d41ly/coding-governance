@@ -24480,7 +24480,7 @@ CASES.append(("deviations on the tree, since the baseline", [B + "deviations.py"
 CASES.append(("deviations on a clean fixture", [B + "deviations.py", "--fixture"], 0, "findings 0"))
 for p, want, rc in [("clause", "since the baseline: joins no deviation record", 1),
                     ("pass-revision", "after its first pass: joins no deviation record", 1),
-                    ("amended", "AMENDED acceptance line", 1), ("pin", "departing from PLAY-dTrueNorth-2@rev-2", 1),
+                    ("amended", "AMENDED acceptance line", 1), ("pin", "departing from missing:PLAY-dTrueNorth-2@rev-2", 1),
                     ("approver", "needs the spec writer", 1), ("status", "findings 0", 0)]:
     CASES.append((f"deviations --plant {p}", [B + "deviations.py", "--fixture", "--plant", p], rc, want))
 CASES.append(("asbuilt on the tree, at the baseline", [B + "asbuilt.py", "--check"], 0, "findings 0"))

@@ -175,26 +175,26 @@ def fixture(plant):
     records = [
         {"id": "fixture-deviation-1", "path": "fixture", "departs": f"{first}@{old_hash} [chain]", "risk": "stricter",
          "cause": "review finding", "approver": "owner, quoted in the round record", "follow": f"amends {first}@{old_hash}"},
-        {"id": "fixture-deviation-2", "path": "fixture", "departs": "PLAY-dTrueNorth-2@rev-2 [acceptance]",
+        {"id": "fixture-deviation-2", "path": "fixture", "departs": "missing:PLAY-dTrueNorth-2@rev-2 [acceptance]",
          "risk": "additive", "cause": "builder discovery", "approver": "spec writer, re-audited at rev-3",
-         "follow": "new unit PLAY-dTrueNorth-7"},
-        {"id": "fixture-deviation-3", "path": "fixture", "departs": "PLAY-dTrueNorth-4@rev-1 [acceptance]",
+         "follow": "new unit missing:PLAY-dTrueNorth-7"},
+        {"id": "fixture-deviation-3", "path": "fixture", "departs": "missing:PLAY-dTrueNorth-4@rev-1 [acceptance]",
          "risk": "editorial", "cause": "review finding", "approver": "author", "follow": "usage design.coverage"}]
-    revisions = [("PLAY-dTrueNorth-2", 1, False, False), ("PLAY-dTrueNorth-2", 2, False, False),
-                 ("PLAY-dTrueNorth-2", 3, True, False), ("PLAY-dTrueNorth-3", 2, True, True)]
-    amended = [("PLAY-dTrueNorth-4", "fixture-deviation-3")]
+    revisions = [("missing:PLAY-dTrueNorth-2", 1, False, False), ("missing:PLAY-dTrueNorth-2", 2, False, False),
+                 ("missing:PLAY-dTrueNorth-2", 3, True, False), ("missing:PLAY-dTrueNorth-3", 2, True, True)]
+    amended = [("missing:PLAY-dTrueNorth-4", "fixture-deviation-3")]
     if plant == "clause":
         records = records[1:]
     elif plant == "pass-revision":
-        revisions.append(("PLAY-dTrueNorth-5", 2, True, False))
+        revisions.append(("missing:PLAY-dTrueNorth-5", 2, True, False))
     elif plant == "amended":
-        amended.append(("PLAY-dTrueNorth-5", ""))
+        amended.append(("missing:PLAY-dTrueNorth-5", ""))
     elif plant == "pin":
-        records[1]["departs"] = "PLAY-dTrueNorth-2@rev-1 [acceptance]"
+        records[1]["departs"] = "missing:PLAY-dTrueNorth-2@rev-1 [acceptance]"
     elif plant == "approver":
         records[0]["approver"] = "author"   # a stricter change needs the spec writer at least
     elif plant == "status":
-        revisions.append(("PLAY-dTrueNorth-6", 4, True, True))
+        revisions.append(("missing:PLAY-dTrueNorth-6", 4, True, True))
     return v2, now, revisions, amended, records
 
 

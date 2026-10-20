@@ -103,8 +103,8 @@ def fixture(plant):
     _, cid, text, h = base[6]
     records = [{"id": "fixture-deviation-1", "departs": f"{cid}@{h} [chain]", "follow": f"amends {cid}@{h}",
                 "after": text + ", and a planted amendment"},
-               {"id": "fixture-deviation-2", "departs": "PLAY-dTrueNorth-2@rev-2 [acceptance]",
-                "follow": "new unit PLAY-dTrueNorth-7", "after": ""}]
+               {"id": "fixture-deviation-2", "departs": "missing:PLAY-dTrueNorth-2@rev-2 [acceptance]",
+                "follow": "new unit missing:PLAY-dTrueNorth-7", "after": ""}]
     if plant == "no-row":
         records.append({"id": "fixture-deviation-3", "departs": f"{base[8][1]}@{base[8][3]} [chain]",
                         "follow": "gap gap-build-08", "after": "x"})
