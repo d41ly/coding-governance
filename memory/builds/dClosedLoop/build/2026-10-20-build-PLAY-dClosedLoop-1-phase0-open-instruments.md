@@ -439,7 +439,7 @@ so every difference below is a difference of derivation, not of input.
 - Whether a rule's or a slot's words say what the plan means: no arm reads meaning, and the owner reads dTrueNorth's
   README and packet whole (P0.7).
 
-## The owner's opening-read answers
+## The opening-read runs: nine driver builds and the README gap join
 
 Dispatch 247's runs, as its brief asks (`build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-answers-builder.md`):
 answers 3 and 5 of the execution record's `[phase0-answers-2]` applied to `open.py` and the gap join, and the opening
