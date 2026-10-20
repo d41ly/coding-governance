@@ -27760,7 +27760,7 @@ K5: principles 42, clauses 496, retired 0 · findings 0
 rerun design map: rc 0
   map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 303 records, 4894 sections, 231 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 233 records, 4128 sections, 215 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27776,9 +27776,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 120 · lines 42861 · unreviewed 11708 (27%)
+  design records 120 · lines 43263 · unreviewed 12110 (28%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 19
+  design commits after the floor that no closing review covers: 20
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27798,6 +27798,7 @@ rerun review debt: rc 0
     bf51d88ef  11 design record(s)  records(dClosedLoop): the second looks applied, run C's five clause walks back, and its skeptics dispatched
     30be8f40e  5 design record(s)  records(dClosedLoop): run C's four skeptics returned, and run C's synthesis dispatched
     8a81ed8c8  3 design record(s)  records(dClosedLoop): run C scored with runs A and B — the bar still not met, and the owner's word asked again
+    60b794f2b  6 design record(s)  records(dClosedLoop): the owner's word, "Fold, re-measure after" — the seal lifted and the recall read plant b
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -28016,13 +28017,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2755 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1934, derived 321, pending 500
+map: 2659 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
+map: purposes declared 1838, derived 321, pending 500
 map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 303 records, 4895 sections, 231 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 233 records, 4128 sections, 215 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
