@@ -728,3 +728,48 @@ node b's pace swept (makespan; busy share of a, d, b; b's runs):
   b 0.50: 243; a 99% d 76% b 70%; spec dFairHearing 18-30, spec dDeclaredLoop 30-53, spec dPlacedRequest 55-69, spec dBoundRoles 78-95, spec dTotalRecall 95-112, spec dRankedPlan 112-123, spec dFurnishedOrders 123-136, spec dMindYourWords 144-155, spec dShippedRelease 155-175, spec dScopedBuild 175-185, spec dTendedCadence 185-197, spec dCalibratedLens 197-208
   a and d alone: 273
 ```
+
+## Finding 15
+
+The revision record's finding 15 (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision.md`), built from
+`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-brief-carries-2.md` (dispatch 242), its recommended option 1:
+print the notes on the "a and d alone" line. `main()` now binds the notes `run(..., with_b=False)` returns, where it
+bound them to `_`. It appends them to that line in the claims line's own form, `; ` before each. With no note, the
+line is as before.
+
+**Where they ran.**
+- `S` is this dispatch's scratch folder, the `d242` sibling of d237's.
+- `S/plant` is a `--shared` clone of the session's worktree at `bcc416ced`. Its script is the old code, blob
+  `bc733fd33f55`, the blob [setup] names. `N` is the new script, in `S/build`, the linked worktree of a second clone
+  on the branch `p0-carries-2`, run by its absolute path from `S/plant`.
+- `S/driver.py` is d237's driver, copied. Its clone is `S/plant` and its reset base is `bcc416ced`. Its output folder
+  and the script it runs come from `OUT` and `RUN`, and each `.out` header still shows the repo-relative script path,
+  so a before and an after run compare byte for byte.
+- Plants and claims are made only in `S/plant`, as [setup] describes. No fetch, push or `unattended.sh --claims` ran.
+
+| # | Command | Exit | The line that proves it |
+|---|---|---|---|
+| 1 | `git -C S/plant hash-object <script>` | 0 | `bc733fd33f553e6b9ee9709991ae603d3d525522` |
+| 2 | `OUT=S/s-before python S/driver.py plain`, the old code | 0 | `plain: exit 0`, with `makespan 271 units; …` and `  a and d alone: 273` |
+| 3 | `OUT=S/s-before python S/driver.py r01 r02 … r13` | 0 | rows 1 and 5 exit 1, every other case 0. Row 9's last line is `  a and d alone: 273`, with no note: the note absent before |
+| 4 | `cmp` of each `S/s-before/*.out` against d237's own outputs, `d237/out/` in the same scratchpad | 0 each | all 17 identical, so at `bcc416ced` the old code prints what [rows] and [plain] quote |
+| 5 | `OUT=S/s-after RUN=N python S/driver.py plain r01 r02 … r13`, the new code | 0 | every case exits as in rows 2 and 3 |
+| 6 | `cmp` of each `S/s-after/*.out` against `S/s-before`, and `diff` of each that differs | `cmp` 0 for 13, `diff` 1 for 4 | 13 identical. Four differ, each on its "a and d alone" line alone: row 9's reads `  a and d alone: 273; dFairHearing claimed on b, absent from this run: left unpinned`, the note printed after |
+| 7 | the same `diff`, the other three | 1 each | row 4: `  a and d alone: 273; dGroundRules claimed on b, absent from this run: left unpinned`. Row 10: `  a and d alone: 270; dGroundRules claimed on b, absent from this run: left unpinned`. Row 11: `  a and d alone: 270; dGroundRules held off-fleet on c` |
+| 8 | `python S/recordcheck.py <this record> S/s-before`: each row's quoted output lines in [rows], row 9's probe block skipped, looked up in its `.out` | 0 | every row `0 missing`, 66 quoted lines in all |
+| 9 | `python S/recordcheck.py <this record> S/s-after` | 1 | `row 9: 2 blocks, 5 quoted lines, 1 missing`, the line `  a and d alone: 273`. Every other row `0 missing` |
+| 10 | a `python -c` looking up the [plain] block's lines in each `plain.out`, run twice, the second time exiting 1 on any miss | 0 | `s-before 83 lines, 0 missing` and `s-after 83 lines, 0 missing` |
+| 11 | `git add` of the script by name in `S/build`, `git diff --quiet` on it, `git ls-files --eol` | 0 | `i/lf    w/lf    attr/text eol=lf`, the index entry `5aa5421e265b`, no CR byte |
+| 12 | `OUT=S/s-staged RUN=N python S/driver.py plain r01 r02 … r13` | 0 | `cmp` of all 17 outputs against `S/s-after` prints nothing |
+
+**Verdict.**
+- Row 9 now matches the plan's row. "a and d alone" reads 273, from a and d only, and the line carries the note that
+  the claim is absent from that run and left unpinned. The pre-fold red still prints 216.
+- Every line [rows] quotes for rows 1 to 8 and 10 to 13 is unchanged. So is every line of the plain run: makespan 271,
+  and "a and d alone" 273 with no note.
+- Rows 4, 10 and 11 gain a note on their "a and d alone" line, which [rows] does not quote. Rows 4 and 10 hold a claim
+  on node b, absent from that figure as row 9's is. Row 11's off-fleet note repeats the one its claims line prints.
+  The plan's Result cells for those three rows do not speak to that line.
+
+**What this does not check.** The sweep lines and the claims line print the notes of the run with node b, as before.
+Nothing here re-runs the done-rule arms, which do not read the notes.
