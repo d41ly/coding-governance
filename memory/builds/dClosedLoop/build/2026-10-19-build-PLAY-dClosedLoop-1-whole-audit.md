@@ -442,6 +442,63 @@ working copy's bytes, so check it with `git cat-file -p HEAD:<path> | sha256sum`
 - **The re-measure,** before the baseline: a fresh sealed copy, new plants, none whose rule lives only in excluded
   history, and a record-to-clause slice beside the scenario and clause slices, scored against a bar fixed first.
 
+## [fold] The fold, its forks and the owner's answers
+
+The fold ran as six writers, each one script applied in order to a copy and checked there by the build's ten final
+checks (`dry_run.sh` in the session's scratch, recorded in the instruments). Writers 1 to 3 took v2's `[chain]` rows by
+build, writer 4 flow-steps and writer 5 the other records (`fold-brief-w1` to `-w5`). Writer 6 took the requests the
+five listed for one another's records and the reconciliation probe's lines their folds raised (`fold-brief-w6`). Their
+returns are `fold-return-w1` to `-w6`.
+
+- **The main loop's amendments, each a comment in the script it touches:** writer 2's place 68 ranked a fork "under
+  `design.forks`' default", a key of dIndexedDesign, which dBoundRoles does not descend from, so the ranking is stated
+  as the core's own; writers 1 and 4 named the new states differently, so the terminal is `incomplete` and the hold
+  `parked`, since the atlas reads one-word terminals.
+- **The dry run, through writer 6:** nine of the ten checks green; the probe's four remaining lines rest on FK-6-1 and
+  FK-6-2.
+- **The forks:** 35 raised; two pairs merged, FK-1-4 with FK-3-1 and FK-4-12 with FK-5-2; 33 questions
+  asked through the question tool, each recommendation first. The owner answered all 33 on 2026-10-20, and
+  5 chose an option the question did not recommend: FK-1-3, FK-1-5, FK-4-2, FK-4-12 + FK-5-2 (two writers, merged), FK-4-13.
+
+| Fork | Asked | The owner's answer, verbatim |
+|---|---|---|
+| FK-1-1 | Where do the override record and the exception register live, and through which door are they written? | "In the build folder (Recommended)" |
+| FK-1-2 | How are clause ids and a spec's Carries relation typed in the map's closed address and edge sets? | "New id class + edge (Recommended)" |
+| FK-1-3 | Which file is the one declaration of each cap's value? | "budgets.* now" |
+| FK-1-4 + FK-3-1 (two writers, merged) | which values stay for install.retired-edits (order, keep, delete) and install.on-shim-call (warn, journal, refuse)? | "Drop delete and refuse (Recommended)" |
+| FK-1-5 | Where does a patch build's draw on its root's rework budget land once the root has closed? | "Reopen root record" |
+| FK-1-6 | While the card-import fixture is red, which wins: cl-0150's fresh-session rule or resume.context? | "Fixture wins (Recommended)" |
+| FK-1-7 | A retry from a new session must be refused as a duplicate. Does a message's id keep its sender's session? | "Drop the session (Recommended)" |
+| FK-2-1 | Does the landing push release the build's lease, or does the lease live until deploy.unlease? | "Live until unlease (Recommended)" |
+| FK-2-2 | Which clock corrects a lease holder's stamp, who measures the offset, and how do the two expiry rules combine? | "Supervisor, 'or' (Recommended)" |
+| FK-2-3 | How do the event-wait sweep and the landing's release arms run before dShippedRelease lands? | "Generic sweep, arms move (Recommended)" |
+| FK-2-4 | How does lease expiry tell a fence beat from a renewal? | "Beats mark renewal (Recommended)" |
+| FK-3-2 | roles.model.<role> holds one model, but a role may run on several harnesses. How does the key fit? | "Per-harness key (Recommended)" |
+| FK-3-3 | design.streams is both the planner's item and a policy key. Rename the key? | "Rename to design.streams-when (Recommended)" |
+| FK-4-1 | Does run.on-owner-question decide an owner item that attendance raises at the moment it is raised, and where does a late answer go? | "Hold, then amend (Recommended)" |
+| FK-4-2 | Can best-effort-recorded fill your landing gate and design gate under three-gates and every-stage? | "Yes, as LR-3 reads" |
+| FK-4-3 | What do deps.on-parent-withdrawn's adopt-parent-work and withdraw-too do? | "Inventory + owner item (Recommended)" |
+| FK-4-4 | How does your mid-build "audit the specs" reach review.trigger? | "Placement disposition (Recommended)" |
+| FK-4-5 | Where does a loop's open work go past flow.route-backs, and which bound wins against review.max-rounds? | "Units, then exhaustion (Recommended)" |
+| FK-4-6 | What happens to a decision candidate the two raters disagree on? | "Stays reconstructed (Recommended)" |
+| FK-4-7 | Does landing.order order landings across nodes? | "Yes, landing-turn ref (Recommended)" |
+| FK-4-8 | What does deploy.distill do before dScopedBuild's build.distill writes any rows? | "Unarmed (Recommended)" |
+| FK-4-9 | Where are the interim stand-ins for routes into later builds declared? | "Rules bullet + rows (Recommended)" |
+| FK-4-10 | What is a paused build's deadline, and what happens when it passes? | "Wait, then owner item (Recommended)" |
+| FK-4-11 | What puts a leg into quarantine under verdict.flakes? | "Split the key (Recommended)" |
+| FK-4-12 + FK-5-2 (two writers, merged) | who writes the seen-red record that test.seen-red reads? | "build.acceptance" |
+| FK-4-13 | How does a best-effort descope remove a failing unit that is already in Test's tree? | "Revert row, no draw" |
+| FK-5-1 | kits.install and kits.update each have two actors. How do they split, and what closes their outcomes? | "Command + attended items (Recommended)" |
+| FK-5-3 | How is a mail, lease or tombstone write bound to the identity it names? | "Refuse at record's door (Recommended)" |
+| FK-5-4 | Who answers a mailbox question addressed to a build that runs unattended? | "A flow item (Recommended)" |
+| FK-5-5 | What do maintain.tiers: bands and maintain.on-breach's red-leg and report do? | "Declared edges (Recommended)" |
+| FK-5-6 | How is environment E's promotion lease declared, and how is a stale holder's promote or rollback fenced? | "Cadence lease + CAS (Recommended)" |
+| FK-6-2 | Which build owns patch.ratify, now that entry.claim reads it for every patch, and what stands in before it lands? | "Move to dPlacedRequest (Recommended)" |
+| FK-6-1 | Before dPlacedRequest lands leases.offline, what does dFairHearing's review.report do when the remote is unreachable at a new: slug's claim? | "Refuse (Recommended)" |
+
+The answers are folded by two writers in parallel, after the six (`fold-brief-w7`, `-w8`). A new clause carries a
+placeholder id, and the main loop's mint step numbers them on from `[clause-ids]`' next free id.
+
 ## [stage0-classes] Stage 0's classes
 
 Empty until the audit's fold classes what it does not fix.
