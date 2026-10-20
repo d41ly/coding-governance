@@ -162,3 +162,125 @@ wrong; it states each as a question in its `[defaults]`.
 leaves `build-complete` unmet and its build "is a `--handoff` under `owner-decision`, never an override"
 (`memory/guides/UNATTENDED-VERBS.md`, rule 9 of the close). D6's recommended option uses the code's admission against
 the guide's rule, on an owner ruling. Whether the bar's unattended leg reds that override is unread.
+
+## [answers-2]
+
+The plan's open choices, asked in three sets on 2026-10-20 after the plan landed (`execution-plan.md` `[defaults]`).
+Each is given with the options offered and the owner's answer verbatim. One answer came back as a question, and the
+main loop's reply is recorded beside it.
+
+**Set 1.**
+
+1. "A build's owned nodes are keys, and a may: grant takes only a decision id or a file path, so grants can't come
+   from owned nodes. What should each build's may: grant be?"
+   - "One decision row (Recommended)": one decision row, landed with the opening, grants each chain build the
+     governance-carrier and public-surface changes its own `[chain]` clauses name; all 22 `may:` lines cite it.
+   - "Paths from its clauses": the file paths among each build's own clause text, 49 in all; 9 builds get none.
+   - "Paths typed per build": the opening's author types each build's paths, and the owner reviews all 22 lines.
+
+   The owner: "One decision row (Recommended)".
+2. "Your deviation answer departs from clause cl-0004, which fixes dTrueNorth's interim deviation check to the
+   by-risk table and fails an approver below the risk. Which holds for the chain?"
+   - "A deviation, your values (Recommended)": a deviation the owner approves, quoting the answer, so the interim
+     check reads `report` and `author-recorded` for the chain.
+   - "Build it as written": the check keeps the by-risk table, and a loosening departure fails the bar until the owner
+     approves it.
+
+   The owner: "A deviation, your values (Recommended)".
+3. "When a spec run's audit or review confirms a finding, the finding becomes a new unit, and the carry-forward close
+   refuses new units. How does such a run end?"
+   - "Override, your ruling (Recommended)": a standing ruling lets it close with `--override build-complete`.
+   - "Hand off to you": the run hands off for the owner's decision.
+   - "Spec run builds them": the spec run builds its added units itself.
+
+   The owner: "Why does carry-forward close refuses new units? It should not refuse any new units that come from the
+   reviews (either spec or closing diff), that sounds like a bug."
+
+   The main loop's reply, as given:
+   - It is not a bug in the code. It is the deliberate edge of M4's severity rule, ruled for diffs on 2026-10-04 and
+     for specs on 2026-10-05: every confirmed review finding is promoted to a unit and built, and none is parked or
+     waived.
+   - The carry-forward term's second condition enforces the rule by refusing to defer a unit the run itself added. Its
+     comment cites M4 (`tools/unattended/unattended.sh`, `check_carry_forward`;
+     `memory/guides/BUILD-METHOD.md` M4).
+   - That rule assumed one run that specs and builds. The split lands the spec run before anything is built, so its
+     promoted units hit a rule written for a run that could have built them.
+   - Carrying them to the same build's build run keeps M4's intent, as long as the build run must build them and
+     cannot defer them again.
+   - The fix is one condition: a spec run may carry a review-promoted unit forward to its own build run, once. That is
+     product code in the unattended kit, so it needs a home. Question 5 asks where.
+4. "At Pro pace the schedule gives node b six spec runs and no build run, though you asked for spec and build. What
+   should b get?"
+   - "Measure, then assign (Recommended)": the pilot measures b's pace, and b gets whatever build runs its slack
+     allows.
+   - "Reserve one build now": pin dRankedPlan's build run (slack 33) to b now.
+   - "Spec runs only": b takes spec runs only.
+
+   The owner: "Spec runs only".
+
+**Set 2.**
+
+5. "The fix is one condition in the unattended kit: a spec run may carry a review-promoted unit forward to its own
+   build run, once. Where does that product code go?"
+   - "dTrueNorth's extra unit (Recommended)": dTrueNorth runs as one whole run, spec and build together, and adds the
+     fix as one unit, a departure from v2 the owner approves.
+   - "dClosedLoop fixes it first": Phase 0 takes one product-code unit, lifting dClosedLoop's no-product-code line
+     for it.
+   - "Override until fixed": spec runs close with `--override build-complete` under a standing ruling until a chain
+     build fixes the condition.
+
+   The owner: "dTrueNorth's extra unit (Recommended)".
+6. "Three kinds of fork still park under today's driver: one whose options all widen a security, data or write
+   surface, one with no surviving option, and one the build's goal can't survive. Until dOrderedCharter's decision
+   principles land, what happens to such a unit?"
+   - "Carry it forward (Recommended)": the build lands without that unit, the owner rules, and a later run builds it.
+   - "Standing ruling": the run takes the most capable option that fails only the security veto or the goal bound,
+     recorded as a departure; nothing waits on the owner, but a security surface may widen unreviewed.
+
+   The owner: "Standing ruling".
+7. "dDeclaredLoop, dPlacedRequest and dWellOiledMachine rewrite the driver they run under. How do their build runs
+   finish?"
+   - "Land through new code (Recommended)": driver-touching units go last, and the build lands through its own new
+     code; the owner lands it only if that code refuses.
+   - "Always hand off": these three always end with a hand-off for the owner to land.
+   - "Run them attended": their build runs are attended sessions.
+
+   The owner: "Land through new code (Recommended)".
+8. "The report setting lets a departure land even when the run never wrote a record for it, but you said departures
+   are recorded. Which applies?"
+   - "Report, as read (Recommended)": the comparison lists every departure it finds, a step before the close gives
+     each a record, and the end report shows any left unrecorded.
+   - "Refuse until recorded": the close refuses until every departure has a record, which only the run need write.
+
+   The owner: "Report, as read (Recommended)".
+
+**Set 3.**
+
+9. "dPlacedRequest moves run claims onto leases while other nodes have runs live. How is that made safe?"
+   - "Test in its spec (Recommended)": its spec carries a test that a live claim on another node survives the
+     migration, with a drain as the fallback.
+   - "Drain first": no other chain run may be live or held when its build run reaches the migrating unit.
+
+   The owner: "Test in its spec (Recommended)".
+10. "Today only your /unattended <slug> starts a run, and the plan needs 44 starts at 38 moments. Who starts each run?"
+    - "You type it (Recommended)": the owner types `/unattended <slug>` on the node the schedule names.
+    - "Node session, standing ruling": each node's attended session starts the run, under a standing ruling.
+    - "Scheduled task": a scheduled task on each node starts the next run; nothing like it exists today.
+
+    The owner: "You type it (Recommended)".
+
+**Not asked, carried as the plan recommends, for the owner's walk:**
+- R6: `design.coverage` stays `refuse`, since the run always clears a coverage red itself.
+- D3: dTrueNorth's product comparison absorbs the instruments' planted cases as its acceptance.
+- D5: after the chain, the two deviation keys return to `standard`'s `refuse` and `by-risk`.
+- D8: the opening mints every roster id and carry-forward ask, which the carry-forward rules force.
+
+**What the answers change in the plan.**
+- The grants become one decision row that every chain README's `may:` cites.
+- The departure from `cl-dClosedLoop-0004` is a deviation the owner approves, quoting answer 3 of `[answers]`.
+- dTrueNorth runs as one whole run and carries one more unit: the carry-forward condition for review-promoted units,
+  a departure from v2 the owner approved. Every later spec run closes with it.
+- Node b takes spec runs only.
+- Residual forks follow the standing ruling, each choice recorded as a departure. A choice that widens a security,
+  data or write surface is listed first in its build's departures report.
+- D1, D2, D4 and R3 stand as recommended.
