@@ -340,3 +340,43 @@ comes from the roster's first row.
 
 The remaining classes concern heredocs, fences, table cells split on a pipe, ledgers, merge ranges and owner items.
 None of them applies here.
+
+**7. `bare-ids.py` pinned** (the main loop's follow-up, after its merge `82cd88009`). This closes the second bullet of
+item 6: a run that edited `bare-ids.py`'s reader used to move no pin. The worktree was fast-forwarded onto
+`82cd88009`, whose tree is `e5402134d`'s, and the change is committed as `b200f3c2d`, giving `packet.py` blob
+`1a8159416`. `INSTRUMENTS` gains `build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` as its last entry, so the
+indexed loads (`INSTRUMENTS[0]`, `[2]` and `[4]`) keep their meaning, and field 1 of the docstring names it. Every
+command ran from a tree's root with `python -B`, under a bounded timeout. On 2026-10-21 `--write` names
+`<packet>` `memory/builds/dTrueNorth/prompts/2026-10-21-prompt-<unit 1>-packet.md`.
+
+- `d243/runs.py` at `b200f3c2d`, compared with item 1's log at `93c1d481d`, whose two blobs `82cd88009` carries: all
+  17 commands keep their exits and finding lines. The two logs differ only on the 10 summary lines that count the
+  pin arm's instruments, each now "pin arm 7 instruments" where it read 6. With that count replaced, `diff` exits 0.
+  The fixture's `--plant pin` and its controls still move `carries.py`, so the fixture never moves `bare-ids.py`'s
+  pin; the run below does.
+- The pin arm's plant on `bare-ids.py`, run by `d243/pin_plant.py` in a fresh worktree at `82cd88009` (the old code)
+  and in one at `b200f3c2d`. First, a minimal untracked `memory/builds/dTrueNorth/README.md`; then
+  `packet.py --write dTrueNorth --unit missing:TOOL-dTrueNorth-1`, exit 0 on both, "packet: wrote <packet>"; then
+  `--check dTrueNorth`, exit 0 on both. The old packet holds 6 instrument pins, none of them `bare-ids.py`. The new
+  packet holds 7, one being "- instrument: `…-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`". Then
+  one byte, a `#` after the last line, was added to `bare-ids.py` and committed (scratch: `68424be03` on the old
+  code, `a2ceb8f35` on the new). `git diff --numstat` gives "1 0", and the blob moves from `ea671312d296` to
+  `ae0327ae8b7d`.
+
+| Command | Old code | New code |
+|---|---|---|
+| `packet.py --check dTrueNorth` | exit 0, "byte compare green · completeness 0 findings over clauses 6, gaps 3, parents 1, owed 0, roster 0, asks 0 · pin arm 6 instruments, 0 findings": the edit moves no pin | exit 1, "byte compare green · completeness 0 findings over clauses 6, gaps 3, parents 1, owed 0, roster 0, asks 0 · pin arm 7 instruments, 1 findings" and "pin arm: instrument memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py moved: pinned ea671312d296, HEAD holds ae0327ae8b7d" |
+| `packet.py --write dTrueNorth`, the pin-keeping re-render | exit 0, "<packet> is current, nothing written" | exit 0, the same |
+| `packet.py --check dTrueNorth` | exit 0, the same line as above | exit 1, the same two lines as above: the re-render kept the pin |
+| `packet.py --repin bare-ids.py` | exit 1, "refused: --repin bare-ids.py names 0 of the instruments: …" | exit 0, "packet: dTrueNorth · memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py pinned ea671312d296 -> ae0327ae8b7d · <packet>" |
+| `packet.py --check dTrueNorth` | exit 0, the same line as above | exit 0, "… pin arm 7 instruments, 0 findings" |
+
+- The checklist over `b200f3c2d`: `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` exits 0 with the same
+  16 classes as above. Three were checked:
+  - **A synthetic value standing in.** The plant is a real one-byte commit, read through `git rev-parse HEAD:<path>`
+    as the pin arm reads it. It is not the blob the fixture derives.
+  - **A fixture that passes by finding nothing.** The fixture's pin plant leaves `bare-ids.py`'s pin unmoved, as the
+    first bullet says.
+  - **An amendment that leaves its other half standing.** This item names item 6's bullet it closes. A
+    `grep -rn` over `build/*.py` for a typed count of the instruments ("6 instruments", "five instruments" and the
+    like) finds none. `INSTRUMENTS` has no reader outside `packet.py`, since `deviations.py` keeps its own list.
