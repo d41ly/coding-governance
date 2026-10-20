@@ -3297,6 +3297,16 @@ The execution plan's fold review, dispatches 226 and 227, derived from each run 
 - 2026-10-20, session 1799cb98: the owner asked: "Render the handoff as a suggested task". Prompt 59 is offered
   as a suggested task whose session first moves its fresh branch onto this one (`execution.md` `[handoff]`).
 
+- 2026-10-20 to 2026-10-21, session 1cef2554: Phase 0 ran on node d from prompt 59, on `branch/unruffled-aryabhata-d89ede`
+  off main `7efaa3d69`, through dispatches 234 to 245. P0.6, P0.1 to P0.5 and P0.8 built; dispatch 234 handed P0.1
+  and P0.2 back, dispatch 238 verified fifteen findings (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision.md`),
+  and the owner answered four questions (`execution.md` `[phase0-answers]`), after which the plan was revised
+  (dispatch 240) and P0.1 and P0.2 rebuilt (241). The opening, `b50573ef4`, opened all 22 builds with
+  `PLAY-dClosedLoop-2` to `-10`; hygiene check 21 then renamed every packet (`738dca981`) and check 27 reworded the
+  rows (`8b51c299e`). P0.7's checks and red tests: `build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md`.
+  P0.9 on node d: `build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-nodes.md`. The full bar at `5a891e8d8` is red
+  on one leg, spec tokens' size arm, since the spec's H1 fix binds its records; raised with the owner.
+
 ## Instruments
 
 ### The gap-ownership join

@@ -96,6 +96,30 @@ open: summary of the 22 chain builds, read from the files the opening wrote, ope
 | dConvergedCharter | Convergence | dScopedBuild dShippedRelease dCalibratedLens dMindYourWords | 23 | PLAY · playbook | PLAY-dConvergedCharter-24 | 33961 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-17 | present, bound |
 ````
 
+## [bar]
+
+The full bar, `bash tools/run-gates/run-gates.sh`, on the quiescent tree at `5a891e8d8`, 2026-10-21: exit 1, one leg
+red. The leg is spec tokens' size arm: the unit spec's H1 took the form a unit's H1 takes in rev-2, so the build index
+binds every record that serves it into the spec's `gen:spec-records` region, and the spec passes the 49152-byte
+ceiling. The escape is a row in `tools/template-size-highwater.txt`, a routed product path Phase 0 does not write, so
+it is raised with the owner. The four skips are leg guards, unchanged against main. The bar's summary lines:
+
+````text
+---- chunk records: green  (4 ran, 0 failed, 0 skipped, 0 reused, 0 held)
+---- chunk product: green  (19 ran, 0 failed, 0 skipped, 0 reused, 0 held)
+---- chunk selftests: skipped  (0 ran, 0 failed, 0 skipped, 0 reused, 68 held)
+GATE skip  kit/dogfood doc parity  (unchanged vs main)
+GATE skip  codebase-map gate coverage  (unchanged vs main)
+GATE skip  transition-audit arms  (unchanged vs main)
+GATE skip  govkit refusal join  (unchanged vs main)
+GATE FAIL  spec tokens (a spec's own names resolve)  (exit 1)
+---- chunk declarations: RED  (33 ran, 1 failed, 4 skipped, 0 reused, 0 held)
+---- chunk wiring: green  (11 ran, 0 failed, 0 skipped, 0 reused, 1 held)
+---- chunk e2e: skipped  (0 ran, 0 failed, 0 skipped, 0 reused, 2 held)
+gates RED — 1/67 legs failed (4 skipped) (71 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)
+spec-tokens: memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md [size] `size <- memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md` — 117455 bytes, 68303 over the spec ceiling 49152; split the spec or move history out of it
+````
+
 ## [instrument]
 
 `redtests.sh <worktree> <scratch dir> <opening's parent>`, verbatim:
