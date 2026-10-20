@@ -2,7 +2,7 @@
 
 **Serves:** research PLAY-dClosedLoop-1
 
-The handoff for dispatch 238 renders from this brief record, through `handoff.py render --role gov-builder`, with this
+The handoff for dispatch 239 renders from this brief record, through `handoff.py render --role gov-builder`, with this
 file as its `input:spec`. Phase 0 is the unit's remaining work, S4 of `spec/2026-10-20-spec-PLAY-dClosedLoop-1.md`,
 and the owner approved it (`build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md` `[walk]`, `[handoff]`).
 
@@ -37,7 +37,7 @@ clone; the opening itself is NOT committed by this unit (the main loop commits i
    `memory/builds/dAlignedCarrier/`), and the readme-contract file's own header.
 3. **Ids, fixed for Phase 0.** Each chain build's roster ids are `<FAMILY>-<slug>-1` to `-<n>` in clause order, the
    family derived by P0.5's rule (PLAY, KICK, DEPL or TOOL); dTrueNorth's seventh row, its extra unit, is
-   `TOOL-dTrueNorth-7` if its derived family is TOOL, carrying `**Derived:** PLAY-dClosedLoop-2`. Each carry-forward
+   `missing:TOOL-dTrueNorth-7` if its derived family is TOOL, carrying `**Derived:** PLAY-dClosedLoop-2`. Each carry-forward
    ask takes the build's next id after its roster. dClosedLoop's decision rows are `PLAY-dClosedLoop-2` (P0.8 row 1)
    to `PLAY-dClosedLoop-10` (row 9), the grant being `PLAY-dClosedLoop-3`; every `may:` line cites
    `PLAY-dClosedLoop-3`, and dTrueNorth's also `PLAY-dClosedLoop-2`. dClosedLoop's clean-reading asks are
@@ -85,4 +85,4 @@ before naming a new function. The pre-commit hook still fires on your commits; g
 - No decision row, no product code, no unit spec of a chain build.
 - No merge, no push, no rebase onto another branch.
 - Write Python to files, never through a heredoc. Commits end with `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`.
-- Scratch work goes under `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d238/` only; never delete anything outside it.
+- Scratch work goes under `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d239/` only; never delete anything outside it.
