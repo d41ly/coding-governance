@@ -19,9 +19,12 @@ INPUTS, all read at --ref except the claim cache:
   - the run claims `unattended.sh --claims` last cached under `refs/gov/remote/runs/<slug>` (no fetch is made here),
     `tools/playbook/fleet.toml` to turn a claim's `node:` user into a fleet tag, and `RESUME_STALE_BOUND` from
     `.unattended.conf`. A `held` claim, or a `live` one whose `beat-utc` is within the bound, pins that build's next
-    phase to the claim's node from time 0. A `live` claim past the bound is reported stale and left unpinned, for a
-    take-over. A claim on a node outside the three keeps its run off every node's table (held off-fleet), and a
-    claim on a SPEC_ONLY node pins only a spec run.
+    phase to the claim's node from time 0, and so does a `live` claim whose `beat-utc` cannot be read, printed
+    "beat unreadable on <node>: kept pinned", since the driver refuses a second driver over it (STOPS 7). A `live`
+    claim past the bound is reported stale and left unpinned, and its run is marked "take over (stale)" in its table
+    cell and its first-wave line, never offered as a fresh start. A claim on a node outside the three keeps its run
+    off every node's table (held off-fleet); a claim on a SPEC_ONLY node pins only a spec run; and a claim on one of
+    the three nodes that the current figure leaves out (node b in "a and d alone") is left unpinned and printed.
   - two facts no file above holds, declared here from the owner's answers: dTrueNorth runs as ONE whole run and
     carries one unit more than its v2 row, the carry-forward condition for any unit a spec run adds, from a review or
     a discovery (WHOLE, EXTRA: `[answers-2]` item 5, widened by `[answers-3]` item 1); and node b takes spec runs
@@ -135,7 +138,7 @@ def claims(ref, names):
     if not bound:
         sys.exit("schedule: .unattended.conf declares no RESUME_STALE_BOUND, so a live claim's age cannot be read")
     now = datetime.datetime.now(datetime.timezone.utc)
-    held, other = {}, []
+    held, other, stale = {}, [], set()
     for ln in git("for-each-ref", "--format=%(refname)", "refs/gov/remote/runs/").split():
         slug = ln.rsplit("/", 1)[1]
         if slug not in names:
@@ -154,11 +157,13 @@ def claims(ref, names):
                     tzinfo=datetime.timezone.utc)
             except ValueError:
                 beat = None            # an unreadable beat refuses a second driver (STOPS 7), so it stays pinned
+                other.append(f"{slug} beat unreadable on {n}: kept pinned")
             if beat is not None and (now - beat).total_seconds() > int(bound.group(1)):
                 other.append(f"{slug} stale on {n}: take over per [coordination]")
+                stale.add(slug)
                 continue
         held[slug] = (n, msg["status"])
-    return held, other
+    return held, other, stale
 
 
 def graph(names, parents, ids, state, s):
@@ -264,7 +269,10 @@ def run(names, parents, ids, state, held, s, pace, with_b=True):
         t = ("build", b) if state[b][0] or b in WHOLE else ("spec", b)
         if t not in T:
             continue
-        if n not in speed:                  # an off-fleet holder: its run stays off every node's table
+        if n in NODES and n not in speed:   # a fleet node this figure leaves out: never a hidden pace
+            notes.append(f"{b} claimed on {n}, absent from this run: left unpinned")
+            continue
+        if n not in NODES:                  # an off-fleet holder: its run stays off every node's table
             speed[n] = 1.0
             pinned[t] = n
             notes.append(f"{b} held off-fleet on {n}")
@@ -288,7 +296,8 @@ def main():
     a = ap.parse_args()
     names, stage, parents, ids, rows = chain(a.ref)
     state = tree_state(a.ref, ids)
-    held, other = claims(a.ref, names)
+    held, other, stale = claims(a.ref, names)
+    takeover = {("build", b) if state[b][0] or b in WHOLE else ("spec", b) for b in stale}
     T, start, fin, where, speed, notes = run(names, parents, ids, state, held, a.s, a.b)
     bl, slack, span = float_of(T)
     mk = max(fin.values(), default=0.0)
@@ -315,7 +324,10 @@ def main():
     def cell(t):
         if t[0] == "spec" and t[1] in WHOLE:
             return "one whole run, in the next column"
-        return "done" if t not in T else f"{where[t]} {start[t]:.0f}-{fin[t]:.0f}, slack {slack[t]:.0f}"
+        if t not in T:
+            return "done"
+        return f"{where[t]} {start[t]:.0f}-{fin[t]:.0f}, slack {slack[t]:.0f}" + (", take over (stale)" if t in takeover
+                                                                                 else "")
     for b in sorted(names, key=lambda b: (start.get(("build", b), -1), b)):
         print(f"| {b} | {stage[b]} | {', '.join(parents[b]) or 'dClosedLoop'} | {len(ids[b]) + EXTRA.get(b, 0)} | "
               f"{cell(('spec', b))} | {cell(('build', b))} |")
@@ -330,7 +342,8 @@ def main():
     print("first wave, each node's first run:")
     for n in speed:
         mine = sorted((t for t in T if where[t] == n), key=lambda t: start[t])
-        print(f"  {n}: " + (f"{kind(mine[0])} {mine[0][1]} at {start[mine[0]]:.0f}" if mine else "no run"))
+        print(f"  {n}: " + (f"{kind(mine[0])} {mine[0][1]} at {start[mine[0]]:.0f}"
+                            + (", take over (stale)" if mine[0] in takeover else "") if mine else "no run"))
     print()
     order = sorted(T, key=lambda t: (start[t], t))
     print(f"runs the owner starts, {len(order)}, at {len({round(start[t]) for t in order})} distinct times, "

@@ -290,7 +290,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 226 | `tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The execution plan's fold review: `fde10e6be` over `8d33694d7`, the first pair's 36 folds and the owner's two fork answers | the args, built by `build_args_fold_review.py` | 1799cb98 | returned as `wf_13a913fe-7dc`, CLEAN WITH FIXES, raw=28 confirmed=25 refuted=3 unverified=0 blocker=0 high=3 medium=21 low=1 | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-execution-fold-a.md` |
 | 227 | `tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The execution plan's fold review: `fde10e6be` over `8d33694d7`, the first pair's 36 folds and the owner's two fork answers | the args, built by `build_args_fold_review.py` | 1799cb98 | returned as `wf_06650e2e-9f6`, CLEAN WITH FIXES, raw=25 confirmed=25 refuted=0 unverified=0 blocker=0 high=3 medium=20 low=2 | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-execution-fold-b.md` |
 | 228 | gov-synthesizer, at its definition's high effort | The execution plan's fold review compared: every finding of runs A and B placed on its defect, each defect's disposition and the fold plan | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-58-synthesizer.md` | 1799cb98 | returned, 5m19s, 34.4k out: the comparison record: 24 defects, 22 fold (7 by run B's skeptics' corrected fixes), no fork, 2 no fold (refuted, run A alone); compare_rounds.py's numbers in its [summary] | `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-fold-reviews-compared.md` |
-| 229 | gov-spec-writer, at its definition's high effort, resumed | The execution plan's writer resumed: the fold review's 22 fold rows applied to the plan and the schedule script | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-56-spec-writer.md` | 1799cb98 | dispatched | `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md` |
+| 229 | gov-spec-writer, at its definition's high effort, resumed | The execution plan's writer resumed: the fold review's 22 fold rows applied to the plan and the schedule script | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-56-spec-writer.md` | 1799cb98 | returned, 2h36m, 366.2k out: the fold review's 22 rows folded into the plan (126.3 KB), the four highs first; the sweep found and fixed four leftovers; the schedule script's three claim cases seen on the old code, its output unchanged; open: the pin guarded only by the owner's landing-diff check, five owner-asked report-switch landings | `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -3259,6 +3259,12 @@ The execution plan's fold review, dispatches 226 and 227, derived from each run 
   overlap of 0.45 and about 3 found by neither, against about 13 after the first pair. A spec run is now one
   whose build's backlog holds an open ask at its baseline, so dTrueNorth's whole run never qualifies. The plan's
   writer folds the 22 (dispatch 229).
+
+- 2026-10-20, session 1799cb98: the fold pair's 22 rows folded (dispatch 229). The packet's pin gains its own
+  check arm and an owner-only re-pin, and the plan no longer claims the pin holds against a run. A spec run must
+  have an open ask, so dTrueNorth's whole run is never one. The departures report reads the run's own range from
+  the prepared merge's first parent. Each instrument's report switch lands as its own owner-asked dClosedLoop
+  step. The schedule's output is unchanged. The plan goes to the owner for approval.
 
 ## Instruments
 
