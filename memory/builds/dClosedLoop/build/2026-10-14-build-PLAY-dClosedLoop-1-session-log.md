@@ -286,6 +286,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 222 | `tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The execution plan's paired review: `d82cee1a2` over `4592ab001`, the execution research, the owner's answers and the plan with every answer folded | the args, built by `build_args_plan_review.py` | 1799cb98 | returned as `wf_90c57682-307`, CLEAN WITH FIXES, raw=35 confirmed=31 refuted=4 unverified=0 blocker=0 high=3 medium=15 low=13 | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-execution-plan-a.md` |
 | 223 | `tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The execution plan's paired review: `d82cee1a2` over `4592ab001`, the execution research, the owner's answers and the plan with every answer folded | the args, built by `build_args_plan_review.py` | 1799cb98 | returned as `wf_81bf7db4-c19`, BLOCKED, raw=29 confirmed=27 refuted=2 unverified=0 blocker=0 high=2 medium=14 low=11 | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-execution-plan-b.md` |
 | 224 | gov-synthesizer, at its definition's high effort | The execution plan's paired review compared: every finding of runs A and B placed on its defect, each defect's disposition and the fold plan | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-57-synthesizer.md` | 1799cb98 | returned, 6m32s, 43.3k out: the comparison record: 39 defects, 36 fold (5 by run B's skeptic's corrected fix), 2 forks (an ungranted veto-2 fork; when each deviation key's chain value lands), 1 no fold; compare_rounds.py's numbers in its [summary]: 38 confirmed, overlap 0.32, about 13 found by neither | `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan-reviews-compared.md` |
+| 225 | gov-spec-writer, at its definition's high effort, resumed | The execution plan's writer resumed: the paired review's 36 folds and the owner's two fork answers applied to the plan | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-56-spec-writer.md` | 1799cb98 | dispatched | `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -3183,6 +3184,12 @@ The execution plan's paired review, dispatches 222 and 223, derived from each ru
   overlap of 0.32 and about 13 found by neither. Run B's blocking defect folds into dTrueNorth's extra unit: an
   empty generated roster falls back to the authored roster. The two forks are an ungranted veto-2 fork, and when
   each deviation key's chain value lands.
+
+- 2026-10-20, session 1799cb98: the owner answered the comparison's two forks and the next step, all three as
+  recommended. An ungranted veto-2 fork falls to the standing ruling, marked `widens:` and listed first. Each
+  build that adds a deviation key sets its chain value in its own landing. The fold is reviewed by a further
+  pair before approval. The plan's writer folds the comparison's 36 rows and the two answers (dispatch 225;
+  `execution.md` `[review]`, `[answers-4]`).
 
 ## Instruments
 

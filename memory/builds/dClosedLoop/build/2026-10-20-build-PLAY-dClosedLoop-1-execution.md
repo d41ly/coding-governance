@@ -361,3 +361,44 @@ the only ranking.
 
 The schedule model is unaffected. The main loop re-ran the script, and its output is byte-identical to the plan's
 `[schedule]`. The plan now goes to the paired review.
+
+## [review]
+
+The paired review ran one run after the other over `d82cee1a2` against `4592ab001`. Run A
+(`reviews/2026-10-20-review-PLAY-dClosedLoop-1-execution-plan-a.md`) reads CLEAN WITH FIXES. Run B (`-b.md`) reads
+BLOCKED.
+
+The comparison record is `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan-reviews-compared.md`. It finds 39
+defects: 36 fold, 2 forks and 1 no fold. compare_rounds.py reads 38 confirmed, an overlap of 0.32 and about 13 found
+by neither.
+
+## [answers-4]
+
+The comparison's two forks and the next step, asked on 2026-10-20, with the options offered and the owner's answers
+verbatim.
+
+1. "A fork can be left with options that all trip veto 2 outside the grant: a new external dependency or install
+   location, or a governance-carrier or public-surface change the build's own clauses don't name. Does it park, or
+   does your standing ruling take it?"
+   - "Standing ruling takes it (Recommended)": rung 5 takes the most capable such option, recorded as a departure
+     marked `widens:`, and the departures report lists it first.
+   - "It parks": it parks as the build method has it, and that build waits on the owner.
+   - "Ask me, unit waits": each such fork comes to the owner while its one unit waits.
+
+   The owner: "Standing ruling takes it (Recommended)".
+2. "The two deviation keys go live at by-risk and refuse in the landing that adds them (dDeclaredLoop's and
+   dScopedBuild's), before the chain's values are set. Who sets report and author-recorded, and when?"
+   - "The adding build (Recommended)": each build that adds a key sets the chain's value in its own landing, carried by
+     its spec under the owner's approval row and recorded as a departure.
+   - "You, before landing": the owner sets the value through the guarded command on that build's branch before it
+     lands.
+
+   The owner: "The adding build (Recommended)".
+3. "About 13 defects are likely still unfound, and fold text is new, unreviewed surface: last time, 42 of 62 round-2
+   findings came from the round-1 fold. After the fold, what happens?"
+   - "Review the fold, then approve (Recommended)": one more paired review over the fold's commit only, compared and
+     folded, then the owner's approval.
+   - "Review it once": a single Tier-2 review of the fold.
+   - "Approve after the fold": no further review.
+
+   The owner: "Review the fold, then approve (Recommended)".
