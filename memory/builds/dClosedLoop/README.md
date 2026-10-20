@@ -74,7 +74,7 @@ ids PLAY-dClosedLoop-16 PLAY-dClosedLoop-17
 | [2026-10-20-spec-PLAY-dClosedLoop-1](spec/2026-10-20-spec-PLAY-dClosedLoop-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-20 |
 <!-- /gen:build-units -->
 
-Records: 584 bound to this build, across 4 record folder(s).
+Records: 586 bound to this build, across 4 record folder(s).
 
 Ids no record names: 2026-10-20-spec-PLAY-dClosedLoop-1.
 
