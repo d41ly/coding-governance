@@ -138,3 +138,27 @@ walk of the plan corrects any of them.
   rescope row each, one backlog ask per build that every spec advances, and a closing review over the spec commits.
 - **Answer 2 puts the grants in the owner's hands at the opening.** Each build's `may:` grant is derived from the
   paths of the nodes it owns, and the owner reads every grant in the opening diff before landing it.
+
+## [plan]
+
+The plan is `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md`. Its schedule script is
+`build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py`. Both were written by dispatch 219, whose return is
+`build/2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan.md`. The plan applies none of the readings it found
+wrong; it states each as a question in its `[defaults]`.
+
+**Two of `[readings]` were wrong, and the main loop confirmed both.**
+- **The grant derivation has no input.** Answer 2's grant is "derived from the paths of the nodes it owns", but a
+  build's owned nodes are keys, and a `may:` grant takes only a decision id or a repo-relative path
+  (`tools/unattended/lib-unattended.sh`, `parse_grants` and the comment above it).
+- **Answer 3 does change a clause.** `cl-dClosedLoop-0004` joins each departure "at the close to a record whose
+  approver meets its risk class by the by-risk table", "seen red on … an approver below the risk" (v2 `[chain]`,
+  dTrueNorth's row). So setting `deviation.approval = author-recorded` for the chain departs from that clause, and the
+  plan carries the departure as a proposed deviation for the owner. The reading "no deviation record is owed" is
+  withdrawn.
+
+**One mechanism departs from a written rule, which the plan's D6 needs the owner to know.** The driver admits
+`--override build-complete`, since its no-override set is `authorization-reachable` and `pieces-complete` only
+(`tools/unattended/unattended.sh`, `DOD_NO_OVERRIDE`). The verbs guide, though, says a unit added during the run
+leaves `build-complete` unmet and its build "is a `--handoff` under `owner-decision`, never an override"
+(`memory/guides/UNATTENDED-VERBS.md`, rule 9 of the close). D6's recommended option uses the code's admission against
+the guide's rule, on an owner ruling. Whether the bar's unattended leg reds that override is unread.
