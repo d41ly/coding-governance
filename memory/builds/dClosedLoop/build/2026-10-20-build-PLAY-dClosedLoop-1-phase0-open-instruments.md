@@ -673,3 +673,33 @@ mode's, now one function both modes call.
   them, and is driver-changing by `check-unattended.sh` in any case.
 - A clause that edits the Skill's text without naming the unattended Skill, as by its path
   `.claude/skills/unattended/`: no v2 clause does, and no arm reads it.
+
+## The spec's size high-water row
+
+Dispatch 247's last item, at the owner's answer 1 in the execution record's `[phase0-answers-2]`: "High-water row
+(Recommended)". The main loop lifted this pass's bar on `tools/` for exactly one file,
+`tools/template-size-highwater.txt`. The runs were made in the same worktree, after `git pull --ff-only` from the main
+loop's worktree at `branch/unruffled-aryabhata-d89ede` fast-forwarded it onto `fc2fd9a37`, which holds the spec at
+rev-4. `probe-size-row.py` is a scratch probe. It loads `tools/check-spec-tokens.py` by path and calls the leg's own
+`read_size_ceilings` and `scan_spec_sizes` over the unit spec, with that spec's high-water row alone, so no other
+row is graded. The leg itself is the main loop's.
+
+1. The spec's bytes with carriage returns stripped, as `scan_spec_sizes` measures them
+   (`len(read_bytes().replace(b"\r", b""))`): 122396, both from the blob at `fc2fd9a37` and from the working copy.
+   That matches the main loop's figure. The class row `memory/builds/*/spec/` in `tools/template-size-limits.txt`
+   is 49152.
+2. `python probe-size-row.py`, before the row: exit 1. "live by the leg's LIVE pattern: True", "this spec's row:
+   None", and the hit "size <- memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md — 122396 bytes,
+   73244 over the spec ceiling 49152; split the spec or move history out of it".
+3. The edit: one row, `memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md`, a tab, `122396`. It
+   sits between aQuarriedLantern's row and dPolishedVitrine's. `git diff --numstat`: "1 0". `od -c` on the added
+   line shows the tab and a closing `\n` with no `\r`. `LC_ALL=C sort -c` on the file: exit 0, so path order holds.
+4. `python probe-size-row.py`, with the row: exit 0. "this spec's row: 122396", "hits 0; stale 0; held 1".
+5. The row seen red: `python probe-size-row.py --plant-minus-one` reads the same row one byte lower, a spec one byte
+   past its row: exit 1. "held at its recorded high-water 122395 in tools/template-size-highwater.txt and now
+   122396 bytes (+1); a held spec may shrink and may not grow".
+
+Not checked here: the spec-tokens leg and `check-template-size.sh`, which reads the same high-water file. Both are
+gates, owed to the main loop. Also unchecked is the arm's stale rule over the file's other rows, which the probe
+does not pass in. The row holds the spec at 122396 bytes, so any growth of the spec past that figure reds the leg
+until the row moves.
