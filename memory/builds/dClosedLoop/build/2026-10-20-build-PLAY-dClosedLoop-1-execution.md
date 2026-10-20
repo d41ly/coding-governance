@@ -302,3 +302,49 @@ The fold leaves four points for the owner:
 - **Placement.** The two deviation records' approvals land as decision rows at the opening, while the record files
   are written in dTrueNorth's spec commits.
 - **Wording.** The records name "owner" as the approver, citing the answer.
+
+## [answers-3]
+
+The four open points, asked on 2026-10-20 after the fold (`[plan-2]`), with the options offered and the owner's
+answers verbatim.
+
+1. "Your fix lets a spec run carry units promoted from its reviews to its build run. A spec run can also adopt a
+   discovery, such as a missing mechanism found while speccing, and that is a unit it adds too. How is a discovery
+   handled?"
+   - "Carry it too (Recommended)": widen dTrueNorth's extra unit so any unit a spec run adds carries forward to its
+     own build run once. A unit added from a review or a discovery is specced and audited in the spec run and recorded
+     as a departure.
+   - "File an ask instead": the spec run files an ask, and the build run adopts and specs it. This departs from the
+     protocol's adopt-now rule. The plan's writer recommended it.
+
+   The owner: "Carry it too (Recommended)".
+2. "A fork can have no option left at all, when every option fails an acceptance criterion or a non-goal. The
+   standing ruling then has nothing to take. What happens?"
+   - "Carry the unit forward (Recommended)": the build lands without that one unit, and the owner rules before a later
+     run builds it.
+   - "Relax the weakest bound": the run drops the least important failing criterion or non-goal, records it as a
+     departure, and builds. Fully autonomous, but it rewrites a unit's own acceptance unreviewed.
+
+   The owner: "Relax the weakest bound".
+3. "Your approvals for the two departures (cl-0004, and dTrueNorth's extra unit) land as decision rows in the
+   opening. Each record file is written later, in the unit's own spec commit as cl-0004 requires, naming 'owner' as
+   approver and citing your answer. Is that right?"
+   - "Yes, as planned (Recommended)".
+   - "Write records at opening": both record files written in dTrueNorth's folder at the opening, itself a
+     departure from `cl-dClosedLoop-0004`.
+
+   The owner: "Yes, as planned (Recommended)".
+4. "The plan is complete apart from these answers. What happens before Phase 0 starts?"
+   - "Review twice, then approve (Recommended)": two independent Tier-2 reviews of the plan, compared and folded, the
+     way the design's closing pair ran, before the owner approves it.
+   - "Review once, then approve".
+   - "Approve, start Phase 0".
+
+   The owner: "Review twice, then approve (Recommended)".
+
+**What they change.**
+- dTrueNorth's extra unit admits any unit a spec run adds, from a review or a discovery, once.
+- A fork with no option left is resolved by relaxing its weakest bound, recorded as a departure. Such a choice is
+  listed first in its build's departures report, beside the surface-widening ones.
+- The record placement and wording stand.
+- The plan, once folded, takes a paired Tier-2 review. The two runs are compared and folded before the owner approves.
