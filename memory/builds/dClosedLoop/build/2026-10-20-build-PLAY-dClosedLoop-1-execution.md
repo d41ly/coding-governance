@@ -617,3 +617,46 @@ questions, 2026-10-20, with the options offered and the answers verbatim:
 
 Answer 4 settles the unit spec's F2: the atlas is no longer published under the 16 MB limit, so neither remedy is
 owed.
+
+## [phase0-answers-2]
+
+The opening read, 2026-10-21, after P0.7 went green and the full bar went red on one leg. The owner: "Put the
+decisions to me". Six questions, with the options offered and the answers verbatim:
+
+1. "The unit spec's H1 now has the form the tools expect, so the build index binds its ~600 records into the spec,
+   which grows to 117 KB against spec tokens' 49 KB ceiling, the bar's one red leg. How should the bar go green?"
+   - "High-water row (Recommended)": one row for this spec in `tools/template-size-highwater.txt`, a one-line change
+     under `tools/`, outside Phase 0's records-only scope, made at the owner's ask.
+   - "Revert the H1": the ledger and `--plan` stop reading the spec as a unit again.
+
+   The owner: "High-water row (Recommended)".
+2. "Packets are now named <date>-prompt-PLAY-dClosedLoop-1-packet.md. Keep that, and update the plan's P0.3 name to
+   match?"
+   - "Keep it (Recommended)"; "Unbound form instead": the shrink-only `RECORD_UNBOUND_PIN` raised by 22.
+
+   The owner: "Keep it (Recommended)".
+3. "The driver-changing rule leaves out two clauses that touch the unattended kit: cl-dClosedLoop-0240 (dLinkedLibrary
+   re-points MAP_CLI, which unattended.sh reads) and cl-dClosedLoop-0195 (dFurnishedOrders edits the /unattended
+   skill's text). Count them?"
+   - "Count both (Recommended)": P0.5's rule revised, both builds gain rule 8 and a clean-reading ask, the opening
+     re-rendered.
+   - "Keep the rule as written"; "Count cl-0195 only".
+
+   The owner: "Count both (Recommended)". The option offered renumbering the asks in v2 order; the charter's `[ids]`
+   rule forbids a renumber, so the two new asks are minted after the seven, `PLAY-dClosedLoop-18` and `-19`.
+4. "F3: ... Do the design rounds' answers owe rows too?"
+   - "Records suffice": the design answers stay in the build records that quote them verbatim, recorded as a departure
+     from kickoff (a), and AC1 closes on the execution rows.
+   - "Mint design rows".
+
+   The owner: "Records suffice".
+5. "F4: ... no P0.7 check runs [the gap join] over the opened READMEs. Is it owed there?"
+   - "Add it to P0.7 (Recommended)": the join over the 22 opened READMEs' problem slots, seen red on a planted orphan.
+   - "v2's join suffices".
+
+   The owner: "Add it to P0.7 (Recommended)".
+6. "F5: the kickoff record's route names this unit's spec at a 2026-10-14 path that was never written ... Re-append
+   the route?"
+   - "Re-append (Recommended)"; "Leave it".
+
+   The owner: "Re-append (Recommended)".
