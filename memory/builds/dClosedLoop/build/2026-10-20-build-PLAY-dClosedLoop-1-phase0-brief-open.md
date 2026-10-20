@@ -75,11 +75,12 @@ before naming a new function. The pre-commit hook still fires on your commits; g
 
 ### Non-goals
 
-- Your tree is the worktree `C:/projects/coding-governance/.claude/worktrees/p0-open`, on branch `branch/p0-open`, cut
-  from the main loop's branch with this brief and the first wave's instruments merged. Run every command there (`git
-  -C` with that forward-slash path, or `cd` into it first) and commit only there. This brief is your spec input: read
-  it there whole, then the plan sections it names.
-- No file committed but `open.py` and the record above. The opening's files are written only in the scratch clone.
+- Your tree is the main loop's worktree, `C:/projects/coding-governance/.claude/worktrees/unruffled-aryabhata-d89ede`,
+  your session's own folder. Another agent may leave an untracked record in it: stage your own paths by name, never
+  `git add -A`. This brief is your spec input: read it whole, then the plan sections it names.
+- No file committed but `open.py`, the record above, and the `memory/builds/dClosedLoop/README.md` and `memory/LIVE.md`
+  renders `gen_build_index.py --write` makes, which the pre-commit's hygiene check 9 requires. The opening's files are
+  written only in the scratch clone.
 - No change to the sibling instruments, v2, the execution plan or any record. If `packet.py` or another instrument
   needs a change for the opening, name it in your return.
 - No decision row, no product code, no unit spec of a chain build.
