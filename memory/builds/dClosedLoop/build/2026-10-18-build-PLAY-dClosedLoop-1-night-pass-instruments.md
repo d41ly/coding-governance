@@ -25993,6 +25993,149 @@ L.save()
 print("unsealed: key, seed, detectability, 5 brief reviews; [recall-scored] written")
 ````
 
+### `fold_batches.py`
+
+The fold's five batches as briefs: disjoint records and sections, places from the fold inventory, each place's findings embedded whole from the three reports.
+
+````python
+"""The fold's five batches, rendered as briefs: each a disjoint set of records and sections, its places drawn from the
+fold inventory, and each place's findings embedded whole from the three walk reports, so a writer reads them without
+hunting. Writers 1 to 3 take v2 `[chain]` clauses by build (writer 3 also v2's other sections), writer 4 flow-steps,
+writer 5 every other record.
+
+Usage: python -X utf8 fold_batches.py <base sha> <scratch root> <out dir>   (from the worktree root)
+"""
+import re
+import sys
+from pathlib import Path
+
+BASE, SCRATCH, OUT = sys.argv[1], sys.argv[2].rstrip("/"), Path(sys.argv[3])
+B = Path("memory/builds/dClosedLoop/build")
+INV = B / "2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.md"
+REVIEWS = Path("memory/builds/dClosedLoop/reviews")
+ID = r"[ABC](?:[1-5]|S[1-4])-F\d+"
+W1 = ("dTrueNorth", "dGroundRules", "dSafePassage", "dOrderedCharter", "dFairHearing", "dDeclaredLoop", "dPlacedRequest",
+      "dKeptSession")
+W2 = ("dBoundRoles", "dFurnishedOrders", "dTotalRecall", "dLinkedLibrary", "dMindYourWords", "dWellOiledMachine",
+      "dWitnessedBar")
+
+v2 = (B / "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md").read_text(encoding="utf-8")
+chain = re.search(r"^## \[chain\][^\n]*\n(.*?)(?=^## )", v2, flags=re.M | re.S).group(1)
+owner = {}
+for ln in chain.split("\n"):
+    m = re.match(r"^\| (d[A-Z]\w+) \|", ln)
+    if m:
+        for c in re.findall(r"cl-dClosedLoop-\d{4}", ln):
+            owner.setdefault(c, m.group(1))
+
+blocks = {}
+for r in "abc":
+    text = (REVIEWS / f"2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-{r}.md").read_text(encoding="utf-8")
+    for m in re.finditer(r"^(### (" + ID + r")\b.*?)(?=^### |^## |\Z)", text, flags=re.M | re.S):
+        blocks.setdefault(m.group(2), m.group(1).strip())
+
+batches = {n: [] for n in range(1, 6)}
+for ln in INV.read_text(encoding="utf-8").split("\n"):
+    m = re.match(r"^\| (\d+) \| ([^|]+) \| (\w+) \| (\w*) \| ([^|]+) \| (.*) \|$", ln)
+    if not m:
+        continue
+    place, worst, ids = m.group(2).strip(), m.group(3), [i.strip().rstrip("?") for i in m.group(5).split(",")]
+    record, anchor = place.split(" · ", 1)
+    if record == "architecture-v2":
+        b = owner.get(anchor)
+        n = 1 if b in W1 else 2 if b in W2 else 3
+    elif record == "flow-steps":
+        n = 4
+    else:
+        n = 5
+    batches[n].append((m.group(1), place, worst, m.group(4), ids, "?" in m.group(5)))
+
+TEMPLATE = """# Fold brief: writer {n}
+
+**Serves:** research PLAY-dClosedLoop-1
+
+**Your task is to fold the whole-design audit's findings at the {count} places below into dClosedLoop's design
+records, as one fold script.** This brief is your instructions, not a spec to review.
+
+## What you fold, and against what
+
+- **The subject is the working tree's design records** under `memory/builds/dClosedLoop/build/`, at commit `{base}`.
+  The findings were made on a sealed copy into which twelve past defects were planted. The copy is not your subject;
+  read nothing in it. The plants are listed in the round record's `[recall-scored]`
+  (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`). A finding that describes a plant points at a defect
+  the working tree never had.
+- **Your records:** {scope}. Edit nothing else. When a place needs an edit in another record, list it under
+  *Requests* in your return, with the exact change, and leave it out of your script.
+- **Read freely** in the working tree: every design record, the gap register, the design map, `tools/`, `skills/` and
+  `.githooks/`. Write only in your scratch folder, `{scratch}`. Nothing goes into the repository.
+
+## How you fold
+
+1. **For each place,** read its findings below, then read the place in the working tree. Give it exactly one
+   disposition:
+   - `fold`: the defect is in the working tree, and the fix follows from what the design already settles. Write it.
+   - `fork`: the fix chooses between real options, or changes what the design means. Write no fold. Name the
+     question, the options and your recommendation, for the owner.
+   - `plant`: the finding describes one of the twelve plants, absent from the working tree. Cite the plant.
+   - `not a defect`: the working tree already answers it. Quote where.
+   - `duplicate`: another place carries the same defect. Name it, and fold it there.
+2. **Write the folds as one Python script,** `{scratch}fold-{n}.py`, using the build's fold library:
+
+```python
+import pathlib, sys
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+R = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+R.sub("<exact old text, matching once>", "<new text>", "<place # and finding ids>")
+R.insert_before("<exact anchor text, matching once>", "<text>", "<place # and finding ids>")
+R.save()
+```
+
+   `sub` refuses unless its old text matches exactly once, so quote enough to be unique. Keep each record's own
+   conventions: a clause keeps its `cl-dClosedLoop-NNNN` id and its build row, a new clause takes the next free id after
+   the highest in `[clause-ids]` (never a renumber), and a record that logs revisions gets a line saying "Revised
+   2026-10-20 by the whole-design audit's fold" with the finding ids. Write prose in the records' own register: short
+   declarative sentences, no new terms where a defined one exists.
+3. **Fold the smallest change that closes each defect,** as its finding's *Fix* and its skeptic's reading say. Where
+   the skeptic narrowed a finding, fold the narrowed one.
+
+## What you return
+
+Your final message, nothing else:
+1. **Dispositions,** one row per place: `| # | place | disposition | findings | evidence or the fold's one-line gist |`.
+2. **Fold script:** its path, and how many edits it makes in which records.
+3. **Forks,** each: `### FK-{n}-<k> — <question>`, then the options, your recommendation and the findings it rests on.
+4. **Requests,** each naming the record, the exact change and the place it serves, or `none`.
+5. **Read outside the list above:** `none`, or what and why.
+
+Write nothing to the repository. Your effort is the one your role definition sets.
+
+## The places
+
+{places}
+"""
+SCOPE = {
+    1: "architecture-v2's `[chain]` rows of " + ", ".join(W1),
+    2: "architecture-v2's `[chain]` rows of " + ", ".join(W2),
+    3: "architecture-v2's `[chain]` rows of every other build, and v2's sections outside `[chain]`",
+    4: "flow-steps (`2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md`)",
+    5: "the records named by your places other than v2 and flow-steps",
+}
+OUT.mkdir(parents=True, exist_ok=True)
+for n, rows in batches.items():
+    parts = []
+    for num, place, worst, crit, ids, unv in rows:
+        parts.append(f"### Place {num}: {place} · worst {worst}{' · critical' if crit else ''}"
+                     f"{' · includes an unverified finding' if unv else ''}\n\n"
+                     + "\n\n".join(re.sub(r"^### ", "#### ", blocks.get(i, f"#### {i} — (not found)"), flags=re.M)
+                                   for i in ids))
+    body = TEMPLATE.format(n=n, count=len(rows), base=BASE, scope=SCOPE[n], scratch=f"{SCRATCH}/fold/w{n}/",
+                           places="\n\n".join(parts))
+    p = OUT / f"2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w{n}.md"
+    p.write_text(body, encoding="utf-8", newline="\n")
+    print(f"wrote {p.as_posix()}: places {len(rows)}, findings {sum(len(r[4]) for r in rows)}, {len(body)} bytes")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -26438,6 +26581,7 @@ MINE = [
     ('walkkit/test_clause_walk.py', "walk.py's run C and second look on synthetic returns from the copy's [chain]: briefs and counts, returns and reports green and seven plants red, skeptic batches, the second look's brief and application, runs A and B still green."),
     ('audit-run/record_run_c_scored.py', "Run C scored with runs A and B: the round record's [walk-run-c-scored], the aggregate only, read from the three reports' shape lines and score.py's --with output."),
     ('audit-run/unseal.py', "The seal lifted at the owner's word: the key copied byte for byte with its hash checked, the seeding and detectability scripts and the brief reviews committed, and [recall-scored] written."),
+    ('audit-run/fold_batches.py', "The fold's five batches as briefs: disjoint records and sections, places from the fold inventory, each place's findings embedded whole from the three reports."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -27776,9 +27920,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 121 · lines 43264 · unreviewed 12111 (28%)
+  design records 127 · lines 43456 · unreviewed 12303 (28%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 21
+  design commits after the floor that no closing review covers: 22
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27800,6 +27944,7 @@ rerun review debt: rc 0
     8a81ed8c8  3 design record(s)  records(dClosedLoop): run C scored with runs A and B — the bar still not met, and the owner's word asked again
     60b794f2b  6 design record(s)  records(dClosedLoop): the owner's word, "Fold, re-measure after" — the seal lifted and the recall read plant b
     11c43418d  1 design record(s)  records(dClosedLoop): the atlas skips the audit's briefs and agent returns, and republishes as v74
+    8222099f8  1 design record(s)  records(dClosedLoop): the fold inventory — 236 confirmed and 10 unverified findings on 179 places
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -28024,7 +28169,7 @@ map: no stale facts read 66 records and 28 quotes of a map count or the critical
 rc 0
 
 $ atlas
-atlas: derived — 234 records, 4129 sections, 215 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 234 records, 4130 sections, 215 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
