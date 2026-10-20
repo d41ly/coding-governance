@@ -170,6 +170,8 @@ token arm reads every carrier's text, from whichever measured build's folder hol
   the carrier: the first token that this build's own text lacks. `XX-dProbe-1` is d235's decision id, of no family.
 - Under `--fixture` the findings filter is every build the fixture measures. Before, `only` was the fixture's build,
   so a moved clause's owner was never read. Every older plant measures one build, so its output is unchanged.
+  [limits]' first item, "Under `--fixture` only the one build's specs are measured", no longer holds for `moved`
+  and `moved-token`, which measure two.
 
 **Where they ran.** Here `S` is this dispatch's scratch folder, the `d242` sibling of d235's. `S/repo` is a
 `--shared` clone of the session's worktree at `bcc416ced`, with `core.hooksPath` set to its own `.githooks`. It holds

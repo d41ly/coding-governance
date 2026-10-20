@@ -763,8 +763,9 @@ line is as before.
 | 12 | `OUT=S/s-staged RUN=N python S/driver.py plain r01 r02 … r13` | 0 | `cmp` of all 17 outputs against `S/s-after` prints nothing |
 
 **Verdict.**
-- Row 9 now matches the plan's row. "a and d alone" reads 273, from a and d only, and the line carries the note that
-  the claim is absent from that run and left unpinned. The pre-fold red still prints 216.
+- Row 9 now matches the plan's row, where [verdict] and row 9 above read DIFFERS on the script before this fix.
+  "a and d alone" reads 273, from a and d only, and the line carries the note that the claim is absent from that run
+  and left unpinned. The pre-fold red still prints 216.
 - Every line [rows] quotes for rows 1 to 8 and 10 to 13 is unchanged. So is every line of the plain run: makespan 271,
   and "a and d alone" 273 with no note.
 - Rows 4, 10 and 11 gain a note on their "a and d alone" line, which [rows] does not quote. Rows 4 and 10 hold a claim
