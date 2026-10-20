@@ -393,6 +393,23 @@ whether refutations get a second look, answered "Second skeptic on refutations (
   run, and run C's four skeptics and its second look make five.
 - **Afterwards** the three runs' confirmed findings fold together, and the key and the hand reading are committed.
 
+### [walk-run-c-scored] Run C, scored with runs A and B
+
+- **Run C's report** reads BLOCKED: 95 of 108 findings confirmed, 11 refuted and
+  2 unverified after its second look, one of them a blocker. Its check over all 495 clauses and 22 builds
+  is clean.
+- **The second looks** left 3 of run A's refutations standing and moved 3 to
+  Unverified. In run B, 10 stand and 5 moved. A refutation and an unverified
+  finding are both outside the recall.
+- **Run C's bar is NOT MET.** Run C alone finds 3 of the ten judgement plants. Joined with it, run A finds
+  7 of twelve, run B 6, and the three runs together 7, against eight a joined run and ten
+  together.
+- **A hand reading,** sealed with the key, reads one of run C's hits as a neighbour of its plant. It also finds two
+  plants whose deleted rule survives only in the review history the walkers' list excluded, which no walk inside its
+  list could cross-reference.
+- **Cost of the three runs:** 38 dispatches, the second looks among them, and 1,928,719 output tokens.
+- **By `[recall]`,** the owner's word is asked again before anything is folded.
+
 ## [stage0-classes] Stage 0's classes
 
 Empty until the audit's fold classes what it does not fix.

@@ -258,6 +258,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 194 | gov-skeptic, at its definition's high effort | The whole-design walk, run C, skeptic 3: 26 findings and eight clean clauses | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-35-skeptic.md` | 1799cb98 | returned, 8m47s, 46.3k out: 26 findings judged, 22 confirmed and 4 refuted; its clean cells 7 held and 1 defects, and new findings CS3-F1; nothing read outside its list but the copy's leg manifest, disclosed | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk-run-c]` |
 | 195 | gov-skeptic, at its definition's high effort | The whole-design walk, run C, skeptic 4: 25 findings and eight clean clauses | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-36-skeptic.md` | 1799cb98 | returned, 8m47s, 45.7k out: 25 findings judged, 20 confirmed and 5 refuted; its clean cells 6 held and 2 defects; nothing read outside its list; its two new findings, CS4-F1 and CS4-F2, are set as bold items rather than headings | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk-run-c]` |
 | 196 | gov-synthesizer, at its definition's high effort | The whole-design walk, run C's synthesis: its report under reviews/ | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-37-synthesizer.md` | 1799cb98 | dispatched | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-c.md` |
+| 197 | gov-skeptic, at its definition's high effort | The second look, run C: its 13 refuted findings judged again without the first refutation | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-38-skeptic.md` | 1799cb98 | returned, 7m22s, 41.2k out: 13 refutations judged again: 11 stand, and 2 split, C4-F7 and C5-F23, which recheck-apply moved to run C's Unverified section; nothing read outside its list | `build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[walk-run-c]` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -2980,6 +2981,11 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   78 confirmed; run B reads BLOCKED, 69 of 84; both walk checks
   are clean. The recall bar is NOT MET (5, 4 and 5 of twelve). The plant-level reading is sealed until the
   owner's word on what follows (`whole-audit.md` `[walk-scored]`).
+
+- 2026-10-20, session 1799cb98: run C walked the chain's 495 clauses and was synthesized, and each run's refutations
+  had a second look. Run C reads BLOCKED, 95 of 108 confirmed. Joined with run C, runs A and B find
+  7 and 6 of twelve, and the three together 7: the bar is NOT MET
+  (`whole-audit.md` `[walk-run-c-scored]`).
 
 ## Instruments
 

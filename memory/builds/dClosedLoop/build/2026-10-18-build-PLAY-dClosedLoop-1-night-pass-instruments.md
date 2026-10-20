@@ -25848,6 +25848,68 @@ for name, ok in checks:
 sys.exit(0 if all(ok for _, ok in checks) else 1)
 ````
 
+### `record_run_c_scored.py`
+
+Run C scored with runs A and B: the round record's [walk-run-c-scored], the aggregate only, read from the three reports' shape lines and score.py's --with output.
+
+````python
+"""Run C scored with runs A and B: the round record's [walk-run-c-scored], the aggregate only, its numbers read from the
+three reports' shape lines and score.py's saved --with output, and the session log's event. Which plants were hit
+stays sealed beside the key until the owner's word, as [walk-scored] keeps it.
+
+Usage: python -X utf8 record_run_c_scored.py <score-with-c.txt>   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+score = open(sys.argv[1], encoding="utf-8").read()
+rev = "memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-whole-walk-{}.md"
+shape = {r: dict(re.findall(r"(\w[\w-]*)=(\d+)", re.search(r"^review-shape .*$", open(rev.format(r), encoding="utf-8")
+                                                               .read(), flags=re.M).group(0))) for r in "abc"}
+alone = re.search(r"whole-walk-c\.md alone: confirmed \d+, plants hit \d+ of 12, of them judgement plants (\d+) of 10", score)
+joined = dict(re.findall(r"whole-walk-(\w)\.md with \S+: confirmed \d+, plants hit (\d+) of 12", score))
+union = re.search(r"union: plants hit (\d+) of 12", score).group(1)
+bar = re.search(r"bar: .*?: (MET|NOT MET)", score).group(1)
+if not alone or sorted(joined) != ["a", "b"]:
+    sys.exit("record_run_c_scored: the score did not parse")
+tok = sum(int(shape[r]["out-tokens"]) for r in "abc")
+agents = sum(int(shape[r]["agents"]) for r in "abc")
+c = shape["c"]
+R = Record("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+R.insert_before("## [stage0-classes] ", f"""### [walk-run-c-scored] Run C, scored with runs A and B
+
+- **Run C's report** reads BLOCKED: {c['confirmed']} of {c['raw']} findings confirmed, {c['refuted']} refuted and
+  {c['unverified']} unverified after its second look, one of them a blocker. Its check over all 495 clauses and 22 builds
+  is clean.
+- **The second looks** left {shape['a']['refuted']} of run A's refutations standing and moved {shape['a']['unverified']} to
+  Unverified. In run B, {shape['b']['refuted']} stand and {shape['b']['unverified']} moved. A refutation and an unverified
+  finding are both outside the recall.
+- **Run C's bar is {bar}.** Run C alone finds {alone.group(1)} of the ten judgement plants. Joined with it, run A finds
+  {joined['a']} of twelve, run B {joined['b']}, and the three runs together {union}, against eight a joined run and ten
+  together.
+- **A hand reading,** sealed with the key, reads one of run C's hits as a neighbour of its plant. It also finds two
+  plants whose deleted rule survives only in the review history the walkers' list excluded, which no walk inside its
+  list could cross-reference.
+- **Cost of the three runs:** {agents} dispatches, the second looks among them, and {tok:,} output tokens.
+- **By `[recall]`,** the owner's word is asked again before anything is folded.
+
+""", "[walk-run-c-scored]")
+R.save()
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", f"""
+- 2026-10-20, session 1799cb98: run C walked the chain's 495 clauses and was synthesized, and each run's refutations
+  had a second look. Run C reads BLOCKED, {c['confirmed']} of {c['raw']} confirmed. Joined with run C, runs A and B find
+  {joined['a']} and {joined['b']} of twelve, and the three together {union}: the bar is {bar}
+  (`whole-audit.md` `[walk-run-c-scored]`).
+""", "the event")
+L.save()
+print(f"C alone {alone.group(1)}/10, A+C {joined['a']}, B+C {joined['b']}, union {union}, bar {bar}, {agents} dispatches, {tok} tokens")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -26291,6 +26353,7 @@ MINE = [
     ('audit-run/record_run_c.py', "The owner's word on the scored walk, run C and the second look, recorded with run C's slices and bar before anything was rendered."),
     ('audit-run/patch_run_c_ids.py', 'Run C in the scratch instruments: finding ids take the letter C, a clean cell may be a clause and its build, the read audit knows the clause and second-look scratch folders.'),
     ('walkkit/test_clause_walk.py', "walk.py's run C and second look on synthetic returns from the copy's [chain]: briefs and counts, returns and reports green and seven plants red, skeptic batches, the second look's brief and application, runs A and B still green."),
+    ('audit-run/record_run_c_scored.py', "Run C scored with runs A and B: the round record's [walk-run-c-scored], the aggregate only, read from the three reports' shape lines and score.py's --with output."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -27613,7 +27676,7 @@ K5: principles 42, clauses 496, retired 0 · findings 0
 rerun design map: rc 0
   map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 295 records, 4727 sections, 230 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 298 records, 4864 sections, 231 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27629,9 +27692,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 113 · lines 42224 · unreviewed 11071 (26%)
+  design records 115 · lines 42628 · unreviewed 11475 (27%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 17
+  design commits after the floor that no closing review covers: 18
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27649,6 +27712,7 @@ rerun review debt: rc 0
     e24afd0ec  7 design record(s)  records(dClosedLoop): the owner's word — run C, a clause walk, and a second skeptic on every refutation
     ebf2e5fc7  2 design record(s)  records(dClosedLoop): the second looks at runs A's and B's refutations, dispatched
     bf51d88ef  11 design record(s)  records(dClosedLoop): the second looks applied, run C's five clause walks back, and its skeptics dispatched
+    30be8f40e  5 design record(s)  records(dClosedLoop): run C's four skeptics returned, and run C's synthesis dispatched
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27867,13 +27931,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2743 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1922, derived 321, pending 500
+map: 2749 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1928, derived 321, pending 500
 map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 295 records, 4727 sections, 230 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 298 records, 4865 sections, 231 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
