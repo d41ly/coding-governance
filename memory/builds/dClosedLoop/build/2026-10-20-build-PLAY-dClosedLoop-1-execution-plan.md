@@ -11,8 +11,10 @@ or product code runs only after the owner approves this plan, and the baseline's
 The owner's answers to the plan's open choices (ER `[answers-2]`, ER:166-286) and to the four points that fold left
 open (ER `[answers-3]`, ER:306-350) are folded in, and so is the paired Tier-2 review of the plan at `d82cee1a2`
 (`build/…-execution-plan-reviews-compared.md` `[fold]`), with the owner's answers to its two forks (ER `[answers-4]`,
-ER:375-404). Each item they decide now reads as decided and quotes the answer;
-the items the owner was not asked are carried as recommended, for the walk (ER:272-276).
+ER:375-404), the second review pair over that fold (`build/…-execution-fold-reviews-compared.md` `[fold]`), and the
+owner's walk of the plan (ER `[walk]`, ER:413-542), whose four changes are folded without a further review. Each item
+they decide now reads as decided and quotes the answer; the items the owner was not asked are carried as recommended
+(ER:272-276).
 
 **Conventions.**
 - `build/` is `memory/builds/dClosedLoop/build/`, and a file there is named by its suffix: `build/…-carries.py`.
@@ -113,7 +115,7 @@ What today's gov forces on the plan.
 | Nothing finds work for a node or offers it one | GR:337, :340 |
 | Under the local anchor a hold owes no push, so held work may live on one node only | STOPS:98-99; `.unattended.conf:267` |
 | Landing is in place: prepare onto the advertised tip, close under `GATE_FULL=1`, land, landed; the remote's fast-forward is the only serializer, with three race retries | PROTOCOL:428-432; `push-main.sh:188`, `:873-884` |
-| A close whose range touches `tools/` owes the flagged bar with its self-tests, under a 21600 s wall | `.unattended.conf:40`, `:67`; VERBS:851-871 |
+| A close whose range touches `tools/` owes the flagged bar, `GATE_FULL=1 GATE_SELFTESTS=1`, under a 21600 s wall. `GATE_SELFTESTS=1` runs the bar's held kit legs; the unattended kit's own suites are on no leg and run only on demand, and the kit's Definition of Done has a landing touching it carry their verdict, which a build README may waive, as dAlignedCarrier's did | `.unattended.conf:40`, `:67`; `unattended.sh:10528`; VERBS:851-871; `memory/guides/MERGE-BAR.md:39-41`; `tools/unattended/run-unattended-gates.sh:2`, `:28-31`; `memory/builds/dAlignedCarrier/README.md:28-30` |
 | `readme-contract.txt` has no merge attribute; `DECISIONS.md` and every `BACKLOG.md` merge by rows; `LIVE.md` and the ledgers take one side and are re-rendered; the merge drivers are per-node config | `.gitattributes:71-86`; `tools/check-wiring.sh:1198-1215` |
 | The driver runs from the worktree, and nothing binds the code it executes | `SKILL.md:9-12`; PROTOCOL:575-576 |
 | Nothing runs the three instruments; a `DOD_EXTRA` item is attested, never executed; `tools/` is a routed path | `unattended.sh:12225-12226`; `.memory-tree.conf:9` |
@@ -340,11 +342,12 @@ marker pairs (`gen_build_index.py:73`, `:85`, `:125-131`) and writes the authore
 | Front matter `slug`, `node: d`, `opened`, `streams`, `roster`, `ids:` (left for the generator), `status: OPEN` | The six required keys, and the scaffold's own `node: <slug's tag>` | `gen_build_index.py:190`, `:3528-3537` |
 | `spec-audit: <the opening date>` | Answer 2 | ER:86-92 |
 | `parents:` | v2's Parents cell; dClosedLoop for dTrueNorth | v2:1762-1785 |
-| `may:` | The grant decision row's id, on all 22; dTrueNorth's line also cites the extra unit's decision row, since the carry-forward condition is a change to a governance carrier no `[chain]` clause names | ER:181; `lib-unattended.sh:1440-1478`; METHOD:82 |
+| `may:` | The grant decision row's id, on all 22; dTrueNorth's line also cites the extra unit's decision row, since the carry-forward condition is a change to a governance carrier (P0.8 row 9's list) no `[chain]` clause names | ER:181; ER:525; `lib-unattended.sh:1440-1478`; METHOD:82 |
 | H1 and stage | `# <slug> — the <Stage> build of the dClosedLoop chain` | v2:1762-1785 |
 | The five slots | Derived bodies, as the scaffold writes them: the problem slot is the build's owned gaps at the baseline (it is the goal bound); the improvements are its clauses carried and built; the detriments are its gaps left open and its children waiting; the build-level rules are below; the parked decisions are "none" | `gen_build_index.py:122-131`, `:3507-3560` |
 | `roster:units` | One unit per clause, in clause order: its id, `cl-dClosedLoop-NNNN@<hash8>`, and the clause's text to its first comma. dTrueNorth's roster adds a seventh row, the extra unit, its carries cell `**Derived:**` from its decision row | v2:1762-1785; `carries.py:11`, `:78-80`; ER:232 |
-| Unit family | TOOL for every unit; a unit's spec header `streams` records the disciplines it serves | `.memory-tree.conf:42`; TEMPLATE-SPEC:56-77 |
+| Unit family, `roster:` and `streams:` | The build's main stream's family, by the rule below: PLAY, KICK, DEPL or TOOL, one family for the whole build, its roster ids and its ask. `roster:` is that family and `streams:` its discipline, the pairing `.memory-tree.conf` declares; a unit's spec header `streams` still names every discipline it serves | ER:438; `.memory-tree.conf:42`; TEMPLATE-SPEC:56-77 |
+| Driver-changing builds | The set the rule below derives, each README carrying rule 8 | ER:476 |
 | `BACKLOG.md`, one ask, for every build but dTrueNorth | "build every roster unit of this build from its spec", filed for the spec run's carry-forward, with its `SEV` row. dTrueNorth runs whole and closes without carry-forward, so it gets none | STOPS:707-709; ASKS:92-100; ER:232 |
 | Packet | P0.3 | above |
 | `readme-contract.txt` rows | 22 bound rows (bare paths); the exempt pin is unchanged | `memory/project/readme-contract.txt:1-29`; `.unattended.conf:383-405` |
@@ -378,13 +381,95 @@ marker pairs (`gen_build_index.py:73`, `:85`, `:125-131`) and writes the authore
    and the shared renders a landing re-renders, `memory/LIVE.md`, the ledgers and the generated files and regions
    ([coordination]). No gate refuses a run's own commit to another build's paths; the departures report lists every
    such path (P0.2) and the closing review reads it.
+8. In a driver-changing build's README only, dAlignedCarrier's rule as its README states it
+   (`memory/builds/dAlignedCarrier/README.md:28-30`): "The unattended kit's own self-test suites are WAIVED for this
+   build's landing (owner, 2026-10-20, walk answer 5). A criterion they would observe is amended citing this rule;
+   their clean reading is owed with <the ask id>." The ask is one the opening files for each driver-changing build in
+   dClosedLoop's own `BACKLOG.md`, under dClosedLoop's slug (P0.6, rule 1), as dAlignedCarrier's clean reading was
+   owed with another build's ask. What the rule waives is the on-demand verdict of
+   `tools/unattended/run-unattended-gates.sh --selftests` that the kit's Definition of Done would otherwise have the
+   landing report carry (`tools/unattended/run-unattended-gates.sh:2`, `:28-31`; the DoD comment at
+   `.githooks/gate-env.sh:25`). Those suites are on no leg of the bar (`memory/guides/MERGE-BAR.md:39-41`), and the
+   owner's standing instruction of 2026-08-23 runs them only when the owner asks
+   (`memory/guides/SESSION-KICKOFF.md:136-138`). In their place a criterion they would observe is proved by a targeted
+   probe or the unit's own planted test, and each acceptance ledger says which suite's run was not observed, as
+   dAlignedCarrier's did (`memory/builds/dAlignedCarrier/build/2026-09-30-build-TOOL-dAlignedCarrier-1-1-acceptance-ledger.md:10`).
+   The close is unchanged: like every close whose range touches `tools/`, it exports `GATE_FULL=1 GATE_SELFTESTS=1`,
+   the flagged bar the driver owes (`unattended.sh:10528`; VERBS:851-871), and `GATE_SELFTESTS=1` runs the bar's held
+   kit legs, not the unattended kit's suites.
+
+**The unit family, derived** (walk answer 1: "Family by stream", ER:438). The owner's rule reads "PLAY for charter
+and playbook builds, KICK for session and kickoff, DEPL for deploy, TOOL otherwise" (ER:435-436). `open.py` applies it
+to two cells each build's v2 row already holds, its Stage and its slug's noun (the slug's last capitalised word), and
+matches the owner's words in that order, whole words only: `charter` or `playbook` gives PLAY, `session` or `kickoff`
+gives KICK, `deploy` gives DEPL, and a build matching none is TOOL. `open.py --families` prints the table below, and
+the per-build summary carries each build's family; this is the plan writer's run of the same rule at `a93477abc`
+(`exec/d219/family2.py` in the writer's scratch folder):
+
+```
+| Build | Stage | Slug noun | Word matched | Family |
+|---|---|---|---|---|
+| dTrueNorth | Fidelity | North | none | TOOL |
+| dGroundRules | Policy | Rules | none | TOOL |
+| dSafePassage | Supersession | Passage | none | TOOL |
+| dOrderedCharter | Foundation | Charter | Charter | PLAY |
+| dFairHearing | Review harness | Hearing | none | TOOL |
+| dDeclaredLoop | Spine | Loop | none | TOOL |
+| dPlacedRequest | Entry | Request | none | TOOL |
+| dKeptSession | Session | Session | Session | KICK |
+| dBoundRoles | Roles | Roles | none | TOOL |
+| dFurnishedOrders | Orders | Orders | none | TOOL |
+| dTotalRecall | Memory | Recall | none | TOOL |
+| dLinkedLibrary | Library | Library | none | TOOL |
+| dMindYourWords | Lexicon | Words | none | TOOL |
+| dWellOiledMachine | Runtime | Machine | none | TOOL |
+| dWitnessedBar | Test | Bar | none | TOOL |
+| dRankedPlan | Plan | Plan | none | TOOL |
+| dIndexedDesign | Design | Design | none | TOOL |
+| dScopedBuild | Build | Build | none | TOOL |
+| dShippedRelease | Deploy | Release | Deploy | DEPL |
+| dTendedCadence | Maintain | Cadence | none | TOOL |
+| dCalibratedLens | Review | Lens | none | TOOL |
+| dConvergedCharter | Convergence | Charter | Charter | PLAY |
+```
+
+Counting the clauses that name each stream's surface was tried first and dropped: it put dOrderedCharter, 12 of 37
+clauses naming the charter, below any natural cut, and made dSafePassage, whose upgrade steps name adopters, a deploy
+build. The owner reads every family in the per-build summary before the landing (P0.7).
+
+**The driver-changing builds, derived** (walk answer 5: "Waive in each README", ER:476). A build is driver-changing
+when one of its v2 clauses names a path or surface of the unattended kit: `unattended.sh`, `check-unattended.sh`,
+`tools/unattended/`, the `/unattended` command, "the unattended kit", unattended's verbs (`--plan`, `--status`) or run
+claims; "the driver" alone is left out, since in v2 it names the loop's driver role. `open.py --driver-builds`
+applies that predicate, and dTrueNorth joins by its extra unit, which edits the kit. The plan writer's probe of the
+same predicate (`exec/d219/driver.py`) finds seven:
+
+| Build | Clauses that touch the kit |
+|---|---|
+| dTrueNorth | its extra unit, the carry-forward condition in `unattended.sh` ([phase-1]) |
+| dOrderedCharter | `cl-dClosedLoop-0047` (`unattended.sh`'s drift-audit and runlog calls), `cl-dClosedLoop-0048` (`check-unattended.sh`'s `RECALL_CLI` probe) |
+| dDeclaredLoop | `cl-dClosedLoop-0106` (`unattended.sh` and `check-unattended.sh` re-pointed to `review.max-rounds`) |
+| dPlacedRequest | `cl-dClosedLoop-0120` and `cl-dClosedLoop-0134` (run claims migrated onto leases, and their tombstones) |
+| dWitnessedBar | `cl-dClosedLoop-0344` (the held-CI reader moved out of the unattended kit) |
+| dWellOiledMachine | `cl-dClosedLoop-0280` (`--plan` and `--status` re-pointed), `cl-dClosedLoop-0281` (unattended's verbs), `cl-dClosedLoop-0306` (the kit dissolved) |
+| dConvergedCharter | `cl-dClosedLoop-0485`, `cl-dClosedLoop-0486`, `cl-dClosedLoop-0494` and `cl-dClosedLoop-0496` (`unattended.sh` folded and the kit retired) |
+
+**The per-build summary** (walk answer 2, ER:446). `open.py --summary` prints one row per build, from the files the
+opening writes, for the owner's read (P0.7): its slug; its stage; its `parents:`; its unit count, roster rows
+(`**Derived:**` ones included); its family and `streams:`; its carry-forward ask id, or "none: whole run" for
+dTrueNorth; its packet's size in bytes and `packet.py --check` result; its `may:` line verbatim; its `spec-audit:`
+date; whether it is driver-changing, so carries README rule 8, and if so the id of its clean-reading ask in
+dClosedLoop's `BACKLOG.md`; and whether its `readme-contract.txt` row is present
+and bound. `open.py --check` reds a summary row that disagrees with the files it summarises, seen red on a planted
+README whose family differs from its row.
 
 **The `may:` grant, decided.** The owner: "One decision row (Recommended)" (ER:181). One `DECISIONS.md` row, landed
 with the opening, grants each chain build the governance-carrier and public-surface changes its own `[chain]` clauses
-name, and all 22 `may:` lines cite its id; the run's M3 judges whether a change is covered
-(`lib-unattended.sh:1455-1458`). It replaces the derivation answer 2 first read, which had no input: v2's owned nodes
-are keys with an `owner` relation and no path (`carries.py:104-113`; the plan writer's probe of every namespace of
-`build/…-map.py`'s `derive()`).
+name, and all 22 `may:` lines cite its id. A governance carrier is a path on P0.8 row 9's list (walk answer 10,
+ER:525), so the grant reads against that list: a change to a listed path that the build's own clauses name is
+granted, and the run's M3 judges whether a change is covered (`lib-unattended.sh:1455-1458`). It replaces the
+derivation answer 2 first read, which had no input: v2's owned nodes are keys with an `owner` relation and no path
+(`carries.py:104-113`; the plan writer's probe of every namespace of `build/…-map.py`'s `derive()`).
 
 ### P0.6 The two opening hazards
 
@@ -422,11 +507,14 @@ instrument's `--fixture` and every `--plant` must give the same verdicts as befo
 **Who may mint in a chain build.** The rule follows the claims, because two nodes share the tag letter `d` in all 22
 slugs:
 1. The opening (dClosedLoop's session) mints each build's roster ids, dTrueNorth's extra unit included, and the one
-   carry-forward ask of each build but dTrueNorth, under that build's slug. It mints them once, in one landing, before
+   carry-forward ask of each build but dTrueNorth, under that build's slug and in its derived family (P0.5). It also
+   files, in dClosedLoop's own `BACKLOG.md` under dClosedLoop's slug, one ask per driver-changing build owing the
+   unattended kit's clean self-test reading that build's README rule 8 waives. It mints them once, in one landing, before
    any claim exists. A session's ids are its own, and the later merge re-mints unmerged ones (HYGIENE.md:172-187).
    This departs from minting one slug per session; it is D8, carried as recommended for the owner's walk (ER:276).
-2. After the opening, only the run holding a slug's claim mints under that slug (`unattended.sh:2284-2301`). Its
-   next id is the build's highest id in that family plus one (HYGIENE.md:177-179).
+2. After the opening, only the run holding a slug's claim mints under that slug (`unattended.sh:2284-2301`), in the
+   one family the opening derived for that build (P0.5). Its next id is the build's highest id in that family plus one
+   (HYGIENE.md:177-179).
 3. A run filing an ask about another build mints it under its own build's slug and files it in the other build's
    `BACKLOG.md` (coordination return), only while that build's build run has not landed ([coordination]). Any other
    row about a foreign ask stays in its own file (ASKS:167-168).
@@ -446,7 +534,7 @@ slugs:
 | Node d's session | Commit P0.1 to P0.6 and the opening on a branch | the charter's `[land]`, `AGENTS.md:31` |
 | Node d's session | `open.py --check`; `packet.py --check` for all 22; `gen_build_index.py --check` and `--check-format` (the contract, both directions); the memory hygiene gate; the generator-grammar bare-id predicate (P0.6), which must print nothing; `carries.py` (exit 2 expected); `deviations.py` printing 0 members, as P0.1's acceptance names, not merely exit 0, which `--policy report` makes constant; `asbuilt.py --check` (0) | `readme-contract.txt:2-5`; `gen_build_index.py:2341-2344` |
 | Node d's session | Red tests: a one-byte README edit reds `open.py --check`; a roster missing one clause reds the arm that reads every clause in exactly one row; a `parents:` typo raises; a removed contract row reds `--check-format` | as above |
-| Owner | Reads the opening diff: every README, its `may:` line, every packet and every decision row | ER:181 |
+| Owner | Reads in full the decision rows (P0.8, nine of them), the grant row among them, and dTrueNorth's README and packet; for the other 21 builds, reads `open.py --check`'s output and `open.py --summary`'s rows (P0.5). "Rows + dTrueNorth (Recommended)" (ER:446) | ER:441-446 |
 | Owner | Asks for the landing | the charter's `[land]`, `AGENTS.md:31` |
 | Node d's session | Lands through `bash tools/push-main.sh`. The pre-push bar takes the doc-only class, because the diff is `memory/` only | `.githooks/pre-push:1215-1223`; `.githooks/gate-env.sh:106-108` |
 
@@ -474,12 +562,41 @@ with the opening. Each row cites its source:
    rule 6 says; every choice with a non-`none` `widens:` or `relaxes:`, and every `grants:` choice, is listed first in
    the build's departures report (ER:284-285, :347-348, :383-384).
 6. The driver-rewriting builds land through their own new code (ER:248), dPlacedRequest's migration carries its
-   test (ER:264), and the owner types every start (ER:270).
+   test (ER:264), and the owner types every start (ER:270). Each driver-changing build (P0.5's derived set) waives
+   the unattended kit's own on-demand self-test suites for its landing in its README, in dAlignedCarrier's form, its
+   driver changes proved by targeted probes and its own planted tests: "Waive in each README" (ER:476), at the scope
+   the walk's correction states (ER:544-557). Its close still runs the flagged bar, `GATE_FULL=1 GATE_SELFTESTS=1`.
 7. The coordination rules: push after every pass, never preflight over a claim, re-run the schedule at every landing,
    and reconcile at a prepare conflict ([coordination]).
+8. The unit family: "Family by stream" (ER:438). Each build's roster ids and ask take its main stream's family, PLAY,
+   KICK, DEPL or TOOL, by the rule and table in P0.5, which `open.py --families` prints.
+9. The governance carrier: "Define it in Phase 0 (Recommended)" (ER:525). A governance carrier is a tracked path on
+   the list `open.py --carriers` derives from the tree at the opening commit, and the row quotes that list. The grant
+   (row 2) reads against it. The list's selectors, each with where the records bound it:
+   - the routed product paths, `tools/`, `skills/`, `coding-governance-agents.template.md` and `WIRE-INTO-PROJECT.md`
+     (`.memory-tree.conf:9`): at `a93477abc`, the 17 kits under `tools/` with a `kit.toml`, `tools/govkit`,
+     `tools/lib` and the root-level gate scripts and their lists under `tools/` (`tools/gate-legs.json` and
+     `tools/push-main.sh` among them), and `skills/session-kickoff` and `skills/deploy-governance`. The records bound
+     the method's template as a carrier (`memory/builds/aClosedDocket/README.md:40`) and a kit's protocol key table as
+     one (`tools/unattended/README.md:336`);
+   - the git hooks, the 11 tracked files under `.githooks/`, which `core.hooksPath` wires (`tools/check-wiring.sh`);
+   - the agent and role files under `.claude/`: the 9 agent definitions, `roles.json`, the 7 skills, `settings.json`
+     with its hooks, and `rules/product.md`;
+   - the charter: the template and its renders `AGENTS.md` and `CLAUDE.md`, which the records bound as "the
+     governance carrier" (`memory/DECISIONS.md:204`);
+   - the method's guides, the ten files under `memory/guides/`: BUILD-METHOD bound at
+     `memory/builds/aRatifiedRulings/README.md:46` and `memory/builds/aEvidencedLens/README.md:55`,
+     UNATTENDED-PROTOCOL at `memory/builds/aPrimedKeepalive/README.md:39-41`, REVIEW-PROTOCOL at
+     `memory/builds/aSightedSkeptic/README.md:45`;
+   - the root confs whose keys a kit's protocol tables: `.unattended.conf`, `.memory-tree.conf`, `.codebase-map.conf`,
+     `.lexicon.conf`, `.process-monitor.conf`, `.gitattributes` and `.governance/deploy.toml`.
 
-**Acceptance.** Every row quotes its answer in ER `[answers]`, `[answers-2]`, `[answers-3]` or `[answers-4]`, or
-names the `[defaults]` item it carries for the owner's walk.
+   Nothing else is a carrier: the build records, `DECISIONS.md`, the backlogs and the root `README.md` are records,
+   not rules a run is held to. `open.py --carriers --check` reds a tracked path under a selector that the row's list
+   omits, seen red on a planted new kit directory.
+
+**Acceptance.** Every row quotes its answer in ER `[answers]`, `[answers-2]`, `[answers-3]`, `[answers-4]` or
+`[walk]`, or names the `[defaults]` item it carries for the owner's walk.
 
 **Not checked.** No gate reads what a row says. Each is tested where a run applies it, in phase 1.
 
@@ -563,8 +680,10 @@ verbs' close rule 9 from their templates. Its red cases, each seen red before th
    `DEFERRED` spec carrying `advances <the opening's ask>` and a defer row, then runs `--close`. Before the change the
    close fails term 2 with "the roster this run started with … cannot be read", naming the units it read as added;
    after it, the carry-forward term is met with every unit in `BC_CARRIED`. It is seen red with the fallback removed.
-   The fixture is kept standing in the driver's test leg, and it also runs check 24 over the same scratch-clone run and
-   requires it to agree with the driver. A one-unit variant is a separate case with its own stated verdict;
+   The fixture is kept standing in the unattended kit's own test suite, which runs only on demand
+   (`tools/unattended/run-unattended-gates.sh:2`) and which README rule 8 waives for this landing; dTrueNorth's run
+   runs it, and every red case here, as a targeted probe. It also runs check 24
+   over the same scratch-clone run and requires it to agree with the driver. A one-unit variant is a separate case with its own stated verdict;
 6. a build-run fixture that closes zero units and defers a unit it added: refused, before and after;
 7. a build run that closes no unit and re-defers a unit the spec run carried: refused;
 8. a whole-run fixture, no open ask at its baseline and every authored unit `MISSING` at its start, whose closing
@@ -579,9 +698,12 @@ verbs' close rule 9 from their templates. Its red cases, each seen red before th
     "cannot be derived" before, accepted as a LATE record after;
 13. a build with an empty generated region and an empty or absent authored roster: check 24's ADD arm still skips.
 
-It edits `tools/unattended/`, so dTrueNorth's close owes the flagged bar with its self-tests (`.unattended.conf:40`).
-It is a driver-touching unit, so under the owner's "Land through new code (Recommended)" (ER:248) it goes last in
-the run, and dTrueNorth lands through it.
+It edits `tools/unattended/`, so the `VERIFYING` notice owes the flagged bar, and its close exports `GATE_FULL=1
+GATE_SELFTESTS=1` (`.unattended.conf:40`; `unattended.sh:10528`). dTrueNorth is a driver-changing build, and its
+README waives the unattended kit's own on-demand suites for this landing (P0.5, rule 8; "Waive in each README",
+ER:476): the thirteen red cases and the unit's targeted probes are what prove the driver change. It is
+a driver-touching unit, so under the owner's "Land through new code (Recommended)" (ER:248) it goes last in the run,
+and dTrueNorth lands through it.
 
 **Preconditions:** the opening has landed, with the three decision rows dTrueNorth reads (P0.8, rows 1, 2 and 3).
 
@@ -597,7 +719,7 @@ the run, and dTrueNorth lands through it.
 | Run | At its Design exit, `carries.py --build dTrueNorth --exit` and `deviations.py --policy refuse`, by hand, since nothing in the bar runs them yet. `refuse` exits 1 on an unjoined member or an approver below its risk; the chain's runs keep `report` | P0.1; deviation return, limit 4 |
 | Run | Builds the units one at a time, the extra unit last. The product join takes the instruments' plant suite as its acceptance (D3, carried). Its configuration cutoff is the opening landing's date, so every chain spec, dTrueNorth's own included, falls on or after it | VERBS:697-768; v2:1764; deviation return, recommendation 3 |
 | Run | The closing review over the whole range; its promoted units are built in this run, as M4 rules | METHOD:144, :251-290 |
-| Run | `--phase VERIFYING`, `--prepare`, then the close sequence of README rule 4 on the prepared merge (`--report dTrueNorth`, a record for each member "recorded by nobody", `--report --write` as `…-departures-build.md` and commit, `--report --check`), then `--authorization`, `--close` under `GATE_FULL=1 GATE_SELFTESTS=1`, `--land`, `--landed` | VERBS:849-947; P0.5, rule 4 |
+| Run | `--phase VERIFYING`, `--prepare`, then the close sequence of README rule 4 on the prepared merge (`--report dTrueNorth`, a record for each member "recorded by nobody", `--report --write` as `…-departures-build.md` and commit, `--report --check`), then `--authorization`, `--close` under `GATE_FULL=1 GATE_SELFTESTS=1`, the flagged bar the driver owes; the unattended kit's own on-demand suites are waived for this landing by README rule 8, so the landing report carries no `--selftests` verdict; then `--land`, `--landed` | VERBS:849-947; `unattended.sh:10528`; P0.5, rules 4 and 8; ER:476 |
 | Owner | Reads the departures report and the coverage it carries. A "no" to a listed departure takes P0.6 rule 5: a decision row recording it, then, since dTrueNorth's whole run has landed, an ask in dClosedLoop's `BACKLOG.md`, which every chain packet carries in field 9 (P0.3) | [owner]; P0.6 |
 | Every node | From this landing, the product join runs in every pre-push bar, every `--close` and remote CI, and every new worktree carries the new carry-forward condition | `.github/workflows/remote-ci.yml:106`; `SKILL.md:9-12` |
 
@@ -969,22 +1091,22 @@ with no step (PROTOCOL:428-432). What follows is what loads at session start or 
 
 | Landing | What changes | Every node | A spec run in flight | A build run in flight |
 |---|---|---|---|---|
-| dTrueNorth | `**Carries:**` lines, the carries join in the spec-tokens leg, the coverage region, deviation records and their join, `@rev-N` pins (`cl-dClosedLoop-0001` to `-0006`); and its extra unit, the carry-forward condition in `tools/unattended/` (ER:232) | Nothing to install: every new worktree runs the new driver from its own tree (`SKILL.md:9-12`). Every packet's parent state goes stale. From here every spec run closes with the new condition. The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table) | none: nothing else runs before it | none |
+| dTrueNorth | `**Carries:**` lines, the carries join in the spec-tokens leg, the coverage region, deviation records and their join, `@rev-N` pins (`cl-dClosedLoop-0001` to `-0006`); and its extra unit, the carry-forward condition in `tools/unattended/` (ER:232) | Nothing to install: every new worktree runs the new driver from its own tree (`SKILL.md:9-12`). Every packet's parent state goes stale. From here every spec run closes with the new condition. The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table). A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | none: nothing else runs before it | none |
 | dSafePassage | The upgrade-step kind, and `.agent-cap.conf` retired by a step (`cl-dClosedLoop-0018`) | Run the upgrade steps on each machine | Rotate its session at the next pass boundary | Same |
-| dOrderedCharter | The charter re-founded and `AGENTS.md` re-rendered (`cl-dClosedLoop-0032`), including the fork-resolving decision principles | Fresh sessions load the new charter. M7 does not re-read it (METHOD:238-246). The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table) | Rotate at the next pass boundary. From here, residual forks resolve by the principles, which take over from the owner's standing ruling (ER:240) | Same |
-| dDeclaredLoop | The roles stage table moved (`cl-dClosedLoop-0086`); `unattended.sh` re-pointed to `review.max-rounds` (`cl-dClosedLoop-0106`); `deviation.approval` (`cl-dClosedLoop-0119`) | None: dDeclaredLoop's own landing sets `deviation.approval = author-recorded`, carried by its spec under P0.8 row 3 and recorded as a departure: "The adding build (Recommended)" (ER:396). The instruments' approval arm retires. The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table) | Merge `origin/main` at the next pass boundary, then `--authorization` (VERBS:923-926). The prepare lands it through the new driver | Same |
-| dPlacedRequest | Run claims migrated onto leases (`cl-dClosedLoop-0120`) | Its spec carries the test that a live claim on another node survives the migration (ER:264); a drain, no other chain run live or held, only if that test could not be written | Its claim survives, by the test | Same |
-| dWitnessedBar | The pre-push hook reads a runner-written verdict (`cl-dClosedLoop-0342`) | The next push goes through the new hook | Lands through it | Lands through it |
+| dOrderedCharter | The charter re-founded and `AGENTS.md` re-rendered (`cl-dClosedLoop-0032`), including the fork-resolving decision principles | Fresh sessions load the new charter. M7 does not re-read it (METHOD:238-246). The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table). A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | Rotate at the next pass boundary. From here, residual forks resolve by the principles, which take over from the owner's standing ruling (ER:240) | Same |
+| dDeclaredLoop | The roles stage table moved (`cl-dClosedLoop-0086`); `unattended.sh` re-pointed to `review.max-rounds` (`cl-dClosedLoop-0106`); `deviation.approval` (`cl-dClosedLoop-0119`) | None: dDeclaredLoop's own landing sets `deviation.approval = author-recorded`, carried by its spec under P0.8 row 3 and recorded as a departure: "The adding build (Recommended)" (ER:396). The instruments' approval arm retires. The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table). A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | Merge `origin/main` at the next pass boundary, then `--authorization` (VERBS:923-926). The prepare lands it through the new driver | Same |
+| dPlacedRequest | Run claims migrated onto leases (`cl-dClosedLoop-0120`) | Its spec carries the test that a live claim on another node survives the migration (ER:264); a drain, no other chain run live or held, only if that test could not be written. A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | Its claim survives, by the test | Same |
+| dWitnessedBar | The pre-push hook reads a runner-written verdict (`cl-dClosedLoop-0342`) | The next push goes through the new hook. A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | Lands through it | Lands through it |
 | dKeptSession | Named presets (`cl-dClosedLoop-0141`); `mailbox.answer` (`cl-dClosedLoop-0504`) | Named presets make an override on `standard` expressible; the `author-recorded` value dDeclaredLoop already set is carried as that override. The `report` value waits for `deviation.gate` at dScopedBuild | Nothing | Nothing |
 | dBoundRoles | The role roster and definitions rewritten (`cl-dClosedLoop-0166` onward) | Re-render the role agents | Rotate. `handoff.py harness-args` now prints the new roles | Same |
 | dTotalRecall | The README's front-matter schema refuses unknown keys (`cl-dClosedLoop-0215`) | The opening's keys are all known (P0.5) | Nothing | Nothing |
 | dFurnishedOrders | The per-pass checklist retired from the method and the Skill (`cl-dClosedLoop-0195`) | None | Picked up at the next reground, since M7 re-reads METHOD | Same |
-| dWellOiledMachine | The `next` verb, with `--plan` and `--status` re-pointed (`cl-dClosedLoop-0280`); the unattended kit dissolved, with `/unattended` kept as a client of `run` until dConvergedCharter retires it (`cl-dClosedLoop-0306`); `gov-session` retired (`cl-dClosedLoop-0320`) | **The driver's successor.** Runs started after this landing still start with `/unattended <slug>`, now a client of `run`. Its verbs are the ones the landed kit's usage and its landing record name, which each packet re-renders | Merge `origin/main` and run `--authorization` at the next pass boundary. Its landing goes through the successor, under the in-flight test dWellOiledMachine's spec carries | Same |
+| dWellOiledMachine | The `next` verb, with `--plan` and `--status` re-pointed (`cl-dClosedLoop-0280`); the unattended kit dissolved, with `/unattended` kept as a client of `run` until dConvergedCharter retires it (`cl-dClosedLoop-0306`); `gov-session` retired (`cl-dClosedLoop-0320`) | **The driver's successor.** Runs started after this landing still start with `/unattended <slug>`, now a client of `run`. Its verbs are the ones the landed kit's usage and its landing record name, which each packet re-renders. A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | Merge `origin/main` and run `--authorization` at the next pass boundary. Its landing goes through the successor, under the in-flight test dWellOiledMachine's spec carries | Same |
 | dIndexedDesign | The Design-to-Build hand-off (`cl-dClosedLoop-0383`) and `design.coverage` (`cl-dClosedLoop-0398`) | `carries.py` stops being run; the departures report reads the product join's output (the retirement table in [phase-1]). The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table) | Closes through the new Design exit | Nothing |
 | dRankedPlan | Priority beside `parents:` and the plan view (`cl-dClosedLoop-0369`) | The plan view is the product successor of the schedule script's ordering | Nothing | Nothing |
 | dScopedBuild | Built specs frozen (`cl-dClosedLoop-0400`); `deviation.gate` (`cl-dClosedLoop-0412`) | None: dScopedBuild's own landing sets `deviation.gate = report`, carried by its spec under P0.8 row 3 and recorded as a departure (ER:396). The `deviations.py` join stops being run; the `--report` mode reads `deviation.gate`'s output and keeps running (the retirement table in [phase-1]). The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table) | Nothing | It may not revise a landed unit's spec; it adds a unit instead |
 | dShippedRelease | The landing record and the lander (`cl-dClosedLoop-0413`) | Every later landing goes through the new lander | Lands through it | Lands through it |
-| dConvergedCharter | Every remaining kit conf key folded into the policy file (`cl-dClosedLoop-0485`), and `/unattended` retired | The chain is done; D5 sets the two deviation keys | none | none |
+| dConvergedCharter | Every remaining kit conf key folded into the policy file (`cl-dClosedLoop-0485`), and `/unattended` retired | The chain is done; D5 sets the two deviation keys. A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | none | none |
 
 ## [deviations]
 
@@ -1109,10 +1231,10 @@ one Max plan serving five projects.
 | When | The owner's step | Rests on |
 |---|---|---|
 | Done | The plan took two independent Tier-2 reviews, compared and folded: "Review twice, then approve (Recommended)" (ER:343) | `build/…-execution-plan-reviews-compared.md` |
-| Now | The fold takes one more paired review over its own commit, compared and folded: "Review the fold, then approve (Recommended)" (ER:404) | [defaults] |
-| After that fold | Walk this plan and approve it. Every choice is answered (ER:166-404); four items are carried for the walk (R6, D3, D5, D8) | [defaults] |
-| After approval | Let node d's session run phase 0 | [phase-0] |
-| Phase 0's end | Read the opening diff (every README, the grant row every `may:` cites, every packet and every decision row) and ask for its landing | P0.7 |
+| Done | The fold took one more paired review over its own commit, compared and folded: "Review the fold, then approve (Recommended)" (ER:404) | `build/…-execution-fold-reviews-compared.md` |
+| Done | Walked the plan section by section, and chose four changes, folded here without a further review (ER:413-542) | [defaults] |
+| Now | Start phase 0 in a new session, from the fully oriented handoff this session writes: "Fold, then give me a fully oriented hand off to start phase 0 in a new session." (ER:533). Four items stay carried as recommended (R6, D3, D5, D8); the one question the fold raised is closed ([defaults]) | [phase-0] |
+| Phase 0's end | Read in full the nine decision rows, the grant row among them, and dTrueNorth's README and packet; for the other 21 builds, read `open.py --check`'s output and `open.py --summary`'s rows, families included; then ask for the landing: "Rows + dTrueNorth (Recommended)" (ER:446) | P0.5; P0.7 |
 | Each moment the script names | Type the run, `/unattended <slug>`, on the named node, in a fresh worktree: 43 runs (ER:270) | [schedule]; PROTOCOL:21-27 |
 | dTrueNorth's landing | Read its departures report, which is also the first look at its coverage, since it ran whole | [phase-1] |
 | Each spec landing | Read the build's coverage report and departures report before typing its build run, and check the landing diff for any path under `memory/builds/dClosedLoop/build/*.py` and any changed pin line in a `*-packet.md`. A "no" to a listed departure takes P0.6 rule 5: a decision row recording it, then an ask in that build's `BACKLOG.md`, which its build run must dispose of | [phase-2]; P0.6 |
@@ -1131,7 +1253,7 @@ section that does it, or listed with its smallest change and that change's kind.
 |---|---|---|
 | No spec audit unless the owner opts in | driver 1 | Designed around: `spec-audit:` in all 22 landed READMEs (answer 2, P0.5) |
 | Governance-carrier and public-surface forks park; `may:` was never exercised | driver 2 | Designed around: one grant decision row every `may:` cites (ER:181); proven in phase 1 |
-| "Governance carrier" is defined nowhere | driver 2 | **Cannot.** A policy: a decision row defining it |
+| "Governance carrier" is defined nowhere | driver 2 | Designed around: a policy, P0.8 row 9, lists the carriers as `open.py --carriers` derives them from the tree at the opening, and the grant reads against that list (ER:525) |
 | No parallelism inside a build; no sharing one build across nodes | driver 3, coordination | Designed around: split phases across builds. Lifting it is a chain build's unit: dPlacedRequest's unit leases (`cl-dClosedLoop-0120`) |
 | Builds that rewrite their own driver | driver 4 | Designed around: they land through their own new code, the owner landing only if it refuses (ER:248), and the [sync-points] rows |
 | A cross-node take-over needs the branch on the remote; no rule says when a branch is pushed | driver 5, coordination, handoffs 6 | Designed around: a policy, push after every pass commit, hold and hand-off (P0.8) |
@@ -1176,7 +1298,7 @@ there.
 
 - **R1, the grant.** "One decision row (Recommended)" (ER:181). One row grants each chain build the
   governance-carrier and public-surface changes its own `[chain]` clauses name, and all 22 `may:` lines cite it
-  (P0.5, P0.8).
+  (P0.5, P0.8). In the walk the owner held the rows as quoted: "Hold, on to Phase 1 (Recommended)" (ER:461).
 - **R2, `cl-dClosedLoop-0004`.** "A deviation, your values (Recommended)" (ER:189). Deviation record 1
   ([deviations]); the interim check reads `report` and `author-recorded` for the chain.
 - **R3, report or refuse.** "Report, as read (Recommended)" (ER:255).
@@ -1214,8 +1336,34 @@ there.
   decision row that records the answer, as P0.1 row 6 requires ([deviations]).
 - **Before phase 0.** "Review twice, then approve (Recommended)" (ER:343): two independent Tier-2 reviews of this
   plan, compared and folded. Then "Review the fold, then approve (Recommended)" (ER:404): one more paired review over
-  the fold's commit, compared and folded, before the owner approves it.
+  the fold's commit, compared and folded. The owner then chose to walk the plan before approving it: "Walk it first"
+  (ER:424).
 - **Node b.** "Spec runs only" (ER:219), the script's rule.
+- **The unit family.** "Family by stream" (ER:438), over the recommended "TOOL for all": each build's family follows
+  its main stream, PLAY for charter and playbook builds, KICK for session and kickoff, DEPL for deploy, TOOL otherwise.
+  P0.5 derives it from each build's Stage and slug noun; P0.8 row 8 records it. Two PLAY, one KICK, one DEPL and
+  eighteen TOOL builds.
+- **The opening read.** "Rows + dTrueNorth (Recommended)" (ER:446): the decision rows, the grant row, and dTrueNorth's
+  README and packet in full; for the other 21, `open.py --check`'s output and the per-build summary P0.5 defines
+  (P0.7).
+- **The self-test suites in driver builds.** "Waive in each README" (ER:476), over the recommended "Run at those
+  closes": each of the seven driver-changing builds P0.5 derives waives the unattended kit's own on-demand suites for
+  its landing in its README, in dAlignedCarrier's form, and proves its driver changes by targeted probes and its own
+  planted tests (README rule 8; P0.8 row 6). The walk's correction sets the scope (ER:544-557): the suites are on no
+  leg of the bar, so the waiver covers the `--selftests` verdict the kit's Definition of Done owes a landing, and every
+  close touching `tools/` still exports `GATE_FULL=1 GATE_SELFTESTS=1`.
+- **The governance carrier.** "Define it in Phase 0 (Recommended)" (ER:525): P0.8 row 9 lists the carriers,
+  derived from the tree at the opening, and the grant reads against it.
+- **After the walk.** "Fold, then give me a fully oriented hand off to start phase 0 in a new session." (ER:533). The
+  walk's four changes are folded without a further review, and phase 0 starts in a new session from that handoff.
+
+### Closed after the walk
+
+- **Self-tests at the close of a build that is not driver-changing.** The writer asked whether every build touching
+  `tools/` should waive the self-tests too. The question has no subject: `GATE_SELFTESTS=1` runs the bar's held kit
+  legs, and no leg runs the unattended kit's suites (`memory/guides/MERGE-BAR.md:39-41`;
+  `tools/unattended/run-unattended-gates.sh:2`). A build touching `tools/` without changing the driver owes the
+  flagged bar and no unattended suite, so it needs no waiver (the walk's correction, ER:544-557).
 
 ### Carried as recommended, not asked, for the owner's walk (ER:272-276)
 
@@ -1236,7 +1384,7 @@ there.
 | Stagger landings by owner order (driver, limit 7) against contention being too low to need it (coordination, test 4) | Coordination: it measured at most two interlopers against three retries |
 | 262 units (schedule, HEFT) against its own stated rule, "the free node takes the ready phase with the most downstream work" | The stated rule, which a node can apply at a landing without a plan; the script gave 270 then and gives 271 with dTrueNorth whole and its extra unit. HEFT's 262 comes from holding a node for a more critical run about to become ready, which a re-derived table can also do if the owner prefers |
 | Node b spec-only (schedule) against "spec and build" (answer 4) | The owner's later "Spec runs only" (ER:219), which agrees with the schedule return |
-| "Records-only landings are cheap" (schedule) | Partly: an in-place close runs the bar under `GATE_FULL=1` whatever the diff (PROTOCOL:428-432). A spec run is spared only the self-tests (`.unattended.conf:40`) |
+| "Records-only landings are cheap" (schedule) | Partly: an in-place close runs the bar under `GATE_FULL=1` whatever the diff (PROTOCOL:428-432). A spec run, whose range touches no `tools/` path, is spared only the held kit legs `GATE_SELFTESTS=1` adds (`.unattended.conf:40`) |
 | `BUILD-METHOD` "MUST run concurrently" against a strictly sequential harness (driver) | The code (`unattended-build.js:76-80`) |
 | "Claims never age" (GR:323, theme T5) against the code (coordination) | The code: a `live` claim turns `stale` at 5400 s, and only `held` never ages (`unattended.sh:2177-2186`) |
 | Several returns: forks the run cannot settle are parked BLOCKED | The owner's rulings: the run settles them itself, by the standing ruling (ER:240), which also takes veto 2 outside the grant (ER:388), or by relaxing the weakest bound (ER:328), and records each as a departure. Nothing parks |

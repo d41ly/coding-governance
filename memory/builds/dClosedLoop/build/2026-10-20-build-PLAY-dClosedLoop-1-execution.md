@@ -540,3 +540,18 @@ departures the owner has approved, the owner's own steps and the [cannot] rows. 
 - a decision row defines a governance carrier, derived from today's tree (answer 10).
 
 Phase 0 then starts in a new session, from a fully oriented handoff this session writes.
+
+**A correction to step 2, the main loop's.** Step 2 said that closing dTrueNorth under `GATE_SELFTESTS=1` runs the
+unattended kit's self-test suites. That is wrong. A kit's self-tests are not on the merge bar, and the unattended kit
+was the first to leave it (`memory/guides/MERGE-BAR.md`, "A KIT'S SELF-TESTS ARE NOT ON THIS BAR"). Its suites run
+only on demand, through `tools/unattended/run-unattended-gates.sh --selftests` ("this kit's SELF-TESTS, run on demand
+and never on the merge bar", its line 2). No leg of `tools/gate-legs.json` runs them, as checked by reading every leg
+that names the kit. `GATE_SELFTESTS=1` runs the bar's other held kit legs. The only one of those naming the kit is the
+workflows kit's `unattended-build` self-test, which the standing instruction leaves out.
+
+So answer 5 keeps its substance at a narrower scope. Each driver-changing build waives the unattended kit's own
+suites, which the kit's Definition of Done would otherwise have its landing report carry. The form is dAlignedCarrier's
+README rule: the suites waived for the landing, a criterion they would observe amended citing the rule, their clean
+reading owed with a backlog record. The close still exports `GATE_FULL=1 GATE_SELFTESTS=1`, the flagged bar the driver
+owes a range that touches `tools/`. A build that touches `tools/` without changing the driver owes the flagged bar and
+no unattended suite, so the writer's open question of a waiver for every `tools/` build has no subject.
