@@ -89,8 +89,9 @@ The real tree, in the acceptance clone.
     The packet also names cl-0004's stand-ins dOrderedCharter and dDeclaredLoop, and cl-0006's stand-in dOrderedCharter,
     and the key `deviation.approval` that dDeclaredLoop owns, as the example does.
 13. `file <packet>; tail -c1 <packet> | od -c`: exit 0. "UTF-8 text" with no CRLF, and a final `\n`.
-14. `python tools/roles/handoff.py render --role gov-spec-writer --build dTrueNorth --unit <unit 1> --input
-    prompt=<packet>`: exit 0. It prints "<handoff>" and "handoff: description — dTrueNorth · <unit 1> · spec-write".
+14. Exit 0 for
+    `python tools/roles/handoff.py render --role gov-spec-writer --build dTrueNorth --unit <unit 1> --input prompt=<packet>`.
+    It prints "<handoff>" and "handoff: description — dTrueNorth · <unit 1> · spec-write".
     The spec writer is the role that reads all five brief keys as required.
 15. `python tools/roles/handoff.py check <handoff>`: exit 0. "<handoff> role-sha=06b14b1ac42a task-sha=00117bbda552"
 16. `grep -n '^### ' <handoff>`: exit 0. "51:### brief:goal", "55:### brief:items", "66:### brief:acceptance", "72:###
@@ -134,8 +135,8 @@ The real tree, in the acceptance clone.
 33. Control 2 on the same plant: `python <scratch>/variants/packet-repin-write.py --write dTrueNorth`, a copy whose
     `render_packet` adds `pins = {p: read_head_blob(p) for p in pins}` after reading the packet's pins: exit 0, "packet:
     wrote <packet>". Then `python packet.py --check dTrueNorth`: exit 0, "pin arm 5 instruments, 0 findings"
-34. `git checkout -- <packet>; python packet.py --write dTrueNorth`: exit 0. Then `python packet.py --check
-    dTrueNorth`: exit 1, the pin arm's line of step 30 again.
+34. `git checkout -- <packet>; python packet.py --write dTrueNorth`: exit 0. Then
+    `python packet.py --check dTrueNorth`: exit 1, the pin arm's line of step 30 again.
 35. Edit: `memory/builds/dTrueNorth/RUN.md` holding `phase: BUILDING`. `python packet.py --repin carries.py`: exit 1.
     "refused: --repin is the owner's, and never runs inside a chain run: memory/builds/dTrueNorth/RUN.md (phase
     BUILDING)". Then `python packet.py --check dTrueNorth`: exit 1, with the packet unchanged.
