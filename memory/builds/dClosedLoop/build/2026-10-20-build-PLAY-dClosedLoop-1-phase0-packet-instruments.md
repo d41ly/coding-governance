@@ -380,3 +380,170 @@ command ran from a tree's root with `python -B`, under a bounded timeout. On 202
   - **An amendment that leaves its other half standing.** This item names item 6's bullet it closes. A
     `grep -rn` over `build/*.py` for a typed count of the instruments ("6 instruments", "five instruments" and the
     like) finds none. `INSTRUMENTS` has no reader outside `packet.py`, since `deviations.py` keeps its own list.
+
+## The packet's file name
+
+Dispatch 244's evidence for its brief (`build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-packet-name.md`). The
+opening at `b50573ef4` redded hygiene check 21 on all 22 packets. Each was named for its build's first unit, and each
+one's Serves line lists PLAY-dClosedLoop-1. The work was built in a `--shared` clone of the main loop's branch at
+`45a825043`, on `p0-packet-name`: `a5a331d9e` carries the code, `738dca981` the re-rendered opening, and the commit
+after them this section. Every command ran from a tree's root with `python -B`, under a bounded timeout, and a script
+named `d244/…` is in this session's scratch folder. `<packet>` is a build's
+`memory/builds/<slug>/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md`.
+
+**What changed.** `packet.py` declares `SERVES = "PLAY-dClosedLoop-1"` once and builds both the packet's Serves line
+and its file name from it. `scan_packets` globs `*-prompt-PLAY-dClosedLoop-1-packet.md`, so it finds a build's packet
+by that name alone, and `render_packet` writes a first render under it. The first unit fed only the name, so three
+things that served it are deleted: its derivation, its two refusals ("no first unit of <slug>" and "--unit <id> is not
+<first unit>"), and the `--unit` flag that supplied it. `render_packet(slug)` is the call `open.py` already made. Both
+docstrings name the new form. `packet.py`'s blob moves from `1a8159416` to `7dd2b7972`, and `open.py`'s from
+`43cdb6d77` to `b8c9e9c04`. The code is committed before the re-render because a first render pins each instrument's
+blob at HEAD. Rendered in the code's own commit, every packet would pin the old blobs of both files and carry the old
+generator version, so its check would red as soon as that commit landed.
+
+**1. The commands, in order.**
+
+| # | Tree | Command | Exit | The line that proves it |
+|---|---|---|---|---|
+| 1 | scratch | `git clone --shared` of the main loop's worktree at `branch/unruffled-aryabhata-d89ede`, `git config core.hooksPath .githooks`, `git worktree add -b p0-packet-name` | 0 | "HEAD is now at 45a825043" |
+| 2 | `45a825043` | `tools/lexicon/lexicon.py --suggest SERVES --as py.constant` | 2 | "cell `py.constant` is UNDECLARED — no CELLS row names it, so there is no convention to answer in". No new function is named. |
+| 3 | `45a825043`, the clone's own checkout | `d244/runs.py`: `packet.py --fixture` and its 12 plant and control runs | 0 | item 2 |
+| 4 | the change, uncommitted | `d244/names.py`: per build, what `scan_packets` finds, the path `render_packet` names, and that path's id against the rendered Serves line | 0 | "builds 22 · name/Serves mismatches 0"; `scan_packets` finds none of the 22 old-named packets |
+| 5 | `45a825043` | the same | 0 | "builds 22 · name/Serves mismatches 22", e.g. "render names memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-packet.md · claims TOOL-dTrueNorth-1 · Serves ['PLAY-dClosedLoop-1'] · MISMATCH" |
+| 6 | the change, staged | `git ls-files --eol` and `git cat-file -p :<path>` over the two files | 0 | "i/lf w/lf attr/text eol=lf" for both, and no CR in either staged blob. `git show :<path>` counted 696 and 709 CR lines, a rendered view of the same blobs and not their bytes. |
+| 7 | | `git commit`, through the pre-commit hook | 0 | "[p0-packet-name a5a331d9e] …" |
+| 8 | `a5a331d9e` | `git rm` of the 22 `*-prompt-<first unit>-packet.md` files | 0 | `git status --short`: 22 `D` lines |
+| 9 | | `open.py --write` | 0 | "open: wrote and staged 43 files, 22 contract rows in memory/project/readme-contract.txt and 22 packets, opened 2026-10-21; run `gen_build_index.py --write` next" |
+| 10 | | `tools/memory-tree/gen_build_index.py --write` | 0 | "build-index: wrote 1561 artifact(s)" |
+| 11 | | `git diff HEAD --stat`, then `git add` of the 22 READMEs it refilled | 0 | "22 files changed, 88 insertions(+), 88 deletions(-)": the 22 packets alone, every README back at its committed bytes and no other view changed |
+| 12 | | `git ls-files --eol` and `git cat-file -p` over the 22 new packets | 0 | "i/lf w/lf" for all 22, no CR in any staged blob |
+| 13 | | `open.py --check`, before the commit | 0 | "… summary arm over 22 rows, 0 disagreements · findings 0" |
+| 14 | | `git commit`, through the pre-commit hook | 0 | "[p0-packet-name 738dca981] …", 22 renames, each moving four lines: the `packet.py` and `open.py` pins, the render HEAD and the generator version |
+| 15 | `738dca981` | `open.py --check` | 0 | "open: check of the opening of 2026-10-21 · 65 files byte-compared · roster arm over 509 clauses · summary arm over 22 rows, 0 disagreements · findings 0" |
+| 16 | `738dca981` | `packet.py --check <slug>` for each of the 22 | 0 for all 22 | item 3 |
+| 17 | `738dca981` | `gen_build_index.py --check` | 0 | "build-index: clean (1561 artifact(s))", with "0 verdict(s)" |
+| 18 | `738dca981` | `d244/runs.py` | 0 | item 2: its log is byte-identical to step 3's (`diff` exit 0) |
+| 19 | a throwaway worktree at `738dca981` | `d244/red.py`, open.py's red tests, run in the background while steps 20 to 25 ran | 0 | item 4 |
+| 20 | `738dca981` | `tools/memory-tree/gotchas.py --for-diff 45a825043..HEAD` | 0 | item 6 |
+| 21 | `738dca981` | `bash tools/memory-tree/check-memory-hygiene.sh`, the whole tree | not run | "BLOCKED by scratch-guard: a role agent runs no gate. Agent type gov-builder ran … which is row G1 leg, the leg "memory hygiene"." Owed (item 5). |
+| 22 | `738dca981` | `d244/check21.py` | 0 | "packet S rows 22 · packet findings 0 · branch 4 findings tree-wide, unfiltered 0" |
+| 23 | `45a825043` | the same | 0 | "packet S rows 22 · packet findings 22 · branch 4 findings tree-wide, unfiltered 22", each "S row: <the old packet> — the name claims <its build's first unit>" |
+| 24 | `738dca981` | `packet.py --write dTrueNorth --unit TOOL-dTrueNorth-1` | 2 | "packet.py: error: unrecognized arguments: --unit TOOL-dTrueNorth-1" |
+| 25 | `738dca981` | `packet.py --write dTrueNorth` | 0 | "packet: memory/builds/dTrueNorth/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md is current, nothing written", and `git status --short` empty |
+| 26 | the throwaway worktree | red 7 again, with the codebase map regenerated | 1 | item 4 |
+| 27 | the throwaway worktree | `tools/roles/handoff.py render --role gov-spec-writer --build dTrueNorth --unit TOOL-dTrueNorth-1 --input prompt=<packet>`, then `handoff.py check` on what it wrote, then `git clean` of it | 0, 0 | "handoff: description — dTrueNorth · TOOL-dTrueNorth-1 · spec-write"; "role-sha=06b14b1ac42a task-sha=3be43a7f5124"; its five `### brief:` heads at lines 51 to 78, and 6 lines naming `cl-dClosedLoop-000[1-6]@` |
+
+**2. The packet plants, before and after** (steps 3 and 18). The two logs are byte-identical.
+
+| Command | Exit | The line that proves it |
+|---|---|---|
+| `packet.py --fixture` | 0 | byte compare green · completeness 0 findings over clauses 6, gaps 3, parents 1, owed 1, roster 7, asks 7 · pin arm 7 instruments, 0 findings |
+| `… --plant clause` | 1 | clause arm: `cl-dClosedLoop-0004@c374ccd0` of dTrueNorth's row is not in Items; the byte compare green |
+| `… --plant gap` | 1 | gap arm: `gap-mem-47`, which dTrueNorth owns, is not in Gaps; the byte compare green |
+| `… --plant parent` | 1 | parent arm: dClosedLoop is not in Parents; the byte compare green |
+| `… --plant owed` | 1 | owed arm: v2:fixture `[owed]`, naming dTrueNorth, is not in Obligations; the byte compare green |
+| `… --plant roster` | 1 | roster arm: `TOOL-dTrueNorth-7` of the opened README is not in Obligations; the byte compare green |
+| `… --plant ask` | 1 | ask arm: `PLAY-dClosedLoop-17` (memory/builds/dClosedLoop/BACKLOG.md:11) is not in Obligations; the byte compare green |
+| `… --plant hand-edit` | 1 | byte compare: the packet differs from its render from line 15: A hand edit. |
+| `… --plant pin` | 1 | pin arm: instrument …-carries.py moved: pinned 0b5fab9cc06d, HEAD holds 5b44b718e5ed; the byte compare green |
+| `… --plant pin --control no-pin-arm` | 0 | byte compare green · completeness 0 findings over … owed 2 … · pin arm removed |
+| `… --plant pin --control repin` | 0 | byte compare green · completeness 0 findings over … owed 2 … · pin arm 7 instruments, 0 findings |
+| `… --plant run-live` | 1 | --repin refused: memory/builds/dTrueNorth/RUN.md (phase BUILDING) |
+| `… --plant run-landed` | 0 | --repin not refused: no live chain run |
+
+Since the opening, the fixture's roster of 7 and its 7 asks are the tree's own: dTrueNorth's README roster and the
+clean-reading asks in dClosedLoop's `BACKLOG.md`. So the roster and ask plants drop real items, and only the `[owed]`
+line is seeded.
+
+**3. Each packet's check** (step 16). Each printed "packet: <slug> · <packet> · byte compare green · completeness 0
+findings over clauses C, gaps G, parents P, owed O, roster R, asks 7 · pin arm 7 instruments, 0 findings". The counts
+are those of the opening's own record (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-open-instruments.md`,
+`[acceptance]` 6), whose pin arm then read 6 instruments:
+
+| Build | C | G | P | O | R |
+|---|---|---|---|---|---|
+| dTrueNorth | 6 | 3 | 1 | 0 | 7 |
+| dGroundRules | 11 | 3 | 1 | 1 | 11 |
+| dSafePassage | 13 | 13 | 1 | 0 | 13 |
+| dOrderedCharter | 37 | 31 | 1 | 3 | 37 |
+| dFairHearing | 18 | 13 | 1 | 0 | 18 |
+| dDeclaredLoop | 34 | 17 | 2 | 4 | 34 |
+| dPlacedRequest | 21 | 18 | 1 | 0 | 21 |
+| dKeptSession | 28 | 8 | 2 | 1 | 28 |
+| dBoundRoles | 26 | 22 | 3 | 4 | 26 |
+| dFurnishedOrders | 20 | 13 | 1 | 0 | 20 |
+| dTotalRecall | 26 | 22 | 3 | 7 | 26 |
+| dLinkedLibrary | 25 | 23 | 1 | 0 | 25 |
+| dMindYourWords | 17 | 11 | 4 | 1 | 17 |
+| dWellOiledMachine | 61 | 63 | 3 | 5 | 61 |
+| dWitnessedBar | 30 | 27 | 1 | 0 | 30 |
+| dRankedPlan | 16 | 10 | 3 | 1 | 16 |
+| dIndexedDesign | 16 | 13 | 5 | 2 | 16 |
+| dScopedBuild | 15 | 10 | 4 | 1 | 15 |
+| dShippedRelease | 31 | 24 | 6 | 1 | 31 |
+| dTendedCadence | 18 | 14 | 5 | 2 | 18 |
+| dCalibratedLens | 17 | 13 | 2 | 0 | 17 |
+| dConvergedCharter | 23 | 15 | 4 | 1 | 23 |
+
+**4. open.py's red tests** (steps 19 and 26): the opening record's `[red]` 1 to 11, in a throwaway worktree at
+`738dca981`. Each plant was restored by `git reset --hard 738dca981` before the next, and `git status --short` read
+empty after each. Only `open.py`'s commands ran on a plant. Red 3's `gen_build_index.py --check` is a leg of the bar,
+not the opening's, and was left out.
+
+| Red | Plant, with `git diff --numstat` | Command | Exit | The line that proves it |
+|---|---|---|---|---|
+| 1 | dGroundRules's README, `goal bound.` to `goal bound!` ("1 1") | `open.py --check` | 1 | "byte compare: memory/builds/dGroundRules/README.md differs from its render from line 19: … goal bound!" |
+| 2 | the `cl-dClosedLoop-0012` roster row deleted ("0 1") | `open.py --check` | 1 | findings 6: "roster arm: dGroundRules: `cl-dClosedLoop-0012` is in 0 roster rows, not exactly one", beside the README's byte compare, the byte compare of dGroundRules's `<packet>` and its packet arm, and the summary arm's Units (`10` against `11`) and Packet lines |
+| 3 | `parents: dTrueNorth` to `dTrueNorht` ("1 1") | `open.py --check` | 1 | "byte compare: … from line 10: parents: dTrueNorht" and "summary arm: dGroundRules: `parents:` reads `dTrueNorht` in the files, and the derivation gives `dTrueNorth`" |
+| 4 | dGroundRules's README removed from `memory/project/readme-contract.txt` ("0 1") | `open.py --check` | 1 | "summary arm: dGroundRules: Contract row reads `absent` in the files, and the derivation gives `present, bound`" |
+| 5 | `roster: TOOL` to `roster: PLAY` ("1 1") | `open.py --check` | 1 | "byte compare: … from line 6: roster: PLAY" and "summary arm: dGroundRules: Family · `streams:` reads `PLAY · tooling` in the files, and the derivation gives `TOOL · tooling`" |
+| 6 | `tools/newkit/kit.toml`, committed (scratch `04d2f1b59`) | `open.py --carriers --check` | 1 | "tools/newkit/ (routed product paths; tracked tools/newkit/kit.toml) is under a selector, and the list at the opening commit b50573ef4b42 omits it", with "113 entries now, 112 listed" |
+| 7 | `git rm tools/settings-merge.py`, then `git commit` | `git commit` | 1 | the pre-commit hook refused it: "FAIL test_generated_artifacts_are_fresh" and "STALE symbols.json — regen: python tools/codebase-map/gen_map.py --write". Nothing was committed, so `--carriers --check` did not run. |
+| 7, step 26 | the same removal, then `tools/codebase-map/gen_map.py --write` (exit 0) and the `memory/map/generated/symbols.json` it rewrote staged, committed through the hook (scratch `03a9825a2`) | `open.py --carriers --check` | 1 | "tools/settings-merge.py is on the list at the opening commit b50573ef4b42, and nothing tracked at HEAD sits under it", with "111 entries now, 112 listed" |
+| 8 | `PLAY-dClosedLoop-13`'s ask row removed from dClosedLoop's `BACKLOG.md` ("0 1") | `open.py --check`, then `open.py --write` | 1, 1 | findings 67: "owed asks: memory/builds/dClosedLoop/BACKLOG.md lacks the opening's row: - PLAY-dClosedLoop-13 · filed 2026-10-21 · …", and for each of the 22 packets a byte compare, a packet arm and a summary-arm Packet line. Then "open: refused: memory/builds/dClosedLoop/BACKLOG.md exists without the opening's rows, and the opening writes it once", with `git status --short` showing only the plant. |
+| 9 | dGroundRules's `BACKLOG.md` copied into dTrueNorth's folder | `open.py --check` | 1 | "byte compare: memory/builds/dTrueNorth/BACKLOG.md exists, and the opening writes none for a whole-run build" and "summary arm: dTrueNorth: Carry-forward ask reads `TOOL-dGroundRules-12` in the files, and the derivation gives `none: whole run`" |
+| 10 | dGroundRules's `<packet>`, `### Goal` to `### Goal!` ("1 1") | `open.py --check` | 1 | findings 3: "byte compare: memory/builds/dGroundRules/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md differs from its render", "packet arm: dGroundRules: byte compare: the packet differs from its render from line 13: ### Goal!", and the summary arm's Packet line, 30358 B with exit 1 against 30357 B with exit 0 |
+| 11 | every plant restored, `git status --short` empty | `open.py --check`, then `open.py --carriers --check` | 0, 0 | "… findings 0"; "carriers at HEAD 738dca98145d against the list at the opening commit b50573ef4b42 · 112 entries now, 112 listed · findings 0" |
+
+**5. The hygiene run, owed.** The brief names one gate for this unit: the whole-tree `check-memory-hygiene.sh`, run
+after the commit. The scratch-guard hook refused it to this role (step 21), so it did not run. It is owed to the main
+loop at the close, where no check 21 finding may name a packet. `d244/check21.py` stands in for its check 21 until
+then. It runs `gen_build_index.py --print-bindings`, the parse check 21 reads, and applies three arms to every packet's
+rows: the A arm (no conformant Serves line), the B arm (a Serves id no spec defines) and branch 4's filename
+projection, ported from the awk at `tools/memory-tree/check-memory-hygiene.sh:1446-1478`. On `45a825043` it gives the
+opening's 22 findings, each in the check's own words. On `738dca981` it gives none, and no branch 4 finding anywhere
+in the tree. It is not the check. It leaves out `extract_graded_rows`'s legacy list and `RECORD_SERVES_CUTOFF`, which
+only remove rows, and the U arm's pin, and it runs none of the other checks.
+
+**6. After the commits, the M6 checklist.** `python tools/memory-tree/gotchas.py --for-diff 45a825043..HEAD` over both
+commits: exit 0, 16 classes, 10 by anchor and 6 universal. Six were checked:
+
+- **A retirement inventory that misses readers by value.** Retired: the `--unit` flag, `first_unit`, the two refusal
+  texts and the per-unit name. `git grep` over the tree's `.py`, `.sh`, `.json` and `.toml` files finds nothing for
+  the refusal texts, `first_unit` or "first render's unit", for `packet.py` with `--unit`, or for `render_packet(` with
+  a second argument. Of the tools that read a prompt file's name, `handoff.py`'s `derive_prompt_name` counts only
+  `<date>-prompt-<unit>-<digits>-` under the unit's own stem, so the packet's name never enters its numbering; step 27
+  renders a handoff from a renamed packet. `deviations.py`'s `outside-packet` plant writes a packet-shaped path only as
+  a write outside the build's folder, and reads no name. The earlier records that quote the old name are history.
+- **Two answers to one question.** The Serves line and the name were typed apart, so they could drift. Both now read
+  `SERVES`. The docstrings name the form in prose, as the brief asks.
+- **An amendment that leaves its other half standing.** The usage line, the `--write` gloss, the `render_packet` line
+  and `open.py`'s list of what it writes were amended with the code. A `grep` for "first unit" and `first_unit` over
+  both files finds nothing.
+- **A fixture that passes by finding nothing.** The fixture renders in memory and reads no file name, so its unchanged
+  verdicts say nothing about the name. The name was seen red first on the old tree, by `d244/names.py` (step 5) and
+  `d244/check21.py` (step 23).
+- **A synthetic value standing in.** The probes call the real `render_packet` and read the generator's real bindings
+  parse, and the red tests plant the opening's own files.
+- **A heredoc escape that reaches a regex.** No heredoc: every script and every commit message was written to a file.
+
+The remaining classes concern guards above a fold, fences, merges read as additions, inserts after a repeated key,
+ledger tokens, table cells split on a pipe, a record's Serves line and filename, owner items, policy values and quoted
+rates. None of them applies here, except the Serves-and-filename class, which this change closes for the packets.
+
+**7. What these runs do not show.**
+
+- Check 21 over the whole tree, and every other hygiene check: owed (item 5).
+- A packet under any other name. `scan_packets` does not find it, so neither `packet.py --check` nor `open.py --check`
+  reads it. Hygiene check 21 reds it, as it redded the opening's.
+- `gen_build_index.py --check-format` and every other leg of the bar: none ran.

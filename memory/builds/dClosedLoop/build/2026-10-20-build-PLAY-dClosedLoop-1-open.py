@@ -10,8 +10,8 @@ What `--write` writes, per chain build:
       driver-changing build), and the authored `roster:units` pair. `gen_build_index.py --write` fills `ids:` and
       the generated regions afterwards.
   memory/builds/<slug>/BACKLOG.md  the one carry-forward ask and its SEV row, for every build but a whole-run one.
-  memory/builds/<slug>/prompts/<date>-prompt-<first unit>-packet.md   through the packet instrument's
-      `render_packet`, imported by path.
+  memory/builds/<slug>/prompts/<date>-prompt-PLAY-dClosedLoop-1-packet.md   through the packet instrument's
+      `render_packet`, imported by path, so the name claims the id the packet's Serves line lists.
 and once: the 22 bound rows of `memory/project/readme-contract.txt`, through the generator's `add_contract_row`; and
 dClosedLoop's own `BACKLOG.md` with one clean-reading ask, and its SEV row, per driver-changing build. It stages every
 file it writes, because the index generator reads `git ls-files` and a packet reads the open asks through it.
