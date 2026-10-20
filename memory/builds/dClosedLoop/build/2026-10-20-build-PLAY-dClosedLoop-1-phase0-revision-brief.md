@@ -68,7 +68,7 @@ text, grouped into the decisions the owner must make and the fixes that follow f
 
 ### Items
 
-1. Each of the fifteen findings, verified against the cited source (file and line), marked CONFIRMED, REFUTED or
+1. Each of the fifteen findings, quoted verbatim in this brief record's `## The prompt` (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision-brief.md`, read it whole first), verified against the cited source (file and line), marked CONFIRMED, REFUTED or
    PARTLY, with what you measured.
 2. For each confirmed finding: options, a recommendation, and the revised plan text for P0.1, P0.2, P0.3, P0.4 or
    P0.7 as it would read.
