@@ -19,9 +19,10 @@ file it writes, because the index generator reads `git ls-files` and a packet re
 Ids, fixed for Phase 0 (dispatch 239's brief, item 3), every one built from its parts here, so this file cites none:
   a chain build's roster ids are `<FAMILY>-<slug>-1` to `-<n>`, in clause order, then its extra units;
   its carry-forward ask is the next id after its roster;
-  P0.8's rows 1 to 9 are dClosedLoop's ids 2 to 10 (written `missing:PLAY-dClosedLoop-2` to `-10` until the main loop
-  lands them), the grant being row 2, which every `may:` line cites, and the extra unit's decision row 1;
-  dClosedLoop's clean-reading asks follow, from id 11, one per driver-changing build in v2's `[chain]` order.
+  P0.8's rows 1 to 9 are dClosedLoop's ids counted on from row 1's, which the packet instrument declares once as
+  `EXTRA_DECISION` (`missing:PLAY-dClosedLoop-2` until the main loop lands it, so ids 2 to 10); the grant is row 2,
+  which every `may:` line cites, and the extra unit derives from row 1;
+  dClosedLoop's clean-reading asks follow row 9's id, one per driver-changing build in v2's `[chain]` order.
 
 The family rule (walk answer 1, ER:435-436): the build's Stage and its slug's noun, its last capitalised word, matched
 in that order and whole words only against `charter` or `playbook` (PLAY), `session` or `kickoff` (KICK) and
@@ -65,7 +66,6 @@ B = "memory/builds/dClosedLoop/build/"
 OWN = "dClosedLoop"
 PACKET = B + "2026-10-20-build-PLAY-dClosedLoop-1-packet.py"
 OWED_BACKLOG = f"memory/builds/{OWN}/BACKLOG.md"
-FIRST_DECISION = 2        # P0.8 row 1 is dClosedLoop's second id, its spec being the first (dispatch 239's brief)
 DECISION_ROWS = 9         # P0.8's nine rows; dClosedLoop's clean-reading asks take the ids after them
 GRANT_ROW, EXTRA_ROW = 2, 1
 WAIVER_DATE = "2026-10-20"  # the owner's walk answer 5 (ER:476), which README rule 8 quotes
@@ -113,9 +113,12 @@ def read_conf():
 
 
 def derive_decision_id(row):
-    """dClosedLoop's id for P0.8's row `row`, or for the clean-reading asks after the nine rows."""
-    fam = genindex.parse_front_matter(f"memory/builds/{OWN}/README.md", OWN)["roster"]
-    return f"{fam}-{OWN}-{FIRST_DECISION + row - 1}"
+    """dClosedLoop's id for P0.8's row `row`, or for a clean-reading ask after the nine rows, counted on from row 1's
+    id, which the packet instrument declares once as `EXTRA_DECISION`, so the two instruments cannot disagree."""
+    m = re.fullmatch(r"missing:([A-Z]+)-" + OWN + r"-(\d+)", packet.EXTRA_DECISION)
+    if not m:
+        raise Refusal(f"packet.py's EXTRA_DECISION `{packet.EXTRA_DECISION}` is no `missing:` id of {OWN}")
+    return f"{m.group(1)}-{OWN}-{int(m.group(2)) + row - EXTRA_ROW}"
 
 
 def derive_family(stage, slug):

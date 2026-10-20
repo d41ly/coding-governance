@@ -6,20 +6,25 @@ Dispatch 239's record, as its brief asks (`build/2026-10-20-build-PLAY-dClosedLo
 command run for an acceptance check or a red test, in order, with its exit and the line that proves it; then
 `--families`, `--driver-builds`, `--carriers` and `--summary` whole; then where the derivation differs from the plan's
 probes. `build/` is `memory/builds/dClosedLoop/build/`. `open.py` is `build/2026-10-20-build-PLAY-dClosedLoop-1-open.py`,
-at blob `61a6fbf9ede9c9d89e464d5c4a7ecbb349d06072` in every run below and in the commit that carries this record.
+at blob `43cdb6d77d9a04edfc242ab5091d9f9715e4eed0` in every run below and in the commit that carries this record.
 `packet.py` and `bare-ids.py` are the sibling instruments of those names under `build/`, and `gen_build_index.py` is
 `tools/memory-tree/gen_build_index.py`.
 
 **Where the runs happened.** In "the acceptance clone": a `git clone --shared` of the main loop's worktree at
-`300960db2`, with `open.py` added byte for byte as one scratch commit (`bba78e2a45a1`), so its own blob pins in every
+`429ad182d`, with `open.py` added byte for byte as one scratch commit (`f797b6179970`), so its own blob pins in every
 packet. The opening was written there only. After acceptance step 9 the clone committed it as scratch commit
-`7658186f3807`,
-the opening commit `--carriers --check` reads, and each red test's plant was restored from that commit before the
-next. Every command ran from the clone's root under a bounded timeout. Three probes ran beside the instruments, from
+`c67e46ce6be7`, the opening commit `--carriers --check` reads, and each red test's plant was restored from that commit
+before the next. Every command ran from the clone's root under a bounded timeout. Three probes ran beside the instruments, from
 the session's scratch folder and never in the tree: `probe-bare.py` splits the bare-id predicate's output by file and
 by whether the opening minted each id; `probe-slots.py` measures each opened README's authored slots in bytes, the
 heading's next line to the line before the next heading, against `tools/memory-tree/build-readme-slot-limits.txt`,
 and every authored line's width; `probe-carriers-a93.py` runs `open.py`'s carrier derivation at `a93477abc`.
+
+**This record replaces the one committed at `429ad182d`**, whose runs were of blob `61a6fbf9`. The bug-class
+checklist over that commit (`gotchas.py --for-diff HEAD~1..HEAD`) selected `two-answers-to-one-question`: P0.8 row
+1's id was declared both in `packet.py` (`EXTRA_DECISION`) and in `open.py`. `open.py` now counts every decision and
+clean-reading id on from `packet.py`'s one declaration. Every id it derives is unchanged, and every run below was made
+again, on the new blob.
 
 **Ids.** Every family id below is one the opening mints (a roster unit, a carry-forward ask, or one of dClosedLoop's
 clean-reading asks, `PLAY-dClosedLoop-11` to `-17`) or one of P0.8's rows the main loop writes after it, the grant
@@ -73,12 +78,14 @@ clean-reading asks, `PLAY-dClosedLoop-11` to `-17`) or one of P0.8's rows the ma
 
    The six pinned instruments are `carries.py`, `deviations.py`, `asbuilt.py`, `packet.py`, the schedule script and
    `open.py`. dTrueNorth's roster of 7 is its six clauses and its extra unit.
-7. `python bare-ids.py`: exit 1, 1062 lines. `python probe-bare.py <its output>`: exit 0, "opening's own files: 43
-   files, 1062 hits, 0 of them ids the opening did not mint". Every hit is a roster unit or a carry-forward ask cited
-   in the opening's own packets (each roster line names its unit twice) and chain `BACKLOG.md` files (ask and SEV
-   row); no file outside the opening holds a chain id. As the brief scopes it, this output names only ids the opening
-   minted, the plan's known defect (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision-brief.md`, finding 11),
-   so it is recorded and not chased.
+7. `python bare-ids.py`: exit 1, 1084 lines. `python probe-bare.py <its output>`: exit 0, "opening's own files: 43
+   files, 1062 hits, 0 of them ids the opening did not mint", and one file elsewhere: this record as committed at
+   `429ad182d`, 22 hits on its `[summary]` rows and its `[red]` 9 line, "minted by the opening: 22 of 22". The
+   opening's hits are roster units and carry-forward asks in its own packets (each roster line names its unit twice)
+   and chain `BACKLOG.md` files (ask and SEV row). No other file under `memory/` holds a chain id. As the brief scopes
+   it, this output names only ids the opening minted, the plan's known defect
+   (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision-brief.md`, finding 11), so it is recorded and not
+   chased.
 8. `python probe-slots.py`: exit 0. Largest authored slots: the problem 684 B (dWellOiledMachine) of 900; the
    improvements 364 B (dTrueNorth) of 500; the detriments 166 B (dDeclaredLoop) of 500; the build-level rules 1782 B
    (dWellOiledMachine) of 1800; the parked decisions 4 B of 1800. "over ceiling: none"; "lines over 350 characters
@@ -87,14 +94,14 @@ clean-reading asks, `PLAY-dClosedLoop-11` to `-17`) or one of P0.8's rows the ma
    that `tools/memory-tree/build-readme-slot-highwater.txt` records, so `--check-format` will print an advisory line
    for each, which never changes its exit.
 9. `python open.py --families`, `--driver-builds`, `--carriers` and `--summary`: exit 0 each, printed whole below.
-10. `git add -A; git commit` (scratch, the opening commit `7658186f3807`), then `python open.py --carriers --check`:
-    exit 0. "open: carriers at HEAD 7658186f3807 against the list at the opening commit 7658186f3807 · 112 entries
+10. `git add -A; git commit` (scratch, the opening commit `c67e46ce6be7`), then `python open.py --carriers --check`:
+    exit 0. "open: carriers at HEAD c67e46ce6be7 against the list at the opening commit c67e46ce6be7 · 112 entries
     now, 112 listed · findings 0"
 
 In the main loop's worktree, where nothing is opened, `python open.py --check` exits 2, "open:
-memory/builds/dTrueNorth/README.md does not exist: nothing is opened to check", and `python open.py --carriers
---check` exits 2, "open: no commit in HEAD's history adds a chain build's README, so there is no list at the opening
-commit to check against". Neither reads an empty population as green.
+memory/builds/dTrueNorth/README.md does not exist: nothing is opened to check", and
+`python open.py --carriers --check` exits 2, "open: no commit in HEAD's history adds a chain build's README, so there
+is no list at the opening commit to check against". Neither reads an empty population as green.
 
 ## [red]
 
@@ -104,10 +111,11 @@ after its run. `git diff --numstat` showed each edit's size before the run.
 1. P0.7: a one-byte README edit (`goal bound.` to `goal bound!`, numstat "1 1"). `python open.py --check`: exit 1.
    "byte compare: memory/builds/dGroundRules/README.md differs from its render from line 19: gap-tool-24, gap-rt-34.
    Closing every one is this build's goal bound!"
-2. P0.7: a roster missing one clause (the `cl-dClosedLoop-0012` row deleted, numstat "0 1"). `python open.py
-   --check`: exit 1, six findings, among them "roster arm: dGroundRules: `cl-dClosedLoop-0012` is in 0 roster rows,
-   not exactly one", beside the README's byte compare, the packet's byte compare and its packet arm (the packet
-   carries the roster), and the summary arm's "Units reads `10` in the files, and the derivation gives `11`".
+2. P0.7: a roster missing one clause (the `cl-dClosedLoop-0012` row deleted, numstat "0 1").
+   `python open.py --check`: exit 1, six findings, among them "roster arm: dGroundRules: `cl-dClosedLoop-0012` is in
+   0 roster rows, not exactly one", beside the README's byte compare, the packet's byte compare and its packet arm
+   (the packet carries the roster), and the summary arm's "Units reads `10` in the files, and the derivation gives
+   `11`".
 3. P0.7: a `parents:` typo (`dTrueNorth` to `dTrueNorht`, numstat "1 1"). `python gen_build_index.py --check`: exit
    1. "build-index: memory/builds/dGroundRules/README.md: parents: names 'dTrueNorht', which is not a build folder
    under memory/builds/ — an edge to nothing is a typo, not a relation". Then `python open.py --check`: exit 1, "byte
@@ -121,28 +129,28 @@ after its run. `git diff --numstat` showed each edit's size before the run.
    1"). `python open.py --check`: exit 1. "byte compare: memory/builds/dGroundRules/README.md differs from its render
    from line 6: roster: PLAY" and "summary arm: dGroundRules: Family · `streams:` reads `PLAY · tooling` in the files,
    and the derivation gives `TOOL · tooling`". The summary arm names the disagreement on its own line.
-6. P0.8 row 9: a planted new kit directory (`tools/newkit/kit.toml`, committed). `python open.py --carriers
-   --check`: exit 1. "tools/newkit/ (routed product paths; tracked tools/newkit/kit.toml) is under a selector, and the
-   list at the opening commit 7658186f3807 omits it", with "113 entries now, 112 listed".
+6. P0.8 row 9: a planted new kit directory (`tools/newkit/kit.toml`, committed).
+   `python open.py --carriers --check`: exit 1. "tools/newkit/ (routed product paths; tracked tools/newkit/kit.toml)
+   is under a selector, and the list at the opening commit c67e46ce6be7 omits it", with "113 entries now, 112 listed".
 7. The reverse arm, which reads the list both ways: a listed carrier removed (`git rm tools/settings-merge.py`,
    committed). `python open.py --carriers --check`: exit 1. "tools/settings-merge.py is on the list at the opening
-   commit 7658186f3807, and nothing tracked at HEAD sits under it", with "111 entries now, 112 listed".
+   commit c67e46ce6be7, and nothing tracked at HEAD sits under it", with "111 entries now, 112 listed".
 8. The owed-asks arm: one clean-reading ask row removed from dClosedLoop's `BACKLOG.md` (`PLAY-dClosedLoop-13`'s,
    numstat "0 1"). `python open.py --check`: exit 1, 67 findings: "owed asks: memory/builds/dClosedLoop/BACKLOG.md
    lacks the opening's row: - PLAY-dClosedLoop-13 · filed 2026-10-20 · …", and in all 22 packets, which carry every
-   open ask in that file, a byte compare, a packet arm and a summary-arm Packet finding. Then `python open.py
-   --write`: exit 1, "open: refused: memory/builds/dClosedLoop/BACKLOG.md exists without the opening's rows, and the
-   opening writes it once".
-9. The whole-run arm: a `BACKLOG.md` planted in dTrueNorth's folder (a copy of dGroundRules's). `python open.py
-   --check`: exit 1. "byte compare: memory/builds/dTrueNorth/BACKLOG.md exists, and the opening writes none for a
-   whole-run build" and "summary arm: dTrueNorth: Carry-forward ask reads `TOOL-dGroundRules-12` in the files, and the
-   derivation gives `none: whole run`".
+   open ask in that file, a byte compare, a packet arm and a summary-arm Packet finding. Then
+   `python open.py --write`: exit 1, "open: refused: memory/builds/dClosedLoop/BACKLOG.md exists without the
+   opening's rows, and the opening writes it once".
+9. The whole-run arm: a `BACKLOG.md` planted in dTrueNorth's folder (a copy of dGroundRules's).
+   `python open.py --check`: exit 1. "byte compare: memory/builds/dTrueNorth/BACKLOG.md exists, and the opening
+   writes none for a whole-run build" and "summary arm: dTrueNorth: Carry-forward ask reads `TOOL-dGroundRules-12` in
+   the files, and the derivation gives `none: whole run`".
 10. The packet arm: a one-byte packet edit (`### Goal` to `### Goal!` in dGroundRules's packet, numstat "1 1").
     `python open.py --check`: exit 1. "byte compare: …-packet.md differs from its render", "packet arm: dGroundRules:
     byte compare: the packet differs from its render from line 13: ### Goal!" and the summary arm's Packet line,
     "30201 B · `packet.py --check` exit 1" against "30200 B · `packet.py --check` exit 0".
-11. Every plant restored (`git status --short` empty): `python open.py --check`, exit 0, "findings 0"; `python
-    open.py --carriers --check`, exit 0, "112 entries now, 112 listed · findings 0".
+11. Every plant restored (`git status --short` empty): `python open.py --check`, exit 0, "findings 0";
+    `python open.py --carriers --check`, exit 0, "112 entries now, 112 listed · findings 0".
 
 ## [families]
 
@@ -210,11 +218,11 @@ Clauses naming "the driver" and no term, left out: 8
 
 ## [carriers]
 
-`python open.py --carriers`, whole. HEAD is the acceptance clone's scratch commit `bba78e2a45a1`, `300960db2` with
-`open.py` added; no selector reaches `memory/builds/`, so the list is the same at `300960db2`.
+`python open.py --carriers`, whole. HEAD is the acceptance clone's scratch commit `f797b6179970`, `429ad182d` with
+`open.py` added; no selector reaches `memory/builds/`, so the list is the same at `429ad182d`.
 
 ```text
-Governance carriers at HEAD `bba78e2a45a1`, P0.8 row 9's six selectors: 112 entries over 451 tracked paths.
+Governance carriers at HEAD `f797b6179970`, P0.8 row 9's six selectors: 112 entries over 451 tracked paths.
 
 1. routed product paths (`.memory-tree.conf` `ROUTED_PATHS`: tools/ skills/ coding-governance-agents.template.md WIRE-INTO-PROJECT.md): 63 entries, 17 kits with a `kit.toml`, 4 other directories, 42 files
    - `WIRE-INTO-PROJECT.md`
@@ -377,7 +385,7 @@ open: summary of the 22 chain builds, read from the files the opening wrote, ope
 ## [comparison]
 
 The plan's family table, driver-changing table and carrier list came from the plan writer's scratch probes at
-`a93477abc` (P0.5, P0.8 row 9). v2 is byte-identical at `a93477abc` and at `300960db2` (`git diff --quiet`, exit 0),
+`a93477abc` (P0.5, P0.8 row 9). v2 is byte-identical at `a93477abc` and at `429ad182d` (`git diff --quiet`, exit 0),
 so every difference below is a difference of derivation, not of input.
 
 - **Families.** No difference. All 22 rows match the plan's table cell for cell: the same slug noun, the same word
@@ -416,7 +424,7 @@ so every difference below is a difference of derivation, not of input.
   at the opening commit. A `DECISIONS.md` row is one line within the 300-character entry budget, and the list is 112
   entries, so the row cannot hold it inline. `--carriers --check` therefore derives the list at the opening commit
   itself, the first commit in HEAD's history that adds dTrueNorth's README, and compares the list at HEAD against it
-  both ways. This record's `[carriers]` section is the list as derived at `300960db2`, which the opening does not
+  both ways. This record's `[carriers]` section is the list as derived at `429ad182d`, which the opening does not
   change.
 
 ## [not-checked]
