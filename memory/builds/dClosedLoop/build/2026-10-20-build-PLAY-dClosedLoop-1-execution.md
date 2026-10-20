@@ -22,8 +22,15 @@ no model or network calls. Each return is saved verbatim beside this record as i
 
 | Facet | Dispatch | Handoff | Return |
 |---|---|---|---|
-| The unattended driver, end to end | 214 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-51-researcher.md` | pending |
-| Coordination across nodes a, b and d | 215 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-52-researcher.md` | pending |
-| Fully oriented handoffs | 216 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-53-researcher.md` | pending |
-| Per-node task distribution | 217 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-54-researcher.md` | pending |
-| Specs held to the design, strictly | 218 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-55-researcher.md` | pending |
+| The unattended driver, end to end | 214 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-51-researcher.md` | `build/2026-10-20-build-PLAY-dClosedLoop-1-research-exec-driver.md` |
+| Coordination across nodes a, b and d | 215 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-52-researcher.md` | `build/2026-10-20-build-PLAY-dClosedLoop-1-research-exec-coordination.md` |
+| Fully oriented handoffs | 216 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-53-researcher.md` | `build/2026-10-20-build-PLAY-dClosedLoop-1-research-exec-handoffs.md` |
+| Per-node task distribution | 217 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-54-researcher.md` | `build/2026-10-20-build-PLAY-dClosedLoop-1-research-exec-schedule.md` |
+| Specs held to the design, strictly | 218 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-55-researcher.md` | `build/2026-10-20-build-PLAY-dClosedLoop-1-research-exec-deviation.md` |
+
+Every probe script the five left in their scratch folders is kept verbatim in
+`build/2026-10-20-build-PLAY-dClosedLoop-1-research-exec-instruments.md`, so each table can be re-run. That record's
+`[verified]` holds the main loop's two checks of claims the returns left open. First, a spec whose design pin is
+stale passes today's spec-tokens leg, seen red on a control first, while the bootstrap `carries.py` reds it. Second,
+a README the owner landed on main resolves at the default-branch anchor, where a `slug` run reads `spec-audit:` and
+`may:`; that was read in the driver, not run.
