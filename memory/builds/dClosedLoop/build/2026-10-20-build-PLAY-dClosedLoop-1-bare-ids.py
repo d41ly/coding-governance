@@ -14,6 +14,9 @@ whose build has an opened README, unless it is a `roster:units` id of that READM
 an ask row of its own `BACKLOG.md` in its own slug. Each build's joined ids are then exactly the ids the opening
 minted. P0.7 runs the plain predicate at the opening commit's parent and `--opened` at the opening commit.
 
+`read_roster` is the `roster:units` pair's one reader, for this file, `deviations.py` (through `read_roster_units`)
+and `packet.py` and the opening (through `packet.read_roster`): one unit per table row, the row's first id.
+
 Usage (from the worktree root):
   python bare-ids.py            one line per hit, `<path>:<line>: <id>`
   python bare-ids.py --opened   the same, less each opened build's roster ids and its carry-forward ask
@@ -42,18 +45,26 @@ def read_chain_slugs(v2_text):
     return set(re.findall(r"^\| (d[A-Z]\w+) \|", chain, flags=re.M))
 
 
-def read_roster_units(text, id_re):
-    """The ids of a README's authored `roster:units` pair, in its order, read with the generator's markers and id
-    grammar."""
+def read_roster(text, id_re, slug=None):
+    """[(unit id, line number, row)] of a README's authored `roster:units` pair, in its order: each table row's first
+    id read with the generator's markers and id grammar, so a `missing:` citation is no unit, and of `slug` alone when
+    one is given. The pair's one reader: `read_roster_units` below and `packet.read_roster` read it through this."""
     out, inside = [], False
-    for ln in text.split("\n"):
+    for n, ln in enumerate(text.split("\n"), 1):
         if ln.strip() == gbi.PLAN_OPEN:
             inside = True
         elif ln.strip() == gbi.PLAN_CLOSE:
             break
-        elif inside:
-            out += [i for i, _slug in gbi.extract_roster_ids(ln, id_re) if i not in out]
+        elif inside and ln.startswith("|"):
+            ids = [i for i, s in gbi.extract_roster_ids(ln, id_re) if slug is None or s == slug]
+            if ids:
+                out.append((ids[0], n, ln.strip()))
     return out
+
+
+def read_roster_units(text, id_re):
+    """The unit ids of a README's `roster:units` pair, in its order, each once: `read_roster`'s units."""
+    return list(dict.fromkeys(u for u, _n, _row in read_roster(text, id_re)))
 
 
 def read_asks(text, conf):

@@ -6,7 +6,8 @@ carries `## The prompt` and `## The brief`, so `tools/roles/handoff.py render --
 prompt=<packet>` reads its `brief:*`: Goal, Items, Acceptance, Gates and Non-goals, then one sub-head per field.
 
 Its twelve fields, derived and never typed:
-  1  Pins: the baseline sha; the blobs at HEAD of v2 and of the as-built view; each instrument's pinned blob
+  1  Pins: the baseline sha, `deviations.BASELINE` (P0.1 row 5) and never v2's `Baseline:` line, which
+     `deviations.py` checks against it; the blobs at HEAD of v2 and of the as-built view; each instrument's pinned blob
      (`carries.py`, `deviations.py`, `asbuilt.py`, this file, the schedule script and the opening script, those
      tracked at the first render); the HEAD it was rendered at; and the generator's version, this file's blob at HEAD.
   2  Items: each clause of the row, its id at its baseline hash, its hash now in the as-built view with the record
@@ -22,7 +23,8 @@ Its twelve fields, derived and never typed:
   8  Later builds named: every mention of a non-ancestor chain build in a clause, verbatim, flagged when the clause
      matches the probe's stand-in pattern.
   9  Obligations: v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming the build; every unit of the
-     opened README's `roster:units` pair, `**Derived:**` ones included; for a build the schedule script's `EXTRA`
+     opened README's `roster:units` pair as `bare-ids.py`'s `read_roster` reads it, `**Derived:**` ones included;
+     for a build the schedule script's `EXTRA`
      names, its units beyond v2's row and the decision row they derive from (P0.8 row 1, written `missing:` until
      `memory/DECISIONS.md` holds it); and every open ask in dClosedLoop's `BACKLOG.md` naming a chain build, from the
      index generator's `--asks` (an absent file reads as none, never as an error). A unit or ask line opens with the
@@ -54,8 +56,10 @@ Exit 0 green, 1 on a finding or a refusal, 2 when there is nothing to check.
 
 What it does not check: whether a spec builds what a clause means, which the carries join and the semantic lens
 read; a source-reading defect the renderer and the arms share, since both read the same tree; an instrument edited
-and not committed, since the pin arm reads HEAD; and a hand edit of a pin line or of this file, which only the
-owner's landing-diff check guards until a chain unit's merge-bar check (the execution plan's `[cannot]`).
+and not committed, since the pin arm reads HEAD; whether v2's `Baseline:` line agrees with the pin, which
+`deviations.py` lists as a member and `asbuilt.py --check` reports; and a hand edit of a pin line or of this file,
+which only the owner's landing-diff check guards until a chain unit's merge-bar check (the execution plan's
+`[cannot]`).
 """
 import argparse
 import copy
@@ -111,9 +115,11 @@ def load_instrument(name, path):
 
 carries = load_instrument("carries", INSTRUMENTS[0])
 asbuilt = load_instrument("asbuilt", INSTRUMENTS[2])
+deviations = asbuilt.deviations     # the module asbuilt.py loads: BASELINE, the pin the view and the packet render from
+bareids = deviations.bareids        # the module deviations.py loads: `read_roster`, the roster:units pair's one reader
 schedule = load_instrument("schedule", INSTRUMENTS[4])
 handoff = load_instrument("handoff", "tools/roles/handoff.py")             # the reader `render` takes brief:* with
-genindex = load_instrument("gen_build_index", "tools/memory-tree/gen_build_index.py")   # the roster:units pair
+genindex = load_instrument("gen_build_index", "tools/memory-tree/gen_build_index.py")   # the conf and roster id grammar
 
 
 def run_git(*args):
@@ -207,18 +213,10 @@ def derive_ancestors(slug, rows):
 
 
 def read_roster(text, slug):
-    """[(unit id, line number, row)] of the README's authored `roster:units` pair, in its order."""
-    out, inside = [], False
-    for n, ln in enumerate(text.split("\n"), 1):
-        if ln.strip() == genindex.PLAN_OPEN:
-            inside = True
-        elif ln.strip() == genindex.PLAN_CLOSE:
-            break
-        elif inside and ln.startswith("|"):
-            m = re.search(r"\b[A-Z]+-" + slug + r"-\d+\b", ln)
-            if m:
-                out.append((m.group(0), n, ln.strip()))
-    return out
+    """[(unit id, line number, row)] of the README's authored `roster:units` pair, in its order, the units of `slug`
+    alone: `bareids.read_roster` over the tree's declared families. The opening imports this."""
+    families = {p.split(":")[1] for p in genindex.load_conf(".")["FAMILIES"].split() if ":" in p}
+    return bareids.read_roster(text, genindex.build_roster_id_re(families), slug)
 
 
 @functools.lru_cache(maxsize=None)
@@ -251,12 +249,8 @@ def read_tree():
     rows = read_chain(v2)
     if list(rows) != list(builds):
         raise Refusal("v2's [chain] rows and carries.py's design() name different chain builds")
-    ids = v2.split("\n## [clause-ids]", 1)[1].split("\n## ", 1)[0] if "\n## [clause-ids]" in v2 else ""
-    m = re.search(r"^Baseline: `([0-9a-f]{7,40})`", ids, flags=re.M)
-    if not m:
-        raise Unmeasured("v2's [clause-ids] records no Baseline, so no clause has a baseline hash to pin")
-    sha = run_git("rev-parse", m.group(1)).strip()
-    base = {cid: h for _b, cid, _t, h in asbuilt.baseline_clauses(run_git("show", f"{sha}:{carries.V2}"))}
+    sha = deviations.BASELINE
+    base ={cid: h for _b, cid, _t, h in asbuilt.baseline_clauses(run_git("show", f"{sha}:{carries.V2}"))}
     view = {}
     for ln in (read_file(asbuilt.OUT) or "").split("\n"):
         r = asbuilt.ROW.match(ln)
@@ -387,7 +381,7 @@ def render_text(src, pins, at):
         out.append(f"- The surfaces of {', '.join(standins)}, which this build's clauses use as stand-ins only "
                    "(Later builds named).")
     order = {p: i for i, p in enumerate(INSTRUMENTS)}
-    out += ["", "### Pins", "", f"- baseline: `{src['baseline']}`, v2's `[clause-ids]` `Baseline:`",
+    out += ["", "### Pins", "", f"- baseline: `{src['baseline']}`, the pin `deviations.py` carries (P0.1 row 5)",
             f"- v2: `{carries.V2}` " + (f"blob `{src['v2_blob']}`" if src["v2_blob"] else "absent at HEAD"),
             f"- as-built view: `{asbuilt.OUT}` "
             + (f"blob `{src['view_blob']}`" if src["view_blob"] else "absent at HEAD")]
