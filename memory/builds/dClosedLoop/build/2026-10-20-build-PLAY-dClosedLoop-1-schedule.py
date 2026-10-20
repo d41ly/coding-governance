@@ -1,6 +1,7 @@
 # **Serves:** research PLAY-dClosedLoop-1
 """The chain's schedule across nodes a, b and d: which node takes which build's spec run and build run, and when,
-re-derived from the tree at every landing (the execution plan's `[schedule]`).
+re-derived from the tree at every landing (the execution plan's `[schedule]`). The owner's answers bind it
+(`build/…-execution.md` `[answers]` and `[answers-2]`).
 
 Usage (from the worktree root, after `git fetch`):
   python <this file> [--ref <rev>] [--s 0.33] [--b 0.25]
@@ -17,22 +18,27 @@ INPUTS, all read at --ref except the claim cache:
   - the run claims the last fetch cached under `refs/gov/remote/runs/<slug>` (no fetch is made here), and
     `tools/playbook/fleet.toml` to turn a claim's `node:` user into a fleet tag. A `live` or `held` claim on a chain
     slug pins that build's next phase to the claim's node from time 0.
+  - two facts no file above holds, declared here from the owner's answers (`[answers-2]` items 4 and 5): dTrueNorth
+    runs as ONE whole run and carries one unit more than its v2 row, the carry-forward condition for review-promoted
+    units (WHOLE, EXTRA); and node b takes spec runs only (SPEC_ONLY).
 
-THE MODEL. Each build is two runs: a spec run of s*U units and a build run of (1-s)*U, U its clause count, in units
-of a full-pace node's work. Policy J (the schedule return's): a spec run starts once dTrueNorth has landed, every
-parent's spec run has closed and every grandparent has landed (dTrueNorth's own spec run starts at once); a build run
-starts once its own spec run has closed and every parent has landed. Nodes a and d work at pace 1, node b at --b; each
-node holds one run at a time. The dispatch rule, at every moment a node is free:
+THE MODEL. Each build is two runs: a spec run of s*U units and a build run of (1-s)*U, U its clause count plus any
+EXTRA, in units of a full-pace node's work; a WHOLE build is one run of U, which starts at once. Policy J (the schedule
+return's): a spec run starts once dTrueNorth has landed, every parent's spec run has closed (a WHOLE parent's run has
+landed) and every grandparent has landed; a build run starts once its own spec run has closed and every parent has
+landed. Nodes a and d work at pace 1, node b at --b; each node holds one run at a time. The dispatch rule, at every
+moment a node is free:
   - a free full-pace node (a before d) takes the ready run with the most downstream work, its bottom level;
-  - node b takes the ready run with the MOST slack among those whose slack covers b's slowdown, (1/b - 1) times the
-    run's work, and never a run with no slack; slack is each run's float in the same graph with unlimited nodes at
-    pace 1, so b's slice is smaller and off the critical path, the owner's fourth answer.
+  - node b takes the ready SPEC run with the MOST slack among those whose slack covers b's slowdown, (1/b - 1) times
+    the run's work, never a run with no slack and never a build run; slack is each run's float in the same graph with
+    unlimited nodes at pace 1, so b's slice is smaller and off the critical path (`[answers]` 4, `[answers-2]` 4).
 
 WHAT IT DOES NOT MODEL: wall time, since no unit's wall time is recorded (gap-rt-26) and a unit here is a share of
 work, not hours; the spec share s, which history cannot measure; usage limits, holds and resumes; review rounds, the
 closing review and the landing bar's wall (up to `GATE_WALL`); the owner's delay in starting each run; the opening,
 phase 0 and each node's preparation; how far an in-flight run has got (it is charged its whole phase from time 0);
-rework a landing forces on a build in flight; and two runs at once on one node.
+rework a landing forces on a build in flight; two runs at once on one node; and an EXTRA unit's own spec, which carries
+no clause, so a WHOLE build reads landed once the specs of its v2 clauses are all CLOSED or WONTDO.
 
 Prints the schedule table, each node's load, the first wave, the runs the owner starts in order, each landing with
 the runs in flight then, and node b's pace swept from 0.25 to 0.5 beside a and d alone. Exit 0, or 1 when v2's
@@ -46,6 +52,9 @@ import sys
 V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
 FLEET = "tools/playbook/fleet.toml"
 ROOT = "dTrueNorth"
+WHOLE = {"dTrueNorth"}                         # one run, spec and build together (`[answers-2]` item 5)
+EXTRA = {"dTrueNorth": 1}                      # its unit beyond v2: the carry-forward condition (`[answers-2]` item 5)
+SPEC_ONLY = {"b"}                              # node b takes spec runs only (`[answers-2]` item 4)
 NODES = ("a", "d", "b")                       # the owner's three nodes, full-pace ones first
 CID = re.compile(r"`(cl-d[A-Z]\w+-\d{4})`")
 ROW = re.compile(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| [^|]+ \|$")
@@ -135,12 +144,15 @@ def graph(names, parents, ids, state, s):
     done = {("spec", b) for b in names if state[b][0]} | {("build", b) for b in names if state[b][1]}
     T = {}
     for b in names:
-        U = len(ids[b])
+        U = len(ids[b]) + EXTRA.get(b, 0)
         if b == ROOT:
             pre = []
         else:
             grand = {g for p in parents[b] for g in parents[p]}
-            pre = [("build", ROOT)] + [("spec", p) for p in parents[b]] + [("build", g) for g in grand]
+            pre = [("build", ROOT)] + [("build" if p in WHOLE else "spec", p) for p in parents[b]]                 + [("build", g) for g in grand]
+        if b in WHOLE:                      # one run: the build key carries the whole of it
+            T[("build", b)] = (U, pre)
+            continue
         T[("spec", b)] = (s * U, pre)
         T[("build", b)] = (U - s * U, [("spec", b)] + [("build", p) for p in parents[b]])
     return {t: (w, sorted({p for p in pre if p not in done})) for t, (w, pre) in T.items() if t not in done}
@@ -189,8 +201,8 @@ def simulate(T, speed, pinned):
             if speed[n] >= 1:
                 cand = sorted(ready, key=lambda t: (-bl[t], t))
             else:
-                cand = sorted((t for t in ready if slack[t] > 1e-9 and slack[t] >= T[t][0] * (1 / speed[n] - 1) - 1e-9),
-                              key=lambda t: (-slack[t], t))
+                cand = sorted((t for t in ready if (n not in SPEC_ONLY or t[0] == "spec") and slack[t] > 1e-9
+                               and slack[t] >= T[t][0] * (1 / speed[n] - 1) - 1e-9), key=lambda t: (-slack[t], t))
             if cand:
                 t = cand[0]
                 start[t], fin[t], where[t] = now, now + T[t][0] / speed[n], n
@@ -226,11 +238,15 @@ def run(names, parents, ids, state, held, s, pace, with_b=True):
         speed["b"] = pace
     pinned = {}
     for b, (n, _) in held.items():
-        t = ("build", b) if state[b][0] else ("spec", b)
+        t = ("build", b) if state[b][0] or b in WHOLE else ("spec", b)
         if t in T and n in speed:
             pinned[t] = n
     start, fin, where = simulate(T, speed, pinned)
     return T, start, fin, where, speed
+
+
+def kind(t):
+    return "whole" if t[1] in WHOLE else t[0]
 
 
 def main():
@@ -247,9 +263,9 @@ def main():
     mk = max(fin.values(), default=0.0)
     whole = {}
 
-    def ef(x):                          # v2's whole-build critical path, as critical-path.py measures it
+    def ef(x):                          # the whole-build critical path, as critical-path.py measures it, with EXTRA
         if x not in whole:
-            whole[x] = len(ids[x]) + max((ef(p) for p in parents[x]), default=0)
+            whole[x] = len(ids[x]) + EXTRA.get(x, 0) + max((ef(p) for p in parents[x]), default=0)
         return whole[x]
     for b in names:
         ef(b)
@@ -258,42 +274,46 @@ def main():
     print("claims cached on chain builds: " + (", ".join(f"{b} {st} on {n}" for b, (n, st) in sorted(held.items()))
                                                 or "none live or held") + ("; other: " + ", ".join(other) if other else ""))
     print(f"makespan {mk:.0f} units; with unlimited nodes {span:.0f}; whole builds after their parents land "
-          f"{max(whole.values())}; serial on one node {sum(len(v) for v in ids.values())}")
+          f"{max(whole.values())}; serial on one node {sum(len(v) for v in ids.values()) + sum(EXTRA.values())} "
+          f"(v2's 509 and {sum(EXTRA.values())} unit beyond it)")
     print()
     print("| Build | Stage | Parents | Units | Spec run: node, start-end, slack | Build run: node, start-end, slack |")
     print("|---|---|---|---|---|---|")
 
     def cell(t):
+        if t[0] == "spec" and t[1] in WHOLE:
+            return "one whole run, in the next column"
         return "done" if t not in T else f"{where[t]} {start[t]:.0f}-{fin[t]:.0f}, slack {slack[t]:.0f}"
     for b in sorted(names, key=lambda b: (start.get(("build", b), -1), b)):
-        print(f"| {b} | {stage[b]} | {', '.join(parents[b]) or 'dClosedLoop'} | {len(ids[b])} | "
+        print(f"| {b} | {stage[b]} | {', '.join(parents[b]) or 'dClosedLoop'} | {len(ids[b]) + EXTRA.get(b, 0)} | "
               f"{cell(('spec', b))} | {cell(('build', b))} |")
     print()
     for n in speed:
         mine = [t for t in T if where[t] == n]
         busy = sum(fin[t] - start[t] for t in mine)
         print(f"node {n}: busy {busy:.0f} of {mk:.0f} ({100 * busy / mk if mk else 0:.0f}%), "
-              f"work {sum(T[t][0] for t in mine):.0f} of {sum(w for w, _ in T.values()):.0f} units, {len(mine)} runs: {sum(1 for t in mine if t[0] == 'spec')} spec, {sum(1 for t in mine if t[0] == 'build')} build")
+              f"work {sum(T[t][0] for t in mine):.0f} of {sum(w for w, _ in T.values()):.0f} units, {len(mine)} runs: "
+              + ", ".join(f"{sum(1 for t in mine if kind(t) == k)} {k}" for k in ("spec", "build", "whole")))
     print()
     print("first wave, each node's first run:")
     for n in speed:
         mine = sorted((t for t in T if where[t] == n), key=lambda t: start[t])
-        print(f"  {n}: " + (f"{mine[0][0]} {mine[0][1]} at {start[mine[0]]:.0f}" if mine else "no run"))
+        print(f"  {n}: " + (f"{kind(mine[0])} {mine[0][1]} at {start[mine[0]]:.0f}" if mine else "no run"))
     print()
     order = sorted(T, key=lambda t: (start[t], t))
     print(f"runs the owner starts, {len(order)}, at {len({round(start[t]) for t in order})} distinct times, "
           f"in order (time, node, run):")
     line = []
     for t in order:
-        line.append(f"{start[t]:.0f} {where[t]} {t[0]} {t[1]}")
+        line.append(f"{start[t]:.0f} {where[t]} {kind(t)} {t[1]}")
     for i in range(0, len(line), 4):
         print("  " + " · ".join(line[i:i + 4]))
     print()
     surf = surfaces(rows)
-    print("landings of build runs, with the runs in flight then and the surfaces the landing's clauses touch:")
+    print("landings of build and whole runs, with the runs in flight then and the surfaces the landing's clauses touch:")
     for t in sorted((t for t in T if t[0] == "build"), key=lambda t: fin[t]):
         L = fin[t]
-        flight = [f"{k[0]} {k[1]} on {where[k]}" for k in sorted(T, key=lambda k: start[k])
+        flight = [f"{kind(k)} {k[1]} on {where[k]}" for k in sorted(T, key=lambda k: start[k])
                   if start[k] < L - 1e-9 < fin[k] - 1e-9]
         print(f"  {L:4.0f} {t[1]} lands; in flight: {', '.join(flight) or 'none'}; surfaces: {surf[t[1]]}")
     print()
@@ -304,7 +324,7 @@ def main():
         share = {n: sum(f2[t] - s2[t] for t in T2 if w2[t] == n) / m2 * 100 if m2 else 0 for n in sp2}
         bs = sorted((t for t in T2 if w2[t] == "b"), key=lambda t: s2[t])
         print(f"  b {pace:.2f}: {m2:.0f}; a {share['a']:.0f}% d {share['d']:.0f}% b {share['b']:.0f}%; "
-              + (", ".join(f"{t[0]} {t[1]} {s2[t]:.0f}-{f2[t]:.0f}" for t in bs) or "none"))
+              + (", ".join(f"{kind(t)} {t[1]} {s2[t]:.0f}-{f2[t]:.0f}" for t in bs) or "none"))
     T3, s3, f3, w3, sp3 = run(names, parents, ids, state, held, a.s, a.b, with_b=False)
     print(f"  a and d alone: {max(f3.values(), default=0.0):.0f}")
 

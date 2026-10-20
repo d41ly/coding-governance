@@ -284,3 +284,21 @@ main loop's reply is recorded beside it.
 - Residual forks follow the standing ruling, each choice recorded as a departure. A choice that widens a security,
   data or write surface is listed first in its build's departures report.
 - D1, D2, D4 and R3 stand as recommended.
+
+## [plan-2]
+
+Dispatch 220, the plan's writer resumed, folded `[answers-2]` into the plan and its schedule script. Its return is
+`build/2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-2.md`. The main loop re-ran the script on the tree.
+It exits 0, and its output is pasted verbatim in the plan's `[schedule]`. The figures:
+- 271 units in all;
+- node a busy 96%, node d 77%, node b 60% on six spec runs;
+- 43 runs for the owner to start, at 37 moments;
+- dTrueNorth one whole run of seven units.
+
+The fold leaves four points for the owner:
+- **D9.** A discovery a spec run would adopt is also a unit the run adds, and the extra unit admits only
+  review-promoted units.
+- **D10.** A fork with no option left for the standing ruling to take.
+- **Placement.** The two deviation records' approvals land as decision rows at the opening, while the record files
+  are written in dTrueNorth's spec commits.
+- **Wording.** The records name "owner" as the approver, citing the answer.
