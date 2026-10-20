@@ -2987,6 +2987,11 @@ The final questions' research, dispatches 155 to 159, derived from each run the 
   7 and 6 of twelve, and the three together 7: the bar is NOT MET
   (`whole-audit.md` `[walk-run-c-scored]`).
 
+- 2026-10-20, session 1799cb98: the owner answered "Fold, re-measure after (Recommended)". The seal is lifted: the key,
+  the seeding script, the brief reviews and the plant-by-plant reading are in the build folder (`whole-audit.md`
+  `[recall-scored]`). The fold of all three runs' confirmed findings comes next, and a fresh sealed re-measure before
+  the baseline.
+
 ## Instruments
 
 ### The gap-ownership join

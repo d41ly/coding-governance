@@ -410,6 +410,37 @@ whether refutations get a second look, answered "Second skeptic on refutations (
 - **Cost of the three runs:** 38 dispatches, the second looks among them, and 1,928,719 output tokens.
 - **By `[recall]`,** the owner's word is asked again before anything is folded.
 
+### [recall-scored] The recall, read plant by plant, and the fold's plan
+
+The owner, 2026-10-20, asked what follows run C under the bar, and answered "Fold, re-measure after (Recommended)". The
+seal is lifted: the key (`build/2026-10-20-build-PLAY-dClosedLoop-1-walk-key.json`, its SHA-256 the pinned one), the
+seeding script (`...-walk-seed.py`), the five brief reviews and the detectability probe (`...-walk-detectability.py`)
+are committed beside the walk.
+
+| Plant | Where | What was reverted | The rule in allowed records | A | B | C | Read by hand |
+|---|---|---|---|---|---|---|---|
+| P01 | v2 `[chain]` 0019 | the step walk's failure route | only in excluded review history | none | none | none | unfindable by cross-reference; A4-F4 is a neighbour |
+| P02 | v2 `[chain]` 0229, 0231; memory-plan | the `journal` alias | memory-plan, three times | none | none | C3-F14 | a hit |
+| P03 | v2 `[chain]` 0284 | the restarted supervisor's reconciliation | only in excluded review history | none | none | none | unfindable by cross-reference |
+| P04 | v2 `[chain]` 0305, 0377 | intake ratifying only from its owner origin | one research mention | none | none | none | missed; a run A walker cited the planted 0377 as its reference |
+| P05 | v2 `[chain]` 0488 | the declined retirement's amended row | twice in v2 | none | none | none | missed |
+| P06 | flow-steps `entry.claim` | the unreachable remote's route | `leases.offline`'s row | A5-F6 | refuted twice (B1-F7) | none | contestable: the policy row arguably answers the case |
+| P07 | v2 `[chain]` 0283 | fallback witnesses kept readable across the drain | once in audit-fold | none | none | CS1-F1 scored | a neighbour: a different defect at its clauses |
+| P08 | flow-steps `entry.intake` | the hook made a scout | an item row | A1-F1 | B1-F1 | C4-F4 | a hit in every run |
+| P09 | flow-steps `plan.exit` | ratification as the planner records it | an item row | A1-F2 | B1-F2 | none | a hit |
+| P10 | v2 `[chain]` 0289, 0318 | the commit queue | 37 mentions | none | none | none | missed by every run |
+| P11 | layer-memory kind table | a kind's writer (mechanical) | n/a | Stage 0 | Stage 0 | Stage 0 | Stage 0's |
+| P12 | v2 `[chain]` 0093 | P23's only clause (mechanical) | n/a | Stage 0, A1-F3 | Stage 0, B1-F3 | Stage 0, C2-F1 | Stage 0's, and every run's |
+
+- **The pattern:** every plant on a flow-steps item row was found, and the clause deletions were missed. The two whose
+  rule survives only in excluded history were unfindable by any walk inside its list, a defect of this seal's design.
+  The others survive in allowed records, P10 in 37 places, and were missed: the walks read clauses and items, not the
+  records' settled rules looking for the clause that carries each.
+- **The fold** takes all three runs' confirmed findings, 236 across the three reports, before anything else. The
+  shortfall, the seal's defect and the blind spot are recorded as this audit's known limits.
+- **The re-measure,** before the baseline: a fresh sealed copy, new plants, none whose rule lives only in excluded
+  history, and a record-to-clause slice beside the scenario and clause slices, scored against a bar fixed first.
+
 ## [stage0-classes] Stage 0's classes
 
 Empty until the audit's fold classes what it does not fix.

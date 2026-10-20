@@ -1,0 +1,213 @@
+{
+ "base": "747a2af2292f1f9253ff1f019db9c241b25444dc",
+ "plants": [
+  {
+   "id": "P01",
+   "record": "architecture-v2",
+   "tag": "chain",
+   "anchors": [
+    "cl-dClosedLoop-0018",
+    "cl-dClosedLoop-0019",
+    "cl-dClosedLoop-0021"
+   ],
+   "words": [
+    "fail",
+    "killed",
+    "interrupt",
+    "stop"
+   ],
+   "mechanical": false,
+   "source": "the shape audit's walk-failure-route"
+  },
+  {
+   "id": "P02",
+   "record": "architecture-v2",
+   "tag": "chain",
+   "anchors": [
+    "cl-dClosedLoop-0229",
+    "cl-dClosedLoop-0231"
+   ],
+   "words": [
+    "alias",
+    "journal",
+    "rename"
+   ],
+   "mechanical": false,
+   "source": "the shape audit's journal-rename"
+  },
+  {
+   "id": "P03",
+   "record": "architecture-v2",
+   "tag": "chain",
+   "anchors": [
+    "cl-dClosedLoop-0284",
+    "cl-dClosedLoop-0303",
+    "cl-dClosedLoop-0310"
+   ],
+   "words": [
+    "restart",
+    "second act",
+    "two act",
+    "duplicate",
+    "re-adopt",
+    "reconcil"
+   ],
+   "mechanical": false,
+   "source": "the shape audit's supervisor-restart"
+  },
+  {
+   "id": "P04",
+   "record": "architecture-v2",
+   "tag": "chain",
+   "anchors": [
+    "cl-dClosedLoop-0305",
+    "cl-dClosedLoop-0377"
+   ],
+   "words": [
+    "origin",
+    "ratif"
+   ],
+   "mechanical": false,
+   "source": "the shape audit's intake-ratification"
+  },
+  {
+   "id": "P05",
+   "record": "architecture-v2",
+   "tag": "chain",
+   "anchors": [
+    "cl-dClosedLoop-0488",
+    "cl-dClosedLoop-0478"
+   ],
+   "words": [
+    "declin",
+    "refus",
+    "reject"
+   ],
+   "mechanical": false,
+   "source": "the shape audit's declined-retirement"
+  },
+  {
+   "id": "P06",
+   "record": "flow-steps",
+   "tag": "entry",
+   "anchors": [
+    "entry.claim"
+   ],
+   "words": [
+    "unreachable",
+    "offline",
+    "remote"
+   ],
+   "mechanical": false,
+   "source": "the design audit's M13"
+  },
+  {
+   "id": "P07",
+   "record": "architecture-v2",
+   "tag": "chain",
+   "anchors": [
+    "cl-dClosedLoop-0283",
+    "cl-dClosedLoop-0378"
+   ],
+   "words": [
+    "drain",
+    "fallback",
+    "in flight",
+    "migrat"
+   ],
+   "mechanical": false,
+   "source": "the design audit's M15"
+  },
+  {
+   "id": "P08",
+   "record": "flow-steps",
+   "tag": "entry",
+   "anchors": [
+    "entry.intake"
+   ],
+   "words": [
+    "agent",
+    "typed",
+    "verbatim",
+    "scout",
+    "hook",
+    "witness"
+   ],
+   "mechanical": false,
+   "source": "the session model's H2"
+  },
+  {
+   "id": "P09",
+   "record": "flow-steps",
+   "tag": "plan",
+   "anchors": [
+    "plan.exit"
+   ],
+   "words": [
+    "ratif",
+    "typed",
+    "planner",
+    "agent"
+   ],
+   "mechanical": false,
+   "source": "the session model's H1"
+  },
+  {
+   "id": "P10",
+   "record": "architecture-v2",
+   "tag": "chain",
+   "anchors": [
+    "cl-dClosedLoop-0289",
+    "cl-dClosedLoop-0318",
+    "build.worktree"
+   ],
+   "words": [
+    "index",
+    "lock",
+    "concurren",
+    "serial",
+    "commit queue",
+    "parallel"
+   ],
+   "mechanical": false,
+   "source": "the session model's H6"
+  },
+  {
+   "id": "P11",
+   "record": "layer-memory",
+   "tag": [
+    "contract",
+    "design"
+   ],
+   "anchors": [
+    "dupes"
+   ],
+   "words": [
+    "writer"
+   ],
+   "mechanical": true,
+   "source": "mechanical: a kind's writer dropped"
+  },
+  {
+   "id": "P12",
+   "record": "architecture-v2",
+   "tag": [
+    "chain",
+    "enforcement",
+    "principles"
+   ],
+   "anchors": [
+    "cl-dClosedLoop-0093",
+    "P23"
+   ],
+   "words": [
+    "P23",
+    "claim",
+    "trusted",
+    "enforc"
+   ],
+   "mechanical": true,
+   "source": "mechanical: a principle's only enforcing clause dropped"
+  }
+ ]
+}

@@ -25910,6 +25910,89 @@ L.save()
 print(f"C alone {alone.group(1)}/10, A+C {joined['a']}, B+C {joined['b']}, union {union}, bar {bar}, {agents} dispatches, {tok} tokens")
 ````
 
+### `unseal.py`
+
+The seal lifted at the owner's word: the key copied byte for byte with its hash checked, the seeding and detectability scripts and the brief reviews committed, and [recall-scored] written.
+
+````python
+"""The seal lifted at the owner's word: the key copied byte for byte with its SHA-256 checked against the pin, the
+seeding and detectability scripts and the five brief reviews committed beside the walk, and the round record given
+the owner's answer verbatim, the plant-by-plant reading and the fold's plan ([recall-scored]), with the session log's
+event.
+
+Usage: python -X utf8 unseal.py <sealed folder>   (from the worktree root)
+"""
+import hashlib
+import pathlib
+import shutil
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+SEALED = pathlib.Path(sys.argv[1])
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+PIN = "505c52433040b18b95d5da9021b5ad0feada756b88290857a1b9eee9c4b837b7"
+SERVES = "# **Serves:** research PLAY-dClosedLoop-1\n"
+
+key = SEALED / "sealed/key.json"
+if hashlib.sha256(key.read_bytes()).hexdigest() != PIN:
+    sys.exit("unseal: the key's hash moved from the pin; nothing copied")
+dest = B / "2026-10-20-build-PLAY-dClosedLoop-1-walk-key.json"
+shutil.copyfile(key, dest)
+if hashlib.sha256(dest.read_bytes()).hexdigest() != PIN:
+    sys.exit("unseal: the copied key's hash differs from the pin")
+for src, name in ((SEALED / "sealed/seed.py", "walk-seed.py"), (SEALED / "detectability.py", "walk-detectability.py")):
+    (B / f"2026-10-20-build-PLAY-dClosedLoop-1-{name}").write_text(SERVES + src.read_text(encoding="utf-8"),
+                                                                   encoding="utf-8", newline="\n")
+for f in sorted((SEALED / "sealed/brief-reviews").glob("*.md")):
+    shutil.copyfile(f, B / f.name)
+
+R = Record(str(B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"))
+R.insert_before("## [stage0-classes] ", """### [recall-scored] The recall, read plant by plant, and the fold's plan
+
+The owner, 2026-10-20, asked what follows run C under the bar, and answered "Fold, re-measure after (Recommended)". The
+seal is lifted: the key (`build/2026-10-20-build-PLAY-dClosedLoop-1-walk-key.json`, its SHA-256 the pinned one), the
+seeding script (`...-walk-seed.py`), the five brief reviews and the detectability probe (`...-walk-detectability.py`)
+are committed beside the walk.
+
+| Plant | Where | What was reverted | The rule in allowed records | A | B | C | Read by hand |
+|---|---|---|---|---|---|---|---|
+| P01 | v2 `[chain]` 0019 | the step walk's failure route | only in excluded review history | none | none | none | unfindable by cross-reference; A4-F4 is a neighbour |
+| P02 | v2 `[chain]` 0229, 0231; memory-plan | the `journal` alias | memory-plan, three times | none | none | C3-F14 | a hit |
+| P03 | v2 `[chain]` 0284 | the restarted supervisor's reconciliation | only in excluded review history | none | none | none | unfindable by cross-reference |
+| P04 | v2 `[chain]` 0305, 0377 | intake ratifying only from its owner origin | one research mention | none | none | none | missed; a run A walker cited the planted 0377 as its reference |
+| P05 | v2 `[chain]` 0488 | the declined retirement's amended row | twice in v2 | none | none | none | missed |
+| P06 | flow-steps `entry.claim` | the unreachable remote's route | `leases.offline`'s row | A5-F6 | refuted twice (B1-F7) | none | contestable: the policy row arguably answers the case |
+| P07 | v2 `[chain]` 0283 | fallback witnesses kept readable across the drain | once in audit-fold | none | none | CS1-F1 scored | a neighbour: a different defect at its clauses |
+| P08 | flow-steps `entry.intake` | the hook made a scout | an item row | A1-F1 | B1-F1 | C4-F4 | a hit in every run |
+| P09 | flow-steps `plan.exit` | ratification as the planner records it | an item row | A1-F2 | B1-F2 | none | a hit |
+| P10 | v2 `[chain]` 0289, 0318 | the commit queue | 37 mentions | none | none | none | missed by every run |
+| P11 | layer-memory kind table | a kind's writer (mechanical) | n/a | Stage 0 | Stage 0 | Stage 0 | Stage 0's |
+| P12 | v2 `[chain]` 0093 | P23's only clause (mechanical) | n/a | Stage 0, A1-F3 | Stage 0, B1-F3 | Stage 0, C2-F1 | Stage 0's, and every run's |
+
+- **The pattern:** every plant on a flow-steps item row was found, and the clause deletions were missed. The two whose
+  rule survives only in excluded history were unfindable by any walk inside its list, a defect of this seal's design.
+  The others survive in allowed records, P10 in 37 places, and were missed: the walks read clauses and items, not the
+  records' settled rules looking for the clause that carries each.
+- **The fold** takes all three runs' confirmed findings, 236 across the three reports, before anything else. The
+  shortfall, the seal's defect and the blind spot are recorded as this audit's known limits.
+- **The re-measure,** before the baseline: a fresh sealed copy, new plants, none whose rule lives only in excluded
+  history, and a record-to-clause slice beside the scenario and clause slices, scored against a bar fixed first.
+
+""", "[recall-scored]")
+R.save()
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+L.insert_before("\n## Instruments\n", """
+- 2026-10-20, session 1799cb98: the owner answered "Fold, re-measure after (Recommended)". The seal is lifted: the key,
+  the seeding script, the brief reviews and the plant-by-plant reading are in the build folder (`whole-audit.md`
+  `[recall-scored]`). The fold of all three runs' confirmed findings comes next, and a fresh sealed re-measure before
+  the baseline.
+""", "the event")
+L.save()
+print("unsealed: key, seed, detectability, 5 brief reviews; [recall-scored] written")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -26354,6 +26437,7 @@ MINE = [
     ('audit-run/patch_run_c_ids.py', 'Run C in the scratch instruments: finding ids take the letter C, a clean cell may be a clause and its build, the read audit knows the clause and second-look scratch folders.'),
     ('walkkit/test_clause_walk.py', "walk.py's run C and second look on synthetic returns from the copy's [chain]: briefs and counts, returns and reports green and seven plants red, skeptic batches, the second look's brief and application, runs A and B still green."),
     ('audit-run/record_run_c_scored.py', "Run C scored with runs A and B: the round record's [walk-run-c-scored], the aggregate only, read from the three reports' shape lines and score.py's --with output."),
+    ('audit-run/unseal.py', "The seal lifted at the owner's word: the key copied byte for byte with its hash checked, the seeding and detectability scripts and the brief reviews committed, and [recall-scored] written."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -27676,7 +27760,7 @@ K5: principles 42, clauses 496, retired 0 · findings 0
 rerun design map: rc 0
   map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 298 records, 4864 sections, 231 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 303 records, 4894 sections, 231 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27692,9 +27776,9 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 115 · lines 42628 · unreviewed 11475 (27%)
+  design records 120 · lines 42861 · unreviewed 11708 (27%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 18
+  design commits after the floor that no closing review covers: 19
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27713,6 +27797,7 @@ rerun review debt: rc 0
     ebf2e5fc7  2 design record(s)  records(dClosedLoop): the second looks at runs A's and B's refutations, dispatched
     bf51d88ef  11 design record(s)  records(dClosedLoop): the second looks applied, run C's five clause walks back, and its skeptics dispatched
     30be8f40e  5 design record(s)  records(dClosedLoop): run C's four skeptics returned, and run C's synthesis dispatched
+    8a81ed8c8  3 design record(s)  records(dClosedLoop): run C scored with runs A and B — the bar still not met, and the owner's word asked again
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
 rc 1
 ````
@@ -27931,13 +28016,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2749 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1928, derived 321, pending 500
+map: 2755 nodes in 30 namespaces; 28190 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1934, derived 321, pending 500
 map: no stale facts read 65 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 298 records, 4865 sections, 231 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 303 records, 4895 sections, 231 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
