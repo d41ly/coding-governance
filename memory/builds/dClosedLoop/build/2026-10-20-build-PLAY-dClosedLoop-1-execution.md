@@ -402,3 +402,141 @@ verbatim.
    - "Approve after the fold": no further review.
 
    The owner: "Review the fold, then approve (Recommended)".
+
+## [plan-final]
+
+Both review pairs are folded. The fold pair (`reviews/2026-10-20-review-PLAY-dClosedLoop-1-execution-fold-a.md` and
+`-b.md`, both CLEAN WITH FIXES) was compared in `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-fold-reviews-compared.md`:
+24 defects, 22 fold, no fork, about 3 found by neither. Dispatch 229 folded the 22, and the plan stands at
+`a93477abc`.
+
+## [walk]
+
+The owner's approval question, 2026-10-20, with the options offered and the answer verbatim:
+
+- "Approve the execution plan?"
+  - "Approve, start Phase 0 (Recommended)": the plan and its four carried defaults stand, and node d starts
+    Phase 0.
+  - "Walk it first": the main loop takes the owner through it section by section, each choice beside it,
+    before approval.
+  - "Review the last fold": one more paired review over the second fold's commit.
+
+  The owner: "Walk it first".
+
+The walk goes section by section, and each step's questions and answers are recorded here as they land.
+
+**Step 1, Phase 0.** The main loop summarised P0.1 to P0.9 and named one limit: until dTrueNorth's product checks
+land, the runs themselves run the deviation scripts, and the owner's read of the landing diff is the only check a run
+cannot skip. Three questions, with the options offered and the owner's answers verbatim:
+
+1. "Every chain unit is minted in the TOOL family, and each spec's streams line names the disciplines it serves. Keep
+   that?"
+   - "TOOL for all (Recommended)": one family for the whole chain, the streams line carrying the rest.
+   - "Family by stream": each build's family follows its main stream: PLAY for charter and playbook builds, KICK for
+     session and kickoff, DEPL for deploy, TOOL otherwise.
+
+   The owner: "Family by stream".
+2. "The opening diff holds 22 READMEs, 22 packets, about 21 asks and 7 decision rows, all derived by one checked
+   script. How much of it do you read before asking for the landing?"
+   - "Rows + dTrueNorth (Recommended)": the 7 decision rows, the grant row, and dTrueNorth's README and packet in full;
+     for the other 21, the script's check output and a per-build summary.
+   - "All of it": every README and packet.
+   - "Rows only": the decision rows and the grant row.
+
+   The owner: "Rows + dTrueNorth (Recommended)".
+3. "Anything else in Phase 0 before Phase 1?"
+   - "On to Phase 1 (Recommended)".
+   - "Show README rules in full".
+   - "Show decision rows in full".
+
+   The owner: "Show decision rows in full".
+
+The main loop quoted P0.8's seven rows and named the eighth that answer 1 adds, each build's unit family following
+its main stream. One question:
+
+4. "Do the seven decision rows hold, with the eighth for the unit family?"
+   - "Hold, on to Phase 1 (Recommended)": the eight rows stand.
+   - "Narrow the grant": row 2 grants only the changes a build's clauses name and list as a path or key.
+
+   The owner: "Hold, on to Phase 1 (Recommended)".
+
+**Step 2, Phase 1.** The main loop summarised dTrueNorth's pilot. It flagged that the plan closes dTrueNorth under
+`GATE_SELFTESTS=1`, which runs the unattended kit's self-test suites, against the owner's standing instruction of
+2026-08-23 not to run them. A build touching the kit waives them in its README. Two questions:
+
+5. "Builds that change the unattended driver (dTrueNorth, dDeclaredLoop, dPlacedRequest, dWellOiledMachine, at
+   least) would run the kit's self-test suites at their close, which your standing instruction forbids. What applies
+   for the chain?"
+   - "Run at those closes (Recommended)": lift the instruction for these closes only; each suite runs once at the
+     close of a build that changes the driver.
+   - "Waive in each README": each driver-changing build waives the suites in its README, as dAlignedCarrier did; its
+     changes are proved by targeted probes and its own planted tests.
+   - "Run at dTrueNorth only": the pilot runs them once; the other driver-changing builds waive them.
+
+   The owner: "Waive in each README".
+6. "Anything else in Phase 1 before Phase 2?"
+   - "On to Phase 2 (Recommended)".
+   - "Show the 13 red cases".
+
+   The owner: "On to Phase 2 (Recommended)".
+
+**Step 3, Phase 2.** The main loop summarised the spec run, the build run, the six-rung fork ladder with the
+weakest-bound tiers, and what the owner sees at each spec landing. One question:
+
+7. "Anything in Phase 2 to change before handoffs and coordination?"
+   - "On to handoffs (Recommended)".
+   - "Show the run steps in full".
+   - "Show the fork ladder in full".
+
+   The owner: "On to handoffs (Recommended)".
+
+**Step 4, handoffs and coordination.** The main loop summarised the packet, the per-pass brief, the cold session's
+reading order, keeping a packet current, the node loop, the claim rules, landing, shared records and what a node
+does when another's work is in its way. One question:
+
+8. "Anything in handoffs and coordination to change before the schedule?"
+   - "On to the schedule (Recommended)".
+   - "Show the packet's fields".
+   - "Show the claim rules".
+
+   The owner: "On to the schedule (Recommended)".
+
+**Step 5, the schedule, sync points and per-node runbooks.** The main loop summarised the derived schedule (271
+units; a 96%, d 77%, b 60%; the first wave; 43 starts at 37 moments), the dispatch rule, the critical path's
+carriers and the landings that change what nodes load. One question:
+
+9. "Anything in the schedule, sync points or runbooks to change before the last step?"
+   - "On to deviations (Recommended)".
+   - "Show the full table".
+   - "Show the sync points".
+
+   The owner: "On to deviations (Recommended)".
+
+**Step 6, deviations, the owner's steps and what today's gov cannot do.** The main loop summarised the owner's
+deviation rule as applied, the departures report, what still detects strictly and what nothing catches, the
+departures the owner has approved, the owner's own steps and the [cannot] rows. Two questions:
+
+10. "\"Governance carrier\" is defined nowhere, yet your grant row lets each run judge which carrier changes its
+    clauses cover. Define it?"
+    - "Define it in Phase 0 (Recommended)": one more decision row lists what counts as a governance carrier, derived
+      from today's tree, so the grant reads against a list.
+    - "Leave it to the run": each run judges what a carrier is under the grant.
+
+    The owner: "Define it in Phase 0 (Recommended)".
+11. "The walk changed four things: unit ids by stream, your opening read, self-test waivers in driver builds, and
+    the carrier answer above. What happens now?"
+    - "Fold, then start Phase 0 (Recommended)": the writer folds the walk's changes, the main loop checks them, and
+      node d starts Phase 0.
+    - "Fold, review, then start": one Tier-2 review of the fold before Phase 0.
+    - "Not yet".
+
+    The owner: "Fold, then give me a fully oriented hand off to start phase 0 in a new session."
+
+**What the walk changes.** The plan's writer folds four changes, and this session then writes the handoff:
+- each build's unit family follows its main stream (answer 1);
+- the owner reads the decision rows, the grant row and dTrueNorth's README and packet in full, and a per-build summary
+  for the other 21 (answer 2);
+- each driver-changing build waives the unattended kit's self-test suites in its README (answer 5);
+- a decision row defines a governance carrier, derived from today's tree (answer 10).
+
+Phase 0 then starts in a new session, from a fully oriented handoff this session writes.
