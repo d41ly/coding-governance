@@ -138,6 +138,27 @@ gates RED — 1/67 legs failed (4 skipped) (71 held: subject kit or chunk selfte
 spec-tokens: memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md [size] `size <- memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md` — 117455 bytes, 68303 over the spec ceiling 49152; split the spec or move history out of it
 ````
 
+## [bar-2]
+
+The full bar again, on the quiescent tree at `a83c07253`, 2026-10-21, after the owner's answer 1 added the unit spec's
+high-water row (`tools/template-size-highwater.txt`, 122396 bytes): exit 0, every leg green. Run directly first, spec
+tokens and `check-template-size.sh` each exited 0. The four skips are leg guards, unchanged against main; 71 legs are
+held, the kit self-tests (`GATE_SELFTESTS` unset) and the e2e chunk. The bar's summary lines:
+
+````text
+---- chunk records: green  (4 ran, 0 failed, 0 skipped, 0 reused, 0 held)
+---- chunk product: green  (19 ran, 0 failed, 0 skipped, 0 reused, 0 held)
+---- chunk selftests: skipped  (0 ran, 0 failed, 0 skipped, 0 reused, 68 held)
+GATE skip  kit/dogfood doc parity  (unchanged vs main)
+GATE skip  codebase-map gate coverage  (unchanged vs main)
+GATE skip  transition-audit arms  (unchanged vs main)
+GATE skip  govkit refusal join  (unchanged vs main)
+---- chunk declarations: green  (33 ran, 0 failed, 4 skipped, 0 reused, 0 held)
+---- chunk wiring: green  (11 ran, 0 failed, 0 skipped, 0 reused, 1 held)
+---- chunk e2e: skipped  (0 ran, 0 failed, 0 skipped, 0 reused, 2 held)
+gates GREEN — 67/67 legs passed (4 skipped) (71 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)
+````
+
 ## [instrument]
 
 `redtests.sh <worktree> <scratch dir> <opening's parent>`, verbatim:
