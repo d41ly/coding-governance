@@ -13,8 +13,10 @@ What `--write` writes, per chain build:
   memory/builds/<slug>/prompts/<date>-prompt-PLAY-dClosedLoop-1-packet.md   through the packet instrument's
       `render_packet`, imported by path, so the name claims the id the packet's Serves line lists.
 and once: the 22 bound rows of `memory/project/readme-contract.txt`, through the generator's `add_contract_row`; and
-dClosedLoop's own `BACKLOG.md` with one clean-reading ask, and its SEV row, per driver-changing build. It stages every
-file it writes, because the index generator reads `git ls-files` and a packet reads the open asks through it.
+dClosedLoop's own `BACKLOG.md` with one clean-reading ask, and its SEV row, per driver-changing build, written whole
+when the file is absent; when it is present, each row it lacks is added after the opening's last row of its kind, and
+a lacked row before a held one is refused, since the opening adds the ids it mints and never re-files one. It stages
+every file it writes, because the index generator reads `git ls-files` and a packet reads the open asks through it.
 
 Ids, fixed for Phase 0 (dispatch 239's brief, item 3), every one built from its parts here, so this file cites none:
   a chain build's roster ids are `<FAMILY>-<slug>-1` to `-<n>`, in clause order, then its extra units;
@@ -22,13 +24,18 @@ Ids, fixed for Phase 0 (dispatch 239's brief, item 3), every one built from its 
   P0.8's rows 1 to 9 are dClosedLoop's ids counted on from row 1's, which the packet instrument declares once as
   `EXTRA_DECISION` (`missing:PLAY-dClosedLoop-2` until the main loop lands it, so ids 2 to 10); the grant is row 2,
   which every `may:` line cites, and the extra unit derives from row 1;
-  dClosedLoop's clean-reading asks follow row 9's id, one per driver-changing build in v2's `[chain]` order.
+  dClosedLoop's clean-reading asks follow row 9's id, one per driver-changing build: first each build the walk's
+  predicate counts, then each only answer 3's arms count, each set in v2's `[chain]` order, so no id the opening
+  minted is renumbered (the charter's `[ids]`).
 
 The family rule (walk answer 1, ER:435-436): the build's Stage and its slug's noun, its last capitalised word, matched
 in that order and whole words only against `charter` or `playbook` (PLAY), `session` or `kickoff` (KICK) and
 `deploy` (DEPL); a build matching none is TOOL. `roster:` is the family, `streams:` its discipline in `FAMILIES`.
 The driver-changing rule (walk answer 5, ER:476): a v2 clause names a path or surface of the unattended kit, one of
-KIT_TERMS below; a build with an extra unit joins by it, since the plan's only one edits the kit ([phase-1]).
+KIT_TERMS below; a build with an extra unit joins by it, since the plan's only one edits the kit ([phase-1]). The
+owner's opening-read answer 3 (ER:638-646) adds two arms, whole words: a clause that re-points a key the kit reads, a
+`KEY=` line of its example conf `KIT_CONF` beside a form of "re-point", never one that merely names a key; and a
+clause naming the unattended Skill, whose text it edits.
 The carrier list (P0.8 row 9): six selectors over the tracked tree, each reduced to entries, a kit directory, a
 skill directory or a file, so a new file inside an entry stays covered and a new entry does not.
 
@@ -48,7 +55,8 @@ Exit 0 green, 1 on a finding or a refusal, 2 when there is nothing to check.
 
 What it does not check: the generated regions and `ids:` (`gen_build_index.py --check`), the slot contract and its
 budgets (`--check-format`), a packet's own arms (`packet.py --check`), whether a rule's or a slot's words say what the
-plan means, and the contract file's and dClosedLoop's `BACKLOG.md`'s other rows, which later builds write.
+plan means, the contract file's and dClosedLoop's `BACKLOG.md`'s other rows, which later builds write, and whether a
+clause's re-point has the kit key it names for its object, since the arm reads the two in one clause.
 """
 import argparse
 import contextlib
@@ -74,6 +82,9 @@ KIT_TERMS = (("`unattended.sh`", r"(?<![-\w])unattended\.sh\b"), ("`check-unatte
              ("`tools/unattended/`", r"\btools/unattended/"), ("the `/unattended` command", r"`/unattended`"),
              ("the unattended kit", r"\bunattended kit\b"), ("`--plan`", r"`--plan`"), ("`--status`", r"`--status`"),
              ("unattended's verbs", r"\bunattended's verbs\b"), ("run claims", r"\brun claims?\b"))
+KIT_CONF = "tools/unattended/.unattended.conf.example"   # its `KEY=` lines: the keys the kit's driver reads (its header)
+REPOINT = r"\bre-point(?:s|ed|ing)?\b"
+SKILL_TERM = ("the unattended Skill", r"(?i:\bunattended skill\b)")
 EXTRA_TEXT = ("the carry-forward condition for every unit a spec run adds, once, and the starting-roster reading it "
               "rests on")   # the execution plan's `[deviations]` row for the extra unit
 EXTRA_KIT = "its extra unit, the carry-forward condition in `unattended.sh` (the execution plan's `[phase-1]`)"
@@ -132,13 +143,27 @@ def derive_family(stage, slug):
     return noun, "none", "TOOL"
 
 
+@functools.lru_cache(maxsize=None)
+def read_kit_keys():
+    """The keys the unattended kit reads: each `KEY=` line of its example conf, which its driver reads and never
+    restates (the conf's header), so no key is typed here."""
+    keys = tuple(dict.fromkeys(re.findall(r"^([A-Z][A-Z0-9_]*)=", read_file(KIT_CONF) or "", re.M)))
+    if not keys:
+        raise Refusal(f"{KIT_CONF} holds no `KEY=` line, so the keys the kit reads cannot be derived")
+    return keys
+
+
 def derive_kit_clauses(clauses):
-    """[(clause id, [term labels])] of the clauses naming a kit path or surface."""
+    """[(clause id, [term labels], walk)] of the clauses that touch the kit: naming a path or surface of it (walk
+    answer 5; `walk` true), or by answer 3's arms, naming a key it reads beside a re-point, or naming its Skill."""
     out = []
     for cid, (text, _h, _t) in clauses.items():
-        terms = [label for label, rx in KIT_TERMS if re.search(rx, text)]
-        if terms:
-            out.append((cid, terms))
+        walk = [label for label, rx in KIT_TERMS if re.search(rx, text)]
+        more = ([f"`{k}` re-pointed" for k in read_kit_keys() if re.search(r"\b" + k + r"\b", text)]
+                if re.search(REPOINT, text) else [])
+        more += [SKILL_TERM[0]] if re.search(SKILL_TERM[1], text) else []
+        if walk or more:
+            out.append((cid, walk + more, bool(walk)))
     return out
 
 
@@ -177,13 +202,16 @@ def derive_chain():
                     "whole": slug in packet.schedule.WHOLE,
                     "ask": None if slug in packet.schedule.WHOLE else f"{fam}-{slug}-{n + 1}",
                     "kit": kit, "driver": bool(kit) or bool(extra.get(slug)), "gaps": row["gaps"], "n_gaps": len(keys),
+                    "walk": any(w for _c, _t, w in kit) or bool(extra.get(slug)),
                     "children": [c for c, r in rows.items() if slug in r["parents"]], "baseline": t["baseline"]})
     row = DECISION_ROWS
     for b in out:
-        b["clean"] = None
-        if b["driver"]:
-            row += 1
-            b["clean"] = derive_decision_id(row)
+        b["clean"], b["clean_row"] = None, None
+    for walk in (True, False):          # the walk's predicate's builds first, so answer 3's ids follow theirs
+        for b in out:
+            if b["driver"] and b["walk"] is walk:
+                row += 1
+                b["clean"], b["clean_row"] = derive_decision_id(row), row
     return out
 
 
@@ -280,11 +308,9 @@ def render_backlog(b, date):
 
 
 def render_owed_rows(chain, date):
-    """dClosedLoop's clean-reading asks and their SEV rows: ([ask rows], [SEV rows])."""
+    """dClosedLoop's clean-reading asks and their SEV rows, in id order: ([ask rows], [SEV rows])."""
     asks, sevs = [], []
-    for b in chain:
-        if not b["clean"]:
-            continue
+    for b in sorted((b for b in chain if b["clean"]), key=lambda b: b["clean_row"]):
         s, c = b["slug"], b["clean"]
         asks.append(f"- {c} · filed {date} · THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT {s}'S LANDING. "
                     f"{s}'s README rule 8 waives the on-demand verdict of "
@@ -299,6 +325,22 @@ def render_owed_rows(chain, date):
 def render_owed_backlog(chain, date):
     asks, sevs = render_owed_rows(chain, date)
     return "\n".join([f"# {OWN} — asks", "", "## Asks", ""] + asks + ["", "## Dispositions", ""] + sevs) + "\n"
+
+
+def add_owed_rows(text, chain, date):
+    """dClosedLoop's `BACKLOG.md` with each opening row it lacks added after the opening's last row of its kind, every
+    other line kept. Refused when it holds no opening row of a kind, or lacks one before a row it holds: the opening
+    adds the ids it mints after those it minted, and never re-files one."""
+    lines = text.split("\n")
+    for kind, rows in zip(("ask", "SEV"), render_owed_rows(chain, date)):
+        held = [i for i, r in enumerate(rows) if r in lines]
+        lacked = [r for r in rows if r not in lines]
+        if not held or (lacked and rows.index(lacked[0]) < held[-1]):
+            raise Refusal(f"{OWED_BACKLOG} exists without the opening's {kind} rows in order "
+                          f"({len(held)} of {len(rows)} held), and the opening only adds the rows after its last")
+        at = lines.index(rows[held[-1]]) + 1
+        lines[at:at] = lacked
+    return "\n".join(lines)
 
 
 def derive_opening(date):
@@ -333,11 +375,9 @@ def cmd_write(date):
     chain, files, contract = derive_opening(date)
     owed = read_file(OWED_BACKLOG)
     if owed is not None:
-        asks, sevs = render_owed_rows(chain, date)
-        lines = owed.split("\n")
-        if any(r not in lines for r in asks + sevs):
-            raise Refusal(f"{OWED_BACKLOG} exists without the opening's rows, and the opening writes it once")
-        del files[OWED_BACKLOG]
+        files[OWED_BACKLOG] = add_owed_rows(owed, chain, date)
+        if files[OWED_BACKLOG] == owed:
+            del files[OWED_BACKLOG]
     for path, text in files.items():
         write_file(path, text)
     conf = read_conf()
@@ -552,21 +592,27 @@ def cmd_families():
 def cmd_driver_builds():
     chain = derive_chain()
     builds = packet.read_tree()["builds"]
+    keys = read_kit_keys()
     print("The predicate (P0.5, walk answer 5): a v2 clause names " + ", ".join(lb for lb, _rx in KIT_TERMS)
           + "; \"the driver\" alone is left out, since in v2 it names the loop's driver role. A build with an extra "
-          "unit joins by it.")
+          "unit joins by it. The opening read's answer 3 adds two arms, whole words: a clause that re-points a key "
+          f"the kit reads, one of the {len(keys)} `KEY=` lines of `{KIT_CONF}` beside a form of \"re-point\", never "
+          "one that only names a key; and a clause naming the unattended Skill, whose text it edits.")
     print("")
     print("| Build | Clauses that touch the kit |")
     print("|---|---|")
     for b in chain:
         if b["driver"]:
-            cells = ([EXTRA_KIT] if b["extra"] else []) + [f"`{cid}` ({', '.join(t)})" for cid, t in b["kit"]]
+            cells = ([EXTRA_KIT] if b["extra"] else []) + [f"`{cid}` ({', '.join(t)})" for cid, t, _w in b["kit"]]
             print(f"| {b['slug']} | {'; '.join(cells)} |")
     print("")
-    print(f"{sum(1 for b in chain if b['driver'])} builds, {sum(len(b['kit']) for b in chain)} clauses. Near misses, "
-          "the clauses naming \"unattended\" that match no term, which the predicate leaves out:")
+    late = [b["slug"] for b in chain if b["driver"] and not b["walk"]]
+    print(f"{sum(1 for b in chain if b['driver'])} builds, {sum(len(b['kit']) for b in chain)} clauses; "
+          f"{len(late)} of the builds join by answer 3's arms alone ({', '.join(late) or 'none'}), so their "
+          "clean-reading asks take the ids after the others'. Near misses, the clauses naming \"unattended\" that "
+          "match no term, which the predicate leaves out:")
     print("")
-    hits = {cid for b in chain for cid, _t in b["kit"]}
+    hits = {cid for b in chain for cid, _t, _w in b["kit"]}
     misses = 0
     for b in chain:
         for cid, (text, _h, _t) in builds[b["slug"]].items():
@@ -577,6 +623,11 @@ def cmd_driver_builds():
     driver = sum(1 for b in chain for cid, (text, _h, _t) in builds[b["slug"]].items()
                  if re.search(r"\bthe driver\b", text) and cid not in hits)
     print(("" if misses else "- none\n") + f"\nClauses naming \"the driver\" and no term, left out: {driver}")
+    print("\nClauses naming a key the kit reads and no re-point, left out:\n")
+    named = [f"- `{cid}` ({b['slug']}): " + ", ".join(f"`{k}`" for k in found)
+             for b in chain for cid, (text, _h, _t) in builds[b["slug"]].items() if cid not in hits
+             for found in [[k for k in keys if re.search(r"\b" + k + r"\b", text)]] if found]
+    print("\n".join(named) or "- none")
     return 0
 
 
