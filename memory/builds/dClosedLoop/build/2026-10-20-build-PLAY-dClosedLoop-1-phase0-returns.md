@@ -450,3 +450,136 @@ Files are in `C:\Users\d41ly\AppData\Local\Temp\claude\C--projects-coding-govern
   - `2026-10-20-build-PLAY-dClosedLoop-1-phase0-schedule-redtests.md`
 - Scratch harness: `runall.sh`, `probe_owner.py`, `driver.py`, `recordcheck.py` and `stageA-carries.py`, with outputs in `c-before\`, `c-stageA\`, `c-stageB\`, `c-staged\`, `s-before\`, `s-after\` and `s-staged\`.
 ````
+
+## [dispatch-243]
+
+Prompt 70, `prompts/` handoff 70. Its return after the resume (the first return is summarised in the session log's row):
+
+````text
+`bare-ids.py` is now one of the packet's pinned instruments, and a one-byte commit to it turns the pin arm red while the byte compare stays green. The new tip of `p0-packet-2` is `f75c7777cd3bc3c6400dd300555aac51baadc4ed`, in the clone at `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d243/clone` (worktree `d243/wt`). I fast-forwarded it onto `82cd88009` first.
+
+**The commits on top of `82cd88009`:**
+- **`b200f3c2d`, `packet.py`:** `bare-ids.py` is added as the last entry of the instrument list, so the existing loads by position still point at the same files. Field 1 of the docstring names it.
+- **`f75c7777c`, the record:** a new item 7 in `## The pinned baseline and one roster reader`. It says it closes item 6's bullet about `bare-ids.py` instead of editing that bullet. `gen_build_index.py --write` rendered nothing new.
+
+**The pin plant on a real tree.** I wrote dTrueNorth's packet, committed one byte added to `bare-ids.py`, then ran `--check`:
+
+| Step | Old code (`82cd88009`) | New code (`b200f3c2d`) |
+|---|---|---|
+| `--check` after the commit | exit 0, "pin arm 6 instruments, 0 findings": the edit moves no pin | exit 1, byte compare green, "pin arm 7 instruments, 1 findings", "…bare-ids.py moved: pinned ea671312d296, HEAD holds ae0327ae8b7d" |
+| `--write`, which keeps existing pins | "is current, nothing written"; `--check` still exit 0 | "is current, nothing written"; `--check` still red |
+| `--repin bare-ids.py` | refused: "names 0 of the instruments" | exit 0, the pin moved; `--check` exit 0 |
+
+**Every other packet plant keeps its verdict.** All 17 modes of `packet.py` and `bare-ids.py` keep their exits and finding lines. The only change is in the 10 summary lines that count pinned instruments, which now say 7 where they said 6. With that count normalized, the logs diff clean.
+
+**Checks:** the pre-commit hook passed on both commits, and I ran the M6 checklist (`gotchas.py`) over each. I acted on three classes:
+- **Synthetic value:** the plant is a real commit, not a computed blob.
+- **Fixture that passes by finding nothing:** `--fixture`'s own pin plant still moves only `carries.py`, so the real-tree run above is the only evidence for the new pin.
+- **Amendment left standing:** no typed instrument count exists anywhere in the build's scripts, and only `packet.py` reads the list (`deviations.py` keeps its own).
+
+**Still owed to the main loop:** the whole-tree hygiene run at the push boundary. This adds no new gate check, so no first-red run is owed at the close.
+
+The worktrees `d243/pin-old` and `d243/pin-new` (branches `d243-pin-*`) hold throwaway plant commits. Nothing outside `d243/` was touched.
+````
+
+## [dispatch-244]
+
+Handoff `prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-1-builder.md`. The return:
+
+````text
+The rename is built and committed on `p0-packet-name`. Its tip is `786fd620de3d01f77c315f3c077f74d6398c723d`, in the clone at `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d244/clone` (worktree `…/d244/wt`). One acceptance item is not observed: the scratch-guard hook refused the whole-tree hygiene run to my role, so that run is owed at the close.
+
+## Commits (all through the pre-commit hook)
+1. `a5a331d9e`: the code change in `packet.py` and `open.py`'s docstring.
+2. `738dca981`: the opening re-rendered. The 22 old packets were removed with `git rm`, then `open.py --write` and `gen_build_index.py --write` ran. The commit holds only 22 renames: the generator put every README back to its committed bytes and changed no other view.
+3. `786fd620d`: the `## The packet's file name` section appended to `build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-packet-instruments.md`, listing all 27 commands in order with exit and proof line.
+
+The code had to land before the re-render. A new packet pins each instrument's blob at HEAD, so packets rendered in the code's own commit would pin the old blobs and fail their check once committed.
+
+## What changed in `packet.py`
+- A single constant, `SERVES = "PLAY-dClosedLoop-1"`, now feeds both the packet's Serves line and its file name, so the two can't drift apart.
+- `scan_packets` finds a build's packet as `*-prompt-PLAY-dClosedLoop-1-packet.md`, and `render_packet` writes new packets under that name.
+- **A judgement call you may want to reverse:** the first unit fed only the name. So I deleted its derivation, its two refusals, and the `--unit` flag that supplied it. `render_packet(slug)` is already how `open.py` calls it. `git grep` finds no other reader of any of them.
+- The naming lexicon has no `py.constant` cell (exit 2), and I added no new function.
+
+## Checks that ran
+- `open.py --check`: exit 0, findings 0. `packet.py --check` exits 0 for all 22, with the same counts as the opening's record. `gen_build_index.py --check` exits 0.
+- **Packet plants:** the `--fixture` run and its 12 plant and control runs give byte-identical logs before (`45a825043`) and after (`738dca981`).
+- **`open.py` red tests 1–11:** all keep their recorded verdicts, run in a throwaway worktree that is now removed.
+  - The pre-commit hook refused red 7's first plant commit (the codebase map was stale). I ran the map regeneration the hook named, staged it, and red 7 then failed as recorded.
+  - I left out red 3's `gen_build_index.py --check`, which is a gate leg, not `open.py`'s.
+- **Name probe:** on the old tree, 22 of 22 packet names claim an id their Serves line doesn't list; on the new tree, 0.
+- **Handoff:** `handoff.py render` from a renamed packet, then `handoff.py check`, both exit 0.
+- **M6 checklist:** `gotchas.py --for-diff` over both ranges exit 0, and I acted on six classes (detail in item 6 of the record).
+
+## Owed at the close
+- **Whole-tree `check-memory-hygiene.sh`** (the brief's one allowed gate). The hook said: "BLOCKED by scratch-guard: a role agent runs no gate". Expected result: no check 21 finding naming a packet.
+  - Stand-in until then: a probe that runs `gen_build_index.py --print-bindings` (the data check 21 reads) and applies check 21's arms A, B and the filename projection.
+  - On `45a825043` it reproduces the opening's 22 findings in the check's own wording; on `738dca981` it finds 0 for packets and 0 tree-wide.
+  - It skips the legacy and cutoff filters and the U arm's pin, and runs no other check.
+- `gen_build_index.py --check-format` and every other leg: none ran.
+
+## Not touched, and limits
+- The execution plan's P0.3 line (line 316) still names the packet `<first unit>`; that is yours to route.
+- A packet left under any other name is invisible to both `packet.py --check` and `open.py --check`. Only hygiene check 21 catches it, as it did at the opening.
+- Commit trailers use `Claude Opus 5` as the charter and brief require, not the harness's `5.5`.
+
+Files, under `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d244/wt/memory/builds/dClosedLoop/build/`:
+- `2026-10-20-build-PLAY-dClosedLoop-1-packet.py`
+- `2026-10-20-build-PLAY-dClosedLoop-1-open.py`
+- `2026-10-20-build-PLAY-dClosedLoop-1-phase0-packet-instruments.md`
+````
+
+## [dispatch-245]
+
+Handoff `prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-2-spec-writer.md`. The return:
+
+````text
+**PLAY-dClosedLoop-1: revised.** I edited only the unit spec, `C:\projects\coding-governance\.claude\worktrees\unruffled-aryabhata-d89ede\memory\builds\dClosedLoop\spec\2026-10-20-spec-PLAY-dClosedLoop-1.md`. Its header now reads rev-2, dated 2026-10-21. Nothing is committed and no index was regenerated.
+
+**One thing to do before staging:** the memory hygiene gate fails in the worktree right now on check 9 ("generated build index differs from a fresh render"). The H1 change caused it. Once the spec reads as a unit, the index generator binds every record that serves it.
+- Running `python tools/memory-tree/gen_build_index.py --write` fixes it. It rewrites the spec's `gen:spec-records` region and the dClosedLoop README's units row and "Ids no record names" lines.
+- The spec grows from about 330 lines to 936, almost all of it the records table.
+- I checked this in a scratch clone: after the render, hygiene exits 0 and the spec outside the generated region is byte-identical to mine.
+
+**Item 1, the H1.** It now reads `# PLAY-dClosedLoop-1 — the architecture and the chain plan for gov's one lifecycle loop`, with the title unchanged.
+- `bash tools/unattended/unattended.sh --plan dClosedLoop --paths`:
+  - Before: `2026-10-20-spec-PLAY-dClosedLoop-1.md - NOT A UNIT (no status header)`, then `next: PLAY-dClosedLoop-1 (MISSING - spec it first)`.
+  - After: `PLAY-dClosedLoop-1 INPROGRESS FORKED memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md`, `0 with no tracked spec`, then `next: PLAY-dClosedLoop-1 (FORKED)`. FORKED is expected because F1, F3, F4 and F5 are still open.
+  - The cause was the reader's id pattern in `tools/unattended/unattended.sh`, `/^# [A-Za-z0-9][A-Za-z0-9-]* /`. It wants a space straight after the id, so the colon stopped it. The status header itself was fine.
+- `python tools/roles/handoff.py agents --handoff …-61-builder.md`: the output is the same before and after. It prints `2 complete line(s) held, nothing written; pass --write …`. The "no spec … defines a unit id" note only appears under `--write`.
+  - To see it without touching the worktree, I ran `--write` in a scratch clone.
+  - With the colon H1: `no spec under memory/builds/dClosedLoop/spec defines a unit id on its first line, so the ledger would serve nothing and is not written`.
+  - With the dash H1: `…/2026-10-21-build-PLAY-dClosedLoop-1-agent-ledger.md: 2 line(s) added`.
+  - The clone was then reset.
+
+**Item 2, §6 statuses.** Each one cites the record I read.
+
+| Criterion | Status | Notes |
+|---|---|---|
+| AC1 | DONE for the execution answers, OPEN for the design rounds' answers (F3) | Nine rows at `memory/DECISIONS.md:230-238`. A `query.py` probe returned all nine. |
+| AC2 | DONE | My probe of v2's `[chain]`, `memory/LIVE.md` and each README found 22 of 22. |
+| AC3 | Unchanged, apart from one correction | It said the chain READMEs do not exist yet; that is no longer true. |
+| AC6 | DONE against the revised P0.1 | Says that a `deviations.py` plant's "red" is now exit 1 under `--policy refuse`. Row 10's pin plant is cited from the packet record, step 30. |
+| AC7 | DONE | |
+| AC8 | DONE | |
+| AC9 | DONE | Row 9 fixed by Finding 15. The script on the tree is blob `5aa5421e2`, the one that fix measured. |
+| AC10 | DONE | Says the single bare-id predicate it names predates the revised P0.7, which runs the plain mode at the parent and `--opened` at the tip. |
+| AC11 | DONE, via the decisions record | Only `-3`, `-5`, `-9` and `-10` quote their answer inline in `memory/DECISIONS.md`. The other five cite ER lines and point to the decisions record, because of the 300-character row cap. Every quote matches its ER line. |
+| AC12 | OPEN on every node | Node d: three of four observations hold, and the resume tick is the owner's act. Nodes a and b have not run. |
+
+**Items 3 and 4.**
+- F2 now carries `RESOLVED (owner, 2026-10-20)` with answer 4 quoted verbatim (ER:615-616). F1, F3, F4 and F5 are untouched.
+- The §9 rev-2 entry names its scope. I counted the edits as material because statuses changed and a fork was resolved.
+
+**Changes the brief didn't ask for:**
+- I added `· ratified 2026-10-20` to the header tail. `memory/TEMPLATE-SPEC.md` asks for this when a fork is resolved. No other spec in the tree carries it, so drop it if you'd rather not set the precedent. Hygiene passes either way.
+- The plan's revision had moved line numbers, so I re-pointed stale execution-plan citations in §3, §4, §5, F4 and §10. The new lines are :134-137, :1299, :1317, :410 and :397-399.
+- I avoided writing any chain-build unit id bare. The only ids in the spec are the unit itself and the minted decision rows `PLAY-dClosedLoop-2` to `-10`.
+
+**Checks I ran:**
+- No line begins with an AC label outside the criteria list.
+- All ten `##` sections are present, in order.
+- The lexicon exits 0.
+- Probe outputs are in `…/scratchpad/d245/`: `ac2.py`, the before/after outputs of both readers, and the hygiene logs.
+````

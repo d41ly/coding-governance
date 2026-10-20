@@ -371,6 +371,7 @@
 | [2026-10-20-build-PLAY-dClosedLoop-1-walk-return-c4.md](../build/2026-10-20-build-PLAY-dClosedLoop-1-walk-return-c4.md) | research | — |
 | [2026-10-20-build-PLAY-dClosedLoop-1-walk-return-c5.md](../build/2026-10-20-build-PLAY-dClosedLoop-1-walk-return-c5.md) | research | — |
 | [2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py](../build/2026-10-20-build-PLAY-dClosedLoop-1-walk-seed.py) | research | — |
+| [2026-10-21-build-PLAY-dClosedLoop-1-agent-ledger.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-agent-ledger.md) | journal | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-packet-name.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-packet-name.md) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-spec.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-spec.md) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md) | research | — |

@@ -74,7 +74,7 @@ ids PLAY-dClosedLoop-16 PLAY-dClosedLoop-17
 | [PLAY-dClosedLoop-1 — the architecture and the chain plan for gov's one lifecycle loop](spec/2026-10-20-spec-PLAY-dClosedLoop-1.md) | — | 2 | INPROGRESS | rev-2 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 589 bound to this build, across 4 record folder(s).
+Records: 590 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
