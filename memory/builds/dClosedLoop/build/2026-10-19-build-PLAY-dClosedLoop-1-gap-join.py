@@ -24,7 +24,7 @@ import sys
 
 sys.dont_write_bytecode = True
 
-RANGE = r"gap-[a-z]+-\d\d to gap-[a-z]+-\d\d"
+RANGE = r"(gap-[a-z]+-\d\d) to (gap-[a-z]+-\d\d)"
 ROW = r"^\| (d[A-Z][A-Za-z]+) \| [^|]+ \| [^|]+ \| [^|]+ \| (.+) \|$"
 GENERATOR = "tools/memory-tree/gen_build_index.py"
 
@@ -32,7 +32,7 @@ GENERATOR = "tools/memory-tree/gen_build_index.py"
 def extract_owned(cell):
     """The gap keys a cell or slot lists, each range expanded."""
     owned = set()
-    for a, b in re.findall(r"(gap-[a-z]+-\d\d) to (gap-[a-z]+-\d\d)", cell):
+    for a, b in re.findall(RANGE, cell):
         stem, lo, hi = a.rsplit("-", 1)[0], int(a.rsplit("-", 1)[1]), int(b.rsplit("-", 1)[1])
         owned |= {f"{stem}-{i:02d}" for i in range(lo, hi + 1)}
     owned |= set(re.findall(r"gap-[a-z]+-\d\d", re.sub(RANGE, "", cell)))

@@ -153,14 +153,18 @@ def read_kit_keys():
     return keys
 
 
+def extract_kit_keys(text):
+    """The keys the kit reads that a clause names, whole words."""
+    return [k for k in read_kit_keys() if re.search(r"\b" + k + r"\b", text)]
+
+
 def derive_kit_clauses(clauses):
     """[(clause id, [term labels], walk)] of the clauses that touch the kit: naming a path or surface of it (walk
     answer 5; `walk` true), or by answer 3's arms, naming a key it reads beside a re-point, or naming its Skill."""
     out = []
     for cid, (text, _h, _t) in clauses.items():
         walk = [label for label, rx in KIT_TERMS if re.search(rx, text)]
-        more = ([f"`{k}` re-pointed" for k in read_kit_keys() if re.search(r"\b" + k + r"\b", text)]
-                if re.search(REPOINT, text) else [])
+        more = [f"`{k}` re-pointed" for k in extract_kit_keys(text)] if re.search(REPOINT, text) else []
         more += [SKILL_TERM[0]] if re.search(SKILL_TERM[1], text) else []
         if walk or more:
             out.append((cid, walk + more, bool(walk)))
@@ -626,7 +630,7 @@ def cmd_driver_builds():
     print("\nClauses naming a key the kit reads and no re-point, left out:\n")
     named = [f"- `{cid}` ({b['slug']}): " + ", ".join(f"`{k}`" for k in found)
              for b in chain for cid, (text, _h, _t) in builds[b["slug"]].items() if cid not in hits
-             for found in [[k for k in keys if re.search(r"\b" + k + r"\b", text)]] if found]
+             for found in [extract_kit_keys(text)] if found]
     print("\n".join(named) or "- none")
     return 0
 
