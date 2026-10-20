@@ -132,6 +132,11 @@ opening paragraph, its rows 1, 3, 5, 6, 7 and 10, its new rows 5a and 8a, its fu
 acceptance; P0.2's sources, head, name, acceptance and red tests; P0.4's row 9; P0.7's checks and red tests; and one
 sentence of P0.8. P0.1's rows keep their numbers, so every citation of a row elsewhere still holds.
 
+**Revised 2026-10-21**, at the owner's opening-read answers in ER `[phase0-answers-2]` (ER:621-662). Answer 2 revised
+P0.3's packet name. Answer 3 revised P0.5's driver-changing rule and its table, P0.6's rule 1, [sync-points]'
+dFurnishedOrders row and the self-test item of [defaults]. Answer 5 added a check and a red test to P0.7. Answers 1, 4
+and 6 change no line of this plan.
+
 dClosedLoop's remaining work. It runs on node d, is written by dClosedLoop's session (the main loop) unless a step
 names another actor, and lands once, on the owner's ask. Every file is a record under `memory/`. None is product
 code (`memory/builds/dClosedLoop/README.md:39-40`).
@@ -313,8 +318,14 @@ Plants:
 `carries.py`'s `design()` (`carries.py:83-113`) and from `asbuilt.py`'s view.
 
 **One packet per chain build.** It is written as
-`memory/builds/<slug>/prompts/<date>-prompt-<first unit>-packet.md`. It carries `## The prompt` and `## The brief`, so
-`handoff.py render --input prompt=<packet>` reads `brief:*` from it (`tools/roles/handoff.py:283-294`).
+`memory/builds/<slug>/prompts/<date>-prompt-PLAY-dClosedLoop-1-packet.md`. It carries `## The prompt` and `## The
+brief`, so `handoff.py render --input prompt=<packet>` reads `brief:*` from it (`tools/roles/handoff.py:283-294`).
+The name claims `PLAY-dClosedLoop-1`, the id its `**Serves:**` line lists. Memory hygiene's check 21 reds a bound
+record whose name claims an id its Serves line does not list (`tools/memory-tree/check-memory-hygiene.sh:1446-1478`),
+and naming the build's first unit instead would need that id on the Serves line, which check 21 also reds: no chain
+unit has a spec at the opening, so no spec H1 defines it
+(`build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-packet-name.md:5-11`). The owner, asked whether to keep
+the name: "Keep it (Recommended)" (ER `[phase0-answers-2]`, answer 2, ER:633-637).
 
 **Its fields** (the handoffs return's §3):
 1. Pins: the baseline sha, the blobs of v2, the as-built view and each instrument, the HEAD it was rendered at, and
@@ -503,9 +514,24 @@ build. The owner reads every family in the per-build summary before the landing 
 **The driver-changing builds, derived** (walk answer 5: "Waive in each README", ER:476). A build is driver-changing
 when one of its v2 clauses names a path or surface of the unattended kit: `unattended.sh`, `check-unattended.sh`,
 `tools/unattended/`, the `/unattended` command, "the unattended kit", unattended's verbs (`--plan`, `--status`) or run
-claims; "the driver" alone is left out, since in v2 it names the loop's driver role. `open.py --driver-builds`
-applies that predicate, and dTrueNorth joins by its extra unit, which edits the kit. The plan writer's probe of the
-same predicate (`exec/d219/driver.py`) finds seven:
+claims; "the driver" alone is left out, since in v2 it names the loop's driver role. It also counts two kinds of
+clause the owner named at the opening read, "Count both (Recommended)" (ER `[phase0-answers-2]`, answer 3,
+ER:638-646):
+- a clause that re-points a key or command the unattended kit reads, as `cl-dClosedLoop-0240` does: "unattended's
+  `MAP_CLI`, re-pointed at the map's CLI" (v2:1775). `.unattended.conf:190` declares `MAP_CLI`, and
+  `tools/unattended/unattended.sh` reads it (`:10416-10417`, `:11894`, `:11912`);
+- a clause that edits the `/unattended` skill's text, as `cl-dClosedLoop-0195` does: the per-pass checklist and the
+  lookup by a write set's paths "retired with that selection, in the build method's and the unattended Skill's text
+  among them" (v2:1773).
+
+`open.py --driver-builds` applies that predicate, and dTrueNorth joins by its extra unit, which edits the kit. The
+plan writer's probe of the first predicate (`exec/d219/driver.py`) found seven builds, and `open.py --driver-builds`
+at `ddc6ba9fb` prints the same seven, with `cl-dClosedLoop-0195` and `cl-dClosedLoop-0240` among its near misses. With
+the two kinds added there are nine. A probe that counted every `.unattended.conf` key a clause names
+(`d246/driver9.py` in the writer's scratch folder, at `ddc6ba9fb`) also hit
+`cl-dClosedLoop-0013` (dGroundRules), which names `REVIEW_ROUNDS` only to list it as a legacy home and re-points
+nothing, so it is left out; its other key hits, `RECALL_CLI` (`cl-dClosedLoop-0048`), `REVIEW_ROUNDS`
+(`cl-dClosedLoop-0106`) and `RESUME_ATTEMPTS` (`cl-dClosedLoop-0284`), fall in builds already counted:
 
 | Build | Clauses that touch the kit |
 |---|---|
@@ -513,6 +539,8 @@ same predicate (`exec/d219/driver.py`) finds seven:
 | dOrderedCharter | `cl-dClosedLoop-0047` (`unattended.sh`'s drift-audit and runlog calls), `cl-dClosedLoop-0048` (`check-unattended.sh`'s `RECALL_CLI` probe) |
 | dDeclaredLoop | `cl-dClosedLoop-0106` (`unattended.sh` and `check-unattended.sh` re-pointed to `review.max-rounds`) |
 | dPlacedRequest | `cl-dClosedLoop-0120` and `cl-dClosedLoop-0134` (run claims migrated onto leases, and their tombstones) |
+| dFurnishedOrders | `cl-dClosedLoop-0195` (the per-pass checklist and the write-set lookup retired from the unattended Skill's text) |
+| dLinkedLibrary | `cl-dClosedLoop-0240` (unattended's `MAP_CLI` re-pointed at the map's CLI) |
 | dWitnessedBar | `cl-dClosedLoop-0344` (the held-CI reader moved out of the unattended kit) |
 | dWellOiledMachine | `cl-dClosedLoop-0280` (`--plan` and `--status` re-pointed), `cl-dClosedLoop-0281` (unattended's verbs), `cl-dClosedLoop-0306` (the kit dissolved) |
 | dConvergedCharter | `cl-dClosedLoop-0485`, `cl-dClosedLoop-0486`, `cl-dClosedLoop-0494` and `cl-dClosedLoop-0496` (`unattended.sh` folded and the kit retired) |
@@ -572,8 +600,11 @@ slugs:
 1. The opening (dClosedLoop's session) mints each build's roster ids, dTrueNorth's extra unit included, and the one
    carry-forward ask of each build but dTrueNorth, under that build's slug and in its derived family (P0.5). It also
    files, in dClosedLoop's own `BACKLOG.md` under dClosedLoop's slug, one ask per driver-changing build owing the
-   unattended kit's clean self-test reading that build's README rule 8 waives. It mints them once, in one landing, before
-   any claim exists. A session's ids are its own, and the later merge re-mints unmerged ones (HYGIENE.md:172-187).
+   unattended kit's clean self-test reading that build's README rule 8 waives. The seven the first predicate derived
+   are `PLAY-dClosedLoop-11` to `-17`, and they keep their ids. The two builds answer 3 adds take the next two, in v2
+   `[chain]` order: `missing:PLAY-dClosedLoop-18` for dFurnishedOrders and `missing:PLAY-dClosedLoop-19` for
+   dLinkedLibrary. They are never renumbered into the seven, since the charter's `[ids]` forbids a renumber
+   (`AGENTS.md:35`; ER:645-646). It mints them once, in one landing, before any claim exists. A session's ids are its own, and the later merge re-mints unmerged ones (HYGIENE.md:172-187).
    This departs from minting one slug per session; it is D8, carried as recommended for the owner's walk (ER:276).
 2. After the opening, only the run holding a slug's claim mints under that slug (`unattended.sh:2284-2301`), in the
    one family the opening derived for that build (P0.5). Its next id is the build's highest id in that family plus one
@@ -595,8 +626,8 @@ slugs:
 | Actor | Step | Rests on |
 |---|---|---|
 | Node d's session | Commit P0.1 to P0.6 and the opening on a branch | the charter's `[land]`, `AGENTS.md:31` |
-| Node d's session | `open.py --check`; `packet.py --check` for all 22; `gen_build_index.py --check` and `--check-format` (the contract, both directions); the memory hygiene gate; the generator-grammar bare-id predicate (P0.6) at the opening commit's parent, which must print nothing; and `bare-ids.py --opened` at the opening commit, which prints each chain-slug id the generator joins that is neither a `roster:units` id of its build's opened README nor that build's carry-forward ask, and must print nothing; `carries.py` (exit 2 expected); `deviations.py` printing 0 members, as P0.1's acceptance names, not merely exit 0, which `--policy report` makes constant; `asbuilt.py --check` (0) | `readme-contract.txt:2-5`; `gen_build_index.py:2341-2344` |
-| Node d's session | Red tests: a one-byte README edit reds `open.py --check`; a roster missing one clause reds the arm that reads every clause in exactly one row; a `parents:` typo raises; a removed contract row reds `--check-format`; a bare chain id of an opened build planted in a record makes `--opened` print one line | as above |
+| Node d's session | `open.py --check`; `packet.py --check` for all 22; `gen_build_index.py --check` and `--check-format` (the contract, both directions); the memory hygiene gate; the generator-grammar bare-id predicate (P0.6) at the opening commit's parent, which must print nothing; and `bare-ids.py --opened` at the opening commit, which prints each chain-slug id the generator joins that is neither a `roster:units` id of its build's opened README nor that build's carry-forward ask, and must print nothing; `carries.py` (exit 2 expected); `deviations.py` printing 0 members, as P0.1's acceptance names, not merely exit 0, which `--policy report` makes constant; `asbuilt.py --check` (0); and the gap join over the opened READMEs: `build/2026-10-19-build-PLAY-dClosedLoop-1-gap-join.py`'s README mode reads the gap register and the 22 opened READMEs' problem slots, the gaps each lists as owned, and must find every gap owned by exactly one build and every build owning at least one, as its v2 mode already finds over v2's `[chain]`. The owner: "Add it to P0.7 (Recommended)" (ER `[phase0-answers-2]`, answer 5, ER:653-657) | `readme-contract.txt:2-5`; `gen_build_index.py:2341-2344`; P0.5's problem slot |
+| Node d's session | Red tests: a one-byte README edit reds `open.py --check`; a roster missing one clause reds the arm that reads every clause in exactly one row; a `parents:` typo raises; a removed contract row reds `--check-format`; a bare chain id of an opened build planted in a record makes `--opened` print one line; a planted orphan gap, a gap removed from one README's problem slot, reds the gap join's README mode (answer 5) | as above |
 | Owner | Reads in full the decision rows (P0.8, nine of them), the grant row among them, and dTrueNorth's README and packet; for the other 21 builds, reads `open.py --check`'s output and `open.py --summary`'s rows (P0.5). "Rows + dTrueNorth (Recommended)" (ER:446) | ER:441-446 |
 | Owner | Asks for the landing | the charter's `[land]`, `AGENTS.md:31` |
 | Node d's session | Lands through `bash tools/push-main.sh`. The pre-push bar takes the doc-only class, because the diff is `memory/` only | `.githooks/pre-push:1215-1223`; `.githooks/gate-env.sh:106-108` |
@@ -1166,7 +1197,7 @@ with no step (PROTOCOL:428-432). What follows is what loads at session start or 
 | dKeptSession | Named presets (`cl-dClosedLoop-0141`); `mailbox.answer` (`cl-dClosedLoop-0504`) | Named presets make an override on `standard` expressible; the `author-recorded` value dDeclaredLoop already set is carried as that override. The `report` value waits for `deviation.gate` at dScopedBuild | Nothing | Nothing |
 | dBoundRoles | The role roster and definitions rewritten (`cl-dClosedLoop-0166` onward) | Re-render the role agents | Rotate. `handoff.py harness-args` now prints the new roles | Same |
 | dTotalRecall | The README's front-matter schema refuses unknown keys (`cl-dClosedLoop-0215`) | The opening's keys are all known (P0.5) | Nothing | Nothing |
-| dFurnishedOrders | The per-pass checklist retired from the method and the Skill (`cl-dClosedLoop-0195`) | None | Picked up at the next reground, since M7 re-reads METHOD | Same |
+| dFurnishedOrders | The per-pass checklist retired from the method and the Skill (`cl-dClosedLoop-0195`) | None. A driver-changing build since the opening read's answer 3 (ER:638-646): its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | Picked up at the next reground, since M7 re-reads METHOD | Same |
 | dWellOiledMachine | The `next` verb, with `--plan` and `--status` re-pointed (`cl-dClosedLoop-0280`); the unattended kit dissolved, with `/unattended` kept as a client of `run` until dConvergedCharter retires it (`cl-dClosedLoop-0306`); `gov-session` retired (`cl-dClosedLoop-0320`) | **The driver's successor.** Runs started after this landing still start with `/unattended <slug>`, now a client of `run`. Its verbs are the ones the landed kit's usage and its landing record name, which each packet re-renders. A driver-changing build: its README waives the unattended kit's own on-demand suites for its build run's landing, which still closes under `GATE_FULL=1 GATE_SELFTESTS=1` (P0.5, rule 8; ER:476) | Merge `origin/main` and run `--authorization` at the next pass boundary. Its landing goes through the successor, under the in-flight test dWellOiledMachine's spec carries | Same |
 | dIndexedDesign | The Design-to-Build hand-off (`cl-dClosedLoop-0383`) and `design.coverage` (`cl-dClosedLoop-0398`) | `carries.py` stops being run; the departures report reads the product join's output (the retirement table in [phase-1]). The report-switch step follows this landing: an ask in dClosedLoop's `BACKLOG.md`, then dClosedLoop's edit of `deviations.py --report` and `packet.py --repin deviations.py` in one owner-asked landing ([phase-1], the retirement table) | Closes through the new Design exit | Nothing |
 | dRankedPlan | Priority beside `parents:` and the plan view (`cl-dClosedLoop-0369`) | The plan view is the product successor of the schedule script's ordering | Nothing | Nothing |
@@ -1417,7 +1448,8 @@ there.
   README and packet in full; for the other 21, `open.py --check`'s output and the per-build summary P0.5 defines
   (P0.7).
 - **The self-test suites in driver builds.** "Waive in each README" (ER:476), over the recommended "Run at those
-  closes": each of the seven driver-changing builds P0.5 derives waives the unattended kit's own on-demand suites for
+  closes": each of the nine driver-changing builds P0.5 derives (seven, and two more at the opening read's "Count both
+  (Recommended)", ER:638-646) waives the unattended kit's own on-demand suites for
   its landing in its README, in dAlignedCarrier's form, and proves its driver changes by targeted probes and its own
   planted tests (README rule 8; P0.8 row 6). The walk's correction sets the scope (ER:544-557): the suites are on no
   leg of the bar, so the waiver covers the `--selftests` verdict the kit's Definition of Done owes a landing, and every

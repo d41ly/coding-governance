@@ -1,6 +1,6 @@
 # PLAY-dClosedLoop-1 — the architecture and the chain plan for gov's one lifecycle loop
 
-**Status:** INPROGRESS · rev-2 · 2026-10-21 · node d · Tier-2 · base 742957fc · streams playbook+kickoff+tooling+deployer · ratified 2026-10-20
+**Status:** INPROGRESS · rev-3 · 2026-10-21 · node d · Tier-2 · base 742957fc · streams playbook+kickoff+tooling+deployer · ratified 2026-10-20
 
 <!-- gen:spec-records -->
 
@@ -654,7 +654,7 @@ The kickoff record's Non-goals own the cut-line
 (`memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:63-70`). The build README's
 build-level rules extend it (`memory/builds/dClosedLoop/README.md:37-51`). Phase 0 keeps it, because every file
 Phase 0 writes is a record under `memory/`
-(`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:134-137`).
+(`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:139-142`).
 
 This spec restates no design fact. Section 4 names the record that owns each one.
 
@@ -693,7 +693,7 @@ Each question below has one owning record. This spec points at it and never answ
 
 The execution plan's "The plan in brief" owns the order: Phase 0 on node d, then Phase 1, then Phase 2 across the
 chain (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:83`). Its `[owner]`
-section owns the owner's steps (`:1299`), and its `[cannot]` section owns what today's gov cannot do (`:1317`).
+section owns the owner's steps (`:1330`), and its `[cannot]` section owns what today's gov cannot do (`:1348`).
 
 ### Alternatives rejected
 
@@ -711,7 +711,7 @@ section owns the owner's steps (`:1299`), and its `[cannot]` section owns what t
 - observability — the session log records each dispatch and event
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:58`, `:1970`).
 - risks — the execution plan's "bad news first" (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:34-81`)
-  and its `[cannot]` section (`:1317`).
+  and its `[cannot]` section (`:1348`).
 - testing — every instrument is seen red on a plant before it is trusted, as the audit's plan
   (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md:27-29`) and P0.1 require.
 - migration — N/A: the unit changes no data; each migration the design needs is a chain build's unit.
@@ -731,7 +731,9 @@ criterion resting on one of them says where its words and the revised plan part.
   row of `memory/DECISIONS.md` (kickoff (a),
   `memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:49`).
   Red when: an answer the build's records quote verbatim has no decision row.
-  DONE for the execution answers, and OPEN for the design rounds' answers (F3). `memory/DECISIONS.md:230-238` holds
+  DONE on the execution rows, with a departure from kickoff (a) for the design rounds' answers, which the owner chose
+  at the opening read (F3): those answers stay in the build records that quote them verbatim, and no row is owed for
+  them. `memory/DECISIONS.md:230-238` holds
   the nine rows P0.8 mints, `PLAY-dClosedLoop-2` to `PLAY-dClosedLoop-10`, landed with the opening `b50573ef4`. The
   record that carries each in full is
   `memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-decisions.md`, `[row-1]` to `[row-9]`.
@@ -745,7 +747,7 @@ criterion resting on one of them says where its words and the revised plan part.
   no `parents:` line.
   DONE. `memory/LIVE.md` lists all 22 builds of v2's `[chain]` at `OPEN`. Each chain README's H1 names its stage in
   the form P0.5 writes, and its `parents:` line is v2's Parents cell
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:407`, `:409`). The opening
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:418`, `:420`). The opening
   `b50573ef4` wrote them. `open.py --summary` lists each build's stage and parents, and `gen_build_index.py --check`
   exits 0, so `memory/LIVE.md` is current
   (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[summary]`, `[checks]`).
@@ -759,8 +761,11 @@ criterion resting on one of them says where its words and the revised plan part.
   DONE against v2's `[chain]`: exit 1 on two planted orphans, and exit 0 on the register and v2
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:3336-3339`), and rc 0 on the
   folded tree (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md:535`). OPEN
-  against the chain READMEs. The opening wrote them (AC2), and no P0.7 check runs the join over them
-  (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`; F4).
+  against the chain READMEs. The opening wrote them (AC2). At the owner's answer to F4, P0.7 now carries the join
+  over the 22 opened READMEs' problem slots as a check, with a planted orphan gap as its red test
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md`, P0.7). It stays OPEN
+  until the main loop records that join's run. The checks record holds no such run yet
+  (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`).
 - **AC4** — When the declared spec audit's report is read, it sits under `memory/builds/dClosedLoop/reviews/`, and
   every finding is folded or rejected with its reason (kickoff (d),
   `memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:54-55`).
@@ -778,7 +783,7 @@ criterion resting on one of them says where its words and the revised plan part.
   `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` and
   `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` run their plants and run on the
   tree, each exits as P0.1's acceptance states
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:204-208`).
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:209-213`).
   Red when: a P0.1 plant exits other than as its row says.
   DONE against P0.1 as revised. The revision moved what "as its row says" means for one instrument: a
   `deviations.py` plant's red is exit 1 under `--policy refuse`, and the same plant exits 0 under `report` with its
@@ -793,7 +798,7 @@ criterion resting on one of them says where its words and the revised plan part.
   `deviations.py` exits 0 with 0 members, and `asbuilt.py --check` exits 0
   (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`).
 - **AC7** — When the departures report's `--fixture` runs, it lists each population plant P0.2's acceptance names
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:288`).
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:293`).
   Red when: one of P0.2's red tests stays green.
   DONE. `deviations.py --report dTrueNorth --fixture` exits 0 with 34 entries, its byte compare and its validating
   arm green. Entries 5 to 25 are every population plant of P0.1, the three further arms' plants included, as the
@@ -803,7 +808,7 @@ criterion resting on one of them says where its words and the revised plan part.
   `## P0.1 and P0.2`, item 12). The old instrument had no report mode, so no red test has a run on the old code.
 - **AC8** — When the packet instrument renders dTrueNorth's packet, the result is what P0.3's acceptance states, and
   `tools/roles/handoff.py` renders and checks it green
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:349-355`).
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:360-366`).
   Red when: the rendered packet differs from the worked example P0.3 cites.
   DONE. dTrueNorth's packet carries the six clauses `cl-dClosedLoop-0001@83b6b117` through
   `cl-dClosedLoop-0006@06ceb3cc`, the node, the three gaps and the extra unit's decision row, which is the handoffs
@@ -815,7 +820,7 @@ criterion resting on one of them says where its words and the revised plan part.
   (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[ac8]`, `[checks]`).
 - **AC9** — When `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` is re-run on the
   plants of P0.4's red-test table, each result matches its row
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:371-388`).
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:382-399`).
   Red when: a plant's output differs from its row.
   DONE. Re-run at `4bfca2c74`, twelve of the thirteen rows matched, and row 9 differed because its note was never
   printed (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-schedule-redtests.md`
@@ -824,10 +829,12 @@ criterion resting on one of them says where its words and the revised plan part.
   inputs the done rule does not decide are recorded under `[done-rule]` as questions for the owner.
 - **AC10** — When the opening is committed, every check and red test of P0.7 gives the result its row states,
   P0.6's bare-id predicate printing nothing among them
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:593-603`).
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:624-634`).
   Red when: a P0.7 red test stays green.
-  DONE. On the opening as committed, `b50573ef4` with the packet renames `738dca981` and the row rewording
-  `8b51c299e`, every check of P0.7 exits as its row states and each of its five red tests reds
+  DONE for P0.7 as it stood at the opening, and OPEN on the gap join's check and red test that the owner's answer to
+  F4 added, until the main loop records their run, as AC3 is. On the opening as committed, `b50573ef4` with the
+  packet renames `738dca981` and the row rewording `8b51c299e`, every check of P0.7 exits as its row states and each
+  of its five red tests reds
   (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`,
   `[red-tests]`). The memory hygiene gate was red at `b50573ef4`, on check 21 and then check 27, and is green after
   those two fixes. The criterion's single bare-id predicate predates the revised P0.7, which runs the plain
@@ -835,7 +842,7 @@ criterion resting on one of them says where its words and the revised plan part.
   checked, as `[red-tests]` states: a byte after a README's last generated marker, which no check reads.
 - **AC11** — When each of P0.8's decision rows in `memory/DECISIONS.md` is read, it quotes its answer from the
   execution record or names the `[defaults]` item it carries
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:664-665`).
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:695-696`).
   Red when: a row quotes no answer.
   DONE through the record each row points at. Every row of
   `memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-decisions.md`, `[row-1]` to `[row-9]`,
@@ -844,7 +851,7 @@ criterion resting on one of them says where its words and the revised plan part.
   record's preamble): `PLAY-dClosedLoop-3`, `-5`, `-9` and `-10` carry their quote inline, and the other five cite
   the execution record's lines and name their row of the decisions record.
 - **AC12** — When P0.9's steps have run on a node, its four acceptance observations hold there
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:681-685`).
+  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:712-716`).
   Red when: `tools/check-wiring.sh` in check mode still reports the unset merge driver.
   OPEN on every node. On node d, at `03843fc8c`, three of the four hold: `unattended.sh --claims` answers from the
   remote, `check-wiring.sh` is clean, and `unattended.sh --plan dClosedLoop --paths` runs. The resume tick is not
@@ -891,12 +898,25 @@ bar before any landing. P0.7 owns the opening's own checks and its one landing.
   - Recommendation: raise it with the owner at the opening read, since the plan's decided answers stand and a gap in
     them is raised, never fixed silently
     (`memory/builds/dClosedLoop/prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-59-session.md:120-121`).
+  - RESOLVED (owner, 2026-10-21): option (a). The owner's answer 4 at the opening read, verbatim: "Records suffice",
+    whose option reads "the design answers stay in the build records that quote them verbatim, recorded as a
+    departure from kickoff (a), and AC1 closes on the execution rows."
+    (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md:647-652`,
+    `[phase0-answers-2]`). The departure, recorded here: kickoff (a) asks for the owner's ratified answers as decision
+    rows (`memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:49`); the execution
+    answers are rows, and the design rounds' answers are not, staying in the build records that quote them verbatim.
 - **F4 — Kickoff (c) joins the gap register against the chain READMEs. The join reads v2's `[chain]` table, and no
   P0.7 check runs it over the opened READMEs. Is it owed there?**
   - Option (a): add the join over the opened READMEs to P0.7's checks.
   - Option (b): take the join over v2 as the witness, since P0.5 derives each README's problem slot from the build's
-    owned gaps (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:410`).
+    owned gaps (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:421`).
   - Recommendation: raise it with the owner at the opening read, for the reason F3 gives.
+  - RESOLVED (owner, 2026-10-21): option (a). The owner's answer 5 at the opening read, verbatim: "Add it to P0.7
+    (Recommended)", whose option reads "the join over the 22 opened READMEs' problem slots, seen red on a planted
+    orphan." (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md:653-657`,
+    `[phase0-answers-2]`). P0.7's checks and red tests carry it
+    (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md`, P0.7), and AC3 stays
+    OPEN against the READMEs until the main loop records the join's run.
 - **F5 — The kickoff record's route names this unit's spec at a 2026-10-14 path that was never written, while this
   spec is dated 2026-10-20. Is the route re-appended?**
   - The route is at `memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:104-107`.
@@ -904,6 +924,11 @@ bar before any landing. P0.7 owns the opening's own checks and its one landing.
     changes (`:103`).
   - Option (b): leave the route as written.
   - Recommendation: (a), the route's own procedure, run by the main loop.
+  - RESOLVED (owner, 2026-10-21): option (a). The owner's answer 6 at the opening read, verbatim: "Re-append
+    (Recommended)" (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md:658-662`,
+    `[phase0-answers-2]`). The route now names `memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md`
+    (`memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:104-107`, `## route`), and the
+    main loop re-appended it to the session card in `09ea557ed`.
 
 ## 9. Revision log
 
@@ -914,6 +939,13 @@ bar before any landing. P0.7 owns the opening's own checks and its one landing.
   words. F2 resolved by the owner's answer 4. The H1 takes the em dash that `tools/roles/handoff.py:763` and the
   driver's plan reader parse, the title unchanged. Execution-plan line citations the plan's revision moved are re-pointed in
   §3, §4, §5, §8's F4 and §10.
+- rev-3 · 2026-10-21 · §6 AC1 AC3 AC10 · §8 F3 F4 F5 · §3 §4 §5 §6 §8's F4 §10 citations · the owner's
+  opening-read answers (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md`
+  `[phase0-answers-2]`). F3 resolved by answer 4, "Records suffice", and recorded as a departure from kickoff (a), so
+  AC1 is DONE on the execution rows. F4 resolved by answer 5, "Add it to P0.7 (Recommended)"; AC3 stays OPEN against
+  the READMEs until the join's run is recorded, and AC10 is OPEN on the check and red test P0.7 gained. F5 resolved by
+  answer 6, "Re-append (Recommended)", the route naming this spec. Execution-plan line citations that the plan's
+  revision for answers 2, 3 and 5 moved are re-pointed.
 
 ## 10. Reuse audit
 
@@ -933,7 +965,7 @@ its `gate-legs` inventory, except the Deploy research spec, which the kickoff's 
 | `tools/drift-audit/drift_report.py` | the gap evidence for Maintain | the Maintain research (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-research-maintain.md:12`) |
 | `memory/builds/aDeployScout/spec/governance-deployer-research.md` | the Deploy stage's design origin | the Deploy research (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-research-deploy.md:31`) |
 | `memory/guides/BUILD-METHOD.md` | the Build stage, and the method the plan cites | the plan's conventions (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:26-27`) |
-| `tools/memory-tree/gen_build_index.py` | the build folder opened and registered, and the opening's heading canon | the Events (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:1974-1976`); P0.5 (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:397-399`) |
+| `tools/memory-tree/gen_build_index.py` | the build folder opened and registered, and the opening's heading canon | the Events (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:1974-1976`); P0.5 (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:408-410`) |
 | `tools/roles/handoff.py` | every role dispatch, rendered as a handoff | the Phase 0 handoff's render (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md:561-564`) |
 | `tools/workflows/tier2-review.js` | the declared spec audit and every review pair | dispatch 98 (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:162`) |
 
