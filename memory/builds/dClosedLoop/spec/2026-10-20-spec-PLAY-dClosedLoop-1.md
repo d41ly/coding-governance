@@ -1,6 +1,6 @@
 # PLAY-dClosedLoop-1 — the architecture and the chain plan for gov's one lifecycle loop
 
-**Status:** INPROGRESS · rev-3 · 2026-10-21 · node d · Tier-2 · base 742957fc · streams playbook+kickoff+tooling+deployer · ratified 2026-10-20
+**Status:** INPROGRESS · rev-4 · 2026-10-21 · node d · Tier-2 · base 742957fc · streams playbook+kickoff+tooling+deployer · ratified 2026-10-20
 
 <!-- gen:spec-records -->
 
@@ -722,8 +722,9 @@ section owns the owner's steps (`:1330`), and its `[cannot]` section owns what t
 The kickoff's acceptance check, (a) to (d), is criteria AC1 to AC4. The baseline taken is AC5, and Phase 0's
 acceptance as the execution plan states it is AC6 to AC12. Each criterion cites the record that shows it DONE or
 OPEN. The kickoff's (c) and (d) and the baseline keep the evidence measured at `72b65c083` on 2026-10-20. Every
-other status was read from its record at `88cbbafb2` on 2026-10-21, after Phase 0 ran on node d. P0.1, P0.2 and P0.7
-were revised on 2026-10-20 at the owner's answers
+other status was read from its record at `88cbbafb2` on 2026-10-21, after Phase 0 ran on node d, except AC3's join
+over the opened READMEs and AC10's check and red test that the owner's answer to F4 added, read at `df6dcd189`.
+P0.1, P0.2 and P0.7 were revised on 2026-10-20 at the owner's answers
 (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md` `[phase0-answers]`), so a
 criterion resting on one of them says where its words and the revised plan part.
 
@@ -760,12 +761,14 @@ criterion resting on one of them says where its words and the revised plan part.
   Red when: a planted orphan row exits 0.
   DONE against v2's `[chain]`: exit 1 on two planted orphans, and exit 0 on the register and v2
   (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:3336-3339`), and rc 0 on the
-  folded tree (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md:535`). OPEN
-  against the chain READMEs. The opening wrote them (AC2). At the owner's answer to F4, P0.7 now carries the join
-  over the 22 opened READMEs' problem slots as a check, with a planted orphan gap as its red test
-  (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md`, P0.7). It stays OPEN
-  until the main loop records that join's run. The checks record holds no such run yet
-  (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`).
+  folded tree (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md:535`). DONE
+  against the chain READMEs too, the check the owner's answer to F4 added to P0.7. On the opening as re-rendered at
+  `bcc221781` and re-checked at `f579121fe`, `gap-join.py --readmes` over the 22 opened READMEs' problem slots exits
+  0, printing `owned but not in the register: none` and `builds owning nothing: none`, and the v2 mode still exits 0.
+  Red test 6, a gap removed from one README's problem slot, exits 0 before the plant and 1 after it, with
+  `unowned: ['gap-tool-24']`
+  (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`,
+  `[red-tests]`, `[answers-2]`).
 - **AC4** — When the declared spec audit's report is read, it sits under `memory/builds/dClosedLoop/reviews/`, and
   every finding is folded or rejected with its reason (kickoff (d),
   `memory/builds/dClosedLoop/prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:54-55`).
@@ -831,14 +834,15 @@ criterion resting on one of them says where its words and the revised plan part.
   P0.6's bare-id predicate printing nothing among them
   (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:624-634`).
   Red when: a P0.7 red test stays green.
-  DONE for P0.7 as it stood at the opening, and OPEN on the gap join's check and red test that the owner's answer to
-  F4 added, until the main loop records their run, as AC3 is. On the opening as committed, `b50573ef4` with the
-  packet renames `738dca981` and the row rewording `8b51c299e`, every check of P0.7 exits as its row states and each
-  of its five red tests reds
+  DONE. On the opening as committed, `b50573ef4` with the packet renames `738dca981` and the row rewording
+  `8b51c299e`, every check of P0.7 exits as its row states and each of its five red tests reds
   (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`,
-  `[red-tests]`). The memory hygiene gate was red at `b50573ef4`, on check 21 and then check 27, and is green after
-  those two fixes. The criterion's single bare-id predicate predates the revised P0.7, which runs the plain
-  predicate at the opening's parent `8d19dd714` and `bare-ids.py --opened` at the tip; each printed nothing. Not
+  `[red-tests]`). The check and red test that the owner's answer to F4 added are DONE too: on the opening as
+  re-rendered at `bcc221781`, every check was re-run at `f579121fe`, the gap join's README mode among them at exit 0,
+  and red test 6 reds the README mode on a gap removed from one README's problem slot (the same record, `[checks]`,
+  `[red-tests]`, `[answers-2]`). The memory hygiene gate was red at `b50573ef4`, on check 21 and then check 27, and
+  is green after those two fixes. The criterion's single bare-id predicate predates the revised P0.7, which runs
+  the plain predicate at the opening's parent `8d19dd714` and `bare-ids.py --opened` at the tip; each printed nothing. Not
   checked, as `[red-tests]` states: a byte after a README's last generated marker, which no check reads.
 - **AC11** — When each of P0.8's decision rows in `memory/DECISIONS.md` is read, it quotes its answer from the
   execution record or names the `[defaults]` item it carries
@@ -946,6 +950,12 @@ bar before any landing. P0.7 owns the opening's own checks and its one landing.
   the READMEs until the join's run is recorded, and AC10 is OPEN on the check and red test P0.7 gained. F5 resolved by
   answer 6, "Re-append (Recommended)", the route naming this spec. Execution-plan line citations that the plan's
   revision for answers 2, 3 and 5 moved are re-pointed.
+- rev-4 · 2026-10-21 · §6 intro AC3 AC10 · AC3 marked DONE against the opened READMEs as well as v2, and AC10 DONE
+  whole, from the gap join's README-mode run and red test 6 that the main loop recorded at `df6dcd189`
+  (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`,
+  `[red-tests]`, `[answers-2]`). The rev moves because each criterion's evidence text changes, not only its status
+  word (`memory/TEMPLATE-SPEC.md:67-69`). No citation into the checks record or the open instruments record moved:
+  the spec cites the checks record by section names that still stand, and cites the open instruments record nowhere.
 
 ## 10. Reuse audit
 
