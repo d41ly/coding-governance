@@ -555,3 +555,21 @@ README rule: the suites waived for the landing, a criterion they would observe a
 reading owed with a backlog record. The close still exports `GATE_FULL=1 GATE_SELFTESTS=1`, the flagged bar the driver
 owes a range that touches `tools/`. A build that touches `tools/` without changing the driver owes the flagged bar and
 no unattended suite, so the writer's open question of a waiver for every `tools/` build has no subject.
+
+## [handoff]
+
+The walk's changes were folded by dispatch 230, and the waiver was set to its true scope by dispatch 231. The plan
+stands at `f6cdd71d7`. The owner's Phase 0 starts in a new session, from a fully oriented handoff,
+`prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-59-session.md`. It was rendered by `handoff.py render --role
+gov-session`, with the Phase 0 brief `build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-handoff-brief.md` and the task
+inline, and `handoff.py check` is green on it.
+
+Its `task:todo` comes from a Phase 0 card passed with `--card`, not from this session's card. This session's card
+still carries dClosedLoop's original to-do, all of it done, and a render from it would have handed a cold session
+stale work. The handoff names:
+- the worktree, branch and tip;
+- the reading order;
+- Phase 0's order of work;
+- the owner's standing rules;
+- the stop point, the opening read the walk set;
+- the two items to raise with the owner, the atlas's size and any error found in the plan.

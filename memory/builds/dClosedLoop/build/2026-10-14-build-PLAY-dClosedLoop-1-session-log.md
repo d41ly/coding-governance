@@ -3275,6 +3275,11 @@ The execution plan's fold review, dispatches 226 and 227, derived from each run 
   then asked: "Fold, then give me a fully oriented hand off to start phase 0 in a new session." The writer folds
   the four (dispatch 230), and this session then writes the handoff.
 
+- 2026-10-20, session 1799cb98: the walk's four changes folded (dispatch 230), and the self-test waiver set to
+  dAlignedCarrier's scope after the main loop's step-2 premise proved wrong (dispatch 231; `execution.md`
+  `[walk]`). Phase 0's handoff for a new session is `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-59-session.md`
+  (`execution.md` `[handoff]`). This session does no more work on the branch.
+
 ## Instruments
 
 ### The gap-ownership join
