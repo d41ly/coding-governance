@@ -80,3 +80,9 @@ planted a landing only later builds can stage.
   was measured at 47 hits over 27 record kinds, mostly homonyms such as "landing" and "scope", so the check prints
   that count as unread instead of reading it. Roles, shapes and commands are not owned nodes. A clause that rests on
   one states its stand-in until that build lands.
+
+## Gate
+
+No machine gate holds this class on the merge bar. The documented check is dClosedLoop's reconciliation
+probe, the instrument in its build folder that reads every route, key and registration of a chain row and
+reds a dependency on a later build that no tolerance row names.

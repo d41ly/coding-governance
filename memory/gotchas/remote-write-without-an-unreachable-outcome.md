@@ -26,3 +26,8 @@ the ask family's counter ref had an outcome for every reachable case, and the of
   policy.
 - It never mints a local id. It queues the request keyed by content and mints on reconnection, or it refuses.
 - Probe it with the remote made unreachable.
+
+## Gate
+
+No machine gate holds this class: it lives in the design of a remote write. The documented check is the
+fix's probe, the write run with the remote made unreachable.

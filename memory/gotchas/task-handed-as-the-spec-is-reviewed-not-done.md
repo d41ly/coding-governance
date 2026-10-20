@@ -31,3 +31,8 @@ task: they returned four, five and seven findings about the brief, and derived n
 - Hand a task that must be performed to a role whose input is a question, as the researcher's is.
 - Before dispatching, read the rendered task as the role will. If the role's instructions say "audit what
   you are handed", the handed text is the subject.
+
+## Gate
+
+No machine gate holds this class. The documented check is the fix's last step: read the rendered task as the
+role will before dispatching it.

@@ -29,3 +29,8 @@ installed" had no reader once the readers were re-pointed.
   from an adapter without the capability, and from any other only before that adapter's own drain landing. Or the
   drain backfills marked records.
 - Probe a planted adapter without the capability, and a build that crosses the drain.
+
+## Gate
+
+No machine gate holds this class: it lives in a design, before any adapter exists. The documented check
+is the probe the fix names, a planted adapter without the capability and a build that crosses the drain.

@@ -39,3 +39,9 @@ researcher's own, which is the fix's first rule.
 - Keep the parent's own working files in named folders, never at the root.
 - An instrument that reads a scratch file checks that file's provenance, its sha or its writer, before
   trusting it.
+
+## Gate
+
+No machine gate holds this class: a subagent's writes to scratch are outside every gate's reach. The
+documented check is the brief, which names each subagent's own scratch folder, and the parent's check of a
+scratch file's provenance before it trusts the file.

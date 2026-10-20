@@ -33,3 +33,8 @@ dClosedLoop's whole-design audit, 2026-10-18
   templates, and every glob the new or moved file matches.
 - Re-point or re-export in the move's own unit, and prove a scan set's change with a staged break in the moved file.
 - Related: `retirement-inventory-misses-readers-by-value`.
+
+## Gate
+
+No machine gate holds this class. The documented check is the fix's inventory by path as well as by import,
+and a staged break in the moved file that every changed scan set must catch.

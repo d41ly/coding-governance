@@ -30,3 +30,8 @@ every step.
 - Scope the scan to the structure that holds the real data, here the page's style elements, never the
   whole page.
 - Re-run a probe over a page built from records after the probe's own record lands.
+
+## Gate
+
+No machine gate holds this class. The documented check is the fix's re-run: the probe run again over a page
+built from the records after the probe's own record has landed.
