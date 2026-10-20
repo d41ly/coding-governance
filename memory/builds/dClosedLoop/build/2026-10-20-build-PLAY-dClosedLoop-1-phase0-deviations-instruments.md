@@ -207,8 +207,8 @@ refuse`, every plant at once: exit 1, `members 25 (10 unjoined) … refused 6`; 
 the same repository: exit 1, `members 13, records 15 · findings 8`, and neither the moved baseline nor any further arm
 among them.
 
-**11. Row 9's placement.** `grep -n -- "--prepare" build/…-deviations.py`: line 7, `Placement (P0.1 row 9): the
-instruments run on the prepared merge, after \`push-main.sh --prepare\`, so two specs written`.
+**11. Row 9's placement.** `grep -n -- "--prepare" build/…-deviations.py`: line 7, the docstring's "Placement (P0.1
+row 9): the instruments run on the prepared merge, after `push-main.sh --prepare`, so two specs written".
 
 **12. The departures report** (P0.2; findings 6 and 12). Each run builds the fixture, renders the report, writes it
 under the fixture's `memory/builds/dTrueNorth/build/` and commits it on the prepared merge, renders it again, and
@@ -253,7 +253,7 @@ The red tests, each planted into the sources or a renderer stub:
 | `range --control base-range` | 0 | red in what it lists: `entry 11 · fork · … Decided: their own choice — another build's fork`, required by the arm, and `entry 17 · outside · memory/builds/dSafePassage/build/2026-10-21-build-FIX-dSafePassage-1-note.md` |
 | `record-late` | 1 | `the written report differs from its render from line 28: - entry 9 · member · new unit FIX-dTrueNorth-28 …` |
 | `hand-edit` | 1 | `the written report differs from its render from line 18: ## Entries, reviewed` |
-| `instrument-byte` | 1 | `the written report differs from its render from line 12: - instrument \`…-carries.py\` blob \`…` |
+| `instrument-byte` | 1 | `the written report differs from its render from line 12`, the head line naming `carries.py`'s blob |
 
 The old instrument had no report mode (`deviations.py --report dTrueNorth` at `1d6a7e8fe` prints the plain summary and
 ignores the flag), so no red test of item 12 has a before.
@@ -287,3 +287,23 @@ lists a moved baseline in every build's report. The `range` control's red is in 
 only that every trailer of its range appears. A hand-back whose record lands in the commit that revises the spec reads
 the revised header. In a fixture, the report's `carries.py --report` and `asbuilt.py --check` blocks are the
 worktree's, since the fixture holds none of their inputs.
+
+**After the commit, the M6 checklist.** `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` over
+`472249174`: exit 0, 16 classes. Four were checked by a probe:
+- **A fixture that passes by finding nothing.** `d241/controls.py` builds each green control's repository and reads
+  what it planted. For `pass-none`, the commit `build FIX-dTrueNorth-11, attributed to no pass` writes a product path
+  and carries the trailer `none`, so the first pass is `None`. For `status-flip`, the trailer-less commit naming the
+  unit writes no product path. For `header-rev`, two revisions follow the pass, one excepted and one material. For
+  `gen` and `status-gen`, one revision follows the pass and is not material. For `quote`, the spec holds `AMENDED`
+  twice. For `defer`, `RESCOPE` reads the `defer` row. For `fix-record`, the record is read, Goal not `DIVERGENCE:`.
+  For `audit-nopin`, the audit is read with no pin.
+- **A synthetic value standing in.** `check_approver` was run with the tree's own conf: it reads 195 rows of
+  `memory/DECISIONS.md` at `origin/main`. An owner citing missing:PLAY-dClosedLoop-4 is refused while that row is
+  absent, passes once a row naming `cl-dClosedLoop-0004` is added in memory, and is refused when it cites a row
+  naming neither the clause nor the unit.
+- **Readers of what changed.** packet.py reads `asbuilt.baseline_clauses`, which `asbuilt.py` keeps as an alias of
+  `deviations.read_chain_clauses`. `packet.py --fixture` gives the same line at `1d6a7e8fe` and at `472249174`:
+  exit 0, `byte compare green · completeness 0 findings … · pin arm 6 instruments, 0 findings`. The retired plants'
+  names now appear only in frozen records of earlier runs.
+- **A key that occurs twice.** Each of the nine clause ids the fixture edits occurs once in v2's `[chain]`, so the
+  edit lands on the clause's own id.
