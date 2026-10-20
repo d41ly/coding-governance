@@ -67,8 +67,10 @@ one note, so Stage 0 runs in any tree, the walk's seeded copy among them. Line c
 `Subjects (round N):` line, where it had stopped (research-final-audit `[1b]`).
 
 A finding stands unless a row of `[stage0-classes]` names its arm, its node and a class from that arm's closed set,
-and a row no finding needs is itself a finding. The audit's fold fixes each red or classes it there; the walk takes
-the reds and each arm's "left out" lines as its leads.
+and a row no finding needs is itself a finding. The walk took the reds and each arm's "left out" lines as its leads.
+The audit's fold and its closing pair's fold fixed the reds their findings named, and classed what fits an arm's
+set; Stage 0 on the folded tree still finds 98, classed 7, the leads of plan step 3's "Stage 0 again"
+(the closing pair's comparison record, `[folded]`).
 
 **Seen red.** Each arm's plants, on an in-memory copy, turn it red for their own reason, and the run is in the night
 pass's instruments record, `[stage0]`. The reconciliation probe's default run passes a plan item planted with a route
@@ -530,11 +532,17 @@ question did not recommend: FK-1-3, FK-1-5, FK-4-2, FK-4-12 + FK-5-2 (two writer
   it joins the row (`k5_rows.py`). It was found when the instruments recorder's Stage 0 plant `k5-cited` could not red
   for its own reason over the folded tree.
 - **The checks:** applied to the tree and run on a copy of it, design map rc 0, atlas rc 0, fold state rc 0, reconciliation probe rc 0, clause scan rc 0, clause ids rc 0, gap join rc 0, preset check rc 0, critical path rc 0, first-segment probe rc 0;
-  `ALL rc 0`.
+  `ALL rc 0`. Stage 0 is not among the ten, and was red then: the closing pair found the omission, and its fold
+  records Stage 0's run (the comparison record's `[folded]`).
 
 ## [stage0-classes] Stage 0's classes
 
-Empty until the audit's fold classes what it does not fix.
+Each row is a red the design keeps, classed from its arm's closed set by the closing pair's fold (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w10.md`, its requests).
 
 | Arm | Node | Class | Reason |
 |---|---|---|---|
+| K2 | `adopt.instructions` | external entry | Entered only from `kits.install` or the core's own command, both started outside any item. |
+| K2 | `adopt.declarations` | external entry | Same, through `kits.install` or `kits.update`. |
+| K2 | `kits.install-attended` | external entry | Reached only through `kits.install`, which the owner's operator order, an outbox order or the prepared merge starts (cl-0025). |
+| K2 | `kits.update-attended` | external entry | Same, through `kits.update`. |
+| K2 | `mailbox.answer` | external entry | A `question` arrives from another build's session through the mailbox, and `next` is a verb, not an item. |

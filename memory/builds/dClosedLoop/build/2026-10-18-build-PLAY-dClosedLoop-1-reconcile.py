@@ -17,7 +17,7 @@ Rules, each over a population it names in its summary line:
    program by naming it, in the names flow-steps [breakpoint] declares. An expansion item's Routes cell that hands
    into a stage, named by [chain]'s Stage column, also needs that stage's build.
 4. reads: each backticked policy key in a flow item's cells, the Owner cell aside, is built by the item's owner or
-   an ancestor of it.
+   an ancestor of it; a key is read whole or as `policy.<key>`, the full spelling flow-steps declares legal.
 5. registers: each expansion's contract names, in its "extension points used" row, the Runtime points it registers
    at; each point's owner is an ancestor of, or one of, the owners of that expansion's items. Points of another
    layer are not modelled as nodes, so the summary names each one left unread.
@@ -25,25 +25,32 @@ Rules, each over a population it names in its summary line:
 6. transitions: each disposition `entry.place` routes through `entry.claim` has a `none` row in flow-steps'
    [transitions], since the engine refuses any transition the table lacks (the night pass's closing review, H1).
 
-Rule 3 reads every route target too, as the whole-design audit's Stage 0 asks (K2, final-questions `[audit]`): each
-item or step a flow item's Then cell or an expansion item's Routes cell names, a step by the name [chain]'s Stage column
-gives it and read as that step's first item, is built by the source item's owner or an ancestor of it. Every run reads
-it since the audit's fold classed the forward routes it finds (the owner's FK-4-9, 2026-10-20). Before that only Stage
-0's `--all-routes` run did; the flag is still accepted, and changes nothing.
+Rule 3 also reads every route target, as the whole-design audit's Stage 0 asks (K2, final-questions `[audit]`): each
+item a flow item's Then cell or an expansion item's Routes cell names in backticks, and each stage a branch names after
+its arrow (`→`) by one of the five flow steps' names in STAGES, read as that step's first item, is built by the source
+item's owner or an ancestor of it. A stage word with no arrow before it in its branch is prose, not a route (the
+closing pair's `prose-stage-words-as-routes`). Every run reads it since the audit's fold classed the forward routes it
+finds (the owner's FK-4-9, 2026-10-20); `--all-routes`, Stage 0's flag before that, is accepted and ignored.
 
-A dependency is classed only by a row of the re-cut's [reconciled-order] table naming its build, its node and its
-owner, with a class from the closed set; a row whose class is blank or outside the set, or that no dependency needs,
-is a finding. Exit 1 on any finding.
+A dependency is classed only by a row of the re-cut's [reconciled-order] table naming its build, the rule that reads
+it (cites, stage, routes, reads or registers), its node and its owner, with a class from the closed set, so a
+dependency one rule classes is still unclassed under another (the closing pair's `reconcile-key-no-rule`). A row whose
+class is blank or outside the set, whose rule is none of the five, or that no dependency needs, is a finding, and so is
+a tolerance row whose reason says "today's tool" and names no backticked path that exists
+(`tolerance-rows-unnamed-tool`); a reason naming any other stand-in is not checked. Exit 1 on any finding.
 What it does not read, said in its summary: systems cited in prose; points of another layer; roles, shapes and
 commands, which are not owned nodes; and an owned record kind written as plain words. The plain-word count is printed:
 measured 2026-10-18 at 47 mentions over 27 kinds, mostly homonyms ("landing", "scope", "code"), so a clause that
 depends on another build's node cites it backticked, and this rule reads only those (the closing review's H2).
-Plants, each in memory: --plant-drop <build>:<node> removes a class row; --plant-edge-drop <child>:<parent> removes
-a parent edge (repeatable); --plant-class <build>:<node>=<text> sets a class cell; --plant-add <build>:<node>:<owner>
-adds a class row; --plant-item <tag>:<step>:<owner>:<then> adds a flow item; --plant-transition-drop <disposition>
-removes that disposition's `none` row from [transitions].
+Plants, each in memory: --plant-drop <build>:<node>[:<rule>] removes that pair's class rows, every rule's or the one
+named; --plant-edge-drop <child>:<parent> removes a parent edge (repeatable); --plant-class <build>:<node>=<text> sets
+the class cell of that pair's rows; --plant-why <build>:<node>=<text> sets their reason cell; --plant-add
+<build>:<node>:<owner>[:<rule>] adds a tolerance row, for cites unless a rule is named; --plant-item
+<tag>:<step>:<owner>:<then> adds a flow item; --plant-transition-drop <disposition> removes that disposition's `none`
+row from [transitions].
 """
 import importlib.util
+import os
 import re
 import sys
 
@@ -144,7 +151,7 @@ sources = {own for tag, (step, own, _, then) in items.items() if own and step !=
 sources |= {b for b, text in rows.items() if BREAK.search(text)}
 le = open(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md", encoding="utf-8").read()
 contracts = []   # (expansion's entry, its "extension points used" cell, the owners of its items)
-expansion_routes = []   # (owner, Routes cell) of each expansion item, read under --all-routes
+expansion_routes = []   # (owner, Routes cell) of each expansion item, read by rule 3's route targets
 for sec in re.split(r"(?m)^\| Contract field \|", le)[1:]:
     entry = sec.split("|", 1)[0].strip()
     used = next((cells(ln)[1] for ln in sec.split("\n") if ln.startswith("| extension points used |")), "")
@@ -174,8 +181,16 @@ for src in sorted(sources):
     outside = sorted({o for _, o in program if not within(o, src)})
     if outside:
         deps.append(("routes", src, "review.trigger", ",".join(outside)))
-# Every item or step a route names, from flow items and expansion items alike, in every run since the audit's fold.
+# Every item a route names in backticks, and every stage a branch names after its arrow, from flow items and expansion
+# items alike, in every run since the audit's fold. A stage word with no arrow before it in its branch is prose.
 STEP_NAME = re.compile(r"\b(" + "|".join(s.capitalize() for s in STAGES) + r")\b")
+
+
+def routed_stages(text):
+    return [w for branch in re.split(r";\s*", text) if "→" in branch
+            for w in STEP_NAME.findall(branch.split("→", 1)[1])]
+
+
 route_edges = 0
 item_owner = {tag: v[1] for tag, v in items.items()}
 item_owner.update({key: o for (kind, key), o in owner.items() if kind == "item" and key not in item_owner})
@@ -183,7 +198,7 @@ route_sources = [(own, then) for _, (_, own, _, then) in items.items() if own] +
                 [(own, routes) for own, routes in expansion_routes if own]
 for own, text in route_sources:
     targets = {t for t in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", text) if t in item_owner}
-    targets |= {first[w.lower()] for w in STEP_NAME.findall(text)}
+    targets |= {first[w.lower()] for w in routed_stages(text)}
     for t in sorted(targets):
         route_edges += 1
         town = item_owner[t]
@@ -197,6 +212,8 @@ for tag, (step, own, text, _) in items.items():
     if not own:
         continue
     for tok in set(re.findall(r"`([a-z][a-z0-9.<>-]*\.[a-z0-9<>-]+)(?::[^`]*)?`", text)):
+        # flow-steps declares the full spelling, `policy.<key>`, legal (the closing pair's `policy-prefix-unread`).
+        tok = tok[len("policy."):] if tok.startswith("policy.") else tok
         kown = keys.get(tok)
         if kown is None:
             kown = next((o for pat, o in templated.items() if re.fullmatch(pat, tok)), None)
@@ -232,31 +249,43 @@ for b, text in rows.items():
         if kind == "record-kind" and not within(own, b) and \
                 re.search(r"(?<![\w-])" + re.escape(key.replace("-", " ")) + r"(?![\w-])", bare):
             plain_hits += 1
-# The classes: (build, node) -> (owner, class), from the re-cut's table.
+# The classes: (rule, build, node) -> (owner, class, reason), from the re-cut's table, whose rows name the rule that
+# reads each dependency (the closing pair's `reconcile-key-no-rule`).
+RULES = ("cites", "stage", "routes", "reads", "registers")
 recut = open(sys.argv[1], encoding="utf-8").read()
 section = recut.split("### [reconciled-order]", 1)[1].split("\n## ", 1)[0] if "### [reconciled-order]" in recut else ""
-classes = {}
+classes, bad_rule = {}, []
 for ln in section.split("\n"):
     c = [x.strip() for x in ln.strip().strip("|").split("|")]
-    if ln.startswith("| d") and len(c) >= 5:
-        classes[(c[0], c[1].strip("`"))] = (c[2], c[3])
+    if ln.startswith("| d") and len(c) >= 6:
+        if c[1] not in RULES:
+            bad_rule.append((c[0], c[1], c[2].strip("`")))
+            continue
+        classes[(c[1], c[0], c[2].strip("`"))] = (c[3], c[4], c[5])
 for arg in plants("--plant-drop"):
-    classes.pop(tuple(arg.split(":", 1)), None)
-for arg in plants("--plant-class"):
-    key, text = arg.split("=", 1)
-    b, node = key.split(":", 1)
-    classes[(b, node)] = (classes.get((b, node), ("", ""))[0], text)
+    parts = arg.split(":")
+    for k in [k for k in classes if k[1:] == (parts[0], parts[1]) and (len(parts) < 3 or k[0] == parts[2])]:
+        del classes[k]
+for flag, field in (("--plant-class", 1), ("--plant-why", 2)):
+    for arg in plants(flag):
+        key, text = arg.split("=", 1)
+        b, node = key.split(":", 1)
+        for k in [k for k in classes if k[1:] == (b, node)] or [("cites", b, node)]:
+            row = list(classes.get(k, ("", "", "")))
+            row[field] = text
+            classes[k] = tuple(row)
 for arg in plants("--plant-add"):
-    b, node, own = arg.split(":", 2)
-    classes[(b, node)] = (own, "tolerance")
+    parts = arg.split(":")
+    classes[(parts[3] if len(parts) > 3 else "cites", parts[0], parts[1])] = (parts[2], "tolerance", "planted")
 deps = sorted(set(deps))
 count = {k: sum(d[0] == k for d in deps) for k in ("cites", "stage", "routes", "reads", "registers")}
 print(f"chain rows {len(rows)} · owned nodes read {len(owner)} · flow items read {len(items)} · stages {len(STAGES)} · "
       f"breakpoint items {len(program)}, names {len(vocab)} · contracts read {len(contracts)} · on a non-ancestor's node "
       f"{len(deps)} ({', '.join(f'{k} {v}' for k, v in count.items())})")
 print(f"left out: systems, cited in prose; roles, shapes and commands, not owned nodes; {plain_hits} plain-word "
-      f"mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes "
-      f"({len(unread)}): " + "; ".join(unread))
+      f"mentions of a record kind a non-ancestor owns, mostly homonyms; stage words other than the {len(STAGES)} flow "
+      f"steps' names, and any no arrow precedes in its branch, read as prose; points of another layer, not modelled as "
+      f"nodes ({len(unread)}): " + "; ".join(unread))
 print(f"transitions: {len(routed)} dispositions routed through entry.claim, {len(none_rows)} `none` rows")
 print(f"all routes: {route_edges} route edges read from flow and expansion items")
 findings = 0
@@ -264,17 +293,24 @@ for d in untransitioned:
     print(f"  transitions: the disposition `{d}` routes through `entry.claim`, and [transitions] has no `none` row for it")
     findings += 1
 for rule, b, key, own in deps:
-    row = classes.get((b, key))
+    row = classes.get((rule, b, key))
     ok = row is not None and row[1] in CLASSES and row[0] == own
     label = row[1] if ok else ("UNCLASSED" if row is None else f"BAD CLASS ROW (owner {row[0] or '-'}, class {row[1] or '-'})")
     print(f"  {b} {rule} `{key}` ({own}'s, not an ancestor): {label}")
     findings += not ok
-needed = {(b, key) for _, b, key, _ in deps}
-for (b, key), (own, cls) in sorted(classes.items()):
-    if (b, key) not in needed:
-        print(f"  class row with no dependency: {b} `{key}` ({own}, {cls or '-'})")
+needed = {(rule, b, key) for rule, b, key, _ in deps}
+for (rule, b, key), (own, cls, why) in sorted(classes.items()):
+    if (rule, b, key) not in needed:
+        print(f"  class row with no dependency: {b} {rule} `{key}` ({own}, {cls or '-'})")
         findings += 1
     elif cls not in CLASSES:
-        print(f"  class row outside the closed set: {b} `{key}` ({cls or 'blank'})")
+        print(f"  class row outside the closed set: {b} {rule} `{key}` ({cls or 'blank'})")
+    elif cls == "tolerance" and "today's tool" in why and not any(
+            "/" in path and os.path.exists(path) for path in re.findall(r"`([^`]+)`", why)):
+        print(f"  tolerance row names no stand-in: {b} {rule} `{key}` says today's tool and names no path that exists")
+        findings += 1
+for b, rule, key in bad_rule:
+    print(f"  class row with a rule outside the five: {b} `{key}` ({rule or 'blank'})")
+    findings += 1
 print(f"findings {findings}")
 sys.exit(1 if findings else 0)

@@ -462,10 +462,11 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 - **Supervision.** On each beat, the supervisor:
   - runs `reap.py --sweep` under `PROCMON_REAP_MODE` (reap-orphans here);
   - reaps act sessions past `runtime.act-ceiling`;
-  - expires leases past `leases.expiry-hours`, judged by the declared clock, and prunes a terminal tombstone, a
-    run claim's (`refs/gov/runs/*`) among them, only once it is older than `leases.queued-claim-days` (P40),
-    through dPlacedRequest's coordination verbs. It never prunes `refs/gov/claims/*`, where a slug's claim lives
-    (layer-memory `[contract]`);
+  - expires leases past `leases.expiry-hours`, judged by the declared clock, and prunes a run claim's terminal
+    tombstone (`refs/gov/runs/*`) only once it is older than `leases.queued-claim-days` (P40), through
+    dPlacedRequest's coordination verbs. It never prunes a build's or unit's terminal tombstone, which a patch
+    build's draw on a closed root acquires (`cl-dClosedLoop-0440`), nor `refs/gov/claims/*`, where a slug's claim
+    lives (layer-memory `[contract]`, the closing pair's closed-root-draw-pruned);
   - raises the release hold's owner item for each `deploy.released` wait that has outlived
     `build.release-ceiling`, counted from the landing record or from the owner's last keep-waiting
     answer, through the notification adapter. The item is keyed by (build, landed SHA), and the sweep
@@ -1455,3 +1456,7 @@ The night pass's other runtime additions are units in v2's dWellOiledMachine row
 the `step —` announcement, intake for a prompt that reaches no owner session, the browser capability and the visual
 capture adapter, the default load replayed at a compaction with `next`'s line, compactions journaled, and a hook
 pack's refusal text checked.
+
+Revised 2026-10-20 by the closing pair's fold (`build/2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md`): the supervisor prunes only a
+run claim's terminal tombstone, never a build's or unit's, which a patch build's draw on a closed root acquires
+(closed-root-draw-pruned).

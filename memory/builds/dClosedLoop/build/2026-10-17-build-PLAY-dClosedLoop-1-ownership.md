@@ -121,11 +121,11 @@ The 47 flagged rows, in one table:
 
 ## [namespaces] The namespace rules
 
-The 78 keys that nothing names take their namespace's owner:
+The 77 keys that nothing names take their namespace's owner (78 until FK-1-3 gave `budgets.*` its own row):
 
 | Namespace | Owner | Keys | The owner's row says |
 | --- | --- | --- | --- |
-| `budgets` | dCalibratedLens | 1 | caps re-derived from evidence and review cost |
+| `budgets` | dGroundRules | 0 | the one switch every gate enforcing a size cap reads; `budgets.*` has its own row since FK-1-3, so no key takes this namespace's owner |
 | `card` | dDeclaredLoop | 1 | the build's orientation card at level 1 |
 | `currency` | dShippedRelease | 2 | the fleet register and currency watch |
 | `deploy` | dShippedRelease | 4 | the deploy engine |
@@ -1017,3 +1017,6 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
   from dCalibratedLens to dGroundRules, which makes it each cap's one declaration (FK-1-3); and the items
   `kits.install-attended` and `kits.update-attended` join dShippedRelease (FK-5-1). The rows above carry the
   moves.
+- **The closing pair's fold, 2026-10-20** (`build/2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md`): `[namespaces]`' `budgets` row follows
+  FK-1-3, its owner dGroundRules and its count 0, so the lead-in counts 77 keys (budgets-namespace-stale). The
+  instrument below keeps the table as it ran.

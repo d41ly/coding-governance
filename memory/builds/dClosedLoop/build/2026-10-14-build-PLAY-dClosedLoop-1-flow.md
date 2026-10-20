@@ -623,14 +623,15 @@ Amend the nearest live build; Plan with a short checklist. Answer: A patch build
 | An amendment inside an open build's goal | Design | unit-level re-entry, or feature-level when `design.reentry`'s triggers hold |
 | A critical planning issue | Design, after a recorded plan revision | the plan record revised and ratified, completed work kept, amended by new units, or retired |
 | A small, self-contained product change no planned build covers | Design, as a patch build | a minimal plan record derived from the intake and ratified as `patch.ratify` says (automatically by default), then a micro-spec |
-| A Maintain safe fix that changes tracked content | Design, as a patch build | as above, its intake filed by Maintain's run, placed by `entry.place` and claimed by `entry.claim` |
+| A Maintain safe fix that changes tracked content | Design, as a patch build | as above, its intake filed by Maintain's run, placed by `entry.place`, then `entry.claim`, then `plan.dedupe`, then Design |
 | A Maintain action that changes no tracked content | no build | applied and recorded by the run |
-| After its build closed at landing: a post-landing core red, a landing-review finding or a decision-log row missing at the landed SHA; a failed verify | Design, as a patch build; a failed verify at Plan's triage | the first three as a patch intake that `deploy.core`, the landing review or `deploy.distill` files, placed by `entry.place` and claimed by `entry.claim`, then a micro-spec; a failed verify filed as an ask, then a patch build or a planned build by its size |
+| After its build closed at landing: a post-landing core red, a landing-review finding or a decision-log row missing at the landed SHA; a failed verify | Design, as a patch build; a failed verify at Plan's triage | the first three as a patch intake that `deploy.core`, the landing review or `deploy.distill` files, placed by `entry.place`, then `entry.claim`, then `plan.dedupe`, then a micro-spec at Design; a failed verify filed as an ask, then a patch build or a planned build by its size |
 
 Revised 2026-10-20 by the whole-design audit's fold (A3-F2, B5-F1): the post-close row sent every post-landing
 red to triage as an ask, though layer-flow `[settled]` and flow-steps' `deploy.core`, `deploy.distill` and landing
 review send all but a failed verify as a patch build, and a Maintain patch now enters through Entry's placement
-and claim, as every patch does.
+and claim, as every patch does. Revised 2026-10-20 by the closing pair's fold (patch-route-skips-dedupe): both
+rows go on from the claim through `plan.dedupe` to Design.
 
 ## [review] Review
 

@@ -29,7 +29,7 @@ arm prints what it does not read, "left out", and the walk takes those as named 
 Usage: python stage0.py [--root <tree>] [--arms K1,K2,K3,K4,K5,reruns] [--plant <case>]   (from the worktree root)
   --root   the tree whose records are read, such as the walk's seeded copy; every check runs inside it.
   --plant  damages one input in memory, and that arm must go red: k1-witness, k1-ghost-need, k1-cycle, k1-dash,
-           k1-owner, k1-actor, k2-ghost, k2-unformed, k2-dead-end, k2-unreached, k2-deploy-land, k3-writer, k3-reader,
+           k1-owner, k1-actor, k1-owning-role, k2-ghost, k2-unformed, k2-dead-end, k2-unreached, k2-deploy-land, k3-writer, k3-reader,
            k4-unread, k5-row, k5-ghost, k5-retired, k5-cited, class-stale.
 Exit 1 on any finding or any red re-run.
 """
@@ -187,6 +187,8 @@ elif PLANT == "k1-owner":
     items["plan.dedupe"]["owner"] = "dNoSuchBuild"
 elif PLANT == "k1-actor":
     items["plan.dedupe"]["actor"] = "wizard"
+elif PLANT == "k1-owning-role":
+    items["plan.dedupe"]["actor"] = "the role that answers the question"
 elif PLANT == "k2-ghost":
     items["plan.dedupe"]["then"] += "; a planted outcome → `plan.ghost`"
 elif PLANT == "k2-unformed":
@@ -255,6 +257,8 @@ if "K1" in ARMS:
         head = re.split(r"[,:(]", v["actor"].strip(), maxsplit=1)[0].strip().lower()
         if not v["actor"].strip():
             find("K1", t, "no actor")
+        elif head.startswith("the role that owns"):
+            pass   # one actor, the role owning the asked interface or item, per instance (layer-roles [matrix])
         elif head not in KINDS:
             role = roster.get(head)
             if role is None:

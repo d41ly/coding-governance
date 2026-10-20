@@ -437,8 +437,8 @@ layer that registers a kind adds its row.
 | adopters | dShippedRelease | its writer is `kits.adopters`: gov's reading of each adopter, per release, named for adopters since the fleet names nodes (P40) |
 | adopter register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.adopters` |
 | transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
-| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a terminal tombstone and never deleting the ref (P40); writer item not named |
-| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not named: the coordination verbs, which are no item, write it |
+| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a terminal tombstone and never deleting the ref (P40); writer item not named: the coordination verbs, which are no item, write it, through `record`'s door once dTotalRecall lands it (`cl-dClosedLoop-0505`) |
+| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not named: the coordination verbs, which are no item, write it, through `record`'s door once dTotalRecall lands it (`cl-dClosedLoop-0505`) |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
 | return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named: the commit queue, which is no item, writes it into the build's trail at its item's witness and pushes it with the build's branch (revised 2026-10-19, the night pass two, point 4) |
 | act | dWellOiledMachine | one act session per role act; act binding and the epoch check; writer item not named |
@@ -489,6 +489,10 @@ and writer (FK-1-1), and the receipt's writers gain the attended install and upd
 
 Revised 2026-10-20 by the whole-design audit's fork answers: the seen-red kind's writer is `build.acceptance`, and
 `test.seen-red` reads it (FK-4-12, FK-5-2). A held flaky leg's acceptance reads the release streak (FK-4-11).
+
+Revised 2026-10-20 by the closing pair's fold: the lease and mailbox rows name the coordination verbs, which
+write through `record`'s door once dTotalRecall lands it (door-misses-coordination-verbs), and a held leg's entry
+threshold under `measured` is the one the gate-health record holds (flakes-measured-no-writer).
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their
@@ -582,7 +586,8 @@ optional component, and the research library is the library side.
   - an adapter fault: the adapter's next run passes;
   - a held flaky leg, keyed by the leg's name, so a second filing while one is open is a no-op: the
     leg green on as many consecutive runs as `verdict.flakes.release` says, the hold's own entry threshold
-    being `verdict.flakes.entry` (the owner's FK-4-11), read from the runner's verdict records since the hold (`gap-test-04`); or its
+    being `verdict.flakes.entry` (the owner's FK-4-11), under `measured` the threshold dWitnessedBar's gate health writes
+    to the gate-health record, 2 in 10 until it writes one (`cl-dClosedLoop-0339`), read from the runner's verdict records since the hold (`gap-test-04`); or its
     manifest row changed, as the bar's own quarantine releases a leg whose row changed.
     `test.flakes` files it under `quarantine` and is the flake record's one writer, and
     `test.select` lifts the hold and closes the ask, citing the streak. The runs come as

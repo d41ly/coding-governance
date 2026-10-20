@@ -23657,6 +23657,7 @@ WANT = {
     "k1-dash": ("K1", "K1 plan.dedupe: a dash for Needs, on an item that is not its step's first"),
     "k1-owner": ("K1", "K1 plan.dedupe: owner 'dNoSuchBuild' is no chain build"),
     "k1-actor": ("K1", "K1 plan.dedupe: actor 'wizard' is no kind and no declared role"),
+    "k1-owning-role": ("K1", "K1 plan.dedupe: actor 'the role that answers the question' is no kind and no declared role"),
     "k2-ghost": ("K2", "K2 plan.dedupe: routes to `plan.ghost`, which is no item and no key"),
     "k2-unformed": ("K2", "K2 plan.dedupe: a target in no declared form: \"somewhere unnamed\""),
     "k2-dead-end": ("K2", "K2 plan.loop-a: ends nowhere"),
@@ -30855,6 +30856,1326 @@ missing = [n for n in names if not (dest / n).is_file()]
 print(f"files {len(names)}, missing {len(missing)}, longest {max(len(str(dest / n)) for n in names)} chars")
 ````
 
+### `build_args_closing.py`
+
+The closing pair's args: 8d21999a9 over 6ba4eaaa1, 32 specs, by-design notes, the gotchas checklist; runs A and B differ only in label, report path and scratch.
+
+````python
+"""Build the args of the whole-design audit's Stage 2 closing pair: every design commit since the parked debt's pair
+(6ba4eaaa1) through the audit's fold (8d21999a9), reviewed as one range. The plan the owner approved with "go"
+(2026-10-19) puts it after the fold: "the paired closing review from 6ba4eaaa1". Two independent full Tier-2 diff
+reviews, every role at medium (the owner's NT-12 default); the runs differ only in the run label, the report path and
+the scratch path.
+
+Usage: python -X utf8 build_args_closing.py <scratch-dir>   (from the worktree root)
+Writes <scratch-dir>/closing/args-audit-closing-<run>.json and a compact copy of each. Refuses an existing report.
+"""
+import json
+import pathlib
+import subprocess
+import sys
+
+S = pathlib.Path(sys.argv[1])
+B = "memory/builds/dClosedLoop/build/"
+REV = "memory/builds/dClosedLoop/reviews/2026-10-20-review-PLAY-dClosedLoop-1-audit-closing-{}.md"
+BASE, HEAD = "6ba4eaaa1", "8d21999a9"
+template = json.loads((S / "cloud" / "args-parked-debt-a.json").read_text(encoding="utf-8"))
+full = lambda r: subprocess.run(["git", "rev-parse", r], capture_output=True, text=True, check=True).stdout.strip()
+D = lambda d, n: B + f"2026-10-{d}-build-PLAY-dClosedLoop-1-{n}.md"
+COMMON = [D(14, "architecture-v2"), D(14, "gap-register"), D(14, "foundations"), D(15, "layer-instruction"),
+          D(15, "layer-flow"), D(15, "flow-steps"), D(15, "flow-roles"), D(15, "layer-roles"), D(15, "layer-memory"),
+          D(15, "layer-runtime"), D(16, "layer-expansions"), D(15, "review-system"), D(16, "systems"), D(18, "recut"),
+          D(18, "fates"), D(18, "memory-plan"), D(14, "coordination"), D(14, "flow"), D(14, "orientation"),
+          D(17, "ownership"), D(17, "project-map")]
+ROUND = [D(19, "final-questions"), D(19, "whole-audit"), D(20, "fold-inventory"), D(19, "stall-and-loop"),
+         D(19, "cloud-and-scale"), D(19, "parked-debt-reviews-compared")]
+RESEARCH = [B + p.rsplit("/", 1)[1] for p in subprocess.run(
+    ["git", "diff", "--name-only", f"{BASE}..{HEAD}", "--", B], capture_output=True, text=True, check=True
+).stdout.split() if "-research-" in p]
+EARLIER = ("FQ-1 to FQ-8, SL-1 to SL-8, CL-1 to CL-4, FA-1 to FA-7, NT-1 to NT-28, SA-1 to SA-12, SK-1 and SK-2, IA-1 to "
+           "IA-6, AP-1 to AP-35, NP-1 to NP-24, SP-1 and SP-2, WK-1 to WK-8, PM-1 to PM-12, RC-1 to RC-9, AF-1 to AF-3, "
+           "FL1, FR-1 to FR-12, CX-1 to CX-3, RT-1 to RT-4")
+BY_DESIGN = [
+    "- The build is design-only: no product code and no unit specs. Unit-level detail is absent by design and owed to "
+    "the chain builds, and a row's planned units are prose, counted one per clause.",
+    "- Verbatim records are not under review, though a record that misstates one is: the research returns; the "
+    "audit's walk returns, skeptic and synthesis returns and the three walk reports (reviews/...-whole-walk-a, -b, -c); "
+    "the fold writers' returns (build/...-fold-return-w1 to -w9b); every brief and handoff (build/...-brief*, "
+    "prompts/).",
+    "- The audit's sealed material, committed once the seal lifted (the walk key, the seeding script, the "
+    "detectability script, the brief reviews), is what was used: the twelve plants were damage to a sealed copy, never "
+    "to the tree, and a finding naming a plant's text is no defect in the design.",
+    "- Dated records keep what held when they were written: revision notes, the walk and audit records, the "
+    "ownership record's snapshot rows, and the round record's sections for each step.",
+    "- The instruments record holds the scripts as they ran; a script is reviewed only for whether it did what the "
+    "records say it did.",
+    "- Generated files (memory/LIVE.md, the build README's generated regions, memory/gotchas/INDEX.md) are rendered, "
+    "not reviewed.",
+    "- The owner's answers are decisions, recorded verbatim: FQ-1 to FQ-8 in final-questions, the four [open] "
+    "readings confirmed at step 2 (whole-audit [readings]), the walk choices (run C, the second skeptic) and \"Fold, "
+    "re-measure after\" (whole-audit [walk-run-c], [recall-scored]), and the fold's 37 answers verbatim in whole-audit "
+    "[fold] and [fold-applied], five of them away from the recommendation (FK-1-3, FK-1-5, FK-4-2, FK-4-12 with "
+    "FK-5-2, FK-4-13). A finding may show a fold contradicting the owner's words, a record, the research it cites or "
+    "the tree, not re-argue an answer.",
+    "- The audit's known limits are recorded, not owed by this range: the recall bar not met, two plants unfindable "
+    "inside the seal's allow-list, the clause-omission blind spot, and the fresh sealed re-measure planned before the "
+    "baseline (whole-audit [recall-scored]).",
+    f"- Every earlier answer stands: {EARLIER}, and every round's before them.",
+    "- Commits 47de3dc82 to 8a81ed8c8 are the walk's records (briefs, returns, skeptics, reports, scores), and "
+    "55d72e821 renders the README: context, in scope only where a design record's text changed. Judge every finding "
+    "against the records as they stand at the head, and drop one a later commit already fixed.",
+]
+TAIL = ("A fold's own text is new surface: check it as hard as the text it replaced. This is run {run} of two "
+        "independent runs on the same diff; read no other run's report. Write the report to {report}. Its head carries "
+        "an H1, then, within its first twelve lines, the line `**Serves:** diff-review PLAY-dClosedLoop-1`. It carries "
+        "exactly one `## Verdict:` line, whose token is CLEAN, CLEAN WITH FIXES or BLOCKED and nothing else.")
+CONTEXT = (
+    f"The diff is {HEAD} over {BASE}: every design commit since the parked debt's closing pair, which the whole-design "
+    "audit's Stage 2 closes. 930120e45 folds that pair's 35 defects: release kinds (a hand-over or terminal), the fence "
+    "in layer-runtime, silence never applying a loosening, a guarded node profile and versioned node ledgers, the "
+    "stream-plan kind, `kits.adopters`, and five new bug classes under memory/gotchas/. 590305b02 researches the "
+    "owner's final questions (the whole design audited, held to its specs, its deviations recorded). 4ac19101f folds "
+    "the owner's FQ-1 to FQ-8: P41 (the design carried whole) and P42 (every user-facing surface documented from the "
+    "fact that defines it), dTrueNorth at the chain's root with the speccing controls, nine keys, seven gaps. "
+    "0e5d54a79 mints the clause ids cl-dClosedLoop-0001 to -0496 with their check. 94f9607ca adds Stage 0's five "
+    "mechanical checks and v2 [enforcement]. 1d5799a45 adds the walk kit, its scorer and the instruments (the carries "
+    "join, the deviation population, the as-built view). 747a2af22 records the owner's confirmation of v2's four "
+    "[open] readings. 60b794f2b lifts the walk's seal at the owner's word, and 11c43418d keeps the audit's briefs and "
+    "returns out of the atlas. 8222099f8, e7b58e2ee and 10c0c4fb4 derive the fold inventory (179 places), brief its "
+    "writers and record the owner's first 33 answers. 8d21999a9 applies the fold: nine writers' scripts over v2, "
+    "flow-steps and fifteen other records, four later answers, clause ids 0503 to 0509, the reconciliation probe "
+    "widened to every route with a tolerance row per forward route, two principle rows (K5), and the walk kit's "
+    "fixtures pinned to the tree they were written for. Start from `git diff --stat`, then read each design record's "
+    "diff by path; the verbatim records are covered by the by-design notes. Review it as a design change. Does each "
+    "of the audit's findings the fold claims, by its id in a revision note, land as its walk report and skeptic "
+    "narrowed it, and does any fold text still state what it replaced? Does each owner answer land the same way in "
+    "every record it touches, the five taken away from the recommendation included? Does every new or amended clause "
+    "sit on its own build or an ancestor, naming the stand-in where it relies on a later build, and does each new "
+    "tolerance row name the stand-in its route really reaches? Are the new and renamed keys (`verdict.flakes.entry` "
+    "and `.release`, `design.streams-when`, `roles.model.<role>.<harness>`, `budgets.*` moved to dGroundRules, "
+    "`patch.ratify` to dPlacedRequest) consistent with the presets, the tag grammar and every reader? Do P41's and "
+    "P42's clauses, dTrueNorth's controls and the clause-id grammar hold together? Do the security seams hold: the "
+    "record door binding each coordination write to its writer (FK-5-3), the minimal guard's single admitted write "
+    "(FK-9-2), no credential in a coordination record? Does each new gap state a fact its evidence supports, owned by "
+    "the build whose unit closes it? Do the design records, the round record included, report their research and "
+    "their instruments faithfully? " + TAIL)
+specs = COMMON + ROUND + RESEARCH
+if len(set(specs)) != len(specs):
+    sys.exit("a spec repeats")
+for f in specs:
+    if not pathlib.Path(f).exists():
+        sys.exit(f"missing {f}")
+checklist = subprocess.run([sys.executable, "tools/memory-tree/gotchas.py", "--for-diff", f"{BASE}..{HEAD}"],
+                           capture_output=True, text=True, encoding="utf-8", check=True).stdout
+(S / "closing").mkdir(parents=True, exist_ok=True)
+for run in ("A", "B"):
+    report = REV.format(run.lower())
+    if pathlib.Path(report).exists():
+        sys.exit(f"{report} exists")
+    a = dict(template, base=full(BASE), head=full(HEAD), specs=specs, checklist=checklist,
+             byDesign="\n".join(BY_DESIGN), intensity="full", round=1,
+             efforts={"diffFinder": "medium", "skeptic": "medium", "synthesis": "medium"},
+             scratch=(S / "closing" / f"review-{run.lower()}").as_posix(),
+             context=CONTEXT.replace("{run}", run).replace("{report}", report))
+    out = S / "closing" / f"args-audit-closing-{run.lower()}.json"
+    out.write_text(json.dumps(a, indent=1, ensure_ascii=False), encoding="utf-8", newline="\n")
+    (S / "closing" / f"args-audit-closing-{run.lower()}.compact.json").write_text(json.dumps(a, ensure_ascii=False),
+                                                                                encoding="utf-8", newline="\n")
+    print(f"{run}: {a['base'][:9]}..{a['head'][:9]}, {len(specs)} specs, checklist {len(checklist.splitlines())} lines, "
+          f"context {len(a['context'].split())} words, {len(json.dumps(a, ensure_ascii=False))} bytes, "
+          f"report {report.rsplit('/', 1)[1]}, roles {a['roles']}, intensity {a['intensity']}")
+````
+
+### `log_review.py`
+
+The session log's rows for the closing pair's two Workflow runs, each outcome read from its report's verdict and review-shape line.
+
+````python
+"""The session log's rows for the Stage 2 closing pair, each a `tier2-review.js` Workflow run rather than a role
+handoff, so log_dispatch.py's prompt-file rows do not fit. `add` writes a run's row as dispatched; `outcome` reads the
+run's report and turns the row into `returned as <wf id>, <verdict>, <shape counts>`, every count read from the
+report's `review-shape` line and never typed.
+
+Usage (from the worktree root):
+  python -X utf8 log_review.py add <row> A|B
+  python -X utf8 log_review.py outcome <row> <wf id> <report path>
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+ANCHOR = "\nMaintain, and the machinery by which the loop corrects itself, is researched by"
+REPORT = "reviews/2026-10-20-review-PLAY-dClosedLoop-1-audit-closing-{}.md"
+verb, args = sys.argv[1], sys.argv[2:]
+
+
+def row_line(n):
+    start = L.text.find(f"\n| {n} | ")
+    return None if start < 0 else L.text[start + 1:L.text.index("\n", start + 1)]
+
+
+if verb == "add":
+    n, run = args
+    if row_line(n) is not None:
+        sys.exit(f"row {n} exists already")
+    who = (f"`tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one "
+           f"`gov-synthesizer`, all at the owner's medium, run {run} of two")
+    what = ("The whole-design audit's Stage 2 closing pair: `8d21999a9` over `6ba4eaaa1`, every design commit since the "
+            "parked debt's pair, the fold included")
+    L.insert_before(ANCHOR, f"| {n} | {who} | {what} | the args, built by `build_args_closing.py` | 1799cb98 | "
+                            f"dispatched | `{REPORT.format(run.lower())}` |\n", f"row {n}")
+elif verb == "outcome":
+    n, wf, report = args
+    line = row_line(n)
+    if line is None or line.count("| dispatched |") != 1:
+        sys.exit(f"row {n} is not one dispatched row")
+    text = pathlib.Path(report).read_text(encoding="utf-8")
+    verdict = re.findall(r"^## Verdict: (.+)$", text, flags=re.M)
+    shape = re.findall(r"review-shape[^\n]*", text)
+    if len(verdict) != 1 or not shape:
+        sys.exit(f"{report}: {len(verdict)} verdict lines, {len(shape)} shape lines")
+    counts = " ".join(re.findall(r"\b(?:raw|confirmed|refuted|unverified|blocker|high|medium|low)=\d+", shape[0]))
+    L.sub(line, line.replace("| dispatched |", f"| returned as `{wf}`, {verdict[0].strip()}, {counts} |"), f"row {n}")
+else:
+    sys.exit(__doc__)
+L.save()
+````
+
+### `log_pair_agents.py`
+
+The closing pair's agent lines, derived by handoff.py agents --run for both runs, written once into the session log.
+
+````python
+"""The closing pair's agent lines, derived from each run by the roles kit (`handoff.py agents --run`) and written to the
+session log's Dispatches section as one fenced block, the way the parked debt's pair's were, so compare_rounds.py can
+sum each run's returned lines. Refuses a run that derives no returned line, or a second write.
+
+Usage: python -X utf8 log_pair_agents.py <run-a id> <run-b id>   (from the worktree root)
+"""
+import pathlib
+import subprocess
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+L = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+HEAD = "The whole-design audit's closing pair, dispatches 208 and 209, derived from each run the same way:"
+if HEAD in L.text:
+    sys.exit("log_pair_agents: the block is in the log already")
+lines = []
+for run in sys.argv[1:3]:
+    out = subprocess.run([sys.executable, "-X", "utf8", "tools/roles/handoff.py", "agents", "--run", run],
+                         capture_output=True, text=True, encoding="utf-8").stdout
+    got = [l for l in out.splitlines() if l.startswith(("- agent — ", "- returned — "))]
+    if not any(l.startswith("- returned — ") for l in got):
+        sys.exit(f"log_pair_agents: {run} derives no returned line")
+    lines += got
+L.insert_before("## Events\n", f"{HEAD}\n\n```text\n" + "\n".join(lines) + "\n```\n\n", "agent lines")
+L.save()
+print(f"log_pair_agents: {len(lines)} lines for {sys.argv[1]} and {sys.argv[2]}")
+````
+
+### `mention_audit.py`
+
+Where run B's transcripts mention run A's report: each mention's record type and whether it sits in a tool call or an injected attachment.
+
+````python
+"""Where each run B transcript mentions run A's report: the JSONL line's type and role, whether it sits in a tool call
+the agent made (a read) or in text handed to the agent (a prompt, a hook, a tool result), and 160 characters around it.
+Usage: python -X utf8 mention_audit.py <workflow transcript dir> <needle>"""
+import json, pathlib, sys
+d, needle = pathlib.Path(sys.argv[1]), sys.argv[2]
+for f in sorted(d.glob("*.jsonl")):
+    for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+        if needle not in line:
+            continue
+        rec = json.loads(line)
+        msg = rec.get("message", {})
+        kinds = []
+        content = msg.get("content")
+        if isinstance(content, list):
+            for c in content:
+                s = json.dumps(c)
+                if needle in s:
+                    kinds.append(c.get("type", "?") + (":" + c.get("name", "") if c.get("type") == "tool_use" else ""))
+        elif isinstance(content, str) and needle in content:
+            kinds.append("text")
+        i = line.find(needle)
+        print(f"{f.name[:22]} line {n} type={rec.get('type')} role={msg.get('role')} in={kinds} :: "
+              f"{line[max(0, i - 110):i + 50]!r}"[:330])
+````
+
+### `fill_summary.py`
+
+The comparison record's [summary]: the synthesizer's placeholder replaced by compare_rounds.py's output as run.
+
+````python
+"""The comparison record's [summary]: the placeholder line the synthesizer left is replaced by compare_rounds.py's output
+as run, with the command line, in a text block, so every number the record states is the tool's. Refuses a record
+without exactly one placeholder.
+
+Usage: python -X utf8 fill_summary.py <record> <compare output file>
+"""
+import pathlib
+import sys
+
+rec, out = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2]).read_text(encoding="utf-8").replace("\r\n", "\n")
+t = rec.read_text(encoding="utf-8")
+PH = "(the comparison tool's output, written by the main loop)"
+if t.count(PH) != 1:
+    sys.exit(f"fill_summary: {t.count(PH)} placeholders in {rec.name}")
+cmd = ("$ python compare_rounds.py audit-closing-a.md audit-closing-b.md audit-closing-reviews-compared.md "
+       "session-log.md wf_fe1512b8-f16 wf_e897bbe0-97d")
+t = t.replace(PH, "```text\n" + cmd + "\n" + out.strip("\n") + "\n```")
+rec.write_text(t, encoding="utf-8", newline="\n")
+print(f"fill_summary: [summary] holds {len(out.splitlines())} lines of compare_rounds.py output")
+````
+
+### `patch_reconcile.py`
+
+The probe changed by the closing pair: rule-keyed class rows, the policy. spelling, stage words routed only after an arrow, the stand-in check, the docstring.
+
+````python
+"""The reconciliation probe, changed by the audit's closing pair (2026-10-20, the comparison record's [fold] rows):
+- reconcile-key-no-rule: the re-cut's class rows name the rule that reads the dependency, and the probe keys them by
+  (rule, build, node), so a dependency one rule classes is still unclassed under another;
+- tolerance-rows-unnamed-tool: a tolerance row whose reason says "today's tool" and names no backticked path that
+  exists is a finding;
+- policy-prefix-unread: rule 4 reads a key spelled `policy.<key>`, the full spelling flow-steps declares legal;
+- prose-stage-words-as-routes: a stage word counts as a route target only after its branch's arrow;
+- rule3-doc-overstates: the docstring, the comment and the summary line say what rule 3 reads.
+Each replacement must match once.
+
+Usage: python -X utf8 patch_reconcile.py <reconcile.py>
+"""
+import pathlib
+import sys
+
+p = pathlib.Path(sys.argv[1])
+t = p.read_text(encoding="utf-8")
+EDITS = [
+    # rule 4's docstring line
+    ("""4. reads: each backticked policy key in a flow item's cells, the Owner cell aside, is built by the item's owner or
+   an ancestor of it.""",
+     """4. reads: each backticked policy key in a flow item's cells, the Owner cell aside, is built by the item's owner or
+   an ancestor of it; a key is read whole or as `policy.<key>`, the full spelling flow-steps declares legal."""),
+    # rule 3's widened reading
+    ("""Rule 3 reads every route target too, as the whole-design audit's Stage 0 asks (K2, final-questions `[audit]`): each
+item or step a flow item's Then cell or an expansion item's Routes cell names, a step by the name [chain]'s Stage column
+gives it and read as that step's first item, is built by the source item's owner or an ancestor of it. Every run reads
+it since the audit's fold classed the forward routes it finds (the owner's FK-4-9, 2026-10-20). Before that only Stage
+0's `--all-routes` run did; the flag is still accepted, and changes nothing.""",
+     """Rule 3 also reads every route target, as the whole-design audit's Stage 0 asks (K2, final-questions `[audit]`): each
+item a flow item's Then cell or an expansion item's Routes cell names in backticks, and each stage a branch names after
+its arrow (`→`) by one of the five flow steps' names in STAGES, read as that step's first item, is built by the source
+item's owner or an ancestor of it. A stage word with no arrow before it in its branch is prose, not a route (the
+closing pair's `prose-stage-words-as-routes`). Every run reads it since the audit's fold classed the forward routes it
+finds (the owner's FK-4-9, 2026-10-20); `--all-routes`, Stage 0's flag before that, is accepted and ignored."""),
+    # the class rows and their findings
+    ("""A dependency is classed only by a row of the re-cut's [reconciled-order] table naming its build, its node and its
+owner, with a class from the closed set; a row whose class is blank or outside the set, or that no dependency needs,
+is a finding. Exit 1 on any finding.""",
+     """A dependency is classed only by a row of the re-cut's [reconciled-order] table naming its build, the rule that reads
+it (cites, stage, routes, reads or registers), its node and its owner, with a class from the closed set, so a
+dependency one rule classes is still unclassed under another (the closing pair's `reconcile-key-no-rule`). A row whose
+class is blank or outside the set, whose rule is none of the five, or that no dependency needs, is a finding, and so is
+a tolerance row whose reason says "today's tool" and names no backticked path that exists
+(`tolerance-rows-unnamed-tool`); a reason naming any other stand-in is not checked. Exit 1 on any finding."""),
+    # the plants
+    ("""Plants, each in memory: --plant-drop <build>:<node> removes a class row; --plant-edge-drop <child>:<parent> removes
+a parent edge (repeatable); --plant-class <build>:<node>=<text> sets a class cell; --plant-add <build>:<node>:<owner>
+adds a class row; --plant-item <tag>:<step>:<owner>:<then> adds a flow item; --plant-transition-drop <disposition>
+removes that disposition's `none` row from [transitions].""",
+     """Plants, each in memory: --plant-drop <build>:<node>[:<rule>] removes that pair's class rows, every rule's or the one
+named; --plant-edge-drop <child>:<parent> removes a parent edge (repeatable); --plant-class <build>:<node>=<text> sets
+the class cell of that pair's rows; --plant-why <build>:<node>=<text> sets their reason cell; --plant-add
+<build>:<node>:<owner>[:<rule>] adds a tolerance row, for cites unless a rule is named; --plant-item
+<tag>:<step>:<owner>:<then> adds a flow item; --plant-transition-drop <disposition> removes that disposition's `none`
+row from [transitions]."""),
+    ("import importlib.util\nimport re\nimport sys\n", "import importlib.util\nimport os\nimport re\nimport sys\n"),
+    ("expansion_routes = []   # (owner, Routes cell) of each expansion item, read under --all-routes",
+     "expansion_routes = []   # (owner, Routes cell) of each expansion item, read by rule 3's route targets"),
+    # rule 3's stage words
+    ("""# Every item or step a route names, from flow items and expansion items alike, in every run since the audit's fold.
+STEP_NAME = re.compile(r"\\b(" + "|".join(s.capitalize() for s in STAGES) + r")\\b")
+route_edges = 0""",
+     """# Every item a route names in backticks, and every stage a branch names after its arrow, from flow items and expansion
+# items alike, in every run since the audit's fold. A stage word with no arrow before it in its branch is prose.
+STEP_NAME = re.compile(r"\\b(" + "|".join(s.capitalize() for s in STAGES) + r")\\b")
+
+
+def routed_stages(text):
+    return [w for branch in re.split(r";\\s*", text) if "→" in branch
+            for w in STEP_NAME.findall(branch.split("→", 1)[1])]
+
+
+route_edges = 0"""),
+    ("    targets |= {first[w.lower()] for w in STEP_NAME.findall(text)}\n",
+     "    targets |= {first[w.lower()] for w in routed_stages(text)}\n"),
+    # rule 4's full spelling
+    ("""    for tok in set(re.findall(r"`([a-z][a-z0-9.<>-]*\\.[a-z0-9<>-]+)(?::[^`]*)?`", text)):
+        kown = keys.get(tok)""",
+     """    for tok in set(re.findall(r"`([a-z][a-z0-9.<>-]*\\.[a-z0-9<>-]+)(?::[^`]*)?`", text)):
+        # flow-steps declares the full spelling, `policy.<key>`, legal (the closing pair's `policy-prefix-unread`).
+        tok = tok[len("policy."):] if tok.startswith("policy.") else tok
+        kown = keys.get(tok)"""),
+    # the class table, keyed by rule
+    ("""# The classes: (build, node) -> (owner, class), from the re-cut's table.
+recut = open(sys.argv[1], encoding="utf-8").read()
+section = recut.split("### [reconciled-order]", 1)[1].split("\\n## ", 1)[0] if "### [reconciled-order]" in recut else ""
+classes = {}
+for ln in section.split("\\n"):
+    c = [x.strip() for x in ln.strip().strip("|").split("|")]
+    if ln.startswith("| d") and len(c) >= 5:
+        classes[(c[0], c[1].strip("`"))] = (c[2], c[3])
+for arg in plants("--plant-drop"):
+    classes.pop(tuple(arg.split(":", 1)), None)
+for arg in plants("--plant-class"):
+    key, text = arg.split("=", 1)
+    b, node = key.split(":", 1)
+    classes[(b, node)] = (classes.get((b, node), ("", ""))[0], text)
+for arg in plants("--plant-add"):
+    b, node, own = arg.split(":", 2)
+    classes[(b, node)] = (own, "tolerance")
+""",
+     """# The classes: (rule, build, node) -> (owner, class, reason), from the re-cut's table, whose rows name the rule that
+# reads each dependency (the closing pair's `reconcile-key-no-rule`).
+RULES = ("cites", "stage", "routes", "reads", "registers")
+recut = open(sys.argv[1], encoding="utf-8").read()
+section = recut.split("### [reconciled-order]", 1)[1].split("\\n## ", 1)[0] if "### [reconciled-order]" in recut else ""
+classes, bad_rule = {}, []
+for ln in section.split("\\n"):
+    c = [x.strip() for x in ln.strip().strip("|").split("|")]
+    if ln.startswith("| d") and len(c) >= 6:
+        if c[1] not in RULES:
+            bad_rule.append((c[0], c[1], c[2].strip("`")))
+            continue
+        classes[(c[1], c[0], c[2].strip("`"))] = (c[3], c[4], c[5])
+for arg in plants("--plant-drop"):
+    parts = arg.split(":")
+    for k in [k for k in classes if k[1:] == (parts[0], parts[1]) and (len(parts) < 3 or k[0] == parts[2])]:
+        del classes[k]
+for flag, field in (("--plant-class", 1), ("--plant-why", 2)):
+    for arg in plants(flag):
+        key, text = arg.split("=", 1)
+        b, node = key.split(":", 1)
+        for k in [k for k in classes if k[1:] == (b, node)] or [("cites", b, node)]:
+            row = list(classes.get(k, ("", "", "")))
+            row[field] = text
+            classes[k] = tuple(row)
+for arg in plants("--plant-add"):
+    parts = arg.split(":")
+    classes[(parts[3] if len(parts) > 3 else "cites", parts[0], parts[1])] = (parts[2], "tolerance", "planted")
+"""),
+    # the summary line's left-out list
+    ("""print(f"left out: systems, cited in prose; roles, shapes and commands, not owned nodes; {plain_hits} plain-word "
+      f"mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes "
+      f"({len(unread)}): " + "; ".join(unread))""",
+     """print(f"left out: systems, cited in prose; roles, shapes and commands, not owned nodes; {plain_hits} plain-word "
+      f"mentions of a record kind a non-ancestor owns, mostly homonyms; stage words other than the {len(STAGES)} flow "
+      f"steps' names, and any no arrow precedes in its branch, read as prose; points of another layer, not modelled as "
+      f"nodes ({len(unread)}): " + "; ".join(unread))"""),
+    # the findings, keyed by rule
+    ("""for rule, b, key, own in deps:
+    row = classes.get((b, key))""",
+     """for rule, b, key, own in deps:
+    row = classes.get((rule, b, key))"""),
+    ("""needed = {(b, key) for _, b, key, _ in deps}
+for (b, key), (own, cls) in sorted(classes.items()):
+    if (b, key) not in needed:
+        print(f"  class row with no dependency: {b} `{key}` ({own}, {cls or '-'})")
+        findings += 1
+    elif cls not in CLASSES:
+        print(f"  class row outside the closed set: {b} `{key}` ({cls or 'blank'})")
+""",
+     """needed = {(rule, b, key) for rule, b, key, _ in deps}
+for (rule, b, key), (own, cls, why) in sorted(classes.items()):
+    if (rule, b, key) not in needed:
+        print(f"  class row with no dependency: {b} {rule} `{key}` ({own}, {cls or '-'})")
+        findings += 1
+    elif cls not in CLASSES:
+        print(f"  class row outside the closed set: {b} {rule} `{key}` ({cls or 'blank'})")
+    elif cls == "tolerance" and "today's tool" in why and not any(
+            "/" in path and os.path.exists(path) for path in re.findall(r"`([^`]+)`", why)):
+        print(f"  tolerance row names no stand-in: {b} {rule} `{key}` says today's tool and names no path that exists")
+        findings += 1
+for b, rule, key in bad_rule:
+    print(f"  class row with a rule outside the five: {b} `{key}` ({rule or 'blank'})")
+    findings += 1
+"""),
+]
+for old, new in EDITS:
+    n = t.count(old)
+    if n != 1:
+        sys.exit(f"patch_reconcile: {old[:70]!r} matches {n} times")
+    t = t.replace(old, new)
+p.write_text(t, encoding="utf-8", newline="\n")
+print(f"patch_reconcile: {len(EDITS)} edits to {p.name}")
+````
+
+### `rule_column.py`
+
+The re-cut table's Rule column, derived from the probe's own dependency lines: a row per rule, rows no dependency needs dropped and listed.
+
+````python
+"""The re-cut's class table gains its Rule column, derived and never typed (the closing pair's `reconcile-key-no-rule`).
+The probe, run on the tree in the current directory, prints every dependency it reads, classed or not; each class row
+takes the rule of each dependency on its (build, node), one row per rule, so a row two rules need becomes two rows
+with the same class and reason (the fold then words each reason for its own rule). A row no dependency needs is
+dropped and listed: the probe would red it, and the closing pair's `prose-stage-words-as-routes` names the rows whose
+edges the probe no longer reads. Refuses a table already converted, or a dependency line it cannot parse.
+
+Usage: python -X utf8 rule_column.py   (from a tree's root; all.py runs it as the step rule_column)
+"""
+import pathlib
+import re
+import subprocess
+import sys
+
+B = "memory/builds/dClosedLoop/build/"
+RECUT = pathlib.Path(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+OLD_HEAD = "| Row | Node | Owner | Class | Why |"
+NEW_HEAD = "| Row | Rule | Node | Owner | Class | Why |"
+DEP = re.compile(r"^  (d\w+) (cites|stage|routes|reads|registers) `([^`]+)` \((.+?)'s, not an ancestor\): ")
+
+out = subprocess.run([sys.executable, "-X", "utf8", B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py", str(RECUT)],
+                     capture_output=True, text=True, encoding="utf-8").stdout
+deps = [DEP.match(l).groups() for l in out.splitlines() if DEP.match(l)]
+if not deps or len(deps) != sum(" not an ancestor): " in l for l in out.splitlines()):
+    sys.exit("rule_column: a dependency line did not parse, or none was printed")
+rules_of = {}
+for b, rule, node, _ in deps:
+    rules_of.setdefault((b, node), []).append(rule)
+t = RECUT.read_text(encoding="utf-8")
+sec = t.split("### [reconciled-order]", 1)
+if len(sec) != 2 or t.count(OLD_HEAD) != 1:
+    sys.exit("rule_column: no [reconciled-order] table in the old shape, or it is converted already")
+lines, dropped, split = t.split("\n"), [], []
+start = lines.index(OLD_HEAD)
+out_lines = lines[:start] + [NEW_HEAD, "|---|---|---|---|---|---|"]
+i = start + 2
+while i < len(lines) and lines[i].startswith("|"):
+    c = [x.strip() for x in lines[i].strip().strip("|").split("|")]
+    if not lines[i].startswith("| d") or len(c) != 5:
+        sys.exit(f"rule_column: a table line not in the old shape: {lines[i][:120]}")
+    rules = sorted(set(rules_of.get((c[0], c[1].strip("`")), [])))
+    if not rules:
+        dropped.append(f"{c[0]} {c[1]} ({c[3]})")
+    if len(rules) > 1:
+        split.append(f"{c[0]} {c[1]}: {', '.join(rules)}")
+    out_lines += [f"| {c[0]} | {r} | {c[1]} | {c[2]} | {c[3]} | {c[4]} |" for r in rules]
+    i += 1
+out_lines += lines[i:]
+RECUT.write_text("\n".join(out_lines), encoding="utf-8", newline="\n")
+print(f"rule_column: {i - start - 2} rows read, {len(dropped)} dropped with no dependency, {len(split)} split by rule")
+for d in dropped:
+    print(f"  dropped: {d}")
+for s in split:
+    print(f"  split: {s}")
+````
+
+### `patch_stage0.py`
+
+Stage 0's K1 reads the owning-role actor, and the plant k1-owning-role reds any other undeclared opening.
+
+````python
+"""Stage 0's K1 reads an Actor cell that opens "the role that owns" as one actor, the owning role chosen per instance,
+as layer-roles `[matrix]` and its role_matrix.py read it (the closing pair's `mailbox-answer-actor`, run B's route).
+Any other undeclared opening still reds: the new plant k1-owning-role sets one, and run_plants.py wants its line.
+Each replacement must match once.
+
+Usage: python -X utf8 patch_stage0.py <stage0.py> <run_plants.py>
+"""
+import pathlib
+import sys
+
+s0, rp = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+EDITS = {
+    s0: [
+        ("""           k1-owner, k1-actor, k2-ghost,""", """           k1-owner, k1-actor, k1-owning-role, k2-ghost,"""),
+        ("""        if not v["actor"].strip():
+            find("K1", t, "no actor")
+        elif head not in KINDS:""",
+         """        if not v["actor"].strip():
+            find("K1", t, "no actor")
+        elif head.startswith("the role that owns"):
+            pass   # one actor, the role owning the asked interface or item, per instance (layer-roles [matrix])
+        elif head not in KINDS:"""),
+        ("""elif PLANT == "k1-actor":
+    items["plan.dedupe"]["actor"] = "wizard"
+""",
+         """elif PLANT == "k1-actor":
+    items["plan.dedupe"]["actor"] = "wizard"
+elif PLANT == "k1-owning-role":
+    items["plan.dedupe"]["actor"] = "the role that answers the question"
+"""),
+    ],
+    rp: [
+        ("""    "k1-actor": ("K1", "K1 plan.dedupe: actor 'wizard' is no kind and no declared role"),
+""",
+         """    "k1-actor": ("K1", "K1 plan.dedupe: actor 'wizard' is no kind and no declared role"),
+    "k1-owning-role": ("K1", "K1 plan.dedupe: actor 'the role that answers the question' is no kind and no declared role"),
+"""),
+    ],
+}
+for path, edits in EDITS.items():
+    t = path.read_text(encoding="utf-8")
+    for old, new in edits:
+        n = t.count(old)
+        if n != 1:
+            sys.exit(f"patch_stage0: {path.name}: {old[:60]!r} matches {n} times")
+        t = t.replace(old, new)
+    path.write_text(t, encoding="utf-8", newline="\n")
+    print(f"patch_stage0: {len(edits)} edits to {path.name}")
+````
+
+### `fold-10.py`
+
+Fold writer 10's script: the closing pair's confirmed defects and the owner's flakes answers (fold-return-w10).
+
+````python
+"""Writer 10's fold, the closing pair's fold (fold brief w10): every `fold` row of
+`build/2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md` but the parts that are the main loop's,
+and the owner's answer to its one fork, `flakes-measured-no-writer`: dWitnessedBar derives it (option (a)).
+
+It runs after the main loop's Rule-column step (`rule_column.py`) and before the mint step, so the re-cut's anchors
+are the six-column rows that step leaves, and every other anchor is the working tree's. It adds no clause, so it
+carries no placeholder id and moves no `[clause-ids]` next id. Run from the tree's root; each `sub` and
+`insert_before` must match exactly once, or the script stops before it writes anything.
+
+What it does not do: edit the build's scripts (reconcile.py, stage0.py), the round record or the instruments, which
+are the main loop's; class a Stage 0 red, which its return lists as a request; or check that a stand-in a row names
+is the one the route really reaches, beyond the probe's own "today's tool" check.
+"""
+import sys
+
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+B = "memory/builds/dClosedLoop/build/"
+V2 = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+RC = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+MP = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+LE = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+FL = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-flow.md")
+OW = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+FT = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+CMP = "`build/2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md`"
+BRIEF = "`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w10.md`"
+
+
+def row(b, rule, node, cls, why, label):
+    """Rewrite one re-cut class row, found by its build, rule and node, keeping its owner."""
+    head = f"| {b} | {rule} | `{node}` | "
+    lines = [ln for ln in RC.text.split("\n") if ln.startswith(head)]
+    if len(lines) != 1:
+        sys.exit(f"recut: {label}: {len(lines)} rows for {b} {rule} {node}")
+    owner = lines[0][len(head):].split(" | ", 1)[0]
+    RC.sub(lines[0], f"{head}{owner} | {cls} | {why} |", label)
+
+
+def drop(b, rule, node, label):
+    head = f"| {b} | {rule} | `{node}` | "
+    lines = [ln for ln in RC.text.split("\n") if ln.startswith(head)]
+    if len(lines) != 1:
+        sys.exit(f"recut: {label}: {len(lines)} rows for {b} {rule} {node}")
+    RC.sub(lines[0] + "\n", "", label)
+
+
+# ===================================================================================== unit-lease-needs-cycle
+FS.sub("| `build.unit-lease` | command, one per unit | `build.base`, and `build.reuse-check` of each unit the declared "
+       "order puts before it | takes the unit's lease with its write set as the unit starts, declared as the driver's "
+       "`--dispatch --pass <id> --writes <path>` declares one | the lease record | held → `build.unit-pass`; an overlap, "
+       "or a refusal → by its cause (`[rules]`), an overlap under `leases: warn` going on as held |",
+       "| `build.unit-lease` | command, one per unit | `build.base` | takes the unit's lease with its write set as the "
+       "unit starts, declared as the driver's `--dispatch --pass <id> --writes <path>` declares one, and only once "
+       "every unit its spec declares as a dependency has its `build.reuse-check` witnessed clean, so units with no "
+       "dependency between them start in parallel | the lease record, and the spec's dependency record joined to "
+       "each named unit's clean `build.reuse-check` | held → `build.unit-pass`; a declared dependency not yet "
+       "witnessed clean → waits for it, drawing nothing; an overlap, or a refusal → by its cause (`[rules]`), an "
+       "overlap under `leases: warn` going on as held |",
+       "unit-lease-needs-cycle: build.unit-lease's Needs back to build.base, its ordering in Does and Then")
+
+# ===================================================================================== closed-root-draw-pruned
+V2.sub("a terminal tombstone pruned only that long after its release, seen red on a pruned lease,",
+       "a run claim's terminal tombstone pruned only that long after its release, a build's or unit's terminal "
+       "tombstone never pruned, so a draw on a closed root always finds it (layer-memory `[contract]`), seen red on a "
+       "pruned lease, on a planted prune of a closed build's terminal tombstone,",
+       "closed-root-draw-pruned: cl-0134 prunes run claims alone")
+V2.sub("and a terminal tombstone may be pruned only this long after its release, so no queued claim outlives the "
+       "tombstone it would race and a pruned lease never restarts its epoch",
+       "and a run claim's terminal tombstone may be pruned only this long after its release, so no queued claim "
+       "outlives the tombstone it would race and a pruned lease never restarts its epoch, while a build's or unit's "
+       "terminal tombstone is never pruned, so a draw on a closed root always finds it (layer-memory `[contract]`, "
+       "the closing pair's closed-root-draw-pruned)",
+       "closed-root-draw-pruned: the leases.queued-claim-days row")
+LR.sub("and prunes a terminal tombstone, a\n    run claim's (`refs/gov/runs/*`) among them, only once it is older than "
+       "`leases.queued-claim-days` (P40),\n    through dPlacedRequest's coordination verbs. It never prunes "
+       "`refs/gov/claims/*`, where a slug's claim lives\n    (layer-memory `[contract]`);",
+       "and prunes a run claim's terminal\n    tombstone (`refs/gov/runs/*`) only once it is older than "
+       "`leases.queued-claim-days` (P40), through\n    dPlacedRequest's coordination verbs. It never prunes a build's "
+       "or unit's terminal tombstone, which a patch\n    build's draw on a closed root acquires (`cl-dClosedLoop-0440`), "
+       "nor `refs/gov/claims/*`, where a slug's claim\n    lives (layer-memory `[contract]`, the closing pair's "
+       "closed-root-draw-pruned);",
+       "closed-root-draw-pruned: the supervisor prunes run claims alone")
+V2.sub("so concurrent draws serialize on the acquisition's compare-and-swap,",
+       "so concurrent draws serialize on the acquisition's compare-and-swap, a draw on a closed root always finding "
+       "the root's tombstone, which is never pruned (cl-0134),",
+       "closed-root-draw-pruned: cl-0440's draw finds the tombstone")
+V2.sub("on two planted concurrent draws on one closed root whose budget admits only one, both landing,",
+       "on two planted concurrent draws on one closed root whose budget admits only one, both landing, on two such "
+       "draws on a root closed longer ago than `leases.queued-claim-days`, neither refused,",
+       "closed-root-draw-pruned: cl-0440's witness past the prune age")
+
+# ===================================================================================== tolerance-rows-unnamed-tool
+FS.sub("  today's tool for a command, and `push-main.sh` for the lander (the owner's FK-4-9, A4-F14, B1-F8). A stand-in\n"
+       "  a clause declares for its own route wins,",
+       "  today's tool for a command, named by its path, and `push-main.sh` for the lander (the owner's FK-4-9, A4-F14,\n"
+       "  B1-F8). A command with no tool today is unarmed, as FK-4-8 has `deploy.distill`: it records that it ran\n"
+       "  nothing, is never green, and the route goes on (the closing pair's tolerance-rows-unnamed-tool). A stand-in\n"
+       "  a clause declares for its own route wins,",
+       "tolerance-rows-unnamed-tool: [rules]' stand-in bullet names the unarmed command")
+UNARMED_INPUT = ("`design.input` is unarmed, no tool pinning the input today: it records that it pinned nothing, is never "
+                 "green, and the route goes on to Design's role items, which the attended session's agent does, until "
+                 "dIndexedDesign lands `design.input` (flow-steps [rules]' stand-in, the owner's FK-4-9 and FK-4-8)")
+for b in ("dDeclaredLoop", "dRankedPlan", "dWitnessedBar"):
+    row(b, "routes", "design.input", "tolerance", UNARMED_INPUT, f"tolerance-rows-unnamed-tool: {b} → design.input")
+row("dDeclaredLoop", "routes", "build.distill", "tolerance",
+    "`build.distill` is unarmed, as FK-4-8's `deploy.distill` row above reads: no tool writes decision-log rows today, "
+    "so no row is written and `build.recommend` routes on, until dScopedBuild lands `build.distill` (flow-steps "
+    "[rules]' stand-in, the owner's FK-4-9 and FK-4-8)",
+    "tolerance-rows-unnamed-tool: build.distill unarmed")
+row("dDeclaredLoop", "routes", "deploy.notify", "tolerance",
+    "`deploy.notify` is unarmed: the mailbox it posts `landed` to is dKeptSession's, so no post is made and the route "
+    "goes on, until dShippedRelease lands `deploy.notify` (flow-steps [rules]' stand-in, the owner's FK-4-9 and "
+    "FK-4-8)",
+    "tolerance-rows-unnamed-tool: deploy.notify unarmed")
+row("dDeclaredLoop", "routes", "design.ready", "tolerance",
+    "a route into `design.ready` reaches today's tool, `tools/memory-tree/gen_build_index.py`, which reads each "
+    "spec's status and tier, `design.handoff`'s `status-and-tier` arm as today, until dIndexedDesign lands "
+    "`design.ready` (flow-steps [rules]' stand-in, the owner's FK-4-9)",
+    "tolerance-rows-unnamed-tool: design.ready's tool named")
+for node, src, b in (("plan.exit", "`plan.recommend` or `plan.reason`", "dRankedPlan"),
+                     ("test.exit", "`test.recommend` or `test.reason`", "dWitnessedBar")):
+    row("dDeclaredLoop", "routes", node, "tolerance",
+        f"a route into `{node}` from {src} reaches the fixture witness the transition table's row holds for an exit "
+        f"item whose build has not landed, the stand-in the clause declares, which wins over [rules]', until {b} "
+        f"lands and arms `{node}` (cl-dClosedLoop-0098, C2-F8, the owner's FK-8-1)",
+        f"tolerance-rows-unnamed-tool: {node}'s fixture witness")
+drop("dDeclaredLoop", "routes", "build.base", "prose-stage-words-as-routes: the build.base row dropped")
+drop("dWellOiledMachine", "routes", "deploy.current", "prose-stage-words-as-routes: the deploy.current row dropped")
+
+# ===================================================================================== reconcile-key-no-rule
+row("dFairHearing", "cites", "review.trigger", "tolerance",
+    "cl-dClosedLoop-0070 runs `review.pin` directly with its pin arguments, a stand-in until dDeclaredLoop's "
+    "`review.trigger` lands (the whole-design audit's C2-F6)",
+    "reconcile-key-no-rule: review.trigger's cites row")
+row("dFairHearing", "cites", "review.dispose", "tolerance",
+    "cl-dClosedLoop-0075 writes the report's dispositions to the review record, disposed by hand as today's reviews "
+    "are, a stand-in until dDeclaredLoop lands `review.dispose` and routes them (flow-steps [breakpoint]'s "
+    "stand-ins, C2-F6)",
+    "reconcile-key-no-rule: review.dispose's cites row")
+row("dFairHearing", "routes", "review.dispose", "tolerance",
+    "`review.report`'s route into `review.dispose` reaches the review record, its dispositions disposed by hand as "
+    "today's reviews are, until dDeclaredLoop lands `review.dispose` and routes them (cl-dClosedLoop-0075, "
+    "flow-steps [breakpoint]'s stand-ins, C2-F6)",
+    "reconcile-key-no-rule: review.dispose's routes row")
+row("dDeclaredLoop", "cites", "decisions.major", "tolerance",
+    "cl-dClosedLoop-0104 names the key's `author-owner-ratifies` value only for the case its owner gate stands in "
+    "for `build.ratify`, holding `build.recommend`'s route for the owner's disposition, until dLinkedLibrary lands "
+    "the key and dScopedBuild `build.ratify` (the owner's FK-9-1)",
+    "reconcile-key-no-rule: decisions.major's cites row")
+row("dDeclaredLoop", "cites", "build.ratify", "tolerance",
+    "cl-dClosedLoop-0104 names `build.ratify` as the item its owner gate stands in for under `decisions.major: "
+    "author-owner-ratifies`, holding `build.recommend`'s route for the owner's disposition, until dScopedBuild lands "
+    "it (flow-steps [build]'s stand-in, the owner's FK-9-1)",
+    "reconcile-key-no-rule: build.ratify's cites row")
+row("dDeclaredLoop", "cites", "plan.exit", "tolerance",
+    "cl-dClosedLoop-0104 cites `plan.exit` for RC-9's fallback, dDeclaredLoop's owner gate holding it for the "
+    "owner's disposition (cl-dClosedLoop-0378), the owner-gate stand-in its own gate repeats for `build.ratify` "
+    "(the owner's FK-9-1)",
+    "reconcile-key-no-rule: plan.exit's cites row")
+RC.sub("cites, stage, routes, reads and registers. Each row is matched on its owner too, and its class must be one of\n",
+       "cites, stage, routes, reads and registers. Each row names the rule that reads its dependency, and is matched on\n"
+       "that rule and on its owner too, so a row one rule needs classes no other rule's dependency on its node (the\n"
+       "closing pair's reconcile-key-no-rule). Its class must be one of\n",
+       "reconcile-key-no-rule: the table's prose names the Rule column")
+
+# ===================================================================================== prose-stage-words-as-routes
+FS.sub("built → each new unit through Design, Build's tail waiting until it is built,",
+       "built → each new unit through Design, the build's remaining units waiting until it is built,",
+       "prose-stage-words-as-routes: review.dispose names no stage in prose")
+FS.sub("a pause, withdraw or supersede is refused: the build closes through Deploy.",
+       "a pause, withdraw or supersede is refused: the build closes through its landing.",
+       "prose-stage-words-as-routes: life.quiesce names no stage in prose")
+
+# ===================================================================================== mailbox-answer-actor
+FS.sub("- **One actor per item, of one kind:** a role, a command the supervisor runs, the executor, a hook the\n"
+       "  supervisor awaits, or the owner. Every item the audit found with several actors is split, and an item\n"
+       "  whose actor a policy value chooses is one item per value.",
+       "- **One actor per item, of one kind:** a role, a command the supervisor runs, the executor, a hook the\n"
+       "  supervisor awaits, or the owner. Every item the audit found with several actors is split, and an item\n"
+       "  whose actor a policy value chooses is one item per value. A role may be the role that owns what the item's\n"
+       "  input names, chosen per instance, as `mailbox.answer`'s is (layer-roles `[matrix]`, the closing pair's\n"
+       "  mailbox-answer-actor).",
+       "mailbox-answer-actor: [rules]' one-actor rule names the owning role")
+
+# ===================================================================================== mailbox-answer-targets, answer-dispatch-non-ancestor
+FS.sub("| a `question` addressed to the build or one of its units, which `next` dispatches when it arrives |",
+       "| a `question` addressed to the build or one of its units, which `next` dispatches when it arrives, and until "
+       "dWellOiledMachine lands `next`, none for an unattended build, whose asker's declared default answers "
+       "(`cl-dClosedLoop-0504`) |",
+       "answer-dispatch-non-ancestor: mailbox.answer's Needs names the stand-in")
+FS.sub("| answered → the `answer` posted to the asker's mailbox; no answer within `flow.wait-ceiling` → the asker's "
+       "declared default answers it (`cl-dClosedLoop-0162`) | dKeptSession |",
+       "| answered → done: the `answer` posted to the asker's mailbox; no answer within `flow.wait-ceiling`, or no "
+       "`next` to dispatch the question before dWellOiledMachine lands it → back to the asking item, which takes its "
+       "declared default (`cl-dClosedLoop-0162`) | dKeptSession |",
+       "mailbox-answer-targets: the Then targets in declared forms")
+FS.sub("  build arrives, run by the role that owns the asked interface or item (`[entry]`). A transition refused while a\n",
+       "  build arrives, run by the role that owns the asked interface or item (`[entry]`). Until dWellOiledMachine lands\n"
+       "  `next`, a question to an unattended build is answered by the asker's declared default (`cl-dClosedLoop-0162`),\n"
+       "  the stand-in `cl-dClosedLoop-0504` declares, which covers the answering role too. A transition refused while a\n",
+       "answer-dispatch-non-ancestor: the mailbox rule names the stand-in")
+V2.sub("dispatched by `next` when the question arrives,",
+       "dispatched by `next` when the question arrives, and until dWellOiledMachine lands `next`, a question to an "
+       "unattended build answered by the asker's declared default under cl-0162, the same stand-in "
+       "covering its answering role (the closing pair's answer-dispatch-non-ancestor),",
+       "answer-dispatch-non-ancestor: cl-0504 names the stand-in")
+
+# ===================================================================================== guard-no-positive-arm, change-record-undefined
+V2.sub("with a change record attached, the file's other conditions left to the record's argument as today, and the "
+       "guard once it lands admitting that raise alone, seen red on a planted agent write of every other shape, a "
+       "lowered cap, two caps raised, a class row raised, a raise beside another change and a raise with no change "
+       "record, each admitted (M11, FM1, SA-12, the owner's FK-7-1 and FK-9-2)",
+       "with its change record attached, which at this build is today's rule from `tools/template-size-limits.txt`, "
+       "the RAISED argument in place beside the cap and a `memory/DECISIONS.md` row in the same commit, the minimal "
+       "guard checking for both, until dOrderedCharter's instruction change-record kind lands and re-points it, the "
+       "file's other conditions left to the record's argument as today, and the guard once it lands admitting that "
+       "raise alone, seen green on a planted raise of a single measured-file cap under `budgets.*`, nothing else "
+       "changed and its change record attached, which must be admitted, the arm red if the guard refuses it, and red "
+       "on a planted agent write of every other shape, a lowered cap, two caps raised, a class row raised, a raise "
+       "beside another change and a raise with neither the RAISED argument nor the decision row, each refused, the "
+       "arm red if the guard admits any (M11, FM1, SA-12, the owner's FK-7-1 and FK-9-2, the closing pair's "
+       "guard-no-positive-arm and change-record-undefined)",
+       "guard-no-positive-arm, change-record-undefined: cl-0012")
+V2.sub("argued in the write's change record, every other agent write to it refused as `policy-file.guard` says, seen "
+       "red on a planted run's raise with no change record and on a planted run's lowering, each admitted (the "
+       "owner's FK-7-1)",
+       "argued in the write's change record as cl-0012 defines it, every other agent write to it "
+       "refused as `policy-file.guard` says, seen green on a planted run's raise of a single measured-file cap, "
+       "nothing else changed and its change record attached, which must be admitted, the arm red if the guard "
+       "refuses it, and red on a planted run's raise with no change record and on a planted run's lowering, each "
+       "refused (the owner's FK-7-1, the closing pair's guard-no-positive-arm and change-record-undefined)",
+       "guard-no-positive-arm, change-record-undefined: cl-0087")
+V2.sub("argued in the write's change record (DA-L6, the owner's FK-7-1 and FK-9-2)",
+       "argued in the write's change record as cl-0012 defines it (DA-L6, the owner's FK-7-1 and "
+       "FK-9-2, the closing pair's change-record-undefined)",
+       "change-record-undefined: cl-0036")
+
+# ===================================================================================== door-misses-coordination-verbs, close-path-writes-refused
+MP.sub("dTotalRecall's registry writes registry rows; the coordination verbs write refs, claims, leases and mail; the\n",
+       "dTotalRecall's registry writes registry rows; the coordination verbs write refs, claims, leases and mail,\n"
+       "through `record`'s door once dTotalRecall lands it, which binds each such write to its writer\n"
+       "(`cl-dClosedLoop-0505`), and straight to the remote before it (the closing pair's\n"
+       "door-misses-coordination-verbs); the\n",
+       "door-misses-coordination-verbs: memory-plan [doors]")
+LM.sub("| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a "
+       "terminal tombstone and never deleting the ref (P40); writer item not named |",
+       "| lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a "
+       "terminal tombstone and never deleting the ref (P40); writer item not named: the coordination verbs, which are "
+       "no item, write it, through `record`'s door once dTotalRecall lands it (`cl-dClosedLoop-0505`) |",
+       "door-misses-coordination-verbs: layer-memory's lease row")
+LM.sub("| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not "
+       "named: the coordination verbs, which are no item, write it |",
+       "| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not "
+       "named: the coordination verbs, which are no item, write it, through `record`'s door once dTotalRecall lands "
+       "it (`cl-dClosedLoop-0505`) |",
+       "door-misses-coordination-verbs: layer-memory's mailbox row")
+V2.sub("written only through the coordination verbs, read at every transition,",
+       "written only through the coordination verbs, which pass the record door once dTotalRecall lands it and write "
+       "the ref directly until then (the closing pair's door-misses-coordination-verbs), read at every transition,",
+       "door-misses-coordination-verbs: cl-0143's mailbox")
+V2.sub("the record door binding each coordination write to its writer: a mail, lease or tombstone write whose ref path "
+       "or sender names a session, act or fleet tag other than the writer's own session binding (layer-runtime "
+       "`[act]`) refused, and a terminal tombstone admitted only from the lease's holder or the take-over verb, seen "
+       "red on a planted cross-session mail write and on a forged tombstone,",
+       "the record door, through which the coordination verbs write refs, claims, leases and mail (memory-plan "
+       "`[doors]`), binding each coordination write to its writer: a mail, lease or tombstone write whose ref path "
+       "or sender names a session, act or fleet tag other than the writer's own session binding (layer-runtime "
+       "`[act]`) refused, a terminal tombstone admitted only from the lease's holder, the take-over verb, or the "
+       "unlease commands `deploy.unlease` and `life.unlease` acting under the build lease, a unit lease an act on "
+       "another node still holds when `life.quiesce` ends on `runtime.act-ceiling` among them, and a delete of a ref "
+       "under the build's own `refs/gov/mail/<slug>/` admitted only from that build's closing verbs, "
+       "`deploy.unlease`, `life.unlease` for a withdrawal or supersession (cl-0281) and, once "
+       "dTendedCadence lands it, Maintain's prune, only after the copy into the build folder and only under the "
+       "build's lease, as its holder, through the take-over verb or as the owner's guarded command, `life.unlease` "
+       "alone closing a build until dShippedRelease lands `deploy.unlease`, a landing ending at the lander until "
+       "then, seen admitted on a planted closing build holding a cross-session mail ref and closed by each verb and "
+       "on a planted withdrawal that unleases a unit held on another node, and seen red on a planted cross-session "
+       "mail write and on a forged tombstone, each made through the `gov` coordination verbs and never at the door "
+       "itself, on a planted prune by a session holding no lease and on a planted delete of another build's mailbox,",
+       "door-misses-coordination-verbs, close-path-writes-refused: cl-0505")
+V2.sub("(the owner's FK-5-3, the whole-design audit's A2-F10) `cl-dClosedLoop-0505`",
+       "(the owner's FK-5-3, the whole-design audit's A2-F10, the closing pair's door-misses-coordination-verbs and "
+       "close-path-writes-refused) `cl-dClosedLoop-0505`",
+       "close-path-writes-refused: cl-0505's sources")
+FS.sub("are marked so in that copy. Only then is the ref pruned, and a missing ref counts as done.",
+       "are marked so in that copy. Only then is the ref pruned, and a missing ref counts as done. The record door\n"
+       "  admits that delete from the build's closing verbs alone, under its lease (`cl-dClosedLoop-0505`).",
+       "close-path-writes-refused: the mailbox close names the admitted writers")
+
+RC.insert_before(
+    "| dWitnessedBar | routes | `build.fix-pass` |",
+    "| dWellOiledMachine | cites | `deploy.unlease` | dShippedRelease | tolerance | cl-dClosedLoop-0505 admits "
+    "`deploy.unlease`'s terminal tombstones and mailbox close once dShippedRelease lands it, a landing ending at the "
+    "lander, `push-main.sh`, until then, which writes neither, so `life.unlease` alone closes a build (flow-steps "
+    "[rules]' stand-in, the closing pair's close-path-writes-refused) |\n",
+    "close-path-writes-refused: cl-0505's cite of deploy.unlease classed")
+
+# ===================================================================================== dedupe-patch-no-transition
+FS.insert_before(
+    "| none | a placement disposition `repeat`, from any of the three,",
+    "| none | a `patch` whose `plan.dedupe` finds a duplicate or an overlap, re-placed: continue, or amend or patch onto "
+    "the matched build | merged | the placement disposition, the dupes record and the claim ref, the patch's lease "
+    "released |\n"
+    "| none | a `patch` whose `plan.dedupe` finds a duplicate or an overlap, re-placed: ask | deferred | the placement "
+    "disposition, the dupes record, the filed ask and the claim ref, the patch's lease released |\n"
+    "| none | a `patch` whose `plan.dedupe` finds a duplicate or an overlap, re-placed: none | answered | the "
+    "placement disposition, the dupes record and the claim ref, the patch's lease released |\n",
+    "dedupe-patch-no-transition: three none rows for a re-placed patch")
+
+# ===================================================================================== patch-route-skips-dedupe
+FS.sub("patch → `entry.claim`, then Design as a patch build;",
+       "patch → `entry.claim`, then `plan.dedupe`, then Design as a patch build;",
+       "patch-route-skips-dedupe: entry.place's patch arm")
+LE.sub("filed → `entry.place`, which places it as a patch, and `entry.claim`, which claims its slug and takes its "
+       "lease, then Design, as `patch.ratify` says;",
+       "filed → `entry.place`, which places it as a patch, then `entry.claim`, which claims its slug and takes its "
+       "lease, then `plan.dedupe`, then Design, as `patch.ratify` says;",
+       "patch-route-skips-dedupe: maintain.patch's Routes")
+FL.sub("| as above, its intake filed by Maintain's run, placed by `entry.place` and claimed by `entry.claim` |",
+       "| as above, its intake filed by Maintain's run, placed by `entry.place`, then `entry.claim`, then "
+       "`plan.dedupe`, then Design |",
+       "patch-route-skips-dedupe: flow.md's Maintain row")
+FL.sub("placed by `entry.place` and claimed by `entry.claim`, then a micro-spec; a failed verify",
+       "placed by `entry.place`, then `entry.claim`, then `plan.dedupe`, then a micro-spec at Design; a failed verify",
+       "patch-route-skips-dedupe: flow.md's post-close row")
+
+# ===================================================================================== flakes-measured-no-writer (the owner's answer)
+V2.sub("`measured` holds a leg at 2 flakes in its last 10 verdicts until the flake records measure the legs' rates, "
+       "then at a threshold set from that evidence (P39)",
+       "`measured` holds a leg at 2 flakes in its last 10 verdicts until every leg of the bar has 30 verdicts in the "
+       "flake records, then at the threshold dWitnessedBar's gate health derives from them by the rule "
+       "`cl-dClosedLoop-0339` states and writes to the gate-health record, which `test.flakes` reads (P39, the "
+       "closing pair's flakes-measured-no-writer, the owner's answer)",
+       "flakes-measured-no-writer: the verdict.flakes.entry row")
+V2.sub("gate health measured and the reliability bar `cl-dClosedLoop-0339`",
+       "gate health measured and the reliability bar, with `verdict.flakes.entry`'s `measured` threshold derived "
+       "from the flake records once every leg of the bar has 30 verdicts there: one more than the 90th percentile, "
+       "across the bar's legs, of each leg's flakes in its last ten verdicts, re-derived at each gate-health "
+       "measurement and written to the gate-health record with the verdicts it came from, which `test.flakes` reads, "
+       "2 in 10 holding until the record holds one, seen on a planted bar whose measured threshold differs from 2 in "
+       "10, a leg held at the measured threshold and not at 2 in 10, and red on a planted `test.flakes` that holds at "
+       "2 in 10 once the record holds a measured threshold (the closing pair's flakes-measured-no-writer, the owner's "
+       "answer) `cl-dClosedLoop-0339`",
+       "flakes-measured-no-writer: cl-0339 derives and writes the threshold")
+V2.sub("two in its last ten until the flake records measure it,",
+       "two in its last ten until the gate-health record holds the measured threshold cl-0339 derives, "
+       "and that threshold after,",
+       "flakes-measured-no-writer: cl-0346 reads it")
+LM.sub("the hold's own entry threshold\n    being `verdict.flakes.entry` (the owner's FK-4-11),",
+       "the hold's own entry threshold\n    being `verdict.flakes.entry` (the owner's FK-4-11), under `measured` the "
+       "threshold dWitnessedBar's gate health writes\n    to the gate-health record, 2 in 10 until it writes one "
+       "(`cl-dClosedLoop-0339`),",
+       "flakes-measured-no-writer: layer-memory's held-leg acceptance")
+FS.sub("under `quarantine`, a leg whose flakes reach `verdict.flakes.entry` in its window of verdicts is held,",
+       "under `quarantine`, a leg whose flakes reach `verdict.flakes.entry` in its window of verdicts is held, under "
+       "`measured` the threshold the gate-health record holds, 2 in 10 until it holds one (`cl-dClosedLoop-0339`),",
+       "flakes-measured-no-writer: test.flakes reads the record")
+
+# ===================================================================================== budgets-namespace-stale
+OW.sub("The 78 keys that nothing names take their namespace's owner:\n\n| Namespace | Owner | Keys | The owner's row says |\n"
+       "| --- | --- | --- | --- |\n| `budgets` | dCalibratedLens | 1 | caps re-derived from evidence and review cost |",
+       "The 77 keys that nothing names take their namespace's owner (78 until FK-1-3 gave `budgets.*` its own row):\n\n"
+       "| Namespace | Owner | Keys | The owner's row says |\n| --- | --- | --- | --- |\n"
+       "| `budgets` | dGroundRules | 0 | the one switch every gate enforcing a size cap reads; `budgets.*` has its own "
+       "row since FK-1-3, so no key takes this namespace's owner |",
+       "budgets-namespace-stale: the namespace row and the lead-in")
+OW.sub("`kits.install-attended` and `kits.update-attended` join dShippedRelease (FK-5-1). The rows above carry the\n"
+       "  moves.",
+       "`kits.install-attended` and `kits.update-attended` join dShippedRelease (FK-5-1). The rows above carry the\n"
+       "  moves.\n"
+       "- **The closing pair's fold, 2026-10-20** (" + CMP + "): `[namespaces]`' `budgets` row follows\n"
+       "  FK-1-3, its owner dGroundRules and its count 0, so the lead-in counts 77 keys (budgets-namespace-stale). The\n"
+       "  instrument below keeps the table as it ran.",
+       "budgets-namespace-stale: the [amended] note")
+
+# ===================================================================================== silence-loosening-two-copies
+FS.sub("- under `run.on-owner-silence: apply-recommendation`, the item's recommended option applied past the deadline\n"
+       "  and recorded with it, never for a ratification, an owner-only write or a loosening (the parked debt's review).",
+       "- under `run.on-owner-silence: apply-recommendation`, the item's recommended option applied past the deadline\n"
+       "  and recorded with it, a loosening's recommendation being the decline, never for a ratification or an\n"
+       "  owner-only write, as v2's catalogue row says (the parked debt's review, the closing pair's\n"
+       "  silence-loosening-two-copies).",
+       "silence-loosening-two-copies: flow-steps follows the catalogue")
+V2.sub("seen red on a planted silent owner under each value of `run.on-owner-silence`,",
+       "seen on a planted loosening approval left silent past the deadline, its decline recorded with the deadline "
+       "as its witness, and seen red on a planted silent owner under each value of `run.on-owner-silence`,",
+       "silence-loosening-two-copies: cl-0326 plants the silent loosening")
+
+# ===================================================================================== fates-runaway-ceiling-stale, fates-fleet-register
+FT.sub("| MERGED | the loop kit's definition, moved in the unit that retires `REVIEW_ROUNDS` (dDeclaredLoop) | v2 `[chain]` "
+       "dDeclaredLoop; the shape audit, run A's M22 and run B's M5 |",
+       "| MERGED | the policy key `review.max-rounds` (dDeclaredLoop), `unattended.sh` and `check-unattended.sh` "
+       "re-pointed in the unit that retires `REVIEW_ROUNDS` | v2 `[chain]` dDeclaredLoop, `cl-dClosedLoop-0106` and "
+       "C2-F3; the shape audit, run A's M22 and run B's M5 |",
+       "fates-runaway-ceiling-stale: fates' RUNAWAY_CEILING row")
+FT.sub("| RESHAPED | the fleet register (dShippedRelease) |",
+       "| RESHAPED | the adopter register (dShippedRelease), its rows read by `kits.adopters` |",
+       "fates-fleet-register: fates' adopters.toml row")
+
+# ===================================================================================== stage0-red-unreported: the design's reds
+V2.sub("overlap warned or refused, fleet identity",
+       "an overlap at `leases.overlap`'s granularity warned or refused as `leases` says, the reading flow-steps "
+       "`[rules]` routes, fleet identity",
+       "stage0-red-unreported: cl-0120 reads leases.overlap")
+V2.sub("kit release notes, generated from the landing records and version deltas since the previous tag,",
+       "kit release notes, generated at each tag `kits.cut` cuts as `kits.cadence` says, each value seen on its "
+       "planted case, from the landing records and version deltas since the previous tag,",
+       "stage0-red-unreported: cl-0414 reads kits.cadence")
+V2.sub("into an attended session only as `runtime.attended-judge` says (RT-4),",
+       "into an attended session only as `runtime.attended-judge` says, its `allowance` value approving only a call "
+       "inside `runtime.attended-allowance`, a planted call outside it going to the person (RT-4),",
+       "stage0-red-unreported: cl-0288 reads runtime.attended-allowance")
+
+# ===================================================================================== the revision notes
+V2.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review",
+    "Revised 2026-10-20 by the audit's closing pair's fold (" + CMP + ", " + BRIEF + "):\n"
+    "closed-root-draw-pruned, stage0-red-unreported, guard-no-positive-arm, change-record-undefined,\n"
+    "door-misses-coordination-verbs, close-path-writes-refused, flakes-measured-no-writer,\n"
+    "silence-loosening-two-copies and answer-dispatch-non-ancestor. Only a run claim's\n"
+    "terminal tombstone is pruned, so a draw on a closed root always finds the root's tombstone (cl-0134, cl-0440, the\n"
+    "`leases.queued-claim-days` row). cl-0012's change record is today's rule, the RAISED argument and a decision row\n"
+    "in one commit, until dOrderedCharter's change-record kind re-points it, and cl-0012 and cl-0087 plant the admitted\n"
+    "raise green beside each refused shape. The coordination verbs write through the record door once dTotalRecall\n"
+    "lands it (cl-0143, cl-0505), and cl-0505 admits the close path's own tombstones and mailbox deletes and plants\n"
+    "through the verbs. dWitnessedBar's gate health derives `measured`'s threshold and writes it to the gate-health\n"
+    "record, which `test.flakes` reads (the owner's answer, cl-0339, cl-0346, the `verdict.flakes.entry` row). A silent\n"
+    "loosening's decline is planted (cl-0326). Until dWellOiledMachine lands `next`, an unattended build's question is\n"
+    "answered by the asker's default (cl-0504). cl-0120, cl-0288 and cl-0414 read `leases.overlap`,\n"
+    "`runtime.attended-allowance` and `kits.cadence`. No clause is new.\n\n",
+    "the revision paragraph in v2")
+FS.text = FS.text.rstrip("\n") + (
+    "\n\n**Revised 2026-10-20 by the closing pair's fold** (" + CMP + "). `build.unit-lease` needs\n"
+    "`build.base` alone and waits in its Does cell for the units its spec declares as dependencies, so Stage 0 reads\n"
+    "no Needs cycle and disjoint units start in parallel. `[rules]` names the owning role as one actor, and a command\n"
+    "with no tool today as unarmed. `mailbox.answer`'s targets take declared forms and its stand-in before `next` is\n"
+    "the asker's default. A patch goes from its claim through `plan.dedupe` to Design, and `[transitions]` gains its\n"
+    "three re-placement rows. The silence rule's loosening copy follows v2's catalogue. `review.dispose` and\n"
+    "`life.quiesce` name no stage in prose, and `test.flakes` reads the measured threshold from the gate-health record.\n")
+FS.done += 1
+RC.insert_before(
+    "\n\nThe critical path, its instrument and its runs:",
+    "\n\nRevised 2026-10-20 by the closing pair's fold (" + CMP + "): each row names its rule, and the\n"
+    "rows two rules needed are worded for each (reconcile-key-no-rule). Each route into a command names its real\n"
+    "stand-in: today's tool by its path, a clause's fixture witness, or `unarmed`, as FK-4-8's row reads\n"
+    "(tolerance-rows-unnamed-tool). dDeclaredLoop's `build.base` row and dWellOiledMachine's `deploy.current` row went\n"
+    "with the prose that made their edges (prose-stage-words-as-routes). dWellOiledMachine's cite of `deploy.unlease`\n"
+    "names `life.unlease` as its stand-in (close-path-writes-refused). `next` is a command, which the probe does not read as a node, so cl-0504 states its\n"
+    "stand-in in the clause and no row classes it (answer-dispatch-non-ancestor).",
+    "the re-cut's revision note")
+LM.insert_before(
+    "\n\n**One refinement to layers round one,**",
+    "\n\nRevised 2026-10-20 by the closing pair's fold: the lease and mailbox rows name the coordination verbs, which\n"
+    "write through `record`'s door once dTotalRecall lands it (door-misses-coordination-verbs), and a held leg's entry\n"
+    "threshold under `measured` is the one the gate-health record holds (flakes-measured-no-writer).",
+    "layer-memory's revision note")
+LR.text = LR.text.rstrip("\n") + (
+    "\n\nRevised 2026-10-20 by the closing pair's fold (" + CMP + "): the supervisor prunes only a\n"
+    "run claim's terminal tombstone, never a build's or unit's, which a patch build's draw on a closed root acquires\n"
+    "(closed-root-draw-pruned).\n")
+LR.done += 1
+LE.insert_before(
+    "\n\n## [open] What the expansion round owes",
+    "\n\n**Revised 2026-10-20 by the closing pair's fold** (" + CMP + "). `maintain.patch`\n"
+    "routes its patch from `entry.claim` through `plan.dedupe` to Design, as every patch goes (patch-route-skips-dedupe).",
+    "layer-expansions' revision note")
+FL.sub("and claim, as every patch does.\n",
+       "and claim, as every patch does. Revised 2026-10-20 by the closing pair's fold (patch-route-skips-dedupe): both\n"
+       "rows go on from the claim through `plan.dedupe` to Design.\n",
+       "flow.md's revision note")
+
+for rec in (V2, FS, RC, LR, LM, MP, LE, FL, OW, FT):
+    rec.save()
+````
+
+### `stage0_classes.py`
+
+The five K2 classes writer 10 asked for, copied whole from its return and checked against Stage 0's closed sets.
+
+````python
+"""The round record's `[stage0-classes]` takes the classes the closing pair's fold asked for: the rows of writer 10's
+saved return, `## 4. Requests`, copied whole, each checked against Stage 0's closed set for its arm. The section's
+lead line, which said the table was empty until the audit's fold classed what it does not fix, now says where its rows
+come from. Refuses a class outside its arm's set, or a second run.
+
+Usage: python -X utf8 stage0_classes.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+ROUND = B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"
+RET = B / "2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w10.md"
+S0 = (B / "2026-10-19-build-PLAY-dClosedLoop-1-stage0.py").read_text(encoding="utf-8")
+sets = {arm: set(re.findall(r'"([^"]+)"', body))
+        for arm, body in re.findall(r'"(K\d)": (\{[^}]*\}|set\(\))', S0.split("CLASSES = {", 1)[1].split("\n}", 1)[0])}
+req = RET.read_text(encoding="utf-8").split("## 4. Requests", 1)[1].split("\n## ", 1)[0]
+rows = [ln for ln in req.split("\n") if re.match(r"^\| K\d \| `", ln)]
+for ln in rows:
+    arm, _, cls = [c.strip() for c in ln.strip().strip("|").split("|")][:3]
+    if cls not in sets.get(arm, set()):
+        sys.exit(f"stage0_classes: {cls!r} is outside {arm}'s closed set {sorted(sets.get(arm, set()))}")
+t = ROUND.read_text(encoding="utf-8")
+LEAD = "Empty until the audit's fold classes what it does not fix."
+HEAD = "| Arm | Node | Class | Reason |\n|---|---|---|---|\n"
+if t.count(LEAD) != 1 or t.count(HEAD) != 1:
+    sys.exit("stage0_classes: the section is not as the audit's fold left it")
+t = t.replace(LEAD, "Each row is a red the design keeps, classed from its arm's closed set by the closing pair's fold "
+                    "(`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w10.md`, its requests).")
+t = t.replace(HEAD, HEAD + "\n".join(rows) + "\n")
+ROUND.write_text(t, encoding="utf-8", newline="\n")
+print(f"stage0_classes: {len(rows)} rows classed")
+````
+
+### `run_probe_plants.py`
+
+The probe's plants for the closing pair's four rows, before on a pinned ef94fefba tree and after on the folded tree, each checked.
+
+````python
+"""The reconciliation probe's plants for the audit's closing pair's four rows, run and captured whole into
+probe-plants.out beside this script, each with its command, the lines it is about and its exit code. A before run uses
+the probe as it stood at PIN (`reconcile.before-closing.py`) inside an archive of the tree at PIN; an after run uses the
+working tree's probe on the working tree. Each run must print, or must not print, the line it is for, or this refuses.
+
+Usage: python -X utf8 run_probe_plants.py   (from the worktree root, after the closing fold is applied)
+"""
+import io
+import pathlib
+import subprocess
+import sys
+import tarfile
+
+HERE = pathlib.Path(__file__).resolve().parent
+PIN = "ef94fefba"
+PINNED = HERE / f"pinned-{PIN}"
+B = "memory/builds/dClosedLoop/build/"
+PROBE, RECUT = B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py", B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md"
+
+
+def pinned():
+    if not (PINNED / ".extracted").is_file():
+        r = subprocess.run(["git", "archive", "--format=tar", PIN], capture_output=True, check=True)
+        with tarfile.open(fileobj=io.BytesIO(r.stdout)) as tf:
+            tf.extractall(PINNED, filter="data")
+        (PINNED / ".extracted").write_text(PIN + "\n", encoding="utf-8")
+    return PINNED
+
+
+def run(when, plants, about, want_present):
+    if when == "before":
+        args, cwd = [sys.executable, "-X", "utf8", str(HERE / "reconcile.before-closing.py"), RECUT], pinned()
+    else:
+        args, cwd = [sys.executable, "-X", "utf8", PROBE, RECUT], None
+    r = subprocess.run(args + plants, capture_output=True, text=True, encoding="utf-8", cwd=cwd)
+    lines = [l for l in r.stdout.splitlines() if about in l]
+    if bool(lines) != want_present:
+        sys.exit(f"run_probe_plants: {when} {' '.join(plants)}: '{about}' {'missing' if want_present else 'present'}")
+    shown = lines or [f"(no line naming {about})"]
+    findings = [l for l in r.stdout.splitlines() if l.startswith("findings")]
+    return (f"$ python reconcile.py recut.md {' '.join(plants)}   # {when}\n" + "\n".join(shown) + "\n"
+            + "\n".join(findings) + f"\nrc {r.returncode}")
+
+
+ITEM = "--plant-item"
+runs = [
+    # reconcile-key-no-rule: a cites dependency whose pair keeps only its routes row is unclassed.
+    run("after", ["--plant-drop", "dFairHearing:review.trigger:cites"], "cites `review.trigger`", True),
+    # policy-prefix-unread: a key read as `policy.<key>` is a read.
+    run("before", [ITEM, "plan.planted:plan:dRankedPlan:reads `policy.deploy.currency`"], "reads `deploy.currency`", False),
+    run("after", [ITEM, "plan.planted:plan:dRankedPlan:reads `policy.deploy.currency`"], "reads `deploy.currency`", True),
+    # prose-stage-words-as-routes: a stage word with no arrow before it is prose; after an arrow it is a route.
+    run("before", [ITEM, "plan.prose:plan:dTrueNorth:waits while the Plan step runs"], "dTrueNorth routes `plan.input`", True),
+    run("after", [ITEM, "plan.prose:plan:dTrueNorth:waits while the Plan step runs"], "dTrueNorth routes `plan.input`", False),
+    run("after", [ITEM, "plan.arrow:plan:dTrueNorth:fails → a fix unit through Design"], "dTrueNorth routes `design.input`",
+        True),
+    # tolerance-rows-unnamed-tool: a route row whose reason says today's tool and names no path reds.
+    run("after", ["--plant-why", "dWellOiledMachine:deploy.released=today's tool"], "names no stand-in", True),
+]
+(HERE / "probe-plants.out").write_text("\n\n".join(runs) + "\n", encoding="utf-8", newline="\n")
+print(f"run_probe_plants: {len(runs)} runs, each as wanted")
+````
+
+### `record_closing_folded.py`
+
+The comparison record's [folded], the round record's two amended passages and the session-log event, every count read from a run.
+
+````python
+"""Record the closing pair's fold. Every count, line and answer is read from a saved return, a captured run or the
+answers file, never typed.
+- The comparison record gains `[folded]`: the owner's two answers verbatim; the main loop's parts, which are the
+  instruments, the Rule column and the classes; writer 10's dispositions, copied whole; and Stage 0's run on the
+  folded tree.
+- The round record's two passages the pair found untrue are amended in place. `[stage0]` now says what the folds did
+  with Stage 0's reds. `[fold-applied]`'s checks bullet now says Stage 0 was not among the ten.
+- The session log gains one event.
+
+Usage: python -X utf8 record_closing_folded.py   (from the worktree root, after the closing fold is applied)
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+answers = (HERE.parent / "fold" / "fork-answers.md").read_text(encoding="utf-8")
+pairs = re.findall(r'"(.*?)"="(.*?)"(?=, "|\s*$)', answers.split("\nbatch 13", 1)[1], flags=re.M)
+if len(pairs) != 2:
+    sys.exit(f"record_closing_folded: {len(pairs)} answers after batch 13, want 2")
+ret = (B / "2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w10.md").read_text(encoding="utf-8")
+disp = ret.split("## 1. Dispositions", 1)[1].split("\n## ", 1)[0].strip()
+s0 = (HERE / "stage0-after.out").read_text(encoding="utf-8")
+s0_lines = [l for l in s0.splitlines() if l.startswith(("K1:", "K2:", "K3:", "K4:", "K5:", "stage0:"))]
+last = re.search(r"findings (\d+) · classed (\d+)", s0_lines[-1])
+if len(s0_lines) != 6 or not last:
+    sys.exit("record_closing_folded: stage0-after.out holds no full run")
+answer_rows = "\n".join(f"- {q.split(':')[0]}: \"{q.split(':', 1)[1].strip()}\" — \"{a}\"" for q, a in pairs)
+section = f"""## [folded] Every defect folded, 2026-10-20
+
+The owner's answers, verbatim from the question tool:
+
+{answer_rows}
+
+- **The main loop's parts.**
+  - **The probe.** reconcile.py keys class rows by (rule, build, node), reads a key spelled `policy.<key>`, counts a
+    stage word as a route only after its branch's arrow, reds a tolerance row naming "today's tool" with no path that
+    exists, and its docstring says what rule 3 reads. Each rule is seen red in the instruments record's
+    `[closing-probe]`.
+  - **Stage 0.** Its K1 reads the owning-role actor, and the plant `k1-owning-role` reds any other undeclared opening.
+  - **The Rule column.** It is derived by `rule_column.py` from the probe's own dependency lines.
+  - **The classes.** The five K2 entries writer 10 asked for are classed in the round record's `[stage0-classes]`.
+- **Writer 10's fold**, its dispositions copied whole from its return (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w10.md`):
+
+{disp}
+
+- **Stage 0 on the folded tree** reads as follows. K1 and K5 are clean, and the {last.group(1)} findings left are the
+  leads for plan step 3's "Stage 0 again".
+
+```text
+{chr(10).join(s0_lines)}
+```
+"""
+C = Record(str(B / "2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md"))
+if "## [folded]" in C.text:
+    sys.exit("record_closing_folded: [folded] is written already")
+C.text = C.text.rstrip("\n") + "\n\n" + section
+C.save()
+R = Record(str(B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"))
+R.sub("and a row no finding needs is itself a finding. The audit's fold fixes each red or classes it there; the walk takes\n"
+      "the reds and each arm's \"left out\" lines as its leads.",
+      "and a row no finding needs is itself a finding. The walk took the reds and each arm's \"left out\" lines as its leads.\n"
+      "The audit's fold and its closing pair's fold fixed the reds their findings named, and classed what fits an arm's\n"
+      f"set; Stage 0 on the folded tree still finds {last.group(1)}, classed {last.group(2)}, the leads of plan step 3's "
+      "\"Stage 0 again\"\n(the closing pair's comparison record, `[folded]`).",
+      "[stage0]")
+R.sub("  `ALL rc 0`.\n\n## [stage0-classes]",
+      "  `ALL rc 0`. Stage 0 is not among the ten, and was red then: the closing pair found the omission, and its fold\n"
+      "  records Stage 0's run (the comparison record's `[folded]`).\n\n## [stage0-classes]",
+      "[fold-applied] checks")
+R.save()
+L = Record(str(B / "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md"))
+L.insert_before("## Instruments\n",
+                f"- 2026-10-20, session 1799cb98: the audit's closing pair compared and folded. Writer 10 folded the\n"
+                f"  confirmed defects, and the owner answered its two questions. The probe now keys class rows by rule.\n"
+                f"  Stage 0 on the folded tree finds {last.group(1)}, classed {last.group(2)}\n"
+                f"  (`audit-closing-reviews-compared.md` `[folded]`).\n\n", "event")
+L.save()
+print(f"record_closing_folded: [folded] written; Stage 0 {last.group(1)} findings, {last.group(2)} classed")
+````
+
+### `prep_recorder_closing.py`
+
+This recorder's [final] Stage 0 line, recorded and not refused, its [stage0] wording, and its [closing-probe] section.
+
+````python
+"""The instruments recorder after the audit's closing pair (2026-10-20, the comparison record's `stage0-red-unreported`
+and the probe's four fold rows):
+- `[final]` also runs Stage 0, all five arms, and records its real result, rc and per-arm counts, without refusing
+  it, since Stage 0 stays red until its leads are fixed or classed; the nine checks before it still refuse a red;
+- the `[stage0]` section's run on the tree is named for what it is, the run as the record is written;
+- a `[closing-probe]` section holds the probe's plants for the closing pair's four rows, each run as captured, with its
+  exit code.
+Each insertion must match once, and a second run refuses.
+
+Usage: python -X utf8 prep_recorder_closing.py
+"""
+import pathlib
+import sys
+
+S = pathlib.Path(__file__).resolve().parent.parent
+R = S / "night/record_instruments.py"
+t = R.read_text(encoding="utf-8")
+if "[closing-probe]" in t:
+    sys.exit("prep_recorder_closing: the recorder carries [closing-probe] already")
+EDITS = [
+    ("The first run on the real tree, the audit's first leads, whole:",
+     "Stage 0 on the tree as this record is written, whole (the first run's leads are in the round record's `[stage0]`):"),
+    ("""        final.append(f"$ {label}\\n{out}\\nrc {rc}")
+    return final""",
+     """        final.append(f"$ {label}\\n{out}\\nrc {rc}")
+    # Stage 0, all five arms: recorded as it is, never refused, since it stays red until its leads are fixed or classed
+    # (the closing pair's stage0-red-unreported).
+    s0, s0_rc = run(STAGE0)
+    s0_lines = [l for l in s0.split("\\n") if l.startswith(("K1:", "K2:", "K3:", "K4:", "K5:", "stage0:"))]
+    final.append("$ stage0, all five arms, recorded and not refused\\n" + "\\n".join(s0_lines) + f"\\nrc {s0_rc}")
+    return final"""),
+    ('kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))\n',
+     '''parts.append("""
+## [closing-probe] The probe's four rows from the audit's closing pair, each seen red
+
+The comparison record's `[fold]` (`2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md`) changed the
+reconciliation probe: class rows keyed by their rule (`reconcile-key-no-rule`), a key read as `policy.<key>`
+(`policy-prefix-unread`), a stage word read as a route only after its branch's arrow (`prose-stage-words-as-routes`),
+and a tolerance row naming "today's tool" with no path that exists reds (`tolerance-rows-unnamed-tool`). Each plant
+below ran on the folded tree; the before runs used the probe as it stood at `ef94fefba` on that commit's tree.
+
+""" + block("text", read(S / "closing/probe-plants.out")))
+kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))
+'''),
+]
+for old, new in EDITS:
+    n = t.count(old)
+    if n != 1:
+        sys.exit(f"prep_recorder_closing: {old[:60]!r} matches {n} times")
+    t = t.replace(old, new)
+R.write_text(t, encoding="utf-8", newline="\n")
+print(f"prep_recorder_closing: {len(EDITS)} edits to {R.name}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -31326,6 +32647,19 @@ MINE = [
     ('walkkit/pin_walk_cases.py', "The walk kit's walk-check cases pinned to the tree before the fold, whose items their fixtures were written for: on the folded tree the clean fixtures red and drop-cell reds on 25 rows, not its own one."),
     ('walkkit/pin_walk_cases2.py', "The pinned tree extracted by git archive and tarfile, after bash from Python resolved to WSL's, which cannot read the worktree's git."),
     ('walkkit/tar_probe.py', "The probe that this node's Python extracts the pinned tree whole under the scratchpad: 5029 files, none missing, paths to 309 characters."),
+    ('closing/build_args_closing.py', "The closing pair's args: 8d21999a9 over 6ba4eaaa1, 32 specs, by-design notes, the gotchas checklist; runs A and B differ only in label, report path and scratch."),
+    ('closing/log_review.py', "The session log's rows for the closing pair's two Workflow runs, each outcome read from its report's verdict and review-shape line."),
+    ('closing/log_pair_agents.py', "The closing pair's agent lines, derived by handoff.py agents --run for both runs, written once into the session log."),
+    ('closing/mention_audit.py', "Where run B's transcripts mention run A's report: each mention's record type and whether it sits in a tool call or an injected attachment."),
+    ('closing/fill_summary.py', "The comparison record's [summary]: the synthesizer's placeholder replaced by compare_rounds.py's output as run."),
+    ('closing/patch_reconcile.py', 'The probe changed by the closing pair: rule-keyed class rows, the policy. spelling, stage words routed only after an arrow, the stand-in check, the docstring.'),
+    ('fold/rule_column.py', "The re-cut table's Rule column, derived from the probe's own dependency lines: a row per rule, rows no dependency needs dropped and listed."),
+    ('closing/patch_stage0.py', "Stage 0's K1 reads the owning-role actor, and the plant k1-owning-role reds any other undeclared opening."),
+    ('fold/w10/fold-10.py', "Fold writer 10's script: the closing pair's confirmed defects and the owner's flakes answers (fold-return-w10)."),
+    ('closing/stage0_classes.py', "The five K2 classes writer 10 asked for, copied whole from its return and checked against Stage 0's closed sets."),
+    ('closing/run_probe_plants.py', "The probe's plants for the closing pair's four rows, before on a pinned ef94fefba tree and after on the folded tree, each checked."),
+    ('closing/record_closing_folded.py', "The comparison record's [folded], the round record's two amended passages and the session-log event, every count read from a run."),
+    ('closing/prep_recorder_closing.py', "This recorder's [final] Stage 0 line, recorded and not refused, its [stage0] wording, and its [closing-probe] section."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -31555,7 +32889,7 @@ run reds (the plant `k2-deploy-land` above):
 
 """ + block("text", "$ python reconcile.py recut.md --plant-item 'plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`'\n"
             + "\n".join(reconcile_plant[0].strip().split("\n")[-1:]) + f"\nrc {reconcile_plant[1]}") + """
-The first run on the real tree, the audit's first leads, whole:
+Stage 0 on the tree as this record is written, whole (the first run's leads are in the round record's `[stage0]`):
 
 """ + block("text", "$ python stage0.py\n" + real.strip() + f"\nrc {real_rc}"))
 def probe_reading(rel, cmd, rc):
@@ -31585,6 +32919,16 @@ and, after writer 9's rows were applied, the widened probe with one route row dr
 After writer 9's rows, the widened run is green on the tree, as `[final]` shows.
 """)
 
+parts.append("""
+## [closing-probe] The probe's four rows from the audit's closing pair, each seen red
+
+The comparison record's `[fold]` (`2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md`) changed the
+reconciliation probe: class rows keyed by their rule (`reconcile-key-no-rule`), a key read as `policy.<key>`
+(`policy-prefix-unread`), a stage word read as a route only after its branch's arrow (`prose-stage-words-as-routes`),
+and a tolerance row naming "today's tool" with no path that exists reds (`tolerance-rows-unnamed-tool`). Each plant
+below ran on the folded tree; the before runs used the probe as it stood at `ef94fefba` on that commit's tree.
+
+""" + block("text", read(S / "closing/probe-plants.out")))
 kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))
 if kit_rc != 0:
     sys.exit("a walk-kit or instrument run did not go as wanted:\n" + kit_out[-800:])
@@ -31621,6 +32965,11 @@ def run_final():
         if rc != 0:
             sys.exit(f"{label} is red: {out[-400:]}")
         final.append(f"$ {label}\n{out}\nrc {rc}")
+    # Stage 0, all five arms: recorded as it is, never refused, since it stays red until its leads are fixed or classed
+    # (the closing pair's stage0-red-unreported).
+    s0, s0_rc = run(STAGE0)
+    s0_lines = [l for l in s0.split("\n") if l.startswith(("K1:", "K2:", "K3:", "K4:", "K5:", "stage0:"))]
+    final.append("$ stage0, all five arms, recorded and not refused\n" + "\n".join(s0_lines) + f"\nrc {s0_rc}")
     return final
 
 
@@ -31941,12 +33290,12 @@ seen red                 8  dTrueNorth (dWitnessedBar's), dGroundRules (dWitness
 witness                  7  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's) …
 census                   6  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dPlacedRequest (dLinkedLibrary's), dKeptSession (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 scope                    6  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dWellOiledMachine (dScopedBuild's), dCalibratedLens (dScopedBuild's)
+decision                 5  dTrueNorth (dLinkedLibrary's), dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
+commit                   5  dTrueNorth (dDeclaredLoop's), dGroundRules (dDeclaredLoop's), dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 fork                     5  dDeclaredLoop (dIndexedDesign's), dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
 act                      5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's)
-decision                 4  dTrueNorth (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
-commit                   4  dTrueNorth (dDeclaredLoop's), dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 release                  4  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
 baseline                 3  dTrueNorth (dLinkedLibrary's), dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
@@ -31979,7 +33328,7 @@ overlap                  1  dPlacedRequest (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
 currency                 1  dTendedCadence (dShippedRelease's)
-plain-word hits on a non-ancestor's record kind: 144, over 45 kinds
+plain-word hits on a non-ancestor's record kind: 146, over 45 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -32412,6 +33761,7 @@ k1-cycle         rc 1  RED for its reason
 k1-dash          rc 1  RED for its reason
 k1-owner         rc 1  RED for its reason
 k1-actor         rc 1  RED for its reason
+k1-owning-role   rc 1  RED for its reason
 k2-ghost         rc 1  RED for its reason
 k2-unformed      rc 1  RED for its reason
 k2-dead-end      rc 1  RED for its reason
@@ -32425,46 +33775,48 @@ k5-ghost         rc 1  RED for its reason
 k5-retired       rc 1  RED for its reason
 k5-cited         rc 1  RED for its reason
 class-stale      rc 1  RED for its reason
-plants 19, red for their reason 19
+plants 20, red for their reason 20
 
 $ python stage0.py --plant k1-witness
-stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-witness
+stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-witness
 $ python stage0.py --plant k1-ghost-need
-stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-ghost-need
+stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-ghost-need
 $ python stage0.py --plant k1-cycle
-stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-cycle
+stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-cycle
 $ python stage0.py --plant k1-dash
-stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-dash
+stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-dash
 $ python stage0.py --plant k1-owner
-stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-owner
+stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-owner
 $ python stage0.py --plant k1-actor
-stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-actor
+stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-actor
+$ python stage0.py --plant k1-owning-role
+stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-owning-role
 $ python stage0.py --plant k2-ghost
-stage0: arms K2 · findings 33 · classed 0 · reruns red 0 · plant k2-ghost
+stage0: arms K2 · findings 23 · classed 7 · reruns red 0 · plant k2-ghost
 $ python stage0.py --plant k2-unformed
-stage0: arms K2 · findings 32 · classed 0 · reruns red 0 · plant k2-unformed
+stage0: arms K2 · findings 22 · classed 7 · reruns red 0 · plant k2-unformed
 $ python stage0.py --plant k2-dead-end
-stage0: arms K2 · findings 33 · classed 0 · reruns red 0 · plant k2-dead-end
+stage0: arms K2 · findings 23 · classed 7 · reruns red 0 · plant k2-dead-end
 $ python stage0.py --plant k2-unreached
-stage0: arms K2 · findings 32 · classed 0 · reruns red 0 · plant k2-unreached
+stage0: arms K2 · findings 22 · classed 7 · reruns red 0 · plant k2-unreached
 $ python stage0.py --plant k2-deploy-land
-stage0: arms K2 · findings 32 · classed 0 · reruns red 0 · plant k2-deploy-land
+stage0: arms K2 · findings 22 · classed 7 · reruns red 0 · plant k2-deploy-land
 $ python stage0.py --plant k3-writer
-stage0: arms K3 · findings 77 · classed 0 · reruns red 0 · plant k3-writer
+stage0: arms K3 · findings 82 · classed 0 · reruns red 0 · plant k3-writer
 $ python stage0.py --plant k3-reader
-stage0: arms K3 · findings 77 · classed 0 · reruns red 0 · plant k3-reader
+stage0: arms K3 · findings 82 · classed 0 · reruns red 0 · plant k3-reader
 $ python stage0.py --plant k4-unread
-stage0: arms K4 · findings 5 · classed 0 · reruns red 0 · plant k4-unread
+stage0: arms K4 · findings 7 · classed 0 · reruns red 0 · plant k4-unread
 $ python stage0.py --plant k5-row
-stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-row
+stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-row
 $ python stage0.py --plant k5-ghost
-stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-ghost
+stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-ghost
 $ python stage0.py --plant k5-retired
-stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-retired
+stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-retired
 $ python stage0.py --plant k5-cited
-stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-cited
+stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-cited
 $ python stage0.py --plant class-stale
-stage0: arms K4 · findings 5 · classed 0 · reruns red 0 · plant class-stale
+stage0: arms K4 · findings 7 · classed 0 · reruns red 0 · plant class-stale
 ````
 
 The reconciliation probe's default run on a plan item planted with a route to `deploy.land`, which its `--all-routes`
@@ -32476,24 +33828,18 @@ findings 1
 rc 1
 ````
 
-The first run on the real tree, the audit's first leads, whole:
+Stage 0 on the tree as this record is written, whole (the first run's leads are in the round record's `[stage0]`):
 
 ````text
 $ python stage0.py
-K1: items 127 (98 flow, 29 expansion), roles 14 · findings 2
-  K1 mailbox.answer: actor 'the role that owns the asked interface or item' is no kind and no declared role
-  K1 build.unit-lease: a cycle among Needs: build.unit-lease > build.reuse-check > build.scope > build.acceptance > build.unit-pass > build.unit-lease
+K1: items 127 (98 flow, 29 expansion), roles 14 · findings 0
   left out: whether a witness is actor-typed (P2) and whether the outcome is the right one; a Needs cell's prose beyond its item tags
-K2: targets by form: ask 4, edge 186, owner 13, policy 4, program 7, return 23, terminal 56, wait 5; roots 14, reached 116, ending 125 · findings 31
+K2: targets by form: ask 4, edge 186, owner 13, policy 4, program 7, return 24, terminal 58, wait 5; roots 14, reached 116, ending 126 · findings 21 · classed 7
   K2 entry.place: a target in no declared form: "an amendment that re-enters the item it answers, drawing on `flow.rework-budget` (`[breakp"
-  K2 mailbox.answer: a target in no declared form: "the `answer` posted to the asker's mailbox"
-  K2 mailbox.answer: a target in no declared form: "the asker's declared default answers it (`cl-dClosedLoop-0162`)"
   K2 plan.exit: a target in no declared form: "the card is re-rendered and the executor launched where `run.host` says"
   K2 design.overlaps: a target in no declared form: "as under `warn`"
   K2 life.quiesce: a target in no declared form: "paused"
   K2 adopt.decisions: a target in no declared form: "the rubric revised and the candidates rated again, within `flow.route-backs` (`cl-dClosedL"
-  K2 adopt.instructions: a target in no declared form: "the unit, the amendment or the drop written"
-  K2 adopt.declarations: a target in no declared form: "the overlay row written"
   K2 loop.file: a target in no declared form: "a kept row's disposition is a keep record, keyed by (ledger kind, id, date), so each keep,"
   K2 release.record: a target in no declared form: "the release slot's exit record for the SHA, with the outcome, E and this record's id"
   K2 kits.cut: a target in no declared form: "the disposition its witness, keyed by period, or under `owner-cut` by the span's tip SHA, "
@@ -32504,18 +33850,12 @@ K2: targets by form: ask 4, edge 186, owner 13, policy 4, program 7, return 23, 
   K2 kits.update: a target in no declared form: "reclaimed once its holder is dead, then the walk again (`cl-dClosedLoop-0019`)"
   K2 kits.update: a target in no declared form: "its slot renders not installed, the core render kept"
   K2 kits.offer: ends nowhere: every route it takes leads only to items that never end
-  K2 mailbox.answer: ends nowhere: every route it takes leads only to items that never end
-  K2 adopt.declarations: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 adopt.instructions: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.adopters: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.currency: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.cut: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.install: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 kits.install-attended: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.offer: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.update: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 kits.update-attended: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 mailbox.answer: reached from no entry: no reached item routes to it, and no item it needs is reached
   left out: whether a branch that ends by a terminal, return, wait, owner, ask, policy or program form does end (the walk's S6); a policy's routes per value; the [transitions] join gap-flow-15 owes; the conditions before each arrow
 K3: kinds 83, table rows 83 · findings 76
   K3 act: no writer item: "one act session per role act; act binding and the epoch check; writer item not n"
@@ -32595,18 +33935,15 @@ K3: kinds 83, table rows 83 · findings 76
   K3 work-order: no writer item: "the work order rendered per item; writer item not named"
   K3 work-order: no reader: no item waits on its writer or names it, and no clause of another build names it
   left out: a reader or writer that is a gate, a renderer or a hook rather than an item; a kind named in plain words other than '<kind> record'; whether a non-item writer is real
-K4: keys 267 · findings 4
-  K4 kits.cadence: read by no chain clause and no item
-  K4 leases.overlap: read by no chain clause and no item
+K4: keys 267 · findings 1
   K4 roles.shape-enforce: read by no chain clause and no item
-  K4 runtime.attended-allowance: read by no chain clause and no item (guard-bearing)
   left out: a key read in a layer or system record but built by no clause; whether an unread key is guard-bearing beyond its values' words
 K5: principles 42, clauses 509, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 66 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 67 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 234 records, 4134 sections, 217 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 237 records, 4211 sections, 217 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -32622,34 +33959,10 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 276 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 144 · lines 47726 · unreviewed 16573 (35%)
+  design records 149 · lines 48761 · unreviewed 0 (0%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 24
-    930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
-    590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
-    4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
-    0e5d54a79  2 design record(s)  records(dClosedLoop): the clause ids minted — cl-dClosedLoop-0001 to -0496, one per chain clause, and their ch
-    94f9607ca  3 design record(s)  records(dClosedLoop): the whole-design audit's Stage 0 — five checks over items, routes, kinds, keys and princ
-    1d5799a45  1 design record(s)  records(dClosedLoop): the audit's walk kit, its scorer and the instruments questions 2 and 3 rest on — each se
-    747a2af22  2 design record(s)  records(dClosedLoop): the audit's step 2 — the owner confirms v2's four open readings, and where deviation rec
-    47de3dc82  11 design record(s)  records(dClosedLoop): the whole-design walk dispatched — the sealed copy, Stage 0 on it and on the tree, and t
-    abbc8c76d  6 design record(s)  records(dClosedLoop): run B sealed tighter — the round record names no plant's kind, and its briefs forbid the
-    8b51f1f39  5 design record(s)  records(dClosedLoop): run B's four brief reviews answered — the seal is an allow-list and a read audit, and wa
-    69b111f9e  13 design record(s)  records(dClosedLoop): both walks whole — run B's walkers 1, 3, 4 and 5 walk at last, and the ten returns join 
-    cca97c487  13 design record(s)  records(dClosedLoop): run A's four skeptics returned, run B's sent, and run A's synthesis dispatched
-    4a93b33bd  5 design record(s)  records(dClosedLoop): run B's four skeptics returned, and run B's synthesis dispatched
-    bb68f583d  1 design record(s)  records(dClosedLoop): both walks scored — two BLOCKED reports, and the recall bar not met
-    e24afd0ec  7 design record(s)  records(dClosedLoop): the owner's word — run C, a clause walk, and a second skeptic on every refutation
-    ebf2e5fc7  2 design record(s)  records(dClosedLoop): the second looks at runs A's and B's refutations, dispatched
-    bf51d88ef  11 design record(s)  records(dClosedLoop): the second looks applied, run C's five clause walks back, and its skeptics dispatched
-    30be8f40e  5 design record(s)  records(dClosedLoop): run C's four skeptics returned, and run C's synthesis dispatched
-    8a81ed8c8  3 design record(s)  records(dClosedLoop): run C scored with runs A and B — the bar still not met, and the owner's word asked again
-    60b794f2b  6 design record(s)  records(dClosedLoop): the owner's word, "Fold, re-measure after" — the seal lifted and the recall read plant b
-    11c43418d  1 design record(s)  records(dClosedLoop): the atlas skips the audit's briefs and agent returns, and republishes as v74
-    8222099f8  1 design record(s)  records(dClosedLoop): the fold inventory — 236 confirmed and 10 unverified findings on 179 places
-    e7b58e2ee  6 design record(s)  records(dClosedLoop): the fold's five writers briefed — 179 places in disjoint records, each judged against th
-    10c0c4fb4  12 design record(s)  records(dClosedLoop): the fold's six writers returned and the owner answered all 33 forks — 5 away from the re
-stage0: arms K1,K2,K3,K4,K5,reruns · findings 113 · classed 0 · reruns red 0
+  design commits after the floor that no closing review covers: 0
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 98 · classed 7 · reruns red 0
 rc 1
 ````
 
@@ -32766,6 +34079,52 @@ rc 1
 ````
 
 After writer 9's rows, the widened run is green on the tree, as `[final]` shows.
+
+
+## [closing-probe] The probe's four rows from the audit's closing pair, each seen red
+
+The comparison record's `[fold]` (`2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md`) changed the
+reconciliation probe: class rows keyed by their rule (`reconcile-key-no-rule`), a key read as `policy.<key>`
+(`policy-prefix-unread`), a stage word read as a route only after its branch's arrow (`prose-stage-words-as-routes`),
+and a tolerance row naming "today's tool" with no path that exists reds (`tolerance-rows-unnamed-tool`). Each plant
+below ran on the folded tree; the before runs used the probe as it stood at `ef94fefba` on that commit's tree.
+
+````text
+$ python reconcile.py recut.md --plant-drop dFairHearing:review.trigger:cites   # after
+  dFairHearing cites `review.trigger` (dDeclaredLoop's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+
+$ python reconcile.py recut.md --plant-item plan.planted:plan:dRankedPlan:reads `policy.deploy.currency`   # before
+(no line naming reads `deploy.currency`)
+findings 0
+rc 0
+
+$ python reconcile.py recut.md --plant-item plan.planted:plan:dRankedPlan:reads `policy.deploy.currency`   # after
+  dRankedPlan reads `deploy.currency` (dShippedRelease's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+
+$ python reconcile.py recut.md --plant-item plan.prose:plan:dTrueNorth:waits while the Plan step runs   # before
+  dTrueNorth routes `plan.input` (dRankedPlan's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+
+$ python reconcile.py recut.md --plant-item plan.prose:plan:dTrueNorth:waits while the Plan step runs   # after
+(no line naming dTrueNorth routes `plan.input`)
+findings 0
+rc 0
+
+$ python reconcile.py recut.md --plant-item plan.arrow:plan:dTrueNorth:fails → a fix unit through Design   # after
+  dTrueNorth routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+
+$ python reconcile.py recut.md --plant-why dWellOiledMachine:deploy.released=today's tool   # after
+  tolerance row names no stand-in: dWellOiledMachine routes `deploy.released` says today's tool and names no path that exists
+findings 1
+rc 1
+````
 
 
 ## [walk-kit] The walk kit, the scorer and the three instruments, each seen red
@@ -32981,13 +34340,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2682 nodes in 30 namespaces; 28441 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1855, derived 323, pending 504
-map: no stale facts read 66 records and 28 quotes of a map count or the critical path
+map: 2686 nodes in 30 namespaces; 28441 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1859, derived 323, pending 504
+map: no stale facts read 67 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 234 records, 4160 sections, 217 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 237 records, 4225 sections, 217 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
@@ -33005,10 +34364,10 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 22 · owned nodes read 517 · flow items read 98 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 63 (cites 28, stage 0, routes 29, reads 6, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 144 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch intake that Entry places and claims, and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
-transitions: 3 dispositions routed through entry.claim, 4 `none` rows
-all routes: 204 route edges read from flow and expansion items
+chain rows 22 · owned nodes read 517 · flow items read 98 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 60 (cites 29, stage 0, routes 25, reads 6, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 146 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; stage words other than the 5 flow steps' names, and any no arrow precedes in its branch, read as prose; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch intake that Entry places and claims, and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+transitions: 3 dispositions routed through entry.claim, 7 `none` rows
+all routes: 197 route edges read from flow and expansion items
   dDeclaredLoop cites `build.ratify` (dScopedBuild's, not an ancestor): tolerance
   dDeclaredLoop cites `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
   dDeclaredLoop cites `design.inventory` (dIndexedDesign's, not an ancestor): tolerance
@@ -33017,7 +34376,7 @@ all routes: 204 route edges read from flow and expansion items
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
   dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
   dFairHearing cites `review.dispose` (dDeclaredLoop's, not an ancestor): tolerance
-  dFairHearing cites `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
+  dFairHearing cites `review.trigger` (dDeclaredLoop's, not an ancestor): tolerance
   dFurnishedOrders cites `code` (dTotalRecall's, not an ancestor): tolerance
   dFurnishedOrders cites `feature` (dTotalRecall's, not an ancestor): tolerance
   dGroundRules cites `policy-file.guard` (dDeclaredLoop's, not an ancestor): not a use
@@ -33036,6 +34395,7 @@ all routes: 204 route edges read from flow and expansion items
   dTotalRecall cites `journal` (dWellOiledMachine's, not an ancestor): homonym
   dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
   dTrueNorth cites `deviation.approval` (dDeclaredLoop's, not an ancestor): tolerance
+  dWellOiledMachine cites `deploy.unlease` (dShippedRelease's, not an ancestor): tolerance
   dWitnessedBar cites `build.acceptance` (dScopedBuild's, not an ancestor): tolerance
   dDeclaredLoop reads `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
   dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
@@ -33043,7 +34403,6 @@ all routes: 204 route edges read from flow and expansion items
   dPlacedRequest reads `build.unit-holders` (dWellOiledMachine's, not an ancestor): tolerance
   dPlacedRequest reads `kickoff.runs` (dRankedPlan's, not an ancestor): tolerance
   dRankedPlan reads `run.host` (dWellOiledMachine's, not an ancestor): tolerance
-  dDeclaredLoop routes `build.base` (dScopedBuild's, not an ancestor): tolerance
   dDeclaredLoop routes `build.distill` (dScopedBuild's, not an ancestor): tolerance
   dDeclaredLoop routes `build.ratify` (dScopedBuild's, not an ancestor): tolerance
   dDeclaredLoop routes `deploy.notify` (dShippedRelease's, not an ancestor): tolerance
@@ -33055,7 +34414,6 @@ all routes: 204 route edges read from flow and expansion items
   dDeclaredLoop routes `test.exit` (dWitnessedBar's, not an ancestor): tolerance
   dFairHearing routes `review.dispose` (dDeclaredLoop's, not an ancestor): tolerance
   dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
-  dIndexedDesign routes `build.base` (dScopedBuild's, not an ancestor): tolerance
   dIndexedDesign routes `build.unit-pass` (dScopedBuild's, not an ancestor): tolerance
   dLinkedLibrary routes `build.unit-pass` (dScopedBuild's, not an ancestor): tolerance
   dPlacedRequest routes `build.unit-lease` (dScopedBuild's, not an ancestor): tolerance
@@ -33065,12 +34423,10 @@ all routes: 204 route edges read from flow and expansion items
   dPlacedRequest routes `plan.triage-rule` (dRankedPlan's, not an ancestor): tolerance
   dRankedPlan routes `design.input` (dIndexedDesign's, not an ancestor): tolerance
   dShippedRelease routes `maintain.patch` (dTendedCadence's, not an ancestor): not a use
-  dWellOiledMachine routes `deploy.current` (dShippedRelease's, not an ancestor): tolerance
   dWellOiledMachine routes `deploy.released` (dShippedRelease's, not an ancestor): tolerance
   dWellOiledMachine routes `deploy.unlease` (dShippedRelease's, not an ancestor): tolerance
   dWitnessedBar routes `build.fix-pass` (dScopedBuild's, not an ancestor): tolerance
   dWitnessedBar routes `build.resolve` (dScopedBuild's, not an ancestor): tolerance
-  dWitnessedBar routes `deploy.current` (dShippedRelease's, not an ancestor): tolerance
   dWitnessedBar routes `design.input` (dIndexedDesign's, not an ancestor): tolerance
 findings 0
 rc 0
@@ -33100,6 +34456,15 @@ $ critical path
 critical path: 276 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 each build's earliest finish, in units: dTrueNorth 6, dGroundRules 17, dSafePassage 30, dFairHearing 48, dOrderedCharter 67, dDeclaredLoop 101, dPlacedRequest 122, dWitnessedBar 131, dKeptSession 150, dBoundRoles 157, dTotalRecall 157, dRankedPlan 173, dFurnishedOrders 177, dLinkedLibrary 182, dIndexedDesign 198, dWellOiledMachine 218, dScopedBuild 233, dMindYourWords 235, dTendedCadence 236, dShippedRelease 249, dCalibratedLens 253, dConvergedCharter 276
 rc 0
+
+$ stage0, all five arms, recorded and not refused
+K1: items 127 (98 flow, 29 expansion), roles 14 · findings 0
+K2: targets by form: ask 4, edge 186, owner 13, policy 4, program 7, return 24, terminal 58, wait 5; roots 14, reached 116, ending 126 · findings 21 · classed 7
+K3: kinds 83, table rows 83 · findings 76
+K4: keys 267 · findings 1
+K5: principles 42, clauses 509, retired 0 · findings 0
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 98 · classed 7 · reruns red 0
+rc 1
 ````
 
 

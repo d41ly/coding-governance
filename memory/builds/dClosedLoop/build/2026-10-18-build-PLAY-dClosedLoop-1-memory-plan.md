@@ -274,7 +274,10 @@ serve the edge sites:
 - the supervisor writes acts and session bindings, and pushes each act's minimal binding record.
 
 The other doors write the other node kinds: the builder writes code annotations under the grammar; govkit's `intake`, install and update write `.governance/deploy.toml`'s answers and kit selection; the upgrade-step kind writes the instruction overlay for a step that moves a repository's text into it, dBoundRoles' house files and dOrderedCharter's adopter rules among them;
-dTotalRecall's registry writes registry rows; the coordination verbs write refs, claims, leases and mail; the
+dTotalRecall's registry writes registry rows; the coordination verbs write refs, claims, leases and mail,
+through `record`'s door once dTotalRecall lands it, which binds each such write to its writer
+(`cl-dClosedLoop-0505`), and straight to the remote before it (the closing pair's
+door-misses-coordination-verbs); the
 renderers write views; the release writes `kit-release` tags; and the lander writes its own commits, their
 trailers from the binding it runs under.
 

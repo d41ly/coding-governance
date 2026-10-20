@@ -271,6 +271,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 207 | gov-spec-writer, at its definition's high effort, resumed | The fold's integration, writer 9 resumed: the owner's FK-9-1 and FK-9-2 folded into its script | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-47-spec-writer.md` | 1799cb98 | returned, 22m14s, 102.4k out: 37 places (37 fold); its script holds 22 sub and insert calls; forks 0; top-level request bullets 0 | `build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w9.md` |
 | 208 | `tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run A of two | The whole-design audit's Stage 2 closing pair: `8d21999a9` over `6ba4eaaa1`, every design commit since the parked debt's pair, the fold included | the args, built by `build_args_closing.py` | 1799cb98 | returned as `wf_fe1512b8-f16`, CLEAN WITH FIXES, raw=25 confirmed=21 refuted=4 unverified=0 blocker=0 high=4 medium=13 low=4 | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-audit-closing-a.md` |
 | 209 | `tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The whole-design audit's Stage 2 closing pair: `8d21999a9` over `6ba4eaaa1`, every design commit since the parked debt's pair, the fold included | the args, built by `build_args_closing.py` | 1799cb98 | returned as `wf_e897bbe0-97d`, CLEAN WITH FIXES, raw=24 confirmed=17 refuted=7 unverified=0 blocker=0 high=0 medium=13 low=4 | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-audit-closing-b.md` |
+| 210 | gov-synthesizer, at its definition's effort | The closing pair compared: every finding of runs A and B placed on its defect, each defect's disposition and the fold plan | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-48-synthesizer.md` | 1799cb98 | returned, 7m57s, 38.6k out: the comparison record: map rows 7 no fold, 1 fork, 21 fold; compare_rounds.py's numbers in its [summary] | `build/2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md` |
+| 211 | gov-spec-writer, at its definition's high effort | The closing pair's fold, writer 10: the comparison record's fold rows and the owner's flakes answer, after the main loop's instrument changes and Rule column | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-49-spec-writer.md` | 1799cb98 | returned, 18m12s, 102.3k out: 22 places (19 fold, 2 main loop's, 1 fork); its script holds 52 sub and insert calls; forks 1; top-level request bullets 0 | `build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w10.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -3064,6 +3066,11 @@ The whole-design audit's closing pair, dispatches 208 and 209, derived from each
 - 2026-10-20, session 1799cb98: the fold applied. Writers 7 to 9 folded the owner's answers and the
   integration, 7 clause ids were minted and the reconciliation probe reads every route;
   the ten checks pass (`whole-audit.md` `[fold-applied]`).
+
+- 2026-10-20, session 1799cb98: the audit's closing pair compared and folded. Writer 10 folded the
+  confirmed defects, and the owner answered its two questions. The probe now keys class rows by rule.
+  Stage 0 on the folded tree finds 98, classed 7
+  (`audit-closing-reviews-compared.md` `[folded]`).
 
 ## Instruments
 
