@@ -50,6 +50,8 @@ gap-mem-39, gap-tool-17, gap-deploy-26, gap-mem-45. Closing every one is this bu
   choice carries `grants: <id> <change>`.
 - Writes stay in this build's folder and a build run's `--dispatch --writes` paths; outside, only an ask row in
   another build's `BACKLOG.md` and the shared renders. The departures report lists the rest.
+- The unattended kit's own self-test suites are WAIVED for this build's landing (owner, 2026-10-20, walk answer 5). A
+  criterion they would observe is amended citing this rule; their clean reading is owed with PLAY-dClosedLoop-19.
 
 ## Parked decisions
 

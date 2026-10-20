@@ -438,3 +438,238 @@ so every difference below is a difference of derivation, not of input.
 - `handoff.py render` over the opened dTrueNorth, P0.3's acceptance, which the main loop re-observes.
 - Whether a rule's or a slot's words say what the plan means: no arm reads meaning, and the owner reads dTrueNorth's
   README and packet whole (P0.7).
+
+## The owner's opening-read answers
+
+Dispatch 247's runs, as its brief asks (`build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-answers-builder.md`):
+answers 3 and 5 of the execution record's `[phase0-answers-2]` applied to `open.py` and the gap join, and the opening
+re-rendered on them. Every command, in order, with its exit and the line that proves it. `gap-join.py` is
+`build/2026-10-19-build-PLAY-dClosedLoop-1-gap-join.py`, `<register>` the gap register and `<v2>` architecture v2,
+both under `build/`. The runs happened in a `git clone --shared` of the main loop's worktree at `ddc6ba9fb`, on a
+linked worktree at branch `p0-answers`, from its root under a bounded timeout. Its commits: `d07e3ca19` (the two
+instruments), `e3369a999` (the bug-class checklist's fix to both), `bcc221781` (the re-rendered opening), and the
+one that carries this section. Steps 4 to 10 ran on `d07e3ca19`'s blobs, and again in step 11 on `e3369a999`'s, which
+every later step ran on: `open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`, which every packet pins, and
+`gap-join.py` blob `21a08df8d1633bbae649a61995137b200943b547`. The scratch probes sit in
+the dispatch's scratch folder, never in the tree. A chain build's id appears here only in its `missing:` form, so the
+build index joins none of them (P0.6).
+
+### Before the change, at `ddc6ba9fb`
+
+1. `python open.py --check`: exit 0. "open: check of the opening of 2026-10-21 · 65 files byte-compared · roster arm
+   over 509 clauses · summary arm over 22 rows, 0 disagreements · findings 0"
+2. `python gap-join.py <register> <v2>`, the old blob `0c5d8fbb6`: exit 0. "register keys 386 · chain builds 22", then
+   "unowned: none", "owned twice or more: none", "owned but not in the register: none", "builds owning nothing: none".
+   Its output is kept as the comparison for steps 6 and 7.
+3. `probe-arms.py`, which ran candidate arms over every v2 clause: exit 0. It printed 65 `KEY=` lines in
+   `tools/unattended/.unattended.conf.example`, a superset of the 24 keys `tools/unattended/kit.toml`'s `[config]`
+   lists. Five clauses name a kit key: `cl-dClosedLoop-0013` (`REVIEW_ROUNDS`, no re-point), `cl-dClosedLoop-0048`
+   (`RECALL_CLI`, re-point), `cl-dClosedLoop-0106` (`REVIEW_ROUNDS`, re-point), `cl-dClosedLoop-0240` (`MAP_CLI`,
+   re-point) and `cl-dClosedLoop-0284` (`RESUME_ATTEMPTS`, no re-point). One clause names the unattended Skill,
+   `cl-dClosedLoop-0195`.
+
+### The predicate (answer 3)
+
+The arms: a clause that re-points a key the kit reads, read as a key of the kit's example conf, whole words, in the
+same clause as a form of "re-point", and never a clause that only names a key; and a clause naming the unattended
+Skill, whole words, any case. The conf is the source of the keys because its header says "The driver and the gate leg
+READ these declarations; neither restates one", so no key is typed in `open.py`. v2's text for the two clauses
+(v2:1773 and v2:1775): `cl-dClosedLoop-0195` retires the lookup "in the build method's and the unattended Skill's text
+among them", and `cl-dClosedLoop-0240` names "unattended's `MAP_CLI`, re-pointed at the map's CLI". The seven builds
+the walk's predicate counts keep `PLAY-dClosedLoop-11` to `-17`. A build that joins by answer 3's arms alone takes the
+next id in v2's `[chain]` order: dFurnishedOrders (row 10) `PLAY-dClosedLoop-18` and dLinkedLibrary (row 12) `-19`.
+
+4. `python open.py --driver-builds`: exit 0, whole:
+
+   ```text
+   The predicate (P0.5, walk answer 5): a v2 clause names `unattended.sh`, `check-unattended.sh`, `tools/unattended/`, the `/unattended` command, the unattended kit, `--plan`, `--status`, unattended's verbs, run claims; "the driver" alone is left out, since in v2 it names the loop's driver role. A build with an extra unit joins by it. The opening read's answer 3 adds two arms, whole words: a clause that re-points a key the kit reads, one of the 65 `KEY=` lines of `tools/unattended/.unattended.conf.example` beside a form of "re-point", never one that only names a key; and a clause naming the unattended Skill, whose text it edits.
+
+   | Build | Clauses that touch the kit |
+   |---|---|
+   | dTrueNorth | its extra unit, the carry-forward condition in `unattended.sh` (the execution plan's `[phase-1]`) |
+   | dOrderedCharter | `cl-dClosedLoop-0047` (`unattended.sh`); `cl-dClosedLoop-0048` (`check-unattended.sh`, `RECALL_CLI` re-pointed) |
+   | dDeclaredLoop | `cl-dClosedLoop-0106` (`unattended.sh`, `check-unattended.sh`, `REVIEW_ROUNDS` re-pointed) |
+   | dPlacedRequest | `cl-dClosedLoop-0120` (run claims); `cl-dClosedLoop-0134` (run claims) |
+   | dFurnishedOrders | `cl-dClosedLoop-0195` (the unattended Skill) |
+   | dLinkedLibrary | `cl-dClosedLoop-0240` (`MAP_CLI` re-pointed) |
+   | dWellOiledMachine | `cl-dClosedLoop-0280` (`--plan`, `--status`); `cl-dClosedLoop-0281` (unattended's verbs); `cl-dClosedLoop-0306` (the `/unattended` command, the unattended kit) |
+   | dWitnessedBar | `cl-dClosedLoop-0344` (the unattended kit) |
+   | dConvergedCharter | `cl-dClosedLoop-0485` (`unattended.sh`, `tools/unattended/`); `cl-dClosedLoop-0486` (`tools/unattended/`, the `/unattended` command, the unattended kit); `cl-dClosedLoop-0494` (the unattended kit); `cl-dClosedLoop-0496` (the unattended kit) |
+
+   9 builds, 15 clauses; 2 of the builds join by answer 3's arms alone (dFurnishedOrders, dLinkedLibrary), so their clean-reading asks take the ids after the others'. Near misses, the clauses naming "unattended" that match no term, which the predicate leaves out:
+
+   - `cl-dClosedLoop-0032` (dOrderedCharter): "…fixed, rendered from the principle registry, the decision principles that resolve unattended forks, ranked above the practices, active practices, one…"
+   - `cl-dClosedLoop-0053` (dOrderedCharter): "a build run unattended by default from its request, said in the drive section,…"
+   - `cl-dClosedLoop-0108` (dDeclaredLoop): "…and trailer ids `routed_commits.py` reads and the trailer replacing the subject that unattended's `read_attribution_tokens` reads, each consumer naming…"
+   - `cl-dClosedLoop-0113` (dDeclaredLoop): "…says, a change that only adds items, roles, stages or stricter values applying unattended and recorded, one that removes, reorders or loosens…"
+   - `cl-dClosedLoop-0118` (dDeclaredLoop): "…set, which never passes, a wait declaring no deadline, a scenario successor cycle, an unattended raise of the budget, of a round count, of a retry count…"
+   - `cl-dClosedLoop-0123` (dPlacedRequest): "…by `placement` and recorded with its reason, its facts checked by `placement.check`, an unattended prompt placed the same way, the disposition carried in the…"
+   - `cl-dClosedLoop-0504` (dKeptSession): "…when the question arrives, and until dWellOiledMachine lands `next`, a question to an unattended build answered by the asker's declared default under…"
+   - `cl-dClosedLoop-0426` (dShippedRelease): "an unattended `kits.offer` in a govkit mode that runs nothing from the…"
+
+   Clauses naming "the driver" and no term, left out: 8
+
+   Clauses naming a key the kit reads and no re-point, left out:
+
+   - `cl-dClosedLoop-0013` (dGroundRules): `REVIEW_ROUNDS`
+   - `cl-dClosedLoop-0284` (dWellOiledMachine): `RESUME_ATTEMPTS`
+   ```
+
+   dGroundRules stays out. Its `cl-dClosedLoop-0013` lists `REVIEW_ROUNDS` among the legacy homes and re-points
+   nothing, the edge the plan writer's probe flagged and the main loop passed on. dWellOiledMachine's
+   `cl-dClosedLoop-0284` names `RESUME_ATTEMPTS` as a cap and re-points nothing, and the build is driver-changing by
+   three other clauses.
+5. `python plant-arms.py`: exit 0. "plants: 8, wrong verdicts: 0", and "tree: 9 driver-changing builds; dGroundRules
+   among them: False". The script runs `derive_kit_clauses` over planted clause texts, each a real v2 clause with at
+   most one edit:
+   - `cl-dClosedLoop-0013` as v2 writes it: not counted. With "re-pointed" planted beside its key: counted,
+     "`REVIEW_ROUNDS` re-pointed";
+   - `cl-dClosedLoop-0240` as written: counted, "`MAP_CLI` re-pointed". With its re-point removed: not counted. With
+     the key misspelt `MAP_CLIX`: not counted, a whole-word miss;
+   - `cl-dClosedLoop-0195` as written: counted, "the unattended Skill". With `Skillset` for `Skill`: not counted. With
+     `skill` lower-cased: counted.
+
+   The ids it derives: "dTrueNorth PLAY-dClosedLoop-11, dOrderedCharter PLAY-dClosedLoop-12, dDeclaredLoop
+   PLAY-dClosedLoop-13, dPlacedRequest PLAY-dClosedLoop-14, dFurnishedOrders PLAY-dClosedLoop-18, dLinkedLibrary
+   PLAY-dClosedLoop-19, dWellOiledMachine PLAY-dClosedLoop-15, dWitnessedBar PLAY-dClosedLoop-16, dConvergedCharter
+   PLAY-dClosedLoop-17".
+6. The plants seen red: `python plant-arms.py variants/open-names-key.py`, a scratch copy of `open.py` whose one
+   changed line counts a key with or without a re-point (`if re.search(REPOINT, text)` made `if True`): exit 1. "BAD ·
+   cl-0013 as v2 writes it: names `REVIEW_ROUNDS`, re-points nothing: counted", "BAD · cl-0240 with its re-point
+   removed: … counted", "tree: 10 driver-changing builds; dGroundRules among them: True", "plants: 8, wrong verdicts:
+   3". Under that variant dGroundRules would take `PLAY-dClosedLoop-18`, and dFurnishedOrders and dLinkedLibrary would
+   shift to `-19` and `-20`.
+
+### The gap join's README mode (answer 5)
+
+`python gap-join.py --readmes <register> <v2> <builds dir>` reads the builds of v2's chain table, as the chain-table
+mode does, and for each one the problem slot of `<builds dir>/<build>/README.md`. The slot is found by the heading
+`gen_build_index.py`'s slot canon declares, and its lines are joined so a range wrapped across a line still expands.
+A README that is absent, or holds no such slot, owns nothing. The join and its four findings are the chain-table
+mode's, now one function both modes call.
+
+7. `python gap-join.py <register> <v2>`, the new blob: exit 0, its output byte-identical to step 2's (`cmp`).
+8. The chain-table mode's red is kept. A scratch copy of `<register>` gains one planted row, `| gap-zzz-01 | Plant |
+   LOW | a planted orphan row | none | — |`. `python gap-join-old.py <it> <v2>` and `python gap-join.py <it> <v2>`:
+   exit 1 each, their outputs byte-identical. "register keys 387 · chain builds 22", "unowned: ['gap-zzz-01']".
+9. `python gap-join.py` with no arguments: exit 2, "usage: gap-join.py <register> <architecture> | --readmes
+   <register> <architecture> <builds dir>". `python gap-join-old.py` with no arguments: exit 1, "IndexError: list
+   index out of range".
+10. `python gap-join.py --readmes <register> <v2> memory/builds`, on the opening as `ddc6ba9fb` holds it: exit 0.
+    "register keys 386 · chain builds 22 · READMEs under memory/builds, 22 read, absent or without the problem slot:
+    none" and the four findings "none". The opening does not change any problem slot, so the same holds at
+    `bcc221781` (step 20).
+11. `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` over `d07e3ca19`: exit 0. It selected
+    `two-answers-to-one-question`. `open.py` spelled the whole-word key match twice, in the arm and in the
+    left-out list, and `gap-join.py` spelled the range pattern twice. `e3369a999` gives each one spelling
+    (`extract_kit_keys`, `RANGE`). Steps 4 to 10 ran again on it: `--driver-builds` printed the same bytes (`cmp`),
+    the plants and the variant gave the same verdicts, and the join's outputs were byte-identical to step 2's and
+    step 8's. The checklist over `e3369a999` selected the same classes and none applied.
+
+### The opening re-rendered, at `e3369a999`
+
+12. The 22 packet files removed from the working tree, so each renders fresh and pins every instrument at HEAD, as
+    dispatch 244's re-render did. `packet.py`'s `render_packet` keeps an existing packet's pins, so a packet left in
+    place would still pin `open.py`'s old blob `b8c9e9c04`, and its pin arm would red. That is a reading of the code,
+    not a run. Then `python open.py --write --date 2026-10-21`, the date every opened README's `opened:` carries:
+    exit 0. "open: wrote and staged 44 files, 22 contract rows in memory/project/readme-contract.txt and 22 packets,
+    opened 2026-10-21; run `gen_build_index.py --write` next". dClosedLoop's `BACKLOG.md` existed, so `--write` added
+    its two asks after `PLAY-dClosedLoop-17`'s row and its two SEV rows after `-17`'s, every other line kept.
+13. `python gen_build_index.py --write`: exit 0. "build-index: wrote 1561 artifact(s)", over "backlog 891 ask(s) ·
+    1272 row(s) · 126 link(s) in 149 file(s) · 553 live · 0 verdict(s)". Every file `git status` named was staged by
+    name. Against `e3369a999`, the staged diff was 28 files. dFurnishedOrders' and dLinkedLibrary's READMEs gain rule
+    8's two lines. dClosedLoop's `BACKLOG.md` gains four rows, and dClosedLoop's README its `ids:` through `-19`.
+    `memory/LIVE.md` moves dClosedLoop's id count from 18 to 19, and `memory/backlog/PLAY.md` gains the two asks.
+    Each of the 22 packets moves its `open.py` pin, its render HEAD and its two new ask lines. The two READMEs'
+    packets also move every roster line number by two, the two lines rule 8 adds above the roster.
+14. `python open.py --check`, staged and before the commit: exit 0, "… findings 0". Then the commit, `bcc221781`.
+
+### On the committed opening, `bcc221781`
+
+15. `python packet.py --check <slug>`, once per chain build: exit 0 each, "byte compare green · completeness 0
+    findings over clauses C, gaps G, parents P, owed O, roster R, asks 9 · pin arm 7 instruments, 0 findings". C, G,
+    P, O and R are `[acceptance]` step 6's for every build, unchanged. Each packet now carries the nine open asks of
+    dClosedLoop's `BACKLOG.md`.
+16. `python open.py --check`: exit 0. "open: check of the opening of 2026-10-21 · 65 files byte-compared · roster arm
+    over 509 clauses · summary arm over 22 rows, 0 disagreements · findings 0"
+17. `python gen_build_index.py --check`: exit 0. "build-index: clean (1561 artifact(s))", over "… 0 verdict(s)".
+18. `python open.py --summary`: exit 0. Nine rows read "yes" in the rule 8 column: `PLAY-dClosedLoop-11` to `-17` as
+    in `[summary]`, then "dFurnishedOrders … 33433 B · `packet.py --check` exit 0 … yes · PLAY-dClosedLoop-18" and
+    "dLinkedLibrary … 40272 B · `packet.py --check` exit 0 … yes · PLAY-dClosedLoop-19". The other 13 read "no".
+19. `python open.py --carriers --check`: exit 0. "open: carriers at HEAD bcc22178196a against the list at the opening
+    commit b50573ef4b42 · 112 entries now, 112 listed · findings 0"
+20. `python gap-join.py --readmes <register> <v2> memory/builds`: exit 0, as in step 10.
+21. The README mode's plants, each in dGroundRules's README, `git diff --numstat` "1 1" or a removal, restored from
+    `bcc221781` after its run:
+    - an orphan gap, `gap-rt-34` removed from the problem slot: exit 1, "unowned: ['gap-rt-34']";
+    - a double owner, dTrueNorth's `gap-mem-47` added to the slot: exit 1, "owned twice or more: {'gap-mem-47':
+      ['dTrueNorth', 'dGroundRules']}";
+    - the README removed: exit 1, "21 read, absent or without the problem slot: ['dGroundRules']", "unowned:
+      ['gap-tool-24', 'gap-rt-34', 'gap-spine-06']", "builds owning nothing: ['dGroundRules']".
+
+    Restored (`git status --short` empty): exit 0, every finding "none".
+22. `open.py`'s red tests from `[red]`, each plant in dGroundRules's files unless named, restored after its run:
+    - 1, a one-byte README edit (numstat "1 1"): exit 1, "byte compare: memory/builds/dGroundRules/README.md differs
+      from its render from line 19: gap-tool-24, gap-rt-34. Closing every one is this build's goal bound!";
+    - 2, the `cl-dClosedLoop-0012` roster row deleted ("0 1"): exit 1, six findings, among them "roster arm:
+      dGroundRules: `cl-dClosedLoop-0012` is in 0 roster rows, not exactly one";
+    - 3, a `parents:` typo ("1 1"): `gen_build_index.py --check` exit 1, "parents: names 'dTrueNorht', which is not a
+      build folder under memory/builds/ …"; `open.py --check` exit 1, "summary arm: dGroundRules: `parents:` reads
+      `dTrueNorht` in the files, and the derivation gives `dTrueNorth`";
+    - 4, the contract row removed ("0 1"): exit 1, "summary arm: dGroundRules: Contract row reads `absent` in the
+      files, and the derivation gives `present, bound`";
+    - 5, `roster: TOOL` made `roster: PLAY` ("1 1"): exit 1, "summary arm: dGroundRules: Family · `streams:` reads
+      `PLAY · tooling` in the files, and the derivation gives `TOOL · tooling`";
+    - 8, `PLAY-dClosedLoop-13`'s ask row removed from dClosedLoop's `BACKLOG.md` ("0 1"): `open.py --check` exit 1, 67
+      findings, "owed asks: memory/builds/dClosedLoop/BACKLOG.md lacks the opening's row: - PLAY-dClosedLoop-13 ·
+      filed 2026-10-21 · …", with a packet arm in all 22 packets. Then `open.py --write --date 2026-10-21`: exit 1,
+      "open: refused: memory/builds/dClosedLoop/BACKLOG.md exists without the opening's ask rows in order (8 of 9
+      held), and the opening only adds the rows after its last". Nothing else was written;
+    - 8b, the add path on a plant: `-19`'s ask row and SEV row removed ("0 2"), then `open.py --write --date
+      2026-10-21` (exit 0) and `gen_build_index.py --write` (exit 0). `git diff HEAD --name-only` was empty: the
+      working tree came back byte-identical to `bcc221781`, the two rows re-added where they were. The index held the
+      authored halves `--write` staged, and was restored from HEAD;
+    - 8c, dClosedLoop's `BACKLOG.md` with its two headings and no row: `open.py --write --date 2026-10-21` exit 1,
+      "… exists without the opening's ask rows in order (0 of 9 held) …";
+    - 9, a `BACKLOG.md` planted in dTrueNorth's folder (a copy of dGroundRules's): exit 1, "byte compare:
+      memory/builds/dTrueNorth/BACKLOG.md exists, and the opening writes none for a whole-run build" and "summary arm:
+      dTrueNorth: Carry-forward ask reads `missing:TOOL-dGroundRules-12` in the files, and the derivation gives `none:
+      whole run`";
+    - 10, `### Goal` made `### Goal!` in dGroundRules's packet ("1 1"): exit 1, "packet arm: dGroundRules: byte
+      compare: the packet differs from its render from line 13: ### Goal!", and the summary arm's Packet line, "31600
+      B · `packet.py --check` exit 1" against "31599 B · `packet.py --check` exit 0".
+
+    Every plant restored (`git status --short` empty): `python open.py --check`, exit 0, "findings 0".
+23. `python probe-rules-slot.py dFurnishedOrders dLinkedLibrary dWellOiledMachine dGroundRules`: exit 0. Against
+    "## Build-level rules	1800" in `tools/memory-tree/build-readme-slot-limits.txt`: dFurnishedOrders 1780 B,
+    dLinkedLibrary 1776 B, dWellOiledMachine 1782 B (as `[acceptance]` step 8 measured), dGroundRules 1540 B. The
+    widest line is 118 characters.
+24. `python tools/memory-tree/gotchas.py --for-diff HEAD~1..HEAD` over `bcc221781`: exit 0. It selected 18 classes,
+    none acted on. No row is missing: each packet reads `asks 9`, and the backlog view gains both asks. No path moved
+    and nothing was `git rm`ed. The packets were staged by `open.py --write` before `gen_build_index.py --write` read
+    the index.
+25. With this section staged: `python bare-ids.py --opened`, exit 0, printing nothing, so no chain-slug id here or
+    in the re-rendered opening joins a build it was not minted for; and `python gen_build_index.py --check`, exit 0,
+    "build-index: clean (1561 artifact(s))".
+
+### Where this changes the record above
+
+- `[comparison]`'s finding for the owner is settled by answer 3: dLinkedLibrary and dFurnishedOrders are
+  driver-changing, and their READMEs carry rule 8. `cl-dClosedLoop-0108` stays a near miss. It names a function of
+  `tools/unattended/lib-unattended.sh`, which is no conf key and no Skill, and dDeclaredLoop is driver-changing by
+  `cl-dClosedLoop-0106`.
+- `[red]` 8's `--write` refusal still holds for a row lacked before a held one, now worded "exists without the
+  opening's ask rows in order". A lacked row after the last held one is added (step 22, 8b), which is how this
+  re-render filed `-18` and `-19`.
+
+### Not checked here
+
+- `[red]` 6 and 7, the carrier list's plants: each commits a change under `tools/`, which this pass may not make. This
+  diff leaves `derive_entries` and `cmd_carriers` unchanged, and step 19 is green.
+- `gen_build_index.py --check-format` and the memory hygiene gate over the re-rendered opening: gates, owed to the
+  main loop.
+- Whether a clause's re-point has the kit key it names for its object: the arm reads the two in one clause.
+  `cl-dClosedLoop-0048` re-points the readers of the moved grammar, `check-unattended.sh`'s `RECALL_CLI` probe among
+  them, and is driver-changing by `check-unattended.sh` in any case.
+- A clause that edits the Skill's text without naming the unattended Skill, as by its path
+  `.claude/skills/unattended/`: no v2 clause does, and no arm reads it.

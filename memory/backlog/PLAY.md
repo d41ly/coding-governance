@@ -23,5 +23,7 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-15](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
 | [PLAY-dClosedLoop-16](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dWitnessedBar'S… |
 | [PLAY-dClosedLoop-17](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
+| [PLAY-dClosedLoop-18](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
+| [PLAY-dClosedLoop-19](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dLinkedLibrary'S… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
