@@ -672,3 +672,80 @@ Not re-run: red tests 6 and 7, the carrier plants. Each commits a change under `
 
 Every check above is a probe of the code this pass changed, standing in for nothing in the bar.
 ````
+
+## [dispatch-246-resumed]
+
+Handoff `prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-3-spec-writer.md`, resumed. Its return after the resume:
+
+````text
+AC3 and AC10 now both read DONE, and the spec is at rev-4 with its §9 entry. I edited only `memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md`, created no file and committed nothing. I didn't run memory hygiene or spec tokens on it, so both are still owed.
+
+**Unit PLAY-dClosedLoop-1: authored (follow-up, rev-4)**
+
+**AC3, as written** (only the status paragraph changed; the criterion and its "Red when" line are as before):
+
+> DONE against v2's `[chain]`: exit 1 on two planted orphans, and exit 0 on the register and v2
+> (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md:3336-3339`), and rc 0 on the
+> folded tree (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md:535`). DONE
+> against the chain READMEs too, the check the owner's answer to F4 added to P0.7. On the opening as re-rendered at
+> `bcc221781` and re-checked at `f579121fe`, `gap-join.py --readmes` over the 22 opened READMEs' problem slots exits
+> 0, printing `owned but not in the register: none` and `builds owning nothing: none`, and the v2 mode still exits 0.
+> Red test 6, a gap removed from one README's problem slot, exits 0 before the plant and 1 after it, with
+> `unowned: ['gap-tool-24']`
+> (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`,
+> `[red-tests]`, `[answers-2]`).
+
+**AC10, as written** (status paragraph):
+
+> DONE. On the opening as committed, `b50573ef4` with the packet renames `738dca981` and the row rewording
+> `8b51c299e`, every check of P0.7 exits as its row states and each of its five red tests reds
+> (`memory/builds/dClosedLoop/build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md` `[checks]`,
+> `[red-tests]`). The check and red test that the owner's answer to F4 added are DONE too: on the opening as
+> re-rendered at `bcc221781`, every check was re-run at `f579121fe`, the gap join's README mode among them at exit 0,
+> and red test 6 reds the README mode on a gap removed from one README's problem slot (the same record, `[checks]`,
+> `[red-tests]`, `[answers-2]`). The memory hygiene gate was red at `b50573ef4`, on check 21 and then check 27, and
+> is green after those two fixes. The criterion's single bare-id predicate predates the revised P0.7, which runs
+> the plain predicate at the opening's parent `8d19dd714` and `bare-ids.py --opened` at the tip; each printed nothing.
+> Not checked, as `[red-tests]` states: a byte after a README's last generated marker, which no check reads.
+
+**Other changes:**
+- **Header:** moved from rev-3 to rev-4. TEMPLATE-SPEC (`memory/TEMPLATE-SPEC.md:67-69`) moves the rev on any material content change, and only a pure status flip escapes. Here both criteria's evidence text changed, not just the status word.
+- **§9:** one rev-4 line for this edit.
+- **§6 intro:** I added one sentence saying AC3's README join and AC10's added check were read at `df6dcd189`. Without it, the intro's claim that every status was read at `88cbbafb2` would be wrong.
+- **Citations:** none needed re-pointing. The spec cites the checks record only by section names (`[summary]`, `[checks]`, `[red-tests]`, `[ac8]`, `[answers-2]`), and all of them still exist. It never cites the open instruments record.
+
+**Left as written:** F4's resolution still says "AC3 stays OPEN against the READMEs until the main loop records the join's run". That condition is now met. Say if you want a pointer to `df6dcd189` added there.
+````
+
+## [dispatch-247-resumed]
+
+Handoff `prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-4-builder.md`, resumed. Its return after the resume:
+
+````text
+The high-water row is committed, and the new tip on `p0-answers` is `dc139ce32`. The re-sync fast-forwarded the worktree onto `fc2fd9a37`, and my earlier tip `303f6a861` is an ancestor of it.
+
+**What changed:** one row in `tools/template-size-highwater.txt`: the unit spec's path, a tab, `122396`, placed in path order between the aQuarriedLantern and dPolishedVitrine rows. Nothing else in that file moved. The same commit appends a `## The spec's size high-water row` section to the open instruments record listing the runs. The subject names the owner's answer 1, "High-water row (Recommended)".
+
+**How I checked it:** with a scratch probe, not the leg. The probe loads `tools/check-spec-tokens.py` and calls its own `read_size_ceilings` and `scan_spec_sizes` on the spec and this one row:
+- **Size:** I measured the spec at 122396 bytes with carriage returns stripped, both at `fc2fd9a37` and in the working copy, matching your figure. The ceiling for specs is 49152.
+- **Before the row:** exit 1, "122396 bytes, 73244 over the spec ceiling 49152".
+- **With the row:** exit 0, "hits 0; stale 0; held 1", and the same again at the tip.
+- **Row one byte lower:** with the row read as 122395, exit 1, "+1; a held spec may shrink and may not grow".
+- **File bytes:** both committed files have no carriage returns and end in a newline, and the file is still in sorted path order.
+- **Spec unchanged:** `gen_build_index.py --check` stays clean with the new record section, and the spec is still 122396 bytes.
+- **Bug-class checklist:** run over `dc139ce32`. None of its classes applied to this change, so nothing needed fixing.
+
+**Owed to the main loop:**
+- The spec-tokens leg itself.
+- `check-template-size.sh`, which reads the same file.
+- The leg's check for stale rows across the file's other rows. My probe looked only at this one row.
+
+From now on, any growth of the spec past 122396 bytes turns the leg red until the row is raised.
+
+My first return still stands otherwise.
+
+Files:
+- `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d247/wt/tools/template-size-highwater.txt`
+- `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d247/wt/memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-open-instruments.md`
+- The probe: `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d247/probe-size-row.py`
+````
