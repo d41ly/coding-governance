@@ -280,6 +280,7 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 216 | gov-researcher, at the owner's medium effort | Execution under today's gov, fully oriented handoffs: kickoff, gov-session, handoff.py render, what a cold session reads; a worked dTrueNorth example | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-53-researcher.md` | 1799cb98 | returned, 8m07s, 45.7k out: one generated packet per chain build (509 clauses, 386 gaps, parents and owned nodes all derive; stand-ins only as verbatim mentions), checked by a byte re-render, plus a pass brief citing it; per-node handoffs rejected; eight limits, each with its smallest change | the execution plan's handoff facet |
 | 217 | gov-researcher, at the owner's medium effort | Execution under today's gov, per-node distribution: a derived schedule of the chain over nodes a, b and d, its sync points and a first wave | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-54-researcher.md` | 1799cb98 | returned, 10m22s, 58.2k out: just-in-time spec phases split from build phases across nodes, re-dispatched at every landing: 262 units against 276 on the critical path and 322 whole-build-per-node; a busy 100%, d 86%, b 34% at Pro speed; dTrueNorth on a first, d opens the 22 folders; eleven sync points; five limits | the execution plan's schedule facet |
 | 218 | gov-researcher, at the owner's medium effort | Execution under today's gov, specs held to the design: the bootstrap instruments, what gates them before dTrueNorth lands, deviation approval when unattended, with plants | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-55-researcher.md` | 1799cb98 | returned, 11m21s, 54.9k out: nothing runs the bootstrap instruments at a commit, a pass or a landing; in plants, a foreign carry, an approver written as owner, a subject-only pass, a cross-node revision and a re-pointed baseline went green, and two false reds; a hardened merge-bar leg as dTrueNorth's first unit, loosening deviations parked when unattended | the execution plan's deviation facet |
+| 219 | gov-spec-writer, at its definition's high effort | The execution plan: the chain specced, built and landed across nodes a, b and d by today's driver, under the owner's four answers, with its schedule script | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-56-spec-writer.md` | 1799cb98 | dispatched | `build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -3097,6 +3098,12 @@ The whole-design audit's closing pair, dispatches 208 and 209, derived from each
   The main loop checked two claims they left open. Today's spec-tokens leg passes a stale design pin, and an
   owner-landed README reaches the default-branch anchor (`research-exec-instruments.md` `[verified]`). The plan and
   its forks go to the owner next.
+
+- 2026-10-20, session 1799cb98: the owner answered the plan's four questions. Spec and build phases are split, and
+  the opening carries the audit and derived grants. On deviations: "departures are recorded and explained at the end,
+  nothing is parked or blocked - the build must go through to completion." Node b does spec and build "since node b
+  has lower limits, it should be issued a smaller slice, preferably non-critical". A spec writer writes the plan
+  (dispatch 219; `execution.md` `[answers]`, `[readings]`).
 
 ## Instruments
 
