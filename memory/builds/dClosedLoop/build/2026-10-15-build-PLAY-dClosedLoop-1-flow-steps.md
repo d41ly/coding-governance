@@ -36,12 +36,28 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
   It adds only the owner's interactions: the announcement, confirmations at breakpoints and owner questions asked
   live (P4; `[breakpoint]`; night pass, point 1).
 - **Every route back is bounded** (P39). A route back, a fix pass, a review round after the first, a re-dispatch
-  after a refusal and a research or probe round trip each draw on the build's one rework budget,
-  `flow.rework-budget`, in its transition record. Contention draws nothing: a verdict staled or a merge conflicted
-  by another build's landing is re-verified in its turn. Past `flow.route-backs` returns to the same item, that
-  item's loop ends non-converging and its open work goes to asks. Once the budget is spent, the build ends as
-  `flow.on-exhausted` says, never with another lap. Revised 2026-10-19 by the owner's SL-1 and SL-2: the loop
-  had become an owner item, resolved as [breakpoint]'s owner gate is (FH1).
+  after a refusal, a research or probe round trip and a patch build of the build's own landing each draw on the
+  build's one rework budget, `flow.rework-budget`, in its transition record. A patch build draws on the originating
+  build's budget, keyed by the originating slug its claim carries (`entry.claim`), and a draw on a closed root re-opens the
+  root's transition record under the root's lease, which serializes concurrent draws (the owner's FK-1-5). Contention draws nothing: a
+  verdict staled or a merge conflicted by another build's landing is re-verified in its turn, a lease another live
+  build holds is waited for, and an unreachable remote is retried. Past `flow.route-backs` returns to the same
+  item, that item's loop ends non-converging. While the budget remains, a blocking item's open work becomes a new
+  unit, and a non-blocking item's goes to asks (`cl-dClosedLoop-0117`). An item blocks where its step's exit needs
+  its witness. A review loop ends at whichever bound it reaches first, `flow.route-backs` or `review.max-rounds`,
+  and both promote its open findings the same way (the owner's FK-4-5). Once the budget is spent, the build ends as
+  `flow.on-exhausted` says, never with another lap. Revised 2026-10-19 by the owner's SL-1 and SL-2: before it,
+  such a loop became an owner item, resolved as [breakpoint]'s owner gate is (FH1).
+- **A lease or claim refusal routes by its cause,** in `entry.claim`, `plan.lease` and `build.unit-lease`:
+  - a terminal tombstone, a terminal build or an epoch fence → refused whatever `leases` says, never retried, and
+    an ask filed (`cl-dClosedLoop-0281`, `cl-dClosedLoop-0415`);
+  - a live holder → a wait, contention that draws nothing, within `flow.wait-ceiling`, then an owner item;
+  - an overlap at `leases.overlap`'s granularity → as `leases` says: under `warn`, noted on the card and in the
+    other build's mailbox, then as held; under `refuse`, as a live holder;
+  - the remote unreachable → as `leases.offline` says, no local id minted.
+- **An unreachable remote is contention.** A command item whose act cannot reach the remote, and whose row
+  declares no other arm, is held and retried as `next`'s `stale-remote` answer is, drawing nothing, then raises an
+  owner item once `leases.expiry-hours` passes.
 - **Every ask an item files states its acceptance** in one of the mechanical forms the memory layer's
   `[asks]` declares (LR-5). The forms are cited from there, never copied.
 - **Every work order loads its load set (P27):**
@@ -51,12 +67,22 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
   - the step's practice reach;
   - the policy values the item reads.
 - **At every item boundary,** the executor reads the build's mailbox (`mailbox.reads`) and updates the
-  card's pointers (`card.pointers`).
+  card's pointers (`card.pointers`). A parent's `withdrawn` post read there routes at that boundary as
+  `deps.on-parent-withdrawn` says: `replan` by a plan revision back to planning (`[transitions]`),
+  `adopt-parent-work` by that plan revision with the parent's kept units taken in through the build's
+  `design.inventory` at the parent's kept branch's tip, and `withdraw-too` by an owner item proposing the build's
+  withdrawal (the owner's FK-4-3). A
+  `superseded` post moves the link to the replacement, as `deploy.parents` does.
+- **A question to a build is answered.** `next` dispatches `mailbox.answer` when a `question` addressed to the
+  build arrives, run by the role that owns the asked interface or item (`[entry]`). A transition refused while a
+  message awaits its answer is a declared wait inside `flow.wait-ceiling`, so `leases.renewal: progress` renews the
+  build's lease meanwhile (P39, the owner's FK-5-4).
 - **Closing a mailbox.** When `deploy.unlease` or `life.unlease` closes a build's mailbox, every message
   still on its mailbox ref, disposed or not, is copied into the build folder, and the undisposed ones
   are marked so in that copy. Only then is the ref pruned, and a missing ref counts as done. Unlease
   closes the mailbox, not the build: under `build.closes: after-release-verifies` with `close-only`,
-  the build stays open after `deploy.unlease` until `deploy.close` records its transition.
+  the build stays open after `deploy.unlease` until `deploy.close` records its transition. A post to a build
+  whose slug carries a terminal transition is refused, and the sender is answered with that state.
 - **Every step ends in an exit item.** Its witness is the witnesses of every item the run reached. An
   item a route skipped is not owed, and the transition record lists the path the run took. A breakpoint
   declared there blocks it until disposed.
@@ -68,7 +94,15 @@ never collides with a policy key such as `policy.build.scope` (instruction layer
   merges, so a merge of the default branch into the build never reads as the build's additions (the
   gotcha `a-merge-of-the-default-branch-read-as-additions`).
 - **Every command item declares whether it is idempotent or reconciles**, as Runtime requires of every
-  command adapter.
+  command adapter. One whose Actor cell says neither is idempotent by its witness (`cl-dClosedLoop-0092`): a
+  witnessed instance is never re-run, so a successor reads the witness and goes on.
+
+- **A route into a later build reaches today's stand-in.** Until an item's owning build lands, a route into it
+  reaches today's stand-in, where no clause declares another: the attended session's agent for a role item,
+  today's tool for a command, and `push-main.sh` for the lander (the owner's FK-4-9, A4-F14, B1-F8). A stand-in
+  a clause declares for its own route wins, as `cl-dClosedLoop-0123`'s owner item does for a placement routed to
+  Plan or Design (the owner's FK-8-1, C2-F7). The re-cut's `[reconciled-order]` classes each such route with the
+  stand-in it reaches.
 
 - **Every item names its owning build** in its table's `Owner` column (revised 2026-10-17, PM-8 and PM-10, `build/2026-10-17-build-PLAY-dClosedLoop-1-ownership.md`). A step's owners are its items' owners, so a step can have several.
 
@@ -79,11 +113,12 @@ The flow's router, before any step.
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
 | `entry.intake` | hook: prompt-submit, in an owner-bound session only | — | records the owner's prompt, its secrets redacted and its size capped | the hook-written intake entry, carrying the session binding it came from, keyed by its session and content, so it mints no id | `entry.orient`; no intake, because the hook crashed or never fired → `entry.orient` records it absent, and no request mandate exists | dWellOiledMachine |
-| `entry.orient` | orientation scout | `entry.intake` | composes the session's card: refreshed, or the full kickoff's where no READY card exists | the card written to its stores, its keys recomputing | `entry.place`, `entry.place-check` or `entry.place-owner`, as `placement` says | dPlacedRequest |
-| `entry.place` | orientation scout, under `placement: agent-places` | `entry.orient` | returns the disposition from the closed set (continue, amend, new, patch, repeat, ask, none), with its reason and evidence, and names each observation the request claims | `placement.check` over the return's facts | new → `entry.claim`, then Plan, or `plan.triage-rule` on a re-placement after `plan.dedupe`; amend → Design re-entry, or an `intake` message to the session holding the build; patch → `entry.claim`, then Design as a patch build; repeat → `entry.claim`, then Design as a playbook run, its playbook supplying the feature design; an observation the request claims → `probe.trigger` first, as `probe.observations` says, and back to `entry.place` with the probe's record; continue → that build's `next`; ask → filed; none → the answer relayed; a failed check → back to `entry.place` with the refusal | dPlacedRequest |
+| `entry.orient` | orientation scout | `entry.intake` | composes the session's card: refreshed, or the full kickoff's where `kickoff.runs` says (`no-ready-card` by default: where no READY card exists) | the card written to its stores, its keys recomputing | `entry.place`, `entry.place-check` or `entry.place-owner`, as `placement` says | dPlacedRequest |
+| `entry.place` | orientation scout, under `placement: agent-places` | `entry.orient` | returns the disposition from the closed set (continue, amend, new, patch, repeat, unit, breakpoint, ask, none), with its reason and evidence, and names each observation the request claims | `placement.check` over the return's facts | new → `entry.claim`, then Plan, or `plan.triage-rule` on a re-placement after `plan.dedupe`; amend → Design re-entry, or an `intake` message to the session holding the build, and an owner's answer that arrives after its owner item was decided → an amendment that re-enters the item it answers, drawing on `flow.rework-budget` (`[breakpoint]`); patch → `entry.claim`, then Design as a patch build; repeat → `entry.claim`, then Design as a playbook run, its playbook supplying the feature design; an observation the request claims → `probe.trigger` first, as `probe.observations` says, and back to `entry.place` with the probe's record; continue → that build's `next`; unit → one ready unit of a leased build, as `build.unit-holders` says: its `build.unit-lease` taken for this session under `any-session`, refused under `driver-only` (`cl-dClosedLoop-0319`); breakpoint → the breakpoint the request names, declared on that live build as the owner's request, its `review.trigger` firing at its position; ask → filed; none → the answer relayed; a failed check → back to `entry.place` with the refusal | dPlacedRequest |
 | `entry.place-check` | command, under `placement: declared-checked` | `entry.orient` | checks the placement the request declares | `placement.check` over the declared placement | as `entry.place`'s outcomes; a failed check → the request returned with the refusal | dPlacedRequest |
 | `entry.place-owner` | owner, under `placement: owner-places` | `entry.orient` | places the request | the owner's disposition record | as `entry.place`'s outcomes | dPlacedRequest |
-| `entry.claim` | command | a `new`, `patch` or `repeat` disposition from any of the three placing items, or triage's select | mints the build's slug as memory `[names]` says, and claims it by a compare-and-swap push that creates `refs/gov/claims/<slug>` on the remote, the way unattended claims `refs/gov/runs/<slug>`; `check_slug_claimed` is only its local pre-check. The claim commit carries the claimant's key, the session and the intake's or the ask's content key, so a retry that finds its own key counts as claimed. On `patch` or `repeat` it also takes the build's lease, which such a build never reaches `plan.lease` to take | the claim ref on the remote; on `patch` or `repeat`, the lease record too | claimed → Plan, or Design on `patch` or `repeat`; the slug claimed under another key → a fresh slug, within `flow.route-backs`; the lease refused → as `leases` says; the remote unreachable → no local id minted, the claim queued or refused as `leases.offline` says (DA-M13, FL1) | dPlacedRequest |
+| `entry.claim` | command | a `new`, `patch` or `repeat` disposition from any of the three placing items, or triage's select | mints the build's slug as memory `[names]` says, and claims it by a compare-and-swap push that creates `refs/gov/claims/<slug>` on the remote, the way unattended claims `refs/gov/runs/<slug>`; `check_slug_claimed` is only its local pre-check. The claim commit carries the claimant's key, the session and the intake's or the ask's content key, so a retry that finds its own key counts as claimed. On `patch` or `repeat` it also takes the build's lease, which such a build never reaches `plan.lease` to take, and writes the build's derived plan record: a patch's minimal plan record from its intake or filing, a repeat's from its playbook. On a patch the post-close row raises, the claim commit also carries the originating build's slug and landed SHA, which key the budget the patch draws on | the claim ref on the remote; on `patch` or `repeat`, the lease record and the derived plan record too | claimed → Plan; on `repeat`, Design; on `patch`, `plan.dedupe`, then Design once its derived plan record is ratified as `patch.ratify` says: under `auto` the record stands, and under `owner` an owner item holds it until the owner's disposition, as every ratification is held (LR-3, FH1); the slug claimed under another key → a fresh slug, within `flow.route-backs`, each retry drawing on the pre-claim budget keyed to the intake's content key (`cl-dClosedLoop-0132`); the lease refused → by its cause (`[rules]`), the claim staying on the remote, keyed to its claimant, so the ask or the owner item names the slug and a retry finds it claimed; the remote unreachable → no local id minted, the claim queued or refused as `leases.offline` says (DA-M13, FL1) | dPlacedRequest |
+| `mailbox.answer` | the role that owns the asked interface or item, one per question | a `question` addressed to the build or one of its units, which `next` dispatches when it arrives | answers the question from the build's records: the asked interface's declaration, or the asked item's witnesses | a computed join: the `answer` message names the question's id and cites records that exist at their SHAs | answered → the `answer` posted to the asker's mailbox; no answer within `flow.wait-ceiling` → the asker's declared default answers it (`cl-dClosedLoop-0162`) | dKeptSession |
 
 - **Whose prompt is intake.** Only a session whose binding record says "owner" writes intake: the session the
   owner types in, attended or not, since attendance is a mode and not a kind of session (night pass, point 1). An
@@ -95,9 +130,17 @@ The flow's router, before any step.
   length and its hash.
 - **The hook is Runtime's.** Its event joins Runtime's enforcement surface, with a witness its reader
   checks (`gap-rt-14`).
-- **Policies:** `placement`, `placement.check`, `builds.slug-*`, `leases.*` and `flow.route-backs`.
+- **Before the builds it rests on land.** dPlacedRequest builds the step's items ahead of two later builds, so
+  each later part has a stand-in until its build lands:
+  - dRankedPlan's `kickoff.runs` (`cl-dClosedLoop-0376`): `entry.orient` runs the full kickoff where no READY card
+    exists, the key's default, `no-ready-card`;
+  - dWellOiledMachine's unit holders (`cl-dClosedLoop-0319`) and `build.unit-holders`: a `unit` disposition is
+    refused as under `driver-only`, the build's driver alone driving its units.
+- **Policies:** `placement`, `placement.check`, `kickoff.runs`, `builds.slug-*`, `leases.*`, `build.unit-holders`,
+  `patch.ratify`, `flow.wait-ceiling` and `flow.route-backs`.
 - **Owner** (revised 2026-10-17, PM-9, and 2026-10-18, SP-1): dPlacedRequest builds the step's items, and `entry.intake`'s
-  hook stays dWellOiledMachine's, with `gap-rt-14`. The owner column lands with the ownership table
+  hook stays dWellOiledMachine's, with `gap-rt-14`. `mailbox.answer` is dKeptSession's, which builds the mailbox
+  (the owner's FK-5-4). The owner column lands with the ownership table
   (PM-8, PM-10).
 
 Other sources enter Plan's triage directly:
@@ -128,17 +171,21 @@ plan record.
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
 | `plan.input` | command | — | pins the intake record, or the selected ask, filing or proposal | its SHA | `plan.dedupe`; an observation the request claims, under `probe.observations: verify-at-plan` → `probe.trigger` first, then `plan.dedupe` with the probe's record | dRankedPlan |
-| `plan.dedupe` | command | `plan.input` | checks for duplicates and overlaps against live builds, the design index and open asks | the dupes record, keyed by the derived index | none → `plan.triage-rule`; a duplicate or an overlap → `entry.place`, with the finding | dRankedPlan |
+| `plan.dedupe` | command | `plan.input`, or `entry.claim` on a patch | checks for duplicates and overlaps against live builds, the design index and open asks | the dupes record, keyed by the derived index | none → `plan.triage-rule`; none, on a patch → Design as a patch build, its ratification held as `entry.claim` routes it; a duplicate or an overlap → `entry.place`, with the finding | dRankedPlan |
 | `plan.triage-rule` | command | `plan.dedupe` | applies the declared rules: severity, acceptance, readiness | the triage record naming its rule | select → `plan.record`, through `entry.claim` first on a pass outside any build; defer → filed as an ask, with its acceptance; retire → the ask retired, with the rule; refuse → out of scope, and the requester told; no rule decides → `plan.triage-judge` | dRankedPlan |
 | `plan.triage-judge` | planner | `plan.triage-rule` | triages what no rule decides, choosing select, defer, retire or refuse | the schema check over its return, its choice joined to the triage record | as `plan.triage-rule`'s outcomes | dRankedPlan |
-| `plan.record` | planner | a select | drafts the plan record: problem, goal, cut-line in and out, acceptance as observations, priority, parents with the interfaces it expects, and each active practice's Plan reach | the plan-record schema check | drafted → `plan.place`; a research request → `plan.research`; an owner question → an owner item, resolved as [breakpoint]'s owner gate is (FH1) | dRankedPlan |
+| `plan.record` | planner | a select | drafts the plan record: problem, goal, cut-line in and out, acceptance as observations, priority, parents with the interfaces it expects, and each active practice's Plan reach | the plan-record schema check | drafted → `plan.place`; a research request → `plan.research`; an owner question → an owner item, resolved as [breakpoint]'s owner gate is (FH1), and an answer that arrives after it was decided re-enters `plan.record` as an amendment (FK-4-1) | dRankedPlan |
 | `plan.research` | researcher | the request of `plan.record` | answers the planner's question | the research record's schema check | `plan.record` | dRankedPlan |
 | `plan.place` | command | `plan.record` | regenerates the plan view, the build placed by priority and parents | the placement predicate | placed → `plan.lease`; unplaced → as `plan.unplaced` says | dRankedPlan |
-| `plan.lease` | command | `plan.place` | takes the build lease by compare-and-swap | the lease record the lease engine writes at each take | held → `plan.recommend`; an overlap → noted on the card and in the other build's mailbox; refused → as `leases` says | dRankedPlan |
+| `plan.lease` | command | `plan.place` | takes the build lease by compare-and-swap | the lease record the lease engine writes at each take | held → `plan.recommend`; an overlap, or a refusal → by its cause (`[rules]`), an overlap under `leases: warn` going on as held | dRankedPlan |
 | `plan.recommend` | command | `plan.lease` | scores the review recommendation | the recommendation record | `plan.reason`, or under `signals-only`: no review → `plan.exit`, a review → the Plan breakpoint | dDeclaredLoop |
 | `plan.reason` | planner | `plan.recommend` | answers the step's one question, the score handed | the schema check, its answer joined to the recommendation record | no review → `plan.exit`; a review → the Plan breakpoint | dDeclaredLoop |
 | `plan.exit` | command | every item the run reached | records the transition; under `plan.ratification: request`, the intake record stands as the ratification | the transition record over the reached items' witnesses | Design; the card is re-rendered and the executor launched where `run.host` says | dRankedPlan |
 
+- **Before the builds it rests on land.** Until dWellOiledMachine's hook writes intake (`cl-dClosedLoop-0378`),
+  `plan.input` pins `entry.orient`'s record of the intake absent, and the owner's words are taken as the owner
+  gate's disposition, which `plan.exit` holds under `plan.ratification: request`. Until dIndexedDesign lands the
+  design index (`cl-dClosedLoop-0384`), `plan.dedupe` checks against live builds and open asks only.
 - **Roles:** planner and researcher; reviewers at a breakpoint.
 - **Instruction:**
   - the practices' Plan reach (for `[yagni]`: is the need real now?);
@@ -164,7 +211,7 @@ plan record.
 ## [design] Design: how will it be built, and in what pieces?
 
 **Enters** on any of seven inputs:
-- the ratified plan record;
+- the ratified plan record, which may name a build it supersedes;
 - an admitted in-goal amendment;
 - a ratified plan revision;
 - a patch build's derived plan record, its slug claimed and its lease taken by `entry.claim`;
@@ -178,18 +225,18 @@ posted to dependents. The build moves through Design whole (FL-D1).
 
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
-| `design.input` | command | — | pins the input and its kind | its SHA and kind | plan record → `design.seams`; amendment → `design.reentry`; plan revision → `design.inventory`; patch → `design.unit-spec`, as a micro-spec; finding or fix unit → `design.unit-spec` for its new unit, or `design.decompose` when it changes an interface; playbook run → `design.unit-spec`, one unit for each piece its playbook declares | dIndexedDesign |
+| `design.input` | command | — | pins the input and its kind | its SHA and kind | plan record → `design.seams`; a plan record naming a build it supersedes → `design.seams`, and `design.inventory` over that build's built units at its kept branch's tip; amendment → `design.reentry`; plan revision → `design.inventory`, over the withdrawn parent's kept units too under `deps.on-parent-withdrawn: adopt-parent-work`; patch → `design.overlaps` for its unit, then `design.unit-spec`, as a micro-spec, its red-first reproduction owed before its first `build.unit-pass` when it comes from a bug report (`probe.trigger`); finding or fix unit → `design.overlaps` for its new unit, then `design.unit-spec`, or `design.decompose` when it changes an interface; playbook run → `design.unit-spec`, one unit for each piece its playbook declares | dIndexedDesign |
 | `design.reentry` | command | `design.input` | classifies an amendment by a structural diff of the declared interfaces (FL-B4) | the diff record | additive and untriggered → `design.unit-spec` for the new units; breaking, or a `design.reentry` trigger → `design.decompose` for that feature | dIndexedDesign |
-| `design.inventory` | architect | `design.input` | after a plan revision, gives each completed unit a verdict (kept, amended by a new unit, or retired) with its reason | the inventory joined to every built unit | `design.decompose` | dIndexedDesign |
+| `design.inventory` | architect | `design.input` | after a plan revision, gives each completed unit a verdict (kept, amended by a new unit, or retired) with its reason; on a supersession, each built unit of the superseded build; under `adopt-parent-work`, each kept unit of the withdrawn parent, at its kept branch's tip | the inventory joined to every built unit | `design.decompose` | dIndexedDesign |
 | `design.seams` | reuse scout | `design.input` | finds the seams by a tree search over the plan's scope paths and the open asks, adding the map's and recall's sources where installed | the seams' probe digests, re-derived by the executor | `design.decompose` | dIndexedDesign |
-| `design.decompose` | architect | `design.seams`, `design.inventory` or `design.reentry` | decomposes into features and units: feature designs declaring interfaces structurally (producer, consumers, contract), units with their order and write sets, and feature forks recorded | the roster and interface schema check; every raised feature fork joined to its fork record, which carries its id, its resolver and its declared class | decomposed → `design.overlaps`; a fact fork → `design.research`; a fork the goal cannot survive → a plan revision under the mandate (FR-12) | dIndexedDesign |
+| `design.decompose` | architect | `design.seams`, `design.inventory` or `design.reentry`; on a supersession, `design.seams` and `design.inventory` | decomposes into features and units: feature designs declaring interfaces structurally (producer, consumers, contract), units with their order and write sets, and feature forks recorded | the roster and interface schema check; every raised feature fork joined to its fork record, which carries its id, its resolver, its declared class, and the admitted options in their ranking with the pick | decomposed → `design.overlaps`; a fact fork → `design.research`; a fork the goal cannot survive → a plan revision under the mandate (FR-12) | dIndexedDesign |
 | `design.research` | researcher | the asking item | answers a fact fork | the research record's schema check | back to the item that asked | dIndexedDesign |
-| `design.overlaps` | command | `design.decompose` | runs the design index over the roster's write sets, against live builds | the overlap record | `design.streams` where `design.streams` holds for the build, else `design.unit-spec` | dIndexedDesign |
-| `design.streams` | planner, through the planning workflow | `design.overlaps`, where `design.streams` holds for the build | groups the roster's units into streams that several node units can take at once, by their declared order, write sets and the overlap record, the workflow's agents at the planner's effort, medium by default, and needing no head (the owner's CL-3) | the stream plan, each stream's units re-derived against the order and the overlap record | `design.unit-spec` | dIndexedDesign |
-| `design.unit-spec` | spec writer, one per unit, in parallel within the bound | `design.overlaps` or `design.streams`, or the input's unit | writes the unit's structured spec: definitions, design, boundaries, interfaces, acceptance as observations with their commands, and each active practice's Design reach; resolves unit forks by `design.forks`; acknowledges the unit's overlaps in its boundaries | the format check on the spec at its SHA; every raised fork joined to its fork record, which carries its id, its resolver and its declared class | authored → `design.recommend`; a feature-level fork → `design.decompose` | dIndexedDesign |
+| `design.overlaps` | command | `design.decompose`, or `design.input` for a patch, finding or fix unit | runs the design index over the roster's write sets, or the unit's, against live builds, and acts as `design.overlap` says | the overlap record | under `warn`, each overlap noted for the unit's spec writer, and under `index-only`, recorded in the design index only, each then → `design.streams` where `policy.design.streams-when` holds for the build, else `design.unit-spec`; under `refuse`, an overlap no build acknowledges → back to `design.decompose` with the overlap record, and none → as under `warn` | dIndexedDesign |
+| `design.streams` | planner, through the planning workflow | `design.overlaps`, where `policy.design.streams-when` holds for the build | groups the roster's units into streams that several node units can take at once, by their declared order, write sets and the overlap record, the workflow's agents at the planner's effort, medium by default, and needing no head (the owner's CL-3) | the stream plan, each stream's units re-derived against the order and the overlap record | `design.unit-spec` | dIndexedDesign |
+| `design.unit-spec` | spec writer, one per unit, in parallel within the bound | `design.overlaps` or `design.streams`, or the input's unit | writes the unit's structured spec: definitions, design, boundaries, interfaces, acceptance as observations with their commands, and each active practice's Design reach; resolves unit forks by `design.forks`; acknowledges the unit's overlaps in its boundaries | the format check on the spec at its SHA; every raised fork joined to its fork record, which carries its id, its resolver, its declared class, and the admitted options in their ranking with the pick | authored → `design.recommend`; a feature-level fork → `design.decompose` | dIndexedDesign |
 | `design.recommend` | command | every unit's `design.unit-spec` | scores the recommendation | the recommendation record | `design.reason`, or under `signals-only`: no review → `design.ready`, a review → the spec audit | dDeclaredLoop |
 | `design.reason` | architect | `design.recommend` | answers the step's one question, the score handed | the schema check, its answer joined to the recommendation record | no review → `design.ready`; a review → the spec audit | dDeclaredLoop |
-| `design.ready` | command | `design.recommend`, and the spec audit where it ran | derives READY per unit | derived READY: none MISSING, THIN or FORKED | all READY → `design.exit`; any not → back to that unit's spec writer | dIndexedDesign |
+| `design.ready` | command | `design.reason`, or `design.recommend` under `signals-only`, and, where either routed to the spec audit, that audit's `review.dispose` and its last `review.fold` | derives READY per unit, as `design.handoff` says: under `derived-ready`, READY alone; under `ready-plus-audit`, READY and the spec audit's disposition, the audit owed; under `status-and-tier`, each spec's status and tier, as today | derived READY: none MISSING, THIN, FORKED or, under `design.coverage`, UNCARRIED (`cl-dClosedLoop-0398`) | all READY → `design.exit`; any not → back to that unit's spec writer | dIndexedDesign |
 | `design.exit` | command | `design.ready` | records the transition, and posts the confirmed interfaces to dependents | the transition record | Build | dIndexedDesign |
 
 - **Roles:** reuse scout, architect, spec writer and researcher; reviewers at a breakpoint.
@@ -197,7 +244,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the practices' Design reach;
   - the decomposition and spec-writing views;
   - the feature-design schema, the structured spec and the micro-spec;
-  - the policies: `design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `deps.early-build`, `deps.messaging`, `review.design`, `review.design.rounds`, `review.design.round-count`, `review.recommendation.source` and `flow.route-backs`.
+  - the policies: `design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `design.coverage`, `deps.early-build`, `deps.messaging`, `deps.on-parent-withdrawn`, `review.design`, `review.design.rounds`, `review.design.round-count`, `review.recommendation.source` and `flow.route-backs`.
 - **Memory:**
   - reads the plan record, the design index and the parents' confirmed interfaces;
   - writes the roster, the feature designs, the specs, the fork records, each resolved fork with its
@@ -221,7 +268,7 @@ posted to dependents. The build moves through Design whole (FL-D1).
 
 ## [build] Build: is each unit built to its spec?
 
-**Enters** when every unit is READY and the mandate is active.
+**Enters** when every unit is READY and the mandate is active, or for a resolution pass from `test.merge`.
 
 **Exits** when:
 - every unit is built, with its acceptance recorded;
@@ -231,38 +278,47 @@ posted to dependents. The build moves through Design whole (FL-D1).
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
 | `build.base` | command | — | pins the base from history, and the mandate | the base SHA and the intake record | `build.unit-lease` | dScopedBuild |
-| `build.unit-lease` | command | `build.base` | takes each starting unit's lease with its write set, declared as the driver's `--dispatch --pass <id> --writes <path>` declares one | the lease record | held → `build.unit-pass`; an overlap → warned (`leases.overlap`); refused → as `leases` says | dScopedBuild |
+| `build.unit-lease` | command, one per unit | `build.base`, and `build.reuse-check` of each unit the declared order puts before it | takes the unit's lease with its write set as the unit starts, declared as the driver's `--dispatch --pass <id> --writes <path>` declares one | the lease record | held → `build.unit-pass`; an overlap, or a refusal → by its cause (`[rules]`), an overlap under `leases: warn` going on as held | dScopedBuild |
 | `build.unit-pass` | builder, one per unit, in declared order; disjoint write sets in parallel | `build.unit-lease` | builds and commits one pass, with the unit id and its trailers; the executor queues its commits | the commit, resolved by the executor. Each unit `reuse.propose` selects carries its reuse line, `proposed <tag>` or `none` with its reason: under `new-seam`, a unit whose spec's reuse audit records a new seam; under `every-unit`, every unit; under `owner-asks`, none, as below. A fix unit carries the class records its findings' `new:` dispositions owe, in its write set, and where the map is installed the claiming dossier's edit. Revised 2026-10-17, the debt round's fold: the line is computed, never taken as typed. `proposed <tag>` joins the instruction command's proposal record for that unit and tag. `none` from a unit whose spec's reuse-audit token (`gap-design-05`) records an existing seam joins that token; from a unit whose token records a new seam, it carries a reason from a closed set (single-use, internal to its feature, or covered by an existing entry whose tag resolves). Under `owner-asks`, no line is owed, and the owner names the features to enter through the instruction command, as LB-2 offered it. For each `new:` slug a fix unit's findings owe, a record under `memory/gotchas/` exists at the unit's commit, its `from:` naming the review and the finding; a missing one is red | committed → `build.acceptance`; spec wrong → the spec writer (unit re-entry); interface change → the architect (feature re-entry if breaking); fork → as `design.forks` says | dScopedBuild |
-| `build.acceptance` | executor | `build.unit-pass` | re-runs the spec's acceptance commands on the commit | the executor-written acceptance record | pass → `build.scope`; fail → a fix pass | dScopedBuild |
-| `build.scope` | command | `build.acceptance` | checks the commit's paths against its unit's write set, from history, as the driver's `--check-commit` and check 23 already grade a pass; and, where retrofit's ledger is seeded, the touch join over the unit's own commits (retrofit `[drain]`) | the scope report | in scope → the unit's next pass, or, its last pass done, `build.reuse-check`; stray → as `build.scope` says: warned with an ask, reported, or refused. A refused stray routes to a revert pass on the unit, and a stray the range later reverts passes | dScopedBuild |
-| `build.reuse-check` | reuse scout, one per unit, at medium | `build.scope` | lists the units the unit's commits add, from the code record, capped at sixty with an overflow line, and answers one row per unit (`duplicate`, `should-extend`, `new` or `not-a-unit`, each with its nearest existing symbol or what was searched), added rows for what the lister cannot see, and one row per MUST seam the unit's spec carried (`used`, `bypassed` or `not-applicable`), under a no-stop line | a computed join: every listed unit and every MUST has one row, and a `bypassed` MUST is also a `duplicate` | clean → the unit built; a `duplicate` or `bypassed` row → a fix pass on the unit, which may answer a row `disputed` with its reason, and a disputed row → the closing review; re-entries past `flow.route-backs` → that item's loop ends non-converging and its open rows go to asks, each re-entry drawing on `flow.rework-budget` (revised 2026-10-19 by the owner's SL-1 and SL-2, the parked debt's review: they went to the owner); an overflow past sixty → a further pass over the remainder, never clean; under `build.reuse-check.second-pass: on`, a second independent pass, its rows unioned (the night pass two, point 2, the dispute and the overflow added by its review) | dScopedBuild |
-| `build.recommend` | command | every unit built and reuse-checked | scores the recommendation, signals only: Build runs a builder per unit, so it has no single producing role | the recommendation record | the closing review where owed; otherwise `build.ratify` under `decisions.major: author-owner-ratifies`, else `build.distill` | dDeclaredLoop |
-| `build.ratify` | owner, under `decisions.major: author-owner-ratifies` | `build.recommend`, and the closing review where it ran | rules on each fork its author classed major: ratified, or rejected, when the command re-classes the fork as not major on its fork record, acting on the verdict | the owner's disposition record for each major fork | `build.distill`; held → until the owner's disposition record, a ratification `run.on-owner-question` never resolves (FH1) | dScopedBuild |
-| `build.distill` | command, idempotent | `build.recommend`, the closing review where it ran, and `build.ratify` under `author-owner-ratifies` | appends to the decision log, in the build's own branch, a row for each of its resolved forks whose class is major, as `decisions.major` says: its date, its build, the fork's id, the decision, a pointer to its rationale, and the reuse entry it created, if any. Its population is the fork records that Design's witnesses and Build's fork records joined, never a directory listing. Under `owner-only`, only a fork the owner resolved may be major; under `author-owner-ratifies`, only a ratified fork's row is written. A row already present, keyed by (build, fork id), is skipped | a one-to-one join on (build, fork id) between the build's resolved forks, each with its class declared, and a row for each major one; a fork with no class, or a second row for one key, is red; under `owner-only`, a major row whose fork the owner did not resolve is red | `build.core`; a fork with no class → back to the role that resolved it, a unit re-entry counted against `flow.route-backs`; under `owner-only`, a major fork the owner did not resolve → an owner item: re-classed as not major, or resolved by the owner | dScopedBuild |
+| `build.acceptance` | executor | `build.unit-pass` | re-runs the spec's acceptance commands on the commit, and for each gate the unit adds or changes, re-runs its planted red and writes the seen-red record, one per gate, keyed by leg and red SHA | the executor-written acceptance record, and a seen-red record per gate the unit adds or changes | pass → `build.scope`; fail, a planted red that stays green included → `build.fix-pass`, and past `flow.route-backs` as `[rules]` says | dScopedBuild |
+| `build.fix-pass` | builder, one per red unit | the red record that routed it: a failed `build.acceptance`, a `duplicate` or `bypassed` row of `build.reuse-check`, a code miss `test.attribute` judged, or a gate `test.seen-red` found unseen | builds and commits one fix pass on the unit, its allowance the unit's write set less the red check's own test files and gate script and the acceptance commands' files (M16, `[test]`'s "A fix pass keeps its check"), each pass drawing on `flow.rework-budget` | the commit, resolved by the executor | `build.acceptance` | dScopedBuild |
+| `build.scope` | command | `build.acceptance` | checks the commit's paths against its unit's write set, from history, as the driver's `--check-commit` and check 23 already grade a pass; and, where retrofit's ledger is seeded, the touch join over the unit's own commits (retrofit `[drain]`) | the scope report | in scope → the unit's next pass, or, its last pass done, `build.reuse-check`; stray → as `build.scope` says: warned with an ask, reported, or refused. A refused stray routes to `build.revert-pass` on the unit, and a stray the range later reverts passes | dScopedBuild |
+| `build.revert-pass` | builder | `build.scope`'s refused stray, or a best-effort descope of a failing unit already in Test's tree (`[transitions]`) | reverts the stray paths, or the descoped unit's commits, in one commit on the unit, drawing on `flow.rework-budget` as a fix pass does, and nothing for a descope, which is an ending and not a lap | the commit, resolved by the executor | `build.scope`; on a descope, `build.core` over the range without the unit, which goes to an ask named on Build's transition record | dScopedBuild |
+| `build.reuse-check` | reuse scout, one per unit, at medium | `build.scope` | lists the units the unit's commits add, from the code record, capped at sixty with an overflow line, and answers one row per unit (`duplicate`, `should-extend`, `new` or `not-a-unit`, each with its nearest existing symbol or what was searched), added rows for what the lister cannot see, and one row per MUST seam the unit's spec carried (`used`, `bypassed` or `not-applicable`), under a no-stop line | a computed join: every listed unit and every MUST has one row, and a `bypassed` MUST is also a `duplicate` | clean → the unit built, and `build.recommend` once every unit in the roster has its `build.reuse-check` witnessed clean; a `duplicate` or `bypassed` row → `build.fix-pass` on the unit, which may answer a row `disputed` with its reason, and a disputed row → the closing review; re-entries past `flow.route-backs` → that item's loop ends non-converging and its open rows go to asks, each re-entry drawing on `flow.rework-budget` (revised 2026-10-19 by the owner's SL-1 and SL-2, the parked debt's review: they went to the owner); an overflow past sixty → a further pass over the remainder, never clean; under `build.reuse-check.second-pass: on`, a second independent pass, its rows unioned (the night pass two, point 2, the dispute and the overflow added by its review) | dScopedBuild |
+| `build.recommend` | command | `build.reuse-check`, witnessed clean for every unit in the roster, the units `review.dispose` minted included | scores the recommendation, signals only: Build runs a builder per unit, so it has no single producing role | the recommendation record | the closing review where owed, but on a lap whose units a closing review's findings minted, that review's follow-up round as `review.follow-up` says, never a fresh closing review; otherwise `build.ratify` under `decisions.major: author-owner-ratifies`, else `build.distill` | dDeclaredLoop |
+| `build.ratify` | owner, under `decisions.major: author-owner-ratifies` | `build.recommend`, and, where it routed to the closing review, that review's `review.dispose`, every unit it minted with its `build.reuse-check` witnessed clean | rules on each fork its author classed major: ratified, or rejected, when the command re-classes the fork as not major on its fork record, acting on the verdict | the owner's disposition record for each major fork | `build.distill`; held → until the owner's disposition record, a ratification `run.on-owner-question` never resolves (FH1) | dScopedBuild |
+| `build.distill` | command, idempotent | `build.recommend`; where it routed to the closing review, that review's `review.dispose`, every unit it minted with its `build.reuse-check` witnessed clean; and `build.ratify` under `author-owner-ratifies` | appends to the decision log, in the build's own branch, a row for each of its resolved forks whose class is major, as `decisions.major` says: its date, its build, the fork's id, the decision, a pointer to its rationale, and the reuse entry it created, if any. Its population is the fork records that Design's witnesses and Build's fork records joined, never a directory listing. Under `owner-only`, only a fork the owner resolved may be major; under `author-owner-ratifies`, only a ratified fork's row is written. A row already present, keyed by (build, fork id), is skipped | a one-to-one join on (build, fork id) between the build's resolved forks, each with its class declared, and a row for each major one; a fork with no class, or a second row for one key, is red; under `owner-only`, a major row whose fork the owner did not resolve is red | `build.core`; a fork with no class → back to the role that resolved it, a unit re-entry counted against `flow.route-backs`; under `owner-only`, a major fork the owner did not resolve → an owner item: re-classed as not major, or resolved by the owner | dScopedBuild |
 | `build.core` | executor | `build.distill` | runs the core checks over the build's range, the decision-log rows included | the executor-written result | clean → `build.exit`; an own red → a fix unit through Design, or excepted (`core.exceptions`) | dScopedBuild |
 | `build.exit` | command | `build.core` | records the transition | the transition record | Test | dScopedBuild |
+| `build.resolve` | builder | `test.merge`'s conflict | resolves the conflict in the units it touches, a recorded resolution pass (flow-interactions), its allowance those units' write sets; the pass, and any re-review, are contention and draw nothing | the resolution commit, resolved by the executor, and the routing record | `test.merge`; an interface clash → the architect (feature re-entry) | dScopedBuild |
 
 **The closing review** is the breakpoint between `build.recommend` and `build.ratify` under
 `decisions.major: author-owner-ratifies`, otherwise `build.distill`, owed by default:
 - it reviews through the diff lens;
 - its findings become new units by `review.findings`, so built specs stay frozen (P19), and those
-  units pass through Design and back;
+  units pass through Design and back, Build's tail waiting until each is built, seen red on a planted finding
+  unit that must hold `build.exit`;
 - a follow-up round runs after a HIGH finding (`review.follow-up`);
 - `build.ratify` where it applies, then `build.distill` and `build.core`, run over the range, the
   findings' units included, so the core checks grade the decision-log rows too (Revised 2026-10-17, the
   debt round's fold and the folds' closing review).
 
-- **Roles:** builder; the spec writer and the architect on a divergence; reviewers at the closing
-  review.
+- **Before the build it rests on lands** (the owner's FK-9-1). dDeclaredLoop builds `build.recommend` ahead of
+  dScopedBuild, so until dScopedBuild lands `build.ratify`, its route there under `decisions.major:
+  author-owner-ratifies` reaches dDeclaredLoop's own owner gate, held for the owner's disposition, as RC-9's
+  fallback holds `plan.exit` (`cl-dClosedLoop-0378`). Being a ratification, it is never decided by
+  `run.on-owner-question` (LR-3).
+- **Roles:** builder, for the unit passes, the fix and revert passes and the resolution pass; the spec writer and
+  the architect on a divergence; reviewers at the closing review.
 - **Instruction:**
   - the practices' Build reach;
   - the unit-building and divergence views;
   - the trailer and builder-return schemas;
-  - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `reuse.propose`, `decisions.major`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial`, `run.on-owner-question` and `flow.route-backs`.
+  - the policies: `build.worktree`, `build.scope`, `leases.*`, `design.forks`, `design.reentry`, `review.build`, `review.findings`, `review.follow-up`, `reuse.propose`, `decisions.major`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial`, `run.on-owner-question`, `deps.on-parent-withdrawn`, `flow.rework-budget` and `flow.route-backs`.
 - **Memory:**
   - reads the specs at their SHAs, the write sets, and the bug classes the specs name (revised 2026-10-19,
     the night pass two, point 6, the owner's NT-24: no longer those the write sets select);
-  - writes the commits, the acceptance records, the scope reports, the review report, the core result,
+  - writes the commits, the acceptance and seen-red records, the scope reports, the review report, the core result,
     the reuse lines and proposals, the fix units' class records, the fork records of forks resolved in
     Build, each with its id, resolver and class, written by whoever `design.forks` names to resolve
     it, a rejected fork's re-class, the decision-log rows and the transition.
@@ -290,16 +346,16 @@ posted to dependents. The build moves through Design whole (FL-D1).
 
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
-| `test.merge` | command: the lander's `--prepare` | — | under `verdict.tree: prepared-merge`, prepares the landing merge in Test's worktree: the build merged onto the default branch's tip, kit versions minted where distribution fills the version slot, otherwise the announced skip, and outputs regenerated into it. Under `build-tip`, it pins the build's tip | the prepared merge's SHA and tree hash, or the tip's | prepared → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes; refused → an ask naming the lander's refusal | dWitnessedBar |
-| `test.select` | command | `test.merge` | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`). A held leg whose verdict records show `verdict.flakes`' threshold of consecutive greens since its hold, or whose manifest row changed, is released: selected as an ordinary leg, its held-flaky-leg ask closed citing the streak. Without observability's Maintain, the levels left to its cadence too, as `tests.without-cadence` says | the selection record | `test.verdict` | dWitnessedBar |
+| `test.merge` | command: the lander's `--prepare` | — | under `verdict.tree: prepared-merge`, prepares the landing merge in Test's worktree: the build merged onto the default branch's tip, kit versions minted where distribution fills the version slot, otherwise the announced skip, and outputs regenerated into it. Under `build-tip`, it pins the build's tip | the prepared merge's SHA and tree hash, or the tip's | prepared → `test.select`; a conflict → `build.resolve`, contention that draws nothing; refused → an ask naming the lander's refusal | dWitnessedBar |
+| `test.select` | command | `test.merge` | selects the legs the paths claim, the declared product-test levels (`tests.landing-levels`) and the held legs (`verdict.held`). A held leg whose verdict records show `verdict.flakes.release`' streak of consecutive greens since its hold, or whose manifest row changed, is released: selected as an ordinary leg, its held-flaky-leg ask closed citing the streak. Without observability's Maintain, the levels left to its cadence too, as `tests.without-cadence` says | the selection record | `test.verdict` | dWitnessedBar |
 | `test.verdict` | command: the bar's runner, on the declared backend | `test.select` | runs the bar with attribution (`GATE_ATTRIBUTE`); the runner writes the verdict record for the tree, which the pre-push hook reads | the runner-written verdict per tree hash, each red classed OWN, INHERITED, MIXED, CONTENDED or DEAD PROBE | green → `test.seen-red`; red → `test.route`; stale → `test.merge` | dWitnessedBar |
-| `test.route` | command | `test.verdict` | re-runs each red leg once on the same tree, under `test.verdict`'s env, then routes each red by its computed class, as `verdict.blocks` says. A leg red then green is nondeterministic | every red joined to one route, with its re-run's verdict | a nondeterministic leg → `test.flakes`; an OWN or MIXED red → `test.attribute`; a blocking CONTENDED red → a re-run on a quiet host; a blocking DEAD PROBE → the probe repaired, or an owner exception (`core.exceptions`); a blocking INHERITED red → a fix unit through Design, or an owner exception; a red that does not block → an ask | dWitnessedBar |
-| `test.attribute` | tester | the OWN and MIXED reds of `test.route` | judges each such red: the code misses its spec, or the spec is wrong | a computed join: every such red has one judgment, and the artifact its route names exists | as `verdict.red-route` says: under `fix-pass-or-design`, a code miss → a fix pass in Build and a wrong spec → a new unit through Design; under `always-new-unit`, both → a new unit through Design | dWitnessedBar |
-| `test.flakes` | command | the nondeterministic reds of `test.route` | records each nondeterministic leg as the flake record, of which it is the one writer, except under `retry-only`, and acts as `verdict.flakes` says | the flake record, a flow record kind; under `retry-only`, the re-entry's routing record | under `quarantine`, a leg past the threshold `verdict.flakes` declares is held, an ask is filed in the held-flaky-leg form, keyed by the leg's name, unless one is open for that leg, and the run re-enters `test.select`, which applies the hold, while a leg below it goes as under `record`; under `record`, the flake is recorded and the run re-enters `test.verdict`; under `retry-only`, the run re-enters `test.verdict` and nothing is recorded. Each re-entry counts against `flow.route-backs` | dWitnessedBar |
-| `test.seen-red` | command | `test.verdict` | checks that every gate the build added or changed has a seen-red record | the seen-red records | all present → `test.recommend`; one missing → a fix pass on the unit that added the gate | dWitnessedBar |
+| `test.route` | command | `test.verdict` | re-runs each red leg once on the same tree, under `test.verdict`'s env, then routes each red by its computed class, as `verdict.blocks` says. A leg red then green is nondeterministic | every red joined to one route, with its re-run's verdict | a nondeterministic leg → `test.flakes`; an OWN red, or a MIXED red that `verdict.blocks` blocks → `test.attribute`; a blocking CONTENDED red → a re-run on a quiet host; a blocking DEAD PROBE → the probe repaired, or an owner exception (`core.exceptions`); a blocking INHERITED red → a fix unit through Design, or an owner exception; a red that does not block → an ask | dWitnessedBar |
+| `test.attribute` | tester | the OWN reds, and the blocking MIXED reds, of `test.route` | judges each such red: the code misses its spec, or the spec is wrong | a computed join: every such red has one judgment, and the artifact its route names exists | as `verdict.red-route` says: under `fix-pass-or-design`, a code miss → `build.fix-pass` and a wrong spec → a new unit through Design; under `always-new-unit`, both → a new unit through Design | dWitnessedBar |
+| `test.flakes` | command | the nondeterministic reds of `test.route` | records each nondeterministic leg as the flake record, of which it is the one writer, except under `retry-only`, and acts as `verdict.flakes` says | the flake record, a flow record kind; under `retry-only`, the re-entry's routing record | under `quarantine`, a leg whose flakes reach `verdict.flakes.entry` in its window of verdicts is held, an ask is filed in the held-flaky-leg form, keyed by the leg's name, unless one is open for that leg, and the run re-enters `test.select`, which applies the hold, while a leg below it goes as under `record`; under `record`, the flake is recorded and the run re-enters `test.verdict`; under `retry-only`, the run re-enters `test.verdict` and nothing is recorded. Each re-entry counts against `flow.route-backs`, past which as `[rules]` says | dWitnessedBar |
+| `test.seen-red` | command | `test.verdict` | reads the seen-red record `build.acceptance` wrote for every gate the build added or changed, and writes none | the seen-red records, joined one to one to the gates the build added or changed | all present → `test.recommend`; one missing, a planted gate with no recorded red among them → `build.fix-pass` on the unit that added the gate | dWitnessedBar |
 | `test.recommend` | command | `test.seen-red` | scores the recommendation | the recommendation record | `test.reason`, or under `signals-only`: the gate review where declared, otherwise `test.exit` | dDeclaredLoop |
 | `test.reason` | tester | `test.recommend` | answers the step's one question, the score handed | the schema check, its answer joined to the recommendation record | the gate review where declared, otherwise `test.exit` | dDeclaredLoop |
-| `test.exit` | command | `test.recommend`, and the gate review where it ran | records the transition, and the verified tree on the build's lease record | the transition record and the lease record | Deploy | dWitnessedBar |
+| `test.exit` | command | `test.reason`, or `test.recommend` under `signals-only`, and, where either routed to the gate review, that review's `review.dispose` | records the transition, and the verified tree on the build's lease record, or on the transition record until dPlacedRequest lands the lease kind | the transition record and the lease record | Deploy | dWitnessedBar |
 
 - **Where a flake is seen.** `test.route`'s re-run of a red leg on the same tree is a runner mode
   dWitnessedBar owes (`gap-test-04`), with its probe: Test's declared invocation, over a fixture whose
@@ -322,6 +378,10 @@ posted to dependents. The build moves through Design whole (FL-D1).
   and a fix pass after a failed `build.acceptance` leaves the acceptance commands' own files alone too (M16).
 - **The tester before dBoundRoles** (WK-1). Until dBoundRoles re-founds the roles, dWitnessedBar's minimal tester
   agent plays `test.attribute`, `test.reason` and the fix pass's judgment, its allowance scratch only.
+- **The seen-red writer before dScopedBuild** (the owner's FK-4-12 and FK-5-2). Until dScopedBuild lands
+  `build.acceptance`, the attended session's agent observes each new arm red on its staged break and green once
+  restored, and records both in the unit's acceptance ledger, as the build method does today. `test.seen-red`
+  reads that record as the seen-red record.
 - **Test is the landing verdict; testing elsewhere is a probe** (`[probe]`, P31).
 - **Roles:** tester; builders and the architect through its routes; reviewers with the gate lens at a
   breakpoint.
@@ -329,9 +389,10 @@ posted to dependents. The build moves through Design whole (FL-D1).
   - the practices' Test reach;
   - the bar and attribution views;
   - the tester-return schema, its judgment set closed;
-  - the policies: `verdict`, `verdict.tree`, `verdict.blocks`, `verdict.held`, `verdict.red-route`, `verdict.flakes`, `tests.landing-levels`, `tests.without-cadence`, `tests.product`, `hooks.bypass`, `review.test`, `review.recommendation.source` and `flow.route-backs`.
+  - the policies: `verdict`, `verdict.tree`, `verdict.blocks`, `verdict.held`, `verdict.red-route`, `verdict.flakes`, `verdict.flakes.entry`, `verdict.flakes.release`, `tests.landing-levels`, `tests.without-cadence`, `tests.product`, `hooks.bypass`, `review.test`, `review.recommendation.source` and `flow.route-backs`.
 - **Memory:** writes the merge, selection, routing and attribution records, the runner-written verdict,
-  the flake and seen-red records, the transition and the verified tree.
+  the flake records, the transition and the verified tree, and reads the seen-red records `build.acceptance`
+  writes.
 - **Runtime:** Test's worktree, the verdict backend, leases.
 - **Breakpoints:** the gate review, opt-in by default and above-tier under `strict`; the owner's gate at
   `test.exit` under `every-stage`.
@@ -353,6 +414,7 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 
 **Exits** when:
 - the build is landed and recorded;
+- a core red its landing introduced is fixed, a later SHA that contains it green, or excepted (K1);
 - its major decisions' rows are in the decision log at the landed SHA;
 - its dependents are notified;
 - the card's terminal snapshot is committed;
@@ -363,19 +425,22 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
 | `deploy.current` | command | — | checks that the verdict's tree equals the prepared merge on the current tip, or under `verdict.tree: build-tip`, the build's tip | the comparison record | current → `deploy.mandate`; stale → Test | dShippedRelease |
-| `deploy.mandate` | command | `deploy.current` | checks the landing's authority: the request's mandate under `plan-only`; under `three-gates` and `every-stage`, the disposition of the owner's landing gate, the breakpoint before this item | the intake record, or the gate's witness | `deploy.parents` | dShippedRelease |
-| `deploy.parents` | command | `deploy.mandate` | reads each parent's state, as `deps.landing` says | the parents' records | every parent landed → `deploy.land`; under `test-decides`, the build's own verdict green without the parents' unlanded work → `deploy.land`; a parent unlanded or paused → holds; a parent withdrawn, or ended in planning without landing (deferred, retired, refused or answered) → as `deps.on-parent-withdrawn` says; a parent superseded or merged → the link moves to its replacement, or to the build it merged into, and the hold reads that | dShippedRelease |
-| `deploy.land` | command: the lander's `--land`, run with `GOV_PUSH_MAIN_MAX_RETRIES=1` | `deploy.parents` | pushes HEAD of the prepared merge, gated by the pre-push bar for that tree. On a race it re-prepares onto the new tip and exits without a second push | the outcome class, from the lander's exit, the pre-push hook's allow and bar records, and probes of the remote's default branch before and after the push; a landing is the remote holding the pushed SHA that it did not hold before the push, and the lander's marker is optional | landed and gated, the allow record naming the SHA and the bar record a real bar → `deploy.core`; landed ungated, no allow record naming the SHA or a bar record reading a stub → `deploy.core`, the landing recorded ungated until its bar is green; nothing pushed, the remote holding the SHA before the push → `deploy.core`, the landing recorded as already held; refused before the push, a race included → Test, which grades the merge `--land` re-prepared, or an ask for a carried commit; the remote unreachable, a failed probe included → the supervisor's retry, then an owner item; an argument → an ask on the adapter | dShippedRelease |
-| `deploy.core` | command | `deploy.land` | starts the post-merge bar on the landed SHA unless a run for that SHA already shows, and reads its verdict keyed by that SHA (K1), as `GATE_POST_MERGE` declares | the bar's verdict for the landed SHA, copied into the landing record when read | green → `deploy.record`; red → a patch build through the entry-point table's post-close row, and the close waits for its filing; refused → one re-run after a fetch, then an owner item; a failed publication → the verdict routes as above, and the publication is re-tried once, then an owner item; still running → waits, within the act's ceiling; no verdict past it → an owner item | dShippedRelease |
-| `deploy.record` | command | `deploy.core` | writes the landing record: SHA, the builds and units carried, the outcome class, the pre-push verdict or ungated, the core re-check's verdict, and the `build.closes` value in force. It reads the lander's marker where one was written, otherwise the pushed SHA and the remote tip | the landing record | `deploy.distill` | dShippedRelease |
-| `deploy.distill` | command, idempotent | `deploy.record` | confirms that the decision-log rows `build.distill` wrote are in the log at the landed SHA | the rows at the landed SHA, joined one to one on (build, fork id) to the build's major forks | `deploy.recommend`; rows missing at the landed SHA → a patch build through the entry-point table's post-close row, as `deploy.core`'s red does, its append keyed by (build, fork id) so it stays idempotent | dShippedRelease |
+| `deploy.mandate` | command | `deploy.current` | checks the landing's authority: under `plan-only`, the plan's ratification, which is the mandate: `plan.exit`'s for a build that passed Plan, and for a patch or repeat build, which never reaches `plan.exit`, its derived plan record's, as `patch.ratify` says for a patch; under `three-gates` and `every-stage`, the disposition of the owner's landing gate, the breakpoint before this item | `plan.exit`'s transition record with its ratification, the derived plan record with its ratification, or the gate's witness | `deploy.parents` | dShippedRelease |
+| `deploy.parents` | command | `deploy.mandate` | reads each parent's state, as `deps.landing` says | the parents' records | every parent landed → `deploy.land`; under `test-decides`, the build's own verdict green without the parents' unlanded work → `deploy.land`; a parent unlanded or paused → holds, a wait within `flow.wait-ceiling`, past which as `deps.on-parent-withdrawn` says; a parent withdrawn, or ended in planning without landing (deferred, retired, refused or answered) → as `deps.on-parent-withdrawn` says; a parent superseded or merged → the link moves to its replacement, or to the build it merged into, and the hold reads that | dShippedRelease |
+| `deploy.land` | command: the lander's `--land`, run with `GOV_PUSH_MAIN_MAX_RETRIES=1` | `deploy.parents` | once the landing queue admits it, by a landing-turn ref it takes on the remote by compare-and-swap, in the order `landing.order` says across nodes, a landing under `owner-orders` the owner has not ordered waiting for the owner's order as an owner item, pushes HEAD of the prepared merge, gated by the pre-push bar for that tree. On a race it re-prepares onto the new tip and exits without a second push | the outcome class, from the lander's exit, the pre-push hook's allow and bar records, and probes of the remote's default branch before and after the push; a landing is the remote holding the pushed SHA that it did not hold before the push, and the lander's marker is optional | landed and gated, the allow record naming the SHA and the bar record a real bar → `deploy.core`; landed ungated, no allow record naming the SHA or a bar record reading a stub → `deploy.core`, the landing recorded ungated until its bar is green; nothing pushed, the remote holding the SHA before the push → `deploy.core`, the landing recorded as already held; refused before the push, a race included → Test, which grades the merge `--land` re-prepared, or an ask for a carried commit; the remote unreachable, a failed probe included → held and retried as `next`'s `stale-remote` answer is, drawing nothing, then an owner item once `leases.expiry-hours` passes (`[rules]`); an argument → an ask on the adapter | dShippedRelease |
+| `deploy.core` | command | `deploy.land` | starts the post-merge bar on the landed SHA unless a run for that SHA already shows, and reads its verdict keyed by that SHA (K1), as `GATE_POST_MERGE` declares | the bar's verdict for the landed SHA, copied into the landing record when read | green → `deploy.record`; red → `deploy.record`, the landing recorded red, and a patch build filed through the entry-point table's post-close row, its intake keyed by (`default-branch-red`, landed SHA), the key Maintain's reading of the same red uses, so `maintain.patch` finds it open and files no second patch; refused → one re-run after a fetch, then an owner item; a failed publication → the verdict routes as above, and the publication is re-tried once, then an owner item; still running → waits, within the act's ceiling; no verdict past it → an owner item | dShippedRelease |
+| `deploy.record` | command | `deploy.core` | writes the landing record: SHA, the builds and units carried, the outcome class, the pre-push verdict or ungated, the core re-check's verdict, on a red the patch intake's key, and the `build.closes` value in force. It reads the lander's marker where one was written, otherwise the pushed SHA and the remote tip | the landing record | `deploy.distill` | dShippedRelease |
+| `deploy.distill` | command, idempotent | `deploy.record` | confirms that the decision-log rows `build.distill` wrote are in the log at the landed SHA | the rows at the landed SHA, joined one to one on (build, fork id) to the build's major forks, or, unarmed, the landing record's line that it measured nothing | `deploy.recommend`; unarmed → `deploy.recommend`, never green; rows missing at the landed SHA → a patch build through the entry-point table's post-close row, as `deploy.core`'s red does, its append keyed by (build, fork id) so it stays idempotent | dShippedRelease |
 | `deploy.recommend` | command | `deploy.distill` | scores the recommendation, signals only, since core Deploy has no producing role | the recommendation record | the landing review where declared, otherwise `deploy.notify` | dDeclaredLoop |
-| `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.released` and `deploy.snapshot` | dShippedRelease |
+| `deploy.notify` | command, idempotent | `deploy.recommend`, and, where it routed to the landing review, that review's `review.dispose` | posts `landed` to dependents, keyed by the landing SHA, so a repeated post is a no-op | the mailbox posts | `deploy.released` and `deploy.snapshot` | dShippedRelease |
 | `deploy.released` | command | `deploy.notify` | reads `build.closes`. Under `after-release-verifies`, it is an event wait: the release slot's exit record for the landed SHA, or for a later SHA that contains it, wakes it, once for each waiting build whose landed SHA it contains, and the supervisor runs each under that instance's cadence lease, since under `close-only` the build's lease is gone by then. Under the other two values, it passes at once | the wake's witness, keyed by (exit record id, build), naming the slot's exit record, with its SHA, environment and outcome, and the build it answered; under the other two values, the landing record's `build.closes` value | verified, or a pass → `deploy.close`, once `deploy.unlease` is done; held, rolled forward, rolled back, halted or unverified → the release hold's owner item, keyed by (build, landed SHA) and opened unless one is open, through the owner's notification adapter, since the build's mailbox may be closed, resolved as `run.on-owner-question` says: close unreleased, the outcome on the transition, or wait for a later release, each keep-waiting answer counted per (build, landed SHA) and the third parking the build (P39); no exit record within `build.release-ceiling`, which the supervisor's sweep watches → the same owner item; `release.environments` emptied, or integrations removed, after the landing → as `policy-file.on-missing-expansion` says | dShippedRelease |
 | `deploy.snapshot` | command, idempotent | `deploy.notify`, and under `build.release-hold: whole-close`, `deploy.released` | commits the card's terminal snapshot; an equal snapshot is a no-op | the snapshot commit | `deploy.unlease` | dShippedRelease |
 | `deploy.unlease` | command, idempotent | `deploy.snapshot` | closes each of the build's leases with a terminal tombstone, never deleting the ref, a lease already terminal counting as done, and closes its mailbox (`[rules]`) (P40) | the terminal tombstones, and the mailbox's messages in the folder | `deploy.close`, once `deploy.released` has passed | dShippedRelease |
-| `deploy.close` | command | `deploy.unlease` and `deploy.released` | records the transition, with the release outcome under `after-release-verifies`, minted under the build's claim ref, which is never pruned (layer-memory `[contract]`) | the transition record | the build is closed | dShippedRelease |
+| `deploy.close` | command | `deploy.unlease` and `deploy.released`, and, on a landing recorded red, the patch build's `deploy.core` green for a SHA that contains the landed one, or an exception under `core.exceptions` (K1, `cl-dClosedLoop-0423`) | records the transition, with the release outcome under `after-release-verifies`, minted under the build's claim ref, which is never pruned (layer-memory `[contract]`) | the transition record | the build is closed; on a landing recorded red, an event wait for that green, which, past `flow.wait-ceiling` or once the patch build ends without it, raises an owner item: an exception under `core.exceptions`, or the budget raised, the owner's alone | dShippedRelease |
 
+- **Before the build it rests on lands** (the owner's FK-4-8). Until dScopedBuild lands `build.distill`, which
+  writes the rows, `deploy.distill` is unarmed: it records on the landing record that it measured nothing, is never
+  green, and routes on to `deploy.recommend`, as `test.seed` records an unarmed seed.
 - **The core re-check's witness** (K1):
   - under `GATE_POST_MERGE=local` or undeclared, `deploy.core` starts `post-merge.sh` on the landed
     SHA as the lander does, unless the start record `<common-dir>/gate-post-merge.start` or the
@@ -404,14 +469,15 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
   probes of the remote's default branch before and after the push, since one exit code covers
   several, and a failed probe counts as unreachable. A landing needs the remote not to have held the
   SHA before the push, so no push is both landed and nothing pushed. The lander's own outcome record is owed (`gap-deploy-09`).
-- **The landing order.** Landings on a node are ordered by `landing.order` over the verified trees on
-  the builds' leases. The turnstile is the host-wide bar semaphore, admitting `slots` concurrent bars,
+- **The landing order.** Landings are ordered by `landing.order` over the verified trees on the builds'
+  leases, across nodes: the landing queue `gap-flow-08` owes admits a landing once it takes the landing-turn ref
+  on the remote by compare-and-swap (the owner's FK-4-7). The turnstile is the host-wide bar semaphore, admitting `slots` concurrent bars,
   and `push-main.sh` never takes it, so no landing queue exists yet (`gap-flow-08`).
 - **Roles:** none in the core: every item is a command. The deployer works only in the expansions.
 - **Instruction:**
   - the practices' Deploy reach;
   - the landing view;
-  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `build.release-hold`, `build.release-ceiling`, `release.environments`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
+  - the policies: `autonomy`, `plan.ratification`, `verdict.tree`, `landing.order`, `deps.landing`, `deps.on-parent-withdrawn`, `flow.wait-ceiling`, `hooks.bypass`, `core.bypass`, `core.exceptions`, `build.closes`, `build.release-hold`, `build.release-ceiling`, `release.environments`, `card.snapshot`, `run.on-owner-question`, `review.deploy` and `flow.route-backs`.
 - **Memory:** writes the landing record, the transition, the terminal snapshot and the `landed`
   messages, reads the decision log at the landed SHA and, under `after-release-verifies`, the release
   slot's exit record, closes the lease refs with terminal tombstones, never deleting them (P40), and deletes the
@@ -445,7 +511,8 @@ The core runs to the landing, and the build closes there (`build.closes: at-land
 A breakpoint declares three things:
 - its position: an item boundary, or a step's exit;
 - its disposer: a reviewer lens with its skeptic and synthesizer, or the owner;
-- its trigger: owed by policy, a binding recommendation, or the owner's request.
+- its trigger: owed by policy, a binding recommendation, or the owner's request, a `breakpoint` placement
+  disposition.
 
 It blocks as `review.blocks` says. Once disposed, the flow resumes at the item the breakpoint stands
 before.
@@ -464,10 +531,20 @@ is one of three:
 - under `run.on-owner-silence: apply-recommendation`, the item's recommended option applied past the deadline
   and recorded with it, never for a ratification, an owner-only write or a loosening (the parked debt's review).
 
+**While the owner attends,** an owner item raised then, a gate attendance adds or a question asked live among
+them, is held until `run.owner-deadline` once dWellOiledMachine lands it, never decided when raised, and
+`run.on-owner-silence` decides it then: `run.on-owner-question` decides only an item raised while the owner is away.
+An owner's answer that arrives after its item was decided is placed by `entry.place` as an amendment that re-enters
+the item it answers, drawing on `flow.rework-budget` (`[transitions]`, the owner's FK-4-1).
+
 `autonomy` places the owner's gates:
 - `plan-only` places the Plan ratification, unless the request ratifies;
 - `three-gates` adds the design go at `design.exit` and the landing gate before `deploy.mandate`;
 - `every-stage` adds a gate at every step's exit.
+
+Every gate `autonomy` places but the Plan ratification is an owner item like any other, so `run.on-owner-question`
+may decide it, the supervisor's recorded choice under `best-effort-recorded` included: LR-3 excludes only
+ratifications (the owner's FK-4-2).
 
 `attendance` adds the owner's interactions while the owner attends (night pass, point 1):
 - every attended value announces each act before it runs, with the `step —` line, and asks owner questions live;
@@ -480,26 +557,36 @@ multi-agent act. The items are its witnessed stages:
 
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
-| `review.trigger` | command | — | records why the breakpoint fired | the policy value, the recommendation record, or the owner's request record | fired → `review.pin`; not fired → the flow continues | dDeclaredLoop |
+| `review.trigger` | command | — | records why the breakpoint fired, and refuses a round past `review.max-rounds` or `flow.route-backs`, whichever the loop reaches first | the policy value, the recommendation record, or the placement disposition naming the breakpoint, with its intake record | fired → `review.pin`; a round past `review.max-rounds` → refused, the last round's report reading CEILING, and `review.dispose` promotes its open findings; a round past `flow.route-backs` → refused, the loop ending non-converging, its open findings promoted the same way; not fired → the flow continues | dDeclaredLoop |
 | `review.pin` | command | `review.trigger` | pins the artifact: the plan revision, the spec revisions, the commit range or the landing record. It reads `review.opt-in` and passes the harness its arguments: `optIn`, and `preset`, which is `design-audit` when every pinned spec revision is a design or architecture record by the record-kind registry | the pinned SHAs, and the arguments passed, joined to the report's lens-yield keys | `review.lens` | dFairHearing |
 | `review.lens` | reviewer, one per lens, within the fan-out bound | `review.pin` | reviews through the lens | a computed join: each finding cites lines that exist in the pinned artifact, and carries its lens and, where one fits, a class from memory's bug-class catalogue (KN-1) | `review.refute` | dFairHearing |
 | `review.refute` | skeptic | `review.lens` | tries to refute each finding | a computed join: every finding has one verdict (confirmed, refuted, or unverified, the harness's `uncertain`), and each verdict names its probe and the probe's output | `review.report` | dFairHearing |
-| `review.report` | synthesizer | `review.refute` | merges the findings into one report, giving each confirmed finding its left-shift disposition: `class:<slug>`, `new:<slug>`, `gate:<leg>`, or, where `review.unclassed` allows it, `none` with its reason | a computed join: every confirmed finding appears in the report, under the build's `reviews/`, with one disposition. `class:` resolves to a record under `memory/gotchas/`, and `gate:` to a leg in the legs manifest. `new:` names a slug the report claimed at report time, by a compare-and-swap ref on the remote, `refs/gov/class-claims/<slug>`, as `entry.claim` claims a build's slug, so a slug another branch minted is seen; the claim is recorded in the report and re-derivation reads it, or the slug's record carries `from:` this report and finding. `none` carries a reason, and appears only under `reason` or `owner-rules` | `review.dispose`; a `new:` slug claimed elsewhere → re-disposed as `class:` that slug where it fits, or a fresh slug, within `flow.route-backs`; under `owner-rules`, each `none` → an owner item first, resolved as [breakpoint]'s owner gate is (FH1): a class or a gate named, the reason accepted, or the finding returned for a disposition, within `flow.route-backs` | dFairHearing |
-| `review.dispose` | command | `review.report` | disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On built work, they become new units or asks by `review.findings`. It files each `new:` class with the item that owes its record: `review.fold`'s spec writer on an unbuilt spec, and the fix unit's builder on built work. A finding that becomes an ask carries its `new:` slug, in memory `[asks]`' below-threshold form, which names the record's writer and its acceptance. Each new class carries `from:` its review and finding. It counts each class by its tag (`review.left-shift`), turns an earned gate into a patch-build intake, and files each unverified finding as `review.unverified` says | each disposition joined to its fold, unit or ask, and each `new:` slug to the item or ask that owes its record | unbuilt → `review.fold`; built → released, with a follow-up round as `review.follow-up` says; an unverified finding under `block` → a verification round | dDeclaredLoop |
-| `review.fold` | spec writer | `review.dispose` | folds the confirmed findings into the unbuilt specs, the spec-write workflow's disposal stage, and writes the class record of each `new:` disposition | each confirmed finding joined to its fold in the spec at its new SHA, and each `new:` slug to its class record, whose `from:` names this review and finding | the next round as `review.design.rounds` says, or released | dDeclaredLoop |
+| `review.report` | synthesizer | `review.refute` | merges the findings into one report, giving each confirmed finding its left-shift disposition: `class:<slug>`, `new:<slug>`, `gate:<leg>`, or, where `review.unclassed` allows it, `none` with its reason | a computed join: every confirmed finding appears in the report, under the build's `reviews/`, with one disposition. `class:` resolves to a record under `memory/gotchas/`, and `gate:` to a leg in the legs manifest. `new:` names a slug the report claimed at report time, by a compare-and-swap ref on the remote, `refs/gov/class-claims/<slug>`, as `entry.claim` claims a build's slug, so a slug another branch minted is seen; the claim is recorded in the report and re-derivation reads it, or the slug's record carries `from:` this report and finding. `none` carries a reason, and appears only under `reason` or `owner-rules` | `review.dispose`; the remote unreachable at a `new:` slug's claim → as `leases.offline` says, and refused until dPlacedRequest lands the key (the stand-ins below); a `new:` slug claimed elsewhere → re-disposed as `class:` that slug where it fits, or a fresh slug, within `flow.route-backs`; under `owner-rules`, each `none` → an owner item first, resolved as [breakpoint]'s owner gate is (FH1): a class or a gate named, the reason accepted, or the finding returned for a disposition, within `flow.route-backs` | dFairHearing |
+| `review.dispose` | command | `review.report` | disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On built work, they become new units or asks by `review.findings`. On a plan revision, they go to `plan.record`, which revises the unratified plan. On a landing record, each becomes a patch-build intake by the entry-point table's post-close row. It files each `new:` class with the item that owes its record: `review.fold`'s spec writer on an unbuilt spec, and the fix unit's builder on built work. A finding that becomes an ask carries its `new:` slug, in memory `[asks]`' below-threshold form, which names the record's writer and its acceptance. Each new class carries `from:` its review and finding. It counts each class by its tag (`review.left-shift`), turns an earned gate into a patch-build intake, and files each unverified finding as `review.unverified` says | each disposition joined to its fold, unit or ask, and each `new:` slug to the item or ask that owes its record | unbuilt → `review.fold`; a plan revision → `plan.record`; built → each new unit through Design, Build's tail waiting until it is built, with a follow-up round as `review.follow-up` says; a landing record → its patch-build intakes, then released; a NON-CONVERGENT or CEILING round → its findings promoted, to units while budget remains and to asks after, never folded into another round (`cl-dClosedLoop-0117`); an unverified finding under `block` → a verification round | dDeclaredLoop |
+| `review.fold` | spec writer | `review.dispose` | folds the confirmed findings into the unbuilt specs, the spec-write workflow's disposal stage, and writes the class record of each `new:` disposition | each confirmed finding joined to its fold in the spec at its new SHA, and each `new:` slug to its class record, whose `from:` names this review and finding | the next round as `review.design.rounds` says, or released; a NON-CONVERGENT or CEILING round → its findings promoted as `review.dispose` promotes them | dDeclaredLoop |
 | `review.cost` | command | `review.report` | records the review's agents and out-tokens in its report, as the harness logs them, extending the harness's `review-shape` line with `shape`, `efforts` and `role-sha` into the shape-run row (systems `[design-role-shapes]`) | the cost field | done | dDeclaredLoop |
 
+- **Before the builds it rests on land.** dFairHearing builds `review.pin` to `review.report` ahead of them, and
+  dDeclaredLoop `review.cost`, so each later part has a stand-in until its build lands:
+  - dTotalRecall's record-kind registry: `review.pin` reads a pinned record's kind from its filename;
+  - dDeclaredLoop's `review.dispose`: the report's findings are disposed by hand, as today's reviews are, each
+    disposition recorded in the report;
+  - dPlacedRequest's `leases.offline`: `review.report` refuses a `new:` slug's claim while the remote is
+    unreachable, as `refuse` would. No slug is claimed and no local id is minted, and the finding stays in the
+    report with its slug marked unclaimed, disposed by hand (the owner's FK-6-1);
+  - dBoundRoles' shape registry and dTotalRecall's shape-run kind: `review.cost` writes `shape` and `role-sha`
+    blank, and its fields ride the harness's `review-shape` line in the report.
 - **Classes.** `review.left-shift` counts by class where memory's catalogue tags a finding, and by
   lens where no class fits. The catalogue is core since KN-1, on memory's library side.
 - **An unverified finding under `review.unverified: block`.** Its verification round re-runs the
   skeptic with a fresh probe, draws on `flow.rework-budget` and counts against `flow.route-backs`. Past that
   bound the finding's loop ends non-converging, and the finding is filed as an ask with its evidence. Revised
-  2026-10-19 by the owner's SL-1 and SL-2, the parked debt's review: it became an owner item, resolved as the owner gate
-  above is (FH1).
+  2026-10-19 by the owner's SL-1 and SL-2, the parked debt's review: before it, such a finding became an owner item,
+  resolved as the owner gate above is (FH1).
 - **Instruction:**
   - the lens views;
   - the reviewer, skeptic and synthesizer schemas;
-  - the policies: `review.<stage>`, `review.breakpoints`, `review.blocks`, `review.findings`, `review.left-shift`, `review.unclassed`, `review.follow-up`, `review.unverified`, `review.design.rounds`, `review.design.round-count`, `review.recommendation`, `review.opt-in`, `flow.route-backs` and `run.on-owner-question`.
+  - the policies: `review.<stage>`, `review.breakpoints`, `review.blocks`, `review.findings`, `review.left-shift`, `review.unclassed`, `review.follow-up`, `review.unverified`, `review.design.rounds`, `review.design.round-count`, `review.max-rounds`, `review.recommendation`, `review.opt-in`, `flow.rework-budget`, `flow.route-backs` and `run.on-owner-question`.
 - **Extension points:** lens packs, which `review.opt-in` fills by swapping a named default lens of a
   preset; a lens, gov's, an expansion's or a repository's, is a catalogue row whose brief is a unit, and
   the harness fills its five slots from that data (the flow and roles adoption, FA-1; revised 2026-10-19,
@@ -533,12 +620,13 @@ feeds `deploy.current`.
 
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
-| `probe.trigger` | command | — | records why the probe opened: the boundary `probe.points` names, the owner's request, the observation `probe.observations` owes, or a role item's `probe` outcome under `probe.raise` | the trigger record, keyed by the boundary or the raising return, and by content for a probe before placement, which mints no id | opened → `probe.pin`; not opened → the flow continues | dPlacedRequest |
+| `probe.trigger` | command | — | records why the probe opened: the boundary `probe.points` names, the owner's request, the observation `probe.observations` owes, a role item's `probe` outcome under `probe.raise`, or a patch build from a bug report, owed a red-first reproduction before its first `build.unit-pass` (`cl-dClosedLoop-0408`) | the trigger record, keyed by the boundary or the raising return, and by content for a probe before placement, which mints no id | opened → `probe.pin`; not opened → the flow continues | dPlacedRequest |
 | `probe.pin` | command | `probe.trigger` | pins the subject by SHA, and records the question, the kind and the losing outcome before anything runs | the probe record's head, its losing outcome committed first | a verification or a reproduction → `probe.design`; an experiment → `probe.experiment` | dPlacedRequest |
 | `probe.design` | tester | `probe.pin` | declares the commands that test the claim at the pinned SHA, cold: from the claim and the subject, never from the asker's reasoning | the method's schema check | `probe.run` | dPlacedRequest |
 | `probe.experiment` | researcher | `probe.pin` | declares the experiment: the `experiment` shape with its corpus, its variants and its judge | the method's schema check, and the experiment's fan checked against `probe.experiment.authority` | `probe.run`; an experiment beyond its authority → an owner item, resolved as `[breakpoint]`'s owner gate is | dPlacedRequest |
 | `probe.run` | executor | `probe.design` or `probe.experiment` | runs the commands at the pinned SHA, or launches the experiment's harness, keeping each output by hash; a visual verification runs through the visual capture adapter | the captured outputs by hash, and an experiment's shape-run rows | `probe.judge`; no capability for the method → `probe.return`, the verdict unrunnable | dPlacedRequest |
-| `probe.judge` | command: the executor's re-run, or the experiment's scorer | `probe.run` | compares the outcome with the losing outcome: confirmed, refuted or inconclusive; an experiment measured, within noise or aborted | the re-run's or the scorer's computed verdict; where no command can judge, the verifier's judgment, recorded as claimed | `probe.return` | dPlacedRequest |
+| `probe.judge` | command: the executor's re-run, or the experiment's scorer | `probe.run` | compares the outcome with the losing outcome: confirmed, refuted or inconclusive; an experiment measured, within noise or aborted, its blind judge's outputs among the scorer's inputs | the re-run's or the scorer's computed verdict | `probe.return`; a verification or a reproduction no command can judge → `probe.judge-claimed` | dPlacedRequest |
+| `probe.judge-claimed` | tester | `probe.judge` | judges the outcome against the losing outcome, cold | the judgment's schema check, recorded as claimed | `probe.return` | dPlacedRequest |
 | `probe.return` | command, idempotent, through `record` | `probe.judge` | writes the probe record and hands it to the asking item as an input, or to the item after the boundary | the probe record | the asking item's re-entry, or the boundary's next item; a claimed or an unrunnable verdict → an owner item, resolved as `[breakpoint]`'s owner gate is | dPlacedRequest |
 
 - **Against Test and the breakpoint.** A probe gates nothing past the item that asked. A breakpoint disposes its
@@ -584,19 +672,23 @@ Runtime executes the owner's controls (dWellOiledMachine, RT-3). They extend una
 
 | Item | Actor | Needs | Does | Proven by | Then | Owner |
 |---|---|---|---|---|---|---|
-| `life.request` | owner | — | asks to pause, resume, withdraw or supersede the build, or to attend or unattend it, through the guarded command | the command's record | `life.quiesce`; resume → the build's `next`; attend or unattend → the `attendance override` record, scoped by `attendance.scope`, then the build's `next`, announced while attended | dWellOiledMachine |
-| `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or supersede → `life.notify`. Once a push is made, the build has landed, and a pause, withdraw or supersede is refused: the build closes through Deploy. One case is not refused: a withdraw or supersede of a landed build waiting at `deploy.released` goes to the release hold's owner item, keyed by (build, landed SHA), which `life.quiesce` opens unless one is open, through the notification adapter: close unreleased, or keep waiting. Once `deploy.unlease` has run, the request is an event wake, and `life.quiesce` runs under its instance's cadence lease (layer-runtime `[schedule]`) | dWellOiledMachine |
+| `life.request` | owner | — | asks to pause, resume, withdraw or supersede the build, or to attend or unattend it, through the guarded command; a supersede names its replacement's claimed slug, and one naming none is refused | the command's record, naming the replacement on a supersede | `life.quiesce`; resume → the build's `next`; attend or unattend → the `attendance override` record, scoped by `attendance.scope`, then the build's `next`, announced while attended | dWellOiledMachine |
+| `life.quiesce` | executor | `life.request` | dispatches nothing new. Each running act finishes within its ceiling, a unit holder's on another session or node included: it posts a quiesce to each unit holder (`cl-dClosedLoop-0319`) and waits, per unit lease, for the holder's acknowledgement that its act finished, or for `runtime.act-ceiling`. An open review fan finishes, its findings going to asks under withdraw and to the replacement under supersede, and a prepared merge is discarded | the executor's record of the acts it let finish, and per unit lease, its holder's acknowledgement or the ceiling passed | pause → paused; withdraw or supersede → `life.notify`. Once the landing push to the default branch is made, the build has landed, and a pause, withdraw or supersede is refused: the build closes through Deploy. One case is not refused: a withdraw or supersede of a landed build waiting at `deploy.released` goes to the release hold's owner item, keyed by (build, landed SHA), which `life.quiesce` opens unless one is open, through the notification adapter: close unreleased, or keep waiting. Once `deploy.unlease` has run, the request is an event wake, and `life.quiesce` runs under its instance's cadence lease (layer-runtime `[schedule]`) | dWellOiledMachine |
 | `life.notify` | command, idempotent | `life.quiesce` | posts `withdrawn` or `superseded` to dependents, with the replacement's slug | the mailbox posts | `life.snapshot` | dWellOiledMachine |
 | `life.snapshot` | command, idempotent | `life.notify` | commits the card's terminal snapshot | the snapshot commit | `life.unlease` | dWellOiledMachine |
-| `life.unlease` | command, idempotent | `life.snapshot` | closes each lease with a terminal tombstone, never deleting the ref (P40), closes the mailbox (`[rules]`), and reclaims the build's workspaces | the terminal tombstones, the mailbox's messages in the folder, and the workspace record | `life.close` | dWellOiledMachine |
-| `life.close` | command | `life.unlease` | records the terminal transition: withdrawn, or superseded by its replacement | the transition record | closed | dWellOiledMachine |
+| `life.unlease` | command, idempotent | `life.snapshot` | closes each lease with a terminal tombstone, never deleting the ref (P40), closes the mailbox (`[rules]`), and reclaims the build's worktrees, keeping its branch, which a superseding build's `design.inventory` reads | the terminal tombstones, the mailbox's messages in the folder, and the workspace record | `life.close` | dWellOiledMachine |
+| `life.close` | command | `life.unlease` | records the terminal transition: withdrawn, or superseded by its replacement, and on a supersede writes the `supersedes` relation from the replacement to the build (`cl-dClosedLoop-0217`) | the transition record, and on a supersede the relation | closed | dWellOiledMachine |
 
 - **Attend and unattend stop at the record** (night pass, point 1). They quiesce nothing, since attendance changes no
   item (P4): the next act reads the override and announces itself, or no longer does.
-- **A paused build keeps its leases.** The supervisor renews them while it is paused, so
-  `leases.expiry-hours` never expires a paused build. Resume enters its `next`.
+- **A paused build keeps its leases.** Its pause is a declared wait within `flow.wait-ceiling`, so
+  `leases.renewal: progress` renews them while it is paused and `leases.expiry-hours` never expires it. Past the
+  ceiling, an owner item asks to resume, withdraw or stay paused, staying paused a new wait within the ceiling.
+  Unanswered at `run.owner-deadline`, the build is parked and its lease released (`[transitions]`). Resume enters
+  its `next` (the owner's FK-4-10).
 - **A superseded build's kept work** passes to its replacement through the replacement's
-  `design.inventory`.
+  `design.inventory`, which `design.input` reaches on the replacement's plan record naming the build it
+  supersedes, over that build's built units at its kept branch's tip.
 
 ## [adopt] Repository-level items: adoption and seeding
 
@@ -611,8 +703,11 @@ distribution is absent, the core's own command runs it.
 | `adopt.census` | command | — | once in a repository, before its first build, or at the owner's ask: finds the repository's own practices and counts each one's instances, each CI job its own practice | the `census` record | `test.seed` | dLinkedLibrary |
 | `test.seed` | command | a check's registration: `adopt.census`, a kit update that brings a new check, or a widened predicate | seeds each registered population that is absent, at that SHA, and after that only a widened predicate's new keys; at adoption, measures the repository's own drain load | the population files, each with its seed SHA and direction | seeded → armed; a failed seed, a timeout, a dead probe or a home the target's hygiene refuses → unarmed, with its reason; under `retrofit.unseeded: refuse`, a check left unseeded refuses the adoption | dWitnessedBar |
 | `adopt.practices` | owner | `adopt.census` | rules each practice once: import, translate, keep alongside or retire, largest first, or by keys times reads where observability is installed | the ruling records | each ruling → its practice's migration; until one, as `retrofit.practice-pending` says | dLinkedLibrary |
-| `adopt.decisions` | reviewer, as two raters, and the owner where `retrofit.decisions` says | `adopt.census` | routes the decision candidates by the author's rubric | the reconstructed decision records, each `origin: reconstructed@<sha8>` | accepted → `reconstructed`; declined by the owner → kept `rejected`, which the index hides | dLinkedLibrary |
+| `adopt.decisions` | reviewer, as two raters | `adopt.census` | routes the decision candidates by the author's rubric, and computes the raters' agreement | the reconstructed decision records, each `origin: reconstructed@<sha8>`, and the agreement record | accepted → `reconstructed`, and under `docs-owner-ratifies` or `docs-and-trailers` each major one → `adopt.decisions-ratify`; a candidate the two raters split on → kept `reconstructed` and not major, and → `adopt.decisions-ratify` only under `docs-owner-ratifies` or `docs-and-trailers` (the owner's FK-4-6); agreement below kappa 0.8 → the rubric revised and the candidates rated again, within `flow.route-backs` (`cl-dClosedLoop-0238`) | dLinkedLibrary |
+| `adopt.decisions-ratify` | owner, under `retrofit.decisions: docs-owner-ratifies` or `docs-and-trailers` | `adopt.decisions` | rules on each major reconstructed decision, and each candidate the raters split on | the owner's disposition record for each | ratified → kept `reconstructed`; declined → kept `rejected`, which the index hides | dLinkedLibrary |
 | `adopt.reconstruct` | command | `adopt.census` under `retrofit.reconstruct: at-adoption`, or the owner's ask under `on-ask` | reconstructs records for code no unit touched | the reconstructed records | done; under the default `on-touch` it never runs, and `build.unit-pass` reconstructs on first touch | dLinkedLibrary |
+| `adopt.instructions` | command | the install: `kits.install`, or the core's own command | renders the repository's own instruction files verbatim as the legacy block, wires every harness file at once, and proposes each paragraph as a repository unit, an amendment of a gov unit or a drop (`cl-dClosedLoop-0260`) | the legacy block, each file's bytes kept in it, and one proposal record per paragraph | each proposal → an owner item, ruled once, resolved as `[breakpoint]`'s owner gate is; ruled → the unit, the amendment or the drop written | dLinkedLibrary |
+| `adopt.declarations` | command | `kits.install` or `kits.update`, or the core's own command | proposes today's flow and role customizations as overlay rows (`cl-dClosedLoop-0438`) | one proposal record per customization | each proposal → an owner item, ruled once, resolved as `[breakpoint]`'s owner gate is; ruled → the overlay row written; declined → recorded as a drop | dShippedRelease |
 
 ## [transitions] The build's transition table
 
@@ -624,7 +719,7 @@ the engine refuses any transition the table lacks.
 |---|---|---|---|
 | none | a placement disposition `new`, from `entry.place`, `entry.place-check` or `entry.place-owner`, its slug claimed by `entry.claim` | planning | the intake record, the disposition and the claim ref |
 | none | triage's select of an ask, filing or proposal, its slug claimed by `entry.claim` | planning | the triage record and the claim ref |
-| none | a placement disposition `patch`, from any of the three, its slug claimed and its lease taken by `entry.claim` | designing | the patch's derived plan record, the claim ref and the lease record |
+| none | a placement disposition `patch`, from any of the three, its slug claimed and its lease taken by `entry.claim` | designing | the patch's derived plan record, the claim ref, the lease record and the dupes record, and under `patch.ratify: owner` the owner's disposition record |
 | none | a placement disposition `repeat`, from any of the three, its slug claimed and its lease taken by `entry.claim` | designing | the playbook's record, the run's derived plan record, the claim ref and the lease record (the night pass's closing review, H1) |
 | planning | `plan.exit` | designing | the transition record |
 | planning | triage's defer, retire or refuse | deferred, retired or refused | the triage record |
@@ -635,23 +730,36 @@ the engine refuses any transition the table lacks.
 | designing | a fork the goal cannot survive | planning | the plan revision |
 | building | `build.exit` | testing | the transition record |
 | building | a unit or feature re-entry, or a fix unit | designing | the re-entry record |
-| building, testing, or deploying before the push | an amendment admitted at an item boundary | designing | the re-entry record |
+| building | a closing-review finding disposed into a new unit | designing | the review report and the disposition |
+| designing, building, or deploying before the push | a parent's `withdrawn` post, or a parent hold past `flow.wait-ceiling`, under `deps.on-parent-withdrawn: replan` or `adopt-parent-work` | planning | the parent's post or the hold's record, and the plan revision |
+| planning, designing, building, testing, or deploying before the push | an amendment admitted at an item boundary, an owner's late answer placed as one included (`[breakpoint]`) | the state of the item it re-enters: designing, or planning for a Plan item | the re-entry record, and for a late answer the placement disposition |
 | testing | `test.exit` | deploying | the transition record |
-| testing | a fix pass, or a conflict to resolve | building | the routing record |
+| testing | `build.fix-pass` for a code miss, or `build.resolve` for a conflict | building | the routing record |
+| building | `build.resolve` | testing | the resolution commit and the routing record |
+| testing | a best-effort descope of a failing unit already in Test's tree, `build.revert-pass` reverting it and drawing nothing on `flow.rework-budget`, being an ending and not a lap | building | the transition record naming the descoped unit and its ask, and the revert commit |
 | testing | a new unit through Design | designing | the routing record |
 | deploying | a stale verdict | testing | the comparison record |
 | deploying | `deploy.land`'s class refused before the push, a race included | testing | the outcome class and the lander's line |
-| deploying | `deploy.close` | landed | the transition record, which names the release outcome under `after-release-verifies` |
+| deploying | `deploy.close` | landed | the transition record, which names the release outcome under `after-release-verifies`, and on a landing recorded red, the patch's green core verdict or the exception |
 | any open state | `life.request`: pause | paused | the command's record |
 | paused | `life.request`: resume | the state it paused in | the command's record |
+| any open state | an owner item parks the build: `run.on-owner-silence` past `run.owner-deadline` under `remind-then-park` or `wait`, or on a ratification or an owner-only write; `run.on-owner-question: park-build`; `flow.on-exhausted: park-for-owner`; or a paused build's owner item unanswered at `run.owner-deadline` (`[lifecycle]`) | parked | the transition record naming the owner item it parks on, and the lease record where the park releases the lease |
+| parked | the owner's disposition of the item it parked on | the state it parked in | the owner's disposition record, and the lease record of the lease re-taken |
+| parked, before the push | the owner's disposition of a `flow.on-exhausted: park-for-owner` park that closes the build incomplete | incomplete | the owner's disposition record, and the transition record naming the ending, the branch and records kept, and every open item filed |
+| any open state, before the push | a spent budget's ending that closes the build incomplete: `flow.on-exhausted: close-incomplete`, or `best-effort-ending` where nothing can land | incomplete | the transition record naming the ending, the branch and records kept, and every open item filed |
 | any open state, before the push | `life.close`: withdrawn | withdrawn | the transition record |
 | any open state, before the push | `life.close`: superseded | superseded | the transition record |
 
-Landed, withdrawn, superseded, deferred, retired, refused, merged and answered are terminal. A
+Landed, withdrawn, superseded, incomplete, deferred, retired, refused, merged and answered are terminal.
+Parked is a hold, not a terminal: unlike paused, it releases the lease where its key says so. A best-effort descope
+in Build moves no state: the descoped units go to asks, named on the step's transition record. A descope in Test
+moves the build back to building, where `build.revert-pass` reverts the failing unit from Test's tree, drawing
+nothing on the budget, being an ending and not a lap (the owner's FK-4-13). A
 re-placement after `plan.dedupe` that answers `new` keeps the build, and its claim, in planning: it goes
 on to `plan.triage-rule`, which is no transition. A join is owed
 beside the table (`gap-flow-15`): every cross-step route in an item's `Then` cell has a row, and every
-row is reached by an item, seen red on a planted dropped row.
+row is reached by an item, seen red on a planted dropped row and on a planted build that spends its budget in
+planning, which must reach incomplete.
 
 ## [expansions] What the expansions add to the flow
 
@@ -765,7 +873,8 @@ named:
 - **none:** every finding on it was refuted.
 
 Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,
-`policy.on-missing-expansion` (`[consequences]`).
+`policy-file.on-missing-expansion` (`[consequences]`; spelt `policy.on-missing-expansion` until its rename,
+revised 2026-10-20 by the whole-design audit's fold, A4-F19).
 
 | Defect | Disposition | Where the fix sits |
 |---|---|---|
@@ -792,7 +901,7 @@ Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,
 | `bar-attribution-unjoined` | amend | `test.verdict` runs `GATE_ATTRIBUTE`, `test.route` routes the computed classes, and `test.attribute` judges OWN and MIXED reds only |
 | `lander-rewrites-merge` | amend | `test.merge` is the lander's `--prepare`, and `deploy.land` its `--land` |
 | `verdict-tree-build-tip` | amend | `test.merge` and `deploy.current` under `build-tip` |
-| `presets-fail-build-closes` | fork, amend | LR-4; `[consequences]`; v2's `policy.on-missing-expansion` |
+| `presets-fail-build-closes` | fork, amend | LR-4; `[consequences]`; v2's `policy-file.on-missing-expansion` |
 | `hook-actor-kind` | amend | `entry.intake` is a hook; `test.verdict` is the runner, whose record the pre-push hook reads; layer-flow, v2's contracts, dWitnessedBar's row and flow-roles' Test row too |
 | `ask-row-shape` | amend | `[open]` S-2: today's ask row |
 | `lease-ref-history` | amend | the lease record replaces "the lease ref's history" |
@@ -899,3 +1008,55 @@ while the build waits at `deploy.released`; the release hold's owner item has on
 SHA), and every producer opens it only when none is open; a request on a build with no lease is an
 event wake; and `deploy.released`'s witness names the build it answered. The debt comparison record's
 `[fold-expansions-fold-round3]` names each defect and where it went.
+
+**Revised 2026-10-20 by the whole-design audit's fold** (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`;
+the fold inventory, `build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.md`, places 15 to 177 of this
+record). [transitions] gains the parked state, the incomplete terminal, the closing review's units, a
+withdrawn parent's replan and the resolution pass, and a descope moves no state (A5-F1, B4-F2, BS3-F3, A1-F6,
+A3-F10, B2-F9, A5-F8). [rules] gains the lease refusal by its cause, the unreachable remote as contention, a patch build's
+draw, a parent's notice at every boundary, the closed mailbox's refusal and the idempotent default (A3-F13,
+A5-F3, A5-F6, B3-F9, B1-F5, B3-F3, B2-F9, A3-F16, BS3-F4, A5-F11). `entry.claim` derives a patch's plan record
+and reads `patch.ratify`, and `entry.place` offers a unit (A3-F3, AS4-F4, B1-F11). Build's tail joins on
+every unit's reuse check, and the fix, revert and resolution passes are items (B2-F2, A1-F8, AS1-F1, B2-F18,
+B2-F6, B2-F8, A5-F8). Needs name a breakpoint's disposition, never "where it ran", and READY gains
+UNCARRIED (B2-F1, A1-F7, B2-F19,
+A1-F10). Design reads `design.overlap` and `design.handoff`, and a patch passes `design.overlaps` (B2-F3,
+B2-F17, A3-F20, B2-F20). A supersession hands its kept work to `design.inventory` (A3-F12, B2-F5, B4-F6).
+Deploy holds the close for a core red's fix, keys its patch with Maintain's, reads the plan's ratification as
+the mandate, bounds the parent hold and admits landings by `landing.order` (B3-F2, A3-F1, A3-F7, A3-F5,
+B3-F11, AS4-F1, A2-F4, A3-F11, B3-F5, B3-F10). The breakpoint reads `review.max-rounds`, routes every pinned
+artifact and declares its stand-ins (A5-F7, AS4-F2, B4-F3, B4-F4, B4-F11, B4-F12). `probe.judge` is split and a
+bug-report patch triggers its reproduction (B4-F9, B4-F10); `life.quiesce` reaches every unit holder (A3-F15,
+B4-F8, A3-F19, B4-F7); `[adopt]` gains its two missing items and splits `adopt.decisions` (B5-F15, A4-F15,
+B5-F8); Plan and Test declare their stand-ins (BS2-F1, B1-F9, B3-F13); `test.route` blocks MIXED only as
+`verdict.blocks` says (B3-F7); and the retired key spelling is renamed (A4-F19).
+
+**Revised 2026-10-20, the fold's requests pass** (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w6.md`).
+A park on a spent budget may end incomplete by the owner's disposition (C2-F2). A fork record carries its
+admitted options in their ranking with the pick (C3-F1). A patch passes `plan.dedupe` before Design, and the
+dupes record joins its entry witness (B5-F1). `[adopt]`'s two new items say what each ruling writes (A4-F5).
+`[entry]` declares its stand-ins for dRankedPlan's and dWellOiledMachine's keys, and a patch's ratification hold
+names no key it never reads (B1-F11, AS4-F4, A3-F3).
+
+**Revised 2026-10-20 by the whole-design audit's fork answers** (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w8.md`).
+While the owner attends, an owner item is held until `run.owner-deadline`, and a late answer re-enters the item it
+answers, the amendment row reading from planning and designing too (FK-4-1). Every gate `autonomy` places but the
+ratification may be decided by `run.on-owner-question` (FK-4-2). `adopt-parent-work` and `withdraw-too` have their
+routes (FK-4-3). `entry.place` gains a `breakpoint` disposition, which `review.trigger` reads (FK-4-4). A loop past
+`flow.route-backs` promotes a blocking item's open work to a unit, and a review loop ends at its first bound
+(FK-4-5). A split decision candidate stays reconstructed (FK-4-6). Landings take a landing-turn ref across nodes
+(FK-4-7). `deploy.distill` is unarmed until dScopedBuild lands (FK-4-8). `[rules]` names today's stand-ins for a
+route into a later build (FK-4-9). A pause is a declared wait (FK-4-10). `verdict.flakes`' threshold splits into an
+entry threshold and a release streak (FK-4-11). `build.acceptance` writes the seen-red record that `test.seen-red`
+reads (FK-4-12, FK-5-2). A descope in Test reverts its unit with no draw (FK-4-13). `mailbox.answer` answers a
+mailbox `question` (FK-5-4). `review.report` refuses an unreachable claim until `leases.offline` lands (FK-6-1).
+
+**Revised 2026-10-20, the fork answers** (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w7.md`). A patch
+build's draw on a closed root re-opens the root's transition record under the root's lease (FK-1-5), and
+Design's conditions read the key `design.streams-when` (FK-3-3).
+
+**Revised 2026-10-20 by the whole-design audit's fold integration** (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w9.md`).
+`[rules]`' stand-in for a route into a later build holds where no clause declares another, and a clause's own
+stand-in wins, as `cl-dClosedLoop-0123`'s owner item does for a placement routed to Plan or Design (FK-8-1).
+The re-cut's `[reconciled-order]` classes each such route with the stand-in it reaches. Until dScopedBuild
+lands `build.ratify`, Build's route there reaches dDeclaredLoop's own owner gate (`[build]`, FK-9-1).

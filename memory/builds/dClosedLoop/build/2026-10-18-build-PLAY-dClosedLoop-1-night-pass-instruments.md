@@ -24411,17 +24411,45 @@ Every walk-kit, scorer and instrument run in one pass, each checked against the 
 its own reason, and each clean run checked green (or, on the tree, never green before its input exists).
 
 Usage: python -X utf8 run_kit_plants.py   (from the worktree root); prints one line per run and a summary
+
+The walk-check cases run in an archive of the tree at PIN, the last commit before the whole-design audit's fold, which
+the walk fixtures were written for: the check derives a walker's cells from the live design's items, and the fold
+added items, so on a later tree the clean fixtures red and the drop-cell plant reds for the wrong reason.
 """
+import io
 import pathlib
 import subprocess
 import sys
+import tarfile
 
 S = pathlib.Path(__file__).resolve().parent
 B = "memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-"
 
 
-def run(*args):
-    r = subprocess.run([sys.executable, "-X", "utf8", *args], capture_output=True, text=True, encoding="utf-8")
+PIN = "10c0c4fb4c2bfa709cd60e1447f091057e074c6b"
+PINNED = S / f"pinned-{PIN[:9]}"
+
+
+def pinned():
+    """The tree at PIN, extracted once with git archive; a partial extraction is refused, never reused."""
+    done = PINNED / ".extracted"
+    if not done.is_file():
+        PINNED.mkdir(parents=True, exist_ok=True)
+        r = subprocess.run(["git", "archive", "--format=tar", PIN], capture_output=True)
+        if r.returncode != 0:
+            sys.exit(f"run_kit_plants: git archive {PIN} failed: {r.stderr[-300:]!r}")
+        with tarfile.open(fileobj=io.BytesIO(r.stdout)) as tf:
+            tf.extractall(PINNED, filter="data")
+        want = subprocess.run(["git", "ls-tree", "-r", "--name-only", PIN], capture_output=True, text=True).stdout.split()
+        got = [p for p in want if (PINNED / p).is_file()]
+        if not want or len(got) != len(want):
+            sys.exit(f"run_kit_plants: the pinned tree extracted {len(got)} of {len(want)} files")
+        done.write_text(PIN + "\n", encoding="utf-8")
+    return str(PINNED)
+
+
+def run(*args, cwd=None):
+    r = subprocess.run([sys.executable, "-X", "utf8", *args], capture_output=True, text=True, encoding="utf-8", cwd=cwd)
     return r.returncode, r.stdout + r.stderr
 
 
@@ -24461,7 +24489,7 @@ for p, want in [("hand-edit", "(a hand edit)"), ("no-row", "carries no amends or
 
 failed = []
 for label, args, rc_want, want in CASES:
-    rc, out = run(*args)
+    rc, out = run(*args, cwd=pinned() if label.startswith("walk check") else None)
     ok = rc == rc_want and want in out
     print(f"{'ok  ' if ok else 'FAIL'} rc {rc} (wants {rc_want}) {label}")
     if not ok:
@@ -26136,6 +26164,4697 @@ for n, rows in batches.items():
     print(f"wrote {p.as_posix()}: places {len(rows)}, findings {sum(len(r[4]) for r in rows)}, {len(body)} bytes")
 ````
 
+### `fold_lib.py`
+
+The fold library every fold script imports: a record read whole, sub and insert_before refusing anything but one match, saved with LF.
+
+````python
+"""Shared helper for the expansion review's fold scripts: exact, single-match substitutions."""
+import pathlib
+import sys
+
+
+class Record:
+    def __init__(self, path):
+        self.path = pathlib.Path(path)
+        self.text = self.path.read_text(encoding="utf-8")
+        self.done = 0
+
+    def sub(self, old, new, label):
+        n = self.text.count(old)
+        if n != 1:
+            sys.exit(f"{self.path.name}: {label}: the anchor matches {n} times")
+        self.text = self.text.replace(old, new, 1)
+        self.done += 1
+
+    def insert_before(self, anchor, block, label):
+        self.sub(anchor, block + anchor, label)
+
+    def save(self):
+        self.path.write_text(self.text, encoding="utf-8", newline="\n")
+        print(f"{self.path.name}: {self.done} edits")
+````
+
+### `dry_run.sh`
+
+The fold's dry run: the worktree copied to a folder under the scratchpad (DRY_DIR, refused elsewhere), a fold script run there, then the build's ten final checks.
+
+````python
+#!/usr/bin/env bash
+# Dry-run the stall-and-loop answers fold on a full copy of the worktree, then run the eight final checks and the
+# first-segment probe there. Usage: bash dry_run.sh [<fold script>]   (writes only under this folder's dry/)
+S=C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad
+W=C:/projects/coding-governance/.claude/worktrees/gov-architecture-plan-e34297
+FOLD=${1:-$S/stall/fold_stall_answers.py}
+D=${DRY_DIR:-$S/stall/dry}
+case "$D" in "$S"/*/*) ;; *) echo "DRY_DIR must sit two levels under the scratchpad: $D"; exit 2;; esac
+rm -rf "$D" && mkdir -p "$D" || exit 2
+cd "$W" || exit 2
+cp -r memory tools skills .claude .githooks .github .governance help *.md .codebase-map.conf .gitattributes \
+  .gitignore .lexicon.conf .memory-tree.conf .process-monitor.conf .unattended.conf "$D/" || exit 2
+cd "$D" || exit 2
+python -X utf8 "$FOLD" || { echo "FOLD FAILED"; exit 1; }
+B=memory/builds/dClosedLoop/build
+fail=0
+check() {
+  label=$1; shift
+  out=$(python -X utf8 "$@" 2>&1); rc=$?
+  echo "== $label rc $rc"
+  echo "$out" | tail -n 6
+  [ $rc -eq 0 ] || fail=1
+}
+check "design map" $B/2026-10-17-build-PLAY-dClosedLoop-1-map.py --check
+check "atlas" $B/2026-10-16-build-PLAY-dClosedLoop-1-atlas.py --check
+check "fold state" $S/night/fold_state.py
+check "reconciliation probe" $B/2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py $B/2026-10-18-build-PLAY-dClosedLoop-1-recut.md
+check "clause scan" $S/walk/paren_semis.py
+check "clause ids" $B/2026-10-19-build-PLAY-dClosedLoop-1-clause-ids.py
+check "gap join" $S/join_canonical.py $B/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md $B/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md
+check "preset check" $S/preset_check_canonical.py $B/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md
+check "critical path" $S/order/critical_path.py
+check "first-segment probe" $S/night2/tag/first_segment_probe.py
+echo "ALL rc $fail"
+exit $fail
+````
+
+### `all.py`
+
+Runs the fold's scripts on a tree in FOLD_ORDER: writer n's w<n>/fold-<n>.py, then any named step such as mint; an absent one stops the run.
+
+````python
+"""Run the whole-design audit's fold scripts in order on the tree in the current directory: each writer's script, then
+the main loop's passes. FOLD_ORDER names them (default "1 2 3 4 5 requests"): a digit is writer n's `w<n>/fold-<n>.py`,
+any other word is `<word>.py` beside this file. A named script that is absent stops the run, so a dry run never reads
+green over a fold it skipped.
+
+Usage: FOLD_ORDER="1 2 3" python -X utf8 all.py   (from the tree's root; dry_run.sh runs it on a copy)
+"""
+import os
+import pathlib
+import runpy
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+for n in os.environ.get("FOLD_ORDER", "1 2 3 4 5 requests").split():
+    p = HERE / (f"w{n}/fold-{n}.py" if n.isdigit() else f"{n}.py")
+    if not p.is_file():
+        sys.exit(f"all: {p.as_posix()} is absent")
+    print(f"all: {p.relative_to(HERE).as_posix()}")
+    runpy.run_path(str(p), run_name="__main__")
+````
+
+### `noop.py`
+
+The no-op fold: dry_run.sh with it checks a tree as it stands, the unfolded base or the applied fold.
+
+````python
+# no-op fold: the base tree, unchanged
+````
+
+### `fold-1.py`
+
+Fold writer 1's script, as returned (fold-return-w1), with the main loop's state-name amendment marked in a comment.
+
+````python
+"""Fold writer 1: the whole-design audit's findings at dTrueNorth to dKeptSession's [chain] rows of architecture-v2.
+
+Run from the repository root (or a copy of it); every edit is a single-match `sub` or `insert_before`.
+"""
+import pathlib, sys
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+
+# --- dTrueNorth -------------------------------------------------------------------------------------------------
+
+# Place 47: cl-0002, C1-F18
+R.sub("the carries join, a ninth join of the spec tokens leg",
+      "the carries join, a further join of the spec tokens leg",
+      "place 47, cl-0002, C1-F18")
+# Place 47: cl-0002, A4-F12 and B2-F11
+R.sub("two specs carrying one clause whole and disagreeing,",
+      "two specs carrying one clause whole, or pinning it to two hashes,",
+      "place 47, cl-0002, A4-F12, B2-F11")
+
+# Place 48: cl-0003, B2-F10 as the skeptic narrowed it
+R.sub("memory hygiene refusing a chain build's spec in progress while its build's coverage is red",
+      "memory hygiene refusing a chain build's spec at `INPROGRESS` (approved, its build underway, so past its "
+      "build's Design exit) while its build's coverage is red",
+      "place 48, cl-0003, B2-F10")
+
+# Place 49: cl-0004, C1-F9 as the skeptic narrowed it
+R.sub("the deviation record, its kind joined to check 21's kinds and its fields the departure's address, before and "
+      "after, cause class, reason, evidence, risk class, approver and follow-through,",
+      "the deviation record, its kind joined to check 21's kinds, kept in its departing build's `build/` folder as the "
+      "owner's word on the open readings sets, written in the departing unit's own commit, and its fields its id, the "
+      "hand-off, the departure's address, before and after, cause class, reason, evidence, risk class, approver and "
+      "where the approval is recorded, follow-through and its `caused-by` (P35),",
+      "place 49, cl-0004, C1-F9")
+# Place 49: cl-0004, A4-F11; place 153's cl-0004 half, C1-F7
+R.sub("at the close to a record whose approver meets its risk class, seen red on a planted revision after a pass",
+      "at the close to a record whose approver meets its risk class by the by-risk table final-questions "
+      "`[deviation]` sets, the risk class read from the record, a stand-in until dOrderedCharter's classifier and "
+      "dDeclaredLoop's `deviation.approval` land and re-point it, seen red on a planted revision after a pass",
+      "place 49, cl-0004, A4-F11, C1-F7")
+
+# Place 153: cl-0006, C1-F7
+R.sub("the design at its baseline commit with each deviation's amends or supersedes row applied,",
+      "the design at its baseline commit with each deviation's amends or supersedes row applied, read from the "
+      "record's `**Follow-through:**` line as the bootstrap instrument reads it, a stand-in until dOrderedCharter's "
+      "overlay grammar lands and re-points it,",
+      "place 153, cl-0006, C1-F7")
+
+# --- dGroundRules -----------------------------------------------------------------------------------------------
+
+# Place 50: cl-0015, C1-F14
+R.sub(", and on a load set missing a required unit and a composition over a harness's own limit, both still refused "
+      "under `warn` (the night pass two, point 5, the owner's NT-22, made a census by the night pass two's review) "
+      "`cl-dClosedLoop-0015`",
+      ", and on today's consumer limit, agent-instructions' `CODEX_MAX`, left outside the switch, a planted canonical "
+      "over it answered the same under each value, the load set's and the composition's refusals seen in the "
+      "dOrderedCharter units that build them (the night pass two, point 5, the owner's NT-22, made a census by the "
+      "night pass two's review, the whole-design audit's C1-F14) `cl-dClosedLoop-0015`",
+      "place 50, cl-0015, C1-F14")
+
+# Place 3: cl-0016, A4-F1 and C1-F5
+R.sub("its clamp of every bound to 1 to 5 retired in the same unit with `.agent-cap.conf`, its refusal of a set "
+      "`AGENT_CAP` and its print mode, their readers re-pointed to the policy reader,",
+      "its clamp of every bound to 1 to 5 retired in the same unit with its refusal of a set `AGENT_CAP` and its "
+      "print mode, their readers re-pointed to the policy reader, `.agent-cap.conf` kept as a legacy home the policy "
+      "reader reads, its `FANOUT_CAP` only ever lowering the limit, until dSafePassage's step moves it into the key "
+      "(P38),",
+      "place 3, cl-0016, A4-F1, C1-F5")
+R.sub("the session's total left to the in-flight ledger (the night pass two, point 7, the owner's NT-27 and NT-28, "
+      "completed by the night pass two's review) `cl-dClosedLoop-0016`",
+      "the session's total left to the in-flight ledger, and a planted `FANOUT_CAP=2` still capping at 2 under the "
+      "key's default of 6 (the night pass two, point 7, the owner's NT-27 and NT-28, completed by the night pass "
+      "two's review, the whole-design audit's A4-F1 and C1-F5) `cl-dClosedLoop-0016`",
+      "place 3, cl-0016, A4-F1, C1-F5")
+
+# --- dSafePassage -----------------------------------------------------------------------------------------------
+
+# Place 3: cl-0018, A4-F1 and C1-F5
+R.sub("with the legacy homes declared as the translation window's population (P38, AP-25),",
+      "with the legacy homes declared as the translation window's population, `.agent-cap.conf` among them, its "
+      "`FANOUT_CAP` moved into `runtime.agents-in-flight` by a step that retires the file, seen on a planted "
+      "`FANOUT_CAP=2` capping at 2 before the step and after it (P38, AP-25, the whole-design audit's A4-F1 and "
+      "C1-F5),",
+      "place 3, cl-0018, A4-F1, C1-F5")
+
+# Place 52: cl-0028, A4-F7
+R.sub("the interpreter floor raised to Python 3.15 as the step kind's first step and the template a later raise "
+      "copies (AP-31)",
+      "the interpreter floor raised to Python 3.15 as the step kind's first step after the receipt's schema-4 step, "
+      "whose `steps` field every later step's progress is written to, and the template a later raise copies (AP-31, "
+      "the whole-design audit's A4-F7)",
+      "place 52, cl-0028, A4-F7")
+# Place 52: cl-0028, C1-F16
+R.sub("its down restoring the old declaration and refusing while a tracked TOML file fails to parse under the floor "
+      "it restores,",
+      "its down restoring the old declaration and refusing while a tracked TOML file fails to parse, or a tracked "
+      "`.py` file fails to compile, under the floor it restores, seen red on a planted PEP 701 f-string landed after "
+      "the raise (the whole-design audit's C1-F16),",
+      "place 52, cl-0028, C1-F16")
+
+# --- dOrderedCharter --------------------------------------------------------------------------------------------
+
+# Place 4: cl-0032, C1-F2, C1-F10, C1-F11, and C1-F12's writer and fields
+R.sub("the charter re-founded in its level-0 envelope (front door, precedence and override rule with "
+      "`charter.override` and its record, instruction map, active practices, one line each, hand-off to the loop, "
+      "the repository's project block from its own overlay) `cl-dClosedLoop-0032`",
+      "the charter re-founded in its level-0 envelope (front door, precedence and override rule with "
+      "`charter.override` and its record, instruction map, the core principles, fixed, rendered from the principle "
+      "registry, the decision principles that resolve unattended forks, ranked above the practices, active "
+      "practices, one line each, hand-off to the loop, the repository's project block from its own overlay), the "
+      "override record carrying the rule set aside and the owner's words, written by the session's agent as "
+      "`charter.override` admits, the `up —` micro-format naming where a credential lives and never asking its "
+      "value, the statement grammar refusing a field that asks for one, seen red on today's `pw` field "
+      "(gap-found-18), and the charter's section-number readers re-pointed to the active practices' tags in the same "
+      "unit, `roles_lib.py`'s `SECTION_ONE_RE` and the roles `rules:` join among them, with the review harness "
+      "prompts that grade by section number, proven by a role render over the re-founded charter (layer-instruction "
+      "R-B, the whole-design audit's C1-F2, C1-F10, C1-F11 and C1-F12) `cl-dClosedLoop-0032`",
+      "place 4, cl-0032, C1-F2, C1-F10, C1-F11, C1-F12")
+# Place 4: cl-0037, C1-F12's writer and fields
+R.sub("the conformance-gate contract, the exception register and the `core.*` policies, and the factories and gates "
+      "for instruction units, practices, Skills and layers `cl-dClosedLoop-0037`",
+      "the conformance-gate contract, the exception register, each exception carrying its principle, the part it "
+      "excuses and a reason, written by the session `core.exceptions` admits, and the `core.*` policies, and the "
+      "factories and gates for instruction units, practices, Skills and layers (the whole-design audit's C1-F12) "
+      "`cl-dClosedLoop-0037`",
+      "place 4, cl-0037, C1-F12")
+
+# Place 154: cl-0038, C1-F20
+R.sub("another harness's through its Runtime harness adapter,",
+      "another harness's through its Runtime harness adapter, agent-instructions' wiring standing in until "
+      "dWellOiledMachine lands the adapters (the whole-design audit's C1-F20),",
+      "place 154, cl-0038, C1-F20")
+
+# Place 5: cl-0039, C1-F1
+R.sub("a `help` holding its rationale, and class, fixed or open), documents rendered from units "
+      "`cl-dClosedLoop-0039`",
+      "a `help` holding its rationale, `required-by`, the roles and items that require it, `enforced-by`, and class, "
+      "fixed or open), documents rendered from units (layer-instruction R-A, the whole-design audit's C1-F1) "
+      "`cl-dClosedLoop-0039`",
+      "place 5, cl-0039, C1-F1")
+# Place 5: cl-0041, C1-F1; place 50: cl-0041, C1-F14
+R.sub("and refused when missing a required unit (`instructions.checks`, narrowed by the night pass two, point 5, the "
+      "owner's NT-22), injected load points measured `cl-dClosedLoop-0041`",
+      "and refused when missing a unit its `required-by` names, still refused under `budgets.enforce`'s `warn` "
+      "(`instructions.checks`, narrowed by the night pass two, point 5, the owner's NT-22), seen red on a planted "
+      "load set missing a unit a role's `required-by` names, injected load points measured (the whole-design "
+      "audit's C1-F1 and C1-F14) `cl-dClosedLoop-0041`",
+      "place 5 and 50, cl-0041, C1-F1, C1-F14")
+
+# Place 155: cl-0045, C1-F19
+R.sub("instruction packs extending `charter.practices` into the preset catalogue `cl-dClosedLoop-0045`",
+      "instruction packs extending `charter.practices` into a pack catalogue, apart from the policy presets, which "
+      "never touch `charter.practices` (the whole-design audit's C1-F19) `cl-dClosedLoop-0045`",
+      "place 155, cl-0045, C1-F19")
+
+# Place 53: cl-0048, C1-F6
+R.sub("from an inventory of every reader of `extract.py` and `recall_conf.py` by path: `check-verdict-epoch.sh`'s "
+      "scan set and its DELEGATES, `migrate_backlog.py`'s `seed_recall_kit` and `merge-rows.test.sh`'s fixture "
+      "copies,",
+      "from an inventory of every reader of memory-recall's `extract.py` and `recall_conf.py` by path, derived by a "
+      "query over `tools`, `skills` and `.githooks` and never typed beside it, each reader it finds re-pointed and "
+      "its arm seen red again: `check-verdict-epoch.sh`'s scan set and its DELEGATES, `migrate_backlog.py`'s "
+      "`seed_recall_kit` and `merge-rows.test.sh`'s fixture copies, and among today's others `manifest-check.test.sh`'s "
+      "F1 arm, which hides `extract.py` and expects the grammar's NOTE, `straggler-guard.test.sh`, "
+      "`transition-audit.test.sh`, `check-unattended.sh`'s `RECALL_CLI` probe and the test fixtures that copy the "
+      "two files (the whole-design audit's C1-F6),",
+      "place 53, cl-0048, C1-F6")
+
+# Place 6: cl-0049, C1-F3
+R.sub("with one resolver (`gov tag show`, `where`, `refs` and `check`) and the `doc` and `unit` namespaces,",
+      "with one resolver (`gov tag show`, `where`, `refs` and `check`), `gov tag show` returning a leaf or its "
+      "subtree as `tags.slice` says, the `retired` check reading new text that cites a retired tag as "
+      "`tags.retired-cites` says and the `resolves` check reading bare references as `tags.bare-refs` says, each "
+      "value seen on its planted case (the whole-design audit's C1-F3), and the `doc` and `unit` namespaces,",
+      "place 6, cl-0049, C1-F3")
+
+# Place 50: cl-0064, C1-F14
+R.sub("an overflow warned or refused as `budgets.enforce` says and one over a harness's own limit refused,",
+      "an overflow warned or refused as `budgets.enforce` says and one over a harness's own limit refused under "
+      "`warn` too, seen on a planted composition over Codex's 32 KiB (the whole-design audit's C1-F14),",
+      "place 50, cl-0064, C1-F14")
+
+# --- dFairHearing -----------------------------------------------------------------------------------------------
+
+# Place 54: cl-0070, C2-F6
+R.sub("and each shipping on its losing test `cl-dClosedLoop-0070`",
+      "and each shipping on its losing test, `review.pin` run directly with its pin arguments, a stand-in until "
+      "dDeclaredLoop's `review.trigger` lands (the whole-design audit's C2-F6) `cl-dClosedLoop-0070`",
+      "place 54, cl-0070, C2-F6")
+# Place 54: cl-0075, C2-F6
+R.sub("against the leg manifest and the class slugs the harness hands over `cl-dClosedLoop-0075`",
+      "against the leg manifest and the class slugs the harness hands over, the report's dispositions written to the "
+      "review record, a stand-in until dDeclaredLoop's `review.dispose` lands and routes them (the whole-design "
+      "audit's C2-F6) `cl-dClosedLoop-0075`",
+      "place 54, cl-0075, C2-F6")
+
+# Place 156: cl-0078, C2-F16
+R.sub("; the panel's internals, and the twin merge",
+      "; the panel's internals, every agent the harness spawns typed and declared in a stage, seen red on a planted "
+      "untyped spawn (gap-review-13, the whole-design audit's C2-F16), and the twin merge",
+      "place 156, cl-0078, C2-F16")
+
+# --- dDeclaredLoop ----------------------------------------------------------------------------------------------
+
+# Place 157: cl-0087 and cl-0088, C2-F9
+R.sub("; the guard, the TTY CLI and the default floor `cl-dClosedLoop-0087`",
+      "; the guard, the TTY CLI and the default floor, each invariant switched by `floor` only under the guard, "
+      "seen red on an invariant switched off without it (the whole-design audit's C2-F9) `cl-dClosedLoop-0087`",
+      "place 157, cl-0087, C2-F9")
+R.sub("; the transition record three ways `cl-dClosedLoop-0088`",
+      "; the transition record three ways, its channels the set `transitions.record` selects, seen on a planted "
+      "subset and red on an empty set (the whole-design audit's C2-F9) `cl-dClosedLoop-0088`",
+      "place 157, cl-0088, C2-F9")
+
+# Place 55: cl-0098, C2-F8
+R.sub("; one transition table per level (build, feature, unit), the engine refusing any transition it lacks "
+      "`cl-dClosedLoop-0098`",
+      "; one transition table per level (build, feature, unit), the engine refusing any transition it lacks, each "
+      "row naming its exit item by tag, a fixture witness standing in for an item whose build has not landed until "
+      "that build lands and arms it (the whole-design audit's C2-F8) `cl-dClosedLoop-0098`",
+      "place 55, cl-0098, C2-F8")
+
+# Place 56: cl-0106, C2-F3
+R.sub("the runaway ceiling, `RUNAWAY_CEILING`, moved into the loop kit's definition in the same unit with "
+      "`unattended.sh` and `check-unattended.sh` re-pointed to it, and a planted round count at the ceiling refused,",
+      "the runaway ceiling, `RUNAWAY_CEILING`, made the policy key `review.max-rounds` in the same unit with "
+      "`unattended.sh` and `check-unattended.sh` re-pointed to it, and a planted round count above it refused and "
+      "one equal to it admitted,",
+      "place 56, cl-0106, C2-F3")
+R.sub("(AF-1, DA-M8, FM7, FM10, P38) `cl-dClosedLoop-0106`",
+      "(AF-1, DA-M8, FM7, FM10, P38, the whole-design audit's C2-F3) `cl-dClosedLoop-0106`",
+      "place 56, cl-0106, C2-F3")
+
+# Place 8: cl-0116, C2-F2
+R.sub("each ending planted, a best-effort choice to lap again refused, and raising the budget the owner's alone "
+      "(P39, the owner's SL-2) `cl-dClosedLoop-0116`",
+      "each ending a row of the build's transition table, any open state to `incomplete`, a terminal, on the "
+      "exhaustion record, and any open state to `parked`, left only by the owner's disposition, each "
+      "ending planted from those rows, a best-effort choice to lap again refused, and raising the budget the "
+      "owner's alone (P39, the owner's SL-2, the whole-design audit's C2-F2) `cl-dClosedLoop-0116`",
+      "place 8, cl-0116, C2-F2")
+
+# Place 58: cl-0118, C2-F13
+R.sub("an unattended raise of the budget and an approval item recommending a loosening (P39, the parked debt's "
+      "review) `cl-dClosedLoop-0118`",
+      "an unattended raise of the budget, of a round count, of a retry count and of a deadline, each its own planted "
+      "case, and an approval item recommending a loosening (P39, the parked debt's review, the whole-design audit's "
+      "C2-F13) `cl-dClosedLoop-0118`",
+      "place 58, cl-0118, C2-F13")
+
+# --- dPlacedRequest ---------------------------------------------------------------------------------------------
+
+# Place 59: cl-0120 and cl-0121, C2-F10
+R.sub("the coordination feature: one lease grammar for builds, units and cadence runs,",
+      "the coordination feature: one lease grammar for builds, units and cadence runs, the levels a build leases as "
+      "`leases.granularity` says, each value seen on its planted case (the whole-design audit's C2-F10),",
+      "place 59, cl-0120, C2-F10")
+R.sub("the build's orientation card at level 1, below the charter, kept as a ref per build on the remote",
+      "the build's orientation card at level 1, below the charter, re-rendered as `card.follows` says, each value "
+      "seen on its planted case (the whole-design audit's C2-F10), kept as a ref per build on the remote",
+      "place 59, cl-0121, C2-F10")
+
+# Place 60: cl-0123, C2-F7
+R.sub("the disposition carried in the claim commit `entry.claim` writes until dWellOiledMachine's intake kind lands "
+      "(RC-9) `cl-dClosedLoop-0123`",
+      "the disposition carried in the claim commit `entry.claim` writes until dWellOiledMachine's intake kind lands "
+      "(RC-9), and a stand-in for each later part it rests on: until Plan's and Design's items land, a placement "
+      "that routes to either files an owner item carrying the claim (the whole-design audit's C2-F7) "
+      "`cl-dClosedLoop-0123`",
+      "place 60, cl-0123, C2-F7")
+
+# Place 61: cl-0132, C2-F4
+R.sub("drawing on a budget keyed to the intake's content key, sized as `flow.rework-budget`'s base, seen red on a "
+      "planted placement loop (P39) `cl-dClosedLoop-0132`",
+      "drawing on a budget keyed to the request's content key, computed from its text, so an absent intake keys it "
+      "the same way, sized as `flow.rework-budget`'s base, seen red on a planted placement loop and on one with no "
+      "intake record (P39, the whole-design audit's C2-F4) `cl-dClosedLoop-0132`",
+      "place 61, cl-0132, C2-F4")
+
+# Place 62: cl-0135, A2-F6
+R.sub("; a lease's expiry judged by a declared clock, never the reader's raw clock: here an observer seeing the tip "
+      "unchanged for `leases.expiry-hours`, seen red on a reader whose clock runs a day ahead, which must not expire "
+      "a lease whose tip moved within the hour (P40, the parked debt's review) `cl-dClosedLoop-0135`",
+      "; a lease's expiry, an offer's deadline and a tombstone's prune age, each a deadline one node judges on a "
+      "record another node stamped, judged by a declared clock, never the reader's raw clock: here an observer "
+      "measuring the time since it first saw the record unchanged, a lease's tip for `leases.expiry-hours`, an "
+      "offer for `leases.offer-seconds` and a tombstone for `leases.queued-claim-days`, each seen red on a reader "
+      "whose clock runs a day ahead, which must not expire a lease whose tip moved within the hour, claim a unit "
+      "offered to another node before its offer passes, or prune a tombstone early (P40, the parked debt's review, "
+      "the whole-design audit's A2-F6) `cl-dClosedLoop-0135`",
+      "place 62, cl-0135, A2-F6")
+
+# --- dKeptSession -----------------------------------------------------------------------------------------------
+
+# Place 63: cl-0143, C2-F15
+R.sub("its closed set of message kinds checked on write, read and disposed at every transition, shown on the card "
+      "and kept in the build's transition log `cl-dClosedLoop-0143`",
+      "its closed set of message kinds checked on write, written only through the coordination verbs, read at every "
+      "transition, which is refused while a message addressed to the build is neither answered nor acknowledged "
+      "until `flow.wait-ceiling` passes, seen red on a planted unanswered message, disposed there, shown on the card "
+      "and kept in the build's transition log (coordination item 6, the whole-design audit's C2-F15) "
+      "`cl-dClosedLoop-0143`",
+      "place 63, cl-0143, C2-F15")
+
+# Place 64: cl-0145 and cl-0147, C2-F11
+R.sub("; dependency coordination by the parent's lease, interfaces confirmed at Design's exit, change and landing "
+      "notices `cl-dClosedLoop-0145`",
+      "; dependency coordination by the parent's lease as `deps.coordination` says, interfaces confirmed at Design's "
+      "exit, early building as `deps.early-build` admits, change and landing notices, each key seen on strict's "
+      "value (the whole-design audit's C2-F11) `cl-dClosedLoop-0145`",
+      "place 64, cl-0145, C2-F11")
+R.sub("; orientation cost recorded per stage `cl-dClosedLoop-0147`",
+      "; orientation cost recorded per stage and held as `orient.budget` says, seen on strict's "
+      "`warn-at-evidence-ceiling` (the whole-design audit's C2-F11) `cl-dClosedLoop-0147`",
+      "place 64, cl-0147, C2-F11")
+
+# Place 66: cl-0154, CS4-F1
+R.sub("; the policy namespaces' purposes, reviewed `cl-dClosedLoop-0154`",
+      "; the policy namespaces' purposes, reviewed as `memory.map-purpose`'s default, `review`, says, a stand-in "
+      "until dTotalRecall lands the key (the whole-design audit's CS4-F1) `cl-dClosedLoop-0154`",
+      "place 66, cl-0154, CS4-F1")
+
+# Place 62: cl-0162, A2-F6
+R.sub("a message awaiting an answer declaring `flow.wait-ceiling` as its deadline, past which the asker's declared "
+      "default answers it and the build's transitions go on, seen on a planted question nobody answers (P39) "
+      "`cl-dClosedLoop-0162`",
+      "a message awaiting an answer declaring `flow.wait-ceiling` as its deadline, judged by the declared clock "
+      "dPlacedRequest's leases use, the time since the waiter first saw the message, past which the asker's "
+      "declared default answers it and the build's transitions go on, seen on a planted question nobody answers "
+      "and red on a reader whose clock runs a day ahead (P39, the whole-design audit's A2-F6) `cl-dClosedLoop-0162`",
+      "place 62, cl-0162, A2-F6")
+
+# --- The revision log -------------------------------------------------------------------------------------------
+
+R.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review (`reviews/2026-10-17-review-PLAY-dClosedLoop-1-debt-folds.md`):\n",
+    "Revised 2026-10-20 by the whole-design audit's fold (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.md`),\n"
+    "writer 1, dTrueNorth to dKeptSession: the carries join reds any second whole carrier, the hygiene refusal waits\n"
+    "for `INPROGRESS`, and the deviation record names its home, writer and fields and its by-risk stand-in\n"
+    "(A4-F12, B2-F11, C1-F18, B2-F10, C1-F9, A4-F11, C1-F7); an adopter's `FANOUT_CAP` keeps lowering the limit until\n"
+    "dSafePassage's step moves it (A4-F1, C1-F5), and the floor step follows the receipt's schema-4 step, its down\n"
+    "compiling tracked Python (A4-F7, C1-F16); the re-founded charter carries its principles, re-points its\n"
+    "section-number readers and asks no secret (C1-F2, C1-F10, C1-F11, C1-F12), the unit row gains `required-by`\n"
+    "(C1-F1), and every guard-bearing key the walk found unread is named with its arm (C1-F3, C2-F9, C2-F10,\n"
+    "C2-F11); each dependency on a later build names its stand-in (C2-F6, C2-F7, C2-F8, C1-F20, CS4-F1); the\n"
+    "budget's endings are table rows, the ceiling is `review.max-rounds`, and every cross-node deadline reads a\n"
+    "declared clock (C2-F2, C2-F3, C2-F13, C2-F4, A2-F6, C2-F15, C1-F14, C1-F6, C1-F19, C2-F16).\n\n",
+    "revision line, writer 1")
+
+# The main loop's amendment, 2026-10-20: `closed-incomplete` renamed `incomplete` and `parked-for-owner` `parked`, one name per state across writers 1 and 4 (atlas.py reads a one-word terminal set).
+R.save()
+````
+
+### `fold-2.py`
+
+Fold writer 2's script, as returned (fold-return-w2), with the main loop's place-68 amendment marked in a comment.
+
+````python
+"""Fold writer 2: the whole-design audit's findings folded into architecture-v2's [chain] rows of dBoundRoles,
+dFurnishedOrders, dTotalRecall, dLinkedLibrary, dMindYourWords, dWellOiledMachine and dWitnessedBar.
+Run from the repository root. Every edit is a single-match substitution through the build's fold library."""
+import pathlib, sys
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+
+# --- dBoundRoles ---------------------------------------------------------------------------------------------
+R.sub("registered through the integrations and observability layer contracts,",
+      "registered through the distribution, integrations and observability layer contracts, the deployer under "
+      "both distribution's and integrations',",
+      "place 158: C3-F29")
+
+R.sub("every fork resolved by the role that meets it and recorded, or held as `run.on-owner-question` says (LR-3) "
+      "`cl-dClosedLoop-0176`",
+      "every fork resolved by the role that meets it and recorded, or held as `run.on-owner-question` says, its "
+      "options only those the core admits, ranked the most feature-rich first and then the most expandable, its full "
+      "record naming the admitted options in that ranking and the pick, seen red on a planted fork whose pick lies "
+      "outside the admitted set and on one whose pick is not the first of its recorded ranking (LR-3) "
+      "`cl-dClosedLoop-0176`",
+      "place 68: C3-F1, B2-F15")
+# The main loop's amendment, 2026-10-20: the writer's text ranked "under `design.forks`' default", a key dIndexedDesign
+# owns and dBoundRoles does not descend from, and the reconciliation probe read it as an unclassed dependency. The
+# ranking is stated here as the core's own; cl-0390 makes it a policy once dIndexedDesign lands the key.
+
+R.sub("the role static block carried once per spawn `cl-dClosedLoop-0180`",
+      "the role static block carried once per spawn, the single-carry check reading `instructions.task-charter` and "
+      "the harness kind and refusing `always` on a backend that loads the static block, seen red on a planted "
+      "`always` there, and the block's budget covering the whole rendered static block, its charter block included, "
+      "never its base body alone, seen red on a planted charter block that pushes a role over its ceiling "
+      "(gap-roles-20) `cl-dClosedLoop-0180`",
+      "place 69: C3-F2, C3-F3")
+
+# --- dFurnishedOrders ----------------------------------------------------------------------------------------
+R.sub("the answered-call hook (`roles.answered-calls`) `cl-dClosedLoop-0197`",
+      "the answered-call hook (`roles.answered-calls`), a verifier's read of its subject and a read the packet does "
+      "not cover never an answered call, and below CLI 2.1.295, where a rule on an ungated tool stays open when its "
+      "hook fails, each failure recorded, seen allowed on a planted verifier read of its subject and recorded on a "
+      "planted hook crash `cl-dClosedLoop-0197`",
+      "place 70: C3-F8")
+
+R.sub("the role files' re-verification orders and protocol pointers replaced by rendered slices "
+      "`cl-dClosedLoop-0199`",
+      "the role files' re-verification orders and protocol pointers replaced by rendered slices, the machinery that "
+      "carries and asserts the whole Protocols section re-pointed in the same unit: `roles_lib.CARRIED_SECTIONS`, "
+      "`check_roles.py`'s R0, R5 and R10, and `render_agents.py`'s self-test arm 4 `cl-dClosedLoop-0199`",
+      "place 71: C3-F4")
+
+R.sub("role metrics per role and item into the value ledger, answered calls",
+      "role metrics per role and item into the value ledger, written to a plain metrics file this build owns until "
+      "dCalibratedLens's value ledger lands and reads it, answered calls",
+      "place 72: C3-F6")
+
+R.sub("replaced by rendered slices, the machinery",
+      "replaced by rendered slices, handed whole or as a pointer as `instructions.slices` says, the machinery",
+      "place 73: C3-F5 (instructions.slices)")
+
+R.sub("the legacy slot in its four states `cl-dClosedLoop-0202`",
+      "the legacy slot in its four states and capped by `retrofit.slot-bytes`, the memory slices rendering \"not "
+      "installed\" until dTotalRecall's section extractors and `record show` land, and the reuse scout's house index "
+      "handed first, as a pointer or not at all as `roles.orientation.house-index` says, rendering \"not installed\" "
+      "until dLinkedLibrary's house index lands, each value seen on a planted work order `cl-dClosedLoop-0202`",
+      "place 73: C3-F5 (retrofit.slot-bytes, roles.orientation.house-index), C3-F7")
+
+R.sub("with the unfolds each item declares (PM-6),",
+      "with the unfolds each item declares, none or all as `memory.map-unfold` says (PM-6),",
+      "place 73: C3-F5 (memory.map-unfold)")
+
+R.sub("and the code-notes slot filled from the tag's bundle (night pass, point 4) `cl-dClosedLoop-0209`",
+      "and the code-notes slot filled from the tag's bundle, delivered in the work order, on demand or not at all as "
+      "`annotations.delivery` says (night pass, point 4) `cl-dClosedLoop-0209`",
+      "place 73: C3-F5 (annotations.delivery)")
+
+# --- dTotalRecall --------------------------------------------------------------------------------------------
+R.sub("proven by flipping the grammar in a scratch clone `cl-dClosedLoop-0216`",
+      "`BUILD_SLUG_RE` derived from the `builds.slug-*` keys, a changed grammar binding new mints only, existing "
+      "slugs and ids keeping their form, every reader accepting both and each slug recording the grammar in force at "
+      "its minting, proven by flipping the grammar in a scratch clone over the named flips, `slug-words` 1 and 3, "
+      "`slug-style` `descriptive`, and `slug-date` `shown` and `in-slug` in a digit and a hyphenated form, every "
+      "reader the parser's own search finds turning green `cl-dClosedLoop-0216`",
+      "place 74: C3-F10")
+
+R.sub("inverted, checked both ways and rendered as the relation graph `cl-dClosedLoop-0217`",
+      "inverted, checked both ways and rendered as the relation graph, every target existing and `depends-on` "
+      "forming no cycle, a target on another node's unlanded branch resolved through the remote's refs, the build's "
+      "card and lease refs, and a target found nowhere pending, never red, until its build lands or is withdrawn, "
+      "seen red on a planted two-build cycle and pending on a planted target on another node's branch "
+      "`cl-dClosedLoop-0217`",
+      "place 40: C3-F9")
+
+R.sub("re-timed on a planted adopter-scale fixture (the shape audit) `cl-dClosedLoop-0219`",
+      "re-timed at this build's first unit on gov's tree and on a planted adopter-scale fixture with vendored, "
+      "binary, LFS and oversized files, a cold derivation over 30 s or a record over 1 MB on either losing (the "
+      "shape audit) `cl-dClosedLoop-0219`",
+      "place 75: C3-F11")
+
+R.sub("the read budget per role item (`memory.item-budget`, MS-2, reported when exceeded, MS-3),",
+      "the read budget per role item (`memory.item-budget`, MS-2), a work order over it answered as "
+      "`memory.over-budget` says, refused, reported by default (MS-3) or off, and exempt from `budgets.enforce`'s "
+      "refusal and the roles' route-back, a superseded slice refused or marked as `memory.superseded-slices` says, "
+      "seen red on a superseded decision handed to a builder,",
+      "place 76: C3-F16 (memory.over-budget, memory.superseded-slices)")
+
+R.sub("the acceptance re-measure counted over every read channel `cl-dClosedLoop-0223`",
+      "the acceptance re-measure counted over every read channel, the work order's inlined slices, Read results on "
+      "memory paths and the output of shell commands that name a memory path or call `record show`, `record find` "
+      "or `gov tag`, passing only if thirty days after landing the median memory bytes per agent that reads memory "
+      "are below 33 KB `cl-dClosedLoop-0223`",
+      "place 77: C3-F12")
+
+R.sub("at most `memory.map-budget` and degraded in a fixed order over it, never dropping a node "
+      "`cl-dClosedLoop-0225`",
+      "at most `memory.map-budget`, and over it degraded in a fixed order or refused as `memory.map-overflow` says, "
+      "never dropping a node `cl-dClosedLoop-0225`",
+      "place 76: C3-F16 (memory.map-overflow)")
+
+R.sub("the replay with the map and without at its first unit, scored through dFairHearing's scorer factory, so a "
+      "losing map is never built, and a loss routed:",
+      "the replay with the map and without at its first unit, the coherence and reuse lenses each run twice with "
+      "the map and the architect's unfolds handed and twice without, at the base commits of the systems and "
+      "retrofit, library and debt-folds audits, scored through dFairHearing's scorer factory against those audits' "
+      "known not-in-view items, so a losing map is never built, the map losing if the known set's recall rises by "
+      "less than the twin runs' difference plus 5 items, the median of existence searches per lens falls by less "
+      "than one, or the bytes read before the first act rise by more than the map's own bytes (the project map's "
+      "`[test]`), and a loss routed:",
+      "place 9: C3-F13 (cl-dClosedLoop-0228)")
+
+# --- dLinkedLibrary ------------------------------------------------------------------------------------------
+R.sub("today's 200 rows routed by two raters at kappa 0.8 or better,",
+      "today's 200 rows routed by two raters at kappa 0.8 or better, below it the rubric revised and the routing "
+      "re-run, no row moving until it passes, each re-run drawing on the build's rework budget and ending as "
+      "`flow.on-exhausted` says,",
+      "place 159: CS3-F1")
+
+R.sub("the re-run refusing, naming the clone it lacks, without them `cl-dClosedLoop-0239`",
+      "the re-run refusing, naming the clone it lacks, without them, and the acceptance passing only at M1c's 16 of "
+      "24 on the benchmark and its 8 of 12 on the held-out cases or better (layer-memory `[reuse]`, the scouted-seam "
+      "research's held-out run) `cl-dClosedLoop-0239`",
+      "place 10: C3-F17")
+
+R.sub("`reuse_lookup.py` and its agent retired with their readers rewritten and their own upgrade step,",
+      "`reuse_lookup.py` and its agent retired with their readers rewritten, by name and by value, and their own "
+      "upgrade step, the readers by value named: hygiene check 12's §10 arm, which accepts the token "
+      "`reuse_lookup` as reuse evidence and past a new cutoff accepts the reuse scout's record instead, seen red on "
+      "a planted spec citing `reuse_lookup` after it, unattended's `MAP_CLI`, re-pointed at the map's CLI, and the "
+      "`reuse-probed` DoD item and M5, which read the reuse scout's record in place of the lookup's and recall's "
+      "query logs,",
+      "place 78: C3-F18")
+
+R.sub("the generated annotation index and its resolve check (`annotations.grammar`),",
+      "the generated annotation index and its resolve check (`annotations.grammar`), over notes alone or every "
+      "comment reference as `annotations.resolve-scope` says,",
+      "place 160: C3-F22 (annotations.resolve-scope)")
+
+R.sub("the generated views: README routing, the relation graph, the decisions' holds-now view and the reuse view "
+      "`cl-dClosedLoop-0242`",
+      "the generated views: the decisions' holds-now view and the reuse view, beside dTotalRecall's README routing "
+      "and relation graph, which this build reads and never renders again `cl-dClosedLoop-0242`",
+      "place 79: C3-F20")
+
+R.sub("the marker query with the map's index rows where the map is installed (AN-1),",
+      "the marker query with the map's index rows where the map is installed, the query alone or the map's index "
+      "alone as `annotations.lookup` says (AN-1),",
+      "place 160: C3-F22 (annotations.lookup)")
+
+R.sub("scored through dFairHearing's scorer factory (night pass, point 3) `cl-dClosedLoop-0253`",
+      "scored through dFairHearing's scorer factory, the slot losing if its recall of the files the unit then read "
+      "is no better than its seed's alone, the losing test the code research committed before its probe (night "
+      "pass, point 3) `cl-dClosedLoop-0253`",
+      "place 9: C3-F13 (cl-dClosedLoop-0253)")
+
+R.sub("seen red on a planted file (night pass, point 4) `cl-dClosedLoop-0254`",
+      "seen red on a planted file, and the span share re-measured with the map's own extractors, the hybrid losing "
+      "if 80% or more of a feature's outside spans sit in a derivable definition (night pass, point 4) "
+      "`cl-dClosedLoop-0254`",
+      "place 161: C3-F31")
+
+# --- dMindYourWords ------------------------------------------------------------------------------------------
+R.sub("with only debt counted against the shrink-only pin (`lexicon.pin`),",
+      "with only debt counted against the shrink-only pin (`lexicon.pin`), one pin over today's three seams, "
+      "`VERB_OFFENDER_PIN` becoming the debt pin, `SUFFIX_OFFENDER_PIN` folded into it and the per-cell `PINS:` "
+      "block retired, its cells counted inside it,",
+      "place 162: C3-F27 (cl-dClosedLoop-0262)")
+
+R.sub("packs keyed by base member, base prefix and host namespace, applied only where the site resolves statically "
+      "through its imports to that base, against committed pack data `cl-dClosedLoop-0263`",
+      "packs keyed by base member, base prefix and host namespace, member and prefix rows applied only where the "
+      "site resolves statically through its imports to that base, a namespaced closed set applied by name through "
+      "its rows' namespace pattern (`pytest_*`, `__*__`), against committed pack data, and three cases with their "
+      "own outcome, each with its fixture: an unresolved base graded as debt and reported unresolved, an override "
+      "of a parent defined in the repository forced by that parent, and a marker on a base defined in the "
+      "repository or on an unpacked base reported rather than red `cl-dClosedLoop-0263`",
+      "place 80: C3-F24")
+
+R.sub("and a noun canon seeded from the corpus and frozen `cl-dClosedLoop-0271`",
+      "and a noun canon of clusters written exogenously, such as `sha` against `oid`, `hash` and `digest`, the "
+      "corpus deciding only which clusters are live `cl-dClosedLoop-0271`",
+      "place 81: C3-F25")
+
+R.sub("with `ratified` replaced by its record and the `init` row re-justified `cl-dClosedLoop-0272`",
+      "with `ratified` replaced by its record and its readers by value moved with it: the drift signal comparing "
+      "VERBS and LANGS edits (`drift_signals.py`, `drift_report.py`), `adopt-lexicon.sh --check`, the kit's "
+      "`lexicon-pins` hole, the scaffold and the lexicon's own reads of it in `lexicon.py` and `lexicon_conf.py`, "
+      "the leg pack's arm seen red on a planted LANGS change newer than the record, and the `init` row re-justified "
+      "`cl-dClosedLoop-0272`",
+      "place 82: C3-F26")
+
+R.sub("records kept out by the path selector `cl-dClosedLoop-0276`",
+      "records kept out by the path selector, `py.file` and `py.constant` re-armed once it excludes "
+      "`memory/builds/**` `cl-dClosedLoop-0276`",
+      "place 162: C3-F27 (cl-dClosedLoop-0276)")
+
+# --- dWellOiledMachine ---------------------------------------------------------------------------------------
+R.sub("which the admission queue reads (the answers' review) `cl-dClosedLoop-0279`",
+      "which the admission queue reads, its result setting `runtime.spawn-backend`'s default for single-agent acts, "
+      "the key read at each act's launch (the answers' review) `cl-dClosedLoop-0279`",
+      "place 83: C4-F8 (runtime.spawn-backend)")
+
+R.sub("relaunch capped by `RESUME_ATTEMPTS`,",
+      "relaunch fresh or resumed as `runtime.relaunch` says, each value seen on a planted relaunch, and capped by "
+      "`RESUME_ATTEMPTS`,",
+      "place 83: C4-F8 (runtime.relaunch)")
+
+R.sub("`onFailure` written on every entry with its effect recorded per binary,",
+      "`onFailure` written on every entry, closed or open as `runtime.hook-failure` says, each value seen on a "
+      "planted failing hook, with its effect recorded per binary,",
+      "place 83: C4-F8 (runtime.hook-failure)")
+
+R.sub("and each compaction journaled with its session, build, item in flight and trigger (night pass, point 5) "
+      "`cl-dClosedLoop-0290`",
+      "and each compaction journaled with its session, build, item in flight and trigger, and the card's size check "
+      "holding the card under the harness's re-attachment cap, seen red on a planted card over it (night pass, "
+      "point 5) `cl-dClosedLoop-0290`",
+      "place 36: C4-F3 (cl-dClosedLoop-0290)")
+
+R.sub("and the secret value scan at every boundary that publishes `cl-dClosedLoop-0295`",
+      "and the secret value scan at every boundary that publishes, its shape report beside it under "
+      "`runtime.secret-scan: value-gate+shape-report`, seen on a planted token shape `cl-dClosedLoop-0295`",
+      "place 83: C4-F8 (runtime.secret-scan)")
+
+R.sub("ending with `next`'s line computed at that moment (PM-7, PM-12, night pass point 5) `cl-dClosedLoop-0301`",
+      "ending with `next`'s line computed at that moment, the hook channel's output cap measured with a 32 KiB map "
+      "before the default is armed, and a size check that reds a replayed set over the measured cap rather than "
+      "letting the harness cut it silently, seen red on a planted set over the cap (PM-7, PM-12, night pass point 5) "
+      "`cl-dClosedLoop-0301`",
+      "place 36: C4-F3 (cl-dClosedLoop-0301)")
+
+R.sub("`resume-tick.sh` and the `RESUME_SCHEDULE_*` task retired with an adopter's hand-registered resume task "
+      "removed, and the `/unattended` shim",
+      "the `RESUME_SCHEDULE_*` task and `resume-tick.sh`'s `--dangerously-skip-permissions` launch retired, "
+      "`resume-tick.sh` kept as the supervisor's seam and an adopter's hand-registered `gov-resume-tick` task kept "
+      "as the node tick that starts and restarts it, and the `/unattended` shim",
+      "place 11: C4-F1")
+
+R.sub("with `check-wiring.test.sh` and `format-guard.test.sh`,",
+      "with `check-wiring.test.sh`, `format-guard.test.sh`, `scratch-guard.test.sh` and `manifest-check.test.sh`,",
+      "place 86: C4-F11")
+
+R.sub("and journaled by the loop detector, a wait inside its declared deadline exempt,",
+      "and journaled by the loop detector, the no-progress and repeat detectors journal-only, routing nothing, "
+      "until a replay over gov's recorded run logs records their false positives, a wait inside its declared "
+      "deadline exempt,",
+      "place 87: C4-F6")
+
+R.sub("the session-limit hold releasing the build's lease as a hand-over at `runtime.hold-ceiling` so a node with "
+      "quota takes the build over and the wake tick stops,",
+      "the session-limit hold releasing the build's lease as a hand-over at `runtime.hold-ceiling` and raising an "
+      "owner item, so a node with quota takes the build over and the wake tick stops,",
+      "place 88: C4-F5 (the hold)")
+
+R.sub("a hand-over no second node takes, a planted leaked act slot,",
+      "a hand-over no second node takes, a ceiling passed with no owner item raised, a planted leaked act slot,",
+      "place 88: C4-F5 (its red arm)")
+
+# --- dWitnessedBar -------------------------------------------------------------------------------------------
+R.sub("the peer-node verifier `cl-dClosedLoop-0344`",
+      "the verdict backends registered under `verdict`, the local hook, the peer-node verifier and the remote "
+      "verdict, a remote verdict standing as a witness only when its `head_sha` is the SHA it judges, its writer the "
+      "platform's own app, the declared workflow path, a push event and the declared job, its bar step concluded "
+      "and not skipped, and the pinned files at `head_sha` equal to `verdict.remote.pin` over the files "
+      "`verdict.remote.pin-scope` names, as `verdict.remote.trust` says, seen red on a swapped workflow, and the "
+      "held-CI reader moved out of the unattended kit and registered as that remote verdict's reader (gap-test-11, "
+      "gap-test-13) `cl-dClosedLoop-0344`",
+      "place 89: C4-F9 (verdict backends, remote source check, held-CI reader)")
+
+R.sub("flake quarantine `cl-dClosedLoop-0346`",
+      "flake quarantine, fed by the runner's mode re-running each red leg once on the same tree under "
+      "`test.verdict`'s env, seen on a fixture leg that reds then greens reaching `test.flakes` (gap-test-04) "
+      "`cl-dClosedLoop-0346`",
+      "place 90: C4-F10")
+
+R.sub("the product-test contract with runner adapters `cl-dClosedLoop-0347`",
+      "the product-test contract with runner adapters, product tests declared, declared with runners or none as "
+      "`tests.product` says, each value seen on a planted repository `cl-dClosedLoop-0347`",
+      "place 89: C4-F9 (tests.product)")
+
+R.sub("the `ratchet` leg pack, with its `populated`, `seed laundering`, rename and merge rows `cl-dClosedLoop-0352`",
+      "the `ratchet` leg pack, with its `populated`, `seed laundering`, rename and merge rows, a population's growth "
+      "admitted only through a widen record with its reason or refused, as `retrofit.widen` says, each value seen "
+      "on a planted growth `cl-dClosedLoop-0352`",
+      "place 89: C4-F9 (retrofit.widen)")
+
+R.sub("the last moved in from gate-lint's `encoding_posture.py` with its shell-hygiene mode,",
+      "the last moved in from gate-lint's `encoding_posture.py`, with `sh_hygiene.py`'s legs beside it,",
+      "place 91: C4-F12")
+
+R.sub("a candidate accepted only once it runs and answers `uname -s` as MINGW or MSYS, a staged WSL-first break "
+      "seen red,",
+      "a candidate accepted only once it runs, and on a Windows host only once it also answers `uname -s` as MINGW "
+      "or MSYS, a staged WSL-first break seen red on Windows and a Linux node's own bash accepted on a Linux arm,",
+      "place 13: C4-F2")
+
+R.save()
+````
+
+### `fold-3.py`
+
+Fold writer 3's script, as returned (fold-return-w3).
+
+````python
+"""Writer 3's fold of the whole-design audit (fold brief w3): v2's [chain] rows of dRankedPlan, dIndexedDesign,
+dScopedBuild, dShippedRelease, dTendedCadence, dCalibratedLens and dConvergedCharter, and v2 outside [chain].
+Run from the worktree root."""
+import pathlib, sys
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+
+# ---------------------------------------------------------------- dRankedPlan
+R.sub("the planner and triager role and Plan workflow `cl-dClosedLoop-0370`",
+      "the planner and triager role and Plan workflow, the plan's order set as `plan.authority` says: drafted by the "
+      "planner and binding once the owner ratifies it, the planner adding but never reordering between "
+      "ratifications, under `planner-drafts-owner-ratifies`, ordered by the planner within the themes and priorities "
+      "the owner sets under `planner-within-themes`, and written by the owner, agents only proposing, under "
+      "`owner-orders`, each value seen on its planted case (R2.4) `cl-dClosedLoop-0370`",
+      "place 163 C5-F19, place 109 B1-F10: plan.authority")
+R.sub("rule-based triage `cl-dClosedLoop-0371`",
+      "triage as `plan.triage` says: by `plan.triage-rule`'s declared rules, the planner judging what no rule "
+      "decides, under `rules`, drafted and held for the owner to ratify in batches at an owner breakpoint under "
+      "`owner-batches`, and the legacy backlog archived with only new asks triaged under `archive-legacy`, each "
+      "value seen on its planted case `cl-dClosedLoop-0371`",
+      "place 163 C5-F19, place 109 B1-F10: plan.triage")
+R.sub("Plan Review `cl-dClosedLoop-0374`",
+      "Plan Review, run until dCalibratedLens's Plan lenses land with the lenses of the preset `review.pin` passes "
+      "from dFairHearing's catalogue, seen on a tree that holds no Plan lens `cl-dClosedLoop-0374`",
+      "place 92 C5-F14: Plan Review's stand-in lens")
+R.sub("kickoff offering the next item and attended briefs gated `cl-dClosedLoop-0375`",
+      "kickoff using the plan as `plan.kickoff` says: offering the plan's next item under `offer-next`, holding the "
+      "session to the plan's next item under `binding`, and showing the plan as advice beside the session's own "
+      "choice under `advisory`, each value seen on its planted case, and attended briefs gated `cl-dClosedLoop-0375`",
+      "place 163 C5-F19: plan.kickoff")
+R.sub("until that hook and the intake kind land, `plan.exit` under `plan.ratification: request` falls back to "
+      "dDeclaredLoop's owner gate, held for the owner's disposition, its witness recorded as \"intake not installed\" "
+      "(RC-9, AF-1, DA-H1) `cl-dClosedLoop-0378`",
+      "until the intake kind lands and the harness's adapter declares the prompt-submit event in its capability "
+      "table, `plan.exit` under `plan.ratification: request` falls back to dDeclaredLoop's owner gate, held for the "
+      "owner's disposition, its witness recorded as \"intake not installed\", the fallback kept for every harness "
+      "whose adapter does not declare the event whichever of this build and dWellOiledMachine lands first, seen on a "
+      "planted Codex-shaped adapter that reaches Plan's exit through it (RC-9, AF-1, DA-H1) `cl-dClosedLoop-0378`",
+      "place 93 CS1-F1: the fallback per harness")
+R.sub("through a plan revision (the night pass two, point 1, the owner's NT-2) `cl-dClosedLoop-0382` | gap-plan-01,",
+      "through a plan revision (the night pass two, point 1, the owner's NT-2) `cl-dClosedLoop-0382`; "
+      "the plan revision record: a fork the goal cannot survive moving the build from designing back to planning, "
+      "the planner recording what the revision changes in the ratified plan and why, ratified as the plan is, and "
+      "Design re-entered on the ratified revision, seen on a planted fork the goal cannot survive whose revision "
+      "Design receives `cl-dClosedLoop-0497`; "
+      "the artifact levels declared as the owner confirmed them in the flow round: the card at the session's level "
+      "above the plan, one plan record per build holding its concrete details, and the brief derived from the plan, "
+      "the spec and the stage's facts and never authored, each fact with one home that a lower level renders and "
+      "never restates, seen red on a planted brief that types a plan field `cl-dClosedLoop-0498` | gap-plan-01,",
+      "place 94 C5-F13: the plan revision record (gap-flow-04's Plan half) and the levels (gap-flow-03)")
+
+# ---------------------------------------------------------------- dIndexedDesign
+R.sub("the derived-READY hand-off `cl-dClosedLoop-0383`",
+      "the Design-to-Build hand-off as `design.handoff` says, derived READY, READY plus a Tier-2 audit, or status "
+      "and tier, each value seen on its planted case `cl-dClosedLoop-0383`",
+      "place 95 C5-F16: design.handoff")
+R.sub("the design index `cl-dClosedLoop-0384`",
+      "the design index, an overlap between live designs that neither acknowledges warned at spec-write and kickoff, "
+      "refused until acknowledged, or shown in the index view only, as `design.overlap` says, each value seen on a "
+      "planted overlapping roster `cl-dClosedLoop-0384`",
+      "place 95 C5-F16: design.overlap")
+R.sub("additive-versus-breaking interface classification (proposed), fork resolution",
+      "additive-versus-breaking interface classification, fork resolution",
+      "place 164 B2-F14: the stale marker")
+
+# ---------------------------------------------------------------- dScopedBuild
+R.sub("built specs frozen, every closing-review finding disposed as new units by `review.findings` `cl-dClosedLoop-0400`",
+      "built specs frozen, a revision of a spec whose unit has landed refused at the commit with or without a "
+      "deviation record, seen red on a planted in-place edit of a landed unit's spec and green on a status-only "
+      "edit, and every closing-review finding disposed as new units by `review.findings` `cl-dClosedLoop-0400`",
+      "place 96 B2-F16: the freeze's refusing check")
+R.sub("the closing review recorded `cl-dClosedLoop-0402`",
+      "the closing review recorded, run as `review.build.when` says, once per build, per unit or per landing, each "
+      "value seen on its planted case `cl-dClosedLoop-0402`",
+      "place 166 C5-F18: review.build.when")
+R.sub("`build.unit-pass` and `build.scope` draining the legacy a unit touches, in hunks under `retrofit.drain-cap`, and "
+      "claiming the baselined map keys its write set holds (dossiers) under `retrofit.claim-cap` `cl-dClosedLoop-0406`",
+      "`build.unit-pass` and `build.scope` draining the legacy a unit touches as `retrofit.drain` says, its changed "
+      "hunks under `hunk`, every baselined site in each touched file under `file`, both under `retrofit.drain-cap`, "
+      "and nothing owed under `off`, and claiming the baselined map keys its write set holds (dossiers) under "
+      "`retrofit.claim-cap`, carrying them with an ask, or neither, as `retrofit.claim-on-touch` says, each value "
+      "seen on a planted unit `cl-dClosedLoop-0406`",
+      "place 97 C5-F5: retrofit.drain and retrofit.claim-on-touch")
+
+# ---------------------------------------------------------------- dShippedRelease
+R.sub("kit release notes `cl-dClosedLoop-0414`",
+      "kit release notes, generated from the landing records and version deltas since the previous tag, red on "
+      "planted notes that miss a landing `cl-dClosedLoop-0414`",
+      "place 99 C5-F12: the release notes' losing test")
+R.sub("seen red on a queued claim replayed against an unleased build, which is refused (P40, the parked debt's review) "
+      "`cl-dClosedLoop-0415`",
+      "seen red on a queued claim replayed against an unleased build, which is refused, and closing its mailbox: "
+      "every message still on its ref, disposed or not, copied into the build folder with the undisposed ones "
+      "marked, and only then the ref pruned, seen on a planted build unleased with an undisposed message, its "
+      "marked copy in the folder before its ref is pruned (P40, the parked debt's review) `cl-dClosedLoop-0415`",
+      "place 98 CS4-F2: deploy.unlease's mailbox close")
+R.sub("the adopter register and currency watch `cl-dClosedLoop-0417`",
+      "the adopter register and currency watch, `kits.currency` and `kits.adopters` run on `kits.host` per "
+      "`kits.watch-cadence`, an adopter's reading reported, offered as an update or recorded only, as "
+      "`deploy.currency` says, each value seen on its planted case `cl-dClosedLoop-0417`",
+      "place 100 C5-F11: the currency watch's keys")
+R.sub("a derived runbook `cl-dClosedLoop-0419`",
+      "a derived runbook: the operator order for install and update, rendered from the kit descriptors by "
+      "dOrderedCharter's renderer, a hand edit to a rendered section red at render parity `cl-dClosedLoop-0419`",
+      "place 99 C5-F12: the runbook's losing test")
+R.sub("landings ordered through the landing queue it builds (`gap-flow-08`) `cl-dClosedLoop-0422`",
+      "landings ordered through the landing queue it builds, as `landing.order` says, by plan priority then first "
+      "verified, by first verified, or as the owner orders, each value seen on its planted queue (`gap-flow-08`) "
+      "`cl-dClosedLoop-0422`",
+      "place 100 C5-F11: landing.order")
+R.sub("so a core red the landing merge introduced stops that build from closing (foundations K1) `cl-dClosedLoop-0423`",
+      "so a core red the landing merge introduced files a patch build through the entry-point table's post-close "
+      "row before that build closes, seen red on a planted red landed tree whose build closes with no filing "
+      "(foundations K1) `cl-dClosedLoop-0423`",
+      "place 101 C5-F3: the settled post-close route")
+R.sub("the landing review blocking the build's close rather than the push `cl-dClosedLoop-0424`",
+      "the landing review blocking the build's close rather than the push, run until dCalibratedLens's Deploy lenses "
+      "land with the lenses of the preset `review.pin` passes from dFairHearing's catalogue, seen on a tree that "
+      "holds no Deploy lens `cl-dClosedLoop-0424`",
+      "place 92 C5-F14: the landing review's stand-in lens")
+R.sub("an update `kits.offer` offers runs neither in the adopter's tree, and its outbox order names the adopter's own "
+      "run of both `cl-dClosedLoop-0430`",
+      "an update `kits.offer` offers runs neither `adopt` nor `test.seed` in the adopter's tree, and its outbox order "
+      "names the adopter's own run of each `cl-dClosedLoop-0430`",
+      "place 167 C5-F20: the antecedent")
+R.sub("the receipt's schema 5 gaining `superseded`, `deprecations` and `prior_commit` beside dSafePassage's `steps`, "
+      "its messages",
+      "the receipt's schema 5 gaining `superseded`, `deprecations` and `prior_commit` beside dSafePassage's `steps`, "
+      "and `release`, the tag an install under `install.from: release-tag` came from, and `source_remote`, gov's "
+      "remote, in place of the local path `gov_source` holds today, both read by `kits.currency`, a planted "
+      "release-tag receipt with no `release` red at receipt integrity, its messages",
+      "place 14 C5-F1, A4-F6: the receipt's release and source remote")
+R.sub("a squash re-emitting the union of trailers, refused at the landing under `refuse` and recorded as a lossy "
+      "landing under `accept-loss`",
+      "a squash handled as `commits.squash` says, re-emitting the union of trailers under `re-emit-union`, refused at "
+      "the landing under `refuse` and recorded as a lossy landing under `accept-loss`",
+      "place 100 C5-F11: commits.squash named")
+
+# ---------------------------------------------------------------- dTendedCadence
+R.sub("the cadence, on Runtime's hosts `cl-dClosedLoop-0443`",
+      "the cadence, on Runtime's hosts: Maintain run on `maintain.host` per `maintain.cadence`, and its event runs "
+      "for the events `maintain.events` names, `release-verify-failed` rendered not installed where integrations is "
+      "not installed, each value seen on its planted case `cl-dClosedLoop-0443`",
+      "place 103 C5-F9: Maintain's host, cadence and events")
+R.sub("detectors with owners `cl-dClosedLoop-0445`",
+      "detectors with owners, a reading with no derivable owner or no pin refused at registration under "
+      "`maintain.reading-admission: refuse-unowned` and admitted and reported unowned under `report-unowned`, "
+      "nothing filed for it until an owner is derived, each value seen on a planted ownerless reading "
+      "`cl-dClosedLoop-0445`",
+      "place 103 C5-F9: the reading admission")
+R.sub("the maintenance record `cl-dClosedLoop-0447`",
+      "the maintenance record, and the run record the journal reader writes when the journal shows a run closed, as "
+      "`observability.run-record` says, for every run, for a run with an anomaly or never, each value seen on a "
+      "planted run `cl-dClosedLoop-0447`",
+      "place 103 C5-F9: the run record")
+R.sub("a detector for the memory's dead pointers, owned by Maintain, absorbing `check-dead-paths.sh` and keeping its "
+      "merge-bar leg at Test's leg-pack point (NP-22)",
+      "a detector for dead pointers, owned by Maintain, over both populations it absorbs: drift-audit's "
+      "dangling-pointer signal over the agent's auto-memory, and `check-dead-paths.sh`'s, the text outside "
+      "`memory/`, map dossiers and gotcha pages that name a deleted or renamed file, keeping that script's merge-bar "
+      "leg at Test's leg-pack point (NP-22)",
+      "place 168 C5-F2: both populations named")
+R.sub("Maintain and the Loop Review delivered as cadence steps of the observability expansion, detectors registered",
+      "Maintain delivered as a cadence step of the observability expansion, the Loop Review's step registered by "
+      "dCalibratedLens, detectors registered",
+      "place 105 C5-F8: Maintain's step only")
+R.sub("as `maintain.interpreter-eol` says (AP-35) `cl-dClosedLoop-0457` | gap-maint-01,",
+      "as `maintain.interpreter-eol` says (AP-35) `cl-dClosedLoop-0457`; "
+      "drift-audit's five gateable drift signals moved to core legs at Test's leg-pack point, each owned by the layer "
+      "whose records it grades, `ledger_rows` by memory, `non_terminal_specs` and `closed_specs` by flow, and "
+      "`handkept` and `cutoff_keys_armed` by instruction, so the merge bar reaches none through the observability "
+      "kit, repo-scoped readings taken as `maintain.reading-tree` says, in a clean checkout at the base SHA or in "
+      "the node's worktree, each value seen on a planted reading that differs between the two trees, and the "
+      "remote-CI drift signal registered as a reading with its liveness, dead past `maintain.dead-after` readings "
+      "and filed to its source, seen on a planted node without `gh` `cl-dClosedLoop-0499` | gap-maint-01,",
+      "place 104 C5-F10: gap-maint-09, gap-maint-10 and gap-maint-11 carried")
+
+# ---------------------------------------------------------------- dCalibratedLens
+R.sub("the weekly Loop Review `cl-dClosedLoop-0460`",
+      "the Loop Review, registered as a cadence step of the observability expansion and run as "
+      "`review.loop.cadence` says, weekly, monthly or every n landings, its lease keyed by the selected period, each "
+      "value seen on its planted case `cl-dClosedLoop-0460`",
+      "place 106 C5-F7, place 105 C5-F8: review.loop.cadence and the Loop Review's registration")
+R.sub("caps re-derived from evidence and review cost `cl-dClosedLoop-0461`",
+      "caps re-derived from evidence and review cost, the `budgets.*` values `cl-dClosedLoop-0461`",
+      "place 106 C5-F7 (narrowed): budgets.* named")
+
+# ---------------------------------------------------------------- dConvergedCharter
+R.sub("across `tools`, `skills`, `.githooks`, `.claude`, `.github`, `help`, the runbook and the template, every path "
+      "matched by a row's path glob and a planted unlisted file seen red,",
+      "across `tools`, `skills`, `.githooks`, `.claude`, `.github`, `help`, the runbook and the template, and every "
+      "path a fates row names outside them, `memory/guides/` and the root's kit confs among them, every path matched "
+      "by a row's path glob, a planted unlisted file and a planted surviving `memory/guides/` file each seen red,",
+      "place 169 C5-F22: the population")
+R.sub("its reference half generated from its registry by dOrderedCharter's renderer and its how-to half",
+      "its reference half generated from its registry by dOrderedCharter's renderer, the runbook's taken as "
+      "dShippedRelease derives it, and its how-to half",
+      "place 99 C5-F12: one derivation of the runbook")
+R.sub("retired as a seed: a repository's efforts folded into the `roles.effort.*` policy keys,",
+      "retired as a seed: a repository's efforts folded into the `roles.effort.*` policy keys, only those the owner "
+      "has not ruled on through `adopt.declarations`, a declined proposal read as a drop, seen on a planted declined "
+      "effort the fold leaves unwritten,",
+      "place 107 C5-F21: the owner's rulings kept")
+
+# ---------------------------------------------------------------- [clause-ids]
+R.sub("through every amendment, its text's hash being its revision, and a spec that carries it pins both.",
+      "through every amendment, its text's hash being its revision, and a spec that carries it pins both. The hash is\n"
+      "the first eight hex digits of the SHA-256 of the clause's UTF-8 text with its trailing id cut off, each run of\n"
+      "whitespace folded to one space and the ends trimmed, as `build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py`'s\n"
+      "`clause_hash` takes it.",
+      "place 152 B2-F12: the hash rule")
+R.sub("mints and checks them, and the next it mints is\n`cl-dClosedLoop-0497`.",
+      "mints and checks them, and the next it mints is\n`cl-dClosedLoop-0500`.",
+      "places 94 and 104: three ids minted")
+
+# ---------------------------------------------------------------- [enforcement]
+R.sub("| `P29` | `cl-dClosedLoop-0178` |",
+      "| `P29` | `cl-dClosedLoop-0178`, `cl-dClosedLoop-0196`, `cl-dClosedLoop-0197`, `cl-dClosedLoop-0198`, "
+      "`cl-dClosedLoop-0205` |",
+      "place 43 B4-F14, C3-F28: P29's rules")
+
+# ---------------------------------------------------------------- the revision line
+R.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review",
+    "Revised 2026-10-20 by the whole-design audit's fold (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`\n"
+    "`[recall-scored]`), its third writer's places. Plan's triage, kickoff and authority, Design's hand-off and overlap,\n"
+    "the retrofit drain and claim, the closing review's timing, the landing order, the currency watch, `commits.squash`,\n"
+    "Maintain's host, cadence, events, admission and run record, and the Loop Review's cadence are each read by their\n"
+    "clause with every value planted (B1-F10, C5-F19, C5-F16, C5-F5, C5-F18, C5-F11, C5-F9, C5-F7). The receipt gains\n"
+    "its release and source remote (C5-F1, A4-F6). Plan Review and the landing review run dFairHearing's preset until\n"
+    "dCalibratedLens lands (C5-F14), and RC-9's fallback holds per harness (CS1-F1). dRankedPlan builds the plan revision\n"
+    "record and the artifact levels (C5-F13), and dTendedCadence carries its three drift gaps (C5-F10), three ids minted.\n"
+    "Built specs refuse an in-place edit (B2-F16), `deploy.unlease` closes the mailbox (CS4-F2), the runbook and release\n"
+    "notes have losing tests and one derivation (C5-F12), a post-landing core red files a patch build before the close\n"
+    "(C5-F3), Maintain registers only its own step (C5-F8), convergence keeps the owner's effort rulings (C5-F21), and\n"
+    "0390, 0430, 0448 and 0488 are corrected (B2-F14, C5-F20, C5-F2, C5-F22). `[clause-ids]` states the hash rule\n"
+    "(B2-F12), and P29's row names its rules' clauses (B4-F14, C3-F28).\n\n",
+    "the revision line")
+
+R.save()
+````
+
+### `fold-4.py`
+
+Fold writer 4's script, as returned (fold-return-w4), with the main loop's state-name amendment marked in a comment.
+
+````python
+"""Writer 4's fold of the whole-design audit into flow-steps (fold brief w4). Run from the worktree root."""
+import pathlib, sys
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+R = Record("memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+
+# ---------------------------------------------------------------- [rules]
+
+# Place 23 (B1-F5, A3-F13, A5-F3), place 128 (B3-F9), place 23 (A5-F6's non-plant cells): the budget's draws,
+# what is contention, how a lease refusal routes, and an unreachable remote.
+R.sub(
+    "- **Every route back is bounded** (P39). A route back, a fix pass, a review round after the first, a re-dispatch\n"
+    "  after a refusal and a research or probe round trip each draw on the build's one rework budget,\n"
+    "  `flow.rework-budget`, in its transition record. Contention draws nothing: a verdict staled or a merge conflicted\n"
+    "  by another build's landing is re-verified in its turn. Past `flow.route-backs` returns to the same item, that\n"
+    "  item's loop ends non-converging and its open work goes to asks.",
+    "- **Every route back is bounded** (P39). A route back, a fix pass, a review round after the first, a re-dispatch\n"
+    "  after a refusal, a research or probe round trip and a patch build of the build's own landing each draw on the\n"
+    "  build's one rework budget, `flow.rework-budget`, in its transition record. A patch build draws on the originating\n"
+    "  build's budget, keyed by the originating slug its claim carries (`entry.claim`). Contention draws nothing: a\n"
+    "  verdict staled or a merge conflicted by another build's landing is re-verified in its turn, a lease another live\n"
+    "  build holds is waited for, and an unreachable remote is retried. Past `flow.route-backs` returns to the same\n"
+    "  item, that item's loop ends non-converging and its open work goes to asks.",
+    "place 23, 128: B1-F5, B3-F3, A3-F13, A5-F3, B3-F9")
+
+# Place 172 (A5-F11): the revision note says what the route was before it.
+R.sub(
+    "`flow.on-exhausted` says, never with another lap. Revised 2026-10-19 by the owner's SL-1 and SL-2: the loop\n"
+    "  had become an owner item, resolved as [breakpoint]'s owner gate is (FH1).",
+    "`flow.on-exhausted` says, never with another lap. Revised 2026-10-19 by the owner's SL-1 and SL-2: before it,\n"
+    "  such a loop became an owner item, resolved as [breakpoint]'s owner gate is (FH1).",
+    "place 172: A5-F11")
+
+R.insert_before(
+    "- **Every ask an item files states its acceptance**",
+    "- **A lease or claim refusal routes by its cause,** in `entry.claim`, `plan.lease` and `build.unit-lease`:\n"
+    "  - a terminal tombstone, a terminal build or an epoch fence → refused whatever `leases` says, never retried, and\n"
+    "    an ask filed (`cl-dClosedLoop-0281`, `cl-dClosedLoop-0415`);\n"
+    "  - a live holder → a wait, contention that draws nothing, within `flow.wait-ceiling`, then an owner item;\n"
+    "  - an overlap at `leases.overlap`'s granularity → as `leases` says: under `warn`, noted on the card and in the\n"
+    "    other build's mailbox, then as held; under `refuse`, as a live holder;\n"
+    "  - the remote unreachable → as `leases.offline` says, no local id minted.\n"
+    "- **An unreachable remote is contention.** A command item whose act cannot reach the remote, and whose row\n"
+    "  declares no other arm, is held and retried as `next`'s `stale-remote` answer is, drawing nothing, then raises an\n"
+    "  owner item once `leases.expiry-hours` passes.\n",
+    "place 23, 134, 128: A3-F13, A5-F3, A1-F11, A4-F20, A5-F6, B3-F9")
+
+# Place 130 (B2-F9), place 17 (A3-F10's replan half): a parent's notice routes at the boundary that reads it.
+R.sub(
+    "- **At every item boundary,** the executor reads the build's mailbox (`mailbox.reads`) and updates the\n"
+    "  card's pointers (`card.pointers`).",
+    "- **At every item boundary,** the executor reads the build's mailbox (`mailbox.reads`) and updates the\n"
+    "  card's pointers (`card.pointers`). A parent's `withdrawn` post read there routes at that boundary as\n"
+    "  `deps.on-parent-withdrawn` says, `replan` by a plan revision back to planning (`[transitions]`), and a\n"
+    "  `superseded` post moves the link to the replacement, as `deploy.parents` does.",
+    "place 130, 17: B2-F9, A3-F10")
+
+# Place 172 (A3-F16): a post to a closed mailbox.
+R.sub(
+    "the build stays open after `deploy.unlease` until `deploy.close` records its transition.",
+    "the build stays open after `deploy.unlease` until `deploy.close` records its transition. A post to a build\n"
+    "  whose slug carries a terminal transition is refused, and the sender is answered with that state.",
+    "place 172: A3-F16")
+
+# Place 174 (BS3-F4): a command item that declares neither.
+R.sub(
+    "- **Every command item declares whether it is idempotent or reconciles**, as Runtime requires of every\n"
+    "  command adapter.",
+    "- **Every command item declares whether it is idempotent or reconciles**, as Runtime requires of every\n"
+    "  command adapter. One whose Actor cell says neither is idempotent by its witness (`cl-dClosedLoop-0092`): a\n"
+    "  witnessed instance is never re-run, so a successor reads the witness and goes on.",
+    "place 174: BS3-F4")
+
+# ---------------------------------------------------------------- [entry]
+
+# Place 176 (B1-F11).
+R.sub(
+    "composes the session's card: refreshed, or the full kickoff's where no READY card exists",
+    "composes the session's card: refreshed, or the full kickoff's where `kickoff.runs` says (`no-ready-card` by\n"
+    "default: where no READY card exists)".replace("\n", " "),
+    "place 176: B1-F11")
+
+# Place 123 (AS4-F4): a unit of a leased build at placement.
+R.sub(
+    "returns the disposition from the closed set (continue, amend, new, patch, repeat, ask, none)",
+    "returns the disposition from the closed set (continue, amend, new, patch, repeat, unit, ask, none)",
+    "place 123: AS4-F4")
+R.sub(
+    "continue → that build's `next`; ask → filed; none → the answer relayed;",
+    "continue → that build's `next`; unit → one ready unit of a leased build, as `build.unit-holders` says: its "
+    "`build.unit-lease` taken for this session under `any-session`, refused under `driver-only` "
+    "(`cl-dClosedLoop-0319`); ask → filed; none → the answer relayed;",
+    "place 123: AS4-F4")
+
+# Place 23 (A3-F3, A3-F13, A5-F3, B1-F5): the patch's derived plan record and `patch.ratify`, the originating build,
+# the claim's retries, and the lease refusal by its cause.
+R.sub(
+    "On `patch` or `repeat` it also takes the build's lease, which such a build never reaches `plan.lease` to take "
+    "| the claim ref on the remote; on `patch` or `repeat`, the lease record too "
+    "| claimed → Plan, or Design on `patch` or `repeat`; the slug claimed under another key → a fresh slug, within "
+    "`flow.route-backs`; the lease refused → as `leases` says;",
+    "On `patch` or `repeat` it also takes the build's lease, which such a build never reaches `plan.lease` to take, "
+    "and writes the build's derived plan record: a patch's minimal plan record from its intake or filing, a repeat's "
+    "from its playbook. On a patch the post-close row raises, the claim commit also carries the originating build's "
+    "slug and landed SHA, which key the budget the patch draws on "
+    "| the claim ref on the remote; on `patch` or `repeat`, the lease record and the derived plan record too "
+    "| claimed → Plan; on `repeat`, Design; on `patch`, Design once its derived plan record is ratified as "
+    "`patch.ratify` says: under `auto` the record stands, and under `owner` an owner item holds it for the owner's "
+    "disposition, a ratification `run.on-owner-question` never resolves (FH1); the slug claimed under another key → "
+    "a fresh slug, within `flow.route-backs`, each retry drawing on the pre-claim budget keyed to the intake's content "
+    "key (`cl-dClosedLoop-0132`); the lease refused → by its cause (`[rules]`), the claim staying on the remote, keyed "
+    "to its claimant, so the ask or the owner item names the slug and a retry finds it claimed;",
+    "place 23: A3-F3, A3-F13, A5-F3, B1-F5")
+
+R.sub(
+    "- **Policies:** `placement`, `placement.check`, `builds.slug-*`, `leases.*` and `flow.route-backs`.",
+    "- **Policies:** `placement`, `placement.check`, `kickoff.runs`, `builds.slug-*`, `leases.*`, `build.unit-holders`,\n"
+    "  `patch.ratify`, `flow.wait-ceiling` and `flow.route-backs`.",
+    "place 176, 123, 23: B1-F11, AS4-F4, A3-F3, A3-F13")
+
+# ---------------------------------------------------------------- [plan]
+
+# Place 134 (A1-F11, A4-F20), place 23 (A3-F13, A5-F3, A5-F6).
+R.sub(
+    "| held → `plan.recommend`; an overlap → noted on the card and in the other build's mailbox; refused → as `leases` "
+    "says | dRankedPlan |",
+    "| held → `plan.recommend`; an overlap, or a refusal → by its cause (`[rules]`), an overlap under `leases: warn` "
+    "going on as held | dRankedPlan |",
+    "place 134, 23: A1-F11, A4-F20, A3-F13, A5-F3, A5-F6")
+
+# Place 124 (BS2-F1), place 133 (B1-F9): Plan's stand-ins.
+R.insert_before(
+    "- **Roles:** planner and researcher; reviewers at a breakpoint.",
+    "- **Before the builds it rests on land.** Until dWellOiledMachine's hook writes intake (`cl-dClosedLoop-0378`),\n"
+    "  `plan.input` pins `entry.orient`'s record of the intake absent, and the owner's words are taken as the owner\n"
+    "  gate's disposition, which `plan.exit` holds under `plan.ratification: request`. Until dIndexedDesign lands the\n"
+    "  design index (`cl-dClosedLoop-0384`), `plan.dedupe` checks against live builds and open asks only.\n",
+    "place 124, 133: BS2-F1, B1-F9")
+
+# ---------------------------------------------------------------- [design]
+
+# Place 25, 37, 116 (A3-F12, B2-F5, B4-F6): a supersession reaches `design.inventory`.
+R.sub(
+    "- the ratified plan record;\n- an admitted in-goal amendment;",
+    "- the ratified plan record, which may name a build it supersedes;\n- an admitted in-goal amendment;",
+    "place 25, 37: A3-F12, B2-F5")
+
+# Place 37 (A3-F20, B2-F20, B2-F5), place 136 (B4-F10).
+R.sub(
+    "| plan record → `design.seams`; amendment → `design.reentry`; plan revision → `design.inventory`; patch → "
+    "`design.unit-spec`, as a micro-spec; finding or fix unit → `design.unit-spec` for its new unit, or "
+    "`design.decompose` when it changes an interface;",
+    "| plan record → `design.seams`; a plan record naming a build it supersedes → `design.seams`, and "
+    "`design.inventory` over that build's built units at its kept branch's tip; amendment → `design.reentry`; plan "
+    "revision → `design.inventory`; patch → `design.overlaps` for its unit, then `design.unit-spec`, as a micro-spec, "
+    "its red-first reproduction owed before its first `build.unit-pass` when it comes from a bug report "
+    "(`probe.trigger`); finding or fix unit → `design.overlaps` for its new unit, then `design.unit-spec`, or "
+    "`design.decompose` when it changes an interface;",
+    "place 37, 136: A3-F20, B2-F20, B2-F5, B4-F10")
+
+R.sub(
+    "| after a plan revision, gives each completed unit a verdict (kept, amended by a new unit, or retired) with its "
+    "reason |",
+    "| after a plan revision, gives each completed unit a verdict (kept, amended by a new unit, or retired) with its "
+    "reason; on a supersession, each built unit of the superseded build |",
+    "place 25, 37: A3-F12, B2-F5")
+
+R.sub(
+    "| `design.decompose` | architect | `design.seams`, `design.inventory` or `design.reentry` |",
+    "| `design.decompose` | architect | `design.seams`, `design.inventory` or `design.reentry`; on a supersession, "
+    "`design.seams` and `design.inventory` |",
+    "place 25, 37: A3-F12, B2-F5")
+
+# Place 22 (B2-F3), place 175 (B2-F17), place 37.
+R.sub(
+    "| `design.overlaps` | command | `design.decompose` | runs the design index over the roster's write sets, against "
+    "live builds | the overlap record | `design.streams` where `design.streams` holds for the build, else "
+    "`design.unit-spec` | dIndexedDesign |",
+    "| `design.overlaps` | command | `design.decompose`, or `design.input` for a patch, finding or fix unit | runs the "
+    "design index over the roster's write sets, or the unit's, against live builds, and acts as `design.overlap` "
+    "says | the overlap record | under `warn`, each overlap noted for the unit's spec writer, and under `index-only`, "
+    "recorded in the design index only, each then → `design.streams` where `policy.design.streams` holds for the "
+    "build, else `design.unit-spec`; under `refuse`, an overlap no build acknowledges → back to `design.decompose` "
+    "with the overlap record, and none → as under `warn` | dIndexedDesign |",
+    "place 22, 175, 37: B2-F3, B2-F17, A3-F20, B2-F20")
+
+R.sub(
+    "| `design.streams` | planner, through the planning workflow | `design.overlaps`, where `design.streams` holds for "
+    "the build |",
+    "| `design.streams` | planner, through the planning workflow | `design.overlaps`, where `policy.design.streams` "
+    "holds for the build |",
+    "place 175: B2-F17")
+
+# Place 38 (B2-F1, A1-F7, B2-F19), place 173 (A1-F10), place 22 (B2-F3).
+R.sub(
+    "| `design.ready` | command | `design.recommend`, and the spec audit where it ran | derives READY per unit | "
+    "derived READY: none MISSING, THIN or FORKED |",
+    "| `design.ready` | command | `design.reason`, or `design.recommend` under `signals-only`, and, where either "
+    "routed to the spec audit, that audit's `review.dispose` and its last `review.fold` | derives READY per unit, as "
+    "`design.handoff` says: under `derived-ready`, READY alone; under `ready-plus-audit`, READY and the spec audit's "
+    "disposition, the audit owed; under `status-and-tier`, each spec's status and tier, as today | derived READY: none "
+    "MISSING, THIN, FORKED or, under `design.coverage`, UNCARRIED (`cl-dClosedLoop-0398`) |",
+    "place 38, 173, 22: B2-F1, A1-F7, B2-F19, A1-F10, B2-F3")
+
+R.sub(
+    "`design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `deps.early-build`, `deps.messaging`,",
+    "`design.forks`, `design.reentry`, `design.overlap`, `design.handoff`, `design.coverage`, `deps.early-build`, "
+    "`deps.messaging`, `deps.on-parent-withdrawn`,",
+    "place 130, 38: B2-F9, B2-F19")
+
+# ---------------------------------------------------------------- [build]
+
+R.sub(
+    "**Enters** when every unit is READY and the mandate is active.",
+    "**Enters** when every unit is READY and the mandate is active, or for a resolution pass from `test.merge`.",
+    "place 140: A5-F8")
+
+# Place 120 (B2-F8), place 23 (A3-F13, A5-F3, A5-F6), place 134 (A1-F11).
+R.sub(
+    "| `build.unit-lease` | command | `build.base` | takes each starting unit's lease with its write set, declared as "
+    "the driver's `--dispatch --pass <id> --writes <path>` declares one | the lease record | held → `build.unit-pass`; "
+    "an overlap → warned (`leases.overlap`); refused → as `leases` says | dScopedBuild |",
+    "| `build.unit-lease` | command, one per unit | `build.base`, and `build.reuse-check` of each unit the declared "
+    "order puts before it | takes the unit's lease with its write set as the unit starts, declared as the driver's "
+    "`--dispatch --pass <id> --writes <path>` declares one | the lease record | held → `build.unit-pass`; an overlap, "
+    "or a refusal → by its cause (`[rules]`), an overlap under `leases: warn` going on as held | dScopedBuild |",
+    "place 120, 23, 134: B2-F8, A3-F13, A5-F3, A5-F6, A1-F11")
+
+# Place 118 (B2-F6): the fix pass and the revert pass are items.
+R.sub(
+    "| pass → `build.scope`; fail → a fix pass | dScopedBuild |",
+    "| pass → `build.scope`; fail → `build.fix-pass` | dScopedBuild |\n"
+    "| `build.fix-pass` | builder, one per red unit | the red record that routed it: a failed `build.acceptance`, a "
+    "`duplicate` or `bypassed` row of `build.reuse-check`, a code miss `test.attribute` judged, or a gate "
+    "`test.seen-red` found unseen | builds and commits one fix pass on the unit, its allowance the unit's write set "
+    "less the red check's own test files and gate script and the acceptance commands' files (M16, `[test]`'s \"A fix "
+    "pass keeps its check\"), each pass drawing on `flow.rework-budget` | the commit, resolved by the executor | "
+    "`build.acceptance` | dScopedBuild |",
+    "place 118: B2-F6")
+
+R.sub(
+    "stray → as `build.scope` says: warned with an ask, reported, or refused. A refused stray routes to a revert pass "
+    "on the unit, and a stray the range later reverts passes | dScopedBuild |",
+    "stray → as `build.scope` says: warned with an ask, reported, or refused. A refused stray routes to "
+    "`build.revert-pass` on the unit, and a stray the range later reverts passes | dScopedBuild |\n"
+    "| `build.revert-pass` | builder | `build.scope`'s refused stray | reverts the stray paths in one commit on the unit, "
+    "drawing on `flow.rework-budget` as a fix pass does | the commit, resolved by the executor | `build.scope` | "
+    "dScopedBuild |",
+    "place 118: B2-F6")
+
+# Place 16 (B2-F2), place 119 (A1-F8, AS1-F1), place 118 (B2-F6).
+R.sub(
+    "| clean → the unit built; a `duplicate` or `bypassed` row → a fix pass on the unit,",
+    "| clean → the unit built, and `build.recommend` once every unit in the roster has its `build.reuse-check` "
+    "witnessed clean; a `duplicate` or `bypassed` row → `build.fix-pass` on the unit,",
+    "place 16, 119, 118: B2-F2, A1-F8, AS1-F1, B2-F6")
+
+# Place 16 (B2-F2, B2-F18).
+R.sub(
+    "| `build.recommend` | command | every unit built and reuse-checked | scores the recommendation, signals only: "
+    "Build runs a builder per unit, so it has no single producing role | the recommendation record | the closing "
+    "review where owed; otherwise",
+    "| `build.recommend` | command | `build.reuse-check`, witnessed clean for every unit in the roster, the units "
+    "`review.dispose` minted included | scores the recommendation, signals only: Build runs a builder per unit, so it "
+    "has no single producing role | the recommendation record | the closing review where owed, but on a lap whose "
+    "units a closing review's findings minted, that review's follow-up round as `review.follow-up` says, never a "
+    "fresh closing review; otherwise",
+    "place 16, 119: B2-F2, B2-F18, A1-F8, AS1-F1")
+
+# Place 38 (B2-F1), place 28 (A1-F6).
+R.sub(
+    "| `build.ratify` | owner, under `decisions.major: author-owner-ratifies` | `build.recommend`, and the closing "
+    "review where it ran |",
+    "| `build.ratify` | owner, under `decisions.major: author-owner-ratifies` | `build.recommend`, and, where it routed "
+    "to the closing review, that review's `review.dispose`, every unit it minted with its `build.reuse-check` "
+    "witnessed clean |",
+    "place 38, 28: B2-F1, A1-F6")
+R.sub(
+    "| `build.distill` | command, idempotent | `build.recommend`, the closing review where it ran, and `build.ratify` "
+    "under `author-owner-ratifies` |",
+    "| `build.distill` | command, idempotent | `build.recommend`; where it routed to the closing review, that review's "
+    "`review.dispose`, every unit it minted with its `build.reuse-check` witnessed clean; and `build.ratify` under "
+    "`author-owner-ratifies` |",
+    "place 38, 28: B2-F1, A1-F6")
+
+# Place 140 (A5-F8): the resolution pass.
+R.sub(
+    "| `build.exit` | command | `build.core` | records the transition | the transition record | Test | dScopedBuild |",
+    "| `build.exit` | command | `build.core` | records the transition | the transition record | Test | dScopedBuild |\n"
+    "| `build.resolve` | builder | `test.merge`'s conflict | resolves the conflict in the units it touches, a recorded "
+    "resolution pass (flow-interactions), its allowance those units' write sets; the pass, and any re-review, are "
+    "contention and draw nothing | the resolution commit, resolved by the executor, and the routing record | "
+    "`test.merge`; an interface clash → the architect (feature re-entry) | dScopedBuild |",
+    "place 140: A5-F8")
+
+# Place 28 (A1-F6): the closing review's units hold Build's tail.
+R.sub(
+    "- its findings become new units by `review.findings`, so built specs stay frozen (P19), and those\n"
+    "  units pass through Design and back;",
+    "- its findings become new units by `review.findings`, so built specs stay frozen (P19), and those\n"
+    "  units pass through Design and back, Build's tail waiting until each is built, seen red on a planted finding\n"
+    "  unit that must hold `build.exit`;",
+    "place 28: A1-F6")
+
+R.sub(
+    "`decisions.major`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial`, `run.on-owner-question` and "
+    "`flow.route-backs`.",
+    "`decisions.major`, `core.bypass`, `core.exceptions`, `hooks.bypass`, `resume.partial`, `run.on-owner-question`, "
+    "`deps.on-parent-withdrawn`, `flow.rework-budget` and `flow.route-backs`.",
+    "place 130, 118: B2-F9, B2-F6")
+
+R.sub(
+    "- **Roles:** builder; the spec writer and the architect on a divergence; reviewers at the closing\n  review.",
+    "- **Roles:** builder, for the unit passes, the fix and revert passes and the resolution pass; the spec writer and\n"
+    "  the architect on a divergence; reviewers at the closing review.",
+    "place 118, 140: B2-F6, A5-F8")
+
+# ---------------------------------------------------------------- [test]
+
+# Place 140 (A5-F8).
+R.sub(
+    "prepared → `test.select`; a conflict → Build for a resolution pass, or the architect when an interface clashes;",
+    "prepared → `test.select`; a conflict → `build.resolve`, contention that draws nothing;",
+    "place 140: A5-F8")
+
+# Place 141 (B3-F7).
+R.sub(
+    "a nondeterministic leg → `test.flakes`; an OWN or MIXED red → `test.attribute`;",
+    "a nondeterministic leg → `test.flakes`; an OWN red, or a MIXED red that `verdict.blocks` blocks → "
+    "`test.attribute`;",
+    "place 141: B3-F7")
+R.sub(
+    "| `test.attribute` | tester | the OWN and MIXED reds of `test.route` |",
+    "| `test.attribute` | tester | the OWN reds, and the blocking MIXED reds, of `test.route` |",
+    "place 141: B3-F7")
+
+# Place 118 (B2-F6).
+R.sub(
+    "under `fix-pass-or-design`, a code miss → a fix pass in Build and a wrong spec → a new unit through Design;",
+    "under `fix-pass-or-design`, a code miss → `build.fix-pass` and a wrong spec → a new unit through Design;",
+    "place 118: B2-F6")
+R.sub(
+    "| all present → `test.recommend`; one missing → a fix pass on the unit that added the gate |",
+    "| all present → `test.recommend`; one missing → `build.fix-pass` on the unit that added the gate |",
+    "place 118: B2-F6")
+
+# Place 38 (B2-F1, A1-F7), place 138 (B3-F13).
+R.sub(
+    "| `test.exit` | command | `test.recommend`, and the gate review where it ran | records the transition, and the "
+    "verified tree on the build's lease record |",
+    "| `test.exit` | command | `test.reason`, or `test.recommend` under `signals-only`, and, where either routed to the "
+    "gate review, that review's `review.dispose` | records the transition, and the verified tree on the build's lease "
+    "record, or on the transition record until dPlacedRequest lands the lease kind |",
+    "place 38, 138: B2-F1, A1-F7, B3-F13")
+
+# ---------------------------------------------------------------- [deploy]
+
+R.sub(
+    "- the build is landed and recorded;\n- its major decisions' rows",
+    "- the build is landed and recorded;\n"
+    "- a core red its landing introduced is fixed, a later SHA that contains it green, or excepted (K1);\n"
+    "- its major decisions' rows",
+    "place 19: B3-F2")
+
+# Place 21 (B3-F11, AS4-F1).
+R.sub(
+    "| checks the landing's authority: the request's mandate under `plan-only`; under `three-gates` and `every-stage`, "
+    "the disposition of the owner's landing gate, the breakpoint before this item | the intake record, or the gate's "
+    "witness |",
+    "| checks the landing's authority: under `plan-only`, the plan's ratification, which is the mandate: `plan.exit`'s "
+    "for a build that passed Plan, and for a patch or repeat build, which never reaches `plan.exit`, its derived plan "
+    "record's, as `patch.ratify` says for a patch; under `three-gates` and `every-stage`, the disposition of the "
+    "owner's landing gate, the breakpoint before this item | `plan.exit`'s transition record with its ratification, "
+    "the derived plan record with its ratification, or the gate's witness |",
+    "place 21: B3-F11, AS4-F1")
+
+# Place 129 (A2-F4, A3-F11, B3-F5).
+R.sub(
+    "a parent unlanded or paused → holds;",
+    "a parent unlanded or paused → holds, a wait within `flow.wait-ceiling`, past which as `deps.on-parent-withdrawn` "
+    "says;",
+    "place 129: A2-F4, A3-F11, B3-F5")
+
+# Place 23 (A5-F6), place 128 (B3-F9): the landing's unreachable remote, bounded.
+R.sub(
+    "the remote unreachable, a failed probe included → the supervisor's retry, then an owner item;",
+    "the remote unreachable, a failed probe included → held and retried as `next`'s `stale-remote` answer is, "
+    "drawing nothing, then an owner item once `leases.expiry-hours` passes (`[rules]`);",
+    "place 23, 128: A5-F6, B3-F9")
+
+# Place 19 (B3-F2), place 20 (A3-F1), place 126 (A3-F5).
+R.sub(
+    "| green → `deploy.record`; red → a patch build through the entry-point table's post-close row, and the close waits "
+    "for its filing;",
+    "| green → `deploy.record`; red → `deploy.record`, the landing recorded red, and a patch build filed through the "
+    "entry-point table's post-close row, its intake keyed by (`default-branch-red`, landed SHA), the key Maintain's "
+    "reading of the same red uses, so `maintain.patch` finds it open and files no second patch;",
+    "place 19, 20, 126: B3-F2, A3-F1, A3-F5")
+R.sub(
+    "the pre-push verdict or ungated, the core re-check's verdict, and the `build.closes` value in force.",
+    "the pre-push verdict or ungated, the core re-check's verdict, on a red the patch intake's key, and the "
+    "`build.closes` value in force.",
+    "place 20: A3-F1")
+
+# Place 38 (B2-F1).
+R.sub(
+    "| `deploy.notify` | command, idempotent | `deploy.recommend`, and the landing review where it ran |",
+    "| `deploy.notify` | command, idempotent | `deploy.recommend`, and, where it routed to the landing review, that "
+    "review's `review.dispose` |",
+    "place 38: B2-F1")
+
+# Place 19 (B3-F2), place 20 (A3-F1), place 121 (A3-F7).
+R.sub(
+    "| `deploy.close` | command | `deploy.unlease` and `deploy.released` | records the transition, with the release "
+    "outcome under `after-release-verifies`, minted under the build's claim ref, which is never pruned (layer-memory "
+    "`[contract]`) | the transition record | the build is closed | dShippedRelease |",
+    "| `deploy.close` | command | `deploy.unlease` and `deploy.released`, and, on a landing recorded red, the patch "
+    "build's `deploy.core` green for a SHA that contains the landed one, or an exception under `core.exceptions` (K1, "
+    "`cl-dClosedLoop-0423`) | records the transition, with the release outcome under `after-release-verifies`, minted "
+    "under the build's claim ref, which is never pruned (layer-memory `[contract]`) | the transition record | the "
+    "build is closed; on a landing recorded red, an event wait for that green, which, past `flow.wait-ceiling` or once "
+    "the patch build ends without it, raises an owner item: an exception under `core.exceptions`, or the budget "
+    "raised, the owner's alone | dShippedRelease |",
+    "place 19, 20, 121: B3-F2, A3-F1, A3-F7")
+
+R.sub(
+    "`deps.landing`, `deps.on-parent-withdrawn`, `hooks.bypass`,",
+    "`deps.landing`, `deps.on-parent-withdrawn`, `flow.wait-ceiling`, `hooks.bypass`,",
+    "place 129: A2-F4, B3-F5")
+
+# Place 125 (B3-F10): `landing.order` read where the landing waits.
+R.sub(
+    "| `deploy.parents` | pushes HEAD of the prepared merge,",
+    "| `deploy.parents` | once the landing queue admits it, in the order `landing.order` says, a landing under "
+    "`owner-orders` the owner has not ordered waiting for the owner's order as an owner item, pushes HEAD of the "
+    "prepared merge,",
+    "place 125: B3-F10")
+
+# ---------------------------------------------------------------- [breakpoint]
+
+# Place 28, 41, 137 (A5-F7, AS4-F2, B4-F3): the review ceiling.
+R.sub(
+    "| `review.trigger` | command | — | records why the breakpoint fired | the policy value, the recommendation record, "
+    "or the owner's request record | fired → `review.pin`; not fired → the flow continues | dDeclaredLoop |",
+    "| `review.trigger` | command | — | records why the breakpoint fired, and refuses a round past `review.max-rounds` | "
+    "the policy value, the recommendation record, or the owner's request record | fired → `review.pin`; a round past "
+    "`review.max-rounds` → refused, the last round's report reading CEILING, and `review.dispose` promotes its open "
+    "findings; not fired → the flow continues | dDeclaredLoop |",
+    "place 28, 41, 137: A5-F7, AS4-F2, B4-F3")
+
+# Place 23 (A5-F6): the class claim's unreachable remote.
+R.sub(
+    "| `review.dispose`; a `new:` slug claimed elsewhere →",
+    "| `review.dispose`; the remote unreachable at a `new:` slug's claim → as `leases.offline` says; a `new:` slug "
+    "claimed elsewhere →",
+    "place 23: A5-F6")
+
+# Place 28 (A1-F6, B4-F4, A5-F7).
+R.sub(
+    "disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On "
+    "built work, they become new units or asks by `review.findings`.",
+    "disposes each confirmed finding by the artifact's state. On an unbuilt spec, the findings go to `review.fold`. On "
+    "built work, they become new units or asks by `review.findings`. On a plan revision, they go to `plan.record`, "
+    "which revises the unratified plan. On a landing record, each becomes a patch-build intake by the entry-point "
+    "table's post-close row.",
+    "place 28: B4-F4")
+R.sub(
+    "| unbuilt → `review.fold`; built → released, with a follow-up round as `review.follow-up` says; an unverified "
+    "finding under `block` → a verification round | dDeclaredLoop |",
+    "| unbuilt → `review.fold`; a plan revision → `plan.record`; built → each new unit through Design, Build's tail "
+    "waiting until it is built, with a follow-up round as `review.follow-up` says; a landing record → its patch-build "
+    "intakes, then released; a NON-CONVERGENT or CEILING round → its findings promoted, to units while budget remains "
+    "and to asks after, never folded into another round (`cl-dClosedLoop-0117`); an unverified finding under `block` → "
+    "a verification round | dDeclaredLoop |",
+    "place 28: A1-F6, B4-F4, A5-F7")
+R.sub(
+    "| the next round as `review.design.rounds` says, or released | dDeclaredLoop |",
+    "| the next round as `review.design.rounds` says, or released; a NON-CONVERGENT or CEILING round → its findings "
+    "promoted as `review.dispose` promotes them | dDeclaredLoop |",
+    "place 137, 28: B4-F3, A5-F7")
+
+# Place 41 (B4-F11), place 177 (B4-F12): the breakpoint's stand-ins.
+R.insert_before(
+    "- **Classes.** `review.left-shift` counts by class",
+    "- **Before the builds it rests on land.** dFairHearing builds `review.pin` to `review.report` ahead of them, and\n"
+    "  dDeclaredLoop `review.cost`, so each later part has a stand-in until its build lands:\n"
+    "  - dTotalRecall's record-kind registry: `review.pin` reads a pinned record's kind from its filename;\n"
+    "  - dDeclaredLoop's `review.dispose`: the report's findings are disposed by hand, as today's reviews are, each\n"
+    "    disposition recorded in the report;\n"
+    "  - dBoundRoles' shape registry and dTotalRecall's shape-run kind: `review.cost` writes `shape` and `role-sha`\n"
+    "    blank, and its fields ride the harness's `review-shape` line in the report.\n",
+    "place 41, 177: B4-F11, B4-F12")
+
+# Place 172 (A5-F11).
+R.sub(
+    "bound the finding's loop ends non-converging, and the finding is filed as an ask with its evidence. Revised\n"
+    "  2026-10-19 by the owner's SL-1 and SL-2, the parked debt's review: it became an owner item, resolved as the owner gate\n"
+    "  above is (FH1).",
+    "bound the finding's loop ends non-converging, and the finding is filed as an ask with its evidence. Revised\n"
+    "  2026-10-19 by the owner's SL-1 and SL-2, the parked debt's review: before it, such a finding became an owner item,\n"
+    "  resolved as the owner gate above is (FH1).",
+    "place 172: A5-F11")
+
+R.sub(
+    "`review.design.rounds`, `review.design.round-count`, `review.recommendation`, `review.opt-in`, `flow.route-backs` "
+    "and `run.on-owner-question`.",
+    "`review.design.rounds`, `review.design.round-count`, `review.max-rounds`, `review.recommendation`, "
+    "`review.opt-in`, `flow.rework-budget`, `flow.route-backs` and `run.on-owner-question`.",
+    "place 28, 41, 137: A5-F7, AS4-F2, B4-F3")
+
+# ---------------------------------------------------------------- [probe]
+
+# Place 136 (B4-F10).
+R.sub(
+    "the observation `probe.observations` owes, or a role item's `probe` outcome under `probe.raise` |",
+    "the observation `probe.observations` owes, a role item's `probe` outcome under `probe.raise`, or a patch build "
+    "from a bug report, owed a red-first reproduction before its first `build.unit-pass` (`cl-dClosedLoop-0408`) |",
+    "place 136: B4-F10")
+
+# Place 135 (B4-F9).
+R.sub(
+    "| `probe.judge` | command: the executor's re-run, or the experiment's scorer | `probe.run` | compares the outcome "
+    "with the losing outcome: confirmed, refuted or inconclusive; an experiment measured, within noise or aborted | "
+    "the re-run's or the scorer's computed verdict; where no command can judge, the verifier's judgment, recorded as "
+    "claimed | `probe.return` | dPlacedRequest |",
+    "| `probe.judge` | command: the executor's re-run, or the experiment's scorer | `probe.run` | compares the outcome "
+    "with the losing outcome: confirmed, refuted or inconclusive; an experiment measured, within noise or aborted, "
+    "its blind judge's outputs among the scorer's inputs | the re-run's or the scorer's computed verdict | "
+    "`probe.return`; a verification or a reproduction no command can judge → `probe.judge-claimed` | dPlacedRequest |\n"
+    "| `probe.judge-claimed` | tester | `probe.judge` | judges the outcome against the losing outcome, cold | the "
+    "judgment's schema check, recorded as claimed | `probe.return` | dPlacedRequest |",
+    "place 135: B4-F9")
+
+# ---------------------------------------------------------------- [lifecycle]
+
+# Place 25 (A3-F12).
+R.sub(
+    "| asks to pause, resume, withdraw or supersede the build, or to attend or unattend it, through the guarded command "
+    "| the command's record |",
+    "| asks to pause, resume, withdraw or supersede the build, or to attend or unattend it, through the guarded "
+    "command; a supersede names its replacement's claimed slug, and one naming none is refused | the command's record, "
+    "naming the replacement on a supersede |",
+    "place 25: A3-F12")
+
+# Place 132 (A3-F15, B4-F8, A3-F19, B4-F7).
+R.sub(
+    "| dispatches nothing new. Each running act finishes within its ceiling. An open review fan finishes, and a "
+    "prepared merge is discarded | the executor's record of the acts it let finish | pause → parked; withdraw or "
+    "supersede → `life.notify`. Once a push is made, the build has landed,",
+    "| dispatches nothing new. Each running act finishes within its ceiling, a unit holder's on another session or node "
+    "included: it posts a quiesce to each unit holder (`cl-dClosedLoop-0319`) and waits, per unit lease, for the "
+    "holder's acknowledgement that its act finished, or for `runtime.act-ceiling`. An open review fan finishes, its "
+    "findings going to asks under withdraw and to the replacement under supersede, and a prepared merge is discarded | "
+    "the executor's record of the acts it let finish, and per unit lease, its holder's acknowledgement or the ceiling "
+    "passed | pause → paused; withdraw or supersede → `life.notify`. Once the landing push to the default branch is "
+    "made, the build has landed,",
+    "place 132: A3-F15, B4-F8, A3-F19, B4-F7")
+
+R.sub(
+    "| closes each lease with a terminal tombstone, never deleting the ref (P40), closes the mailbox (`[rules]`), and "
+    "reclaims the build's workspaces |",
+    "| closes each lease with a terminal tombstone, never deleting the ref (P40), closes the mailbox (`[rules]`), and "
+    "reclaims the build's worktrees, keeping its branch, which a superseding build's `design.inventory` reads |",
+    "place 25: A3-F12")
+R.sub(
+    "| records the terminal transition: withdrawn, or superseded by its replacement | the transition record | closed |",
+    "| records the terminal transition: withdrawn, or superseded by its replacement, and on a supersede writes the "
+    "`supersedes` relation from the replacement to the build (`cl-dClosedLoop-0217`) | the transition record, and on a "
+    "supersede the relation | closed |",
+    "place 25: A3-F12")
+R.sub(
+    "- **A superseded build's kept work** passes to its replacement through the replacement's\n"
+    "  `design.inventory`.",
+    "- **A superseded build's kept work** passes to its replacement through the replacement's\n"
+    "  `design.inventory`, which `design.input` reaches on the replacement's plan record naming the build it\n"
+    "  supersedes, over that build's built units at its kept branch's tip.",
+    "place 25, 37, 116: A3-F12, B2-F5, B4-F6")
+
+# ---------------------------------------------------------------- [adopt]
+
+# Place 117 (A4-F15, B5-F8's split and kappa half).
+R.sub(
+    "| `adopt.decisions` | reviewer, as two raters, and the owner where `retrofit.decisions` says | `adopt.census` | "
+    "routes the decision candidates by the author's rubric | the reconstructed decision records, each "
+    "`origin: reconstructed@<sha8>` | accepted → `reconstructed`; declined by the owner → kept `rejected`, which the "
+    "index hides | dLinkedLibrary |",
+    "| `adopt.decisions` | reviewer, as two raters | `adopt.census` | routes the decision candidates by the author's "
+    "rubric, and computes the raters' agreement | the reconstructed decision records, each "
+    "`origin: reconstructed@<sha8>`, and the agreement record | accepted → `reconstructed`, and under "
+    "`docs-owner-ratifies` or `docs-and-trailers` each major one → `adopt.decisions-ratify`; agreement below kappa 0.8 → "
+    "the rubric revised and the candidates rated again, within `flow.route-backs` (`cl-dClosedLoop-0238`) | "
+    "dLinkedLibrary |\n"
+    "| `adopt.decisions-ratify` | owner, under `retrofit.decisions: docs-owner-ratifies` or `docs-and-trailers` | "
+    "`adopt.decisions` | rules on each major reconstructed decision | the owner's disposition record for each | "
+    "ratified → kept `reconstructed`; declined → kept `rejected`, which the index hides | dLinkedLibrary |",
+    "place 117: A4-F15, B5-F8")
+
+# Place 114 (B5-F15).
+R.sub(
+    "| done; under the default `on-touch` it never runs, and `build.unit-pass` reconstructs on first touch | "
+    "dLinkedLibrary |",
+    "| done; under the default `on-touch` it never runs, and `build.unit-pass` reconstructs on first touch | "
+    "dLinkedLibrary |\n"
+    "| `adopt.instructions` | command | the install: `kits.install`, or the core's own command | renders the "
+    "repository's own instruction files verbatim as the legacy block, wires every harness file at once, and proposes "
+    "each paragraph as a repository unit, an amendment of a gov unit or a drop (`cl-dClosedLoop-0260`) | the legacy "
+    "block, each file's bytes kept in it, and one proposal record per paragraph | each proposal → an owner item, ruled "
+    "once, resolved as `[breakpoint]`'s owner gate is | dLinkedLibrary |\n"
+    "| `adopt.declarations` | command | `kits.install` or `kits.update`, or the core's own command | proposes today's "
+    "flow and role customizations as overlay rows (`cl-dClosedLoop-0438`) | one proposal record per customization | "
+    "each proposal → an owner item, ruled once, resolved as `[breakpoint]`'s owner gate is | dShippedRelease |",
+    "place 114: B5-F15")
+
+# ---------------------------------------------------------------- [transitions]
+
+# Place 23 (A3-F3).
+R.sub(
+    "| designing | the patch's derived plan record, the claim ref and the lease record |",
+    "| designing | the patch's derived plan record, the claim ref and the lease record, and under `patch.ratify: owner` "
+    "the owner's disposition record |",
+    "place 23: A3-F3")
+
+# Place 28 (A1-F6), place 130 (B2-F9), place 17 (A3-F10's replan half).
+R.sub(
+    "| building | a unit or feature re-entry, or a fix unit | designing | the re-entry record |",
+    "| building | a unit or feature re-entry, or a fix unit | designing | the re-entry record |\n"
+    "| building | a closing-review finding disposed into a new unit | designing | the review report and the disposition |\n"
+    "| designing, building, or deploying before the push | a parent's `withdrawn` post, or a parent hold past "
+    "`flow.wait-ceiling`, under `deps.on-parent-withdrawn: replan` | planning | the parent's post or the hold's record, "
+    "and the plan revision |",
+    "place 28, 130, 17: A1-F6, B2-F9, A3-F10")
+
+# Place 140 (A5-F8), place 118 (B2-F6), place 15 (A5-F1's descope).
+R.sub(
+    "| testing | a fix pass, or a conflict to resolve | building | the routing record |",
+    "| testing | `build.fix-pass` for a code miss, or `build.resolve` for a conflict | building | the routing record |\n"
+    "| building | `build.resolve` | testing | the resolution commit and the routing record |",
+    "place 140, 118: A5-F8, B2-F6")
+
+# Place 19, 20 (B3-F2, A3-F1).
+R.sub(
+    "| deploying | `deploy.close` | landed | the transition record, which names the release outcome under "
+    "`after-release-verifies` |",
+    "| deploying | `deploy.close` | landed | the transition record, which names the release outcome under "
+    "`after-release-verifies`, and on a landing recorded red, the patch's green core verdict or the exception |",
+    "place 19, 20: B3-F2, A3-F1")
+
+# Place 15 (A5-F1, B4-F2), place 27 (BS3-F3): the parked state and the incomplete ending.
+R.sub(
+    "| paused | `life.request`: resume | the state it paused in | the command's record |",
+    "| paused | `life.request`: resume | the state it paused in | the command's record |\n"
+    "| any open state | an owner item parks the build: `run.on-owner-silence` past `run.owner-deadline` under "
+    "`remind-then-park` or `wait`, or on a ratification or an owner-only write; `run.on-owner-question: park-build`; or "
+    "`flow.on-exhausted: park-for-owner` | parked | the transition record naming the owner item it parks on, and the "
+    "lease record where the park releases the lease |\n"
+    "| parked | the owner's disposition of the item it parked on | the state it parked in | the owner's disposition "
+    "record, and the lease record of the lease re-taken |\n"
+    "| any open state, before the push | a spent budget's ending that closes the build incomplete: "
+    "`flow.on-exhausted: close-incomplete`, or `best-effort-ending` where nothing can land | incomplete | the "
+    "transition record naming the ending, the branch and records kept, and every open item filed |",
+    "place 15, 27: A5-F1, B4-F2, BS3-F3")
+
+R.sub(
+    "Landed, withdrawn, superseded, deferred, retired, refused, merged and answered are terminal. A\n"
+    "re-placement",
+    "Landed, withdrawn, superseded, incomplete, deferred, retired, refused, merged and answered are terminal.\n"
+    "Parked is a hold, not a terminal: unlike paused, it releases the lease where its key says so. A best-effort descope\n"
+    "in Build moves no state: the descoped units go to asks, named on the step's transition record. A\n"
+    "re-placement",
+    "place 15: A5-F1, B4-F2")
+R.sub(
+    "row is reached by an item, seen red on a planted dropped row.",
+    "row is reached by an item, seen red on a planted dropped row and on a planted build that spends its budget in\n"
+    "planning, which must reach incomplete.",
+    "place 15, 27: B4-F2, BS3-F3")
+
+# ---------------------------------------------------------------- [revised]
+
+# Place 171 (A4-F19).
+R.sub(
+    "Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,\n"
+    "`policy.on-missing-expansion` (`[consequences]`).",
+    "Two keys join v2's catalogue: `flow.route-backs` (`[rules]`) and, from LR-4,\n"
+    "`policy-file.on-missing-expansion` (`[consequences]`; spelt `policy.on-missing-expansion` until its rename,\n"
+    "revised 2026-10-20 by the whole-design audit's fold, A4-F19).",
+    "place 171: A4-F19")
+R.sub(
+    "| `presets-fail-build-closes` | fork, amend | LR-4; `[consequences]`; v2's `policy.on-missing-expansion` |",
+    "| `presets-fail-build-closes` | fork, amend | LR-4; `[consequences]`; v2's `policy-file.on-missing-expansion` |",
+    "place 171: A4-F19")
+
+# The record's revision line.
+R.sub(
+    "`[fold-expansions-fold-round3]` names each defect and where it went.\n",
+    "`[fold-expansions-fold-round3]` names each defect and where it went.\n"
+    "\n"
+    "**Revised 2026-10-20 by the whole-design audit's fold** (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`;\n"
+    "the fold inventory, `build/2026-10-20-build-PLAY-dClosedLoop-1-fold-inventory.md`, places 15 to 177 of this\n"
+    "record). [transitions] gains the parked state, the incomplete terminal, the closing review's units, a\n"
+    "withdrawn parent's replan and the resolution pass, and a descope moves no state (A5-F1, B4-F2, BS3-F3, A1-F6,\n"
+    "A3-F10, B2-F9, "
+    "A5-F8). [rules] gains the lease refusal by its cause, the unreachable remote as contention, a patch build's\n"
+    "draw, a parent's notice at every boundary, the closed mailbox's refusal and the idempotent default (A3-F13,\n"
+    "A5-F3, A5-F6, B3-F9, B1-F5, B3-F3, B2-F9, A3-F16, BS3-F4, A5-F11). `entry.claim` derives a patch's plan record\n"
+    "and reads `patch.ratify`, and `entry.place` offers a unit (A3-F3, AS4-F4, B1-F11). Build's tail joins on\n"
+    "every unit's reuse check, and the fix, revert and resolution passes are items (B2-F2, A1-F8, AS1-F1, B2-F18,\n"
+    "B2-F6, B2-F8, A5-F8). Needs name a breakpoint's disposition, never \"where it ran\", and READY gains\n"
+    "UNCARRIED (B2-F1, A1-F7, B2-F19,\n"
+    "A1-F10). Design reads `design.overlap` and `design.handoff`, and a patch passes `design.overlaps` (B2-F3,\n"
+    "B2-F17, A3-F20, B2-F20). A supersession hands its kept work to `design.inventory` (A3-F12, B2-F5, B4-F6).\n"
+    "Deploy holds the close for a core red's fix, keys its patch with Maintain's, reads the plan's ratification as\n"
+    "the mandate, bounds the parent hold and admits landings by `landing.order` (B3-F2, A3-F1, A3-F7, A3-F5,\n"
+    "B3-F11, AS4-F1, A2-F4, A3-F11, B3-F5, B3-F10). The breakpoint reads `review.max-rounds`, routes every pinned\n"
+    "artifact and declares its stand-ins (A5-F7, AS4-F2, B4-F3, B4-F4, B4-F11, B4-F12). `probe.judge` is split and a\n"
+    "bug-report patch triggers its reproduction (B4-F9, B4-F10); `life.quiesce` reaches every unit holder (A3-F15,\n"
+    "B4-F8, A3-F19, B4-F7); `[adopt]` gains its two missing items and splits `adopt.decisions` (B5-F15, A4-F15,\n"
+    "B5-F8); Plan and Test declare their stand-ins (BS2-F1, B1-F9, B3-F13); `test.route` blocks MIXED only as\n"
+    "`verdict.blocks` says (B3-F7); and the retired key spelling is renamed (A4-F19).\n",
+    "the revision line")
+
+# The main loop's amendment, 2026-10-20: `closed-incomplete` renamed `incomplete` and `parked-for-owner` `parked`, one name per state across writers 1 and 4 (atlas.py reads a one-word terminal set).
+R.save()
+````
+
+### `fold-5.py`
+
+Fold writer 5's script, as returned (fold-return-w5).
+
+````python
+"""Writer 5's fold of the whole-design audit: places 32, 33, 39, 113, 142-147, 149, 151, 170, 178 and 179.
+
+Run from the repository root (or a copy's root). Places 31, 34, 111, 112, 148 and 150 are forks and fold nothing here.
+"""
+import pathlib, sys
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+B = "memory/builds/dClosedLoop/build/"
+
+# ------------------------------------------------------------------------------------------------ layer-expansions
+LE = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+
+# Place 32 (consistency of the contract row with the fold below): Maintain uses Entry's patch intake, not Design.
+LE.sub("Flow's Plan intake, the patch-build entry at Design and the breakpoints",
+       "Flow's Plan intake, the patch intake that Entry places and claims, and the breakpoints",
+       "place 32: A3-F4, B5-F1, B1-F4")
+
+# Place 33: every item table gains a Needs column, after Routes so the atlas's positional reading of the first five
+# cells holds; every outcome of a cadence run reaches its record item.
+LE.sub("| Item | Actor | Does | Witness | Routes | Owner |\n|---|---|---|---|---|---|\n| `maintain.lease` |",
+       "| Item | Actor | Does | Witness | Routes | Needs | Owner |\n|---|---|---|---|---|---|---|\n| `maintain.lease` |",
+       "place 33: A3-F9, B5-F3, Maintain's header")
+LE.sub("held elsewhere → skip; done → nothing; taken → `maintain.read` | dTendedCadence |",
+       "held elsewhere → skip; done → nothing; taken → `maintain.read` and `maintain.levels` | — | dTendedCadence |",
+       "place 33: A3-F9, B5-F3, maintain.lease")
+LE.sub("in pin → nothing; over pin → `maintain.direct`, `maintain.patch` or `maintain.file`, by its fix; dead past "
+       "`maintain.dead-after` → `maintain.file`, to its source | dTendedCadence |",
+       "in pin → `maintain.record`; over pin → `maintain.direct`, `maintain.patch` or `maintain.file`, by its fix; dead "
+       "past `maintain.dead-after` → `maintain.file`, to its source | `maintain.lease` | dTendedCadence |",
+       "place 33: A3-F9, B5-F3, maintain.read")
+LE.sub("| the next reading shows the set gone | a survivor → `maintain.file` | dTendedCadence |",
+       "| the next reading shows the set gone | the set gone → `maintain.record`; a survivor → `maintain.file` | "
+       "`maintain.read` | dTendedCadence |",
+       "place 33: A3-F9, B5-F3, maintain.direct")
+
+# Places 32 and 33: maintain.patch files its intake for Entry, keys a recurrence by period, and sends an offender
+# that survives its landed patch to maintain.file, as maintain.direct sends a survivor.
+LE.sub("| `maintain.patch` | command | opens a patch build at Design for a fix that changes tracked content, its intake "
+       "rendered from the reading | the intake, keyed by (reading, offender key) | Design, as `patch.ratify` says | "
+       "dTendedCadence |",
+       "| `maintain.patch` | command | files a patch intake for a fix that changes tracked content, rendered from the "
+       "reading, through dWellOiledMachine's filer, which records a cadence filer's prompt as intake (flow-steps "
+       "`[entry]`); a recurrence while the patch is open adds a `seen` row to that intake, keyed by (reading, offender "
+       "key, period, or event and SHA), as `maintain.file`'s recurrences do | the intake, keyed by (reading, offender "
+       "key) | filed → `entry.place`, which places it as a patch, and `entry.claim`, which claims its slug and takes its "
+       "lease, then Design, as `patch.ratify` says; a recurrence while the patch is open → its `seen` row recorded; the "
+       "offender over its pin again once its patch build has landed → `maintain.file`, as a survivor of "
+       "`maintain.direct` is; every outcome → `maintain.record` | `maintain.read` | dTendedCadence |",
+       "places 32 and 33: A3-F4, A3-F8, B5-F1, B1-F4, B5-F2, A3-F9, B5-F3")
+LE.sub("| Plan's triage, as `maintain.on-breach` says | dTendedCadence |",
+       "| filed → Plan's triage, as `maintain.on-breach` says; every outcome → `maintain.record` | `maintain.read`, "
+       "`maintain.direct`, `maintain.patch` or `maintain.levels` | dTendedCadence |",
+       "place 33: A3-F9, B5-F3, maintain.file")
+LE.sub("| the verdict record | a red → `maintain.file`, owned by Test | dTendedCadence |",
+       "| the verdict record | green → `maintain.record`; a red → `maintain.file`, owned by Test | `maintain.lease` | "
+       "dTendedCadence |",
+       "place 33: A3-F9, B5-F3, maintain.levels")
+LE.sub("| the maintenance record, or the lease witness alone, as `maintain.record-when` says | closed | dTendedCadence |",
+       "| the maintenance record, or the lease witness alone, as `maintain.record-when` says | closed | every item the "
+       "run reached | dTendedCadence |",
+       "place 33: A3-F9, B5-F3, maintain.record")
+
+# Place 147: the release-verify-failed join needs both halves, and only dConvergedCharter descends from both.
+LE.sub("A fixture owes it: a red verify under roll-forward leaves one open ask\nwith a `seen` row, not two.",
+       "A fixture owes it: a red verify under roll-forward leaves one open ask\nwith a `seen` row, not two. "
+       "dTendedCadence and dShippedRelease are neither one the other's ancestor (v2\n`[chain]`), so each builds its "
+       "half of the join against a stand-in for the other's, and the join's fixture is\ndConvergedCharter's, the one "
+       "build descended from both.",
+       "place 147: B5-F14")
+
+# Places 33, 145 and 146: the Loop Review's table.
+LE.sub("| Item | Actor | Does | Witness | Routes | Owner |\n|---|---|---|---|---|---|\n| `loop.lease` | executor | "
+       "takes the week's lease | the lease | `loop.gather` | dCalibratedLens |",
+       "| Item | Actor | Does | Witness | Routes | Needs | Owner |\n|---|---|---|---|---|---|---|\n| `loop.lease` | "
+       "executor | takes the week's lease | the lease; a closed witness for the week means done | held elsewhere → skip; "
+       "done → nothing; taken → `loop.gather` | — | dCalibratedLens |",
+       "places 33 and 146: A3-F9, B5-F3, B5-F4, loop.lease")
+LE.sub("a missing source renders searched-none | `loop.price` | dCalibratedLens |",
+       "a missing source renders searched-none | `loop.price` | `loop.lease` | dCalibratedLens |",
+       "place 33: A3-F9, B5-F3, loop.gather")
+LE.sub("| the ledger blob | `loop.propose` | dCalibratedLens |",
+       "| the ledger blob | `loop.propose` | `loop.gather` | dCalibratedLens |",
+       "place 33: A3-F9, B5-F3, loop.price")
+LE.sub("| the proposal list | `loop.file` | dCalibratedLens |",
+       "| the proposal list | `loop.file` | `loop.price` | dCalibratedLens |",
+       "place 33: A3-F9, B5-F3, loop.propose")
+LE.sub("an open ask with that key gains a `seen` row keyed by ISO week instead of a second ask | one ask per "
+       "(ledger kind, id) |",
+       "an open ask with that key gains a `seen` row keyed by ISO week instead of a second ask. Each filing states its "
+       "acceptance as the `accept` line layer-memory `[asks]` asks of every expansion filer: the row disposed at the "
+       "owner's breakpoint, as `review.loop.retire` says, a keep by its keep record | one ask per (ledger kind, id) |",
+       "place 145: BS3-F2, loop.file's acceptance")
+LE.sub("which the breakpoint's resolution writes through `record` | dCalibratedLens |",
+       "which the breakpoint's resolution writes through `record`; every filing done → `loop.record` | `loop.propose` | "
+       "dCalibratedLens |",
+       "place 33: A3-F9, B5-F3, loop.file")
+LE.sub("| `loop.record` | command, through `record` | writes the Loop Review record | the record | closed | "
+       "dCalibratedLens |",
+       "| `loop.record` | command, through `record` | writes the Loop Review record, and releases the week's lease | "
+       "the record | closed | every item the run reached | dCalibratedLens |",
+       "place 33: A3-F9, B5-F3, loop.record")
+LE.sub("record. Each is seen red against a proposer that never lets a keep lapse.",
+       "record. Each is seen red against a proposer that never lets a keep lapse. And a proposal filed with no `accept`\n"
+       "line is refused, seen red against a filer that omits it.",
+       "place 145: BS3-F2, the refused filing's fixture")
+
+# Places 33, 146 and 149: the release program's table.
+LE.sub("| Item | Actor | Does | Witness | Routes | Owner |\n|---|---|---|---|---|---|\n| `release.pick` |",
+       "| Item | Actor | Does | Witness | Routes | Needs | Owner |\n|---|---|---|---|---|---|---|\n| `release.pick` |",
+       "place 33: A3-F9, B5-F3, the release header")
+LE.sub("| the landing record and the SHA's core verdict | `release.approve` | dShippedRelease |",
+       "| the landing record and the SHA's core verdict | E's promotion lease held elsewhere → skip; no landed SHA that E "
+       "lacks → nothing; picked, an approval owed as `deploy.promotion` says, for every environment under "
+       "`owner-approves-each` or one marked production under `owner-approves-prod` → `release.approve-owner`; picked, "
+       "none owed → `release.approve-auto` | — | dShippedRelease |",
+       "places 146 and 149: B5-F4, BS2-F2, release.pick")
+LE.sub("| `release.approve` | the owner, or a command | asks the owner where `deploy.promotion` says so: for every "
+       "environment under `owner-approves-each`, for one marked production under `owner-approves-prod`; otherwise it "
+       "passes on green | the disposition, or `auto-on-green` | approved → `release.promote`; refused → "
+       "`release.record`, the outcome held | dShippedRelease |",
+       "| `release.approve-owner` | owner, under `deploy.promotion`'s `owner-approves-each`, or `owner-approves-prod` "
+       "for an environment marked production | asks the owner to approve promoting the SHA into E | the disposition | "
+       "approved → `release.promote`; refused → `release.record`, the outcome held | `release.pick` | "
+       "dShippedRelease |\n"
+       "| `release.approve-auto` | command, under `deploy.promotion: auto-on-green`, or `owner-approves-prod` for an "
+       "environment not marked production | passes the SHA on its green core verdict | the pick's green verdict, "
+       "recorded with `deploy.promotion`'s value | `release.promote` | `release.pick` | dShippedRelease |",
+       "place 149: BS2-F2, release.approve split by actor")
+LE.sub("retry again, or `release.record`, the outcome unverified | dShippedRelease |",
+       "retry again, or `release.record`, the outcome unverified | `release.approve-owner` or `release.approve-auto` | "
+       "dShippedRelease |",
+       "places 33 and 149: B5-F3, BS2-F2, release.promote")
+LE.sub("verify again, or `release.record`, the outcome unverified | dShippedRelease |",
+       "verify again, or `release.record`, the outcome unverified | `release.promote` | dShippedRelease |",
+       "place 33: B5-F3, release.verify")
+LE.sub("| `release.record`, the outcome rolled forward, rolled back or halted | dShippedRelease |",
+       "| `release.record`, the outcome rolled forward, rolled back or halted | `release.verify` | dShippedRelease |",
+       "place 33: B5-F3, release.route")
+LE.sub("| `release.record` | command, idempotent, through `record` | writes the release record for (SHA, E), with its "
+       "outcome | the record | verified → the next environment; verified at the last, or any other outcome → the "
+       "release slot's exit record for the SHA, with the outcome, E and this record's id | dShippedRelease |",
+       "| `release.record` | command, idempotent, through `record` | writes the release record for (SHA, E), with its "
+       "outcome, and releases E's promotion lease | the record, and the lease's release | verified → the next "
+       "environment; verified at the last, or any other outcome → the release slot's exit record for the SHA, with "
+       "the outcome, E and this record's id | `release.approve-owner`, `release.promote`, `release.verify` or "
+       "`release.route` | dShippedRelease |",
+       "places 33 and 146: B5-F3, B5-F4, release.record")
+
+# Places 33, 142, 143 and 144: distribution's table and contract.
+LE.sub("`receipt` (`.governance/install.json`, schema 4: per-kit versions, the release tag, the source remote; gov's "
+       "own in source mode, DI-1)",
+       "`receipt` (`.governance/install.json`: per-kit versions, the release tag and the source remote, dSafePassage's "
+       "per-step `steps` at schema 4 (`cl-dClosedLoop-0020`), and schema 5's `superseded`, `deprecations` and "
+       "`prior_commit` (`cl-dClosedLoop-0435`); gov's own in source mode, DI-1)",
+       "place 144: B5-F10, the receipt's schemas")
+LE.sub("| Item | Actor | Does | Witness | Routes | Owner |\n|---|---|---|---|---|---|\n| `kits.version` |",
+       "| Item | Actor | Does | Witness | Routes | Needs | Owner |\n|---|---|---|---|---|---|---|\n| `kits.version` |",
+       "place 33: B5-F3, distribution's header")
+LE.sub("govkit absent → the announced skip | dShippedRelease |",
+       "govkit absent → the announced skip | `test.merge`'s prepare | dShippedRelease |",
+       "place 33: B5-F3, kits.version")
+LE.sub("refused by the remote → an owner item | dShippedRelease |",
+       "the tag number taken by another cut → a retry with the tags refetched and the next `<n>`, its notes "
+       "regenerated since the tag now previous, within `flow.route-backs`; refused by the remote otherwise, or past "
+       "that bound → an owner item | — | dShippedRelease |",
+       "places 33 and 143: B5-F3, B5-F5, kits.cut")
+LE.sub("a note, an owner item, or under `red` the `currency` leg's red | dShippedRelease |",
+       "a note, an owner item, or under `red` the `currency` leg's red | — | dShippedRelease |",
+       "place 33: B5-F3, kits.currency")
+LE.sub("| the adopter record, per release | `pull-and-watch` → reported; `push-branches` → `kits.offer`; `pull-only` → "
+       "recorded, never reported or offered | dShippedRelease |",
+       "| the adopter record, per release; a remote or receipt it cannot read → unverified, never green | as "
+       "`deploy.currency` says: `pull-and-watch` → reported; `push-branches` → `kits.offer`; `pull-only` → recorded, "
+       "never reported or offered; a remote or receipt it cannot read → the adopter record unverified, reported as "
+       "under `pull-and-watch` except under `pull-only`, and never offered | — | dShippedRelease |",
+       "places 33 and 142: B5-F3, A4-F18, BS4-F1, kits.adopters")
+LE.sub("and the design adds an eighth; the mode refuses all eight:",
+       "and the design adds an eighth and a ninth; the mode refuses all nine:",
+       "place 144: A4-F17, B5-F10, the count")
+LE.sub("which the offer leaves to the adopter's own run.",
+       "which the offer leaves to the adopter's own run. The ninth is the upgrade steps' processes "
+       "(`cl-dClosedLoop-0435`), refused unless a step runs under the step kind's isolation contract "
+       "(`cl-dClosedLoop-0024`), so the offer runs the steps that need no target code, as `install.steps` says, and "
+       "leaves a step marked attended to the adopter's own run.",
+       "place 144: A4-F17, B5-F10, the ninth kind")
+LE.sub("and then pushes `gov/update-<release>` through that adopter's own grant, scoped to `gov/update-*` on its one "
+       "remote |",
+       "and then pushes `gov/update-<release>` through that adopter's own grant, scoped to `gov/update-*` on its one "
+       "remote. A token's write scope is not per ref, so that scope is enforced on the adopter's remote, by a rule "
+       "letting the grant's identity push only under `gov/update-*`, and registration probes it with a push of a probe "
+       "ref outside the prefix, which must be refused: a grant that can push there is wider than declared and refused, "
+       "seen red on such a token |",
+       "place 144: A4-F8, the prefix grant")
+LE.sub("an outbox order the adopter runs itself | dShippedRelease |",
+       "an outbox order the adopter runs itself | `kits.adopters` | dShippedRelease |",
+       "place 33: B5-F3, kits.offer")
+LE.sub("an adapter that declares no target → its slot renders not installed, the core render kept | dShippedRelease |",
+       "an adapter that declares no target → its slot renders not installed, the core render kept | — | "
+       "dShippedRelease |",
+       "place 33: B5-F3, kits.install and kits.update (their actor and outcomes are fork FK-5-1)")
+
+LE.insert_before("\n## [open] What the expansion round owes",
+                 "\n**Revised 2026-10-20 by the whole-design audit's fold** "
+                 "(`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`).\nThe four item tables gain a Needs "
+                 "column, after Routes so the atlas's reading of the first five cells holds, and\nevery outcome of a "
+                 "cadence run reaches its record item, so `maintain.record`, `maintain.levels` and `loop.record`\nare "
+                 "reached and both programs' leases released (A3-F9, B5-F3). `maintain.patch` files its intake for `entry.place` "
+                 "and\n`entry.claim`, and an offender over its pin after its patch landed goes to `maintain.file` "
+                 "(A3-F4, A3-F8, B5-F1,\nB1-F4, B5-F2). `loop.lease` and `release.pick` skip a lease held elsewhere, "
+                 "and `release.record` releases E's\npromotion lease (B5-F4). `loop.file` states its acceptance "
+                 "(BS3-F2). `release.approve` is split by actor\n(BS2-F2). `kits.cut` renumbers a tag another cut took "
+                 "(B5-F5). `kits.adopters` names `deploy.currency` and\nreads an unreadable adopter as unverified "
+                 "(A4-F18, BS4-F1). `kits.offer` names the ninth spawn kind and how its\ngrant's prefix is enforced and "
+                 "probed, and the receipt names its schemas (A4-F17, B5-F10, A4-F8). The\n`release-verify-failed` join "
+                 "is owed by the one build descended from both its halves (B5-F14).\n",
+                 "places 32, 33, 142-147, 149: the revision line")
+LE.save()
+
+# ------------------------------------------------------------------------------------------------ layer-memory
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LM.insert_before("| intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9)",
+                 "| lifecycle request | dWellOiledMachine | its writer is `life.request`: the guarded command's record of "
+                 "the owner's pause, resume, withdraw, supersede, attend or unattend, which `life.quiesce` waits on, or "
+                 "its event instance once the build's lease is gone (layer-runtime `[schedule]`) |\n"
+                 "| quiesce | dWellOiledMachine | its writer is `life.quiesce`: the executor's record of the acts it let "
+                 "finish, which `life.notify` waits on |\n",
+                 "place 178: B4-F15, lifecycle request and quiesce")
+LM.insert_before("| loop review | dCalibratedLens | its writer is `loop.record` |",
+                 "| probe trigger | dPlacedRequest | its writer is `probe.trigger`: why the probe opened, keyed by the "
+                 "boundary or the raising return, or by content for a probe before placement; `probe.pin` waits on it "
+                 "|\n",
+                 "place 178: B4-F15, probe trigger")
+LM.insert_before("\n**One refinement to layers round one,**",
+                 "\nRevised 2026-10-20 by the whole-design audit's fold (B4-F15): the probe trigger, lifecycle request "
+                 "and\nquiesce kinds, each written by a flow item, gain their rows.\n",
+                 "place 178: the revision line")
+LM.save()
+
+# ------------------------------------------------------------------------------------------------ layer-runtime
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+LR.sub("| dDeclaredLoop, with `gap-conc-01`, `gap-conc-02` and `gap-flow-06` |",
+       "| dPlacedRequest, with `gap-conc-01` and `gap-conc-02`; the mailbox ref and dependency coordination "
+       "dKeptSession's, with `gap-flow-06` (v2 `[chain]`; revised 2026-10-20 by the whole-design audit's fold, "
+       "A3-F18) |",
+       "place 179: A3-F18, the settled-elsewhere table")
+LR.sub("raises an owner item and releases the build's lease as a hand-over, so a node with quota takes the build "
+       "over, and its wake\n    tick stops firing into the refused turn. Revised 2026-10-19 (P39): it kept holding, "
+       "and today's held run\n    woke a session 115 times over 4.8 days.",
+       "raises an owner item and releases every lease it holds for the build as a hand-over, the build's and each\n"
+       "    in-flight unit's, so a node with quota takes them over, and its wake tick stops firing into the refused "
+       "turn. A\n    pass its act left uncommitted stays unwitnessed in this node's workspace, so the node that takes "
+       "the unit runs\n    the item again from its last witness. Revised 2026-10-19 (P39): it kept holding, and "
+       "today's held run\n    woke a session 115 times over 4.8 days. Revised 2026-10-20 by the whole-design audit's "
+       "fold (A2-F2): only the\n    build's lease was released, so an in-flight unit's lease stayed held until "
+       "`leases.expiry-hours`.",
+       "place 151: A2-F2, the hold ceiling")
+LR.insert_before("- **Every workspace gets:**",
+                 "  - **a unit held off the build's node,** under `build.unit-holders` (v2 `cl-dClosedLoop-0319`): "
+                 "whatever\n    `build.worktree` says, a worktree per unit lease on its holder's node, branched from "
+                 "the build branch's tip,\n    its unit branch pushed as `build.push` says. Revised 2026-10-20 by the "
+                 "whole-design audit's fold (B2-F7):\n    under `shared`, nothing said where such a unit commits or how "
+                 "its pass joins the build branch.\n",
+                 "place 39: B2-F7, the cross-node unit's workspace")
+LR.insert_before("  - Shared records never ride a unit branch (`[supervise]`).\n",
+                 "  - A unit branch pushed from another node is merged the same way by the build's driver, from the "
+                 "remote, and\n    its holder releases the unit's lease only once that check passes on the fetched "
+                 "build branch, so the pass\n    reaches the build through its branch, never by a push to the build "
+                 "branch, seen on a planted unit a second\n    node takes under `shared`.\n",
+                 "place 39: B2-F7, the cross-node unit's integration")
+LR.sub("    - the coordination feature (`gap-conc-01`, `gap-conc-02`), and the hook factory.",
+       "    - the hook factory. The coordination feature (`gap-conc-01`, `gap-conc-02`) moved to dPlacedRequest with "
+       "the\n      chain re-cut (v2 `[chain]`, `cl-dClosedLoop-0120`). Revised 2026-10-20 by the whole-design audit's "
+       "fold\n      (A3-F18).",
+       "place 179: A3-F18, what stays where it is")
+LR.sub("Once `runtime.hold-ceiling` passes, it raises an owner item and releases the lease as a\n    hand-over, a "
+       "second node takes the build over, and the wake tick stops. It is red while the lease is still\n    held or the "
+       "tick fires again.",
+       "Once `runtime.hold-ceiling` passes, it raises an owner item and releases every lease it\n    holds for the "
+       "build as a hand-over, a second node takes the build over, a limit planted mid-unit sees that unit\n    taken "
+       "within one tick, and the wake tick stops. It is red while any of those leases is still held or the tick\n"
+       "    fires again (the whole-design audit's fold, A2-F2).",
+       "place 151: A2-F2, the limits fixture")
+LR.save()
+
+# ------------------------------------------------------------------------------------------------ flow
+FL = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-flow.md")
+FL.sub("| A Maintain safe fix that changes tracked content | Design, as a patch build | as above, opened by Maintain's "
+       "run |",
+       "| A Maintain safe fix that changes tracked content | Design, as a patch build | as above, its intake filed by "
+       "Maintain's run, placed by `entry.place` and claimed by `entry.claim` |",
+       "place 32: A3-F4, B5-F1, the Maintain row")
+FL.sub("| A failed verify after its build closed at landing | Plan's triage | filed as an ask, then a patch build or a "
+       "planned build by its size |",
+       "| After its build closed at landing: a post-landing core red, a landing-review finding or a decision-log row "
+       "missing at the landed SHA; a failed verify | Design, as a patch build; a failed verify at Plan's triage | the "
+       "first three as a patch intake that `deploy.core`, the landing review or `deploy.distill` files, placed by "
+       "`entry.place` and claimed by `entry.claim`, then a micro-spec; a failed verify filed as an ask, then a patch "
+       "build or a planned build by its size |\n\n"
+       "Revised 2026-10-20 by the whole-design audit's fold (A3-F2, B5-F1): the post-close row sent every post-landing\n"
+       "red to triage as an ask, though layer-flow `[settled]` and flow-steps' `deploy.core`, `deploy.distill` and "
+       "landing\nreview send all but a failed verify as a patch build, and a Maintain patch now enters through "
+       "Entry's placement\nand claim, as every patch does.",
+       "place 113: A3-F2, the post-close row")
+FL.save()
+
+# ------------------------------------------------------------------------------------------------ fates
+FA = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-fates.md")
+FA.sub("| govkit | install and update, receipt | copy deploy | RESHAPED | release tags, receipt names its release, "
+       "`kits.offer` (dShippedRelease) | v2 `[chain]` dShippedRelease |",
+       "| govkit | install and update, receipt | copy deploy | RESHAPED | release tags, receipt names its release, "
+       "`kits.offer` (dShippedRelease); the step walk `update` runs and the receipt's per-step `steps` (dSafePassage, "
+       "revised 2026-10-20 by the whole-design audit's fold, A4-F16) | v2 `[chain]` dShippedRelease; v2 `[chain]` "
+       "dSafePassage |",
+       "place 170: A4-F16, govkit's row")
+FA.save()
+````
+
+### `fold-6.py`
+
+Fold writer 6's script: the five writers' requests and the probe's rows their folds raised (fold-return-w6).
+
+````python
+"""Writer 6's fold of the whole-design audit (fold brief w6): the five fold writers' requests, and the reconciliation
+probe's findings after their scripts. It runs after fold-1.py to fold-5.py, so every anchor below is the text they
+leave, or the working tree's for a record none of them touches. Run from the worktree root."""
+import sys
+
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+B = "memory/builds/dClosedLoop/build/"
+V2 = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+LE = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+OR = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-orientation.md")
+PM = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-project-map.md")
+GR = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md")
+RC = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+
+# =============================================================================================== architecture-v2
+# ---- w2-1: writer 2's revision paragraph, between writer 1's and writer 3's
+V2.insert_before(
+    "Revised 2026-10-20 by the whole-design audit's fold (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`\n"
+    "`[recall-scored]`), its third writer's places.",
+    "Revised 2026-10-20 by the whole-design audit's fold (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md`\n"
+    "`[recall-scored]`), its second writer's places, dBoundRoles to dWitnessedBar. dBoundRoles registers the deployer under\n"
+    "distribution too, records a fork's admitted options in the core's ranking with its pick, and checks the task\n"
+    "charter's single carry and the whole static block's budget (C3-F29, C3-F1, B2-F15, C3-F2, C3-F3). dFurnishedOrders\n"
+    "re-points its section readers, names its slot keys, keeps its metrics in a file of its own until the ledger lands and\n"
+    "records hook failures below the floor version (C3-F4, C3-F5, C3-F7, C3-F6, C3-F8). dTotalRecall gains the map's\n"
+    "replay and the code slot's losing test, the relations' rules, the slug grammar, the derivation's loss bounds, the\n"
+    "read budget's keys and the read-channel re-measure (C3-F13, C3-F9, C3-F10, C3-F11, C3-F16, C3-F12). dLinkedLibrary\n"
+    "holds M1c's acceptance bars, names its by-value readers, reads dTotalRecall's renders, draws each rubric re-run on\n"
+    "the rework budget, names its lookup and scope keys and re-measures the span share (C3-F17, C3-F18, C3-F20, CS3-F1,\n"
+    "C3-F22, C3-F31). dMindYourWords resolves member and prefix rows, writes noun clusters exogenously, names `ratified`'s\n"
+    "readers and keeps one pin over three seams (C3-F24, C3-F25, C3-F26, C3-F27). dWellOiledMachine retires only the\n"
+    "resume schedule and its unguarded launch, sizes the hook channel and the card, names its runtime keys and the tests\n"
+    "that hold the card path, keeps both detectors journal-only until a replay measures them, and raises an owner item\n"
+    "at the hold ceiling (C4-F1, C4-F3, C4-F8, C4-F11, C4-F6, C4-F5). dWitnessedBar accepts a running bash off Windows,\n"
+    "registers its verdict backends with a remote verdict's trust, re-runs a red leg once for flakes and runs\n"
+    "`sh_hygiene.py` beside its encoding legs (C4-F2, C4-F9, C4-F10, C4-F12). A2-F3, A2-F7, C4-F13 and C4-F7 went to the\n"
+    "owner.\n\n",
+    "w2-1: writer 2's revision paragraph")
+
+# ---- this pass's revision paragraph, after writer 3's
+V2.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review",
+    "Revised 2026-10-20 by the whole-design audit's fold, its requests pass\n"
+    "(`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w6.md`): the five writers' requests on rows and records\n"
+    "outside their own, and the reconciliation probe's findings after their folds. dFurnishedOrders' scout re-verifies\n"
+    "recall at entry, which P29's row names (C3-F28, B4-F14), the verdict backends gain the `remote-ci` slot (A4-F13,\n"
+    "B3-F6), and the clause ids read the hash `[clause-ids]` defines (B2-F12). dLinkedLibrary fixes its follow-through\n"
+    "test before it runs and corrects its stale records at their sources (C3-F23), gap-mem-23 moves to dScopedBuild\n"
+    "(C3-F15), and gap-flow-04's re-design inventory is split to gap-flow-25, dIndexedDesign's (C5-F13). RC-9's\n"
+    "re-pointing waits for dRankedPlan (CS1-F1), a withdrawal closes the mailbox (CS4-F2), and the session-limit hold\n"
+    "hands over every unit lease (A2-F2). dDeclaredLoop's replan and CEILING promotion, dPlacedRequest's patch claim,\n"
+    "dShippedRelease's close, patch key and landing order, and dIndexedDesign's hand-off and overlap each gain the\n"
+    "clause text flow-steps already folded (B2-F9, A3-F10, A5-F7, A3-F3, A3-F13, A5-F3, B3-F2, A3-F1, A3-F7, A3-F5,\n"
+    "B3-F10, B2-F3), and dConvergedCharter builds the release asks' join (B5-F14), three ids minted. The re-cut's\n"
+    "`[reconciled-order]` classes five stand-ins the folds named, and the owner is asked how dFairHearing meets\n"
+    "`leases.offline` and where `patch.ratify` lives (FK-6-1, FK-6-2).\n\n",
+    "the requests pass's revision paragraph")
+
+# ---- w3-R-1: the scout re-verifies recall at entry, and P29's row names it
+V2.sub("the orientation scout composing the card in a sidechain at session start `cl-dClosedLoop-0192`",
+       "the orientation scout composing the card in a sidechain at session start, and re-verifying recall once at "
+       "entry, a recalled record whose source moved handed as stale, seen on a planted stale recall "
+       "`cl-dClosedLoop-0192`",
+       "w3-R-1: cl-0192")
+V2.sub("| `P29` | `cl-dClosedLoop-0178`, `cl-dClosedLoop-0196`,",
+       "| `P29` | `cl-dClosedLoop-0178`, `cl-dClosedLoop-0192`, `cl-dClosedLoop-0196`,",
+       "w3-R-1: P29's row")
+
+# ---- w3-R-2, merged into writer 2's cl-0344: the remote-ci slot and the unregistered backend
+V2.sub("the local hook, the peer-node verifier and the remote verdict,",
+       "the local hook, the peer-node verifier and the remote verdict, the last a `remote-ci` slot the integrations "
+       "expansion fills,",
+       "w3-R-2: cl-0344's remote-ci slot")
+V2.sub("seen red on a swapped workflow",
+       "seen red on a swapped workflow and on a planted unregistered backend",
+       "w3-R-2: cl-0344's unregistered backend")
+
+# ---- w3-R-3: gap-mem-23 moves to dScopedBuild
+V2.sub("gap-mem-21, gap-mem-23, gap-mem-26,", "gap-mem-21, gap-mem-26,", "w3-R-3: dTotalRecall's gaps")
+V2.sub("gap-build-06, gap-flow-22 |", "gap-build-06, gap-flow-22, gap-mem-23 |", "w3-R-3: dScopedBuild's gaps")
+
+# ---- w3-R-4: cl-0244's follow-through test, and gap-mem-11's corrections minted as 0500
+V2.sub("and the read hook on shell reads too (AN-2) `cl-dClosedLoop-0244`",
+       "and the read hook on shell reads too (AN-2), the follow-through test that chooses it given a threshold, a "
+       "sample size and a window fixed before it runs, and a measure that separates following a pointer from working "
+       "on the same build `cl-dClosedLoop-0244`",
+       "w3-R-4: cl-0244")
+V2.sub("`cl-dClosedLoop-0261` | gap-mem-02,",
+       "`cl-dClosedLoop-0261`; the records that contradict the code corrected at their sources: the map README's "
+       "path, `backlog.py`'s shards claim, the DEPL rows of other families, the duplicated ids, the spec template's "
+       "security-model line, the typed README statuses, the `ANNOTATION-STYLE` guide and its template naming the "
+       "signal that reads comment citations, and `HYGIENE.md`'s unused `note` kind `cl-dClosedLoop-0500` | gap-mem-02,",
+       "w3-R-4: cl-0500 minted")
+
+# ---- w3-R-5: cl-0283 waits for dRankedPlan
+V2.sub("Plan's ratification and the placement dispositions re-pointed to the intake record, RC-9's fallback drained "
+       "per harness,",
+       "Plan's ratification and the placement dispositions re-pointed to the intake record where dRankedPlan has "
+       "landed first, dRankedPlan reading the intake itself where it lands second, RC-9's fallback drained per harness,",
+       "w3-R-5: cl-0283's order")
+V2.sub("that still reaches Plan's exit (DA-M14)",
+       "that still reaches Plan's exit once dRankedPlan has landed (DA-M14)",
+       "w3-R-5: cl-0283's planted adapter")
+
+# ---- w3-R-6: dIndexedDesign owns gap-flow-25
+V2.sub("gap-design-11, gap-design-12 |", "gap-design-11, gap-design-12, gap-flow-25 |", "w3-R-6: dIndexedDesign's gaps")
+
+# ---- w3-R-7: a withdrawal closes the mailbox
+V2.sub("a withdrawal or supersession closing the build's leases with terminal tombstones,",
+       "a withdrawal or supersession closing the build's leases with terminal tombstones and its mailbox, every "
+       "message copied into the build folder with the undisposed ones marked before the ref is pruned,",
+       "w3-R-7: cl-0281")
+
+# ---- w3-R-10: cl-0001 reads the hash [clause-ids] defines
+V2.sub("with its minted `cl-` id and the hash of its text,",
+       "with its minted `cl-` id and the hash of its text as the design's `[clause-ids]` section defines it,",
+       "w3-R-10: cl-0001")
+
+# ---- w4-1a, w4-1b: dDeclaredLoop
+V2.sub("and `deps.on-parent-withdrawn` `cl-dClosedLoop-0100`",
+       "and `deps.on-parent-withdrawn`, `replan` read at every item boundary where a parent's `withdrawn` post is read "
+       "and routed by a plan revision back to planning, seen red on a planted withdrawn parent read in Design "
+       "`cl-dClosedLoop-0100`",
+       "w4-1a: cl-0100's replan")
+V2.sub("never folded into another round",
+       "never folded into another round, a CEILING round's open findings promoted the same way",
+       "w4-1b: cl-0117's CEILING")
+
+# ---- w4-2: dPlacedRequest's patch claim, minted as 0501
+V2.sub("`cl-dClosedLoop-0138` | gap-flow-07,",
+       "`cl-dClosedLoop-0138`; `entry.claim` writing a patch or repeat build's derived plan record, the patch's "
+       "ratified as `patch.ratify` says, `owner` holding it as an owner item, and a lease or claim refusal routed by "
+       "its cause (a terminal tombstone, a terminal build or an epoch fence refused, a live holder waited for as "
+       "contention within `flow.wait-ceiling`, an overlap as `leases` says), seen red on a planted patch under `owner` "
+       "reaching Design unratified and on a replayed take against a tombstone under `leases: warn` "
+       "`cl-dClosedLoop-0501` | gap-flow-07,",
+       "w4-2: cl-0501 minted")
+
+# ---- w4-3a, merged into writer 3's cl-0423: the close waits for the patch's green
+V2.sub("so a core red the landing merge introduced files a patch build through the entry-point table's post-close row "
+       "before that build closes, seen red on a planted red landed tree whose build closes with no filing "
+       "(foundations K1)",
+       "so a core red the landing merge introduced files a patch build through the entry-point table's post-close row "
+       "before that build closes, the landing recorded red meanwhile, and that build closes only once the patch "
+       "build's core checks are green for a SHA that contains the landed one or an exception under "
+       "`core.exceptions` is recorded, seen red on a planted red landed tree whose build closes with no filing and on "
+       "a planted red landing whose patch is filed and not yet green (foundations K1)",
+       "w4-3a: cl-0423")
+
+# ---- w4-3b: cl-0440, one red files one patch
+V2.sub("a patch build raised by a landing drawing on",
+       "a patch build raised by a landing, or a Maintain patch whose offender is a landed SHA, its intake keyed by "
+       "(`default-branch-red`, landed SHA) so one red files one patch, drawing on",
+       "w4-3b: cl-0440's key")
+V2.sub("seen red on a planted patch chain and on a planted owner who answers keep-waiting three times",
+       "seen red on a planted patch chain, on a planted owner who answers keep-waiting three times and on a planted "
+       "double filing of one red",
+       "w4-3b: cl-0440's double filing")
+
+# ---- w4-3c, merged into writer 3's cl-0422: the owner-orders red (the cross-node turn waits on FK-4-7)
+V2.sub("each value seen on its planted queue (`gap-flow-08`) `cl-dClosedLoop-0422`",
+       "each value seen on its planted queue, and a planted `owner-orders` landing admitted with no order seen red "
+       "(`gap-flow-08`) `cl-dClosedLoop-0422`",
+       "w4-3c: cl-0422")
+
+# ---- w4-4a, w4-4b, merged into writer 3's cl-0383 and cl-0384
+V2.sub("or status and tier, each value seen on its planted case `cl-dClosedLoop-0383`",
+       "or status and tier, each value seen on its planted case, and a planted `ready-plus-audit` hand-off with no "
+       "audit seen red `cl-dClosedLoop-0383`",
+       "w4-4a: cl-0383")
+V2.sub("each value seen on a planted overlapping roster `cl-dClosedLoop-0384`",
+       "each value seen on a planted overlapping roster, an unacknowledged overlap under `refuse` seen red "
+       "`cl-dClosedLoop-0384`",
+       "w4-4b: cl-0384")
+
+# ---- w5-1, merged into writer 2's cl-0325: every lease the supervisor holds for the build
+V2.sub("the session-limit hold releasing the build's lease as a hand-over at `runtime.hold-ceiling` and raising an "
+       "owner item, so a node with quota takes the build over",
+       "the session-limit hold releasing every lease the supervisor holds for the build, the build's and each "
+       "in-flight unit's, as a hand-over at `runtime.hold-ceiling` and raising an owner item, so a node with quota "
+       "takes them over",
+       "w5-1: cl-0325's leases")
+V2.sub("seen red on the 115-wake limit loop replayed, the lease still held or the tick firing again past the ceiling,",
+       "seen red on the 115-wake limit loop replayed, the lease still held or the tick firing again past the ceiling, "
+       "a limit planted mid-unit whose unit lease is still held,",
+       "w5-1: cl-0325's planted mid-unit limit")
+
+# ---- w5-2: dConvergedCharter's release asks' join, minted as 0502
+V2.sub("`cl-dClosedLoop-0496` | gap-spine-04,",
+       "`cl-dClosedLoop-0496`; the release asks' join: Maintain's `release-verify-failed` ask and `release.route`'s "
+       "keyed alike by (reading, (SHA, E)), so a red verify under roll-forward leaves one open ask with a `seen` row, "
+       "not two, dTendedCadence and dShippedRelease each building its half against a stand-in for the other's, seen "
+       "red on a planted red verify that files two asks (layer-expansions `[design-observability]`, the whole-design "
+       "audit's fold, B5-F14) `cl-dClosedLoop-0502` | gap-spine-04,",
+       "w5-2: cl-0502 minted")
+
+# ---- [clause-ids]: three minted, 0500 to 0502
+V2.sub("mints and checks them, and the next it mints is\n`cl-dClosedLoop-0500`.",
+       "mints and checks them, and the next it mints is\n`cl-dClosedLoop-0503`.",
+       "[clause-ids]: the next id past 0502")
+
+# =============================================================================================== flow-steps
+# ---- w1-R1: the owner's disposition of a spent budget's park may end the build incomplete
+FS.sub("| parked | the owner's disposition of the item it parked on | the state it parked in | the owner's disposition "
+       "record, and the lease record of the lease re-taken |\n",
+       "| parked | the owner's disposition of the item it parked on | the state it parked in | the owner's disposition "
+       "record, and the lease record of the lease re-taken |\n"
+       "| parked, before the push | the owner's disposition of a `flow.on-exhausted: park-for-owner` park that closes "
+       "the build incomplete | incomplete | the owner's disposition record, and the transition record naming the "
+       "ending, the branch and records kept, and every open item filed |\n",
+       "w1-R1: parked to incomplete")
+
+# ---- w2-2: the fork record carries the admitted options in their ranking with the pick
+FS.sub("every raised feature fork joined to its fork record, which carries its id, its resolver and its declared class",
+       "every raised feature fork joined to its fork record, which carries its id, its resolver, its declared class, "
+       "and the admitted options in their ranking with the pick",
+       "w2-2: design.decompose's witness")
+FS.sub("every raised fork joined to its fork record, which carries its id, its resolver and its declared class",
+       "every raised fork joined to its fork record, which carries its id, its resolver, its declared class, and the "
+       "admitted options in their ranking with the pick",
+       "w2-2: design.unit-spec's witness")
+
+# ---- w3-R-8, its residual on writer 4's [adopt] rows: what each ruling writes
+FS.sub("each proposal → an owner item, ruled once, resolved as `[breakpoint]`'s owner gate is | dLinkedLibrary |",
+       "each proposal → an owner item, ruled once, resolved as `[breakpoint]`'s owner gate is; ruled → the unit, the "
+       "amendment or the drop written | dLinkedLibrary |",
+       "w3-R-8: adopt.instructions' rulings")
+FS.sub("each proposal → an owner item, ruled once, resolved as `[breakpoint]`'s owner gate is | dShippedRelease |",
+       "each proposal → an owner item, ruled once, resolved as `[breakpoint]`'s owner gate is; ruled → the overlay row "
+       "written; declined → recorded as a drop | dShippedRelease |",
+       "w3-R-8: adopt.declarations' rulings")
+
+# ---- w5-3 with probe-8: a patch passes the dedupe, and the ratification hold names no key it never reads
+FS.sub("on `patch`, Design once its derived plan record is ratified as `patch.ratify` says: under `auto` the record "
+       "stands, and under `owner` an owner item holds it for the owner's disposition, a ratification "
+       "`run.on-owner-question` never resolves (FH1);",
+       "on `patch`, `plan.dedupe`, then Design once its derived plan record is ratified as `patch.ratify` says: under "
+       "`auto` the record stands, and under `owner` an owner item holds it until the owner's disposition, as every "
+       "ratification is held (LR-3, FH1);",
+       "w5-3, probe-8: entry.claim's patch route")
+FS.sub("| `plan.dedupe` | command | `plan.input` | checks for duplicates and overlaps against live builds, the design "
+       "index and open asks | the dupes record, keyed by the derived index | none → `plan.triage-rule`; a duplicate "
+       "or an overlap → `entry.place`, with the finding | dRankedPlan |",
+       "| `plan.dedupe` | command | `plan.input`, or `entry.claim` on a patch | checks for duplicates and overlaps "
+       "against live builds, the design index and open asks | the dupes record, keyed by the derived index | none → "
+       "`plan.triage-rule`; none, on a patch → Design as a patch build, its ratification held as `entry.claim` routes "
+       "it; a duplicate or an overlap → `entry.place`, with the finding | dRankedPlan |",
+       "w5-3: plan.dedupe on a patch")
+FS.sub("| designing | the patch's derived plan record, the claim ref and the lease record, and under `patch.ratify: "
+       "owner` the owner's disposition record |",
+       "| designing | the patch's derived plan record, the claim ref, the lease record and the dupes record, and under "
+       "`patch.ratify: owner` the owner's disposition record |",
+       "w5-3: the patch row's witness")
+
+# ---- probe-5, probe-6: [entry]'s stand-ins, as [plan] and [breakpoint] declare theirs
+FS.insert_before(
+    "- **Policies:** `placement`, `placement.check`, `kickoff.runs`,",
+    "- **Before the builds it rests on land.** dPlacedRequest builds the step's items ahead of two later builds, so\n"
+    "  each later part has a stand-in until its build lands:\n"
+    "  - dRankedPlan's `kickoff.runs` (`cl-dClosedLoop-0376`): `entry.orient` runs the full kickoff where no READY card\n"
+    "    exists, the key's default, `no-ready-card`;\n"
+    "  - dWellOiledMachine's unit holders (`cl-dClosedLoop-0319`) and `build.unit-holders`: a `unit` disposition is\n"
+    "    refused as under `driver-only`, the build's driver alone driving its units.\n",
+    "probe-5, probe-6: [entry]'s stand-ins")
+
+# ---- this pass's revision paragraph
+FS.sub("and the retired key spelling is renamed (A4-F19).",
+       "and the retired key spelling is renamed (A4-F19).\n\n"
+       "**Revised 2026-10-20, the fold's requests pass** (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w6.md`).\n"
+       "A park on a spent budget may end incomplete by the owner's disposition (C2-F2). A fork record carries its\n"
+       "admitted options in their ranking with the pick (C3-F1). A patch passes `plan.dedupe` before Design, and the\n"
+       "dupes record joins its entry witness (B5-F1). `[adopt]`'s two new items say what each ruling writes (A4-F5).\n"
+       "`[entry]` declares its stand-ins for dRankedPlan's and dWellOiledMachine's keys, and a patch's ratification hold\n"
+       "names no key it never reads (B1-F11, AS4-F4, A3-F3).",
+       "the requests pass's revision paragraph")
+
+# =============================================================================================== layer-memory
+LM.insert_before(
+    "| exception | dOrderedCharter |",
+    "| deviation | dTrueNorth | the record kept in its departing build's `build/` folder, read by the deviation "
+    "join, the as-built view, `cl-dClosedLoop-0119` and `cl-dClosedLoop-0412`; writer item not named: the departing "
+    "unit's own commit, which is no item, writes it |\n",
+    "w1-R2: the deviation kind")
+LM.sub("| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not "
+       "named |",
+       "| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not "
+       "named: the coordination verbs, which are no item, write it |",
+       "w1-R3: the mailbox message's writers")
+LM.sub("quiesce kinds, each written by a flow item, gain their rows.",
+       "quiesce kinds, each written by a flow item, gain their rows. Its requests pass adds the deviation kind's row\n"
+       "and names the mailbox message's writers (A4-F10, C2-F15).",
+       "the kind table's revision line")
+LM.sub("   - Below kappa 0.8 the rubric is revised and the routing re-run, and no row moves until it passes.",
+       "   - Below kappa 0.8 the rubric is revised and the routing re-run, and no row moves until it passes, each re-run\n"
+       "     drawing on the build's rework budget and ending as `flow.on-exhausted` says (P39).",
+       "w2-3: the re-run's budget")
+
+# =============================================================================================== layer-roles
+# ---- w4-5: the matrix re-derived over every item table, [probe] read as a column
+matrix_start = LR.text.index("| Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle | adopt |\n")
+matrix_end = LR.text.index("\n\n- **Counts:** 81 items", matrix_start)
+LR.sub(LR.text[matrix_start:matrix_end], """\
+| Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle | adopt | probe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — | — | — | — |
+| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | `design.streams` | — | — | — | — | — | — | — |
+| researcher | — | `plan.research` | `design.research` | — | — | — | — | — | — | `probe.experiment` |
+| reuse scout | — | — | `design.seams` | `build.reuse-check` | — | — | — | — | — | — |
+| architect | — | — | `design.inventory`, `design.decompose`, `design.reason` | — | — | — | — | — | — | — |
+| spec writer | — | — | `design.unit-spec` | — | — | — | `review.fold` | — | — | — |
+| builder | — | — | — | `build.unit-pass`, `build.fix-pass`, `build.revert-pass`, `build.resolve` | — | — | — | — | — | — |
+| tester | — | — | — | — | `test.attribute`, `test.reason` | — | — | — | — | `probe.design`, `probe.judge-claimed` |
+| reviewer | — | — | — | — | — | — | `review.lens` | — | `adopt.decisions` | — |
+| skeptic | — | — | — | — | — | — | `review.refute` | — | — | — |
+| synthesizer | — | — | — | — | — | — | `review.report` | — | — | — |
+| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.distill`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.distill`, `deploy.recommend`, `deploy.notify`, `deploy.released`, `deploy.snapshot`, `deploy.unlease`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.unlease`, `life.close` | `adopt.census`, `test.seed`, `adopt.reconstruct`, `adopt.instructions`, `adopt.declarations` | `probe.trigger`, `probe.pin`, `probe.judge`, `probe.return` |
+| executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` | — | `probe.run` |
+| hook | `entry.intake` | — | — | — | — | — | — | — | — | — |
+| owner | `entry.place-owner` | — | — | `build.ratify` | — | — | — | `life.request` | `adopt.practices`, `adopt.decisions-ratify` | — |""",
+       "w4-5: the matrix")
+LR.sub("- **Counts:** 81 items, each with one actor; 15 actors; 20 items with a role.",
+       "- **Counts:** 97 items, each with one actor; 15 actors; 28 items with a role.",
+       "w4-5: the counts")
+LR.sub("    the instrument's revision for that group, in `[instrument]`, derives these counts.\n",
+       "    the instrument's revision for that group, in `[instrument]`, derives these counts.\n"
+       "  - Revised 2026-10-20, the whole-design audit's fold: the instrument reads `[probe]` as a column too, and\n"
+       "    the counts are its run over every item table of the step definitions as the fold leaves them. Before\n"
+       "    it the table held 82 items and 21 with a role against its count of 81 and 20, and missed\n"
+       "    `build.reuse-check` and the seven `[probe]` items. The fold's seven new items join it: `build.fix-pass`,\n"
+       "    `build.revert-pass`, `build.resolve`, `probe.judge-claimed`, `adopt.decisions-ratify`,\n"
+       "    `adopt.instructions` and `adopt.declarations`.\n",
+       "w4-5: the counts' revision")
+LR.insert_before(
+    "## [revised] Revised 2026-10-16: the two Tier-2 rounds, folded",
+    "### `role_matrix.py`, revised 2026-10-20: the `probe` group\n\n"
+    "The night pass's point 2 declared the probe program's items in flow-steps' `[probe]`, a group the instrument\n"
+    "did not read, so the revision before this one reds on each of them, on the step definitions before the\n"
+    "whole-design audit's fold and after it. The instrument now reads that group as a column, as it reads `[adopt]`.\n"
+    "Its one changed line:\n\n"
+    "```text\n"
+    "- STEPS = [\"entry\", \"plan\", \"design\", \"build\", \"test\", \"deploy\", \"breakpoint\", \"lifecycle\", \"adopt\"]\n"
+    "+ STEPS = [\"entry\", \"plan\", \"design\", \"build\", \"test\", \"deploy\", \"breakpoint\", \"lifecycle\", \"adopt\", \"probe\"]\n"
+    "```\n\n"
+    "Both revisions, run over the step definitions as the fold leaves them:\n\n"
+    "```text\n"
+    "$ python role_matrix.py <flow-steps> <layer-roles>   # the revision before this one\n"
+    "items 89 of 89 body rows; actor-item pairs 89; actors 15; items with a role 25; cycle roles 1; findings 8\n"
+    "FINDING arm 0: probe.trigger sits under [probe], which is no step the matrix reads\n"
+    "FINDING arm 0: probe.pin sits under [probe], which is no step the matrix reads\n"
+    "FINDING arm 0: probe.design sits under [probe], which is no step the matrix reads\n"
+    "FINDING arm 0: probe.experiment sits under [probe], which is no step the matrix reads\n"
+    "FINDING arm 0: probe.run sits under [probe], which is no step the matrix reads\n"
+    "FINDING arm 0: probe.judge sits under [probe], which is no step the matrix reads\n"
+    "FINDING arm 0: probe.judge-claimed sits under [probe], which is no step the matrix reads\n"
+    "FINDING arm 0: probe.return sits under [probe], which is no step the matrix reads\n"
+    "exit 1\n\n"
+    "$ python role_matrix.py <flow-steps> <layer-roles>   # this revision\n"
+    "items 97 of 97 body rows; actor-item pairs 97; actors 15; items with a role 28; cycle roles 1; findings 0\n"
+    "exit 0\n"
+    "```\n\n",
+    "w4-5: the instrument's probe group")
+
+# =============================================================================================== layer-expansions
+# ---- w3-R-9, merged into writer 5's receipt cell
+LE.sub("`receipt` (`.governance/install.json`: per-kit versions, the release tag and the source remote, dSafePassage's "
+       "per-step `steps` at schema 4 (`cl-dClosedLoop-0020`), and schema 5's `superseded`, `deprecations` and "
+       "`prior_commit` (`cl-dClosedLoop-0435`);",
+       "`receipt` (`.governance/install.json`: per-kit versions, dSafePassage's per-step `steps` at schema 4 "
+       "(`cl-dClosedLoop-0020`), and schema 5's `superseded`, `deprecations` and `prior_commit`, with `release`, the "
+       "release tag, and `source_remote`, the source remote, in place of a local path (`cl-dClosedLoop-0435`);",
+       "w3-R-9: the receipt's schema 5")
+# ---- w4-7, merged into writer 5's maintain.patch Does cell
+LE.sub("which records a cadence filer's prompt as intake (flow-steps `[entry]`); a recurrence while the patch is open",
+       "which records a cadence filer's prompt as intake (flow-steps `[entry]`), and none where a patch is open for "
+       "the same key, a landing's own included, which `deploy.core` files under (`default-branch-red`, landed SHA); "
+       "a recurrence while the patch is open",
+       "w4-7: maintain.patch finds the landing's patch")
+LE.sub("The\n`release-verify-failed` join is owed by the one build descended from both its halves (B5-F14).",
+       "The\n`release-verify-failed` join is owed by the one build descended from both its halves (B5-F14). Its requests\n"
+       "pass adds that `maintain.patch` files none where a landing's patch is open for the same red, and that the\n"
+       "receipt's schema 5 carries `release` and `source_remote` (A3-F5, A4-F6).",
+       "the requests pass's revision sentence")
+
+# =============================================================================================== orientation
+OR.sub("`patch` (a patch build at Design), `ask <build>`, or `none` (read-only:",
+       "`patch` (a patch build at Design),\n"
+       "  `unit <build>/<unit>` (one ready unit of a build leased elsewhere, under its unit lease), `ask <build>`,\n"
+       "  or `none` (read-only:",
+       "w4-6: the unit disposition")
+OR.sub("for `patch`, a derived plan record is placed;",
+       "for `patch`, a derived plan record is placed;\n"
+       "  for `unit`, the build is live, the unit ready and unleased, and `build.unit-holders` admits this session\n"
+       "  (revised 2026-10-20, the whole-design audit's fold, AS4-F4);",
+       "w4-6: the unit disposition's check")
+
+# =============================================================================================== project-map
+PM.sub("the policy namespace's dDeclaredLoop's, the gap area's dTotalRecall's |",
+       "the policy namespace's dKeptSession's (revised 2026-10-20, CS4-F1), the gap area's dTotalRecall's |",
+       "w1-R4: the policy namespace's purpose")
+
+# =============================================================================================== gap register
+GR.sub("no recorded plan revision and no re-design inventory of completed work, though",
+       "no recorded plan revision, its re-design inventory split to `gap-flow-25`, though",
+       "w3-R-6: gap-flow-04")
+GR.insert_before(
+    "| gap-orient-01 | Orient |",
+    "| gap-flow-25 | Flow | MED | A revised plan has no re-design inventory of completed work: each built unit kept, "
+    "amended by a new unit or retired. Split from gap-flow-04, since dRankedPlan and dIndexedDesign do not descend one "
+    "from the other (the whole-design audit's fold, C5-F13). | flow FL-P6; flow-steps `design.inventory` | — |\n",
+    "w3-R-6: gap-flow-25")
+GR.sub("Flow=24 Maintain=15 Design=13\nLOW=61 MED=197 HIGH=127\n```\n",
+       "Flow=24 Maintain=15 Design=13\nLOW=61 MED=197 HIGH=127\n```\n\n"
+       "Re-measured after the whole-design audit's fold split `gap-flow-25` from `gap-flow-04`\n"
+       "(`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w6.md`), same instrument, over 386 keys:\n\n"
+       "```text\n"
+       "Roles=31 Deploy=29 Plan=8 Spine=29 Orient=21 Test=22 Runtime=46 Lexicon=11 Tooling=24 Review=22 Foundation=36 "
+       "Build=7 Memory=47 Flow=25 Maintain=15 Design=13\n"
+       "LOW=61 MED=198 HIGH=127\n"
+       "```\n",
+       "w3-R-6: the re-measure")
+
+# =============================================================================================== recut
+RC.sub("| dTotalRecall | `journal` | dWellOiledMachine | homonym | the Serves kind named `journal`, which the registry "
+       "renames `log`, not Runtime's journal record kind (the away pass) |\n",
+       "| dTotalRecall | `journal` | dWellOiledMachine | homonym | the Serves kind named `journal`, which the registry "
+       "renames `log`, not Runtime's journal record kind (the away pass) |\n"
+       "| dFairHearing | `review.dispose` | dDeclaredLoop | tolerance | the report's dispositions are written to the "
+       "review record and disposed by hand, as today's reviews are, until dDeclaredLoop lands `review.dispose` and "
+       "routes them (cl-dClosedLoop-0075, flow-steps [breakpoint]'s stand-ins, C2-F6) |\n"
+       "| dKeptSession | `memory.map-purpose` | dTotalRecall | tolerance | the policy namespaces' purposes are reviewed "
+       "under the key's default, `review`, until dTotalRecall lands the key (cl-dClosedLoop-0154, CS4-F1) |\n"
+       "| dTrueNorth | `deviation.approval` | dDeclaredLoop | tolerance | a deviation's approver is read against the "
+       "by-risk table final-questions `[deviation]` sets, the risk class read from the record, until dOrderedCharter's "
+       "classifier and dDeclaredLoop's key land and re-point it (cl-dClosedLoop-0004, C1-F9) |\n"
+       "| dPlacedRequest | `build.unit-holders` | dWellOiledMachine | tolerance | a `unit` disposition is refused as "
+       "under `driver-only`, the build's driver alone driving its units, until dWellOiledMachine lands the unit holders "
+       "and the key (flow-steps [entry]'s stand-ins, AS4-F4) |\n"
+       "| dPlacedRequest | `kickoff.runs` | dRankedPlan | tolerance | `entry.orient` runs the full kickoff where no "
+       "READY card exists, the key's default `no-ready-card`, until dRankedPlan lands the key and re-points it "
+       "(flow-steps [entry]'s stand-ins, B1-F11) |\n"
+       "\n"
+       "Revised 2026-10-20 by the whole-design audit's fold: the last five rows class the stand-ins its folds named.\n"
+       "dFairHearing's read of `leases.offline` and dPlacedRequest's and dShippedRelease's of `patch.ratify` wait on\n"
+       "the owner (FK-6-1, FK-6-2), so the probe still reds on them.\n",
+       "probes 1, 2, 3, 5, 6: five tolerance rows")
+
+for rec in (V2, FS, LM, LR, LE, OR, PM, GR, RC):
+    rec.save()
+````
+
+### `fold-7.py`
+
+Fold writer 7's script: the owner's answers on v2's policies, leases and the layer records, new clauses under placeholder ids (fold-return-w7).
+
+````python
+"""Writer 7's fold of the whole-design audit's fork answers (fold brief w7): the owner's answers of 2026-10-20 to
+eighteen forks on v2's policies, leases and the layer records, each folded as the owner chose it. It runs after
+fold-1.py to fold-6.py, so every anchor below is the text they leave, or the working tree's for a record none of them
+touches. New clauses end with a placeholder id, `cl-dClosedLoop-W7-<k>`, which the main loop's mint step numbers.
+Run from the worktree root."""
+import sys
+
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+B = "memory/builds/dClosedLoop/build/"
+V2 = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+MP = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-memory-plan.md")
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LI = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md")
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-runtime.md")
+LE = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+SY = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-systems.md")
+CS = Record(B + "2026-10-19-build-PLAY-dClosedLoop-1-cloud-and-scale.md")
+OW = Record(B + "2026-10-17-build-PLAY-dClosedLoop-1-ownership.md")
+
+# =============================================================================================== FK-1-1
+# The override record and the exception register: records in the building build's `build/` folder, as deviation
+# records are, written in the recording session's commit, on memory-plan [doors]' stand-in list until dTotalRecall's
+# `record` adopts them.
+V2.sub("the override record carrying the rule set aside and the owner's words, written by the session's agent as "
+       "`charter.override` admits,",
+       "the override record carrying the rule set aside and the owner's words, kept in the building build's `build/` "
+       "folder as a deviation record is and written by the session's agent in the recording session's commit as "
+       "`charter.override` admits, through a stand-in door memory-plan `[doors]` lists until dTotalRecall's record "
+       "door adopts it,",
+       "FK-1-1: cl-0032's override record")
+V2.sub("(layer-instruction R-B, the whole-design audit's C1-F2, C1-F10, C1-F11 and C1-F12) `cl-dClosedLoop-0032`",
+       "(layer-instruction R-B, the whole-design audit's C1-F2, C1-F10, C1-F11 and C1-F12, the owner's FK-1-1) "
+       "`cl-dClosedLoop-0032`",
+       "FK-1-1: cl-0032's source")
+V2.sub("the exception register, each exception carrying its principle, the part it excuses and a reason, written by "
+       "the session `core.exceptions` admits,",
+       "the exception register, each exception carrying its principle, the part it excuses and a reason, a record in "
+       "the building build's `build/` folder as a deviation record is, written in the recording session's commit by "
+       "the session `core.exceptions` admits, through a stand-in door memory-plan `[doors]` lists until "
+       "dTotalRecall's record door adopts it,",
+       "FK-1-1: cl-0037's exception register")
+V2.sub("(the whole-design audit's C1-F12) `cl-dClosedLoop-0037`",
+       "(the whole-design audit's C1-F12, the owner's FK-1-1) `cl-dClosedLoop-0037`",
+       "FK-1-1: cl-0037's source")
+LM.sub("| exception | dOrderedCharter | the exception register beside the `core.*` policies; writer item not named |",
+       "| exception | dOrderedCharter | the exception register, kept in the building build's `build/` folder as a "
+       "deviation record is; writer item not named: the session `core.exceptions` admits writes it in the recording "
+       "session's commit, through a stand-in door memory-plan `[doors]` lists until dTotalRecall's `record` adopts "
+       "it (the owner's FK-1-1) |",
+       "FK-1-1: the exception kind's row")
+LM.sub("| override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule; "
+       "writer item not named |",
+       "| override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule, the "
+       "record kept in the building build's `build/` folder as a deviation record is; writer item not named: the "
+       "session's agent writes it in the recording session's commit, through a stand-in door memory-plan `[doors]` "
+       "lists until dTotalRecall's `record` adopts it (the owner's FK-1-1) |",
+       "FK-1-1: the override kind's row")
+MP.insert_before(
+    "**Reading.** One index answers every read:",
+    "The override record and the exception register are records in the building build's `build/` folder, as\n"
+    "deviation records are, each written in the recording session's commit: an override by the session's agent as\n"
+    "`charter.override` admits, an exception by the session `core.exceptions` admits. Each is a stand-in door on the\n"
+    "one-door check's list, beside the edge sites' doors, until dTotalRecall's `record` adopts it (the owner's FK-1-1,\n"
+    "2026-10-20).\n\n",
+    "FK-1-1: [doors]' stand-in list")
+
+# =============================================================================================== FK-1-2
+# Clause ids a native-id class owned by dTrueNorth, pinned `@hash8`; a new edge type, `carries-clause`.
+V2.sub("the eleven new edge types registered with their namespaces, `decides` and `after` widened,",
+       "the twelve new edge types registered with their namespaces, `carries-clause` among them, `decides` and "
+       "`after` widened,",
+       "FK-1-2: cl-0058's edge types")
+V2.sub("the `FAMILY-<slug>-<seq>` ids the charter's ids practice mints, each later class registered",
+       "the `FAMILY-<slug>-<seq>` ids the charter's ids practice mints, and the clause ids `cl-<slug>-NNNN`, the "
+       "class dTrueNorth brought before the mechanism, registered with dTrueNorth as their owner, each later class "
+       "registered",
+       "FK-1-2: cl-0058's clause-id class")
+V2.sub("legal only as an `amends` or `supersedes` target, one edge per address form, tag, pinned tag, section and "
+       "FAMILY id, planted and resolved, a pinned target missing its `@`, one with a malformed hash, one whose hash "
+       "matches no text in its unit's history and a pin on any other edge type each seen red",
+       "legal only as an `amends` or `supersedes` target, and the pinned clause id `<id>@<hash8>`, its hash the one "
+       "the design's `[clause-ids]` section defines, legal only as the target of a `carries-clause` edge, which runs "
+       "from a spec to a clause it carries and may carry the pin, one edge per address form, tag, pinned tag, "
+       "section, FAMILY id, clause id and pinned clause id, planted and resolved, a pinned target missing its `@`, "
+       "one with a malformed hash, one whose hash matches no text in its unit's history, a pinned clause id whose "
+       "hash matches no revision of its clause and a pin on any other edge type each seen red",
+       "FK-1-2: cl-0058's pinned clause id")
+V2.sub("(P33, P34, the folds' review) `cl-dClosedLoop-0058`",
+       "(P33, P34, the folds' review, the owner's FK-1-2) `cl-dClosedLoop-0058`",
+       "FK-1-2: cl-0058's source")
+V2.sub("The twelve declared types gain eleven, the",
+       "The twelve declared types gain twelve, the",
+       "FK-1-2: P33's count")
+V2.sub("`promoted-from` (the away pass).",
+       "`promoted-from` (the away pass), and `carries-clause`, a spec carrying a clause (the owner's FK-1-2).",
+       "FK-1-2: P33's new type")
+MP.sub("`FAMILY-<slug>-<seq>`, a gap key, an act, session or landing id), each native-id class registered with its owner\n"
+       "  (P33): FAMILY ids by dOrderedCharter, gap keys by dTotalRecall,",
+       "`FAMILY-<slug>-<seq>`, a gap key, a clause id `cl-<slug>-NNNN`, an act, session or landing id), each native-id\n"
+       "  class registered with its owner (P33): FAMILY ids by dOrderedCharter, clause ids by dTrueNorth, gap keys by\n"
+       "  dTotalRecall,",
+       "FK-1-2: [frame]'s clause-id class")
+MP.sub("against, and no other edge carries a pin (IA-2, the folds' closing review).",
+       "against, a `carries-clause` target may pin its clause id as `<id>@<hash8>`, the hash v2's `[clause-ids]`\n"
+       "  defines, and no other edge carries a pin (IA-2, the folds' closing review, the owner's FK-1-2).",
+       "FK-1-2: [frame]'s pins")
+MP.sub("The twelve declared types stand (P33). Eleven join them,",
+       "The twelve declared types stand (P33). Twelve join them,",
+       "FK-1-2: [edges]' count")
+MP.insert_before(
+    "| `pinned-at` | record, probe, claim → commit or tree |",
+    "| `carries-clause` | spec → clause, its target a clause id, pinned as `<id>@<hash8>` or not | the spec's "
+    "`**Carries:**` line | `carried-in` | new: the owner's FK-1-2, 2026-10-20 | spec to clause, which the carries join "
+    "reads |\n",
+    "FK-1-2: [edges]' new row")
+MP.sub("the eleven edge types registered;",
+       "the twelve edge types registered;",
+       "FK-1-2: [integration]'s count")
+
+# =============================================================================================== FK-1-3
+# `budgets.*` the one declaration of each cap's value now; an upgrade step migrates `template-size-limits.txt`.
+V2.sub("each cap's value read from its one declaration,",
+       "each cap's value read from its one declaration, `budgets.*`, through the policy reader, "
+       "`template-size-limits.txt` kept as a legacy home the policy reader reads until dSafePassage's step moves its "
+       "rows into the key, a cap holding a value in both homes refused, and every reader of a cap re-pointed to the "
+       "policy reader in the same unit, `check-template-size.sh` and `check-spec-tokens.py`'s size join among them, "
+       "seen red on a planted cap held in both homes and on a planted reader still reading the file for a cap the "
+       "key holds,",
+       "FK-1-3: cl-0015's one declaration")
+V2.sub("the whole-design audit's C1-F14) `cl-dClosedLoop-0015`",
+       "the whole-design audit's C1-F14, the owner's FK-1-3) `cl-dClosedLoop-0015`",
+       "FK-1-3: cl-0015's source")
+V2.sub("seen on a planted `FANOUT_CAP=2` capping at 2 before the step and after it (P38, AP-25, the whole-design "
+       "audit's A4-F1 and C1-F5),",
+       "seen on a planted `FANOUT_CAP=2` capping at 2 before the step and after it (P38, AP-25, the whole-design "
+       "audit's A4-F1 and C1-F5), and `template-size-limits.txt` among them too, its rows moved into `budgets.*` by "
+       "a step that retires the file, each row's argued history carried beside its value, seen on a planted row "
+       "whose cap reads the same before the step and after it (the owner's FK-1-3),",
+       "FK-1-3: cl-0018's step")
+V2.sub("measured at its first unit against `template-size-limits.txt`'s AGENTS.md and charter-template rows,",
+       "measured at its first unit against its caps under `budgets.*`, the AGENTS.md and charter-template rows "
+       "`template-size-limits.txt` held,",
+       "FK-1-3: cl-0036's caps")
+V2.sub("budgeted per load point and per harness, extending `template-size-limits.txt`,",
+       "budgeted per load point and per harness, each budget a cap under `budgets.*`,",
+       "FK-1-3: cl-0041's budgets")
+V2.sub("| `budgets.*` | each cap's value, the owner's; whether a breach warns or refuses is `budgets.enforce`'s | "
+       "re-derived from evidence | walk R4; the mode moved to one switch by the night pass two, point 5, the owner's "
+       "NT-22 | dCalibratedLens |",
+       "| `budgets.*` | each cap's value, the owner's, its one declaration; whether a breach warns or refuses is "
+       "`budgets.enforce`'s | the value its legacy home held, `template-size-limits.txt` moved by dSafePassage's "
+       "step, then re-derived from evidence | walk R4; the mode moved to one switch by the night pass two, point 5, "
+       "the owner's NT-22; made each cap's one declaration now, the file migrated into it, and moved from "
+       "dCalibratedLens to dGroundRules, whose `budgets.enforce` reads it, by the owner's FK-1-3; dCalibratedLens "
+       "re-derives the values | dGroundRules |",
+       "FK-1-3: the `budgets.*` row")
+LI.sub("  - The budgets extend `tools/template-size-limits.txt` and `check-template-size.sh`, with their\n"
+       "    high-water ratchet and the owner's rule for who may raise a row. A new load point joins that\n"
+       "    table.",
+       "  - The budgets are caps under `budgets.*`, read by `check-template-size.sh` with its high-water\n"
+       "    ratchet, `tools/template-size-limits.txt` migrated into the key by an upgrade step with the owner's\n"
+       "    rule for who may raise a row (revised 2026-10-20, the owner's FK-1-3). A new load point joins the\n"
+       "    key.",
+       "FK-1-3: layer-instruction's budgets")
+
+# =============================================================================================== FK-1-4 + FK-3-1
+# Drop `install.retired-edits: delete` and `install.on-shim-call: refuse`; `keep` stays, armed in cl-0026.
+V2.sub("| `install.on-shim-call` | warn, journal, refuse | warn | the away pass, point 6: a forwarded call prints and is "
+       "journaled for the adopter view; the owner's AP-27 | dSafePassage |",
+       "| `install.on-shim-call` | warn, journal | warn | the away pass, point 6: a forwarded call prints and is "
+       "journaled for the adopter view; the owner's AP-27; `refuse`, which broke an adopter's scripts against P38's "
+       "\"keeps working, or warns\", dropped by the owner's FK-1-4 + FK-3-1 | dSafePassage |",
+       "FK-1-4: on-shim-call's values")
+V2.sub("| `install.retired-edits` | order, keep, delete | order |",
+       "| `install.retired-edits` | order, keep | order |",
+       "FK-1-4: retired-edits' values")
+V2.sub("never silently patched and never graded as a fork; the owner's AP-28, moved to dSafePassage by SA-2 | "
+       "dSafePassage |",
+       "never silently patched and never graded as a fork; the owner's AP-28, moved to dSafePassage by SA-2; `keep` "
+       "keeps the file as `retired-edited` and reports it with no order, and `delete`, which lost edits against P8, "
+       "is dropped by the owner's FK-1-4 + FK-3-1 | dSafePassage |",
+       "FK-1-4: retired-edits' source")
+V2.sub("seen red on that mapping stubbed to `forked`,",
+       "seen red on that mapping stubbed to `forked`, under `keep` the same row kept with no order and named in "
+       "update's report, never silent, seen red on a planted `keep` row update's report omits,",
+       "FK-1-4: cl-0026's keep arm")
+V2.sub("(P38, SA-2, IA-2, the folds' review) `cl-dClosedLoop-0026`",
+       "(P38, SA-2, IA-2, the folds' review, the owner's FK-1-4) `cl-dClosedLoop-0026`",
+       "FK-1-4: cl-0026's source")
+
+# =============================================================================================== FK-1-5
+# A patch build's draw on a closed root re-opens the root's transition record under the root's lease.
+V2.sub("and green on a planted stale verdict that draws nothing (P39, the owner's SL-1, the parked debt's review) "
+       "`cl-dClosedLoop-0115`",
+       "and green on a planted stale verdict that draws nothing, and a closed build's record re-opened for a patch "
+       "build's draw alone, each draw an appended row naming the patch build, the build's terminal state never moved "
+       "by a draw, seen on a planted draw on a closed build whose state stays terminal (P39, the owner's SL-1 and "
+       "FK-1-5, the parked debt's review) `cl-dClosedLoop-0115`",
+       "FK-1-5: cl-0115's re-opened record")
+V2.sub("drawing on the originating build's rework budget, so a chain of patch builds shares one budget,",
+       "drawing on the originating build's rework budget, so a chain of patch builds shares one budget, a draw on a "
+       "closed root re-opening the root's transition record under the root's lease: the patch build acquires the "
+       "root's terminal lease for that draw alone, its epoch bumped, and appends the draw and releases the lease "
+       "terminal again in one push, so concurrent draws serialize on the acquisition's compare-and-swap, the loser "
+       "re-reading the remaining budget before it draws,",
+       "FK-1-5: cl-0440's draw under the root's lease")
+V2.sub("seen red on a planted patch chain,",
+       "seen red on a planted patch chain, on two planted concurrent draws on one closed root whose budget admits "
+       "only one, both landing,",
+       "FK-1-5: cl-0440's concurrent draws")
+V2.sub("(P39, the parked debt's review) `cl-dClosedLoop-0440`",
+       "(P39, the parked debt's review, the owner's FK-1-5) `cl-dClosedLoop-0440`",
+       "FK-1-5: cl-0440's source")
+V2.sub("which refuses every acquisition, the epoch rising",
+       "which refuses every acquisition but a patch build's draw on its closed root's rework budget, held for that "
+       "draw alone and released terminal again, the epoch rising",
+       "FK-1-5: cl-0134's draw admission")
+V2.sub("and on a terminal tombstone acquired (P40",
+       "and on a terminal tombstone acquired for anything but a draw (P40",
+       "FK-1-5: cl-0134's red case")
+FS.sub("keyed by the originating slug its claim carries (`entry.claim`).",
+       "keyed by the originating slug its claim carries (`entry.claim`), and a draw on a closed root re-opens the\n"
+       "  root's transition record under the root's lease, which serializes concurrent draws (the owner's FK-1-5).",
+       "FK-1-5: flow-steps [rules]' patch draw")
+CS.sub("terminal tombstone for a unit landed or withdrawn, which refuses every acquisition, and the epoch rises",
+       "terminal tombstone for a unit landed or withdrawn, which refuses every acquisition but a patch build's draw on\n"
+       "   its closed root's rework budget (revised 2026-10-20, the owner's FK-1-5), and the epoch rises",
+       "FK-1-5: cloud-and-scale item 3")
+
+# =============================================================================================== FK-1-6
+V2.sub("a fresh session in the build's worktree recommended until the card-import fixture passes "
+       "`cl-dClosedLoop-0150`",
+       "a fresh session in the build's worktree recommended until the card-import fixture passes, the fixture winning "
+       "over `resume.context`: while it is red, `always-resume` read as `fresh-when-idle` and the override reported, "
+       "never silent, seen on a planted `always-resume` with the fixture red that resumes no idle session and "
+       "reports the override (the owner's FK-1-6) `cl-dClosedLoop-0150`",
+       "FK-1-6: cl-0150")
+V2.sub("| `resume.context` | fresh-when-idle, always-resume, always-fresh | fresh-when-idle | orientation OR-7 | "
+       "dPlacedRequest |",
+       "| `resume.context` | fresh-when-idle, always-resume, always-fresh | fresh-when-idle | orientation OR-7; while "
+       "the card-import fixture is red, `always-resume` reads as `fresh-when-idle` and the override is reported "
+       "(`cl-dClosedLoop-0150`, the owner's FK-1-6) | dPlacedRequest |",
+       "FK-1-6: the `resume.context` row")
+
+# =============================================================================================== FK-1-7
+V2.sub("each message's id derived from its sender's session, and its act once Runtime mints acts, its item and pass, "
+       "its kind, its subject and the id it answers, so a retried post is refused as a duplicate while two answers to "
+       "two messages both land, seen on a post retried after a crash and on two acknowledgements from one item (the "
+       "night pass two, point 4, the owner's NT-18, the answered id added by the night pass two's review)",
+       "each message's id derived from its build, its item's instance key, its pass, its kind, its subject and the id "
+       "it answers, never from its sender's session, and from its act once Runtime mints acts, the duplicate check "
+       "reading every one of the build's per-session refs, so a retried post is refused as a duplicate, a retry from "
+       "a new session among them, while two answers to two messages both land, seen on a post retried after a crash, "
+       "on a retry from a new session and on two acknowledgements from one item (the night pass two, point 4, the "
+       "owner's NT-18, the answered id added by the night pass two's review, the session dropped by the owner's "
+       "FK-1-7)",
+       "FK-1-7: cl-0160")
+
+# =============================================================================================== FK-2-1
+# The landing push carries the lease beat and the `landed` notice; the release stays at `deploy.unlease`.
+V2.sub("the lander's push to main and the build's release with its landed notice carried in one atomic push, seen red "
+       "on a landing whose release the remote dropped and on a lander stubbed back to re-read the epoch and then push "
+       "after a take-over (P40, the parked debt's review)",
+       "the lander's push to main, the build's lease beat and its landed notice carried in one atomic push, the push "
+       "releasing nothing, so the lease lives on for the Deploy items after it and a build that dies between its "
+       "landing and its close keeps a lease that expires or hands over, a re-run landing finding its SHA already "
+       "held, seen red on a landing whose landed notice the remote dropped, on a lease released by the landing "
+       "push, and on a lander stubbed back to re-read the epoch and then push after a take-over (P40, the parked "
+       "debt's review, the owner's FK-2-1)",
+       "FK-2-1: cl-0337")
+V2.sub("with a conformance fixture holding the fence, tombstone and atomic-landing probes,",
+       "with a conformance fixture holding the fence, tombstone and atomic-landing probes, the last pushing a landing, "
+       "its lease beat and its landed notice together or not at all and leaving the lease live,",
+       "FK-2-1: cl-0333's atomic-landing probe")
+CS.sub("the lander's push to main, a release with\n   its `landed` notice, carries",
+       "the lander's push to main with\n   its `landed` notice, carries",
+       "FK-2-1: cloud-and-scale item 2")
+CS.sub("This replaces re-reading the epoch before the push, and merges two pushes\n   into one.",
+       "This replaces re-reading the epoch before the push, and merges two pushes\n   into one. The landing push "
+       "releases nothing: the build's lease lives until `deploy.unlease` (revised 2026-10-20,\n   the owner's FK-2-1).",
+       "FK-2-1: cloud-and-scale item 2's release")
+
+# =============================================================================================== FK-2-2 + FK-2-4
+V2.sub("| `leases.expiry-hours` | hours | 24 | walk C2; judged by a declared clock, never the reader's raw clock: an "
+       "observer seeing the tip unchanged this long, and, once dWellOiledMachine records each node's clock offset, "
+       "the holder's stamp corrected by it (P40, the parked debt's review) | dPlacedRequest |",
+       "| `leases.expiry-hours` | hours | 24 | walk C2; judged by a declared clock, never the reader's raw clock: an "
+       "observer seeing no renewing beat this long, each beat marking whether it renews and a fence beat that "
+       "carries no new witness renewing nothing, or, once dWellOiledMachine's supervisor measures each node's clock "
+       "offset at each beat against the remote host's time, the holder's stamp on its last renewing beat corrected "
+       "by it, either rule expiring the lease (P40, the parked debt's review, the owner's FK-2-2 and FK-2-4) | "
+       "dPlacedRequest |",
+       "FK-2-2, FK-2-4: the `leases.expiry-hours` row")
+V2.sub("the node's clock offset among them correcting a holder's stamp when a lease's expiry is judged, as "
+       "`leases.expiry-hours` says, seen red on a planted holder stamp skewed by an hour (P40, the parked debt's "
+       "review)",
+       "the node's clock offset among them, measured by the supervisor at each beat against the remote host's time "
+       "read through the host adapter and recorded in the registry, correcting a holder's stamp when a lease's "
+       "expiry is judged, as `leases.expiry-hours` says, either the corrected stamp or the observer's rule expiring "
+       "the lease, seen red on a planted holder stamp skewed by an hour and on a node that misreports its own offset "
+       "and still loses its lease (P40, the parked debt's review, the owner's FK-2-2)",
+       "FK-2-2: cl-0293")
+LR.sub("  - the clock offset, and `autocrlf`;",
+       "  - the clock offset, which the supervisor measures at each beat against the remote host's time, read\n"
+       "    through the host adapter, and records here, either expiry rule then expiring a lease (revised\n"
+       "    2026-10-20, the owner's FK-2-2), and `autocrlf`;",
+       "FK-2-2: layer-runtime's clock offset")
+CS.sub("4. **Expiry is judged by a declared clock:** the holder's stamp corrected by the clock offset the node registry\n"
+       "   records, or an observer seeing the tip unchanged for `leases.expiry-hours`,",
+       "4. **Expiry is judged by a declared clock:** the holder's stamp on its last renewing beat corrected by the clock\n"
+       "   offset the supervisor measures at each beat against the remote host's time and the node registry records,\n"
+       "   or an observer seeing no renewing beat for `leases.expiry-hours`, either rule expiring the lease, each beat\n"
+       "   marking whether it renews (revised 2026-10-20, the owner's FK-2-2 and FK-2-4),",
+       "FK-2-2, FK-2-4: cloud-and-scale item 4")
+V2.sub("here an observer measuring the time since it first saw the record unchanged, a lease's tip for "
+       "`leases.expiry-hours`,",
+       "here an observer measuring the time since it first saw the record unchanged, a lease's last renewing beat for "
+       "`leases.expiry-hours`, each beat marking whether it renews, a beat renewing only when it carries a new "
+       "witness, so a fence beat that carries none moves the tip and renews nothing,",
+       "FK-2-4: cl-0135's renewing beat")
+V2.sub("which must not expire a lease whose tip moved within the hour,",
+       "which must not expire a lease renewed within the hour,",
+       "FK-2-4: cl-0135's red case")
+V2.sub("(P40, the parked debt's review, the whole-design audit's A2-F6) `cl-dClosedLoop-0135`",
+       "(P40, the parked debt's review, the whole-design audit's A2-F6, the owner's FK-2-4) `cl-dClosedLoop-0135`",
+       "FK-2-4: cl-0135's source")
+V2.sub("an instance reaped twice and relaunched instead of routed, and a planted holder that loops while active, its "
+       "lease lost after `leases.expiry-hours` (P39, the parked debt's review)",
+       "an instance reaped twice and relaunched instead of routed, a planted holder that loops while active, its "
+       "lease lost after `leases.expiry-hours`, and a planted holder whose fix passes keep pushing one red verdict, "
+       "each push a fence beat marked as no renewal, its lease lost after `leases.expiry-hours` too (P39, the parked "
+       "debt's review, the owner's FK-2-4)",
+       "FK-2-4: cl-0324's red arm")
+
+# =============================================================================================== FK-2-3
+# The sweep generic over each wait's deadline; the release-ceiling arm, the landing's release arm and the key move
+# to dShippedRelease.
+V2.sub("and the sweep that raises a wait past `build.release-ceiling` once, under the release hold's one key "
+       "`cl-dClosedLoop-0296`",
+       "and the sweep, generic over each wait's declared deadline, raising each wait past its deadline once, seen red "
+       "on a planted owner-request wait past its deadline that it raises twice or never, the release ceiling's arm "
+       "dShippedRelease's (the owner's FK-2-3) `cl-dClosedLoop-0296`",
+       "FK-2-3: cl-0296's generic sweep")
+V2.sub("| `build.release-ceiling` | hours | 72 | the expansion fold's follow-up round: how long `deploy.released` waits "
+       "for an exit record before an owner item | dWellOiledMachine |",
+       "| `build.release-ceiling` | hours | 72 | the expansion fold's follow-up round: how long `deploy.released` waits "
+       "for an exit record before an owner item; moved from dWellOiledMachine with the release arm by the owner's "
+       "FK-2-3, its wait's declared deadline, which dWellOiledMachine's generic sweep raises | dShippedRelease |",
+       "FK-2-3: the `build.release-ceiling` row")
+V2.sub("the parked debt's review) `cl-dClosedLoop-0415`",
+       "the parked debt's review) `cl-dClosedLoop-0415`; the release arms dWellOiledMachine's sweep and lander leave "
+       "to this build: a `deploy.released` wait given `build.release-ceiling` as its declared deadline, counted from "
+       "the landing record or from the owner's last keep-waiting answer, so the generic sweep dWellOiledMachine "
+       "builds raises the release hold's one owner item once past it, and the build's lease released only at "
+       "`deploy.unlease`, after the landing push that carried its beat and its landed notice, seen red on a planted "
+       "`deploy.released` wait whose ceiling opens a second item while one is open and on a supervisor killed "
+       "between `deploy.land` and `deploy.unlease` whose build a second node takes over and closes (the owner's "
+       "FK-2-1 and FK-2-3) `cl-dClosedLoop-W7-1`",
+       "FK-2-1, FK-2-3: the new release-arms clause")
+LR.sub("`deploy.released` and `life.quiesce`). The sweep reads `build.closes` and `build.release-ceiling`;",
+       "`deploy.released` and `life.quiesce`). The sweep reads `build.closes` and each wait's declared\n"
+       "    deadline, generic over every wait, an owner request's among them, and dShippedRelease, which owns\n"
+       "    `build.release-ceiling`, builds this release arm (revised 2026-10-20, the owner's FK-2-3);",
+       "FK-2-3: layer-runtime's sweep")
+
+# =============================================================================================== FK-3-2
+V2.sub("| `roles.model.<role>` | the models the harness adapter offers | the role's declared model | FA-6:",
+       "| `roles.model.<role>.<harness>` | the models the harness adapter offers | that harness adapter's "
+       "equivalent of the role's declared model | FA-6:",
+       "FK-3-2: the row's key")
+V2.sub("(the flow adoption's review took it off the keys presets never touch, where the fold had put it) | "
+       "dBoundRoles |",
+       "(the flow adoption's review took it off the keys presets never touch, where the fold had put it); keyed per "
+       "harness by the owner's FK-3-2, since `roles.harness.<role>` admits several harnesses, the preset check red on "
+       "a role whose harness set holds a harness with no model | dBoundRoles |",
+       "FK-3-2: the row's source")
+V2.sub("| `roles.model.<role>` | the role's model | the role's model | the role's model | the role's model |",
+       "| `roles.model.<role>.<harness>` | the role's model on that harness | the role's model on that harness | the "
+       "role's model on that harness | the role's model on that harness |",
+       "FK-3-2: the preset row")
+V2.sub("`roles.effort.default` and `roles.model.<role>`, a stage's effort",
+       "`roles.effort.default` and `roles.model.<role>.<harness>`, a stage's effort",
+       "FK-3-2: cl-0186's key")
+V2.sub("a role's model from its key, then its declared value,",
+       "a role's model on a harness from its key for that harness, then that harness adapter's equivalent of its "
+       "declared value, seen red on a planted key for one harness read on another,",
+       "FK-3-2: cl-0186's reader")
+V2.sub("first dropping work whose roles need a harness, model or hardware the node profile lacks,",
+       "first dropping work whose roles need a harness, model or hardware the node profile lacks, a role's model on "
+       "the node's harness read from `roles.model.<role>.<harness>`, and the preset check extended to refuse a role "
+       "whose `roles.harness.<role>` set holds a harness with no model,",
+       "FK-3-2: cl-0332's pick")
+V2.sub("seen red on a released lease no node picks up, on a unit offered to a node without its harness,",
+       "seen red on a released lease no node picks up, on a unit offered to a node without its harness, on a role "
+       "set to two harnesses with no model for the second, which the preset check refuses,",
+       "FK-3-2: cl-0332's red case")
+V2.sub("(P40, the owner's CL-3 and fleet, the parked debt's review) `cl-dClosedLoop-0332`",
+       "(P40, the owner's CL-3, fleet and FK-3-2, the parked debt's review) `cl-dClosedLoop-0332`",
+       "FK-3-2: cl-0332's source")
+SY.sub("beside `roles.model.<role>` (revised 2026-10-19, FA-6 and the\n    flow adoption's review).",
+       "beside `roles.model.<role>.<harness>` (revised 2026-10-19, FA-6 and the\n    flow adoption's review, and keyed "
+       "per harness 2026-10-20 by the owner's FK-3-2).",
+       "FK-3-2: systems' key")
+
+# =============================================================================================== FK-3-3
+V2.sub("| `design.streams` | opt-in, always, off | opt-in |",
+       "| `design.streams-when` | opt-in, always, off | opt-in |",
+       "FK-3-3: the row's key")
+V2.sub("under `opt-in` only when the build's brief or the owner asks | dIndexedDesign |",
+       "under `opt-in` only when the build's brief or the owner asks; the key renamed from `design.streams` by the "
+       "owner's FK-3-3, so the planner's item keeps that name alone | dIndexedDesign |",
+       "FK-3-3: the row's source")
+V2.sub("| `design.streams` | opt-in | opt-in | opt-in | opt-in |",
+       "| `design.streams-when` | opt-in | opt-in | opt-in | opt-in |",
+       "FK-3-3: the preset row")
+V2.sub("run as `design.streams` says",
+       "run as `design.streams-when` says",
+       "FK-3-3: cl-0397's key")
+V2.sub("on each value of `design.streams` planted",
+       "on each value of `design.streams-when` planted",
+       "FK-3-3: cl-0397's planted values")
+V2.sub("(the owner's CL-3, the parked debt's review) `cl-dClosedLoop-0397`",
+       "(the owner's CL-3 and FK-3-3, the parked debt's review) `cl-dClosedLoop-0397`",
+       "FK-3-3: cl-0397's source")
+FS.sub("`policy.design.streams` holds for the build, else `design.unit-spec`",
+       "`policy.design.streams-when` holds for the build, else `design.unit-spec`",
+       "FK-3-3: `design.overlaps`' condition")
+FS.sub("`design.overlaps`, where `policy.design.streams` holds for the build |",
+       "`design.overlaps`, where `policy.design.streams-when` holds for the build |",
+       "FK-3-3: `design.streams`' Needs")
+
+# =============================================================================================== FK-5-1
+LE.sub("| `kits.install`, `kits.update` | the owner, or a command | applies or updates a release, installing each render "
+       "target where the adapters in `runtime.harnesses` say | the receipt, and the wiring verdict | an adapter that "
+       "declares no target → its slot renders not installed, the core render kept | — | dShippedRelease |",
+       "| `kits.install`, `kits.update` | command: govkit's install or update and its step walk, started by the "
+       "owner's operator order, an outbox order, or gov first in the prepared merge (`cl-dClosedLoop-0025`) | "
+       "applies or updates a release, walking its upgrade steps as `install.steps` says and installing each render "
+       "target where the adapters in `runtime.harnesses` say | the receipt, and the wiring verdict | every step "
+       "applied → the receipt and the wiring verdict, then `test.seed` for each new check, and `adopt.census` on an "
+       "install; a step marked attended (`cl-dClosedLoop-0024`), or a hook `cl-dClosedLoop-0427` runs attended → "
+       "`kits.install-attended` or `kits.update-attended`; step k failed or killed → the receipt naming step k-1 and "
+       "an owner item asking to rerun or roll back (`cl-dClosedLoop-0019`, `cl-dClosedLoop-0022`); a stale lock → "
+       "reclaimed once its holder is dead, then the walk again (`cl-dClosedLoop-0019`); a downgrade → refused unless "
+       "a recorded rollback lifts it (`cl-dClosedLoop-0021`); a `retired-edited` file or an edited render → held "
+       "with an order, or under `install.retired-edits: keep` reported (`cl-dClosedLoop-0026`); a stale edge under "
+       "`instructions.stale: refuse` → the update refused, with an ask; an adapter that declares no target → its "
+       "slot renders not installed, the core render kept | — | dShippedRelease |\n"
+       "| `kits.install-attended`, `kits.update-attended` | owner | runs, in the adopter's own session, the steps the "
+       "walk marked attended (`cl-dClosedLoop-0024`, `install.steps`) and the install and update hooks that call "
+       "`adopt` and `test.seed` (`cl-dClosedLoop-0427`) | the receipt, each attended step recorded applied | applied "
+       "→ `kits.install` or `kits.update`, the walk resumed past it; failed → the receipt naming the last completed "
+       "step, held for the owner's rerun or a recorded rollback (`cl-dClosedLoop-0021`) | `kits.install` or "
+       "`kits.update` | dShippedRelease |",
+       "FK-5-1: the install and update rows")
+LM.sub("| receipt | dShippedRelease | its writers are `kits.install` and `kits.update`, with the wiring verdict |",
+       "| receipt | dShippedRelease | its writers are the commands `kits.install` and `kits.update`, with the wiring "
+       "verdict, and the owner items `kits.install-attended` and `kits.update-attended`, each attended step it "
+       "records (the owner's FK-5-1) |",
+       "FK-5-1: the receipt kind's writers")
+V2.sub("the install and update hooks that call `adopt` and `test.seed`, attended,",
+       "the install and update hooks that call `adopt` and `test.seed`, attended, run by the owner items "
+       "`kits.install-attended` and `kits.update-attended` beside the commands `kits.install` and `kits.update`, "
+       "which walk the steps and close on dSafePassage's outcomes, each outcome seen on its planted walk (the "
+       "owner's FK-5-1),",
+       "FK-5-1: cl-0427")
+
+# =============================================================================================== FK-5-3
+V2.sub("(P40, the parked debt's review) `cl-dClosedLoop-0335`",
+       "(P40, the parked debt's review) `cl-dClosedLoop-0335`; the record door binding each coordination write to "
+       "its writer: a mail, lease or tombstone write whose ref path or sender names a session, act or fleet tag other "
+       "than the writer's own session binding (layer-runtime `[act]`) refused, and a terminal tombstone admitted "
+       "only from the lease's holder or the take-over verb, seen red on a planted cross-session mail write and on a "
+       "forged tombstone, its limit stated openly: a process outside the door that holds push rights to the remote "
+       "is not stopped, since under Codex the git boundary is the floor (the owner's FK-5-3, the whole-design "
+       "audit's A2-F10) `cl-dClosedLoop-W7-2`",
+       "FK-5-3: the new record-door clause")
+
+# =============================================================================================== FK-5-5
+V2.sub("to log, to diagnose read-only or to act within `maintain.fixes` (NP-21) `cl-dClosedLoop-0455`",
+       "to log, to diagnose read-only or to act within `maintain.fixes`, each reading declaring its band edges beside "
+       "its pin at registration and admission refusing one without them, the log band a journal line and a count in "
+       "the maintenance record with nothing filed, the diagnose band a read-only probe through `probe.trigger` with "
+       "the reading as its observation, its record attached to the ask `maintain.file` files, and the act band "
+       "routed by its fix, each band seen on its planted reading and a reading registered without edges refused "
+       "(NP-21, the owner's FK-5-5) `cl-dClosedLoop-0455`; `maintain.on-breach`'s three values at `maintain.file`: "
+       "`file-ask` filing the ask into Plan's triage, `red-leg` filing nothing and registering a leg at Test's "
+       "leg-pack point that reads the newest maintenance record offline, as the `currency` leg does, red while an "
+       "offender stands over its pin, and `report` filing nothing and sending the maintenance record through the "
+       "notification adapter, each value seen on its planted offender (the owner's FK-5-5, the whole-design audit's "
+       "B5-F11) `cl-dClosedLoop-W7-3`",
+       "FK-5-5: cl-0455's bands and the new on-breach clause")
+LE.sub("| in pin → `maintain.record`; over pin → `maintain.direct`, `maintain.patch` or `maintain.file`, by its fix; "
+       "dead past `maintain.dead-after` → `maintain.file`, to its source |",
+       "| in pin → `maintain.record`; over pin under `maintain.tiers: pins`, or in the act band under `bands` → "
+       "`maintain.direct`, `maintain.patch` or `maintain.file`, by its fix; in the log band → a journal line and a "
+       "count in the maintenance record, nothing filed, then `maintain.record`; in the diagnose band → "
+       "`probe.trigger`, a read-only probe with the reading as its observation, its record attached to the ask "
+       "`maintain.file` files; a reading with no declared band edges under `bands` → refused at admission; dead past "
+       "`maintain.dead-after` → `maintain.file`, to its source |",
+       "FK-5-5: `maintain.read`'s band routes")
+LE.sub("| `maintain.file` | command, through `record` | files an ask for the owner,",
+       "| `maintain.file` | command, through `record` | under `maintain.on-breach: file-ask`, files an ask for the "
+       "owner,",
+       "FK-5-5: `maintain.file`'s Does")
+LE.sub("| filed → Plan's triage, as `maintain.on-breach` says; every outcome → `maintain.record` |",
+       "| as `maintain.on-breach` says: `file-ask` → the ask filed into Plan's triage; `red-leg` → nothing filed, the "
+       "offender recorded by `maintain.record`, where a leg at Test's leg-pack point reads it offline, as the "
+       "`currency` leg reads its record, red while the offender stands over its pin; `report` → nothing filed, the "
+       "maintenance record sent through the notification adapter; every outcome → `maintain.record` |",
+       "FK-5-5: `maintain.file`'s on-breach routes")
+
+# =============================================================================================== FK-5-6
+V2.sub("promotion after landing through environments as an integrations extension point `cl-dClosedLoop-0425`",
+       "promotion after landing through environments as an integrations extension point, E's promotion lease a "
+       "cadence lease named `release/<E>` with its epoch, and every engine adapter's promote and rollback a "
+       "compare-and-swap on E's current deployment id read at the pick, an engine that cannot compare-and-swap "
+       "declaring that gap and running only where `deploy.runs` names the operator, seen red on a stale holder's "
+       "rollback after a take-over (the owner's FK-5-6, the whole-design audit's BS1-F2 and B5-F4) "
+       "`cl-dClosedLoop-0425`",
+       "FK-5-6: cl-0425")
+LE.sub("that environment E lacks, and E's promotion lease;",
+       "that environment E lacks, and E's promotion lease, a cadence lease named `release/<E>` with its epoch, "
+       "reading E's current deployment id under it;",
+       "FK-5-6: `release.pick`'s lease")
+LE.sub("| promotes the SHA into E; already there counts as done | the engine's deployment id, read back by (SHA, E) | "
+       "promoted → `release.verify`;",
+       "| promotes the SHA into E by a compare-and-swap on E's current deployment id read at the pick, an engine that "
+       "cannot compare-and-swap having declared that gap and running only where `deploy.runs` names the operator; "
+       "already there counts as done | the engine's deployment id, read back by (SHA, E) | promoted → "
+       "`release.verify`; the compare-and-swap refused → nothing promoted and nothing recorded, the stale holder's "
+       "effect dropped as a fenced push's is, the lease's new holder running E;",
+       "FK-5-6: `release.promote`'s compare-and-swap")
+LE.sub("roll back to E's last verified SHA, re-verify and file an ask;",
+       "roll back to E's last verified SHA by the same compare-and-swap, re-verify and file an ask;",
+       "FK-5-6: `release.route`'s rollback")
+
+# =============================================================================================== FK-6-2
+V2.sub("| `patch.ratify` | auto, owner | auto | flow FL-M3 | dTendedCadence |",
+       "| `patch.ratify` | auto, owner | auto | flow FL-M3; moved from dTendedCadence by the owner's FK-6-2, since "
+       "`entry.claim`, dPlacedRequest's, reads it for every patch at entry and its other readers descend from "
+       "dPlacedRequest | dPlacedRequest |",
+       "FK-6-2: the `patch.ratify` row")
+OW.sub("| `patch.ratify` | key | dTendedCadence | Maintain files patch intakes from detector readings in "
+       "dTendedCadence's row, and the key says who ratifies them (FL-M3) |",
+       "| `patch.ratify` | key | dPlacedRequest | `entry.claim`, dPlacedRequest's own item, reads it for every patch at "
+       "entry, and its other readers, `deploy.mandate` and `maintain.patch`'s route, descend from dPlacedRequest "
+       "(moved from dTendedCadence by the owner's FK-6-2, 2026-10-20) |",
+       "FK-6-2: ownership:94")
+OW.sub("| `patch.ratify` | dTendedCadence | judgment | Maintain files patch intakes from detector readings in "
+       "dTendedCadence's row, and the key says who ratifies them (FL-M3) | yes |",
+       "| `patch.ratify` | dPlacedRequest | judgment | `entry.claim`, dPlacedRequest's own item, reads it for every "
+       "patch at entry, and its other readers, `deploy.mandate` and `maintain.patch`'s route, descend from "
+       "dPlacedRequest (moved from dTendedCadence by the owner's FK-6-2, 2026-10-20) | yes |",
+       "FK-6-2: ownership:379")
+
+# ---- the ownership record's other moves, and its [amended] line
+OW.sub("| `build.release-ceiling` | dWellOiledMachine | row | row dWellOiledMachine |  |",
+       "| `build.release-ceiling` | dShippedRelease | judgment | the release wait's declared deadline, whose arm "
+       "dShippedRelease builds, dWellOiledMachine's sweep being generic over each wait's deadline (moved by the "
+       "owner's FK-2-3, 2026-10-20) | yes |",
+       "FK-2-3: ownership's release-ceiling row")
+OW.sub("| `budgets.*` | dCalibratedLens | namespace | dCalibratedLens's row: caps re-derived from evidence and review "
+       "cost |  |",
+       "| `budgets.*` | dGroundRules | judgment | dGroundRules's `budgets.enforce` clause makes the key each cap's one "
+       "declaration, and dCalibratedLens's row re-derives the values (moved from dCalibratedLens by the owner's "
+       "FK-1-3, 2026-10-20) | yes |",
+       "FK-1-3: ownership's budgets row")
+OW.sub("`roles.on-contradiction`, `roles.orientation.house-index`, `roles.trust`, `roles.verifier-context`.\n",
+       "`roles.on-contradiction`, `roles.orientation.house-index`, `roles.trust`, `roles.verifier-context`.\n"
+       "- **The whole-design audit's fork answers, 2026-10-20**\n"
+       "  (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w7.md`): `patch.ratify` moves from dTendedCadence to\n"
+       "  dPlacedRequest, whose `entry.claim` reads it for every patch (FK-6-2); `build.release-ceiling` moves from\n"
+       "  dWellOiledMachine to dShippedRelease with the release arm of the event-wait sweep (FK-2-3); `budgets.*` moves\n"
+       "  from dCalibratedLens to dGroundRules, which makes it each cap's one declaration (FK-1-3); and the items\n"
+       "  `kits.install-attended` and `kits.update-attended` join dShippedRelease (FK-5-1). The rows above carry the\n"
+       "  moves.\n",
+       "the [amended] line")
+
+# =============================================================================================== revision notes
+V2.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review",
+    "Revised 2026-10-20 by the whole-design audit's fork answers\n"
+    "(`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w7.md`): the owner's answers to eighteen forks on the\n"
+    "policies, the leases and the layer records, each folded as chosen. The override record and the exception\n"
+    "register are records in the building build's `build/` folder (FK-1-1). Clause ids become a native-id class of\n"
+    "dTrueNorth's, pinned `@hash8`, and `carries-clause` joins P33's closed set (FK-1-2). `budgets.*` becomes each\n"
+    "cap's one declaration now, dGroundRules's, `template-size-limits.txt` migrated into it by dSafePassage's step\n"
+    "(FK-1-3). `install.retired-edits` drops `delete` and `install.on-shim-call` drops `refuse`, and `keep` gains its\n"
+    "arm (FK-1-4, FK-3-1). A patch build's draw on a closed root re-opens the root's transition record under the\n"
+    "root's lease (FK-1-5). The card-import fixture wins over `resume.context` while it is red (FK-1-6), and a\n"
+    "message's id drops its sender's session (FK-1-7). The landing push leaves the lease live until `deploy.unlease`\n"
+    "(FK-2-1), the supervisor measures each node's clock offset and either expiry rule expires a lease (FK-2-2), the\n"
+    "event-wait sweep is generic and the release arms and `build.release-ceiling` move to dShippedRelease (FK-2-3),\n"
+    "and a beat marks whether it renews (FK-2-4). The role's model is keyed per harness (FK-3-2), and the key the\n"
+    "planner's item shared a name with becomes `design.streams-when` (FK-3-3). `kits.install` and `kits.update` are\n"
+    "commands beside two attended owner items (FK-5-1), the record door binds each coordination write to its writer\n"
+    "(FK-5-3), `maintain.tiers`' bands and `maintain.on-breach`'s values gain their arms (FK-5-5), E's promotion lease\n"
+    "is a cadence lease and each promote and rollback a compare-and-swap (FK-5-6), and `patch.ratify` moves to\n"
+    "dPlacedRequest (FK-6-2). Three clause ids are minted. Who may raise a cap once its row moves under `budgets.*`\n"
+    "goes back to the owner (FK-7-1).\n\n",
+    "the fork answers' revision paragraph")
+LM.insert_before(
+    "\n**One refinement to layers round one,**",
+    "\nRevised 2026-10-20 by the whole-design audit's fork answers: the exception and override kinds name their home\n"
+    "and writer (FK-1-1), and the receipt's writers gain the attended install and update items (FK-5-1).\n",
+    "layer-memory's revision line")
+LE.insert_before(
+    "\n## [open] What the expansion round owes",
+    "\n**Revised 2026-10-20 by the whole-design audit's fork answers**\n"
+    "(`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w7.md`). `kits.install` and `kits.update` are commands\n"
+    "that walk the steps, beside the owner items `kits.install-attended` and `kits.update-attended`, their outcomes\n"
+    "closed from dSafePassage's clauses (FK-5-1). `maintain.read` routes each band of `maintain.tiers`, and\n"
+    "`maintain.file` each value of `maintain.on-breach` (FK-5-5). E's promotion lease is the cadence lease\n"
+    "`release/<E>`, and each promote and rollback a compare-and-swap on E's deployment id (FK-5-6).\n",
+    "layer-expansions' revision line")
+
+for rec in (V2, MP, LM, LI, LR, LE, FS, SY, CS, OW):
+    rec.save()
+````
+
+### `fold-8.py`
+
+Fold writer 8's script: the owner's answers on flow-steps, new clauses under placeholder ids (fold-return-w8).
+
+````python
+"""Writer 8's fold of the owner's fork answers (fold brief w8): FK-4-1 to FK-4-13, FK-4-12 with FK-5-2, FK-5-4 and
+FK-6-1, as the owner chose them on 2026-10-20. It runs after fold-1.py to fold-6.py (and writer 7's fold-7.py), so
+every anchor below is the text they leave, or the working tree's for a record none of them touches. New clauses carry
+the placeholder ids `cl-dClosedLoop-W8-<k>`, which the main loop's mint step numbers. Run from the worktree root."""
+import sys
+
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+B = "memory/builds/dClosedLoop/build/"
+V2 = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+OR = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-orientation.md")
+RC = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+
+
+def append(rec, block, label):
+    """Append a paragraph at the record's end: the flow-steps [revised] section closes the file, and an end anchor
+    shared with writer 7 would match once only for whichever script runs first."""
+    rec.text = rec.text.rstrip("\n") + "\n\n" + block.rstrip("\n") + "\n"
+    rec.done += 1
+
+
+# =============================================================================================== flow-steps
+# ---- FK-4-5: one rule past `flow.route-backs`, and the first bound a review loop reaches ends it
+FS.sub("Past `flow.route-backs` returns to the same\n"
+       "  item, that item's loop ends non-converging and its open work goes to asks.",
+       "Past `flow.route-backs` returns to the same\n"
+       "  item, that item's loop ends non-converging. While the budget remains, a blocking item's open work becomes a new\n"
+       "  unit, and a non-blocking item's goes to asks (`cl-dClosedLoop-0117`). An item blocks where its step's exit needs\n"
+       "  its witness. A review loop ends at whichever bound it reaches first, `flow.route-backs` or `review.max-rounds`,\n"
+       "  and both promote its open findings the same way (the owner's FK-4-5).",
+       "FK-4-5: [rules]' route-back rule")
+
+# ---- FK-5-4: a mailbox question is answered, and the recipient's refused transition is a declared wait
+FS.insert_before(
+    "- **Closing a mailbox.**",
+    "- **A question to a build is answered.** `next` dispatches `mailbox.answer` when a `question` addressed to the\n"
+    "  build arrives, run by the role that owns the asked interface or item (`[entry]`). A transition refused while a\n"
+    "  message awaits its answer is a declared wait inside `flow.wait-ceiling`, so `leases.renewal: progress` renews the\n"
+    "  build's lease meanwhile (P39, the owner's FK-5-4).\n",
+    "FK-5-4: [rules]' answered question")
+
+# ---- FK-4-3: each value of `deps.on-parent-withdrawn` routes at the boundary that reads the post
+FS.sub("`deps.on-parent-withdrawn` says, `replan` by a plan revision back to planning (`[transitions]`), and a",
+       "`deps.on-parent-withdrawn` says: `replan` by a plan revision back to planning (`[transitions]`),\n"
+       "  `adopt-parent-work` by that plan revision with the parent's kept units taken in through the build's\n"
+       "  `design.inventory` at the parent's kept branch's tip, and `withdraw-too` by an owner item proposing the build's\n"
+       "  withdrawal (the owner's FK-4-3). A",
+       "FK-4-3: [rules]' boundary bullet")
+
+# ---- FK-4-9: a route into a later build's item reaches today's stand-in
+FS.insert_before(
+    "- **Every item names its owning build**",
+    "- **A route into a later build reaches today's stand-in.** Until an item's owning build lands, a route into it\n"
+    "  reaches today's stand-in: the attended session's agent for a role item, today's tool for a command, and\n"
+    "  `push-main.sh` for the lander (the owner's FK-4-9, A4-F14, B1-F8).\n\n",
+    "FK-4-9: [rules]' stand-in bullet")
+
+# ---- FK-4-4 and FK-4-1: entry.place's closed set gains `breakpoint`, and a late answer is placed as an amendment
+FS.sub("returns the disposition from the closed set (continue, amend, new, patch, repeat, unit, ask, none)",
+       "returns the disposition from the closed set (continue, amend, new, patch, repeat, unit, breakpoint, ask, none)",
+       "FK-4-4: entry.place's closed set")
+FS.sub("amend → Design re-entry, or an `intake` message to the session holding the build;",
+       "amend → Design re-entry, or an `intake` message to the session holding the build, and an owner's answer that "
+       "arrives after its owner item was decided → an amendment that re-enters the item it answers, drawing on "
+       "`flow.rework-budget` (`[breakpoint]`);",
+       "FK-4-1: entry.place's late answer")
+FS.sub("refused under `driver-only` (`cl-dClosedLoop-0319`); ask → filed;",
+       "refused under `driver-only` (`cl-dClosedLoop-0319`); breakpoint → the breakpoint the request names, declared on "
+       "that live build as the owner's request, its `review.trigger` firing at its position; ask → filed;",
+       "FK-4-4: entry.place's breakpoint route")
+
+# ---- FK-5-4: the answering item, dKeptSession's
+FS.insert_before(
+    "\n- **Whose prompt is intake.**",
+    "| `mailbox.answer` | the role that owns the asked interface or item, one per question | a `question` addressed to "
+    "the build or one of its units, which `next` dispatches when it arrives | answers the question from the build's "
+    "records: the asked interface's declaration, or the asked item's witnesses | a computed join: the `answer` message "
+    "names the question's id and cites records that exist at their SHAs | answered → the `answer` posted to the "
+    "asker's mailbox; no answer within `flow.wait-ceiling` → the asker's declared default answers it "
+    "(`cl-dClosedLoop-0162`) | dKeptSession |\n",
+    "FK-5-4: mailbox.answer")
+FS.sub("hook stays dWellOiledMachine's, with `gap-rt-14`.",
+       "hook stays dWellOiledMachine's, with `gap-rt-14`. `mailbox.answer` is dKeptSession's, which builds the mailbox\n"
+       "  (the owner's FK-5-4).",
+       "FK-5-4: [entry]'s owner bullet")
+
+# ---- FK-4-1: plan.record's owner question takes a late answer back
+FS.sub("an owner question → an owner item, resolved as [breakpoint]'s owner gate is (FH1) | dRankedPlan |",
+       "an owner question → an owner item, resolved as [breakpoint]'s owner gate is (FH1), and an answer that arrives "
+       "after it was decided re-enters `plan.record` as an amendment (FK-4-1) | dRankedPlan |",
+       "FK-4-1: plan.record's late answer")
+
+# ---- FK-4-3: design.input and design.inventory take in a withdrawn parent's kept units
+FS.sub("amendment → `design.reentry`; plan revision → `design.inventory`;",
+       "amendment → `design.reentry`; plan revision → `design.inventory`, over the withdrawn parent's kept units too "
+       "under `deps.on-parent-withdrawn: adopt-parent-work`;",
+       "FK-4-3: design.input")
+FS.sub("on a supersession, each built unit of the superseded build | the inventory joined to every built unit |",
+       "on a supersession, each built unit of the superseded build; under `adopt-parent-work`, each kept unit of the "
+       "withdrawn parent, at its kept branch's tip | the inventory joined to every built unit |",
+       "FK-4-3: design.inventory")
+
+# ---- FK-4-12 with FK-4-5: build.acceptance writes the seen-red record, and its loop ends as [rules] says
+FS.sub("| `build.acceptance` | executor | `build.unit-pass` | re-runs the spec's acceptance commands on the commit | the "
+       "executor-written acceptance record | pass → `build.scope`; fail → `build.fix-pass` | dScopedBuild |",
+       "| `build.acceptance` | executor | `build.unit-pass` | re-runs the spec's acceptance commands on the commit, and for "
+       "each gate the unit adds or changes, re-runs its planted red and writes the seen-red record, one per gate, keyed "
+       "by leg and red SHA | the executor-written acceptance record, and a seen-red record per gate the unit adds or "
+       "changes | pass → `build.scope`; fail, a planted red that stays green included → `build.fix-pass`, and past "
+       "`flow.route-backs` as `[rules]` says | dScopedBuild |",
+       "FK-4-12, FK-4-5: build.acceptance")
+
+# ---- FK-4-13: the revert pass also reverts a unit a best-effort descope removes from Test's tree, drawing nothing
+FS.sub("| `build.revert-pass` | builder | `build.scope`'s refused stray | reverts the stray paths in one commit on the "
+       "unit, drawing on `flow.rework-budget` as a fix pass does | the commit, resolved by the executor | `build.scope` |",
+       "| `build.revert-pass` | builder | `build.scope`'s refused stray, or a best-effort descope of a failing unit "
+       "already in Test's tree (`[transitions]`) | reverts the stray paths, or the descoped unit's commits, in one commit "
+       "on the unit, drawing on `flow.rework-budget` as a fix pass does, and nothing for a descope, which is an ending "
+       "and not a lap | the commit, resolved by the executor | `build.scope`; on a descope, `build.core` over the range "
+       "without the unit, which goes to an ask named on Build's transition record |",
+       "FK-4-13: build.revert-pass")
+
+# ---- FK-4-12: Build writes the seen-red records, Test reads them
+FS.sub("  - writes the commits, the acceptance records, the scope reports,",
+       "  - writes the commits, the acceptance and seen-red records, the scope reports,",
+       "FK-4-12: Build's Memory bullet")
+FS.sub("the flake and seen-red records, the transition and the verified tree.",
+       "the flake records, the transition and the verified tree, and reads the seen-red records `build.acceptance`\n"
+       "  writes.",
+       "FK-4-12: Test's Memory bullet")
+FS.sub("| `test.seen-red` | command | `test.verdict` | checks that every gate the build added or changed has a seen-red "
+       "record | the seen-red records | all present → `test.recommend`; one missing → `build.fix-pass` on the unit that "
+       "added the gate | dWitnessedBar |",
+       "| `test.seen-red` | command | `test.verdict` | reads the seen-red record `build.acceptance` wrote for every gate "
+       "the build added or changed, and writes none | the seen-red records, joined one to one to the gates the build "
+       "added or changed | all present → `test.recommend`; one missing, a planted gate with no recorded red among them → "
+       "`build.fix-pass` on the unit that added the gate | dWitnessedBar |",
+       "FK-4-12: test.seen-red")
+FS.insert_before(
+    "- **Test is the landing verdict; testing elsewhere is a probe**",
+    "- **The seen-red writer before dScopedBuild** (the owner's FK-4-12 and FK-5-2). Until dScopedBuild lands\n"
+    "  `build.acceptance`, the attended session's agent observes each new arm red on its staged break and green once\n"
+    "  restored, and records both in the unit's acceptance ledger, as the build method does today. `test.seen-red`\n"
+    "  reads that record as the seen-red record.\n",
+    "FK-4-12: Test's stand-in")
+
+# ---- FK-4-11: the entry threshold and the release streak
+FS.sub("A held leg whose verdict records show `verdict.flakes`' threshold of consecutive greens since its hold",
+       "A held leg whose verdict records show `verdict.flakes.release`' streak of consecutive greens since its hold",
+       "FK-4-11: test.select")
+FS.sub("under `quarantine`, a leg past the threshold `verdict.flakes` declares is held,",
+       "under `quarantine`, a leg whose flakes reach `verdict.flakes.entry` in its window of verdicts is held,",
+       "FK-4-11: test.flakes' hold")
+FS.sub("under `retry-only`, the run re-enters `test.verdict` and nothing is recorded. Each re-entry counts against "
+       "`flow.route-backs` | dWitnessedBar |",
+       "under `retry-only`, the run re-enters `test.verdict` and nothing is recorded. Each re-entry counts against "
+       "`flow.route-backs`, past which as `[rules]` says | dWitnessedBar |",
+       "FK-4-5: test.flakes' bound")
+FS.sub("`verdict.flakes`, `tests.landing-levels`",
+       "`verdict.flakes`, `verdict.flakes.entry`, `verdict.flakes.release`, `tests.landing-levels`",
+       "FK-4-11: Test's policy list")
+
+# ---- FK-4-7: landings ordered across nodes by a landing-turn ref
+FS.sub("| `deploy.land` | command: the lander's `--land`, run with `GOV_PUSH_MAIN_MAX_RETRIES=1` | `deploy.parents` | once "
+       "the landing queue admits it, in the order `landing.order` says,",
+       "| `deploy.land` | command: the lander's `--land`, run with `GOV_PUSH_MAIN_MAX_RETRIES=1` | `deploy.parents` | once "
+       "the landing queue admits it, by a landing-turn ref it takes on the remote by compare-and-swap, in the order "
+       "`landing.order` says across nodes,",
+       "FK-4-7: deploy.land")
+FS.sub("- **The landing order.** Landings on a node are ordered by `landing.order` over the verified trees on\n"
+       "  the builds' leases.",
+       "- **The landing order.** Landings are ordered by `landing.order` over the verified trees on the builds'\n"
+       "  leases, across nodes: the landing queue `gap-flow-08` owes admits a landing once it takes the landing-turn ref\n"
+       "  on the remote by compare-and-swap (the owner's FK-4-7).",
+       "FK-4-7: [deploy]'s landing order")
+
+# ---- FK-4-8: deploy.distill unarmed until dScopedBuild lands build.distill
+FS.sub("| the rows at the landed SHA, joined one to one on (build, fork id) to the build's major forks | "
+       "`deploy.recommend`; rows missing at the landed SHA →",
+       "| the rows at the landed SHA, joined one to one on (build, fork id) to the build's major forks, or, unarmed, the "
+       "landing record's line that it measured nothing | `deploy.recommend`; unarmed → `deploy.recommend`, never green; "
+       "rows missing at the landed SHA →",
+       "FK-4-8: deploy.distill")
+FS.insert_before(
+    "- **The core re-check's witness** (K1):",
+    "- **Before the build it rests on lands** (the owner's FK-4-8). Until dScopedBuild lands `build.distill`, which\n"
+    "  writes the rows, `deploy.distill` is unarmed: it records on the landing record that it measured nothing, is never\n"
+    "  green, and routes on to `deploy.recommend`, as `test.seed` records an unarmed seed.\n",
+    "FK-4-8: Deploy's stand-in")
+
+# ---- FK-4-4: the breakpoint's trigger reads the placement disposition
+FS.sub("its trigger: owed by policy, a binding recommendation, or the owner's request.",
+       "its trigger: owed by policy, a binding recommendation, or the owner's request, a `breakpoint` placement\n"
+       "  disposition.",
+       "FK-4-4: [breakpoint]'s trigger")
+
+# ---- FK-4-1 and FK-4-2: the attended hold and the late answer; autonomy's gates
+FS.insert_before(
+    "`autonomy` places the owner's gates:",
+    "**While the owner attends,** an owner item raised then, a gate attendance adds or a question asked live among\n"
+    "them, is held until `run.owner-deadline` once dWellOiledMachine lands it, never decided when raised, and\n"
+    "`run.on-owner-silence` decides it then: `run.on-owner-question` decides only an item raised while the owner is away.\n"
+    "An owner's answer that arrives after its item was decided is placed by `entry.place` as an amendment that re-enters\n"
+    "the item it answers, drawing on `flow.rework-budget` (`[transitions]`, the owner's FK-4-1).\n\n",
+    "FK-4-1: [breakpoint]'s attended hold")
+FS.insert_before(
+    "`attendance` adds the owner's interactions",
+    "Every gate `autonomy` places but the Plan ratification is an owner item like any other, so `run.on-owner-question`\n"
+    "may decide it, the supervisor's recorded choice under `best-effort-recorded` included: LR-3 excludes only\n"
+    "ratifications (the owner's FK-4-2).\n\n",
+    "FK-4-2: autonomy's gates")
+
+# ---- FK-4-4 and FK-4-5: review.trigger
+FS.sub("| `review.trigger` | command | — | records why the breakpoint fired, and refuses a round past `review.max-rounds` "
+       "| the policy value, the recommendation record, or the owner's request record | fired → `review.pin`; a round past "
+       "`review.max-rounds` → refused, the last round's report reading CEILING, and `review.dispose` promotes its open "
+       "findings; not fired → the flow continues | dDeclaredLoop |",
+       "| `review.trigger` | command | — | records why the breakpoint fired, and refuses a round past `review.max-rounds` "
+       "or `flow.route-backs`, whichever the loop reaches first | the policy value, the recommendation record, or the "
+       "placement disposition naming the breakpoint, with its intake record | fired → `review.pin`; a round past "
+       "`review.max-rounds` → refused, the last round's report reading CEILING, and `review.dispose` promotes its open "
+       "findings; a round past `flow.route-backs` → refused, the loop ending non-converging, its open findings promoted "
+       "the same way; not fired → the flow continues | dDeclaredLoop |",
+       "FK-4-4, FK-4-5: review.trigger")
+
+# ---- FK-6-1: review.report refuses an unreachable claim until dPlacedRequest lands `leases.offline`
+FS.sub("`review.dispose`; the remote unreachable at a `new:` slug's claim → as `leases.offline` says;",
+       "`review.dispose`; the remote unreachable at a `new:` slug's claim → as `leases.offline` says, and refused until "
+       "dPlacedRequest lands the key (the stand-ins below);",
+       "FK-6-1: review.report")
+FS.insert_before(
+    "  - dBoundRoles' shape registry and dTotalRecall's shape-run kind:",
+    "  - dPlacedRequest's `leases.offline`: `review.report` refuses a `new:` slug's claim while the remote is\n"
+    "    unreachable, as `refuse` would. No slug is claimed and no local id is minted, and the finding stays in the\n"
+    "    report with its slug marked unclaimed, disposed by hand (the owner's FK-6-1);\n",
+    "FK-6-1: [breakpoint]'s stand-in")
+
+# ---- FK-4-10: a pause is a declared wait
+FS.sub("- **A paused build keeps its leases.** The supervisor renews them while it is paused, so\n"
+       "  `leases.expiry-hours` never expires a paused build. Resume enters its `next`.",
+       "- **A paused build keeps its leases.** Its pause is a declared wait within `flow.wait-ceiling`, so\n"
+       "  `leases.renewal: progress` renews them while it is paused and `leases.expiry-hours` never expires it. Past the\n"
+       "  ceiling, an owner item asks to resume, withdraw or stay paused, staying paused a new wait within the ceiling.\n"
+       "  Unanswered at `run.owner-deadline`, the build is parked and its lease released (`[transitions]`). Resume enters\n"
+       "  its `next` (the owner's FK-4-10).",
+       "FK-4-10: [lifecycle]'s pause")
+
+# ---- FK-4-6: a candidate the raters split on
+FS.sub("| accepted → `reconstructed`, and under `docs-owner-ratifies` or `docs-and-trailers` each major one → "
+       "`adopt.decisions-ratify`;",
+       "| accepted → `reconstructed`, and under `docs-owner-ratifies` or `docs-and-trailers` each major one → "
+       "`adopt.decisions-ratify`; a candidate the two raters split on → kept `reconstructed` and not major, and → "
+       "`adopt.decisions-ratify` only under `docs-owner-ratifies` or `docs-and-trailers` (the owner's FK-4-6);",
+       "FK-4-6: adopt.decisions")
+FS.sub("| `adopt.decisions` | rules on each major reconstructed decision |",
+       "| `adopt.decisions` | rules on each major reconstructed decision, and each candidate the raters split on |",
+       "FK-4-6: adopt.decisions-ratify")
+
+# ---- [transitions]: FK-4-1's amendment row, FK-4-3's replan row, FK-4-10's park, FK-4-13's descope
+FS.sub("| building, testing, or deploying before the push | an amendment admitted at an item boundary | designing | the "
+       "re-entry record |",
+       "| planning, designing, building, testing, or deploying before the push | an amendment admitted at an item "
+       "boundary, an owner's late answer placed as one included (`[breakpoint]`) | the state of the item it re-enters: "
+       "designing, or planning for a Plan item | the re-entry record, and for a late answer the placement disposition |",
+       "FK-4-1: the amendment row")
+FS.sub("under `deps.on-parent-withdrawn: replan` | planning |",
+       "under `deps.on-parent-withdrawn: replan` or `adopt-parent-work` | planning |",
+       "FK-4-3: the replan row")
+FS.sub("`run.on-owner-question: park-build`; or `flow.on-exhausted: park-for-owner` | parked |",
+       "`run.on-owner-question: park-build`; `flow.on-exhausted: park-for-owner`; or a paused build's owner item "
+       "unanswered at `run.owner-deadline` (`[lifecycle]`) | parked |",
+       "FK-4-10: the park row")
+FS.insert_before(
+    "| testing | a new unit through Design | designing | the routing record |",
+    "| testing | a best-effort descope of a failing unit already in Test's tree, `build.revert-pass` reverting it and "
+    "drawing nothing on `flow.rework-budget`, being an ending and not a lap | building | the transition record naming "
+    "the descoped unit and its ask, and the revert commit |\n",
+    "FK-4-13: the descope row")
+FS.sub("A best-effort descope\nin Build moves no state: the descoped units go to asks, named on the step's transition record.",
+       "A best-effort descope\nin Build moves no state: the descoped units go to asks, named on the step's transition record. "
+       "A descope in Test\nmoves the build back to building, where `build.revert-pass` reverts the failing unit from Test's "
+       "tree, drawing\nnothing on the budget, being an ending and not a lap (the owner's FK-4-13).",
+       "FK-4-13: the descope sentence")
+
+append(FS,
+       "**Revised 2026-10-20 by the whole-design audit's fork answers** (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w8.md`).\n"
+       "While the owner attends, an owner item is held until `run.owner-deadline`, and a late answer re-enters the item it\n"
+       "answers, the amendment row reading from planning and designing too (FK-4-1). Every gate `autonomy` places but the\n"
+       "ratification may be decided by `run.on-owner-question` (FK-4-2). `adopt-parent-work` and `withdraw-too` have their\n"
+       "routes (FK-4-3). `entry.place` gains a `breakpoint` disposition, which `review.trigger` reads (FK-4-4). A loop past\n"
+       "`flow.route-backs` promotes a blocking item's open work to a unit, and a review loop ends at its first bound\n"
+       "(FK-4-5). A split decision candidate stays reconstructed (FK-4-6). Landings take a landing-turn ref across nodes\n"
+       "(FK-4-7). `deploy.distill` is unarmed until dScopedBuild lands (FK-4-8). `[rules]` names today's stand-ins for a\n"
+       "route into a later build (FK-4-9). A pause is a declared wait (FK-4-10). `verdict.flakes`' threshold splits into an\n"
+       "entry threshold and a release streak (FK-4-11). `build.acceptance` writes the seen-red record that `test.seen-red`\n"
+       "reads (FK-4-12, FK-5-2). A descope in Test reverts its unit with no draw (FK-4-13). `mailbox.answer` answers a\n"
+       "mailbox `question` (FK-5-4). `review.report` refuses an unreachable claim until `leases.offline` lands (FK-6-1).",
+       "the fork answers' revision paragraph")
+
+# =============================================================================================== architecture-v2
+# ---- [policies]
+V2.sub("it decides an owner item when the item is raised, and `run.on-owner-silence` decides only what it leaves open at "
+       "`run.owner-deadline`: a held or parked item, a ratification or an owner-only write (the parked debt's review) |",
+       "it decides an owner item raised while the owner is away when the item is raised, and `run.on-owner-silence` "
+       "decides only what it leaves open at `run.owner-deadline`: an item raised while the owner attends, held until "
+       "then, a held or parked item, a ratification or an owner-only write (the parked debt's review, the owner's "
+       "FK-4-1) |",
+       "FK-4-1: run.on-owner-question's row")
+V2.sub("| `deps.on-parent-withdrawn` | replan, adopt-parent-work, withdraw-too | replan | layers round two |",
+       "| `deps.on-parent-withdrawn` | replan, adopt-parent-work, withdraw-too | replan | layers round two; `replan` "
+       "revises the plan back to planning, `adopt-parent-work` takes the parent's kept units into that revision through "
+       "`design.inventory` at the parent's kept branch's tip, and `withdraw-too` raises an owner item proposing the "
+       "build's withdrawal (the owner's FK-4-3) |",
+       "FK-4-3: deps.on-parent-withdrawn's row")
+V2.sub("past which that item's loop ends non-converging and its open work goes to asks (P39, the owner's SL-1) |",
+       "past which that item's loop ends non-converging, a blocking item's open work promoted to a new unit while the "
+       "budget remains and then ending as `flow.on-exhausted` says, and a non-blocking item's going to asks, a review "
+       "loop ending at whichever of this key and `review.max-rounds` it reaches first (P39, the owner's SL-1 and "
+       "FK-4-5) |",
+       "FK-4-5: flow.route-backs' row")
+V2.sub("| `verdict.flakes` | quarantine, record, retry-only; a threshold | quarantine | walk T3; the threshold three "
+       "consecutive greens unless set, and a quarantined leg run at least once a day (P39) | dWitnessedBar |\n",
+       "| `verdict.flakes` | quarantine, record, retry-only | quarantine | walk T3; a quarantined leg run at least once a "
+       "day (P39); its one threshold split into `verdict.flakes.entry` and `verdict.flakes.release` (the owner's "
+       "FK-4-11) | dWitnessedBar |\n"
+       "| `verdict.flakes.entry` | measured, or a flake count in a window of the leg's last verdicts, written "
+       "`<count>/<window>` | measured | the owner's FK-4-11: \"Split the key (Recommended)\"; what holds a leg under "
+       "`quarantine`, its flakes counted in a window of its last verdicts; `measured` holds a leg at 2 flakes in its last "
+       "10 verdicts until the flake records measure the legs' rates, then at a threshold set from that evidence (P39) | "
+       "dWitnessedBar |\n"
+       "| `verdict.flakes.release` | 3, or another count of consecutive greens | 3 | the owner's FK-4-11: the release "
+       "streak, the consecutive greens since its hold that release a held leg (P39) | dWitnessedBar |\n",
+       "FK-4-11: the split key's rows")
+V2.sub("| `verdict.flakes` | record | quarantine | record | quarantine |\n",
+       "| `verdict.flakes` | record | quarantine | record | quarantine |\n"
+       "| `verdict.flakes.entry` | measured | measured | measured | measured |\n"
+       "| `verdict.flakes.release` | 3 | 3 | 3 | 3 |\n",
+       "FK-4-11: the split key's preset rows")
+
+# ---- [chain]: dDeclaredLoop
+V2.sub("`replan` read at every item boundary where a parent's `withdrawn` post is read and routed by a plan revision "
+       "back to planning, seen red on a planted withdrawn parent read in Design `cl-dClosedLoop-0100`",
+       "`replan` read at every item boundary where a parent's `withdrawn` post is read and routed by a plan revision "
+       "back to planning, `adopt-parent-work` taking the parent's kept units into that revision through "
+       "`design.inventory` at the parent's kept branch's tip, and `withdraw-too` raising an owner item that proposes the "
+       "build's withdrawal, never withdrawing it by a command, seen red on a planted withdrawn parent read in Design "
+       "under each value (the owner's FK-4-3) `cl-dClosedLoop-0100`",
+       "FK-4-3: cl-0100")
+V2.sub("or descoping the failing units to asks and landing the rest,",
+       "or descoping the failing units to asks and landing the rest, a unit already in Test's tree reverted through a "
+       "testing-to-building row that draws nothing, being an ending and not a lap (the owner's FK-4-13),",
+       "FK-4-13: cl-0116")
+V2.sub("and every review loop, the closing review's included, held to `review.max-rounds` rounds,",
+       "and every review loop, the closing review's included, held to `review.max-rounds` rounds and ended at whichever "
+       "of it and `flow.route-backs` it reaches first, both promoting its open findings the same way, a blocking item's "
+       "open work past `flow.route-backs` promoted to a new unit while budget remains and then ending as "
+       "`flow.on-exhausted` says, and a non-blocking item's going to asks,",
+       "FK-4-5: cl-0117's bounds")
+V2.sub("the round after the limit refused and the report reading CEILING (P39, the owner's SL-3, keeping FR-9, the "
+       "parked debt's review) `cl-dClosedLoop-0117`",
+       "the round after the limit refused and the report reading CEILING, and on a planted acceptance red that never "
+       "greens, which must reach a terminal (P39, the owner's SL-3, keeping FR-9, the parked debt's review, the owner's "
+       "FK-4-5) `cl-dClosedLoop-0117`",
+       "FK-4-5: cl-0117's planted case")
+
+# ---- [chain]: dPlacedRequest, the breakpoint disposition (W8-1)
+V2.sub("(the whole-design audit's C2-F7) `cl-dClosedLoop-0123`",
+       "(the whole-design audit's C2-F7) `cl-dClosedLoop-0123`; the `breakpoint` disposition in the placement set: an "
+       "owner's request for a review on a live build, the breakpoint named by the request and fired through "
+       "`review.trigger`, its witness the intake record and the placement disposition, seen red on a planted owner prompt "
+       "to audit the specs whose build passes Design's exit with no spec audit (the whole-design audit's A1-F5, the "
+       "owner's FK-4-4) `cl-dClosedLoop-W8-1`",
+       "FK-4-4: W8-1")
+
+# ---- [chain]: dKeptSession, the answering item (W8-2)
+V2.sub("red on a reader whose clock runs a day ahead (P39, the whole-design audit's A2-F6) `cl-dClosedLoop-0162`",
+       "red on a reader whose clock runs a day ahead (P39, the whole-design audit's A2-F6) `cl-dClosedLoop-0162`; "
+       "`mailbox.answer`: a `question` addressed to a build answered by the role that owns the asked interface or item, "
+       "dispatched by `next` when the question arrives, and the recipient's transition, refused meanwhile, a declared "
+       "wait inside `flow.wait-ceiling` that `leases.renewal: progress` renews, seen red on a planted question to an "
+       "unattended build whose lease lapses while it waits (the whole-design audit's A2-F5, the owner's FK-5-4) "
+       "`cl-dClosedLoop-W8-2`",
+       "FK-5-4: W8-2")
+
+# ---- [chain]: dFurnishedOrders' live questions, and dWellOiledMachine's owner items and pause
+V2.sub("owner questions asked live while the build is attended, best effort recorded once the wait passes (night pass, "
+       "point 1) `cl-dClosedLoop-0207`",
+       "owner questions asked live while the build is attended, each held like every owner item raised while the owner "
+       "attends, never decided when raised, `run.on-owner-question` deciding only an item raised while the owner is "
+       "away, and an answer that arrives after its item was decided placed by `entry.place` as an amendment that "
+       "re-enters the item it answers, drawing on `flow.rework-budget`, seen red on a planted attended gate decided at "
+       "raise and on a planted late answer that re-enters nothing (night pass, point 1, the owner's FK-4-1) "
+       "`cl-dClosedLoop-0207`",
+       "FK-4-1: cl-0207")
+V2.sub("past which `run.on-owner-silence` decides an item `run.on-owner-question` left open, the item's recommended "
+       "option by default,",
+       "past which `run.on-owner-silence` decides an item `run.on-owner-question` left open, every item raised while the "
+       "owner attends among them, held until then (the owner's FK-4-1), the item's recommended option by default,",
+       "FK-4-1: cl-0326")
+V2.sub("mapped onto unattended's verbs, a withdrawal or supersession",
+       "mapped onto unattended's verbs, a pause a declared wait within `flow.wait-ceiling` that `leases.renewal: "
+       "progress` renews, past which an owner item asks to resume, withdraw or stay paused, and that item, unanswered "
+       "at `run.owner-deadline`, parks the build with its lease released, seen red on a planted pause past the ceiling "
+       "that raises no owner item (the owner's FK-4-10), a withdrawal or supersession",
+       "FK-4-10: cl-0281")
+
+# ---- [chain]: dLinkedLibrary, a split candidate
+V2.sub("`adopt.decisions` (two raters by the author's rubric, through `retrofit.decisions`)",
+       "`adopt.decisions` (two raters by the author's rubric, through `retrofit.decisions`, a candidate the raters split "
+       "on kept `reconstructed` and not major, and ratified by the owner only under `docs-owner-ratifies` or "
+       "`docs-and-trailers`, seen on a planted split candidate, the owner's FK-4-6)",
+       "FK-4-6: cl-0245")
+
+# ---- [chain]: dWitnessedBar, the reader and the split thresholds
+V2.sub("seen-red records `cl-dClosedLoop-0345`",
+       "`test.seen-red` reading the seen-red records `build.acceptance` writes, one per gate a build adds or changes, "
+       "keyed by leg and red SHA, a planted gate with no recorded red turning it red, and, until dScopedBuild lands that "
+       "writer, the attended session's agent observing each new arm red on its staged break and green once restored and "
+       "recording both in the unit's acceptance ledger, which `test.seen-red` reads as the record (gap-test-06, the "
+       "owner's FK-4-12 and FK-5-2) `cl-dClosedLoop-0345`",
+       "FK-4-12: cl-0345")
+V2.sub("flake quarantine, fed by the runner's mode re-running each red leg once on the same tree under "
+       "`test.verdict`'s env, seen on a fixture leg that reds then greens reaching `test.flakes` (gap-test-04)",
+       "flake quarantine, a leg held once its flakes reach `verdict.flakes.entry` in its window of verdicts, two in its "
+       "last ten until the flake records measure it, fed by the runner's mode re-running each red leg once on the same "
+       "tree under `test.verdict`'s env, seen on a fixture leg that reds then greens reaching `test.flakes` and red on a "
+       "planted leg held below the entry threshold (gap-test-04, the owner's FK-4-11)",
+       "FK-4-11: cl-0346")
+V2.sub("a quarantined leg released after three consecutive greens unless `verdict.flakes` sets another threshold,",
+       "a quarantined leg released after `verdict.flakes.release`' streak of consecutive greens, three by default,",
+       "FK-4-11: cl-0368")
+
+# ---- [chain]: dScopedBuild, the seen-red writer (W8-3)
+V2.sub("(the owner's FQ-3, P41) `cl-dClosedLoop-0412`",
+       "(the owner's FQ-3, P41) `cl-dClosedLoop-0412`; `build.acceptance` writing the seen-red record: the executor "
+       "re-running each new or changed gate's planted red beside the unit's acceptance commands, one record per gate "
+       "keyed by leg and red SHA, which dWitnessedBar's `test.seen-red` reads, a planted red that stays green failing the "
+       "acceptance, seen red on a planted gate whose red never ran (gap-test-06, the owner's FK-4-12 and FK-5-2) "
+       "`cl-dClosedLoop-W8-3`",
+       "FK-4-12: W8-3")
+
+# ---- [chain]: dShippedRelease, the cross-node turn and the unarmed distill (W8-4)
+V2.sub("the landing record `cl-dClosedLoop-0413`",
+       "the landing record `cl-dClosedLoop-0413`; `deploy.distill` unarmed until dScopedBuild lands `build.distill`: it "
+       "records on the landing record that it measured nothing, is never green and routes on, as `test.seed` records an "
+       "unarmed seed, seen red on a planted empty join read green (the whole-design audit's B3-F12, the owner's FK-4-8) "
+       "`cl-dClosedLoop-W8-4`",
+       "FK-4-8: W8-4")
+V2.sub("each value seen on its planted queue, and a planted `owner-orders` landing admitted with no order seen red "
+       "(`gap-flow-08`) `cl-dClosedLoop-0422`",
+       "each value seen on its planted queue, across nodes by a landing-turn ref the queue takes on the remote by "
+       "compare-and-swap, two nodes' planted landings taking one turn seen red, and a planted `owner-orders` landing "
+       "admitted with no order seen red (`gap-flow-08`, the owner's FK-4-7) `cl-dClosedLoop-0422`",
+       "FK-4-7: cl-0422")
+
+# ---- the revision paragraph
+V2.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review",
+    "Revised 2026-10-20 by the whole-design audit's fork answers (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w8.md`),\n"
+    "its flow-steps forks. While the owner attends, an owner item is held until `run.owner-deadline`, and a late answer\n"
+    "re-enters the item it answers (FK-4-1). dDeclaredLoop arms `adopt-parent-work` and `withdraw-too`, ends a loop at\n"
+    "the first bound it reaches, promoting a blocking item's open work to a unit, and reverts a unit descoped in Test\n"
+    "with no draw (FK-4-3, FK-4-5, FK-4-13). dPlacedRequest places a `breakpoint` disposition (FK-4-4). dLinkedLibrary\n"
+    "keeps a split decision candidate reconstructed (FK-4-6). dShippedRelease orders landings across nodes by a\n"
+    "landing-turn ref, and keeps `deploy.distill` unarmed until dScopedBuild lands (FK-4-7, FK-4-8). A pause is a\n"
+    "declared wait (FK-4-10). `verdict.flakes`' threshold splits into `verdict.flakes.entry` and\n"
+    "`verdict.flakes.release`, each with its preset row (FK-4-11). dScopedBuild's `build.acceptance` writes the seen-red\n"
+    "record dWitnessedBar's `test.seen-red` reads (FK-4-12, FK-5-2). dKeptSession answers a mailbox `question`\n"
+    "(FK-5-4). The re-cut classes the stand-ins these name, `leases.offline`'s for dFairHearing among them (FK-6-1).\n"
+    "Four clauses are new, their ids minted after the fold.\n\n",
+    "the fork answers' revision paragraph")
+
+# =============================================================================================== layer-memory
+LM.sub("| seen-red | dWitnessedBar | its writer is `test.seen-red` |",
+       "| seen-red | dWitnessedBar | its writer is `build.acceptance`, the executor re-running each new or changed gate's "
+       "planted red, one record per gate keyed by leg and red SHA; `test.seen-red` reads it (the owner's FK-4-12 and "
+       "FK-5-2) |",
+       "FK-4-12: the seen-red kind's writer")
+LM.sub("leg green on as many consecutive runs as `verdict.flakes`' threshold, which serves both the hold\n"
+       "    and its release, read from",
+       "leg green on as many consecutive runs as `verdict.flakes.release` says, the hold's own entry threshold\n"
+       "    being `verdict.flakes.entry` (the owner's FK-4-11), read from",
+       "FK-4-11: the held flaky leg's acceptance")
+LM.insert_before(
+    "**One refinement to layers round one,**",
+    "Revised 2026-10-20 by the whole-design audit's fork answers: the seen-red kind's writer is `build.acceptance`, and\n"
+    "`test.seen-red` reads it (FK-4-12, FK-5-2). A held flaky leg's acceptance reads the release streak (FK-4-11).\n\n",
+    "the fork answers' revision line")
+
+# =============================================================================================== layer-roles
+LR.sub("    the instrument's revision for that group, in `[instrument]`, derives these counts.\n",
+       "    the instrument's revision for that group, in `[instrument]`, derives these counts.\n"
+       "  - Revised 2026-10-20, the whole-design audit's fork answers: flow-steps' `[entry]` gains `mailbox.answer`\n"
+       "    (FK-5-4), dKeptSession's, whose Actor cell opens with the role that owns the asked interface or item. The\n"
+       "    instrument reads that opening as no declared role (its arm 1), so the matrix and counts above leave the item\n"
+       "    out until the instrument is revised to read an actor chosen per question.\n",
+       "FK-5-4: the matrix's owed revision")
+
+# =============================================================================================== orientation
+OR.sub("under its unit lease), `ask <build>`,",
+       "under its unit lease),\n"
+       "  `breakpoint <build>` (a review the owner asks for on a live build, its breakpoint named by the request),\n"
+       "  `ask <build>`,",
+       "FK-4-4: the breakpoint disposition")
+OR.sub("for `ask`, the ask is filed;",
+       "for `breakpoint`, the build is live\n  (revised 2026-10-20, the fork answers, FK-4-4); for `ask`, the ask is filed;",
+       "FK-4-4: the breakpoint disposition's check")
+
+# =============================================================================================== recut
+RC.sub("until dRankedPlan lands the key and re-points it (flow-steps [entry]'s stand-ins, B1-F11) |\n",
+       "until dRankedPlan lands the key and re-points it (flow-steps [entry]'s stand-ins, B1-F11) |\n"
+       "| dFairHearing | `leases.offline` | dPlacedRequest | tolerance | `review.report` refuses a `new:` slug's claim "
+       "while the remote is unreachable, as `refuse` would: no slug claimed and no local id minted, the finding kept in "
+       "the report with its slug marked unclaimed and disposed by hand, until dPlacedRequest lands the key (flow-steps "
+       "[breakpoint]'s stand-ins, FK-6-1) |\n"
+       "| dDeclaredLoop | `design.inventory` | dIndexedDesign | tolerance | under `adopt-parent-work`, the attended "
+       "session's agent takes the withdrawn parent's kept units into the plan revision, flow-steps [rules]' stand-in for "
+       "a role item, until dIndexedDesign lands `design.inventory` (cl-dClosedLoop-0100, FK-4-3, FK-4-9) |\n"
+       "| dWitnessedBar | `build.acceptance` | dScopedBuild | tolerance | the attended session's agent observes each new "
+       "arm red on its staged break and green once restored, and records both in the unit's acceptance ledger, which "
+       "`test.seen-red` reads, until dScopedBuild lands `build.acceptance`'s seen-red write (cl-dClosedLoop-0345, "
+       "flow-steps [test], FK-4-12) |\n"
+       "| dShippedRelease | `build.distill` | dScopedBuild | tolerance | `deploy.distill` is unarmed: it records on the "
+       "landing record that it measured nothing, is never green and routes on, as `test.seed` records an unarmed seed, "
+       "until dScopedBuild lands `build.distill` (flow-steps [deploy]'s stand-in, FK-4-8) |\n",
+       "FK-6-1, FK-4-3, FK-4-12, FK-4-8: four tolerance rows")
+RC.insert_before(
+    "The critical path, its instrument and its runs:",
+    "Revised 2026-10-20 by the whole-design audit's fork answers (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w8.md`):\n"
+    "the four rows after `kickoff.runs` class the stand-ins the answers name. FK-6-1's row classes dFairHearing's read of\n"
+    "`leases.offline`. FK-4-9 adds no row: flow-steps `[rules]` names today's stand-ins for every route into a later\n"
+    "build, and each forward route this probe reads only under `--all-routes` would make its default run red on a class\n"
+    "row with no dependency, so those routes wait for the probe's change.\n\n",
+    "the fork answers' revision note")
+
+for rec in (V2, FS, LM, LR, OR, RC):
+    rec.save()
+````
+
+### `fold-9.py`
+
+Fold writer 9's script: the widened probe's route rows generated from its lines, FK-7-1, FK-8-1, FK-9-1, FK-9-2 and the crossed requests (fold-return-w9, -w9b).
+
+````python
+"""Writer 9's fold, the whole-design audit's fold integration (fold brief w9): the widened reconciliation probe's
+forward routes classed in the re-cut, the owner's FK-8-1 and FK-7-1, the recut sentence writers 7 and 8 both
+rewrote, writer 7's flow-steps note, cl-0115's merged text, the roles matrix's actor read per question, and a
+revision note in each record edited. It runs after fold-1.py to fold-8.py and before the mint step, so every anchor
+is the text those scripts leave, or the working tree's for a record none of them touches. It adds no clause, so it
+carries no placeholder id. Run from the tree's root.
+
+The re-cut's route rows are generated, never typed: the script runs the committed probe on the tree as fold-8 leaves
+it, reads each UNCLASSED route line, reads the target's kind from its Actor cell in flow-steps, and writes one row per
+line in the stand-in flow-steps [rules] names for that kind, or the stand-in a clause declares for its own route
+(FK-8-1). The one owner item it reaches, `build.ratify`, reaches dDeclaredLoop's own owner gate (the owner's FK-9-1),
+and any other owner item stops the script. FK-9-2's interim admission is folded into cl-0012. What it does not
+check: that a tool exists today for each command the rows name "today's tool" for, which is the owner's FK-4-9
+wording."""
+import re
+import subprocess
+import sys
+
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+B = "memory/builds/dClosedLoop/build/"
+PROBE = B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py"
+V2 = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+RC = Record(B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md")
+LR = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-roles.md")
+LI = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-instruction.md")
+BRIEF = "`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w9.md`"
+
+
+def append(rec, block):
+    """Append a paragraph at the record's end, as fold-8 appends flow-steps' fork-answers note."""
+    rec.text = rec.text.rstrip("\n") + "\n\n" + block.rstrip("\n") + "\n"
+    rec.done += 1
+
+
+# =============================================================================================== item 1: the rows
+# The probe's lines on the tree as fold-8 leaves it, before any edit below.
+run = subprocess.run([sys.executable, "-X", "utf8", PROBE, RC.path.as_posix()], capture_output=True, text=True,
+                     encoding="utf-8")
+LINE = re.compile(r"^  (d\w+) (cites|routes) `([^`]+)` \((d\w+)'s, not an ancestor\): UNCLASSED$", re.M)
+lines = LINE.findall(run.stdout)
+routes = sorted((b, t, o) for b, rule, t, o in lines if rule == "routes")
+cites = [(b, t, o) for b, rule, t, o in lines if rule == "cites"]
+if len(routes) != 27 or cites != [("dTendedCadence", "currency", "dShippedRelease")]:
+    sys.exit(f"fold-9: the probe reads {len(routes)} unclassed routes and {cites} unclassed cites; the brief's "
+             f"probe-1 to probe-28 are 27 routes and dTendedCadence's `currency`")
+
+
+def cells(ln):
+    return [c.strip() for c in re.split(r"(?<!\\)\|", ln.strip().strip("|"))]
+
+
+actor = {}   # each item's Actor cell opening, in flow-steps' and the expansions' item tables, both Item | Actor | ...
+LE = open(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md", encoding="utf-8").read()
+for ln in (LE + "\n" + FS.text).split("\n"):
+    if ln.startswith("| `"):
+        c = cells(ln)
+        if len(c) == 7:
+            actor[c[0].strip("`")] = re.split(r"[,:(]", c[1], maxsplit=1)[0].strip()
+KINDS = {"command", "executor", "hook", "owner"}
+RULE = "flow-steps [rules]' stand-in, the owner's FK-4-9"
+CL0123 = ("a placement routed to Plan or Design files an owner item carrying the claim until {o} lands `{t}`, the "
+          "stand-in the clause declares for its own route, which wins over [rules]' (cl-dClosedLoop-0123, C2-F7, the "
+          "owner's FK-8-1)")
+OWN = {   # (build, node): (class, why): a clause's or a record's own stand-in, or a line that names and never routes
+    ("dPlacedRequest", "plan.input"): ("tolerance", CL0123),
+    ("dPlacedRequest", "plan.dedupe"): ("tolerance", CL0123),
+    ("dPlacedRequest", "plan.triage-rule"): ("tolerance", CL0123),
+    ("dPlacedRequest", "design.input"): ("tolerance", CL0123),
+    ("dPlacedRequest", "build.unit-lease"): (
+        "tolerance", "a `unit` disposition is refused as under `driver-only`, the build's driver alone driving its "
+        "units, until dWellOiledMachine lands the unit holders and {o} `{t}`, the stand-in flow-steps [entry] "
+        "declares, which wins over [rules]' (flow-steps [entry]'s stand-ins, AS4-F4, the owner's FK-8-1)"),
+    ("dShippedRelease", "maintain.patch"): (
+        "not a use", "`deploy.core` files a red landing's patch under the key Maintain's reading uses, so "
+        "`maintain.patch` finds it open and files no second, and never routes to it"),
+    ("dDeclaredLoop", "plan.input"): (
+        "not a use", "`plan.recommend` and `plan.reason` route a review to the Plan breakpoint, the breakpoint "
+        "program at Plan's exit, which the probe reads as the Plan step's first item, and neither routes into "
+        "`plan.input`"),
+    ("dDeclaredLoop", "build.ratify"): (
+        "tolerance", "under `decisions.major: author-owner-ratifies`, `build.recommend`'s route reaches dDeclaredLoop's "
+        "own owner gate, held for the owner's disposition, as RC-9's fallback holds `plan.exit`, until {o} lands "
+        "`{t}` (cl-dClosedLoop-0104, flow-steps [build]'s stand-in, the owner's FK-9-1)"),
+}
+LANDER = {   # a route into Deploy reaches the lander until dShippedRelease lands (flow-steps [rules])
+    "deploy.current": "a route into Deploy reaches the lander, `push-main.sh`, which reconciles the build onto the "
+                      "remote's tip before it gates, as `deploy.current` checks, until {o} lands it ({r})",
+    "deploy.released": "a landing ends at the lander, `push-main.sh`, until {o} lands `{t}`, so `life.quiesce` finds "
+                       "no landed build waiting there ({r})",
+    "deploy.unlease": "a landing ends at the lander, `push-main.sh`, until {o} lands `{t}`, so `life.quiesce` finds no "
+                      "build past it ({r})",
+}
+rows, forks = [], []
+for b, t, o in routes:
+    kind = actor.get(t)
+    if kind is None:
+        sys.exit(f"fold-9: `{t}` has no item row in flow-steps to read its actor from")
+    if (b, t) in OWN:
+        cls, why = OWN[(b, t)]
+    elif t in LANDER:
+        cls, why = "tolerance", LANDER[t]
+    elif kind == "owner":
+        forks.append((b, t, o))
+        continue
+    elif kind == "command":
+        cls, why = "tolerance", "a route into a command reaches today's tool until {o} lands `{t}` ({r})"
+    elif kind in KINDS:
+        sys.exit(f"fold-9: `{t}`'s actor is the {kind}, which flow-steps [rules]' stand-in bullet does not name")
+    else:
+        cls, why = "tolerance", ("a route into a role item reaches the attended session's agent, doing the " + kind +
+                                 "'s work, until {o} lands `{t}` ({r})")
+    rows.append(f"| {b} | `{t}` | {o} | {cls} | {why.format(o=o, t=t, r=RULE)} |")
+if forks:
+    sys.exit(f"fold-9: owner items reached {forks} with no stand-in the design settles; FK-9-1 settles `build.ratify`'s")
+print(f"fold-9: {len(rows)} route rows generated")
+
+# ---- FK-9-1: the stand-in stated where the design states Build's route into `build.ratify`
+FS.insert_before(
+    "- **Roles:** builder, for the unit passes, the fix and revert passes and the resolution pass;",
+    "- **Before the build it rests on lands** (the owner's FK-9-1). dDeclaredLoop builds `build.recommend` ahead of\n"
+    "  dScopedBuild, so until dScopedBuild lands `build.ratify`, its route there under `decisions.major:\n"
+    "  author-owner-ratifies` reaches dDeclaredLoop's own owner gate, held for the owner's disposition, as RC-9's\n"
+    "  fallback holds `plan.exit` (`cl-dClosedLoop-0378`). Being a ratification, it is never decided by\n"
+    "  `run.on-owner-question` (LR-3).\n",
+    "FK-9-1: [build]'s stand-in")
+V2.sub("which `run.on-owner-question` resolves only once dBoundRoles lands it and never for a ratification (AF-1, "
+       "DA-H1) `cl-dClosedLoop-0104`",
+       "which `run.on-owner-question` resolves only once dBoundRoles lands it and never for a ratification, and, until "
+       "dScopedBuild lands `build.ratify`, the gate standing in for it under `decisions.major: author-owner-ratifies`, "
+       "`build.recommend`'s route held there for the owner's disposition as RC-9's fallback holds `plan.exit`, seen red "
+       "on a planted major fork under that value with dScopedBuild unlanded that reaches no gate (AF-1, DA-H1, the "
+       "owner's FK-9-1) `cl-dClosedLoop-0104`",
+       "FK-9-1: cl-0104")
+RC.insert_before("\n\nRevised 2026-10-20 by the whole-design audit's fold: the last five rows class",
+                 "\n" + "\n".join(rows), "item 1: the route rows")
+
+# ---- item 1, `currency`: W7-3 names distribution's leg only as its pattern, and reads no currency record
+V2.sub("reads the newest maintenance record offline, as the `currency` leg does, red while",
+       "reads the newest maintenance record offline, as distribution's currency leg reads its own record, red while",
+       "item 1: W7-3's pattern in plain words")
+
+# =============================================================================================== item 2: FK-8-1
+FS.sub("- **A route into a later build reaches today's stand-in.** Until an item's owning build lands, a route into it\n"
+       "  reaches today's stand-in: the attended session's agent for a role item, today's tool for a command, and\n"
+       "  `push-main.sh` for the lander (the owner's FK-4-9, A4-F14, B1-F8).\n",
+       "- **A route into a later build reaches today's stand-in.** Until an item's owning build lands, a route into it\n"
+       "  reaches today's stand-in, where no clause declares another: the attended session's agent for a role item,\n"
+       "  today's tool for a command, and `push-main.sh` for the lander (the owner's FK-4-9, A4-F14, B1-F8). A stand-in\n"
+       "  a clause declares for its own route wins, as `cl-dClosedLoop-0123`'s owner item does for a placement routed to\n"
+       "  Plan or Design (the owner's FK-8-1, C2-F7). The re-cut's `[reconciled-order]` classes each such route with the\n"
+       "  stand-in it reaches.\n",
+       "item 2: [rules]' stand-in bullet")
+
+# =============================================================================================== item 3: FK-7-1
+V2.sub("a cap holding a value in both homes refused, ",
+       "a cap holding a value in both homes refused, a run allowed to raise a measured-file cap once its row is under "
+       "the key, through dDeclaredLoop's guarded policy command, and before it lands through the one write shape the "
+       "minimal guard admits, on the four conditions `template-size-limits.txt` states, which the step carries into "
+       "the key's declaration beside the rows' argued history, a class row, a lowering, a new row and a removal "
+       "staying the owner's (the owner's FK-7-1 and FK-9-2), ",
+       "item 3: cl-0015")
+V2.sub("whose answers render into the charter's level 0, until dDeclaredLoop's guard lands (M11, FM1, SA-12) "
+       "`cl-dClosedLoop-0012`",
+       "whose answers render into the charter's level 0, until dDeclaredLoop's guard lands, the minimal guard admitting "
+       "one agent write shape meanwhile, a single measured-file cap under `budgets.*` raised, nothing else changed, with "
+       "a change record attached, the file's other conditions left to the record's argument as today, and the guard "
+       "once it lands admitting that raise alone, seen red on a planted agent write of every other shape, a lowered "
+       "cap, two caps raised, a class row raised, a raise beside another change and a raise with no change record, "
+       "each admitted (M11, FM1, SA-12, the owner's FK-7-1 and FK-9-2) `cl-dClosedLoop-0012`",
+       "item 3, FK-9-2: cl-0012")
+V2.sub("seen red on an invariant switched off without it (the whole-design audit's C2-F9) `cl-dClosedLoop-0087`",
+       "seen red on an invariant switched off without it (the whole-design audit's C2-F9), and the guarded policy "
+       "command admitting one agent write to the policy file, a run's raise of a measured-file cap whose row is under "
+       "`budgets.*`, on the four conditions its declaration carries, argued in the write's change record, every other "
+       "agent write to it refused as `policy-file.guard` says, seen red on a planted run's raise with no change record "
+       "and on a planted run's lowering, each admitted (the owner's FK-7-1) `cl-dClosedLoop-0087`",
+       "item 3: cl-0087, the command that admits the raise")
+V2.sub("the AGENTS.md and charter-template rows `template-size-limits.txt` held, the raise owed under that file's "
+       "conditions (DA-L6) `cl-dClosedLoop-0036`",
+       "the AGENTS.md and charter-template rows `template-size-limits.txt` held, the raise owed under that file's four "
+       "conditions, a run's to make once its row is under `budgets.*`, through the one write shape the minimal guard "
+       "admits before dDeclaredLoop's guard lands, argued in the write's change record (DA-L6, the owner's FK-7-1 and "
+       "FK-9-2) `cl-dClosedLoop-0036`",
+       "item 3: cl-0036")
+V2.sub("by the owner's FK-1-3; dCalibratedLens re-derives the values | dGroundRules |",
+       "by the owner's FK-1-3; dCalibratedLens re-derives the values; a run may raise a measured-file cap under the "
+       "file's four conditions through the guarded policy command, or before it lands the minimal guard's one admitted "
+       "write shape, argued in the write's change record, and every other movement of a cap stays the owner's (the "
+       "owner's FK-7-1 and FK-9-2) | dGroundRules |",
+       "item 3: the budgets.* row")
+LI.sub("`tools/template-size-limits.txt` migrated into the key by an upgrade step with the owner's\n"
+       "    rule for who may raise a row (revised 2026-10-20, the owner's FK-1-3).",
+       "`tools/template-size-limits.txt` migrated into the key by an upgrade step with the owner's\n"
+       "    rule for who may raise a row: a run may raise a measured-file cap under the file's four conditions, through\n"
+       "    the guarded policy command, or before it lands the one write shape the minimal guard admits, and argued in\n"
+       "    the write's change record, and a class row, a lowering, a new row and a removal stay the owner's (revised\n"
+       "    2026-10-20, the owner's FK-1-3, FK-7-1 and FK-9-2).",
+       "item 3: layer-instruction's raise rule")
+
+# =============================================================================================== item 4: the recut sentence
+RC.sub("Revised 2026-10-20 by the whole-design audit's fold: the last five rows class the stand-ins its folds named.\n"
+       "dFairHearing's read of `leases.offline` and dPlacedRequest's and dShippedRelease's of `patch.ratify` wait on\n"
+       "the owner (FK-6-1, FK-6-2), so the probe still reds on them.",
+       "Revised 2026-10-20 by the whole-design audit's fold: the five rows from dFairHearing's `review.dispose` to\n"
+       "`kickoff.runs` class the stand-ins its folds named. The owner's FK-6-2 moved `patch.ratify` to dPlacedRequest,\n"
+       "which clears dPlacedRequest's and dShippedRelease's reads of it, and FK-6-1's tolerance row classes\n"
+       "dFairHearing's read of `leases.offline`: `review.report` refuses an unreachable claim until dPlacedRequest lands\n"
+       "the key. The widened probe reads every forward route too, and the fold integration's rows class them (below).",
+       "item 4: fold-6's sentence")
+
+# =============================================================================================== item 6: cl-0115
+V2.sub("past which that item's loop ends non-converging and its open work goes to asks, seen red on a planted loop",
+       "past which that item's loop ends non-converging, a blocking item's open work promoted to a new unit while the "
+       "budget remains and then ending as `flow.on-exhausted` says, and a non-blocking item's going to asks, seen red "
+       "on a planted loop",
+       "item 6: cl-0115's route-back phrase")
+V2.sub("(P39, the owner's SL-1 and FK-1-5, the parked debt's review) `cl-dClosedLoop-0115`",
+       "(P39, the owner's SL-1, FK-1-5 and FK-4-5, the parked debt's review) `cl-dClosedLoop-0115`",
+       "item 6: cl-0115's attribution")
+
+# =============================================================================================== item 7: the roles matrix
+LR.sub("declarations. Each Actor cell opens with one actor's kind: `command`, `executor`, `hook`, `owner`, or a\n"
+       "role's name, which ends at the first comma, colon or parenthesis. `role_matrix.py` (`[instrument]`,\n"
+       "revised 2026-10-17) reads only that opening,",
+       "declarations. Each Actor cell opens with one actor's kind: `command`, `executor`, `hook`, `owner`, a\n"
+       "role's name, which ends at the first comma, colon or parenthesis, or `the role that owns` what the item's\n"
+       "input names, a role chosen per instance. `role_matrix.py` (`[instrument]`, revised 2026-10-20) reads only\n"
+       "that opening,",
+       "item 7: [matrix]'s grammar")
+LR.insert_before("| command | `entry.place-check`",
+                 "| owning role | `mailbox.answer` | — | — | — | — | — | — | — | — | — |\n",
+                 "item 7: [matrix]'s owning-role row")
+LR.sub("- **Counts:** 97 items, each with one actor; 15 actors; 28 items with a role.",
+       "- **Counts:** 98 items, each with one actor; 16 actors; 29 items with a role.",
+       "item 7: [matrix]'s counts")
+LR.insert_before("- **The prompt writer and the driver** act in no item.",
+                 "  - Revised 2026-10-20, the whole-design audit's fold integration\n"
+                 "    (" + BRIEF + "): the instrument reads an Actor cell\n"
+                 "    opening `the role that owns` as one actor, the role that owns what the item's input names, so\n"
+                 "    `mailbox.answer` joins the table as the owning role's and the counts are its run (`[instrument]`).\n"
+                 "    Which role that is, arms 2 and 3 cannot read.\n",
+                 "item 7: [matrix]'s revision bullet")
+LR.sub("  - every item's actor is a command, the executor, a hook, the owner, or a declared item role;",
+       "  - every item's actor is a command, the executor, a hook, the owner, a declared item role, or the role that\n"
+       "    owns what the item's input names;",
+       "item 7: arm 1's bullet")
+LR.insert_before(
+    "\n## [revised] Revised 2026-10-16: the two Tier-2 rounds, folded",
+    "\n### `role_matrix.py`, revised 2026-10-20: the role that owns what the item's input names\n\n"
+    "The fork answers' fold added `mailbox.answer` to flow-steps' `[entry]` (FK-5-4), its Actor cell opening \"the role\n"
+    "that owns the asked interface or item\": one role per question, chosen by what it owns. The revision before this\n"
+    "one reads that opening as no kind and no declared role, and reds under arm 1. This revision reads an opening\n"
+    "`the role that owns` as one actor, the owning role, a row of its own in the matrix, and still reds on any other\n"
+    "opening no kind or declared role names. Arms 2 and 3 cannot read which role owns the asked node, so neither\n"
+    "checks it. Its changed lines:\n\n"
+    "```diff\n"
+    "-  1. every item's actor is a command, the executor, a hook, the owner, or a declared item role;\n"
+    "+  1. every item's actor is a command, the executor, a hook, the owner, a declared item role, or the role\n"
+    "+     that owns what the item's input names, an opening `the role that owns` (arms 2 and 3 cannot read which);\n"
+    " KINDS = (\"command\", \"executor\", \"hook\", \"owner\")\n"
+    "+OWNING = \"the role that owns \"\n"
+    "         item, actor = row.group(1), actor_of(row.group(2))\n"
+    "-        if actor in KINDS:\n"
+    "+        if actor.startswith(OWNING):\n"
+    "+            actor = \"owning role\"\n"
+    "+        if actor in KINDS or actor == \"owning role\":\n"
+    "-    order = [n for n in roles if n in matrix] + [k for k in KINDS if k in matrix]\n"
+    "+    order = [n for n in roles if n in matrix] + [n for n in (\"owning role\",) if n in matrix]\n"
+    "+    order += [k for k in KINDS if k in matrix]\n"
+    "```\n\n"
+    "Both revisions, run over the step definitions as the fold leaves them, and this revision over a copy with one\n"
+    "line planted:\n\n"
+    "```text\n"
+    "$ python role_matrix.py <flow-steps> <layer-roles>   # the revision before this one\n"
+    "items 98 of 98 body rows; actor-item pairs 97; actors 15; items with a role 28; cycle roles 1; findings 1\n"
+    "FINDING arm 1: mailbox.answer: actor 'the role that owns the asked interface or item' is no kind and no declared role\n"
+    "exit 1\n\n"
+    "$ python role_matrix.py <flow-steps> <layer-roles>   # this revision\n"
+    "items 98 of 98 body rows; actor-item pairs 98; actors 16; items with a role 29; cycle roles 1; findings 0\n"
+    "exit 0\n\n"
+    "$ planted: `mailbox.answer`'s actor changed to `the role that answers the question` (1 line changed)\n"
+    "items 98 of 98 body rows; actor-item pairs 97; actors 15; items with a role 28; cycle roles 1; findings 1\n"
+    "FINDING arm 1: mailbox.answer: actor 'the role that answers the question' is no kind and no declared role\n"
+    "exit 1\n"
+    "```\n",
+    "item 7: [instrument]'s revision")
+
+# =============================================================================================== items 5 and 8: notes
+append(FS,
+       "**Revised 2026-10-20, the fork answers** (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w7.md`). A patch\n"
+       "build's draw on a closed root re-opens the root's transition record under the root's lease (FK-1-5), and\n"
+       "Design's conditions read the key `design.streams-when` (FK-3-3).")
+append(FS,
+       "**Revised 2026-10-20 by the whole-design audit's fold integration** (" + BRIEF + ").\n"
+       "`[rules]`' stand-in for a route into a later build holds where no clause declares another, and a clause's own\n"
+       "stand-in wins, as `cl-dClosedLoop-0123`'s owner item does for a placement routed to Plan or Design (FK-8-1).\n"
+       "The re-cut's `[reconciled-order]` classes each such route with the stand-in it reaches. Until dScopedBuild\n"
+       "lands `build.ratify`, Build's route there reaches dDeclaredLoop's own owner gate (`[build]`, FK-9-1).")
+RC.insert_before(
+    "\n\nThe critical path, its instrument and its runs:",
+    "\n\nRevised 2026-10-20 by the whole-design audit's fold integration (" + BRIEF + "):\n"
+    "the probe reads every route target in every run now, so the rows after `build.distill`'s class the forward routes\n"
+    "it reads on the folded records, generated from its lines. Each names the stand-in the route reaches: flow-steps\n"
+    "`[rules]`' for the target's actor, or the one a clause or [entry] declares for its own route, which wins (FK-4-9,\n"
+    "FK-8-1). Two are not a use: `deploy.core` names `maintain.patch` only as the reader of its patch's key, and\n"
+    "dDeclaredLoop's Plan recommendation names the Plan breakpoint, which the probe reads as the Plan step's first\n"
+    "item. dDeclaredLoop's route into `build.ratify`, an owner item, reaches dDeclaredLoop's own owner gate, as RC-9's\n"
+    "fallback holds `plan.exit` (FK-9-1). dTendedCadence's `red-leg` clause names distribution's currency leg in plain\n"
+    "words now, since it reads no currency record.",
+    "item 8: the re-cut's revision note")
+V2.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review",
+    "Revised 2026-10-20 by the whole-design audit's fold integration (" + BRIEF + "): the owner's last two\n"
+    "answers and the writers' crossed requests. A run may raise a measured-file cap once its row is under `budgets.*`,\n"
+    "through dDeclaredLoop's guarded policy command, on `template-size-limits.txt`'s four conditions and argued in the\n"
+    "write's change record, and every other movement of a cap stays the owner's (FK-7-1, in cl-0012, cl-0015, cl-0036,\n"
+    "cl-0087 and the `budgets.*` row). Before that guard lands, cl-0012's minimal guard admits one agent write shape, a\n"
+    "single measured-file cap raised with nothing else changed and a change record attached, the file's other\n"
+    "conditions left to the record's argument, and refuses every other shape (FK-9-2). cl-0115's route-back limit\n"
+    "promotes a blocking item's open work as FK-4-5 says, beside FK-1-5's re-opened record. dTendedCadence's `red-leg`\n"
+    "arm names distribution's currency leg in plain words, since it reads no currency record. A stand-in a clause\n"
+    "declares for its own route wins over flow-steps `[rules]`' (FK-8-1), and the re-cut classes each forward route the\n"
+    "widened probe reads. Until dScopedBuild lands `build.ratify`, `build.recommend`'s route there reaches\n"
+    "dDeclaredLoop's own owner gate, as RC-9's fallback holds `plan.exit` (FK-9-1, in cl-0104). No clause is new.\n\n",
+    "item 8: v2's revision paragraph")
+
+for rec in (V2, FS, RC, LR, LI):
+    rec.save()
+````
+
+### `mint.py`
+
+The mint step: the writers' placeholder clause ids numbered on from [clause-ids]' next free id in their first use in [chain], verbatim records left alone.
+
+````python
+"""The fold's mint step: writers who fold in parallel give each new clause a placeholder id, `cl-dClosedLoop-W<n>-<k>`,
+so no two of them take one number. This step numbers the placeholders on from `[clause-ids]`' next free id, in the
+order of their first use inside v2's `[chain]`, rewrites every use in the build's design records, and moves the next
+free id past the last. Run it from a tree's root after the writers' scripts; all.py runs it as the step `mint`.
+
+Refuses (exit 1): a placeholder used in a record but never in `[chain]`, one ending two clauses, or no next free id.
+What it does not do: check the clauses themselves (the clause-ids check does, after it), or touch a record kept
+verbatim: an agent's saved return, a brief, the session log, the round record, an instruments or research record.
+Writer 8 found the first version rewriting and refusing over a saved return that quoted writer 7's placeholders.
+"""
+import pathlib
+import re
+import sys
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+V2 = B / "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
+PH = re.compile(r"cl-dClosedLoop-W\d+-\d+")
+NEXT = re.compile(r"(the next it mints is\s+)`cl-dClosedLoop-(\d{4})`")
+
+v2 = V2.read_text(encoding="utf-8")
+chain = re.search(r"^## \[chain\][^\n]*\n(.*?)(?=^## )", v2, flags=re.M | re.S)
+nxt = NEXT.search(v2)
+if not chain or not nxt:
+    sys.exit("mint: v2 has no [chain] section or no next free id")
+order = list(dict.fromkeys(PH.findall(chain.group(1))))
+ends = re.findall(r"`(" + PH.pattern + r")`(?=\s*(?:;|\||$))", chain.group(1), flags=re.M)
+twice = sorted({p for p in ends if ends.count(p) > 1})
+VERBATIM = ("-return-", "-brief", "-session-log", "-whole-audit", "-instruments", "-research-")
+records = sorted(r for r in B.glob("*.md") if not any(v in r.name for v in VERBATIM))
+used = {p for r in records for p in PH.findall(r.read_text(encoding="utf-8"))}
+stray = sorted(used - set(order))
+if twice or stray:
+    sys.exit(f"mint: placeholders ending two clauses {twice or 'none'}; used outside [chain] only {stray or 'none'}")
+start = int(nxt.group(2))
+ids = {p: f"cl-dClosedLoop-{start + i:04d}" for i, p in enumerate(order)}
+for r in records:
+    t = r.read_text(encoding="utf-8")
+    new = PH.sub(lambda m: ids[m.group(0)], t)
+    if r == V2:
+        new = NEXT.sub(lambda m: f"{m.group(1)}`cl-dClosedLoop-{start + len(order):04d}`", new, count=1)
+    if new != t:
+        r.write_text(new, encoding="utf-8", newline="\n")
+for p, i in ids.items():
+    print(f"mint: {p} -> {i}")
+print(f"mint: {len(ids)} minted; the next free id is cl-dClosedLoop-{start + len(order):04d}")
+````
+
+### `rename_states.py`
+
+The main loop's amendment of fold-1 and fold-4: the terminal named incomplete and the hold parked, one name per state.
+
+````python
+"""The main loop's amendment of fold-4 and fold-1, 2026-10-20: one name per state across writers. The terminal is
+`incomplete` (writer 1's word; atlas.py reads the terminal sentence as one-word states, as every terminal is) and the
+hold is `parked` (writer 4's state, which the park rows enter). Each replacement's count is asserted."""
+import pathlib
+S = pathlib.Path(__file__).resolve().parent
+NOTE = ("\n# The main loop's amendment, 2026-10-20: `closed-incomplete` renamed `incomplete` and `parked-for-owner` "
+        "`parked`, one name per state across writers 1 and 4 (atlas.py reads a one-word terminal set).\n")
+for path, old, new, want in ((S / "w4/fold-4.py", "closed-incomplete", "incomplete", 4),
+                             (S / "w1/fold-1.py", "`parked-for-owner`", "`parked`", 1)):
+    t = path.read_text(encoding="utf-8")
+    n = t.count(old)
+    assert n == want, f"{path.name}: {old} found {n} times, want {want}"
+    if NOTE.strip() not in t:
+        t = t.replace("\nR.save()", NOTE + "R.save()", 1) if "\nR.save()" in t else t + NOTE
+    path.write_text(t.replace(old, new), encoding="utf-8", newline="\n")
+    print(f"{path.name}: {old} -> {new} x{n}")
+````
+
+### `widen_probe.py`
+
+The reconciliation probe's rule 3 widened to every route in every run, as its docstring prescribed once the fold classed the forward routes.
+
+````python
+"""The reconciliation probe's rule 3 widened in every run: its docstring kept the default run to the breakpoint
+program "until the audit's fold classes what it finds", and the fold classes the forward routes (the owner's FK-4-9,
+2026-10-20). The `if ALL_ROUTES:` guards are removed rather than pinned true, and `--all-routes` is still accepted,
+since Stage 0's K2 arm passes it. Each replacement must match once.
+
+Usage: python -X utf8 widen_probe.py <reconcile.py>
+"""
+import pathlib
+import sys
+
+p = pathlib.Path(sys.argv[1])
+t = p.read_text(encoding="utf-8")
+edits = [
+    ("""--all-routes widens rule 3 to every route target, as the whole-design audit's Stage 0 asks (K2, final-questions
+`[audit]`): each item or step a flow item's Then cell or an expansion item's Routes cell names, a step by the name
+[chain]'s Stage column gives it and read as that step's first item, is built by the source item's owner or an ancestor
+of it. Until the audit's fold classes what it finds, the default run keeps rule 3 to the breakpoint program, so the
+widened run is Stage 0's and not yet the final check's.
+""",
+     """Rule 3 reads every route target too, as the whole-design audit's Stage 0 asks (K2, final-questions `[audit]`): each
+item or step a flow item's Then cell or an expansion item's Routes cell names, a step by the name [chain]'s Stage column
+gives it and read as that step's first item, is built by the source item's owner or an ancestor of it. Every run reads
+it since the audit's fold classed the forward routes it finds (the owner's FK-4-9, 2026-10-20). Before that only Stage
+0's `--all-routes` run did; the flag is still accepted, and changes nothing.
+"""),
+    ("""# --all-routes: every item or step a route names, from flow items and expansion items alike.
+ALL_ROUTES = "--all-routes" in sys.argv
+STEP_NAME""",
+     """# Every item or step a route names, from flow items and expansion items alike, in every run since the audit's fold.
+STEP_NAME"""),
+]
+for old, new in edits:
+    if t.count(old) != 1:
+        sys.exit(f"widen_probe: {old[:60]!r} matches {t.count(old)} times")
+    t = t.replace(old, new)
+# The guarded block: drop `if ALL_ROUTES:` and dedent its body, up to the next top-level line.
+lines = t.split("\n")
+starts = [i for i, l in enumerate(lines) if l == "if ALL_ROUTES:"]
+if len(starts) != 2:
+    sys.exit(f"widen_probe: {len(starts)} `if ALL_ROUTES:` lines, want 2")
+for s in reversed(starts):
+    end = s + 1
+    while end < len(lines) and (lines[end].startswith("    ") or lines[end] == ""):
+        end += 1
+    body = [l[4:] if l.startswith("    ") else l for l in lines[s + 1:end]]
+    lines[s:end] = body
+t = "\n".join(lines)
+if "ALL_ROUTES" in t:
+    sys.exit("widen_probe: ALL_ROUTES still read")
+p.write_text(t, encoding="utf-8", newline="\n")
+print(f"widen_probe: {p.name} reads every route in every run")
+````
+
+### `record_forks.py`
+
+The round record's [fold] and its session-log event: the 33 answers copied verbatim, counts derived.
+
+````python
+"""Record the fold's forks and the owner's answers: a `[fold]` section in the round record, before `[stage0-classes]`,
+and one session-log event. The answers are copied verbatim from the question tool's returns, saved as they came in
+(fork-answers.md beside this script); every count is derived from the saved returns and that file, never typed.
+
+Usage: python -X utf8 record_forks.py   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+answers_text = (HERE / "fork-answers.md").read_text(encoding="utf-8")
+pairs = re.findall(r'"(FK-.*?)"="(.*?)"(?=, "FK-|\s*$)', answers_text, flags=re.M)
+returns = [B / f"2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w{n}.md" for n in range(1, 7)]
+raised = sum(len(re.findall(r"^### FK-\d+-\d+", r.read_text(encoding="utf-8"), flags=re.M)) for r in returns)
+merged = sum(" + FK-" in q.split(":")[0] for q, _ in pairs)
+other = [q.split(":")[0] for q, a in pairs if "(Recommended)" not in a]
+if len(pairs) + merged != raised:
+    sys.exit(f"record_forks: {len(pairs)} answers and {merged} merges do not cover {raised} forks raised")
+
+rows = "\n".join(f"| {q.split(':')[0]} | {q.split(':', 1)[1].strip()} | \"{a}\" |" for q, a in pairs)
+section = f"""## [fold] The fold, its forks and the owner's answers
+
+The fold ran as six writers, each one script applied in order to a copy and checked there by the build's ten final
+checks (`dry_run.sh` in the session's scratch, recorded in the instruments). Writers 1 to 3 took v2's `[chain]` rows by
+build, writer 4 flow-steps and writer 5 the other records (`fold-brief-w1` to `-w5`). Writer 6 took the requests the
+five listed for one another's records and the reconciliation probe's lines their folds raised (`fold-brief-w6`). Their
+returns are `fold-return-w1` to `-w6`.
+
+- **The main loop's amendments, each a comment in the script it touches:** writer 2's place 68 ranked a fork "under
+  `design.forks`' default", a key of dIndexedDesign, which dBoundRoles does not descend from, so the ranking is stated
+  as the core's own; writers 1 and 4 named the new states differently, so the terminal is `incomplete` and the hold
+  `parked`, since the atlas reads one-word terminals.
+- **The dry run, through writer 6:** nine of the ten checks green; the probe's four remaining lines rest on FK-6-1 and
+  FK-6-2.
+- **The forks:** {raised} raised; two pairs merged, FK-1-4 with FK-3-1 and FK-4-12 with FK-5-2; {len(pairs)} questions
+  asked through the question tool, each recommendation first. The owner answered all {len(pairs)} on 2026-10-20, and
+  {len(other)} chose an option the question did not recommend: {", ".join(other)}.
+
+| Fork | Asked | The owner's answer, verbatim |
+|---|---|---|
+{rows}
+
+The answers are folded by two writers in parallel, after the six (`fold-brief-w7`, `-w8`). A new clause carries a
+placeholder id, and the main loop's mint step numbers them on from `[clause-ids]`' next free id.
+
+"""
+R = Record(str(B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"))
+R.insert_before("## [stage0-classes] Stage 0's classes\n", section, "[fold]")
+R.save()
+L = Record(str(B / "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md"))
+event = (f"- 2026-10-20, session 1799cb98: the fold's six writers returned and their scripts dry-run with nine of ten checks\n"
+         f"  green. The owner answered all {len(pairs)} fork questions, {len(other)} away from the recommendation\n"
+         f"  (`whole-audit.md` `[fold]`). Two writers fold the answers in parallel.\n\n")
+L.insert_before("## Instruments\n", event, "event")
+L.save()
+print(f"record_forks: {raised} forks raised, {len(pairs)} answers, {len(other)} not recommended")
+````
+
+### `record_fold_applied.py`
+
+The round record's [fold-applied] and its session-log event: the later answers verbatim, the tallies, the minted ids and the checks, each read from a saved output.
+
+````python
+"""Record the fold as applied: a `[fold-applied]` section in the round record after `[fold]`, and one session-log event.
+`[fold]` keeps the 33-question round as it stood; this section adds the answers that came after it, verbatim from the
+question tool's returns (fork-answers.md beside this script, batches 10 onward), and what the writers, the mint step and
+the checks did. Every count and id is read from a saved return, a script or a captured run, never typed.
+
+Usage: python -X utf8 record_fold_applied.py   (from the worktree root, after the fold is applied and checked)
+Inputs it reads: fork-answers.md; the nine saved fold returns; w<n>/fold-<n>.py; mint-applied.out (the mint step's
+output on the tree); applied-check.out (dry_run.sh with noop.py over the applied tree).
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+answers = (HERE / "fork-answers.md").read_text(encoding="utf-8")
+later = answers.split("\nbatch 10:", 1)
+if len(later) != 2:
+    sys.exit("record_fold_applied: no batch 10 in fork-answers.md")
+pairs = re.findall(r'"(FK-.*?)"="(.*?)"(?=, "FK-|\s*$)', "batch 10:" + later[1], flags=re.M)
+all_pairs = re.findall(r'"(FK-.*?)"="(.*?)"(?=, "FK-|\s*$)', answers, flags=re.M)
+returns = [B / f"2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w{n}.md" for n in range(1, 10)]
+raised = sum(len(re.findall(r"^### FK-\d+-\d+", r.read_text(encoding="utf-8"), flags=re.M)) for r in returns)
+merged = sum(" + FK-" in q.split(":")[0] for q, _ in all_pairs)
+if len(all_pairs) + merged != raised:
+    sys.exit(f"record_fold_applied: {len(all_pairs)} answers and {merged} merges do not cover {raised} forks raised")
+other = [q.split(":")[0] for q, a in all_pairs if "(Recommended)" not in a]
+
+mint =(HERE / "mint-applied.out").read_text(encoding="utf-8")
+minted = re.findall(r"^mint: (cl-dClosedLoop-W\d+-\d+) -> (cl-dClosedLoop-\d{4})$", mint, flags=re.M)
+nxt = re.search(r"the next free id is (cl-dClosedLoop-\d{4})", mint)
+k5 = [f"`{c}` joins {p}'s row" for c, p in re.findall(r"^k5_rows: (cl-dClosedLoop-\d{4}) joins (P\d+)'s row$",
+                                                        (HERE / "k5-applied.out").read_text(encoding="utf-8"), flags=re.M)]
+if not k5:
+    sys.exit("record_fold_applied: k5-applied.out names no clause")
+check = (HERE / "applied-check.out").read_text(encoding="utf-8")
+verdicts = re.findall(r"^== (.+?) rc (\d+)$", check, flags=re.M)
+last = re.findall(r"^ALL rc (\d+)$", check, flags=re.M)
+if not minted or not nxt or len(verdicts) != 10 or last != ["0"]:
+    sys.exit(f"record_fold_applied: mint {len(minted)} ids, checks {len(verdicts)}, ALL {last}; want ids, 10 checks, ALL rc 0")
+
+rows = "\n".join(f"| {q.split(':')[0]} | {q.split(':', 1)[1].strip()} | \"{a}\" |" for q, a in pairs)
+section = f"""## [fold-applied] The fold applied: the later answers, the integration and the checks
+
+The answers were folded by writers 7 and 8 in parallel and writer 9 integrated what they left (`fold-brief-w7` to
+`-w9`; returns `fold-return-w7`, `-w8`, `-w9`, and `-w9b` for writer 9's resumed pass with FK-9-1 and FK-9-2). Each
+pass's tally, derived from its return and its script when it returned, is its dispatch row in the session log, rows
+204 to 207.
+
+Their folds raised {len(pairs)} forks after `[fold]`'s round, answered as they came:
+
+| Fork | Asked | The owner's answer, verbatim |
+|---|---|---|
+{rows}
+
+In all, {raised} forks were raised and {len(all_pairs)} questions asked; {len(other)} answers chose an option the
+question did not recommend: {", ".join(other)}.
+
+- **The probe widened.** The reconciliation probe's docstring kept rule 3 to the breakpoint program "until the audit's
+  fold classes what it finds"; the owner's FK-4-9 asked for a tolerance row per forward route, so every run now reads
+  every route, and writer 9 classed what the widened run found. The readings before and after, and a dropped row seen
+  red, are in the night pass's instruments record, `[fold-probe]`.
+- **The mint step** numbered the writers' placeholder ids in their order of first use in `[chain]`:
+  {", ".join(f"`{p}` → `{i}`" for p, i in minted)}; the next free id is `{nxt.group(1)}`. It leaves an agent's saved
+  return verbatim, a defect writer 8 found in its first version.
+- **The K5 step,** the main loop's: {"; ".join(k5)}. Writer 1 folded both citations, and Stage 0's K5 arm reds a
+  clause citing a principle by id outside that principle's `[enforcement]` row; each clause enforces what it cites, so
+  it joins the row (`k5_rows.py`). It was found when the instruments recorder's Stage 0 plant `k5-cited` could not red
+  for its own reason over the folded tree.
+- **The checks:** applied to the tree and run on a copy of it, {", ".join(f"{label} rc {rc}" for label, rc in verdicts)};
+  `ALL rc 0`.
+
+"""
+# A re-run replaces what an earlier run wrote: its section, and its session-log event.
+ROUND = B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"
+LOGP = B / "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md"
+EVENT = "- 2026-10-20, session 1799cb98: the fold applied."
+for path, pattern in ((ROUND, r"## \[fold-applied\] .*?(?=## \[stage0-classes\] )"),
+                      (LOGP, re.escape(EVENT) + r".*?\n\n")):
+    text = path.read_text(encoding="utf-8")
+    found = re.findall(pattern, text, flags=re.S)
+    if len(found) > 1:
+        sys.exit(f"record_fold_applied: {len(found)} earlier writes in {path.name}")
+    if found:
+        path.write_text(text.replace(found[0], "", 1), encoding="utf-8", newline="\n")
+        print(f"record_fold_applied: replaced the earlier write in {path.name}")
+R = Record(str(ROUND))
+R.insert_before("## [stage0-classes] Stage 0's classes\n", section, "[fold-applied]")
+R.save()
+L = Record(str(LOGP))
+L.insert_before("## Instruments\n",
+                f"- 2026-10-20, session 1799cb98: the fold applied. Writers 7 to 9 folded the owner's answers and the\n"
+                f"  integration, {len(minted)} clause ids were minted and the reconciliation probe reads every route;\n"
+                f"  the ten checks pass (`whole-audit.md` `[fold-applied]`).\n\n", "event")
+L.save()
+print(f"record_fold_applied: {len(pairs)} later answers, {len(minted)} ids, {len(verdicts)} checks green")
+````
+
+### `prep_recorder.py`
+
+This recorder's [fold-probe] section, inserted.
+
+````python
+"""The instruments recorder gains the fold's evidence: a `[fold-probe]` section with the reconciliation probe's
+readings before and after it was widened, each run's summary, unclassed lines and exit code as captured, inserted
+before the walk kit's section. Each insertion must match once, and a second run refuses.
+
+Usage: python -X utf8 prep_recorder.py
+"""
+import pathlib
+import sys
+
+S = pathlib.Path(__file__).resolve().parent.parent
+R = S / "night/record_instruments.py"
+t = R.read_text(encoding="utf-8")
+if "[fold-probe]" in t:
+    sys.exit("prep_recorder: [fold-probe] is in the recorder already")
+ANCHOR = 'kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))\n'
+if t.count(ANCHOR) != 1:
+    sys.exit("prep_recorder: the walk kit's anchor is not where it was")
+PART = '''
+
+def probe_reading(rel, cmd, rc):
+    """One captured probe run: its summary line, its all-routes count, its unclassed lines and its findings."""
+    keep = [l for l in read(S / rel).strip().split("\\n")
+            if l.startswith(("chain rows", "all routes", "findings")) or "UNCLASSED" in l]
+    return f"$ {cmd}\\n" + "\\n".join(keep) + f"\\nrc {rc}"
+
+
+parts.append("""
+## [fold-probe] The reconciliation probe widened at the fold, red before its rows
+
+Its docstring kept rule 3 to the breakpoint program in the default run "until the audit's fold classes what it finds",
+and the owner's FK-4-9 asked for a tolerance row per forward route, so every run now reads every route
+(`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[fold]`). The runs below: the probe before the change, on the
+unfolded tree with Stage 0's flag and on a copy folded through fold-8 and the mint step; the widened probe on both;
+and, after writer 9's rows were applied, the widened probe with one route row dropped in memory.
+
+""" + block("text", "\\n\\n".join([
+    probe_reading("fold/probe-old-wide-base.out", "python reconcile.py recut.md --all-routes   # before; the unfolded tree", 1),
+    probe_reading("fold/probe-narrow.out", "python reconcile.py recut.md   # before; the folded copy", 1),
+    probe_reading("fold/probe-new-base.out", "python reconcile.py recut.md   # widened; the unfolded tree", 1),
+    probe_reading("fold/probe-new-folded.out", "python reconcile.py recut.md   # widened; the folded copy, before writer 9", 1),
+    probe_reading("fold/probe-plant-drop.out", "python reconcile.py recut.md --plant-drop " + read(S / "fold/probe-plant-drop.arg").strip()
+                  + "   # widened; the folded tree, one route row dropped", 1),
+])) + """
+After writer 9's rows, the widened run is green on the tree, as `[final]` shows.
+""")
+'''
+R.write_text(t.replace(ANCHOR, PART.lstrip("\n") + "\n" + ANCHOR, 1), encoding="utf-8", newline="\n")
+print("prep_recorder: [fold-probe] inserted before the walk kit's section")
+````
+
+### `writer_outcome.py`
+
+A fold writer's outcome text for its dispatch row, derived from its saved return and its script.
+
+````python
+"""A fold writer's outcome text, derived from its saved return and its fold script and never typed: its places by
+disposition, the edits its script makes, its forks and its top-level request bullets.
+
+Usage: python -X utf8 writer_outcome.py <saved return.md> <fold script>
+What it does not do: judge a disposition (the first word of the cell names it), or count requests nested under a
+record-level bullet one by one (it counts the top-level bullets, and says so).
+"""
+import pathlib
+import re
+import sys
+
+ret = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
+script = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")
+sec = re.search(r"(?s)Dispositions\**\s*\n(.*?)(?=\n(?:## )?2\. )", ret)
+if not sec:
+    sys.exit(f"writer_outcome: no dispositions section in {sys.argv[1]}")
+disp = {}
+for ln in sec.group(1).split("\n"):
+    # a row's first cell is its place number, or a request or finding label (writer 6); the header and rule rows
+    # are skipped
+    m = re.match(r"^\| (?!#|item\b|-)[^|]+ \| [^|]+ \| ([^|]+) \|", ln)
+    if m:
+        d = m.group(1).strip().lower()
+        if d == "disposition":
+            continue
+        parts = [(int(c), rest) for c, rest in re.findall(r"(\d+) ([^,]+)", d)] if re.match(r"\d", d) else [(1, d)]
+        for n, part in parts:
+            k = next((w for w in ("not a defect", "duplicate", "plant", "fork", "fold") if part.startswith(w)), part)
+            disp[k] = disp.get(k, 0) + n
+edits = len(re.findall(r"^\s*\w+\.(?:sub|insert_before)\(", script, flags=re.M))
+forks = len(re.findall(r"^### FK-\d+-\d+", ret, flags=re.M))
+req = re.search(r"(?s)\n(?:## )?4\. \**Requests\**(.*?)(?=\n(?:## )?5\. )", ret)
+reqs = len(re.findall(r"^(?:- \*\*|\d+\. \*\*)", req.group(1), flags=re.M)) if req else 0
+parts = ", ".join(f"{v} {k}" for k, v in sorted(disp.items(), key=lambda kv: (-kv[1], kv[0])))
+print(f"{sum(disp.values())} places ({parts}); its script holds {edits} sub and insert calls; forks {forks}; "
+      f"top-level request bullets {reqs}")
+````
+
+### `fix_writer_outcome3.py`
+
+writer_outcome.py's compound cells and label repaired, and the session log's rows 198 to 205 relabelled to say what was counted.
+
+````python
+"""Two repairs, 2026-10-20:
+1. writer_outcome.py read writer 9's compound cell ("26 fold, 1 fork, 1 fold by reword") as one disposition: a cell
+   that opens with a count is now split on its commas, each part's count added to its own disposition.
+2. It counted `sub` and `insert_before` calls and called them edits; a script that writes rows in a loop (writer 9) or
+   appends through a helper (writer 8) makes more edits than calls. The label now says what is counted, and the
+   session log's rows 198 to 205, whose numbers were counted the same way, take the same label.
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+W = HERE / "writer_outcome.py"
+t = W.read_text(encoding="utf-8")
+old_cls = """        if d == "disposition":
+            continue
+        k = next((w for w in ("not a defect", "duplicate", "plant", "fork", "fold") if d.startswith(w)), d)
+        disp[k] = disp.get(k, 0) + 1
+"""
+new_cls = """        if d == "disposition":
+            continue
+        parts = [(int(c), rest) for c, rest in re.findall(r"(\\d+) ([^,]+)", d)] if re.match(r"\\d", d) else [(1, d)]
+        for n, part in parts:
+            k = next((w for w in ("not a defect", "duplicate", "plant", "fork", "fold") if part.startswith(w)), part)
+            disp[k] = disp.get(k, 0) + n
+"""
+old_lbl = 'its script makes {edits} edits; '
+new_lbl = 'its script holds {edits} sub and insert calls; '
+for old, new in ((old_cls, new_cls), (old_lbl, new_lbl)):
+    if t.count(old) != 1:
+        sys.exit(f"fix3: {old[:50]!r} matches {t.count(old)} times")
+    t = t.replace(old, new)
+W.write_text(t, encoding="utf-8", newline="\n")
+print("writer_outcome.py: compound cells split, the label names what it counts")
+
+LOG = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-session-log.md")
+log = LOG.read_text(encoding="utf-8")
+n = 0
+lines = log.split("\n")
+for i, l in enumerate(lines):
+    m = re.match(r"^\| (19[89]|20[0-5]) \|", l)
+    if m and re.search(r"its script makes \d+ edits;", l):
+        lines[i] = re.sub(r"its script makes (\d+) edits;", r"its script holds \1 sub and insert calls;", l)
+        n += 1
+if n != 8:
+    sys.exit(f"fix3: relabelled {n} rows, want 8 (198 to 205)")
+LOG.write_text("\n".join(lines), encoding="utf-8", newline="\n")
+print(f"session log: {n} rows relabelled")
+````
+
+### `k5_rows.py`
+
+The fold's K5 step, the main loop's: writer 1's cl-0004 and cl-0016 cite P35 and P38 by id, so each joins its principle's [enforcement] row, found when Stage 0's k5-cited plant could not red for its own reason.
+
+````python
+"""The fold's K5 step, the main loop's: writer 1 folded two clauses that cite a principle by id, cl-0004 (P35, the
+deviation record's `caused-by`) and cl-0016 (P38, `.agent-cap.conf` kept as a legacy home until dSafePassage's step),
+and Stage 0's K5 arm reds a clause citing a principle by id outside that principle's `[enforcement]` row. Each clause
+enforces what it cites, so it joins the row, its id placed in the row's ascending order. Found when the instruments
+recorder's Stage 0 plant k5-cited could not red for its own reason over the folded tree (2026-10-20).
+
+Usage: python -X utf8 k5_rows.py   (from a tree's root, after the mint step; all.py runs it as the step k5_rows)
+"""
+import pathlib
+import re
+import sys
+
+V2 = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+t = V2.read_text(encoding="utf-8")
+for principle, cid in (("P35", "0004"), ("P38", "0016")):
+    rows = re.findall(r"^\| `" + principle + r"` \| (.*) \|$", t, flags=re.M)
+    if len(rows) != 1:
+        sys.exit(f"k5_rows: {len(rows)} rows for {principle}, want 1")
+    ids = re.findall(r"`cl-dClosedLoop-(\d{4})`", rows[0])
+    if cid in ids:
+        sys.exit(f"k5_rows: {principle}'s row names cl-dClosedLoop-{cid} already")
+    new = ", ".join(f"`cl-dClosedLoop-{i}`" for i in sorted(ids + [cid]))
+    old_line = f"| `{principle}` | {rows[0]} |"
+    if rows[0] != ", ".join(f"`cl-dClosedLoop-{i}`" for i in ids) or t.count(old_line) != 1:
+        sys.exit(f"k5_rows: {principle}'s row is not a plain id list")
+    t = t.replace(old_line, f"| `{principle}` | {new} |")
+    print(f"k5_rows: cl-dClosedLoop-{cid} joins {principle}'s row")
+V2.write_text(t, encoding="utf-8", newline="\n")
+````
+
+### `pin_walk_cases.py`
+
+The walk kit's walk-check cases pinned to the tree before the fold, whose items their fixtures were written for: on the folded tree the clean fixtures red and drop-cell reds on 25 rows, not its own one.
+
+````python
+"""run_kit_plants.py's walk-check cases pinned to the tree their fixtures were written for (2026-10-20).
+
+The walk check derives each walker's cells from the live design's items. The fold added items, so on the folded tree
+the clean fixtures (`ret-a3.md`, `report-b.md`) lack their rows and red, and the `drop-cell` plant reds on 25 missing
+rows instead of its own one: red for the wrong reason. The fixtures are the kit's regression inputs, so every
+walk-check case now runs in an archive of the tree at the last commit before the fold, extracted once beside the
+runner. Each replacement must match once.
+
+Usage: python -X utf8 pin_walk_cases.py
+"""
+import pathlib
+import sys
+
+R = pathlib.Path(__file__).resolve().parent / "run_kit_plants.py"
+t = R.read_text(encoding="utf-8")
+edits = [
+    ('''Usage: python -X utf8 run_kit_plants.py   (from the worktree root); prints one line per run and a summary
+"""''',
+     '''Usage: python -X utf8 run_kit_plants.py   (from the worktree root); prints one line per run and a summary
+
+The walk-check cases run in an archive of the tree at PIN, the last commit before the whole-design audit's fold, which
+the walk fixtures were written for: the check derives a walker's cells from the live design's items, and the fold
+added items, so on a later tree the clean fixtures red and the drop-cell plant reds for the wrong reason.
+"""'''),
+    ('''def run(*args):
+    r = subprocess.run([sys.executable, "-X", "utf8", *args], capture_output=True, text=True, encoding="utf-8")
+    return r.returncode, r.stdout + r.stderr
+''',
+     '''PIN = "10c0c4fb4c2bfa709cd60e1447f091057e074c6b"
+PINNED = S / f"pinned-{PIN[:9]}"
+
+
+def pinned():
+    """The tree at PIN, extracted once with git archive; a partial extraction is refused, never reused."""
+    done = PINNED / ".extracted"
+    if not done.is_file():
+        PINNED.mkdir(parents=True, exist_ok=True)
+        r = subprocess.run(["bash", "-c", f"git archive --format=tar {PIN} | tar -x -C '{PINNED.as_posix()}'"],
+                           capture_output=True, text=True)
+        want = subprocess.run(["git", "ls-tree", "-r", "--name-only", PIN], capture_output=True, text=True).stdout.split()
+        got = [p for p in want if (PINNED / p).is_file()]
+        if r.returncode != 0 or len(got) != len(want):
+            sys.exit(f"run_kit_plants: the pinned tree extracted {len(got)} of {len(want)} files: {r.stderr[-300:]}")
+        done.write_text(PIN + "\\n", encoding="utf-8")
+    return str(PINNED)
+
+
+def run(*args, cwd=None):
+    r = subprocess.run([sys.executable, "-X", "utf8", *args], capture_output=True, text=True, encoding="utf-8", cwd=cwd)
+    return r.returncode, r.stdout + r.stderr
+'''),
+    ('''for label, args, rc_want, want in CASES:
+    rc, out = run(*args)''',
+     '''for label, args, rc_want, want in CASES:
+    rc, out = run(*args, cwd=pinned() if label.startswith("walk check") else None)'''),
+]
+for old, new in edits:
+    if t.count(old) != 1:
+        sys.exit(f"pin_walk_cases: {old[:60]!r} matches {t.count(old)} times")
+    t = t.replace(old, new)
+R.write_text(t, encoding="utf-8", newline="\n")
+print("run_kit_plants.py: walk-check cases run on the pinned tree")
+````
+
+### `pin_walk_cases2.py`
+
+The pinned tree extracted by git archive and tarfile, after bash from Python resolved to WSL's, which cannot read the worktree's git.
+
+````python
+"""run_kit_plants.py's pinned tree extracted by Python, not by `bash -c`: from Python, `bash` resolved to WSL's, which
+cannot read the Windows worktree's git (2026-10-20). git archive's tar is read with tarfile; this node extracts its
+309-character paths whole. Each replacement must match once.
+
+Usage: python -X utf8 pin_walk_cases2.py
+"""
+import pathlib
+import sys
+
+R = pathlib.Path(__file__).resolve().parent / "run_kit_plants.py"
+t = R.read_text(encoding="utf-8")
+edits = [
+    ("import pathlib\nimport subprocess\nimport sys\n", "import io\nimport pathlib\nimport subprocess\nimport sys\nimport tarfile\n"),
+    ('''        r = subprocess.run(["bash", "-c", f"git archive --format=tar {PIN} | tar -x -C '{PINNED.as_posix()}'"],
+                           capture_output=True, text=True)
+        want = subprocess.run(["git", "ls-tree", "-r", "--name-only", PIN], capture_output=True, text=True).stdout.split()
+        got = [p for p in want if (PINNED / p).is_file()]
+        if r.returncode != 0 or len(got) != len(want):
+            sys.exit(f"run_kit_plants: the pinned tree extracted {len(got)} of {len(want)} files: {r.stderr[-300:]}")
+''',
+     '''        r = subprocess.run(["git", "archive", "--format=tar", PIN], capture_output=True)
+        if r.returncode != 0:
+            sys.exit(f"run_kit_plants: git archive {PIN} failed: {r.stderr[-300:]!r}")
+        with tarfile.open(fileobj=io.BytesIO(r.stdout)) as tf:
+            tf.extractall(PINNED, filter="data")
+        want = subprocess.run(["git", "ls-tree", "-r", "--name-only", PIN], capture_output=True, text=True).stdout.split()
+        got = [p for p in want if (PINNED / p).is_file()]
+        if not want or len(got) != len(want):
+            sys.exit(f"run_kit_plants: the pinned tree extracted {len(got)} of {len(want)} files")
+'''),
+]
+for old, new in edits:
+    if t.count(old) != 1:
+        sys.exit(f"pin_walk_cases2: {old[:60]!r} matches {t.count(old)} times")
+    t = t.replace(old, new)
+R.write_text(t, encoding="utf-8", newline="\n")
+print("run_kit_plants.py: the pinned tree extracted by tarfile")
+````
+
+### `tar_probe.py`
+
+The probe that this node's Python extracts the pinned tree whole under the scratchpad: 5029 files, none missing, paths to 309 characters.
+
+````python
+import io, subprocess, sys, tarfile, pathlib
+dest = pathlib.Path(sys.argv[1]); pin = sys.argv[2]
+data = subprocess.run(["git", "archive", "--format=tar", pin], capture_output=True, check=True).stdout
+with tarfile.open(fileobj=io.BytesIO(data)) as tf:
+    names = [m.name for m in tf.getmembers() if m.isfile()]
+    try:
+        tf.extractall(dest, filter="data")
+    except TypeError:
+        tf.extractall(dest)
+missing = [n for n in names if not (dest / n).is_file()]
+print(f"files {len(names)}, missing {len(missing)}, longest {max(len(str(dest / n)) for n in names)} chars")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -26582,6 +31301,31 @@ MINE = [
     ('audit-run/record_run_c_scored.py', "Run C scored with runs A and B: the round record's [walk-run-c-scored], the aggregate only, read from the three reports' shape lines and score.py's --with output."),
     ('audit-run/unseal.py', "The seal lifted at the owner's word: the key copied byte for byte with its hash checked, the seeding and detectability scripts and the brief reviews committed, and [recall-scored] written."),
     ('audit-run/fold_batches.py', "The fold's five batches as briefs: disjoint records and sections, places from the fold inventory, each place's findings embedded whole from the three reports."),
+    ('expansions/fold_lib.py', 'The fold library every fold script imports: a record read whole, sub and insert_before refusing anything but one match, saved with LF.'),
+    ('stall/dry_run.sh', "The fold's dry run: the worktree copied to a folder under the scratchpad (DRY_DIR, refused elsewhere), a fold script run there, then the build's ten final checks."),
+    ('fold/all.py', "Runs the fold's scripts on a tree in FOLD_ORDER: writer n's w<n>/fold-<n>.py, then any named step such as mint; an absent one stops the run."),
+    ('fold/noop.py', 'The no-op fold: dry_run.sh with it checks a tree as it stands, the unfolded base or the applied fold.'),
+    ('fold/w1/fold-1.py', "Fold writer 1's script, as returned (fold-return-w1), with the main loop's state-name amendment marked in a comment."),
+    ('fold/w2/fold-2.py', "Fold writer 2's script, as returned (fold-return-w2), with the main loop's place-68 amendment marked in a comment."),
+    ('fold/w3/fold-3.py', "Fold writer 3's script, as returned (fold-return-w3)."),
+    ('fold/w4/fold-4.py', "Fold writer 4's script, as returned (fold-return-w4), with the main loop's state-name amendment marked in a comment."),
+    ('fold/w5/fold-5.py', "Fold writer 5's script, as returned (fold-return-w5)."),
+    ('fold/w6/fold-6.py', "Fold writer 6's script: the five writers' requests and the probe's rows their folds raised (fold-return-w6)."),
+    ('fold/w7/fold-7.py', "Fold writer 7's script: the owner's answers on v2's policies, leases and the layer records, new clauses under placeholder ids (fold-return-w7)."),
+    ('fold/w8/fold-8.py', "Fold writer 8's script: the owner's answers on flow-steps, new clauses under placeholder ids (fold-return-w8)."),
+    ('fold/w9/fold-9.py', "Fold writer 9's script: the widened probe's route rows generated from its lines, FK-7-1, FK-8-1, FK-9-1, FK-9-2 and the crossed requests (fold-return-w9, -w9b)."),
+    ('fold/mint.py', "The mint step: the writers' placeholder clause ids numbered on from [clause-ids]' next free id in their first use in [chain], verbatim records left alone."),
+    ('fold/rename_states.py', "The main loop's amendment of fold-1 and fold-4: the terminal named incomplete and the hold parked, one name per state."),
+    ('fold/widen_probe.py', "The reconciliation probe's rule 3 widened to every route in every run, as its docstring prescribed once the fold classed the forward routes."),
+    ('fold/record_forks.py', "The round record's [fold] and its session-log event: the 33 answers copied verbatim, counts derived."),
+    ('fold/record_fold_applied.py', "The round record's [fold-applied] and its session-log event: the later answers verbatim, the tallies, the minted ids and the checks, each read from a saved output."),
+    ('fold/prep_recorder.py', "This recorder's [fold-probe] section, inserted."),
+    ('audit-run/writer_outcome.py', "A fold writer's outcome text for its dispatch row, derived from its saved return and its script."),
+    ('audit-run/fix_writer_outcome3.py', "writer_outcome.py's compound cells and label repaired, and the session log's rows 198 to 205 relabelled to say what was counted."),
+    ('fold/k5_rows.py', "The fold's K5 step, the main loop's: writer 1's cl-0004 and cl-0016 cite P35 and P38 by id, so each joins its principle's [enforcement] row, found when Stage 0's k5-cited plant could not red for its own reason."),
+    ('walkkit/pin_walk_cases.py', "The walk kit's walk-check cases pinned to the tree before the fold, whose items their fixtures were written for: on the folded tree the clean fixtures red and drop-cell reds on 25 rows, not its own one."),
+    ('walkkit/pin_walk_cases2.py', "The pinned tree extracted by git archive and tarfile, after bash from Python resolved to WSL's, which cannot read the worktree's git."),
+    ('walkkit/tar_probe.py', "The probe that this node's Python extracts the pinned tree whole under the scratchpad: 5029 files, none missing, paths to 309 characters."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -26814,6 +31558,33 @@ run reds (the plant `k2-deploy-land` above):
 The first run on the real tree, the audit's first leads, whole:
 
 """ + block("text", "$ python stage0.py\n" + real.strip() + f"\nrc {real_rc}"))
+def probe_reading(rel, cmd, rc):
+    """One captured probe run: its summary line, its all-routes count, its unclassed lines and its findings."""
+    keep = [l for l in read(S / rel).strip().split("\n")
+            if l.startswith(("chain rows", "all routes", "findings")) or "UNCLASSED" in l]
+    return f"$ {cmd}\n" + "\n".join(keep) + f"\nrc {rc}"
+
+
+parts.append("""
+## [fold-probe] The reconciliation probe widened at the fold, red before its rows
+
+Its docstring kept rule 3 to the breakpoint program in the default run "until the audit's fold classes what it finds",
+and the owner's FK-4-9 asked for a tolerance row per forward route, so every run now reads every route
+(`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[fold]`). The runs below: the probe before the change, on the
+unfolded tree with Stage 0's flag and on a copy folded through fold-8 and the mint step; the widened probe on both;
+and, after writer 9's rows were applied, the widened probe with one route row dropped in memory.
+
+""" + block("text", "\n\n".join([
+    probe_reading("fold/probe-old-wide-base.out", "python reconcile.py recut.md --all-routes   # before; the unfolded tree", 1),
+    probe_reading("fold/probe-narrow.out", "python reconcile.py recut.md   # before; the folded copy", 1),
+    probe_reading("fold/probe-new-base.out", "python reconcile.py recut.md   # widened; the unfolded tree", 1),
+    probe_reading("fold/probe-new-folded.out", "python reconcile.py recut.md   # widened; the folded copy, before writer 9", 1),
+    probe_reading("fold/probe-plant-drop.out", "python reconcile.py recut.md --plant-drop " + read(S / "fold/probe-plant-drop.arg").strip()
+                  + "   # widened; the folded tree, one route row dropped", 1),
+])) + """
+After writer 9's rows, the widened run is green on the tree, as `[final]` shows.
+""")
+
 kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))
 if kit_rc != 0:
     sys.exit("a walk-kit or instrument run did not go as wanted:\n" + kit_out[-800:])
@@ -27163,21 +31934,21 @@ H2's measurement, re-run on the folded tree. The first fold read 47 mentions ove
 
 ````text
 $ python plain_cites.py
-landing                 10  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dDeclaredLoop (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's) …
-plan                     9  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
+landing                 11  dGroundRules (dShippedRelease's), dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dDeclaredLoop (dShippedRelease's), dPlacedRequest (dShippedRelease's), dKeptSession (dShippedRelease's) …
+plan                    10  dSafePassage (dRankedPlan's), dOrderedCharter (dRankedPlan's), dDeclaredLoop (dRankedPlan's), dPlacedRequest (dRankedPlan's), dBoundRoles (dRankedPlan's), dTotalRecall (dRankedPlan's) …
+spec                     9  dTrueNorth (dIndexedDesign's), dOrderedCharter (dIndexedDesign's), dFairHearing (dIndexedDesign's), dDeclaredLoop (dIndexedDesign's), dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's) …
 seen red                 8  dTrueNorth (dWitnessedBar's), dGroundRules (dWitnessedBar's), dSafePassage (dWitnessedBar's), dOrderedCharter (dWitnessedBar's), dFairHearing (dWitnessedBar's), dDeclaredLoop (dWitnessedBar's) …
+witness                  7  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's) …
 census                   6  dGroundRules (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dPlacedRequest (dLinkedLibrary's), dKeptSession (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
-witness                  6  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
 scope                    6  dOrderedCharter (dScopedBuild's), dDeclaredLoop (dScopedBuild's), dPlacedRequest (dScopedBuild's), dMindYourWords (dScopedBuild's), dWellOiledMachine (dScopedBuild's), dCalibratedLens (dScopedBuild's)
-spec                     5  dTrueNorth (dIndexedDesign's), dFairHearing (dIndexedDesign's), dDeclaredLoop (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dFurnishedOrders (dIndexedDesign's)
 code                     5  dSafePassage (dTotalRecall's), dFairHearing (dTotalRecall's), dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's), dBoundRoles (dTotalRecall's)
+fork                     5  dDeclaredLoop (dIndexedDesign's), dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
 return                   5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dFurnishedOrders (dWellOiledMachine's), dIndexedDesign (dWellOiledMachine's)
+act                      5  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's)
+decision                 4  dTrueNorth (dLinkedLibrary's), dOrderedCharter (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
 commit                   4  dTrueNorth (dDeclaredLoop's), dSafePassage (dDeclaredLoop's), dOrderedCharter (dDeclaredLoop's), dFairHearing (dDeclaredLoop's)
 release                  4  dSafePassage (dShippedRelease's), dOrderedCharter (dShippedRelease's), dPlacedRequest (dShippedRelease's), dWellOiledMachine (dShippedRelease's)
-act                      4  dDeclaredLoop (dWellOiledMachine's), dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dBoundRoles (dWellOiledMachine's)
 intake                   4  dPlacedRequest (dWellOiledMachine's), dKeptSession (dWellOiledMachine's), dTotalRecall (dWellOiledMachine's), dRankedPlan (dWellOiledMachine's)
-fork                     4  dPlacedRequest (dIndexedDesign's), dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's), dRankedPlan (dIndexedDesign's)
-decision                 3  dTrueNorth (dLinkedLibrary's), dTotalRecall (dLinkedLibrary's), dWellOiledMachine (dLinkedLibrary's)
 baseline                 3  dTrueNorth (dLinkedLibrary's), dFurnishedOrders (dLinkedLibrary's), dWitnessedBar (dLinkedLibrary's)
 review                   3  dGroundRules (dFairHearing's), dSafePassage (dFairHearing's), dOrderedCharter (dFairHearing's)
 registry                 3  dSafePassage (dTotalRecall's), dOrderedCharter (dTotalRecall's), dBoundRoles (dTotalRecall's)
@@ -27195,7 +31966,9 @@ ask                      2  dDeclaredLoop (dTotalRecall's), dKeptSession (dTotal
 claim                    2  dDeclaredLoop (dTotalRecall's), dPlacedRequest (dTotalRecall's)
 comparison               2  dPlacedRequest (dShippedRelease's), dTotalRecall (dShippedRelease's)
 roster                   2  dBoundRoles (dIndexedDesign's), dWellOiledMachine (dIndexedDesign's)
+seams                    2  dFurnishedOrders (dIndexedDesign's), dMindYourWords (dIndexedDesign's)
 acceptance               1  dTrueNorth (dDeclaredLoop's)
+instrument               1  dTrueNorth (dTotalRecall's)
 override                 1  dGroundRules (dOrderedCharter's)
 receipt                  1  dSafePassage (dShippedRelease's)
 card                     1  dOrderedCharter (dPlacedRequest's)
@@ -27203,10 +31976,10 @@ selection                1  dFairHearing (dWitnessedBar's)
 disposition              1  dFairHearing (dDeclaredLoop's)
 triage                   1  dPlacedRequest (dRankedPlan's)
 overlap                  1  dPlacedRequest (dIndexedDesign's)
-seams                    1  dFurnishedOrders (dIndexedDesign's)
 value ledger             1  dFurnishedOrders (dCalibratedLens's)
 work order               1  dTotalRecall (dBoundRoles's)
-plain-word hits on a non-ancestor's record kind: 131, over 43 kinds
+currency                 1  dTendedCadence (dShippedRelease's)
+plain-word hits on a non-ancestor's record kind: 144, over 45 kinds
 ````
 
 The committed probe's transitions rule, red before `repeat`'s row landed:
@@ -27584,7 +32357,7 @@ green run on the real table is in `[final]`.
 
 ````text
 $ python preset_check_canonical.py v2-round-count-over.md
-catalogue keys 270 · presettable 244 · preset rows 244
+catalogue keys 272 · presettable 246 · preset rows 246
 pair rule: velocity sets review.max-rounds 2 under review.design.round-count 3
 rc 1
 ````
@@ -27607,20 +32380,20 @@ rc 1
 
 ````text
 $ python clause-ids.py --plant missing
-clause ids: read 496 clauses in 22 builds; findings 1
+clause ids: read 509 clauses in 22 builds; findings 1
   dTrueNorth: a clause holds 0 ids or none at its end: the clause ids: each clause of the design read with its minted `cl-` i...
 rc 1
 $ python clause-ids.py --plant duplicate
-clause ids: read 496 clauses in 22 builds; findings 1
+clause ids: read 509 clauses in 22 builds; findings 1
   cl-dClosedLoop-0001 minted twice: dTrueNorth and dTrueNorth
 rc 1
 $ python clause-ids.py --plant retired
-clause ids: read 496 clauses in 22 builds; findings 1
+clause ids: read 509 clauses in 22 builds; findings 1
   cl-dClosedLoop-0001 is retired and in use on dTrueNorth
 rc 1
 $ python clause-ids.py --plant next
-clause ids: read 496 clauses in 22 builds; findings 1
-  an id reaches 496, past the recorded next number 1
+clause ids: read 509 clauses in 22 builds; findings 1
+  an id reaches 509, past the recorded next number 1
 rc 1
 ````
 
@@ -27655,33 +32428,33 @@ class-stale      rc 1  RED for its reason
 plants 19, red for their reason 19
 
 $ python stage0.py --plant k1-witness
-stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-witness
+stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-witness
 $ python stage0.py --plant k1-ghost-need
-stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-ghost-need
+stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-ghost-need
 $ python stage0.py --plant k1-cycle
-stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-cycle
+stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-cycle
 $ python stage0.py --plant k1-dash
-stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-dash
+stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-dash
 $ python stage0.py --plant k1-owner
-stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-owner
+stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-owner
 $ python stage0.py --plant k1-actor
-stage0: arms K1 · findings 5 · classed 0 · reruns red 0 · plant k1-actor
+stage0: arms K1 · findings 3 · classed 0 · reruns red 0 · plant k1-actor
 $ python stage0.py --plant k2-ghost
-stage0: arms K2 · findings 48 · classed 0 · reruns red 0 · plant k2-ghost
+stage0: arms K2 · findings 33 · classed 0 · reruns red 0 · plant k2-ghost
 $ python stage0.py --plant k2-unformed
-stage0: arms K2 · findings 47 · classed 0 · reruns red 0 · plant k2-unformed
+stage0: arms K2 · findings 32 · classed 0 · reruns red 0 · plant k2-unformed
 $ python stage0.py --plant k2-dead-end
-stage0: arms K2 · findings 48 · classed 0 · reruns red 0 · plant k2-dead-end
+stage0: arms K2 · findings 33 · classed 0 · reruns red 0 · plant k2-dead-end
 $ python stage0.py --plant k2-unreached
-stage0: arms K2 · findings 47 · classed 0 · reruns red 0 · plant k2-unreached
+stage0: arms K2 · findings 32 · classed 0 · reruns red 0 · plant k2-unreached
 $ python stage0.py --plant k2-deploy-land
-stage0: arms K2 · findings 47 · classed 0 · reruns red 0 · plant k2-deploy-land
+stage0: arms K2 · findings 32 · classed 0 · reruns red 0 · plant k2-deploy-land
 $ python stage0.py --plant k3-writer
-stage0: arms K3 · findings 80 · classed 0 · reruns red 0 · plant k3-writer
+stage0: arms K3 · findings 77 · classed 0 · reruns red 0 · plant k3-writer
 $ python stage0.py --plant k3-reader
-stage0: arms K3 · findings 80 · classed 0 · reruns red 0 · plant k3-reader
+stage0: arms K3 · findings 77 · classed 0 · reruns red 0 · plant k3-reader
 $ python stage0.py --plant k4-unread
-stage0: arms K4 · findings 56 · classed 0 · reruns red 0 · plant k4-unread
+stage0: arms K4 · findings 5 · classed 0 · reruns red 0 · plant k4-unread
 $ python stage0.py --plant k5-row
 stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-row
 $ python stage0.py --plant k5-ghost
@@ -27691,7 +32464,7 @@ stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-retired
 $ python stage0.py --plant k5-cited
 stage0: arms K5 · findings 1 · classed 0 · reruns red 0 · plant k5-cited
 $ python stage0.py --plant class-stale
-stage0: arms K4 · findings 56 · classed 0 · reruns red 0 · plant class-stale
+stage0: arms K4 · findings 5 · classed 0 · reruns red 0 · plant class-stale
 ````
 
 The reconciliation probe's default run on a plan item planted with a route to `deploy.land`, which its `--all-routes`
@@ -27699,69 +32472,52 @@ run reds (the plant `k2-deploy-land` above):
 
 ````text
 $ python reconcile.py recut.md --plant-item 'plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`'
-findings 0
-rc 0
+findings 1
+rc 1
 ````
 
 The first run on the real tree, the audit's first leads, whole:
 
 ````text
 $ python stage0.py
-K1: items 116 (90 flow, 26 expansion), roles 14 · findings 4
-  K1 release.approve: actor 'the owner' is no kind and no declared role
-  K1 kits.install: actor 'the owner' is no kind and no declared role
-  K1 kits.update: actor 'the owner' is no kind and no declared role
-  K1 design.streams: a cycle among Needs: design.streams > design.streams
+K1: items 127 (98 flow, 29 expansion), roles 14 · findings 2
+  K1 mailbox.answer: actor 'the role that owns the asked interface or item' is no kind and no declared role
+  K1 build.unit-lease: a cycle among Needs: build.unit-lease > build.reuse-check > build.scope > build.acceptance > build.unit-pass > build.unit-lease
   left out: whether a witness is actor-typed (P2) and whether the outcome is the right one; a Needs cell's prose beyond its item tags
-K2: targets by form: ask 3, edge 142, owner 10, policy 6, program 12, return 20, terminal 33, wait 8; roots 14, reached 102, ending 113 · findings 46
+K2: targets by form: ask 4, edge 186, owner 13, policy 4, program 7, return 23, terminal 56, wait 5; roots 14, reached 116, ending 125 · findings 31
+  K2 entry.place: a target in no declared form: "an amendment that re-enters the item it answers, drawing on `flow.rework-budget` (`[breakp"
+  K2 mailbox.answer: a target in no declared form: "the `answer` posted to the asker's mailbox"
+  K2 mailbox.answer: a target in no declared form: "the asker's declared default answers it (`cl-dClosedLoop-0162`)"
   K2 plan.exit: a target in no declared form: "the card is re-rendered and the executor launched where `run.host` says"
+  K2 design.overlaps: a target in no declared form: "as under `warn`"
+  K2 life.quiesce: a target in no declared form: "paused"
+  K2 adopt.decisions: a target in no declared form: "the rubric revised and the candidates rated again, within `flow.route-backs` (`cl-dClosedL"
+  K2 adopt.instructions: a target in no declared form: "the unit, the amendment or the drop written"
+  K2 adopt.declarations: a target in no declared form: "the overlay row written"
   K2 loop.file: a target in no declared form: "a kept row's disposition is a keep record, keyed by (ledger kind, id, date), so each keep,"
   K2 release.record: a target in no declared form: "the release slot's exit record for the SHA, with the outcome, E and this record's id"
   K2 kits.cut: a target in no declared form: "the disposition its witness, keyed by period, or under `owner-cut` by the span's tip SHA, "
   K2 kits.offer: a target in no declared form: "the adopter lands it with its own lander, whose bar runs the checks the offer left unrun"
   K2 kits.offer: a target in no declared form: "an outbox order the adopter runs itself"
+  K2 kits.install: a target in no declared form: "reclaimed once its holder is dead, then the walk again (`cl-dClosedLoop-0019`)"
   K2 kits.install: a target in no declared form: "its slot renders not installed, the core render kept"
+  K2 kits.update: a target in no declared form: "reclaimed once its holder is dead, then the walk again (`cl-dClosedLoop-0019`)"
   K2 kits.update: a target in no declared form: "its slot renders not installed, the core render kept"
-  K2 kits.install: ends nowhere: every route it takes leads only to items that never end
   K2 kits.offer: ends nowhere: every route it takes leads only to items that never end
-  K2 kits.update: ends nowhere: every route it takes leads only to items that never end
-  K2 build.core: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 build.distill: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 build.exit: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 build.ratify: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 build.recommend: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 mailbox.answer: ends nowhere: every route it takes leads only to items that never end
+  K2 adopt.declarations: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 adopt.instructions: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.adopters: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.currency: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.cut: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.install: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 kits.install-attended: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.offer: reached from no entry: no reached item routes to it, and no item it needs is reached
   K2 kits.update: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 loop.record: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 maintain.levels: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 maintain.record: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 dDeclaredLoop→build.distill: order: routes `build.distill`, dScopedBuild's, not an ancestor, UNCLASSED
-  K2 dDeclaredLoop→build.ratify: order: routes `build.ratify`, dScopedBuild's, not an ancestor, UNCLASSED
-  K2 dDeclaredLoop→deploy.notify: order: routes `deploy.notify`, dShippedRelease's, not an ancestor, UNCLASSED
-  K2 dDeclaredLoop→design.ready: order: routes `design.ready`, dIndexedDesign's, not an ancestor, UNCLASSED
-  K2 dDeclaredLoop→plan.exit: order: routes `plan.exit`, dRankedPlan's, not an ancestor, UNCLASSED
-  K2 dDeclaredLoop→plan.input: order: routes `plan.input`, dRankedPlan's, not an ancestor, UNCLASSED
-  K2 dDeclaredLoop→test.exit: order: routes `test.exit`, dWitnessedBar's, not an ancestor, UNCLASSED
-  K2 dFairHearing→review.dispose: order: routes `review.dispose`, dDeclaredLoop's, not an ancestor, UNCLASSED
-  K2 dIndexedDesign→build.base: order: routes `build.base`, dScopedBuild's, not an ancestor, UNCLASSED
-  K2 dLinkedLibrary→build.unit-pass: order: routes `build.unit-pass`, dScopedBuild's, not an ancestor, UNCLASSED
-  K2 dPlacedRequest→design.input: order: routes `design.input`, dIndexedDesign's, not an ancestor, UNCLASSED
-  K2 dPlacedRequest→plan.dedupe: order: routes `plan.dedupe`, dRankedPlan's, not an ancestor, UNCLASSED
-  K2 dPlacedRequest→plan.input: order: routes `plan.input`, dRankedPlan's, not an ancestor, UNCLASSED
-  K2 dPlacedRequest→plan.triage-rule: order: routes `plan.triage-rule`, dRankedPlan's, not an ancestor, UNCLASSED
-  K2 dRankedPlan→design.input: order: routes `design.input`, dIndexedDesign's, not an ancestor, UNCLASSED
-  K2 dWellOiledMachine→deploy.current: order: routes `deploy.current`, dShippedRelease's, not an ancestor, UNCLASSED
-  K2 dWellOiledMachine→deploy.released: order: routes `deploy.released`, dShippedRelease's, not an ancestor, UNCLASSED
-  K2 dWellOiledMachine→deploy.unlease: order: routes `deploy.unlease`, dShippedRelease's, not an ancestor, UNCLASSED
-  K2 dWitnessedBar→build.base: order: routes `build.base`, dScopedBuild's, not an ancestor, UNCLASSED
-  K2 dWitnessedBar→deploy.current: order: routes `deploy.current`, dShippedRelease's, not an ancestor, UNCLASSED
-  K2 dWitnessedBar→design.input: order: routes `design.input`, dIndexedDesign's, not an ancestor, UNCLASSED
+  K2 kits.update-attended: reached from no entry: no reached item routes to it, and no item it needs is reached
+  K2 mailbox.answer: reached from no entry: no reached item routes to it, and no item it needs is reached
   left out: whether a branch that ends by a terminal, return, wait, owner, ask, policy or program form does end (the walk's S6); a policy's routes per value; the [transitions] join gap-flow-15 owes; the conditions before each arrow
-K3: kinds 79, table rows 79 · findings 79
+K3: kinds 83, table rows 83 · findings 76
   K3 act: no writer item: "one act session per role act; act binding and the epoch check; writer item not n"
   K3 act: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 adopter-register: no reader: no item waits on its writer or names it, and no clause of another build names it
@@ -27772,25 +32528,23 @@ K3: kinds 79, table rows 79 · findings 79
   K3 archive: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 ask: no writer item: "the ask kind's acceptance at filing; writer item not named"
   K3 ask: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 attribution: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 backlog-row: no writer item: "the ask register's row store; the memory contract declares it; writer item not n"
   K3 backlog-row: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 baseline: no writer item: "retrofit's `baseline` and `census` record kinds; writer item not named"
   K3 baseline: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 build-readme: no writer item: "the build README's declared front-matter schema, with unknown keys refused; writ"
   K3 build-readme: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 claim: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 code: no writer item: "the core code record: files, definitions with their ranges and body hashes, impo"
   K3 commit: no writer item: "a git commit, its `Gov-*` trailers an edge site; written by the commit queue fro"
   K3 commit: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 currency: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 decision: no writer item: "decisions split by kind, the major-decision log; writer item not named"
   K3 decision: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 design-record: no writer item: "a core memory kind with no writer item; the memory contract declares it"
   K3 design-record: no reader: no item waits on its writer or names it, and no clause of another build names it
+  K3 deviation: no writer item: "the record kept in its departing build's `build/` folder, read by the deviation "
   K3 dossier: no writer item: "dossiers anchored to symbol keys; writer item not named"
   K3 dossier: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 exception: no writer item: "the exception register beside the `core.*` policies; writer item not named"
+  K3 exception: no writer item: "the exception register, kept in the building build's `build/` folder as a deviat"
   K3 exception: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 flake: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 fork: no writer item: "a flow record kind (layer-memory `[decisions]`); fork resolution by `design.fork"
@@ -27812,14 +32566,13 @@ K3: kinds 79, table rows 79 · findings 79
   K3 node-ledger: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 node-profile: no writer item: "the node's one description, kept at the node's home outside every repository: wr"
   K3 node-profile: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 override: no writer item: "`charter.override` and its record, under the precedence and override rule; write"
+  K3 override: no writer item: "`charter.override` and its record, under the precedence and override rule, the r"
   K3 override: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 playbook: no writer item: "a design record kind carrying dScriptedRepeat's canon, which an ordinary build a"
   K3 playbook-set: no writer item: "its writer is the set check, which dIndexedDesign registers at Test's leg-pack p"
   K3 playbook-set: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 recall-index: no writer item: "memory-recall narrowed to a record finder; writer item not named"
   K3 recall-index: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 receipt: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 registry: no writer item: "a gate's row registry under `memory/project/`, written by its gate's pin emitter"
   K3 registry: no reader: no item waits on its writer or names it, and no clause of another build names it
   K3 release: no reader: no item waits on its writer or names it, and no clause of another build names it
@@ -27842,69 +32595,18 @@ K3: kinds 79, table rows 79 · findings 79
   K3 work-order: no writer item: "the work order rendered per item; writer item not named"
   K3 work-order: no reader: no item waits on its writer or names it, and no clause of another build names it
   left out: a reader or writer that is a gate, a renderer or a hook rather than an item; a kind named in plain words other than '<kind> record'; whether a non-item writer is real
-K4: keys 265 · findings 55
-  K4 annotations.delivery: read by no chain clause and no item (guard-bearing)
-  K4 annotations.lookup: read by no chain clause and no item
-  K4 annotations.resolve-scope: read by no chain clause and no item
-  K4 budgets.*: read by no chain clause and no item
-  K4 card.follows: read by no chain clause and no item
-  K4 commits.squash: read by no chain clause and no item
-  K4 deploy.currency: read by no chain clause and no item
-  K4 deploy.runs: read by no chain clause and no item
-  K4 deps.coordination: read by no chain clause and no item
-  K4 deps.early-build: read by no chain clause and no item
-  K4 design.handoff: read by no chain clause and no item
-  K4 design.overlap: read by no chain clause and no item (guard-bearing)
-  K4 floor: read by no chain clause and no item (guard-bearing)
-  K4 instructions.slices: read by no chain clause and no item
-  K4 instructions.task-charter: read by no chain clause and no item
+K4: keys 267 · findings 4
   K4 kits.cadence: read by no chain clause and no item
-  K4 kits.host: read by no chain clause and no item
-  K4 kits.watch-cadence: read by no chain clause and no item
-  K4 landing.order: read by no chain clause and no item
-  K4 leases.granularity: read by no chain clause and no item
-  K4 maintain.cadence: read by no chain clause and no item
-  K4 maintain.events: read by no chain clause and no item (guard-bearing)
-  K4 maintain.host: read by no chain clause and no item
-  K4 maintain.reading-admission: read by no chain clause and no item (guard-bearing)
-  K4 memory.map-overflow: read by no chain clause and no item
-  K4 memory.map-unfold: read by no chain clause and no item (guard-bearing)
-  K4 memory.over-budget: read by no chain clause and no item (guard-bearing)
-  K4 memory.superseded-slices: read by no chain clause and no item
-  K4 observability.run-record: read by no chain clause and no item (guard-bearing)
-  K4 orient.budget: read by no chain clause and no item (guard-bearing)
-  K4 plan.authority: read by no chain clause and no item
-  K4 plan.kickoff: read by no chain clause and no item
-  K4 plan.triage: read by no chain clause and no item
-  K4 retrofit.claim-on-touch: read by no chain clause and no item (guard-bearing)
-  K4 retrofit.drain: read by no chain clause and no item (guard-bearing)
-  K4 retrofit.slot-bytes: read by no chain clause and no item
-  K4 retrofit.widen: read by no chain clause and no item
-  K4 review.build.when: read by no chain clause and no item
-  K4 review.loop.cadence: read by no chain clause and no item
-  K4 roles.orientation.house-index: read by no chain clause and no item (guard-bearing)
+  K4 leases.overlap: read by no chain clause and no item
   K4 roles.shape-enforce: read by no chain clause and no item
   K4 runtime.attended-allowance: read by no chain clause and no item (guard-bearing)
-  K4 runtime.hook-failure: read by no chain clause and no item
-  K4 runtime.relaunch: read by no chain clause and no item
-  K4 runtime.secret-scan: read by no chain clause and no item (guard-bearing)
-  K4 runtime.spawn-backend: read by no chain clause and no item
-  K4 tags.bare-refs: read by no chain clause and no item (guard-bearing)
-  K4 tags.retired-cites: read by no chain clause and no item (guard-bearing)
-  K4 tags.slice: read by no chain clause and no item
-  K4 tests.product: read by no chain clause and no item (guard-bearing)
-  K4 transitions.record: read by no chain clause and no item (guard-bearing)
-  K4 verdict: read by no chain clause and no item
-  K4 verdict.remote.pin: read by no chain clause and no item
-  K4 verdict.remote.pin-scope: read by no chain clause and no item
-  K4 verdict.remote.trust: read by no chain clause and no item
   left out: a key read in a layer or system record but built by no clause; whether an unread key is guard-bearing beyond its values' words
-K5: principles 42, clauses 496, retired 0 · findings 0
+K5: principles 42, clauses 509, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
   map: no stale facts read 66 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 234 records, 4129 sections, 215 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 234 records, 4134 sections, 217 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -27912,17 +32614,17 @@ rerun reconciliation probe: rc 0
 rerun clause scan: rc 0
   splits inside a clause: 0
 rerun clause ids: rc 0
-  clause ids: read 496 clauses in 22 builds; findings 0
+  clause ids: read 509 clauses in 22 builds; findings 0
 rerun gap join: rc 0
   builds owning nothing: none
 rerun preset check: rc 0
   no findings
 rerun critical path: rc 0
-  critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+  critical path: 276 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 127 · lines 43456 · unreviewed 12303 (28%)
+  design records 144 · lines 47726 · unreviewed 16573 (35%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 22
+  design commits after the floor that no closing review covers: 24
     930120e45  8 design record(s)  records(dClosedLoop): the parked debt's review pair, run and folded — 35 defects, eight high, none for the own
     590305b02  1 design record(s)  records(dClosedLoop): the final questions researched — the whole design audited, held to its specs, its deviat
     4ac19101f  6 design record(s)  records(dClosedLoop): the owner's final answers folded — P41 and P42, dTrueNorth at the chain's root, nine key
@@ -27945,9 +32647,125 @@ rerun review debt: rc 0
     60b794f2b  6 design record(s)  records(dClosedLoop): the owner's word, "Fold, re-measure after" — the seal lifted and the recall read plant b
     11c43418d  1 design record(s)  records(dClosedLoop): the atlas skips the audit's briefs and agent returns, and republishes as v74
     8222099f8  1 design record(s)  records(dClosedLoop): the fold inventory — 236 confirmed and 10 unverified findings on 179 places
-stage0: arms K1,K2,K3,K4,K5,reruns · findings 184 · classed 0 · reruns red 0
+    e7b58e2ee  6 design record(s)  records(dClosedLoop): the fold's five writers briefed — 179 places in disjoint records, each judged against th
+    10c0c4fb4  12 design record(s)  records(dClosedLoop): the fold's six writers returned and the owner answered all 33 forks — 5 away from the re
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 113 · classed 0 · reruns red 0
 rc 1
 ````
+
+
+## [fold-probe] The reconciliation probe widened at the fold, red before its rows
+
+Its docstring kept rule 3 to the breakpoint program in the default run "until the audit's fold classes what it finds",
+and the owner's FK-4-9 asked for a tolerance row per forward route, so every run now reads every route
+(`2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[fold]`). The runs below: the probe before the change, on the
+unfolded tree with Stage 0's flag and on a copy folded through fold-8 and the mint step; the widened probe on both;
+and, after writer 9's rows were applied, the widened probe with one route row dropped in memory.
+
+````text
+$ python reconcile.py recut.md --all-routes   # before; the unfolded tree
+chain rows 22 · owned nodes read 500 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 43 (cites 18, stage 0, routes 22, reads 3, registers 0)
+all routes: 153 route edges read from flow and expansion items
+  dDeclaredLoop routes `build.distill` (dScopedBuild's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `build.ratify` (dScopedBuild's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `deploy.notify` (dShippedRelease's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `design.ready` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `plan.exit` (dRankedPlan's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `plan.input` (dRankedPlan's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `test.exit` (dWitnessedBar's, not an ancestor): UNCLASSED
+  dFairHearing routes `review.dispose` (dDeclaredLoop's, not an ancestor): UNCLASSED
+  dIndexedDesign routes `build.base` (dScopedBuild's, not an ancestor): UNCLASSED
+  dLinkedLibrary routes `build.unit-pass` (dScopedBuild's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.dedupe` (dRankedPlan's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.input` (dRankedPlan's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.triage-rule` (dRankedPlan's, not an ancestor): UNCLASSED
+  dRankedPlan routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.current` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.released` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.unlease` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `build.base` (dScopedBuild's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `deploy.current` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 21
+rc 1
+
+$ python reconcile.py recut.md   # before; the folded copy
+chain rows 22 · owned nodes read 517 · flow items read 98 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 33 (cites 26, stage 0, routes 1, reads 6, registers 0)
+  dTendedCadence cites `currency` (dShippedRelease's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+
+$ python reconcile.py recut.md   # widened; the unfolded tree
+chain rows 22 · owned nodes read 500 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 43 (cites 18, stage 0, routes 22, reads 3, registers 0)
+all routes: 153 route edges read from flow and expansion items
+  dDeclaredLoop routes `build.distill` (dScopedBuild's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `build.ratify` (dScopedBuild's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `deploy.notify` (dShippedRelease's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `design.ready` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `plan.exit` (dRankedPlan's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `plan.input` (dRankedPlan's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `test.exit` (dWitnessedBar's, not an ancestor): UNCLASSED
+  dFairHearing routes `review.dispose` (dDeclaredLoop's, not an ancestor): UNCLASSED
+  dIndexedDesign routes `build.base` (dScopedBuild's, not an ancestor): UNCLASSED
+  dLinkedLibrary routes `build.unit-pass` (dScopedBuild's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.dedupe` (dRankedPlan's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.input` (dRankedPlan's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.triage-rule` (dRankedPlan's, not an ancestor): UNCLASSED
+  dRankedPlan routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.current` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.released` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.unlease` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `build.base` (dScopedBuild's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `deploy.current` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 21
+rc 1
+
+$ python reconcile.py recut.md   # widened; the folded copy, before writer 9
+chain rows 22 · owned nodes read 517 · flow items read 98 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 61 (cites 26, stage 0, routes 29, reads 6, registers 0)
+all routes: 204 route edges read from flow and expansion items
+  dTendedCadence cites `currency` (dShippedRelease's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `build.base` (dScopedBuild's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `build.distill` (dScopedBuild's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `build.ratify` (dScopedBuild's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `deploy.notify` (dShippedRelease's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `design.ready` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `plan.exit` (dRankedPlan's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `plan.input` (dRankedPlan's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `plan.record` (dRankedPlan's, not an ancestor): UNCLASSED
+  dDeclaredLoop routes `test.exit` (dWitnessedBar's, not an ancestor): UNCLASSED
+  dIndexedDesign routes `build.base` (dScopedBuild's, not an ancestor): UNCLASSED
+  dIndexedDesign routes `build.unit-pass` (dScopedBuild's, not an ancestor): UNCLASSED
+  dLinkedLibrary routes `build.unit-pass` (dScopedBuild's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `build.unit-lease` (dScopedBuild's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.dedupe` (dRankedPlan's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.input` (dRankedPlan's, not an ancestor): UNCLASSED
+  dPlacedRequest routes `plan.triage-rule` (dRankedPlan's, not an ancestor): UNCLASSED
+  dRankedPlan routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+  dShippedRelease routes `maintain.patch` (dTendedCadence's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.current` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.released` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWellOiledMachine routes `deploy.unlease` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `build.fix-pass` (dScopedBuild's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `build.resolve` (dScopedBuild's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `deploy.current` (dShippedRelease's, not an ancestor): UNCLASSED
+  dWitnessedBar routes `design.input` (dIndexedDesign's, not an ancestor): UNCLASSED
+findings 28
+rc 1
+
+$ python reconcile.py recut.md --plant-drop dWellOiledMachine:deploy.released   # widened; the folded tree, one route row dropped
+chain rows 22 · owned nodes read 517 · flow items read 98 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 63 (cites 28, stage 0, routes 29, reads 6, registers 0)
+all routes: 204 route edges read from flow and expansion items
+  dWellOiledMachine routes `deploy.released` (dShippedRelease's, not an ancestor): UNCLASSED
+findings 1
+rc 1
+````
+
+After writer 9's rows, the widened run is green on the tree, as `[final]` shows.
 
 
 ## [walk-kit] The walk kit, the scorer and the three instruments, each seen red
@@ -28112,10 +32930,10 @@ FINDING fates: kit.unattended carries fate=absorbed, and [kits] says None
 FINDING fates: kit.workflows carries fate=kept, and [kits] says None
 rc 1
 $ python map.py --check --plant unpinned-count
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:907 quotes '31,203 of its 32,768' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:916 quotes '31,203 of its 32,768' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unpinned-path
-FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:907 quotes 'critical path is 211' with nothing pinning it on its line
+FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:916 quotes 'critical path is 211' with nothing pinning it on its line
 rc 1
 $ python map.py --check --plant unclosed-fence
 FINDING no stale facts: 2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md ends inside an open fence, which mutes every line after it
@@ -28145,7 +32963,7 @@ $ python atlas.py --check --plant hop-edge
 atlas: memory-plan [cycle] hop 'work order → act': a family, its state or an edge is unread ['answered-by-typo']
 rc 1
 $ python atlas.py --check --plant edges-split
-atlas: memory-plan [edges] holds 24 row lines but its table parsed 1: a split table drops rows
+atlas: memory-plan [edges] holds 25 row lines but its table parsed 1: a split table drops rows
 rc 1
 $ python atlas.py --check --plant instruments-decision
 atlas: night-pass-instruments is an instruments record, yet its section 'The owner's answers, folded' reads as a decision; an instruments record holds scripts and runs, so retitle the section
@@ -28163,13 +32981,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2660 nodes in 30 namespaces; 32602 B of 32768 (degraded: purposes 40); folded 14; unarmed none
-map: purposes declared 1839, derived 321, pending 500
+map: 2682 nodes in 30 namespaces; 28441 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1855, derived 323, pending 504
 map: no stale facts read 66 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 234 records, 4130 sections, 215 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 234 records, 4160 sections, 217 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
@@ -28187,12 +33005,19 @@ rows read unfolded despite a fold section: 0
 rc 0
 
 $ reconciliation probe
-chain rows 22 · owned nodes read 500 · flow items read 90 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 22 (cites 18, stage 0, routes 1, reads 3, registers 0)
-left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 131 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch-build entry at Design and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
+chain rows 22 · owned nodes read 517 · flow items read 98 · stages 5 · breakpoint items 8, names 7 · contracts read 3 · on a non-ancestor's node 63 (cites 28, stage 0, routes 29, reads 6, registers 0)
+left out: systems, cited in prose; roles, shapes and commands, not owned nodes; 144 plain-word mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes (5): Observability's entry: Flow's Plan intake, the patch intake that Entry places and claims, and the breakpoints; Observability's entry: Memory's record kinds through `record`; Integrations' entry: Flow's verdict backends and release slot; Distribution's entry: Flow's version slot in Test's `test.merge`; Distribution's entry: Test's leg-pack point, for the `currency` leg
 transitions: 3 dispositions routed through entry.claim, 4 `none` rows
+all routes: 204 route edges read from flow and expansion items
+  dDeclaredLoop cites `build.ratify` (dScopedBuild's, not an ancestor): tolerance
+  dDeclaredLoop cites `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
+  dDeclaredLoop cites `design.inventory` (dIndexedDesign's, not an ancestor): tolerance
+  dDeclaredLoop cites `plan.exit` (dRankedPlan's, not an ancestor): tolerance
   dDeclaredLoop cites `run.on-owner-question` (dBoundRoles's, not an ancestor): tolerance
   dFairHearing cites `class` (dTotalRecall's, not an ancestor): homonym
   dFairHearing cites `preset` (dKeptSession's, not an ancestor): homonym
+  dFairHearing cites `review.dispose` (dDeclaredLoop's, not an ancestor): tolerance
+  dFairHearing cites `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
   dFurnishedOrders cites `code` (dTotalRecall's, not an ancestor): tolerance
   dFurnishedOrders cites `feature` (dTotalRecall's, not an ancestor): tolerance
   dGroundRules cites `policy-file.guard` (dDeclaredLoop's, not an ancestor): not a use
@@ -28200,18 +33025,53 @@ transitions: 3 dispositions routed through entry.claim, 4 `none` rows
   dKeptSession cites `build.closes` (dShippedRelease's, not an ancestor): tolerance
   dKeptSession cites `hooks.bypass` (dWitnessedBar's, not an ancestor): not a use
   dKeptSession cites `intake` (dWellOiledMachine's, not an ancestor): homonym
+  dKeptSession cites `memory.map-purpose` (dTotalRecall's, not an ancestor): tolerance
   dKeptSession cites `playbook` (dIndexedDesign's, not an ancestor): tolerance
   dOrderedCharter cites `check` (dWitnessedBar's, not an ancestor): homonym
   dOrderedCharter cites `code` (dTotalRecall's, not an ancestor): not a use
   dOrderedCharter cites `memory.map-purpose` (dTotalRecall's, not an ancestor): moved
   dRankedPlan cites `entry.intake` (dWellOiledMachine's, not an ancestor): tolerance
   dSafePassage cites `check` (dWitnessedBar's, not an ancestor): homonym
+  dShippedRelease cites `build.distill` (dScopedBuild's, not an ancestor): tolerance
   dTotalRecall cites `journal` (dWellOiledMachine's, not an ancestor): homonym
   dTotalRecall cites `roster` (dIndexedDesign's, not an ancestor): homonym
+  dTrueNorth cites `deviation.approval` (dDeclaredLoop's, not an ancestor): tolerance
+  dWitnessedBar cites `build.acceptance` (dScopedBuild's, not an ancestor): tolerance
   dDeclaredLoop reads `decisions.major` (dLinkedLibrary's, not an ancestor): tolerance
   dFairHearing reads `flow.route-backs` (dDeclaredLoop's, not an ancestor): not a use
+  dFairHearing reads `leases.offline` (dPlacedRequest's, not an ancestor): tolerance
+  dPlacedRequest reads `build.unit-holders` (dWellOiledMachine's, not an ancestor): tolerance
+  dPlacedRequest reads `kickoff.runs` (dRankedPlan's, not an ancestor): tolerance
   dRankedPlan reads `run.host` (dWellOiledMachine's, not an ancestor): tolerance
+  dDeclaredLoop routes `build.base` (dScopedBuild's, not an ancestor): tolerance
+  dDeclaredLoop routes `build.distill` (dScopedBuild's, not an ancestor): tolerance
+  dDeclaredLoop routes `build.ratify` (dScopedBuild's, not an ancestor): tolerance
+  dDeclaredLoop routes `deploy.notify` (dShippedRelease's, not an ancestor): tolerance
+  dDeclaredLoop routes `design.input` (dIndexedDesign's, not an ancestor): tolerance
+  dDeclaredLoop routes `design.ready` (dIndexedDesign's, not an ancestor): tolerance
+  dDeclaredLoop routes `plan.exit` (dRankedPlan's, not an ancestor): tolerance
+  dDeclaredLoop routes `plan.input` (dRankedPlan's, not an ancestor): not a use
+  dDeclaredLoop routes `plan.record` (dRankedPlan's, not an ancestor): tolerance
+  dDeclaredLoop routes `test.exit` (dWitnessedBar's, not an ancestor): tolerance
+  dFairHearing routes `review.dispose` (dDeclaredLoop's, not an ancestor): tolerance
   dFairHearing routes `review.trigger` (dDeclaredLoop's, not an ancestor): not a use
+  dIndexedDesign routes `build.base` (dScopedBuild's, not an ancestor): tolerance
+  dIndexedDesign routes `build.unit-pass` (dScopedBuild's, not an ancestor): tolerance
+  dLinkedLibrary routes `build.unit-pass` (dScopedBuild's, not an ancestor): tolerance
+  dPlacedRequest routes `build.unit-lease` (dScopedBuild's, not an ancestor): tolerance
+  dPlacedRequest routes `design.input` (dIndexedDesign's, not an ancestor): tolerance
+  dPlacedRequest routes `plan.dedupe` (dRankedPlan's, not an ancestor): tolerance
+  dPlacedRequest routes `plan.input` (dRankedPlan's, not an ancestor): tolerance
+  dPlacedRequest routes `plan.triage-rule` (dRankedPlan's, not an ancestor): tolerance
+  dRankedPlan routes `design.input` (dIndexedDesign's, not an ancestor): tolerance
+  dShippedRelease routes `maintain.patch` (dTendedCadence's, not an ancestor): not a use
+  dWellOiledMachine routes `deploy.current` (dShippedRelease's, not an ancestor): tolerance
+  dWellOiledMachine routes `deploy.released` (dShippedRelease's, not an ancestor): tolerance
+  dWellOiledMachine routes `deploy.unlease` (dShippedRelease's, not an ancestor): tolerance
+  dWitnessedBar routes `build.fix-pass` (dScopedBuild's, not an ancestor): tolerance
+  dWitnessedBar routes `build.resolve` (dScopedBuild's, not an ancestor): tolerance
+  dWitnessedBar routes `deploy.current` (dShippedRelease's, not an ancestor): tolerance
+  dWitnessedBar routes `design.input` (dIndexedDesign's, not an ancestor): tolerance
 findings 0
 rc 0
 
@@ -28220,11 +33080,11 @@ splits inside a clause: 0
 rc 0
 
 $ clause ids
-clause ids: read 496 clauses in 22 builds; findings 0
+clause ids: read 509 clauses in 22 builds; findings 0
 rc 0
 
 $ gap join
-register keys 385 · chain builds 22
+register keys 386 · chain builds 22
 unowned: none
 owned twice or more: none
 owned but not in the register: none
@@ -28232,13 +33092,13 @@ builds owning nothing: none
 rc 0
 
 $ preset check
-catalogue keys 270 · presettable 244 · preset rows 244
+catalogue keys 272 · presettable 246 · preset rows 246
 no findings
 rc 0
 
 $ critical path
-critical path: 272 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
-each build's earliest finish, in units: dTrueNorth 6, dGroundRules 17, dSafePassage 30, dFairHearing 48, dOrderedCharter 67, dDeclaredLoop 101, dPlacedRequest 120, dWitnessedBar 131, dKeptSession 147, dBoundRoles 157, dTotalRecall 157, dRankedPlan 171, dFurnishedOrders 177, dLinkedLibrary 181, dIndexedDesign 197, dWellOiledMachine 217, dScopedBuild 231, dTendedCadence 233, dMindYourWords 234, dShippedRelease 246, dCalibratedLens 250, dConvergedCharter 272
+critical path: 276 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
+each build's earliest finish, in units: dTrueNorth 6, dGroundRules 17, dSafePassage 30, dFairHearing 48, dOrderedCharter 67, dDeclaredLoop 101, dPlacedRequest 122, dWitnessedBar 131, dKeptSession 150, dBoundRoles 157, dTotalRecall 157, dRankedPlan 173, dFurnishedOrders 177, dLinkedLibrary 182, dIndexedDesign 198, dWellOiledMachine 218, dScopedBuild 233, dMindYourWords 235, dTendedCadence 236, dShippedRelease 249, dCalibratedLens 253, dConvergedCharter 276
 rc 0
 ````
 

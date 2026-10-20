@@ -146,13 +146,20 @@ Placement is the one judgment left, and it is declared and checked, never inferr
   worktree, is that build's session, mechanically.
 - **Any other request is an intake**, the session's first message or any later one that asks for a
   change. Its disposition is declared, never inferred: `continue <build>`, `amend <build>` (re-entry at
-  Design), `new` (Plan intake), `patch` (a patch build at Design), `ask <build>`, or `none` (read-only:
+  Design), `new` (Plan intake), `patch` (a patch build at Design),
+  `unit <build>/<unit>` (one ready unit of a build leased elsewhere, under its unit lease),
+  `breakpoint <build>` (a review the owner asks for on a live build, its breakpoint named by the request),
+  `ask <build>`,
+  or `none` (read-only:
   a question, research or a review, with no tracked change).
 - **Evidence, not a decision**: `next --place` lists the candidate builds by plan goal and design
   index, and the open asks, beside the request.
 - **Checked**: a disposition's witness must hold before the session acts. For `continue` or `amend`,
   the build is live and its lease is free or this session's; for `new`, a Plan intake record holds the
-  owner's words verbatim; for `patch`, a derived plan record is placed; for `ask`, the ask is filed; for
+  owner's words verbatim; for `patch`, a derived plan record is placed;
+  for `unit`, the build is live, the unit ready and unleased, and `build.unit-holders` admits this session
+  (revised 2026-10-20, the whole-design audit's fold, AS4-F4); for `breakpoint`, the build is live
+  (revised 2026-10-20, the fork answers, FK-4-4); for `ask`, the ask is filed; for
   `none`, the write gate refuses every tracked write.
 - **Recorded**: the disposition and its reason go into the intake record, so a mis-placement can be
   audited.

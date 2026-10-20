@@ -112,7 +112,7 @@ extends.
 | gap-flow-07 | Flow | MED | A build whose units sit in different steps has no defined step, and a session's card does not follow its build across transitions. Raised by the owner. | flow interactions FI-1, FI-8 | — |
 | gap-flow-08 | Flow | MED | Landing order among builds verified at once is undefined; the first landing silently stales the others' verdicts; and no landing queue exists: the turnstile is a host-wide bar semaphore that `push-main.sh` never takes. Raised by the owner. | flow interactions FI-7 | — |
 | gap-flow-09 | Flow | MED | A merge conflict between a build and the default branch's tip has no route. Raised by the owner. | flow interactions FI-3 | — |
-| gap-flow-04 | Flow | MED | A critical planning issue has no path: no recorded plan revision and no re-design inventory of completed work, though none has occurred in 173 builds. Raised by the owner. | flow FL-P6 and its measurement | — |
+| gap-flow-04 | Flow | MED | A critical planning issue has no path: no recorded plan revision, its re-design inventory split to `gap-flow-25`, though none has occurred in 173 builds. Raised by the owner. | flow FL-P6 and its measurement | — |
 | gap-flow-10 | Flow | HIGH | A build can end only by landing: no withdrawn, superseded or merged terminal state exists, the owner's pause, resume and abort exist only for unattended runs (`--hold`, `--resume`, `--abort`) and supersede does not exist, and a dependent held until its parent lands (`deps.landing`) waits forever on a parent that never will. Raised by the owner. | layers round two, `[uncovered]`; flow-roles `[steps]` Deploy; coordination `[design]` | — |
 | gap-flow-11 | Flow | MED | Reviews and owner gates are two mechanisms fixed to set points: each step's review sits at one item (`review.<stage>`), owner gates sit at `autonomy`'s points, and neither can be placed at another item boundary. Raised by the owner. | layers round two, `[uncovered]`; flow `[review]` | — |
 | gap-flow-12 | Flow | MED | The driver reasons out the review recommendation at Plan, Design, Test and Deploy, against P25 and `driver.reads`: a command scores it, and no role is named to reason it (FL-R3). Raised by the owner. | layers round two, `[audit]`; research flow items a F2, b F-X1; roles `[map]` | — |
@@ -128,6 +128,7 @@ extends.
 | gap-flow-22 | Flow | MED | The closing review is handed the build's range alone, never the criteria or seams its finders must answer, though the verifier's packet allows them. | `research-handoffs-design.md` section 5, item 6 | — |
 | gap-flow-23 | Flow | HIGH | No bound spans a build: the driver bounds each review loop and each unit pass apart, so a build's total rework has no ceiling; a promotion cascade ran four audit generations, about 12M tokens, before a run's own override stopped it. Raised by the owner. | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-history.md` rows 6 to 8 | — |
 | gap-flow-24 | Flow | MED | Nothing checks that a flow can finish or that its loops are counted: the run's phases are code, extension vocabularies add steps unchecked, and a per-item counter never escalated once a loop minted new units. | `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-prior-art.md` P1 and P5; `build/2026-10-19-build-PLAY-dClosedLoop-1-research-stall-census.md` | — |
+| gap-flow-25 | Flow | MED | A revised plan has no re-design inventory of completed work: each built unit kept, amended by a new unit or retired. Split from gap-flow-04, since dRankedPlan and dIndexedDesign do not descend one from the other (the whole-design audit's fold, C5-F13). | flow FL-P6; flow-steps `design.inventory` | — |
 | gap-orient-01 | Orient | HIGH | Placement is unaided and unrecorded: kickoff tells the agent to derive a request's scope itself, an unattended run handed a prompt always opens a new build, and only 6 of 131 recent builds name a predecessor, so a mis-placement cannot be audited; path overlap cannot decide placement (the named predecessor ranked first 0 of 5 times). Raised by the owner. | orientation research, routing; `skills/session-kickoff/SKILL.md:126-131`; `tools/unattended/SKILL.template.md:28-32` | — |
 | gap-orient-02 | Orient | HIGH | Nothing binds a session to its build: the route check verifies existence and pairing only, so a route to a terminal build or to another session's build lands, and a resumed route is never re-checked. Raised by the owner. | orientation research, routing; `skills/session-kickoff/manifest-check.sh:995-1001` | — |
 | gap-orient-03 | Orient | HIGH | A build's position is read from typed state: a unit's step and pass come from status headers and RUN.md's phase, all 10 INPROGRESS units sat idle 8 days or more, no resolver says which pass is due, and `LIVE.md` inherits 7 of 30 stale non-terminal headers. Raised by the owner. | orientation research, routing (c) and trust | — |
@@ -902,4 +903,12 @@ Re-measured after the owner's final questions added `gap-design-13`, `gap-build-
 ```text
 Roles=31 Deploy=29 Plan=8 Spine=29 Orient=21 Test=22 Runtime=46 Lexicon=11 Tooling=24 Review=22 Foundation=36 Build=7 Memory=47 Flow=24 Maintain=15 Design=13
 LOW=61 MED=197 HIGH=127
+```
+
+Re-measured after the whole-design audit's fold split `gap-flow-25` from `gap-flow-04`
+(`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w6.md`), same instrument, over 386 keys:
+
+```text
+Roles=31 Deploy=29 Plan=8 Spine=29 Orient=21 Test=22 Runtime=46 Lexicon=11 Tooling=24 Review=22 Foundation=36 Build=7 Memory=47 Flow=25 Maintain=15 Design=13
+LOW=61 MED=198 HIGH=127
 ```

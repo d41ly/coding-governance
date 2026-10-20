@@ -441,8 +441,8 @@ derives, and `gov:end <tag>` closes it only where none does. Its tags are `part-
   - **Effort moves to the `roles.effort.*` keys at dBoundRoles,** which re-points `resolve_stage_efforts`
     (`roles_lib.py:561`) to read a stage's key, then its role's key, then `roles.effort.default`, then the role's
     declared effort, the house file's `[effort.roles]` and `[effort.stages.<workflow>]` read only where no key is
-    set until dConvergedCharter retires the seed, beside `roles.model.<role>` (revised 2026-10-19, FA-6 and the
-    flow adoption's review).
+    set until dConvergedCharter retires the seed, beside `roles.model.<role>.<harness>` (revised 2026-10-19, FA-6 and the
+    flow adoption's review, and keyed per harness 2026-10-20 by the owner's FK-3-2).
   - **Why.** The first design added `tools/roles/shapes.toml` beside `workflows.toml`, which already
     declares each workflow's roles and stages (`workflows.toml:37-67`). That made two registries over
     one fact.

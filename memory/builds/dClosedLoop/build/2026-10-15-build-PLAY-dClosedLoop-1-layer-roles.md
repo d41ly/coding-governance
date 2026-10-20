@@ -391,34 +391,51 @@ at the spawn, not because another agent said it. The design keeps three boundari
 ## [matrix] Each role's relation to the steps
 
 The relation is derived from the item declarations, never typed. Today the step definitions are the
-declarations. Each Actor cell opens with one actor's kind: `command`, `executor`, `hook`, `owner`, or a
-role's name, which ends at the first comma, colon or parenthesis. `role_matrix.py` (`[instrument]`,
-revised 2026-10-17) reads only that opening, so prose in the cell never adds an actor, and derives the
+declarations. Each Actor cell opens with one actor's kind: `command`, `executor`, `hook`, `owner`, a
+role's name, which ends at the first comma, colon or parenthesis, or `the role that owns` what the item's
+input names, a role chosen per instance. `role_matrix.py` (`[instrument]`, revised 2026-10-20) reads only
+that opening, so prose in the cell never adds an actor, and derives the
 matrix from the step definitions as folded:
 
-| Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle | adopt |
-|---|---|---|---|---|---|---|---|---|---|
-| orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — | — | — |
-| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | `design.streams` | — | — | — | — | — | — |
-| researcher | — | `plan.research` | `design.research` | — | — | — | — | — | — |
-| reuse scout | — | — | `design.seams` | — | — | — | — | — | — |
-| architect | — | — | `design.inventory`, `design.decompose`, `design.reason` | — | — | — | — | — | — |
-| spec writer | — | — | `design.unit-spec` | — | — | — | `review.fold` | — | — |
-| builder | — | — | — | `build.unit-pass` | — | — | — | — | — |
-| tester | — | — | — | — | `test.attribute`, `test.reason` | — | — | — | — |
-| reviewer | — | — | — | — | — | — | `review.lens` | — | `adopt.decisions` |
-| skeptic | — | — | — | — | — | — | `review.refute` | — | — |
-| synthesizer | — | — | — | — | — | — | `review.report` | — | — |
-| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.distill`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.distill`, `deploy.recommend`, `deploy.notify`, `deploy.released`, `deploy.snapshot`, `deploy.unlease`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.unlease`, `life.close` | `adopt.census`, `test.seed`, `adopt.reconstruct` |
-| executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` | — |
-| hook | `entry.intake` | — | — | — | — | — | — | — | — |
-| owner | `entry.place-owner` | — | — | `build.ratify` | — | — | — | `life.request` | `adopt.practices` |
+| Actor | entry | plan | design | build | test | deploy | breakpoint | lifecycle | adopt | probe |
+|---|---|---|---|---|---|---|---|---|---|---|
+| orientation scout | `entry.orient`, `entry.place` | — | — | — | — | — | — | — | — | — |
+| planner | — | `plan.triage-judge`, `plan.record`, `plan.reason` | `design.streams` | — | — | — | — | — | — | — |
+| researcher | — | `plan.research` | `design.research` | — | — | — | — | — | — | `probe.experiment` |
+| reuse scout | — | — | `design.seams` | `build.reuse-check` | — | — | — | — | — | — |
+| architect | — | — | `design.inventory`, `design.decompose`, `design.reason` | — | — | — | — | — | — | — |
+| spec writer | — | — | `design.unit-spec` | — | — | — | `review.fold` | — | — | — |
+| builder | — | — | — | `build.unit-pass`, `build.fix-pass`, `build.revert-pass`, `build.resolve` | — | — | — | — | — | — |
+| tester | — | — | — | — | `test.attribute`, `test.reason` | — | — | — | — | `probe.design`, `probe.judge-claimed` |
+| reviewer | — | — | — | — | — | — | `review.lens` | — | `adopt.decisions` | — |
+| skeptic | — | — | — | — | — | — | `review.refute` | — | — | — |
+| synthesizer | — | — | — | — | — | — | `review.report` | — | — | — |
+| owning role | `mailbox.answer` | — | — | — | — | — | — | — | — | — |
+| command | `entry.place-check`, `entry.claim` | `plan.input`, `plan.dedupe`, `plan.triage-rule`, `plan.place`, `plan.lease`, `plan.recommend`, `plan.exit` | `design.input`, `design.reentry`, `design.overlaps`, `design.recommend`, `design.ready`, `design.exit` | `build.base`, `build.unit-lease`, `build.scope`, `build.recommend`, `build.distill`, `build.exit` | `test.merge`, `test.select`, `test.verdict`, `test.route`, `test.flakes`, `test.seen-red`, `test.recommend`, `test.exit` | `deploy.current`, `deploy.mandate`, `deploy.parents`, `deploy.land`, `deploy.core`, `deploy.record`, `deploy.distill`, `deploy.recommend`, `deploy.notify`, `deploy.released`, `deploy.snapshot`, `deploy.unlease`, `deploy.close` | `review.trigger`, `review.pin`, `review.dispose`, `review.cost` | `life.notify`, `life.snapshot`, `life.unlease`, `life.close` | `adopt.census`, `test.seed`, `adopt.reconstruct`, `adopt.instructions`, `adopt.declarations` | `probe.trigger`, `probe.pin`, `probe.judge`, `probe.return` |
+| executor | — | — | — | `build.acceptance`, `build.core` | — | — | — | `life.quiesce` | — | `probe.run` |
+| hook | `entry.intake` | — | — | — | — | — | — | — | — | — |
+| owner | `entry.place-owner` | — | — | `build.ratify` | — | — | — | `life.request` | `adopt.practices`, `adopt.decisions-ratify` | — |
 
-- **Counts:** 81 items, each with one actor; 15 actors; 20 items with a role.
+- **Counts:** 98 items, each with one actor; 16 actors; 29 items with a role.
   - Revised 2026-10-17, the folds' closing review: the library fold's `build.ratify` added the 76th.
   - Revised again 2026-10-17, the systems and retrofit audit's M3: flow-steps' `[adopt]` added five,
     and `adopt.decisions` is the twentieth with a role. The matrix gained the `adopt` column, and
     the instrument's revision for that group, in `[instrument]`, derives these counts.
+  - Revised 2026-10-20, the whole-design audit's fork answers: flow-steps' `[entry]` gains `mailbox.answer`
+    (FK-5-4), dKeptSession's, whose Actor cell opens with the role that owns the asked interface or item. The
+    instrument reads that opening as no declared role (its arm 1), so the matrix and counts above leave the item
+    out until the instrument is revised to read an actor chosen per question.
+  - Revised 2026-10-20, the whole-design audit's fold: the instrument reads `[probe]` as a column too, and
+    the counts are its run over every item table of the step definitions as the fold leaves them. Before
+    it the table held 82 items and 21 with a role against its count of 81 and 20, and missed
+    `build.reuse-check` and the seven `[probe]` items. The fold's seven new items join it: `build.fix-pass`,
+    `build.revert-pass`, `build.resolve`, `probe.judge-claimed`, `adopt.decisions-ratify`,
+    `adopt.instructions` and `adopt.declarations`.
+  - Revised 2026-10-20, the whole-design audit's fold integration
+    (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w9.md`): the instrument reads an Actor cell
+    opening `the role that owns` as one actor, the role that owns what the item's input names, so
+    `mailbox.answer` joins the table as the owning role's and the counts are its run (`[instrument]`).
+    Which role that is, arms 2 and 3 cannot read.
 - **The prompt writer and the driver** act in no item. The prompt writer is a cycle role: it acts in
   every role item's cycle, framing each work order (`[roster]`, flow-roles `[cycle]`). The driver
   routes and never works.
@@ -427,7 +444,8 @@ matrix from the step definitions as folded:
     under a step's heading, and every step holds an item, since a parser that skips what it cannot
     place reports a clean run (arm 0, added after the fold's closing review and widened after its
     follow-up round);
-  - every item's actor is a command, the executor, a hook, the owner, or a declared item role;
+  - every item's actor is a command, the executor, a hook, the owner, a declared item role, or the role that
+    owns what the item's input names;
   - every core item role acts in at least one core item;
   - no core item names an expansion role (P28).
   - Revised 2026-10-19 (the flow and roles adoption, FA-4, and the night pass two): a repository role is a
@@ -1685,6 +1703,82 @@ exit 1
 $ planted: `deploy.notify`'s row with its leading pipe dropped (1 line changed)
 items 80 of 81 body rows; actor-item pairs 80; actors 15; items with a role 20; cycle roles 1; findings 1
 FINDING arm 0: a row under [deploy] that the item pattern cannot read: `deploy.notify` | command, idempotent | `deploy.
+exit 1
+```
+
+### `role_matrix.py`, revised 2026-10-20: the `probe` group
+
+The night pass's point 2 declared the probe program's items in flow-steps' `[probe]`, a group the instrument
+did not read, so the revision before this one reds on each of them, on the step definitions before the
+whole-design audit's fold and after it. The instrument now reads that group as a column, as it reads `[adopt]`.
+Its one changed line:
+
+```text
+- STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle", "adopt"]
++ STEPS = ["entry", "plan", "design", "build", "test", "deploy", "breakpoint", "lifecycle", "adopt", "probe"]
+```
+
+Both revisions, run over the step definitions as the fold leaves them:
+
+```text
+$ python role_matrix.py <flow-steps> <layer-roles>   # the revision before this one
+items 89 of 89 body rows; actor-item pairs 89; actors 15; items with a role 25; cycle roles 1; findings 8
+FINDING arm 0: probe.trigger sits under [probe], which is no step the matrix reads
+FINDING arm 0: probe.pin sits under [probe], which is no step the matrix reads
+FINDING arm 0: probe.design sits under [probe], which is no step the matrix reads
+FINDING arm 0: probe.experiment sits under [probe], which is no step the matrix reads
+FINDING arm 0: probe.run sits under [probe], which is no step the matrix reads
+FINDING arm 0: probe.judge sits under [probe], which is no step the matrix reads
+FINDING arm 0: probe.judge-claimed sits under [probe], which is no step the matrix reads
+FINDING arm 0: probe.return sits under [probe], which is no step the matrix reads
+exit 1
+
+$ python role_matrix.py <flow-steps> <layer-roles>   # this revision
+items 97 of 97 body rows; actor-item pairs 97; actors 15; items with a role 28; cycle roles 1; findings 0
+exit 0
+```
+
+### `role_matrix.py`, revised 2026-10-20: the role that owns what the item's input names
+
+The fork answers' fold added `mailbox.answer` to flow-steps' `[entry]` (FK-5-4), its Actor cell opening "the role
+that owns the asked interface or item": one role per question, chosen by what it owns. The revision before this
+one reads that opening as no kind and no declared role, and reds under arm 1. This revision reads an opening
+`the role that owns` as one actor, the owning role, a row of its own in the matrix, and still reds on any other
+opening no kind or declared role names. Arms 2 and 3 cannot read which role owns the asked node, so neither
+checks it. Its changed lines:
+
+```diff
+-  1. every item's actor is a command, the executor, a hook, the owner, or a declared item role;
++  1. every item's actor is a command, the executor, a hook, the owner, a declared item role, or the role
++     that owns what the item's input names, an opening `the role that owns` (arms 2 and 3 cannot read which);
+ KINDS = ("command", "executor", "hook", "owner")
++OWNING = "the role that owns "
+         item, actor = row.group(1), actor_of(row.group(2))
+-        if actor in KINDS:
++        if actor.startswith(OWNING):
++            actor = "owning role"
++        if actor in KINDS or actor == "owning role":
+-    order = [n for n in roles if n in matrix] + [k for k in KINDS if k in matrix]
++    order = [n for n in roles if n in matrix] + [n for n in ("owning role",) if n in matrix]
++    order += [k for k in KINDS if k in matrix]
+```
+
+Both revisions, run over the step definitions as the fold leaves them, and this revision over a copy with one
+line planted:
+
+```text
+$ python role_matrix.py <flow-steps> <layer-roles>   # the revision before this one
+items 98 of 98 body rows; actor-item pairs 97; actors 15; items with a role 28; cycle roles 1; findings 1
+FINDING arm 1: mailbox.answer: actor 'the role that owns the asked interface or item' is no kind and no declared role
+exit 1
+
+$ python role_matrix.py <flow-steps> <layer-roles>   # this revision
+items 98 of 98 body rows; actor-item pairs 98; actors 16; items with a role 29; cycle roles 1; findings 0
+exit 0
+
+$ planted: `mailbox.answer`'s actor changed to `the role that answers the question` (1 line changed)
+items 98 of 98 body rows; actor-item pairs 97; actors 15; items with a role 28; cycle roles 1; findings 1
+FINDING arm 1: mailbox.answer: actor 'the role that answers the question' is no kind and no declared role
 exit 1
 ```
 

@@ -46,7 +46,7 @@ layer model and from what earlier rounds left owed.
   | Mechanism | Settled in | Owned by |
   |---|---|---|
   | the loop definition, its items, and `next` deriving position from witnessed state | flow, P24 | dDeclaredLoop |
-  | leases on the shared remote (acquire, renew, release, take over by compare-and-swap), the mailbox ref per build, fleet identity, offline acquisition, dependency coordination | coordination record | dDeclaredLoop, with `gap-conc-01`, `gap-conc-02` and `gap-flow-06` |
+  | leases on the shared remote (acquire, renew, release, take over by compare-and-swap), the mailbox ref per build, fleet identity, offline acquisition, dependency coordination | coordination record | dPlacedRequest, with `gap-conc-01` and `gap-conc-02`; the mailbox ref and dependency coordination dKeptSession's, with `gap-flow-06` (v2 `[chain]`; revised 2026-10-20 by the whole-design audit's fold, A3-F18) |
   | the item cycle: work order, spawn guard, schema-forced returns, retries (`roles.retries`), no-spawn fallback (`roles.no-spawn`), write gates by allowance, return validation at subagent stop | roles round, flow-roles `[cycle]` | dBoundRoles |
   | P29's keyed handed facts, the answered-call hook, separation of duties at spawn | layers round three | dBoundRoles |
   | the card as a ref per build, the per-worktree card file, re-rendered by every session-start hook | orientation round | dOrderedCharter, dDeclaredLoop |
@@ -403,9 +403,12 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - The supervisor parses the reset time from the limit message, holds new launches until then, and
     keeps renewing its lease, the hold being a declared wait inside its deadline.
   - A weekly limit can hold for days. So once the hold passes `runtime.hold-ceiling`, the supervisor
-    raises an owner item and releases the build's lease as a hand-over, so a node with quota takes the build over, and its wake
-    tick stops firing into the refused turn. Revised 2026-10-19 (P39): it kept holding, and today's held run
-    woke a session 115 times over 4.8 days.
+    raises an owner item and releases every lease it holds for the build as a hand-over, the build's and each
+    in-flight unit's, so a node with quota takes them over, and its wake tick stops firing into the refused turn. A
+    pass its act left uncommitted stays unwitnessed in this node's workspace, so the node that takes the unit runs
+    the item again from its last witness. Revised 2026-10-19 (P39): it kept holding, and today's held run
+    woke a session 115 times over 4.8 days. Revised 2026-10-20 by the whole-design audit's fold (A2-F2): only the
+    build's lease was released, so an in-flight unit's lease stayed held until `leases.expiry-hours`.
 - **Fencing.** Revised: 2026-10-17, the debt round's fold, and 2026-10-19 by the parked debt's review (P40).
   - Each lease carries an epoch in dPlacedRequest's lease grammar, bumped at every take-over and never reset,
     since a release writes a hand-over or a terminal tombstone and never deletes the ref. One name per lease:
@@ -467,7 +470,9 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     `build.release-ceiling`, counted from the landing record or from the owner's last keep-waiting
     answer, through the notification adapter. The item is keyed by (build, landed SHA), and the sweep
     opens it only when none is open, as every producer of that item does (flow-steps'
-    `deploy.released` and `life.quiesce`). The sweep reads `build.closes` and `build.release-ceiling`;
+    `deploy.released` and `life.quiesce`). The sweep reads `build.closes` and each wait's declared
+    deadline, generic over every wait, an owner request's among them, and dShippedRelease, which owns
+    `build.release-ceiling`, builds this release arm (revised 2026-10-20, the owner's FK-2-3);
   - names holders by fleet tag.
 - **Shared records.**
   - Under the supervisor, only it writes a build's shared mutable records: decision rows, the run
@@ -720,6 +725,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
   - **per-unit, or parallel-only for parallel passes:** a worktree per unit lease, branched from the
     build branch's tip and never from origin's default. This is the route TOOL-dUnstalledConvoy-7
     measured and cleared.
+  - **a unit held off the build's node,** under `build.unit-holders` (v2 `cl-dClosedLoop-0319`): whatever
+    `build.worktree` says, a worktree per unit lease on its holder's node, branched from the build branch's tip,
+    its unit branch pushed as `build.push` says. Revised 2026-10-20 by the whole-design audit's fold (B2-F7):
+    under `shared`, nothing said where such a unit commits or how its pass joins the build branch.
 - **Every workspace gets:**
   - the trusted hooks path (`[enforce]`);
   - a scratch directory, with one per agent inside it, since this round lost a probe to a shared name;
@@ -733,6 +742,10 @@ The flow and roles records name Runtime's parts in their own words. This is the 
     the unit's lease.
   - It refuses release while the unit branch holds commits the build branch lacks
     (`git merge-base --is-ancestor`).
+  - A unit branch pushed from another node is merged the same way by the build's driver, from the remote, and
+    its holder releases the unit's lease only once that check passes on the fetched build branch, so the pass
+    reaches the build through its branch, never by a push to the build branch, seen on a planted unit a second
+    node takes under `shared`.
   - Shared records never ride a unit branch (`[supervise]`).
 - **The sweep reaps only what the supervisor allocated:**
   - lease-marked directories under a gov-owned scratch root;
@@ -834,7 +847,9 @@ The flow and roles records name Runtime's parts in their own words. This is the 
 - **The node registry gains runtime facts,** which the supervisor reads before it launches:
   - each `claude` binary, with its path and version, whether `onFailure` takes effect on it, and whether
     its PermissionRequest can approve each gated tool;
-  - the clock offset, and `autocrlf`;
+  - the clock offset, which the supervisor measures at each beat against the remote host's time, read
+    through the host adapter, and records here, either expiry rule then expiring a lease (revised
+    2026-10-20, the owner's FK-2-2), and `autocrlf`;
   - the process-start cost class;
   - the user-level guards.
 
@@ -1040,7 +1055,9 @@ Settled by RT-3: the owner chose "Runtime takes `next` and the controls too".
   - **dDeclaredLoop** keeps:
     - the position engine, which gains the closed answer set and instance keys (`[decide]`);
     - the guarded command, the terminal states and `deps.on-parent-withdrawn`;
-    - the coordination feature (`gap-conc-01`, `gap-conc-02`), and the hook factory.
+    - the hook factory. The coordination feature (`gap-conc-01`, `gap-conc-02`) moved to dPlacedRequest with the
+      chain re-cut (v2 `[chain]`, `cl-dClosedLoop-0120`). Revised 2026-10-20 by the whole-design audit's fold
+      (A3-F18).
   - **dBoundRoles** keeps the return contract and its validation (`gap-roles-04`), and the spawn marker.
     Runtime runs both.
   - **dScopedBuild** keeps the exit contract and the core checks at Build's exit, and gains
@@ -1123,9 +1140,10 @@ Each fixture names what turns it red, and `[invariants]` cites them by these tag
   - in a partial fan where some of k agents return null, the returns persist, the nulls become
     `deferred-platform`, and the relaunch re-pays only the nulls;
   - on a StopFailure limit record, the supervisor parses the reset time, holds and renews its lease inside the
-    hold's deadline. Once `runtime.hold-ceiling` passes, it raises an owner item and releases the lease as a
-    hand-over, a second node takes the build over, and the wake tick stops. It is red while the lease is still
-    held or the tick fires again. Revised 2026-10-19 by the parked debt's review: it asserted the hold kept and
+    hold's deadline. Once `runtime.hold-ceiling` passes, it raises an owner item and releases every lease it
+    holds for the build as a hand-over, a second node takes the build over, a limit planted mid-unit sees that unit
+    taken within one tick, and the wake tick stops. It is red while any of those leases is still held or the tick
+    fires again (the whole-design audit's fold, A2-F2). Revised 2026-10-19 by the parked debt's review: it asserted the hold kept and
     the lease renewed past the ceiling, which P39 replaced.
 - **`in-flight`:**
   - with `runtime.agents-in-flight` at 3 (`FANOUT_CAP=3` until the night pass two's point 7), the supervisor queues an act whose declared fan exceeds the free slots, and the

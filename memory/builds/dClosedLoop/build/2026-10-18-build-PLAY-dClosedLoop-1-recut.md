@@ -203,6 +203,64 @@ superseded: re-run on the committed tree, it reds on the routes row it cannot re
 | dRankedPlan | `run.host` | dWellOiledMachine | tolerance | `plan.exit` launches the executor only where the supervisor is installed; before dWellOiledMachine lands, the attended session carries the build into Design (FM4's reads rule) |
 | dSafePassage | `check` | dWitnessedBar | homonym | govkit's `check` verb beside `update`, which reads the `[[retired]]` rows, not the `check` tag namespace (the away pass; moved with the step kind's clause, AP-25) |
 | dTotalRecall | `journal` | dWellOiledMachine | homonym | the Serves kind named `journal`, which the registry renames `log`, not Runtime's journal record kind (the away pass) |
+| dFairHearing | `review.dispose` | dDeclaredLoop | tolerance | the report's dispositions are written to the review record and disposed by hand, as today's reviews are, until dDeclaredLoop lands `review.dispose` and routes them (cl-dClosedLoop-0075, flow-steps [breakpoint]'s stand-ins, C2-F6) |
+| dKeptSession | `memory.map-purpose` | dTotalRecall | tolerance | the policy namespaces' purposes are reviewed under the key's default, `review`, until dTotalRecall lands the key (cl-dClosedLoop-0154, CS4-F1) |
+| dTrueNorth | `deviation.approval` | dDeclaredLoop | tolerance | a deviation's approver is read against the by-risk table final-questions `[deviation]` sets, the risk class read from the record, until dOrderedCharter's classifier and dDeclaredLoop's key land and re-point it (cl-dClosedLoop-0004, C1-F9) |
+| dPlacedRequest | `build.unit-holders` | dWellOiledMachine | tolerance | a `unit` disposition is refused as under `driver-only`, the build's driver alone driving its units, until dWellOiledMachine lands the unit holders and the key (flow-steps [entry]'s stand-ins, AS4-F4) |
+| dPlacedRequest | `kickoff.runs` | dRankedPlan | tolerance | `entry.orient` runs the full kickoff where no READY card exists, the key's default `no-ready-card`, until dRankedPlan lands the key and re-points it (flow-steps [entry]'s stand-ins, B1-F11) |
+| dFairHearing | `leases.offline` | dPlacedRequest | tolerance | `review.report` refuses a `new:` slug's claim while the remote is unreachable, as `refuse` would: no slug claimed and no local id minted, the finding kept in the report with its slug marked unclaimed and disposed by hand, until dPlacedRequest lands the key (flow-steps [breakpoint]'s stand-ins, FK-6-1) |
+| dDeclaredLoop | `design.inventory` | dIndexedDesign | tolerance | under `adopt-parent-work`, the attended session's agent takes the withdrawn parent's kept units into the plan revision, flow-steps [rules]' stand-in for a role item, until dIndexedDesign lands `design.inventory` (cl-dClosedLoop-0100, FK-4-3, FK-4-9) |
+| dWitnessedBar | `build.acceptance` | dScopedBuild | tolerance | the attended session's agent observes each new arm red on its staged break and green once restored, and records both in the unit's acceptance ledger, which `test.seen-red` reads, until dScopedBuild lands `build.acceptance`'s seen-red write (cl-dClosedLoop-0345, flow-steps [test], FK-4-12) |
+| dShippedRelease | `build.distill` | dScopedBuild | tolerance | `deploy.distill` is unarmed: it records on the landing record that it measured nothing, is never green and routes on, as `test.seed` records an unarmed seed, until dScopedBuild lands `build.distill` (flow-steps [deploy]'s stand-in, FK-4-8) |
+| dDeclaredLoop | `build.base` | dScopedBuild | tolerance | a route into a command reaches today's tool until dScopedBuild lands `build.base` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dDeclaredLoop | `build.distill` | dScopedBuild | tolerance | a route into a command reaches today's tool until dScopedBuild lands `build.distill` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dDeclaredLoop | `build.ratify` | dScopedBuild | tolerance | under `decisions.major: author-owner-ratifies`, `build.recommend`'s route reaches dDeclaredLoop's own owner gate, held for the owner's disposition, as RC-9's fallback holds `plan.exit`, until dScopedBuild lands `build.ratify` (cl-dClosedLoop-0104, flow-steps [build]'s stand-in, the owner's FK-9-1) |
+| dDeclaredLoop | `deploy.notify` | dShippedRelease | tolerance | a route into a command reaches today's tool until dShippedRelease lands `deploy.notify` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dDeclaredLoop | `design.input` | dIndexedDesign | tolerance | a route into a command reaches today's tool until dIndexedDesign lands `design.input` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dDeclaredLoop | `design.ready` | dIndexedDesign | tolerance | a route into a command reaches today's tool until dIndexedDesign lands `design.ready` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dDeclaredLoop | `plan.exit` | dRankedPlan | tolerance | a route into a command reaches today's tool until dRankedPlan lands `plan.exit` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dDeclaredLoop | `plan.input` | dRankedPlan | not a use | `plan.recommend` and `plan.reason` route a review to the Plan breakpoint, the breakpoint program at Plan's exit, which the probe reads as the Plan step's first item, and neither routes into `plan.input` |
+| dDeclaredLoop | `plan.record` | dRankedPlan | tolerance | a route into a role item reaches the attended session's agent, doing the planner's work, until dRankedPlan lands `plan.record` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dDeclaredLoop | `test.exit` | dWitnessedBar | tolerance | a route into a command reaches today's tool until dWitnessedBar lands `test.exit` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dIndexedDesign | `build.base` | dScopedBuild | tolerance | a route into a command reaches today's tool until dScopedBuild lands `build.base` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dIndexedDesign | `build.unit-pass` | dScopedBuild | tolerance | a route into a role item reaches the attended session's agent, doing the builder's work, until dScopedBuild lands `build.unit-pass` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dLinkedLibrary | `build.unit-pass` | dScopedBuild | tolerance | a route into a role item reaches the attended session's agent, doing the builder's work, until dScopedBuild lands `build.unit-pass` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dPlacedRequest | `build.unit-lease` | dScopedBuild | tolerance | a `unit` disposition is refused as under `driver-only`, the build's driver alone driving its units, until dWellOiledMachine lands the unit holders and dScopedBuild `build.unit-lease`, the stand-in flow-steps [entry] declares, which wins over [rules]' (flow-steps [entry]'s stand-ins, AS4-F4, the owner's FK-8-1) |
+| dPlacedRequest | `design.input` | dIndexedDesign | tolerance | a placement routed to Plan or Design files an owner item carrying the claim until dIndexedDesign lands `design.input`, the stand-in the clause declares for its own route, which wins over [rules]' (cl-dClosedLoop-0123, C2-F7, the owner's FK-8-1) |
+| dPlacedRequest | `plan.dedupe` | dRankedPlan | tolerance | a placement routed to Plan or Design files an owner item carrying the claim until dRankedPlan lands `plan.dedupe`, the stand-in the clause declares for its own route, which wins over [rules]' (cl-dClosedLoop-0123, C2-F7, the owner's FK-8-1) |
+| dPlacedRequest | `plan.input` | dRankedPlan | tolerance | a placement routed to Plan or Design files an owner item carrying the claim until dRankedPlan lands `plan.input`, the stand-in the clause declares for its own route, which wins over [rules]' (cl-dClosedLoop-0123, C2-F7, the owner's FK-8-1) |
+| dPlacedRequest | `plan.triage-rule` | dRankedPlan | tolerance | a placement routed to Plan or Design files an owner item carrying the claim until dRankedPlan lands `plan.triage-rule`, the stand-in the clause declares for its own route, which wins over [rules]' (cl-dClosedLoop-0123, C2-F7, the owner's FK-8-1) |
+| dRankedPlan | `design.input` | dIndexedDesign | tolerance | a route into a command reaches today's tool until dIndexedDesign lands `design.input` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dShippedRelease | `maintain.patch` | dTendedCadence | not a use | `deploy.core` files a red landing's patch under the key Maintain's reading uses, so `maintain.patch` finds it open and files no second, and never routes to it |
+| dWellOiledMachine | `deploy.current` | dShippedRelease | tolerance | a route into Deploy reaches the lander, `push-main.sh`, which reconciles the build onto the remote's tip before it gates, as `deploy.current` checks, until dShippedRelease lands it (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dWellOiledMachine | `deploy.released` | dShippedRelease | tolerance | a landing ends at the lander, `push-main.sh`, until dShippedRelease lands `deploy.released`, so `life.quiesce` finds no landed build waiting there (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dWellOiledMachine | `deploy.unlease` | dShippedRelease | tolerance | a landing ends at the lander, `push-main.sh`, until dShippedRelease lands `deploy.unlease`, so `life.quiesce` finds no build past it (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dWitnessedBar | `build.fix-pass` | dScopedBuild | tolerance | a route into a role item reaches the attended session's agent, doing the builder's work, until dScopedBuild lands `build.fix-pass` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dWitnessedBar | `build.resolve` | dScopedBuild | tolerance | a route into a role item reaches the attended session's agent, doing the builder's work, until dScopedBuild lands `build.resolve` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dWitnessedBar | `deploy.current` | dShippedRelease | tolerance | a route into Deploy reaches the lander, `push-main.sh`, which reconciles the build onto the remote's tip before it gates, as `deploy.current` checks, until dShippedRelease lands it (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+| dWitnessedBar | `design.input` | dIndexedDesign | tolerance | a route into a command reaches today's tool until dIndexedDesign lands `design.input` (flow-steps [rules]' stand-in, the owner's FK-4-9) |
+
+Revised 2026-10-20 by the whole-design audit's fold: the five rows from dFairHearing's `review.dispose` to
+`kickoff.runs` class the stand-ins its folds named. The owner's FK-6-2 moved `patch.ratify` to dPlacedRequest,
+which clears dPlacedRequest's and dShippedRelease's reads of it, and FK-6-1's tolerance row classes
+dFairHearing's read of `leases.offline`: `review.report` refuses an unreachable claim until dPlacedRequest lands
+the key. The widened probe reads every forward route too, and the fold integration's rows class them (below).
+
+Revised 2026-10-20 by the whole-design audit's fork answers (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w8.md`):
+the four rows after `kickoff.runs` class the stand-ins the answers name. FK-6-1's row classes dFairHearing's read of
+`leases.offline`. FK-4-9 adds no row: flow-steps `[rules]` names today's stand-ins for every route into a later
+build, and each forward route this probe reads only under `--all-routes` would make its default run red on a class
+row with no dependency, so those routes wait for the probe's change.
+
+Revised 2026-10-20 by the whole-design audit's fold integration (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w9.md`):
+the probe reads every route target in every run now, so the rows after `build.distill`'s class the forward routes
+it reads on the folded records, generated from its lines. Each names the stand-in the route reaches: flow-steps
+`[rules]`' for the target's actor, or the one a clause or [entry] declares for its own route, which wins (FK-4-9,
+FK-8-1). Two are not a use: `deploy.core` names `maintain.patch` only as the reader of its patch's key, and
+dDeclaredLoop's Plan recommendation names the Plan breakpoint, which the probe reads as the Plan step's first
+item. dDeclaredLoop's route into `build.ratify`, an owner item, reaches dDeclaredLoop's own owner gate, as RC-9's
+fallback holds `plan.exit` (FK-9-1). dTendedCadence's `red-leg` clause names distribution's currency leg in plain
+words now, since it reads no currency record.
 
 The critical path, its instrument and its runs:
 

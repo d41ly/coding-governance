@@ -25,11 +25,11 @@ Rules, each over a population it names in its summary line:
 6. transitions: each disposition `entry.place` routes through `entry.claim` has a `none` row in flow-steps'
    [transitions], since the engine refuses any transition the table lacks (the night pass's closing review, H1).
 
---all-routes widens rule 3 to every route target, as the whole-design audit's Stage 0 asks (K2, final-questions
-`[audit]`): each item or step a flow item's Then cell or an expansion item's Routes cell names, a step by the name
-[chain]'s Stage column gives it and read as that step's first item, is built by the source item's owner or an ancestor
-of it. Until the audit's fold classes what it finds, the default run keeps rule 3 to the breakpoint program, so the
-widened run is Stage 0's and not yet the final check's.
+Rule 3 reads every route target too, as the whole-design audit's Stage 0 asks (K2, final-questions `[audit]`): each
+item or step a flow item's Then cell or an expansion item's Routes cell names, a step by the name [chain]'s Stage column
+gives it and read as that step's first item, is built by the source item's owner or an ancestor of it. Every run reads
+it since the audit's fold classed the forward routes it finds (the owner's FK-4-9, 2026-10-20). Before that only Stage
+0's `--all-routes` run did; the flag is still accepted, and changes nothing.
 
 A dependency is classed only by a row of the re-cut's [reconciled-order] table naming its build, its node and its
 owner, with a class from the closed set; a row whose class is blank or outside the set, or that no dependency needs,
@@ -174,23 +174,21 @@ for src in sorted(sources):
     outside = sorted({o for _, o in program if not within(o, src)})
     if outside:
         deps.append(("routes", src, "review.trigger", ",".join(outside)))
-# --all-routes: every item or step a route names, from flow items and expansion items alike.
-ALL_ROUTES = "--all-routes" in sys.argv
+# Every item or step a route names, from flow items and expansion items alike, in every run since the audit's fold.
 STEP_NAME = re.compile(r"\b(" + "|".join(s.capitalize() for s in STAGES) + r")\b")
 route_edges = 0
-if ALL_ROUTES:
-    item_owner = {tag: v[1] for tag, v in items.items()}
-    item_owner.update({key: o for (kind, key), o in owner.items() if kind == "item" and key not in item_owner})
-    route_sources = [(own, then) for _, (_, own, _, then) in items.items() if own] + \
-                    [(own, routes) for own, routes in expansion_routes if own]
-    for own, text in route_sources:
-        targets = {t for t in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", text) if t in item_owner}
-        targets |= {first[w.lower()] for w in STEP_NAME.findall(text)}
-        for t in sorted(targets):
-            route_edges += 1
-            town = item_owner[t]
-            if town and not within(town, own):
-                deps.append(("routes", own, t, town))
+item_owner = {tag: v[1] for tag, v in items.items()}
+item_owner.update({key: o for (kind, key), o in owner.items() if kind == "item" and key not in item_owner})
+route_sources = [(own, then) for _, (_, own, _, then) in items.items() if own] + \
+                [(own, routes) for own, routes in expansion_routes if own]
+for own, text in route_sources:
+    targets = {t for t in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", text) if t in item_owner}
+    targets |= {first[w.lower()] for w in STEP_NAME.findall(text)}
+    for t in sorted(targets):
+        route_edges += 1
+        town = item_owner[t]
+        if town and not within(town, own):
+            deps.append(("routes", own, t, town))
 # 4. reads.
 keys = {n["key"]: owner.get(("policy-key", n["key"])) for n in ns["policy-key"]}
 templated = {re.sub(r"<stage>", "(" + "|".join(STAGES) + ")", re.escape(k).replace(r"\<stage\>", "<stage>")): o
@@ -260,8 +258,7 @@ print(f"left out: systems, cited in prose; roles, shapes and commands, not owned
       f"mentions of a record kind a non-ancestor owns, mostly homonyms; points of another layer, not modelled as nodes "
       f"({len(unread)}): " + "; ".join(unread))
 print(f"transitions: {len(routed)} dispositions routed through entry.claim, {len(none_rows)} `none` rows")
-if ALL_ROUTES:
-    print(f"all routes: {route_edges} route edges read from flow and expansion items")
+print(f"all routes: {route_edges} route edges read from flow and expansion items")
 findings = 0
 for d in untransitioned:
     print(f"  transitions: the disposition `{d}` routes through `entry.claim`, and [transitions] has no `none` row for it")

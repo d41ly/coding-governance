@@ -173,7 +173,7 @@ tag, or "the owner, NP-22, 2026-10-18" for a part the night pass proposed and th
 | run-gates | held halves, WSL, selftests, profile, ceilings | bar tooling | STAYS | `held_halves` re-pointed (dConvergedCharter) | v2 `[chain]` dConvergedCharter |
 | run-gates | `regen.py`, `check-receipt.py` | regenerate, receipt | STAYS | `regen.py` re-pointed for a lib descriptor (dShippedRelease) | v2 `[chain]` dShippedRelease |
 | run-gates | `read_held_reds` | remote-CI read | RESHAPED | the `verdict:remote-ci` integration (dWitnessedBar, which owns gap-test-13) | layer-expansions `[design-integrations]` |
-| govkit | install and update, receipt | copy deploy | RESHAPED | release tags, receipt names its release, `kits.offer` (dShippedRelease) | v2 `[chain]` dShippedRelease |
+| govkit | install and update, receipt | copy deploy | RESHAPED | release tags, receipt names its release, `kits.offer` (dShippedRelease); the step walk `update` runs and the receipt's per-step `steps` (dSafePassage, revised 2026-10-20 by the whole-design audit's fold, A4-F16) | v2 `[chain]` dShippedRelease; v2 `[chain]` dSafePassage |
 | govkit | epoch, selfcheck 5c | version arms | MERGED | the one version check (dShippedRelease, which owns gap-tool-02) | gap-tool-02 |
 | govkit | `govkit check` | wiring | MERGED | absorbs check-wiring's install arms and check-placeholders (dShippedRelease) | layer-expansions `[design-distribution]` |
 | govkit | `adopters.toml` | adopter list | RESHAPED | the fleet register (dShippedRelease) | v2 `[chain]` dShippedRelease; layer-expansions `[design-distribution]` |

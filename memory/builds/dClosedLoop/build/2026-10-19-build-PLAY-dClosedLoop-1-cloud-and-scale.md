@@ -198,18 +198,22 @@ costs latency and never correctness.
 1. **The truth stays core, in git.** Leases, mail, registers, the change feed, bindings and the card stay git refs
    written by compare-and-swap. Git stays the store of record, as the owner's NT-14 settled, and every verdict is
    computed on the node (P3). An endpoint is an adapter that carries the same records faster.
-2. **The fence travels with the effect.** Every effect push, a pass push, the lander's push to main, a release with
+2. **The fence travels with the effect.** Every effect push, a pass push, the lander's push to main with
    its `landed` notice, carries the holder's new lease beat in one `git push --atomic` under
    `--force-with-lease=<lease>:<tip seen>`. This replaces re-reading the epoch before the push, and merges two pushes
-   into one.
+   into one. The landing push releases nothing: the build's lease lives until `deploy.unlease` (revised 2026-10-20,
+   the owner's FK-2-1).
 3. **A lease is never deleted.** A release writes a hand-over, which any node may take with the epoch bumped, or a
-   terminal tombstone for a unit landed or withdrawn, which refuses every acquisition, and the epoch rises
+   terminal tombstone for a unit landed or withdrawn, which refuses every acquisition but a patch build's draw on
+   its closed root's rework budget (revised 2026-10-20, the owner's FK-1-5), and the epoch rises
    monotonically for the lease's whole life. A claim queued offline carries its node's last fetch of the lease refs
    and is refused on reconnection once that fetch is older than `leases.queued-claim-days`, and a terminal tombstone
    may be pruned only that long after its release, so no queued claim outlives the tombstone it would race (the
    parked debt's review).
-4. **Expiry is judged by a declared clock:** the holder's stamp corrected by the clock offset the node registry
-   records, or an observer seeing the tip unchanged for `leases.expiry-hours`, never the reader's raw clock against
+4. **Expiry is judged by a declared clock:** the holder's stamp on its last renewing beat corrected by the clock
+   offset the supervisor measures at each beat against the remote host's time and the node registry records,
+   or an observer seeing no renewing beat for `leases.expiry-hours`, either rule expiring the lease, each beat
+   marking whether it renews (revised 2026-10-20, the owner's FK-2-2 and FK-2-4), never the reader's raw clock against
    the writer's stamp. The observer's rule lands with the leases, and the corrected stamp with dWellOiledMachine,
    which records each node's clock offset (the parked debt's review).
 5. **Messages are causal and keyed.** Each carries its session's sequence number, a take-over names its predecessor's

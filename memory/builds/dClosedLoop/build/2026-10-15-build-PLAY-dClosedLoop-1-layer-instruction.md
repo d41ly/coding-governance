@@ -452,9 +452,13 @@ Proposed gaps, each with its proposed owner build. The register holds them as `g
 - Each load point declares a budget, in bytes of the committed blob, never of a working copy.
   - A budget is per load point, one render each. A budget summed over the files a session reads is
     what `TOOL-dSpentCeiling-1` retired, and it stays retired.
-  - The budgets extend `tools/template-size-limits.txt` and `check-template-size.sh`, with their
-    high-water ratchet and the owner's rule for who may raise a row. A new load point joins that
-    table.
+  - The budgets are caps under `budgets.*`, read by `check-template-size.sh` with its high-water
+    ratchet, `tools/template-size-limits.txt` migrated into the key by an upgrade step with the owner's
+    rule for who may raise a row: a run may raise a measured-file cap under the file's four conditions, through
+    the guarded policy command, or before it lands the one write shape the minimal guard admits, and argued in
+    the write's change record, and a class row, a lowering, a new row and a removal stay the owner's (revised
+    2026-10-20, the owner's FK-1-3, FK-7-1 and FK-9-2). A new load point joins the
+    key.
   - The role block is the exception: its carrier is `check_roles.py`'s `BODY_CEILINGS` (roles
     `[tags]`), which the render reads for a role file. Each load point has one carrier.
 - Load points come in two classes:

@@ -19,10 +19,12 @@ The layers already form a cycle: instruction says, runtime enforces, flow witnes
 returns become memory, and memory renders the card and every work order. The plan makes that cycle one graph:
 - **Every piece is a node.** A node has an address: a tag (`<ns>.<seg>`), a section (`<doc> [<seg>]` in prose,
   `<doc>#<seg>` in an edge target, which holds no space), or a native id (a commit's SHA, an id
-  `FAMILY-<slug>-<seq>`, a gap key, an act, session or landing id), each native-id class registered with its owner
-  (P33): FAMILY ids by dOrderedCharter, gap keys by dTotalRecall, and every other class by the build that brings
+  `FAMILY-<slug>-<seq>`, a gap key, a clause id `cl-<slug>-NNNN`, an act, session or landing id), each native-id
+  class registered with its owner (P33): FAMILY ids by dOrderedCharter, clause ids by dTrueNorth, gap keys by
+  dTotalRecall, and every other class by the build that brings
   it. An `amends` or `supersedes` target may pin its tag as `<tag>@<hash>`, the hash of the text it was written
-  against, and no other edge carries a pin (IA-2, the folds' closing review). Instruction units, record sections, code regions, commits, acts and sessions are all nodes of one index,
+  against, a `carries-clause` target may pin its clause id as `<id>@<hash8>`, the hash v2's `[clause-ids]`
+  defines, and no other edge carries a pin (IA-2, the folds' closing review, the owner's FK-1-2). Instruction units, record sections, code regions, commits, acts and sessions are all nodes of one index,
   resolved by one resolver; acts and sessions are read beside a tree's index from the binding records.
 - **Every relation is a typed edge.** Its type comes from one closed set, it is declared once at the site that owns
   its fact, and its inverse is derived (P33). A reference written as prose is a derived `cites`, never a typed fact.
@@ -168,7 +170,7 @@ in 12 of 31 dossiers.
 
 ## [edges] The closed set, extended
 
-The twelve declared types stand (P33). Eleven join them, each needed by a hop the returns measured. `cites` stays
+The twelve declared types stand (P33). Twelve join them, each needed by a hop the returns measured. `cites` stays
 derived.
 
 | Edge | From → to | Declared at | Inverse, derived | Status | Needed by |
@@ -192,6 +194,7 @@ derived.
 | `answers` | return → work order; the owner's answer → fork | the return's header; the answer's section | `answered-by` | new | return to handoff (prose in 58 of 88 research records) |
 | `runs-in` | act, claim, commit → session | the session binding; a claim's `session:`; the `Gov-Session:` trailer | `hosts` | new | act and commit to session |
 | `carries` | landing → unit, commit | the landing record | `carried-by` | new | what a landing moved |
+| `carries-clause` | spec → clause, its target a clause id, pinned as `<id>@<hash8>` or not | the spec's `**Carries:**` line | `carried-in` | new: the owner's FK-1-2, 2026-10-20 | spec to clause, which the carries join reads |
 | `pinned-at` | record, probe, claim → commit or tree | "Derived at", a probe's pin | `pinned-by` | new: today's pins, now typed apart from `cites` | staleness |
 | `reads` | item, role → record kind | the role definition's `reads:` field and the item's declaration; the kind's registry row renders its readers from them | `read-by` | new | who reads a kind |
 | `writes` | item, role → record kind | the role definition's `writes:` field and the item's declaration; the kind's registry row names the door it writes through | `written-by` | new | who writes a kind |
@@ -275,6 +278,12 @@ dTotalRecall's registry writes registry rows; the coordination verbs write refs,
 renderers write views; the release writes `kit-release` tags; and the lander writes its own commits, their
 trailers from the binding it runs under.
 
+The override record and the exception register are records in the building build's `build/` folder, as
+deviation records are, each written in the recording session's commit: an override by the session's agent as
+`charter.override` admits, an exception by the session `core.exceptions` admits. Each is a stand-in door on the
+one-door check's list, beside the edge sites' doors, until dTotalRecall's `record` adopts it (the owner's FK-1-1,
+2026-10-20).
+
 **Reading.** One index answers every read:
 - `gov tag show | where | refs | bundle <address>` returns a node, its location, its inbound edges, or its bundle
   (P33);
@@ -288,7 +297,7 @@ trailers from the binding it runs under.
 
 | Layer | What the plan adds |
 |---|---|
-| instruction | the shared edge grammar; the record header and section edge line as the instruction unit's twin; the eleven edge types registered; `promoted-from` on promotion |
+| instruction | the shared edge grammar; the record header and section edge line as the instruction unit's twin; the twelve edge types registered; `promoted-from` on promotion |
 | flow | the commit node and its trailer keys; one reader for `Pass:` and `Decided:`, offering both views today's readers answer, the union of subject and trailer ids and the trailer replacing the subject; `carries` on landings |
 | roles | every work order marked; `reads` and `writes` from role definitions; `answers` on every return |
 | memory | the registry's rows gain home, lifecycle, readers and layer; witness rows for pockets outside the tree; the `caused-by` field on every kind; view, registry, archive and instrument kinds; the `journal` alias |

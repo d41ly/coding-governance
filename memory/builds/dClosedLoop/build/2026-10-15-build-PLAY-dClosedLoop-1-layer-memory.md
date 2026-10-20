@@ -396,9 +396,12 @@ layer that registers a kind adds its row.
 
 | Kind | Owner | Its writer, or what names it |
 |---|---|---|
-| exception | dOrderedCharter | the exception register beside the `core.*` policies; writer item not named |
-| override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule; writer item not named |
+| deviation | dTrueNorth | the record kept in its departing build's `build/` folder, read by the deviation join, the as-built view, `cl-dClosedLoop-0119` and `cl-dClosedLoop-0412`; writer item not named: the departing unit's own commit, which is no item, writes it |
+| exception | dOrderedCharter | the exception register, kept in the building build's `build/` folder as a deviation record is; writer item not named: the session `core.exceptions` admits writes it in the recording session's commit, through a stand-in door memory-plan `[doors]` lists until dTotalRecall's `record` adopts it (the owner's FK-1-1) |
+| override | dOrderedCharter | `charter.override` and its record, under the precedence and override rule, the record kept in the building build's `build/` folder as a deviation record is; writer item not named: the session's agent writes it in the recording session's commit, through a stand-in door memory-plan `[doors]` lists until dTotalRecall's `record` adopts it (the owner's FK-1-1) |
 | attendance override | dWellOiledMachine | its writer is `life.request`'s attend and unattend: the attendance value and its scope, which `attendance.scope` reads (the night pass's closing review, M13) |
+| lifecycle request | dWellOiledMachine | its writer is `life.request`: the guarded command's record of the owner's pause, resume, withdraw, supersede, attend or unattend, which `life.quiesce` waits on, or its event instance once the build's lease is gone (layer-runtime `[schedule]`) |
+| quiesce | dWellOiledMachine | its writer is `life.quiesce`: the executor's record of the acts it let finish, which `life.notify` waits on |
 | intake | dWellOiledMachine | its writer is `entry.intake`'s hook (PM-9), in dWellOiledMachine's row since the re-cut |
 | card | dPlacedRequest | the build's orientation card at level 1, its stores and snapshot; its writer is `entry.orient`, which composes it |
 | plan | dRankedPlan | its writer is `plan.record` |
@@ -422,20 +425,20 @@ layer that registers a kind adds its row.
 | flake | dWitnessedBar | its writer is `test.flakes`; flake quarantine |
 | selection | dWitnessedBar | its writer is `test.select` |
 | routing | dWitnessedBar | its writers are `test.route` and `test.flakes`, the re-entry's routing record; `release.route`, dShippedRelease's, also writes one |
-| seen-red | dWitnessedBar | its writer is `test.seen-red` |
+| seen-red | dWitnessedBar | its writer is `build.acceptance`, the executor re-running each new or changed gate's planted red, one record per gate keyed by leg and red SHA; `test.seen-red` reads it (the owner's FK-4-12 and FK-5-2) |
 | playbook set | dIndexedDesign | its writer is the set check, which dIndexedDesign registers at Test's leg-pack point: a playbook run's pieces joined by hash, and the set's identity derived from them (night pass, point 1, moved by its closing review's H2); writer item not named |
 | landing | dShippedRelease | the landing record; its writer is `deploy.record` |
 | comparison | dShippedRelease | its writer is `deploy.current` |
 | release | dShippedRelease | its writer is `release.record`, one per (SHA, environment) with its outcome |
 | release exit | dShippedRelease | the release slot's exit record, keyed by SHA with an outcome; `release.record` writes it and `deploy.released` names it |
 | kit release | dShippedRelease | its writer is `kits.cut`: the annotated tag and its notes blob |
-| receipt | dShippedRelease | its writers are `kits.install` and `kits.update`, with the wiring verdict |
+| receipt | dShippedRelease | its writers are the commands `kits.install` and `kits.update`, with the wiring verdict, and the owner items `kits.install-attended` and `kits.update-attended`, each attended step it records (the owner's FK-5-1) |
 | currency | dShippedRelease | its writer is `kits.currency`, keyed by HEAD SHA |
 | adopters | dShippedRelease | its writer is `kits.adopters`: gov's reading of each adopter, per release, named for adopters since the fleet names nodes (P40) |
 | adopter register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.adopters` |
 | transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
 | lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a terminal tombstone and never deleting the ref (P40); writer item not named |
-| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not named |
+| mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not named: the coordination verbs, which are no item, write it |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
 | return | dWellOiledMachine | the persisted-return store, keyed per spawn site; writer item not named: the commit queue, which is no item, writes it into the build's trail at its item's witness and pushes it with the build's branch (revised 2026-10-19, the night pass two, point 4) |
 | act | dWellOiledMachine | one act session per role act; act binding and the epoch check; writer item not named |
@@ -466,6 +469,7 @@ layer that registers a kind adds its row.
 | maintenance record | dTendedCadence | the maintenance record; writer item not named |
 | recommendation | dDeclaredLoop | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1) |
 | probe | dPlacedRequest | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an experiment's record the measured reference that later acceptance cites (night pass, point 2) |
+| probe trigger | dPlacedRequest | its writer is `probe.trigger`: why the probe opened, keyed by the boundary or the raising return, or by content for a probe before placement; `probe.pin` waits on it |
 | loop review | dCalibratedLens | its writer is `loop.record` |
 | value ledger | dCalibratedLens | a generated library view; `loop.price` regenerates it |
 | lexicon declaration | dMindYourWords | layer-memory lists the lexicon as an optional component's kind; dMindYourWords builds the declaration and its packs; writer item not named |
@@ -475,6 +479,16 @@ layer that registers a kind adds its row.
 | archive | dTotalRecall | a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named |
 | instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass); writer item not named |
 | witness | dTotalRecall | a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a scheduled task: its home, key and reader, written by its own owner and never by `record` (the away pass); writer item not named |
+
+Revised 2026-10-20 by the whole-design audit's fold (B4-F15): the probe trigger, lifecycle request and
+quiesce kinds, each written by a flow item, gain their rows. Its requests pass adds the deviation kind's row
+and names the mailbox message's writers (A4-F10, C2-F15).
+
+Revised 2026-10-20 by the whole-design audit's fork answers: the exception and override kinds name their home
+and writer (FK-1-1), and the receipt's writers gain the attended install and update items (FK-5-1).
+
+Revised 2026-10-20 by the whole-design audit's fork answers: the seen-red kind's writer is `build.acceptance`, and
+`test.seen-red` reads it (FK-4-12, FK-5-2). A held flaky leg's acceptance reads the release streak (FK-4-11).
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their
@@ -567,8 +581,8 @@ optional component, and the research library is the library side.
   - a carried commit: its build claims it;
   - an adapter fault: the adapter's next run passes;
   - a held flaky leg, keyed by the leg's name, so a second filing while one is open is a no-op: the
-    leg green on as many consecutive runs as `verdict.flakes`' threshold, which serves both the hold
-    and its release, read from the runner's verdict records since the hold (`gap-test-04`); or its
+    leg green on as many consecutive runs as `verdict.flakes.release` says, the hold's own entry threshold
+    being `verdict.flakes.entry` (the owner's FK-4-11), read from the runner's verdict records since the hold (`gap-test-04`); or its
     manifest row changed, as the bar's own quarantine releases a leg whose row changed.
     `test.flakes` files it under `quarantine` and is the flake record's one writer, and
     `test.select` lifts the hold and closes the ask, citing the streak. The runs come as
@@ -679,7 +693,8 @@ records. Neither may instruct by being recalled.
    migration counts.
    - The raters are two independent agents with the rubric, neither seeing the other's labels, and the
      owner rules on each row they disagree on.
-   - Below kappa 0.8 the rubric is revised and the routing re-run, and no row moves until it passes.
+   - Below kappa 0.8 the rubric is revised and the routing re-run, and no row moves until it passes, each re-run
+     drawing on the build's rework budget and ending as `flow.on-exhausted` says (P39).
 4. **The charter's `[records]` rule follows.** Each decision is recorded in its build as it is made. A
    major one is also logged. A reusable feature or convention becomes a reuse entry.
 

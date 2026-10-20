@@ -654,7 +654,7 @@ today, the map reads it. Where none exists, the namespace's owning build adds on
 | leg | none: the leg has a name only | `purpose` in `gate-legs.json`, dWitnessedBar |
 | hook, point | none | `purpose` on the pack and point registrations, dWellOiledMachine |
 | record kind | none | `purpose` in the kind registry, dTotalRecall |
-| tag namespace, policy namespace, gap area | none | `purpose` on the namespace row, dOrderedCharter; the policy namespace's dDeclaredLoop's, the gap area's dTotalRecall's |
+| tag namespace, policy namespace, gap area | none | `purpose` on the namespace row, dOrderedCharter; the policy namespace's dKeptSession's (revised 2026-10-20, CS4-F1), the gap area's dTotalRecall's |
 | design record | its H1 | declared |
 
 - **A node with no purpose,** under `memory.map-purpose: review` (PM-5):

@@ -91,7 +91,7 @@ The 47 flagged rows, in one table:
 | `build.closes` | key | dShippedRelease | `deploy.released` reads it, and Deploy holds the close; dDeclaredLoop's row cites it only as the presets check's example; row dDeclaredLoop |
 | `build.release-hold` | key | dShippedRelease | it says what waits at `deploy.released` (RH-1), a Deploy item; dWellOiledMachine's sweep only raises a wait past `build.release-ceiling` |
 | `integrations.tracker` | key | dTotalRecall | it mirrors the ask register out; the register is dTotalRecall's, and the mirror is an integrations adapter at its point |
-| `patch.ratify` | key | dTendedCadence | Maintain files patch intakes from detector readings in dTendedCadence's row, and the key says who ratifies them (FL-M3) |
+| `patch.ratify` | key | dPlacedRequest | `entry.claim`, dPlacedRequest's own item, reads it for every patch at entry, and its other readers, `deploy.mandate` and `maintain.patch`'s route, descend from dPlacedRequest (moved from dTendedCadence by the owner's FK-6-2, 2026-10-20) |
 | `annotations.delivery` | key | dBoundRoles | it switches the work order's code-notes slot, which dBoundRoles renders; the annotations system is dTotalRecall's; system annotations (dTotalRecall) |
 | `review.twin` | key | dFairHearing | dFairHearing's row runs the twin merge `review.twin` opts in (RS-1); the role-shapes system, dBoundRoles's, declares the `twin` shape kind; row dFairHearing; system role-shapes (dBoundRoles) |
 | `memory.default-load` | key | dTotalRecall | dTotalRecall's row holds the default load of the charter and the card; dWellOiledMachine's session-start hook performs the load; system memory-structure (dTotalRecall),project-map (dTotalRecall) |
@@ -359,7 +359,7 @@ The 78 keys that nothing names take their namespace's owner:
 | `install.from` | dShippedRelease | namespace | dShippedRelease's row: the deploy engine; the fleet register |  |
 | `build.closes` | dShippedRelease | judgment | `deploy.released` reads it, and Deploy holds the close; dDeclaredLoop's row cites it only as the presets check's example; row dDeclaredLoop | yes |
 | `build.release-hold` | dShippedRelease | judgment | it says what waits at `deploy.released` (RH-1), a Deploy item; dWellOiledMachine's sweep only raises a wait past `build.release-ceiling` | yes |
-| `build.release-ceiling` | dWellOiledMachine | row | row dWellOiledMachine |  |
+| `build.release-ceiling` | dShippedRelease | judgment | the release wait's declared deadline, whose arm dShippedRelease builds, dWellOiledMachine's sweep being generic over each wait's deadline (moved by the owner's FK-2-3, 2026-10-20) | yes |
 | `kits.cadence` | dShippedRelease | namespace | dShippedRelease's row: the fleet register and currency watch; the kit factory |  |
 | `kits.host` | dShippedRelease | namespace | dShippedRelease's row: the fleet register and currency watch; the kit factory |  |
 | `kits.watch-cadence` | dShippedRelease | namespace | dShippedRelease's row: the fleet register and currency watch; the kit factory |  |
@@ -376,7 +376,7 @@ The 78 keys that nothing names take their namespace's owner:
 | `maintain.dead-after` | dTendedCadence | namespace | dTendedCadence's row: the Maintain run as its step checklist; the cadence; the safe-fix set; detectors with owners |  |
 | `maintain.record-when` | dTendedCadence | namespace | dTendedCadence's row: the Maintain run as its step checklist; the cadence; the safe-fix set; detectors with owners |  |
 | `observability.run-record` | dTendedCadence | namespace | dTendedCadence's row: Maintain and the Loop Review delivered as cadence steps of the observability expansion |  |
-| `patch.ratify` | dTendedCadence | judgment | Maintain files patch intakes from detector readings in dTendedCadence's row, and the key says who ratifies them (FL-M3) | yes |
+| `patch.ratify` | dPlacedRequest | judgment | `entry.claim`, dPlacedRequest's own item, reads it for every patch at entry, and its other readers, `deploy.mandate` and `maintain.patch`'s route, descend from dPlacedRequest (moved from dTendedCadence by the owner's FK-6-2, 2026-10-20) | yes |
 | `review.<stage>` | dCalibratedLens | row | row dCalibratedLens |  |
 | `review.<stage>.effort` | dCalibratedLens | namespace | dCalibratedLens's row: review by policy per stage and effort; the stage-exit recommendation; the weekly Loop Review |  |
 | `review.recommendation` | dCalibratedLens | namespace | dCalibratedLens's row: review by policy per stage and effort; the stage-exit recommendation; the weekly Loop Review |  |
@@ -389,7 +389,7 @@ The 78 keys that nothing names take their namespace's owner:
 | `review.loop.retire` | dCalibratedLens | namespace | dCalibratedLens's row: review by policy per stage and effort; the stage-exit recommendation; the weekly Loop Review |  |
 | `review.loop.window-days` | dCalibratedLens | namespace | dCalibratedLens's row: review by policy per stage and effort; the stage-exit recommendation; the weekly Loop Review |  |
 | `review.loop.catch-source` | dCalibratedLens | namespace | dCalibratedLens's row: review by policy per stage and effort; the stage-exit recommendation; the weekly Loop Review |  |
-| `budgets.*` | dCalibratedLens | namespace | dCalibratedLens's row: caps re-derived from evidence and review cost |  |
+| `budgets.*` | dGroundRules | judgment | dGroundRules's `budgets.enforce` clause makes the key each cap's one declaration, and dCalibratedLens's row re-derives the values (moved from dCalibratedLens by the owner's FK-1-3, 2026-10-20) | yes |
 | `tags.slice` | dOrderedCharter | system | system tags (dOrderedCharter) |  |
 | `tags.retired-cites` | dOrderedCharter | system | system tags (dOrderedCharter) |  |
 | `tags.positional` | dOrderedCharter | system | system tags (dOrderedCharter) |  |
@@ -1010,3 +1010,10 @@ census: FINDING census: tools/newkit/kit.toml is on disk with no kit node rc 1
   - to dLinkedLibrary: the items `adopt.census`, `adopt.practices`, `adopt.decisions`, `adopt.reconstruct`, the kinds `research return`, `decision`, `gotcha`, `annotation index`, `recall index`, `baseline`, `census`, `ruling`, the
     annotations system, and the keys `annotations.budget`, `annotations.grammar`, `annotations.lookup`, `annotations.resolve-scope`, `decisions.major`, `memory.code-enrich`, `retrofit.decisions`, `retrofit.practice-pending`, `retrofit.reconstruct`, `reuse.delivery`, `reuse.propose`;
   - to dFurnishedOrders: the keys `annotations.delivery`, `instructions.slices`, `memory.code-budget`, `memory.code-roles`, `memory.map-unfold`, `memory.project-map`, `notices.record`, `prompts.batch`, `retrofit.slot-bytes`, `roles.answered-calls`, `roles.on-contradiction`, `roles.orientation.house-index`, `roles.trust`, `roles.verifier-context`.
+- **The whole-design audit's fork answers, 2026-10-20**
+  (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w7.md`): `patch.ratify` moves from dTendedCadence to
+  dPlacedRequest, whose `entry.claim` reads it for every patch (FK-6-2); `build.release-ceiling` moves from
+  dWellOiledMachine to dShippedRelease with the release arm of the event-wait sweep (FK-2-3); `budgets.*` moves
+  from dCalibratedLens to dGroundRules, which makes it each cap's one declaration (FK-1-3); and the items
+  `kits.install-attended` and `kits.update-attended` join dShippedRelease (FK-5-1). The rows above carry the
+  moves.

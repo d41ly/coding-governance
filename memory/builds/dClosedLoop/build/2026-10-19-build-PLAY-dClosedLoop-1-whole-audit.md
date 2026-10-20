@@ -499,6 +499,39 @@ returns are `fold-return-w1` to `-w6`.
 The answers are folded by two writers in parallel, after the six (`fold-brief-w7`, `-w8`). A new clause carries a
 placeholder id, and the main loop's mint step numbers them on from `[clause-ids]`' next free id.
 
+## [fold-applied] The fold applied: the later answers, the integration and the checks
+
+The answers were folded by writers 7 and 8 in parallel and writer 9 integrated what they left (`fold-brief-w7` to
+`-w9`; returns `fold-return-w7`, `-w8`, `-w9`, and `-w9b` for writer 9's resumed pass with FK-9-1 and FK-9-2). Each
+pass's tally, derived from its return and its script when it returned, is its dispatch row in the session log, rows
+204 to 207.
+
+Their folds raised 4 forks after `[fold]`'s round, answered as they came:
+
+| Fork | Asked | The owner's answer, verbatim |
+|---|---|---|
+| FK-7-1 | Once a cap's row moves under budgets.* (your FK-1-3 answer), may a run still raise it? | "Run may raise, per the file's rules (Recommended)" |
+| FK-8-1 | Before dRankedPlan and dIndexedDesign land, a placement routed to Plan or Design has two stand-ins: cl-0123 files an owner item carrying the claim, while FK-4-9's new [rules] bullet sends a route into a role item to the attended session's agent. Which governs? | "The clause's own wins (Recommended)" |
+| FK-9-1 | Before dScopedBuild lands, where does dDeclaredLoop's build.recommend route when decisions.major: author-owner-ratifies sends it to the owner item build.ratify? (The window only opens between dLinkedLibrary and dScopedBuild, and only under a non-default value.) | "Own owner gate (Recommended)" |
+| FK-9-2 | Between dSafePassage's step moving caps under budgets.* and dDeclaredLoop's guard landing, cl-0012's minimal guard refuses every agent write to the policy file. How does a run raise a cap in that window? (cl-0036's raise, in dOrderedCharter, falls inside it.) | "Guard admits one shape (Recommended)" |
+
+In all, 39 forks were raised and 37 questions asked; 5 answers chose an option the
+question did not recommend: FK-1-3, FK-1-5, FK-4-2, FK-4-12 + FK-5-2 (two writers, merged), FK-4-13.
+
+- **The probe widened.** The reconciliation probe's docstring kept rule 3 to the breakpoint program "until the audit's
+  fold classes what it finds"; the owner's FK-4-9 asked for a tolerance row per forward route, so every run now reads
+  every route, and writer 9 classed what the widened run found. The readings before and after, and a dropped row seen
+  red, are in the night pass's instruments record, `[fold-probe]`.
+- **The mint step** numbered the writers' placeholder ids in their order of first use in `[chain]`:
+  `cl-dClosedLoop-W8-1` → `cl-dClosedLoop-0503`, `cl-dClosedLoop-W8-2` → `cl-dClosedLoop-0504`, `cl-dClosedLoop-W7-2` → `cl-dClosedLoop-0505`, `cl-dClosedLoop-W8-3` → `cl-dClosedLoop-0506`, `cl-dClosedLoop-W8-4` → `cl-dClosedLoop-0507`, `cl-dClosedLoop-W7-1` → `cl-dClosedLoop-0508`, `cl-dClosedLoop-W7-3` → `cl-dClosedLoop-0509`; the next free id is `cl-dClosedLoop-0510`. It leaves an agent's saved
+  return verbatim, a defect writer 8 found in its first version.
+- **The K5 step,** the main loop's: `cl-dClosedLoop-0004` joins P35's row; `cl-dClosedLoop-0016` joins P38's row. Writer 1 folded both citations, and Stage 0's K5 arm reds a
+  clause citing a principle by id outside that principle's `[enforcement]` row; each clause enforces what it cites, so
+  it joins the row (`k5_rows.py`). It was found when the instruments recorder's Stage 0 plant `k5-cited` could not red
+  for its own reason over the folded tree.
+- **The checks:** applied to the tree and run on a copy of it, design map rc 0, atlas rc 0, fold state rc 0, reconciliation probe rc 0, clause scan rc 0, clause ids rc 0, gap join rc 0, preset check rc 0, critical path rc 0, first-segment probe rc 0;
+  `ALL rc 0`.
+
 ## [stage0-classes] Stage 0's classes
 
 Empty until the audit's fold classes what it does not fix.
