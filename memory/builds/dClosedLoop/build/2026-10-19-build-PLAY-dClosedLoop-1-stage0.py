@@ -7,8 +7,9 @@ runs it, and research-final-audit `[2]` and `[5]` name the classes a table can c
 
   K1 items       every flow item has an actor of a declared kind or role, a core item no expansion role; a Needs cell,
                  a dash there only on its step's first item, every item it names existing and no cycle among them; a
-                 witness; a Then cell; and an owning chain build. Expansion items carry no Needs column, and the rest
-                 of K1 reads them too.
+                 witness; a Then cell; and an owning chain build. An expansion item's Needs column is read where its
+                 table has one: its needs join the ghost and cycle checks, and a dash there marks an entry its trigger
+                 starts, so the dash and missing-cell rules hold for flow items only (Stage 0 again, 2026-10-20).
   K2 routes      every item-shaped tag a Then or Routes cell names is an item or a catalogue key; every target a branch
                  routes to has a declared form (`FORMS`); every item ends, through its own branches or an item it
                  routes to; and every item is reached from an entry. The order half, every route target built by its
@@ -23,14 +24,16 @@ runs it, and research-final-audit `[2]` and `[5]` name the classes a table can c
                  principle's row.
 
 A finding stands unless a row of the round record's `[stage0-classes]` names its arm, its node and a class from that
-arm's closed set (`CLASSES`); a row that no finding needs, or whose class is outside the set, is itself a finding. Each
+arm's closed set (`CLASSES`) that answers the finding's kind (`COVERS`): a writer class a missing writer, a reader class
+a missing reader, `external entry` an unreached item, `prose target` an unformed target, `prose need` a need, and K4's
+classes an unread key. A row that answers no finding, or whose class is outside the set, is itself a finding. Each
 arm prints what it does not read, "left out", and the walk takes those as named targets.
 
 Usage: python stage0.py [--root <tree>] [--arms K1,K2,K3,K4,K5,reruns] [--plant <case>]   (from the worktree root)
   --root   the tree whose records are read, such as the walk's seeded copy; every check runs inside it.
   --plant  damages one input in memory, and that arm must go red: k1-witness, k1-ghost-need, k1-cycle, k1-dash,
            k1-owner, k1-actor, k1-owning-role, k2-ghost, k2-unformed, k2-dead-end, k2-unreached, k2-deploy-land, k3-writer, k3-reader,
-           k4-unread, k5-row, k5-ghost, k5-retired, k5-cited, class-stale.
+           k4-unread, k5-row, k5-ghost, k5-retired, k5-cited, class-stale, class-covers.
 Exit 1 on any finding or any red re-run.
 """
 import collections
@@ -147,7 +150,7 @@ for head, rows in atlas.tables(le):
     for n, r in enumerate(rows):
         get = lambda h: r[col[h]].strip() if h in col and col[h] < len(r) else ""   # noqa: E731
         for tag in re.findall(r"`([a-z]+\.[a-z0-9-]+)`", r[0]):
-            items.setdefault(tag, dict(step="expansion", first=n == 0, actor=get("Actor"), needs="", does=get("Does"),
+            items.setdefault(tag, dict(step="expansion", first=n == 0, actor=get("Actor"), needs=get("Needs"), does=get("Does"),
                                        proof=get("Witness"), then=get("Routes"), owner=get("Owner"), flow=False))
 keys = {p["key"]: p for p in A["policies"]}
 roster = {r["role"]: r for r in A["roster"]}
@@ -211,6 +214,9 @@ elif PLANT == "k4-unread":
     keys["plan.planted-knob"] = {"key": "plan.planted-knob", "values": "on, off", "default": "on", "owner": "dRankedPlan"}
 elif PLANT == "class-stale":
     classes.append(("K4", "plan.no-such-key", "planned", "planted"))
+elif PLANT == "class-covers":
+    items["plan.dedupe"]["then"] += "; a planted outcome → somewhere unnamed"
+    classes.append(("K2", "plan.dedupe", "external entry", "planted"))
 elif PLANT and PLANT.startswith("k5-") and enforcement is not None:
     rows = [ln for ln in enforcement.split("\n") if ln.startswith("| `P")]
     if PLANT == "k5-row":
@@ -274,11 +280,11 @@ if "K1" in ARMS:
         if v["owner"] not in chain_names:
             find("K1", t, f"owner '{v['owner']}' is no chain build")
     graph = {}
-    for t, v in flow.items():
+    for t, v in items.items():
         need = v["needs"].strip()
-        if not need:
+        if v["flow"] and not need:
             find("K1", t, "no Needs cell")
-        elif need in ("—", "-") and not v["first"]:
+        elif v["flow"] and need in ("—", "-") and not v["first"]:
             find("K1", t, "a dash for Needs, on an item that is not its step's first")
         refs, ghosts = item_refs(need)
         for g in ghosts:
@@ -348,8 +354,8 @@ if "K2" in ARMS:
                 changed = True
     for t in sorted(set(items) - ends):
         find("K2", t, "ends nowhere: every route it takes leads only to items that never end")
-    roots = {t for t, v in items.items() if (v["flow"] and v["needs"].strip() in ("—", "-")) or
-             (not v["flow"] and v["first"])}
+    roots = {t for t, v in items.items() if v["needs"].strip() in ("—", "-") or
+             (not v["flow"] and v["first"] and not v["needs"].strip())}
     reached = set(roots)
     changed = True
     while changed:
@@ -400,7 +406,8 @@ if "K3" in ARMS:
         if not writers:
             find("K3", k, f"no writer item: \"{row[2][:80]}\"")
         spelled = k.replace("-", " ")
-        pat = re.compile(r"`" + re.escape(k) + r"`|(?<![\w-])" + re.escape(spelled) + r"s? records?\b", re.I)
+        base = spelled[:-len(" record")] if spelled.endswith(" record") else spelled   # not "record records"
+        pat = re.compile(r"`" + re.escape(k) + r"`|(?<![\w-])" + re.escape(base) + r"s? records?\b", re.I)
         # A reader waits on a writer's witness, which is the kind's record, or names the kind in its own cells.
         readers = [t for t, v in items.items() if t not in writers and
                    (set(item_refs(v["needs"])[0]) & set(writers) or pat.search(" ".join((v["needs"], v["does"], v["then"]))))]
@@ -465,22 +472,27 @@ if "K5" in ARMS:
     left["K5"].append("whether a named clause enforces its principle, which only a reader judges")
 
 # ------------------------------------------------------------------------------------------------- the classes
+# What each class answers: a finding of that kind on the row's node, and no other (Stage 0 again, 2026-10-20).
+COVERS = {"prose need": "need", "prose target": "a target in no declared form", "external entry": "reached from no entry",
+          "program writer": "no writer item", "hook writer": "no writer item", "external writer": "no writer item",
+          "program reader": "no reader", "external reader": "no reader", "planned": "read by no",
+          "read through a system": "read by no"}
 accepted, needed = collections.Counter(), set()
-for arm, node, cls, reason in classes:
-    if arm in findings and any(n == node for n, _ in findings[arm]):
-        needed.add((arm, node))
 for arm in list(findings):
     kept = []
     for node, what in findings[arm]:
-        row = next((c for c in classes if c[0] == arm and c[1] == node), None)
-        if row and row[2] in CLASSES.get(arm, set()):
+        rows = [c for c in classes if c[0] == arm and c[1] == node]
+        row = next((c for c in rows if c[2] in CLASSES.get(arm, set()) and COVERS.get(c[2], "\0") in what), None)
+        if row:
             accepted[arm] += 1
+            needed.add((row[0], row[1], row[2]))
             continue
-        kept.append((node, what + (f" [class row '{row[2]}' outside {arm}'s set]" if row else "")))
+        stray = [c[2] for c in rows if c[2] not in CLASSES.get(arm, set())]
+        kept.append((node, what + (f" [class row '{stray[0]}' outside {arm}'s set]" if stray else "")))
     findings[arm] = kept
 for arm, node, cls, reason in classes:
-    if (arm, node) not in needed:
-        findings["classes"].append((node, f"a {arm} class row that no finding needs ({cls})"))
+    if (arm, node, cls) not in needed:
+        findings["classes"].append((node, f"a {arm} class row that answers no finding ({cls})"))
 
 # ------------------------------------------------------------------------------------------------------ re-runs
 RERUNS = [("design map", [B + "2026-10-17-build-PLAY-dClosedLoop-1-map.py", "--check"]),

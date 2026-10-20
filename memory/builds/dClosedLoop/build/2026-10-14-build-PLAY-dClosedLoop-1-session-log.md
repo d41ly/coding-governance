@@ -273,6 +273,8 @@ included; the agent lines derived by `tools/roles/handoff.py agents` go to this 
 | 209 | `tier2-review.js`, diff review, full intensity: `gov-diff-reviewer` lenses, `gov-skeptic` batches and one `gov-synthesizer`, all at the owner's medium, run B of two | The whole-design audit's Stage 2 closing pair: `8d21999a9` over `6ba4eaaa1`, every design commit since the parked debt's pair, the fold included | the args, built by `build_args_closing.py` | 1799cb98 | returned as `wf_e897bbe0-97d`, CLEAN WITH FIXES, raw=24 confirmed=17 refuted=7 unverified=0 blocker=0 high=0 medium=13 low=4 | `reviews/2026-10-20-review-PLAY-dClosedLoop-1-audit-closing-b.md` |
 | 210 | gov-synthesizer, at its definition's effort | The closing pair compared: every finding of runs A and B placed on its defect, each defect's disposition and the fold plan | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-48-synthesizer.md` | 1799cb98 | returned, 7m57s, 38.6k out: the comparison record: map rows 7 no fold, 1 fork, 21 fold; compare_rounds.py's numbers in its [summary] | `build/2026-10-20-build-PLAY-dClosedLoop-1-audit-closing-reviews-compared.md` |
 | 211 | gov-spec-writer, at its definition's high effort | The closing pair's fold, writer 10: the comparison record's fold rows and the owner's flakes answer, after the main loop's instrument changes and Rule column | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-49-spec-writer.md` | 1799cb98 | returned, 18m12s, 102.3k out: 22 places (19 fold, 2 main loop's, 1 fork); its script holds 52 sub and insert calls; forks 1; top-level request bullets 0 | `build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w10.md` |
+| 212 | gov-spec-writer, at its definition's high effort | Stage 0 again, writer 11: every lead Stage 0 reports on the folded tree fixed in the design, classed or forked | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-50-spec-writer.md` | 1799cb98 | returned, 21m12s, 115.9k out: 24 places (14 fold, 3 class: external entry, 2 class: external writer, 1 class: program reader, 1 class: program writer, 1 class: program writer, except journal, which is hook writer, 1 fork, 1 left with fk-11-1 or fk-11-2); its script holds 33 sub and insert calls; forks 2; top-level request bullets 0; classes file 33 rows | `build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w11.md` |
+| 213 | gov-spec-writer, at its definition's high effort, resumed | Stage 0 again, writer 11 resumed: the owner's FK-11-1 and FK-11-2 folded against the fixed Stage 0 | `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-50-spec-writer.md` | 1799cb98 | returned, 29m54s, 132.0k out: 21 places (14 fold, 2 none needed, 1 class: external reader, 1 class: external writer, 1 class: hook writer, 1 class: program reader, 1 class: program writer); its script holds 45 sub and insert calls; forks 0; top-level request bullets 0; classes file 49 rows | `build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w11.md` |
 
 Maintain, and the machinery by which the loop corrects itself, is researched by the main loop in
 this session rather than by a sixth agent: the direct-spawn budget is five per owner turn
@@ -3071,6 +3073,11 @@ The whole-design audit's closing pair, dispatches 208 and 209, derived from each
   confirmed defects, and the owner answered its two questions. The probe now keys class rows by rule.
   Stage 0 on the folded tree finds 98, classed 7
   (`audit-closing-reviews-compared.md` `[folded]`).
+
+- 2026-10-20, session 1799cb98: Stage 0 again. Writer 11 fixed or classed every lead, the main loop
+  fixed Stage 0's three defects, and Stage 0 is green on the tree: 0 findings,
+  50 classed. The owner chose the baseline without a re-measure
+  (`whole-audit.md` `[stage0-again]`).
 
 ## Instruments
 

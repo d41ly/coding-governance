@@ -69,8 +69,8 @@ one note, so Stage 0 runs in any tree, the walk's seeded copy among them. Line c
 A finding stands unless a row of `[stage0-classes]` names its arm, its node and a class from that arm's closed set,
 and a row no finding needs is itself a finding. The walk took the reds and each arm's "left out" lines as its leads.
 The audit's fold and its closing pair's fold fixed the reds their findings named, and classed what fits an arm's
-set; Stage 0 on the folded tree still finds 98, classed 7, the leads of plan step 3's "Stage 0 again"
-(the closing pair's comparison record, `[folded]`).
+set; Stage 0 on the folded tree found 98, classed 7, and Stage 0 again fixed or classed every one: 0 findings,
+50 classed (`[stage0-again]`).
 
 **Seen red.** Each arm's plants, on an in-memory copy, turn it red for their own reason, and the run is in the night
 pass's instruments record, `[stage0]`. The reconciliation probe's default run passes a plan item planted with a route
@@ -441,7 +441,7 @@ working copy's bytes, so check it with `git cat-file -p HEAD:<path> | sha256sum`
   records' settled rules looking for the clause that carries each.
 - **The fold** takes all three runs' confirmed findings, 236 across the three reports, before anything else. The
   shortfall, the seal's defect and the blind spot are recorded as this audit's known limits.
-- **The re-measure,** before the baseline: a fresh sealed copy, new plants, none whose rule lives only in excluded
+- **The re-measure** was dropped at the owner's word after Stage 0 again (`[stage0-again]`). As planned, before the baseline: a fresh sealed copy, new plants, none whose rule lives only in excluded
   history, and a record-to-clause slice beside the scenario and clause slices, scored against a bar fixed first.
 
 ## [fold] The fold, its forks and the owner's answers
@@ -535,14 +535,95 @@ question did not recommend: FK-1-3, FK-1-5, FK-4-2, FK-4-12 + FK-5-2 (two writer
   `ALL rc 0`. Stage 0 is not among the ten, and was red then: the closing pair found the omission, and its fold
   records Stage 0's run (the comparison record's `[folded]`).
 
+## [stage0-again] Stage 0 again, its leads fixed or classed
+
+Plan step 3 ends with Stage 0 again. On the tree the audit's fold and its closing pair's fold left, Stage 0 found 98
+leads in its K2, K3 and K4 arms. Writer 11 fixed each one in the design or classed it (`fold-brief-w11`; returns
+`fold-return-w11` and `-w11b`, dispatches 212 and 213), and the owner answered its two questions, verbatim:
+
+- "FK-11-1: Seven record kinds have no reader named anywhere: archive, instrument, override, playbook-set, release, ruling and run-record. How is each one closed?" — "Name a reader each (Recommended)"
+- "FK-11-2 (adopter register): who writes the adopter register?" — "govkit registration (Recommended)"
+- "FK-11-2 (instrument): who writes the instrument record kind?" — "The record's session (Recommended)"
+
+- **Stage 0's own defects, fixed by the main loop.** Writer 11 found three: Stage 0 read no Needs column for an
+  expansion item, a class row answered every finding on its node, and a kind ending in "record" matched as "record
+  records". Stage 0 now reads the column, a dash there marking an entry. A class answers only findings of its kind,
+  one row per class on a node. The pattern takes the name without its trailing "record". The instruments record's
+  `[stage0-fixed]` shows the findings that moved, and the plants `class-covers` and `class-stale` red each new rule.
+- **The classes.** 4 rows of the closing fold's went idle once the Needs column was read, and are
+  removed: K2 `adopt.instructions`, K2 `adopt.declarations`, K2 `kits.install-attended`, K2 `kits.update-attended`. Writer 11's 49 rows join `[stage0-classes]`, each
+  class from its arm's closed set and its reason from the records.
+- **Stage 0 on the tree**, every arm and the reruns:
+
+```text
+K1: items 127 (98 flow, 29 expansion), roles 14 · findings 0
+K2: findings 0 · classed 1
+K3: kinds 83, table rows 83 · findings 0 · classed 49
+K4: keys 267 · findings 0
+K5: principles 42, clauses 509, retired 0 · findings 0
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 0 · classed 50 · reruns red 0
+```
+
+The owner then chose the path to the baseline, verbatim:
+
+- "Which path to speccing, once Stage 0 again is committed?" — "Once the review is done, fold, take the baseline, don't remeasure. Stop there."
+
+So the re-measure `[recall-scored]` planned is not run. The recall shortfall, the seal's defect and the
+clause-omission blind spot stay this audit's recorded limits, and the baseline is taken on this tree (`[baseline]`).
+
 ## [stage0-classes] Stage 0's classes
 
 Each row is a red the design keeps, classed from its arm's closed set by the closing pair's fold (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w10.md`, its requests).
 
 | Arm | Node | Class | Reason |
 |---|---|---|---|
-| K2 | `adopt.instructions` | external entry | Entered only from `kits.install` or the core's own command, both started outside any item. |
-| K2 | `adopt.declarations` | external entry | Same, through `kits.install` or `kits.update`. |
-| K2 | `kits.install-attended` | external entry | Reached only through `kits.install`, which the owner's operator order, an outbox order or the prepared merge starts (cl-0025). |
-| K2 | `kits.update-attended` | external entry | Same, through `kits.update`. |
 | K2 | `mailbox.answer` | external entry | A `question` arrives from another build's session through the mailbox, and `next` is a verb, not an item. |
+| K3 | `act` | program writer | The supervisor writes acts and session bindings (memory-plan `[doors]`). |
+| K3 | `act` | program reader | The supervisor reads each act's outcome record at Stop (layer-runtime `[enforce]`), and the commit-key leg and the causes check read its binding record (cl-0317). |
+| K3 | `adopter-register` | program writer | govkit's registration of an adopter, the step that probes the adopter's grant, writes its rows (its row; `kits.offer`'s Does; the owner's FK-11-2). |
+| K3 | `annotation-index` | program writer | A generated kind, written by its generator and checked against a re-render (layer-memory `[design]`). |
+| K3 | `annotation-index` | program reader | Its resolve check (cl-0241). |
+| K3 | `archive` | program writer | Rotation writes a rotated record under `memory/archive/` (its row, the away pass). |
+| K3 | `archive` | program reader | `record find` reads rotated records under `memory/archive/` beside the live ones (cl-0220, the owner's FK-11-1). |
+| K3 | `backlog-row` | program writer | The ask register's disposition verbs, for the core flow items that file asks (layer-memory `[settled]`, `[current]`). |
+| K3 | `backlog-row` | program reader | The register's order-free fold into status and its READY grading read every row (layer-memory `[current]`). |
+| K3 | `build-readme` | program writer | `record`'s `--new-build` scaffold, extending `gen_build_index.py --new-build` (layer-memory `[design]`, cl-0231). |
+| K3 | `build-readme` | program reader | dLinkedLibrary reads its generated routing region (cl-0242), and `record` takes it as the root a cause falls back on (cl-0230). |
+| K3 | `code` | program writer | Derived per blob through the shared extraction primitive and cached by tree hash (cl-0219), never written by an item. |
+| K3 | `commit` | program writer | The commit queue from the act binding, the owner's `prepare-commit-msg` filler and the lander (memory-plan `[sites]`, `[doors]`). |
+| K3 | `commit` | program reader | The commit-key leg, Maintain's commit reading and the landing's `carries` read each pushed commit's trailers (cl-0317). |
+| K3 | `design-record` | program writer | `record`, which writes every record (memory-plan `[doors]`), the row declaring no writer item. |
+| K3 | `deviation` | program writer | Written in the departing unit's own commit (cl-0004), which the commit queue writes from the act binding (memory-plan `[doors]`); its row says no item writes it. |
+| K3 | `exception` | external writer | Written in the recording session's commit by the session `core.exceptions` admits, through a stand-in door until `record` adopts it (cl-0037, memory-plan `[doors]`, the owner's FK-1-1). |
+| K3 | `flake` | program reader | dWitnessedBar's gate health derives `verdict.flakes.entry`'s `measured` threshold from the flake records (cl-0339). |
+| K3 | `instrument` | external writer | The session that writes the record it serves writes it (its row, the owner's FK-11-2). |
+| K3 | `instrument` | external reader | Its owner and reviewers re-run it as evidence on demand (its row, the owner's FK-11-1). |
+| K3 | `journal` | hook writer | The SubagentStart hook's witness is the journal entry with the spawn marker (layer-runtime `[enforce]`), and Runtime's detectors journal their events (cl-0324, cl-0327). |
+| K3 | `lease` | program writer | The coordination verbs, which are no item, write it, through `record`'s door once dTotalRecall lands it (its row, memory-plan `[doors]`, cl-0505). |
+| K3 | `lexicon-declaration` | external writer | The owner declares it, changed through the instruction write path (lexicon, settled after L-1 to L-6, L-5; cl-0271). |
+| K3 | `lexicon-declaration` | program reader | The lexicon's checks read the families it declares (cl-0271, cl-0274). |
+| K3 | `loop-review` | program reader | The next Loop Review reads it: each record keeps the ledger snapshot it priced (layer-expansions `[design-observability]`), and a size breach that persists or grows across reviews raises an owner item (cl-0472). |
+| K3 | `mailbox-message` | program writer | The coordination verbs, which are no item (its row, memory-plan `[doors]`). |
+| K3 | `mailbox-message` | program reader | The mailbox read at every item boundary by `mailbox.reads` (cl-0148), and the wait graph over open mailbox questions (cl-0328). |
+| K3 | `node-ledger` | program writer | The ledgers' one local writer, through which each project charges and releases its own reservations (cl-0331). |
+| K3 | `node-ledger` | program reader | Each launch's admission (cl-0331) and the pick (cl-0332). |
+| K3 | `node-profile` | external writer | The owner, through its guarded owner command, one of the floor's owner-only writes (cl-0338). |
+| K3 | `node-profile` | program reader | Every node unit on the node reads it whole (cl-0338), and the pick drops work it lacks (cl-0332). |
+| K3 | `override` | external writer | The session's agent writes it in the recording session's commit as `charter.override` admits, through a stand-in door (cl-0032, memory-plan `[doors]`, the owner's FK-1-1). |
+| K3 | `playbook` | program writer | A design record kind an ordinary build authors (night pass, point 6), written through `record` as every record is (memory-plan `[doors]`). |
+| K3 | `playbook-set` | program writer | The set check, which dIndexedDesign registers at Test's leg-pack point (its row, cl-0393). |
+| K3 | `recall-index` | program writer | A generated kind, written by its generator (layer-memory `[design]`), its tables in the one index (cl-0232). |
+| K3 | `recall-index` | program reader | `record find` (memory-plan `[pockets]`, SA-6). |
+| K3 | `registry` | program writer | Its gate's pin emitter (its row, the away pass). |
+| K3 | `registry` | program reader | The check that keeps each population where it sits (retrofit `[ledger]`, the home). |
+| K3 | `return` | program writer | The commit queue, which is no item, writes it into the trail at its item's witness (its row). |
+| K3 | `return` | program reader | The supervisor, which counts an item done only on it (layer-runtime `[enforce]`) and hands a relaunch its persisted returns (layer-runtime `[supervise]`). |
+| K3 | `run-record` | program writer | Observability's journal reader writes it when the journal shows a run closed, as `observability.run-record` says (cl-0447). |
+| K3 | `session-binding` | program writer | The supervisor writes acts and session bindings (memory-plan `[doors]`). |
+| K3 | `session-binding` | program reader | Act binding, at the first gated call's PermissionRequest decision (layer-runtime `[enforce]`), and the session node derived from bindings (cl-0313). |
+| K3 | `view` | program writer | A generated kind, written by its generator and checked against a re-render (layer-memory `[design]`); the renderers write views (memory-plan `[doors]`). |
+| K3 | `view` | program reader | The plan view is read by the kickoff's card and by Maintain (flow-interactions `[shared]`). |
+| K3 | `witness` | external writer | Its own owner, never `record` (its row, memory-plan `[frame]`). |
+| K3 | `witness` | program reader | The reader its registry row names: the binding's `transcript=` pointer read by `gov trace` (cl-0312), and scheduled tasks by preflight (memory-plan `[pockets]`). |
+| K3 | `work-order` | program writer | The handoff renderer (memory-plan `[doors]`). |
+| K3 | `work-order` | program reader | The supervisor binds each act to its work order by `task-sha` (cl-0168, cl-0310), and the act's agent takes it as its root (`builds.agent-root`, cl-0215). |

@@ -410,7 +410,7 @@ layer that registers a kind adds its row.
 | seams | dIndexedDesign | its writer is `design.seams` |
 | feature design | dIndexedDesign | its writer is `design.decompose` |
 | spec | dIndexedDesign | its writer is `design.unit-spec`; the spec redesigned as a structured, tagged contract |
-| fork | dIndexedDesign | a flow record kind (layer-memory `[decisions]`); fork resolution by `design.forks` is dIndexedDesign's, though forks arise in every step; writer item not named |
+| fork | dIndexedDesign | a flow record kind (layer-memory `[decisions]`); fork resolution by `design.forks` is dIndexedDesign's, though forks arise in every step; its writers in Design are `design.decompose` and `design.unit-spec`, each joining every fork it raised to its fork record |
 | overlap | dIndexedDesign | its writer is `design.overlaps` |
 | diff | dIndexedDesign | its writer is `design.reentry`, classifying an amendment by a structural diff |
 | roster | dIndexedDesign | its writer is `design.decompose`, with the interface schema check; not the README's derived `roster` field |
@@ -435,8 +435,8 @@ layer that registers a kind adds its row.
 | receipt | dShippedRelease | its writers are the commands `kits.install` and `kits.update`, with the wiring verdict, and the owner items `kits.install-attended` and `kits.update-attended`, each attended step it records (the owner's FK-5-1) |
 | currency | dShippedRelease | its writer is `kits.currency`, keyed by HEAD SHA |
 | adopters | dShippedRelease | its writer is `kits.adopters`: gov's reading of each adopter, per release, named for adopters since the fleet names nodes (P40) |
-| adopter register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.adopters` |
-| transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |
+| adopter register | dShippedRelease | `adopters.toml` grown into the register; writer item not named: govkit's registration of an adopter, the step that probes the adopter's grant, writes its rows (the owner's FK-11-2), and gov's adopters program reads them |
+| transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it: `plan.exit`, `design.exit`, `build.exit`, `test.exit` and `deploy.close`, and `life.close` the terminal one |
 | lease | dPlacedRequest | dPlacedRequest's row builds the one lease grammar, a release writing a hand-over or a terminal tombstone and never deleting the ref (P40); writer item not named: the coordination verbs, which are no item, write it, through `record`'s door once dTotalRecall lands it (`cl-dClosedLoop-0505`) |
 | mailbox message | dKeptSession | dKeptSession's row builds the mailbox and its message kinds; writer item not named: the coordination verbs, which are no item, write it, through `record`'s door once dTotalRecall lands it (`cl-dClosedLoop-0505`) |
 | disposition | dDeclaredLoop | the owner's disposition record, written by whichever channel carried it: the mailbox, a terminal command or a prompt. dDeclaredLoop is the earliest of its writers' builds and an ancestor of the others, and `entry.place-owner` writes it first (PM-12d) |
@@ -452,21 +452,21 @@ layer that registers a kind adds its row.
 | review | dFairHearing | its writer is `review.report`, the harness's, under the proposal for the breakpoint's items |
 | research return | dLinkedLibrary | the research view over the research-return kind and its dated backfill; `plan.research` and `design.research` write it |
 | design record | dTotalRecall | a core memory kind with no writer item; the memory contract declares it |
-| ask | dTotalRecall | the ask kind's acceptance at filing; writer item not named |
+| ask | dTotalRecall | the ask kind's acceptance at filing; its writers are the items that file asks, `maintain.file` and `loop.file` among them, each filing stating its acceptance (`[asks]`) |
 | backlog row | dTotalRecall | the ask register's row store; the memory contract declares it; writer item not named |
-| decision | dLinkedLibrary | decisions split by kind, the major-decision log; writer item not named |
-| gotcha | dLinkedLibrary | gotchas handed as the unit's spec names them, never by write set (revised 2026-10-19, the night pass two, point 6, the owner's NT-24); writer item not named |
-| dossier | dTotalRecall | dossiers anchored to symbol keys; writer item not named |
+| decision | dLinkedLibrary | decisions split by kind, the major-decision log; its writers are `build.distill`, a log row for each major resolved fork, and `adopt.decisions`, each reconstructed decision record |
+| gotcha | dLinkedLibrary | gotchas handed as the unit's spec names them, never by write set (revised 2026-10-19, the night pass two, point 6, the owner's NT-24); its writers are `review.fold`, the class record of each `new:` disposition on an unbuilt spec, and `build.unit-pass`, a fix unit's class records under `memory/gotchas/` |
+| dossier | dTotalRecall | dossiers anchored to symbol keys; its writer, where the map is installed, is `build.unit-pass`, the claiming dossier's edit in its witness |
 | code | dTotalRecall | the core code record: files, definitions with their ranges and body hashes, imports, resolved calls, tests and kit membership, derived per blob and cached by tree hash. It replaces the optional symbols and callers (night pass, point 3); writer item not named |
 | annotation index | dLinkedLibrary | the generated annotation index and its resolve check; writer item not named |
 | recall index | dLinkedLibrary | memory-recall narrowed to a record finder; writer item not named |
-| baseline | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; writer item not named |
+| baseline | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; its writer is `test.seed`, seeding each registered population's file |
 | census | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; `adopt.census` writes it |
 | ruling | dLinkedLibrary | `adopt.practices` writes the ruling records, an item dLinkedLibrary owns |
-| shape-run | dTotalRecall | the shape-run kind; writer item not named |
+| shape-run | dTotalRecall | the shape-run kind; its writers are `review.cost`, a review act's row, the supervisor's journal reconcile, every other role act's, and `probe.run`, an experiment's (systems `[design-role-shapes]`) |
 | build readme | dTotalRecall | the build README's declared front-matter schema, with unknown keys refused; writer item not named |
 | claim | dTotalRecall | the claim ref on the remote and the ask-family counter ref (`gap-mem-13`); `entry.claim` writes the claim |
-| maintenance record | dTendedCadence | the maintenance record; writer item not named |
+| maintenance record | dTendedCadence | the maintenance record; its writer is `maintain.record`, as `maintain.record-when` says |
 | recommendation | dDeclaredLoop | every `*.recommend` item writes it; the stage-exit recommendation is one mechanism, dDeclaredLoop's (AF-1) |
 | probe | dPlacedRequest | its writer is `probe.return`: one record per probe, its kind a verification, a reproduction or an experiment, an experiment's record the measured reference that later acceptance cites (night pass, point 2) |
 | probe trigger | dPlacedRequest | its writer is `probe.trigger`: why the probe opened, keyed by the boundary or the raising return, or by content for a probe before placement; `probe.pin` waits on it |
@@ -477,7 +477,7 @@ layer that registers a kind adds its row.
 | view | dTotalRecall | a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged (the away pass); writer item not named |
 | registry | dTotalRecall | a gate's row registry under `memory/project/`, written by its gate's pin emitter (the away pass); writer item not named |
 | archive | dTotalRecall | a rotated record under `memory/archive/`, written by rotation (the away pass); writer item not named |
-| instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass); writer item not named |
+| instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass); writer item not named: the session that writes the record it serves writes it (the owner's FK-11-2), and its owner and reviewers re-run it as evidence on demand (the owner's FK-11-1) |
 | witness | dTotalRecall | a declared pocket outside the tree, such as a transcript, a Codex rollout, the auto-memory, the live inbox or a scheduled task: its home, key and reader, written by its own owner and never by `record` (the away pass); writer item not named |
 
 Revised 2026-10-20 by the whole-design audit's fold (B4-F15): the probe trigger, lifecycle request and
@@ -493,6 +493,12 @@ Revised 2026-10-20 by the whole-design audit's fork answers: the seen-red kind's
 Revised 2026-10-20 by the closing pair's fold: the lease and mailbox rows name the coordination verbs, which
 write through `record`'s door once dTotalRecall lands it (door-misses-coordination-verbs), and a held leg's entry
 threshold under `measured` is the one the gate-health record holds (flakes-measured-no-writer).
+
+Revised 2026-10-20 by Stage 0 again (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w11.md`): the ask, baseline, decision, dossier, fork,
+gotcha, maintenance record, shape-run and transition rows name the items the flow and the expansions already give
+as their writers. By the owner's FK-11-2, govkit's registration writes the adopter register, which gov's adopters
+program reads, and an instrument is written by the session that writes the record it serves; by FK-11-1, its
+owner and reviewers re-run it on demand.
 
 **One refinement to layers round one,** for research records and major decisions alike. Core items
 write them (`plan.research`, `design.research`, and each build's decisions as it makes them), so their

@@ -23670,7 +23670,8 @@ WANT = {
     "k5-ghost": ("K5", "names `cl-dClosedLoop-9999`, which no clause carries"),
     "k5-retired": ("K5", "a retired id"),
     "k5-cited": ("K5", "by id, and"),
-    "class-stale": ("K4", "classes plan.no-such-key: a K4 class row that no finding needs (planned)"),
+    "class-stale": ("K4", "classes plan.no-such-key: a K4 class row that answers no finding (planned)"),
+    "class-covers": ("K2", "K2 plan.dedupe: a target in no declared form: \"somewhere unnamed\""),
 }
 
 
@@ -30610,7 +30611,7 @@ import sys
 
 ret = pathlib.Path(sys.argv[1]).read_text(encoding="utf-8")
 script = pathlib.Path(sys.argv[2]).read_text(encoding="utf-8")
-sec = re.search(r"(?s)Dispositions\**\s*\n(.*?)(?=\n(?:## )?2\. )", ret)
+sec = re.search(r"(?s)Dispositions\**\s*\n(.*?)(?=\n(?:#{2,3} )?2\. )", ret)
 if not sec:
     sys.exit(f"writer_outcome: no dispositions section in {sys.argv[1]}")
 disp = {}
@@ -30628,7 +30629,7 @@ for ln in sec.group(1).split("\n"):
             disp[k] = disp.get(k, 0) + n
 edits = len(re.findall(r"^\s*\w+\.(?:sub|insert_before)\(", script, flags=re.M))
 forks = len(re.findall(r"^### FK-\d+-\d+", ret, flags=re.M))
-req = re.search(r"(?s)\n(?:## )?4\. \**Requests\**(.*?)(?=\n(?:## )?5\. )", ret)
+req = re.search(r"(?s)\n(?:#{2,3} )?4\. \**Requests\**(.*?)(?=\n(?:#{2,3} )?5\. )", ret)
 reqs = len(re.findall(r"^(?:- \*\*|\d+\. \*\*)", req.group(1), flags=re.M)) if req else 0
 parts = ", ".join(f"{v} {k}" for k, v in sorted(disp.items(), key=lambda kv: (-kv[1], kv[0])))
 print(f"{sum(disp.values())} places ({parts}); its script holds {edits} sub and insert calls; forks {forks}; "
@@ -32176,6 +32177,623 @@ R.write_text(t, encoding="utf-8", newline="\n")
 print(f"prep_recorder_closing: {len(EDITS)} edits to {R.name}")
 ````
 
+### `patch_stage0_b.py`
+
+Stage 0's three fixes found in Stage 0 again: the expansions' Needs column read, a class answering only its finding's kind (COVERS), and the record-word pattern.
+
+````python
+"""Stage 0, changed for Stage 0 again (2026-10-20). Writer 11 found three defects in it:
+1. needs: it set an expansion item's Needs to empty although layer-expansions' item tables carry the column. It now
+   reads the column. An expansion item's needs join K1's ghost and cycle checks. A dash there marks an entry its
+   trigger starts, so K1's dash and missing-cell rules hold for flow items only, and K2 counts that item a root.
+2. covers: a class row covered every finding on its node, whatever the finding. A class now answers only findings of
+   its kind (COVERS). A node may carry one row per kind, and a row that answers nothing is idle and red.
+3. record words: K3's pattern for a kind whose name ends in "record" asked for "record" twice. Its base is now the
+   name without its trailing "record".
+Each replacement must match once.
+
+Usage: python -X utf8 patch_stage0_b.py <stage0.py>
+"""
+import pathlib
+import sys
+
+p = pathlib.Path(sys.argv[1])
+t = p.read_text(encoding="utf-8")
+EDITS = [
+    ("""                 witness; a Then cell; and an owning chain build. Expansion items carry no Needs column, and the rest
+                 of K1 reads them too.""",
+     """                 witness; a Then cell; and an owning chain build. An expansion item's Needs column is read where its
+                 table has one: its needs join the ghost and cycle checks, and a dash there marks an entry its trigger
+                 starts, so the dash and missing-cell rules hold for flow items only (Stage 0 again, 2026-10-20)."""),
+    ("""A finding stands unless a row of the round record's `[stage0-classes]` names its arm, its node and a class from that
+arm's closed set (`CLASSES`); a row that no finding needs, or whose class is outside the set, is itself a finding.""",
+     """A finding stands unless a row of the round record's `[stage0-classes]` names its arm, its node and a class from that
+arm's closed set (`CLASSES`) that answers the finding's kind (`COVERS`): a writer class a missing writer, a reader class
+a missing reader, `external entry` an unreached item, `prose target` an unformed target, `prose need` a need, and K4's
+classes an unread key. A row that answers no finding, or whose class is outside the set, is itself a finding."""),
+    ("""            items.setdefault(tag, dict(step="expansion", first=n == 0, actor=get("Actor"), needs="", does=get("Does"),""",
+     """            items.setdefault(tag, dict(step="expansion", first=n == 0, actor=get("Actor"), needs=get("Needs"), does=get("Does"),"""),
+    ("""    for t, v in flow.items():
+        need = v["needs"].strip()
+        if not need:
+            find("K1", t, "no Needs cell")
+        elif need in ("—", "-") and not v["first"]:
+            find("K1", t, "a dash for Needs, on an item that is not its step's first")""",
+     """    for t, v in items.items():
+        need = v["needs"].strip()
+        if v["flow"] and not need:
+            find("K1", t, "no Needs cell")
+        elif v["flow"] and need in ("—", "-") and not v["first"]:
+            find("K1", t, "a dash for Needs, on an item that is not its step's first")"""),
+    ("""    roots = {t for t, v in items.items() if (v["flow"] and v["needs"].strip() in ("—", "-")) or
+             (not v["flow"] and v["first"])}""",
+     """    roots = {t for t, v in items.items() if v["needs"].strip() in ("—", "-") or
+             (not v["flow"] and v["first"] and not v["needs"].strip())}"""),
+    ("""        spelled = k.replace("-", " ")
+        pat = re.compile(r"`" + re.escape(k) + r"`|(?<![\\w-])" + re.escape(spelled) + r"s? records?\\b", re.I)""",
+     """        spelled = k.replace("-", " ")
+        base = spelled[:-len(" record")] if spelled.endswith(" record") else spelled   # not "record records"
+        pat = re.compile(r"`" + re.escape(k) + r"`|(?<![\\w-])" + re.escape(base) + r"s? records?\\b", re.I)"""),
+    ("""accepted, needed = collections.Counter(), set()
+for arm, node, cls, reason in classes:
+    if arm in findings and any(n == node for n, _ in findings[arm]):
+        needed.add((arm, node))
+for arm in list(findings):
+    kept = []
+    for node, what in findings[arm]:
+        row = next((c for c in classes if c[0] == arm and c[1] == node), None)
+        if row and row[2] in CLASSES.get(arm, set()):
+            accepted[arm] += 1
+            continue
+        kept.append((node, what + (f" [class row '{row[2]}' outside {arm}'s set]" if row else "")))
+    findings[arm] = kept
+for arm, node, cls, reason in classes:
+    if (arm, node) not in needed:
+        findings["classes"].append((node, f"a {arm} class row that no finding needs ({cls})"))""",
+     """# What each class answers: a finding of that kind on the row's node, and no other (Stage 0 again, 2026-10-20).
+COVERS = {"prose need": "need", "prose target": "a target in no declared form", "external entry": "reached from no entry",
+          "program writer": "no writer item", "hook writer": "no writer item", "external writer": "no writer item",
+          "program reader": "no reader", "external reader": "no reader", "planned": "read by no",
+          "read through a system": "read by no"}
+accepted, needed = collections.Counter(), set()
+for arm in list(findings):
+    kept = []
+    for node, what in findings[arm]:
+        rows = [c for c in classes if c[0] == arm and c[1] == node]
+        row = next((c for c in rows if c[2] in CLASSES.get(arm, set()) and COVERS.get(c[2], "\\0") in what), None)
+        if row:
+            accepted[arm] += 1
+            needed.add((row[0], row[1], row[2]))
+            continue
+        stray = [c[2] for c in rows if c[2] not in CLASSES.get(arm, set())]
+        kept.append((node, what + (f" [class row '{stray[0]}' outside {arm}'s set]" if stray else "")))
+    findings[arm] = kept
+for arm, node, cls, reason in classes:
+    if (arm, node, cls) not in needed:
+        findings["classes"].append((node, f"a {arm} class row that answers no finding ({cls})"))"""),
+]
+for old, new in EDITS:
+    n = t.count(old)
+    if n != 1:
+        sys.exit(f"patch_stage0_b: {old[:70]!r} matches {n} times")
+    t = t.replace(old, new)
+p.write_text(t, encoding="utf-8", newline="\n")
+print(f"patch_stage0_b: {len(EDITS)} edits to {p.name}")
+````
+
+### `patch_stage0_c.py`
+
+Stage 0's plants after those fixes: class-stale's new wording, and class-covers, an unformed target under an external entry row.
+
+````python
+"""Stage 0's plants after patch_stage0_b (2026-10-20). The class-stale plant's line takes the new wording. A new plant,
+class-covers, plants an unformed target on plan.dedupe under a K2 `external entry` row. Before the change that row
+silenced the target finding. Now the finding stands and the row answers nothing. Each replacement must match once.
+
+Usage: python -X utf8 patch_stage0_c.py <stage0.py> <run_plants.py>
+"""
+import pathlib
+import sys
+
+s0, rp = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+EDITS = {
+    s0: [
+        ("""           k4-unread, k5-row, k5-ghost, k5-retired, k5-cited, class-stale.""",
+         """           k4-unread, k5-row, k5-ghost, k5-retired, k5-cited, class-stale, class-covers."""),
+        ("""elif PLANT == "class-stale":
+    classes.append(("K4", "plan.no-such-key", "planned", "planted"))
+""",
+         """elif PLANT == "class-stale":
+    classes.append(("K4", "plan.no-such-key", "planned", "planted"))
+elif PLANT == "class-covers":
+    items["plan.dedupe"]["then"] += "; a planted outcome → somewhere unnamed"
+    classes.append(("K2", "plan.dedupe", "external entry", "planted"))
+"""),
+    ],
+    rp: [
+        ("""    "class-stale": ("K4", "classes plan.no-such-key: a K4 class row that no finding needs (planned)"),
+""",
+         """    "class-stale": ("K4", "classes plan.no-such-key: a K4 class row that answers no finding (planned)"),
+    "class-covers": ("K2", "K2 plan.dedupe: a target in no declared form: \\"somewhere unnamed\\""),
+"""),
+    ],
+}
+for path, edits in EDITS.items():
+    t = path.read_text(encoding="utf-8")
+    for old, new in edits:
+        n = t.count(old)
+        if n != 1:
+            sys.exit(f"patch_stage0_c: {path.name}: {old[:60]!r} matches {n} times")
+        t = t.replace(old, new)
+    path.write_text(t, encoding="utf-8", newline="\n")
+    print(f"patch_stage0_c: {len(edits)} edits to {path.name}")
+````
+
+### `stage0_unclass.py`
+
+The fold step that removes the class rows Stage 0 reports answering no finding, named in unclass.txt from Stage 0's own lines.
+
+````python
+"""The fold step `stage0_unclass`: rows of the round record's `[stage0-classes]` that answer no finding once Stage 0
+reads the expansions' Needs column and matches a class to its finding's kind (Stage 0 again, 2026-10-20) are removed.
+The rows to remove are named in unclass.txt beside this script, one `<arm> <node> <class>` per line, copied from Stage
+0's own "answers no finding" lines. Each named row must be in the table exactly once, or this refuses.
+
+Usage: python -X utf8 stage0_unclass.py   (from a tree's root; all.py runs it as the step stage0_unclass)
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+ROUND = pathlib.Path("memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md")
+names = [l.split(None, 2) for l in (HERE / "unclass.txt").read_text(encoding="utf-8").splitlines() if l.strip()]
+t = ROUND.read_text(encoding="utf-8")
+for arm, node, cls in names:
+    rows = re.findall(r"^\| " + re.escape(arm) + r" \| `" + re.escape(node) + r"` \| " + re.escape(cls) + r" \| .*\|\n",
+                      t, flags=re.M)
+    if len(rows) != 1:
+        sys.exit(f"stage0_unclass: {arm} {node} {cls}: {len(rows)} rows in [stage0-classes]")
+    t = t.replace(rows[0], "", 1)
+ROUND.write_text(t, encoding="utf-8", newline="\n")
+print(f"stage0_unclass: {len(names)} idle rows removed")
+````
+
+### `stage0_classes.py`
+
+The fold step that adds fold writers' class rows to [stage0-classes], each class in its arm's closed set, one row per class on a node.
+
+````python
+"""The fold step `stage0_classes`: the round record's `[stage0-classes]` takes the class rows fold writers list in
+`classes.md` beside their scripts (`w<n>/classes.md`), each row `| K<n> | `<node>` | <class> | <reason> |`. Each class
+must be in its arm's closed set (stage0.py's CLASSES), and no row may repeat an arm, node and class the table holds:
+a node may carry one row per class, a writer class and a reader class beside each other. Run it
+from a tree's root after the writers' scripts; all.py runs it as the step `stage0_classes`.
+
+Refuses (exit 1): a class outside its arm's set, a repeated arm, node and class, or a malformed row.
+What it does not do: judge a class (Stage 0 reds a row no finding needs, and the writer's return argues each one).
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+ROUND = B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"
+S0 = (B / "2026-10-19-build-PLAY-dClosedLoop-1-stage0.py").read_text(encoding="utf-8")
+sets = {arm: set(re.findall(r'"([^"]+)"', body))
+        for arm, body in re.findall(r'"(K\d)": (\{[^}]*\}|set\(\))', S0.split("CLASSES = {", 1)[1].split("\n}", 1)[0])}
+ROW = re.compile(r"^\| (K\d) \| `([^`]+)` \| ([^|]+?) \| (.+) \|$")
+rows = []
+for f in sorted(HERE.glob("w*/classes.md")):
+    for ln in f.read_text(encoding="utf-8").splitlines():
+        if ln.startswith("| K"):
+            m = ROW.match(ln.strip())
+            if not m:
+                sys.exit(f"stage0_classes: {f.parent.name}: a malformed row: {ln[:100]}")
+            if m.group(3) not in sets.get(m.group(1), set()):
+                sys.exit(f"stage0_classes: {f.parent.name}: {m.group(3)!r} is outside {m.group(1)}'s closed set")
+            rows.append(ln.strip())
+t = ROUND.read_text(encoding="utf-8")
+sec = t.split("\n## [stage0-classes]", 1)
+if len(sec) != 2:
+    sys.exit("stage0_classes: the round record has no [stage0-classes]")
+body = sec[1].split("\n## ", 1)[0]
+have = {(m.group(1), m.group(2), m.group(3)) for m in (ROW.match(l.strip()) for l in body.splitlines()) if m}
+new = {(ROW.match(r).group(1), ROW.match(r).group(2), ROW.match(r).group(3)) for r in rows}
+if len(new) != len(rows) or have & new:
+    sys.exit(f"stage0_classes: repeated arm, node and class: {sorted(have & new) or 'within the listed rows'}")
+table_end = max(i for i, l in enumerate(body.splitlines()) if l.startswith("|"))
+lines = body.splitlines()
+lines[table_end + 1:table_end + 1] = rows
+ROUND.write_text(sec[0] + "\n## [stage0-classes]" + "\n".join(lines) + t[len(sec[0]) + len("\n## [stage0-classes]") + len(body):],
+                 encoding="utf-8", newline="\n")
+print(f"stage0_classes: {len(rows)} rows added from {len(list(HERE.glob('w*/classes.md')))} file(s)")
+````
+
+### `fold-11.py`
+
+Fold writer 11's script: Stage 0 again's fixes in the design, and the owner's FK-11-1 and FK-11-2 (fold-return-w11, -w11b).
+
+````python
+"""Writer 11's fold, Stage 0 again (fold brief w11): the leads Stage 0 prints on the tree at `15988ccd5` whose answer
+the records already settle, each folded as the smallest edit.
+
+- K2: fourteen targets in no declared form, each rewritten in a form `FORMS` reads, with its meaning kept, which also
+  ends `kits.offer`; and the two that writer 10's class rows hid, `adopt.instructions`' and `adopt.declarations'`.
+- K3, the owner's answers of 2026-10-20: FK-11-1 names a reader for each of seven kinds (archive, instrument,
+  override, playbook-set, release, ruling, run-record), each in its reader's build; FK-11-2 names the adopter
+  register's writer, govkit's registration, and the instrument's, the record's session.
+- K3: nine kinds' rows name the item the records say writes them (ask, baseline, decision, dossier, fork, gotcha,
+  maintenance record, shape-run, transition), and seven readers name the kind they read (`plan.dedupe` asks,
+  `plan.record` research returns, `deploy.close` exception records, `build.scope` the baseline, `kits.currency`
+  kit-release tags, `kits.offer` the adopters record, `loop.propose` the value ledger).
+- K4: cl-0297 names `roles.shape-enforce`, the key its act binding already applies (systems `[design-role-shapes]`).
+
+It adds no clause, so it carries no placeholder id. Run from the tree's root; each `sub` and `insert_before` must match
+exactly once, or the script stops before it writes anything.
+
+What it does not do: class a lead (`classes.md` beside it does, through the main loop's `stage0_classes` step), close a
+lead the return leaves to a fork, edit the build's scripts (stage0.py, reconcile.py), the round record or any brief,
+return or instrument, or check that a reader it names reads the kind's newest record rather than any.
+"""
+import sys
+
+sys.path.insert(0, "C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-gov-architecture-plan-e34297/1799cb98-0882-4ab8-a308-19495d2a487a/scratchpad/expansions")
+from fold_lib import Record
+
+B = "memory/builds/dClosedLoop/build/"
+V2 = Record(B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+FS = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md")
+LM = Record(B + "2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md")
+LE = Record(B + "2026-10-16-build-PLAY-dClosedLoop-1-layer-expansions.md")
+BRIEF = "`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-brief-w11.md`"
+
+# ============================================================================== K2: targets in a declared form
+FS.sub("→ an amendment that re-enters the item it answers, drawing on",
+       "→ re-entry of the item it answers, as an amendment, drawing on",
+       "K2 entry.place: the late answer's target is a re-entry")
+FS.sub("| Design; the card is re-rendered and the executor launched where `run.host` says |",
+       "| Design, once the card is re-rendered and the executor launched where `run.host` says |",
+       "K2 plan.exit: the re-render is the route to Design, not a second branch")
+FS.sub("and none → as under `warn` |",
+       "and none → `design.streams` or `design.unit-spec`, as under `warn` |",
+       "K2 design.overlaps: none under refuse names warn's two targets")
+FS.sub("pause → paused; ",
+       "pause → paused, held until the owner's next lifecycle request; ",
+       "K2 life.quiesce: a paused build is held")
+FS.sub("agreement below kappa 0.8 → the rubric revised",
+       "agreement below kappa 0.8 → a re-run, the rubric revised",
+       "K2 adopt.decisions: the low-agreement branch is a re-run")
+LE.sub("; a kept row's disposition is a keep record, keyed",
+       "; a kept row's disposition → recorded as a keep record, keyed",
+       "K2 loop.file: the keep branch ends recorded")
+LE.sub("→ the release slot's exit record for the SHA, with the outcome, E and this record's id",
+       "→ recorded as the release slot's exit record for the SHA, with the outcome, E and this record's id",
+       "K2 release.record: the last branch ends recorded")
+LE.sub("declined → the disposition its witness",
+       "declined → recorded, the disposition its witness",
+       "K2 kits.cut: a declined cut ends recorded")
+LE.sub("pushed → the adopter lands it with its own lander",
+       "pushed → done, the adopter landing it with its own lander",
+       "K2 kits.offer: the offer is done once pushed")
+LE.sub("→ an outbox order the adopter runs itself",
+       "→ an outbox order recorded for the adopter to run itself",
+       "K2 kits.offer: the outbox branch ends recorded")
+LE.sub("then the walk again (`cl-dClosedLoop-0019`)",
+       "then the walk re-run (`cl-dClosedLoop-0019`)",
+       "K2 kits.install, kits.update: a reclaimed lock re-runs the walk")
+LE.sub("→ its slot renders not installed, the core render kept",
+       "→ nothing installed for it, its slot rendering not installed and the core render kept",
+       "K2 kits.install, kits.update: an adapter with no target installs nothing")
+
+# ============================================================================== K3: writers the records name
+LM.sub("| transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it |",
+       "| transition | dDeclaredLoop | the transition record three ways; every step's exit item writes it: `plan.exit`, "
+       "`design.exit`, `build.exit`, `test.exit` and `deploy.close`, and `life.close` the terminal one |",
+       "K3 transition: the exit items named")
+LM.sub("| maintenance record | dTendedCadence | the maintenance record; writer item not named |",
+       "| maintenance record | dTendedCadence | the maintenance record; its writer is `maintain.record`, as "
+       "`maintain.record-when` says |",
+       "K3 maintenance-record: its writer named")
+LM.sub("| decision | dLinkedLibrary | decisions split by kind, the major-decision log; writer item not named |",
+       "| decision | dLinkedLibrary | decisions split by kind, the major-decision log; its writers are `build.distill`, "
+       "a log row for each major resolved fork, and `adopt.decisions`, each reconstructed decision record |",
+       "K3 decision: its writers named")
+LM.sub("| ask | dTotalRecall | the ask kind's acceptance at filing; writer item not named |",
+       "| ask | dTotalRecall | the ask kind's acceptance at filing; its writers are the items that file asks, "
+       "`maintain.file` and `loop.file` among them, each filing stating its acceptance (`[asks]`) |",
+       "K3 ask: its writers named")
+LM.sub("though forks arise in every step; writer item not named |",
+       "though forks arise in every step; its writers in Design are `design.decompose` and `design.unit-spec`, each "
+       "joining every fork it raised to its fork record |",
+       "K3 fork: its writers named")
+LM.sub("the owner's NT-24); writer item not named |",
+       "the owner's NT-24); its writers are `review.fold`, the class record of each `new:` disposition on an unbuilt "
+       "spec, and `build.unit-pass`, a fix unit's class records under `memory/gotchas/` |",
+       "K3 gotcha: its writers named")
+LM.sub("| dossier | dTotalRecall | dossiers anchored to symbol keys; writer item not named |",
+       "| dossier | dTotalRecall | dossiers anchored to symbol keys; its writer, where the map is installed, is "
+       "`build.unit-pass`, the claiming dossier's edit in its witness |",
+       "K3 dossier: its writer named")
+LM.sub("| baseline | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; writer item not named |",
+       "| baseline | dLinkedLibrary | retrofit's `baseline` and `census` record kinds; its writer is `test.seed`, "
+       "seeding each registered population's file |",
+       "K3 baseline: its writer named")
+LM.sub("| shape-run | dTotalRecall | the shape-run kind; writer item not named |",
+       "| shape-run | dTotalRecall | the shape-run kind; its writers are `review.cost`, a review act's row, the "
+       "supervisor's journal reconcile, every other role act's, and `probe.run`, an experiment's (systems "
+       "`[design-role-shapes]`) |",
+       "K3 shape-run: its writers named")
+
+# ============================================================================== K3: readers that name the kind
+FS.sub("the design index and open asks |",
+       "the design index and open ask records |",
+       "K3 ask: plan.dedupe reads open ask records")
+FS.sub("and each active practice's Plan reach |",
+       "and each active practice's Plan reach, drawing on the `research-return` of each question `plan.research` "
+       "answered |",
+       "K3 research-return: plan.record reads the return it asked for")
+FS.sub("or an exception under `core.exceptions` (K1",
+       "or an exception record under `core.exceptions` (K1",
+       "K3 exception: deploy.close reads the exception record")
+FS.sub("where retrofit's ledger is seeded",
+       "where retrofit's `baseline` ledger is seeded",
+       "K3 baseline: build.scope reads the seeded baseline")
+LE.sub("joins the receipt's rows to gov's remote tag list",
+       "joins the receipt's rows to gov's remote list of `kit-release` tags",
+       "K3 kit-release: kits.currency reads the tags kits.cut cuts")
+LE.sub("under `push-branches`, runs one adopter's update in a throwaway workspace",
+       "under `push-branches`, runs the update of the one adopter its `adopters` record names, in a throwaway "
+       "workspace",
+       "K3 adopters: kits.offer reads the adopters record it is offered on")
+LE.sub("proposes retiring or merging each row with no catch",
+       "proposes retiring or merging each `value-ledger` row with no catch",
+       "K3 value-ledger: loop.propose reads the ledger loop.price regenerates")
+
+# ============================================================================== K2: the two forms the classes hid
+FS.sub("ruled → the unit, the amendment or the drop written",
+       "ruled → recorded as the unit, the amendment or the drop",
+       "K2 adopt.instructions: a ruled proposal ends recorded")
+FS.sub("ruled → the overlay row written",
+       "ruled → recorded as the overlay row",
+       "K2 adopt.declarations: a ruled proposal ends recorded")
+
+# ============================================================================== K3: the owner's FK-11-1 and FK-11-2
+# FK-11-1, "Name a reader each": each reader stated in its own build, as a clause or an item cell.
+V2.sub("and taking over its `check-recall` leg (SA-6)",
+       "and taking over its `check-recall` leg (SA-6), reading rotated records under `memory/archive/` beside the "
+       "live ones (the owner's FK-11-1)",
+       "FK-11-1 archive: record find reads the archive")
+V2.sub("the Loop Review pruning units that bear no load and tightening those broken often `cl-dClosedLoop-0462`",
+       "the Loop Review pruning units that bear no load and tightening those broken often, and proposing a charter "
+       "amendment for a rule whose override records recur, so a standing override becomes an amendment rather than a "
+       "habit (foundations, step 1, the owner's FK-11-1) `cl-dClosedLoop-0462`",
+       "FK-11-1 override: the Loop Review reads override records")
+V2.sub("the integrations import of an adopter's CI jobs as legs, test jobs only,",
+       "the integrations import of an adopter's CI jobs as legs, reading each job's ruling record and importing only "
+       "a job ruled `import` (the owner's FK-11-1), test jobs only,",
+       "FK-11-1 ruling: the integrations import reads a CI job's ruling")
+FS.sub("at adoption, measures the repository's own drain load |",
+       "at adoption, measures the repository's own drain load, and seeds the population of each practice that is "
+       "not a CI job and that its ruling record imports or translates (the owner's FK-11-1) |",
+       "FK-11-1 ruling: test.seed reads the other practices' rulings")
+FS.sub("the runner writes the verdict record for the tree, which the pre-push hook reads",
+       "the runner writes the verdict record for the tree, which the pre-push hook reads; a playbook run's set check, "
+       "a leg at Test's leg-pack point, reads its playbook set record (the owner's FK-11-1)",
+       "FK-11-1 playbook-set: test.verdict reads it through the set check's leg")
+LE.sub("roll back to E's last verified SHA by the same compare-and-swap",
+       "roll back to E's last verified SHA, read from E's release records (the owner's FK-11-1), by the same "
+       "compare-and-swap",
+       "FK-11-1 release: release.route reads E's last verified SHA")
+LE.sub("cycle times from transitions, yield from review records",
+       "cycle times from transitions, each run from its run records (the owner's FK-11-1), yield from review records",
+       "FK-11-1 run-record: loop.gather reads the run records")
+LM.sub("| instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass); "
+       "writer item not named |",
+       "| instrument | dTotalRecall | a script, table or drawing kept beside the record it serves (the away pass); "
+       "writer item not named: the session that writes the record it serves writes it (the owner's FK-11-2), and its "
+       "owner and reviewers re-run it as evidence on demand (the owner's FK-11-1) |",
+       "FK-11-1, FK-11-2 instrument: its writer and reader")
+# FK-11-2, "govkit registration": the register's writer named, and its reader in words Stage 0 reads as a reader.
+LM.sub("| adopter register | dShippedRelease | `adopters.toml` grown into the register, its rows read by `kits.adopters` |",
+       "| adopter register | dShippedRelease | `adopters.toml` grown into the register; writer item not named: govkit's "
+       "registration of an adopter, the step that probes the adopter's grant, writes its rows (the owner's FK-11-2), "
+       "and gov's adopters program reads them |",
+       "FK-11-2 adopter-register: its writer named, its reader named without an item tag")
+LE.sub("reads each register row's committed receipt at its remote tip",
+       "reads each `adopter-register` row's committed receipt at its remote tip",
+       "FK-11-2 adopter-register: kits.adopters names the register it reads")
+
+# ============================================================================== K4: the key a clause applies
+V2.sub("act binding against the resolved shape's digest, and the journal reconciled against it, writing each "
+       "non-review act's shape-run row",
+       "act binding against the resolved shape's digest, a Workflow call whose roles, efforts or fan differ from it "
+       "refused or recorded as `roles.shape-enforce` says, and the journal reconciled against it, writing each "
+       "non-review act's shape-run row",
+       "K4 roles.shape-enforce: cl-0297 names the key its binding applies")
+
+# ============================================================================== the revision notes
+V2.insert_before(
+    "Revised: 2026-10-17, after the folds' closing review",
+    "Revised 2026-10-20 by Stage 0 again (" + BRIEF + "): cl-0297's act binding refuses or records a\n"
+    "Workflow call whose shape differs, as `roles.shape-enforce` says (systems `[design-role-shapes]`). By the owner's\n"
+    "FK-11-1, `record find` reads the archive (cl-0220), the Loop Review proposes a charter amendment for a rule whose\n"
+    "override records recur (cl-0462), and the integrations import reads each CI job's ruling record (cl-0429). No\n"
+    "clause is new.\n\n",
+    "the revision paragraph in v2")
+FS.sub("`life.quiesce` name no stage in prose, and `test.flakes` reads the measured threshold from the gate-health record.\n",
+       "`life.quiesce` name no stage in prose, and `test.flakes` reads the measured threshold from the gate-health record.\n"
+       "\n**Revised 2026-10-20 by Stage 0 again** (" + BRIEF + "). Five Then cells end in a form Stage 0\n"
+       "reads, their meaning kept: `entry.place`'s late answer is a re-entry, `plan.exit` goes to Design once the card is\n"
+       "re-rendered, `design.overlaps`' none under `refuse` names `warn`'s two targets, a paused build is held, and\n"
+       "`adopt.decisions` re-runs below kappa 0.8. `plan.dedupe` reads open ask records, `plan.record` the research\n"
+       "return it asked for, `deploy.close` the exception record, and `build.scope` the seeded baseline. A ruled\n"
+       "adoption proposal ends recorded. By the owner's FK-11-1, `test.seed` seeds the practices other than CI jobs that\n"
+       "a ruling record imports or translates, and `test.verdict`'s set check reads each playbook set record.\n",
+       "flow-steps' revision note")
+LM.insert_before(
+    "\n\n**One refinement to layers round one,**",
+    "\n\nRevised 2026-10-20 by Stage 0 again (" + BRIEF + "): the ask, baseline, decision, dossier, fork,\n"
+    "gotcha, maintenance record, shape-run and transition rows name the items the flow and the expansions already give\n"
+    "as their writers. By the owner's FK-11-2, govkit's registration writes the adopter register, which gov's adopters\n"
+    "program reads, and an instrument is written by the session that writes the record it serves; by FK-11-1, its\n"
+    "owner and reviewers re-run it on demand.",
+    "layer-memory's revision note")
+LE.insert_before(
+    "\n\n## [open] What the expansion round owes",
+    "\n\n**Revised 2026-10-20 by Stage 0 again** (" + BRIEF + "). The Routes cells of `loop.file`,\n"
+    "`release.record`, `kits.cut`, `kits.offer`, `kits.install` and `kits.update` end in forms Stage 0 reads, their\n"
+    "meaning kept. `kits.currency` reads the `kit-release` tags, `kits.offer` its adopter's `adopters` record, and\n"
+    "`loop.propose` the `value-ledger` rows `loop.price` regenerates. By the owner's FK-11-1, `release.route` reads E's\n"
+    "last verified SHA from its release records and `loop.gather` reads the run records, and by FK-11-2 `kits.adopters`\n"
+    "reads the `adopter-register` rows govkit's registration writes.",
+    "layer-expansions' revision note")
+
+for rec in (V2, FS, LM, LE):
+    rec.save()
+````
+
+### `record_stage0_again.py`
+
+The round record's [stage0-again], its [stage0] and [recall-scored] passages amended, and the session-log event, every count read from a run.
+
+````python
+"""Record Stage 0 again. The round record gains `[stage0-again]`: the owner's answers verbatim, writer 11's fold, Stage
+0's three fixes, the idle rows removed, and Stage 0's run on the tree. Its `[stage0]` passage and its `[recall-scored]`
+re-measure plan are amended to the owner's word. The session log gains one event. Every count and answer is read
+from a captured run, a file or the answers file, never typed.
+
+Usage: python -X utf8 record_stage0_again.py   (from the worktree root, after Stage 0 again is applied)
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+answers = (HERE.parent / "fold" / "fork-answers.md").read_text(encoding="utf-8")
+def batch(n):
+    body = answers.split(f"\nbatch {n} ", 1)[1].split("\nbatch ", 1)[0]
+    return re.findall(r'"(.*?)"="(.*?)"(?=, "|\s*$)', body, flags=re.M)
+fk11, path = batch(15), batch(16)
+if len(fk11) != 3 or len(path) != 1:
+    sys.exit(f"record_stage0_again: {len(fk11)} FK-11 answers and {len(path)} path answers, want 3 and 1")
+s0 = (HERE / "stage0-green.out").read_text(encoding="utf-8").splitlines()
+s0_lines = [re.sub(r"targets by form:[^·]*· ", "", l) for l in s0 if l.startswith(("K1:", "K2:", "K3:", "K4:", "K5:", "stage0:"))]
+last = re.search(r"findings (\d+) · classed (\d+) · reruns red (\d+)", s0_lines[-1])
+unclass = [l.split(None, 2) for l in (HERE.parent / "fold" / "unclass.txt").read_text(encoding="utf-8").splitlines() if l.strip()]
+classes = sum(1 for l in (HERE.parent / "fold" / "w11" / "classes.md").read_text(encoding="utf-8").splitlines() if l.startswith("| K"))
+if len(s0_lines) != 6 or not last:
+    sys.exit("record_stage0_again: stage0-green.out holds no full run")
+quote = lambda q, a: f"- \"{q}\" — \"{a}\""
+section = f"""## [stage0-again] Stage 0 again, its leads fixed or classed
+
+Plan step 3 ends with Stage 0 again. On the tree the audit's fold and its closing pair's fold left, Stage 0 found 98
+leads in its K2, K3 and K4 arms. Writer 11 fixed each one in the design or classed it (`fold-brief-w11`; returns
+`fold-return-w11` and `-w11b`, dispatches 212 and 213), and the owner answered its two questions, verbatim:
+
+{chr(10).join(quote(q, a) for q, a in fk11)}
+
+- **Stage 0's own defects, fixed by the main loop.** Writer 11 found three: Stage 0 read no Needs column for an
+  expansion item, a class row answered every finding on its node, and a kind ending in "record" matched as "record
+  records". Stage 0 now reads the column, a dash there marking an entry. A class answers only findings of its kind,
+  one row per class on a node. The pattern takes the name without its trailing "record". The instruments record's
+  `[stage0-fixed]` shows the findings that moved, and the plants `class-covers` and `class-stale` red each new rule.
+- **The classes.** {len(unclass)} rows of the closing fold's went idle once the Needs column was read, and are
+  removed: {", ".join(f"{a} `{n}`" for a, n, _ in unclass)}. Writer 11's {classes} rows join `[stage0-classes]`, each
+  class from its arm's closed set and its reason from the records.
+- **Stage 0 on the tree**, every arm and the reruns:
+
+```text
+{chr(10).join(s0_lines)}
+```
+
+The owner then chose the path to the baseline, verbatim:
+
+{chr(10).join(quote(q, a) for q, a in path)}
+
+So the re-measure `[recall-scored]` planned is not run. The recall shortfall, the seal's defect and the
+clause-omission blind spot stay this audit's recorded limits, and the baseline is taken on this tree (`[baseline]`).
+
+"""
+R = Record(str(B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"))
+R.insert_before("## [stage0-classes] Stage 0's classes\n", section, "[stage0-again]")
+R.sub("set; Stage 0 on the folded tree still finds 98, classed 7, the leads of plan step 3's \"Stage 0 again\"\n"
+      "(the closing pair's comparison record, `[folded]`).",
+      "set; Stage 0 on the folded tree found 98, classed 7, and Stage 0 again fixed or classed every one: "
+      f"{last.group(1)} findings,\n{last.group(2)} classed (`[stage0-again]`).",
+      "[stage0]")
+R.sub("- **The re-measure,** before the baseline:",
+      "- **The re-measure** was dropped at the owner's word after Stage 0 again (`[stage0-again]`). As planned, before the baseline:",
+      "[recall-scored]")
+R.save()
+L = Record(str(B / "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md"))
+L.insert_before("## Instruments\n",
+                f"- 2026-10-20, session 1799cb98: Stage 0 again. Writer 11 fixed or classed every lead, the main loop\n"
+                f"  fixed Stage 0's three defects, and Stage 0 is green on the tree: {last.group(1)} findings,\n"
+                f"  {last.group(2)} classed. The owner chose the baseline without a re-measure\n"
+                f"  (`whole-audit.md` `[stage0-again]`).\n\n", "event")
+L.save()
+print(f"record_stage0_again: Stage 0 {last.group(1)} findings, {last.group(2)} classed; {len(unclass)} rows removed, {classes} added")
+````
+
+### `prep_recorder_s0.py`
+
+This recorder's Stage 0 check relaxed to refuse only a crash, and its [stage0-fixed] section.
+
+````python
+"""The instruments recorder after Stage 0 again (2026-10-20). Stage 0 is green on the tree now, so the recorder refuses
+only a Stage 0 run that crashes (an exit other than 0 or 1), not a green one. A `[stage0-fixed]` section shows Stage
+0's three fixes by the findings that moved: the run before them and the run after, each on the tree before writer
+11's fold, diffed. Each edit must match once, and a second run refuses.
+
+Usage: python -X utf8 prep_recorder_s0.py
+"""
+import pathlib
+import sys
+
+S = pathlib.Path(__file__).resolve().parent.parent
+R = S / "night/record_instruments.py"
+t = R.read_text(encoding="utf-8")
+if "[stage0-fixed]" in t:
+    sys.exit("prep_recorder_s0: the recorder carries [stage0-fixed] already")
+EDITS = [
+    ("""if real_rc != 1:
+    sys.exit(f"Stage 0 on the real tree returned {real_rc}, where its first run found leads")""",
+     """if real_rc not in (0, 1):
+    sys.exit(f"Stage 0 on the real tree crashed: exit {real_rc}")"""),
+    ('kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))\n',
+     '''s0_before = read(S / "closing/s0-before-b.out").splitlines()
+s0_after = read(S / "closing/s0-after-b.out").splitlines()
+moved = ([f"- {l.strip()}" for l in s0_before if l.startswith("  ") and l not in s0_after]
+         + [f"+ {l.strip()}" for l in s0_after if l.startswith("  ") and l not in s0_before])
+parts.append("""
+## [stage0-fixed] Stage 0's three fixes, by the findings they moved
+
+Writer 11 found three defects in Stage 0 itself during Stage 0 again (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w11.md`):
+it read no Needs column for expansion items, a class row answered every finding on its node, and a kind whose name
+ends in "record" was matched as "record records". Both runs below are on the tree before writer 11's fold. A line
+with `-` is a finding the fixes removed, and `+` one they added: the two form findings the old class rows hid, and the
+four `external entry` rows left answering nothing. The plants class-covers and class-stale, in `[stage0]`, red each
+new rule for its own reason.
+
+""" + block("text", "\\n".join([s0_before[-1], s0_after[-1], ""] + moved)))
+kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))
+'''),
+]
+for old, new in EDITS:
+    n = t.count(old)
+    if n != 1:
+        sys.exit(f"prep_recorder_s0: {old[:60]!r} matches {n} times")
+    t = t.replace(old, new)
+R.write_text(t, encoding="utf-8", newline="\n")
+print(f"prep_recorder_s0: {len(EDITS)} edits to {R.name}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -32660,6 +33278,13 @@ MINE = [
     ('closing/run_probe_plants.py', "The probe's plants for the closing pair's four rows, before on a pinned ef94fefba tree and after on the folded tree, each checked."),
     ('closing/record_closing_folded.py', "The comparison record's [folded], the round record's two amended passages and the session-log event, every count read from a run."),
     ('closing/prep_recorder_closing.py', "This recorder's [final] Stage 0 line, recorded and not refused, its [stage0] wording, and its [closing-probe] section."),
+    ('closing/patch_stage0_b.py', "Stage 0's three fixes found in Stage 0 again: the expansions' Needs column read, a class answering only its finding's kind (COVERS), and the record-word pattern."),
+    ('closing/patch_stage0_c.py', "Stage 0's plants after those fixes: class-stale's new wording, and class-covers, an unformed target under an external entry row."),
+    ('fold/stage0_unclass.py', "The fold step that removes the class rows Stage 0 reports answering no finding, named in unclass.txt from Stage 0's own lines."),
+    ('fold/stage0_classes.py', "The fold step that adds fold writers' class rows to [stage0-classes], each class in its arm's closed set, one row per class on a node."),
+    ('fold/w11/fold-11.py', "Fold writer 11's script: Stage 0 again's fixes in the design, and the owner's FK-11-1 and FK-11-2 (fold-return-w11, -w11b)."),
+    ('closing/record_stage0_again.py', "The round record's [stage0-again], its [stage0] and [recall-scored] passages amended, and the session-log event, every count read from a run."),
+    ('closing/prep_recorder_s0.py', "This recorder's Stage 0 check relaxed to refuse only a crash, and its [stage0-fixed] section."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -32872,8 +33497,8 @@ for case_line in s0_plants.strip().split("\n")[:-1]:
     planted = read(S / f"stage0/plants/{case}.out").split("\n")
     s0_lines.append(f"$ python stage0.py --plant {case}\n" + "\n".join(ln for ln in planted if ln.startswith("stage0:")))
 real, real_rc = run(STAGE0)
-if real_rc != 1:
-    sys.exit(f"Stage 0 on the real tree returned {real_rc}, where its first run found leads")
+if real_rc not in (0, 1):
+    sys.exit(f"Stage 0 on the real tree crashed: exit {real_rc}")
 reconcile_plant = run(B + "2026-10-18-build-PLAY-dClosedLoop-1-reconcile.py", B + "2026-10-18-build-PLAY-dClosedLoop-1-recut.md",
                       "--plant-item", "plan.planted:plan:dRankedPlan:a planted outcome → `deploy.land`")
 parts.append("""
@@ -32929,6 +33554,21 @@ and a tolerance row naming "today's tool" with no path that exists reds (`tolera
 below ran on the folded tree; the before runs used the probe as it stood at `ef94fefba` on that commit's tree.
 
 """ + block("text", read(S / "closing/probe-plants.out")))
+s0_before = read(S / "closing/s0-before-b.out").splitlines()
+s0_after = read(S / "closing/s0-after-b.out").splitlines()
+moved = ([f"- {l.strip()}" for l in s0_before if l.startswith("  ") and l not in s0_after]
+         + [f"+ {l.strip()}" for l in s0_after if l.startswith("  ") and l not in s0_before])
+parts.append("""
+## [stage0-fixed] Stage 0's three fixes, by the findings they moved
+
+Writer 11 found three defects in Stage 0 itself during Stage 0 again (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w11.md`):
+it read no Needs column for expansion items, a class row answered every finding on its node, and a kind whose name
+ends in "record" was matched as "record records". Both runs below are on the tree before writer 11's fold. A line
+with `-` is a finding the fixes removed, and `+` one they added: the two form findings the old class rows hid, and the
+four `external entry` rows left answering nothing. The plants class-covers and class-stale, in `[stage0]`, red each
+new rule for its own reason.
+
+""" + block("text", "\n".join([s0_before[-1], s0_after[-1], ""] + moved)))
 kit_out, kit_rc = run(str(S / "walkkit/run_kit_plants.py"))
 if kit_rc != 0:
     sys.exit("a walk-kit or instrument run did not go as wanted:\n" + kit_out[-800:])
@@ -33775,48 +34415,51 @@ k5-ghost         rc 1  RED for its reason
 k5-retired       rc 1  RED for its reason
 k5-cited         rc 1  RED for its reason
 class-stale      rc 1  RED for its reason
-plants 20, red for their reason 20
+class-covers     rc 1  RED for its reason
+plants 21, red for their reason 21
 
 $ python stage0.py --plant k1-witness
-stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-witness
+stage0: arms K1 · findings 51 · classed 0 · reruns red 0 · plant k1-witness
 $ python stage0.py --plant k1-ghost-need
-stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-ghost-need
+stage0: arms K1 · findings 51 · classed 0 · reruns red 0 · plant k1-ghost-need
 $ python stage0.py --plant k1-cycle
-stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-cycle
+stage0: arms K1 · findings 51 · classed 0 · reruns red 0 · plant k1-cycle
 $ python stage0.py --plant k1-dash
-stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-dash
+stage0: arms K1 · findings 51 · classed 0 · reruns red 0 · plant k1-dash
 $ python stage0.py --plant k1-owner
-stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-owner
+stage0: arms K1 · findings 51 · classed 0 · reruns red 0 · plant k1-owner
 $ python stage0.py --plant k1-actor
-stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-actor
+stage0: arms K1 · findings 51 · classed 0 · reruns red 0 · plant k1-actor
 $ python stage0.py --plant k1-owning-role
-stage0: arms K1 · findings 6 · classed 0 · reruns red 0 · plant k1-owning-role
+stage0: arms K1 · findings 51 · classed 0 · reruns red 0 · plant k1-owning-role
 $ python stage0.py --plant k2-ghost
-stage0: arms K2 · findings 23 · classed 7 · reruns red 0 · plant k2-ghost
+stage0: arms K2 · findings 51 · classed 1 · reruns red 0 · plant k2-ghost
 $ python stage0.py --plant k2-unformed
-stage0: arms K2 · findings 22 · classed 7 · reruns red 0 · plant k2-unformed
+stage0: arms K2 · findings 50 · classed 1 · reruns red 0 · plant k2-unformed
 $ python stage0.py --plant k2-dead-end
-stage0: arms K2 · findings 23 · classed 7 · reruns red 0 · plant k2-dead-end
+stage0: arms K2 · findings 51 · classed 1 · reruns red 0 · plant k2-dead-end
 $ python stage0.py --plant k2-unreached
-stage0: arms K2 · findings 22 · classed 7 · reruns red 0 · plant k2-unreached
+stage0: arms K2 · findings 50 · classed 1 · reruns red 0 · plant k2-unreached
 $ python stage0.py --plant k2-deploy-land
-stage0: arms K2 · findings 22 · classed 7 · reruns red 0 · plant k2-deploy-land
+stage0: arms K2 · findings 50 · classed 1 · reruns red 0 · plant k2-deploy-land
 $ python stage0.py --plant k3-writer
-stage0: arms K3 · findings 82 · classed 0 · reruns red 0 · plant k3-writer
+stage0: arms K3 · findings 2 · classed 49 · reruns red 0 · plant k3-writer
 $ python stage0.py --plant k3-reader
-stage0: arms K3 · findings 82 · classed 0 · reruns red 0 · plant k3-reader
+stage0: arms K3 · findings 2 · classed 49 · reruns red 0 · plant k3-reader
 $ python stage0.py --plant k4-unread
-stage0: arms K4 · findings 7 · classed 0 · reruns red 0 · plant k4-unread
+stage0: arms K4 · findings 51 · classed 0 · reruns red 0 · plant k4-unread
 $ python stage0.py --plant k5-row
-stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-row
+stage0: arms K5 · findings 51 · classed 0 · reruns red 0 · plant k5-row
 $ python stage0.py --plant k5-ghost
-stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-ghost
+stage0: arms K5 · findings 51 · classed 0 · reruns red 0 · plant k5-ghost
 $ python stage0.py --plant k5-retired
-stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-retired
+stage0: arms K5 · findings 51 · classed 0 · reruns red 0 · plant k5-retired
 $ python stage0.py --plant k5-cited
-stage0: arms K5 · findings 6 · classed 0 · reruns red 0 · plant k5-cited
+stage0: arms K5 · findings 51 · classed 0 · reruns red 0 · plant k5-cited
 $ python stage0.py --plant class-stale
-stage0: arms K4 · findings 7 · classed 0 · reruns red 0 · plant class-stale
+stage0: arms K4 · findings 51 · classed 0 · reruns red 0 · plant class-stale
+$ python stage0.py --plant class-covers
+stage0: arms K2 · findings 51 · classed 1 · reruns red 0 · plant class-covers
 ````
 
 The reconciliation probe's default run on a plan item planted with a route to `deploy.land`, which its `--all-routes`
@@ -33834,116 +34477,18 @@ Stage 0 on the tree as this record is written, whole (the first run's leads are 
 $ python stage0.py
 K1: items 127 (98 flow, 29 expansion), roles 14 · findings 0
   left out: whether a witness is actor-typed (P2) and whether the outcome is the right one; a Needs cell's prose beyond its item tags
-K2: targets by form: ask 4, edge 186, owner 13, policy 4, program 7, return 24, terminal 58, wait 5; roots 14, reached 116, ending 126 · findings 21 · classed 7
-  K2 entry.place: a target in no declared form: "an amendment that re-enters the item it answers, drawing on `flow.rework-budget` (`[breakp"
-  K2 plan.exit: a target in no declared form: "the card is re-rendered and the executor launched where `run.host` says"
-  K2 design.overlaps: a target in no declared form: "as under `warn`"
-  K2 life.quiesce: a target in no declared form: "paused"
-  K2 adopt.decisions: a target in no declared form: "the rubric revised and the candidates rated again, within `flow.route-backs` (`cl-dClosedL"
-  K2 loop.file: a target in no declared form: "a kept row's disposition is a keep record, keyed by (ledger kind, id, date), so each keep,"
-  K2 release.record: a target in no declared form: "the release slot's exit record for the SHA, with the outcome, E and this record's id"
-  K2 kits.cut: a target in no declared form: "the disposition its witness, keyed by period, or under `owner-cut` by the span's tip SHA, "
-  K2 kits.offer: a target in no declared form: "the adopter lands it with its own lander, whose bar runs the checks the offer left unrun"
-  K2 kits.offer: a target in no declared form: "an outbox order the adopter runs itself"
-  K2 kits.install: a target in no declared form: "reclaimed once its holder is dead, then the walk again (`cl-dClosedLoop-0019`)"
-  K2 kits.install: a target in no declared form: "its slot renders not installed, the core render kept"
-  K2 kits.update: a target in no declared form: "reclaimed once its holder is dead, then the walk again (`cl-dClosedLoop-0019`)"
-  K2 kits.update: a target in no declared form: "its slot renders not installed, the core render kept"
-  K2 kits.offer: ends nowhere: every route it takes leads only to items that never end
-  K2 kits.adopters: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 kits.currency: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 kits.cut: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 kits.install: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 kits.offer: reached from no entry: no reached item routes to it, and no item it needs is reached
-  K2 kits.update: reached from no entry: no reached item routes to it, and no item it needs is reached
+K2: targets by form: ask 4, edge 187, owner 13, policy 4, program 7, return 28, terminal 67, wait 6; roots 18, reached 126, ending 127 · findings 0 · classed 1
   left out: whether a branch that ends by a terminal, return, wait, owner, ask, policy or program form does end (the walk's S6); a policy's routes per value; the [transitions] join gap-flow-15 owes; the conditions before each arrow
-K3: kinds 83, table rows 83 · findings 76
-  K3 act: no writer item: "one act session per role act; act binding and the epoch check; writer item not n"
-  K3 act: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 adopter-register: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 adopters: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 annotation-index: no writer item: "the generated annotation index and its resolve check; writer item not named"
-  K3 annotation-index: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 archive: no writer item: "a rotated record under `memory/archive/`, written by rotation (the away pass); w"
-  K3 archive: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 ask: no writer item: "the ask kind's acceptance at filing; writer item not named"
-  K3 ask: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 backlog-row: no writer item: "the ask register's row store; the memory contract declares it; writer item not n"
-  K3 backlog-row: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 baseline: no writer item: "retrofit's `baseline` and `census` record kinds; writer item not named"
-  K3 baseline: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 build-readme: no writer item: "the build README's declared front-matter schema, with unknown keys refused; writ"
-  K3 build-readme: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 code: no writer item: "the core code record: files, definitions with their ranges and body hashes, impo"
-  K3 commit: no writer item: "a git commit, its `Gov-*` trailers an edge site; written by the commit queue fro"
-  K3 commit: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 decision: no writer item: "decisions split by kind, the major-decision log; writer item not named"
-  K3 decision: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 design-record: no writer item: "a core memory kind with no writer item; the memory contract declares it"
-  K3 design-record: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 deviation: no writer item: "the record kept in its departing build's `build/` folder, read by the deviation "
-  K3 dossier: no writer item: "dossiers anchored to symbol keys; writer item not named"
-  K3 dossier: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 exception: no writer item: "the exception register, kept in the building build's `build/` folder as a deviat"
-  K3 exception: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 flake: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 fork: no writer item: "a flow record kind (layer-memory `[decisions]`); fork resolution by `design.fork"
-  K3 gotcha: no writer item: "gotchas handed as the unit's spec names them, never by write set (revised 2026-1"
-  K3 gotcha: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 instrument: no writer item: "a script, table or drawing kept beside the record it serves (the away pass); wri"
-  K3 instrument: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 journal: no writer item: "the journal grammar moved into the core; writer item not named"
-  K3 kit-release: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 lease: no writer item: "dPlacedRequest's row builds the one lease grammar, a release writing a hand-over"
-  K3 lexicon-declaration: no writer item: "layer-memory lists the lexicon as an optional component's kind; dMindYourWords b"
-  K3 lexicon-declaration: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 loop-review: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 mailbox-message: no writer item: "dKeptSession's row builds the mailbox and its message kinds; writer item not nam"
-  K3 mailbox-message: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 maintenance-record: no writer item: "the maintenance record; writer item not named"
-  K3 maintenance-record: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 node-ledger: no writer item: "the plan and hardware ledgers at the node's home, under a versioned schema, each"
-  K3 node-ledger: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 node-profile: no writer item: "the node's one description, kept at the node's home outside every repository: wr"
-  K3 node-profile: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 override: no writer item: "`charter.override` and its record, under the precedence and override rule, the r"
-  K3 override: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 playbook: no writer item: "a design record kind carrying dScriptedRepeat's canon, which an ordinary build a"
-  K3 playbook-set: no writer item: "its writer is the set check, which dIndexedDesign registers at Test's leg-pack p"
-  K3 playbook-set: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 recall-index: no writer item: "memory-recall narrowed to a record finder; writer item not named"
-  K3 recall-index: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 registry: no writer item: "a gate's row registry under `memory/project/`, written by its gate's pin emitter"
-  K3 registry: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 release: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 research-return: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 return: no writer item: "the persisted-return store, keyed per spawn site; writer item not named: the com"
-  K3 return: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 ruling: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 run-record: no writer item: "observability's journal reader writes it when the journal shows a run closed, as"
-  K3 run-record: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 session-binding: no writer item: "sessions bound on every source; writer item not named"
-  K3 session-binding: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 shape-run: no writer item: "the shape-run kind; writer item not named"
-  K3 shape-run: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 transition: no writer item: "the transition record three ways; every step's exit item writes it"
-  K3 value-ledger: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 view: no writer item: "a generated view: LIVE.md, the ledger, the ask views; re-rendered, never merged "
-  K3 view: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 witness: no writer item: "a declared pocket outside the tree, such as a transcript, a Codex rollout, the a"
-  K3 witness: no reader: no item waits on its writer or names it, and no clause of another build names it
-  K3 work-order: no writer item: "the work order rendered per item; writer item not named"
-  K3 work-order: no reader: no item waits on its writer or names it, and no clause of another build names it
+K3: kinds 83, table rows 83 · findings 0 · classed 49
   left out: a reader or writer that is a gate, a renderer or a hook rather than an item; a kind named in plain words other than '<kind> record'; whether a non-item writer is real
-K4: keys 267 · findings 1
-  K4 roles.shape-enforce: read by no chain clause and no item
+K4: keys 267 · findings 0
   left out: a key read in a layer or system record but built by no clause; whether an unread key is guard-bearing beyond its values' words
 K5: principles 42, clauses 509, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
   map: no stale facts read 67 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 237 records, 4211 sections, 217 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 237 records, 4226 sections, 217 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -33959,11 +34504,12 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 276 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 149 · lines 48761 · unreviewed 0 (0%)
+  design records 153 · lines 49203 · unreviewed 544 (1%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 0
-stage0: arms K1,K2,K3,K4,K5,reruns · findings 98 · classed 7 · reruns red 0
-rc 1
+  design commits after the floor that no closing review covers: 1
+    15988ccd5  16 design record(s)  records(dClosedLoop): the audit's closing pair compared and folded — 22 defects, the probe keyed by rule, Stag
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 0 · classed 50 · reruns red 0
+rc 0
 ````
 
 
@@ -34124,6 +34670,39 @@ $ python reconcile.py recut.md --plant-why dWellOiledMachine:deploy.released=tod
   tolerance row names no stand-in: dWellOiledMachine routes `deploy.released` says today's tool and names no path that exists
 findings 1
 rc 1
+````
+
+
+## [stage0-fixed] Stage 0's three fixes, by the findings they moved
+
+Writer 11 found three defects in Stage 0 itself during Stage 0 again (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w11.md`):
+it read no Needs column for expansion items, a class row answered every finding on its node, and a kind whose name
+ends in "record" was matched as "record records". Both runs below are on the tree before writer 11's fold. A line
+with `-` is a finding the fixes removed, and `+` one they added: the two form findings the old class rows hid, and the
+four `external entry` rows left answering nothing. The plants class-covers and class-stale, in `[stage0]`, red each
+new rule for its own reason.
+
+````text
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 98 · classed 7 · reruns red 0
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 93 · classed 1 · reruns red 0
+
+- K2 kits.adopters: reached from no entry: no reached item routes to it, and no item it needs is reached
+- K2 kits.currency: reached from no entry: no reached item routes to it, and no item it needs is reached
+- K2 kits.cut: reached from no entry: no reached item routes to it, and no item it needs is reached
+- K2 kits.install: reached from no entry: no reached item routes to it, and no item it needs is reached
+- K2 kits.offer: reached from no entry: no reached item routes to it, and no item it needs is reached
+- K2 kits.update: reached from no entry: no reached item routes to it, and no item it needs is reached
+- K3 adopter-register: no reader: no item waits on its writer or names it, and no clause of another build names it
+- K3 adopters: no reader: no item waits on its writer or names it, and no clause of another build names it
+- K3 design-record: no reader: no item waits on its writer or names it, and no clause of another build names it
+- K3 maintenance-record: no reader: no item waits on its writer or names it, and no clause of another build names it
+- K3 value-ledger: no reader: no item waits on its writer or names it, and no clause of another build names it
++ K2 adopt.instructions: a target in no declared form: "the unit, the amendment or the drop written"
++ K2 adopt.declarations: a target in no declared form: "the overlay row written"
++ classes adopt.instructions: a K2 class row that answers no finding (external entry)
++ classes adopt.declarations: a K2 class row that answers no finding (external entry)
++ classes kits.install-attended: a K2 class row that answers no finding (external entry)
++ classes kits.update-attended: a K2 class row that answers no finding (external entry)
 ````
 
 
@@ -34340,13 +34919,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2686 nodes in 30 namespaces; 28441 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1859, derived 323, pending 504
+map: 2687 nodes in 30 namespaces; 28441 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1860, derived 323, pending 504
 map: no stale facts read 67 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 237 records, 4225 sections, 217 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 237 records, 4234 sections, 217 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state
@@ -34459,12 +35038,12 @@ rc 0
 
 $ stage0, all five arms, recorded and not refused
 K1: items 127 (98 flow, 29 expansion), roles 14 · findings 0
-K2: targets by form: ask 4, edge 186, owner 13, policy 4, program 7, return 24, terminal 58, wait 5; roots 14, reached 116, ending 126 · findings 21 · classed 7
-K3: kinds 83, table rows 83 · findings 76
-K4: keys 267 · findings 1
+K2: targets by form: ask 4, edge 187, owner 13, policy 4, program 7, return 28, terminal 67, wait 6; roots 18, reached 126, ending 127 · findings 0 · classed 1
+K3: kinds 83, table rows 83 · findings 0 · classed 49
+K4: keys 267 · findings 0
 K5: principles 42, clauses 509, retired 0 · findings 0
-stage0: arms K1,K2,K3,K4,K5,reruns · findings 98 · classed 7 · reruns red 0
-rc 1
+stage0: arms K1,K2,K3,K4,K5,reruns · findings 0 · classed 50 · reruns red 0
+rc 0
 ````
 
 
