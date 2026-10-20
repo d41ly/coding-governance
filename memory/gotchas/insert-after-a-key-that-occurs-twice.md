@@ -38,3 +38,6 @@ path in the Dispatches table, so that row was never added.
 
 It has no machine gate yet. A hygiene check that every table row under `memory/` has its header's
 column count would catch the whole class.
+
+Related: `record-file-read-by-line-position`, its read-side sibling: both trust the first match in a record
+file to be the one meant.

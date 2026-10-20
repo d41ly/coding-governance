@@ -2,7 +2,7 @@
 
 **Serves:** research PLAY-dClosedLoop-1
 
-This is dispatch 123's return, verbatim, except that a title line would be demoted to keep one H1 per record. Its question is in `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-5-researcher.md`, and its use is in `build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md`.
+This is dispatch 123's return, verbatim, except that a title line would be demoted to keep one H1 per record, and that an id of another build that led a list item carries the word "id" before it, so hygiene check 13 does not read it as defined here. Its question is in `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-5-researcher.md`, and its use is in `build/2026-10-19-build-PLAY-dClosedLoop-1-flow-roles-adoption.md`.
 
 ---
 
@@ -112,13 +112,13 @@ In a default adopter install, the spawn guard refuses gov's own review harness.
 
 ### Records' incidents
 I found no record of an adopter customizing roles, `workflows.toml` or `policy.toml`; the grep hit only gov's own specs.
-- **TOOL-aRepatriatedFork-4:** at inCMS, gov's harness gates, which only searched gov's install prefix, "print a clean verdict over a set that excludes all 13 live harnesses", and "both adopters carry a hand-kept population fork". It was fixed by discovering harnesses by marker.
+- **id TOOL-aRepatriatedFork-4:** at inCMS, gov's harness gates, which only searched gov's install prefix, "print a clean verdict over a set that excludes all 13 live harnesses", and "both adopters carry a hand-kept population fork". It was fixed by discovering harnesses by marker.
 - **DEPL-aRepatriatedFork-17 S8:** the gate-leg step refused nc's `agent-instructions wiring` row, which had gov's argv but no receipt record. This produced the claim rule.
-- **DEPL-cMendedVintage-22:** a hand-edit of a gov-owned row "is never detected" and was overwritten. A gov argv change "reds an adopter whose manifest is byte-identical". It was fixed to compare the target against the receipt.
-- **DEPL-aBenchedProbe-2:** the ceiling keep rule. Its N3 says a deleted key is not preserved.
+- **id DEPL-cMendedVintage-22:** a hand-edit of a gov-owned row "is never detected" and was overwritten. A gov argv change "reds an adopter whose manifest is byte-identical". It was fixed to compare the target against the receipt.
+- **id DEPL-aBenchedProbe-2:** the ceiling keep rule. Its N3 says a deleted key is not preserved.
 - **aBoundedCeiling round-2 review:** "An adopter's manifest is a merge, not a rewrite". Target-authored rows with no ceiling sat beside kit rows that had one, and the runner refuses.
-- **TOOL-aRepatriatedFork-49:** refused to clear interpreter variables because doing so "changes the environment every adopter's own legs receive".
-- **TOOL-aRepatriatedFork-7:** nc's lower `FANOUT_CAP`.
+- **id TOOL-aRepatriatedFork-49:** refused to clear interpreter variables because doing so "changes the environment every adopter's own legs receive".
+- **id TOOL-aRepatriatedFork-7:** nc's lower `FANOUT_CAP`.
 - **Backlog TOOL-cSettledDocket-8 (DEFERRED):** `DIRECTIVES_EXTRA_TABLE` has one reader.
 - **nc's landing nodes:** these lived in its `CLAUDE.md` prose and became `LANDING_NODES` (sibling pass).
 

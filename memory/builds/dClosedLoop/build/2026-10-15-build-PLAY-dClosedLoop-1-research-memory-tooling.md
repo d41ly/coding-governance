@@ -2,7 +2,7 @@
 
 **Serves:** research PLAY-dClosedLoop-1
 
-This is dispatch 26's return, verbatim. Its question is in
+This is dispatch 26's return, verbatim, except that an id of another build that led a list item carries the word "id" before it, so hygiene check 13 does not read it as defined here. Its question is in
 `prompts/2026-10-15-prompt-PLAY-dClosedLoop-1-7-researcher.md`, and its use is in
 `build/2026-10-15-build-PLAY-dClosedLoop-1-layer-memory.md`.
 
@@ -111,7 +111,7 @@ Counted as banner loads ("Base directory for this skill") from 2026-08-16 onward
 - **Three Skills are used through their scripts only.** The drift-audit, memory-recall and runlog Skills have 0 loads, while their scripts ran 365, 314 and 32 times.
 - **Known reds.**
   - `TOOL-aBoundedCeiling-9`: the unattended kit's leg is red on main.
-  - `TOOL-aQuenchedHarness-9`: govkit's selftest has two red arms (cited at `run-selftests.sh:36-37`).
+  - id `TOOL-aQuenchedHarness-9`: govkit's selftest has two red arms (cited at `run-selftests.sh:36-37`).
   - `reuse_lookup.py` scored 0 of 24 (handed verdict).
 - **Not measured.** Firing counts for hooks and legs, because they leave no transcript trace. Runlog lines would supply them; I did not read them, to keep within scope.
 

@@ -1,3 +1,16 @@
+# The whole-design walk's key
+
+**Serves:** research PLAY-dClosedLoop-1
+
+The sealed walk's key: the twelve plants the seeding script made in the sealed copy, committed when the seal was
+lifted (`build/2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[recall-scored]`). It was committed as
+`build/2026-10-20-build-PLAY-dClosedLoop-1-walk-key.json` and moved into this record at the build's landing,
+2026-10-20, because a JSON file cannot carry the Serves line hygiene check 21 reads. The tilde-fenced block below
+holds the committed blob's bytes unchanged: its lines, each ending in a newline, are the key, and their SHA-256
+is the pinned `505c52433040b18b95d5da9021b5ad0feada756b88290857a1b9eee9c4b837b7`. Check it with
+`git cat-file -p HEAD:<this record> | python -c "import sys,hashlib;l=sys.stdin.buffer.read().split(b'\n');i=l.index(b'~~~json');j=l.index(b'~~~',i+1);print(hashlib.sha256(b'\n'.join(l[i+1:j])+b'\n').hexdigest())"`.
+
+~~~json
 {
  "base": "747a2af2292f1f9253ff1f019db9c241b25444dc",
  "plants": [
@@ -211,3 +224,4 @@
   }
  ]
 }
+~~~

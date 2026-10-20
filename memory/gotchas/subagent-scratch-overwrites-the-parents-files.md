@@ -45,3 +45,6 @@ researcher's own, which is the fix's first rule.
 No machine gate holds this class: a subagent's writes to scratch are outside every gate's reach. The
 documented check is the brief, which names each subagent's own scratch folder, and the parent's check of a
 scratch file's provenance before it trusts the file.
+
+Related: the owner ruling TOOL-aProbedUnit-10 hands every harness agent the session scratchpad, and this
+class is what happens when several agents share that one folder with no name of their own in it.

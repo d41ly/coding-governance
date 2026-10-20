@@ -2,7 +2,7 @@
 
 **Serves:** research PLAY-dClosedLoop-1
 
-This is dispatch 118's return, verbatim, except that a title line would be demoted to keep one H1 per record. Its question is in `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-1-researcher.md`, and its use is in `build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md`.
+This is dispatch 118's return, verbatim, except that a title line would be demoted to keep one H1 per record, and that an id of another build that led a list item carries the word "id" before it, so hygiene check 13 does not read it as defined here. Its question is in `prompts/2026-10-19-prompt-PLAY-dClosedLoop-1-1-researcher.md`, and its use is in `build/2026-10-19-build-PLAY-dClosedLoop-1-adopter-instructions.md`.
 
 ---
 
@@ -88,9 +88,9 @@ The fixture held its own `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `.github/copilot
 
 **Records:**
 - **TOOL-aScouredKit-14** (cited in a comment in `entries/playbook.kit.toml`): "a hand-edit of the rendered AGENTS.md was reverted by the next render."
-- **PLAY-aDistilledCharter-4:** gov's authored wrapper around the region was folded into `[charter] adopter_rules`, "so gov's charter is the region alone." Gov moved off the outside-the-region seam.
-- **DEPL-aRepatriatedFork-1:** "Both adopters forked this file" for `PROJECT_NAME`; this was retired by making it an asked answer.
-- **TOOL-aRepatriatedFork-10:** nc carried tagged carve-outs that touch the memory-tree kit (its table runs `1/24`, `2/24`, …), including a note in its forked `scripts/HYGIENE.template.md:63-69`. They were moved into config and renders. The runbook's carve-out ledger (`WIRE-INTO-PROJECT.md:1139-1198`) came from this. It is adopter-side only; govkit's only hits for `carve-out` are code comments, and nothing parses the tags.
+- **id PLAY-aDistilledCharter-4:** gov's authored wrapper around the region was folded into `[charter] adopter_rules`, "so gov's charter is the region alone." Gov moved off the outside-the-region seam.
+- **id DEPL-aRepatriatedFork-1:** "Both adopters forked this file" for `PROJECT_NAME`; this was retired by making it an asked answer.
+- **id TOOL-aRepatriatedFork-10:** nc carried tagged carve-outs that touch the memory-tree kit (its table runs `1/24`, `2/24`, …), including a note in its forked `scripts/HYGIENE.template.md:63-69`. They were moved into config and renders. The runbook's carve-out ledger (`WIRE-INTO-PROJECT.md:1139-1198`) came from this. It is adopter-side only; govkit's only hits for `carve-out` are code comments, and nothing parses the tags.
 - **aRepatriatedFork README:** one pull left "27 and 32 engine rows `unattributed`", merged by hand, and the merge "silently stripped 16 CR bytes."
 - **dPolishedVitrine round-2 review:** NicoCares' rendered memory docs were stuck one vintage back, graded `re-rendered`, then `patched`.
 - **dRetiredFork-3:** nine rendered rows were stale at NicoCares.

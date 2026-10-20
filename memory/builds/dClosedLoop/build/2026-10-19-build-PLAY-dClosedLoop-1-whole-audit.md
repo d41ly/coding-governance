@@ -415,7 +415,8 @@ whether refutations get a second look, answered "Second skeptic on refutations (
 ### [recall-scored] The recall, read plant by plant, and the fold's plan
 
 The owner, 2026-10-20, asked what follows run C under the bar, and answered "Fold, re-measure after (Recommended)". The
-seal is lifted: the key (`build/2026-10-20-build-PLAY-dClosedLoop-1-walk-key.json`, its SHA-256 the pinned one), the
+seal is lifted: the key (`build/2026-10-20-build-PLAY-dClosedLoop-1-walk-key.json`, its SHA-256 the pinned one; at the build's
+landing it moved, bytes unchanged, into `build/2026-10-20-build-PLAY-dClosedLoop-1-walk-key.md`), the
 seeding script (`...-walk-seed.py`), the five brief reviews and the detectability probe (`...-walk-detectability.py`)
 are committed beside the walk. The key's pin is over its committed blob: a checkout that writes CRLF changes the
 working copy's bytes, so check it with `git cat-file -p HEAD:<path> | sha256sum`.

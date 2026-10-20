@@ -1,3 +1,4 @@
+# **Serves:** research PLAY-dClosedLoop-1
 kind	node	owner	evidence	settled
 item	entry.intake	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9; entry.intake's hook itself is dWellOiledMachine's (gap-rt-14))	yes
 item	entry.orient	dDeclaredLoop	11195-build-PLAY-dClosedLoop-1-flow-steps.md:86 "(revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (settled by PM-9)	yes

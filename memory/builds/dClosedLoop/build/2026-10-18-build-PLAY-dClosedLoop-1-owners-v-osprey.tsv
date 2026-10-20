@@ -1,3 +1,4 @@
+# **Serves:** research PLAY-dClosedLoop-1
 kind	node	owner	evidence	settled
 item	entry.intake	dWellOiledMachine	memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:401 "the entry step's items are dDeclaredLoop's, and `entry.intake`'s hook stays dWellOiledMachine's"; memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:83 "**The hook is Runtime's.**"	yes
 item	entry.orient	dDeclaredLoop	memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md:401 "the entry step's items are dDeclaredLoop's, and `entry.intake`'s hook stays dWellOiledMachine's"; memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:86 "dDeclaredLoop builds the step's items"	yes

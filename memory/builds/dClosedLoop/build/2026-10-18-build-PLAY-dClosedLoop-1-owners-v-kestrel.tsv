@@ -1,3 +1,4 @@
+# **Serves:** research PLAY-dClosedLoop-1
 kind	node	owner	evidence	settled
 item	entry.intake	dWellOiledMachine	memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:86 "and `entry.intake`'s" / next line: "hook stays dWellOiledMachine's, with `gap-rt-14`" (item row at memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:69, section [entry])	yes
 item	entry.orient	dDeclaredLoop	memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:86 "Owner** (revised 2026-10-17, PM-9): dDeclaredLoop builds the step's items" (item row at memory/builds/dClosedLoop/build/2026-10-15-build-PLAY-dClosedLoop-1-flow-steps.md:70, section [entry])	yes
