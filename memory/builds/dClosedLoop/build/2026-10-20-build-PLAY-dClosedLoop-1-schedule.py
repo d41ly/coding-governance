@@ -1,10 +1,11 @@
 # **Serves:** research PLAY-dClosedLoop-1
 """The chain's schedule across nodes a, b and d: which node takes which build's spec run and build run, and when,
 re-derived from the tree at every landing (the execution plan's `[schedule]`). The owner's answers bind it
-(`build/…-execution.md` `[answers]` and `[answers-2]`).
+(`build/…-execution.md` `[answers]`, `[answers-2]` and `[answers-3]`).
 
-Usage (from the worktree root, after `git fetch`):
-  python <this file> [--ref <rev>] [--s 0.33] [--b 0.25]
+Usage (from the worktree root; `git fetch` does not fill the claim cache, `--claims` does):
+  . tools/lib/resolve-python.sh && PY=$(resolve_python)
+  git fetch; bash tools/unattended/unattended.sh --claims; "$PY" <this file> [--ref <rev>] [--s 0.33] [--b 0.25]
 --ref is the commit whose tree is read, HEAD by default; a node re-running it at a landing passes `origin/main`.
 
 INPUTS, all read at --ref except the claim cache:
@@ -14,13 +15,17 @@ INPUTS, all read at --ref except the claim cache:
   - each chain build's tracked specs under `memory/builds/<slug>/spec/`: its `**Status:**` token and its
     `**Carries:**`, `**Moved:**`, `**Retired:**` and `**Deferred:**` lines. A build's spec phase is DONE when its specs
     carry or release every clause of its row and none is OPEN or SPECCED; its build phase is DONE when, besides,
-    every spec is CLOSED or WONTDO.
-  - the run claims the last fetch cached under `refs/gov/remote/runs/<slug>` (no fetch is made here), and
-    `tools/playbook/fleet.toml` to turn a claim's `node:` user into a fleet tag. A `live` or `held` claim on a chain
-    slug pins that build's next phase to the claim's node from time 0.
-  - two facts no file above holds, declared here from the owner's answers (`[answers-2]` items 4 and 5): dTrueNorth
-    runs as ONE whole run and carries one unit more than its v2 row, the carry-forward condition for review-promoted
-    units (WHOLE, EXTRA); and node b takes spec runs only (SPEC_ONLY).
+    every spec in its folder is CLOSED or WONTDO, an EXTRA unit's spec included.
+  - the run claims `unattended.sh --claims` last cached under `refs/gov/remote/runs/<slug>` (no fetch is made here),
+    `tools/playbook/fleet.toml` to turn a claim's `node:` user into a fleet tag, and `RESUME_STALE_BOUND` from
+    `.unattended.conf`. A `held` claim, or a `live` one whose `beat-utc` is within the bound, pins that build's next
+    phase to the claim's node from time 0. A `live` claim past the bound is reported stale and left unpinned, for a
+    take-over. A claim on a node outside the three keeps its run off every node's table (held off-fleet), and a
+    claim on a SPEC_ONLY node pins only a spec run.
+  - two facts no file above holds, declared here from the owner's answers: dTrueNorth runs as ONE whole run and
+    carries one unit more than its v2 row, the carry-forward condition for any unit a spec run adds, from a review or
+    a discovery (WHOLE, EXTRA: `[answers-2]` item 5, widened by `[answers-3]` item 1); and node b takes spec runs
+    only (SPEC_ONLY: `[answers-2]` item 4).
 
 THE MODEL. Each build is two runs: a spec run of s*U units and a build run of (1-s)*U, U its clause count plus any
 EXTRA, in units of a full-pace node's work; a WHOLE build is one run of U, which starts at once. Policy J (the schedule
@@ -37,14 +42,15 @@ WHAT IT DOES NOT MODEL: wall time, since no unit's wall time is recorded (gap-rt
 work, not hours; the spec share s, which history cannot measure; usage limits, holds and resumes; review rounds, the
 closing review and the landing bar's wall (up to `GATE_WALL`); the owner's delay in starting each run; the opening,
 phase 0 and each node's preparation; how far an in-flight run has got (it is charged its whole phase from time 0);
-rework a landing forces on a build in flight; two runs at once on one node; and an EXTRA unit's own spec, which carries
-no clause, so a WHOLE build reads landed once the specs of its v2 clauses are all CLOSED or WONTDO.
+rework a landing forces on a build in flight; and two runs at once on one node.
 
 Prints the schedule table, each node's load, the first wave, the runs the owner starts in order, each landing with
 the runs in flight then, and node b's pace swept from 0.25 to 0.5 beside a and d alone. Exit 0, or 1 when v2's
-`[chain]` does not hold 22 builds and 509 clauses or a claim names a node the fleet does not.
+`[chain]` does not hold 22 builds and 509 clauses or a claim names a node the fleet does not. Every claim it does
+not pin is printed with the reason.
 """
 import argparse
+import datetime
 import re
 import subprocess
 import sys
@@ -53,7 +59,9 @@ V2 = "memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-archit
 FLEET = "tools/playbook/fleet.toml"
 ROOT = "dTrueNorth"
 WHOLE = {"dTrueNorth"}                         # one run, spec and build together (`[answers-2]` item 5)
-EXTRA = {"dTrueNorth": 1}                      # its unit beyond v2: the carry-forward condition (`[answers-2]` item 5)
+EXTRA = {"dTrueNorth": 1}                      # its unit beyond v2: the carry-forward condition for any unit a spec
+#                                                run adds, from a review or a discovery (`[answers-2]` item 5, widened by
+#                                                `[answers-3]` item 1, ER:320)
 SPEC_ONLY = {"b"}                              # node b takes spec runs only (`[answers-2]` item 4)
 NODES = ("a", "d", "b")                       # the owner's three nodes, full-pace ones first
 CID = re.compile(r"`(cl-d[A-Z]\w+-\d{4})`")
@@ -120,22 +128,36 @@ def tree_state(ref, ids):
 
 
 def claims(ref, names):
-    """build -> (node tag, status) for a live or held cached claim; and the other claims, reported."""
+    """build -> (node tag, status) for a held claim or a live one within the stale bound; the others, reported."""
     fleet = git("show", f"{ref}:{FLEET}")
     tag = dict((u, t) for t, u in re.findall(r'^tag = "(\w)"\s*\nuser = "([^"]+)"', fleet, flags=re.M))
+    bound = re.search(r'^RESUME_STALE_BOUND="(\d+)"', git("show", f"{ref}:.unattended.conf"), flags=re.M)
+    if not bound:
+        sys.exit("schedule: .unattended.conf declares no RESUME_STALE_BOUND, so a live claim's age cannot be read")
+    now = datetime.datetime.now(datetime.timezone.utc)
     held, other = {}, []
     for ln in git("for-each-ref", "--format=%(refname)", "refs/gov/remote/runs/").split():
         slug = ln.rsplit("/", 1)[1]
         if slug not in names:
             continue
         msg = dict(re.findall(r"^(\w[\w-]*): (.*)$", git("log", "-1", "--format=%B", ln), flags=re.M))
-        if msg.get("status") in ("live", "held"):
-            if msg.get("node") not in tag:
-                print(f"schedule: the claim on {slug} names node user '{msg.get('node')}', which {FLEET} does not")
-                sys.exit(1)
-            held[slug] = (tag[msg["node"]], msg["status"])
-        else:
+        if msg.get("status") not in ("live", "held"):
             other.append(f"{slug} {msg.get('status', '?')}")
+            continue
+        if msg.get("node") not in tag:
+            print(f"schedule: the claim on {slug} names node user '{msg.get('node')}', which {FLEET} does not")
+            sys.exit(1)
+        n = tag[msg["node"]]
+        if msg["status"] == "live":
+            try:
+                beat = datetime.datetime.strptime(msg.get("beat-utc", ""), "%Y-%m-%dT%H:%M:%SZ").replace(
+                    tzinfo=datetime.timezone.utc)
+            except ValueError:
+                beat = None            # an unreadable beat refuses a second driver (STOPS 7), so it stays pinned
+            if beat is not None and (now - beat).total_seconds() > int(bound.group(1)):
+                other.append(f"{slug} stale on {n}: take over per [coordination]")
+                continue
+        held[slug] = (n, msg["status"])
     return held, other
 
 
@@ -149,7 +171,8 @@ def graph(names, parents, ids, state, s):
             pre = []
         else:
             grand = {g for p in parents[b] for g in parents[p]}
-            pre = [("build", ROOT)] + [("build" if p in WHOLE else "spec", p) for p in parents[b]]                 + [("build", g) for g in grand]
+            pre = [("build", ROOT)] + [("build" if p in WHOLE else "spec", p) for p in parents[b]] \
+                + [("build", g) for g in grand]
         if b in WHOLE:                      # one run: the build key carries the whole of it
             T[("build", b)] = (U, pre)
             continue
@@ -236,13 +259,21 @@ def run(names, parents, ids, state, held, s, pace, with_b=True):
     speed = {"a": 1.0, "d": 1.0}
     if with_b:
         speed["b"] = pace
-    pinned = {}
+    pinned, notes = {}, []
     for b, (n, _) in held.items():
         t = ("build", b) if state[b][0] or b in WHOLE else ("spec", b)
-        if t in T and n in speed:
+        if t not in T:
+            continue
+        if n not in speed:                  # an off-fleet holder: its run stays off every node's table
+            speed[n] = 1.0
+            pinned[t] = n
+            notes.append(f"{b} held off-fleet on {n}")
+        elif n in SPEC_ONLY and t[0] != "spec":
+            notes.append(f"{b} claimed on {n}, which takes spec runs only: its {t[0]} run is left unpinned")
+        else:
             pinned[t] = n
     start, fin, where = simulate(T, speed, pinned)
-    return T, start, fin, where, speed
+    return T, start, fin, where, {k: v for k, v in speed.items() if k in NODES}, notes
 
 
 def kind(t):
@@ -258,7 +289,7 @@ def main():
     names, stage, parents, ids, rows = chain(a.ref)
     state = tree_state(a.ref, ids)
     held, other = claims(a.ref, names)
-    T, start, fin, where, speed = run(names, parents, ids, state, held, a.s, a.b)
+    T, start, fin, where, speed, notes = run(names, parents, ids, state, held, a.s, a.b)
     bl, slack, span = float_of(T)
     mk = max(fin.values(), default=0.0)
     whole = {}
@@ -272,7 +303,8 @@ def main():
     print(f"read at {a.ref}: 22 builds, 509 clauses; s={a.s}, node b at pace {a.b}; "
           f"specs done {sum(st[0] for st in state.values())}, builds landed {sum(st[1] for st in state.values())}")
     print("claims cached on chain builds: " + (", ".join(f"{b} {st} on {n}" for b, (n, st) in sorted(held.items()))
-                                                or "none live or held") + ("; other: " + ", ".join(other) if other else ""))
+                                                or "none live or held") + ("; other: " + ", ".join(other) if other else "")
+          + ("; " + "; ".join(notes) if notes else ""))
     print(f"makespan {mk:.0f} units; with unlimited nodes {span:.0f}; whole builds after their parents land "
           f"{max(whole.values())}; serial on one node {sum(len(v) for v in ids.values()) + sum(EXTRA.values())} "
           f"(v2's 509 and {sum(EXTRA.values())} unit beyond it)")
@@ -319,13 +351,13 @@ def main():
     print()
     print("node b's pace swept (makespan; busy share of a, d, b; b's runs):")
     for pace in (0.25, 0.3, 0.35, 0.4, 0.45, 0.5):
-        T2, s2, f2, w2, sp2 = run(names, parents, ids, state, held, a.s, pace)
+        T2, s2, f2, w2, sp2, _ = run(names, parents, ids, state, held, a.s, pace)
         m2 = max(f2.values(), default=0.0)
         share = {n: sum(f2[t] - s2[t] for t in T2 if w2[t] == n) / m2 * 100 if m2 else 0 for n in sp2}
         bs = sorted((t for t in T2 if w2[t] == "b"), key=lambda t: s2[t])
         print(f"  b {pace:.2f}: {m2:.0f}; a {share['a']:.0f}% d {share['d']:.0f}% b {share['b']:.0f}%; "
               + (", ".join(f"{kind(t)} {t[1]} {s2[t]:.0f}-{f2[t]:.0f}" for t in bs) or "none"))
-    T3, s3, f3, w3, sp3 = run(names, parents, ids, state, held, a.s, a.b, with_b=False)
+    T3, s3, f3, w3, sp3, _ = run(names, parents, ids, state, held, a.s, a.b, with_b=False)
     print(f"  a and d alone: {max(f3.values(), default=0.0):.0f}")
 
 
