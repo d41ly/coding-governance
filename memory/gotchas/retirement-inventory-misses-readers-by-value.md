@@ -34,6 +34,19 @@ The same shape is why a build's own records are searched by grep rather than by 
 sweep touches every folder under `memory/builds/`, and a reader keyed on the folder's name finds none
 of it.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Five: the receipt
+schema bump would have widened a back-fill keyed to the constant's value; `RUNAWAY_CEILING` retired with the unattended
+kit while a catalogue bound still read it; the per-session orientation card retired while the write gate read it; the
+unattended kit's retirement named its README and missed its legs, size rows and pointers; and `/session-kickoff`'s
+per-machine link had no fate at all.
+
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). The converse:
+`/session-kickoff`'s retirement inventoried its readers by value and missed those by path, the session hooks that run
+its `manifest-check.sh`, the leg rows, the kit entry, the registry's glob and check-wiring's link arm. Every retirement
+now inventories by path and by value.
+
 ## Cause
 
 Inventorying is a search, and a search needs a term. The name is the only term available, so the
@@ -41,6 +54,11 @@ inventory silently becomes "readers that spell it" rather than "readers that dep
 dependency on a VALUE — a count of rows a builder placed, a time it chose, a digest of what it wrote —
 leaves no token behind. It is a reader all the same, and it is the one that fails last, after the
 retirement has landed and the diff has been reviewed.
+
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+`gov-session` retired with an upgrade step only, though nine files read it by value. Point 6 retired the per-pass
+checklist and the prebuild with no build owning the retirement.
 
 ## The fix
 

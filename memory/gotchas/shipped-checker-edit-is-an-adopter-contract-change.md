@@ -21,6 +21,12 @@ The kickoff manifest carried this as a standing trap: the file is copied in by
 root, so the source here IS the product, and this repo is one adopter among several that happens
 to share a checkout with it.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). An upgrade step row
+could be edited or removed after adopters ran it, so a down would no longer reverse its up and the walk leg would stay
+green. A step row landed on the default branch is now frozen: a correction is a new step, and a removal a `[[retired]]`
+row.
+
 ## The fix
 
 Treat any edit to that file as a kit change, which the manifest's own tier rule already says is

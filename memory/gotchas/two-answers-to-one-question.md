@@ -86,6 +86,46 @@ adopter header and arm 15's comment, and only a grep that dropped the article fo
 a". The check: a record that says a phrase sits on one line is checked by a grep for the exact
 literal it quotes, article included, whose hit count equals the carrier count.
 
+It bit again in the answers fold, 2026-10-18 (`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-answers-reviews-compared.md`): v2's `[planned]` said the
+pwsh-launch plan's gaps would join the register when its trigger held, while the register already held them, filed the
+same day under AP-33.
+
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Twelve in one design:
+two builds each built the record finder and the bug-class selector, and two the record-kind factory; the one-door rule
+listed five doors beside writers the same record named; `reads` and `writes` were declared at two sites; the edge
+grammar said one line and one line per type; the refs and policy-values pockets named superseded owners; the hop tally
+disagreed with its own table; and three consolidations (the bash resolver, the ledger's merge driver, the `Pass:`
+reader) ignored the seams that exist.
+
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). Six more: the systems
+record's unit schema beside v2's registry clause; a `[[retired]]` row and a change record as witnesses of one rename; a
+unit field named `owner` beside the `owner` edge; the adopter record's `[chain]` and `[folded]` on gov's update of
+itself; two scopes for one house-file move; and two legacy lists for one install.
+
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+The mail ref was keyed by node in coordination and v2 and by sender in the memory plan. Point 7's account said both
+harness settings queue where its return says the direct one refuses. A Workflow's agents were counted once as a
+reservation and again as started agents.
+
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+The memory plan pinned the overlay's rows to gov's text, where v2 and the adoption record pinned them to their
+canonical form, and role effort had two live homes with no precedence between them.
+
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The queue's start rule counted the agents in flight where the ledger in the same row counted reservations too, and the
+effort rows read both the role's declared effort and medium by default.
+
+It bit again in the parked debt's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
+`run.on-owner-question` and `run.on-owner-silence` both resolved an open owner item with no precedence, one
+release served both a hand-over and a terminal end, and `runtime.no-progress` read "past it" in its row and
+"this many" in its clause.
+
 ## The fix
 
 Ask, do not copy. `tools/memory-tree/check-memory-hygiene.sh` owns the append-only set and the index

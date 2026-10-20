@@ -34,6 +34,18 @@ three of its entries were records that build had added. The fix again moved the 
 the block is read at the range's base, and an invariant the range moves is a checklist item, which
 can only widen a review.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Two proofs the
+subject could forge: `tty-cli`, the default owner proof, rests on a terminal an agent's shell can get from a pty wrapper
+and on a trailer anyone can type; and a mailbox `intake` any sender may append was read as the owner's ratification. The
+owner accepted the first for now, with a layered proof planned, and only owner-origin intake now ratifies.
+
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). Two more: the
+`editorial` mark that exempts a pin from drift is written by gov's own author on gov's own change record, and the fixed
+class a refusal reads was typed by hand. `editorial` is now admitted only for a mechanical diff or the owner's proof-carrying ruling,
+and the class is derived from the parsers.
+
 ## Cause
 
 Writing a check is an act of reasoning about LOGIC, and the logic is usually fine. Provenance is a

@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-19, the newest record date in this tree (aScoutedSeam).
+Dormant: no record dated within 21 days of 2026-10-20, the newest record date in this tree (dClosedLoop).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -13,7 +13,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aOrientedCast](builds/aOrientedCast/README.md) | OPEN | a | 2026-10-11 | tooling+kickoff+playbook | 33 | 2026-10-16 | active | 0 |
 | [aRoutedQuill](builds/aRoutedQuill/README.md) | DEFERRED | a | 2026-10-09 | tooling+kickoff+playbook+deployer | 15 | 2026-10-10 | active | 0 |
 | [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 0 |
-| [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | active | 0 |
+| [dClosedLoop](builds/dClosedLoop/README.md) | OPEN | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 1 | 2026-10-20 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 | 2026-08-18 | dormant | 0 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 | 2026-07-12 | dormant | 0 |
@@ -30,6 +30,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [bConvergentLodestar](builds/bConvergentLodestar/README.md) | SPECCED | b | 2026-07-22 | tooling | 1 | 2026-07-22 | dormant | 0 |
 | [dLandedVerdict](builds/dLandedVerdict/README.md) | INPROGRESS | d | 2026-08-19 | tooling | 2 | 2026-08-19 | dormant | 0 |
 | [dNarrowedAnchor](builds/dNarrowedAnchor/README.md) | INPROGRESS | d | 2026-08-24 | tooling | 3 | 2026-08-25 | dormant | 1 |
+| [dPinnedHandoff](builds/dPinnedHandoff/README.md) | SPECCED | d | 2026-09-22 | tooling | 3 | 2026-09-28 | dormant | 0 |
 | [dPolishedVitrine](builds/dPolishedVitrine/README.md) | INPROGRESS | d | 2026-09-12 | tooling+deployer | 19 | 2026-09-22 | dormant | 0 |
 | [dPromptedSeam](builds/dPromptedSeam/README.md) | DEFERRED | d | 2026-08-25 | tooling | 4 | 2026-08-25 | dormant | 0 |
 | [dRetiredFork](builds/dRetiredFork/README.md) | DEFERRED | d | 2026-09-02 | tooling+deployer | 56 | 2026-09-03 | dormant | 0 |

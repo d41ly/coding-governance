@@ -19,6 +19,12 @@ TOOL-aPairedSlots-5 kept one bar per worktree on the turnstile's slot claim in
 `tools/run-gates/run-gates.sh`. The docs key TOOL-aPairedSlots-4 had added never asked, so a doc-only
 bar ran beside its own worktree's holder (aPairedSlots closing review, M3).
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Four admission paths
+in one design: the commit site's trailers covered the commit queue but not the lander's own commits; Codex hook trust
+was surfaced at install but not on an update that changes a hook; the sha pin held for gov's workflow but not for
+emitted CI; and the epoch fenced a take-over but not a supervisor restarted on the same node.
+
 ## Where it bit
 
 TOOL-dRenderedAnchor-1 gave `render_agents.py`, one of two readers of the role index, a `misplaced`

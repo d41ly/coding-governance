@@ -22,7 +22,8 @@ gotcha-classes = ["a-grep-for-a-word-is-a-presence-probe.md",
   "record-without-serves-or-with-a-round-counter.md", "sourced-conf-blank-overrides-the-default.md",
   "name-search-resolves-a-namesake.md", "index-derivation-reads-a-half-staged-move-as-a-deletion.md",
   "history-leg-graded-before-the-reconcile-commit.md",
-  "line-claim-matched-over-the-whole-output.md"]
+  "line-claim-matched-over-the-whole-output.md", "parser-drops-rows-it-cannot-place.md",
+  "insert-after-a-key-that-occurs-twice.md", "pipe-in-a-code-span-splits-a-table-cell.md"]
 guides = []
 backlog-shards = []
 lexicon-verbs = []

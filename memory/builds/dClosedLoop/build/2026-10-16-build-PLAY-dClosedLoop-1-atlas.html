@@ -1,0 +1,2219 @@
+<title>Closed Loop Atlas</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<!--
+**Serves:** research PLAY-dClosedLoop-1
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Overpass:wght@400;600;700&family=Overpass+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a signal-box console. Views fill the left, an inspector rail holds the selected record on the right, and the flow's lanes and stations borrow a transit map's grammar. Today is grey, the target is the accent, and the change between them is the signal amber. */
+:root {
+  --bg: #EDF1F0; --surface: #FFFFFF; --surface-2: #F5F8F7; --ink: #13201C; --ink-2: #384843; --muted: #64746E;
+  --line: #CED8D5; --line-2: #A9B8B3; --accent: #0D6B5B; --accent-soft: #DCEFE9; --signal: #B07800; --signal-soft: #FBEFD2;
+  --ok: #23824F; --warn: #A86A12; --bad: #B9362F; --ok-soft: #DDF1E5; --warn-soft: #F8EAD3; --bad-soft: #F7DEDB;
+  --l-entry: #62738C; --l-plan: #2A67C4; --l-design: #7748BA; --l-build: #C96A16; --l-test: #1F8D58; --l-deploy: #C23838; --l-breakpoint: #A98312; --l-lifecycle: #5F716D; --l-adopt: #2E7F86;
+  --f-display: "Barlow Condensed", "Arial Narrow", Arial, sans-serif;
+  --f-body: "Overpass", "Segoe UI", system-ui, sans-serif;
+  --f-mono: "Overpass Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  --radius: 6px; --top-h: 96px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0D1412; --surface: #141D1A; --surface-2: #1A2522; --ink: #E3EBE8; --ink-2: #BFCBC6; --muted: #8A9B95;
+    --line: #26332F; --line-2: #3A4B46; --accent: #52C4A9; --accent-soft: #16342D; --signal: #F0B23A; --signal-soft: #3A2E12;
+    --ok: #4CC38A; --warn: #E3A43C; --bad: #EF6A5F; --ok-soft: #14321F; --warn-soft: #352812; --bad-soft: #3A1916;
+    --l-entry: #8EA0B8; --l-plan: #5C94EA; --l-design: #A47DE2; --l-build: #EE8E3A; --l-test: #3CC07F; --l-deploy: #EC6464; --l-breakpoint: #DDB23C; --l-lifecycle: #92A6A1; --l-adopt: #5FBEC6;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0D1412; --surface: #141D1A; --surface-2: #1A2522; --ink: #E3EBE8; --ink-2: #BFCBC6; --muted: #8A9B95;
+  --line: #26332F; --line-2: #3A4B46; --accent: #52C4A9; --accent-soft: #16342D; --signal: #F0B23A; --signal-soft: #3A2E12;
+  --ok: #4CC38A; --warn: #E3A43C; --bad: #EF6A5F; --ok-soft: #14321F; --warn-soft: #352812; --bad-soft: #3A1916;
+  --l-entry: #8EA0B8; --l-plan: #5C94EA; --l-design: #A47DE2; --l-build: #EE8E3A; --l-test: #3CC07F; --l-deploy: #EC6464; --l-breakpoint: #DDB23C; --l-lifecycle: #92A6A1; --l-adopt: #5FBEC6;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+body { background: var(--bg); color: var(--ink); font-family: var(--f-body); font-size: 15px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+code, .mono { font-family: var(--f-mono); font-size: 0.86em; }
+code { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 0 4px; word-break: break-word; }
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--signal); outline-offset: 2px; }
+.gutter { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+/* Masthead */
+.top { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 30; background: var(--bg); border-bottom: 1px solid var(--line); }
+.stripe { display: grid; grid-template-columns: repeat(9, 1fr); height: 4px; }
+.stripe span:nth-child(1) { background: var(--l-entry); } .stripe span:nth-child(2) { background: var(--l-plan); }
+.stripe span:nth-child(3) { background: var(--l-design); } .stripe span:nth-child(4) { background: var(--l-build); }
+.stripe span:nth-child(5) { background: var(--l-test); } .stripe span:nth-child(6) { background: var(--l-deploy); }
+.stripe span:nth-child(7) { background: var(--l-breakpoint); } .stripe span:nth-child(8) { background: var(--l-lifecycle); }
+.stripe span:nth-child(9) { background: var(--l-adopt); }
+.top-inner { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; padding-block: 10px; max-width: 1480px; margin: 0 auto; }
+.brand { display: flex; flex-direction: column; min-width: 0; }
+.wordmark { font-family: var(--f-display); font-weight: 700; font-size: 26px; letter-spacing: 0.02em; text-transform: uppercase; line-height: 1.05; }
+.wordmark b { color: var(--accent); font-weight: 700; }
+.sub { color: var(--muted); font-size: 12.5px; }
+.tabs { display: flex; gap: 2px; overflow-x: auto; max-width: 100%; scrollbar-width: thin; }
+.tab { border: 0; background: transparent; padding: 8px 11px; border-radius: var(--radius); font-family: var(--f-display); font-weight: 600; font-size: 16px; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); cursor: pointer; white-space: nowrap; }
+.tab:hover { color: var(--ink); background: var(--surface-2); }
+.tab[aria-selected="true"] { color: var(--ink); background: var(--surface); box-shadow: inset 0 -3px 0 var(--accent); }
+
+/* Shell */
+.shell { max-width: 1480px; margin: 0 auto; padding-block: 20px 48px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+@media (min-width: 1100px) { .shell { grid-template-columns: minmax(0, 1fr) 380px; } }
+.view { min-width: 0; display: flex; flex-direction: column; gap: 20px; }
+.eyebrow { font-family: var(--f-display); font-weight: 600; font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+h1, h2, h3 { text-wrap: balance; margin: 0; }
+.view-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px; }
+.view-title { font-family: var(--f-display); font-weight: 700; font-size: 30px; line-height: 1.05; text-transform: uppercase; letter-spacing: 0.02em; }
+.lede { color: var(--ink-2); max-width: 70ch; margin: 4px 0 0; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); }
+.scroll-x { overflow-x: auto; min-width: 0; }
+
+/* Overview */
+.thesis { font-family: var(--f-display); font-weight: 600; font-size: clamp(26px, 4.2vw, 46px); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.01em; margin: 0; }
+.thesis button { border: 0; background: none; padding: 0; font: inherit; text-transform: inherit; cursor: pointer; color: var(--accent); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+.thesis button:hover { color: var(--signal); }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { display: inline-flex; align-items: baseline; gap: 6px; padding: 3px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); font-size: 13px; color: var(--ink-2); }
+.chip b { font-family: var(--f-mono); font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+.ov-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+@media (min-width: 900px) { .ov-grid { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); } }
+.diagram { padding: 8px; }
+.diagram svg { display: block; width: 100%; height: auto; min-width: 520px; }
+.layer-list { display: flex; flex-direction: column; gap: 6px; }
+.layer-card { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; text-align: left; padding: 10px 12px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); cursor: pointer; }
+.layer-card:hover { border-color: var(--line-2); }
+.layer-card[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.layer-card .lc-name { font-family: var(--f-display); font-weight: 700; font-size: 19px; text-transform: uppercase; letter-spacing: 0.03em; }
+.layer-card .lc-what { grid-column: 1 / -1; color: var(--ink-2); font-size: 13.5px; }
+.kind { justify-self: start; align-self: center; font-family: var(--f-mono); font-size: 11px; padding: 1px 7px; border-radius: 999px; border: 1px solid var(--line-2); color: var(--muted); }
+.kind.core { border-color: var(--accent); color: var(--accent); }
+.kind.expansion { border-style: dashed; }
+.group-label { margin-top: 8px; }
+.cycle-list { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 14px; display: grid; gap: 2px; }
+.two-col { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 700px) { .two-col { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.box { padding: 14px 16px; min-width: 0; }
+.box > .eyebrow { margin-bottom: 8px; }
+
+/* SVG shared */
+svg text { fill: var(--ink); font-family: var(--f-body); }
+.svg-node { cursor: pointer; }
+.svg-node rect.body, .svg-node circle.body { fill: var(--surface); stroke: var(--line-2); stroke-width: 1.5; transition: stroke .15s, stroke-width .15s; }
+.svg-node:hover rect.body, .svg-node:hover circle.body { stroke: var(--accent); }
+.svg-node.on rect.body, .svg-node.on circle.body { stroke: var(--accent); stroke-width: 3; }
+.svg-node.exp rect.body, .svg-node.opt circle.body { stroke-dasharray: 5 4; }
+.svg-node:focus-visible { outline: none; }
+.svg-node:focus-visible rect.body, .svg-node:focus-visible circle.body { stroke: var(--signal); stroke-width: 3; }
+.n-title { font-family: var(--f-display); font-weight: 700; font-size: 19px; text-transform: uppercase; letter-spacing: 0.04em; }
+.n-sub { fill: var(--muted); font-family: var(--f-mono); font-size: 10.5px; }
+.ring { fill: none; stroke: var(--accent); stroke-width: 2.5; }
+.ring-label { fill: var(--ink-2); font-size: 12.5px; font-style: italic; }
+.dash { fill: none; stroke: var(--line-2); stroke-width: 1.5; stroke-dasharray: 4 4; }
+.base rect { fill: var(--surface-2); }
+.arrowhead { fill: var(--accent); }
+
+/* Flow */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.seg button { border: 1px solid var(--line); background: var(--surface); padding: 4px 10px; border-radius: 999px; cursor: pointer; font-size: 13px; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.search { flex: 1 1 200px; min-width: 0; max-width: 340px; padding: 6px 10px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 16px; color: var(--muted); font-size: 12.5px; align-items: center; }
+.legend svg { vertical-align: middle; }
+.lanes { display: flex; flex-direction: column; gap: 10px; }
+.lane { padding: 12px 14px 8px; border-left: 6px solid var(--lc); }
+.lane-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
+.badge { display: inline-grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: var(--lc); color: var(--surface); font-family: var(--f-display); font-weight: 700; font-size: 16px; flex: none; align-self: center; }
+.lane-name { font-family: var(--f-display); font-weight: 700; font-size: 21px; text-transform: uppercase; letter-spacing: 0.03em; }
+.lane-q { color: var(--ink-2); font-size: 14px; }
+.lane-count { margin-left: auto; color: var(--muted); font-size: 12.5px; font-family: var(--f-mono); }
+.lane-track { margin-top: 2px; }
+.lane-track svg { display: block; }
+.lane details { margin: 4px 0 2px; font-size: 13.5px; color: var(--ink-2); }
+.lane summary { cursor: pointer; color: var(--muted); font-size: 12.5px; }
+.lane summary:hover { color: var(--ink); }
+.lane dl { display: grid; grid-template-columns: minmax(0, 9em) minmax(0, 1fr); gap: 4px 12px; margin: 8px 0 4px; }
+.lane dt { color: var(--muted); font-size: 12.5px; }
+.lane dd { margin: 0; min-width: 0; }
+.st { cursor: pointer; }
+.st .hit { fill: transparent; }
+.st .ring-sel { fill: none; stroke: transparent; stroke-width: 2.5; }
+.st.sel .ring-sel { stroke: var(--signal); stroke-width: 3; }
+.st.need .ring-sel { stroke: var(--accent); stroke-dasharray: 3 3; }
+.st.route .ring-sel { stroke: var(--accent); }
+.st.dim { opacity: 0.18; }
+.st-label { font-family: var(--f-mono); font-size: 11.5px; fill: var(--ink-2); }
+.st.sel .st-label { fill: var(--ink); font-weight: 600; }
+.st:focus-visible { outline: none; }
+.st:focus-visible .ring-sel { stroke: var(--signal); }
+
+/* Lifecycle */
+.state rect.body { rx: 6px; }
+.state.terminal rect.body { stroke-width: 3; }
+.state .s-label { font-family: var(--f-mono); font-size: 12.5px; text-anchor: middle; }
+.edge { fill: none; stroke: var(--ink-2); stroke-width: 1.7; }
+.edge.back { stroke: var(--signal); }
+.edge.end { stroke: var(--muted); }
+.edge.ctrl { stroke: var(--l-lifecycle); stroke-dasharray: 5 4; }
+.edge-hit { fill: none; stroke: transparent; stroke-width: 14; cursor: pointer; }
+.edge-g.on .edge { stroke-width: 3.5; stroke: var(--accent); }
+.edge-g:hover .edge { stroke-width: 3; }
+.bracket { fill: none; stroke: var(--line-2); stroke-width: 1.5; }
+.bracket-tick { stroke: var(--line-2); stroke-width: 1; stroke-dasharray: 2 4; }
+.bracket-label { fill: var(--muted); font-size: 12px; font-style: italic; }
+
+/* Tables */
+table.data { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.data th { text-align: left; font-family: var(--f-display); font-weight: 600; font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line-2); position: sticky; top: 0; background: var(--surface); }
+table.data td { padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; min-width: 0; }
+table.data tr.clickable { cursor: pointer; }
+table.data tr.clickable:hover td { background: var(--surface-2); }
+table.data tr.on td { background: var(--accent-soft); }
+td.key { font-family: var(--f-mono); font-size: 12.5px; white-space: nowrap; }
+td.diff { background: var(--signal-soft); }
+td.num { font-family: var(--f-mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.table-wrap { max-height: 70vh; overflow: auto; }
+.count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.sev { display: inline-block; font-family: var(--f-mono); font-size: 11px; padding: 0 7px; border-radius: 999px; font-weight: 600; }
+.sev.HIGH { background: var(--bad-soft); color: var(--bad); } .sev.MED { background: var(--warn-soft); color: var(--warn); } .sev.LOW { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+select.pick { padding: 6px 8px; border: 1px solid var(--line-2); border-radius: var(--radius); background: var(--surface); color: var(--ink); font: inherit; font-size: 14px; max-width: 100%; min-width: 0; }
+
+/* Roles */
+.matrix td { min-width: 120px; }
+.matrix td:first-child { min-width: 170px; }
+.ichips { display: flex; flex-wrap: wrap; gap: 4px; }
+.ichip { border: 1px solid var(--line); border-left: 4px solid var(--lc, var(--line-2)); background: var(--surface); border-radius: 4px; padding: 1px 6px; font-family: var(--f-mono); font-size: 11.5px; cursor: pointer; color: var(--ink); text-align: left; overflow-wrap: anywhere; }
+.ichip:hover { border-color: var(--accent); border-left-color: var(--lc, var(--accent)); }
+.ichip.ref { --lc: var(--accent); }
+.role-name { font-weight: 600; }
+.role-meta { color: var(--muted); font-size: 12px; }
+
+/* Chain */
+.chain-svg svg { display: block; min-width: 860px; width: 100%; height: auto; }
+.cnode rect.body { rx: 6px; }
+.cnode.root rect.body { stroke: var(--accent); stroke-width: 2; fill: var(--accent-soft); }
+.c-slug { font-family: var(--f-mono); font-weight: 600; font-size: 13px; }
+.c-stage { fill: var(--muted); font-family: var(--f-display); font-weight: 600; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; }
+.c-count { fill: var(--muted); font-family: var(--f-mono); font-size: 10.5px; }
+.cedge { fill: none; stroke: var(--line-2); stroke-width: 1.5; }
+.cedge.hot { stroke: var(--accent); stroke-width: 2.5; }
+.bar-h { fill: var(--bad); } .bar-m { fill: var(--warn); } .bar-l { fill: var(--line-2); }
+
+/* Progress */
+.rail { display: grid; gap: 8px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 560px) { .rail { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.step-card { padding: 12px 14px; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; text-align: left; cursor: pointer; }
+.step-card:hover { border-color: var(--line-2); }
+.step-card .sc-name { font-family: var(--f-display); font-weight: 700; font-size: 19px; text-transform: uppercase; letter-spacing: 0.03em; }
+.pills { display: flex; flex-wrap: wrap; gap: 4px; }
+.state-pill { align-self: start; font-family: var(--f-mono); font-size: 11.5px; padding: 1px 8px; border-radius: 999px; }
+.state-pill.done { background: var(--ok-soft); color: var(--ok); }
+.state-pill.open { background: var(--signal-soft); color: var(--signal); }
+.state-pill.todo { background: var(--surface-2); color: var(--muted); border: 1px dashed var(--line-2); }
+.sc-meta { color: var(--ink-2); font-size: 13px; }
+.chart svg { display: block; width: 100%; height: auto; min-width: 560px; }
+.ax { stroke: var(--line); stroke-width: 1; }
+.ax-label { fill: var(--muted); font-family: var(--f-mono); font-size: 11px; }
+.bar-label { font-family: var(--f-mono); font-size: 12px; fill: var(--ink-2); }
+.rbar { cursor: pointer; }
+.rbar:hover .rb-bg { fill: var(--surface-2); }
+.rb-bg { fill: transparent; }
+.rb-h { fill: var(--bad); } .rb-m { fill: var(--warn); } .rb-l { fill: var(--line-2); } .rb-r { fill: none; stroke: var(--line-2); stroke-dasharray: 3 2; }
+.timeline { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0; }
+.tl-day { font-family: var(--f-display); font-weight: 700; font-size: 17px; letter-spacing: 0.06em; margin: 14px 0 4px; color: var(--ink); }
+.tl-item { display: grid; grid-template-columns: 14px minmax(0, 1fr); gap: 10px; align-items: start; border: 0; background: none; text-align: left; padding: 5px 0; cursor: pointer; width: 100%; }
+.tl-item::before { content: ""; width: 9px; height: 9px; border-radius: 50%; margin-top: 7px; background: var(--surface); border: 2px solid var(--accent); }
+.tl-item:hover span, .tl-item.on span { color: var(--accent); }
+.tl-item span { color: var(--ink-2); font-size: 14px; }
+.open-list { margin: 0; padding-left: 18px; display: grid; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.open-list ul { margin: 4px 0 0; padding-left: 16px; display: grid; gap: 2px; }
+.owed { display: flex; flex-direction: column; gap: 10px; }
+.fold { border-top: 1px solid var(--line); padding-top: 8px; }
+.fold > summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.fold > summary .muted { font-weight: 400; }
+.fold > .md { margin-top: 8px; }
+.themes > summary { cursor: pointer; font-weight: 600; font-size: 14px; }
+.themes[open] > summary { margin-bottom: 8px; }
+.themes > .ref-line { margin-bottom: 6px; }
+.events { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 10px; }
+.events li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.events li:first-child { border-top: 0; padding-top: 0; }
+.ev-date { font-family: var(--f-mono); font-size: 12px; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.events .md { font-size: 13.5px; }
+.events .md p { margin: 0 0 4px; }
+.more { align-self: start; border: 1px solid var(--line-2); background: var(--surface); border-radius: 999px; padding: 4px 12px; cursor: pointer; font-size: 13px; color: var(--ink-2); }
+.more:hover { border-color: var(--accent); color: var(--ink); }
+
+/* Records: markdown rendered from the records' own text */
+.md { font-size: 14.5px; line-height: 1.6; color: var(--ink); min-width: 0; overflow-wrap: anywhere; }
+.md > :first-child { margin-top: 0; }
+.md > :last-child { margin-bottom: 0; }
+.md h1 { font-family: var(--f-display); font-weight: 700; font-size: 28px; line-height: 1.1; margin: 0 0 12px; }
+.md h2 { font-family: var(--f-display); font-weight: 700; font-size: 22px; line-height: 1.15; letter-spacing: 0.01em; margin: 6px 0 8px; }
+.md h3 { font-weight: 700; font-size: 15.5px; margin: 16px 0 6px; }
+.md h4 { font-size: 14px; margin: 12px 0 4px; }
+.md p { margin: 0 0 10px; max-width: 80ch; }
+.md ul, .md ol { margin: 0 0 10px; padding-left: 22px; max-width: 80ch; }
+.md li { margin: 2px 0; }
+.md li > ul, .md li > ol { margin: 2px 0 4px; }
+.md li > p { margin: 0 0 4px; }
+.md blockquote { margin: 0 0 10px; padding: 6px 12px; border-left: 3px solid var(--signal); background: var(--signal-soft); color: var(--ink-2); }
+.md blockquote p { margin: 0 0 4px; }
+.md pre { background: var(--surface-2); border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; overflow-x: auto; font-size: 12.5px; line-height: 1.45; margin: 0 0 10px; overflow-wrap: normal; }
+.md pre code { background: none; border: 0; padding: 0; font-size: inherit; word-break: normal; white-space: pre; }
+.md .md-table { overflow-x: auto; margin: 0 0 12px; border: 1px solid var(--line); border-radius: 4px; }
+.md table { border-collapse: collapse; font-size: 13px; min-width: 100%; overflow-wrap: normal; }
+.md th { text-align: left; font-weight: 700; background: var(--surface-2); padding: 6px 8px; border-bottom: 1px solid var(--line-2); vertical-align: bottom; }
+.md td { padding: 6px 8px; border-top: 1px solid var(--line); vertical-align: top; min-width: 8em; max-width: 46ch; overflow-wrap: anywhere; }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 14px 0; }
+.md a { color: var(--accent); }
+.md .dead { border-bottom: 1px dotted var(--line-2); }
+.md-raw { white-space: pre-wrap; font-family: var(--f-mono); font-size: 12.5px; margin: 0; }
+.xref { cursor: pointer; color: var(--accent); }
+code.xref { border-color: var(--accent); }
+code.xref:hover { background: var(--accent-soft); }
+.rec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; }
+.rec-path { font-family: var(--f-mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; min-width: 0; }
+.rec-doc { padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.rec-sec { scroll-margin-top: calc(var(--top-h) + 16px); border-radius: 4px; }
+.rec-sec + .rec-sec { border-top: 1px solid var(--line); padding-top: 12px; }
+.rec-sec.flash { animation: flash 1.8s ease-out; }
+@keyframes flash { from { background: var(--signal-soft); } to { background: transparent; } }
+.toc { list-style: none; margin: 0; padding: 0; display: grid; gap: 1px; }
+.toc button { border: 0; background: none; text-align: left; padding: 3px 6px; border-radius: 4px; cursor: pointer; font-size: 13.5px; color: var(--ink-2); width: 100%; }
+.toc button:hover { background: var(--surface-2); color: var(--ink); }
+.toc .l3 button { padding-left: 22px; font-size: 12.5px; }
+.toc .tag { font-family: var(--f-mono); font-size: 11px; color: var(--accent); margin-right: 5px; }
+.results { display: flex; flex-direction: column; gap: 6px; }
+.sresult { display: block; width: 100%; text-align: left; padding: 10px 12px; cursor: pointer; }
+.sresult:hover { border-color: var(--line-2); }
+.sr-where { font-size: 12px; color: var(--muted); font-family: var(--f-mono); }
+.sr-title { font-weight: 700; font-size: 14px; }
+.sr-snip { font-size: 13px; color: var(--ink-2); overflow-wrap: anywhere; }
+mark { background: var(--signal-soft); color: var(--ink); padding: 0 1px; border-radius: 2px; }
+@media (min-width: 1100px) { .toc-open { display: none; } }
+
+/* Compare */
+.cmp-two { display: grid; gap: 16px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 900px) { .cmp-two { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } }
+.side { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.side-label { display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-display); font-weight: 700; font-size: 15px; letter-spacing: 0.08em; text-transform: uppercase; }
+.side-label::before { content: ""; width: 10px; height: 10px; border-radius: 2px; background: var(--sc); flex: none; }
+.today { --sc: var(--muted); }
+.target { --sc: var(--accent); }
+.change { --sc: var(--signal); }
+.side.today { border-top: 3px solid var(--muted); }
+.side.target { border-top: 3px solid var(--accent); }
+.panel.change { border-top: 3px solid var(--signal); }
+.scroll-box { max-height: 460px; overflow: auto; padding-right: 4px; }
+.ref-line { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 12.5px; color: var(--muted); }
+.gapbar { display: inline-flex; height: 8px; width: 110px; background: var(--surface-2); border: 1px solid var(--line); border-radius: 2px; overflow: hidden; vertical-align: middle; margin-right: 8px; }
+.gapbar span { display: block; height: 100%; }
+.gapbar .h { background: var(--bad); } .gapbar .m { background: var(--warn); } .gapbar .l { background: var(--line-2); }
+.area-title { font-family: var(--f-display); font-weight: 700; font-size: 24px; text-transform: uppercase; letter-spacing: 0.02em; }
+.sub-head { font-weight: 700; font-size: 14px; margin: 4px 0 2px; }
+.how { color: var(--muted); font-size: 13px; max-width: 80ch; }
+
+/* Principles */
+.p-grid { display: grid; gap: 10px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .p-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.p-card { padding: 12px 14px; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.p-card.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.p-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; align-items: baseline; border: 0; background: none; padding: 0; text-align: left; cursor: pointer; }
+.p-head:hover .p-title { color: var(--accent); }
+.p-num { font-family: var(--f-display); font-weight: 700; font-size: 24px; line-height: 1; color: var(--accent); min-width: 2.1em; font-variant-numeric: tabular-nums; }
+.p-title { font-weight: 700; font-size: 15px; line-height: 1.3; }
+.p-card .md { font-size: 13.5px; }
+
+/* Decisions */
+.trail { display: flex; flex-direction: column; gap: 6px; }
+.dec-day { font-family: var(--f-display); font-weight: 700; font-size: 18px; letter-spacing: 0.06em; margin: 12px 0 0; }
+.dec-rec { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 8px 0 0; font-size: 13px; color: var(--muted); }
+.dec-rec b { font-family: var(--f-mono); font-weight: 600; color: var(--ink-2); font-size: 12.5px; }
+.dec { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.dec > summary { cursor: pointer; padding: 8px 12px; display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; list-style: none; }
+.dec > summary::-webkit-details-marker { display: none; }
+.dec > summary::before { content: "+"; font-family: var(--f-mono); color: var(--muted); width: 1ch; }
+.dec[open] > summary::before { content: "\2212"; }
+.d-title { font-weight: 600; min-width: 0; }
+.d-body { padding: 10px 14px 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 8px; }
+.dkind { font-family: var(--f-mono); font-size: 11px; padding: 0 7px; border-radius: 999px; border: 1px solid transparent; white-space: nowrap; }
+.dkind.words { background: var(--signal-soft); color: var(--signal); }
+.dkind.asked { background: var(--accent-soft); color: var(--accent); }
+.dkind.settled { background: var(--ok-soft); color: var(--ok); }
+.dkind.round { background: var(--surface-2); color: var(--ink-2); border-color: var(--line-2); }
+
+/* Inspector */
+.inspector { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px 18px; display: flex; flex-direction: column; gap: 10px; }
+.insp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.insp-close { display: none; border: 1px solid var(--line); background: var(--surface-2); border-radius: 999px; width: 32px; height: 32px; cursor: pointer; font-size: 18px; line-height: 1; }
+.insp-title { font-family: var(--f-display); font-weight: 700; font-size: 24px; line-height: 1.1; text-transform: none; word-break: break-word; }
+.insp-title.mono { font-family: var(--f-mono); font-size: 18px; text-transform: none; }
+.insp-body { display: flex; flex-direction: column; gap: 12px; font-size: 14px; }
+.insp-body h4 { margin: 0 0 3px; font-family: var(--f-display); font-weight: 600; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.insp-body p { margin: 0; }
+.insp-body .refs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.insp-body ul { margin: 0; padding-left: 18px; display: grid; gap: 3px; }
+.insp-body .md { font-size: 13.5px; }
+.gap-item { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 8px; padding: 6px 0; border-top: 1px solid var(--line); }
+.gap-item .gid { font-family: var(--f-mono); font-size: 12px; }
+.gap-item p { grid-column: 1 / -1; color: var(--ink-2); font-size: 13px; }
+.kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 3px 10px; font-size: 13.5px; margin: 0; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+.kv dd.md, .lane dd.md { font-size: inherit; }
+.kv dd.md p, .lane dd.md p, .kv dd.md ul, .lane dd.md ul { margin: 0 0 4px; }
+@media (min-width: 1100px) {
+  .inspector { position: sticky; top: calc(var(--top-h) + env(safe-area-inset-top, 0px) + 16px); max-height: calc(100vh - var(--top-h) - 32px); overflow: auto; align-self: start; }
+}
+@media (max-width: 1099.98px) {
+  .inspector { position: fixed; z-index: 40; left: 0; right: 0; bottom: 0; max-height: 72vh; overflow: auto; border-radius: 12px 12px 0 0; border-width: 1px 0 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-bottom: calc(18px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.18); transform: translateY(105%); transition: transform .25s ease; }
+  .inspector.open { transform: none; }
+  .insp-close { display: inline-grid; place-items: center; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.foot { color: var(--muted); font-size: 12.5px; border-top: 1px solid var(--line); padding-top: 12px; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.muted { color: var(--muted); }
+/* the memory view (the away pass, point 1) */
+.mem-legend { margin: 2px 0 0; font-size: 13px; }
+.mem-legend .lg { display: inline-block; padding: 0 6px; border-radius: 3px; margin-right: 4px; border: 1px solid var(--line-2); }
+.mem-legend .lg-typed { border-color: var(--accent); color: var(--accent); }
+.mem-legend .lg-partly { border-style: dashed; border-color: var(--accent); color: var(--accent); }
+.mem-legend .lg-none { border-style: dashed; border-color: var(--signal); color: var(--signal); }
+.marc path { fill: none; stroke-width: 2; }
+.marc-typed path { stroke: var(--accent); }
+.marc-partly path { stroke: var(--accent); stroke-dasharray: 6 4; }
+.marc-none path { stroke: var(--signal); stroke-dasharray: 3 4; }
+.marc.hot path { stroke-width: 3.5; }
+.mah-typed, .mah-partly { fill: var(--accent); }
+.mah-none { fill: var(--signal); }
+.marc-label { fill: var(--ink-2); font-family: var(--f-mono); font-size: 11px; paint-order: stroke; stroke: var(--surface); stroke-width: 3px; }
+.mem-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+.mfam-card.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+.mfam-name { border: 0; background: none; padding: 0; font-family: var(--f-display); font-weight: 700; font-size: 19px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink); cursor: pointer; display: flex; gap: 8px; align-items: center; }
+.mfam-holds { color: var(--ink-2); font-size: 13.5px; margin: 6px 0 8px; }
+.pk { --lc: var(--line-2); }
+.pk-node { --lc: var(--accent); }
+.pk-witness { --lc: var(--signal); }
+.pk-edge-site { --lc: var(--l-design); }
+.pk-folded, .pk-out { color: var(--muted); }
+.kind.pk-node { border-color: var(--accent); color: var(--accent); }
+.kind.pk-witness { border-color: var(--signal); color: var(--signal); }
+.mk-row { display: grid; gap: 4px; margin: 6px 0; }
+.me-new { --lc: var(--signal); }
+.me-p33 { --lc: var(--accent); }
+.me-derived { --lc: var(--line-2); }
+.hs { font-family: var(--f-mono); font-size: 11px; padding: 0 6px; border-radius: 999px; border: 1px solid var(--line-2); white-space: nowrap; }
+.hs-typed { border-color: var(--accent); color: var(--accent); }
+.hs-partly-typed { border-color: var(--accent); border-style: dashed; color: var(--accent); }
+.hs-prose, .hs-search, .hs-none { border-color: var(--signal); color: var(--signal); }
+tr[data-medge] { cursor: pointer; }
+tr[data-medge].on td { background: var(--accent-soft); }
+</style>
+
+<header class="top">
+  <div class="stripe" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+  <div class="top-inner gutter">
+    <div class="brand">
+      <div class="wordmark">Closed <b>Loop</b> Atlas</div>
+      <div class="sub">gov, re-architected onto one loop · derived from build <code>dClosedLoop</code>'s records · <span id="derived"></span></div>
+    </div>
+    <nav class="tabs" role="tablist" aria-label="Views">
+      <button class="tab" role="tab" id="tab-overview" data-view="overview" aria-controls="view-overview">Layers</button>
+      <button class="tab" role="tab" id="tab-compare" data-view="compare" aria-controls="view-compare">Today vs target</button>
+      <button class="tab" role="tab" id="tab-flow" data-view="flow" aria-controls="view-flow">Flow</button>
+      <button class="tab" role="tab" id="tab-lifecycle" data-view="lifecycle" aria-controls="view-lifecycle">Lifecycle</button>
+      <button class="tab" role="tab" id="tab-roles" data-view="roles" aria-controls="view-roles">Roles</button>
+      <button class="tab" role="tab" id="tab-memory" data-view="memory" aria-controls="view-memory">Memory</button>
+      <button class="tab" role="tab" id="tab-chain" data-view="chain" aria-controls="view-chain">Chain</button>
+      <button class="tab" role="tab" id="tab-policies" data-view="policies" aria-controls="view-policies">Policies</button>
+      <button class="tab" role="tab" id="tab-principles" data-view="principles" aria-controls="view-principles">Principles</button>
+      <button class="tab" role="tab" id="tab-decisions" data-view="decisions" aria-controls="view-decisions">Decisions</button>
+      <button class="tab" role="tab" id="tab-progress" data-view="progress" aria-controls="view-progress">Progress</button>
+      <button class="tab" role="tab" id="tab-records" data-view="records" aria-controls="view-records">Records</button>
+    </nav>
+  </div>
+</header>
+
+<div class="shell gutter">
+  <main id="views" class="view-host">
+    <section id="view-overview" class="view" role="tabpanel" aria-labelledby="tab-overview"></section>
+    <section id="view-compare" class="view" role="tabpanel" aria-labelledby="tab-compare" hidden></section>
+    <section id="view-flow" class="view" role="tabpanel" aria-labelledby="tab-flow" hidden></section>
+    <section id="view-lifecycle" class="view" role="tabpanel" aria-labelledby="tab-lifecycle" hidden></section>
+    <section id="view-roles" class="view" role="tabpanel" aria-labelledby="tab-roles" hidden></section>
+    <section id="view-memory" class="view" role="tabpanel" aria-labelledby="tab-memory" hidden></section>
+    <section id="view-chain" class="view" role="tabpanel" aria-labelledby="tab-chain" hidden></section>
+    <section id="view-policies" class="view" role="tabpanel" aria-labelledby="tab-policies" hidden></section>
+    <section id="view-principles" class="view" role="tabpanel" aria-labelledby="tab-principles" hidden></section>
+    <section id="view-decisions" class="view" role="tabpanel" aria-labelledby="tab-decisions" hidden></section>
+    <section id="view-progress" class="view" role="tabpanel" aria-labelledby="tab-progress" hidden></section>
+    <section id="view-records" class="view" role="tabpanel" aria-labelledby="tab-records" hidden></section>
+  </main>
+  <aside id="inspector" class="inspector" aria-label="Details" aria-live="polite">
+    <div class="insp-head">
+      <span class="eyebrow" id="insp-eyebrow">Details</span>
+      <button id="insp-close" class="insp-close" type="button" aria-label="Close details">×</button>
+    </div>
+    <h2 id="insp-title" class="insp-title">Select anything</h2>
+    <div id="insp-body" class="insp-body"><p class="muted">Pick a layer, an item, a state, a build or a review, and its record shows here.</p></div>
+  </aside>
+</div>
+
+<script id="atlas-data" type="application/json">{}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.3.0/marked.min.js"></script>
+<script>
+(function () {
+  'use strict';
+  var D = JSON.parse(document.getElementById('atlas-data').textContent);
+  if (!D.records) {
+    document.getElementById('views').innerHTML = '<p class="lede">This file is the atlas template, without its data. The generator beside it splices the records in: run it with <code>--out &lt;page.html&gt;</code> and open that page.</p>';
+    return;
+  }
+  var NS = 'http://www.w3.org/2000/svg';
+
+  // ---------- helpers ----------
+  function $(s, el) { return (el || document).querySelector(s); }
+  function $$(s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); }
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function md(s) { return esc(s).replace(/`([^`]+)`/g, '<code>$1</code>').replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>'); }
+  function el(tag, attrs, html) {
+    var e = document.createElement(tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) {
+      if (k === 'class') e.className = attrs[k]; else if (k === 'text') e.textContent = attrs[k]; else e.setAttribute(k, attrs[k]);
+    });
+    if (html != null) e.innerHTML = html;
+    return e;
+  }
+  function sv(tag, attrs, text) {
+    var e = document.createElementNS(NS, tag);
+    if (attrs) Object.keys(attrs).forEach(function (k) { e.setAttribute(k, attrs[k]); });
+    if (text != null) e.textContent = text;
+    return e;
+  }
+  function memo(k, v) { try { if (v === undefined) return localStorage.getItem(k); localStorage.setItem(k, v); } catch (e) { return null; } return null; }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+  function onActivate(node, fn) {
+    node.addEventListener('click', fn);
+    node.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' || ev.key === ' ') { ev.preventDefault(); fn(ev); } });
+  }
+  function svgButton(g, label, fn) { g.setAttribute('tabindex', '0'); g.setAttribute('role', 'button'); g.setAttribute('aria-label', label); onActivate(g, fn); }
+
+  // ---------- the records, and markdown rendered from their text ----------
+  var REC = {}, BYFILE = {}, SEC = {};
+  D.records.forEach(function (r) {
+    REC[r.path] = r; BYFILE[r.path.split('/').pop()] = r;
+    r.sections.forEach(function (s) { SEC[r.path + '#' + s.id] = s; });
+  });
+  var GROUPS = ['Architecture', 'Layers', 'Register and comparisons', 'Foundations and walks', 'Journal', 'Reviews', 'Research returns'];
+  function recNamed(name) { return D.records.find(function (r) { return r.name === name && r.group !== 'Reviews'; }); }
+  var V2 = recNamed('architecture-v2');
+  function unesc(s) { return s.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&'); }
+  function recFor(ref) {
+    var base = String(ref).split('#')[0].split('?')[0].split('/').pop();
+    return /\.md$/.test(base) ? BYFILE[base] || null : null;
+  }
+  var MK = window.marked && typeof window.marked.parse === 'function' ? window.marked : null;
+  if (MK) {
+    MK.use({
+      gfm: true, headerIds: false, mangle: false,
+      renderer: {
+        html: function (html) { return /^\s*<!--[\s\S]*-->\s*$/.test(html) ? '' : esc(html); },
+        link: function (href, title, text) {
+          href = href || '';
+          if (/^https?:\/\//i.test(href)) return '<a href="' + esc(href) + '" target="_blank" rel="noopener">' + text + '</a>';
+          var r = recFor(href);
+          if (r) return '<a href="#records" class="xref" data-path="' + esc(r.path) + '">' + text + '</a>';
+          return '<span class="dead" title="' + esc(href) + '">' + text + '</span>';
+        },
+        codespan: function (code) {
+          var r = recFor(unesc(code));
+          return r ? '<code class="xref" data-path="' + esc(r.path) + '" role="link" tabindex="0">' + code + '</code>' : '<code>' + code + '</code>';
+        },
+        table: function (header, body) {
+          return '<div class="md-table"><table><thead>' + header + '</thead>' + (body ? '<tbody>' + body + '</tbody>' : '') + '</table></div>';
+        }
+      }
+    });
+  }
+  var MDC = {};
+  function mdHTML(text, key) {
+    if (key && MDC[key]) return MDC[key];
+    var out;
+    try { out = MK ? MK.parse(text) : '<pre class="md-raw">' + esc(text) + '</pre>'; }
+    catch (e) { out = '<pre class="md-raw">' + esc(text) + '</pre>'; }
+    if (key) MDC[key] = out;
+    return out;
+  }
+  function mdDiv(text, key, cls) { return el('div', { class: 'md' + (cls ? ' ' + cls : '') }, mdHTML(text, key)); }
+  function bodyOf(s) { return s.md.replace(/^#{1,3} [^\n]*\n?/, ''); }
+  function secLabel(path, id) {
+    var r = REC[path], s = SEC[path + '#' + id];
+    if (!r || !s) return id;
+    if (s.tag) return r.name + ' [' + s.tag + ']';
+    var parts = id.split('/');
+    var parent = parts.length > 1 ? SEC[path + '#' + parts[0]] : null;
+    return r.name + ' › ' + (parent ? parent.title + ' › ' : '') + (s.title || id);
+  }
+  function refChip(path, id, label) {
+    var b = el('button', { class: 'ichip ref', type: 'button', title: path + (id ? ' · ' + id : '') }, esc(label || (id ? secLabel(path, id) : (REC[path] ? REC[path].name : path))));
+    b.addEventListener('click', function () { openRecord(path, id); });
+    return b;
+  }
+  document.addEventListener('click', function (ev) {
+    var x = ev.target.closest ? ev.target.closest('.xref[data-path]') : null;
+    if (!x) return;
+    ev.preventDefault();
+    openRecord(x.getAttribute('data-path'));
+  });
+  document.addEventListener('keydown', function (ev) {
+    var t = ev.target;
+    if ((ev.key === 'Enter' || ev.key === ' ') && t.matches && t.matches('code.xref[data-path]')) { ev.preventDefault(); openRecord(t.getAttribute('data-path')); }
+  });
+
+  // ---------- derived indexes ----------
+  var STEP_META = {
+    entry: { badge: '0' }, plan: { badge: '1' }, design: { badge: '2' }, build: { badge: '3' },
+    test: { badge: '4' }, deploy: { badge: '5' }, breakpoint: { badge: 'R' }, lifecycle: { badge: 'C' }, adopt: { badge: 'A' }
+  };
+  var ITEMS = {}, STEP_OF = {}, NEEDED_BY = {}, ROUTED_FROM = {}, STEP = {};
+  D.steps.forEach(function (s) {
+    var parts = s.title.split(': ');
+    s.name = parts[0]; s.question = parts.slice(1).join(': ');
+    STEP[s.tag] = s;
+    s.items.forEach(function (it) { ITEMS[it.tag] = it; STEP_OF[it.tag] = s; });
+  });
+  D.steps.forEach(function (s) {
+    s.items.forEach(function (it) {
+      it.needsRefs.forEach(function (t) { (NEEDED_BY[t] = NEEDED_BY[t] || []).push(it.tag); });
+      it.thenRefs.forEach(function (t) { (ROUTED_FROM[t] = ROUTED_FROM[t] || []).push(it.tag); });
+    });
+  });
+  var N_ITEMS = Object.keys(ITEMS).length;
+  var LAYER = {}; D.layers.forEach(function (l) { LAYER[l.tag] = l; });
+  var BUILD = {}; D.chain.forEach(function (c) { BUILD[c.build] = c; });
+  var GAP = {}; D.gaps.forEach(function (g) { GAP[g.id] = g; });
+  var SEV_ORDER = { HIGH: 0, MED: 1, LOW: 2 };
+  var MAX_GAPS = Math.max.apply(null, D.chain.map(function (c) { return c.gaps.length; }).concat([1]));
+  var REVIEW = {}; D.reviews.forEach(function (r) { REVIEW[r.file] = r; });
+  var AREA = {}; D.areas.forEach(function (a) { AREA[a.key] = a; });
+  var PRIN = {}; D.principles.forEach(function (p) { PRIN[p.n] = p; });
+  var LIBSET = {}; D.libraryItems.forEach(function (t) { LIBSET[t] = true; });
+  var PROG = {}; D.progress.forEach(function (p) { PROG[p.layer] = p; });
+  // The memory view's indexes: families, pockets, record kinds, edge types and the cycle's hops (the away pass, point 1)
+  var MEM = D.memory, FAM = {}, POCKET = {}, MKIND = {}, MEDGE = {};
+  MEM.families.forEach(function (f) { FAM[f.family] = f; f.pockets = []; f.out = []; f.in = []; });
+  MEM.pockets.forEach(function (p) { POCKET[p.pocket] = p; FAM[p.family].pockets.push(p); });
+  MEM.kinds.forEach(function (k) { MKIND[k.kind] = k; });
+  MEM.edges.forEach(function (e) { MEDGE[e.edge] = e; e.hops = []; });
+  MEM.hops.forEach(function (h) { FAM[h.from].out.push(h); if (h.to !== h.from) FAM[h.to].in.push(h); h.edges.forEach(function (e) { MEDGE[e].hops.push(h); }); });
+  var HOP_STATE = { 'typed': 'typed today', 'partly typed': 'partly typed', 'prose': 'prose today', 'search': 'search today', 'none': 'no link today' };
+  function sevCount(ids) { var c = { HIGH: 0, MED: 0, LOW: 0 }; ids.forEach(function (id) { c[GAP[id].sev]++; }); return c; }
+  function bySev(a, b) { return SEV_ORDER[GAP[a].sev] - SEV_ORDER[GAP[b].sev] || (a < b ? -1 : 1); }
+  function kitsOf(tag) { return D.kits.filter(function (k) { return new RegExp('\\b' + tag + '\\b', 'i').test(k.layer.split(/[:;]/)[0]); }); }
+
+  function itemChip(tag) {
+    var s = STEP_OF[tag];
+    var b = el('button', { class: 'ichip', type: 'button', style: '--lc: var(--l-' + (s ? s.tag : 'entry') + ')', title: tag }, esc(tag));
+    b.addEventListener('click', function () { select('item', tag); });
+    return b;
+  }
+  function buildChip(name) {
+    var b = el('button', { class: 'ichip', type: 'button' }, esc(name));
+    b.addEventListener('click', function () { select('build', name); });
+    return b;
+  }
+  function gapChip(id) {
+    var b = el('button', { class: 'ichip', type: 'button', title: GAP[id] ? GAP[id].gap.replace(/`/g, '') : id }, esc(id));
+    b.addEventListener('click', function () { select('gap', id); });
+    return b;
+  }
+
+  // ---------- inspector ----------
+  var insp = $('#inspector');
+  var current = {};
+  function inspector(eyebrow, title, mono, nodes) {
+    $('#insp-eyebrow').textContent = eyebrow;
+    var t = $('#insp-title'); t.textContent = title; t.className = 'insp-title' + (mono ? ' mono' : '');
+    var body = $('#insp-body'); body.innerHTML = '';
+    nodes.forEach(function (n) { if (n) body.appendChild(n); });
+    insp.scrollTop = 0;
+  }
+  function block(label, html, extra) {
+    var d = el('div');
+    d.appendChild(el('h4', { text: label }));
+    if (html != null) d.appendChild(el('div', null, html));
+    if (extra) d.appendChild(extra);
+    return d;
+  }
+  function chips(list, make) { var w = el('div', { class: 'refs' }); list.forEach(function (x) { w.appendChild(make(x)); }); return w; }
+  function kvList(pairs, raw) {
+    var dl = el('dl', { class: 'kv' });
+    pairs.forEach(function (p) { dl.appendChild(el('dt', { text: p[0] })); dl.appendChild(el('dd', null, raw ? p[1] : md(p[1]))); });
+    return dl;
+  }
+  $('#insp-close').addEventListener('click', function () { insp.classList.remove('open'); });
+  document.addEventListener('keydown', function (ev) { if (ev.key === 'Escape') insp.classList.remove('open'); });
+
+  var activeView = 'overview';
+  function select(type, id, quiet) {
+    current[activeView] = { type: type, id: id };
+    memo('atlas.sel.' + activeView, type + '|' + id);
+    ({ layer: showLayer, item: showItem, state: showState, edge: showEdge, build: showBuild, review: showReview, revision: showRevision,
+       gap: showGap, role: showRole, area: showArea, principle: showPrinciple, record: showRecord, trail: showTrail,
+       family: showFamily, pocket: showPocket, kind: showKind, medge: showMedge })[type](id);
+    highlight();
+    if (!quiet) insp.classList.add('open');
+  }
+
+  function showLayer(tag) {
+    var L = LAYER[tag];
+    var kits = kitsOf(tag);
+    var prog = PROG[tag];
+    var nodes = [el('p', null, '<span class="kind ' + esc(L.kind) + '">' + esc(L.kind) + '</span>'), block('What it is', md(L.what))];
+    if (kits.length) {
+      var ul = el('ul');
+      kits.forEach(function (k) { ul.appendChild(el('li', null, '<strong>' + md(k.kit) + '</strong> · ' + md(k.layer) + ' <span class="muted">(' + esc(k.kind) + ')</span>')); });
+      nodes.push(block('Kits', null, ul));
+    }
+    if (prog) {
+      var rv = el('div', { class: 'refs' });
+      prog.reviews.forEach(function (f) {
+        var r = REVIEW[f]; var b = el('button', { class: 'ichip', type: 'button' }, esc(r.scope) + ' · ' + r.confirmed + ' confirmed');
+        b.addEventListener('click', function () { select('review', f); }); rv.appendChild(b);
+      });
+      nodes.push(block('Reviews', (prog.reviews.length ? prog.reviews.length + ' Tier-2 rounds' : 'none yet') + (prog.folded ? ', folded into the records' : ''), rv));
+      var byRec = {};
+      prog.sections.forEach(function (s) { (byRec[s.path] = byRec[s.path] || []).push(s); });
+      var wrap = el('div', { class: 'owed' });
+      Object.keys(byRec).forEach(function (p) {
+        var d = el('div');
+        d.appendChild(el('div', { class: 'sub-head' }, esc(REC[p].name)));
+        d.appendChild(chips(byRec[p], function (s) { return refChip(p, s.id, (s.tag ? '[' + s.tag + '] ' : '') + (s.title || s.id)); }));
+        wrap.appendChild(d);
+      });
+      nodes.push(block('Design records, section by section', null, wrap));
+    } else {
+      nodes.push(block('Design records', '<span class="muted">Not designed yet. An expansion gets its own round once the core is done.</span>'));
+    }
+    if (tag === 'memory' || tag === 'instruction') {
+      var mv = el('button', { class: 'ichip ref', type: 'button' }, 'Open the Memory view');
+      mv.addEventListener('click', function () { goView('memory'); });
+      nodes.splice(2, 0, block('Drawn whole', 'One graph with instruction: its families, pockets, edges and cycle.', mv));
+    }
+    if (tag === 'memory') {
+      var lr = D.libraryRound;
+      nodes.push(block("The library side's round", esc(libraryState()), openList(lr.open)));
+    }
+    inspector('Layer', cap(tag), false, nodes);
+  }
+  function libraryState() {
+    var lr = D.libraryRound;
+    var n = lr.reviews.length;
+    return (n ? 'Reviewed ' + (n === 1 ? 'once' : n === 2 ? 'twice' : n + ' times') + ' at Tier 2' : 'Not reviewed yet') + (lr.folded ? ', folded' : '') +
+      (lr.open.length ? '; ' + plural(lr.open.length, 'item') + ' owed.' : '; nothing owed.');
+  }
+  function openList(items) {
+    var ol = el('ul', { class: 'open-list' });
+    items.forEach(function (o) {
+      var li = el('li', null, '<strong>' + md(o.label) + '</strong>' + (o.text ? ' ' + md(o.text) : ''));
+      if (o.items.length) { var u = el('ul'); o.items.forEach(function (x) { u.appendChild(el('li', null, md(x))); }); li.appendChild(u); }
+      ol.appendChild(li);
+    });
+    return ol;
+  }
+
+  function contractList(con) {
+    return kvList([['Takes in', con.takes], ['Hands out', con.hands], ['Witness', con.witness], ['Owner gate', con.gate], ['Review', con.review]]);
+  }
+  function showItem(tag) {
+    var it = ITEMS[tag], s = STEP_OF[tag];
+    var con = D.contracts.find(function (c) { return c.stage === s.name; });
+    var actor = '<span class="kind">' + esc(it.kind) + '</span> ' + md(it.actor);
+    var nodes = [
+      block('Step', '<span class="badge" style="--lc: var(--l-' + s.tag + '); width:20px;height:20px;font-size:13px;display:inline-grid;vertical-align:middle">' + STEP_META[s.tag].badge + '</span> ' + esc(s.name)),
+      block('Actor', actor),
+      block('Needs', md(it.needs), it.needsRefs.length ? chips(it.needsRefs, itemChip) : null),
+      block('Does', md(it.does)),
+      block('Proven by', md(it.proof)),
+      block('Then', md(it.then), it.thenRefs.length ? chips(it.thenRefs, itemChip) : null)
+    ];
+    if (LIBSET[tag]) nodes.splice(2, 0, el('p', null, '<span class="kind core">library flow point</span> <span class="muted">The library side of memory fills here.</span>'));
+    if ((NEEDED_BY[tag] || []).length) nodes.push(block('Needed by', null, chips(NEEDED_BY[tag], itemChip)));
+    if ((ROUTED_FROM[tag] || []).length) nodes.push(block('Routed here from', null, chips(ROUTED_FROM[tag], itemChip)));
+    if (con) nodes.push(block(s.name + "'s stage contract", null, contractList(con)));
+    inspector('Flow item', tag, true, nodes);
+  }
+
+  // ---------- views ----------
+  var views = {};
+
+  // Layers
+  views.overview = function (v) {
+    var core = D.layers.filter(function (l) { return l.kind === 'core'; });
+    var exp = D.layers.filter(function (l) { return l.kind !== 'core'; });
+    var head = el('div');
+    var th = el('h1', { class: 'thesis' });
+    D.oneLine.replace(/\.$/, '').split(', ').forEach(function (clause, i, all) {
+      var w = clause.split(' '), tag = w[0].toLowerCase();
+      if (LAYER[tag]) {
+        var b = el('button', { type: 'button' }, esc(w[0]));
+        b.addEventListener('click', function () { select('layer', tag); });
+        th.appendChild(b);
+      } else th.appendChild(document.createTextNode(w[0]));
+      th.appendChild(document.createTextNode(' ' + w.slice(1).join(' ') + (i < all.length - 1 ? ', ' : '.')));
+    });
+    head.appendChild(el('div', { class: 'eyebrow', text: 'The layer model, in one line' }));
+    head.appendChild(th);
+    v.appendChild(head);
+    var stats = el('div', { class: 'chips' });
+    [[core.length, 'core layers'], [exp.length, 'expansions'], [N_ITEMS, 'flow items'], [D.transitions.length, 'state transitions'],
+     [D.chain.length, 'chain builds'], [D.gaps.length, 'gaps owned'], [D.policies.length, 'policy keys'], [D.principles.length, 'principles'],
+     [D.decisions.length, 'decision sections'], [D.records.length, 'records']].forEach(function (p) {
+      stats.appendChild(el('span', { class: 'chip' }, '<b>' + p[0] + '</b>' + esc(p[1])));
+    });
+    v.appendChild(stats);
+
+    var grid = el('div', { class: 'ov-grid' });
+    var dia = el('div', { class: 'panel diagram scroll-x' });
+    dia.appendChild(loopDiagram());
+    grid.appendChild(dia);
+    var side = el('div', { class: 'layer-list' });
+    side.appendChild(el('div', { class: 'eyebrow', text: 'Core: carries one build from request to landing' }));
+    core.forEach(function (l) { side.appendChild(layerCard(l)); });
+    side.appendChild(el('div', { class: 'eyebrow group-label', text: 'Expansions: plug in at declared extension points' }));
+    exp.forEach(function (l) { side.appendChild(layerCard(l)); });
+    grid.appendChild(side);
+    v.appendChild(grid);
+
+    var two = el('div', { class: 'two-col' });
+    var c1 = el('div', { class: 'panel box' });
+    c1.appendChild(el('div', { class: 'eyebrow', text: 'The core is a cycle on a base' }));
+    var ul1 = el('ul', { class: 'cycle-list' }); D.cycle.forEach(function (c) { ul1.appendChild(el('li', null, md(c))); }); c1.appendChild(ul1);
+    var c2 = el('div', { class: 'panel box' });
+    c2.appendChild(el('div', { class: 'eyebrow', text: 'Every layer fills one contract' }));
+    var ul2 = el('ul', { class: 'cycle-list' }); D.contract.forEach(function (c) { ul2.appendChild(el('li', null, md(c))); }); c2.appendChild(ul2);
+    two.appendChild(c1); two.appendChild(c2);
+    v.appendChild(two);
+
+    var map = el('div', { class: 'panel box' });
+    map.appendChild(el('div', { class: 'eyebrow', text: 'Architecture v2, section by section, and where this atlas shows it' }));
+    var tw = el('div', { class: 'scroll-x' });
+    var tb = el('table', { class: 'data' });
+    tb.innerHTML = '<thead><tr><th>Section of the converged design</th><th>Shown in</th></tr></thead>';
+    var body = el('tbody');
+    var VIEWNAME = { overview: 'Layers', principles: 'Principles', policies: 'Policies', flow: 'Flow', chain: 'Chain', progress: 'Progress', records: 'Records' };
+    D.v2map.forEach(function (m) {
+      var tr = el('tr');
+      var td1 = el('td'); td1.appendChild(refChip(m.path, m.id, '[' + m.id + '] ' + m.title));
+      var td2 = el('td');
+      var b = el('button', { class: 'ichip', type: 'button' }, esc(VIEWNAME[m.view] || m.view));
+      b.addEventListener('click', function () { if (m.view === 'records') openRecord(m.path, m.id); else goView(m.view); });
+      td2.appendChild(b);
+      if (m.view !== 'records') td2.appendChild(el('span', { class: 'muted' }, ' and in full under Records'));
+      tr.appendChild(td1); tr.appendChild(td2); body.appendChild(tr);
+    });
+    tb.appendChild(body); tw.appendChild(tb); map.appendChild(tw);
+    v.appendChild(map);
+  };
+  function layerCard(l) {
+    var b = el('button', { class: 'layer-card', type: 'button', 'data-layer': l.tag, 'aria-pressed': 'false' });
+    b.innerHTML = '<span class="lc-name">' + esc(l.tag) + '</span><span class="kind ' + esc(l.kind) + '">' + esc(l.kind) + '</span><span class="lc-what">' + md(l.what) + '</span>';
+    b.addEventListener('click', function () { select('layer', l.tag); });
+    return b;
+  }
+  function loopDiagram() {
+    var W = 760, H = 610, cx = 360, cy = 250, R = 160;
+    var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'The core cycle: instruction, flow, roles and memory around runtime, with the expansions plugged in' });
+    var defs = sv('defs');
+    var mk = sv('marker', { id: 'ar', viewBox: '0 0 10 10', refX: '8', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto-start-reverse' });
+    mk.appendChild(sv('path', { d: 'M0 0L10 5L0 10z', class: 'arrowhead' })); defs.appendChild(mk); svg.appendChild(defs);
+    function P(deg, r) { var a = deg * Math.PI / 180; return [cx + (r || R) * Math.cos(a), cy + (r || R) * Math.sin(a)]; }
+    var nodes = { instruction: { deg: -90, gap: 34 }, flow: { deg: 0, gap: 20 }, roles: { deg: 90, gap: 34 }, memory: { deg: 180, gap: 27 } };
+    var arcs = [['instruction', 'flow', 'directs the flow'], ['flow', 'roles', 'names the items roles perform'], ['roles', 'memory', 'returns become memory'], ['memory', 'instruction', 'renders the card, feeds next']];
+    arcs.forEach(function (a) {
+      var A = nodes[a[0]], B = nodes[a[1]];
+      var d0 = A.deg + A.gap, d1 = (B.deg < A.deg ? B.deg + 360 : B.deg) - B.gap;
+      var p0 = P(d0), p1 = P(d1);
+      svg.appendChild(sv('path', { d: 'M' + p0[0] + ' ' + p0[1] + ' A' + R + ' ' + R + ' 0 0 1 ' + p1[0] + ' ' + p1[1], class: 'ring', 'marker-end': 'url(#ar)' }));
+      var mid = (A.deg + (B.deg < A.deg ? B.deg + 360 : B.deg)) / 2, lp = P(mid, R + 24);
+      var anchor = Math.cos(mid * Math.PI / 180) > 0 ? 'start' : 'end';
+      svg.appendChild(sv('text', { x: lp[0], y: lp[1] + 4, class: 'ring-label', 'text-anchor': anchor }, a[2]));
+    });
+    var bx = cx - 230, by = 478, bw = 460, bh = 46;
+    var p60 = P(60), p120 = P(120);
+    svg.appendChild(sv('line', { x1: p120[0], y1: p120[1], x2: p120[0], y2: by, class: 'dash' }));
+    svg.appendChild(sv('line', { x1: p60[0], y1: p60[1], x2: p60[0], y2: by, class: 'dash' }));
+    var g = sv('g', { class: 'svg-node base', 'data-layer': 'runtime' });
+    g.appendChild(sv('rect', { x: bx, y: by, width: bw, height: bh, rx: 6, class: 'body' }));
+    g.appendChild(sv('text', { x: cx, y: by + 20, 'text-anchor': 'middle', class: 'n-title' }, 'runtime'));
+    g.appendChild(sv('text', { x: cx, y: by + 36, 'text-anchor': 'middle', class: 'n-sub' }, 'executes the cycle · enforces what instruction states'));
+    svgButton(g, 'Runtime layer', function () { select('layer', 'runtime'); }); svg.appendChild(g);
+    function box(tag, x, y, w, h, sub) {
+      var n = sv('g', { class: 'svg-node core', 'data-layer': tag });
+      n.appendChild(sv('rect', { x: x - w / 2, y: y - h / 2, width: w, height: h, rx: 6, class: 'body' }));
+      n.appendChild(sv('text', { x: x, y: y + (sub ? -2 : 6), 'text-anchor': 'middle', class: 'n-title' }, tag));
+      if (sub) n.appendChild(sv('text', { x: x, y: y + 14, 'text-anchor': 'middle', class: 'n-sub' }, sub));
+      svgButton(n, cap(tag) + ' layer', function () { select('layer', tag); });
+      svg.appendChild(n); return n;
+    }
+    var pi = P(-90), pf = P(0), pr = P(90), pm = P(180);
+    box('instruction', pi[0], pi[1], 160, 50, 'says · levels 0 to 7');
+    box('flow', pf[0], pf[1], 150, 50, 'witnesses · ' + N_ITEMS + ' items');
+    box('roles', pr[0], pr[1], 160, 50, 'perform the items');
+    var mx = pm[0], my = pm[1], mw = 184, mh = 92;
+    var m = sv('g', { class: 'svg-node core', 'data-layer': 'memory' });
+    m.appendChild(sv('rect', { x: mx - mw / 2, y: my - mh / 2, width: mw, height: mh, rx: 6, class: 'body' }));
+    m.appendChild(sv('text', { x: mx, y: my - 22, 'text-anchor': 'middle', class: 'n-title' }, 'memory'));
+    m.appendChild(sv('line', { x1: mx, y1: my - 10, x2: mx, y2: my + mh / 2 - 8, class: 'dash' }));
+    m.appendChild(sv('text', { x: mx - mw / 4, y: my + 8, 'text-anchor': 'middle', class: 'n-sub' }, 'the trail'));
+    m.appendChild(sv('text', { x: mx - mw / 4, y: my + 22, 'text-anchor': 'middle', class: 'n-sub' }, 'what happened'));
+    m.appendChild(sv('text', { x: mx + mw / 4, y: my + 8, 'text-anchor': 'middle', class: 'n-sub' }, 'the library'));
+    m.appendChild(sv('text', { x: mx + mw / 4, y: my + 22, 'text-anchor': 'middle', class: 'n-sub' }, 'what generalizes'));
+    svgButton(m, 'Memory layer: the trail and the library', function () { select('layer', 'memory'); }); svg.appendChild(m);
+    [['map', -64], ['recall', 0], ['lexicon', 64]].forEach(function (c, i) {
+      var ox = mx - mw / 2 - (i === 1 ? 74 : 62), oy = my + c[1];
+      svg.appendChild(sv('line', { x1: ox + 26, y1: oy, x2: mx - mw / 2, y2: my + c[1] / 3, class: 'dash' }));
+      var o = sv('g', { class: 'svg-node opt', 'data-layer': 'memory' });
+      o.appendChild(sv('circle', { cx: ox, cy: oy, r: 26, class: 'body' }));
+      o.appendChild(sv('text', { x: ox, y: oy + 4, 'text-anchor': 'middle', class: 'n-sub' }, c[0]));
+      svgButton(o, 'Memory optional component: ' + c[0], function () { select('layer', 'memory'); }); svg.appendChild(o);
+    });
+    svg.appendChild(sv('text', { x: 8, y: my + 108, class: 'n-sub' }, 'optional components'));
+    function exp(tag, x, y, w, sub, to) {
+      svg.appendChild(sv('line', { x1: to[0], y1: to[1], x2: to[2], y2: to[3], class: 'dash' }));
+      var n = sv('g', { class: 'svg-node exp', 'data-layer': tag });
+      n.appendChild(sv('rect', { x: x - w / 2, y: y - 22, width: w, height: 44, rx: 6, class: 'body' }));
+      n.appendChild(sv('text', { x: x, y: y + 1, 'text-anchor': 'middle', class: 'n-title', style: 'font-size:16px' }, tag));
+      n.appendChild(sv('text', { x: x, y: y + 15, 'text-anchor': 'middle', class: 'n-sub' }, sub));
+      svgButton(n, cap(tag) + ' expansion', function () { select('layer', tag); }); svg.appendChild(n);
+    }
+    exp('observability', 650, 70, 170, 'signals · Maintain', [650, 92, pf[0] + 30, pf[1] - 25]);
+    exp('integrations', 650, 336, 170, 'adapters outside', [650, 314, pf[0] + 30, pf[1] + 25]);
+    exp('distribution', cx, 578, 200, 'installs it all', [cx, 556, cx, by + bh]);
+    return svg;
+  }
+
+  // Today against the target
+  var areaSel = null;
+  views.compare = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'Today against the target' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'What changes, area by area' }));
+    head.appendChild(el('p', { class: 'lede' }, 'Today is the product as the design rounds measured it. The target is what the converged design specifies. The change between them is the gap register: every distance, each owned by one chain build.'));
+    v.appendChild(head);
+    var all = sevCount(D.gaps.map(function (g) { return g.id; }));
+    var stats = el('div', { class: 'chips' });
+    [[D.areas.length, 'areas compared'], [D.gaps.length, 'gaps in the register'], [all.HIGH, 'high'], [all.MED, 'medium'], [all.LOW, 'low'], [D.chain.length, 'builds own them']].forEach(function (p) {
+      stats.appendChild(el('span', { class: 'chip' }, '<b>' + p[0] + '</b>' + esc(p[1])));
+    });
+    v.appendChild(stats);
+
+    var two = el('div', { class: 'cmp-two' });
+    var t = el('div', { class: 'panel box side today' });
+    t.appendChild(el('div', { class: 'side-label', text: 'Today: an implicit loop' }));
+    t.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(D.loops.today.path, D.loops.today.id));
+    t.appendChild(el('div', { class: 'scroll-box' })).appendChild(mdDiv(bodyOf(SEC[D.loops.today.path + '#' + D.loops.today.id]), 'loop-today'));
+    var g = el('div', { class: 'panel box side target' });
+    g.appendChild(el('div', { class: 'side-label', text: 'Target: one closed loop' }));
+    g.appendChild(el('p', { class: 'lede' }, md(D.oneLine)));
+    g.appendChild(el('div', { class: 'sub-head', text: 'The core is a cycle on a base' }));
+    var ul1 = el('ul', { class: 'cycle-list' }); D.cycle.forEach(function (c) { ul1.appendChild(el('li', null, md(c))); }); g.appendChild(ul1);
+    g.appendChild(el('div', { class: 'sub-head', text: 'Every layer fills one contract' }));
+    var ul2 = el('ul', { class: 'cycle-list' }); D.contract.forEach(function (c) { ul2.appendChild(el('li', null, md(c))); }); g.appendChild(ul2);
+    two.appendChild(t); two.appendChild(g);
+    v.appendChild(two);
+
+    var th = el('details', { class: 'panel box themes', open: '' });
+    th.appendChild(el('summary', null, 'The cross-cutting themes <span class="muted">· what today\'s gaps have in common</span>'));
+    th.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(D.loops.themes.path, D.loops.themes.id));
+    th.appendChild(mdDiv(bodyOf(SEC[D.loops.themes.path + '#' + D.loops.themes.id]), 'loop-themes'));
+    v.appendChild(th);
+
+    var tw = el('div', { class: 'panel scroll-x' });
+    var tb = el('table', { class: 'data', id: 'area-table' });
+    tb.innerHTML = '<thead><tr><th>Area</th><th>Layer</th><th>Today, measured in</th><th>Target</th><th>Gaps</th><th>Owned by</th></tr></thead>';
+    var body = el('tbody');
+    D.areas.forEach(function (a) {
+      var c = sevCount(a.gaps), n = a.gaps.length;
+      var tr = el('tr', { class: 'clickable', 'data-area': a.key });
+      tr.appendChild(el('td', null, '<strong>' + esc(a.title) + '</strong>'));
+      tr.appendChild(el('td', null, a.layer ? '<span class="kind ' + esc(LAYER[a.layer] ? LAYER[a.layer].kind : '') + '">' + esc(a.layer) + '</span>' : '<span class="muted">every layer</span>'));
+      var td3 = el('td'); var w3 = el('div', { class: 'ichips' }); a.today.forEach(function (r) { w3.appendChild(refChip(r.path, r.id)); }); td3.appendChild(w3); tr.appendChild(td3);
+      tr.appendChild(el('td', null, esc(targetName(a))));
+      tr.appendChild(el('td', { class: 'num' }, gapBar(c, n) + n + (c.HIGH ? ' · ' + c.HIGH + ' high' : '')));
+      var owners = uniq(a.gaps.map(function (id) { return GAP[id].owner; }));
+      var td6 = el('td'); var w6 = el('div', { class: 'ichips' }); owners.forEach(function (o) { w6.appendChild(buildChip(o)); }); td6.appendChild(w6); tr.appendChild(td6);
+      tr.addEventListener('click', function (ev) { if (ev.target.closest('button')) return; select('area', a.key); var d = $('#area-detail'); if (d) d.scrollIntoView({ block: 'start', behavior: 'smooth' }); });
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); tw.appendChild(tb); v.appendChild(tw);
+    v.appendChild(el('div', { id: 'area-detail', class: 'view', style: 'gap:14px; scroll-margin-top: calc(var(--top-h) + 16px)' }));
+    var saved = memo('atlas.area');
+    renderArea(AREA[saved] ? saved : D.areas[0].key);
+  };
+  function uniq(list) { var seen = {}; return list.filter(function (x) { if (seen[x]) return false; seen[x] = true; return true; }); }
+  function gapBar(c, n) {
+    var max = Math.max.apply(null, D.areas.map(function (a) { return a.gaps.length; }).concat([1]));
+    var w = function (k) { return (c[k] / max * 100).toFixed(1) + '%'; };
+    return '<span class="gapbar" aria-hidden="true"><span class="h" style="width:' + w('HIGH') + '"></span><span class="m" style="width:' + w('MED') + '"></span><span class="l" style="width:' + w('LOW') + '"></span></span>';
+  }
+  function targetName(a) {
+    var t = a.target;
+    if (t.tools) return 'the tools\' fates: each kit, and every part by function';
+    if (t.library) return 'memory\'s library side: four filling paths';
+    if (t.transitions) return 'the flow layer and the build\'s transition table';
+    if (t.step) {
+      var nm = STEP[t.step].name;
+      return (/^the /i.test(nm) ? nm.replace(/^The/, 'the') : 'the ' + nm + ' step') + (t.contract ? ' and its stage contract' : '');
+    }
+    if (t.layer) return 'the ' + t.layer + ' layer' + (t.contract ? ' and the ' + t.contract + ' contract' : '');
+    return '';
+  }
+  function renderArea(key) {
+    var a = AREA[key], host = $('#area-detail'); if (!a || !host) return;
+    areaSel = key; memo('atlas.area', key);
+    host.innerHTML = '';
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'Area · ' + (a.stages.length ? 'register stage ' + a.stages.join(', ') : 'gaps its record cites') }));
+    head.appendChild(el('h2', { class: 'area-title', text: a.title }));
+    host.appendChild(head);
+    var two = el('div', { class: 'cmp-two' });
+    var t = el('div', { class: 'panel box side today' });
+    t.appendChild(el('div', { class: 'side-label', text: 'Today, as measured' }));
+    a.today.forEach(function (r) {
+      var s = SEC[r.path + '#' + r.id];
+      t.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(r.path, r.id));
+      t.appendChild(el('div', { class: 'scroll-box' })).appendChild(mdDiv(bodyOf(s), r.path + '#' + r.id + '#body'));
+    });
+    var g = el('div', { class: 'panel box side target' });
+    g.appendChild(el('div', { class: 'side-label', text: 'The target' }));
+    targetNodes(a).forEach(function (n) { g.appendChild(n); });
+    two.appendChild(t); two.appendChild(g);
+    host.appendChild(two);
+    var c = el('div', { class: 'panel box change side' });
+    var owners = uniq(a.gaps.map(function (id) { return GAP[id].owner; }));
+    c.appendChild(el('div', { class: 'side-label', text: 'The change: ' + plural(a.gaps.length, 'gap') + ', owned by ' + plural(owners.length, 'build') }));
+    if (!a.stages.length) c.appendChild(el('p', { class: 'how' }, 'This area has no register stage of its own. These are the gaps its design record cites, each also listed under its own stage.'));
+    var tw = el('div', { class: 'scroll-x' });
+    var tb = el('table', { class: 'data' });
+    tb.innerHTML = '<thead><tr><th>Gap</th><th>Sev</th><th>What is missing</th><th>Owner</th></tr></thead>';
+    var body = el('tbody');
+    a.gaps.slice().sort(bySev).forEach(function (id) {
+      var gp = GAP[id];
+      var tr = el('tr', { class: 'clickable', 'data-gap': id }, '<td class="key">' + esc(id) + '</td><td><span class="sev ' + esc(gp.sev) + '">' + esc(gp.sev) + '</span></td><td>' + md(gp.gap) + '</td><td class="key">' + esc(gp.owner) + '</td>');
+      tr.addEventListener('click', function () { select('gap', id); });
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); tw.appendChild(tb); c.appendChild(tw);
+    host.appendChild(c);
+    highlight();
+  }
+  function targetNodes(a) {
+    var t = a.target, out = [];
+    if (t.step) {
+      var s = STEP[t.step];
+      out.push(el('div', { class: 'sub-head' }, esc(s.name) + (s.question ? ': ' + esc(s.question) : '')));
+      if (s.enters || s.exits) out.push(stepEnds(s, 'kv'));
+      out.push(el('div', { class: 'sub-head', text: plural(s.items.length, 'item') + ', in order' }));
+      out.push(chips(s.items.map(function (i) { return i.tag; }), itemChip));
+      if (s.policies) out.push(el('p', { class: 'how' }, 'Its policies: ' + md(s.policies)));
+    }
+    if (t.layer) {
+      var L = LAYER[t.layer];
+      out.push(el('div', { class: 'sub-head' }, 'The ' + esc(t.layer) + ' layer <span class="kind ' + esc(L.kind) + '">' + esc(L.kind) + '</span>'));
+      out.push(el('div', { class: 'md' }, '<p>' + md(L.what) + '</p>'));
+      var kits = kitsOf(t.layer);
+      if (kits.length) {
+        out.push(el('div', { class: 'sub-head', text: 'Kits it holds' }));
+        var ul = el('ul', { class: 'cycle-list' });
+        kits.forEach(function (k) { ul.appendChild(el('li', null, '<strong>' + md(k.kit) + '</strong> · ' + md(k.layer))); });
+        out.push(ul);
+      }
+      var prog = PROG[t.layer];
+      if (prog) {
+        out.push(el('div', { class: 'sub-head', text: 'Its design records' }));
+        out.push(chips(uniq(prog.sections.map(function (s) { return s.path; })), function (p) { return refChip(p, null); }));
+      } else {
+        out.push(el('p', { class: 'how' }, 'Not designed yet: an expansion gets its own round once the core is done.'));
+      }
+    }
+    if (t.contract) {
+      var con = D.contracts.find(function (c) { return c.stage === t.contract; });
+      if (con) { out.push(el('div', { class: 'sub-head', text: t.contract + "'s stage contract" })); out.push(contractList(con)); }
+    }
+    if (t.transitions) {
+      out.push(el('p', null, md('The build moves through ' + D.transitions.length + ' declared transitions, each with its witness. The engine refuses any transition the table lacks. Terminal: ' + D.terminal.join(', ') + '.')));
+      var b1 = el('button', { class: 'more', type: 'button', text: 'Open the lifecycle' });
+      b1.addEventListener('click', function () { goView('lifecycle'); });
+      var b2 = el('button', { class: 'more', type: 'button', text: 'Open the flow' });
+      b2.addEventListener('click', function () { goView('flow'); });
+      var w = el('div', { class: 'chips' }); w.appendChild(b1); w.appendChild(b2); out.push(w);
+    }
+    if (t.library) {
+      out.push(el('div', { class: 'sub-head', text: 'The library fills at four declared flow points' }));
+      out.push(miniTable(['Path', 'Where', 'Actor', 'Witness'], D.libraryPaths.map(function (p) { return [p.path, p.where, p.actor, p.witness]; })));
+      out.push(el('div', { class: 'sub-head', text: 'The optional components, and the core without them' }));
+      out.push(miniTable(['Component', 'Where', 'When absent'], D.consult.map(function (c) { return [c.component, c.where, c.absent]; })));
+    }
+    if (t.tools) {
+      out.push(el('div', { class: 'sub-head', text: 'Each kit\'s fate' }));
+      out.push(miniTable(['Kit', 'Fate', 'What becomes of it'], D.kitFates.map(function (k) { return [k.kit, k.fate, k.what]; })));
+      out.push(el('div', { class: 'sub-head', text: 'Every part, function by function' }));
+      out.push(miniTable(['Fate', 'Part', 'Where it goes, and who decided'], D.tools.map(function (x) { return [x.verdict, x.tools, x.fact]; })));
+      out.push(el('div', { class: 'sub-head', text: 'Each kit\'s layer in the target' }));
+      out.push(miniTable(['Kit or tool', 'Layer', 'Core or expansion'], D.kits.map(function (k) { return [k.kit, k.layer, k.kind]; })));
+    }
+    return out;
+  }
+  // A step's entry and exit conditions keep their lists, so they render as markdown, not as one run-on line.
+  function stepEnds(s, cls, dl) {
+    dl = dl || el('dl', { class: cls });
+    [['Enters', s.enters, /^\*\*Enters\*\*\s*/], ['Exits', s.exits, /^\*\*Exits\*\*\s*/]].forEach(function (p) {
+      if (!p[1]) return;
+      dl.appendChild(el('dt', { text: p[0] }));
+      dl.appendChild(el('dd', { class: 'md' }, mdHTML(p[1].replace(p[2], ''), s.tag + '#' + p[0])));
+    });
+    return dl;
+  }
+  function miniTable(head, rows) {
+    var w = el('div', { class: 'md' });
+    var html = '<div class="md-table"><table><thead><tr>' + head.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead><tbody>' +
+      rows.map(function (r) { return '<tr>' + r.map(function (c) { return '<td>' + md(c) + '</td>'; }).join('') + '</tr>'; }).join('') + '</tbody></table></div>';
+    w.innerHTML = html;
+    return w;
+  }
+  function showArea(key) {
+    var a = AREA[key];
+    if (areaSel !== key) renderArea(key);
+    var c = sevCount(a.gaps);
+    var owners = uniq(a.gaps.map(function (id) { return GAP[id].owner; }));
+    inspector('Today against the target', a.title, false, [
+      kvList([['Layer', a.layer || 'every layer'], ['Register stages', a.stages.join(', ') || 'none: the gaps its record cites'], ['Target', targetName(a)],
+              ['Gaps', a.gaps.length + ' · ' + c.HIGH + ' high · ' + c.MED + ' medium · ' + c.LOW + ' low']]),
+      block('Today, measured in', null, chips(a.today, function (r) { return refChip(r.path, r.id); })),
+      block('Owned by', null, chips(owners, buildChip)),
+      block('Its gaps, by severity', null, chips(a.gaps.slice().sort(bySev), gapChip))
+    ]);
+  }
+
+  // Flow
+  var flowFilter = { kind: 'all', q: '', lib: false };
+  var LANE_PAD = 50, LANE_GAP = 100;
+  views.flow = function (v) {
+    var head = el('div', { class: 'view-head' });
+    var t = el('div');
+    t.appendChild(el('div', { class: 'eyebrow', text: 'The flow, step by step' }));
+    t.appendChild(el('h1', { class: 'view-title', text: 'Every step is a program of items' }));
+    t.appendChild(el('p', { class: 'lede' }, 'A build travels the lines from Entry to Deploy. Each station is an item: an actor, what it needs, what it does, its witness and where it routes. Review is a breakpoint at any item boundary, and the owner\'s controls act on any open build.'));
+    head.appendChild(t); v.appendChild(head);
+    var bar = el('div', { class: 'toolbar' });
+    var seg = el('div', { class: 'seg', role: 'group', 'aria-label': 'Filter by actor' });
+    ['all', 'command', 'role', 'hook', 'owner', 'executor'].forEach(function (k) {
+      var b = el('button', { type: 'button', 'aria-pressed': k === 'all' ? 'true' : 'false', 'data-kind': k }, k === 'all' ? 'All actors' : esc(k));
+      b.addEventListener('click', function () { flowFilter.kind = k; $$('button', seg).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); highlight(); });
+      seg.appendChild(b);
+    });
+    bar.appendChild(seg);
+    var lib = el('div', { class: 'seg', role: 'group', 'aria-label': 'Library flow points' });
+    var lb = el('button', { type: 'button', 'aria-pressed': 'false', title: 'Where the library side of memory fills' }, 'Library flow points · ' + D.libraryItems.length);
+    lb.addEventListener('click', function () { flowFilter.lib = !flowFilter.lib; lb.setAttribute('aria-pressed', flowFilter.lib ? 'true' : 'false'); highlight(); });
+    lib.appendChild(lb); bar.appendChild(lib);
+    var q = el('input', { class: 'search', id: 'flow-search', type: 'search', placeholder: 'Find an item, actor or witness', 'aria-label': 'Find an item' });
+    q.addEventListener('input', function () { flowFilter.q = q.value.trim().toLowerCase(); highlight(); });
+    bar.appendChild(q);
+    v.appendChild(bar);
+    v.appendChild(legend());
+    var lanes = el('div', { class: 'lanes' });
+    var most = Math.max.apply(null, D.steps.map(function (s) { return s.items.length; }));
+    LANE_GAP = Math.max(78, Math.min(104, ((v.clientWidth || 900) - 40 - 2 * LANE_PAD) / Math.max(1, most - 1)));
+    D.steps.forEach(function (s, i) { lanes.appendChild(lane(s, D.steps[i + 1])); });
+    v.appendChild(lanes);
+  };
+  function shape(kind, x, y, color) {
+    var g = sv('g');
+    if (kind === 'command') g.appendChild(sv('rect', { x: x - 6, y: y - 6, width: 12, height: 12, fill: color }));
+    else if (kind === 'role') g.appendChild(sv('circle', { cx: x, cy: y, r: 8, fill: 'var(--surface)', stroke: color, 'stroke-width': 3.5 }));
+    else if (kind === 'hook') g.appendChild(sv('path', { d: 'M' + x + ' ' + (y - 8) + 'L' + (x + 8) + ' ' + (y + 6) + 'L' + (x - 8) + ' ' + (y + 6) + 'z', fill: color }));
+    else if (kind === 'owner') g.appendChild(sv('path', { d: 'M' + x + ' ' + (y - 9) + 'L' + (x + 9) + ' ' + y + 'L' + x + ' ' + (y + 9) + 'L' + (x - 9) + ' ' + y + 'z', fill: 'var(--signal)', stroke: 'var(--surface)', 'stroke-width': 1.5 }));
+    else { g.appendChild(sv('circle', { cx: x, cy: y, r: 10, fill: 'var(--surface)', stroke: color, 'stroke-width': 1.6 })); g.appendChild(sv('circle', { cx: x, cy: y, r: 5, fill: color })); }
+    return g;
+  }
+  function legend() {
+    var lg = el('div', { class: 'legend' });
+    [['command', 'command'], ['role', 'role agent'], ['hook', 'hook'], ['owner', 'owner'], ['executor', 'executor']].forEach(function (p) {
+      var s = sv('svg', { width: 22, height: 22, viewBox: '0 0 22 22', 'aria-hidden': 'true' });
+      s.appendChild(shape(p[0], 11, 11, 'var(--ink-2)'));
+      var w = el('span'); w.appendChild(s); w.appendChild(document.createTextNode(' ' + p[1])); lg.appendChild(w);
+    });
+    lg.appendChild(el('span', null, 'Selected item: amber ring. Its needs: dashed ring. Its routes: solid ring.'));
+    return lg;
+  }
+  function lane(s, next) {
+    var a = el('article', { class: 'panel lane', 'data-step': s.tag, style: '--lc: var(--l-' + s.tag + ')' });
+    var hd = el('div', { class: 'lane-head' });
+    hd.appendChild(el('span', { class: 'badge', 'aria-hidden': 'true', text: STEP_META[s.tag].badge }));
+    hd.appendChild(el('span', { class: 'lane-name', text: s.name }));
+    hd.appendChild(el('span', { class: 'lane-q', text: s.question }));
+    hd.appendChild(el('span', { class: 'lane-count', text: s.items.length + ' items' + (next && ['entry', 'plan', 'design', 'build', 'test'].indexOf(s.tag) >= 0 ? ' · then ' + next.name : '') }));
+    a.appendChild(hd);
+    var gap = LANE_GAP, pad = LANE_PAD, n = s.items.length, w = Math.round(pad * 2 + (n - 1) * gap), hgt = 104, y = 52;
+    var wrap = el('div', { class: 'lane-track scroll-x' });
+    var svg = sv('svg', { width: w, height: hgt, viewBox: '0 0 ' + w + ' ' + hgt, role: 'group', 'aria-label': s.name + ' items' });
+    var dashed = s.tag === 'breakpoint' || s.tag === 'lifecycle';
+    svg.appendChild(sv('path', { d: 'M' + (pad - 34) + ' ' + y + 'H' + (w - pad + 34), stroke: 'var(--l-' + s.tag + ')', 'stroke-width': 6, 'stroke-linecap': 'round', fill: 'none', 'stroke-dasharray': dashed ? '2 10' : 'none' }));
+    s.items.forEach(function (it, i) {
+      var x = pad + i * gap;
+      var g = sv('g', { class: 'st', 'data-tag': it.tag, 'data-kind': it.kind });
+      g.appendChild(sv('circle', { cx: x, cy: y, r: 22, class: 'hit' }));
+      g.appendChild(sv('circle', { cx: x, cy: y, r: 15, class: 'ring-sel' }));
+      g.appendChild(shape(it.kind, x, y, 'var(--l-' + s.tag + ')'));
+      var label = it.tag.split('.').slice(1).join('.');
+      g.appendChild(sv('text', { x: x, y: i % 2 === 0 ? y - 24 : y + 33, 'text-anchor': 'middle', class: 'st-label' }, label));
+      g.appendChild(sv('title', null, it.tag + ' · ' + it.actor.replace(/`/g, '')));
+      svgButton(g, it.tag + ', ' + it.kind, function () { select('item', it.tag); });
+      svg.appendChild(g);
+    });
+    wrap.appendChild(svg); a.appendChild(wrap);
+    var con = D.contracts.find(function (c) { return c.stage === s.name; });
+    if (s.enters || s.exits || con) {
+      var det = el('details');
+      det.appendChild(el('summary', { text: 'When it enters and exits' + (con ? ', and its stage contract' : '') }));
+      var dl = stepEnds(s, '');
+      if (con) [['Takes in', con.takes], ['Hands out', con.hands], ['Witness', con.witness], ['Owner gate', con.gate], ['Review', con.review]].forEach(function (p) {
+        dl.appendChild(el('dt', { text: p[0] })); dl.appendChild(el('dd', null, md(p[1])));
+      });
+      det.appendChild(dl); a.appendChild(det);
+    }
+    return a;
+  }
+
+  // Lifecycle
+  var POS = {
+    none: [44, 230], planning: [168, 230], designing: [318, 230], building: [468, 230], testing: [618, 230], deploying: [768, 230], landed: [912, 230],
+    paused: [468, 64], deferred: [58, 470], retired: [158, 470], refused: [258, 470], merged: [358, 470], answered: [458, 470],
+    withdrawn: [660, 470], superseded: [800, 470]
+  };
+  var OPEN = ['planning', 'designing', 'building', 'testing', 'deploying'];
+  var TERMINAL = {}; D.terminal.forEach(function (t) { TERMINAL[t] = true; });
+  function ends(text) {
+    var s = text.trim();
+    if (/^any open state, before the push$/.test(s)) return ['@openpp'];
+    if (/^any open state$/.test(s)) return ['@open'];
+    if (/^the state it paused in$/.test(s)) return ['@open'];
+    if (/^building, testing, or deploying/.test(s)) return ['building', 'testing', 'deploying'];
+    return s.split(/, or |, | or /).map(function (x) { return x.trim(); });
+  }
+  var EDGES = {};
+  D.transitions.forEach(function (t, i) {
+    ends(t.from).forEach(function (f) { ends(t.to).forEach(function (to) {
+      var k = f + '>' + to; (EDGES[k] = EDGES[k] || { from: f, to: to, rows: [] }).rows.push(i);
+    }); });
+  });
+  // A state the table gains later still gets a place: a spare row beneath the ends.
+  var spare = 0;
+  Object.keys(EDGES).forEach(function (k) {
+    [EDGES[k].from, EDGES[k].to].forEach(function (s) { if (s.charAt(0) !== '@' && !POS[s]) POS[s] = [70 + (spare++) * 130, 540]; });
+  });
+  views.lifecycle = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'A build\'s states' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'The engine refuses any transition the table lacks' }));
+    head.appendChild(el('p', { class: 'lede' }, 'Every state change is a row with its witness. Forward routes run along the line, routes back curve beneath it in amber, and the ends a build can reach sit below. Terminal: ' + D.terminal.map(esc).join(', ') + '.'));
+    v.appendChild(head);
+    var p = el('div', { class: 'panel diagram scroll-x' });
+    p.appendChild(stateDiagram()); v.appendChild(p);
+    var tw = el('div', { class: 'panel table-wrap' });
+    var tb = el('table', { class: 'data' });
+    tb.innerHTML = '<thead><tr><th>From</th><th>On</th><th>To</th><th>Witness</th></tr></thead>';
+    var body = el('tbody');
+    D.transitions.forEach(function (t, i) {
+      var tr = el('tr', { class: 'clickable', 'data-row': String(i) }, '<td>' + md(t.from) + '</td><td>' + md(t.on) + '</td><td>' + md(t.to) + '</td><td>' + md(t.witness) + '</td>');
+      tr.addEventListener('click', function () {
+        var key = Object.keys(EDGES).find(function (k) { return EDGES[k].rows.indexOf(i) >= 0; });
+        if (key) select('edge', key);
+      });
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); tw.appendChild(tb); v.appendChild(tw);
+  };
+  function stateDiagram() {
+    var W = 980, H = spare ? 580 : 520, BW = 112, BH = 38;
+    var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'The build state machine' });
+    svg.style.minWidth = '760px';
+    var defs = sv('defs');
+    ['ink', 'back', 'end', 'ctrl', 'on'].forEach(function (n) {
+      var color = { ink: 'var(--ink-2)', back: 'var(--signal)', end: 'var(--muted)', ctrl: 'var(--l-lifecycle)', on: 'var(--accent)' }[n];
+      var mk = sv('marker', { id: 'sm-' + n, viewBox: '0 0 10 10', refX: '9', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto-start-reverse' });
+      mk.appendChild(sv('path', { d: 'M0 0L10 5L0 10z', fill: color })); defs.appendChild(mk);
+    });
+    svg.appendChild(defs);
+    var openL = POS.planning[0] - BW / 2, openR = POS.deploying[0] + BW / 2;
+    svg.appendChild(sv('path', { d: 'M' + openL + ' 152V140H' + openR + 'V152', class: 'bracket' }));
+    svg.appendChild(sv('text', { x: openL, y: 132, class: 'bracket-label' }, 'any open state'));
+    svg.appendChild(sv('path', { d: 'M' + openL + ' 398V410H' + openR + 'V398', class: 'bracket' }));
+    svg.appendChild(sv('text', { x: openR, y: 428, 'text-anchor': 'end', class: 'bracket-label' }, 'any open state, before the push'));
+    OPEN.forEach(function (s) {
+      svg.appendChild(sv('line', { x1: POS[s][0], y1: 152, x2: POS[s][0], y2: POS[s][1] - BH / 2, class: 'bracket-tick' }));
+      svg.appendChild(sv('line', { x1: POS[s][0], y1: POS[s][1] + BH / 2, x2: POS[s][0], y2: 398, class: 'bracket-tick' }));
+    });
+    var backIdx = 0;
+    Object.keys(EDGES).forEach(function (key) {
+      var e = EDGES[key], f = e.from, t = e.to, d, cls = 'edge', mk = 'ink';
+      var A = POS[f], B = POS[t];
+      if (f === '@open' && t === 'paused') { d = 'M' + (POS.paused[0] - 14) + ' 140V' + (POS.paused[1] + BH / 2 + 2); cls += ' ctrl'; mk = 'ctrl'; }
+      else if (f === 'paused' && t === '@open') { d = 'M' + (POS.paused[0] + 14) + ' ' + (POS.paused[1] + BH / 2) + 'V138'; cls += ' ctrl'; mk = 'ctrl'; }
+      else if (f === '@openpp') { if (!B) return; d = 'M' + B[0] + ' 410V' + (B[1] - BH / 2 - 2); cls += ' end'; mk = 'end'; }
+      else if (!A || !B) return;
+      else if (A[1] === B[1] && B[0] > A[0] && t !== 'designing' || (f === 'planning' && t === 'designing')) {
+        if (f === 'none' && t === 'designing') d = null; else d = 'M' + (A[0] + (f === 'none' ? 10 : BW / 2)) + ' ' + A[1] + 'H' + (B[0] - BW / 2 - 2);
+      } else if (A[1] === B[1] && B[0] < A[0]) {
+        var k = backIdx++, bow = 34 + k * 15, x0 = A[0] - 12 - (k % 3) * 9, x1 = B[0] + 12 + (k % 3) * 9;
+        d = 'M' + x0 + ' ' + (A[1] + BH / 2) + 'C' + x0 + ' ' + (A[1] + bow + 30) + ' ' + x1 + ' ' + (B[1] + bow + 30) + ' ' + x1 + ' ' + (B[1] + BH / 2 + 2);
+        cls += ' back'; mk = 'back';
+      } else if (B[1] > A[1]) {
+        d = 'M' + A[0] + ' ' + (A[1] + BH / 2) + 'L' + B[0] + ' ' + (B[1] - BH / 2 - 2); cls += ' end'; mk = 'end';
+      }
+      if (f === 'none' && t === 'designing') {
+        d = 'M' + A[0] + ' ' + (A[1] - 10) + 'C' + A[0] + ' 178 ' + (B[0] - 30) + ' 176 ' + (B[0] - 30) + ' ' + (B[1] - BH / 2 - 2);
+      }
+      if (!d) return;
+      var g = sv('g', { class: 'edge-g', 'data-edge': key });
+      g.appendChild(sv('path', { d: d, class: cls, 'marker-end': 'url(#sm-' + mk + ')' }));
+      g.appendChild(sv('path', { d: d, class: 'edge-hit' }));
+      g.appendChild(sv('title', null, e.rows.map(function (r) { return D.transitions[r].on.replace(/`/g, ''); }).join(' | ')));
+      svgButton(g, 'Transition ' + label(f) + ' to ' + label(t), function () { select('edge', key); });
+      svg.appendChild(g);
+    });
+    Object.keys(POS).forEach(function (s) {
+      var p = POS[s];
+      var g = sv('g', { class: 'svg-node state' + (TERMINAL[s] ? ' terminal' : ''), 'data-state': s });
+      if (s === 'none') {
+        g.appendChild(sv('circle', { cx: p[0], cy: p[1], r: 10, class: 'body', style: 'fill: var(--ink); stroke: var(--ink)' }));
+        g.appendChild(sv('text', { x: p[0], y: p[1] + 30, class: 's-label' }, 'request'));
+      } else {
+        g.appendChild(sv('rect', { x: p[0] - BW / 2, y: p[1] - BH / 2, width: BW, height: BH, rx: 6, class: 'body' }));
+        if (TERMINAL[s]) g.appendChild(sv('rect', { x: p[0] - BW / 2 + 4, y: p[1] - BH / 2 + 4, width: BW - 8, height: BH - 8, rx: 4, fill: 'none', stroke: 'var(--line-2)' }));
+        g.appendChild(sv('text', { x: p[0], y: p[1] + 4, class: 's-label' }, s));
+      }
+      svgButton(g, 'State ' + s, function () { select('state', s); });
+      svg.appendChild(g);
+    });
+    return svg;
+  }
+  function label(s) { return s === '@open' ? 'any open state' : s === '@openpp' ? 'any open state, before the push' : s; }
+  function rowsTable(idx) {
+    var tb = el('table', { class: 'data' });
+    tb.innerHTML = '<thead><tr><th>On</th><th>Witness</th></tr></thead>';
+    var body = el('tbody');
+    idx.forEach(function (i) { var t = D.transitions[i]; body.appendChild(el('tr', null, '<td>' + md(t.on) + '</td><td>' + md(t.witness) + '</td>')); });
+    tb.appendChild(body); return tb;
+  }
+  function showEdge(key) {
+    var e = EDGES[key];
+    inspector('Transition', label(e.from) + ' → ' + label(e.to), false, [
+      block('From', md(D.transitions[e.rows[0]].from)), block('To', md(D.transitions[e.rows[0]].to)),
+      block(e.rows.length + (e.rows.length === 1 ? ' row' : ' rows') + ' in the table', null, rowsTable(e.rows))
+    ]);
+  }
+  function showState(s) {
+    var out = [], inn = [];
+    Object.keys(EDGES).forEach(function (k) {
+      var e = EDGES[k];
+      var fromIt = e.from === s || (e.from === '@open' || e.from === '@openpp') && OPEN.indexOf(s) >= 0;
+      var toIt = e.to === s || e.to === '@open' && OPEN.indexOf(s) >= 0;
+      if (fromIt) out.push(k); if (toIt) inn.push(k);
+    });
+    function list(keys) {
+      var ul = el('ul');
+      keys.forEach(function (k) {
+        var e = EDGES[k], li = el('li');
+        var b = el('button', { class: 'ichip', type: 'button' }, esc(label(e.from)) + ' → ' + esc(label(e.to)));
+        b.addEventListener('click', function () { select('edge', k); });
+        li.appendChild(b);
+        li.appendChild(el('span', { class: 'muted' }, ' ' + e.rows.map(function (r) { return esc(D.transitions[r].on.replace(/`/g, '')); }).join('; ')));
+        ul.appendChild(li);
+      });
+      return ul;
+    }
+    inspector('State', s, true, [
+      el('p', null, TERMINAL[s] ? '<span class="kind">terminal</span> A build that reaches it is closed.' : (s === 'none' ? 'A request before any build holds it.' : OPEN.indexOf(s) >= 0 ? '<span class="kind core">open</span> A build here can still move.' : '')),
+      out.length ? block('Leaves by', null, list(out)) : null,
+      inn.length ? block('Reached by', null, list(inn)) : null
+    ]);
+  }
+
+  // Roles
+  views.roles = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'Who performs each item' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'Roles by step, derived from the items' }));
+    head.appendChild(el('p', { class: 'lede' }, 'Each item\'s actor cell names one actor. The matrix is derived from those cells, never typed, and the roster says each role\'s layer and how it acts.'));
+    v.appendChild(head);
+    var M = {};
+    D.steps.forEach(function (s) { s.items.forEach(function (it) { var a = it.kind === 'role' ? it.role : it.kind; M[a] = M[a] || {}; (M[a][s.tag] = M[a][s.tag] || []).push(it.tag); }); });
+    var rows = D.roster.map(function (r) { return { name: r.role, meta: r.layer + ' · ' + r.acts, role: true }; });
+    ['command', 'executor', 'hook', 'owner'].forEach(function (k) { rows.push({ name: k, meta: 'an actor kind, not a role', role: false }); });
+    var wrap = el('div', { class: 'panel scroll-x' });
+    var tb = el('table', { class: 'data matrix' });
+    tb.innerHTML = '<thead><tr><th>Actor</th>' + D.steps.map(function (s) { return '<th>' + esc(s.name) + '</th>'; }).join('') + '</tr></thead>';
+    var body = el('tbody');
+    rows.forEach(function (r) {
+      var tr = el('tr');
+      var first = el('td', null, '<div class="role-name">' + esc(r.name) + '</div><div class="role-meta">' + md(r.meta) + '</div>');
+      if (r.role) { first.style.cursor = 'pointer'; first.addEventListener('click', function () { select('role', r.name); }); }
+      tr.appendChild(first);
+      D.steps.forEach(function (s) {
+        var td = el('td'); var list = (M[r.name] || {})[s.tag] || [];
+        if (list.length) { var w = el('div', { class: 'ichips' }); list.forEach(function (t) { w.appendChild(itemChip(t)); }); td.appendChild(w); }
+        else td.innerHTML = '<span class="muted">—</span>';
+        tr.appendChild(td);
+      });
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); wrap.appendChild(tb); v.appendChild(wrap);
+  };
+  function showRole(name) {
+    var r = D.roster.find(function (x) { return x.role === name; });
+    var items = [];
+    D.steps.forEach(function (s) { s.items.forEach(function (it) { if (it.kind === 'role' && it.role === name) items.push(it.tag); }); });
+    inspector('Role', name, false, [
+      block('Layer', md(r.layer)), block('Acts as', md(r.acts)),
+      block('Items', items.length ? null : '<span class="muted">Acts in no item.</span>', items.length ? chips(items, itemChip) : null)
+    ]);
+  }
+
+  // Memory: the instruction and memory plan, drawn whole (the away pass, point 1)
+  function pocketChip(name) {
+    var p = POCKET[name];
+    var b = el('button', { class: 'ichip pk pk-' + p.status.replace(' ', '-'), type: 'button', title: p.status + ' · ' + p.becomes.replace(/`/g, '') }, esc(name));
+    b.addEventListener('click', function () { select('pocket', name); });
+    return b;
+  }
+  function kindChip(name) {
+    var k = MKIND[name], at = k.places[0];
+    var b = el('button', { class: 'ichip', type: 'button', style: '--lc: var(--l-' + (at && STEP[at] ? at : 'lifecycle') + ')', title: 'owner ' + k.owner }, esc(name));
+    b.addEventListener('click', function () { select('kind', name); });
+    return b;
+  }
+  function medgeChip(name) {
+    var e = MEDGE[name];
+    var b = el('button', { class: 'ichip me-' + e.status.toLowerCase(), type: 'button', title: e.fromTo.replace(/`/g, '') }, esc(name));
+    b.addEventListener('click', function () { select('medge', name); });
+    return b;
+  }
+  function memTable(title, heads, rows) {
+    var box = el('div', { class: 'panel box' });
+    box.appendChild(el('div', { class: 'eyebrow', text: title }));
+    var w = el('div', { class: 'scroll-x' });
+    var tb = el('table', { class: 'data' });
+    tb.innerHTML = '<thead><tr>' + heads.map(function (h) { return '<th>' + esc(h) + '</th>'; }).join('') + '</tr></thead>';
+    var body = el('tbody');
+    rows.forEach(function (r) {
+      var attrs = {}; if (r.type) attrs['data-' + r.type] = r.key;
+      var tr = el('tr', attrs);
+      r.cells.forEach(function (c) { var td = el('td'); if (typeof c === 'string') td.innerHTML = c; else td.appendChild(c); tr.appendChild(td); });
+      if (r.type) tr.addEventListener('click', function (ev) { if (ev.target.closest('button')) return; select(r.type, r.key); });
+      body.appendChild(tr);
+    });
+    tb.appendChild(body); w.appendChild(tb); box.appendChild(w);
+    return box;
+  }
+  // The ring follows the cycle: from the first family, each next one is reached by a hop from the last, and the
+  // families no hop reaches close the ring in the plan's order.
+  function ringOrder() {
+    var order = [MEM.families[0].family], left = MEM.families.slice(1).map(function (f) { return f.family; });
+    while (left.length) {
+      var last = order[order.length - 1];
+      var next = left.find(function (f) { return FAM[last].out.some(function (h) { return h.to === f; }); }) || left[0];
+      order.push(next); left.splice(left.indexOf(next), 1);
+    }
+    return order;
+  }
+  function clipBox(c, toward, w, h) {
+    var dx = toward[0] - c[0], dy = toward[1] - c[1];
+    if (!dx && !dy) return c;
+    var s = Math.min(dx ? (w / 2 + 5) / Math.abs(dx) : Infinity, dy ? (h / 2 + 5) / Math.abs(dy) : Infinity);
+    return [c[0] + dx * s, c[1] + dy * s];
+  }
+  function memoryDiagram() {
+    var W = 860, H = 600, cx = 430, cy = 296, R = 228, BW = 156, BH = 56;
+    var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'The memory families on one ring, joined by the cycle\'s hops, each labelled with its edge types' });
+    var defs = sv('defs');
+    ['typed', 'partly', 'none'].forEach(function (k) {
+      var mk = sv('marker', { id: 'mar-' + k, viewBox: '0 0 10 10', refX: '8', refY: '5', markerWidth: '7', markerHeight: '7', orient: 'auto-start-reverse' });
+      mk.appendChild(sv('path', { d: 'M0 0L10 5L0 10z', class: 'mah-' + k })); defs.appendChild(mk);
+    });
+    svg.appendChild(defs);
+    var order = ringOrder(), pos = {};
+    order.forEach(function (f, i) { var a = (-90 + i * 360 / order.length) * Math.PI / 180; pos[f] = [cx + R * Math.cos(a), cy + R * Math.sin(a)]; });
+    var pairs = {}, keys = [];
+    MEM.hops.forEach(function (h) {
+      if (h.from === h.to) return;
+      var k = h.from + '>' + h.to;
+      if (!pairs[k]) { pairs[k] = { from: h.from, to: h.to, edges: [], states: [] }; keys.push(k); }
+      h.edges.forEach(function (e) { if (pairs[k].edges.indexOf(e) < 0) pairs[k].edges.push(e); });
+      pairs[k].states.push(h.state);
+    });
+    keys.forEach(function (k) {
+      var p = pairs[k], a = pos[p.from], b = pos[p.to];
+      var best = p.states.indexOf('typed') >= 0 ? 'typed' : p.states.indexOf('partly typed') >= 0 ? 'partly' : 'none';
+      var mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2, qx = mx + (cx - mx) * 0.38, qy = my + (cy - my) * 0.38;
+      var s = clipBox(a, [qx, qy], BW, BH), t = clipBox(b, [qx, qy], BW, BH);
+      var g = sv('g', { class: 'marc marc-' + best, 'data-from': p.from, 'data-to': p.to });
+      g.appendChild(sv('path', { d: 'M' + s[0] + ' ' + s[1] + ' Q' + qx + ' ' + qy + ' ' + t[0] + ' ' + t[1], 'marker-end': 'url(#mar-' + best + ')' }));
+      var lx = 0.25 * s[0] + 0.5 * qx + 0.25 * t[0], ly = 0.25 * s[1] + 0.5 * qy + 0.25 * t[1];
+      g.appendChild(sv('text', { x: lx, y: ly - 5, 'text-anchor': 'middle', class: 'marc-label' }, p.edges.join(', ')));
+      svg.appendChild(g);
+    });
+    order.forEach(function (name) {
+      var f = FAM[name], c = pos[name];
+      var g = sv('g', { class: 'svg-node mfam', 'data-fam': name });
+      g.appendChild(sv('rect', { x: c[0] - BW / 2, y: c[1] - BH / 2, width: BW, height: BH, rx: 6, class: 'body' }));
+      g.appendChild(sv('text', { x: c[0], y: c[1] - 4, 'text-anchor': 'middle', class: 'n-title', style: 'font-size:17px' }, name));
+      g.appendChild(sv('text', { x: c[0], y: c[1] + 14, 'text-anchor': 'middle', class: 'n-sub' }, 'level ' + f.level + ' · ' + plural(f.pockets.length, 'pocket')));
+      svgButton(g, cap(name) + ' family', function () { select('family', name); });
+      svg.appendChild(g);
+    });
+    return svg;
+  }
+  views.memory = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'The memory layer, drawn whole' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'One graph, written one way' }));
+    head.appendChild(el('p', { class: 'lede' }, md(MEM.frame)));
+    head.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(MEM.path, null, 'the instruction and memory plan'));
+    v.appendChild(head);
+    var st = {}, es = {};
+    MEM.pockets.forEach(function (p) { st[p.status] = (st[p.status] || 0) + 1; });
+    MEM.edges.forEach(function (e) { es[e.status] = (es[e.status] || 0) + 1; });
+    var typed = MEM.hops.filter(function (h) { return h.state === 'typed'; }).length;
+    var stats = el('div', { class: 'chips' });
+    [[MEM.families.length, 'families'], [MEM.pockets.length, 'pockets'], [st.node || 0, 'nodes'], [st.witness || 0, 'witnesses'], [st.out || 0, 'out'],
+     [MEM.kinds.length, 'record kinds'], [(es.P33 || 0) + (es.new || 0), 'declared edge types'], [es.new || 0, 'new in the away pass'],
+     [typed + ' of ' + MEM.hops.length, 'hops typed today']].forEach(function (p) { stats.appendChild(el('span', { class: 'chip' }, '<b>' + p[0] + '</b>' + esc(p[1]))); });
+    v.appendChild(stats);
+    var dia = el('div', { class: 'panel diagram scroll-x' }); dia.appendChild(memoryDiagram()); v.appendChild(dia);
+    v.appendChild(el('p', { class: 'muted mem-legend' }, 'Each arrow is a hop of the cycle between two families, labelled with its edge types: <span class="lg lg-typed">typed today</span><span class="lg lg-partly">partly typed</span><span class="lg lg-none">prose, search or no link today</span>. Every hop is typed once the plan lands. Click a family, a pocket, a kind or an edge type to open it.'));
+    var grid = el('div', { class: 'mem-grid' });
+    MEM.families.forEach(function (f) {
+      var c = el('div', { class: 'panel box mfam-card', 'data-fam': f.family });
+      var h = el('button', { class: 'mfam-name', type: 'button' }, esc(f.family) + ' <span class="kind">level ' + esc(f.level) + '</span>');
+      h.addEventListener('click', function () { select('family', f.family); });
+      c.appendChild(h);
+      c.appendChild(el('p', { class: 'mfam-holds' }, md(f.holds)));
+      c.appendChild(chips(f.pockets.map(function (p) { return p.pocket; }), pocketChip));
+      grid.appendChild(c);
+    });
+    v.appendChild(grid);
+    var kb = el('div', { class: 'panel box' });
+    kb.appendChild(el('div', { class: 'eyebrow', text: 'Record kinds, by the step or program of the first item named as their writer' }));
+    var MARKER_LABEL = { 'no writer item': 'no flow item writes it', 'writer item not named': 'writer item not named yet', "every step's": "every step's exit item writes it" };
+    var groups = {}, gorder = [];
+    MEM.kinds.forEach(function (k) { var g = k.places.length ? k.places[0] : '~' + k.marker; if (!groups[g]) { groups[g] = []; gorder.push(g); } groups[g].push(k.kind); });
+    var rank = function (g) { var i = D.steps.findIndex(function (s) { return s.tag === g; }); return g.charAt(0) === '~' ? 900 : i < 0 ? 500 : i; };
+    gorder.sort(function (a, b) { return rank(a) - rank(b) || (a < b ? -1 : 1); });
+    gorder.forEach(function (g) {
+      var row = el('div', { class: 'mk-row' });
+      row.appendChild(el('div', { class: 'sub-head' }, g.charAt(0) === '~' ? esc(MARKER_LABEL[g.slice(1)] || g.slice(1)) : STEP[g] ? esc(STEP[g].name) : 'the ' + esc(g) + ' program'));
+      row.appendChild(chips(groups[g], kindChip));
+      kb.appendChild(row);
+    });
+    v.appendChild(kb);
+    v.appendChild(memTable('The closed edge set', ['Edge', 'From → to', 'Declared at', 'Inverse', 'Status', 'Needed by'], MEM.edges.map(function (e) {
+      return { type: 'medge', key: e.edge, cells: [medgeChip(e.edge), md(e.fromTo), md(e.site), '<code>' + esc(e.inverse) + '</code>', '<span class="kind">' + esc(e.status) + '</span>', md(e.need)] };
+    })));
+    v.appendChild(memTable('Where each edge is declared', ['Site', 'Syntax', 'Door'], MEM.sites.map(function (s) { return { cells: [md(s.site), md(s.syntax), md(s.door)] }; })));
+    v.appendChild(memTable('The cycle, hop by hop', ['Hop', 'From', 'To', 'Edge', 'Today', 'Planned site'], MEM.hops.map(function (h) {
+      var rest = h.today.slice(h.state.length).replace(/^(: |, )/, '');
+      return { cells: [md(h.hop), esc(h.from), esc(h.to), md(h.edgeText), '<span class="hs hs-' + h.state.replace(' ', '-') + '">' + esc(HOP_STATE[h.state]) + '</span>' + (rest ? ' ' + md(rest) : ''), md(h.site)] };
+    })));
+    v.appendChild(memTable('The instruction ladder, memory at its foot', ['Level', 'What sits there'], MEM.levels.map(function (l) { return { cells: [esc(l.level), md(l.what)] }; })));
+  };
+  function hopList(hs) {
+    var ul = el('ul');
+    hs.forEach(function (h) { ul.appendChild(el('li', null, md(h.hop) + ' <span class="muted">· ' + esc(h.from) + ' → ' + esc(h.to) + ' · ' + esc(HOP_STATE[h.state]) + '</span>')); });
+    return ul;
+  }
+  function ownerNode(o) { return BUILD[o] ? buildChip(o) : el('span', null, md(o)); }
+  function showFamily(name) {
+    var f = FAM[name];
+    var nodes = [block('Level', esc(f.level)), block('What it holds', md(f.holds)), block('Lifecycle', md(f.lifecycle)),
+      block('Pockets', null, chips(f.pockets.map(function (p) { return p.pocket; }), pocketChip))];
+    if (f.out.length) nodes.push(block('Hops leaving it', null, hopList(f.out)));
+    if (f.in.length) nodes.push(block('Hops arriving', null, hopList(f.in)));
+    nodes.push(block('Source', null, refChip(MEM.path, 'families')));
+    inspector('Memory family', name, false, nodes);
+  }
+  function showPocket(name) {
+    var p = POCKET[name];
+    inspector('Memory pocket', name, false, [
+      el('p', null, '<span class="kind pk-' + esc(p.status.replace(' ', '-')) + '">' + esc(p.status) + '</span> <span class="muted">in the ' + esc(p.family) + ' family</span>'),
+      kvList([['Where', p.where], ['Today', p.today], ['Becomes', p.becomes], ['Key', p.key]]),
+      block('Owner', null, ownerNode(p.owner)), block('Source', null, refChip(MEM.path, 'pockets'))]);
+  }
+  function showKind(name) {
+    var k = MKIND[name];
+    var nodes = [block('Owner', null, ownerNode(k.owner)), block('Its writer, or what names it', md(k.writer))];
+    if (k.items.length) nodes.push(block('Writer items, the first deciding its group', null, chips(k.items, function (t) { return ITEMS[t] ? itemChip(t) : el('code', { text: t }); })));
+    else if (k.marker) nodes.push(block('Declared marker', '<code>' + esc(k.marker) + '</code> <span class="muted">· shown apart from the steps until the kind registry names its writer item</span>'));
+    nodes.push(block('Source', null, refChip(D.sources.memory, null, 'layer-memory, the kind registry')));
+    inspector('Record kind', name, true, nodes);
+  }
+  function showMedge(name) {
+    var e = MEDGE[name];
+    var nodes = [el('p', null, '<span class="kind">' + esc(e.status) + '</span>' + (e.statusText !== e.status ? ' <span class="muted">' + md(e.statusText) + '</span>' : '')),
+      kvList([['From → to', e.fromTo], ['Declared at', e.site], ['Inverse, derived', '`' + e.inverse + '`'], ['Needed by', e.need]])];
+    if (e.hops.length) nodes.push(block('Hops it carries', null, hopList(e.hops)));
+    nodes.push(block('Source', null, refChip(MEM.path, 'edges')));
+    inspector('Edge type', name, true, nodes);
+  }
+
+  // Chain
+  var gapFilter = { sev: 'all', owner: 'all', q: '' };
+  views.chain = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'The chain that builds it' }));
+    head.appendChild(el('h1', { class: 'view-title', text: D.chain.length + ' builds own every gap once' }));
+    head.appendChild(el('p', { class: 'lede' }, 'Each build is a child of the builds it depends on, and each gap in the register belongs to exactly one build. The bars show each build\'s gaps by severity.'));
+    v.appendChild(head);
+    var p = el('div', { class: 'panel diagram chain-svg scroll-x' });
+    p.appendChild(chainDiagram()); v.appendChild(p);
+    var bar = el('div', { class: 'toolbar' });
+    var seg = el('div', { class: 'seg', role: 'group', 'aria-label': 'Filter gaps by severity' });
+    ['all', 'HIGH', 'MED', 'LOW'].forEach(function (k) {
+      var b = el('button', { type: 'button', 'aria-pressed': k === 'all' ? 'true' : 'false' }, k === 'all' ? 'All severities' : k);
+      b.addEventListener('click', function () { gapFilter.sev = k; $$('button', seg).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); renderGaps(); });
+      seg.appendChild(b);
+    });
+    bar.appendChild(seg);
+    var sel = el('select', { class: 'pick', id: 'gap-owner', 'aria-label': 'Owner build' });
+    sel.appendChild(el('option', { value: 'all', text: 'Every owner' }));
+    D.chain.forEach(function (c) { sel.appendChild(el('option', { value: c.build, text: c.build })); });
+    sel.addEventListener('change', function () { gapFilter.owner = sel.value; renderGaps(); });
+    bar.appendChild(sel);
+    var q = el('input', { class: 'search', id: 'gap-search', type: 'search', placeholder: 'Find a gap', 'aria-label': 'Find a gap' });
+    q.addEventListener('input', function () { gapFilter.q = q.value.trim().toLowerCase(); renderGaps(); });
+    bar.appendChild(q);
+    bar.appendChild(el('span', { class: 'count', id: 'gap-count' }));
+    v.appendChild(bar);
+    var tw = el('div', { class: 'panel table-wrap' });
+    var tb = el('table', { class: 'data', id: 'gap-table' });
+    tb.innerHTML = '<thead><tr><th>Gap</th><th>Sev</th><th>Stage</th><th>Owner</th><th>What is missing</th></tr></thead><tbody></tbody>';
+    tw.appendChild(tb); v.appendChild(tw);
+    renderGaps();
+  };
+  function renderGaps() {
+    var body = $('#gap-table tbody'); if (!body) return;
+    body.innerHTML = '';
+    var shown = D.gaps.filter(function (g) {
+      return (gapFilter.sev === 'all' || g.sev === gapFilter.sev) && (gapFilter.owner === 'all' || g.owner === gapFilter.owner) &&
+        (!gapFilter.q || (g.id + ' ' + g.gap + ' ' + g.stage + ' ' + g.owner).toLowerCase().indexOf(gapFilter.q) >= 0);
+    });
+    shown.forEach(function (g) {
+      var tr = el('tr', { class: 'clickable', 'data-gap': g.id }, '<td class="key">' + esc(g.id) + '</td><td><span class="sev ' + esc(g.sev) + '">' + esc(g.sev) + '</span></td><td>' + esc(g.stage) + '</td><td class="key">' + esc(g.owner) + '</td><td>' + md(g.gap) + '</td>');
+      tr.addEventListener('click', function () { select('gap', g.id); });
+      body.appendChild(tr);
+    });
+    $('#gap-count').textContent = shown.length + ' of ' + D.gaps.length;
+    highlight();
+  }
+  function chainDiagram() {
+    var depth = { dClosedLoop: 0 };
+    function dep(b) {
+      if (depth[b] != null) return depth[b];
+      var c = BUILD[b]; depth[b] = 1 + Math.max.apply(null, (c.parents.length ? c.parents : ['dClosedLoop']).map(dep)); return depth[b];
+    }
+    D.chain.forEach(function (c) { dep(c.build); });
+    var rows = [];
+    Object.keys(depth).forEach(function (b) { (rows[depth[b]] = rows[depth[b]] || []).push(b); });
+    var NW = 184, NH = 74, GX = 20, RH = 120, X = {};
+    var maxN = Math.max.apply(null, rows.map(function (r) { return r.length; }));
+    var W = Math.max(860, maxN * (NW + GX) + GX), H = rows.length * RH + 10;
+    rows.forEach(function (r, d) {
+      if (d > 0) r.sort(function (a, b) {
+        function mean(n) { var ps = BUILD[n].parents.length ? BUILD[n].parents : ['dClosedLoop']; return ps.reduce(function (s, p) { return s + (X[p] || 0); }, 0) / ps.length; }
+        return mean(a) - mean(b);
+      });
+      var total = r.length * NW + (r.length - 1) * GX, x0 = (W - total) / 2;
+      r.forEach(function (b, i) { X[b] = x0 + i * (NW + GX) + NW / 2; });
+    });
+    var Y = function (b) { return depth[b] * RH + 12; };
+    var svg = sv('svg', { viewBox: '0 0 ' + W + ' ' + H, role: 'img', 'aria-label': 'The chain of builds' });
+    D.chain.forEach(function (c) {
+      (c.parents.length ? c.parents : ['dClosedLoop']).forEach(function (p) {
+        var x0 = X[p], y0 = Y(p) + NH, x1 = X[c.build], y1 = Y(c.build);
+        svg.appendChild(sv('path', { d: 'M' + x0 + ' ' + y0 + 'C' + x0 + ' ' + (y0 + 34) + ' ' + x1 + ' ' + (y1 - 34) + ' ' + x1 + ' ' + y1, class: 'cedge', 'data-from': p, 'data-to': c.build }));
+      });
+    });
+    Object.keys(depth).forEach(function (b) {
+      var c = BUILD[b], x = X[b] - NW / 2, y = Y(b);
+      var g = sv('g', { class: 'svg-node cnode' + (c ? '' : ' root'), 'data-build': b });
+      g.appendChild(sv('rect', { x: x, y: y, width: NW, height: NH, rx: 6, class: 'body' }));
+      g.appendChild(sv('text', { x: x + 12, y: y + 19, class: 'c-stage' }, c ? c.stage : 'this design build'));
+      g.appendChild(sv('text', { x: x + 12, y: y + 38, class: 'c-slug' }, b));
+      if (c) {
+        var cnt = { HIGH: 0, MED: 0, LOW: 0 };
+        c.gaps.forEach(function (id) { cnt[GAP[id].sev]++; });
+        var bw = NW - 24, n = c.gaps.length, bx = x + 12, byy = y + 46, scale = bw / MAX_GAPS;
+        [['HIGH', 'bar-h'], ['MED', 'bar-m'], ['LOW', 'bar-l']].forEach(function (p) {
+          var wd = cnt[p[0]] * scale; if (wd > 0) { g.appendChild(sv('rect', { x: bx, y: byy, width: Math.max(wd - 1, 1), height: 6, class: p[1] })); bx += wd; }
+        });
+        g.appendChild(sv('text', { x: x + 12, y: y + 66, class: 'c-count' }, n + ' gaps · ' + cnt.HIGH + ' high'));
+      }
+      svgButton(g, 'Build ' + b, function () { if (c) select('build', b); });
+      svg.appendChild(g);
+    });
+    return svg;
+  }
+  function showBuild(name) {
+    var c = BUILD[name];
+    var children = D.chain.filter(function (x) { return x.parents.indexOf(name) >= 0; }).map(function (x) { return x.build; });
+    var gl = el('div');
+    c.gaps.slice().sort(bySev).forEach(function (id) {
+      var g = GAP[id], d = el('div', { class: 'gap-item' });
+      d.innerHTML = '<span class="gid">' + esc(id) + '</span><span><span class="sev ' + esc(g.sev) + '">' + esc(g.sev) + '</span> <span class="muted">' + esc(g.stage) + '</span></span><p>' + md(g.gap) + '</p>';
+      gl.appendChild(d);
+    });
+    inspector('Chain build · ' + c.stage, name, true, [
+      block('Parents', null, chips(c.parents, function (p) { return BUILD[p] ? buildChip(p) : el('span', { class: 'ichip' }, esc(p)); })),
+      children.length ? block('Children', null, chips(children, buildChip)) : null,
+      block('Planned units', md(c.units)),
+      block(c.gaps.length + ' gaps owned', null, gl)
+    ]);
+  }
+  function showGap(id) {
+    var g = GAP[id];
+    var areas = D.areas.filter(function (a) { return a.gaps.indexOf(id) >= 0; });
+    inspector('Gap · ' + g.stage, id, true, [
+      el('p', null, '<span class="sev ' + esc(g.sev) + '">' + esc(g.sev) + '</span>'),
+      block('What is missing', md(g.gap)), block('Evidence', md(g.evidence)),
+      block('Owned by', null, chips([g.owner], buildChip)),
+      areas.length ? block('Compared under', null, chips(areas, function (a) {
+        var b = el('button', { class: 'ichip', type: 'button' }, esc(a.title));
+        b.addEventListener('click', function () { goView('compare'); select('area', a.key, true); });
+        return b;
+      })) : null
+    ]);
+  }
+
+  // Policies
+  var polFilter = { q: '', group: 'all' };
+  views.policies = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'Every behaviour is a switchable policy' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'The policy catalogue and its presets' }));
+    head.appendChild(el('p', { class: 'lede' }, 'Each key\'s default is the settled answer, and its allowed values are the options. A preset is a complete assignment, and highlighted cells differ from the default.'));
+    v.appendChild(head);
+    var groups = {};
+    D.policies.forEach(function (p) { var g = p.key.split('.')[0]; groups[g] = (groups[g] || 0) + 1; });
+    var bar = el('div', { class: 'toolbar' });
+    var sel = el('select', { class: 'pick', id: 'pol-group', 'aria-label': 'Key group' });
+    sel.appendChild(el('option', { value: 'all', text: 'Every group (' + D.policies.length + ')' }));
+    Object.keys(groups).sort().forEach(function (g) { sel.appendChild(el('option', { value: g, text: g + ' (' + groups[g] + ')' })); });
+    sel.addEventListener('change', function () { polFilter.group = sel.value; renderPolicies(); });
+    var q = el('input', { class: 'search', id: 'pol-search', type: 'search', placeholder: 'Find a key, value or source', 'aria-label': 'Find a policy' });
+    q.addEventListener('input', function () { polFilter.q = q.value.trim().toLowerCase(); renderPolicies(); });
+    bar.appendChild(sel); bar.appendChild(q); bar.appendChild(el('span', { class: 'count', id: 'pol-count' }));
+    v.appendChild(bar);
+    var tw = el('div', { class: 'panel table-wrap' });
+    var tb = el('table', { class: 'data', id: 'pol-table' });
+    tb.innerHTML = '<thead><tr><th>Key</th><th>Allowed values</th><th>Default</th>' + D.presets.names.map(function (n) { return '<th>' + esc(n) + '</th>'; }).join('') + '<th>Source</th></tr></thead><tbody></tbody>';
+    tw.appendChild(tb); v.appendChild(tw);
+    renderPolicies();
+  };
+  function renderPolicies() {
+    var body = $('#pol-table tbody'); if (!body) return;
+    body.innerHTML = '';
+    var shown = D.policies.filter(function (p) {
+      return (polFilter.group === 'all' || p.key.split('.')[0] === polFilter.group) &&
+        (!polFilter.q || (p.key + ' ' + p.values + ' ' + p.default + ' ' + p.source).toLowerCase().indexOf(polFilter.q) >= 0);
+    });
+    shown.forEach(function (p) {
+      var pr = D.presets.rows[p.key];
+      var cells = D.presets.names.map(function (n, i) {
+        if (!pr) return '<td class="muted">—</td>';
+        var val = pr[i]; var diff = val.replace(/`/g, '') !== p.default.replace(/`/g, '');
+        return '<td' + (diff ? ' class="diff"' : '') + '>' + md(val) + '</td>';
+      }).join('');
+      body.appendChild(el('tr', null, '<td class="key">' + esc(p.key) + '</td><td>' + md(p.values) + '</td><td><strong>' + md(p.default) + '</strong></td>' + cells + '<td class="muted">' + md(p.source) + '</td>'));
+    });
+    $('#pol-count').textContent = shown.length + ' of ' + D.policies.length;
+  }
+
+  // Principles
+  var prinQ = '';
+  views.principles = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'What every chain build implements' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'Principles P1 to P' + D.principles.length }));
+    head.appendChild(el('p', { class: 'lede' }, 'Architecture v2\'s principles, each in its full text. Pick one to see every section of the records that cites it.'));
+    v.appendChild(head);
+    var bar = el('div', { class: 'toolbar' });
+    var q = el('input', { class: 'search', id: 'prin-search', type: 'search', placeholder: 'Find a principle', 'aria-label': 'Find a principle' });
+    q.addEventListener('input', function () { prinQ = q.value.trim().toLowerCase(); renderPrinciples(); });
+    bar.appendChild(q); bar.appendChild(el('span', { class: 'count', id: 'prin-count' }));
+    v.appendChild(bar);
+    v.appendChild(el('div', { class: 'p-grid', id: 'prin-grid' }));
+    renderPrinciples();
+  };
+  function renderPrinciples() {
+    var grid = $('#prin-grid'); if (!grid) return;
+    grid.innerHTML = '';
+    var shown = D.principles.filter(function (p) { return !prinQ || ('p' + p.n + ' ' + p.title + ' ' + p.md).toLowerCase().indexOf(prinQ) >= 0; });
+    shown.forEach(function (p) {
+      var a = el('article', { class: 'panel p-card', 'data-p': String(p.n) });
+      var b = el('button', { class: 'p-head', type: 'button' }, '<span class="p-num">P' + p.n + '</span><span class="p-title">' + md(p.title) + '</span>');
+      b.addEventListener('click', function () { select('principle', p.n); });
+      a.appendChild(b);
+      a.appendChild(mdDiv(p.md, 'P' + p.n));
+      grid.appendChild(a);
+    });
+    $('#prin-count').textContent = shown.length + ' of ' + D.principles.length;
+    highlight();
+  }
+  function showPrinciple(n) {
+    var p = PRIN[n];
+    var rx = new RegExp('\\bP' + n + '\\b');
+    var cites = [];
+    D.records.forEach(function (r) {
+      r.sections.forEach(function (s) {
+        if (r === V2 && s.id === 'principles') return;
+        if (rx.test(s.md)) cites.push({ r: r, s: s });
+      });
+    });
+    var list = el('div', { class: 'refs' });
+    cites.forEach(function (c) { list.appendChild(refChip(c.r.path, c.s.id)); });
+    inspector('Principle', 'P' + n + ' ' + p.title, false, [
+      mdDiv(p.md, 'P' + n),
+      block('Cited in ' + plural(cites.length, 'section'), cites.length ? null : '<span class="muted">No other section names it.</span>', cites.length ? list : null),
+      block('Its home', null, chips([V2.path], function (path) { return refChip(path, 'principles'); }))
+    ]);
+  }
+
+  // Decisions
+  var decFilter = { kind: 'all', rec: 'all', q: '' };
+  var DKIND = { words: "Owner's words", asked: 'Asked', settled: 'Settled', round: 'Design round' };
+  views.decisions = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'Every fork, answer and owner\'s word' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'The decision trail' }));
+    head.appendChild(el('p', { class: 'lede' }, 'Each entry is a section of a design record that holds the owner\'s words, a fork asked, or what an answer settled, in the order the records were written. Open one to read it here, or follow it into its record.'));
+    v.appendChild(head);
+    var counts = {};
+    D.decisions.forEach(function (d) { counts[d.kind] = (counts[d.kind] || 0) + 1; });
+    var bar = el('div', { class: 'toolbar' });
+    var seg = el('div', { class: 'seg', role: 'group', 'aria-label': 'Filter by kind' });
+    ['all', 'words', 'asked', 'settled', 'round'].forEach(function (k) {
+      var b = el('button', { type: 'button', 'aria-pressed': k === 'all' ? 'true' : 'false' }, (k === 'all' ? 'Everything' : esc(DKIND[k])) + ' · ' + (k === 'all' ? D.decisions.length : counts[k] || 0));
+      b.addEventListener('click', function () { decFilter.kind = k; $$('button', seg).forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); }); renderDecisions(); });
+      seg.appendChild(b);
+    });
+    bar.appendChild(seg);
+    var sel = el('select', { class: 'pick', id: 'dec-rec', 'aria-label': 'Record' });
+    sel.appendChild(el('option', { value: 'all', text: 'Every record' }));
+    uniq(D.decisions.map(function (d) { return d.record; })).forEach(function (r) { sel.appendChild(el('option', { value: r, text: r })); });
+    sel.addEventListener('change', function () { decFilter.rec = sel.value; renderDecisions(); });
+    bar.appendChild(sel);
+    var q = el('input', { class: 'search', id: 'dec-search', type: 'search', placeholder: 'Find words in the trail', 'aria-label': 'Find in the decision trail' });
+    q.addEventListener('input', function () { decFilter.q = q.value.trim().toLowerCase(); renderDecisions(); });
+    bar.appendChild(q);
+    bar.appendChild(el('span', { class: 'count', id: 'dec-count' }));
+    v.appendChild(bar);
+    v.appendChild(el('div', { class: 'trail', id: 'dec-list' }));
+    renderDecisions();
+  };
+  function renderDecisions() {
+    var host = $('#dec-list'); if (!host) return;
+    host.innerHTML = '';
+    var q = decFilter.q;
+    var shown = D.decisions.filter(function (d) {
+      if (decFilter.kind !== 'all' && d.kind !== decFilter.kind) return false;
+      if (decFilter.rec !== 'all' && d.record !== decFilter.rec) return false;
+      return !q || (d.parent + ' ' + d.title + ' ' + SEC[d.path + '#' + d.id].md).toLowerCase().indexOf(q) >= 0;
+    });
+    var day = null, rec = null;
+    shown.forEach(function (d) {
+      if (d.date !== day) { day = d.date; rec = null; host.appendChild(el('h2', { class: 'dec-day', text: d.date })); }
+      if (d.record !== rec) {
+        rec = d.record;
+        var rr = el('div', { class: 'dec-rec' }, '<b>' + esc(d.record) + '</b> ');
+        rr.appendChild(document.createTextNode(REC[d.path].title));
+        host.appendChild(rr);
+      }
+      var det = el('details', { class: 'dec' });
+      det.appendChild(el('summary', null, '<span class="dkind ' + esc(d.kind) + '">' + esc(DKIND[d.kind]) + '</span><span class="d-title">' +
+        (d.parent ? '<span class="muted">' + md(d.parent) + ' › </span>' : '') + md(d.title || d.id) + '</span>'));
+      det.addEventListener('toggle', function () {
+        if (!det.open || det.querySelector('.d-body')) return;
+        var s = SEC[d.path + '#' + d.id], body = el('div', { class: 'd-body' });
+        body.appendChild(mdDiv(bodyOf(s), d.path + '#' + d.id + '#body'));
+        var open = el('button', { class: 'more', type: 'button', text: 'Open it in ' + d.record });
+        open.addEventListener('click', function () { openRecord(d.path, d.id); });
+        body.appendChild(open);
+        det.appendChild(body);
+      });
+      host.appendChild(det);
+    });
+    if (!shown.length) host.appendChild(el('p', { class: 'muted', text: 'Nothing in the trail matches. Clear the search or pick another kind.' }));
+    $('#dec-count').textContent = shown.length + ' of ' + D.decisions.length;
+  }
+  function showTrail() {
+    var byRec = {};
+    D.decisions.forEach(function (d) { byRec[d.record] = (byRec[d.record] || 0) + 1; });
+    var counts = {};
+    D.decisions.forEach(function (d) { counts[d.kind] = (counts[d.kind] || 0) + 1; });
+    var list = el('div', { class: 'refs' });
+    Object.keys(byRec).forEach(function (r) {
+      var b = el('button', { class: 'ichip', type: 'button' }, esc(r) + ' · ' + byRec[r]);
+      b.addEventListener('click', function () { decFilter.rec = r; var s = $('#dec-rec'); if (s) s.value = r; renderDecisions(); });
+      list.appendChild(b);
+    });
+    inspector('Decision trail', plural(D.decisions.length, 'section') + ' from ' + plural(Object.keys(byRec).length, 'record'), false, [
+      kvList(Object.keys(DKIND).map(function (k) { return [DKIND[k], String(counts[k] || 0)]; })),
+      block('By record', null, list),
+      el('p', { class: 'muted' }, 'The design rounds record counts whole. Elsewhere a section counts when its tag or its title names the owner\'s words, a fork, an answer or a settlement.')
+    ]);
+  }
+
+  // Progress
+  views.progress = function (v) {
+    var lr = D.libraryRound;
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'Where the design stands' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'Layer by layer, review by review' }));
+    var expansions = D.layers.filter(function (l) { return l.kind !== 'core'; });
+    var designed = expansions.filter(function (l) { return PROG[l.tag]; });
+    var reviewed = designed.filter(function (l) { return PROG[l.tag].reviews.length; });
+    var foldedX = reviewed.filter(function (l) { return PROG[l.tag].folded; });
+    var rounds = reviewed.length ? Math.min.apply(null, reviewed.map(function (l) { return PROG[l.tag].reviews.length; })) : 0;
+    var xState = !designed.length ? 'The expansions come last.' : reviewed.length < designed.length ?
+      designed.length + ' of ' + expansions.length + ' expansions proposed, ' + reviewed.length + ' reviewed.' :
+      designed.length + ' of ' + expansions.length + ' expansions designed, reviewed ' + (rounds === 1 ? 'once' : rounds === 2 ? 'twice' : rounds + ' times') + ' at Tier 2' + (foldedX.length === reviewed.length ? ' and folded.' : '.');
+    // The designs outside the eight layers: progress rows keyed by no layer tag.
+    var outside = D.progress.filter(function (p) { return !LAYER[p.layer]; });
+    var oState = outside.map(function (p) {
+      return p.layer + (p.folded ? ' reviewed ×' + p.reviews.length + ' and folded' : p.reviews.length ? ' reviewed ×' + p.reviews.length + ', its fold owed' : ' never reviewed');
+    }).join('; ');
+    head.appendChild(el('p', { class: 'lede' }, 'Each core layer was drafted with the owner, reviewed twice at Tier 2 and folded. The library side opened after KN-1: ' + esc(libraryState().replace(/^./, function (c) { return c.toLowerCase(); })) + ' ' +
+      esc(xState) + (outside.length ? ' Outside the layers: ' + esc(oState) + '.' : '')));
+    v.appendChild(head);
+    var rail = el('div', { class: 'rail' });
+    function progressCard(p, meta) {
+      var c = el('button', { class: 'panel step-card', type: 'button' });
+      var pill = p.folded ? ['done', 'reviewed ×' + p.reviews.length + ' · folded'] : p.reviews.length ? ['open', 'in review'] : ['open', 'proposed · review owed'];
+      c.innerHTML = '<span class="sc-name">' + esc(p.layer) + '</span><span class="state-pill ' + pill[0] + '">' + esc(pill[1]) + '</span><span class="sc-meta">' + esc(meta || plural(p.records.length, 'design record')) + '</span>';
+      c.addEventListener('click', function () { select('layer', p.layer); });
+      return c;
+    }
+    D.progress.forEach(function (p) { if (LAYER[p.layer] && LAYER[p.layer].kind === 'core') rail.appendChild(progressCard(p)); });
+    var lib = el('button', { class: 'panel step-card', type: 'button' });
+    lib.innerHTML = '<span class="sc-name">memory: library side</span><span class="pills"><span class="state-pill ' + (lr.folded ? 'done' : 'open') + '">' +
+      (lr.reviews.length ? 'reviewed ×' + lr.reviews.length + (lr.folded ? ' · folded' : '') : 'in review') + '</span>' +
+      (lr.open.length ? '<span class="state-pill open">owes ' + lr.open.length + '</span>' : '') + '</span><span class="sc-meta">replaces the Knowledge layer (KN-1)</span>';
+    lib.addEventListener('click', function () { select('layer', 'memory'); });
+    rail.appendChild(lib);
+    outside.forEach(function (p) {
+      var c = el('button', { class: 'panel step-card', type: 'button' });
+      var pill = p.folded ? ['done', 'reviewed ×' + p.reviews.length + ' · folded'] : p.reviews.length ? ['open', 'in review'] : ['open', 'review owed'];
+      c.innerHTML = '<span class="sc-name">' + esc(p.layer) + '</span><span class="state-pill ' + pill[0] + '">' + esc(pill[1]) + '</span><span class="sc-meta">a design outside the layers</span>';
+      if (p.sections.length) c.addEventListener('click', function () { openRecord(p.sections[0].path, p.sections[0].id); });
+      rail.appendChild(c);
+    });
+    expansions.forEach(function (l) {
+      if (PROG[l.tag]) { rail.appendChild(progressCard(PROG[l.tag], 'an expansion · ' + plural(PROG[l.tag].records.length, 'design record'))); return; }
+      var c = el('button', { class: 'panel step-card', type: 'button' });
+      c.innerHTML = '<span class="sc-name">' + esc(l.tag) + '</span><span class="state-pill todo">not designed yet</span><span class="sc-meta">an expansion</span>';
+      c.addEventListener('click', function () { select('layer', l.tag); });
+      rail.appendChild(c);
+    });
+    v.appendChild(rail);
+
+    var two = el('div', { class: 'two-col' });
+    var op = el('div', { class: 'panel box owed' });
+    op.appendChild(el('div', { class: 'eyebrow', text: 'What the design still owes' }));
+    op.appendChild(el('div', { class: 'sub-head', text: "The library side's round" }));
+    op.appendChild(openList(lr.open));
+    [[D.owed, 'Owed to the chain re-cut'], [D.v2open, 'To confirm at chain approval']].forEach(function (p) {
+      var s = SEC[p[0].path + '#' + p[0].id];
+      var det = el('details', { class: 'fold' });
+      det.appendChild(el('summary', null, esc(p[1]) + ' <span class="muted">· architecture v2 [' + esc(p[0].id) + ']</span>'));
+      det.appendChild(mdDiv(bodyOf(s), p[0].path + '#' + p[0].id + '#body'));
+      var b = el('button', { class: 'more', type: 'button', text: 'Open it in architecture-v2' });
+      b.addEventListener('click', function () { openRecord(p[0].path, p[0].id); });
+      det.appendChild(b);
+      op.appendChild(det);
+    });
+    two.appendChild(op);
+    var ev = el('div', { class: 'panel box' });
+    ev.appendChild(el('div', { class: 'eyebrow', text: 'The build\'s journal, newest first' }));
+    var ul = el('ul', { class: 'events', id: 'ev-list' });
+    ev.appendChild(ul);
+    var more = el('button', { class: 'more', type: 'button' });
+    var all = false;
+    function fill() {
+      ul.innerHTML = '';
+      var list = D.events.slice().reverse();
+      (all ? list : list.slice(0, 6)).forEach(function (e, i) {
+        var li = el('li');
+        li.appendChild(el('span', { class: 'ev-date', text: e.date }));
+        li.appendChild(mdDiv(e.md, 'ev#' + (D.events.length - 1 - i)));
+        ul.appendChild(li);
+      });
+      more.textContent = all ? 'Show the latest six' : 'Show all ' + D.events.length + ' events';
+    }
+    more.addEventListener('click', function () { all = !all; fill(); });
+    fill();
+    ev.appendChild(more);
+    var log = recNamed('session-log');
+    if (log) ev.appendChild(el('div', { class: 'ref-line' })).appendChild(refChip(log.path, 'events', 'The whole session log'));
+    two.appendChild(ev);
+    v.appendChild(two);
+
+    var two2 = el('div', { class: 'two-col' });
+    var ch = el('div', { class: 'panel box chart scroll-x' });
+    ch.appendChild(el('div', { class: 'eyebrow', text: 'Findings per review: high, medium, low, then refuted' }));
+    ch.appendChild(reviewChart());
+    two2.appendChild(ch);
+    var tl = el('div', { class: 'panel box' });
+    tl.appendChild(el('div', { class: 'eyebrow', text: 'The architecture\'s revisions, ' + D.timeline.length + ' so far' }));
+    var list = el('ul', { class: 'timeline' }), day = null;
+    D.timeline.forEach(function (t, i) {
+      if (t.date !== day) { day = t.date; list.appendChild(el('li', { class: 'tl-day', text: t.date })); }
+      var li = el('li'); var b = el('button', { class: 'tl-item', type: 'button', 'data-rev': String(i) }, '<span>' + md(cap(t.what)) + '</span>');
+      b.addEventListener('click', function () { select('revision', i); });
+      li.appendChild(b); list.appendChild(li);
+    });
+    tl.appendChild(list);
+    two2.appendChild(tl);
+    v.appendChild(two2);
+  };
+  function reviewChart() {
+    var rows = D.reviews.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.scope < b.scope ? -1 : 1); });
+    var max = Math.ceil(Math.max.apply(null, rows.map(function (r) { return r.raw; })) / 10) * 10;
+    var L = 132, Wd = 560, RH = 24, top = 10, H = top + rows.length * RH + 30, sc = (Wd - L - 16) / max;
+    var svg = sv('svg', { viewBox: '0 0 ' + Wd + ' ' + H, role: 'img', 'aria-label': 'Confirmed and refuted findings per review' });
+    for (var t = 0; t <= max; t += 10) {
+      var x = L + t * sc;
+      svg.appendChild(sv('line', { x1: x, y1: top - 4, x2: x, y2: top + rows.length * RH, class: 'ax' }));
+      svg.appendChild(sv('text', { x: x, y: top + rows.length * RH + 16, 'text-anchor': 'middle', class: 'ax-label' }, String(t)));
+    }
+    rows.forEach(function (r, i) {
+      var y = top + i * RH, g = sv('g', { class: 'rbar', 'data-review': r.file });
+      g.appendChild(sv('rect', { x: 0, y: y, width: Wd, height: RH, class: 'rb-bg' }));
+      g.appendChild(sv('text', { x: L - 8, y: y + 16, 'text-anchor': 'end', class: 'bar-label' }, r.scope));
+      var x = L;
+      [['high', 'rb-h'], ['medium', 'rb-m'], ['low', 'rb-l']].forEach(function (p) {
+        var w = r[p[0]] * sc; if (w > 0) { g.appendChild(sv('rect', { x: x, y: y + 5, width: Math.max(w - 1, 1), height: RH - 10, class: p[1] })); x += w; }
+      });
+      if (r.refuted) g.appendChild(sv('rect', { x: x + 0.5, y: y + 5.5, width: Math.max(r.refuted * sc - 1, 1), height: RH - 11, class: 'rb-r' }));
+      g.appendChild(sv('title', null, r.scope + ': ' + r.confirmed + ' confirmed (' + r.high + ' high), ' + r.refuted + ' refuted'));
+      svgButton(g, 'Review ' + r.scope, function () { select('review', r.file); });
+      svg.appendChild(g);
+    });
+    return svg;
+  }
+  function showReview(file) {
+    var r = REVIEW[file];
+    var dl = kvList([['Kind', esc(r.kind + ', round ' + r.round + ', ' + r.intensity)], ['Verdict', esc(r.verdict)], ['Findings', esc(r.raw + ' raw · ' + r.confirmed + ' confirmed · ' + r.refuted + ' refuted')],
+      ['By severity', esc(r.blocker + ' blocker · ' + r.high + ' high · ' + r.medium + ' medium · ' + r.low + ' low')], ['Cost', esc(r.agents + ' agents · ' + Math.round(r['out-tokens'] / 1000) + 'k output tokens')]], true);
+    inspector('Tier-2 review · ' + r.date, r.scope, true, [dl, block('Its report', null, chips([r.path], function (p) { return refChip(p, null, 'Read the report'); }))]);
+  }
+  function showRevision(i) {
+    var t = D.timeline[i];
+    inspector('Revision · ' + t.date, cap(t.what), false, [block('What changed', md(t.detail))]);
+  }
+
+  // Records
+  var recState = { path: null, q: '' };
+  views.records = function (v) {
+    var head = el('div');
+    head.appendChild(el('div', { class: 'eyebrow', text: 'Every record the design rests on' }));
+    head.appendChild(el('h1', { class: 'view-title', text: 'The records, whole' }));
+    var nsec = D.records.reduce(function (n, r) { return n + r.sections.length; }, 0);
+    head.appendChild(el('p', { class: 'lede' }, 'Every design record, review and research return in the build\'s folder, rendered from its own text: ' + plural(D.records.length, 'record') + ', ' + nsec + ' sections. A link to another record opens it here, and the search covers every section.'));
+    v.appendChild(head);
+    var bar = el('div', { class: 'toolbar' });
+    var sel = el('select', { class: 'pick', id: 'rec-pick', 'aria-label': 'Record' });
+    GROUPS.forEach(function (g) {
+      var recs = D.records.filter(function (r) { return r.group === g; });
+      if (!recs.length) return;
+      var og = el('optgroup', { label: g + ' (' + recs.length + ')' });
+      recs.slice().sort(function (a, b) { return a.date < b.date ? -1 : a.date > b.date ? 1 : (a.name < b.name ? -1 : 1); }).forEach(function (r) {
+        og.appendChild(el('option', { value: r.path, text: r.date + ' · ' + r.name }));
+      });
+      sel.appendChild(og);
+    });
+    sel.addEventListener('change', function () { recState.q = ''; var q = $('#rec-search'); if (q) q.value = ''; select('record', sel.value, true); window.scrollTo(0, 0); });
+    bar.appendChild(sel);
+    var q = el('input', { class: 'search', id: 'rec-search', type: 'search', placeholder: 'Search every record', 'aria-label': 'Search every record' });
+    var timer = null;
+    q.addEventListener('input', function () { clearTimeout(timer); timer = setTimeout(function () { recState.q = q.value.trim(); renderRecord(); }, 160); });
+    bar.appendChild(q);
+    v.appendChild(bar);
+    v.appendChild(el('div', { id: 'rec-body', class: 'view', style: 'gap:12px' }));
+  };
+  function renderRecord() {
+    var host = $('#rec-body'); if (!host) return;
+    host.innerHTML = '';
+    if (recState.q.length >= 2) { renderSearch(host); return; }
+    var r = REC[recState.path]; if (!r) return;
+    var head = el('div', { class: 'rec-head' });
+    head.appendChild(el('span', { class: 'eyebrow', text: r.group + ' · ' + r.date }));
+    head.appendChild(el('span', { class: 'rec-path', text: r.path }));
+    var toc = el('button', { class: 'more toc-open', type: 'button', text: 'Contents' });
+    toc.addEventListener('click', function () { insp.classList.add('open'); });
+    head.appendChild(toc);
+    host.appendChild(head);
+    var doc = el('article', { class: 'panel rec-doc' });
+    r.sections.forEach(function (s) {
+      doc.appendChild(el('section', { class: 'md rec-sec', 'data-sec': s.id }, mdHTML(s.md, r.path + '#' + s.id)));
+    });
+    host.appendChild(doc);
+  }
+  var INDEX = null;
+  function renderSearch(host) {
+    if (!INDEX) { INDEX = []; D.records.forEach(function (r) { r.sections.forEach(function (s) { INDEX.push({ r: r, s: s, hay: s.md.toLowerCase() }); }); }); }
+    var q = recState.q.toLowerCase(), hits = [], total = 0;
+    INDEX.forEach(function (x) { var i = x.hay.indexOf(q); if (i < 0) return; total++; if (hits.length < 150) hits.push({ x: x, i: i }); });
+    host.appendChild(el('p', { class: 'count' }, plural(total, 'section') + (total === 1 ? ' matches' : ' match') + (total > hits.length ? '; the first ' + hits.length + ' are shown' : '') + '.'));
+    var list = el('div', { class: 'results' });
+    hits.forEach(function (h) {
+      var s = h.x.s, r = h.x.r, text = s.md;
+      var a = Math.max(0, h.i - 90), b = Math.min(text.length, h.i + q.length + 150);
+      var snip = (a > 0 ? '…' : '') + text.slice(a, b).replace(/\s+/g, ' ') + (b < text.length ? '…' : '');
+      var j = snip.toLowerCase().indexOf(q);
+      var html = j < 0 ? esc(snip) : esc(snip.slice(0, j)) + '<mark>' + esc(snip.slice(j, j + q.length)) + '</mark>' + esc(snip.slice(j + q.length));
+      var btn = el('button', { class: 'panel sresult', type: 'button' }, '<div class="sr-where">' + esc(r.group) + ' · ' + esc(r.name) + '</div><div class="sr-title">' + esc((s.tag ? '[' + s.tag + '] ' : '') + (s.title || r.title)) + '</div><div class="sr-snip">' + html + '</div>');
+      btn.addEventListener('click', function () { openRecord(r.path, s.id); });
+      list.appendChild(btn);
+    });
+    host.appendChild(list);
+  }
+  function scrollToSec(id) {
+    var node = $$('#rec-body .rec-sec').find(function (n) { return n.getAttribute('data-sec') === id; });
+    if (!node) return;
+    node.scrollIntoView({ block: 'start' });
+    node.classList.remove('flash'); void node.offsetWidth; node.classList.add('flash');
+  }
+  function showRecord(path) {
+    var r = REC[path];
+    if (recState.path !== path || recState.q) {
+      recState.path = path; recState.q = '';
+      var q = $('#rec-search'); if (q) q.value = '';
+      renderRecord();
+    }
+    var pick = $('#rec-pick'); if (pick) pick.value = path;
+    var toc = el('ul', { class: 'toc' });
+    r.sections.forEach(function (s) {
+      if (s.level < 2) return;
+      var li = el('li', { class: 'l' + s.level });
+      var b = el('button', { type: 'button' }, (s.tag ? '<span class="tag">[' + esc(s.tag) + ']</span>' : '') + esc(s.title || s.id));
+      b.addEventListener('click', function () { scrollToSec(s.id); insp.classList.remove('open'); });
+      li.appendChild(b); toc.appendChild(li);
+    });
+    var size = r.sections.reduce(function (n, s) { return n + s.md.length; }, 0);
+    var decs = D.decisions.filter(function (d) { return d.path === path; }).length;
+    inspector('Record · ' + r.group, r.title, false, [
+      kvList([['Name', esc(r.name)], ['Written', esc(r.date)], ['Size', esc(Math.round(size / 1024) + ' KB, ' + r.sections.length + ' sections')], ['Decisions', esc(decs ? plural(decs, 'section') + ' in the trail' : 'none in the trail')], ['Path', '<code>' + esc(r.path) + '</code>']], true),
+      block('Contents', null, toc)
+    ]);
+  }
+  function openRecord(path, sid) {
+    if (!REC[path]) return;
+    current.records = { type: 'record', id: path };
+    memo('atlas.sel.records', 'record|' + path);
+    goView('records');
+    if (recState.path !== path) select('record', path, true);
+    if (sid) scrollToSec(sid);
+  }
+
+  // ---------- highlight: selection, needs, routes and filters ----------
+  function highlight() {
+    var sel = current[activeView] || {};
+    $$('.layer-card').forEach(function (b) { b.setAttribute('aria-pressed', sel.type === 'layer' && b.getAttribute('data-layer') === sel.id ? 'true' : 'false'); });
+    $$('#view-overview .svg-node').forEach(function (n) { n.classList.toggle('on', sel.type === 'layer' && n.getAttribute('data-layer') === sel.id); });
+    var it = sel.type === 'item' ? ITEMS[sel.id] : null;
+    $$('.st').forEach(function (g) {
+      var tag = g.getAttribute('data-tag'), x = ITEMS[tag];
+      g.classList.toggle('sel', !!it && tag === sel.id);
+      g.classList.toggle('need', !!it && it.needsRefs.indexOf(tag) >= 0);
+      g.classList.toggle('route', !!it && it.thenRefs.indexOf(tag) >= 0);
+      var hay = (tag + ' ' + x.actor + ' ' + x.does + ' ' + x.proof + ' ' + x.then).toLowerCase();
+      var pass = (flowFilter.kind === 'all' || x.kind === flowFilter.kind) && (!flowFilter.lib || LIBSET[tag]) && (!flowFilter.q || hay.indexOf(flowFilter.q) >= 0);
+      g.classList.toggle('dim', !pass);
+    });
+    $$('.edge-g').forEach(function (g) { g.classList.toggle('on', sel.type === 'edge' && g.getAttribute('data-edge') === sel.id); });
+    $$('#view-lifecycle .state').forEach(function (g) { g.classList.toggle('on', sel.type === 'state' && g.getAttribute('data-state') === sel.id); });
+    $$('#view-lifecycle tr[data-row]').forEach(function (tr) { tr.classList.toggle('on', sel.type === 'edge' && EDGES[sel.id] && EDGES[sel.id].rows.indexOf(+tr.getAttribute('data-row')) >= 0); });
+    $$('.cnode').forEach(function (g) { g.classList.toggle('on', sel.type === 'build' && g.getAttribute('data-build') === sel.id); });
+    $$('.cedge').forEach(function (p) { p.classList.toggle('hot', sel.type === 'build' && (p.getAttribute('data-from') === sel.id || p.getAttribute('data-to') === sel.id)); });
+    $$('tr[data-gap]').forEach(function (tr) { tr.classList.toggle('on', sel.type === 'gap' && tr.getAttribute('data-gap') === sel.id); });
+    $$('#area-table tr[data-area]').forEach(function (tr) { tr.classList.toggle('on', tr.getAttribute('data-area') === areaSel); });
+    $$('.p-card').forEach(function (c) { c.classList.toggle('on', sel.type === 'principle' && +c.getAttribute('data-p') === sel.id); });
+    $$('.tl-item').forEach(function (b) { b.classList.toggle('on', sel.type === 'revision' && +b.getAttribute('data-rev') === sel.id); });
+    var famOf = sel.type === 'family' ? sel.id : sel.type === 'pocket' && POCKET[sel.id] ? POCKET[sel.id].family : null;
+    $$('.mfam').forEach(function (n) { n.classList.toggle('on', n.getAttribute('data-fam') === famOf); });
+    $$('.mfam-card').forEach(function (c) { c.classList.toggle('on', c.getAttribute('data-fam') === famOf); });
+    $$('.marc').forEach(function (g) { g.classList.toggle('hot', !!famOf && (g.getAttribute('data-from') === famOf || g.getAttribute('data-to') === famOf)); });
+    $$('tr[data-medge]').forEach(function (tr) { tr.classList.toggle('on', sel.type === 'medge' && tr.getAttribute('data-medge') === sel.id); });
+  }
+
+  // ---------- tabs ----------
+  var latestReview = D.reviews.length ? D.reviews.slice().sort(function (a, b) { return a.date < b.date ? 1 : -1; })[0].file : null;
+  var DEFAULTS = { overview: ['layer', 'memory'], compare: ['area', D.areas[0].key], flow: ['item', 'entry.claim'], lifecycle: ['state', 'planning'], roles: ['role', 'reviewer'],
+    memory: ['family', MEM.families[0].family],
+    chain: ['build', 'dTotalRecall'], policies: null, principles: ['principle', 1], decisions: ['trail', 'all'], progress: ['review', latestReview], records: ['record', V2 ? V2.path : D.records[0].path] };
+  var NUMERIC = { revision: true, principle: true };
+  var built = {};
+  function show(view) {
+    if (!views[view]) view = 'overview';
+    activeView = view;
+    $$('.tab').forEach(function (t) { t.setAttribute('aria-selected', t.getAttribute('data-view') === view ? 'true' : 'false'); });
+    $$('.view-host > .view').forEach(function (s) { s.hidden = s.id !== 'view-' + view; });
+    var host = $('#view-' + view);
+    if (!built[view]) { views[view](host); host.appendChild(footer()); built[view] = true; }
+    var sel = current[view];
+    if (!sel) {
+      var saved = memo('atlas.sel.' + view), cut = saved ? saved.indexOf('|') : -1;
+      if (cut > 0) { var type = saved.slice(0, cut), id = saved.slice(cut + 1); sel = { type: type, id: NUMERIC[type] ? +id : id }; }
+      if (!sel || !valid(sel)) sel = DEFAULTS[view] && DEFAULTS[view][1] != null ? { type: DEFAULTS[view][0], id: DEFAULTS[view][1] } : null;
+    }
+    if (sel && valid(sel)) select(sel.type, sel.id, true);
+    else { current[view] = null; inspector('Details', 'Select anything', false, [el('p', { class: 'muted' }, 'Pick a key group or search the catalogue. Layers, items, states, builds and reviews open their records here.')]); highlight(); }
+    memo('atlas.view', view);
+  }
+  function goView(view) {
+    try { if (location.hash !== '#' + view) history.replaceState(null, '', '#' + view); } catch (e) { /* a sandboxed frame may refuse history writes */ }
+    insp.classList.remove('open');
+    show(view); window.scrollTo(0, 0);
+  }
+  function valid(s) {
+    return (s.type === 'layer' && LAYER[s.id]) || (s.type === 'item' && ITEMS[s.id]) || (s.type === 'state' && POS[s.id]) || (s.type === 'edge' && EDGES[s.id]) ||
+      (s.type === 'build' && BUILD[s.id]) || (s.type === 'review' && REVIEW[s.id]) || (s.type === 'revision' && D.timeline[s.id]) || (s.type === 'gap' && GAP[s.id]) ||
+      (s.type === 'role' && D.roster.some(function (r) { return r.role === s.id; })) || (s.type === 'area' && AREA[s.id]) || (s.type === 'principle' && PRIN[s.id]) ||
+      (s.type === 'record' && REC[s.id]) || s.type === 'trail' || (s.type === 'family' && FAM[s.id]) || (s.type === 'pocket' && POCKET[s.id]) ||
+      (s.type === 'kind' && MKIND[s.id]) || (s.type === 'medge' && MEDGE[s.id]);
+  }
+  function footer() {
+    var f = el('div', { class: 'foot' });
+    f.innerHTML = '<span>Derived from ' + plural(D.records.length, 'record') + ' of build <code>dClosedLoop</code>. The structured views parse ' +
+      Object.keys(D.sources).map(function (k) { return '<code>' + esc(D.sources[k].split('/').pop()) + '</code>'; }).join(', ') + '.</span><span>Digest <code>' + esc(D.digest) + '</code> · latest revision ' + esc(D.latest) + (MK ? '' : ' · records shown as plain text: the markdown renderer did not load') + '</span>';
+    return f;
+  }
+  $$('.tab').forEach(function (t) { t.addEventListener('click', function () { goView(t.getAttribute('data-view')); }); });
+  window.addEventListener('hashchange', function () { show(location.hash.slice(1)); });
+  $('#derived').textContent = plural(D.records.length, 'record') + ' · latest revision ' + D.latest + ' · digest ' + D.digest;
+  function sizeTop() { document.documentElement.style.setProperty('--top-h', $('.top').offsetHeight + 'px'); }
+  window.addEventListener('resize', sizeTop); sizeTop();
+  var start = location.hash.slice(1) || memo('atlas.view') || 'overview';
+  show(start);
+})();
+</script>

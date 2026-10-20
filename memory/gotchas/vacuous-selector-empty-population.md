@@ -19,6 +19,12 @@ precisely what a check prints when it passes.
 in one commit: checks 4, 5, 8, 12, the index set and check 10. Any one left at the old count would
 have disarmed its check permanently, with no symptom.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Four set-valued keys
+accepted the empty set, `transitions.record`, `card.store`, `tests.landing-levels` and `platforms.supported`, so an
+ordinary key could switch off a floor invariant or a verdict level. Every set-valued key now says whether it may be
+empty, and the schema refuses an empty value where it may not.
+
 ## The fix, and the trap inside the fix
 
 Every selector over a population a real tree has asserts that population is NON-EMPTY. The first

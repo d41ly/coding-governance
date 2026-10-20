@@ -30,6 +30,11 @@ Two things made it invisible. The driver still carried a comment block describin
 sitting directly above the code that replaced it, and `lib-unattended.sh`'s header still advertised
 "the driver's re-declaration rule" as a caller. Stale prose is where a stale mental model comes from.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Three chain clauses
+took aScoutedSeam's grader and benchmark as input, and the files exist only on an unmerged branch. dFairHearing now
+takes them by blob from `b0fe68f30`, never waiting on the branch.
+
 ## The check, and why there is no gate
 
 **At spec time: open the code at the BASE you are about to pin, and read the function you are

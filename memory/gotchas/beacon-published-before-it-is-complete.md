@@ -19,6 +19,12 @@ The docs beacon in `tools/run-gates/run-gates.sh` was made with `mkdir` before i
 writes, and `scan_dead_docs_beacons` passed over a beacon with no heartbeat (aPairedSlots closing
 review, L2).
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). The upgrade walk
+skipped a step when its witness held, and nothing said the witness is written last, so a step killed after its first
+write would read as done on the re-run. The step kind now writes its witness last and the receipt advances per completed
+step, with kill-midway arms.
+
 ## The remedy
 
 Publish complete, writing under a temporary name and renaming into place, or sweep on the one clock an

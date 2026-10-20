@@ -19,6 +19,31 @@ row — but a dash-led id row IS an anchor, so the row DEFINED the id and the co
 all. The arm asserted a message that never appeared, for a reason unrelated to the rule. Upstream
 counted six probes across one session that reported success while exercising nothing.
 
+A record probe in `memory/builds/dClosedLoop/`, 2026-10-16: the both-runs probe the class
+`one-run-claim-recorded-as-agreed` prescribes was recorded green over `[agreement]`, though its only
+predicate was a spelling no `[agreement]` row uses. It read 52 rows and matched 4. The follow-up
+round caught it (H1 of
+`memory/builds/dClosedLoop/reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-followup.md`).
+A probe recorded green prints how many rows its predicate matched beside how many it read.
+
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). The retired-edited
+check pointed at arm 3c, which loops over descriptor rules and never reads a receipt row, so a planted receipt row would
+pass whatever update did. It now reads update's role-to-verdict mapping and is seen red on that mapping stubbed to
+`forked`.
+
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+The repository-stage splice check planted a stage that removes, reorders or replaces a gov stage, never one before
+Plan, after Deploy or across non-adjacent stages, so a checker that accepted any insertion keeping gov's five whole
+passed every case.
+
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The admission queue's one witness, seven spawns under a limit of six, passed with no queue installed, since the
+harness already queues the agents inside one Workflow run. NT-12's effort check was planted only red, so a check
+refusing every low effort, the owner's own included, passed it.
+
 ## The fix
 
 Every arm asserts the SPECIFIC message its branch emits, never a process exit code, and the fixture

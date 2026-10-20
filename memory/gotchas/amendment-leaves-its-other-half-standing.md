@@ -40,6 +40,44 @@ this class, all of them introduced by the amendments made twenty minutes earlier
 
 None of the four was a lowered bar. Every one was a correct amendment with an uncorrected neighbour.
 
+It bit again in the shape audit, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-18-build-PLAY-dClosedLoop-1-shape-reviews-compared.md`). Twice: the memory
+plan's `[migration]` opened "Nothing is rewritten by hand" above a bullet that routes decision rows by hand, and
+dOrderedCharter held `map_lib`'s re-export for one release after the deprecation window became a policy of two.
+
+It bit again in the last three folds' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-folds-reviews-compared.md`). Four more: the memory
+plan's deploy-overlay row kept `deploy.toml`'s level-0 units after IA-1 moved them out; dOrderedCharter's own upgrade
+steps kept their old list after the fold gave the row three adopter-visible moves; the fates row kept the bug-class
+selector on dLinkedLibrary after SA-7 moved it; and P8's "only through edges" and P38's "changes" outlived the exclusion
+list and the gate's narrower predicate.
+
+It bit again in the night pass two's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-reviews-compared.md`).
+Folds landed in v2 and stopped there. The over-budget refusal survived in layer-instruction, layer-roles and the
+adopter record; `FANOUT_CAP` in the systems and adoption records; agent-cap as the slot counter in the review-system
+and adoption records; and the replaced fates of `agent-cap.js` and `gotchas.py`. dGroundRules also never carried the
+two agent-cap rules point 7's table gave it.
+
+It bit again in the flow and roles adoption's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-flow-adoption-reviews-compared.md`).
+FA-6's fold gave dBoundRoles the `roles.effort.*` keys and left the same row, and the systems record, keeping effort
+in the house file until dConvergedCharter. The record's `[chain]` kept its lines from before FA-3, and
+`instructions.stale` was read for rows with only `order` defined.
+
+It bit again in the owner's answers' closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-night-pass-two-answers-reviews-compared.md`).
+The answers' fold added an admission queue to dWellOiledMachine and left the same row's ledger fallback refusing the
+Workflow call the queue now holds, at the limit of five that NT-28 replaced. The night record's analysis kept the
+tool-call notice and the doorbell-only database that the answers replaced.
+
+It bit again in the parked debt's closing review, 2026-10-19
+(`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-parked-debt-reviews-compared.md`).
+The cloud fold put the fenced push and the tombstone on dPlacedRequest and stopped there: layer-runtime still
+called the re-read before the push safe, flow-steps' unlease items still deleted the lease, and the cloud
+record's own `[chain]` kept a plant from before the owner's fleet. The stall fold left the route-back rule's
+owner item standing twice in flow-steps, and two layer-runtime fixtures asserting the outcomes it replaced.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth
@@ -64,6 +102,13 @@ left standing every note, relaunch line and protocol step that promised a re-run
 The default is the amended half; the promises are the other half, spread across the harness, the
 build harness, the driver and two rendered guides. The harness template,
 `tools/workflows/tier2-review.template.js`, is anchored so the next edit to it selects this class.
+
+**Checklist line: a fold that moves an owner or grows a check re-reads the record's summaries of it.** Build
+dClosedLoop's night pass folded its closing review: the playbook set check moved to dIndexedDesign, and the map's
+fates check grew from six arms to twelve findings. The fold brought the record's fold and instrument sections in
+line, and left the per-point sections, written before it, saying "Test runs the set check (dWitnessedBar)" and "Six
+arms hold every kit to a row". Those sections were what the owner would read first. Grep the record for the old
+owner and the old count before calling a fold done.
 
 There is **no machine gate** for this class today, and the two arms above are filed as
 `TOOL-dTieredTribunal-24` rather than built here. Saying so plainly matters more than usual for this

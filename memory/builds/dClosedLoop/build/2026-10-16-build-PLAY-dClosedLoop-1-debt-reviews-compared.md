@@ -1,0 +1,496 @@
+# The review debt's six pieces, each reviewed twice, compared
+
+**Serves:** research PLAY-dClosedLoop-1
+
+The state record's `[unreviewed]` named six pieces of the design that no review had read
+(`build/2026-10-16-build-PLAY-dClosedLoop-1-state.md`). The owner asked for each to be reviewed twice at
+medium effort. This record holds the twelve runs, and their comparison once they return. The args, and the
+script that wrote them, are in `build/2026-10-16-build-PLAY-dClosedLoop-1-debt-reviews-compared-instruments.md`.
+
+## [words] The owner's words, 2026-10-16
+
+> fix everything that's stale, then review all 6 unreviewed pieces - medium effort, twice each.
+
+## [runs] The twelve runs
+
+| Dispatch | Piece | Kind | Subject | Round | Prior set | Reports |
+|---|---|---|---|---|---|---|
+| 61, 62 | the lexicon | spec audit, full | `lexicon.md` at `424d2a7de` | 1 | — | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-lexicon-a.md`, `-b.md` |
+| 63, 64 | the review system | spec audit, full | `review-system.md` at `40738693d` | 1 | — | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-review-system-a.md`, `-b.md` |
+| 65, 66 | the runtime fold and its two settlements | diff review, light | `6cfd21619..3611a60e9` | 1 | none; the two audit reports ride as specs | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-runtime-fold-a.md`, `-b.md` |
+| 67, 68 | the layers round's follow-up fold | diff review, light | `cc4c83ad5..1bc4883fe` | 3 | round 2's 31 confirmed, from `wf_e26eda01-523` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-fold-round3-a.md`, `-b.md` |
+| 69, 70 | the library round's fold | diff review, light | `d4fc4bb51..0dd962724` | 2 | round 1's 25 confirmed, from `wf_9d4cc07b-2f2` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-library-followup-a.md`, `-b.md` |
+| 71, 72 | the expansion round's follow-up fold | diff review, light | `67c79f7cc..5e139d377` | 3 | round 2's 24 confirmed, from `wf_c69ed990-543` | `reviews/2026-10-16-review-PLAY-dClosedLoop-1-expansions-fold-round3-a.md`, `-b.md` |
+
+## [method] How they run
+
+- **Medium effort.** Every stage, finder, skeptic and synthesis, runs at `medium`, as the owner asked, and
+  as the layers' and the runtime layer's audits ran.
+- **Kinds.** The two designs no review read get the spec audit the layers got: round 1, full, the record
+  at its blob as the subject, and the same six questions. The four folds get the light diff review every
+  fold review got. A fold that answers an earlier round is that chain's next round, handed that round's
+  confirmed set from its workflow's own ledger.
+- **At HEAD.** The worktree is past each fold, and later commits changed some of its text. So each fold
+  review reports a defect only if HEAD still carries it, and cites HEAD's line.
+- **Independent pairs.** Runs A and B share every field but the run label, the report path and a spec
+  audit's scratch directory, which the instruments' `[pairs]` checks. Each run is told the other run's
+  report is not evidence.
+- **One at a time.** No more than five agents run at once, the review protocol's at-once bound, and one
+  run already reaches five. So the twelve run in the table's order, each after the one before returns,
+  as dispatches 57 and 58 did. The owner opened the systems round while dispatch 62 ran, so its two
+  research waves run between dispatches 62 and 63.
+- **The spec audits' opt-in.** This build's README carries `spec-audit:` under `authorized-by: prompt`,
+  and agent-cap admits no audit on a key under that mode. So, as for dispatches 39 to 46, the README's line
+  is set aside and `.unattended.conf` dates `SPEC_AUDIT_DEFAULT` around each spec audit's dispatch call,
+  in the working tree only. Both are restored as soon as the call is admitted, and neither change is
+  committed.
+- **The comparison** follows the layers' method: each pair's findings are placed on shared defects, and
+  what one run alone found is named.
+
+## [summary] Six pairs side by side
+
+Derived by `summarize_debt.py` over this record's six maps (the instruments' `[summarize]`). The columns
+read as the layers comparison's `[summary]` defines them
+(`build/2026-10-16-build-PLAY-dClosedLoop-1-layers-reviews-compared.md`).
+
+| Pair | Kind | Findings A / B | Confirmed A / B | Precision A / B | Out A / B |
+|---|---|---|---|---|---|
+| lexicon | spec audit | 53 / 56 | 47 / 49 | 0.89 / 0.88 | 231.1k / 230.8k |
+| review-system | spec audit | 47 / 45 | 41 / 39 | 0.87 / 0.87 | 224.7k / 207.6k |
+| runtime-fold | light diff | 22 / 25 | 18 / 24 | 0.82 / 0.96 | 88.2k / 119.9k |
+| fold-round3 | light diff | 17 / 18 | 12 / 15 | 0.71 / 0.83 | 105.6k / 106.1k |
+| library-followup | light diff | 24 / 23 | 19 / 22 | 0.79 / 0.96 | 128.6k / 112.0k |
+| expansions-fold-round3 | light diff | 23 / 22 | 19 / 21 | 0.83 / 0.95 | 105.3k / 110.7k |
+| all 6 | — | 186 / 189 | 156 / 170 | 0.84 / 0.90 | 883.5k / 887.1k |
+
+| Pair | Defects | Both | A only | B only | A alone covers | B alone covers | Overlap | Chapman: found by neither | High defects | High, one run only | Shared, graded alike | Refuted, with a confirmed twin |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| lexicon | 49 | 23 | 13 | 13 | 73% | 73% | 0.47 | 7 | 4 | 0 | 14 of 23 | 10 of 13 |
+| review-system | 35 | 19 | 10 | 6 | 83% | 71% | 0.54 | 3 | 2 | 1 | 15 of 19 | 9 of 12 |
+| runtime-fold | 23 | 8 | 5 | 10 | 57% | 78% | 0.35 | 6 | 3 | 2 | 6 of 8 | 0 of 5 |
+| fold-round3 | 13 | 5 | 3 | 5 | 62% | 77% | 0.38 | 2 | 1 | 0 | 3 of 5 | 3 of 8 |
+| library-followup | 21 | 10 | 6 | 5 | 76% | 71% | 0.48 | 3 | 0 | 0 | 9 of 10 | 5 of 6 |
+| expansions-fold-round3 | 17 | 9 | 2 | 6 | 65% | 88% | 0.53 | 1 | 3 | 1 | 7 of 9 | 2 of 5 |
+| the spec audit pairs | 84 | 42 | 23 | 19 | 77% | 73% | 0.50 | 10 | 6 | 1 | 29 of 42 | 19 of 25 |
+| the light diff pairs | 74 | 32 | 16 | 26 | 65% | 78% | 0.43 | 12 | 7 | 3 | 25 of 32 | 10 of 24 |
+| all 6 | 158 | 74 | 39 | 45 | 72% | 75% | 0.47 | 22 | 13 | 4 | 54 of 74 | 29 of 49 |
+
+## [patterns] What the six comparisons show
+
+- **One run still finds three quarters of what two find.**
+  - Alone, a run covers 57% to 88% of its pair's defects, and 72% and 75% over all six pairs. The layers
+    gave 74% and 75%.
+  - The runs overlap at 0.47, against the layers' 0.49. About 22 defects lie beyond both runs.
+  - Run B added 45 defects to run A's 113, about two fifths more. It cost 887.1k output tokens, about 5.1
+    new defects per 100k.
+- **The light diff reviews agree less than the spec audits.** The two full spec audits overlap at 0.50,
+  and the four light diff reviews at 0.43.
+- **High defects slip past a single run.** 4 of the 13 high defects were found by one run only, and 3 of
+  the 4 sit in light diff reviews.
+  - Run A missed three: the runtime fold's `return-key-per-act` and `fencing-epoch`, and the expansion
+    fold's `contract-probe-sixth-site`.
+  - Run B missed one: the review system's `replay-blindness`.
+- **Adjudication is still the noisier half.**
+  - 29 of the 49 refuted findings sit on a defect another finding confirmed. The layers had 40 of 70.
+  - The runs graded 54 of the 74 shared defects alike.
+  - On one claim the skeptics split outright. Run A's two skeptics refuted the expected population's
+    shared state, and run B's confirmed it (`expected-population-shared-state`).
+  - Run B refuted fewer findings in every light diff pair: 6 of 88, against run A's 18 of 86. A post-hoc
+    Fisher test puts the gap at p ≈ 0.01. The spec audits show no gap, at 12 of 100 and 13 of 101.
+- **Run A's findings did not reach run B, save one line.** The two runs' args differ only in their labels,
+  and the instruments' `[contamination]` reads every run-B transcript for the run-A report's name.
+  - In the lexicon pair, one run-B skeptic's `git grep` for an ask id returned one fix line of run A's
+    report.
+  - Elsewhere the name appears only in file listings, in the session's git status, and in run A's args,
+    which carry no finding.
+  - So the light diff pairs' precision gap stays unexplained. dFairHearing's replays are where to watch it.
+- **A fold breaks what it touches.** Every fold review found defects its fold wrote. The expansion fold's
+  both-runs probe is wrong a second time: round 2 found it blind on `[agreement]`, and both round-3 runs
+  found the rewrite exempting three rows it counts as matched.
+- **Four defects went to the owner, all from the two spec audits.** They are `[forks]`' LX-1 to LX-3 and
+  RV-1. Each repair in the four fold pairs stays inside a settled answer.
+
+## [forks] Asked, 2026-10-17
+
+Four pairs are compared so far. Their maps send four defects to the owner, since each one's repair changes a
+settled answer or a standing decision. The last two pairs may add more.
+
+- **Revised: 2026-10-17, all six compared.** The last two pairs add no fork (`[patterns]`).
+
+| Fork | Defects | The question | Options, the recommendation first |
+|---|---|---|---|
+| LX-1 | `acquire-family` | L-3 settled "refuse new splits" as one verb per family per object. The canon has no families: load, read and parse are three clusters, and the "acquire" family was a researcher's probe set. What does the drift rule refuse? | families the owner declares above the canon's clusters, through `instructions.edit`, with `lexicon.drift` reporting until a family is declared; the canon's clusters as the families, so only a split inside one cluster is refused; report only, L-3's second option |
+| LX-2 | `map-extraction-states`, `map-dependency-undeclared` | The lexicon was to classify the map's definitions. That makes it require the map, against KN-1's independent components and the standing decision TOOL-dClosedLexicon-12. The map also reads only the working tree, while the bar, the commit check and `--merge-losses` need the base, the index and both parents of a merge. Where does extraction live? | one extraction primitive in `tools/lib` that reads the working tree, the index or a revision, which both kits call, so neither requires the other; the lexicon requires the map, declared and superseding the decision, and the map learns to read revisions and the index; two extractors, as today |
+| LX-3 | `declaration-home` | Contract declarations are to change only through `instructions.edit`, yet the design places them as `gov:` markers in product code, where any builder's commit edits them. Where do they live? | in a declarations table the instruction write path owns, with at most a pointer in the code that a check resolves; inline `gov:` markers, with a check that refuses a marker change carrying no owner instruction record; in `.lexicon.conf`, owner-edited, as today |
+| RV-1 | `design-audit-selection`, `design-audit-readers` | The design-audit preset is chosen by the subject's kind, and nothing says whether that is a third kind. A third kind passes agent-cap RULE 0's owner opt-in unexamined and misses every reader that keys on the two kinds by value. How is the preset selected? | as a preset of the spec-audit kind, selected by the subject, so RULE 0 and every reader stay as they are; as a third kind, with RULE 0, the harness's kind set, the record-kind vocabulary and the replay scorer updated |
+
+## [answers] Answered, 2026-10-17
+
+Each answer is quoted verbatim.
+
+| Fork | The owner's answer | What it settles |
+|---|---|---|
+| LX-1 | "mechanism that automatically declares families based on what kits were discovered in the adopting repo + owner-declared families" | the drift rule's verb families come from two sources. Each pack that the stack census selects for a kit it discovers in the repository declares that kit's families. The owner declares the rest through `instructions.edit`. `lexicon.drift` refuses a new split inside a declared family and reports one outside every family |
+| LX-2 | "Shared primitive in tools/lib (Recommended)" | one extraction primitive in `tools/lib` reads the working tree, the index or a revision. The map and the lexicon each call it, so neither kit requires the other, and the standing decision TOOL-dClosedLexicon-12 stands |
+| LX-3 | "Instruction-owned table (Recommended)" | contract declarations live in a table the instruction write path owns. The code carries at most a pointer, which a check resolves |
+| RV-1 | "Preset of spec-audit (Recommended)" | design-audit is a preset of the spec-audit kind, selected by its subject. agent-cap RULE 0's owner opt-in and every reader keyed on the two kinds stay as they are |
+
+## [map-lexicon] The lexicon's findings, placed
+
+Run A is `wf_14950dae-859` and run B is `wf_b52591b3-8f4`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `ratified-readers` | retiring the `ratified` stamp names none of its readers: the drift signal v2 makes the lexicon's own leg pack, `adopt-lexicon.sh --check`, the kit's hole and the scaffold | 3, 30, 37, 41 | 2, 30, 38 | amend; `lexicon` `[debt-fold]` |
+| `acquire-family` | the drift rule's verb families do not exist: the canon has no `acquire` family, and load, read and parse are three clusters | 25 | 14, 29 | fork, amend; `lexicon` `[debt-fold]` |
+| `drift-vs-classes` | a declared verb that breaks the one-verb rule is conforming by the class table and debt by `[drift]` | 1 | — | amend; `lexicon` `[debt-fold]` |
+| `drift-object-undefined` | "one verb per family per object" defines neither the object nor the established verb when an object has two | 48 | 54 | amend; `lexicon` `[debt-fold]` |
+| `drift-enforcement-site` | where "refuse new splits" is enforced, and how `lexicon.drift` combines with `lexicon.at-commit`, is unsaid | — | 9 | amend; `lexicon` `[debt-fold]` |
+| `map-extraction-states` | the map reads only the working tree, yet the base comparison, the commit check and `--merge-losses` need other states | 35 | 40 | fork, amend; `lexicon` `[debt-fold]` |
+| `map-dependency-undeclared` | the lexicon comes to require the map, against the kit's self-containment gate and KN-1's independent components, with no `requires` and no absent state | 18, 28, 36, 40 | 5, 25, 28, 42, 52 | fork, amend; `lexicon` `[debt-fold]` |
+| `shim-uncovered` | no pack covers the `mktemp` shim, so 5 of 6 third-party names are covered and the pin cannot fall by 28 | 4, 17, 43 | 6, 16 | amend; `lexicon` `[debt-fold]` |
+| `pin-absorb-dead` | the pin "only falls", yet `absorb` and `no-gate` stay allowed and velocity's `absorb` is unreachable | 2 | 12 | amend; `lexicon` `[debt-fold]` |
+| `pin-rebaseline` | changes that widen or reclassify debt (the `init` row, frozen nouns, pack upgrades) have no re-baseline route | 47 | 49 | amend; `lexicon` `[debt-fold]` |
+| `markers-pep698` | the marker rule misstates PEP 698 and would red correct overrides of in-repository bases | 16 | 1 | amend; `lexicon` `[debt-fold]` |
+| `unresolved-base` | a site whose base cannot be resolved statically gets no class | 49 | 47 | amend; `lexicon` `[debt-fold]` |
+| `declaration-home` | contract declarations sit inline in source as `gov:` markers, outside `instructions.edit`, so an agent can clear its own debt; the readers they cite do not exist | 19, 52 | 23, 35, 48 | fork, amend; `lexicon` `[debt-fold]` |
+| `suppression-path` | a site suppression names no writer or write path, and TOOL-dScaffoldedMirror-4 already designs one | 6 | 31 | amend; `lexicon` `[debt-fold]` |
+| `bar-comparison-seam` | the bar's offender comparison runs only on a red leg under `GATE_ATTRIBUTE`, against the landing base, and never in remote CI | 12, 27 | 15 | amend; `lexicon` `[debt-fold]` |
+| `commit-check-seam` | the commit check names no seam, host, budget or bypass handling | 29, 45 | 8, 33, 51 | amend; `lexicon` `[debt-fold]` |
+| `commit-check-moves` | move-awareness is required at the bar but not at the commit check | 46 | 24 | amend; `lexicon` `[debt-fold]` |
+| `replay-threshold` | the move-aware replay names a measurement with no threshold or consequence | 8 | 32 | amend; `lexicon` `[debt-fold]` |
+| `stdlib-pack-platform` | the stdlib pack depends on the Python minor and the platform it is generated on, and nothing chooses either | 7, 15 | 17 | amend; `lexicon` `[debt-fold]` |
+| `pack-selection-inputs` | pack selection says nothing of a kit with no pack, a version outside every range, no manifest, or several minors | 50 | 50 | amend; `lexicon` `[debt-fold]` |
+| `pack-fixture` | the research's owed fixture across five frameworks is dropped | 5 | — | amend; `lexicon` `[debt-fold]` |
+| `prototype-live-import` | "5 of 5, byte-identical" was measured with the live import the design forbids, on one resolved site | 42 | — | amend; `lexicon` `[debt-fold]` |
+| `pack-row-validation` | what makes a host set namespaced, and how a custom pack's rows are validated, are unsaid | — | 55 | amend; `lexicon` `[debt-fold]` |
+| `forced-by-name-route` | `lexicon.forced` catalogues `by-name`, which no item routes | 32 | 36 | amend; `lexicon` `[debt-fold]` |
+| `suggest-forced-aware` | `--suggest` cannot be forced-aware before the enclosing class exists | 14 | — | amend; `lexicon` `[debt-fold]` |
+| `no-pack-owner-route` | a host with no pack goes to the owner only, with no outcome for a decline or an absent owner | 13 | — | amend; `lexicon` `[debt-fold]` |
+| `vocabulary-proposal-route` | a name that will not fit becomes a vocabulary proposal with no pending or rejected outcome | — | 22 | amend; `lexicon` `[debt-fold]` |
+| `nouns-table` | the NOUNS table rebuilds the canon's clusters and its owner overlay | 26 | — | amend; `lexicon` `[debt-fold]` |
+| `init-row-inventory` | removing the `init` row reds the map's `lexicon-verbs` inventory, and NOUNS has no inventory | — | 41 | amend; `lexicon` `[debt-fold]` |
+| `leg-placement` | the lexicon's bar legs are placed in no leg pack | — | 4 | amend; `lexicon` `[debt-fold]` |
+| `later-records` | later records changed this one with no revision note: gap-lex-08's leg pack and Runtime's hook pack | 9, 20, 51 | 27, 43, 56 | amend; `lexicon` `[debt-fold]` |
+| `chain-order` | L-4 orders dMindYourWords after dTotalRecall alone, before the builds whose extension points it fills | — | 3 | owed; `lexicon` `[debt-fold]` |
+| `chain-count` | the record's chain count is thirteen where v2 now has fifteen | 39 | 45 | amend; `lexicon` `[debt-fold]` |
+| `l6-misstated` | L-6 declared `html` and `svg` dark; the refusal still stands for every other extension | 53 | 11 | amend; `lexicon` `[debt-fold]` |
+| `settled-stale` | `[settled]` still gives dTotalRecall the lexicon's work and gap-mem-10, which L-4 moved | 10, 34 | 37 | amend; `lexicon` `[debt-fold]` |
+| `drain-count` | "one real drain in 60 days" against 11 drains measured | 22 | — | amend; `lexicon` `[debt-fold]` |
+| `readme-misread` | the README's "shrink-only" is the waiver registries', and the two-sided pin has more carriers than `[fixes]` names | 21 | 20, 39 | amend; `lexicon` `[debt-fold]` |
+| `pytest-installed` | "pytest is not installed on this node" is false | 24 | 18 | amend; `lexicon` `[debt-fold]` |
+| `doc-reads-stale` | the legs' `doc_reads` on `memory/builds/` go stale once records leave the population | — | 46 | amend; `lexicon` `[debt-fold]` |
+| `three-pins` | the kit carries three pin seams, and the design names one | — | 34 | amend; `lexicon` `[debt-fold]` |
+| `pins-plain-edit` | the pins and the cell arming still change by plain edit | 38 | — | amend; `lexicon` `[debt-fold]` |
+| `gaps-cite-asks` | the new gaps cite none of the live asks that already state them | 31 | — | amend; `lexicon` `[debt-fold]` |
+| `raise-misread` | "+24 of +30 in `301a36664`" misreads the commit | 23 | — | amend, owed; `lexicon` `[debt-fold]` |
+| `gap2-example` | gap 2's example list drops `get_queryset` | — | 13 | amend, owed; `lexicon` `[debt-fold]` |
+| `foreign-ask` | the out-of-scope class rests on aSurfacedLexicon's open ask, unabsorbed | — | 10, 44 | amend; `lexicon` `[debt-fold]` |
+| `main-red-stale` | `[now]`'s red on main is gone since `ef9c3fbab` | — | 19 | amend; `lexicon` `[debt-fold]` |
+| `fixture-undefined` | "fixture" in the out-of-scope class is undefined | 11 | — | amend; `lexicon` `[debt-fold]` |
+| `tokenizers-thin` | the shell and JavaScript tokenizers cannot give the enclosing class and its bases | 44 | 26 | amend; `lexicon` `[debt-fold]` |
+| `tag-check-point` | the vocabulary check on namespaced tag names, which dOrderedCharter builds, is filled by no lexicon unit | — | 7 | amend, owed; `lexicon` `[debt-fold]` |
+| `declaration-second-carrier` | a contract declaration as a hand-kept copy of the reader's constants | 33 | — | none: refuted, the example limits nothing and a stale arm guards the copy |
+| `import-census` | no extractor collects imports | — | 21 | none: refuted, `lexicon.py`'s Python and JS extractors collect imports |
+| `keys-absent` | the four new keys have no absent state | — | 53 | none: refuted, v2's `policy.on-missing-expansion` covers an absent component |
+
+## [map-review-system] The review system's findings, placed
+
+Run A is `wf_84ae201a-775` and run B is `wf_dd2730e2-e29`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `design-audit-selection` | nothing says how a run or the flow selects the design-audit preset, or whether it is a third kind or a spec-audit preset, and no breakpoint can select it | 1, 13, 30 | 8, 12, 25 | fork, amend; `review-system` `[debt-fold]` |
+| `design-audit-readers` | a third kind meets readers that key on the two kinds by value, and the record names none: agent-cap RULE 0's owner opt-in, the harness's kind set and its `isSpec` branches, the record-kind vocabulary, the replay scorer | 10, 13, 30, 32 | 1, 12, 30, 31, 40 | fork, amend; `review-system` `[debt-fold]` |
+| `rendered-targets` | the edits point at rendered copies, never their sources: `tier2-review.template.js`, `REVIEW-PROTOCOL.template.md` and `gov-synthesizer.agent.md` | 3, 20, 33, 45 | 2, 14, 22, 33 | amend, owed; `review-system` `[debt-fold]` |
+| `gate-home-grammar` | the record's gate homes, "an existing leg, suite or bug class, or new", disagree with `review.report`'s settled dispositions, `class:`, `new:`, `gate:` and `none` | 8, 18, 23, 43 | 3, 23, 44 | amend; `review-system` `[debt-fold]` |
+| `gap-range-stale` | dFairHearing's range reads gap-review-04 to 09, where v2 and the register give it 04 to 10 since the library round | 12, 22, 38 | 4, 18, 28, 39 | amend; `review-system` `[debt-fold]` |
+| `stale-gap-review-03` | `[stale]` lists gap-review-03's agent count as disagreeing, though the register already took the measured count | 12, 22 | — | amend; `review-system` `[debt-fold]` |
+| `preset-two-names` | the current preset is `spec-audit` in `[current]` and "the unit-spec preset" in `[lenses]` | 12 | — | amend; `review-system` `[debt-fold]` |
+| `change-count` | five harness changes in the heading and R-2's fork, four in R-2's answer, which folds the duplicate fix into batching | 9, 31, 40 | 5 | amend; `review-system` `[debt-fold]` |
+| `lenses-heading` | `[lenses]`' heading still reads "no opt-in lenses yet" after R-1's "Both" | 40 | 27 | amend; `review-system` `[debt-fold]` |
+| `owed-tests-missing` | the duplicates change, its orphan check on the diff kind, and gates with a home have no owed test | 9 | 6 | amend; `review-system` `[debt-fold]` |
+| `twins-test-positive-only` | the twins test hands the synthesizer only positive pairs, so one that flags every pair passes | — | 6 | amend; `review-system` `[debt-fold]` |
+| `fix-verdict-test` | the class-level fix-verdict test has a one-instance fixture and no expected verdict | 11 | — | amend; `review-system` `[debt-fold]` |
+| `grade-test-synthetic` | the grade-per-id test uses a hand-built mixed-grade item, not the 110 real same-address pairs | 46 | — | amend; `review-system` `[debt-fold]` |
+| `batch-test-weak` | the batching test's twin arm can move one of three uneven twins, so it can hardly fail | 17 | — | amend; `review-system` `[debt-fold]` |
+| `opt-in-tests` | the opt-in lenses ship with none of the research's losing tests | 6 | — | amend; `review-system` `[debt-fold]` |
+| `replay-blindness` | nothing makes the blind replay blind: a worktree at `6cfd21619` shares refs and objects with the branch that holds the reports | 5, 44 | — | amend; `review-system` `[debt-fold]` |
+| `replay-threshold` | the replay's bar, "about 70%", is not a decidable threshold, sits below what the current preset scores, and has no rule for matching a finding | 4, 14, 44 | 11, 43 | amend; `review-system` `[debt-fold]` |
+| `replay-scorer` | the replay never names `review_replay.py`, which refuses `[tag]`-addressed findings, and the known escapes sit in no appendix | 24, 34 | 43 | amend; `review-system` `[debt-fold]` |
+| `replay-reject-route` | the owed replays route only a pass, and nothing says what happens when one loses | 15 | 17 | amend; `review-system` `[debt-fold]` |
+| `replay-rule0` | the replay's procedure omits agent-cap RULE 0 on that tree | 21 | — | none: refuted, a unit admits its own replay as its spec writes, and the one-off opt-in already exists |
+| `opt-in-extension` | the opt-in catalogue is a closed list in the harness, tied to neither the flow's lens packs nor the roles layer's registration, so an expansion's lens needs a code edit | 7, 19, 26, 37 | 9, 26, 35, 45 | amend, owed; `review-system` `[debt-fold]` |
+| `opt-in-no-reader` | no item in the flow's review program reads `review.opt-in` | 27 | 24 | amend, owed; `review-system` `[debt-fold]` |
+| `opt-in-preset-meaning` | `review.opt-in` mixes policy presets with review presets and is not scoped by review kind | — | 7, 24 | amend; `review-system` `[debt-fold]` |
+| `opt-in-inputs` | `review.opt-in` covers only well-formed values: no validator, no malformed or contradictory value, and no change to the resume key | 41 | 7, 41 | amend; `review-system` `[debt-fold]` |
+| `lensnotes-collision` | the opt-in swap collides with the lens notes' key validation and the light-lens check | 35 | 34 | amend; `review-system` `[debt-fold]` |
+| `lens-duplicates-briefs` | opt-in lenses rebuild briefs the default lenses carry, reopening the retirement of prior-art and unstated-assumption | 25 | 21 | amend; `review-system` `[debt-fold]` |
+| `universal-budget` | three new universal classes take the count to 9 against `UNIVERSAL_BUDGET=6`, which gotchas.py's check 19 refuses | — | 13, 32 | amend; `review-system` `[debt-fold]` |
+| `ordering-unenforced` | nothing orders the chain builds' audits after dFairHearing: only dCalibratedLens names it as a parent | 2 | 10, 16 | amend, owed; `review-system` `[debt-fold]` |
+| `opt-in-depends-on-later-build` | dFairHearing reads `review.opt-in`, whose policy file, schema and reader land later, in dDeclaredLoop | 1 | — | amend; `review-system` `[debt-fold]` |
+| `batch-sort-key` | "sorted by the address they cite" defines no key for a free-text, multi-section or empty address, and a literal sort does not reproduce the measured gains | 42 | 15, 42 | amend; `review-system` `[debt-fold]` |
+| `batch-contiguity` | an address sort breaks the contiguous ids that batch labels, resume files and a code comment assume, and the test file holds 25 references, not 24 | 16 | 19, 36 | amend; `review-system` `[debt-fold]` |
+| `twins-input` | the synthesizer gains no new input from the twins change | 29 | — | none: refuted, the synthesizer is not handed refuted rows' claims today, so the change does add one |
+| `orphan-check-wrong-half` | extending the orphan check to the diff kind extends the parser, while the diff skeptic's prompt asks for a bare "duplicate" | 28 | — | amend; `review-system` `[debt-fold]` |
+| `grade-per-id-f2` | "the counts stay by binding grade, so F2 stands", where F2 chose counts derived from the synthesis's items | — | 20 | amend; `review-system` `[debt-fold]` |
+| `leg-manifest-dependency` | handing the synthesizer the leg manifest adds a dependency the kit does not declare, with no case for an install without it | 36, 47 | — | amend; `review-system` `[debt-fold]` |
+| `rate-denominator` | the twin gain is quoted over 8 beside a population of 9, and lens-note use over "about 49" beside 50 | 39 | 38 | amend; `review-system` `[debt-fold]` |
+| `review-driver-nonexistent` | "the review driver" passes lens notes, but no tool by that name exists, and the Audit stage passes none | — | 29 | amend; `review-system` `[debt-fold]` |
+| `restatement-gate` | restating the hook's lens count as a digit is what the restatement gate refuses | — | 37 | none: refuted, the restatement leg refuses a bare digit at the bar, so nothing wrong ships |
+
+## [map-runtime-fold] The runtime fold's findings, placed
+
+Run A is `wf_c8860577-b54` and run B is `wf_dea5d838-89e`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `binding-on-fail-open-entry` | act binding and the stale-epoch fence sit on the PreToolUse entry, which fails open below 2.1.295, while the PermissionRequest entry, the one path that fails closed, decides by the allowance alone; no fixture crashes PreToolUse beside a healthy PermissionRequest | 1, 13 | 3, 10, 17 | amend; `[fold-runtime-fold]` |
+| `return-key-per-act` | a persisted return is keyed by the item and the act's task-sha, so the agents of one fan share a key and a relaunch cannot tell which returned | — | 1 | amend; `[fold-runtime-fold]` |
+| `fencing-epoch` | fencing rests on an epoch no lease grammar carries, says nothing of how a dispatcher on another node learns it, and its fixture can pass without the refusal running | — | 2 | amend; `[fold-runtime-fold]` |
+| `permission-request-unlisted` | `[enforce]`'s event list and the owner-pack table leave out PermissionRequest, the only allow path for gated tools after RT-2 | 2, 14 | 11, 18 | amend; `[fold-runtime-fold]` |
+| `mid-run-crash-untested` | RT-2's answer says a permission host that crashes mid-run stays a losing test in `[tests]`, and `[tests]` holds no such case | 3, 11, 16 | 7, 15, 24 | amend; `[fold-runtime-fold]` |
+| `onfailure-three-ways` | `onFailure` is written unconditionally by settings-merge, conditionally by unit 7, and omitted by the `binary` fixture, over one tracked settings file for every node | 10, 15 | 14, 19 | amend; `[fold-runtime-fold]` |
+| `next-awaiting-answer` | `[terms]` has `next` report a hook item as awaiting its event, and the closed answer set has no such answer | 4 | 13 | amend; `[fold-runtime-fold]` |
+| `next-answers-untested` | the `next` fixture checks terminal, stuck and invalid-input only, not blocked, stale-remote or act | 17 | — | amend; `[fold-runtime-fold]` |
+| `seen-red-count` | the instrument's red evidence is two planted copies in `[method]` and three in the kept output | 7 | 9, 25 | amend; `[fold-runtime-fold]` |
+| `open-policy-untested` | the `fail-closed` invariant's clauses for a journaled bypass and for `runtime.hook-failure: open` have no fixture arm | 20 | 21 | amend; `[fold-runtime-fold]` |
+| `coverage-arm-design-text` | the `coverage` arm asks whether each `runtime.*` key has a reader in the design record, not in the built code | 18 | 22 | amend; `[fold-runtime-fold]` |
+| `neither-additions-untested` | the fold's own additions, the reap past `runtime.act-ceiling` and the workspace line endings from the node registry, have no fixture | — | 22 | amend; `[fold-runtime-fold]` |
+| `attended-no-allowance` | PermissionRequest decides by the act's allowance, and attended and unbound sessions have no act | 12 | — | amend; `[fold-runtime-fold]` |
+| `dispatcher-start-two-ways` | a dispatcher that cannot start refuses every call at line 617, and hands an attended call to the person at lines 565-566 and in the fixture | — | 6 | amend; `[fold-runtime-fold]` |
+| `allow-rule-bypass` | a gated call "runs only on the dispatcher's approval", yet an allow rule in local or user settings is only warned about, and the act session's launch does not restrict its setting sources | — | 5 | amend; `[fold-runtime-fold]` |
+| `second-permission-hook` | nothing checks local or user settings for a second PermissionRequest hook beside the single dispatcher | — | 20 | amend; `[fold-runtime-fold]` |
+| `attended-slot-release` | an attended session's PreToolUse entry reserves fan slots, and only an act session's exit or reap releases them | — | 12 | amend; `[fold-runtime-fold]` |
+| `cadence-dedup-race` | the supervisor reads the cadence witness before it takes the lease and never re-reads it after | — | 4 | amend; `[fold-runtime-fold]` |
+| `stop-witness-producer` | the Stop row names the act's outcome record as its witness, and nothing produces it | — | 16 | amend; `[fold-runtime-fold]` |
+| `latency-fixture-no-red` | the `latency` fixture's p50 sets the budget it measures, so it names no red | — | 23 | amend; `[fold-runtime-fold]` |
+| `fail-closed-arm-ungated` | the `fail-closed` arm's first tool call after a crashed SessionStart names no gated tool, and Read stays open below 2.1.295 | 5 | — | amend; `[fold-runtime-fold]` |
+| `trap-untested` | git hooks trapping signals closes gap-deploy-07's class, says the record, and the only git arm sends SIGKILL, which no trap catches | 19 | — | amend; `[fold-runtime-fold]` |
+| `capability-claimed` | the capability table claims PermissionRequest answers ask rules on every version, under a heading that claims nothing unmeasured, and only 2.1.292 and 2.1.295 were measured | 21 | — | amend; `[fold-runtime-fold]` |
+| `rt1-two-ways` | RT-1 is restated as a fresh start at every boundary | 6 | — | none: refuted, the line answers the on-full check and the next bullet keeps `context.on-full` |
+| `relaunch-cap-fixture` | the relaunch cap's fixture counts resume-tick's resetting counter | 8 | — | none: refuted, the design defines the cap per act and carries no reset rule over |
+| `act-ceiling-registration` | `runtime.act-ceiling` is a second carrier of process-monitor's ceiling | 9 | — | none: refuted, the two keys carry different facts |
+| `chain-count` | "the chain has fourteen builds" against v2's fifteen | 22 | 8 | amend: refuted only as outside the range, and HEAD still carries it; `[fold-runtime-fold]` |
+
+## [map-fold-round3] The layers round's round-3 fold findings, placed
+
+Run A is `wf_588892a6-fb7` and run B is `wf_fc0975c8-622`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `claim-unreachable-from-triage` | `entry.claim` lists triage's select among its needs, and no route reaches it from triage, whose records are written before any claim | 2 | 7 | amend; `[fold-fold-round3]` |
+| `publish-failed-no-arm` | `deploy.core` reads the verdict from the per-SHA log and routes green, red and REFUSED, and a failed publication prints none of the three there, while `refs/gov/bar-red` is not always published | 1, 7 | 2, 11, 17 | amend; `[fold-fold-round3]` |
+| `held-leg-no-release` | the held-flaky-leg ask's acceptance names a consecutive-green count nothing produces, and no item lifts the hold when it is met | 4, 11 | 12, 18 | amend; `[fold-fold-round3]` |
+| `flake-record-two-writers` | the runner and the `test.flakes` command are both named writers of the flake record | 13 | 5 | amend; `[fold-fold-round3]` |
+| `parser-indented-rows` | `role_matrix.py`'s widened arm 0 still drops an indented or pipe-less row, and its body-row count shrinks with it | 5, 15 | 1, 14, 16 | amend; `[fold-fold-round3]` |
+| `ask-claim-create-once` | the per-family ask claim ref is created once, so it serialises only a family's first ask | 3, 10 | — | amend; `[fold-fold-round3]` |
+| `ask-lock-narrowed` | the ask mint lock covers only `entry.place`'s asks, while the owner, a surfaced idea, an expansion and the supervisor also file outside a build | — | 9 | amend; `[fold-fold-round3]` |
+| `claim-no-idempotence-key` | `entry.claim` declares no key that lets a retry recognise its own claim | — | 8 | amend; `[fold-fold-round3]` |
+| `claim-prune-two-ways` | a slug's claim ref is never pruned in memory, and the runtime supervisor prunes terminal claim refs with no namespace limit | 9 | — | amend; `[fold-fold-round3]` |
+| `flakes-duplicate-ask` | under `quarantine`, `test.flakes` files the held-leg ask on every flake past the threshold, with no idempotence key | 12 | — | amend; `[fold-fold-round3]` |
+| `removal-pending-no-filer` | a `removal-pending` entry waits on a patch build that no item files | 14 | 13 | amend; `[fold-fold-round3]` |
+| `land-outcome-overlap` | `deploy.land`'s "landed ungated" and "nothing pushed" both hold on a no-op push, and its sources cannot tell them apart | 8 | 4 | amend; `[fold-fold-round3]` |
+| `gaps-registered-list` | "the gaps registered" lists two new gaps after the follow-up round, and v2, the register and the record's own L4 row name a third, gap-mem-14 | — | 6, 15 | amend; `[fold-fold-round3]` |
+| `start-guard-blocks-refused-rerun` | `deploy.core`'s start guard makes its own REFUSED re-run dead | 6 | 10 | none: refuted, the re-run is an explicit route that never passes back through the start guard |
+| `gap-test-04-contract` | gap-test-04's row omits the re-run contract and probe the flow says it owes | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it |
+| `gap-rows-no-check` | gap-deploy-02 and gap-deploy-09 state the defect with no check that can fail | 17 | — | none: refuted, the register's rows carry no check column by its own form |
+| `replacement-route` | the route after `plan.dedupe` contradicts itself on a re-placement | — | 3 | none: refuted, a re-placement goes to `plan.triage-rule` and keeps its claim, as `[transitions]` says |
+
+## [map-library-followup] The library round's fold findings, placed
+
+Run A is `wf_579f3126-0b4` and run B is `wf_0beb4276-c5c`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `distill-class-no-producer` | `build.distill` reds on a fork with no class, yet no Design item's witness requires the class, and the red has no route | 1, 20 | 2, 12 | amend; `[fold-library-followup]` |
+| `ratification-two-places` | under `author-owner-ratifies`, Build's breakpoints put the owner's ratification before `build.distill`, its Needs and Then put it after, and a rejected re-class has no writer | 10, 19 | 1, 11, 23 | amend; `[fold-library-followup]` |
+| `owner-only-no-arm` | `owner-only`'s rule that only an owner-resolved fork may be major sits in Does, with no witness arm and no route | 2, 19 | 20 | amend; `[fold-library-followup]` |
+| `distill-key-no-fork-field` | `build.distill`'s idempotence and its one-to-one witness are keyed by build and fork, and the row it writes has no fork field | 9, 17 | 8 | amend; `[fold-library-followup]` |
+| `deploy-distill-no-route` | `deploy.distill` can now go red on a row missing at the landed SHA, and its only route is `deploy.recommend` | 7, 12, 20 | 6, 21 | amend; `[fold-library-followup]` |
+| `distill-after-core` | `build.distill` runs after `build.core`, so the core checks, check 27 among them, never grade the rows it appends, and Build's exit is certified before its last commit | 3, 13 | — | amend; `[fold-library-followup]` |
+| `layer-memory-stale-writer` | layer-memory `[decisions]` still has `deploy.distill` append the major decisions when the build lands | 4 | 5, 13 | amend; `[fold-library-followup]` |
+| `typed-reuse-witness` | round 1's typed-witness finding stands: `build.unit-pass` is still proven by the builder's own reuse line, whose `none` arm cannot fail | 22 | 3, 22 | amend; `[fold-library-followup]` |
+| `built-path-class-unchecked` | on built work nothing checks that an owed class record was written; a write set only allows the path | 18 | 19 | amend; `[fold-library-followup]` |
+| `ask-form-not-catalogued` | the new acceptance, "accepted once the class record exists", is not among layer-memory `[asks]`' closed forms | 16 | 14 | amend; `[fold-library-followup]` |
+| `plan-scope-tags` | Plan reads the research view and the decision log by scope tags that neither carries | 14 | 7, 15 | amend; `[fold-library-followup]` |
+| `build-policy-list-missing` | `build.distill` routes by `run.on-owner-question`, which Build's policy list leaves out | 11 | 10 | amend; `[fold-library-followup]` |
+| `research-kind-selector` | the research-return kind declares no selector, and its witness's planted red cannot fire, since no record in the tree carries the kind | 15 | 18 | amend; `[fold-library-followup]` |
+| `reuse-token-population` | gap-design-05 sizes the token migration against the wrong predicate: the hygiene check admits the substring "no existing seam" | 8, 24 | — | amend; `[fold-library-followup]` |
+| `fork-population-unobserved` | the witness reads only the forks Design recorded, so an empty set cannot show that no fork was resolved | 21 | — | amend; `[fold-library-followup]` |
+| `ordering-dorderedcharter` | dOrderedCharter's widened dependency check can pass only after dTotalRecall lands, though dOrderedCharter comes first | 5 | — | amend; `[fold-library-followup]` |
+| `new-slug-collision` | a `new:` slug passes if no record held it at the report's pinned SHA, so two concurrent reviews can mint one slug | 6 | — | amend; `[fold-library-followup]` |
+| `research-population-count` | the "59 research returns" are selected by file name and include instrument records | 23 | — | amend; `[fold-library-followup]` |
+| `owner-asks-two-meanings` | `owner-asks` means "no line is owed" in LB-2's offer and "a line for the features an owner ask names" in the fold | — | 4 | amend; `[fold-library-followup]` |
+| `recall-imports-eight` | the planned move covers recall's two core-read functions, and check 27 imports eight names from the recall kit | — | 9 | amend; `[fold-library-followup]` |
+| `fix-unit-write-set` | the fix unit's write set omits the dossier edit that claims the new class | — | 17 | amend; `[fold-library-followup]` |
+| `gotcha-claim-wrong-dossier` | the idempotence class is claimed by a dossier of checkers | — | 16 | none: refuted, gotchas.py selects a class by its own anchors, not by a dossier's claims |
+
+## [map-expansions-fold-round3] The expansion round's round-3 fold findings, placed
+
+Run A is `wf_e8eb06bb-8ca` and run B is `wf_bf702393-ce3`. The ids are each report's appendix ids. A
+refuted finding sits on the defect its claim names, beside its confirmed twin where one exists.
+- **A finding that names two defects sits on each one its skeptic confirmed.** B3's skeptic confirmed
+  only its node-tick half, so B3 sits there alone.
+- **The skeptics split on one claim.** A6 and A21 were refuted and B22 was confirmed, all on the
+  expected population's shared state.
+- **Two refuted findings name defects older than the diff.** Their skeptics found A15 and A22 real, but
+  present at the base. Their rows read amend, and the comparison still counts them refuted.
+
+| defect | what | A | B | disposition |
+|---|---|---|---|---|
+| `both-runs-probe-exempts-rows` | the corrected both-runs probe counts a row as matched, then exempts it when "re-measured here" sits in any cell, so three `[agreement]` rows that credit both runs with no return citation pass | 1, 17 | 1, 10, 17 | amend; `[fold-expansions-fold-round3]` |
+| `rerender-declines-hole-probes` | gap-deploy-13 and the gotcha say `GOVKIT_RERENDER=0` leaves the `[[hole]]` probes running, and both of update's hole-probe sites sit behind that switch | 2, 11 | 2, 9 | amend; `[fold-expansions-fold-round3]` |
+| `quiesce-landed-withdraw` | `life.quiesce` now refuses only a pause of a landed build, so a withdraw or supersede of a landed build outside the release wait falls to `life.notify` and is recorded withdrawn | 3 | 4 | amend; `[fold-expansions-fold-round3]` |
+| `release-hold-item-keys` | the release wait's owner item is keyed three ways, by the supervisor's sweep, by `life.quiesce` and by `deploy.released`'s arm, and the sweep has no "unless one is open" | 4, 13 | 5, 12, 21 | amend; `[fold-expansions-fold-round3]` |
+| `request-lease-no-producer` | "life.* runs under the request's own run lease" names a lease that no layer produces | 9, 12 | 5 | amend; `[fold-expansions-fold-round3]` |
+| `ceiling-sweep-key-spent` | the ceiling sweep fires once per (build, landed SHA), so after the owner keeps waiting no later ceiling exists | 5 | — | amend; `[fold-expansions-fold-round3]` |
+| `release-ask-two-keys` | `maintain.file` keys the release-verify-failed ask by (reading, offender key), which makes it (release-verify-failed, SHA, E), and `release.route` keys its ask by (SHA, E) | 7, 14, 20 | 7, 11 | amend; `[fold-expansions-fold-round3]` |
+| `second-keep-same-key` | the keep record is keyed by (ledger kind, id), so once a keep lapses a second keep of the same row cannot be written | 8, 16 | 8, 13 | amend; `[fold-expansions-fold-round3]` |
+| `keep-fixture-one-sided` | the keep fixture checks only that a kept row is left out, never that it returns after the window or on a new catch | 19 | 20 | amend; `[fold-expansions-fold-round3]` |
+| `event-wait-fixture-arms` | the event-wait fixture plants two builds in one landed SHA instead of one exit record for a later SHA containing several, names no stub that turns it red, and its sweep case has no negative arm | 10, 18 | 19 | amend; `[fold-expansions-fold-round3]` |
+| `expected-population-shared-state` | each push boundary's expected population comes from the same range the scan reads, so a range computed wrong empties both and reads "none carried" | 6, 21 | 22 | amend; `[fold-expansions-fold-round3]` |
+| `node-tick-no-expected-population` | the node tick's journal and transcript scan declares no expected population, and the rule that made its empty population a dead probe is gone | — | 3, 15 | amend; `[fold-expansions-fold-round3]` |
+| `quiesce-arms-no-fixture` | `life.quiesce`'s new arms have no fixture | — | 21 | amend; `[fold-expansions-fold-round3]` |
+| `contract-probe-sixth-site` | update's `[[contract]]` parity probe runs the adopter's file with cwd at the target and no `GOVKIT_RERENDER` gate, a sixth kind beside the records' "all five" | — | 18 | amend; `[fold-expansions-fold-round3]` |
+| `five-kinds-probe-unrun` | the reachability probe behind "five kinds" has no recorded run, and run statically it also lists `decline_findings`' spawn, which is off by default | 23 | — | amend; `[fold-expansions-fold-round3]` |
+| `released-witness-no-build` | `deploy.released`'s witness names the exit record keyed by SHA, with no build, while `[schedule]` witnesses each wake by build | — | 14 | amend; `[fold-expansions-fold-round3]` |
+| `runtime-reader-table` | Runtime's reader table omits `build.release-ceiling` and `build.closes`, which the new sweep reads | — | 16 | amend; `[fold-expansions-fold-round3]` |
+| `same-sha-repass-skipped` | after a held pass, a second exit record for the same SHA reuses a witnessed wake key and is skipped | 15 | — | amend: refuted only as older than the diff, since the base keyed the wake by (event, SHA); `[fold-expansions-fold-round3]` |
+| `payload-fixture-vacuous` | under the refusing mode no planted payload runs, so the fixture cannot tell a refusal from a clean sandbox or a crashed payload | 22 | — | amend: refuted only as older than the diff, since the base fixture asserted the same; `[fold-expansions-fold-round3]` |
+| `ceiling-sweep-no-driver` | nothing beats to run the ceiling sweep when no lease is live | — | 6 | none: refuted, the node tick starts a supervisor when none beats under a live lease, and its beat runs the sweep |
+
+## [fold-runtime-fold] The runtime-fold pair, folded 2026-10-17
+
+Dispatches 65 and 66 reviewed the runtime fold, `6cfd21619..3611a60e9`. Each of their map rows
+(`[map-runtime-fold]`) went here, into layer-runtime, v2's chain rows and the runtime comparison record. Each
+row's classes are its confirmed findings' own, from the two ledgers. The fold is unreviewed text, and a
+closing review of the debt round's folds is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `binding-on-fail-open-entry` | 1, 13 | 3, 10, 17 | amend | layer-runtime `[act]`'s call binding and `[enforce]`'s permission baseline; `[tests]` `binding` | `rule-stated-with-no-check-that-fails` |
+| `return-key-per-act` | — | 1 | amend | layer-runtime `[spawn]`'s return key; `[tests]` `relaunch` | — |
+| `fencing-epoch` | — | 2 | amend | layer-runtime `[supervise]`'s fencing and its lease names; v2's dDeclaredLoop row; `[tests]` `fencing` | — |
+| `permission-request-unlisted` | 2, 14 | 11, 18 | amend | layer-runtime `[enforce]`'s events, owner-pack table and class arm; `[harness]`; `[tests]` `extension` | `amendment-leaves-its-other-half-standing` |
+| `mid-run-crash-untested` | 3, 11, 16 | 7, 15, 24 | amend | layer-runtime `[tests]` `fail-closed`; `[answers]`' dated RT-2 note | `rule-stated-with-no-check-that-fails` |
+| `onfailure-three-ways` | 10, 15 | 14, 19 | amend | layer-runtime `[enforce]`'s switch; `[build]` unit 7; `[tests]` `binary` | `amendment-leaves-its-other-half-standing`, `two-answers-to-one-question` |
+| `next-awaiting-answer` | 4 | 13 | amend | layer-runtime `[decide]`'s answers and the diagram; v2's dDeclaredLoop row; `[tests]` `next` | — |
+| `next-answers-untested` | 17 | — | amend | layer-runtime `[tests]` `next` | `rule-stated-with-no-check-that-fails` |
+| `seen-red-count` | 7 | 9, 25 | amend | the runtime comparison record's method line | `two-answers-to-one-question` |
+| `open-policy-untested` | 20 | 21 | amend | layer-runtime `[tests]` `fail-closed` | `rule-stated-with-no-check-that-fails` |
+| `coverage-arm-design-text` | 18 | 22 | amend | layer-runtime `[tests]` `coverage` | `rule-stated-with-no-check-that-fails` |
+| `neither-additions-untested` | — | 22 | amend | layer-runtime `[tests]` `act-ceiling` and `workspaces` | `rule-stated-with-no-check-that-fails` |
+| `attended-no-allowance` | 12 | — | amend | layer-runtime `[act]`'s decision by binding; `[tests]` `binding` | — |
+| `dispatcher-start-two-ways` | — | 6 | amend | layer-runtime `[enforce]`'s bypasses | — |
+| `allow-rule-bypass` | — | 5 | amend | layer-runtime `[enforce]`'s allow path and `[invariants]` `fail-closed`; `[tests]` `fail-closed` | — |
+| `second-permission-hook` | — | 20 | amend | layer-runtime `[enforce]`'s allow path; `[tests]` `fail-closed` | `rule-stated-with-no-check-that-fails` |
+| `attended-slot-release` | — | 12 | amend | layer-runtime `[supervise]`'s agents in flight; `[tests]` `in-flight` | — |
+| `cadence-dedup-race` | — | 4 | amend | layer-runtime `[schedule]`'s cadence witness; `[tests]` `cadence` | — |
+| `stop-witness-producer` | — | 16 | amend | layer-runtime `[enforce]`'s witness table; `[build]` unit 3 | — |
+| `latency-fixture-no-red` | — | 23 | amend | layer-runtime `[enforce]`'s latency; `[tests]` `latency` | `rule-stated-with-no-check-that-fails` |
+| `fail-closed-arm-ungated` | 5 | — | amend | layer-runtime `[act]`'s session binding; `[tests]` `fail-closed` | — |
+| `trap-untested` | 19 | — | amend | layer-runtime `[tests]` `git-witness` | `rule-stated-with-no-check-that-fails` |
+| `capability-claimed` | 21 | — | amend | layer-runtime `[harness]`'s capability table and node registry | — |
+| `rt1-two-ways` | 6 | — | none: refuted, the line answers the on-full check and the next bullet keeps `context.on-full` | — | — |
+| `relaunch-cap-fixture` | 8 | — | none: refuted, the design defines the cap per act and carries no reset rule over | — | — |
+| `act-ceiling-registration` | 9 | — | none: refuted, the two keys carry different facts | — | — |
+| `chain-count` | 22 | 8 | amend: refuted only as outside the range, and HEAD still carries it | layer-runtime `[build]` points at v2's `[chain]` | — |
+
+## [fold-fold-round3] The round-3 fold pair, folded 2026-10-17
+
+Dispatches 67 and 68 reviewed the layers round's follow-up fold, `cc4c83ad5..1bc4883fe`. Each of their
+map rows (`[map-fold-round3]`) went here, into flow-steps, layer-memory, layer-runtime, layer-roles, the
+register, two gotchas and the layers comparison record. Each row's classes are its confirmed findings'
+own, from the two ledgers. The fold is unreviewed text, and a closing review of the debt round's folds
+is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `claim-unreachable-from-triage` | 2 | 7 | amend | flow-steps' Plan Enters and `plan.triage-rule`; layer-memory `[contract]` | `route-names-an-output-its-actor-never-emits` |
+| `publish-failed-no-arm` | 1, 7 | 2, 11, 17 | amend | flow-steps' `deploy.core` and the core re-check's witness; `gap-deploy-02` | `policy-value-with-no-route`, `route-names-an-output-its-actor-never-emits` |
+| `held-leg-no-release` | 4, 11 | 12, 18 | amend | flow-steps' `test.select`; layer-memory `[asks]`; `gap-test-04` | `amendment-leaves-its-other-half-standing` |
+| `flake-record-two-writers` | 13 | 5 | amend | flow-steps' `test.flakes`; layer-memory `[asks]`; `gap-test-04` | — |
+| `parser-indented-rows` | 5, 15 | 1, 14, 16 | amend | layer-roles `[instrument]`, `role_matrix.py` revised 2026-10-17; the parser gotcha | `parser-drops-rows-it-cannot-place`, `zero-witness-over-an-unnamed-population` |
+| `ask-claim-create-once` | 3, 10 | — | amend | layer-memory `[contract]`; `gap-mem-13` | — |
+| `ask-lock-narrowed` | — | 9 | amend | layer-memory `[contract]`; `gap-mem-13` | — |
+| `claim-no-idempotence-key` | — | 8 | amend | flow-steps' `entry.claim`; layer-memory `[contract]`; `gap-mem-13` | `append-without-an-idempotence-key` |
+| `claim-prune-two-ways` | 9 | — | amend | layer-runtime `[supervise]`; `gap-mem-13` | — |
+| `flakes-duplicate-ask` | 12 | — | amend | flow-steps' `test.flakes`; layer-memory `[asks]` | `append-without-an-idempotence-key` |
+| `removal-pending-no-filer` | 14 | 13 | amend | layer-memory `[reuse]` and `[asks]`; the reject-outcome gotcha | `owner-item-without-its-reject-outcome` |
+| `land-outcome-overlap` | 8 | 4 | amend | flow-steps' `deploy.land` and the lander's outcome classes | `route-names-an-output-its-actor-never-emits` |
+| `gaps-registered-list` | — | 6, 15 | amend | the layers comparison's `[folded]`, a gap list typed by hand in the tally script's template, which derives only the counts | — |
+| `start-guard-blocks-refused-rerun` | 6 | 10 | none: refuted, the re-run is an explicit route that never passes back through the start guard | — | — |
+| `gap-test-04-contract` | 16 | — | none: refuted, the row carries the contract the design relies on, and the probe sits in the text that cites it | — | — |
+| `gap-rows-no-check` | 17 | — | none: refuted, the register's rows carry no check column by its own form | — | — |
+| `replacement-route` | — | 3 | none: refuted, a re-placement goes to `plan.triage-rule` and keeps its claim, as `[transitions]` says | — | — |
+
+## [fold-library-followup] The library pair, folded 2026-10-17
+
+Dispatches 69 and 70 reviewed the library round's fold, `d4fc4bb51..0dd962724`. Each of their map rows
+(`[map-library-followup]`) went here, into flow-steps, layer-memory, layer-library, v2 and the register, with two
+probes filed in the instruments record's `[probes-library]`. Each row's classes are its confirmed
+findings' own, from the two ledgers. One fix moves work between chain builds: dOrderedCharter, not
+dTotalRecall, moves check 27's eight recall-kit names into memory-tree. The fold is unreviewed text, and
+a closing review of the debt round's folds is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `distill-class-no-producer` | 1, 20 | 2, 12 | amend | flow-steps' `design.decompose`, `design.unit-spec` and `build.distill`; Build's Memory line; layer-library `[log]` | `route-names-an-output-its-actor-never-emits`, `rule-stated-with-no-check-that-fails` |
+| `ratification-two-places` | 10, 19 | 1, 11, 23 | amend | flow-steps' new `build.ratify` and Build's Breakpoints; layer-library `[log]` | `owner-item-without-its-reject-outcome`, `route-names-an-output-its-actor-never-emits`, `two-answers-to-one-question` |
+| `owner-only-no-arm` | 2, 19 | 20 | amend | flow-steps' `build.distill` witness and route; Design's Memory line | `owner-item-without-its-reject-outcome`, `policy-value-with-no-route` |
+| `distill-key-no-fork-field` | 9, 17 | 8 | amend | flow-steps' `build.distill` and `deploy.distill`; layer-memory `[decisions]`; layer-library `[log]` | — |
+| `deploy-distill-no-route` | 7, 12, 20 | 6, 21 | amend | flow-steps' `deploy.distill`; layer-library `[log]` | `route-names-an-output-its-actor-never-emits` |
+| `distill-after-core` | 3, 13 | — | amend | flow-steps' Build table and the closing review; layer-library `[log]` | — |
+| `layer-memory-stale-writer` | 4 | 5, 13 | amend | layer-memory `[decisions]` | `amendment-leaves-its-other-half-standing` |
+| `typed-reuse-witness` | 22 | 3, 22 | amend | flow-steps' `build.unit-pass`; layer-library `[reuse-proposal]` | — |
+| `built-path-class-unchecked` | 18 | 19 | amend | flow-steps' `build.unit-pass` | — |
+| `ask-form-not-catalogued` | 16 | 14 | amend | layer-memory `[asks]`; flow-steps' `review.dispose`; layer-library `[left-shift]` | — |
+| `plan-scope-tags` | 14 | 7, 15 | amend | flow-steps' Plan Memory line; layer-library `[consult]` | — |
+| `build-policy-list-missing` | 11 | 10 | amend | flow-steps' Build policy list | — |
+| `research-kind-selector` | 15 | 18 | amend | layer-library `[research-view]` | `two-answers-to-one-question` |
+| `reuse-token-population` | 8, 24 | — | amend | `gap-design-05`, with its probe in the debt instruments' `[probes-library]` | — |
+| `fork-population-unobserved` | 21 | — | amend | flow-steps' Design witnesses and `build.distill`'s population | — |
+| `ordering-dorderedcharter` | 5 | — | amend | v2's dOrderedCharter and dTotalRecall rows; layer-library `[consult]` | — |
+| `new-slug-collision` | 6 | — | amend | flow-steps' `review.report`; layer-library `[left-shift]` | — |
+| `research-population-count` | 23 | — | amend | layer-library `[current]`; `gap-mem-15` and `gap-design-07`, with the probe in `[probes-library]` | — |
+| `owner-asks-two-meanings` | — | 4 | amend | flow-steps' `build.unit-pass`; layer-library `[reuse-proposal]` | `amendment-leaves-its-other-half-standing` |
+| `recall-imports-eight` | — | 9 | amend | layer-library `[consult]`; v2's rows and its dated note | — |
+| `fix-unit-write-set` | — | 17 | amend | flow-steps' `build.unit-pass`; layer-library `[left-shift]` | — |
+| `gotcha-claim-wrong-dossier` | — | 16 | none: refuted, gotchas.py selects a class by its own anchors, not by a dossier's claims | — | — |
+
+## [fold-expansions-fold-round3] The expansion pair, folded 2026-10-17
+
+Dispatches 71 and 72 reviewed the expansion fold's round 3, `67c79f7cc..5e139d377`. Each of their map
+rows (`[map-expansions-fold-round3]`) went here, into flow-steps, layer-runtime, layer-expansions, v2, the register, two
+gotchas and the expansions comparison record, with two probes filed in the instruments record's
+`[probes-expansions]`. Each row's classes are its confirmed findings' own, from the two ledgers. The
+fold is unreviewed text, and a closing review of the debt round's folds is owed.
+
+| Defect | A | B | Disposition | Where the fix sits | Its classes |
+|---|---|---|---|---|---|
+| `both-runs-probe-exempts-rows` | 1, 17 | 1, 10, 17 | amend | the both-runs probe revised in the debt instruments' `[probes-expansions]`; layer-expansions' three `[agreement]` rows cited; the gotcha; the expansions comparison's `[follow-up]` note | `fixture-passes-by-finding-nothing`, `one-run-claim-recorded-as-agreed` |
+| `rerender-declines-hole-probes` | 2, 11 | 2, 9 | amend | `gap-deploy-13`; the foreign-code gotcha | `foreign-code-runs-on-the-ambient-credential` |
+| `quiesce-landed-withdraw` | 3 | 4 | amend | flow-steps' `life.quiesce` | — |
+| `release-hold-item-keys` | 4, 13 | 5, 12, 21 | amend | flow-steps' `life.quiesce` and `deploy.released`; layer-runtime `[supervise]`'s sweep | `append-without-an-idempotence-key`, `two-answers-to-one-question` |
+| `request-lease-no-producer` | 9, 12 | 5 | amend | flow-steps' `life.quiesce`; layer-runtime `[schedule]`; v2's dWellOiledMachine row | — |
+| `ceiling-sweep-key-spent` | 5 | — | amend | layer-runtime `[supervise]`'s sweep | — |
+| `release-ask-two-keys` | 7, 14, 20 | 7, 11 | amend | layer-expansions' release asks paragraph and `release.route` | `two-answers-to-one-question` |
+| `second-keep-same-key` | 8, 16 | 8, 13 | amend | layer-expansions' keep record, `loop.propose` and `loop.file` | `append-without-an-idempotence-key` |
+| `keep-fixture-one-sided` | 19 | 20 | amend | layer-expansions' keep fixture | — |
+| `event-wait-fixture-arms` | 10, 18 | 19 | amend | layer-runtime `[tests]` `event-wait` | `fixture-passes-by-finding-nothing`, `route-names-an-output-its-actor-never-emits` |
+| `expected-population-shared-state` | 6, 21 | 22 | amend | layer-runtime `[extend]`'s secret scan; `[tests]` `secret-scan` | — |
+| `node-tick-no-expected-population` | — | 3, 15 | amend | layer-runtime `[extend]`'s secret scan; `[tests]` `secret-scan` | `zero-witness-over-an-unnamed-population` |
+| `quiesce-arms-no-fixture` | — | 21 | amend | layer-runtime `[tests]` `lifecycle` | `two-answers-to-one-question` |
+| `contract-probe-sixth-site` | — | 18 | amend | layer-expansions' `kits.offer`; `gap-deploy-13`; the foreign-code gotcha | — |
+| `five-kinds-probe-unrun` | 23 | — | amend | the target-spawn probe run in the debt instruments' `[probes-expansions]`; `kits.offer`; the foreign-code gotcha | `route-names-an-output-its-actor-never-emits` |
+| `released-witness-no-build` | — | 14 | amend | flow-steps' `deploy.released` | — |
+| `runtime-reader-table` | — | 16 | amend | layer-runtime `[policies]`' reader table | — |
+| `same-sha-repass-skipped` | 15 | — | amend: refuted only as older than the diff, since the base keyed the wake by (event, SHA) | layer-runtime `[schedule]`'s wake key; `[tests]` `event-wait` | — |
+| `payload-fixture-vacuous` | 22 | — | amend: refuted only as older than the diff, since the base fixture asserted the same | the foreign-code gotcha's fixture | — |
+| `ceiling-sweep-no-driver` | — | 6 | none: refuted, the node tick starts a supervisor when none beats under a live lease, and its beat runs the sweep | — | — |

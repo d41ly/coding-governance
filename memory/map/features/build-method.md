@@ -19,7 +19,19 @@ gotcha-classes = ["fold-text-is-unreviewed-surface.md", "amendment-leaves-its-ot
   "a-folded-field-leaves-its-row-shape-docs-behind.md",
   "one-value-field-records-a-mixed-outcome.md", "criterion-asserts-what-its-own-command-cannot-show.md",
   "observation-before-the-last-fold-of-the-same-commit.md",
-  "hand-named-gate-list-green-while-the-bar-reds.md"]
+  "hand-named-gate-list-green-while-the-bar-reds.md",
+  "route-names-an-output-its-actor-never-emits.md", "owner-item-without-its-reject-outcome.md",
+  "policy-value-with-no-route.md", "rate-quoted-without-its-denominator.md",
+  "core-depends-on-an-optional-part.md", "foreign-code-runs-on-the-ambient-credential.md",
+  "zero-witness-over-an-unnamed-population.md", "one-run-claim-recorded-as-agreed.md",
+  "rule-stated-with-no-check-that-fails.md", "ratchet-migration-ignores-how-each-source-grows.md",
+  "reseed-at-a-later-sha-launders-the-base.md", "predicate-designed-without-a-run-over-the-tree.md",
+  "path-keyed-row-strands-on-a-rename.md", "an-allow-that-bypasses-a-judge-names-none.md",
+  "absence-read-from-one-of-several-homes.md", "summary-rewrites-the-text-it-carries.md",
+  "instrument-recorded-into-the-corpus-it-scans.md", "task-handed-as-the-spec-is-reviewed-not-done.md",
+  "subagent-scratch-overwrites-the-parents-files.md", "step-depends-on-a-later-build.md",
+  "move-inventory-misses-readers-by-path.md", "remote-write-without-an-unreachable-outcome.md",
+  "fallback-drain-strands-its-witnesses.md"]
 guides = ["BUILD-METHOD.md"]
 backlog-shards = []
 lexicon-verbs = []

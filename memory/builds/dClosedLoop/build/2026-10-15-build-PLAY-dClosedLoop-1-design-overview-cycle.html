@@ -1,0 +1,33 @@
+<!--
+**Serves:** research PLAY-dClosedLoop-1
+-->
+<style>
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.pill{font-size:13px;padding:4px 10px;border-radius:var(--radius);border:0.5px solid var(--border);color:var(--text-secondary);background:transparent;cursor:pointer}
+.pill.on{background:var(--bg-accent);color:var(--text-accent);border-color:var(--border-accent)}
+.card{background:var(--surface-1);border-radius:12px;padding:1rem 1.25rem;margin:0 0 12px}
+.k{font-size:13px;color:var(--text-secondary);margin:0}
+.v{font-size:14px;color:var(--text-primary);margin:0 0 8px;line-height:1.6}
+.t{font-size:16px;font-weight:500;margin:4px 0 12px;color:var(--text-primary)}
+</style>
+<h2 class="sr-only">The item cycle: six steps every role item follows, from next naming the item to the driver persisting the return and asking next again</h2>
+<div id="pills" style="display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px"></div>
+<div id="panels">
+<div class="card" data-name="next"><p class="k">Step 1 of 6 · the next engine, a command</p><p class="t"><code>next</code> names the item and its actor</p><p class="k">Reads</p><p class="v">Witnesses only: committed records, git, leases and the mailbox. Never a remembered position.</p><p class="k">Hands on</p><p class="v">One checklist item, its actor, its allowance and its witness key.</p></div>
+<div class="card" data-name="brief"><p class="k">Step 2 of 6 · the driver: the main session, or the executor when unattended</p><p class="t">The driver briefs the prompt writer</p><p class="k">Hands over</p><p class="v">The item's definition and acceptance, references to its input records, its allowance, and the actor's return template.</p><p class="k">Never</p><p class="v">Performs the item. It holds only cards, typed returns and cheap state reads.</p></div>
+<div class="card" data-name="prompt"><p class="k">Step 3 of 6 · the prompt writer, a fresh role agent</p><p class="t">The prompt writer composes the task</p><p class="k">Returns</p><p class="v">A tight task prompt, saved as a record and passed on unchanged. Same-role tasks are batched (<code>prompts.batch</code>).</p><p class="k">Never</p><p class="v">Dispatches the task, or performs it.</p></div>
+<div class="card" data-name="spawn"><p class="k">Step 4 of 6 · the executor</p><p class="t">The executor spawns the actor fresh</p><p class="k">Wraps</p><p class="v">A work order: the item, its allowance, its return template, its witness and the hashes.</p><p class="k">Spawns</p><p class="v">A fresh agent whose system prompt is the role's static instructions. The always-spawn harness is owed to the lower-level step.</p></div>
+<div class="card" data-name="return"><p class="k">Step 5 of 6 · the actor, one of the role workers</p><p class="t">The actor works and returns a typed template</p><p class="k">Works inside</p><p class="v">Its allowance: what it may read, write and run.</p><p class="k">Returns</p><p class="v">Its filled template through the schema-forced channel, ending in an outcome from a closed set. A value that fails to resolve is retried up to <code>roles.retries</code>, 3 by default.</p></div>
+<div class="card" data-name="persist"><p class="k">Step 6 of 6 · the driver</p><p class="t">The driver resolves the witness and persists</p><p class="k">Does</p><p class="v">Resolves the item's witness, persists the return with its hash, updates the card's pointers and reads the build's mailbox.</p><p class="k">Then</p><p class="v">Asks <code>next</code> again. No worker carries anything over; whatever a later item needs is in a record.</p></div>
+</div>
+<div style="display:flex;gap:8px;align-items:center"><button id="prev">Previous</button><button id="nxt">Next</button><span id="pos" style="font-size:13px;color:var(--text-secondary)"></span></div>
+<script>
+const panels=[...document.querySelectorAll('#panels .card')];
+const pills=document.getElementById('pills');
+let i=0;
+panels.forEach((p,n)=>{const b=document.createElement('button');b.className='pill';b.textContent=(n+1)+' '+p.dataset.name;b.onclick=()=>show(n);pills.appendChild(b);});
+function show(n){i=(n+panels.length)%panels.length;panels.forEach((p,k)=>{p.style.display=k===i?'block':'none';});[...pills.children].forEach((b,k)=>b.classList.toggle('on',k===i));document.getElementById('pos').textContent=i===panels.length-1?'Next returns to step 1':'';}
+document.getElementById('prev').onclick=()=>show(i-1);
+document.getElementById('nxt').onclick=()=>show(i+1);
+show(0);
+</script>

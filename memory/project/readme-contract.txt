@@ -199,3 +199,4 @@ memory/builds/dSweptBranches/README.md
 memory/builds/dTracedLedger/README.md
 memory/builds/dRedressedBar/README.md
 memory/builds/dRenderedAnchor/README.md
+memory/builds/dClosedLoop/README.md
