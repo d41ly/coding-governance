@@ -579,3 +579,41 @@ in the desktop app. A spawned session opens in a fresh worktree, whose branch do
 So the task's prompt first moves that fresh, clean branch onto `branch/gov-architecture-plan-e34297`, then has the
 session act on prompt 59. Its "Where you are" names the original worktree, and the rest holds. From here the original
 worktree's branch takes no more commits.
+
+## [phase0-answers]
+
+Phase 0 runs in a new session on node d, from prompt 59, on `branch/unruffled-aryabhata-d89ede` off main `7efaa3d69`.
+Dispatch 234's builder built P0.6 and handed P0.1 and P0.2 back: their population as the plan specified it mis-reads
+passes and lists generated-region re-renders. Dispatch 238 verified its findings and two others' in
+`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision.md`: 13 confirmed, 2 partly, none refuted. The owner's four
+questions, 2026-10-20, with the options offered and the answers verbatim:
+
+1. "Apply them to the plan and rebuild P0.1/P0.2 from the revised text?"
+   - "Apply all 13 (Recommended)": a spec writer applies the record's revised text to P0.1, P0.2, P0.4 and P0.7; a
+     builder then builds P0.1 and P0.2 from it, with the carries token-arm and schedule row-9 fixes.
+   - "Walk them first".
+   - "Apply, skip the extras": findings 14 and 15 stay recorded limits.
+
+   The owner: "Apply all 13 (Recommended)".
+2. "If v2's `Baseline:` line has moved off the pinned 59ff8f2ac, what should the deviation instrument do under the
+   chain's `report` policy?"
+   - "List it first (Recommended)": a member no record can join, listed first; `report` exits 0, `refuse` exits 1.
+   - "Exit 2 always": the close sequence stops, a park against answer 3.
+
+   The owner: "List it first (Recommended)".
+3. "Should P0.8's decision rows 1 and 6 name the ids they approve (dTrueNorth's extra unit; cl-dClosedLoop-0120), so
+   the approver check looks the cited id up in DECISIONS.md?"
+   - "Rows name the ids (Recommended)".
+   - "Instrument maps rows": a second typed copy of the nine ids.
+   - "Write ids in later": a re-render before landing and a `--repin` landing after.
+
+   The owner: "Rows name the ids (Recommended)".
+4. "The Closed Loop Atlas measured 16.4 MB with the execution records, past its 16 MB limit, so it wasn't republished
+   (still v77). The opening adds 22 READMEs and 22 packets. How should it fit?"
+   - "Skip execution records"; "Split the atlas"; "Leave it at v77".
+
+   The owner, in their own words: "Atlas is now rendered locally at
+   C:/projects/coding-governance-atlas/closed-loop-atlas.html. No need to mind the size anymore."
+
+Answer 4 settles the unit spec's F2: the atlas is no longer published under the 16 MB limit, so neither remedy is
+owed.
