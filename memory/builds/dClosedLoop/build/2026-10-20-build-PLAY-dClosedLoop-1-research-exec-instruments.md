@@ -4,7 +4,7 @@
 
 Every probe script the five execution researchers left in their scratch folders, verbatim, so each table in their
 returns can be re-run from the build folder (`execution.md` `[research]`). Then the main loop's two checks of claims
-the returns leave open. The ids PLAY-dTrueNorth-1, TOOL-dTrueNorth-1 name units no build has minted yet, so each is written `missing:<id>` and the build index does not take it for a unit; restore them to re-run a script.
+the returns leave open. The ids missing:PLAY-dTrueNorth-1, missing:TOOL-dTrueNorth-1 name units no build has minted yet, so each is written `missing:<id>` and the build index does not take it for a unit; restore them to re-run a script.
 
 ## [d214]
 
@@ -773,7 +773,7 @@ def spec(n, ids, extra=""):
     return "\n".join(lines) + "\n" + extra
 d = Path("memory/builds/dTrueNorth/spec"); d.mkdir(parents=True, exist_ok=True)
 (d / "2026-10-21-spec-missing:PLAY-dTrueNorth-1.md").write_text(spec(1, ["cl-dClosedLoop-0001", "cl-dClosedLoop-0002", "cl-dClosedLoop-0003"]), encoding="utf-8", newline="\n")
-(d / "2026-10-21-spec-PLAY-dTrueNorth-2.md").write_text(spec(2, ["cl-dClosedLoop-0004", "cl-dClosedLoop-0005", "cl-dClosedLoop-0006"]), encoding="utf-8", newline="\n")
+(d / "2026-10-21-spec-missing:PLAY-dTrueNorth-2.md").write_text(spec(2, ["cl-dClosedLoop-0004", "cl-dClosedLoop-0005", "cl-dClosedLoop-0006"]), encoding="utf-8", newline="\n")
 if "--hash" in sys.argv:
     for b in ("dTrueNorth", "dGroundRules"):
         for i in sorted(builds[b])[:2]: print(b, i, builds[b][i][1])
@@ -786,7 +786,7 @@ if "--hash" in sys.argv:
 import re, sys
 from pathlib import Path
 S1 = Path("memory/builds/dTrueNorth/spec/2026-10-21-spec-missing:PLAY-dTrueNorth-1.md")
-S2 = Path("memory/builds/dTrueNorth/spec/2026-10-21-spec-PLAY-dTrueNorth-2.md")
+S2 = Path("memory/builds/dTrueNorth/spec/2026-10-21-spec-missing:PLAY-dTrueNorth-2.md")
 V2 = Path("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
 R = lambda p: p.read_text(encoding="utf-8")
 W = lambda p, t: p.write_text(t, encoding="utf-8", newline="\n")
