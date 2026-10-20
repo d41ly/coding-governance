@@ -370,8 +370,8 @@ def main():
         bs = sorted((t for t in T2 if w2[t] == "b"), key=lambda t: s2[t])
         print(f"  b {pace:.2f}: {m2:.0f}; a {share['a']:.0f}% d {share['d']:.0f}% b {share['b']:.0f}%; "
               + (", ".join(f"{kind(t)} {t[1]} {s2[t]:.0f}-{f2[t]:.0f}" for t in bs) or "none"))
-    T3, s3, f3, w3, sp3, _ = run(names, parents, ids, state, held, a.s, a.b, with_b=False)
-    print(f"  a and d alone: {max(f3.values(), default=0.0):.0f}")
+    T3, s3, f3, w3, sp3, notes3 = run(names, parents, ids, state, held, a.s, a.b, with_b=False)
+    print(f"  a and d alone: {max(f3.values(), default=0.0):.0f}" + ("; " + "; ".join(notes3) if notes3 else ""))
 
 
 if __name__ == "__main__":

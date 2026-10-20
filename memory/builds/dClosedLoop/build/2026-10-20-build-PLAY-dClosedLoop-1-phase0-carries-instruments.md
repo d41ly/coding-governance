@@ -153,3 +153,64 @@ stage, so the departures report can still call it as a subprocess.
 - The real-history plants ran only in the scratch clone. The fixture holds its revisions in memory and never calls
   git.
 - No leg runs this instrument. Only a hand runs it (the plan's `[constraints]`).
+
+## Finding 14
+
+The revision record's finding 14 (`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-revision.md`), built from
+`build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-brief-carries-2.md` (dispatch 242), its recommended option 1: the
+token arm reads every carrier's text, from whichever measured build's folder holds it. The second item in
+[limits] above is the escape it closes.
+
+**What changed in `C`.**
+- `join` reads a carrier's text from every measured build's specs, where it read only the owner build's. The
+  uncarried arm's release check still reads the owner build's specs, as before.
+- `fixture` gains two plants. `moved` is crossbuild's carry, with the owner build measured too. The owner's first
+  spec moves the clause to this build by `**Moved:** <clause> to <build> by XX-dProbe-1` where it carried the clause,
+  and its earlier revision still carries it. `moved-token` is the same, with one of the clause's tokens dropped from
+  the carrier: the first token that this build's own text lacks. `XX-dProbe-1` is d235's decision id, of no family.
+- Under `--fixture` the findings filter is every build the fixture measures. Before, `only` was the fixture's build,
+  so a moved clause's owner was never read. Every older plant measures one build, so its output is unchanged.
+  [limits]' first item, "Under `--fixture` only the one build's specs are measured", no longer holds for `moved`
+  and `moved-token`, which measure two.
+
+**Where they ran.** Here `S` is this dispatch's scratch folder, the `d242` sibling of d235's. `S/repo` is a
+`--shared` clone of the session's worktree at `bcc416ced`, with `core.hooksPath` set to its own `.githooks`. It holds
+the old code: `C` at blob `9657a5e8`, d235's committed fix. `S/build` is that clone's linked worktree on the branch
+`p0-carries-2`, and `N` is `S/build/` followed by `C`. `S/runall.sh` is d235's runall, with W's default moved to
+`S/repo` and `crossbuild` and `typo` added to its plant list. `S/probe_owner.py` is d235's probe, copied unchanged.
+Every run is in `S/repo` unless it names `W=S/build`.
+
+| # | Command | Exit | The line that proves it |
+|---|---|---|---|
+| 1 | `git hash-object C` in `S/repo` | 0 | `9657a5e8679de272e7385a2615cbacece8703ed4` |
+| 2 | `bash S/runall.sh S/c-before`, the old code | per case | tree and tree-exit 2, the report and fixture cases 0, unmeasured 2, every other plant 1, as in [baseline] and [fix-2] |
+| 3 | `python S/probe_owner.py C`, the old code | 0 | `owner measured: findings 1` and ``dGroundRules: cl-dClosedLoop-0007's token `.governance/policy.toml` appears in none of its carriers`` |
+| 4 | a `python -c` over the old code: for dTrueNorth and dGroundRules, the clause crossbuild carries, its tokens, and whether the first is in that build's second fixture spec, run once more at the end to print its exit | 0 | dTrueNorth carries `cl-dClosedLoop-0007` with one token, absent from its text. dGroundRules carries `cl-dClosedLoop-0001`, whose first token `**Carries:**` its text holds, so `moved-token` drops the first token the text lacks |
+| 5 | Stage A, the plants and the filter added, `join` untouched: `W=S/build bash S/runall.sh S/c-stageA moved moved-token` | per case | the 16 older cases exit as in row 2, and `cmp` of each against `S/c-before` prints nothing |
+| 6 | the same run, case `--fixture --plant moved` | 1 | ``dGroundRules: cl-dClosedLoop-0007's token `.governance/policy.toml` appears in none of its carriers``, its one finding, with `specs measured 4 in 2 builds`: red before the fix |
+| 7 | the same run, case `--fixture --plant moved-token` | 1 | the same line, its one finding |
+| 8 | Stage B, the token arm fixed: `W=S/build bash S/runall.sh S/c-stageB moved moved-token` | per case | `cmp` against `S/c-stageA` names only `plant-moved.out` |
+| 9 | the same run, case `--fixture --plant moved` | 0 | `… specs measured 4 in 2 builds · findings 0 · fixture dTrueNorth · plant moved`: green after |
+| 10 | the same run, case `--fixture --plant moved-token` | 1 | ``dGroundRules: cl-dClosedLoop-0007's token `.governance/policy.toml` appears in none of its carriers``: the same carrier without the token, red |
+| 11 | `python S/probe_owner.py N` | 0 | `owner measured: findings 0`, where row 3 printed 1 |
+| 12 | `python N --fixture --plant moved --build dGroundRules` | 0 | `… findings 0 · fixture dGroundRules · plant moved` |
+| 13 | `python N --fixture --plant moved-token --build dGroundRules` | 1 | ``dTrueNorth: cl-dClosedLoop-0001's token `**Derived:**` appears in none of its carriers``, its one finding |
+| 14 | line-length scans of `N` and the schedule script, an authoring aid | 0 | two new lines over 120 characters, a docstring line and the `every` comment, shortened at rows 16 and 18 |
+| 15 | `S/stageA-carries.py`, written by a `python -c` as `N` with the one `joined` line put back: `--fixture --plant moved --build dGroundRules`, then `--plant moved-token --build dGroundRules`, then `--plant moved` | 1, 1, 1 | six findings each for the first two, one per token of `cl-dClosedLoop-0001`, the first ``dTrueNorth: cl-dClosedLoop-0001's token `**Carries:**` appears in none of its carriers``. The third prints row 6's line. Red before the fix under `--build dGroundRules` too |
+| 16 | a docstring rewrap; then `git add` of `C` by name, `git diff --quiet` on it, and `git ls-files --eol` | 0 | `i/lf    w/lf    attr/text eol=lf`, no CR byte |
+| 17 | `W=S/build bash S/runall.sh S/c-staged moved moved-token` | per case | `cmp` of all 18 outputs against `S/c-stageB` prints nothing |
+| 18 | the comment row 14 found, shortened; `git add` again, `git diff --quiet` | 0 | the index entry `0b5fab9cc06d`, `i/lf` |
+| 19 | `W=S/build bash S/runall.sh S/c-staged moved moved-token` again, then rows 11 to 13 again | per case | `cmp` against `S/c-stageB` prints nothing; `owner measured: findings 0`. Rows 12 and 13 were first piped through `tail`, whose exit is not counted, then re-run unpiped: exits 0 and 1, rows 12 and 13's lines |
+
+Today's tree still exits 2 with `carries: no spec measured, so the join reads nothing and is never green`, and the
+report and fixture-report cases are byte-identical in every stage. No function was added or removed, so no name went
+to the lexicon.
+
+**What this does not check.**
+- The plant places the Moved line in the owner's spec. Row 1's arm accepts it in any measured spec, so where the line
+  sits is not varied. d235's probe, rows 3 and 11, places it in both builds' specs.
+- `real_specs` is unchanged, and no real-history plant ran for this finding. The fixture never calls git.
+- A clause moved in with no carrier anywhere still reds as uncarried under `--exit` unless the owner's own specs hold
+  the release line, as before this fix.
+- `moved-token` cannot plant a clause whose every token is in the carrying build's own text. It exits with a message
+  naming the clause.

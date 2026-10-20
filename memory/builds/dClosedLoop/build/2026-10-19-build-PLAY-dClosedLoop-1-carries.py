@@ -19,7 +19,8 @@ The join's arms, each a finding (final-questions `[coverage]`):
              revision that stops carrying a clause and records no move, retirement or deferral (read against every
              commit of the spec since its first, so a later edit does not hide the drop);
   per build  a clause or an owned node no spec carries (with --exit, as at a Design exit); a token of a clause, a
-             backticked name, missing from every spec that carries it;
+             backticked name, missing from every spec that carries it, read from whichever measured build's folder
+             holds the carrier, so a clause moved to another build is read in that build's spec;
   a run that measured no spec is never green: it exits 2.
 
 Usage (from the worktree root):
@@ -28,7 +29,9 @@ Usage (from the worktree root):
   python carries.py --fixture [--plant <case>] [--build <slug>]
       the join over a spec set built in memory, carrying every clause and node of the build (default dTrueNorth), and
       damaged one way: ghost, unbound, stale, ambiguous, dropped, uncarried, node, token, unmeasured, crossbuild (another
-      build's clause carried), typo (a clause dropped, then the spec edited again)
+      build's clause carried), typo (a clause dropped, then the spec edited again); or measured beside the owner build
+      of a clause a **Moved:** line moves to it: moved (the carrier holds the clause's tokens, green), moved-token (the
+      carrier lacks one)
 Exit 0 green, 1 on any finding, 2 when no spec was measured.
 
 What it does not read: whether a spec's text means what its clause means, which the semantic lens reads at the Design
@@ -53,7 +56,7 @@ RELEASED = re.compile(r"^\*\*(Moved|Retired|Deferred):\*\* (cl-d[A-Z]\w+-\d{4})(
                       + r")\s*$", re.M)
 OWNED = ("item", "policy-key", "point", "record-kind", "tag-namespace", "system")
 PLANTS = ("ghost", "unbound", "stale", "ambiguous", "dropped", "uncarried", "node", "token", "unmeasured", "crossbuild",
-          "typo")
+          "typo", "moved", "moved-token")
 
 
 def split_clauses(cell):
@@ -197,6 +200,25 @@ def fixture(builds, nodes, build, plant):
         dropped = specs[0][1].replace(line + "\n", "", 1)
         specs[0] = (specs[0][0], dropped + "\nA typo fixed in a later revision.\n", [specs[0][1], dropped])
         specs[1] = (specs[1][0], specs[1][1] + f"\n{line}\n\n{builds[build][ids[0]][0]}\n", specs[1][2])
+    elif plant in ("moved", "moved-token"):
+        # crossbuild's carry with the owner build measured too, its first spec moving the clause to this build by a
+        # Moved line where it carried the clause, its earlier revision still carrying it. moved-token also drops one of
+        # the clause's tokens, one this build's own text lacks, from the carrier (revision finding 14).
+        other = next(b for b in builds if b != build)
+        cid = sorted(builds[other])[0]
+        body, h, toks = builds[other][cid]
+        carried = body
+        if plant == "moved-token":
+            tok = next((t for t in toks if t not in specs[1][1]), None)
+            if tok is None:
+                sys.exit(f"carries: every token of {cid} is in {build}'s own text, so moved-token has none to drop")
+            carried = body.replace(f"`{tok}`", "").replace(tok, "")
+        specs[1] = (specs[1][0], specs[1][1] + f"\n**Carries:** {cid}@{h} whole\n\n{carried}\n", specs[1][2])
+        owner = fixture(builds, nodes, other, None)[other]
+        p, t, revs = owner[0]
+        owner[0] = (p, t.replace(f"**Carries:** {cid}@{h} whole\n\n{body}\n",
+                                 f"**Moved:** {cid} to {build} by XX-dProbe-1\n"), revs)
+        return {build: specs, other: owner}
     return {build: specs} if specs else {}
 
 
@@ -247,6 +269,7 @@ def join(builds, nodes, retired, specs, only=None, exit_mode=False):
             if sorted(int(p.split()[1].split("/")[0]) for p in parts) != list(range(1, n + 1)):
                 findings.append(f"{ref}: carried in parts {parts}, not 1 to {n}")
     measured = {b for b, items in specs.items() if items}
+    every = {p: t for items in specs.values() for p, t, _ in items}   # a moved-in carrier is in another build's folder
     for b in sorted(measured if only is None else measured & {only}):
         texts = {p: t for p, t, _ in specs[b]}
         for cid, (body, h, tokens) in builds[b].items():
@@ -256,7 +279,7 @@ def join(builds, nodes, retired, specs, only=None, exit_mode=False):
                 if exit_mode and not released:
                     findings.append(f"{b}: {cid} is carried by no spec (uncarried)")
                 continue
-            joined = " ".join(texts[c[0]] for c in cs if c[0] in texts)
+            joined = " ".join(every[c[0]] for c in cs)
             for tok in tokens:
                 if tok not in joined:
                     findings.append(f"{b}: {cid}'s token `{tok}` appears in none of its carriers")
@@ -302,16 +325,16 @@ def main(argv):
         sys.exit(f"carries: {build} is no chain build")
     if "--fixture" in argv:
         specs = fixture(builds, nodes, build, plant)
-        exit_mode = True
+        exit_mode, only = True, None        # every build the fixture measures, a moved clause's owner included
     else:
         specs = real_specs(builds)
-        exit_mode = "--exit" in argv
+        exit_mode, only = "--exit" in argv, build
     if opt("--report"):
         b = opt("--report")
         _, carriers, _, _ = join(builds, nodes, retired, specs, b)
         print(report(b, builds, nodes, specs, carriers))
         return 0
-    findings, carriers, measured, _ = join(builds, nodes, retired, specs, build, exit_mode)
+    findings, carriers, measured, _ = join(builds, nodes, retired, specs, only, exit_mode)
     print(f"carries: chain builds {len(builds)}, clauses {sum(len(c) for c in builds.values())}, retired {len(retired)}, "
           f"specs measured {sum(len(v) for v in specs.values())} in {len(measured)} builds · findings {len(findings)}"
           + (f" · fixture {build}" if "--fixture" in argv else "") + (f" · plant {plant}" if plant else ""))
