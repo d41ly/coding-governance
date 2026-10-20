@@ -18,6 +18,9 @@ near match. The opening commit's parent is `8d19dd714`. Exit codes are taken unp
 | `bash tools/memory-tree/check-memory-hygiene.sh`, whole tree | 0 | after the two fixes above; at `b50573ef4` it was 1 on check 21 (22 packets), then on check 27 (5 rows) |
 | `bare-ids.py` (plain) at the opening's parent `8d19dd714` | 0 | 0 lines |
 | `bare-ids.py --opened` at the tip | 0 | 0 lines |
+| `gap-join.py --readmes` over the 22 opened READMEs | 0 | `owned but not in the register: none`, `builds owning nothing: none`; the v2 mode also 0 |
+| `open.py --driver-builds` | 0 | nine builds, the seven of the opening plus dFurnishedOrders and dLinkedLibrary |
+| `open.py --carriers --check` | 0 | |
 | `carries.py` | 2 | `no spec measured, so the join reads nothing and is never green`, as expected |
 | `deviations.py` | 0 | `members 0 (0 unjoined), records 0 · refused 0 · policy report`: 0 members, not merely exit 0 |
 | `asbuilt.py --check` | 0 | `findings 0 · view at 59ff8f2ac` |
@@ -33,7 +36,7 @@ Each planted in a `git clone --shared` of the branch, then restored; the script 
 red test 5's planted id marked `missing:`, as P0.6 marks verbatim copies, so it joins no build:
 
 ````text
-clone at 8b51c299e
+clone at f579121fe
 parent 8d19dd714: bare-ids plain rc=0 lines=0
 == 1. one-byte README edit reds open.py --check
   before rc=0
@@ -48,6 +51,10 @@ parents: dTrueNorht
 == 5. a bare chain id of an opened build planted in a record makes --opened print one line
   before rc=0 lines=0
   after rc=1 lines=1 :: memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-phase0-nodes.md:71: missing:TOOL-dGroundRules-99
+== 6. a gap removed from one README's problem slot reds the gap join's README mode
+  before rc=0
+gap-rt-34. Closing every one is this build's goal bound.
+  after rc=1 :: unowned: ['gap-tool-24']
 restored: 0 dirty paths
 ````
 
@@ -64,36 +71,47 @@ TOOL-dTrueNorth-1 --input prompt=<dTrueNorth's packet> --input spec=<the packet>
 `brief:acceptance`, `brief:gates` and `brief:non-goals`; `handoff.py check` on it exits 0. The render was made in the
 clone because `--out` admits only the build's own `prompts/`, and the opening writes no handoff.
 
+## [answers-2]
+
+The owner's opening-read answers (`build/2026-10-20-build-PLAY-dClosedLoop-1-execution.md` `[phase0-answers-2]`) re-rendered
+the opening at `bcc221781`: nine driver-changing builds, `PLAY-dClosedLoop-18` and `-19` minted for dFurnishedOrders and
+dLinkedLibrary after `-11` to `-17`, and the gap join's README mode, answer 5, which red test 6 above sees red on a
+planted orphan. Every check of `[checks]` was re-run at `f579121fe` with the results it states. One finding on the
+way: the instruments refused the open instruments record while its new section was titled "The owner's opening-read
+answers", because the atlas parser they share reads a decision-shaped title in an instruments record as misfiled;
+hygiene did not catch it. The section was retitled at `f579121fe`.
+
 ## [summary]
 
-`open.py --summary` at `8b51c299e`, for the owner's read of the other 21 builds:
+`open.py --summary` at `f579121fe`, after the owner's opening-read answers re-rendered the opening, for the owner's read of
+the other 21 builds:
 
 ````text
 open: summary of the 22 chain builds, read from the files the opening wrote, opened 2026-10-21
 | Build | Stage | `parents:` | Units | Family · `streams:` | Carry-forward ask | Packet | `may:` line | `spec-audit:` | Rule 8 · clean-reading ask | Contract row |
 |---|---|---|---|---|---|---|---|---|---|---|
-| dTrueNorth | Fidelity | dClosedLoop | 7 | TOOL · tooling | none: whole run | 18165 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2 | 2026-10-21 | yes · PLAY-dClosedLoop-11 | present, bound |
-| dGroundRules | Policy | dTrueNorth | 11 | TOOL · tooling | TOOL-dGroundRules-12 | 30357 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dSafePassage | Supersession | dGroundRules | 13 | TOOL · tooling | TOOL-dSafePassage-14 | 30406 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dOrderedCharter | Foundation | dSafePassage | 37 | PLAY · playbook | PLAY-dOrderedCharter-38 | 67140 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-12 | present, bound |
-| dFairHearing | Review harness | dSafePassage | 18 | TOOL · tooling | TOOL-dFairHearing-19 | 29105 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dDeclaredLoop | Spine | dOrderedCharter dFairHearing | 34 | TOOL · tooling | TOOL-dDeclaredLoop-35 | 57485 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-13 | present, bound |
-| dPlacedRequest | Entry | dDeclaredLoop | 21 | TOOL · tooling | TOOL-dPlacedRequest-22 | 42320 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-14 | present, bound |
-| dKeptSession | Session | dDeclaredLoop dPlacedRequest | 28 | KICK · kickoff | KICK-dKeptSession-29 | 35911 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dBoundRoles | Roles | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | TOOL-dBoundRoles-27 | 43333 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dFurnishedOrders | Orders | dBoundRoles | 20 | TOOL · tooling | TOOL-dFurnishedOrders-21 | 32191 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dTotalRecall | Memory | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | TOOL-dTotalRecall-27 | 45694 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dLinkedLibrary | Library | dTotalRecall | 25 | TOOL · tooling | TOOL-dLinkedLibrary-26 | 39030 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dMindYourWords | Lexicon | dWellOiledMachine dWitnessedBar dLinkedLibrary dFurnishedOrders | 17 | TOOL · tooling | TOOL-dMindYourWords-18 | 27013 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dWellOiledMachine | Runtime | dBoundRoles dTotalRecall dKeptSession | 61 | TOOL · tooling | TOOL-dWellOiledMachine-62 | 110207 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-15 | present, bound |
-| dWitnessedBar | Test | dDeclaredLoop | 30 | TOOL · tooling | TOOL-dWitnessedBar-31 | 43175 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-16 | present, bound |
-| dRankedPlan | Plan | dDeclaredLoop dTotalRecall dBoundRoles | 16 | TOOL · tooling | TOOL-dRankedPlan-17 | 24082 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dIndexedDesign | Design | dDeclaredLoop dTotalRecall dKeptSession dBoundRoles dLinkedLibrary | 16 | TOOL · tooling | TOOL-dIndexedDesign-17 | 29020 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dScopedBuild | Build | dIndexedDesign dWitnessedBar dWellOiledMachine dFurnishedOrders | 15 | TOOL · tooling | TOOL-dScopedBuild-16 | 25629 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dShippedRelease | Deploy | dWitnessedBar dTotalRecall dBoundRoles dWellOiledMachine dLinkedLibrary dFurnishedOrders | 31 | DEPL · deployer | DEPL-dShippedRelease-32 | 50967 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dTendedCadence | Maintain | dWitnessedBar dRankedPlan dWellOiledMachine dIndexedDesign dFurnishedOrders | 18 | TOOL · tooling | TOOL-dTendedCadence-19 | 30866 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dCalibratedLens | Review | dTendedCadence dFairHearing | 17 | TOOL · tooling | TOOL-dCalibratedLens-18 | 26656 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
-| dConvergedCharter | Convergence | dScopedBuild dShippedRelease dCalibratedLens dMindYourWords | 23 | PLAY · playbook | PLAY-dConvergedCharter-24 | 33961 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-17 | present, bound |
+| dTrueNorth | Fidelity | dClosedLoop | 7 | TOOL · tooling | none: whole run | 19407 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2 | 2026-10-21 | yes · PLAY-dClosedLoop-11 | present, bound |
+| dGroundRules | Policy | dTrueNorth | 11 | TOOL · tooling | TOOL-dGroundRules-12 | 31599 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dSafePassage | Supersession | dGroundRules | 13 | TOOL · tooling | TOOL-dSafePassage-14 | 31648 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dOrderedCharter | Foundation | dSafePassage | 37 | PLAY · playbook | PLAY-dOrderedCharter-38 | 68382 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-12 | present, bound |
+| dFairHearing | Review harness | dSafePassage | 18 | TOOL · tooling | TOOL-dFairHearing-19 | 30347 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dDeclaredLoop | Spine | dOrderedCharter dFairHearing | 34 | TOOL · tooling | TOOL-dDeclaredLoop-35 | 58727 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-13 | present, bound |
+| dPlacedRequest | Entry | dDeclaredLoop | 21 | TOOL · tooling | TOOL-dPlacedRequest-22 | 43562 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-14 | present, bound |
+| dKeptSession | Session | dDeclaredLoop dPlacedRequest | 28 | KICK · kickoff | KICK-dKeptSession-29 | 37153 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dBoundRoles | Roles | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | TOOL-dBoundRoles-27 | 44575 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dFurnishedOrders | Orders | dBoundRoles | 20 | TOOL · tooling | TOOL-dFurnishedOrders-21 | 33433 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-18 | present, bound |
+| dTotalRecall | Memory | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | TOOL-dTotalRecall-27 | 46936 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dLinkedLibrary | Library | dTotalRecall | 25 | TOOL · tooling | TOOL-dLinkedLibrary-26 | 40272 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-19 | present, bound |
+| dMindYourWords | Lexicon | dWellOiledMachine dWitnessedBar dLinkedLibrary dFurnishedOrders | 17 | TOOL · tooling | TOOL-dMindYourWords-18 | 28255 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dWellOiledMachine | Runtime | dBoundRoles dTotalRecall dKeptSession | 61 | TOOL · tooling | TOOL-dWellOiledMachine-62 | 111449 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-15 | present, bound |
+| dWitnessedBar | Test | dDeclaredLoop | 30 | TOOL · tooling | TOOL-dWitnessedBar-31 | 44417 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-16 | present, bound |
+| dRankedPlan | Plan | dDeclaredLoop dTotalRecall dBoundRoles | 16 | TOOL · tooling | TOOL-dRankedPlan-17 | 25324 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dIndexedDesign | Design | dDeclaredLoop dTotalRecall dKeptSession dBoundRoles dLinkedLibrary | 16 | TOOL · tooling | TOOL-dIndexedDesign-17 | 30262 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dScopedBuild | Build | dIndexedDesign dWitnessedBar dWellOiledMachine dFurnishedOrders | 15 | TOOL · tooling | TOOL-dScopedBuild-16 | 26871 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dShippedRelease | Deploy | dWitnessedBar dTotalRecall dBoundRoles dWellOiledMachine dLinkedLibrary dFurnishedOrders | 31 | DEPL · deployer | DEPL-dShippedRelease-32 | 52209 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dTendedCadence | Maintain | dWitnessedBar dRankedPlan dWellOiledMachine dIndexedDesign dFurnishedOrders | 18 | TOOL · tooling | TOOL-dTendedCadence-19 | 32108 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dCalibratedLens | Review | dTendedCadence dFairHearing | 17 | TOOL · tooling | TOOL-dCalibratedLens-18 | 27898 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | no | present, bound |
+| dConvergedCharter | Convergence | dScopedBuild dShippedRelease dCalibratedLens dMindYourWords | 23 | PLAY · playbook | PLAY-dConvergedCharter-24 | 35203 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-21 | yes · PLAY-dClosedLoop-17 | present, bound |
 ````
 
 ## [bar]
@@ -166,5 +184,13 @@ PLANT="TOOL-dGround""Rules-99"   # composed, so this script's own source joins n
 printf '\nA planted citation: %s.\n' "$PLANT" >> "$P"; git add "$P"
 python "$BARE" --opened > "$S/r5.txt" 2>&1; echo "  after rc=$? lines=$(grep -c . "$S/r5.txt") :: $(head -1 "$S/r5.txt")"
 git reset -q; restore
+
+step "6. a gap removed from one README's problem slot reds the gap join's README mode"
+GJ=$D/2026-10-19-build-PLAY-dClosedLoop-1-gap-join.py
+REG=$D/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md
+V2=$D/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md
+python "$GJ" --readmes "$REG" "$V2" memory/builds > "$S/r6a.txt" 2>&1; echo "  before rc=$?"
+sed -i 's/^gap-tool-24, gap-rt-34\./gap-rt-34./' "$R"; grep -m1 '^gap-rt-34' "$R"
+python "$GJ" --readmes "$REG" "$V2" memory/builds > "$S/r6.txt" 2>&1; echo "  after rc=$? :: $(grep -m1 -i 'gap-tool-24\|orphan\|not owned' "$S/r6.txt")"; restore
 echo "restored: $(git status --short | wc -l) dirty paths"
 ````

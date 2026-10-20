@@ -583,3 +583,92 @@ Handoff `prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-2-spec-writer.md`. The ret
 - The lexicon exits 0.
 - Probe outputs are in `…/scratchpad/d245/`: `ac2.py`, the before/after outputs of both readers, and the hygiene logs.
 ````
+
+## [dispatch-246]
+
+Handoff `prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-3-spec-writer.md`. The return:
+
+````text
+I've edited the execution plan and the unit spec to apply the owner's six opening-read answers. I created no file other than the probe under `scratchpad/d246/`, committed nothing, and ran no gate; memory hygiene and spec tokens are still owed on the staged files.
+
+**Unit PLAY-dClosedLoop-1: authored (revision, rev-3)**
+
+### Answer → plan lines (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md`, post-edit line numbers)
+
+- **Answer 2, "Keep it (Recommended)":**
+  - **P0.3, 320-328:** the packet is now named `memory/builds/<slug>/prompts/<date>-prompt-PLAY-dClosedLoop-1-packet.md`. The reason is given with check 21 cited (`tools/memory-tree/check-memory-hygiene.sh:1446-1478`), along with why the first-unit name also reds, and the answer is quoted (ER:633-637).
+  - **Other lines:** no other line used the old name. The `*-packet.md` globs at 954, 1341 and 1388 still match the new name.
+  - **Revision note:** one sentence at 135-139.
+- **Answer 3, "Count both (Recommended)":**
+  - **P0.5 rule, 517-534:** the predicate now also counts the two kinds of clause, each checked against v2's text:
+    - `cl-dClosedLoop-0240`: "unattended's `MAP_CLI`, re-pointed at the map's CLI" (v2:1775). `.unattended.conf:190` declares `MAP_CLI`, and `unattended.sh:10416-10417`, `:11894` and `:11912` read it.
+    - `cl-dClosedLoop-0195`: "retired with that selection, in the build method's and the unattended Skill's text among them" (v2:1773).
+  - **P0.5 table, 542-543:** dFurnishedOrders and dLinkedLibrary are added in v2 `[chain]` order, making nine builds.
+  - **P0.6 rule 1, 603-607:** `PLAY-dClosedLoop-11` to `-17` keep their ids. The two new asks are written `missing:PLAY-dClosedLoop-18` (dFurnishedOrders) and `missing:PLAY-dClosedLoop-19` (dLinkedLibrary), because they aren't minted yet. The no-renumber rule cites `AGENTS.md:35` and ER:645-646.
+  - **[sync-points] dFurnishedOrders row, 1200:** gains the rule-8 waiver sentence.
+  - **[defaults], 1451-1452:** "seven" becomes "nine".
+  - **Revision note:** one sentence at 135-139.
+- **Answer 5, "Add it to P0.7 (Recommended)":**
+  - **P0.7 checks row, 629:** the gap join's README mode over the 22 opened READMEs' problem slots must find every gap owned by exactly one build, and every build owning at least one.
+  - **P0.7 red-tests row, 630:** a gap removed from one README's problem slot reds the join.
+  - **Revision note:** one sentence at 135-139.
+- **Answers 1, 4 and 6** change no plan line, and the revision note says so.
+
+### Spec (`memory/builds/dClosedLoop/spec/2026-10-20-spec-PLAY-dClosedLoop-1.md`)
+
+- The header moves to rev-3, with a rev-3 entry in §9.
+- **F3:** "Records suffice" is quoted verbatim with the option's own words (ER:647-652). The departure from kickoff (a) (brief:49) is recorded in the resolution. AC1 is now DONE on the execution rows, with the departure named.
+- **F4:** "Add it to P0.7 (Recommended)" is quoted (ER:653-657). AC3 stays OPEN against the READMEs until the main loop records the join's run.
+- **F5:** "Re-append (Recommended)" is quoted (ER:658-662). The resolution notes that the route at `prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-brief.md:104-107` now names the 2026-10-20 spec (commit `09ea557ed`).
+- **Beyond the brief's items:**
+  - **AC10:** now reads DONE for P0.7 as it stood at the opening, and OPEN on the check and red test that answer 5 added. Otherwise it would claim a check that hasn't run yet.
+  - **Citations:** the spec's line citations into the plan that my edits shifted are re-pointed: §3, §4, §5, AC2, AC6 to AC12, F4 and §10. I checked each one against the new text.
+
+### Decisions for the main loop
+
+1. **Predicate edge case.** My probe (`scratchpad/d246/driver9.py`, at `ddc6ba9fb`) also flagged `cl-dClosedLoop-0013` (dGroundRules). That clause names `REVIEW_ROUNDS` only to list it as a legacy home and re-points nothing, so under "re-points a key the kit reads" I left it out and said so in the plan. The builder's predicate (dispatch 247) has to draw the same line, or it will print ten builds.
+2. **dLinkedLibrary has no [sync-points] row.** Its rule-8 waiver therefore shows only in P0.5, P0.6 and its README. The plan also doesn't say what happens to a run still in flight when `MAP_CLI` is re-pointed: the `reuse-probed` Definition-of-Done item reads `MAP_CLI`'s probe log (`unattended.sh:11894-11952`). I didn't add a row, because the records don't support the in-flight behaviour it would have to state.
+3. **Older reviews cite old plan lines.** The 2026-10-20 execution-fold reviews cite plan line numbers that were already stale before this pass, and I left them alone.
+````
+
+## [dispatch-247]
+
+Handoff `prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-4-builder.md`. The return:
+
+````text
+The final record commit selected no new class: the fence is balanced, the code-span pipes sit in prose and not in a table, and the record is not a ledger. Over the whole range from `ddc6ba9fb`, 31 files changed, none outside `memory/`.
+
+## Return: dispatch 247, PLAY-dClosedLoop-1 (owner's answers 3 and 5)
+
+**Tip:** `303f6a861` on branch `p0-answers`. The clone is `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-unruffled-aryabhata-d89ede/1cef2554-91c7-4cd1-9950-7f33d1289103/scratchpad/d247/clone` (`git clone --shared` at `ddc6ba9fb`, `core.hooksPath=.githooks`), with its linked worktree at `.../d247/wt`. Nothing was merged, pushed or rebased.
+
+Commits, each ending with the charter's `Co-Authored-By: Claude Opus 5` trailer:
+- `d07e3ca19`: `open.py` counts answer 3's two arms, and `gap-join.py` gains `--readmes`.
+- `e3369a999`: the fix the bug-class checklist asked for. `open.py` had spelled its kit-key match twice and `gap-join.py` its range pattern twice; each now has one spelling.
+- `bcc221781`: the re-rendered opening, 28 files.
+- `303f6a861`: the `## The owner's opening-read answers` section of the open instruments record, 25 steps.
+
+### Acceptance
+- **`--driver-builds` prints nine builds and 15 clauses.** The key arm counts a clause only when a kit key and a form of "re-point" appear in the same clause. The keys come from the `KEY=` lines of `tools/unattended/.unattended.conf.example` (65 keys; its header says the driver reads these), so none is typed in `open.py`.
+  - cl-dClosedLoop-0013 stays out, the edge you flagged. The printout lists it, with cl-dClosedLoop-0284, as a clause that names a key and re-points nothing.
+  - The plant you asked for: 8 planted clause texts all give their expected verdict. Against a scratch variant that counts a key without a re-point, the plants exit 1, with 10 builds and dGroundRules counted.
+- **Ids, with no renumber:** -11 to -17 keep their ids. dFurnishedOrders' README carries rule 8 citing `PLAY-dClosedLoop-18`, and dLinkedLibrary's citing `PLAY-dClosedLoop-19`. dClosedLoop's `BACKLOG.md` holds both asks after -17, and their SEV rows after -17's.
+- **Gap join README mode:** exit 0 on the opening. Exit 1 on a planted orphan gap, a planted double owner, and an absent README. The v2 mode's output is byte-identical to the old code's, both on the tree and on a planted orphan row.
+- **Checks on the committed opening:** `open.py --check`, `packet.py --check` for all 22 (each reads `asks 9` with its pin arm green), `gen_build_index.py --check` and `--carriers --check` all exit 0. `open.py`'s red tests 1–5, 8, 9 and 10 still red.
+- **No new file under `memory/`.**
+
+### Decisions for you
+- **Packets re-pinned through a fresh render.** I deleted the 22 packet files so `open.py --write` rendered them fresh, pinning `open.py`'s new blob `b1bb8b6d4`. That is how dispatch 244 handled the same situation. I did not use `packet.py --repin`, which is documented as the owner's. Kept pins would have left every packet's pin arm red.
+- **`open.py --write` now adds rows to an existing dClosedLoop `BACKLOG.md`.** It used to refuse whenever the file lacked any opening row. Now it adds rows the file lacks after the last opening row it holds. It still refuses a lacked row that comes before a held one, so red test 8's refusal stands. Plants on this path: two removed trailing rows came back byte-exact, and a file holding no opening row is refused.
+- **The two new rule 8s and asks cite only "walk answer 5".** They use P0.5's fixed wording, so neither mentions answer 3, which brought the two builds into the set.
+
+### Owed to the main loop
+These are gates, not run in this pass:
+- `gen_build_index.py --check-format`. The two new rules slots measure 1780 B and 1776 B against an 1800 B ceiling.
+- The whole-tree memory hygiene gate.
+- Recording AC3's README-mode run in the checks record.
+
+Not re-run: red tests 6 and 7, the carrier plants. Each commits a change under `tools/`, which this pass may not make; this diff leaves that code untouched.
+
+Every check above is a probe of the code this pass changed, standing in for nothing in the bar.
+````
