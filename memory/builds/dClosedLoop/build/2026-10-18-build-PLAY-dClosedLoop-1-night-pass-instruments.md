@@ -24476,14 +24476,14 @@ for p, want in [("ghost", "a ghost id"), ("unbound", "(unbound)"), ("stale", "a 
     CASES.append((f"carries --plant {p}", [B + "carries.py", "--fixture", "--plant", p], 2 if p == "unmeasured" else 1, want))
 CASES.append(("carries --plant node", [B + "carries.py", "--fixture", "--build", "dGroundRules", "--plant", "node"], 1,
               "is named by no spec"))
-CASES.append(("deviations on the tree", [B + "deviations.py"], 2, "never green"))
+CASES.append(("deviations on the tree, since the baseline", [B + "deviations.py"], 0, "baseline read"))
 CASES.append(("deviations on a clean fixture", [B + "deviations.py", "--fixture"], 0, "findings 0"))
 for p, want, rc in [("clause", "since the baseline: joins no deviation record", 1),
                     ("pass-revision", "after its first pass: joins no deviation record", 1),
                     ("amended", "AMENDED acceptance line", 1), ("pin", "departing from PLAY-dTrueNorth-2@rev-2", 1),
                     ("approver", "needs the spec writer", 1), ("status", "findings 0", 0)]:
     CASES.append((f"deviations --plant {p}", [B + "deviations.py", "--fixture", "--plant", p], rc, want))
-CASES.append(("asbuilt on the tree", [B + "asbuilt.py", "--check"], 2, "nothing to render"))
+CASES.append(("asbuilt on the tree, at the baseline", [B + "asbuilt.py", "--check"], 0, "findings 0"))
 CASES.append(("asbuilt on a clean fixture", [B + "asbuilt.py", "--fixture"], 0, "findings 0"))
 for p, want in [("hand-edit", "(a hand edit)"), ("no-row", "carries no amends or supersedes row"),
                 ("no-citation", "cites no record")]:
@@ -32794,6 +32794,181 @@ R.write_text(t, encoding="utf-8", newline="\n")
 print(f"prep_recorder_s0: {len(EDITS)} edits to {R.name}")
 ````
 
+### `take_baseline.py`
+
+The baseline taken at the owner's word: v2's [clause-ids] records Baseline naming the design commit after the audit, refusing a second.
+
+````python
+"""Take the design's baseline at the owner's word, "Once the review is done, fold, take the baseline, don't remeasure.
+Stop there." (2026-10-20). v2's `[clause-ids]` records `Baseline:` naming the design commit taken after the audit's
+fold and Stage 0 again (final-questions `[deviation]`): from it on v2 takes no `Revised:` paragraph, and every change
+to a clause of `[chain]` is a deviation record approved by its risk. Refuses a second baseline.
+
+Usage: python -X utf8 take_baseline.py <sha>   (from the worktree root)
+"""
+import pathlib
+import re
+import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+sha = sys.argv[1]
+if not re.fullmatch(r"[0-9a-f]{40}", sha):
+    sys.exit("take_baseline: a full 40-hex commit sha, please")
+V2 = Record("memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md")
+if re.search(r"^Baseline: `", V2.text, flags=re.M):
+    sys.exit("take_baseline: v2 records a baseline already")
+V2.sub("\nRetired: none.\n",
+       f"\nRetired: none.\n\nBaseline: `{sha}`, taken at the owner's word after the whole-design audit (the round record's\n"
+       "`[baseline]`). From it on, v2 takes no `Revised:` paragraph, and every change to a clause of `[chain]` is a\n"
+       "deviation record approved by its risk (final-questions `[deviation]`).\n",
+       "Baseline")
+V2.save()
+print(f"take_baseline: v2 records Baseline {sha[:9]}")
+````
+
+### `patch_atlas_asbuilt.py`
+
+The atlas skips the as-built view, a render of v2's [chain] the page carries already; with it the page measured 16,001,498 bytes.
+
+````python
+"""The atlas skips the as-built view (2026-10-20, the baseline). The view renders v2's `[chain]` at the baseline, with
+each deviation's row applied, and it is generated. The atlas renders v2's `[chain]` already, so the view duplicates it
+until a deviation exists. With the view in its corpus the page measured 16,001,498 bytes, at the 16 MB limit. The
+replacement must match once.
+
+Usage: python -X utf8 patch_atlas_asbuilt.py <atlas.py>
+"""
+import pathlib
+import sys
+
+p = pathlib.Path(sys.argv[1])
+t = p.read_text(encoding="utf-8")
+old = """    # The whole-design audit's briefs and agent returns are snapshots of agent work, not design, and the design map
+    # skips them for the same reason; their reports under reviews/ stay (2026-10-20, the page had passed 16 MB).
+    paths = [BUILD / "README.md"] + sorted(p for p in HERE.glob("*.md") if not any(m in p.name for m in
+                                                                                 ("-brief", "-return-"))) \\"""
+new = """    # The whole-design audit's briefs and agent returns are snapshots of agent work, not design, and the design map
+    # skips them for the same reason; their reports under reviews/ stay (2026-10-20, the page had passed 16 MB). The
+    # as-built view is v2's [chain] rendered at the baseline, a copy the page carries already until a deviation
+    # exists (the baseline, 2026-10-20: with it the page measured 16,001,498 bytes).
+    paths = [BUILD / "README.md"] + sorted(p for p in HERE.glob("*.md") if not any(m in p.name for m in
+                                                                                 ("-brief", "-return-", "-as-built"))) \\"""
+if t.count(old) != 1:
+    sys.exit(f"patch_atlas_asbuilt: the corpus filter matches {t.count(old)} times")
+p.write_text(t.replace(old, new), encoding="utf-8", newline="\n")
+print("patch_atlas_asbuilt: the atlas skips the as-built view")
+````
+
+### `patch_kit_baseline.py`
+
+The walk kit's deviation and as-built cases want green on the tree since the baseline, and the recorder's [walk-kit] wording follows.
+
+````python
+"""The walk kit's two "on the tree" cases for the deviation join and the as-built view assumed no baseline. Since the
+baseline (2026-10-20), both measure: the join reads the baseline and finds no departure, and the as-built view
+re-renders byte for byte. Each case now wants exit 0 and its green line. The recorder's [walk-kit] wording follows.
+Each replacement must match once.
+
+Usage: python -X utf8 patch_kit_baseline.py <run_kit_plants.py> <record_instruments.py>
+"""
+import pathlib
+import sys
+
+kit, rec = pathlib.Path(sys.argv[1]), pathlib.Path(sys.argv[2])
+EDITS = {
+    kit: [
+        ('CASES.append(("deviations on the tree", [B + "deviations.py"], 2, "never green"))',
+         'CASES.append(("deviations on the tree, since the baseline", [B + "deviations.py"], 0, "baseline read"))'),
+        ('CASES.append(("asbuilt on the tree", [B + "asbuilt.py", "--check"], 2, "nothing to render"))',
+         'CASES.append(("asbuilt on the tree, at the baseline", [B + "asbuilt.py", "--check"], 0, "findings 0"))'),
+    ],
+    rec: [
+        ("plant red for its own reason, and each instrument on the tree, before its input exists, never green.",
+         "plant red for its own reason, the carries join on the tree never green before dTrueNorth's specs exist, and\n"
+         "the deviation join and the as-built view green on the tree since the baseline."),
+    ],
+}
+for path, edits in EDITS.items():
+    t = path.read_text(encoding="utf-8")
+    for old, new in edits:
+        n = t.count(old)
+        if n != 1:
+            sys.exit(f"patch_kit_baseline: {path.name}: {old[:60]!r} matches {n} times")
+        t = t.replace(old, new)
+    path.write_text(t, encoding="utf-8", newline="\n")
+    print(f"patch_kit_baseline: {len(edits)} edits to {path.name}")
+````
+
+### `record_baseline.py`
+
+The round record's [baseline] and its session-log event, every value read from v2, the instruments' runs and the as-built view.
+
+````python
+"""Record the baseline. The round record gains `[baseline]`: the owner's word verbatim, the commit v2 records as its
+baseline, what freezes, the two instruments that now measure from it, and the as-built view's first render. The
+session log gains one event. Every value is read from v2, the instruments' captured runs and the as-built view, never
+typed.
+
+Usage: python -X utf8 record_baseline.py   (from the worktree root, after take_baseline.py and the as-built render)
+"""
+import pathlib
+import re
+import sys
+
+HERE = pathlib.Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE.parent / "expansions"))
+from fold_lib import Record  # noqa: E402
+
+B = pathlib.Path("memory/builds/dClosedLoop/build")
+v2 = (B / "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md").read_text(encoding="utf-8")
+sha = re.search(r"^Baseline: `([0-9a-f]{40})`", v2, flags=re.M)
+answers = (HERE.parent / "fold" / "fork-answers.md").read_text(encoding="utf-8")
+path = re.findall(r'"(.*?)"="(.*?)"', answers.split("\nbatch 16 ", 1)[1])
+dev = (HERE / "deviations-after.out").read_text(encoding="utf-8").splitlines()
+ab = (HERE / "asbuilt-check.out").read_text(encoding="utf-8").splitlines()
+view = (B / "2026-10-19-build-PLAY-dClosedLoop-1-as-built.md").read_text(encoding="utf-8")
+rows = len(re.findall(r"^\| d[A-Z]\w+ \| `cl-dClosedLoop-\d{4}` \|", view, flags=re.M))
+if not sha or len(path) != 1 or not dev or not ab or not rows:
+    sys.exit("record_baseline: a value did not read")
+section = f"""## [baseline] The baseline
+
+The owner's word, verbatim: "{path[0][1]}"
+
+- **The baseline** is `{sha.group(1)}`, the design commit after the audit's fold, its closing pair's fold and Stage 0
+  again. v2's `[clause-ids]` records it. As final-questions `[deviation]` settles, v2 takes no `Revised:` paragraph
+  from it on, and every change to a clause of `[chain]` is a deviation record approved by its risk.
+- **The deviation join** now measures from it (`build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py`):
+
+```text
+{chr(10).join(dev)}
+```
+
+- **The as-built view** is generated from it (`build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md`, {rows} clauses at
+  the baseline), and its check re-renders it byte for byte. The atlas skips the view, which repeats v2's `[chain]`
+  until a deviation exists.
+
+```text
+{chr(10).join(ab)}
+```
+
+- **Not done, at the owner's word:** the re-measure `[recall-scored]` planned, and the plan's step 5, opening the chain.
+  The recall shortfall, the seal's defect and the clause-omission blind spot stay this audit's recorded limits.
+
+"""
+R = Record(str(B / "2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md"))
+R.insert_before("## [stage0-classes] Stage 0's classes\n", section, "[baseline]")
+R.save()
+L = Record(str(B / "2026-10-14-build-PLAY-dClosedLoop-1-session-log.md"))
+L.insert_before("## Instruments\n",
+                f"- 2026-10-20, session 1799cb98: the baseline taken at the owner's word, `{sha.group(1)[:9]}`. v2's\n"
+                f"  `[clause-ids]` records it, the deviation join measures from it and the as-built view is rendered from\n"
+                f"  it. The work stops there, as the owner said (`whole-audit.md` `[baseline]`).\n\n", "event")
+L.save()
+print(f"record_baseline: baseline {sha.group(1)[:9]}, as-built rows {rows}")
+````
+
 ### `preset_check_canonical.py`
 
 The preset check [final] runs, its pair rule for the deprecation window added by the away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`.
@@ -33285,6 +33460,10 @@ MINE = [
     ('fold/w11/fold-11.py', "Fold writer 11's script: Stage 0 again's fixes in the design, and the owner's FK-11-1 and FK-11-2 (fold-return-w11, -w11b)."),
     ('closing/record_stage0_again.py', "The round record's [stage0-again], its [stage0] and [recall-scored] passages amended, and the session-log event, every count read from a run."),
     ('closing/prep_recorder_s0.py', "This recorder's Stage 0 check relaxed to refuse only a crash, and its [stage0-fixed] section."),
+    ('closing/take_baseline.py', "The baseline taken at the owner's word: v2's [clause-ids] records Baseline naming the design commit after the audit, refusing a second."),
+    ('closing/patch_atlas_asbuilt.py', "The atlas skips the as-built view, a render of v2's [chain] the page carries already; with it the page measured 16,001,498 bytes."),
+    ('closing/patch_kit_baseline.py', "The walk kit's deviation and as-built cases want green on the tree since the baseline, and the recorder's [walk-kit] wording follows."),
+    ('closing/record_baseline.py', "The round record's [baseline] and its session-log event, every value read from v2, the instruments' runs and the as-built view."),
     ("preset_check_canonical.py", "The preset check [final] runs, its pair rule for the deprecation window added by the "
      "away pass's closing review and seen red on a66c855f3's velocity row. 'seconds' joined its free values with "
      "the night pass two's `mailbox.fetch-seconds`, seen red on that key's four preset values before. 'the models the harness adapter offers' joined them when the flow adoption's review made `roles.model.<role>` presettable, as the owner's FA-6 chose, seen red on that key's four preset values before. The parked debt's review added the round-count pair rule, re-run red in `[pair-rule]`."),
@@ -33577,7 +33756,8 @@ parts.append("""
 
 `2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[briefs]`, `[recall]`, `[instruments]` and `[walltime]` describe
 them. Each run below is checked against the exit code it wants and the line it must print: a clean input green, each
-plant red for its own reason, and each instrument on the tree, before its input exists, never green.
+plant red for its own reason, the carries join on the tree never green before dTrueNorth's specs exist, and
+the deviation join and the as-built view green on the tree since the baseline.
 
 """ + block("text", "$ python run_kit_plants.py\n" + kit_out.strip()))
 parts.append("""
@@ -34486,9 +34666,9 @@ K4: keys 267 · findings 0
 K5: principles 42, clauses 509, retired 0 · findings 0
   left out: whether a named clause enforces its principle, which only a reader judges
 rerun design map: rc 0
-  map: no stale facts read 67 records and 28 quotes of a map count or the critical path
+  map: no stale facts read 68 records and 28 quotes of a map count or the critical path
 rerun atlas: rc 0
-  atlas: derived — 237 records, 4226 sections, 217 decision sections, 16 comparison areas, 42 principles
+  atlas: derived — 237 records, 4235 sections, 217 decision sections, 16 comparison areas, 42 principles
 rerun fold state: rc 0
   rows read unfolded despite a fold section: 0
 rerun reconciliation probe: rc 0
@@ -34504,10 +34684,11 @@ rerun preset check: rc 0
 rerun critical path: rc 0
   critical path: 276 units, dTrueNorth > dGroundRules > dSafePassage > dOrderedCharter > dDeclaredLoop > dWitnessedBar > dBoundRoles > dWellOiledMachine > dTendedCadence > dCalibratedLens > dConvergedCharter
 rerun line coverage: rc 0
-  design records 153 · lines 49203 · unreviewed 544 (1%)
+  design records 154 · lines 49630 · unreviewed 1006 (2%)
 rerun review debt: rc 0
-  design commits after the floor that no closing review covers: 1
+  design commits after the floor that no closing review covers: 2
     15988ccd5  16 design record(s)  records(dClosedLoop): the audit's closing pair compared and folded — 22 defects, the probe keyed by rule, Stag
+    59ff8f2ac  9 design record(s)  records(dClosedLoop): Stage 0 again — every lead fixed or classed, Stage 0 green on the tree, the design ready
 stage0: arms K1,K2,K3,K4,K5,reruns · findings 0 · classed 50 · reruns red 0
 rc 0
 ````
@@ -34710,7 +34891,8 @@ stage0: arms K1,K2,K3,K4,K5,reruns · findings 93 · classed 1 · reruns red 0
 
 `2026-10-19-build-PLAY-dClosedLoop-1-whole-audit.md` `[briefs]`, `[recall]`, `[instruments]` and `[walltime]` describe
 them. Each run below is checked against the exit code it wants and the line it must print: a clean input green, each
-plant red for its own reason, and each instrument on the tree, before its input exists, never green.
+plant red for its own reason, the carries join on the tree never green before dTrueNorth's specs exist, and
+the deviation join and the as-built view green on the tree since the baseline.
 
 ````text
 $ python run_kit_plants.py
@@ -34738,7 +34920,7 @@ ok   rc 1 (wants 1) carries --plant uncarried
 ok   rc 1 (wants 1) carries --plant token
 ok   rc 2 (wants 2) carries --plant unmeasured
 ok   rc 1 (wants 1) carries --plant node
-ok   rc 2 (wants 2) deviations on the tree
+ok   rc 0 (wants 0) deviations on the tree, since the baseline
 ok   rc 0 (wants 0) deviations on a clean fixture
 ok   rc 1 (wants 1) deviations --plant clause
 ok   rc 1 (wants 1) deviations --plant pass-revision
@@ -34746,7 +34928,7 @@ ok   rc 1 (wants 1) deviations --plant amended
 ok   rc 1 (wants 1) deviations --plant pin
 ok   rc 1 (wants 1) deviations --plant approver
 ok   rc 0 (wants 0) deviations --plant status
-ok   rc 2 (wants 2) asbuilt on the tree
+ok   rc 0 (wants 0) asbuilt on the tree, at the baseline
 ok   rc 0 (wants 0) asbuilt on a clean fixture
 ok   rc 1 (wants 1) asbuilt --plant hand-edit
 ok   rc 1 (wants 1) asbuilt --plant no-row
@@ -34919,13 +35101,13 @@ reported the tree as it stood before the record changed (the answers fold's clos
 
 ````text
 $ design map
-map: 2687 nodes in 30 namespaces; 28441 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
-map: purposes declared 1860, derived 323, pending 504
-map: no stale facts read 67 records and 28 quotes of a map count or the critical path
+map: 2688 nodes in 30 namespaces; 28441 B of 32768 (degraded: purposes 40, fold round); folded 15; unarmed none
+map: purposes declared 1861, derived 323, pending 504
+map: no stale facts read 68 records and 28 quotes of a map count or the critical path
 rc 0
 
 $ atlas
-atlas: derived — 237 records, 4234 sections, 217 decision sections, 16 comparison areas, 42 principles
+atlas: derived — 237 records, 4239 sections, 217 decision sections, 16 comparison areas, 42 principles
 rc 0
 
 $ fold state

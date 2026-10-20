@@ -571,6 +571,31 @@ The owner then chose the path to the baseline, verbatim:
 So the re-measure `[recall-scored]` planned is not run. The recall shortfall, the seal's defect and the
 clause-omission blind spot stay this audit's recorded limits, and the baseline is taken on this tree (`[baseline]`).
 
+## [baseline] The baseline
+
+The owner's word, verbatim: "Once the review is done, fold, take the baseline, don't remeasure. Stop there."
+
+- **The baseline** is `59ff8f2ac04a967751eae00de6856afbea66c033`, the design commit after the audit's fold, its closing pair's fold and Stage 0
+  again. v2's `[clause-ids]` records it. As final-questions `[deviation]` settles, v2 takes no `Revised:` paragraph
+  from it on, and every change to a clause of `[chain]` is a deviation record approved by its risk.
+- **The deviation join** now measures from it (`build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py`):
+
+```text
+deviations: baseline read, chain-build specs 0, members 0, records 0 · findings 0
+  not read yet: divergence hand-backs and rescope rows, which no chain build has written
+```
+
+- **The as-built view** is generated from it (`build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md`, 509 clauses at
+  the baseline), and its check re-renders it byte for byte. The atlas skips the view, which repeats v2's `[chain]`
+  until a deviation exists.
+
+```text
+asbuilt: findings 0
+```
+
+- **Not done, at the owner's word:** the re-measure `[recall-scored]` planned, and the plan's step 5, opening the chain.
+  The recall shortfall, the seal's defect and the clause-omission blind spot stay this audit's recorded limits.
+
 ## [stage0-classes] Stage 0's classes
 
 Each row is a red the design keeps, classed from its arm's closed set by the closing pair's fold (`build/2026-10-20-build-PLAY-dClosedLoop-1-fold-return-w10.md`, its requests).

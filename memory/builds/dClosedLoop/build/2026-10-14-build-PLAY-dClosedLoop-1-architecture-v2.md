@@ -1806,6 +1806,10 @@ and a retired clause's id is listed below and never minted again.
 
 Retired: none.
 
+Baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, taken at the owner's word after the whole-design audit (the round record's
+`[baseline]`). From it on, v2 takes no `Revised:` paragraph, and every change to a clause of `[chain]` is a
+deviation record approved by its risk (final-questions `[deviation]`).
+
 ## [enforcement] What enforces each principle
 
 Each principle names, by id, the clauses of `[chain]` that enforce it, and a clause that cites a principle by id sits

@@ -3079,6 +3079,10 @@ The whole-design audit's closing pair, dispatches 208 and 209, derived from each
   50 classed. The owner chose the baseline without a re-measure
   (`whole-audit.md` `[stage0-again]`).
 
+- 2026-10-20, session 1799cb98: the baseline taken at the owner's word, `59ff8f2ac`. v2's
+  `[clause-ids]` records it, the deviation join measures from it and the as-built view is rendered from
+  it. The work stops there, as the owner said (`whole-audit.md` `[baseline]`).
+
 ## Instruments
 
 ### The gap-ownership join

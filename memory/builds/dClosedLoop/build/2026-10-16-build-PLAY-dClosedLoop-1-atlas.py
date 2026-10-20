@@ -239,9 +239,11 @@ def corpus():
     """Every record the atlas carries: the build's README, its design records, reviews and research returns."""
     recs = []
     # The whole-design audit's briefs and agent returns are snapshots of agent work, not design, and the design map
-    # skips them for the same reason; their reports under reviews/ stay (2026-10-20, the page had passed 16 MB).
+    # skips them for the same reason; their reports under reviews/ stay (2026-10-20, the page had passed 16 MB). The
+    # as-built view is v2's [chain] rendered at the baseline, a copy the page carries already until a deviation
+    # exists (the baseline, 2026-10-20: with it the page measured 16,001,498 bytes).
     paths = [BUILD / "README.md"] + sorted(p for p in HERE.glob("*.md") if not any(m in p.name for m in
-                                                                                 ("-brief", "-return-"))) \
+                                                                                 ("-brief", "-return-", "-as-built"))) \
         + sorted(REVIEWS.glob("*.md"))
     for p in paths:
         name = p.stem.split(PREFIX, 1)[-1] if PREFIX in p.stem else p.stem.split("-PLAY-dClosedLoop-1-", 1)[-1]
