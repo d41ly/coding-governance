@@ -573,3 +573,9 @@ stale work. The handoff names:
 - the owner's standing rules;
 - the stop point, the opening read the walk set;
 - the two items to raise with the owner, the atlas's size and any error found in the plan.
+
+The owner then asked, verbatim: "Render the handoff as a suggested task". The handoff is offered as a suggested task
+in the desktop app. A spawned session opens in a fresh worktree, whose branch does not carry this build's commits.
+So the task's prompt first moves that fresh, clean branch onto `branch/gov-architecture-plan-e34297`, then has the
+session act on prompt 59. Its "Where you are" names the original worktree, and the rest holds. From here the original
+worktree's branch takes no more commits.

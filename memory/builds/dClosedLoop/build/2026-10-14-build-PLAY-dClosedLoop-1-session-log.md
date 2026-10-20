@@ -3280,6 +3280,9 @@ The execution plan's fold review, dispatches 226 and 227, derived from each run 
   `[walk]`). Phase 0's handoff for a new session is `prompts/2026-10-20-prompt-PLAY-dClosedLoop-1-59-session.md`
   (`execution.md` `[handoff]`). This session does no more work on the branch.
 
+- 2026-10-20, session 1799cb98: the owner asked: "Render the handoff as a suggested task". Prompt 59 is offered
+  as a suggested task whose session first moves its fresh branch onto this one (`execution.md` `[handoff]`).
+
 ## Instruments
 
 ### The gap-ownership join
