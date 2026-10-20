@@ -125,6 +125,13 @@ What today's gov forces on the plan.
 
 ## [phase-0]
 
+**Revised 2026-10-20.** This section, and [phase-1]'s Design-exit row, were revised on 2026-10-20 from the revision
+record `build/…-phase0-revision.md`, at the owner's answers in ER `[phase0-answers]` (ER:591-610): "Apply all 13
+(Recommended)", "List it first (Recommended)" and "Rows name the ids (Recommended)". The revised passages are P0.1's
+opening paragraph, its rows 1, 3, 5, 6, 7 and 10, its new rows 5a and 8a, its further arms, its chain values and its
+acceptance; P0.2's sources, head, name, acceptance and red tests; P0.4's row 9; P0.7's checks and red tests; and one
+sentence of P0.8. P0.1's rows keep their numbers, so every citation of a row elsewhere still holds.
+
 dClosedLoop's remaining work. It runs on node d, is written by dClosedLoop's session (the main loop) unless a step
 names another actor, and lands once, on the owner's ask. Every file is a record under `memory/`. None is product
 code (`memory/builds/dClosedLoop/README.md:39-40`).
@@ -133,34 +140,70 @@ code (`memory/builds/dClosedLoop/README.md:39-40`).
 
 Each escape now reds on its plant, and each false red now goes green. Rows 1 to 6 are escapes and row 10 is a guard,
 all found by the deviation and handoffs returns. Rows 7 and 8 are false reds, and rows 9 and 11 are placement rules
-rather than fixes. The plants are the deviation return's scratch steps, kept verbatim at IR:754-838, ported into each
-instrument's own `--fixture --plant`.
+rather than fixes. Dispatch 234's builder found two more, each kept beside the row it extends (the revision record's
+findings 13 and 2): row 5a, an escape, and row 8a, a false red. A new row is numbered after the row it follows, so no
+citation of a row moves. The plants are the deviation return's scratch steps, kept verbatim at IR:754-838, ported
+into each instrument's own `--fixture --plant`.
 
-| Escape or false red | Fix | Plant that proves it |
-|---|---|---|
-| A spec carrying another build's clause counts as carried for its owner (`build/…-carries.py:183-204`) | A carried id's build must be the spec's own folder's, unless a `**Moved:** … to <this build> by <decision>` line names it | `crossbuild`: red after the fix, green before |
-| A dropped clause escapes after the next edit, because the drop arm reads only the last two revisions (`carries.py:125-126`, `:205-211`) | Compare against every revision of the spec since its first commit | `drop`, then `typo`: red |
-| A revision after a pass named only in the commit subject (`build/…-deviations.py:150`) | Attribute a pass from subject and trailer together, as `tools/memory-tree/routed_commits.py:22-26` does | A pass commit with the id only in its subject, then a revision: red |
-| A revision on node a while node b's pass is in flight, both merged, is not a descendant of the pass (`deviations.py:153-158`) | Count every revision that is not an ancestor of the first pass | Two branches, merged: red |
-| Baseline re-pointed after a loosening, read from v2's working tree (`deviations.py:132-136`) | Pin `59ff8f2ac` in the instrument, and refuse a v2 whose `Baseline:` differs | Loosen `cl-dClosedLoop-0119`, re-point: red |
-| An approver written as "owner" passes on a prefix match (`deviations.py:81-87`) | Under the chain's value `author-recorded`, any recorded approver role passes. One naming the owner must cite a decision row the default branch holds that names this record's own departure: P0.8 row 3 for the `cl-dClosedLoop-0004` record, row 1 only for the extra unit's deviation-2 record, row 6 for dPlacedRequest's record, or a row naming the record's Departs-from clause id. Every later departure's approver is the run's author role, citing the ruling, never `owner` | "owner" with no id: red; an owner approver citing only an ER line: red; one citing row 5: red; one citing row 1 for a unit a spec run added: red |
-| False red: `AMENDED` read on any spec line (`deviations.py:160`), where the ledger form is `amended rev-N` in journal records (`memory/HYGIENE.md:604-606`) | Read `amended rev-N` from the ledgers | A spec quoting `cl-dClosedLoop-0004`: green; a ledger row with no record: red |
-| False red: revisions numbered by commit count (`deviations.py:153-158`), where the header `rev-N` moves only on a material edit (`memory/TEMPLATE-SPEC.md:61-67`) | Address a revision by its header `rev-N` | A status-only commit, then a record at the header's rev-1: green |
-| Two specs on two branches each carrying one clause whole are caught only on the merged tree | Placement: the instruments run on the prepared merge, after `--prepare` | The deviation return's two-node plant on the merged tree: red |
-| Any run can edit the instruments under `memory/`, the class `TOOL-aStandingWrit-7` names (`memory/builds/aStandingWrit/BACKLOG.md:11`) | Every report and packet prints each instrument's blob hash, and the packet pins it. `packet.py --check`'s pin arm reds a moved blob, and a pin-keeping re-render cannot re-pin it away ([handoffs]). This covers the re-render only: a hand edit of the packet's pin line, or of `packet.py`, can still move a pin, and only the owner's landing-diff check guards that until a chain unit's merge-bar check ([cannot]) | A one-byte edit to `carries.py`, the packet made stale by another cause (an `[owed]` line), and a re-render keeping the pins: the pin arm reds while the byte compare stays green. Two controls, each green on the same plant: `--check` with the pin arm removed, and a `packet.py` variant whose `--write` re-pins |
-| `asbuilt.py --check` reds on each new record until `--write` runs (`build/…-asbuilt.py:81`) | Placement: the record's own commit carries the re-rendered view | None owed; it is the instrument working |
+A plant that needs a git history builds it in a temporary repository whose `.memory-tree.conf` declares one fixture
+family. Every fixture id there is `<that family>-<chain slug>-<n>`, so the fixture's H1 (`tree_lib.py:219`) and
+backlog rows (`row_grammar.py:211`) parse, while the tree's grammar, which matches only declared families
+(`gen_build_index.py:806-818`), joins none of them. The in-memory fixtures keep their `missing:` ids, since nothing
+parses them as ids.
 
-**Two more population arms.** `deviations.py` reads rescope `add`, `retire` and `supersede` rows from `RUN.md` and
-every rotated `RUN.*.md`, and divergence hand-backs, as members; the planned `defer` rows a spec run writes for its
-own roster units are not members. Plants: an add row with no record is listed as unjoined, and so is a hand-back with
-no record, while a spec run's routine defer rows are not listed.
+| # | Escape or false red | Fix | Plant that proves it |
+|---|---|---|---|
+| 1 | A spec carrying another build's clause counts as carried for its owner (`build/…-carries.py:183-204`) | A carried id's build must be the spec's own folder's, unless a `**Moved:** … to <this build> by <decision>` line names it. The token arm reads every carrier's text, from whichever measured build's folder holds it (`carries.py:251`, `:259` read only the owner build's) | `crossbuild`: red after the fix, green before. A `**Moved:**` line naming the clause to this build, its token in the carrier, with the owner build measured too: green, red before. The same carrier without the token: red |
+| 2 | A dropped clause escapes after the next edit, because the drop arm reads only the last two revisions (`carries.py:125-126`, `:205-211`) | Compare against every revision of the spec since its first commit | `drop`, then `typo`: red |
+| 3 | A revision after a pass named only in the commit subject (`build/…-deviations.py:150`) | A unit's first pass is the oldest commit reachable from `HEAD` that does one of two things: it carries a `Pass:` trailer naming the unit, read from git's trailer block as `read_attribution_tokens` reads it (`tools/unattended/lib-unattended.sh:1052-1063`), where `Pass: none` names no unit; or it carries no `Pass:` trailer, names the unit as a whole token in its subject, and writes a path outside every `memory/builds/` folder, `memory/LIVE.md`, `memory/ledger/`, `memory/DECISIONS.md` and `memory/project/readme-contract.txt`. It is the routed-commit attribution (`tools/memory-tree/routed_commits.py:22-26`), narrowed to the commits that are passes. A `Pass: none` spec or records commit (`tools/workflows/unattended-build.js:1182`) belongs to the unit but is not its pass, so a spec revised before its pass stays outside the population ([constraints]) | A product commit with no trailer and the id only in its subject, then a revision: red. Controls, each no member: a `Pass: none` commit naming the unit in its subject, then a revision; a records-only status flip with no trailer naming the unit, then a revision |
+| 4 | A revision on node a while node b's pass is in flight, both merged, is not a descendant of the pass (`deviations.py:153-158`) | Count every revision that is not an ancestor of the first pass | Two branches, merged: red |
+| 5 | Baseline re-pointed after a loosening, read from v2's working tree (`deviations.py:132-136`) | Pin `59ff8f2ac` in the instrument. A v2 whose `Baseline:` differs is a member no record joins, listed first (the owner's chain values, below) | Loosen `cl-dClosedLoop-0119`, re-point: red |
+| 5a | The as-built view renders from v2's working-tree `Baseline:` too (`build/…-asbuilt.py:130-136`) | `asbuilt.py` renders from the pin `deviations.py` carries, which it already imports (`asbuilt.py:35-37`), and reports a differing `Baseline:` as a finding | Loosen `cl-dClosedLoop-0119`, re-point: `asbuilt.py --check` exits 1, and the view still renders from `59ff8f2ac` |
+| 6 | An approver written as "owner" passes on a prefix match (`deviations.py:81-87`) | Under the chain's value `author-recorded` (ER:103-104, :189), the by-risk compare (`deviations.py:81-87`) is removed. An approver passes when its `**Approver:**` opens with a role the record grammar names, `author`, `spec writer` or `owner` (`deviations.py:14`), whatever the risk. One naming the owner must cite a decision id whose row `memory/DECISIONS.md` holds at the advertised default-branch tip (`origin/main`; under `--report`, `P`). That row must name the record's `**Departs from:**` clause id, or the unit its `**Follow-through:** new unit <id>` names. The instrument holds no decision id. P0.8's row 3 qualifies by naming `cl-dClosedLoop-0004`, row 6 by naming `cl-dClosedLoop-0120`, and row 1 by naming dTrueNorth's extra unit. Row 5 names neither, and fails. Every later departure's approver is the run's author role, citing the ruling, never `owner` | These are red: an approver line missing, or naming no role; "owner" with no id; an owner approver citing only an ER line; one citing a row that names neither the clause nor the unit (P0.8 row 5); one citing row 1 for a unit a spec run added; one citing an id no row holds. The `approver` plant, `author` on a stricter record, is now a green control: red before the fix, green after |
+| 7 | False red: `AMENDED` read on any spec line (`deviations.py:160`), where the ledger form is `amended rev-N` in journal records (`memory/HYGIENE.md:604-606`) | Read `amended rev-N` from the ledgers. Each `amended rev-N` line under an `**Evidences:** <unit>` block of a `journal` record (`memory/HYGIENE.md:603-606`) is a member, addressed `<unit>@rev-<N-1>`, the revision the amendment departed from, as a revision member is addressed. It joins the record departing from that address. A hand-back and a revision of the same change carry the same address, so one record joins all three | A spec quoting `cl-dClosedLoop-0004`: green. A ledger row `amended rev-3` with no record departing from `<unit>@rev-2`: red. The same row with that record: green |
+| 8 | False red: revisions numbered by commit count (`deviations.py:153-158`), where the header `rev-N` moves only on a material edit (`memory/TEMPLATE-SPEC.md:61-67`) | Address a revision by its header `rev-N` | A status-only commit, then a record at the header's rev-1: green |
+| 8a | False red: a revision that changes only generated regions, or its `**Status:**` line and generated regions in one commit, is a member, since only a Status-only change is excepted (`deviations.py:157-158`) | Except a revision whose text is unchanged once its `**Status:**` line and every `<!-- gen:... -->` region are removed. The regions are stripped by `GEN_REGION_AWK` (`tools/unattended/lib-unattended.sh:1045`), read from that file and never copied, so check 23 and the instrument strip one way. Like that strip, it cannot tell a hand edit inside a region from a render (`:1042-1043`) | A spec-records re-render after the pass: green. A Status flip and a re-render in one commit: green. A re-render with one acceptance line changed: red |
+| 9 | Two specs on two branches each carrying one clause whole are caught only on the merged tree | Placement: the instruments run on the prepared merge, after `--prepare` | The deviation return's two-node plant on the merged tree: red |
+| 10 | Any run can edit the instruments under `memory/`, the class `TOOL-aStandingWrit-7` names (`memory/builds/aStandingWrit/BACKLOG.md:11`) | The departures report (P0.2) and every packet (P0.3) print each instrument's blob hash, and the packet pins it. `packet.py --check`'s pin arm reds a moved blob, and a pin-keeping re-render cannot re-pin it away ([handoffs]). This covers the re-render only: a hand edit of the packet's pin line, or of `packet.py`, can still move a pin, and only the owner's landing-diff check guards that until a chain unit's merge-bar check ([cannot]) | A one-byte edit to `carries.py`, the packet made stale by another cause (an `[owed]` line), and a re-render keeping the pins: the pin arm reds while the byte compare stays green. Two controls, each green on the same plant: `--check` with the pin arm removed, and a `packet.py` variant whose `--write` re-pins |
+| 11 | `asbuilt.py --check` reds on each new record until `--write` runs (`build/…-asbuilt.py:81`) | Placement: the record's own commit carries the re-rendered view | None owed; it is the instrument working |
+
+**Three more population arms.** `deviations.py` also reads these as members:
+- **Rescope rows.** The `add`, `retire` and `supersede` rows from `RUN.md` and every rotated `RUN.*.md`. An `add`
+  joins the record whose `**Follow-through:**` is `new unit <item>`. A `retire` or `supersede` joins the record
+  departing from `<item>@rev-N`, where N is the item's header revision at the row's commit. The planned `defer`
+  rows a spec run writes for its own roster units are not members.
+- **Divergence hand-backs.** Each revision record under the build's `prompts/` whose `### Goal` opens
+  `DIVERGENCE:`. That is the record the `/build` Skill's stage 5 writes, and VERBS:758-760 has a run follow it
+  (`.claude/skills/build/SKILL.md:68`); no `RUN.md` row records a hand-back. It is addressed `<unit>@rev-N`, where
+  the unit is the one its `**Serves:**` line names and N is the spec header's revision at the commit that added the
+  record. It joins the record departing from that address, hand-off `spec-to-code`.
+- **Revisions after the audited revision.** Each commit of a unit's spec that is not an ancestor of the commit
+  adding the newest `spec-audit` record whose `**Serves:**` line pins `<unit>@rev-N` (`memory/HYGIENE.md:578`),
+  addressed `<unit>@rev-N`. Row 8a's Status-and-generated exception applies. Today's audit harness writes no pin
+  (`tools/workflows/tier2-review.js:1794-1795`), so a unit without one adds nothing here and the report prints "no
+  audit pin" for it. `cl-dClosedLoop-0005`, which dTrueNorth lands, writes the pin for every later chain audit.
+
+Plants:
+- an add row with no record, and a hand-back with no record, are each listed as unjoined;
+- a spec run's routine defer rows are not listed;
+- a `prompts/` fix record whose Goal does not open `DIVERGENCE:` is no member;
+- an audit record pinning `@rev-1`, then a material edit before any pass: listed. The same edit with no pin: not
+  listed, and the report prints "no audit pin".
 
 **The owner's chain values.** Answer 3 also reaches the instruments (ER:126-127). `deviations.py` takes `--policy
-report|refuse`, which defaults to `report`: report prints every member and exits 0, and refuse keeps today's exit 1.
-Plant: one unjoined member exits 0 and is listed under `report`, and exits 1 under `refuse`.
+report|refuse`, which defaults to `report`. `report` lists every member and exits 0. `refuse` exits 1 on an
+unjoined member, or on an approver the chain's value refuses (row 6). Every `deviations.py` plant in the table above
+runs under `--policy refuse`, where its "red" is exit 1. It runs again under `report`, where it exits 0 and lists its
+member. `carries.py` and `asbuilt.py` take no policy, and their plants exit as their rows say.
+A v2 whose `Baseline:` differs from the pinned `59ff8f2ac` (row 5) is counted as a member and listed first under
+both policies, as "v2's Baseline moved from 59ff8f2ac to <sha>". No record joins it, since only the owner's re-pin
+moves the pin. Exit 2 keeps its meaning, "nothing measured". Plants: one unjoined member exits 0 and is listed under
+`report`, and exits 1 under `refuse`; a re-pointed `Baseline:` exits 0 and is listed first under `report`, and
+exits 1 under `refuse`.
 
 **Acceptance.**
-- Every plant above exits as its row says.
+- Every plant above exits as its row says, a `deviations.py` plant under `--policy refuse`, and every `deviations.py`
+  plant exits 0 under `report` with its member listed.
 - On today's tree, `carries.py` exits 2 (no spec measured), `deviations.py` exits 0 with 0 members and `asbuilt.py
   --check` exits 0, as the deviation return measured.
 
@@ -170,8 +213,9 @@ A new mode of `deviations.py`, `--report <slug> [--write|--check]`, extending th
 the population rather than adding one beside it.
 
 **Its sources:**
-- the population for the build: clause moves, revisions after the first pass or after the pinned audited revision,
-  ledger `amended` rows, and the rescope rows and divergence hand-backs P0.1's two further arms read;
+- the population for the build: clause moves, revisions after the first pass, revisions after the audited revision
+  a `spec-audit` record pins, ledger `amended` rows, and the rescope rows and divergence hand-backs, all as P0.1's
+  further arms read them;
 - the records under `memory/builds/<slug>/build/`;
 - the forks the run resolved, as M9 derives them (METHOD:299): every §8 `RESOLVED` mark, every `Decided:` trailer in
   the run's range (below; METHOD:316-320) and every park row;
@@ -195,6 +239,9 @@ entry: only a non-`none` `widens:`, `relaxes:` or `grants:` value orders first o
 choice under ER:240 carries `widens: none` and is listed with the other forks. Each README carries this rule (P0.5,
 rule 6).
 
+Its head names each instrument's blob at `HEAD`, `git rev-parse HEAD:<path>`, for `carries.py`, `deviations.py` and
+`asbuilt.py`, and for `packet.py` once it exists (P0.1 row 10).
+
 **What it lists**, in this order:
 - first, side by side, each choice with a non-`none` `widens:` (a surface widened, or an ungranted veto-2 change,
   under the standing ruling: ER:240, :284-285, :388), each with a non-`none` `relaxes:` (a bound dropped for a fork
@@ -214,6 +261,21 @@ rule 6).
 spec run, and `-departures-build.md` for a build run or dTrueNorth's whole run, so a same-date build run never
 overwrites the spec run's report. README rule 4 and the phase tables use the same names.
 
+The run kind is derived, never passed. `--report` reads `base:` from the build's live `RUN.md` and applies README
+rule 1's test at that commit:
+- the build's `BACKLOG.md` there holds an open ask, read by the memory-tree kit's row grammar
+  (`tools/memory-tree/row_grammar.py:211`);
+- and a `roster:units` unit of the README there has no spec whose H1 defines it (`tree_lib.parse_spec_h1`).
+
+When both hold, the run is a spec run and the report is named `-departures-spec.md`. Otherwise it is named
+`-departures-build.md`. With no live `RUN.md`, `--report` exits 2 and writes nothing.
+
+Plants:
+- an open ask and one `MISSING` unit at `base:`: `-departures-spec.md`;
+- the same with every unit specced: `-departures-build.md`;
+- no ask and every unit `MISSING`, as in dTrueNorth's whole run: `-departures-build.md`;
+- no live `RUN.md`: exit 2.
+
 **Two checks, run under both `--write` and `--check`.**
 - **The byte compare**: `--check` renders the report again and compares the bytes with the written file.
 - **The validating arm**, separate from it: it parses the rendered report and exits 1 unless every non-`none`
@@ -223,7 +285,7 @@ overwrites the spec run's report. README rule 4 and the phase tables use the sam
   trailer citing ER:240, ER:388, ER:328 or P0.8 row 5 that lacks either key; on one citing ER:388 whose `widens:` is
   `none`; and on one citing ER:328 whose `relaxes:` is `none`.
 
-**Acceptance.** `--fixture` lists each population plant of P0.1, P0.1's two further arms' plants included.
+**Acceptance.** `--fixture` lists each population plant of P0.1, P0.1's three further arms' plants included.
 
 **Red tests**, each planted into the sources or a renderer stub, never into the written report:
 - a renderer stub that emits a `widens:` choice in source order after a member: the validating arm reds; the same
@@ -242,7 +304,8 @@ overwrites the spec run's report. README rule 4 and the phase tables use the sam
   its `--prepare`: neither listed nor required, while the run's own write to another build's packet is listed. The
   plant is seen red first against a `<base>..HEAD` range;
 - a report written before a member's record is added: `--check` reds once the record lands;
-- a hand edit of the written report: the byte compare reds.
+- a hand edit of the written report: the byte compare reds;
+- an instrument changed by one byte after `--write`: the byte compare goes red on the head line.
 
 ### P0.3 The packet instrument
 
@@ -318,7 +381,7 @@ the answers changed it; phase 0 runs them again before the landing:
 | A cached `live` claim of user `d41ly` on dGroundRules whose beat is older than `RESUME_STALE_BOUND` (5400 s, read from `.unattended.conf`) | Printed "stale on d: take over per [coordination]", left unpinned, and its table cell marked "take over (stale)"; the same claim with a fresh beat is pinned to d |
 | The same stale claim of user `daily-agent` on dTrueNorth | Its table cell and a's first-wave line both read "whole dTrueNorth at 0, take over (stale)" |
 | A cached `live` claim of user `d41ly` on dGroundRules with no `beat-utc` line | Pinned to d, and printed "dGroundRules beat unreadable on d: kept pinned" |
-| A fresh `live` claim of user `agent5` on dFairHearing | "a and d alone" reads 273, the same as with no claim, from a and d only, and the note says the claim is absent from that run and left unpinned. Seen red on the script before this fold, which put the claim on a hidden pace-1 node and printed 216 |
+| A fresh `live` claim of user `agent5` on dFairHearing | "a and d alone" reads 273, the same as with no claim, from a and d only. The line carries the note that the claim is absent from that run and left unpinned, which the script's lines 373-374 print from the notes `run()` returns. Seen red on the script before this fold, which put the claim on a hidden pace-1 node and printed 216 |
 | A live `agent5` claim on dGroundRules whose specs read done | Printed as a spec-only node's claim on a build run and left unpinned: no build run goes to b |
 | A live claim of user `agent-0`, node c, on dGroundRules | Printed "held off-fleet on c": the run stays off every node's table |
 | `--b 0.5` | b's lines name twelve spec runs and no build run; with the `SPEC_ONLY` filter removed from the dispatch, the same run gives b two build runs |
@@ -532,8 +595,8 @@ slugs:
 | Actor | Step | Rests on |
 |---|---|---|
 | Node d's session | Commit P0.1 to P0.6 and the opening on a branch | the charter's `[land]`, `AGENTS.md:31` |
-| Node d's session | `open.py --check`; `packet.py --check` for all 22; `gen_build_index.py --check` and `--check-format` (the contract, both directions); the memory hygiene gate; the generator-grammar bare-id predicate (P0.6), which must print nothing; `carries.py` (exit 2 expected); `deviations.py` printing 0 members, as P0.1's acceptance names, not merely exit 0, which `--policy report` makes constant; `asbuilt.py --check` (0) | `readme-contract.txt:2-5`; `gen_build_index.py:2341-2344` |
-| Node d's session | Red tests: a one-byte README edit reds `open.py --check`; a roster missing one clause reds the arm that reads every clause in exactly one row; a `parents:` typo raises; a removed contract row reds `--check-format` | as above |
+| Node d's session | `open.py --check`; `packet.py --check` for all 22; `gen_build_index.py --check` and `--check-format` (the contract, both directions); the memory hygiene gate; the generator-grammar bare-id predicate (P0.6) at the opening commit's parent, which must print nothing; and `bare-ids.py --opened` at the opening commit, which prints each chain-slug id the generator joins that is neither a `roster:units` id of its build's opened README nor that build's carry-forward ask, and must print nothing; `carries.py` (exit 2 expected); `deviations.py` printing 0 members, as P0.1's acceptance names, not merely exit 0, which `--policy report` makes constant; `asbuilt.py --check` (0) | `readme-contract.txt:2-5`; `gen_build_index.py:2341-2344` |
+| Node d's session | Red tests: a one-byte README edit reds `open.py --check`; a roster missing one clause reds the arm that reads every clause in exactly one row; a `parents:` typo raises; a removed contract row reds `--check-format`; a bare chain id of an opened build planted in a record makes `--opened` print one line | as above |
 | Owner | Reads in full the decision rows (P0.8, nine of them), the grant row among them, and dTrueNorth's README and packet; for the other 21 builds, reads `open.py --check`'s output and `open.py --summary`'s rows (P0.5). "Rows + dTrueNorth (Recommended)" (ER:446) | ER:441-446 |
 | Owner | Asks for the landing | the charter's `[land]`, `AGENTS.md:31` |
 | Node d's session | Lands through `bash tools/push-main.sh`. The pre-push bar takes the doc-only class, because the diff is `memory/` only | `.githooks/pre-push:1215-1223`; `.githooks/gate-env.sh:106-108` |
@@ -594,6 +657,9 @@ with the opening. Each row cites its source:
    Nothing else is a carrier: the build records, `DECISIONS.md`, the backlogs and the root `README.md` are records,
    not rules a run is held to. `open.py --carriers --check` reds a tracked path under a selector that the row's list
    omits, seen red on a planted new kit directory.
+
+Row 1 names dTrueNorth's extra unit by the id the opening mints for it, and row 6 names `cl-dClosedLoop-0120`; row 3
+already names `cl-dClosedLoop-0004`. P0.1 row 6's approver arm reads these names.
 
 **Acceptance.** Every row quotes its answer in ER `[answers]`, `[answers-2]`, `[answers-3]`, `[answers-4]` or
 `[walk]`, or names the `[defaults]` item it carries for the owner's walk.
@@ -716,7 +782,7 @@ and dTrueNorth lands through it.
 | Run | Read in the [handoffs] order; `packet.py --check dTrueNorth` | P0.3 |
 | Run | The build harness with the pinned `specAudit`: SPEC authors the seven specs, then AUDIT, then DISPOSAL | VERBS:722-748; `unattended-build.js:6-8` |
 | Spec writer | The spec carrying `cl-dClosedLoop-0004` writes the owner-approved deviation record in its own commit; the extra unit's spec carries `**Derived:** <its decision row>` and its own record ([deviations]) | v2:1764; `carries.py:11`; ER:189, :232 |
-| Run | At its Design exit, `carries.py --build dTrueNorth --exit` and `deviations.py --policy refuse`, by hand, since nothing in the bar runs them yet. `refuse` exits 1 on an unjoined member or an approver below its risk; the chain's runs keep `report` | P0.1; deviation return, limit 4 |
+| Run | At its Design exit, `carries.py --build dTrueNorth --exit` and `deviations.py --policy refuse`, by hand, since nothing in the bar runs them yet. `refuse` exits 1 on an unjoined member, or on an approver `author-recorded` refuses (P0.1 row 6); the chain's runs keep `report` | P0.1; deviation return, limit 4 |
 | Run | Builds the units one at a time, the extra unit last. The product join takes the instruments' plant suite as its acceptance (D3, carried). Its configuration cutoff is the opening landing's date, so every chain spec, dTrueNorth's own included, falls on or after it | VERBS:697-768; v2:1764; deviation return, recommendation 3 |
 | Run | The closing review over the whole range; its promoted units are built in this run, as M4 rules | METHOD:144, :251-290 |
 | Run | `--phase VERIFYING`, `--prepare`, then the close sequence of README rule 4 on the prepared merge (`--report dTrueNorth`, a record for each member "recorded by nobody", `--report --write` as `…-departures-build.md` and commit, `--report --check`), then `--authorization`, `--close` under `GATE_FULL=1 GATE_SELFTESTS=1`, the flagged bar the driver owes; the unattended kit's own on-demand suites are waived for this landing by README rule 8, so the landing report carries no `--selftests` verdict; then `--land`, `--landed` | VERBS:849-947; `unattended.sh:10528`; P0.5, rules 4 and 8; ER:476 |
@@ -1160,6 +1226,8 @@ product view takes over at dTrueNorth's landing. It rolls every amends or supers
 - A departure made in code alone, which only the closing review sees (`deviations.py:36-37`).
 - Whether a record's reason or risk class is honest.
 - Two carriers on two branches, until the merged tree (P0.1, row 9).
+- A hand edit inside a spec's generated region after its pass: row 8a's strip, like check 23's, cannot tell it from
+  a render (P0.1, row 8a; `tools/unattended/lib-unattended.sh:1042-1043`).
 - A surface or an ungranted veto-2 change the standing ruling took, or a unit's acceptance a relaxed bound rewrote,
   until the owner reads the report. The validating arm reds a ruling trailer that lacks either key, or whose key is
   `none` where its ruling requires a value (P0.2). What it cannot see is a veto-3 choice under ER:240 marked `widens:
@@ -1190,7 +1258,9 @@ departure needs no owner turn under the chain's approval value (ER:103-104).
 **Carried, not asked, for the owner's walk** (ER:272-276): dTrueNorth's product join takes the instruments' plant
 suite, P0.1's escapes included, as its acceptance (D3). That is stricter than `cl-dClosedLoop-0002@6acd9ea9` and
 `cl-dClosedLoop-0004@c374ccd0`, so dTrueNorth's run records it with its author as approver, under `author-recorded`,
-unless the owner's walk rules otherwise.
+unless the owner's walk rules otherwise. The record also names P0.1 row 8a's exception, a revision that changes only
+its `**Status:**` line and generated regions, beside those stricter plants, so the product inherits that exception
+openly (`build/…-phase0-revision.md`, finding 2).
 
 ## [per-node]
 

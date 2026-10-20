@@ -143,7 +143,7 @@ after its run. `git diff --numstat` showed each edit's size before the run.
    opening's rows, and the opening writes it once".
 9. The whole-run arm: a `BACKLOG.md` planted in dTrueNorth's folder (a copy of dGroundRules's).
    `python open.py --check`: exit 1. "byte compare: memory/builds/dTrueNorth/BACKLOG.md exists, and the opening
-   writes none for a whole-run build" and "summary arm: dTrueNorth: Carry-forward ask reads `TOOL-dGroundRules-12` in
+   writes none for a whole-run build" and "summary arm: dTrueNorth: Carry-forward ask reads `missing:TOOL-dGroundRules-12` in
    the files, and the derivation gives `none: whole run`".
 10. The packet arm: a one-byte packet edit (`### Goal` to `### Goal!` in dGroundRules's packet, numstat "1 1").
     `python open.py --check`: exit 1. "byte compare: …-packet.md differs from its render", "packet arm: dGroundRules:
@@ -359,27 +359,27 @@ open: summary of the 22 chain builds, read from the files the opening wrote, ope
 | Build | Stage | `parents:` | Units | Family · `streams:` | Carry-forward ask | Packet | `may:` line | `spec-audit:` | Rule 8 · clean-reading ask | Contract row |
 |---|---|---|---|---|---|---|---|---|---|---|
 | dTrueNorth | Fidelity | dClosedLoop | 7 | TOOL · tooling | none: whole run | 18008 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2 | 2026-10-20 | yes · PLAY-dClosedLoop-11 | present, bound |
-| dGroundRules | Policy | dTrueNorth | 11 | TOOL · tooling | TOOL-dGroundRules-12 | 30200 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dSafePassage | Supersession | dGroundRules | 13 | TOOL · tooling | TOOL-dSafePassage-14 | 30249 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dOrderedCharter | Foundation | dSafePassage | 37 | PLAY · playbook | PLAY-dOrderedCharter-38 | 66983 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-12 | present, bound |
-| dFairHearing | Review harness | dSafePassage | 18 | TOOL · tooling | TOOL-dFairHearing-19 | 28948 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dDeclaredLoop | Spine | dOrderedCharter dFairHearing | 34 | TOOL · tooling | TOOL-dDeclaredLoop-35 | 57328 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-13 | present, bound |
-| dPlacedRequest | Entry | dDeclaredLoop | 21 | TOOL · tooling | TOOL-dPlacedRequest-22 | 42163 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-14 | present, bound |
-| dKeptSession | Session | dDeclaredLoop dPlacedRequest | 28 | KICK · kickoff | KICK-dKeptSession-29 | 35754 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dBoundRoles | Roles | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | TOOL-dBoundRoles-27 | 43176 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dFurnishedOrders | Orders | dBoundRoles | 20 | TOOL · tooling | TOOL-dFurnishedOrders-21 | 32034 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dTotalRecall | Memory | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | TOOL-dTotalRecall-27 | 45537 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dLinkedLibrary | Library | dTotalRecall | 25 | TOOL · tooling | TOOL-dLinkedLibrary-26 | 38873 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dMindYourWords | Lexicon | dWellOiledMachine dWitnessedBar dLinkedLibrary dFurnishedOrders | 17 | TOOL · tooling | TOOL-dMindYourWords-18 | 26856 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dWellOiledMachine | Runtime | dBoundRoles dTotalRecall dKeptSession | 61 | TOOL · tooling | TOOL-dWellOiledMachine-62 | 110050 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-15 | present, bound |
-| dWitnessedBar | Test | dDeclaredLoop | 30 | TOOL · tooling | TOOL-dWitnessedBar-31 | 43018 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-16 | present, bound |
-| dRankedPlan | Plan | dDeclaredLoop dTotalRecall dBoundRoles | 16 | TOOL · tooling | TOOL-dRankedPlan-17 | 23925 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dIndexedDesign | Design | dDeclaredLoop dTotalRecall dKeptSession dBoundRoles dLinkedLibrary | 16 | TOOL · tooling | TOOL-dIndexedDesign-17 | 28863 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dScopedBuild | Build | dIndexedDesign dWitnessedBar dWellOiledMachine dFurnishedOrders | 15 | TOOL · tooling | TOOL-dScopedBuild-16 | 25472 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dShippedRelease | Deploy | dWitnessedBar dTotalRecall dBoundRoles dWellOiledMachine dLinkedLibrary dFurnishedOrders | 31 | DEPL · deployer | DEPL-dShippedRelease-32 | 50810 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dTendedCadence | Maintain | dWitnessedBar dRankedPlan dWellOiledMachine dIndexedDesign dFurnishedOrders | 18 | TOOL · tooling | TOOL-dTendedCadence-19 | 30709 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dCalibratedLens | Review | dTendedCadence dFairHearing | 17 | TOOL · tooling | TOOL-dCalibratedLens-18 | 26499 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
-| dConvergedCharter | Convergence | dScopedBuild dShippedRelease dCalibratedLens dMindYourWords | 23 | PLAY · playbook | PLAY-dConvergedCharter-24 | 33804 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-17 | present, bound |
+| dGroundRules | Policy | dTrueNorth | 11 | TOOL · tooling | missing:TOOL-dGroundRules-12 | 30200 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dSafePassage | Supersession | dGroundRules | 13 | TOOL · tooling | missing:TOOL-dSafePassage-14 | 30249 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dOrderedCharter | Foundation | dSafePassage | 37 | PLAY · playbook | missing:PLAY-dOrderedCharter-38 | 66983 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-12 | present, bound |
+| dFairHearing | Review harness | dSafePassage | 18 | TOOL · tooling | missing:TOOL-dFairHearing-19 | 28948 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dDeclaredLoop | Spine | dOrderedCharter dFairHearing | 34 | TOOL · tooling | missing:TOOL-dDeclaredLoop-35 | 57328 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-13 | present, bound |
+| dPlacedRequest | Entry | dDeclaredLoop | 21 | TOOL · tooling | missing:TOOL-dPlacedRequest-22 | 42163 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-14 | present, bound |
+| dKeptSession | Session | dDeclaredLoop dPlacedRequest | 28 | KICK · kickoff | missing:KICK-dKeptSession-29 | 35754 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dBoundRoles | Roles | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | missing:TOOL-dBoundRoles-27 | 43176 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dFurnishedOrders | Orders | dBoundRoles | 20 | TOOL · tooling | missing:TOOL-dFurnishedOrders-21 | 32034 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dTotalRecall | Memory | dDeclaredLoop dWitnessedBar dPlacedRequest | 26 | TOOL · tooling | missing:TOOL-dTotalRecall-27 | 45537 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dLinkedLibrary | Library | dTotalRecall | 25 | TOOL · tooling | missing:TOOL-dLinkedLibrary-26 | 38873 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dMindYourWords | Lexicon | dWellOiledMachine dWitnessedBar dLinkedLibrary dFurnishedOrders | 17 | TOOL · tooling | missing:TOOL-dMindYourWords-18 | 26856 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dWellOiledMachine | Runtime | dBoundRoles dTotalRecall dKeptSession | 61 | TOOL · tooling | missing:TOOL-dWellOiledMachine-62 | 110050 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-15 | present, bound |
+| dWitnessedBar | Test | dDeclaredLoop | 30 | TOOL · tooling | missing:TOOL-dWitnessedBar-31 | 43018 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-16 | present, bound |
+| dRankedPlan | Plan | dDeclaredLoop dTotalRecall dBoundRoles | 16 | TOOL · tooling | missing:TOOL-dRankedPlan-17 | 23925 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dIndexedDesign | Design | dDeclaredLoop dTotalRecall dKeptSession dBoundRoles dLinkedLibrary | 16 | TOOL · tooling | missing:TOOL-dIndexedDesign-17 | 28863 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dScopedBuild | Build | dIndexedDesign dWitnessedBar dWellOiledMachine dFurnishedOrders | 15 | TOOL · tooling | missing:TOOL-dScopedBuild-16 | 25472 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dShippedRelease | Deploy | dWitnessedBar dTotalRecall dBoundRoles dWellOiledMachine dLinkedLibrary dFurnishedOrders | 31 | DEPL · deployer | missing:DEPL-dShippedRelease-32 | 50810 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dTendedCadence | Maintain | dWitnessedBar dRankedPlan dWellOiledMachine dIndexedDesign dFurnishedOrders | 18 | TOOL · tooling | missing:TOOL-dTendedCadence-19 | 30709 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dCalibratedLens | Review | dTendedCadence dFairHearing | 17 | TOOL · tooling | missing:TOOL-dCalibratedLens-18 | 26499 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | no | present, bound |
+| dConvergedCharter | Convergence | dScopedBuild dShippedRelease dCalibratedLens dMindYourWords | 23 | PLAY · playbook | missing:PLAY-dConvergedCharter-24 | 33804 B · `packet.py --check` exit 0 | may: PLAY-dClosedLoop-3 | 2026-10-20 | yes · PLAY-dClosedLoop-17 | present, bound |
 ```
 
 ## [comparison]
