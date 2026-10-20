@@ -348,3 +348,16 @@ answers verbatim.
   listed first in its build's departures report, beside the surface-widening ones.
 - The record placement and wording stand.
 - The plan, once folded, takes a paired Tier-2 review. The two runs are compared and folded before the owner approves.
+
+## [plan-3]
+
+Dispatch 221 folded `[answers-3]` into the plan. Its return is
+`build/2026-10-20-build-PLAY-dClosedLoop-1-execution-return-plan-3.md`.
+
+The weakest bound is judged by where each bound comes from, in three tiers. The strongest is a bound the carried
+clause states or a quoted owner ruling. The middle is a bound a v2 principle or policy key sets. The weakest is a
+bound the spec writer added. The run relaxes the lowest failing tier first, and within a tier its written reason is
+the only ranking.
+
+The schedule model is unaffected. The main loop re-ran the script, and its output is byte-identical to the plan's
+`[schedule]`. The plan now goes to the paired review.

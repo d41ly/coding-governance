@@ -8,9 +8,9 @@ or product code runs only after the owner approves this plan, and the baseline's
 (`build/…-execution.md:5-7`). The schedule is not typed here. It is the output of
 `build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py`, kept beside this record and re-run at every landing.
 
-The owner's answers to the plan's open choices (ER `[answers-2]`, ER:166-286) are folded in. Each item they decide now
-reads as decided and quotes the answer; the items the owner was not asked are carried as recommended, for the walk
-(ER:272-276).
+The owner's answers to the plan's open choices (ER `[answers-2]`, ER:166-286) and to the four points that fold left
+open (ER `[answers-3]`, ER:306-350) are folded in. Each item they decide now reads as decided and quotes the answer;
+the items the owner was not asked are carried as recommended, for the walk (ER:272-276).
 
 **Conventions.**
 - `build/` is `memory/builds/dClosedLoop/build/`, and a file there is named by its suffix: `build/…-carries.py`.
@@ -41,15 +41,18 @@ reads as decided and quotes the answer; the items the owner was not asked are ca
    Three kinds of fork would still park: one whose only options widen a security, data or write surface (veto 3),
    one with no surviving option, and one the goal cannot survive (METHOD:81, :93-97). The owner chose a standing
    ruling for them: "Standing ruling" (ER:240). The run takes the most capable option that fails only veto 3 or the
-   goal bound, and records it as a departure. Nothing waits on the owner, but a security, data or write surface may
-   widen unreviewed until the owner reads the build's departures report, where such a choice is listed first. A fork
-   with no surviving option at all still has nothing to take; it is the one residue (D10). dOrderedCharter's
-   fork-resolving decision principles (`cl-dClosedLoop-0032`) are the product's answer.
+   goal bound, and records it as a departure. For a fork with no option left at all, the owner chose "Relax the
+   weakest bound" (ER:328): the run drops the least important failing criterion or non-goal, records it as a
+   departure, and builds. Nothing waits on the owner. The price is that a security, data or write surface may widen,
+   and a unit's own acceptance may be rewritten, unreviewed until the owner reads the build's departures report,
+   where both kinds of choice are listed first. dOrderedCharter's fork-resolving decision principles
+   (`cl-dClosedLoop-0032`) are the product's answer.
 3. Today's carry-forward close refuses every unit a run adds (STOPS:703-704; `unattended.sh:5177-5184`), and every
    confirmed review finding is promoted to a unit (METHOD:144, :274). The owner called that refusal a bug for
    review-promoted units (ER:196-197), and chose to fix it in dTrueNorth: "dTrueNorth's extra unit (Recommended)"
-   (ER:232). dTrueNorth runs as one whole run, spec and build together, so it needs no carry-forward itself, and it
-   carries one unit beyond v2 that lets a spec run carry a review-promoted unit forward to its own build run, once.
+   (ER:232). Then, for a discovery a spec run adopts: "Carry it too (Recommended)" (ER:320). dTrueNorth runs as one
+   whole run, spec and build together, so it needs no carry-forward itself, and it carries one unit beyond v2 that
+   lets a spec run carry ANY unit it adds, from a review or an adopted discovery, forward to its own build run, once.
    Every later spec run closes with it. Until it lands, nothing but dTrueNorth runs.
 4. Two readings of the owner's first answers did not hold as written, and the owner has settled both: the `may:`
    grant is one decision row (ER:181), and the departure from `cl-dClosedLoop-0004` is a deviation the owner
@@ -78,8 +81,7 @@ reads as decided and quotes the answer; the items the owner was not asked are ca
   parents have landed. dGroundRules' spec run is the first spec run, and the first to close by carry-forward.
 - **Deviations.** A departure is recorded by the run that makes it and approved by its author; the owner has
   approved the plan's own departures from v2 in advance ([deviations]). A report generated at each build's end
-  explains every departure, a widened surface first, and nothing waits for the owner but a fork with no surviving
-  option (D10).
+  explains every departure, a widened surface or a relaxed bound first, and nothing waits for the owner.
 
 ## [constraints]
 
@@ -95,7 +97,7 @@ What today's gov forces on the plan.
 | A `may:` grant names decision ids or repo paths, and lifts veto 2 only | `tools/unattended/lib-unattended.sh:1440-1478`; PROTOCOL:116-119; METHOD:82 |
 | A fork with no delegated resolver parks; a decision kind the close table does not list becomes an `owner-decision` hand-off | VERBS:36-46; STOPS:674-696; METHOD:93-97 |
 | A partial build lands only when every unfinished unit meets all five carry-forward terms | STOPS:698-711 |
-| The second term refuses every unit the run added, a review-promoted one included, until dTrueNorth's extra unit changes it | `unattended.sh:5156`, `:5177-5184`; STOPS:703-704 |
+| The second term refuses every unit the run added, a review-promoted or adopted one included, until dTrueNorth's extra unit changes it | `unattended.sh:5156`, `:5177-5184`; STOPS:703-704 |
 | Nothing holds a build until its parents land; `parents:` must only name a folder that exists | `tools/memory-tree/gen_build_index.py:2335-2345` |
 | Nothing finds work for a node or offers it one | GR:337, :340 |
 | Under the local anchor a hold owes no push, so held work may live on one node only | STOPS:98-99; `.unattended.conf:267` |
@@ -159,13 +161,15 @@ the population rather than adding one beside it.
 - the outputs of `carries.py --report <slug>` and `asbuilt.py --check`.
 
 **What it lists**, in this order:
-- first, each choice taken under the owner's standing ruling (ER:240) that widens a security, data or write
-  surface: the owner's answers put it at the top (ER:284-285). The run marks such a choice by writing `widens:
-  <surface>` in its §8 mark and in its `Decided:` trailer, a rule each README carries (P0.5);
+- first, side by side, each choice that widens a security, data or write surface under the owner's standing ruling
+  (ER:240, :284-285), and each bound a run relaxed for a fork with no option left (ER:328, :347-348). The run marks
+  the first kind by writing `widens: <surface>` and the second by writing `relaxes: <bound>`, in its §8 mark and in
+  its `Decided:` trailer, a rule each README carries (P0.5);
 - each member, with its address and hand-off, the record it joins or "recorded by nobody", and the record's reason,
   risk, approver and follow-through;
 - each other fork, with its question, pick, reason and source line;
-- each carried unit, with its ask, and each review-promoted unit a spec run carried to its build run.
+- each carried unit, with its ask, and each unit a spec run added, from a review or a discovery, and carried to its
+  build run.
 
 `--write` writes it as `memory/builds/<slug>/build/<date>-build-<first unit>-departures.md`, and `--check` renders it
 again and compares the bytes.
@@ -175,6 +179,9 @@ again and compares the bytes.
 **Red tests.**
 - A planted `Decided:` trailer missing from the written report reds `--check`.
 - A planted `widens:` choice listed anywhere but first reds `--check`.
+- A planted `relaxes:` choice listed anywhere but first reds `--check`.
+- A planted `relaxes:` choice whose record names no tier and no reason for the bound it dropped reds `--check`
+  ([phase-2], rung 6).
 - A hand edit reds `--check`.
 
 ### P0.3 The packet instrument
@@ -268,15 +275,17 @@ marker pairs (`gen_build_index.py:73`, `:85`, `:125-131`) and writes the authore
 **Build-level rules each README carries:**
 1. dTrueNorth's README: one whole run specs, audits, builds and lands every unit (ER:232). Every other README: a run
    that finds any roster unit `MISSING` is this build's spec run. It specs every unit, runs the audit, defers every
-   unit and closes by carry-forward, a review-promoted unit included. A run that finds none `MISSING` is the build
-   run, and it builds every carried unit, never deferring a review-promoted one again. The phase is read from the
-   tree, never typed (METHOD:39-42; VERBS:72-87).
+   unit and closes by carry-forward, every unit it added included, from a review or a discovery, each specced,
+   audited and recorded as a departure (ER:314-320). A run that finds none `MISSING` is the build run, and it builds
+   every carried unit, never deferring an added one again. The phase is read from the tree, never typed
+   (METHOD:39-42; VERBS:72-87).
 2. The reading order ([handoffs]), and `packet.py --check <slug>` green before the first pass.
 3. Push the run branch after every pass commit, hold and hand-off.
 4. Before `--close`, write the departures report with `deviations.py --report <slug> --write`.
 5. The chain's deviation values are `report` and `author-recorded` (ER:121-127; ER:255).
 6. Forks are settled as [phase-2] says. A choice taken under the standing ruling that widens a security, data or
-   write surface carries `widens: <surface>` in its §8 mark and its `Decided:` trailer (ER:240, :284-285).
+   write surface carries `widens: <surface>` in its §8 mark and its `Decided:` trailer (ER:240, :284-285); a bound
+   relaxed for a fork with no option left carries `relaxes: <bound>`, with its tier and reason (ER:328).
 
 **The `may:` grant, decided.** The owner: "One decision row (Recommended)" (ER:181). One `DECISIONS.md` row, landed
 with the opening, grants each chain build the governance-carrier and public-surface changes its own `[chain]` clauses
@@ -336,16 +345,17 @@ slugs:
 One `memory/DECISIONS.md` row each, minted under dClosedLoop's slug (`missing:PLAY-dClosedLoop-2` onward) and landed
 with the opening. Each row cites its source:
 
-1. The spec-run close by carry-forward (ER:84), and the owner's choice of where its review-promoted units go:
-   "dTrueNorth's extra unit (Recommended)" (ER:232). This row is the decision dTrueNorth's extra unit is
+1. The spec-run close by carry-forward (ER:84), and the owner's choice of where the units a spec run adds go:
+   "dTrueNorth's extra unit (Recommended)" (ER:232) and "Carry it too (Recommended)" (ER:320). This row is the decision dTrueNorth's extra unit is
    `**Derived:**` from, and it records the owner's approval of that unit as a departure from v2 ([deviations]).
 2. The grant: "One decision row (Recommended)" (ER:181). This row is the one all 22 `may:` lines cite.
 3. The chain's deviation values, `report` and `author-recorded`, applied to every run and to the instruments
    (ER:103-104, :121-127, :255), and the owner's approval of the departure from `cl-dClosedLoop-0004`: "A deviation,
    your values (Recommended)" (ER:189).
 4. Node b: "Spec runs only" (ER:219), as the schedule script's rule.
-5. The standing ruling for residual forks: "Standing ruling" (ER:240), each choice recorded as a departure, a widened
-   surface listed first in its build's departures report (ER:284-285).
+5. The standing ruling for residual forks: "Standing ruling" (ER:240), and for a fork with no option left, "Relax the
+   weakest bound" (ER:328). Each choice is recorded as a departure; a widened surface and a relaxed bound are listed
+   first in the build's departures report (ER:284-285, :347-348).
 6. The driver-rewriting builds land through their own new code (ER:248), dPlacedRequest's migration carries its
    test (ER:264), and the owner types every start (ER:270).
 7. The coordination rules: push after every pass, never preflight over a claim, re-run the schedule at every landing,
@@ -389,18 +399,24 @@ coverage in its departures report after its code, not before: the price of that 
 
 **The extra unit**, a departure from v2 the owner approved (ER:232; [deviations]). It changes the carry-forward
 term's second condition (`unattended.sh:5156`, `:5177-5184`; STOPS:703-704) so that:
-- a spec run, a run that closes no unit, may carry forward a DEFERRED unit it added when its own spec audit or its
-  own closing diff review promoted it (METHOD:144, :274), to its own build's next run, once;
+- a spec run, a run that closes no unit, may carry forward a DEFERRED unit it added, whether its own spec audit or
+  its own closing diff review promoted it (METHOD:144, :274) or the run adopted it as a discovery (PROTOCOL:640-690),
+  to its own build's next run, once. The owner: "Carry it too (Recommended)", whose option reads "widen dTrueNorth's
+  extra unit so any unit a spec run adds carries forward to its own build run once" (ER:314-320);
 - that next run must build it: deferring it a second time is refused, at the close, naming the unit;
-- every other unit a run adds, an adopted discovery among them, is still refused, as today.
+- a unit added by a run that closes a unit, a build run or a whole run, is refused as today: it is built in that run.
 
-Its spec states how the driver tells a review-promoted unit, from the records the harness's DISPOSAL stage writes
-(`unattended-build.js:60-66`; VERBS:703-710), and re-renders STOPS §15's second term and the verbs' close rule 9 from
-their templates. Its red cases, each seen red before the change and as stated after it:
+The other four terms are unchanged, so an added unit carries forward only with spec status `DEFERRED`, a defer row,
+and a header that advances the build's ask (STOPS:700-711). The spec run specs and audits every unit it adds, through
+the harness's audit scoped to the added ids (`unattended-build.js:180-183`), and records each as a departure, with
+follow-through "new unit <id>" (ER:315-316). Its spec states how the driver tells a run that closes no unit and a unit
+the run added, from the starting roster and the defer and add rows (`unattended.sh:5177-5184`; VERBS:703-710), and
+re-renders STOPS §15's second term and the verbs' close rule 9 from their templates. Its red cases, each seen red
+before the change and as stated after it:
 1. a spec-run fixture with one review-promoted DEFERRED unit: refused before, carried after;
-2. the next run deferring that carried unit again: refused;
-3. an adopted discovery added in a spec run and deferred: refused;
-4. a review-promoted unit deferred by a run that closed a unit: refused.
+2. a spec-run fixture with one adopted discovery's DEFERRED unit: refused before, carried after;
+3. the next run deferring either carried unit again: refused;
+4. a unit added and deferred by a run that closed a unit: refused, before and after.
 
 It edits `tools/unattended/`, so dTrueNorth's close owes the flagged bar with its self-tests (`.unattended.conf:40`).
 It is a driver-touching unit, so under the owner's "Land through new code (Recommended)" (ER:248) it goes last in
@@ -465,7 +481,7 @@ Each instrument stops being run when the clause that succeeds it lands:
 | Run | For each unit: `--rescope <slug> --act defer --item <unit> --reason "specced; built by this build's build run"` | VERBS:703-710; STOPS:705-706 |
 | Run | For each spec: status `DEFERRED`, with `advances <the ask>` in the header tail | TEMPLATE-SPEC:61-82; STOPS:700-709 |
 | Run | In the build's `BACKLOG.md`, the ask's `DEFERRED … until <the build run>` row, so `asks-disposed` reads it as held | ASKS:136-143 |
-| Run | A unit the spec audit or the closing review promoted is specced, deferred and carried forward like the rest, under the condition dTrueNorth's extra unit added. A discovery the run would adopt is filed as an ask in the build's own `BACKLOG.md` instead (D9) | phase 1; ER:232; PROTOCOL:640-690 |
+| Run | A unit the run adds, promoted by the spec audit or the closing review or adopted as a discovery, is specced, audited through the harness's audit scoped to the added ids, recorded as a departure, deferred with `advances <the ask>` and carried forward like the rest, under the condition dTrueNorth's extra unit added | phase 1; ER:232, :314-320; `unattended-build.js:180-183`; PROTOCOL:640-690 |
 | Run | `carries.py --build <slug> --exit`. Before dTrueNorth lands, `deviations.py` too | P0.1; deviation return, limit 4 |
 | Run | The closing review over the spec commits, recorded with `--review <slug> --subject <slug> …` | METHOD:251-265; VERBS:778; PROTOCOL:352 |
 | Run | `deviations.py --report <slug> --write`, and commit | P0.2 |
@@ -483,7 +499,7 @@ Each instrument stops being run when the clause that succeeds it lands:
 | Run | Re-ground each spec against the parents that have just landed by re-running its §10 probe. Revise it before its first `Pass:` commit. Under the product join, a revision past the pinned audited revision is a member, so the run writes its record, approved by its author | `deviations.py:20-27`; v2:1764 (`cl-dClosedLoop-0004`) |
 | Run | The harness with the pinned `specAudit`. How its audit stage treats specs the spec run already audited is first observed in dGroundRules' build run | VERBS:722-731; `unattended-build.js:180-230` |
 | Run | Per unit: `--brief`, `--dispatch --writes …`, the unit harness, a commit with a `Pass: <unit>` trailer, then `gotchas.py --for-diff HEAD~1..HEAD` | VERBS:697-768 |
-| Run | Each unit's header goes `INPROGRESS`, then `CLOSED`. A unit the spec run carried as review-promoted is built; deferring it again is refused. The last unit to close carries `closes <the ask>` | TEMPLATE-SPEC:61-82; phase 1 |
+| Run | Each unit's header goes `INPROGRESS`, then `CLOSED`. A unit the spec run added and carried is built; deferring it again is refused. The last unit to close carries `closes <the ask>` | TEMPLATE-SPEC:61-82; phase 1 |
 | Run | The closing review over the build's range. Its findings are promoted and built in this run | METHOD:144, :251-290 |
 | Run | The departures report, then the close and the landing as in the spec run | VERBS:849-947 |
 
@@ -497,17 +513,35 @@ Each rung uses only today's driver and the owner's grants. Each resolution is re
 2. **A stated probe decides it**, as a `FACT-QUESTION` (METHOD:100-104).
 3. **The mandate delegates it.** The run takes the most feature-rich option that survives the vetoes (METHOD:86-95),
    with veto 2 lifted where the grant covers the change (METHOD:82).
-4. **A strictly beneficial discovery** is adopted (PROTOCOL:640-690). In a spec run it is filed as an ask for the
-   build run to adopt (D9), since the carry-forward condition admits review-promoted units only.
+4. **A strictly beneficial discovery** is adopted (PROTOCOL:640-690). In a spec run its unit is specced, audited,
+   recorded as a departure and carried to the build run: "Carry it too (Recommended)" (ER:320).
 5. **The owner's standing ruling**: "Standing ruling" (ER:240). Where the only options fail veto 3 or the goal bound
    (METHOD:81, :93-97), the run takes the most capable of them, the one meeting the most stated acceptance criteria
    (METHOD:86), and records it as a departure. A choice that widens a security, data or write surface carries
    `widens: <surface>` and is listed first in the build's departures report (ER:284-285; P0.2).
-6. **What is left** is a fork with no option at all, every one failing an acceptance criterion or a non-goal (veto
-   1). It parks through `--park`, and the run goes on with every other unit (VERBS:36-46). At the close the dependent
-   unit is carried forward (`DEFERRED`, a defer row, the build's ask), so the build still lands (STOPS:685, :698-711),
-   and the owner rules before a later run builds it. dOrderedCharter's decision principles (`cl-dClosedLoop-0032`)
-   are the product's answer.
+6. **A fork with no option left**, every option failing an acceptance criterion or a non-goal (veto 1, METHOD:93-97).
+   The owner: "Relax the weakest bound" (ER:328), whose option reads "the run drops the least important failing
+   criterion or non-goal, records it as a departure, and builds" (ER:325-326). The run relaxes one bound at a time
+   and runs M3 again over the options, until one survives (METHOD:86-97). Nothing parks.
+
+   **How "weakest" is judged.** The records rank a bound by where it comes from, and the run relaxes the lowest tier
+   that fails first:
+   - **strongest**, a bound the unit's carried clause states, in its text or its "seen red on" cases (v2:1762-1785),
+     or a ruling of the owner the spec quotes. v2 is the owner's baseline, and any change to a clause is itself a
+     departure (v2:1809-1811). Relaxing one is a departure from the clause, risk loosening;
+   - **middle**, a bound a v2 principle or a policy key's value sets (v2:847, :1125), which the spec cites;
+   - **weakest**, a bound the spec writer added beyond its clause, a criterion or non-goal no clause token, principle
+     or ruling backs. The records do not rank bounds within a tier: TEMPLATE-SPEC orders a spec's sections, not its
+     criteria (TEMPLATE-SPEC:134-145), and M3 counts criteria without weighing them (METHOD:86).
+
+   Within a tier the run judges for itself, and writes into the departure record which bound it dropped, its tier,
+   the options it unblocked and why this bound was the least important. The spec is revised to drop it, a rev bump
+   with its §9 line (METHOD:55-56), and the choice carries `relaxes: <bound>` in its §8 mark and `Decided:` trailer, so
+   the departures report lists it first, beside the surface-widening choices (ER:347-348; P0.2). A relaxed bound that
+   is itself a security, data or write constraint also carries `widens:`. A relaxed clause-tier bound stays named in
+   the spec's §8 mark, so the carries join's token arm still finds the clause's names in its carrier
+   (`carries.py:233-236`) and the departure, not a coverage red, is what records the drop. dOrderedCharter's decision
+   principles (`cl-dClosedLoop-0032`) are the product's answer to both rungs 5 and 6.
 
 Nothing in the driver judges whether a resolution was sound. The spec audit, the closing review and the owner's
 reading of the report are what read it.
@@ -519,8 +553,8 @@ reading of the report are what read it.
   README's rule.
 - **The coverage report**: `carries.py --report <slug>` inside the departures report until dTrueNorth lands, and the
   README's generated coverage region after it (`cl-dClosedLoop-0003`).
-- **Every departure from v2**, with its record, every fork the run settled (a widened surface first), every
-  review-promoted unit carried to the build run, and every unit carried forward.
+- **Every departure from v2**, with its record; every fork the run settled, a widened surface or a relaxed bound
+  first; and every unit the spec run added, from a review or a discovery, and carried to the build run.
 
 Nothing waits for the owner. The owner's next act is starting the build run when the script names it, so code starts
 only after the owner has had the coverage in front of them (ER:79-80).
@@ -607,7 +641,9 @@ own slug and pushed (P0.6). That ask enters the other build's `F` set, so its ne
 ## [schedule]
 
 The script was run from the worktree root at HEAD `8d4db98a3`, with the owner's answers of `[answers-2]` in its model
-(P0.4). Its exit code was 0.
+(P0.4). Its exit code was 0. `[answers-3]` changes what a spec run may carry and how a fork is settled, neither of
+which the model's run counts, durations or precedences read, so the script is unchanged; re-run at HEAD `54c76bb24`
+it prints the same bytes.
 
 ```
 $ python -B memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py
@@ -759,7 +795,9 @@ the owner:
   step before the close gives each listed member a record.
 - The instruments carry the same values until the product keys exist (P0.1), and dTrueNorth's stand-in carries them
   by the owner-approved departure below (ER:189).
-- A residual fork is settled by the owner's standing ruling and recorded as a departure (ER:240; [phase-2]).
+- A residual fork is settled by the owner's standing ruling (ER:240), and a fork with no option left by relaxing its
+  weakest bound (ER:328); each is recorded as a departure ([phase-2], rungs 5 and 6).
+- Every unit a spec run adds, from a review or a discovery, is recorded as a departure (ER:315-316).
 
 **What is recorded where.**
 - **A departure from v2 or from a spec past its first pass** is a deviation record in the departing build's `build/`,
@@ -770,10 +808,10 @@ the owner:
 - **A park** is a park row (VERBS:36-46).
 
 **The end-of-build departures report** (P0.2) is generated at each build's end, before `--close`, from those records,
-the computed population and M9's derivation (METHOD:293-305). It lists first every choice that widened a security,
-data or write surface under the standing ruling (ER:284-285), then every member, recorded or not, every other fork
-settled, and every unit carried. A member the report lists as "recorded by nobody" is given its record by the run
-before `--close`. That is a step in the README's rules, and it is not gated, as the owner chose (ER:255).
+the computed population and M9's derivation (METHOD:293-305). It lists first, side by side, every choice that widened
+a security, data or write surface under the standing ruling and every bound a run relaxed for a fork with no option
+left (ER:284-285, :347-348), then every member, recorded or not, every other fork settled, and every unit carried.
+A member the report lists as "recorded by nobody" is given its record by the run before `--close`. That is a step in the README's rules, and it is not gated, as the owner chose (ER:255).
 
 **The as-built roll-up.** `asbuilt.py --write` runs in each record's own commit, until `cl-dClosedLoop-0006`'s
 product view takes over at dTrueNorth's landing. It rolls every amends or supersedes row up across the chain
@@ -792,8 +830,11 @@ product view takes over at dTrueNorth's landing. It rolls every amends or supers
 - A departure made in code alone, which only the closing review sees (`deviations.py:36-37`).
 - Whether a record's reason or risk class is honest.
 - Two carriers on two branches, until the merged tree (P0.1, row 9).
-- A surface the standing ruling widened, until the owner reads the report; and a widening the run did not mark
-  `widens:`, which the report cannot put first, since only the mark tells it.
+- A surface the standing ruling widened, or a unit's acceptance a relaxed bound rewrote, until the owner reads the
+  report; and either choice the run did not mark `widens:` or `relaxes:`, which the report cannot put first, since only
+  the mark tells it.
+- Whether the bound a run relaxed was in truth the least important. Only a reader checks the tier against the
+  record's own citation; within a tier it is the run's judgement and its written reason.
 - Under `author-recorded`, who actually approved.
 
 **The departures the owner has approved, where each is recorded, and when.** None is applied by this plan.
@@ -801,7 +842,8 @@ product view takes over at dTrueNorth's landing. It rolls every amends or supers
 | Departure | Departs from | The owner's approval | Recorded where | When |
 |---|---|---|---|---|
 | dTrueNorth's stand-in join reads the chain's values, `report` and any recorded approver, until dDeclaredLoop's and dScopedBuild's keys land | `cl-dClosedLoop-0004@c374ccd0`, which fixes the by-risk table and a red on an approver below the risk | "A deviation, your values (Recommended)" (ER:189), quoting answer 3 of `[answers]` (ER:103-104) | **Deviation record 1**: `memory/builds/dTrueNorth/build/<date>-build-<that unit>-deviation-1.md`. Cause: owner ruling; risk: loosening; approver: owner, citing ER:189 and P0.8's row 3 | Approval: the decision row, in the opening landing. Record: dTrueNorth's whole run, in the commit that writes that unit's spec, as `cl-dClosedLoop-0004` itself asks |
-| dTrueNorth's extra unit: the carry-forward condition for review-promoted units | dTrueNorth's v2 row, which plans six units (v2:1764) | "dTrueNorth's extra unit (Recommended)" (ER:232), after the owner's "that sounds like a bug" (ER:196-197) | **The decision row**, P0.8's row 1, which the unit's spec cites as `**Derived:**`; and **deviation record 2**: `memory/builds/dTrueNorth/build/<date>-build-<the extra unit>-deviation-2.md`, hand-off design-to-spec, follow-through "new unit <its id>". Approver: owner, citing ER:232 | Row: the opening landing. Unit: minted on dTrueNorth's roster in the opening (P0.5). Record: dTrueNorth's whole run, in the extra unit's spec commit |
+| dTrueNorth's extra unit: the carry-forward condition for every unit a spec run adds, from a review or a discovery, once | dTrueNorth's v2 row, which plans six units (v2:1764) | "dTrueNorth's extra unit (Recommended)" (ER:232), after the owner's "that sounds like a bug" (ER:196-197), widened by "Carry it too (Recommended)" (ER:320) | **The decision row**, P0.8's row 1, which the unit's spec cites as `**Derived:**`; and **deviation record 2**: `memory/builds/dTrueNorth/build/<date>-build-<the extra unit>-deviation-2.md`, hand-off design-to-spec, follow-through "new unit <its id>". Approver: owner, citing ER:232 and ER:320 | Row: the opening landing. Unit: minted on dTrueNorth's roster in the opening (P0.5). Record: dTrueNorth's whole run, in the extra unit's spec commit |
+| Each later departure a run makes under the owner's rulings: a unit a spec run adds (ER:315-316), a choice under the standing ruling (ER:240) or a relaxed bound (ER:328) | The clause or spec it departs from | The rulings themselves, landed as P0.8's rows 1 and 5 | A deviation record in the departing build's `build/`, approver the run's author role citing the ruling, under `author-recorded` | In the departing unit's own commit, in the run that makes it |
 | dPlacedRequest's spec carries "a live claim on another node survives the migration", with a drain as the fallback | `cl-dClosedLoop-0120@5d655f07` | "Test in its spec (Recommended)" (ER:264) | A deviation record in `memory/builds/dPlacedRequest/build/`, risk stricter, approver owner citing ER:264 and P0.8's row 6 | dPlacedRequest's spec run, in the migrating unit's spec commit |
 | dWellOiledMachine's spec carries "a `/unattended` run in flight at this landing lands after it" | `cl-dClosedLoop-0306@a3aa83b5` | "Land through new code (Recommended)" (ER:248) | A deviation record in `memory/builds/dWellOiledMachine/build/`, risk stricter, approver owner citing ER:248 | dWellOiledMachine's spec run, in that unit's spec commit |
 
@@ -848,13 +890,14 @@ one Max plan serving five projects.
 
 | When | The owner's step | Rests on |
 |---|---|---|
-| Now | Walk this plan. The choices are answered (ER:166-286); four items are carried for the walk (R6, D3, D5, D8), and [defaults] lists what the answers leave open | [defaults] |
+| Now | The plan takes two independent Tier-2 reviews, compared and folded: "Review twice, then approve (Recommended)" (ER:343) | [defaults] |
+| After the reviews' fold | Walk this plan and approve it. Every choice is answered (ER:166-350); four items are carried for the walk (R6, D3, D5, D8) | [defaults] |
 | After approval | Let node d's session run phase 0 | [phase-0] |
 | Phase 0's end | Read the opening diff (every README, the grant row every `may:` cites, every packet and every decision row) and ask for its landing | P0.7 |
 | Each moment the script names | Type the run, `/unattended <slug>`, on the named node, in a fresh worktree: 43 runs (ER:270) | [schedule]; PROTOCOL:21-27 |
 | dTrueNorth's landing | Read its departures report, which is also the first look at its coverage, since it ran whole | [phase-1] |
 | Each spec landing | Read the build's coverage report and departures report before typing its build run | [phase-2] |
-| Each build landing | Read the departures report, a widened surface first; rule on any unit carried forward for want of any option (D10) | [deviations] |
+| Each build landing | Read the departures report, the widened surfaces and relaxed bounds first. Nothing waits on the owner's reading (ER:240, :328) | [deviations] |
 | At the barrier and the driver landings | Watch dPlacedRequest's test, or call the drain if it could not be written (ER:264); a driver build whose new code refuses its own landing hands it to the owner to land (ER:248) | [sync-points] |
 | At dDeclaredLoop's and dScopedBuild's landings | Set the chain's override values in the policy file the product built (guarded) | [sync-points] |
 | After dConvergedCharter | Set the two deviation keys (D5) | [defaults] |
@@ -889,7 +932,7 @@ section that does it, or listed with its smallest change and that change's kind.
 | The local anchor refuses `spec-audit:` in a `slug` README | handoffs 7 | Designed around: READMEs landed on the default branch (IR:862-869) |
 | `handoff.py` drops the `(1)` of a numbered To-do | handoffs 8 | **Cannot.** A chain build's unit in the roles kit (dBoundRoles) |
 | A spec-only run cannot close except by carry-forward | schedule 1 | Designed around: a policy ratified by answer 1 ([phase-2]) |
-| A spec run cannot carry forward a unit its own audit or closing review promoted | this plan (STOPS:703-704) | Designed around: a chain build's unit, dTrueNorth's extra unit, a departure the owner approved (ER:232; phase 1). An adopted discovery is still refused: D9 |
+| A spec run cannot carry forward a unit it adds, from a review or an adopted discovery | this plan (STOPS:703-704) | Designed around: a chain build's unit, dTrueNorth's extra unit, a departure the owner approved (ER:232, :320; phase 1) |
 | Nothing finds or offers work to a node | schedule 3 | Designed around: a manual step, the script at every landing ([coordination]) |
 | Running sessions do not reload the charter, roles or hooks; installs are per node | schedule 4 | Designed around: manual steps at the sync points ([sync-points]) |
 | dPlacedRequest's migration while other runs are live | schedule 5 | Designed around: its spec carries the survival test, with a drain as the fallback (ER:264) |
@@ -897,7 +940,7 @@ section that does it, or listed with its smallest change and that change's kind.
 | A semantic contradiction or a code-only departure | deviation 3 | **Cannot.** A manual step: the audit on all 22 builds, the owner reading each coverage report, and the closing review |
 | A dropped clause after a later edit | deviation 4 | Designed around: an instrument fix (P0.1, row 2), and `carries.py --exit` at each Design exit until `cl-dClosedLoop-0003` |
 | No driver mode stops a spec run before code | this plan | **Cannot.** A manual step, the README's rule. The product is `cl-dClosedLoop-0383` |
-| A residual fork still parks: veto 3, no survivor, or the goal | this plan | Designed around for veto 3 and the goal bound: the owner's standing ruling, a policy (ER:240). **Cannot** for a fork with no option at all: a manual step, the unit carried forward and the owner ruling, until dOrderedCharter's `cl-dClosedLoop-0032` |
+| A residual fork still parks: veto 3, no survivor, or the goal | this plan | Designed around: policies, the owner's standing ruling for veto 3 and the goal bound (ER:240) and relaxing the weakest bound for a fork with no option left (ER:328), each recorded as a departure, until dOrderedCharter's `cl-dClosedLoop-0032` |
 | The departures report has no Definition-of-Done item that runs it | this plan (`unattended.sh:12225-12226`) | **Cannot.** A manual step in the README's rules. The product is the landing record (`cl-dClosedLoop-0413`) and the deviation gate (`cl-dClosedLoop-0412`) |
 | The owned nodes carry no paths for a grant | this plan | Designed around: one decision row (ER:181) |
 
@@ -905,7 +948,7 @@ section that does it, or listed with its smallest change and that change's kind.
 
 ### Decided by the owner
 
-Each quotes the owner's answer in ER `[answers-2]`; the options offered are recorded there.
+Each quotes the owner's answer in ER `[answers-2]` or `[answers-3]`; the options offered are recorded there.
 
 - **R1, the grant.** "One decision row (Recommended)" (ER:181). One row grants each chain build the
   governance-carrier and public-surface changes its own `[chain]` clauses name, and all 22 `may:` lines cite it
@@ -918,14 +961,25 @@ Each quotes the owner's answer in ER `[answers-2]`; the options offered are reco
   dTrueNorth's extra unit is the first such case.
 - **D2, dPlacedRequest's claim migration.** "Test in its spec (Recommended)" (ER:264), with a drain as the fallback.
 - **D4, who starts each run.** "You type it (Recommended)" (ER:270): 43 starts.
-- **D6, replaced: a spec run's review-promoted units.** The owner: "Why does carry-forward close refuses new units?
-  It should not refuse any new units that come from the reviews (either spec or closing diff), that sounds like a
-  bug." (ER:196-197); then "dTrueNorth's extra unit (Recommended)" (ER:232). dTrueNorth runs whole and carries the
+- **D6, replaced: the units a spec run adds.** The owner: "Why does carry-forward close refuses new units? It should
+  not refuse any new units that come from the reviews (either spec or closing diff), that sounds like a bug."
+  (ER:196-197); then "dTrueNorth's extra unit (Recommended)" (ER:232). dTrueNorth runs whole and carries the
   condition (phase 1). The `--override build-complete` route is dropped.
 - **D7, residual forks.** "Standing ruling" (ER:240). The run takes the most capable option that fails only veto 3 or
-  the goal bound, recorded as a departure, a widened surface first in its departures report (ER:284-285). This
-  replaces the plan's recommendation, carrying the unit forward, which now applies only to a fork with no option at
-  all.
+  the goal bound, recorded as a departure, a widened surface first in its departures report (ER:284-285).
+- **D9, a discovery a spec run adopts.** "Carry it too (Recommended)" (ER:320). The extra unit admits any unit a
+  spec run adds, from a review or a discovery, carried to its own build run once; the build run must build it and
+  never defer it again. The spec run specs and audits it and records it as a departure (ER:314-316). The plan's
+  file-an-ask route is dropped.
+- **D10, a fork with no option left.** "Relax the weakest bound" (ER:328). The run drops the least important failing
+  criterion or non-goal, judged by the tiers in [phase-2], rung 6, records it as a departure and builds. The choice
+  is listed first in its build's departures report, beside the surface-widening choices (ER:347-348), and P0.2's
+  red cases cover that ordering.
+- **The two records' placement and wording.** "Yes, as planned (Recommended)" (ER:336): approval in decision rows at
+  the opening, each record written in the unit's own spec commit, naming the owner as approver and citing the answer
+  ([deviations]).
+- **Before phase 0.** "Review twice, then approve (Recommended)" (ER:343): two independent Tier-2 reviews of this
+  plan, compared and folded, before the owner approves it.
 - **Node b.** "Spec runs only" (ER:219), the script's rule.
 
 ### Carried as recommended, not asked, for the owner's walk (ER:272-276)
@@ -934,21 +988,6 @@ Each quotes the owner's answer in ER `[answers-2]`; the options offered are reco
 - **D3.** dTrueNorth's product join absorbs the instruments' planted cases as its acceptance.
 - **D5.** After the chain, the two deviation keys return to `standard`'s `refuse` and `by-risk` (v2:1609-1610).
 - **D8.** The opening mints every roster id and carry-forward ask, which the carry-forward rules force (P0.6).
-
-### Left open by the answers
-
-- **D9. A discovery a spec run would adopt.** The owner's condition admits units "from the reviews (either spec or
-  closing diff)" (ER:196-197), and an adopted discovery is a unit the run adds too (STOPS:703-704;
-  PROTOCOL:640-690). The options:
-  - (a) A spec run files a strictly beneficial discovery as an ask in its own build's `BACKLOG.md`, held by the
-    ask's `DEFERRED … until` row, and its build run adopts it. This departs from §11's "ADOPT, now".
-  - (b) The extra unit's condition also admits an adopted discovery, once, as it admits a review-promoted unit.
-
-  **Recommended: (a)**, since it keeps the owner's condition as asked and loses nothing: the build run adopts it.
-  Until answered, the README rule applies (a).
-- **D10. A fork with no option at all**, every option failing an acceptance criterion or a non-goal. The standing
-  ruling does not reach it, since nothing survives to take. The plan carries its unit forward and the owner rules
-  ([phase-2], rung 6). Does the owner want that, or a further ruling?
 
 ## [disagreements]
 
@@ -965,5 +1004,6 @@ Each quotes the owner's answer in ER `[answers-2]`; the options offered are reco
 | "Records-only landings are cheap" (schedule) | Partly: an in-place close runs the bar under `GATE_FULL=1` whatever the diff (PROTOCOL:428-432). A spec run is spared only the self-tests (`.unattended.conf:40`) |
 | `BUILD-METHOD` "MUST run concurrently" against a strictly sequential harness (driver) | The code (`unattended-build.js:76-80`) |
 | "Claims never age" (GR:323, theme T5) against the code (coordination) | The code: a `live` claim turns `stale` at 5400 s, and only `held` never ages (`unattended.sh:2177-2186`) |
-| Several returns: forks the run cannot settle are parked BLOCKED | The owner's standing ruling (ER:240): the run settles them itself and records each as a departure; only a fork with no option is carried forward (D10) |
+| Several returns: forks the run cannot settle are parked BLOCKED | The owner's rulings: the run settles them itself, by the standing ruling (ER:240) or by relaxing the weakest bound (ER:328), and records each as a departure. Nothing parks |
 | The plan's own D6, an `--override build-complete` under a ruling, against the owner's view that the refusal is a bug for review-promoted units (ER:196-197) | The owner: the condition is fixed in product, by dTrueNorth's extra unit (ER:232). The override is dropped |
+| The plan's D9, a spec run filing a discovery as an ask, and its D10, carrying a no-option unit forward | The owner chose otherwise: "Carry it too (Recommended)" (ER:320) and "Relax the weakest bound" (ER:328). Both of the plan's routes are dropped |
