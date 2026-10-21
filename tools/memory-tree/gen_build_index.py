@@ -766,6 +766,72 @@ def read_reviewed_paths(text: str) -> list | None:
     return None
 
 
+def derive_audit_writers(root: str, rels) -> set | None:
+    """The graded `spec-audit` records an OLDER review harness wrote, or None when none can be told.
+
+    TOOL-dTrueNorth-14 S1. A run whose base predates the audit pin keeps running its own harness and
+    writes unpinned records dated after SPEC_AUDIT_PIN_CUTOFF; merging main brings in the arm, which
+    would then fail bytes nobody can re-run. No filename date tells that record from one the pinning
+    harness wrote. The harness AT THE RECORD'S ADDING COMMIT does, because TOOL-dTrueNorth-5 landed
+    `renderAuditBinding` and both writers in one commit: a harness lacking it could not have pinned.
+
+    One `git log` finds each record's adding commit, its OLDEST where a record was added twice, and
+    one `git cat-file --batch`, read as bytes and decoded as `read_blobs_at_rev` decodes, reads the
+    harness at each distinct one. A record is in the set only where that harness is a text blob
+    lacking the function. DENY BY DEFAULT for the rest: a record with no adding commit, staged and
+    not yet committed, is graded, since the tree's own harness is writing it; so is one whose adding
+    commit holds no harness blob at the path. The path is the workflows kit's `tier2-review.js`,
+    relative to the repository the kit sits in, the form the hygiene suite's resolver prints, so a
+    fixture repository laid out as the install reads its own copy. With no record it makes no git
+    call. None, exempting nothing, when the kit does not resolve or sits in no repository.
+    """
+    try:
+        kit = backlog.resolve_kit_dir("workflows", "tier2-review.js",
+                                      os.path.dirname(os.path.abspath(__file__)))
+    except LookupError:
+        return None
+    home = next((d for d in (kit, *kit.parents) if (d / ".git").exists()), None)
+    if home is None:
+        return None
+    harness = (kit / "tier2-review.js").relative_to(home).as_posix()
+    wanted = set(rels)
+    if not wanted:
+        return set()
+    log = run("git", "log", "--no-renames", "--diff-filter=A", "--format=%x00%H", "--name-only", "--",
+              *sorted(wanted), cwd=root)
+    added: dict = {}
+    for chunk in log.split("\x00")[1:]:
+        sha, _, names = chunk.partition("\n")
+        for name in names.split("\n"):
+            if name in wanted:
+                added[name] = sha.strip()      # newest first, so the last one seen is the oldest add
+    shas = sorted(set(added.values()))
+    if not shas:
+        return set()
+    done = subprocess.run(("git", "cat-file", "--batch"), cwd=root,
+                          input="".join(f"{s}:{harness}\n" for s in shas).encode("utf-8"),
+                          capture_output=True, check=True, env=_build_git_env())
+    older, data, at = set(), done.stdout, 0
+    for sha in shas:
+        end = data.find(b"\n", at)
+        if end < 0:
+            break
+        header = data[at:end].decode("utf-8", "replace").split()
+        at = end + 1
+        # `<sha> blob <size>`, or `<name> missing` with no body: no harness there, so graded.
+        if len(header) < 3 or header[1] != "blob":
+            continue
+        size = int(header[2])
+        try:
+            text = data[at:at + size].decode("utf-8")
+        except UnicodeDecodeError:
+            text = None
+        at += size + 1
+        if text is not None and "renderAuditBinding" not in text:
+            older.add(sha)
+    return {rel for rel, sha in added.items() if sha in older}
+
+
 def cmd_print_bindings(root: str, conf: dict) -> int:
     """READ-ONLY. Classifies and prints; writes nothing and always exits 0.
 
@@ -816,6 +882,10 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
         if any(at_head.get(p) is None for p in paths):
             continue
         owed[rel] = {hit[1] for hit in (parse_spec_h1(p, at_head[p], m, fams) for p in paths) if hit}
+    # TOOL-dTrueNorth-14 S2 — a graded record an older harness wrote prints no P row: its run could
+    # not have pinned it. It is still counted graded, and the Q row's fourth field counts it again as
+    # exempt, or reads `-` where the workflows kit does not resolve and so nothing is exempt.
+    writers = derive_audit_writers(root, graded_rels)
     graded = 0
     unbound = 0
     for rel in sorted(binds):
@@ -841,10 +911,11 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
         # revision to come. Graded: dated on or after the cutoff, or undated, because unparseable is
         # not old (the rule check 21's population filter states). An id no spec defines has no header
         # to compare, and its B row below already names it. An id the record owes no pin for (S4
-        # above) prints no unpinned row; a pin it carries anyway is still held to its header.
+        # above) prints no unpinned row; a pin it carries anyway is still held to its header. A record
+        # an older harness wrote (TOOL-dTrueNorth-14) prints no P row of either kind.
         if rel in graded_rels:
             graded += 1
-            for i in dict.fromkeys(rec["ids"]):
+            for i in ([] if writers and rel in writers else dict.fromkeys(rec["ids"])):
                 pin = (rec.get("pins") or {}).get(i)
                 if pin is None:
                     if rel not in owed or i in owed[rel]:
@@ -858,8 +929,9 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
             if i not in defined:
                 print(f"B\t{rel}\t{i} is named but no spec H1 in this tree defines it")
     # The audit pin's LIVENESS row, on every run: how many records the P branch graded and from what
-    # cutoff, so a population of zero is announced rather than read as a clean corpus.
-    print(f"Q\t{graded}\t{cutoff or 'off'}")
+    # cutoff, so a population of zero is announced rather than read as a clean corpus, and how many of
+    # them an older harness wrote: `Q<TAB><graded><TAB><cutoff, or off><TAB><exempt, or ->`.
+    print(f"Q\t{graded}\t{cutoff or 'off'}\t{'-' if writers is None else len(writers)}")
     print(f"N\t{unbound}")
     return 0
 
@@ -5356,6 +5428,55 @@ def cmd_selftest() -> int:
             "['memory/x/a.md', 'b.md', ''] None",
             lambda: "%s %s" % (read_reviewed_paths("**Serves:** x\nReviewed: memory/x/a.md@abc1234, b.md@d, \n"),
                                read_reviewed_paths("\n" * 12 + "Reviewed: a.md@abc1234\n")))
+        # TOOL-dTrueNorth-14 AC1 to AC3 — THE WRITER TEST. Commit A holds a fixture harness lacking
+        # renderAuditBinding; a branch from A commits an unpinned record; the trunk lands L, which adds
+        # the function, and merges the branch after it. Then the trunk commits a record and stages a
+        # third. The harness sits where derive_audit_writers reads it, the workflows kit's path in the
+        # repository that kit sits in. Against the base predicate, which grades by filename date alone,
+        # the merged record prints a P row and the Q row carries no fourth field.
+        try:
+            _wf = backlog.resolve_kit_dir("workflows", "tier2-review.js", os.path.dirname(os.path.abspath(__file__)))
+            _wf_home = next((d for d in (_wf, *_wf.parents) if (d / ".git").exists()), None)
+        except LookupError:
+            _wf_home = None
+        if _wf_home is None:
+            print("arm skip  TOOL-dTrueNorth-14 — no workflows kit in a repository beside this kit, so the "
+                  "writer-test arms have no harness path to plant")
+        else:
+            t14w = os.path.join(base, "writers"); os.makedirs(t14w)
+            _fixture(t14w)
+            h14 = os.path.join(t14w, (_wf / "tier2-review.js").relative_to(_wf_home))
+            os.makedirs(os.path.dirname(h14))
+            write_text(h14, "export function review() {}\n")
+            conf14w = _set_pin_cutoff(t14w, "2026-01-01")
+
+            def _commit14(msg, day=None):
+                rel = rv5 + f"2026-02-0{day}-review-ARCH-tOne-1-spec-audit.md" if day else None
+                if rel:
+                    os.makedirs(os.path.join(t14w, rv5), exist_ok=True)
+                    write_text(os.path.join(t14w, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
+                run("git", "add", "-A", cwd=t14w)
+                if msg:
+                    run("git", "commit", "-q", "-m", msg, "--no-verify", cwd=t14w)
+                return rel
+
+            _commit14("A")
+            trunk14 = run("git", "rev-parse", "--abbrev-ref", "HEAD", cwd=t14w).strip()
+            run("git", "checkout", "-q", "-b", "run", cwd=t14w)
+            _commit14("run", 2)
+            run("git", "checkout", "-q", trunk14, cwd=t14w)
+            write_text(h14, "export function review() {}\nexport function renderAuditBinding() {}\n")
+            _commit14("L")
+            run("git", "merge", "-q", "--no-ff", "--no-edit", "run", cwd=t14w)
+            arm("TOOL-dTrueNorth-14 AC1 — an unpinned record a branch committed before the pinning harness "
+                "landed prints no P row once merged, and the Q row counts it exempt",
+                "P=0 Q\t1\t2026-01-01\t1", lambda: _read_pin_rows(t14w, conf14w))
+            _commit14("main", 3)
+            arm("TOOL-dTrueNorth-14 AC2 — an unpinned record the pinning harness wrote prints its P row",
+                "P=1 Q\t2\t2026-01-01\t1", lambda: _read_pin_rows(t14w, conf14w))
+            w14 = _commit14(None, 4)
+            arm("TOOL-dTrueNorth-14 AC3 — a staged record, which has no adding commit, prints its P row",
+                f"P\t{w14}\tARCH-tOne-1 carries no @rev-N pin", lambda: _rows(t14w, conf14w))
 
         # ---- the rendered Records table and the two coverage joins.
         # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER

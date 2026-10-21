@@ -6418,6 +6418,11 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "derive_audit_writers",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_ban_files",
       "kind": "function",
       "file": "tools/check-install-prefix.sh"

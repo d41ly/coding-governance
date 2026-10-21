@@ -92,3 +92,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-21T19:36:41Z dispatch · item 4f2bc259 TOOL-dTrueNorth-13 · reason tools/workflows/tier2-review.template.js tools/workflows/tier2-review.js tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.template.js tools/workflows/unattended-build.js tools/workflows/unattended-build.test.sh tools/memory-tree/gen_build_index.py memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-13.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-13-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
 
 2026-10-21T19:36:45Z brief · item TOOL-dTrueNorth-13 · reason ea1634fe890a memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-13-build-brief.md
+
+2026-10-21T19:54:48Z dispatch · item 60919b0e TOOL-dTrueNorth-14 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-14.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-14-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
+
+2026-10-21T19:54:52Z brief · item TOOL-dTrueNorth-14 · reason 91d1a542e67c memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-14-build-brief.md

@@ -3375,6 +3375,45 @@ cp "$TMP/legacy.tn5" "$_b1/memory/project/legacy-files.txt"
 write_pk_conf ""
 ( cd "$_b1" && git rm -q -r memory/builds/tTwo && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn5-out --no-verify ) >/dev/null 2>&1
 
+# ---- TOOL-dTrueNorth-14 AC4: check 21's audit-pin arm over a record an OLDER HARNESS wrote. Commit
+# ---- A plants a fixture review harness lacking renderAuditBinding where the generator reads it, the
+# ---- workflows kit's path in its own repository; a branch from A commits an unpinned spec-audit
+# ---- record dated after SPEC_AUDIT_PIN_CUTOFF; the trunk lands L, which adds the function, then
+# ---- merges the branch. Check 21 passes and its line counts the exempt record from the four-field Q
+# ---- row. Against the base engine, which cuts the row in three, the line carries no exempt count;
+# ---- against the base generator the record prints a P row and check 21 fails. Taken out after.
+WF_KIT=$(resolve_kit_dir "$_PY" workflows tier2-review.js "$HERE" 2>/dev/null) || WF_KIT=""
+if [ -z "$WF_KIT" ]; then
+  echo "skip check 21's writer test through the engine: no workflows kit beside this one, so its two arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))
+else
+  ( cd "$_b1" && mkdir -p "$WF_KIT" memory/builds/tOne/build \
+    && printf 'export function review() {}\n' > "$WF_KIT/tier2-review.js" \
+    && git add -A && git -c commit.gpgsign=false commit -q -m tn14-a --no-verify \
+    && git checkout -q -b tn14-run \
+    && printf '# r\n\n**Serves:** spec-audit ARCH-tOne-1\n' > memory/builds/tOne/build/2026-09-02-build-ARCH-tOne-1-w.md \
+    && git add -A && git -c commit.gpgsign=false commit -q -m tn14-run --no-verify \
+    && git checkout -q - \
+    && printf 'export function renderAuditBinding() {}\n' >> "$WF_KIT/tier2-review.js" \
+    && git add -A && git -c commit.gpgsign=false commit -q -m tn14-l --no-verify \
+    && git -c commit.gpgsign=false merge -q --no-ff --no-edit tn14-run \
+    && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn14-gen --no-verify ) >/dev/null 2>&1
+  write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+  n=$((n+1))
+  case "$o" in
+    *"check 21: the audit-pin arm graded 1 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=2026-09-01, 1 written by a harness before renderAuditBinding"*) echo "ok   check 21: the audit-pin arm counts a record an older harness wrote as exempt, from the Q row's fourth field" ;;
+    *) echo "FAIL check 21: the audit-pin arm did not count the record an older harness wrote as exempt"; st=1 ;;
+  esac
+  n=$((n+1))
+  case "$o" in
+    *"HYGIENE check 21 FAILED"*) echo "FAIL check 21: a record an older harness wrote, merged after the pinning harness landed, fails check 21"; st=1 ;;
+    *"check 21: the audit-pin arm graded 1 spec-audit record(s)"*) echo "ok   check 21: passes over a merged record an older harness wrote" ;;
+    *) echo "FAIL check 21: the audit-pin arm printed no graded line, so its pass over the exempt record is unobserved"; st=1 ;;
+  esac
+  write_pk_conf ""
+  ( cd "$_b1" && git rm -q "$WF_KIT/tier2-review.js" memory/builds/tOne/build/2026-09-02-build-ARCH-tOne-1-w.md && git branch -q -D tn14-run \
+    && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn14-out --no-verify ) >/dev/null 2>&1
+fi
+
 # ---- TOOL-aRepatriatedFork-10 S5 and S6: a FLAT install at `scripts/` with a govkit receipt,
 # ---- rendered through `--render`. The rendered HYGIENE.md states THIS tree's two conf values, and
 # ---- TEMPLATE-SPEC.md names the codebase-map generator under the receipt's prefix — the kit
@@ -4256,7 +4295,10 @@ fi
 # skipped aloud with that block's twelve. Counted by reading; OWED: observed at the close.
 # RAISED 650 -> 656 by TOOL-dTrueNorth-5: its six check-21 audit-pin assertions, each top-level and
 # never skipped. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=656
+# RAISED 656 -> 658 by TOOL-dTrueNorth-14: its two check-21 writer-test assertions, each top-level and
+# skipped aloud with n_skip carrying them when no workflows kit sits beside this one. Counted by
+# reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=658
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

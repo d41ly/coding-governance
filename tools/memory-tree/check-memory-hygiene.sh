@@ -1423,15 +1423,20 @@ $bad21"
   # ONE population filter, so a record the legacy registry lists or RECORD_SERVES_CUTOFF exempts is
   # exempt here too. The Q row is the arm's LIVENESS half and names what it graded on every run: a
   # parse printing N and no Q is a generator without the arm, refused as the U-row test below is.
+  # The row is `Q<TAB><graded><TAB><cutoff, or off><TAB><exempt>`, read by its `^Q\t` prefix and cut
+  # at its tabs (TOOL-dTrueNorth-14 S3): the exempt field counts the graded records an older review
+  # harness wrote, which print no P row, or is `-` where the workflows kit did not resolve. Its CR
+  # comes off first: a Windows python ends every row but the last, N, in CRLF, and a field cut from
+  # the middle of a line would carry it there, and `off` would never equal `off<CR>`.
   if [ -n "$b21" ]; then
-    qn21=$(printf '%s\n' "$b21" | sed -n 's/^Q\t\([0-9]*\)\t.*$/\1/p' | head -1)
-    qc21=$(printf '%s\n' "$b21" | sed -n 's/^Q\t[0-9]*\t\(.*\)$/\1/p' | head -1)
+    q21=$(printf '%s\n' "$b21" | sed -n '/^Q\t/{s/\r$//;p;}' | head -1)
+    IFS=$'\t' read -r _q21 qn21 qc21 qe21 _q21rest <<<"$q21"
     if [ -z "$qn21" ]; then
       fail 21 "the bindings parse printed N $n21 and no Q row, so a generator without the audit-pin arm leaves every spec-audit record's @rev-N pin ungraded"
     elif [ "$qc21" = off ]; then
       echo "memory-hygiene: check 21: the audit-pin arm is off (SPEC_AUDIT_PIN_CUTOFF blank)" >&2
     else
-      echo "memory-hygiene: check 21: the audit-pin arm graded $qn21 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=$qc21" >&2
+      echo "memory-hygiene: check 21: the audit-pin arm graded $qn21 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=$qc21, $qe21 written by a harness before renderAuditBinding" >&2
     fi
   fi
   apin21=$(printf '%s\n' "$b21" | sed -n 's/^P\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
