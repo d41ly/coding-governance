@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-14
 streams: playbook+kickoff+tooling+deployer
 roster: PLAY
-ids: PLAY-dClosedLoop-1
+ids: PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15 PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19
 spec-audit: 2026-10-14
 authorized-by: prompt
 ---
@@ -65,19 +65,20 @@ asks, 435 of them unlabelled. The owner's prompt is recorded verbatim under `pro
 
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-10-14 · streams playbook+kickoff+tooling+deployer
-ids PLAY-dClosedLoop-1
+ids PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15
+ids PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [2026-10-20-spec-PLAY-dClosedLoop-1](spec/2026-10-20-spec-PLAY-dClosedLoop-1.md) | — | 2 | INPROGRESS | rev-1 | 2026-10-20 |
+| [PLAY-dClosedLoop-1 — the architecture and the chain plan for gov's one lifecycle loop](spec/2026-10-20-spec-PLAY-dClosedLoop-1.md) | — | 2 | INPROGRESS | rev-4 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 552 bound to this build, across 4 record folder(s).
+Records: 594 bound to this build, across 4 record folder(s).
 
-Ids no record names: 2026-10-20-spec-PLAY-dClosedLoop-1.
+Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: 2026-10-20-spec-PLAY-dClosedLoop-1.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -87,5 +88,5 @@ Ids no `spec-audit` record has ever named: 2026-10-20-spec-PLAY-dClosedLoop-1.
 
 <!-- gen:build-edges -->
 
-*This build declares no parent and no build declares it as one.*
+- **Child builds:** [dTrueNorth](../dTrueNorth/README.md)
 <!-- /gen:build-edges -->

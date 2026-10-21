@@ -1,8 +1,11 @@
 # **Serves:** research PLAY-dClosedLoop-1
-"""The as-built view: v2's `[chain]` at its baseline commit, with each deviation record's `amends` or `supersedes` row
+"""The as-built view: v2's `[chain]` at the design baseline, with each deviation record's `amends` or `supersedes` row
 applied and each changed clause citing its record (the owner's FQ-3, dTrueNorth's clause `cl-dClosedLoop-0006`). It
 is generated and never edited by hand, and the coverage join, and later the help and atlas renders, read it in place of
 the design record once the baseline is taken (final-questions `[deviation]`).
+
+The baseline is the pin `deviations.py` carries, `deviations.BASELINE`, never v2's working-tree `Baseline:` line
+(P0.1 row 5a). A `Baseline:` line differing from the pin is a finding, and the view still renders from the pin.
 
 A record's row is its **Follow-through:** line: `amends <clause-id>@<hash8>`, its **After:** the clause's new text; or
 `supersedes <clause-id>@<hash8> by <clause-id>`, the old clause gone and the new one, its **After:**, in its place.
@@ -11,8 +14,9 @@ Usage (from the worktree root):
   python asbuilt.py --write [--out <path>]   render the view, by default beside v2 as `...-as-built.md`
   python asbuilt.py --check [--out <path>]   render it again and compare the bytes with the file
   python asbuilt.py --fixture [--plant <case>]   a baseline and records in memory, damaged one way: hand-edit,
-                                                 no-row, no-citation
-Exit 0 green, 1 on a finding, 2 when v2 records no baseline, so there is nothing to render.
+                                                 no-row, no-citation, baseline (cl-dClosedLoop-0119 loosened and
+                                                 v2's Baseline: re-pointed)
+Exit 0 green, 1 on a finding, 2 when the pin's v2 cannot be read, so there is nothing to render.
 
 What it does not read: whether a record's new text is what its approver approved, which the deviation join and the
 closing review read; and the sections of v2 outside `[chain]`, which change only by a new record of their own.
@@ -27,32 +31,24 @@ B = "memory/builds/dClosedLoop/build/"
 V2 = B + "2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md"
 OUT = B + "2026-10-19-build-PLAY-dClosedLoop-1-as-built.md"
 ROW = re.compile(r"^\| (d[A-Z]\w+) \| `(cl-d[A-Z]\w+-\d{4})` \| (.*) \| (baseline|deviation `([^`]+)`) \|$")
-PLANTS = ("hand-edit", "no-row", "no-citation")
+PLANTS = ("hand-edit", "no-row", "no-citation", "baseline")
 
-spec = importlib.util.spec_from_file_location("carries", B + "2026-10-19-build-PLAY-dClosedLoop-1-carries.py")
-carries = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(carries)
 spec = importlib.util.spec_from_file_location("deviations", B + "2026-10-19-build-PLAY-dClosedLoop-1-deviations.py")
 deviations = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(deviations)
+baseline_clauses = deviations.read_chain_clauses     # [(build, id, text, hash8)] in [chain] order, one parser
 
 
 def git(*args):
     return subprocess.run(["git", *args], capture_output=True, text=True, encoding="utf-8").stdout
 
 
-def baseline_clauses(v2_text):
-    """[(build, id, text, hash8)] in [chain] order."""
-    chain = v2_text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
-    out = []
-    for ln in chain.split("\n"):
-        m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| [^|]+ \| (.+) \| [^|]+ \|$", ln)
-        if m:
-            for c in carries.split_clauses(m.group(2)):
-                i = carries.CID.search(c)
-                if i:
-                    out.append((m.group(1), i.group(1), carries.CID.sub("", c).strip(), carries.clause_hash(c)))
-    return out
+def read_view_base(v2_text):
+    """(the pin, its clauses or None when its v2 is unreadable, findings): the view's baseline, read from the pin
+    deviations.py carries, and a finding when v2's `Baseline:` differs from it."""
+    moved = deviations.check_baseline(v2_text, deviations.BASELINE)
+    pinned = git("show", f"{deviations.BASELINE}:{V2}")
+    return deviations.BASELINE, baseline_clauses(pinned) if pinned else None, [moved] if moved else []
 
 
 def render(base, sha, records):
@@ -103,18 +99,27 @@ def fixture(plant):
     _, cid, text, h = base[6]
     records = [{"id": "fixture-deviation-1", "departs": f"{cid}@{h} [chain]", "follow": f"amends {cid}@{h}",
                 "after": text + ", and a planted amendment"},
-               {"id": "fixture-deviation-2", "departs": "PLAY-dTrueNorth-2@rev-2 [acceptance]",
-                "follow": "new unit PLAY-dTrueNorth-7", "after": ""}]
+               {"id": "fixture-deviation-2", "departs": "missing:PLAY-dTrueNorth-2@rev-2 [acceptance]",
+                "follow": "new unit missing:PLAY-dTrueNorth-7", "after": ""}]
     if plant == "no-row":
         records.append({"id": "fixture-deviation-3", "departs": f"{base[8][1]}@{base[8][3]} [chain]",
                         "follow": "gap gap-build-08", "after": "x"})
+    if plant == "baseline":
+        # Loosen cl-dClosedLoop-0119 and re-point v2's Baseline: past it (P0.1 row 5a): the view renders from the pin,
+        # and the moved line is the one finding, so no record rides along.
+        i = v2.index("`cl-dClosedLoop-0119`")
+        now = v2[:i] + "loosened, so the owner is never asked, " + v2[i:]
+        now = re.sub(r"(?m)^Baseline: `[0-9a-f]+`", f"Baseline: `{git('rev-parse', 'HEAD').strip()}`", now)
+        sha, base, findings = read_view_base(now)
+        rendered, more = render(base, sha, [])
+        return rendered, rendered, base, findings + more, sha
     rendered, findings = render(base, "0" * 40, records)
     body = rendered
     if plant == "hand-edit":
         body = rendered.replace("a planted amendment", "a quiet amendment")
     elif plant == "no-citation":
         body = rendered.replace("deviation `fixture-deviation-1`", "baseline")
-    return body, rendered, base, findings
+    return body, rendered, base, findings, "0" * 40
 
 
 def main(argv):
@@ -123,32 +128,30 @@ def main(argv):
         sys.exit(f"asbuilt: no plant {plant}")
     out = Path(argv[argv.index("--out") + 1] if "--out" in argv else OUT)
     if "--fixture" in argv:
-        body, rendered, base, findings = fixture(plant)
+        body, rendered, base, findings, sha = fixture(plant)
         findings += check(body, rendered, base)
         label = " · fixture" + (f" · plant {plant}" if plant else "")
     else:
-        v2 = Path(V2).read_text(encoding="utf-8")
-        cid = v2.split("\n## [clause-ids]", 1)[1].split("\n## ", 1)[0] if "\n## [clause-ids]" in v2 else ""
-        m = re.search(r"^Baseline: `([0-9a-f]{7,40})`", cid, flags=re.M)
-        if not m:
-            print("asbuilt: v2's [clause-ids] records no Baseline, so there is nothing to render; never green before it")
+        sha, base, findings = read_view_base(Path(V2).read_text(encoding="utf-8"))
+        if base is None:
+            print(f"asbuilt: v2 at the pin {sha[:9]} cannot be read, so there is nothing to render; never green before it")
             return 2
-        base = baseline_clauses(git("show", f"{m.group(1)}:{V2}"))
         records = []
         for p in sorted(Path("memory/builds").glob("*/build/*-deviation-*.md")):
             text = p.read_text(encoding="utf-8")
-            r = deviations.record(p.as_posix(), text)
+            r = deviations.read_record(p.as_posix(), text)
             after = re.search(r"^- \*\*After:\*\* (.+)$", text, flags=re.M)
             r["after"] = after.group(1) if after else ""
             records.append(r)
-        rendered, findings = render(base, m.group(1), records)
+        rendered, more = render(base, sha, records)
+        findings += more
         if "--write" in argv:
             out.write_text(rendered, encoding="utf-8", newline="\n")
             print(f"asbuilt: wrote {out.as_posix()}")
         body = out.read_text(encoding="utf-8") if out.exists() else ""
         findings += check(body, rendered, base) if "--check" in argv else []
         label = ""
-    print(f"asbuilt: findings {len(findings)}{label}")
+    print(f"asbuilt: findings {len(findings)} · view at {sha[:9]}{label}")
     for f in findings:
         print(f"  {f}")
     return 1 if findings else 0

@@ -13,11 +13,14 @@ A spec under `memory/builds/<chain build>/spec/` declares what it carries, one l
 A clause's hash is the first eight hex digits of the SHA-256 of its text, the id cut off and its whitespace folded.
 
 The join's arms, each a finding (final-questions `[coverage]`):
-  per spec   a ghost id; an unbound spec, carrying nothing and derived from nothing; a stale pin; two specs carrying
-             one clause whole, or pinning it to two hashes; a revision that stops carrying a clause and records no
-             move, retirement or deferral (read against the spec's previous commit);
+  per spec   a ghost id; an unbound spec, carrying nothing and derived from nothing; a stale pin; a clause of another
+             build, carried with no **Moved:** line in any measured spec naming it to the spec's own build, which then
+             counts as carried for no build; two specs carrying one clause whole, or pinning it to two hashes; a
+             revision that stops carrying a clause and records no move, retirement or deferral (read against every
+             commit of the spec since its first, so a later edit does not hide the drop);
   per build  a clause or an owned node no spec carries (with --exit, as at a Design exit); a token of a clause, a
-             backticked name, missing from every spec that carries it;
+             backticked name, missing from every spec that carries it, read from whichever measured build's folder
+             holds the carrier, so a clause moved to another build is read in that build's spec;
   a run that measured no spec is never green: it exits 2.
 
 Usage (from the worktree root):
@@ -25,7 +28,10 @@ Usage (from the worktree root):
   python carries.py --report <slug>             the coverage report for one build, as its README renders it
   python carries.py --fixture [--plant <case>] [--build <slug>]
       the join over a spec set built in memory, carrying every clause and node of the build (default dTrueNorth), and
-      damaged one way: ghost, unbound, stale, ambiguous, dropped, uncarried, node, token, unmeasured
+      damaged one way: ghost, unbound, stale, ambiguous, dropped, uncarried, node, token, unmeasured, crossbuild (another
+      build's clause carried), typo (a clause dropped, then the spec edited again); or measured beside the owner build
+      of a clause a **Moved:** line moves to it: moved (the carrier holds the clause's tokens, green), moved-token (the
+      carrier lacks one)
 Exit 0 green, 1 on any finding, 2 when no spec was measured.
 
 What it does not read: whether a spec's text means what its clause means, which the semantic lens reads at the Design
@@ -49,7 +55,8 @@ DERIVED = re.compile(r"^\*\*Derived:\*\* (" + DECISION + r")\s*$", re.M)
 RELEASED = re.compile(r"^\*\*(Moved|Retired|Deferred):\*\* (cl-d[A-Z]\w+-\d{4})(?: to (d[A-Z]\w+))? by (" + DECISION
                       + r")\s*$", re.M)
 OWNED = ("item", "policy-key", "point", "record-kind", "tag-namespace", "system")
-PLANTS = ("ghost", "unbound", "stale", "ambiguous", "dropped", "uncarried", "node", "token", "unmeasured")
+PLANTS = ("ghost", "unbound", "stale", "ambiguous", "dropped", "uncarried", "node", "token", "unmeasured", "crossbuild",
+          "typo", "moved", "moved-token")
 
 
 def split_clauses(cell):
@@ -118,18 +125,19 @@ def git(*args):
 
 
 def real_specs(builds):
-    """{build: [(path, text, previous text or None)]} from each chain build's spec folder."""
+    """{build: [(path, text, [its text at every commit of it since its first])]} from each chain build's spec folder."""
     out = {}
     for b in builds:
         for p in sorted(Path(f"memory/builds/{b}/spec").glob("*.md")):
-            shas = git("log", "--format=%H", "-2", "--", p.as_posix()).split()
-            prev = git("show", f"{shas[1]}:{p.as_posix()}") if len(shas) > 1 else None
-            out.setdefault(b, []).append((p.as_posix(), p.read_text(encoding="utf-8"), prev))
+            shas = git("log", "--format=%H", "--", p.as_posix()).split()
+            revs = [git("show", f"{sha}:{p.as_posix()}") for sha in shas]
+            out.setdefault(b, []).append((p.as_posix(), p.read_text(encoding="utf-8"), revs))
     return out
 
 
 def fixture(builds, nodes, build, plant):
-    """A spec set carrying every clause and node of the build, the third clause in two parts, damaged one way."""
+    """A spec set carrying every clause and node of the build, the third clause in two parts, damaged one way. Each spec
+    is (path, text, [its earlier revisions]), the shape real_specs reads from git."""
     ids = sorted(builds[build])
     lines = [[], []]
     for n, i in enumerate(ids):
@@ -142,11 +150,11 @@ def fixture(builds, nodes, build, plant):
     for k, node in enumerate(sorted(nodes[build])):
         lines[k % 2].append((f"**Carries:** node:{node}", ""))
     texts = ["\n".join(f"{c}\n\n{b}\n" for c, b in ls) for ls in lines]
-    specs = [(f"fixture/{build}/spec/unit-{n + 1}.md", t, t) for n, t in enumerate(texts)]
+    specs = [(f"fixture/{build}/spec/unit-{n + 1}.md", t, [t]) for n, t in enumerate(texts)]
     if plant == "ghost":
         specs[0] = (specs[0][0], specs[0][1] + "\n**Carries:** cl-dClosedLoop-9999@00000000 whole\n", specs[0][2])
     elif plant == "unbound":
-        specs.append((f"fixture/{build}/spec/unit-3.md", "A spec that carries nothing.\n", None))
+        specs.append((f"fixture/{build}/spec/unit-3.md", "A spec that carries nothing.\n", []))
     elif plant == "stale":
         specs[0] = (specs[0][0], re.sub(r"@[0-9a-f]{8}", "@deadbeef", specs[0][1], count=1), specs[0][2])
     elif plant == "ambiguous":
@@ -159,14 +167,14 @@ def fixture(builds, nodes, build, plant):
         specs[1] = (specs[1][0], specs[1][1] + "\n" + moved.replace("part 2/2", "whole") + "\n", specs[1][2])
     elif plant == "uncarried":
         first = CARRY.search(specs[0][1]).group(0)
-        specs[0] = (specs[0][0], specs[0][1].replace(first, ""), specs[0][1].replace(first, ""))
+        specs[0] = (specs[0][0], specs[0][1].replace(first, ""), [specs[0][1].replace(first, "")])
     elif plant == "node":
         both = [s for s in specs if "node:" in s[1]]
         if not both:
             sys.exit(f"carries: {build} owns no node, so the node plant has nothing to drop; pass --build <slug>")
         s = both[0]
         line = re.search(r"^\*\*Carries:\*\* node:\S+\s*$", s[1], flags=re.M).group(0)
-        specs[specs.index(s)] = (s[0], s[1].replace(line, ""), s[2].replace(line, ""))
+        specs[specs.index(s)] = (s[0], s[1].replace(line, ""), [r.replace(line, "") for r in s[2]])
     elif plant == "token":
         # A clause's name dropped from the prose of every spec, the Carries lines left whole.
         tok = next(t for i in ids for t in builds[build][i][2] if not any(t in c for c, _ in lines[0] + lines[1]))
@@ -174,17 +182,53 @@ def fixture(builds, nodes, build, plant):
         def strip(text):
             return "\n".join(ln if ln.startswith("**Carries:**") else ln.replace(f"`{tok}`", "").replace(tok, "")
                              for ln in text.split("\n"))
-        specs = [(p, strip(t), prev) for p, t, prev in specs]
+        specs = [(p, strip(t), revs) for p, t, revs in specs]
     elif plant == "unmeasured":
         specs = []
+    elif plant == "crossbuild":
+        # The first clause of another build carried whole, its pin current, and no Moved line names it to this build
+        # (d218's crossbuild step, IR:796-798, which carries dGroundRules' cl-dClosedLoop-0007 in a dTrueNorth spec).
+        other = next(b for b in builds if b != build)
+        cid = sorted(builds[other])[0]
+        body, h, _ = builds[other][cid]
+        specs[1] = (specs[1][0], specs[1][1] + f"\n**Carries:** {cid}@{h} whole\n\n{body}\n", specs[1][2])
+    elif plant == "typo":
+        # The first clause dropped in one revision, then a later edit that touches no Carries line, so the drop sits
+        # two revisions back (d218's drop then typo steps, IR:804-807). The second spec carries the clause whole, so
+        # neither the uncarried arm nor the token arm sees it, and only the drop arm can.
+        line = f"**Carries:** {ids[0]}@{builds[build][ids[0]][1]} whole"
+        dropped = specs[0][1].replace(line + "\n", "", 1)
+        specs[0] = (specs[0][0], dropped + "\nA typo fixed in a later revision.\n", [specs[0][1], dropped])
+        specs[1] = (specs[1][0], specs[1][1] + f"\n{line}\n\n{builds[build][ids[0]][0]}\n", specs[1][2])
+    elif plant in ("moved", "moved-token"):
+        # crossbuild's carry with the owner build measured too, its first spec moving the clause to this build by a
+        # Moved line where it carried the clause, its earlier revision still carrying it. moved-token also drops one of
+        # the clause's tokens, one this build's own text lacks, from the carrier (revision finding 14).
+        other = next(b for b in builds if b != build)
+        cid = sorted(builds[other])[0]
+        body, h, toks = builds[other][cid]
+        carried = body
+        if plant == "moved-token":
+            tok = next((t for t in toks if t not in specs[1][1]), None)
+            if tok is None:
+                sys.exit(f"carries: every token of {cid} is in {build}'s own text, so moved-token has none to drop")
+            carried = body.replace(f"`{tok}`", "").replace(tok, "")
+        specs[1] = (specs[1][0], specs[1][1] + f"\n**Carries:** {cid}@{h} whole\n\n{carried}\n", specs[1][2])
+        owner = fixture(builds, nodes, other, None)[other]
+        p, t, revs = owner[0]
+        owner[0] = (p, t.replace(f"**Carries:** {cid}@{h} whole\n\n{body}\n",
+                                 f"**Moved:** {cid} to {build} by XX-dProbe-1\n"), revs)
+        return {build: specs, other: owner}
     return {build: specs} if specs else {}
 
 
 def join(builds, nodes, retired, specs, only=None, exit_mode=False):
     findings, carriers, notes = [], {}, {}
     all_ids = {i: b for b, cl in builds.items() for i in cl}
+    moved_to = {(m[1], m[2]) for items in specs.values() for _, t, _ in items for m in RELEASED.findall(t)
+                if m[0] == "Moved"}
     for b, items in specs.items():
-        for path, text, prev in items:
+        for path, text, revs in items:
             carried = CARRY.findall(text)
             if not carried and not DERIVED.search(text):
                 findings.append(f"{path}: carries nothing and is derived from nothing (unbound)")
@@ -198,17 +242,21 @@ def join(builds, nodes, retired, specs, only=None, exit_mode=False):
                 if cid not in all_ids:
                     findings.append(f"{path}: carries {cid}, which no clause carries (a ghost id)")
                     continue
+                if all_ids[cid] != b and (cid, b) not in moved_to:
+                    findings.append(f"{path}: carries {cid}, a clause of {all_ids[cid]}, and no Moved line names it to "
+                                    f"{b} (another build's clause)")
+                    continue
                 cur = builds[all_ids[cid]][cid][1]
                 if h != cur:
                     findings.append(f"{path}: pins {cid}@{h}, and the clause's text now hashes {cur} (a stale pin)")
                 carriers.setdefault(("clause", cid), []).append((path, kind, h))
-            if prev:
-                before = {c[0] for c in CARRY.findall(prev) if c[0]}
+            if revs:
+                before = {c[0] for r in revs for c in CARRY.findall(r) if c[0]}
                 now = {c[0] for c in carried if c[0]}
                 released = {m[1] for m in RELEASED.findall(text)}
                 for cid in sorted(before - now - released):
-                    findings.append(f"{path}: stopped carrying {cid} since its last revision, with no move, retirement "
-                                    f"or deferral recorded")
+                    findings.append(f"{path}: stopped carrying {cid}, which an earlier revision carried, with no move, "
+                                    f"retirement or deferral recorded")
     for (kind, ref), cs in sorted(carriers.items()):
         whole = [c for c in cs if c[1] == "whole"]
         pins = {c[2] for c in cs}
@@ -221,6 +269,7 @@ def join(builds, nodes, retired, specs, only=None, exit_mode=False):
             if sorted(int(p.split()[1].split("/")[0]) for p in parts) != list(range(1, n + 1)):
                 findings.append(f"{ref}: carried in parts {parts}, not 1 to {n}")
     measured = {b for b, items in specs.items() if items}
+    every = {p: t for items in specs.values() for p, t, _ in items}   # a moved-in carrier is in another build's folder
     for b in sorted(measured if only is None else measured & {only}):
         texts = {p: t for p, t, _ in specs[b]}
         for cid, (body, h, tokens) in builds[b].items():
@@ -230,7 +279,7 @@ def join(builds, nodes, retired, specs, only=None, exit_mode=False):
                 if exit_mode and not released:
                     findings.append(f"{b}: {cid} is carried by no spec (uncarried)")
                 continue
-            joined = " ".join(texts[c[0]] for c in cs if c[0] in texts)
+            joined = " ".join(every[c[0]] for c in cs)
             for tok in tokens:
                 if tok not in joined:
                     findings.append(f"{b}: {cid}'s token `{tok}` appears in none of its carriers")
@@ -276,16 +325,16 @@ def main(argv):
         sys.exit(f"carries: {build} is no chain build")
     if "--fixture" in argv:
         specs = fixture(builds, nodes, build, plant)
-        exit_mode = True
+        exit_mode, only = True, None        # every build the fixture measures, a moved clause's owner included
     else:
         specs = real_specs(builds)
-        exit_mode = "--exit" in argv
+        exit_mode, only = "--exit" in argv, build
     if opt("--report"):
         b = opt("--report")
         _, carriers, _, _ = join(builds, nodes, retired, specs, b)
         print(report(b, builds, nodes, specs, carriers))
         return 0
-    findings, carriers, measured, _ = join(builds, nodes, retired, specs, build, exit_mode)
+    findings, carriers, measured, _ = join(builds, nodes, retired, specs, only, exit_mode)
     print(f"carries: chain builds {len(builds)}, clauses {sum(len(c) for c in builds.values())}, retired {len(retired)}, "
           f"specs measured {sum(len(v) for v in specs.values())} in {len(measured)} builds · findings {len(findings)}"
           + (f" · fixture {build}" if "--fixture" in argv else "") + (f" · plant {plant}" if plant else ""))

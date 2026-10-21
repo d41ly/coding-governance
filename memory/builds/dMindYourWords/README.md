@@ -1,0 +1,105 @@
+---
+slug: dMindYourWords
+node: d
+opened: 2026-10-21
+streams: tooling
+roster: TOOL
+ids: TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13 TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18
+status: OPEN
+spec-audit: 2026-10-21
+parents: dWellOiledMachine dWitnessedBar dLinkedLibrary dFurnishedOrders
+may: PLAY-dClosedLoop-3
+---
+
+# dMindYourWords — the Lexicon build of the dClosedLoop chain
+
+## The problem this build exists to solve
+
+dMindYourWords owns 11 gaps at the baseline `59ff8f2ac`, as its row of v2's `[chain]` names them: gap-mem-10,
+gap-lex-01, gap-lex-02, gap-lex-03, gap-lex-04, gap-lex-05, gap-lex-06, gap-lex-07, gap-lex-08, gap-lex-09,
+gap-lex-10. Closing every one is this build's goal bound.
+
+## Expected improvements
+
+- Each of the 17 clauses of its row in v2's `[chain]` carried by a spec pinned to its hash, one roster unit per
+  clause.
+- Each unit built and landed, so the 11 owned gaps above close.
+
+## Detriments if this is not built
+
+- Its 11 owned gaps stay open.
+- Its 1 child build waits on it: dConvergedCharter.
+
+## Build-level rules
+
+- Phase, from the tree: a run whose `BACKLOG.md` at its baseline holds an open ask and whose starting roster has a
+  unit `MISSING` is the spec run; it specs, audits and defers every unit, each it added a departure, and closes by
+  carry-forward. Any other run is the build run: it builds every carried unit, deferring none again.
+- Read in the packet's order, `packet.py --check dMindYourWords` green before the first pass; a moved instrument blob
+  is a stop, never re-rendered away.
+- Push the run branch after every pass commit, hold and hand-off.
+- Close on the prepared merge after `--phase VERIFYING` and the last `push-main.sh --prepare`:
+  `deviations.py --report dMindYourWords`, a record per member "recorded by nobody", the same with `--write` (commit
+  it as `…-departures-spec.md` or `-build.md`) and `--check`, then `--authorization` and `--close`; again after a
+  re-prepare.
+- Deviation values: `report` and `author-recorded`.
+- Forks by the plan's rungs: a rung 5 or 6 choice's §8 mark and `Decided:` trailer cite its ruling (ER:240, ER:388,
+  ER:328 or P0.8 row 5) and carry `widens:` and `relaxes:`, a value or `none`; a `relaxes:` value joins a record with
+  `**Bound:**`, `**Tier:**`, `**Reason:**`, a `widens:` value one with `**Surface:**`, `**Reason:**`; a grant-lifted
+  choice carries `grants: <id> <change>`.
+- Writes stay in this build's folder and a build run's `--dispatch --writes` paths; outside, only an ask row in
+  another build's `BACKLOG.md` and the shared renders. The departures report lists the rest.
+
+## Parked decisions
+
+none
+
+<!-- roster:units -->
+
+| # | Unit | Carries | Clause |
+|---|---|---|---|
+| 1 | `TOOL-dMindYourWords-1` | `cl-dClosedLoop-0262@8be7fb04` | the definition classes (conforming |
+| 2 | `TOOL-dMindYourWords-2` | `cl-dClosedLoop-0263@bab0ffd1` | forced names recognised by what forces them (`lexicon.forced`): packs keyed by base member |
+| 3 | `TOOL-dMindYourWords-3` | `cl-dClosedLoop-0264@a1b36116` | gov's own contract-forced names declared in a table the instruction write path owns |
+| 4 | `TOOL-dMindYourWords-4` | `cl-dClosedLoop-0265@a234cd84` | override markers verified against the packs |
+| 5 | `TOOL-dMindYourWords-5` | `cl-dClosedLoop-0266@db50d898` | a reasoned site suppression as the owner's counted fallback |
+| 6 | `TOOL-dMindYourWords-6` | `cl-dClosedLoop-0267@06ce7948` | `--suggest` made forced-aware |
+| 7 | `TOOL-dMindYourWords-7` | `cl-dClosedLoop-0268@2d14651f` | the packs |
+| 8 | `TOOL-dMindYourWords-8` | `cl-dClosedLoop-0269@f2bbdcc2` | packs detected from the import census and manifests and declared by the owner |
+| 9 | `TOOL-dMindYourWords-9` | `cl-dClosedLoop-0270@01096b8c` | enforcement: the work order's vocabulary slice and forced-aware answers |
+| 10 | `TOOL-dMindYourWords-10` | `cl-dClosedLoop-0271@09fb0fff` | drift beyond verbs (`lexicon.drift`): one verb per declared family per object |
+| 11 | `TOOL-dMindYourWords-11` | `cl-dClosedLoop-0272@aac8dd76` | the vocabulary changed only through the instruction write path |
+| 12 | `TOOL-dMindYourWords-12` | `cl-dClosedLoop-0273@e1bd67f4` | one extraction primitive in `tools/lib` |
+| 13 | `TOOL-dMindYourWords-13` | `cl-dClosedLoop-0274@5185348f` | the tag-name vocabulary check |
+| 14 | `TOOL-dMindYourWords-14` | `cl-dClosedLoop-0275@f7d892e0` | the kit's defects fixed: repeated block headers refused |
+| 15 | `TOOL-dMindYourWords-15` | `cl-dClosedLoop-0276@c565a516` | records kept out by the path selector |
+| 16 | `TOOL-dMindYourWords-16` | `cl-dClosedLoop-0277@11ec04ed` | the two lexicon drift signals as the lexicon's own leg pack |
+| 17 | `TOOL-dMindYourWords-17` | `cl-dClosedLoop-0278@3bd5d4af` | the overloaded terms settled: attended as a session kind and as a mode |
+<!-- /roster:units -->
+
+<!-- gen:build-index -->
+**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+ids TOOL-dMindYourWords-1 TOOL-dMindYourWords-2 TOOL-dMindYourWords-3 TOOL-dMindYourWords-4 TOOL-dMindYourWords-5 TOOL-dMindYourWords-6 TOOL-dMindYourWords-7 TOOL-dMindYourWords-8 TOOL-dMindYourWords-9 TOOL-dMindYourWords-10 TOOL-dMindYourWords-11 TOOL-dMindYourWords-12 TOOL-dMindYourWords-13
+ids TOOL-dMindYourWords-14 TOOL-dMindYourWords-15 TOOL-dMindYourWords-16 TOOL-dMindYourWords-17 TOOL-dMindYourWords-18
+
+<!-- gen:build-units -->
+*No spec under this build carries a status header; the status above is declared in the front matter.*
+<!-- /gen:build-units -->
+
+Records: 1 bound to this build, across 1 record folder(s).
+
+Ids no record names: none — every unit id is named by a record.
+
+Ids no `spec-audit` record has ever named: none — every unit id has one.
+<!-- /gen:build-index -->
+
+<!-- gen:build-order -->
+
+*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+<!-- /gen:build-order -->
+
+<!-- gen:build-edges -->
+
+- **Parent builds:** [dFurnishedOrders](../dFurnishedOrders/README.md), [dLinkedLibrary](../dLinkedLibrary/README.md), [dWellOiledMachine](../dWellOiledMachine/README.md), [dWitnessedBar](../dWitnessedBar/README.md)
+- **Child builds:** [dConvergedCharter](../dConvergedCharter/README.md)
+<!-- /gen:build-edges -->

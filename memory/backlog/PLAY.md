@@ -14,4 +14,16 @@ Cite ids, never line numbers.
 > Already landed without this? Any node:  python tools/memory-tree/migrate_backlog.py --repair <merge-sha>
 > A branch nobody will revisit? From the default branch:  python tools/memory-tree/migrate_backlog.py --ingest <ref>
 
-*No live ask.*
+| Ask | Status | Sev | Decided by | Filed | Summary |
+|---|---|---|---|---|---|
+| [PLAY-dClosedLoop-11](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dTrueNorth'S… |
+| [PLAY-dClosedLoop-12](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
+| [PLAY-dClosedLoop-13](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dDeclaredLoop'S… |
+| [PLAY-dClosedLoop-14](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dPlacedRequest'S… |
+| [PLAY-dClosedLoop-15](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
+| [PLAY-dClosedLoop-16](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dWitnessedBar'S… |
+| [PLAY-dClosedLoop-17](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
+| [PLAY-dClosedLoop-18](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
+| [PLAY-dClosedLoop-19](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dLinkedLibrary'S… |
+| [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
