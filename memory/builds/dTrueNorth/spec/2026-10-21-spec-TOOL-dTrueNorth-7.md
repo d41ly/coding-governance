@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 8
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
 
 **Derived:** PLAY-dClosedLoop-2
 

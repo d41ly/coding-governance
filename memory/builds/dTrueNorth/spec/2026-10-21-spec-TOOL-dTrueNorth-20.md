@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-20 — the round-2 spec audit's 38 minors: declared keys, honest exits, bounded reads, one reader each, and the records that name them
 
-**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
+**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
