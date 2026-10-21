@@ -102,14 +102,14 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-12 — the routed-commits self-test reaches the strip through a resolver and builds its own design in the fixture](spec/2026-10-21-spec-TOOL-dTrueNorth-12.md) | 4 | 2 | OPEN | rev-3 | 2026-10-21 |
 | [TOOL-dTrueNorth-19 — the audit-writer reader takes one glob pathspec, refuses a failed git call, and grades a record whose harness is missing](spec/2026-10-21-spec-TOOL-dTrueNorth-19.md) | 4 | 2 | OPEN | rev-1 | 2026-10-21 |
 | [TOOL-dTrueNorth-8 — the as-built view re-rendered in the commit that changes its inputs, with an owner and a moment](spec/2026-10-21-spec-TOOL-dTrueNorth-8.md) | 4 | 2 | OPEN | rev-3 | 2026-10-21 |
-| [TOOL-dTrueNorth-16 — the round-1 spec audit's 37 minors: one key rule, one revision reader, one conf read, honest exits and the docs that name them](spec/2026-10-21-spec-TOOL-dTrueNorth-16.md) | 5 | 2 | OPEN | rev-3 | 2026-10-21 |
+| [TOOL-dTrueNorth-16 — the round-1 spec audit's 37 minors: one key rule, one revision reader, one conf read, honest exits and the docs that name them](spec/2026-10-21-spec-TOOL-dTrueNorth-16.md) | 5 | 2 | OPEN | rev-4 | 2026-10-21 |
 | [TOOL-dTrueNorth-17 — the order-3 transition of the as-built view: the render's code is a view input, and the second of units 4 and 6 to land re-renders](spec/2026-10-21-spec-TOOL-dTrueNorth-17.md) | 5 | 2 | OPEN | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-18 — two amends of one clause are ordered by a declared supersession, never by path](spec/2026-10-21-spec-TOOL-dTrueNorth-18.md) | 5 | 2 | OPEN | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-20 — the round-2 spec audit's 38 minors: declared keys, honest exits, bounded reads, one reader each, and the records that name them](spec/2026-10-21-spec-TOOL-dTrueNorth-20.md) | 7 | 2 | OPEN | rev-4 | 2026-10-21 |
 | [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 8 | 2 | OPEN | rev-2 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 52 bound to this build, across 4 record folder(s).
+Records: 53 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

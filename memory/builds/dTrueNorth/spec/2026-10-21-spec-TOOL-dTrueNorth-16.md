@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-16 — the round-1 spec audit's 37 minors: one key rule, one revision reader, one conf read, honest exits and the docs that name them
 
-**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
+**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-16-deviation-15.md](../build/2026-10-21-build-TOOL-dTrueNorth-16-deviation-15.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-16-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-16-build-brief.md) | journal | — |
+| [2026-10-21-prompt-TOOL-dTrueNorth-16-deviation-5.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-16-deviation-5.md) | research | — |
 | [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 |
 
 <!-- /gen:spec-records -->
@@ -290,26 +291,8 @@ producer's code, not its dispatch row.
 ### Deviation-5
 
 `memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-16-deviation-5.md`, written in
-this unit's pass, the commit re-rendering the view as `TOOL-dTrueNorth-8` S1 requires:
-
-```markdown
-# TOOL-dTrueNorth-16 deviation 5 — the dispatch refuses a consumer before its producer, a carrier change no clause names
-
-**Serves:** deviation TOOL-dTrueNorth-16
-
-- **Departs from:** `dTrueNorth` [grant]
-- **Hand-off:** design-to-spec
-- **Before:** the chain's grant PLAY-dClosedLoop-3 lifts veto 2 only for the governance-carrier changes dTrueNorth's own `[chain]` clauses name, and none of `cl-dClosedLoop-0001` to `cl-dClosedLoop-0006` names the dispatch order gate of `tools/unattended/unattended.sh`
-- **After:** TOOL-dTrueNorth-16 adds a refusal beside the `--dispatch` order gate of `tools/unattended/unattended.sh`: a unit whose spec consumes from a unit of its own build that is neither CLOSED nor WONTDO is refused with code 49, taken under the owner's standing ruling for a fork whose only options trip veto 2 outside the grant
-- **Cause:** review finding
-- **Reason:** The round-1 spec audit's id 3 found units that consume from one another sharing an order value, which the order gate reads as one parallel group, so a consumer may be dispatched before its producer and build against code that does not exist yet. Every mechanism that closes it without renumbering is a governance-carrier change no dTrueNorth clause names, so the fork was settled at rung 5 by the most capable option, the refusal at the act.
-- **Evidence:** `memory/builds/dTrueNorth/reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md`, item M2 (id 3); the standing ruling ER:388 as the execution plan's rung 5 states it (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:914-922`); the decision row `PLAY-dClosedLoop-6` (`memory/DECISIONS.md:234`); TOOL-dTrueNorth-16 §8 F3
-- **Risk:** stricter
-- **Approver:** spec writer, the gov-spec-writer role of dTrueNorth's whole run, citing `PLAY-dClosedLoop-6` (ER:388), under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
-- **Follow-through:** new unit TOOL-dTrueNorth-16
-- **Caused-by:** 2026-10-21-review-TOOL-dTrueNorth-1-spec-audit
-- **Surface:** the `--dispatch` verb of `tools/unattended/unattended.sh`, a code-49 refusal of a unit whose consumes-from producer in its own build is not terminal
-```
+this unit's pass, the commit re-rendering the view as `TOOL-dTrueNorth-8` S1 requires, byte for byte
+from the fenced block of `memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-16-deviation-5.md`.
 
 ### The asks (S35)
 
@@ -605,6 +588,7 @@ at the close is its targeted probe, run before and after, as `TOOL-dTrueNorth-7`
 - rev-1 · 2026-10-21 · initial draft, batching the round-1 spec audit's 23 MEDIUM and 14 LOW findings.
 - rev-2 · 2026-10-21 · §3 · Edges gains the hands-off mirroring TOOL-dTrueNorth-20's consumes-from.
 - rev-3 · 2026-10-21 · §5 §6 §8 §10 · criteria name this build's new modules quoted or bare, so the spec-tokens paths join stops refusing `--dispatch` before they exist; §5, §8 and §10 tightened under the 49152-byte ceiling. No observation moves.
+- rev-4 · 2026-10-21 · §4 · deviation-5's text moved to a prompts record, unchanged, so the generated records region can grow under the 49152-byte ceiling.
 
 ## 10. Reuse audit
 
