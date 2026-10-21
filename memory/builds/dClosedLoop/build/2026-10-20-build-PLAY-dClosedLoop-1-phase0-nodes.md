@@ -43,7 +43,7 @@ every one a skip (runs leased on node a), so a tick launches nothing on node d t
 well inside the ten-minute interval. Then, from PowerShell, as `tools/unattended/README.md` gives it:
 
 ```
-schtasks /create /sc minute /mo 10 /tn gov-resume-tick /tr '"C:\Program Files\Gitinash.exe" -lc "C:/projects/coding-governance/tools/unattended/resume-tick.sh --repo C:/projects/coding-governance"'
+schtasks /create /sc minute /mo 10 /tn gov-resume-tick /tr '"C:\Program Files\Git\bin\bash.exe" -lc "C:/projects/coding-governance/tools/unattended/resume-tick.sh --repo C:/projects/coding-governance"'
 ```
 
 `SUCCESS: The scheduled task "gov-resume-tick" has successfully been created.` `schtasks /query /tn gov-resume-tick`
