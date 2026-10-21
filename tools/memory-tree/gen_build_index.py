@@ -566,7 +566,11 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
 # `collect()` is reached by both --check and --write through one call site, so a raising parser would
 # let one unannotated record refuse to render every artifact.
 BIND_HEAD_LINES = 12
-RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research")
+# `deviation` (TOOL-dTrueNorth-4 S2): a departure from the design or from a spec, its grammar the
+# deviation join's (`deviation_join.read_record`). Its kind and its file name are joined both ways in
+# `read_bindings`, so an untyped departure cannot pass for research and a typed one cannot hide from
+# the join's glob.
+RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research", "deviation")
 # Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
 # (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
 # exclude the one file most easily forgotten.
@@ -670,6 +674,10 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     `pins` is the kind line's `{id: N}`, the highest `@rev-N` each id carries there, empty when none
     does (TOOL-dTrueNorth-5 S3). A `**Commissions:**` line pins nothing.
 
+    A file named `-deviation-<n>.md` in a build's `build/` folder must carry kind `deviation`, and a
+    `deviation` record must be named `<date>-build-<unit id>-deviation-<n>.md` there; either mismatch is
+    `malformed` with its reason (TOOL-dTrueNorth-4 S2).
+
     Does not raise for an UNREADABLE file — a decode or IO failure becomes a `state` row carrying
     `why`. It CAN still raise for a malformed conf. The former docstring said "Never raises."
     unqualified, which is what let the blanket catch at the caller look reasonable.
@@ -678,6 +686,9 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     """
     m = conf["MEMORY_ROOT"]
     alt = _id_alternation(conf)
+    deviation_named = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/build/[^/]*-deviation-\d+\.md$")
+    deviation_name = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/build/\d{4}-\d{2}-\d{2}-build-(?:" + alt
+                                + r")-[A-Za-z0-9]+-\d+-deviation-\d+\.md$")
     out = {}
     for rel in record_paths(tracked, m):
         rec = {"state": "absent", "kind": None, "ids": [], "pins": {}, "commissions": [], "reason": None,
@@ -745,6 +756,18 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 got = toks[0] if toks else "(empty)"
                 rec["why"] = (f"first token {got} is not one of "
                               + " ".join(RECORD_KIND_TOKENS) + ", and the line is not the none form")
+        # TOOL-dTrueNorth-4 S2 — the deviation kind joined to the file name, both ways: a file the
+        # deviation join's glob reads must say it is one, and a record saying so must be where the glob
+        # reads. A record with no Serves line keeps its own reason.
+        named = deviation_named.search(rel)
+        if named and rec["state"] in ("bound", "unbound") and rec["kind"] != "deviation":
+            rec["state"] = "malformed"
+            rec["why"] = (f"named as a deviation record, -deviation-<n>.md in a build/ folder, and its Serves "
+                          f"kind is {rec['kind'] or 'the none form'}, not deviation")
+        elif rec["kind"] == "deviation" and not deviation_name.match(rel):
+            rec["state"] = "malformed"
+            rec["why"] = ("Serves kind deviation, and the file is not named "
+                          "<date>-build-<unit id>-deviation-<n>.md in a build's build/ folder")
         out[rel] = rec
     return out
 
@@ -5332,6 +5355,30 @@ def cmd_selftest() -> int:
             lambda: _rows(t13, conf13))
         arm("--print-bindings still exits 0 with an S row present", "0",
             lambda: str(cmd_print_bindings(t13, conf13)))
+
+        # TOOL-dTrueNorth-4 AC8 — THE DEVIATION KIND JOINED TO ITS FILE NAME, both ways, each mismatch an
+        # A row naming it: a record named -deviation-<n>.md under another kind, and a deviation record
+        # named off that grammar; one in the grammar is an S row. Against the base generator the first
+        # is an S row and the other two are A rows for an unknown kind, so all three arms red there.
+        t4d = os.path.join(base, "deviation"); os.makedirs(t4d)
+        conf4d = _fixture(t4d)
+        bd4 = "memory/builds/tOne/build/"
+        for name, kind in (("2026-08-01-build-ARCH-tOne-1-deviation-1.md", "research"),
+                           ("2026-08-01-build-ARCH-tOne-1-departure-2.md", "deviation"),
+                           ("2026-08-01-build-ARCH-tOne-1-deviation-3.md", "deviation")):
+            _rec4 = os.path.join(t4d, bd4 + name)
+            os.makedirs(os.path.dirname(_rec4), exist_ok=True)
+            write_text(_rec4, f"# d\n\n**Serves:** {kind} ARCH-tOne-1\n")
+        run("git", "add", "-A", cwd=t4d)
+        arm("TOOL-dTrueNorth-4 AC8 — a record named as a deviation under another kind is an A row naming it",
+            "A\t" + bd4 + "2026-08-01-build-ARCH-tOne-1-deviation-1.md\tnamed as a deviation record",
+            lambda: _rows(t4d, conf4d))
+        arm("TOOL-dTrueNorth-4 AC8 — a deviation record named off the grammar is an A row naming it",
+            "A\t" + bd4 + "2026-08-01-build-ARCH-tOne-1-departure-2.md\tServes kind deviation, and the file is "
+            "not named", lambda: _rows(t4d, conf4d))
+        arm("TOOL-dTrueNorth-4 AC8 — a deviation record in the grammar is an S row",
+            "S\t" + bd4 + "2026-08-01-build-ARCH-tOne-1-deviation-3.md\tdeviation\tARCH-tOne-1",
+            lambda: _rows(t4d, conf4d))
 
         # TOOL-dTrueNorth-5 AC4 — THE AUDIT PIN. The cutoff arms a P row per unpinned or over-pinned
         # id of a spec-audit record dated on or after it, and a Q row counting the records graded.

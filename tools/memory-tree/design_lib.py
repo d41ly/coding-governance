@@ -19,6 +19,10 @@ WHERE THE DESIGN IS comes from four keys of `.memory-tree.conf`, `DESIGN_KEYS`:
 Blank or absent, nothing is read: `read_design` refuses naming each blank key, and the CLI exits 2.
 The chain builds are the view's Build column; no build list is typed anywhere.
 
+THE `[chain]` ROWS of a design record are read by `read_chain_clauses` (TOOL-dTrueNorth-4 S9), the
+one reader the deviation population's clause-move arm and the as-built generator share; it takes the
+record's text, so a caller reads it at whichever commit it measures.
+
 THE BINDING GRAMMAR, the home it has until the spec template carries a section for it. A binding is a
 line at column 0, outside a fenced block, opening with one of five bold keys, with optional trailing
 whitespace and nothing else on the line:
@@ -175,6 +179,58 @@ def read_design_view(view, root="."):
         raise DesignRefusal(f"DESIGN_VIEW names {view}, whose table holds no row, which is never an "
                             "empty design")
     return rows
+
+
+def parse_chain_cell(cell):
+    """A `[chain]` row's clause cell split into its clauses, on `; ` outside backticks, parentheses
+    and double quotes, the clause scan's rule (`carries.py:62-82`)."""
+    out, cur, depth, tick, quote, i = [], [], 0, False, False, 0
+    while i < len(cell):
+        ch = cell[i]
+        if ch == "`" and not quote:
+            tick = not tick
+        elif ch == '"' and not tick:
+            quote = not quote
+        elif not tick and ch == "(":
+            depth += 1
+        elif not tick and ch == ")":
+            depth = max(0, depth - 1)
+        if cell.startswith("; ", i) and not (depth or tick or quote):
+            out.append("".join(cur))
+            cur, i = [], i + 2
+            continue
+        cur.append(ch)
+        i += 1
+    out.append("".join(cur))
+    return [c.strip() for c in out if c.strip()]
+
+
+def read_chain_clauses(text, path="DESIGN_RECORD"):
+    """Every clause of a design record's `[chain]` section, `[(build, clause id, text, hash8)]` in row
+    and clause order, as `deviations.py:159-170` reads them (TOOL-dTrueNorth-4 S9).
+
+    The section runs from its `## [chain]` heading to the next `## ` heading; a row is
+    `| <build> | … | … | <clauses> | … |`, its clause cell split by `parse_chain_cell`, each clause
+    kept where it ends in its backticked `cl-` id. `text` is the clause with that id cut off, and the
+    hash is `derive_clause_hash`'s. The deviation population's clause-move arm and the as-built
+    generator both read the section here, so the two read one grammar. A record with no `[chain]`
+    section is a refusal naming `path`, never an empty chain.
+    """
+    text = text.replace("\r\n", "\n")
+    if "\n## [chain]" not in text:
+        raise DesignRefusal(f"{path} holds no `## [chain]` section, so no clause of the chain can be read")
+    chain = text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
+    out = []
+    for ln in chain.split("\n"):
+        m = re.match(r"^\| (d[A-Z]\w+) \| [^|]+ \| [^|]+ \| (.+) \| [^|]+ \|$", ln)
+        if not m:
+            continue
+        for clause in parse_chain_cell(m.group(2)):
+            cid = CLAUSE_ID.search(clause)
+            if cid:
+                out.append((m.group(1), cid.group(1), CLAUSE_ID.sub("", clause).strip(),
+                            derive_clause_hash(clause)))
+    return out
 
 
 def read_retired_ids(root, record, baseline):

@@ -95,7 +95,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-5 — every spec audit pins the revision it read](spec/2026-10-21-spec-TOOL-dTrueNorth-5.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-13 — a design-document subject of a spec audit: its id served bare, and no pin owed for it](spec/2026-10-21-spec-TOOL-dTrueNorth-13.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-21 |
 | [TOOL-dTrueNorth-14 — the audit-pin arm grades a record by the harness that wrote it, so a run in flight is not refused at its merge](spec/2026-10-21-spec-TOOL-dTrueNorth-14.md) | 3 | 2 | CLOSED | rev-2 | 2026-10-21 |
-| [TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close](spec/2026-10-21-spec-TOOL-dTrueNorth-4.md) | 3 | 2 | OPEN | rev-4 | 2026-10-21 |
+| [TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close](spec/2026-10-21-spec-TOOL-dTrueNorth-4.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-21 |
 | [TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate](spec/2026-10-21-spec-TOOL-dTrueNorth-6.md) | 3 | 2 | OPEN | rev-4 | 2026-10-21 |
 | [TOOL-dTrueNorth-9 — `_expand_ids` keeps its two-value return for all four callers, and the audit pins come from a sibling reader](spec/2026-10-21-spec-TOOL-dTrueNorth-9.md) | 3 | 2 | OPEN | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-10 — deviation records 2 and 3, written verbatim at kind `deviation`, the view re-rendered in their commit](spec/2026-10-21-spec-TOOL-dTrueNorth-10.md) | 4 | 2 | OPEN | rev-3 | 2026-10-21 |
@@ -109,7 +109,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 8 | 2 | OPEN | rev-2 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 35 bound to this build, across 4 record folder(s).
+Records: 38 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

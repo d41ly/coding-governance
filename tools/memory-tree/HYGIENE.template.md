@@ -595,7 +595,8 @@ carry it too:
 ```
 
 - `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
-  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs).
+  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs) ·
+  `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records").
   An open kind field stops being groupable the first time two authors spell one relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
   because one closing review legitimately covers two builds. On a `spec-audit` record dated on or
@@ -618,6 +619,24 @@ carry it too:
 - The check REFUSES when that report exits non-zero or prints no `N` row. The report is the only
   thing check 21 reads, so a report that did not run would otherwise look exactly like a clean
   corpus. An adopter whose generator is a fork must carry the mode, or this check names that first.
+
+**Deviation records.** A departure from the frozen design, or from a spec once its code has started,
+is a `deviation` record named `<date>-build-<unit id>-deviation-<n>.md` in the departing build's
+`build/` folder, `<n>` unique within its build; check 21 joins that kind to that name both ways, each
+mismatch an `A` row. Its fields are `- **<Key>:** <value>` bullets, one line each: Departs from
+(`<clause id>@<hash8>`, `<unit>@rev-N` or a build slug, an optional ` [<section>]` tail), Hand-off
+(`design-to-spec` · `design-revised` · `spec-revised` · `spec-to-code` · `code-to-record`), Before,
+After, Cause (`design defect` · `owner ruling` · `builder discovery` · `review finding` · `external`),
+Reason, Evidence, Risk (`editorial` · `additive` · `stricter` · `loosening` · `breaking`), Approver
+(opening `author`, `spec writer` or `owner`, then where the approval is recorded), Follow-through
+(`amends <clause id>@<hash8>` · `supersedes <clause id>@<hash8> by <clause id>` · `new unit <id>` ·
+`gap <key>` · `ask <id>` · `usage <key>`) and Caused-by (one id), with Bound, Tier and Surface
+optional. `deviation_join.py` computes the departures from history and joins each to its record. An
+approver is graded under one of two values: `author-recorded`, the default, passes a role the grammar
+names, and an owner only citing a decision row held at `origin/main` that names the departed clause or
+the new unit; `by-risk` also refuses a role below the risk class, `editorial` needing an `author`,
+`additive` and `stricter` a `spec writer`, and `loosening`, `breaking` or a cause of `owner ruling` the
+`owner`.
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

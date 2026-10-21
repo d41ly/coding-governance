@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close
 
-**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0004@c374ccd0 whole
 **Carries:** node:record-kind.deviation
@@ -9,6 +9,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-4-deviation-1.md](../build/2026-10-21-build-TOOL-dTrueNorth-4-deviation-1.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-4-deviation-4.md](../build/2026-10-21-build-TOOL-dTrueNorth-4-deviation-4.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-4-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-4-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 | [2026-10-21-prompt-TOOL-dTrueNorth-4-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-4-build-brief.md) | journal | — |
 | [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |

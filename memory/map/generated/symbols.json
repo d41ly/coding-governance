@@ -113,6 +113,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.sh"
     },
     {
+      "id": "Fixture",
+      "kind": "class",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "GIT",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -348,6 +353,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "Unmeasured",
+      "kind": "class",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "ViewShardRefused",
       "kind": "class",
       "file": "tools/memory-tree/merge-rows.py"
@@ -421,6 +431,11 @@
       "id": "add_bad_mode",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "add_base",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "add_card_body",
@@ -556,6 +571,11 @@
       "id": "add_pass",
       "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.test.sh"
+    },
+    {
+      "id": "add_plant",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "add_problem",
@@ -1790,6 +1810,11 @@
     {
       "id": "build_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "build_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
@@ -1826,6 +1851,11 @@
       "id": "build_fixture",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
+    },
+    {
+      "id": "build_fixture_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "build_fixture_r3",
@@ -3508,6 +3538,16 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_approver",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_approvers",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "check_archives_tracked",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -3783,6 +3823,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "check_commit_join",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "check_commit_message",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -3891,6 +3936,11 @@
       "id": "check_derived_landed",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "check_deviation_join",
+      "kind": "function",
+      "file": "tools/memory-tree/routed_commits.py"
     },
     {
       "id": "check_dir_shaped",
@@ -4381,6 +4431,11 @@
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "check_material",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "check_merge_clean",
@@ -6908,6 +6963,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "derive_joins",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "derive_journal_join",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -7151,6 +7211,11 @@
       "id": "derive_phase",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_plant_needle",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "derive_predictor_verdict",
@@ -8226,6 +8291,11 @@
       "id": "extract_ask_vocabulary",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "extract_authored",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "extract_bound_names",
@@ -9920,6 +9990,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
@@ -10228,6 +10303,11 @@
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
+      "id": "measure_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "measure_fleet_over_budget",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -10276,6 +10356,11 @@
       "id": "measure_job_children",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "measure_join",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "measure_killed",
@@ -11171,6 +11256,11 @@
       "id": "parse_cell_key",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
+    },
+    {
+      "id": "parse_chain_cell",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "parse_charter",
@@ -12298,6 +12388,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_adding_commits",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "read_advertised_head",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
@@ -12316,6 +12411,11 @@
       "id": "read_agreement",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_ancestors",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_args",
@@ -12463,6 +12563,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_baseline_line",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "read_bash_conf_values",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -12496,6 +12601,11 @@
       "id": "read_blob_fact",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_blobs",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_blobs",
@@ -12598,6 +12708,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "read_chain_clauses",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "read_charter_shapes",
       "kind": "function",
       "file": "tools/runlog/prose.py"
@@ -12671,6 +12786,11 @@
       "id": "read_commit_time",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_commit_times",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_conf",
@@ -12781,6 +12901,11 @@
       "id": "read_decision_ids",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "read_decision_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_declared",
@@ -12983,9 +13108,19 @@
       "file": "tools/unattended/lib-unattended.sh"
     },
     {
+      "id": "read_first_passes",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "read_fixture",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "read_fixture_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_fixture_keys",
@@ -13046,6 +13181,11 @@
       "id": "read_gates_record",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_gen_strip",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_git",
@@ -13143,6 +13283,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "read_header_rev",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "read_header_verbs",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -13211,6 +13356,11 @@
       "id": "read_host_calibration",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_host_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_host_load",
@@ -13291,6 +13441,11 @@
       "id": "read_job_accounting",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_join_state",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_journal",
@@ -13486,6 +13641,11 @@
       "id": "read_live_census",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
+    },
+    {
+      "id": "read_live_design",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_live_readmes",
@@ -13845,6 +14005,11 @@
     {
       "id": "read_population",
       "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "read_population",
+      "kind": "function",
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
@@ -13915,6 +14080,11 @@
     {
       "id": "read_record",
       "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "read_record",
+      "kind": "function",
       "file": "tools/run-gates/held_halves.py"
     },
     {
@@ -13941,6 +14111,11 @@
       "id": "read_recorded_phase",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_records",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_records",
@@ -14076,6 +14251,11 @@
       "id": "read_row_at",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_row_commit",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_row_hold",
@@ -14331,6 +14511,11 @@
       "id": "read_spec_probes",
       "kind": "function",
       "file": "tools/memory-recall/check-recall.py"
+    },
+    {
+      "id": "read_spec_revisions",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_spec_revs",
@@ -15778,6 +15963,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "render_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "render_live",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -15806,6 +15996,11 @@
       "id": "render_markdown",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "render_member",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "render_model_json",
@@ -18680,6 +18875,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -18736,6 +18936,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "run_git",
@@ -19073,6 +19278,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "run_plant_arms",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "run_pm",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -19286,6 +19496,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "run_selftest",
@@ -19806,6 +20021,11 @@
       "id": "scan_class_tokens",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "scan_clause_members",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "scan_commit_messages",

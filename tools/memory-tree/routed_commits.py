@@ -41,6 +41,15 @@ replace the subject; this file reads the H1 and the union, and NOTHING machine-j
 
 Every git call is pinned (`--no-replace-objects`, `tree_lib.build_git_env`) and counted: the
 self-test holds the number of spawns constant whatever the range holds.
+
+THE DEVIATION JOIN (TOOL-dTrueNorth-4) is hosted here, its core `deviation_join.py`, over the two
+populations this leg already reads: the RANGE half asks whether each design or spec departure in
+the pushed range had its deviation record in its departing commit's tree, the WHOLE half joins every
+departure at HEAD and grades every approver. Its lines follow this leg's under `routed-commits:
+deviation`, and it runs the chain's `report` value, so it never moves the exit. Off unless the conf
+declares DESIGN_RECORD, DESIGN_BASELINE and DESIGN_VIEW, in one line and with no git call, so the
+constant spawn count holds there; armed, its spawns grow with the chain-build specs' revisions. A
+declared design it cannot measure is REFUSED, exit 2.
 """
 from __future__ import annotations
 
@@ -251,9 +260,10 @@ def check_routed_commits(repo, env) -> tuple:
         populations.append(("WHOLE", ["HEAD"], "WHOLE beside RANGE (the history remote CI grades)", " WHOLE"))
     id_re = build_id_re(families)
     routed = " ".join(entries)
-    lines, failed, range_shas = [], False, set()
+    lines, failed, range_shas, read = [], False, set(), []
     for mode, rev_args, label, tag in populations:
         commits = read_routed_commits(repo, rev_args)
+        read.append((mode, label.split(" (")[0], commits))
         total = int(run_git(repo, "rev-list", "--count", *rev_args).decode("utf-8").strip())
         if total != len(commits):
             raise Refusal(f"the log pass parsed {len(commits)} commit(s) and `git rev-list --count` reports {total} "
@@ -316,7 +326,31 @@ def check_routed_commits(repo, env) -> tuple:
         for w in stale:
             lines.append(f"{SAY} FAILED — ROUTED_COMMIT_WAIVED lists {w}, which is not a violation in the graded "
                          f"population: a stale waiver widens nothing, remove it")
-    return (1 if failed else 0), lines
+    # TOOL-dTrueNorth-4 S7: the deviation join over the populations just read. It lists and never moves
+    # the exit, which stays this leg's own verdict.
+    return (1 if failed else 0), lines + check_deviation_join(repo, conf, read)
+
+
+def check_deviation_join(repo, conf, read) -> list:
+    """The deviation join's lines (TOOL-dTrueNorth-4 S7), hosted over the populations this leg read:
+    `read` is `[(mode, label, commits)]`, its WHOLE list among them, so the join reads history once.
+
+    Its RANGE half asks whether each member departing in the pushed range has its record in that
+    commit's tree; its WHOLE half joins every member at HEAD and grades every approver. It runs the
+    chain's values, `report` and `author-recorded`, so it lists and never moves the exit. OFF unless the
+    conf declares DESIGN_RECORD, DESIGN_BASELINE and DESIGN_VIEW: one line, and no git call, so a tree
+    declaring no design keeps this leg's constant spawn count. ARMED, its spawns grow with the
+    chain-build specs' revisions. A declared design it cannot measure, its pin unreadable among them,
+    is a Refusal, exit 2, as an unarmed conf is here.
+    """
+    import deviation_join  # noqa: E402  the join's core, a sibling loaded only here
+    armed, why = deviation_join.read_join_state(conf)
+    if not armed:
+        return [f"{SAY}: deviation join off — {why}"]
+    try:
+        return [f"{SAY}: {ln}" for ln in deviation_join.read_host_lines(repo, conf, read)]
+    except deviation_join.Unmeasured as exc:
+        raise Refusal(f"the deviation join is armed and measures nothing: {exc}") from None
 
 
 def read_newest_unit(repo, rev_range: str) -> str:
@@ -541,6 +575,11 @@ def run_selftest() -> int:
         rc, out = run_check(repo)
         print_arm(rc == 0 and "graded 0 — the range holds 3 commit(s)" in out and "ROUTED_PATHS src/" in out,
             "AC5 a range with no graded commit prints graded 0, its commit count and ROUTED_PATHS", out)
+        # TOOL-dTrueNorth-4 AC12: a conf declaring no design key prints ONE join-off line naming the keys,
+        # and the exit is the leg's own; the spawn arm below holds that it reads no history.
+        print_arm(rc == 0 and out.count(f"{SAY}: deviation join off — ") == 1
+            and "DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW are blank" in out,
+            "TOOL-dTrueNorth-4 AC12 the deviation join is off with the design keys blank, in one line", out)
 
         # ---- AC6: the spawn count does not grow with the commits
         counts = []
@@ -610,6 +649,12 @@ def run_selftest() -> int:
         set_fixture_conf(repo)
         newest = read_newest_unit(repo, f"{s[1]}..HEAD")
         print_arm(newest == "TOOL-tFix-1", f"AC11 --newest-unit skips a newest merge commit's id (got '{newest}')")
+
+        # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
+        # plant's failing case staged by the plant itself, and the record-late plant through this host.
+        import deviation_join  # noqa: E402  the join's core, a sibling
+        for ok, what, detail in deviation_join.run_plant_arms():
+            print_arm(ok, what, detail)
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
@@ -639,5 +684,7 @@ def main(argv: list) -> int:
 
 
 if __name__ == "__main__":
+    # The deviation join imports this module by name; one copy keeps one Refusal class and one counter.
+    sys.modules.setdefault("routed_commits", sys.modules[__name__])
     sys.stdout.reconfigure(encoding="utf-8")
     sys.exit(main(sys.argv))
