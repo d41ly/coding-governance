@@ -128,3 +128,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-21T22:49:27Z dispatch · item a4802536 TOOL-dTrueNorth-17 · reason tools/memory-tree/asbuilt_view.py tools/memory-tree/README.md tools/memory-tree/gen_build_index.py memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-17.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-17-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
 
 2026-10-21T22:49:35Z brief · item TOOL-dTrueNorth-17 · reason 1d3a6f0f3277 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-17-build-brief.md
+
+2026-10-21T23:04:11Z dispatch · item 66f689cb TOOL-dTrueNorth-18 · reason tools/memory-tree/asbuilt_view.py tools/memory-tree/deviation_join.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/README.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-18.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-18-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
+
+2026-10-21T23:04:17Z brief · item TOOL-dTrueNorth-18 · reason 8cdce9c55c15 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-18-build-brief.md

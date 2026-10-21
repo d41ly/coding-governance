@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-18 — two amends of one clause are ordered by a declared supersession, never by path
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
+**Status:** CLOSED · rev-2 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-18-deviation-17.md](../build/2026-10-21-build-TOOL-dTrueNorth-18-deviation-17.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-18-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-18-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-18-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-18-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

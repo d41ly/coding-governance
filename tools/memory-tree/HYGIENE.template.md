@@ -630,8 +630,15 @@ After, Cause (`design defect` · `owner ruling` · `builder discovery` · `revie
 Reason, Evidence, Risk (`editorial` · `additive` · `stricter` · `loosening` · `breaking`), Approver
 (opening `author`, `spec writer` or `owner`, then where the approval is recorded), Follow-through
 (`amends <clause id>@<hash8>` · `supersedes <clause id>@<hash8> by <clause id>` · `new unit <id>` ·
-`gap <key>` · `ask <id>` · `usage <key>`) and Caused-by (one id), with Bound, Tier and Surface
-optional. `deviation_join.py` computes the departures from history and joins each to its record. An
+`gap <key>` · `ask <id>` · `usage <key>`) and Caused-by (one id), with Bound, Tier, Surface and
+Supersedes optional. Supersedes holds one record id, the stem `<date>-build-<unit id>-deviation-<n>`
+of another record, and orders two amends of one clause: the newer names the older there. The
+as-built view's row for a clause whose records' After texts all agree is cited by the later file by
+path; where they differ, the head supplies it, the one record no other names in Supersedes, whatever
+its path. A set left with two or more such records, or none, is an `unordered amends of <clause>`
+finding naming every one, and a Supersedes naming a record outside its clause's set a finding naming
+both; either renders the clause from the baseline, and neither path order nor a commit date decides.
+`deviation_join.py` computes the departures from history and joins each to its record. An
 approver is graded under one of two values: `author-recorded`, the default, passes a role the grammar
 names, and an owner only citing a decision row held at `origin/main` that names the departed clause or
 the new unit; `by-risk` also refuses a role below the risk class, `editorial` needing an `author`,

@@ -12,9 +12,12 @@ THE RECORD is one file, `<MEMORY_ROOT>/builds/<build>/build/<date>-build-<unit i
 in the departing build's `build/` folder, `<n>` unique within its build, its id the file's stem, its
 `**Serves:**` kind `deviation`. Its fields are bold-key bullets read with the instrument's field
 regex, so the two read one value: Departs from, Hand-off, Before, After, Cause, Reason, Evidence,
-Risk, Approver, Follow-through and Caused-by, with Bound, Tier and Surface optional. `read_record`
-grades one against the closed sets below and names each malformed field; it returns the fields
-whatever it found, so a reader of `**After:**` reads a malformed record as the instrument does.
+Risk, Approver, Follow-through and Caused-by, with Bound, Tier, Surface and Supersedes optional.
+`**Supersedes:**` holds one record id, the stem `<date>-build-<unit id>-deviation-<n>` of another
+record, which the newer of two amends of one clause names to order them (TOOL-dTrueNorth-18): the
+as-built view's head rule reads it. `read_record` grades one against the closed sets below and names
+each malformed field; it returns the fields whatever it found, so a reader of `**After:**` reads a
+malformed record as the instrument does.
 
 THE POPULATION, six arms over the chain builds' specs, the chain builds being the Build column of
 `DESIGN_VIEW`; each member carries an address, its hand-off and its departing commit:
@@ -132,8 +135,9 @@ _ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
 DEPARTS = re.compile(r"^(`?)(?:" + _CL + r"@[0-9a-f]{8}|" + _ID + r"@rev-\d+|d[A-Z]\w+)\1(?: \[[^\]]+\])?$")
 FOLLOW = re.compile(r"^(?:amends " + _CL + r"@[0-9a-f]{8}|supersedes " + _CL + r"@[0-9a-f]{8} by " + _CL
                     + r"|new unit " + _ID + r"|(?:gap|ask|usage) \S+)$")
-RECORD_NAME = re.compile(r"(?:^|/)builds/(?P<build>[^/]+)/build/\d{4}-\d{2}-\d{2}-build-" + _ID
-                         + r"-deviation-(?P<n>\d+)\.md$")
+_STEM = r"\d{4}-\d{2}-\d{2}-build-" + _ID + r"-deviation-"      # a record's stem, its <n> following
+RECORD_NAME = re.compile(r"(?:^|/)builds/(?P<build>[^/]+)/build/" + _STEM + r"(?P<n>\d+)\.md$")
+SUPERSEDES = re.compile(r"(`?)(" + _STEM + r"\d+)\1")           # one record id, quoted or bare
 RESCOPE = re.compile(r"^\S+ rescope · item (add|retire|supersede|defer) (\S+)(?: -> (\S+))? · reason (.*)$", re.M)
 LEDGER = re.compile(r"^- (\S+) — amended rev-(\d+)\b")
 RUN_FILE = re.compile(r"^RUN(?:\.[^/]+)?\.md$")
@@ -193,6 +197,13 @@ def read_record(path, text):
         bad.append(("Follow-through", f"{follow} {why}"))
     if "Caused-by" in fields and not re.fullmatch(r"`?[^\s`]+`?", fields["Caused-by"]):
         bad.append(("Caused-by", f"{fields['Caused-by']} is not one id"))
+    supersedes = fields.get("Supersedes")
+    named = SUPERSEDES.fullmatch(supersedes or "")
+    if supersedes is not None and not named:
+        bad.append(("Supersedes", f"{supersedes} is not one record id: **Supersedes:** names the stem "
+                                  "<date>-build-<unit id>-deviation-<n> of another record"))
+    elif named and named.group(2) == pathlib.PurePosixPath(path).stem:
+        bad.append(("Supersedes", f"{supersedes} names the record itself: **Supersedes:** names another record"))
     return {"id": pathlib.PurePosixPath(path).stem, "path": path,
             "build": name.group("build") if name else None, "n": int(name.group("n")) if name else None,
             "departs": fields.get("Departs from", ""),
@@ -202,7 +213,7 @@ def read_record(path, text):
             "risk": fields.get("Risk", ""), "approver": fields.get("Approver"),
             "follow": fields.get("Follow-through", ""), "caused_by": fields.get("Caused-by"),
             "bound": fields.get("Bound"), "tier": fields.get("Tier"), "surface": fields.get("Surface"),
-            "malformed": bad}
+            "supersedes": named.group(2) if named else supersedes, "malformed": bad}
 
 
 def read_records(root, conf):
@@ -750,7 +761,7 @@ PLANTS = ("baseline", "clause", "subject-pass", "pass-none", "status-flip", "two
           "owner-row5", "owner-row1-added", "owner-unknown-id", "approver", "add", "handback", "audit-pin", "defer",
           "fix-record", "audit-nopin",                       # the instrument's 26, deviations.py:851-854
           "pass-revision", "below-risk", "owner-cause", "status-only", "malformed-field", "malformed-risk",
-          "malformed-follow", "duplicate-n", "record-late", "unmeasured")
+          "malformed-follow", "malformed-supersedes", "duplicate-n", "record-late", "unmeasured")
 # The role map (TOOL-dTrueNorth-12 §4): every clause-moving role moves its own clause of the fixture design,
 # so plants compose. The base's owner amendment, which `quote` reads, and the `baseline` and `clause` plants:
 CLAUSE_ROLES = {"base": "cl-dFix-0001", "baseline": "cl-dFix-0002", "clause": "cl-dFix-0003"}
@@ -773,7 +784,7 @@ PLANT_UNITS = {p: f"FIX-dTrueNorth-{n}" for n, p in enumerate(
     ("subject-pass", "pass-none", "status-flip", "two-branch", "header-rev", "gen", "status-gen", "gen-text",
      "quote", "amended", "amended-joined", "owner-row1-added", "add", "handback", "audit-pin", "defer",
      "fix-record", "audit-nopin", "record-late", "pass-revision", "status-only", "malformed-field",
-     "malformed-risk", "malformed-follow", "duplicate-n"), 10)}
+     "malformed-risk", "malformed-follow", "duplicate-n", "malformed-supersedes"), 10)}
 DECISIONS_TEXT = "\n".join([
     "# Decisions", "",
     "- FIX-dClosedLoop-2 · the spec-run close by carry-forward, and dTrueNorth's extra unit FIX-dTrueNorth-99 approved "
@@ -1080,9 +1091,10 @@ def add_plant(fx, plant):
     elif plant == "defer":
         fx.write_spec(u, 1)
         fx.add_run_row(f"rescope · item defer {u} · reason specced; built by this build's build run")
-    elif plant in ("malformed-field", "malformed-risk", "malformed-follow"):
+    elif plant in ("malformed-field", "malformed-risk", "malformed-follow", "malformed-supersedes"):
         kw = {"malformed-field": {"caused": None}, "malformed-risk": {"risk": "moderate"},
-              "malformed-follow": {"follow": "amends cl-dClosedLoop-0012"}}[plant]
+              "malformed-follow": {"follow": "amends cl-dClosedLoop-0012"},
+              "malformed-supersedes": {"supersedes": "deviation-9"}}[plant]   # a short form, no record's stem
         fx.write_commit(dict([fx.render_record(u, f"{u}@rev-1 [scope]", "spec writer", **kw)]),
                         f"records(dTrueNorth): {u}'s deviation, {plant}")
     elif plant == "duplicate-n":
@@ -1209,8 +1221,8 @@ def run_fixture(plants, policy, approval, host=False, resolve=None):
 PLANT_EXITS = dict({p: 1 for p in ("baseline", "clause", "subject-pass", "two-branch", "gen-text", "amended",
                                    "approver-none", "owner-bare", "owner-er", "owner-row5", "owner-row1-added",
                                    "owner-unknown-id", "add", "handback", "audit-pin", "pass-revision",
-                                   "malformed-field", "malformed-risk", "malformed-follow", "duplicate-n",
-                                   "record-late")},
+                                   "malformed-field", "malformed-risk", "malformed-follow",
+                                   "malformed-supersedes", "duplicate-n", "record-late")},
                    **{p: 0 for p in ("pass-none", "status-flip", "header-rev", "gen", "status-gen", "quote",
                                      "amended-joined", "approver", "defer", "fix-record", "audit-nopin",
                                      "below-risk", "owner-cause", "status-only")}, unmeasured=2)
@@ -1234,6 +1246,7 @@ def derive_plant_needle(plant):
             "owner-unknown-id": "cites FIX-dClosedLoop-99, which no row", "owner-row1-added": f"whose row does not name {u}",
             "malformed-field": "Caused-by is missing", "malformed-risk": "Risk moderate is outside",
             "malformed-follow": "names no clause at an eight-hex hash", "duplicate-n": "shares deviation-",
+            "malformed-supersedes": "Supersedes deviation-9 is not one record id: **Supersedes:** names the stem",
             "record-late": "recorded after its departure at", "unmeasured": "nothing measured",
             "below-risk": "below owner, the least approver its risk loosening requires",
             "owner-cause": "below owner, the least approver its cause owner ruling requires"}.get(plant)

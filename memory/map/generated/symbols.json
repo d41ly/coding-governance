@@ -1868,6 +1868,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "build_fixture_record",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
       "id": "build_fixtures",
       "kind": "function",
       "file": "tools/lib/extract-arms.test.sh"
@@ -16806,6 +16811,11 @@
       "id": "resolve_class_drift",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "resolve_clause_rows",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "resolve_clean_oids",

@@ -40,14 +40,23 @@ commit, and is dispatched with DESIGN_VIEW among its `--dispatch --writes` paths
 THE ROW is a record's `**Follow-through:**`, read as the instrument reads it:
   amends <clause id>@<hash8>                      the record's **After:** in the clause's place
   supersedes <clause id>@<hash8> by <clause id>   the new id and its **After:** in the clause's place
-Its last cell cites `deviation` and the record's id, an unchanged row `baseline`. When two records
-name one clause, the later file by path supplies the row.
+Its last cell cites `deviation` and the record's id, an unchanged row `baseline`.
+
+THE HEAD (TOOL-dTrueNorth-18), `resolve_clause_rows`, superseding TOOL-dTrueNorth-6 S2's path order
+for a set whose texts differ. A clause's set is the records whose `**Follow-through:**` row names it.
+When every `**After:**` in the set agrees, the later file by path cites it, as the instrument's
+ordering does, and the text is the shared `**After:**`, so the view keeps its bytes. When they differ, a member another member names in `**Supersedes:**`, the optional field
+holding one record's stem, is superseded, and the one member left, the head, supplies the row's text
+and citation whatever its path. A set left with two or more unsuperseded members, or none, is an
+`unordered amends of <clause>` finding naming every member, and a `**Supersedes:**` naming a record
+outside its clause's set is a finding naming both; either renders the clause's row from the baseline,
+as a refused record's does. Neither path order nor a commit date decides.
 
 THE FINDINGS, each naming its record or clause: a record departing from a clause with no amends or
-supersedes row; a record pinning a hash its clause does not carry at the baseline; the working tree's
-`Baseline:` line differing from the pin, the view still rendering from the pin; and under `--check`, a
-file differing from its render, named at its first differing line, and a `baseline` row whose text
-is not the baseline's, a changed clause with no citation.
+supersedes row; the head rule's two, above; a record pinning a hash its clause does not carry at the
+baseline; the working tree's `Baseline:` line differing from the pin, the view still rendering from
+the pin; and under `--check`, a file differing from its render, named at its first differing line,
+and a `baseline` row whose text is not the baseline's, a changed clause with no citation.
 
 Usage (from the worktree root):
   python asbuilt_view.py --write [--out <path>]      render the view, by default to DESIGN_VIEW
@@ -57,15 +66,18 @@ Usage (from the worktree root):
   python asbuilt_view.py --selftest                  every plant against the exit it must take
 The plants: hand-edit, no-row, no-citation and baseline, ported from the instrument's, then
 pin-mismatch, supersedes and amends-reader, which writes its render to a temporary file and reads it
-back through `read_design_view`. Exit 0 green, 1 on a finding, 2 when the pin's design record cannot be
-read, so there is nothing to render.
+back through `read_design_view`; then the head rule's, each record read through `read_record`:
+amends-order, `…-deviation-10` naming `…-deviation-9` in `**Supersedes:**` although its path sorts
+first, unordered-amends, the two with no field, same-after, two amends with one `**After:**`, and
+supersedes-stray, a field naming a record of another clause. Exit 0 green, 1 on a finding, 2 when the
+pin's design record cannot be read, so there is nothing to render.
 
 OFF when DESIGN_RECORD, DESIGN_BASELINE or DESIGN_VIEW is blank, as an adopter's conf ships them: one
 `as-built view: off` line naming the key, nothing read, exit 0. The host prints the same line.
 
 What it does not read: whether a record's new text is what its approver approved, which the deviation
-join and the closing review judge; a record's grammar beyond the row it gives the view, which is
-`deviation_join.read_record`'s; any section of the design record outside `[chain]`, which changes only
+join and the closing review judge; a record's grammar beyond the row and the `**Supersedes:**` it
+gives the view, which is `deviation_join.read_record`'s; any section of the design record outside `[chain]`, which changes only
 by a record of its own; DESIGN_NODES; and the departures report, which runs the instrument's
 `--check` until the report-switch step.
 """
@@ -81,7 +93,7 @@ import tempfile
 KIT = os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
-from deviation_join import read_baseline_line, read_records  # noqa: E402  the record grammar's one reader
+from deviation_join import read_baseline_line, read_record, read_records  # noqa: E402  the record grammar's one reader
 from design_lib import (  # noqa: E402  the one parser of the design
     DESIGN_KEYS, VIEW_ROW, DesignRefusal, derive_clause_hash, read_chain_clauses, read_design_view, read_repo_root,
     run_git)
@@ -97,11 +109,16 @@ ROW_DEPARTS = re.compile(r"`?(" + _CL + r")@")                                  
 VIEW_HEAD = ("# As built: the design at its baseline, with its deviations\n\n{serves}\n\n"
              "Generated by `build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` from v2's `[chain]` at `{sha}` and "
              "{count} deviation records. Never edit it by hand: `--check` renders it again and compares the bytes.")
-PLANTS = ("hand-edit", "no-row", "no-citation", "baseline", "pin-mismatch", "supersedes", "amends-reader")
+ORDER_PLANTS = ("amends-order", "unordered-amends", "same-after", "supersedes-stray")    # TOOL-dTrueNorth-18's
+PLANTS = ("hand-edit", "no-row", "no-citation", "baseline", "pin-mismatch", "supersedes", "amends-reader") + ORDER_PLANTS
 PLANT_EXITS = {None: 0, "hand-edit": 1, "no-row": 1, "no-citation": 1, "baseline": 1, "pin-mismatch": 1,
-               "supersedes": 0, "amends-reader": 0}
+               "supersedes": 0, "amends-reader": 0, "amends-order": 0, "unordered-amends": 1, "same-after": 0,
+               "supersedes-stray": 1}
 SUCCESSOR = "cl-dClosedLoop-9999"     # the supersedes plant's new id, which the pin's [chain] must not hold
 LOOSENED = "cl-dClosedLoop-0119"      # the baseline plant's clause, the instrument's (asbuilt.py:110)
+# The head rule's two records, older first: by path `…-deviation-10` sorts before `…-deviation-9`.
+ORDER_IDS = tuple(f"2026-10-21-build-FIX-dTrueNorth-18-deviation-{n}" for n in (9, 10))
+BASELINE_NOTE = "the row is the baseline's text, citing none"
 # What a plant's lines must carry, so an arm holds for its own reason and not another's.
 PLANT_NEEDLES = {None: ("findings 0 · view at",), "hand-edit": ("differs from its render from line",),
                  "no-row": ("fixture-deviation-3: departs from", "carries no amends or supersedes row"),
@@ -109,7 +126,14 @@ PLANT_NEEDLES = {None: ("findings 0 · view at",), "hand-edit": ("differs from i
                  "baseline": ("its Baseline: line moved from", f"{LOOSENED} renders the pin's text"),
                  "pin-mismatch": ("fixture-deviation-5: pins", "and the baseline's clause hashes"),
                  "supersedes": (f"superseded by {SUCCESSOR}",),
-                 "amends-reader": ("derive_clause_hash of its **After:** is", "since `deviation fixture-deviation-1`")}
+                 "amends-reader": ("derive_clause_hash of its **After:** is", "since `deviation fixture-deviation-1`"),
+                 "amends-order": (f"{ORDER_IDS[1]} supersedes {ORDER_IDS[0]} and supplies the row's **After:** and "
+                                  "citation, though its path sorts first",),
+                 "unordered-amends": ("unordered amends of ", f"{ORDER_IDS[1]}, {ORDER_IDS[0]} give it differing",
+                                      BASELINE_NOTE),
+                 "same-after": (f"two amends with one **After:** cite the later path, {ORDER_IDS[0]}",),
+                 "supersedes-stray": (f"{ORDER_IDS[0]}: its **Supersedes:** names {ORDER_IDS[1]}, no amends of",
+                                      BASELINE_NOTE)}
 
 
 def read_view_state(conf):
@@ -163,15 +187,19 @@ def read_view_inputs(root, conf):
     return sha, clauses, read_records(root, conf), serves.group(0) if serves else "", [moved] if moved else []
 
 
-def render_view(sha, clauses, records, serves):
-    """`(text, findings)`: the view, a port of `asbuilt.py:54-79` that keeps every byte — the head, the
-    table head, one row per baseline clause, the record count over every record read, a trailing newline.
+def resolve_clause_rows(records):
+    """`(changes, findings)`: each clause the head rule gives a record's row, mapped to that row's
+    `(pinned hash8, new id or None, **After:**, record id)`, and the findings (TOOL-dTrueNorth-18 S2, S3).
 
-    A record departing from a clause with no `amends` or `supersedes` row is a finding and gives no row;
-    the later record by path naming a clause supplies its row, and pinning a hash the clause does not
-    carry at the baseline is a finding while the row still renders.
+    A record departing from a clause with no `amends` or `supersedes` row is a finding and joins no set.
+    A clause's set is the records whose `**Follow-through:**` row names it, in `records`' path order.
+    When every `**After:**` in it agrees, the later file by path cites the shared text, as the
+    instrument's ordering does; when they differ, the head supplies the row, the one member no other
+    names in `**Supersedes:**`, whatever its path. Two or more such members or none is an `unordered
+    amends of <clause>` finding naming every member, and a `**Supersedes:**` naming a record outside the
+    set is a finding naming both; either leaves the clause out of `changes`, so it renders the baseline.
     """
-    rows, findings, changes = [], [], {}
+    findings, sets, changes = [], {}, {}
     for r in records:
         row = ROW_FOLLOW.match(r.get("follow") or "")
         departs = ROW_DEPARTS.match(r.get("departs") or "")
@@ -179,7 +207,39 @@ def render_view(sha, clauses, records, serves):
             findings.append(f"{r['id']}: departs from {departs.group(1)} and carries no amends or supersedes row")
             continue
         if row:
-            changes[row.group(2)] = (row.group(3), row.group(4), (r.get("after") or "").strip(), r["id"])
+            sets.setdefault(row.group(2), []).append((r, row))
+    for cid, members in sets.items():
+        ids = [r["id"] for r, _row in members]
+        stray = [(r["id"], r["supersedes"]) for r, _row in members
+                 if r.get("supersedes") and r["supersedes"] not in ids]
+        for rid, named in stray:
+            findings.append(f"{rid}: its **Supersedes:** names {named}, no amends of {cid}, whose amends are "
+                            f"{', '.join(ids)}; {cid} renders its baseline row")
+        head = members[-1:]
+        if len({(r.get("after") or "").strip() for r, _row in members}) > 1:
+            superseded = {r["supersedes"] for r, _row in members if r.get("supersedes") not in (None, r["id"])}
+            head = [(r, row) for r, row in members if r["id"] not in superseded]
+            if len(head) != 1:
+                findings.append(f"unordered amends of {cid}: {', '.join(ids)} give it differing **After:** texts, and "
+                                + (f"no **Supersedes:** orders {', '.join(r['id'] for r, _row in head)}" if head else
+                                   "each is named in another's **Supersedes:**, a cycle with no head")
+                                + f"; {cid} renders its baseline row")
+        if stray or len(head) != 1:
+            continue
+        r, row = head[0]
+        changes[cid] = (row.group(3), row.group(4), (r.get("after") or "").strip(), r["id"])
+    return changes, findings
+
+
+def render_view(sha, clauses, records, serves):
+    """`(text, findings)`: the view, a port of `asbuilt.py:54-79` that keeps every byte — the head, the
+    table head, one row per baseline clause, the record count over every record read, a trailing newline.
+
+    The row each clause takes, and the findings that refuse one, are `resolve_clause_rows`'s; a record
+    pinning a hash the clause does not carry at the baseline is a finding while the row still renders.
+    """
+    rows = []
+    changes, findings = resolve_clause_rows(records)
     for build, cid, text, h in clauses:
         if cid in changes:
             pinned, new_id, after, rid = changes[cid]
@@ -219,13 +279,22 @@ def read_fixture_row(text, cid):
     return None
 
 
+def build_fixture_record(stem, cid, h, after, supersedes=None):
+    """A record amending `cid@h` to `after`, written in the record grammar's row fields and read back
+    through `read_record`, so a head-rule plant reads `**Supersedes:**` through its one reader."""
+    fields = [("Departs from", f"`{cid}@{h}` [chain]"), ("After", after), ("Follow-through", f"amends {cid}@{h}")]
+    fields += [("Supersedes", supersedes)] if supersedes else []
+    return read_record(f"memory/builds/dFixture/build/{stem}.md", "".join(f"- **{k}:** {v}\n" for k, v in fields))
+
+
 def render_fixture(root, conf, plant=None):
     """`(body, rendered, clauses, findings, notes, sha)` of the fixture: this tree's DESIGN_RECORD at its
     pin, never a synthetic chain, with fixture records in memory and `plant`'s damage in `body`.
 
     The base, as the instrument's (`asbuilt.py:96-122`): the seventh clause amended, and a record
-    departing from no clause. `findings` are the render's and a plant's own observation; `notes` are what
-    a plant observed holding. Nothing is written but amends-reader's temporary view.
+    departing from no clause. The head rule's plants amend the ninth, and the stray's named record the
+    eleventh. `findings` are the render's and a plant's own observation; `notes` are what a plant
+    observed holding. Nothing is written but amends-reader's temporary view.
     """
     sha, clauses, _records, serves, _moved = read_view_inputs(root, conf)
     if len(clauses) < 11 or any(c == SUCCESSOR for _b, c, _t, _h in clauses):
@@ -269,6 +338,20 @@ def render_fixture(root, conf, plant=None):
     elif plant == "supersedes":
         records.append({"id": "fixture-deviation-4", "departs": f"{tid}@{th} [chain]",
                         "follow": f"supersedes {tid}@{th} by {SUCCESSOR}", "after": "a planted successor clause"})
+    elif plant in ORDER_PLANTS:
+        # Two records on the ninth clause, appended in path order as `read_records` sorts them; the
+        # stray plant's second amends the eleventh instead, and the first names it.
+        _b, oid, otext, oh = clauses[8]
+        old, new = ORDER_IDS
+        if plant == "supersedes-stray":
+            pair = [build_fixture_record(old, oid, oh, otext + ", amended once", supersedes=new),
+                    build_fixture_record(new, tid, th, ttext + ", amended once")]
+        else:
+            pair = [build_fixture_record(old, oid, oh, otext + ", amended once"),
+                    build_fixture_record(new, oid, oh, otext + (", amended once" if plant == "same-after" else
+                                                                ", amended again"),
+                                         supersedes=old if plant == "amends-order" else None)]
+        records += sorted(pair, key=lambda r: r["path"])
     rendered, more = render_view(sha, clauses, records, serves)
     body = rendered
     if plant == "hand-edit":
@@ -294,6 +377,23 @@ def render_fixture(root, conf, plant=None):
                      f"`{got[4] if got else 'none'}`; derive_clause_hash of its **After:** is {want}")
         if not got or (got[2], got[3], got[4]) != (after, want, "deviation fixture-deviation-1"):
             findings.append(f"{cid}: the rendered row and read_design_view disagree on its text or its citation")
+    elif plant in ORDER_PLANTS:
+        row, other = read_fixture_row(rendered, oid), read_fixture_row(rendered, tid)
+        bad = [f"{r['id']}: Supersedes {why}" for r in pair for field, why in r["malformed"] if field == "Supersedes"]
+        sorts = [r["id"] for r in records[-2:]] == [new, old]
+        held = {"amends-order": (row == (pair[1]["after"], f"deviation `{new}`") and sorts,
+                                 f"{new} supersedes {old} and supplies the row's **After:** and citation, though its "
+                                 "path sorts first"),
+                "same-after": (row == (pair[0]["after"], f"deviation `{old}`") and sorts,
+                               f"two amends with one **After:** cite the later path, {old}"),
+                "unordered-amends": (row == (otext, "baseline"), BASELINE_NOTE),
+                "supersedes-stray": (row == (otext, "baseline") and other == (pair[1]["after"], f"deviation `{new}`"),
+                                     BASELINE_NOTE)}[plant]
+        if held[0] and not bad:
+            notes.append(f"{oid}: {held[1]}")
+        else:
+            findings.append(f"{oid}: the head rule's row is not the plant's: {row}, the eleventh clause {other}; "
+                            + "; ".join(bad))
     return body, rendered, clauses, more + findings, notes, sha
 
 
@@ -318,7 +418,8 @@ def run_plant_arms(root, conf):
     arms = []
     for plant in (None,) + PLANTS:
         want = PLANT_EXITS[plant]
-        what = (f"TOOL-dTrueNorth-6 {'plant ' + plant if plant else 'the fixture with no plant'} exits {want}, "
+        unit = "TOOL-dTrueNorth-18" if plant in ORDER_PLANTS else "TOOL-dTrueNorth-6"
+        what = (f"{unit} {'plant ' + plant if plant else 'the fixture with no plant'} exits {want}, "
                 f"naming {' and '.join(repr(n) for n in PLANT_NEEDLES[plant])}")
         try:
             rc, lines, live = run_fixture(root, conf, plant)
