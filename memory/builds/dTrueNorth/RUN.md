@@ -116,3 +116,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-21T21:55:51Z dispatch · item 0bf5e896 TOOL-dTrueNorth-12 · reason tools/memory-tree/deviation_join.py tools/memory-tree/routed_commits.py tools/gate-legs.json tools/memory-tree/kit.toml memory/guides/SESSION-KICKOFF.md memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-12.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-12-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
 
 2026-10-21T21:55:55Z brief · item TOOL-dTrueNorth-12 · reason f87b3ec97ba6 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-12-build-brief.md
+
+2026-10-21T22:18:50Z dispatch · item 55c7df4a TOOL-dTrueNorth-19 · reason tools/memory-tree/gen_build_index.py memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-19.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-19-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
+
+2026-10-21T22:18:54Z brief · item TOOL-dTrueNorth-19 · reason bb032a83afc2 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-19-build-brief.md

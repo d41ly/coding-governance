@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-19 — the audit-writer reader takes one glob pathspec, refuses a failed git call, and grades a record whose harness is missing
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** CLOSED · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-19-deviation-18.md](../build/2026-10-21-build-TOOL-dTrueNorth-19-deviation-18.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-19-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-19-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-19-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-19-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

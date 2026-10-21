@@ -811,7 +811,28 @@ def read_reviewed_paths(text: str) -> list | None:
     return None
 
 
-def derive_audit_writers(root: str, rels) -> set | None:
+def read_git_bytes(root: str, argv: tuple, stdin: bytes | None = None) -> bytes:
+    """A git command's stdout as bytes, or a `Problem` naming the command and git's first stderr line.
+
+    TOOL-dTrueNorth-19 S2. `run()` passes `check=True`, so a failed call raises `CalledProcessError`,
+    and a git that cannot start raises `OSError`; no mode handler turns either into a named exit, so
+    the caller died with a traceback and no reason. A read whose failure must never pass for an empty
+    answer goes through here instead, and its caller's mode exits 2 on the `Problem`.
+    """
+    cmd = ("git", *argv)
+    shown = " ".join(cmd)
+    try:
+        done = subprocess.run(cmd, cwd=root, input=stdin, capture_output=True, env=_build_git_env())
+    except OSError as exc:
+        raise Problem(f"`{shown}` could not start: {exc}") from None
+    if done.returncode:
+        first = next((ln.strip() for ln in done.stderr.decode("utf-8", "replace").splitlines()
+                      if ln.strip()), "git printed nothing on stderr")
+        raise Problem(f"`{shown}` exited {done.returncode}: {first}")
+    return done.stdout
+
+
+def derive_audit_writers(root: str, memory_root: str, rels) -> set | None:
     """The graded `spec-audit` records an OLDER review harness wrote, or None when none can be told.
 
     TOOL-dTrueNorth-14 S1. A run whose base predates the audit pin keeps running its own harness and
@@ -820,15 +841,19 @@ def derive_audit_writers(root: str, rels) -> set | None:
     harness wrote. The harness AT THE RECORD'S ADDING COMMIT does, because TOOL-dTrueNorth-5 landed
     `renderAuditBinding` and both writers in one commit: a harness lacking it could not have pinned.
 
-    One `git log` finds each record's adding commit, its OLDEST where a record was added twice, and
-    one `git cat-file --batch`, read as bytes and decoded as `read_blobs_at_rev` decodes, reads the
-    harness at each distinct one. A record is in the set only where that harness is a text blob
-    lacking the function. DENY BY DEFAULT for the rest: a record with no adding commit, staged and
-    not yet committed, is graded, since the tree's own harness is writing it; so is one whose adding
-    commit holds no harness blob at the path. The path is the workflows kit's `tier2-review.js`,
-    relative to the repository the kit sits in, the form the hygiene suite's resolver prints, so a
-    fixture repository laid out as the install reads its own copy. With no record it makes no git
-    call. None, exempting nothing, when the kit does not resolve or sits in no repository.
+    One `git log` finds each record's adding commit, and one `git cat-file --batch`, read as bytes
+    and decoded as `read_blobs_at_rev` decodes, reads the harness at each distinct one. The log's
+    argv does not grow with the records (TOOL-dTrueNorth-19 S1): it lists every add under the glob
+    pathspec `<memory_root>/builds/*/reviews/**`, oldest first, and a record keeps the FIRST add it
+    shows, its oldest where it was added twice; every other path is ignored. Either git call failing
+    raises `Problem` (S2), never an empty set. A record is in the set only where that harness is a
+    present text blob lacking the function. DENY BY DEFAULT for the rest (S3): a record with no
+    adding commit, staged and not yet committed or outside the pathspec, is graded, since the tree's
+    own harness is writing it; so is one whose adding commit's answer is `missing` or not a blob.
+    The path is the workflows kit's `tier2-review.js`, relative to the repository the kit sits in,
+    the form the hygiene suite's resolver prints, so a fixture repository laid out as the install
+    reads its own copy. With no record it makes no git call. None, exempting nothing, when the kit
+    does not resolve or sits in no repository.
     """
     try:
         kit = backlog.resolve_kit_dir("workflows", "tier2-review.js",
@@ -842,44 +867,51 @@ def derive_audit_writers(root: str, rels) -> set | None:
     wanted = set(rels)
     if not wanted:
         return set()
-    log = run("git", "log", "--no-renames", "--diff-filter=A", "--format=%x00%H", "--name-only", "--",
-              *sorted(wanted), cwd=root)
+    # TOOL-dTrueNorth-19 S1 — ONE GLOB PATHSPEC, NEVER THE RECORDS ON ARGV. Every graded path on one
+    # command line raised [WinError 206] at about 330 tracked review paths; this argv is constant.
+    log = read_git_bytes(root, ("log", "--no-renames", "--diff-filter=A", "--reverse", "--format=%x00%H",
+                                "--name-only", "--", f":(glob){memory_root}/builds/*/reviews/**"))
     added: dict = {}
-    for chunk in log.split("\x00")[1:]:
+    for chunk in log.decode("utf-8", "replace").split("\x00")[1:]:
         sha, _, names = chunk.partition("\n")
         for name in names.split("\n"):
+            name = name.rstrip("\r")
             if name in wanted:
-                added[name] = sha.strip()      # newest first, so the last one seen is the oldest add
+                added.setdefault(name, sha.strip())      # oldest first, so the first add seen is kept
     shas = sorted(set(added.values()))
     if not shas:
         return set()
-    done = subprocess.run(("git", "cat-file", "--batch"), cwd=root,
-                          input="".join(f"{s}:{harness}\n" for s in shas).encode("utf-8"),
-                          capture_output=True, check=True, env=_build_git_env())
-    older, data, at = set(), done.stdout, 0
+    data = read_git_bytes(root, ("cat-file", "--batch"),
+                          "".join(f"{s}:{harness}\n" for s in shas).encode("utf-8"))
+    older, at = set(), 0
     for sha in shas:
         end = data.find(b"\n", at)
         if end < 0:
             break
         header = data[at:end].decode("utf-8", "replace").split()
         at = end + 1
-        # `<sha> blob <size>`, or `<name> missing` with no body: no harness there, so graded.
-        if len(header) < 3 or header[1] != "blob":
+        # TOOL-dTrueNorth-19 S3 — DENY BY DEFAULT. `<name> missing` has no body and grades its
+        # records: no harness there is not a harness lacking the function. `<sha> <type> <size>` that
+        # is not a blob has a body, skipped so the next header is read where it starts, and grades too.
+        if len(header) < 3:
             continue
         size = int(header[2])
+        body, at = data[at:at + size], at + size + 1
+        if header[1] != "blob":
+            continue
         try:
-            text = data[at:at + size].decode("utf-8")
+            text = body.decode("utf-8")
         except UnicodeDecodeError:
             text = None
-        at += size + 1
         if text is not None and "renderAuditBinding" not in text:
             older.add(sha)
     return {rel for rel, sha in added.items() if sha in older}
 
 
 def cmd_print_bindings(root: str, conf: dict) -> int:
-    """READ-ONLY. Classifies and prints; writes nothing and always exits 0.
+    """READ-ONLY. Classifies and prints; writes nothing and exits 0, or 2 on a malformed cutoff.
 
+    A git read the audit pin needs and cannot make raises `Problem`, which `main` exits 2 on.
     It is the retrofit's own checklist AND the predicate the gate reads, so a seed list and a gate
     that disagree is structurally impossible here.
     """
@@ -930,7 +962,7 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
     # TOOL-dTrueNorth-14 S2 — a graded record an older harness wrote prints no P row: its run could
     # not have pinned it. It is still counted graded, and the Q row's fourth field counts it again as
     # exempt, or reads `-` where the workflows kit does not resolve and so nothing is exempt.
-    writers = derive_audit_writers(root, graded_rels)
+    writers = derive_audit_writers(root, m, graded_rels)
     graded = 0
     unbound = 0
     for rel in sorted(binds):
@@ -5745,6 +5777,110 @@ def cmd_selftest() -> int:
             arm("TOOL-dTrueNorth-14 AC3 — a staged record, which has no adding commit, prints its P row",
                 f"P\t{w14}\tARCH-tOne-1 carries no @rev-N pin", lambda: _rows(t14w, conf14w))
 
+            # TOOL-dTrueNorth-19 AC1 to AC4 — THE WRITER READ AT SCALE, AND ITS FAILURES, over one
+            # fixture. One commit adds 601 unpinned records, every path at least 98 bytes, beside a
+            # harness carrying renderAuditBinding; a branch drops the function and one record, then
+            # re-adds that record beside one added there first; git resolves to a stub on `log`; a last
+            # commit removes the harness and adds a record. Each reds on its own staged break: AC1 when
+            # the paths go on argv, [WinError 206] on Windows only, since a POSIX argv holds 61 KB;
+            # AC2 when the newest add is kept; AC3 when a failed log is an empty set or a traceback;
+            # AC4 when a missing harness blob exempts its record.
+            t19 = os.path.join(base, "scale"); os.makedirs(t19)
+            _fixture(t19)
+            h19 = os.path.join(t19, (_wf / "tier2-review.js").relative_to(_wf_home))
+            os.makedirs(os.path.dirname(h19))
+            write_text(h19, "export function review() {}\nexport function renderAuditBinding() {}\n")
+            conf19 = _set_pin_cutoff(t19, "2026-01-01")
+
+            def _write_record19(rel):
+                write_text(os.path.join(t19, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
+                return rel
+
+            def _commit19(msg):
+                run("git", "add", "-A", cwd=t19)
+                run("git", "commit", "-q", "-m", msg, "--no-verify", cwd=t19)
+
+            os.makedirs(os.path.join(t19, rv5), exist_ok=True)
+            recs19 = [_write_record19(rv5 + "2026-02-01-review-ARCH-tOne-1-padded-record-name-past-98-%03d-"
+                                      "spec-audit.md" % n) for n in range(601)]
+            _commit19("601 records")
+            arm("TOOL-dTrueNorth-19 AC1 — 601 graded records, every path at least 98 bytes, are read by one "
+                "spawn: 601 P rows and a Q row exempting none",
+                "long=True P=601 Q\t601\t2026-01-01\t0",
+                lambda: f"long={min(len(r.encode('utf-8')) for r in recs19) >= 98} " + _read_pin_rows(t19, conf19))
+            run("git", "checkout", "-q", "-b", "readd", cwd=t19)
+            write_text(h19, "export function review() {}\n")
+            os.remove(os.path.join(t19, recs19[0]))
+            _commit19("drop the function and one record")
+            first19 = _write_record19(rv5 + "2026-02-02-review-ARCH-tOne-1-first-added-beside-the-re-add-"
+                                      "spec-audit.md")
+            _write_record19(recs19[0])
+            _commit19("re-add")
+            arm("TOOL-dTrueNorth-19 AC2 — a record deleted and re-added is keyed to its first adding commit, "
+                "and only the record first added beside the re-add is exempt",
+                f"[{first19!r}]",
+                lambda: str(sorted(derive_audit_writers(t19, conf19["MEMORY_ROOT"], {recs19[0], first19}) or ())))
+            # AC3 — git RESOLVES TO A STUB on `log`: the spawn is redirected to a script that prints one
+            # stderr line and exits 128, in-process here and through `--print-bindings` in a child,
+            # which the same redirect is installed in before the generator runs as __main__.
+            stub19 = os.path.join(base, "git_log_stub19.py")
+            write_text(stub19, "import sys\nsys.stderr.write('fatal: the stub refuses git log\\n')\n"
+                               "sys.exit(128)\n")
+            shim19 = os.path.join(base, "git_log_shim19.py")
+            write_text(shim19, "import runpy, subprocess, sys\n_real = subprocess.run\n\n\n"
+                               "def _resolve(argv, *a, **kw):\n"
+                               "    if tuple(argv[:2]) == ('git', 'log'):\n"
+                               f"        argv = (sys.executable, {stub19!r})\n"
+                               "    return _real(argv, *a, **kw)\n\n\n"
+                               "subprocess.run = _resolve\nsys.argv = sys.argv[1:]\n"
+                               "runpy.run_path(sys.argv[0], run_name='__main__')\n")
+            _real_run19 = subprocess.run
+
+            def _read_failed_log19(redirect):
+                def _resolve(argv, *a, **kw):
+                    if tuple(argv[:2]) == ("git", "log"):
+                        return redirect(argv, *a, **kw)
+                    return _real_run19(argv, *a, **kw)
+
+                subprocess.run = _resolve
+                try:
+                    _rows(t19, conf19)
+                    return "no Problem raised"
+                except Problem as exc:
+                    return (f"git-log={str(exc).startswith('`git log ')} "
+                            f"stub={'fatal: the stub refuses git log' in str(exc)} "
+                            f"start={'could not start' in str(exc)}")
+                finally:
+                    subprocess.run = _real_run19
+
+            def _exec_stub19(argv, *a, **kw):
+                return _real_run19((sys.executable, stub19), *a, **kw)
+
+            def _raise_unstartable19(argv, *a, **kw):
+                raise FileNotFoundError(2, "the stub has no git to start", argv[0])
+
+            arm("TOOL-dTrueNorth-19 AC3 — a git log exiting 128 raises Problem naming the command and its "
+                "first stderr line", "git-log=True stub=True start=False",
+                lambda: _read_failed_log19(_exec_stub19))
+            arm("TOOL-dTrueNorth-19 S2 — a git log that cannot start raises Problem naming the command",
+                "git-log=True stub=False start=True", lambda: _read_failed_log19(_raise_unstartable19))
+            arm("TOOL-dTrueNorth-19 AC3 — --print-bindings exits 2 on that refusal, naming the stub's line",
+                "rc=2 named=True",
+                lambda: (lambda d: f"rc={d.returncode} named={'fatal: the stub refuses git log' in d.stdout}")(
+                    _real_run19((sys.executable, shim19, os.path.abspath(__file__), "--print-bindings"),
+                                cwd=t19, capture_output=True, text=True, encoding="utf-8",
+                                env=_build_git_env())))
+            os.remove(h19)
+            no_harness19 = _write_record19(rv5 + "2026-02-03-review-ARCH-tOne-1-added-where-no-harness-is-"
+                                           "spec-audit.md")
+            _commit19("remove the harness")
+            arm("TOOL-dTrueNorth-19 AC4 — a record whose adding commit holds no harness prints its P row, and "
+                "only the record a present harness lacking the function wrote is exempt",
+                "absent=1 Q\t603\t2026-01-01\t1",
+                lambda: (lambda rows: "absent=%d %s" % (
+                    sum(1 for r in rows if r.startswith(f"P\t{no_harness19}\t")),
+                    " ".join(r for r in rows if r.startswith("Q\t"))))(_rows(t19, conf19).splitlines()))
+
         # ---- the rendered Records table and the two coverage joins.
         # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER
         # SENTENCE arm both lose their subject here. The sentence was the record selector's liveness
@@ -7887,8 +8023,15 @@ def main(argv: list) -> int:
         print("build-index: not a git repo")
         return 2
     conf = load_conf(root)
+    # `--print-bindings` turns a `Problem` into 2, the exit check 21 reds as a parse that did not
+    # complete: a git read the audit-pin grading needs and could not make (TOOL-dTrueNorth-19 S2) is
+    # a named refusal, never a traceback and never an empty exempt set.
     if mode == "--print-bindings":
-        return cmd_print_bindings(root, conf)
+        try:
+            return cmd_print_bindings(root, conf)
+        except Problem as exc:
+            print(f"build-index: {exc}")
+            return 2
     # `--asks` IS DISPATCHED OUTSIDE THE HANDLER BELOW, which prints its message to stdout. That is
     # right for every other mode and wrong for this one, whose stdout is a value a program parses:
     # a refusal printed there is a decode error rather than a refusal. `cmd_asks` owns all of its
