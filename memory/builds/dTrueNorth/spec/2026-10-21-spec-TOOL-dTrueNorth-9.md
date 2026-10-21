@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-9 — `_expand_ids` keeps its two-value return for all four callers, and the audit pins come from a sibling reader
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** CLOSED · rev-2 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-9-deviation-8.md](../build/2026-10-21-build-TOOL-dTrueNorth-9-deviation-8.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-9-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-9-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-9-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-9-build-brief.md) | journal | — |
 | [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 

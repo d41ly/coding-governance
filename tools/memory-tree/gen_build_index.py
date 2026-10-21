@@ -499,8 +499,7 @@ def _parse_order(header: str, path: str):
 
 def _read_backlog_verbs(header: str, path: str, alt: str) -> dict:
     try:
-        # The first two values only: `read_header_verbs` unpacks `ids, bad`, and a verb pins nothing.
-        return backlog.read_header_verbs(header, path, lambda rest: _expand_ids(rest, alt)[:2])
+        return backlog.read_header_verbs(header, path, lambda rest: _expand_ids(rest, alt))
     except backlog.Problem as exc:
         raise Problem(str(exc)) from None
 
@@ -646,23 +645,26 @@ def record_paths(tracked: list, m: str) -> list:
     return [p for p in tracked if sel.match(p)]
 
 
-def _expand_ids(rest: str, alt: str) -> tuple:
-    """Return (ids, bad_tokens, pins). A contiguous run may be written N..M and EXPANDS here, at
-    authoring time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit.
+def build_id_token_re(alt: str):
+    """One id token with its optional `@rev-N` pin (TOOL-dTrueNorth-9 S3). The one spelling
+    `_expand_ids` and `read_id_pins` both match through, so the reader of the ids and the reader of
+    their pins cannot disagree on what an id is."""
+    return re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-(?P<rev>\d+))?$")
 
-    `pins` maps an id to the highest N it carries as `@rev-N` on the line (TOOL-dTrueNorth-5 S3), the
-    revision a spec-audit record read. A range carries no pin, so its ids get none. A caller reading
-    no pin takes the first two values only."""
-    ids, bad, pins = [], [], {}
-    one = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-(?P<rev>\d+))?$")
+
+def _expand_ids(rest: str, alt: str) -> tuple:
+    """Return (ids, bad_tokens). A contiguous run may be written N..M and EXPANDS here, at authoring
+    time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit.
+
+    TWO VALUES, for all four callers (TOOL-dTrueNorth-9 S1): `backlog.read_header_verbs` and
+    `read_idlist` unpack a pair, and a third value stranded both. A pin is `read_id_pins`' to read."""
+    ids, bad = [], []
+    one = build_id_token_re(alt)
     rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
     for tok in rest.split():
         mo = one.match(tok)
         if mo:
-            ident = f"{mo.group('fam')}-{mo.group('slug')}-{mo.group('seq')}"
-            ids.append(ident)
-            if mo.group("rev") is not None:
-                pins[ident] = max(pins.get(ident, 0), int(mo.group("rev")))
+            ids.append(f"{mo.group('fam')}-{mo.group('slug')}-{mo.group('seq')}")
             continue
         mr = rng.match(tok)
         if mr and int(mr.group("lo")) <= int(mr.group("hi")):
@@ -670,14 +672,28 @@ def _expand_ids(rest: str, alt: str) -> tuple:
                 ids.append(f"{mr.group('fam')}-{mr.group('slug')}-{n}")
             continue
         bad.append(tok)
-    return ids, bad, pins
+    return ids, bad
+
+
+def read_id_pins(rest: str, alt: str) -> dict:
+    """`{id: N}`, the highest N each id carries as `@rev-N` on the line (TOOL-dTrueNorth-9 S2), the
+    revision a spec-audit record read. A range token carries no pin, so its ids get none."""
+    pins: dict = {}
+    one = build_id_token_re(alt)
+    for tok in rest.split():
+        mo = one.match(tok)
+        if mo and mo.group("rev") is not None:
+            ident = f"{mo.group('fam')}-{mo.group('slug')}-{mo.group('seq')}"
+            pins[ident] = max(pins.get(ident, 0), int(mo.group("rev")))
+    return pins
 
 
 def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     """path -> {state, kind, ids, pins, commissions, reason, bad}.
 
     `pins` is the kind line's `{id: N}`, the highest `@rev-N` each id carries there, empty when none
-    does (TOOL-dTrueNorth-5 S3). A `**Commissions:**` line pins nothing.
+    does (TOOL-dTrueNorth-5 S3), read by `read_id_pins` beside the `_expand_ids` call
+    (TOOL-dTrueNorth-9 S2). A `**Commissions:**` line pins nothing.
 
     A file named `-deviation-<n>.md` in a build's `build/` folder must carry kind `deviation`, and a
     `deviation` record must be named `<date>-build-<unit id>-deviation-<n>.md` there; either mismatch is
@@ -727,7 +743,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             if not rest:
                 continue
             if mo.group("key") == "Commissions":
-                cids, bad, _cpins = _expand_ids(rest, alt)
+                cids, bad = _expand_ids(rest, alt)
                 rec["commissions"] = cids
                 rec["bad"] += bad
                 continue
@@ -745,10 +761,11 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 continue
             toks = rest.split()
             if toks and toks[0] in RECORD_KIND_TOKENS:
-                ids, bad, pins = _expand_ids(" ".join(toks[1:]), alt)
+                served = " ".join(toks[1:])
+                ids, bad = _expand_ids(served, alt)
                 rec["kind"] = toks[0]
                 rec["ids"] = ids
-                rec["pins"] = pins
+                rec["pins"] = read_id_pins(served, alt)
                 rec["bad"] += bad
                 if not ids:
                     rec["state"] = "malformed"
@@ -3415,7 +3432,7 @@ def read_idlist(tokens, alt: str) -> list:
                 continue
             ids += [f"{stem}-{n}" for n in range(lo, hi + 1)]
             continue
-        got, wrong, _pins = _expand_ids(token, alt)
+        got, wrong = _expand_ids(token, alt)
         if wrong or not got:
             bad.append(f"`{token}` (neither an id, an id range, nor a `-N` continuation)")
             continue
@@ -5624,6 +5641,27 @@ def cmd_selftest() -> int:
         arm("TOOL-dTrueNorth-5 AC6 — a spec whose header moved past its highest pin is named at the pin",
             "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-2.",
             lambda: plan(t5r, conf5r)[0]["memory/builds/tOne/README.md"])
+        # TOOL-dTrueNorth-9 S4 — `_expand_ids` RETURNS A PAIR to all four callers, and the pins come
+        # from `read_id_pins`. One arm per caller that unpacks two values: a spec header carrying both
+        # backlog verbs, an ids list, and a record pinning one id twice beside a range. Against a
+        # three-value `_expand_ids` each of the three raises ValueError on its unpack and reds.
+        arm("TOOL-dTrueNorth-9 AC2 — a spec header carrying closes and advances reads both verbs",
+            "closes=['ARCH-tOne-4'] advances=['ARCH-tOne-5']",
+            lambda: (lambda u: f"closes={u['closes']} advances={u['advances']}")(parse_spec_text(
+                "# ARCH-tOne-9 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-08-01 · node a · Tier-2 · "
+                "base 0123abcd · closes ARCH-tOne-4 · advances ARCH-tOne-5\n", "hdr.md", "ARCH")))
+        arm("TOOL-dTrueNorth-9 AC2 — an ids list read through read_idlist keeps a pinned id and its "
+            "continuation", "['ARCH-tOne-1', 'ARCH-tOne-3']",
+            lambda: str(read_idlist(["ARCH-tOne-1@rev-2", "-3"], "ARCH")))
+        t9p = os.path.join(base, "twopins"); os.makedirs(t9p)
+        conf9p = _fixture(t9p)
+        r9p = rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md"
+        os.makedirs(os.path.join(t9p, rv5), exist_ok=True)
+        write_text(os.path.join(t9p, r9p),
+                   "**Serves:** spec-audit ARCH-tOne-1@rev-2 ARCH-tOne-1@rev-3 ARCH-tOne-2..3\n\n# r\n")
+        run("git", "add", "-A", cwd=t9p)
+        arm("TOOL-dTrueNorth-9 AC3 — a record pinning one id twice keeps the higher pin, and its range pins "
+            "nothing", "{'ARCH-tOne-1': 3}", lambda: str(read_bindings(t9p, [r9p], conf9p)[r9p]["pins"]))
         # TOOL-dTrueNorth-13 AC4 — the REVIEWED PATHS decide which ids owe a pin, read at HEAD. Four
         # records over one committed tree: a design audit naming two committed build/ files owes none,
         # one naming the spec owes its id, one with no Reviewed: line owes every id, and one naming a

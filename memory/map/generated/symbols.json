@@ -2038,6 +2038,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_id_token_re",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "build_idle_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -13411,6 +13416,11 @@
       "id": "read_id_list_refusals",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "read_id_pins",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_id_tokens",
