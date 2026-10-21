@@ -1110,6 +1110,9 @@ PLANT_EXITS = dict({p: 1 for p in ("baseline", "clause", "subject-pass", "two-br
                                      "below-risk", "owner-cause", "status-only")}, unmeasured=2)
 
 
+BASE_MEMBERS = 6     # add_base's: a hand-back, a revision, a ledger line, a supersede, a clause, an add
+
+
 def derive_plant_needle(plant):
     """The text a plant's red line must carry, so an arm reds for its own reason and not another's."""
     u = PLANT_UNITS.get(plant)
@@ -1146,11 +1149,15 @@ def run_plant_arms():
                              f"TOOL-dTrueNorth-4 AC13 {'plant ' + plant if plant else 'the base'} measures nothing, "
                              "exit 2 under both policies, naming why", str(exc)))
                 continue
+            # Liveness: the base plants six members, each joined, so a population that read nothing, or a
+            # join that matched nothing, cannot pass an exit-0 arm by finding nothing.
+            live = sum(1 for _m, r in result["joins"] if r is not None) >= BASE_MEMBERS
             if plant is None:
                 for approval in APPROVALS:
                     lines, findings = render_lines(result, "refuse", approval, "base · ", commit)
-                    arms.append((findings == 0, f"TOOL-dTrueNorth-4 AC1 the base alone exits 0 under refuse and "
-                                                f"{approval}", "\n".join(lines)))
+                    arms.append((findings == 0 and live and len(result["joins"]) == BASE_MEMBERS,
+                                 f"TOOL-dTrueNorth-4 AC1 the base alone exits 0 under refuse and {approval}, its "
+                                 f"{BASE_MEMBERS} members each joined", "\n".join(lines)))
                 continue
             needle = derive_plant_needle(plant)
             approval = "by-risk" if plant in RISK_PLANTS else "author-recorded"
@@ -1162,7 +1169,7 @@ def run_plant_arms():
 
             lines, findings = render_lines(result, "refuse", approval, f"plant {plant} · ", commit)
             want = PLANT_EXITS[plant] if plant not in RISK_PLANTS else 1
-            arms.append(((1 if findings else 0) == want and (want == 0 or check_needle(lines)),
+            arms.append(((1 if findings else 0) == want and live and (want == 0 or check_needle(lines)),
                          f"TOOL-dTrueNorth-4 plant {plant} exits {want} under refuse and {approval}"
                          + (f", naming `{needle}`" if want else ""), "\n".join(lines)))
             lines, _f = render_lines(result, "report", approval, f"plant {plant} · ", commit)
