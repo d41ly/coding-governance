@@ -137,7 +137,7 @@ Lenses probe read-only: no write under the repo, temp files in the run's scratch
 **Record it** under `{{MEMORY_ROOT}}/builds/<slug>/reviews/` per `{{MEMORY_ROOT}}/HYGIENE.md` check 5's filename grammar, opening with
 the literal line `## Verdict: CLEAN` — or `CLEAN WITH FIXES`, or `BLOCKED`. Older records lack it; write it, M9
 derives from it. **Carry the binding line** check 21 requires —
-`**Serves:** spec-audit <the ids you reviewed>` — what makes "unreviewed" answerable from the tree.
+`**Serves:** spec-audit <each id you reviewed>@rev-<the revision you read>` — what makes "unreviewed" answerable from the tree.
 Grammar: `{{MEMORY_ROOT}}/HYGIENE.md`, "Record bindings". **Fold fixes into the spec** (rev bump + §9 line) on a round that is not an exit, then
 re-invoke; **STOP** once a synthesis pass calls the design clean; the exit disposes what stands.
 

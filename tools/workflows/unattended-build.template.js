@@ -178,6 +178,10 @@ function chunk(a, n) {
 //   briefDir: "memory/builds/<slug>/prompts",
 //   reviewDir: "memory/builds/<slug>/reviews",
 //   round: <integer>,                               // which audit round this invocation is
+//   subjects: [{ path, blob, id, rev }],            // optional, beside `specAudit`: the caller's pinned
+//                                                   //   set, which skips the resolver; `id` is the unit
+//                                                   //   whose spec is at `path`, `rev` the integer N of the
+//                                                   //   rev-N its status header carries at `blob`
 //   auditIds: [<unit id>],                          // AFTER A DISPOSAL: the `promotedIds` the previous
 //                                                   //   hand-out returned — the specs no spec-audit record
 //                                                   //   names yet; the audit is scoped to them
@@ -575,8 +579,8 @@ const resumeRemedy =
     : auditIds.length
       ? 're-invoke fresh, WITHOUT `resumeFromRunId`; `subjects` cannot stand beside `auditIds`, so pinning ' +
         'them is no route on this call.'
-      : 're-invoke fresh, WITHOUT `resumeFromRunId`, or resume with `subjects` pinned as {path, blob} from ' +
-        '`git ls-tree HEAD -- <spec path>`.') +
+      : 're-invoke fresh, WITHOUT `resumeFromRunId`, or resume with `subjects` pinned as {path, blob, id, rev} from ' +
+        '`git ls-tree HEAD -- <spec path>` and the rev-N of that spec\'s status header.') +
   ' A resume replays every agent call whose prompt is unchanged, so its cached answer returns this same ' +
   'refusal however the tree has moved since.'
 // TOOL-aEvidencedLens-5 S3 - the spec audit's checklist. A spec precedes its code, so there is no diff:
@@ -753,8 +757,11 @@ const SUBJECTS_SCHEMA = {
           // false for a clean tree. The supplied-subject contract stays `{7,40}` at `badSubject`.
           blob: { type: 'string', pattern: '^[0-9a-f]{40}$' },
           tree: { type: 'string', pattern: '^[0-9a-f]{40}$' },
+          // TOOL-dTrueNorth-5 S2 - the N of the `rev-N` in the spec's status header at `blob`, the pin
+          // the spec-audit record's binding line carries. The id is the roster's, never the agent's.
+          rev: { type: 'integer', minimum: 1 },
         },
-        required: ['path', 'blob', 'tree'],
+        required: ['path', 'blob', 'tree', 'rev'],
       },
     },
     // TOOL-aEvidencedLens-5 S3 - OPTIONAL: the `--for-paths` stdout and the paths it ran over, or why
@@ -1340,8 +1347,8 @@ if (!specAudit) {
 // this line, which is why S4 OBSERVES the route end to end rather than asserting it.
 //
 // THE SPLIT IS FORCED, NOT CHOSEN, and measuring it is what produced this shape. `tier2-review.js`
-// REFUSES a spec-audit whose `subjects` is not a non-empty array of `{path, blob}` with a 7-40 hex
-// blob per subject. A workflow script has no filesystem and no git, so it cannot resolve a blob;
+// REFUSES a spec-audit whose `subjects` is not a non-empty array of `{path, blob, id, rev}` with a
+// 7-40 hex blob per subject. A workflow script has no filesystem and no git, so it cannot resolve a blob;
 // an agent can. So the agent does what only an agent can — read the tree and pin each spec at its
 // blob — and the SCRIPT does what only the script can, which is hold `Workflow`. The old code gave
 // the agent BOTH jobs, and the second one is the one it could not do.
@@ -1419,7 +1426,9 @@ if (specAudit && !subjects) {
       renderRoster(auditUnits, slug, briefDir) + '\n\n' +
       'For each unit above that HAS a spec path, run `git rev-parse HEAD:<specPath>` and ' +
       '`git hash-object <specPath>` in ' + repo + ' and return both as the full 40-character object ' +
-      'names — `blob` and `tree` respectively, one entry per spec. Return ONLY units whose spec ' +
+      'names — `blob` and `tree` respectively, one entry per spec. Also read the first `**Status:**` ' +
+      'line of `git show HEAD:<specPath>` and return the integer N of its `rev-N` field as `rev`. ' +
+      'Return ONLY units whose spec ' +
       'exists and whose blob resolves; an unspecced unit is omitted rather than given an invented ' +
       'hash. Paths are repo-relative and forward-slashed.\n' +
       'A spec path that EXISTS in the working tree and does NOT resolve at HEAD goes in `notAtHead` as ' +
@@ -1484,8 +1493,34 @@ if (specAudit && !subjects) {
         '. Commit the fold; an audit is pinned at bytes history holds.' + resumeRemedy,
     )
   }
-  // `tier2-review.js` takes `{path, blob}` and that contract is not this stage's to widen.
-  subjects = subjects.map(function (s) { return { path: s.path, blob: s.blob } })
+  // TOOL-dTrueNorth-5 S2 - the PIN, refused by name for the reason the fields above are: the suite's
+  // runner evaluates no schema, so a resolver that omits `rev` must not read as a pinned subject.
+  const unrevved = subjects.findIndex(function (s) { return !Number.isInteger(s.rev) || s.rev < 1 })
+  if (unrevved !== -1) {
+    throw new Error(
+      'unattended-build: resolved subject ' + unrevved + ' does not carry `rev`, the integer N of the rev-N its ' +
+        'spec\'s status header carries at HEAD: ' + JSON.stringify(subjects[unrevved]) + '. The spec-audit ' +
+        'record pins each spec at that revision, and a revision past the pin reads as unaudited.',
+    )
+  }
+  // TOOL-dTrueNorth-5 S2 - each subject leaves as `{path, blob, id, rev}`, the shape `tier2-review.js`
+  // pins its binding line from. The `id` is the ROSTER's, the unit whose `specPath` is the subject's
+  // path, never the agent's; a subject no unit's path matches is refused by name, because a pin with
+  // no id is a record that binds nothing.
+  const unmatched = subjects.filter(function (s) {
+    return !ordered.some(function (u) { return u.specPath === s.path })
+  }).map(function (s) { return s.path })
+  if (unmatched.length) {
+    throw new Error(
+      'unattended-build: the resolver returned ' + unmatched.length + ' subject(s) whose path no unit\'s ' +
+        '`specPath` matches, so no id can pin them: ' + unmatched.join(', ') + '. A pin with no id binds ' +
+        'nothing.' + resumeRemedy,
+    )
+  }
+  subjects = subjects.map(function (s) {
+    const u = ordered.find(function (x) { return x.specPath === s.path })
+    return { path: s.path, blob: s.blob, id: u.id, rev: s.rev }
+  })
 }
 // REFUSED HERE RATHER THAN DOWNSTREAM. `tier2-review.js` would refuse an empty set too, but its
 // message is about its own arguments; this one can say which stage failed to produce them, which is
@@ -1514,6 +1549,22 @@ if (badSubject !== -1) {
     'unattended-build: subject ' + badSubject + ' is not a {path, blob} with a 7-40 hex blob: ' +
       JSON.stringify(subjects[badSubject]) + '. An unpinned subject is an audit of whatever the ' +
       'file happens to say when the lens reads it, which is not a review of anything in particular.',
+  )
+}
+// TOOL-dTrueNorth-5 S2 - the pin fields, under the grammar `tier2-review.js` refuses them by, so a
+// caller-supplied set is refused here, naming the field and the stage, before the callee is spawned.
+const unpinned = !specAudit ? null : subjects.reduce(function (hit, s, i) {
+  if (hit) return hit
+  if (typeof s.id !== 'string' || !/^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/.test(s.id)) return { i: i, field: 'id', got: s.id }
+  if (!Number.isInteger(s.rev) || s.rev < 1) return { i: i, field: 'rev', got: s.rev }
+  return null
+}, null)
+if (unpinned) {
+  throw new Error(
+    'unattended-build: subject ' + unpinned.i + '\'s `' + unpinned.field + '` is not ' +
+      (unpinned.field === 'id' ? 'a unit id of the form FAMILY-slug-N' : 'an integer revision of 1 or more') +
+      ': got ' + JSON.stringify(unpinned.got) + '. A spec-audit subject is {path, blob, id, rev}, and the ' +
+      'record pins `<id>@rev-<rev>` so a revision past it reads as unaudited.',
   )
 }
 
@@ -2497,14 +2548,22 @@ if (cleanRound && !attended) {
     .filter(function (u) { return specRefused.indexOf(u.id) === -1 && owed.indexOf(u.id) === -1 })
     .map(function (u) { return u.id })
   const subjectLines = subjects.map(function (s) { return s.path + '@' + s.blob }).join(', ')
+  // TOOL-dTrueNorth-5 S2 - line 1 PINS each owed unit at the revision its subject carried, the line
+  // `renderAuditBinding` gives a record the callee writes: this caller is the one other writer of a
+  // spec-audit record, and a bare id here would read as audited at every later revision.
+  const pinnedLine = '**Serves:** spec-audit ' + owed.map(function (id) {
+    const u = auditUnits.find(function (x) { return x.id === id })
+    const s = subjects.find(function (x) { return x.path === u.specPath })
+    return id + '@rev-' + s.rev
+  }).join(' ')
   handOut.roster = []
   handOut.nextAction =
     'WRITE the spec-audit record this clean round left unwritten, BEFORE any unit is dispatched: the ' +
-    'callee wrote no report, so no tracked record carries `**Serves:** spec-audit ' + owed.join(' ') +
+    'callee wrote no report, so no tracked record carries `' + pinnedLine +
     '` and `specs-audited` refuses every one of those units at --close. Author `' + reviewDir +
     '/<date>-review-' + owed[0] + '-spec-audit-round' + (roundNo - subjectRound + 1) +
     '.md` in this order, which is the order the callee\'s own synthesis writes and hygiene check 22 ' +
-    'reads: line 1 exactly `**Serves:** spec-audit ' + owed.join(' ') + '`; a title line; a line naming ' +
+    'reads: line 1 exactly `' + pinnedLine + '`; a title line; a line naming ' +
     'the reviewed subjects `' + subjectLines + '` and the round; then a heading that is exactly ' +
     '`## Verdict: CLEAN`; then the body quoting the callee (the callee said: ' +
     (typeof auRaw.note === 'string' ? auRaw.note : 'no note') + '). ' +

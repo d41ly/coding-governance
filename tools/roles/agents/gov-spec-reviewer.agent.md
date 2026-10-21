@@ -6,7 +6,7 @@ model: inherit
 workflow: spec-review
 reads: input:spec, brief:goal?, brief:non-goals?
 writes: none
-rules: spec?, verify, gate, class, security, risk
+rules: spec?, verify, gate, class, docs, security, risk
 returns: concrete findings, each with the spec and section, the evidence probed, the consequence and a proposed fix
 mandatory: for every spec audit owed
 output: findings, to its harness

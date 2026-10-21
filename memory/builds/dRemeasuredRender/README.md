@@ -82,6 +82,8 @@ Records: 13 bound to this build, across 4 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-dRemeasuredRender-1 DEPL-dRemeasuredRender-2 DEPL-dRemeasuredRender-3 DEPL-dRemeasuredRender-4 TOOL-dRemeasuredRender-1.
+
+Ids whose spec moved past its audited revision: none — 0 of 5 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -6,7 +6,7 @@ model: inherit
 workflow: build
 reads: input:spec, card:route?, brief:non-goals?
 writes: product
-rules: yagni, reuse, core, derive, verify, gate, security, bytes, cross-os?, tools
+rules: yagni, reuse, core, derive, verify, gate, docs, security, bytes, cross-os?, tools
 returns: whether the unit was committed, the commit, why when it was not, and which check ran for which gate
 mandatory: for every unit built
 output: commits under `ROUTED_PATHS`

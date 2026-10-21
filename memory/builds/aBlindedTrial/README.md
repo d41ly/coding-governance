@@ -99,6 +99,8 @@ Records: 9 bound to this build, across 3 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBlindedTrial-1 TOOL-aBlindedTrial-2 TOOL-aBlindedTrial-3 TOOL-aBlindedTrial-4 TOOL-aBlindedTrial-5 KICK-aBlindedTrial-1 TOOL-aBlindedTrial-7 TOOL-aBlindedTrial-8.
+
+Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

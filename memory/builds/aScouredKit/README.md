@@ -119,6 +119,8 @@ Records: 25 bound to this build, across 3 record folder(s).
 Ids no record names: TOOL-aScouredKit-35 TOOL-aScouredKit-36.
 
 Ids no `spec-audit` record has ever named: TOOL-aScouredKit-35 TOOL-aScouredKit-36.
+
+Ids whose spec moved past its audited revision: none — 0 of 19 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

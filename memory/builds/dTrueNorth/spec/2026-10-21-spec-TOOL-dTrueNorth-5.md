@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-5 — every spec audit pins the revision it read
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59de · streams tooling · order 2 · ratified 2026-10-21
+**Status:** CLOSED · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59de · streams tooling · order 2 · ratified 2026-10-21
 
 **Carries:** cl-dClosedLoop-0005@5417efbc whole
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-5-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-5-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 | [2026-10-21-prompt-TOOL-dTrueNorth-5-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-5-build-brief.md) | journal | — |
 | [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |

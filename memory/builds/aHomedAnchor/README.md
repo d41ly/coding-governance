@@ -100,6 +100,8 @@ Ids no record names: TOOL-aHomedAnchor-26 TOOL-aHomedAnchor-27 TOOL-aHomedAnchor
 
 Ids no `spec-audit` record has ever named: TOOL-aHomedAnchor-1 TOOL-aHomedAnchor-2 TOOL-aHomedAnchor-3 TOOL-aHomedAnchor-4 TOOL-aHomedAnchor-5 TOOL-aHomedAnchor-6 TOOL-aHomedAnchor-7 TOOL-aHomedAnchor-22 TOOL-aHomedAnchor-23 TOOL-aHomedAnchor-24 TOOL-aHomedAnchor-25 TOOL-aHomedAnchor-26
 TOOL-aHomedAnchor-27 TOOL-aHomedAnchor-28.
+
+Ids whose spec moved past its audited revision: none — 0 of 14 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

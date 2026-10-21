@@ -81,6 +81,8 @@ Records: 7 bound to this build, across 4 record folder(s).
 Ids no record names: TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4.
 
 Ids no `spec-audit` record has ever named: TOOL-aBoundedCeiling-2 TOOL-aBoundedCeiling-3 TOOL-aBoundedCeiling-4.
+
+Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

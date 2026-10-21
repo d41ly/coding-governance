@@ -122,10 +122,10 @@ arm('a non-object subject, round 2 -> refused', { kind: 'spec-audit', round: 2, 
 
 // The malformed-blob ladder is UNCHANGED: warn at round 1, refuse above it. Both halves, because
 // an arm asserting only the refusal is satisfied by a checker that refuses everything.
-arm('malformed blob, round 1 -> warns and proceeds', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: 'zzz' }] }, null)
+arm('malformed blob, round 1 -> warns and proceeds', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: 'zzz', id: 'TOOL-x-1', rev: 1 }] }, null)
 arm('malformed blob, round 2 -> refused', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: 'zzz' }] }, SHAPE)
-arm('a good subject, round 1 -> proceeds', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB }] }, null)
-arm('a good subject, round 2 -> proceeds', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB }] }, null)
+arm('a good subject, round 1 -> proceeds', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1 }] }, null)
+arm('a good subject, round 2 -> proceeds', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1 }] }, null)
 
 // The kind is a CLOSED set, and the diff-review default owes none of the above.
 arm('diff-review with no subjects -> untouched', { round: 1 }, null)
@@ -136,14 +136,14 @@ arm('an unknown kind -> refused', { kind: 'code-review', round: 1 }, 'kind')
 // a spec has no commit range and its anchor is the per-subject blob instead.
 arm('a moving ref as base, round 1 -> warns and proceeds', { round: 1, base: 'origin/main' }, null)
 arm('a moving ref as base, round 2 -> refused', { round: 2, base: 'origin/main' }, MOVING)
-arm('a spec audit ignores base entirely', { kind: 'spec-audit', round: 2, base: 'origin/main', subjects: [{ path: 'a.md', blob: BLOB }] }, null)
+arm('a spec audit ignores base entirely', { kind: 'spec-audit', round: 2, base: 'origin/main', subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1 }] }, null)
 // TOOL-dLadderedRemote-4 — a diff review's base is REQUIRED: it used to default to a literal remote
 // ref, which names nothing on a node whose remote is called something else. Absent and blank are both
 // refused before any agent; a spec audit has no range and still owes none.
 const NO_BASE = 'a diff review needs `base`'
 arm('a diff review with no base -> refused', { round: 1, base: undefined }, NO_BASE)
 arm('a diff review with a blank base -> refused', { round: 1, base: '  ' }, NO_BASE)
-arm('a spec audit with no base -> proceeds', { kind: 'spec-audit', round: 1, base: undefined, subjects: [{ path: 'a.md', blob: BLOB }] }, null)
+arm('a spec audit with no base -> proceeds', { kind: 'spec-audit', round: 1, base: undefined, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1 }] }, null)
 
 // ---- TOOL-aSightedSkeptic-7 AC1 — `intensity`, a closed set read in the prelude ----------------------
 // The proceeding arms also read the RESOLVED value back, so they cannot pass over a prelude that never
@@ -161,7 +161,7 @@ function armIntensity(name, extra, want) {
   }
   ck(want === 'refused' ? !!threw && threw.indexOf('intensity') !== -1 : !threw && got === want, name + (threw ? ' (threw: ' + threw + ')' : ' (resolved ' + JSON.stringify(got) + ')'))
 }
-const GOOD_SPEC = { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB }] }
+const GOOD_SPEC = { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1 }] }
 armIntensity('intensity: an unknown value is refused', { intensity: 'medium' }, 'refused')
 armIntensity('intensity: a non-string is refused', { intensity: 7 }, 'refused')
 armIntensity('intensity: light on a diff review proceeds', { intensity: 'light' }, 'light')
@@ -211,10 +211,36 @@ armScratch('spec scratch: a diff review keeps a relative repo', { repo: '.', scr
 // ---- TOOL-aEvidencedLens-4 AC1 — `prevBlob`, refused malformed and refused at round 1 (spec F1) ----
 // A refusal names `prevBlob`, so the subject ladder's own `needs \`subjects\`` throw cannot satisfy one.
 const PREV = '`prevBlob`'
-arm('fold: a malformed prevBlob at round 2 -> refused', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'zz' }] }, PREV)
-arm('fold: a well-formed prevBlob at round 1 -> refused', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'abc1235' }] }, PREV)
-arm('fold: a well-formed prevBlob at round 2 -> proceeds', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'abc1235' }] }, null)
+arm('fold: a malformed prevBlob at round 2 -> refused', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1, prevBlob: 'zz' }] }, PREV)
+arm('fold: a well-formed prevBlob at round 1 -> refused', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1, prevBlob: 'abc1235' }] }, PREV)
+arm('fold: a well-formed prevBlob at round 2 -> proceeds', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 1, prevBlob: 'abc1235' }] }, null)
 arm('fold: a diff review ignores a bad prevBlob', { round: 1, subjects: [{ path: 'a.md', blob: BLOB, prevBlob: 'zz' }] }, null)
+
+// ---- TOOL-dTrueNorth-5 AC1 — the PIN. A spec-audit subject carries `id` and `rev`, and a subject
+// missing or malforming either is refused at EVERY round, round 1 included, naming the field: the
+// record pins `<id>@rev-<rev>`, so an unpinned subject would write the record this refusal stops.
+// Against the base harness each refusal below proceeds instead.
+const PIN_REV = '`rev`'
+const PIN_ID = '`id`'
+arm('pin: a subject with no rev, round 1 -> refused naming rev', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1' }] }, PIN_REV)
+arm('pin: a subject with no rev, round 2 -> refused naming rev', { kind: 'spec-audit', round: 2, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1' }] }, PIN_REV)
+arm('pin: rev 0 -> refused naming rev', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 0 }] }, PIN_REV)
+arm("pin: rev '2', a string -> refused naming rev", { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: '2' }] }, PIN_REV)
+arm("pin: id 'x-1', outside the id grammar -> refused naming id", { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'x-1', rev: 2 }] }, PIN_ID)
+arm('pin: a subject with no id -> refused naming id', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, rev: 2 }] }, PIN_ID)
+arm('pin: two subjects sharing an id -> refused naming the repeat', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 2 }, { path: 'b.md', blob: 'abc1235', id: 'TOOL-x-1', rev: 1 }] }, 'repeats subject 0')
+arm('pin: a pinned subject proceeds', { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 2 }] }, null)
+// ---- TOOL-dTrueNorth-5 AC2 — the binding line is the harness's render, pure, inside this prelude.
+{
+  let rendered = null
+  try {
+    const rab = new Function('args', 'log', 'parallel', 'agent', 'phase', body + '\nreturn renderAuditBinding')(
+      Object.assign({}, base, { kind: 'spec-audit', round: 1, subjects: [{ path: 'a.md', blob: BLOB, id: 'TOOL-x-1', rev: 2 }] }), () => {}, null, null, null)
+    rendered = rab([{ id: 'TOOL-x-1', rev: 3 }, { id: 'TOOL-x-2', rev: 1 }])
+  } catch (e) { rendered = 'threw: ' + e.message }
+  ck(rendered === '**Serves:** spec-audit TOOL-x-1@rev-3 TOOL-x-2@rev-1',
+    'pin: renderAuditBinding pins each subject in subject order: ' + JSON.stringify(rendered))
+}
 
 // ---- D9 — the `args` header must carry every field the file reads --------------------------------
 // BUILD-METHOD M4 sends a reader to that block for the spec-audit spelling, and it named neither
@@ -236,6 +262,10 @@ const fields = [...new Set([...src.slice(alias).matchAll(/\ba\.([A-Za-z_$][\w$]*
 if (!fields.length) die('found no fields read off the args alias — this arm would pass by finding nothing')
 const missing = fields.filter((f) => !new RegExp('(^|[^\\w$])' + f + '\\s*:').test(hdr))
 ck(missing.length === 0, 'the args header documents all ' + fields.length + ' fields read off `a` as `name:` keys' + (missing.length ? ' — missing: ' + missing.join(' ') : ''))
+// TOOL-dTrueNorth-5 AC1 — `id` and `rev` are fields of a SUBJECT, not of `a`, so the arm above cannot see
+// them; the header's `subjects:` key line names both, as the refusal reads them.
+const subjectsKey = (hdr.match(/^\/\/\s+subjects:.*$/m) || [''])[0]
+ck(/\bid\b/.test(subjectsKey) && /\brev\b/.test(subjectsKey), 'pin: the args header documents a spec-audit subject\'s id and rev: ' + subjectsKey)
 
 // ==== TOOL-dDerivedDocket-29 — THE WHOLE SCRIPT, over stub agents ==================================
 // The runner evaluates the file as the Workflow runtime does. Each stub is looked up by exact label
@@ -282,7 +312,7 @@ const H = 'c'.repeat(40)
 // TOOL-aMendedFleet-93 S4 - absent `workerType` reads as Plan, so the durable-spawn arms below pin `none`,
 // which spawns exactly as an absent value did before the default.
 const DIFF = { repo: '/tmp/r', base: B, head: H, round: 1, context: 'ctx', reviewDir: 'memory/reviews', workerType: 'none' }
-const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234' }], scratch: '/tmp/s', workerType: 'none' }
+const SPEC = { repo: '/tmp/r', kind: 'spec-audit', round: 1, context: 'ctx', subjects: [{ path: 's.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }], scratch: '/tmp/s', workerType: 'none' }
 const buildProbe = (finds, verifies, base, head) => ({ commonDir: '/cd', base: base || B, head: head || H, finds: finds || [], verifies: verifies || [] })
 // One finding per lens, so five lenses make five ids and five batches of one: verify:ids-1-1 .. 5-5.
 const buildLensReturn = (label) => {
@@ -363,6 +393,16 @@ async function runWholeScriptArms() {
     'AC1 both prompt kinds order the write BEFORE the return')
   ck(finds.every((t) => t.schema && t.schema.required.indexOf('path') !== -1), 'AC1 the diff finding schema lists path in required')
   ck(verifies.every((t) => t.schema && t.schema.required.indexOf('path') !== -1), 'AC1 the verdict schema lists path in required')
+  // TOOL-dTrueNorth-5 AC2 — the spec kind's synthesis prompt carries the binding line the harness
+  // rendered from the subjects' pins, between its markers, and no longer asks the agent to compose the
+  // id list. Against the base harness the marker block is absent and the composing sentence is there.
+  const pinRun = await runReview(Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 3 }, { path: 'u.md', blob: 'abc9999', id: 'TOOL-x-2', rev: 1 }] }), ALL_OK)
+  if (checkNoThrow(pinRun, 'pin: spec-audit synthesis')) {
+    const pinSynth = pinRun.trace.filter((t) => t.label === 'synth').map((t) => t.prompt)
+    ck(pinSynth.length === 1 && pinSynth[0].indexOf('<<<SERVES\n**Serves:** spec-audit TOOL-x-1@rev-3 TOOL-x-2@rev-1\nSERVES>>>') !== -1 &&
+      pinSynth[0].indexOf('the reviewed spec set defines') === -1,
+      'pin: the spec-audit synthesis prompt carries the rendered, pinned binding line and no composing sentence: ' + pinSynth.length + ' synthesis prompt(s)')
+  }
   const rs = await runReview(SPEC, ALL_OK)
   if (checkNoThrow(rs, 'spec-audit complete run')) {
     const sf = rs.trace.filter((t) => t.label.indexOf('find:') === 0)
@@ -483,7 +523,7 @@ async function runWholeScriptArms() {
     ck(fresh.scanSpawned('find:security').length === 0, 'AC3 ' + what + ': ...and one under its own key is reused')
   }
   const s1 = await runReview(SPEC, ALL_OK)
-  const specMoved = Object.assign({}, SPEC, { subjects: [{ path: 's.md', blob: 'abc1235' }] })
+  const specMoved = Object.assign({}, SPEC, { subjects: [{ path: 's.md', blob: 'abc1235', id: 'TOOL-x-1', rev: 1 }] })
   const s2 = await runReview(specMoved, buildStubs({ 'resume:probe': buildProbe([buildLensFile('reuse', s1.result ? s1.result.key : '')]) }))
   if (checkNoThrow(s1, 'AC3 spec base') && checkNoThrow(s2, 'AC3 spec moved')) {
     ck(s2.result.key !== s1.result.key && s2.scanSpawned('find:reuse').length === 1,
@@ -1548,7 +1588,7 @@ async function runLedgerArms() {
   const P40 = 'a'.repeat(40)
   const D40 = 'd'.repeat(40)
   const E40 = 'e'.repeat(40)
-  const THREE = [{ path: 'one.md', blob: D40, prevBlob: P40 }, { path: 'two.md', blob: E40, prevBlob: E40.slice(0, 9) }, { path: 'three.md', blob: 'abc1234' }]
+  const THREE = [{ path: 'one.md', blob: D40, id: 'TOOL-x-1', rev: 1, prevBlob: P40 }, { path: 'two.md', blob: E40, id: 'TOOL-x-2', rev: 1, prevBlob: E40.slice(0, 9) }, { path: 'three.md', blob: 'abc1234', id: 'TOOL-x-3', rev: 1 }]
   r = await runReview(Object.assign({}, SPEC, { round: 2, subjects: THREE, priorFindings: [{ ref: 'one.md:section 2', claim: 'PRIOR' }] }), ALL_OK)
   if (checkNoThrow(r, 'fold three shapes')) {
     const fv = scanPrompts(r, 'find:').concat(scanPrompts(r, 'verify:'))
@@ -1571,7 +1611,7 @@ async function runLedgerArms() {
       'fold: a round-2 run with neither input is a DEGRADED fold review, warned and in RUN INTEGRITY, never first-round')
   }
   const MOVED40 = 'f0' + '1'.repeat(38)
-  const TWO = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }, { path: 'u.md', blob: 'abc9999' }] })
+  const TWO = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }, { path: 'u.md', blob: 'abc9999', id: 'TOOL-x-2', rev: 1 }] })
   r = await runReview(TWO, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: MOVED40 }, { path: 'u.md', now: '' }] }) }))
   if (checkNoThrow(r, 'fold moved')) {
     const ri = extractIntegrity(r)
@@ -1597,14 +1637,14 @@ async function runLedgerArms() {
   // TOOL-aEvidencedLens-21 AC9 (closing review L2) - the NOT-MOVED arm: a 40-hex `now` that BEGINS with the
   // pin is the same blob. Red on a render copy whose MOVED predicate always holds.
   const SAME40 = 'abc1234' + '0'.repeat(33)
-  const PAIR = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }, { path: 'v.md', blob: 'abc9999' }] })
+  const PAIR = Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }, { path: 'v.md', blob: 'abc9999', id: 'TOOL-x-2', rev: 1 }] })
   r = await runReview(PAIR, buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: SAME40 }, { path: 'v.md', now: MOVED40 }] }) }))
   if (checkNoThrow(r, 'fold unmoved beside moved')) {
     ck(!r.logs.some((l) => l.indexOf('m.md MOVED') !== -1) && r.logs.some((l) => l.indexOf('WARNING: v.md MOVED') === 0) &&
       scanPrompts(r, 'find:').length === 5 && scanPrompts(r, 'find:').every((t) => t.prompt.indexOf('  - m.md  blob abc1234\n') !== -1),
       'fold: a now beginning with the pin is NOT MOVED beside a moved subject: no WARNING and no MOVED suffix')
   }
-  r = await runReview(Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234' }] }),
+  r = await runReview(Object.assign({}, SPEC, { subjects: [{ path: 'm.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1 }] }),
     buildStubs({ 'resume:probe': Object.assign(buildProbe(), { blobs: [{ path: 'm.md', now: SAME40 }] }) }))
   if (checkNoThrow(r, 'fold unmoved alone')) {
     ck(!r.logs.some((l) => l.indexOf('m.md MOVED') !== -1) && scanPrompts(r, 'find:').length === 5 &&
@@ -1612,7 +1652,7 @@ async function runLedgerArms() {
       'fold: the sole subject, unmoved, reads no checked subject moved in RUN INTEGRITY')
   }
   const deriveFoldKey = async (pb) => {
-    const x = await runReview(Object.assign({}, SPEC, { round: 2, priorFindings: [{ ref: 'a', claim: 'b' }], subjects: [{ path: 's.md', blob: 'abc1234', prevBlob: pb }] }), ALL_OK)
+    const x = await runReview(Object.assign({}, SPEC, { round: 2, priorFindings: [{ ref: 'a', claim: 'b' }], subjects: [{ path: 's.md', blob: 'abc1234', id: 'TOOL-x-1', rev: 1, prevBlob: pb }] }), ALL_OK)
     return x.result ? x.result.key : 'threw'
   }
   const k0 = await deriveFoldKey(undefined)
@@ -2104,7 +2144,10 @@ printf '%s\n' "$out"
 # skeptic (1) and the absent argument (1). Counted by hand, not by a run: the pass runs no suite.
 # RAISED 314 -> 322 by TOOL-aOrientedCast-27: 8 assertions, counted off the `OC27` block — the whole
 # labels (5) and the run's identity (3). Counted by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=322
+# RAISED 322 -> 333 by TOOL-dTrueNorth-5: 11 assertions, counted off the `pin:` arms — eight prelude
+# refusals and their control (8), the rendered binding line (1), the args header's subject fields (1)
+# and the synthesis prompt's pinned line (1). Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=333
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

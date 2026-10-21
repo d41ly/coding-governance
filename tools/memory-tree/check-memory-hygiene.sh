@@ -1416,6 +1416,27 @@ $miss21"
   bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
 $bad21"
+  # THE AUDIT-PIN ARM (TOOL-dTrueNorth-5 S4). The generator holds the predicate and prints a P row per
+  # id of a spec-audit record dated on or after SPEC_AUDIT_PIN_CUTOFF that carries no `@rev-N` pin or
+  # pins a revision its spec's header has not reached; the shell fails on the rows, because
+  # `check-arms.py` finds its arms in tracked shell. The rows pass through `extract_graded_rows`, the
+  # ONE population filter, so a record the legacy registry lists or RECORD_SERVES_CUTOFF exempts is
+  # exempt here too. The Q row is the arm's LIVENESS half and names what it graded on every run: a
+  # parse printing N and no Q is a generator without the arm, refused as the U-row test below is.
+  if [ -n "$b21" ]; then
+    qn21=$(printf '%s\n' "$b21" | sed -n 's/^Q\t\([0-9]*\)\t.*$/\1/p' | head -1)
+    qc21=$(printf '%s\n' "$b21" | sed -n 's/^Q\t[0-9]*\t\(.*\)$/\1/p' | head -1)
+    if [ -z "$qn21" ]; then
+      fail 21 "the bindings parse printed N $n21 and no Q row, so a generator without the audit-pin arm leaves every spec-audit record's @rev-N pin ungraded"
+    elif [ "$qc21" = off ]; then
+      echo "memory-hygiene: check 21: the audit-pin arm is off (SPEC_AUDIT_PIN_CUTOFF blank)" >&2
+    else
+      echo "memory-hygiene: check 21: the audit-pin arm graded $qn21 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=$qc21" >&2
+    fi
+  fi
+  apin21=$(printf '%s\n' "$b21" | sed -n 's/^P\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
+  [ -n "$apin21" ] && fail 21 "spec-audit records at or after SPEC_AUDIT_PIN_CUTOFF whose Serves line leaves an id unpinned or pins it past its spec's header revision:
+$apin21"
   # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
   # declaration and the number of them is the thing a reader is entitled to see bounded. `n21` was
   # read above, where its absence is the parse's liveness test.

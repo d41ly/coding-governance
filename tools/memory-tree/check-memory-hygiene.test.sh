@@ -3315,6 +3315,66 @@ esac
 rm -rf "$TMP/kit32"
 ( cd "$_b1" && git rm -q memory/builds/tOne/build/2026-0[89]-02-build-* && git -c commit.gpgsign=false commit -q -m rf32-out --no-verify ) >/dev/null 2>&1
 
+# ---- TOOL-dTrueNorth-5: check 21's AUDIT-PIN ARM. A second build whose one spec carries a status
+# ---- header at rev-2, so a pin has a header to be read against, and two spec-audit records dated
+# ---- after SPEC_AUDIT_PIN_CUTOFF: one naming the id with no pin, one pinning it at rev-5. Rendered
+# ---- by the generator so check 9 stays quiet, and taken out again after the arms. Against the base
+# ---- engine and generator every positive arm here reds: neither prints a pin row or the arm's line.
+mkdir -p "$_b1/memory/builds/tTwo/spec" "$_b1/memory/builds/tTwo/build"
+printf -- '---\nslug: tTwo\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tTwo-1\n---\n\n# tTwo\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > "$_b1/memory/builds/tTwo/README.md"
+printf '# ARCH-tTwo-1 — a pinned unit\n\n**Status:** OPEN · rev-2 · 2026-08-01 · node a · Tier-2 · base 0123abcd\n' > "$_b1/memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md"
+printf '# r\n\n**Serves:** spec-audit ARCH-tTwo-1\n' > "$_b1/memory/builds/tTwo/build/2026-09-02-build-ARCH-tTwo-1-u.md"
+printf '# r\n\n**Serves:** spec-audit ARCH-tTwo-1@rev-5\n' > "$_b1/memory/builds/tTwo/build/2026-09-02-build-ARCH-tTwo-1-o.md"
+cp "$_b1/memory/project/legacy-files.txt" "$TMP/legacy.tn5"
+( cd "$_b1" && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn5 --no-verify ) >/dev/null 2>&1
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"')"; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"spec-audit records at or after SPEC_AUDIT_PIN_CUTOFF whose Serves line leaves an id unpinned or pins it past its spec's header revision"*"2026-09-02-build-ARCH-tTwo-1-o.md — ARCH-tTwo-1@rev-5 pins a revision its spec has not reached, header rev-2"*"2026-09-02-build-ARCH-tTwo-1-u.md — ARCH-tTwo-1 carries no @rev-N pin"*) echo "ok   check 21: the audit-pin arm names the over-pinned and the unpinned spec-audit records" ;;
+  *) echo "FAIL check 21: the audit-pin arm did not name both the over-pinned and the unpinned spec-audit record"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"check 21: the audit-pin arm graded 2 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=2026-09-01"*) echo "ok   check 21: the audit-pin arm prints what it graded and from what cutoff" ;;
+  *) echo "FAIL check 21: the audit-pin arm did not print its graded count and cutoff"; st=1 ;;
+esac
+# The ONE population filter: a record legacy-files.txt lists is exempt from this branch too, and the
+# over-pinned record beside it is the control that the branch still ran.
+printf 'memory/builds/tTwo/build/2026-09-02-build-ARCH-tTwo-1-u.md\n' >> "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m tn5-legacy --no-verify ) >/dev/null 2>&1
+o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"2026-09-02-build-ARCH-tTwo-1-u.md — ARCH-tTwo-1 carries no @rev-N pin"*) echo "FAIL check 21: the audit-pin arm grades a record legacy-files.txt lists — its rows skip extract_graded_rows"; st=1 ;;
+  *"2026-09-02-build-ARCH-tTwo-1-o.md — ARCH-tTwo-1@rev-5 pins a revision its spec has not reached, header rev-2"*) echo "ok   check 21: the audit-pin arm exempts a legacy-listed record and still grades its sibling" ;;
+  *) echo "FAIL check 21: the audit-pin arm stopped naming the over-pinned control record"; st=1 ;;
+esac
+write_pk_conf 'RECORD_UNBOUND_PIN="0"'; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"check 21: the audit-pin arm is off (SPEC_AUDIT_PIN_CUTOFF blank)"*) echo "ok   check 21: a blank SPEC_AUDIT_PIN_CUTOFF prints the arm's off line" ;;
+  *) echo "FAIL check 21: a blank SPEC_AUDIT_PIN_CUTOFF printed no off line"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"pins a revision its spec has not reached"*) echo "FAIL check 21: the audit-pin arm graded a record with SPEC_AUDIT_PIN_CUTOFF blank"; st=1 ;;
+  *) echo "ok   check 21: a blank SPEC_AUDIT_PIN_CUTOFF grades no record" ;;
+esac
+# A generator without the arm prints N and no Q row, which would leave every pin ungraded in silence.
+rm -rf "$TMP/kit5"; cp -r "$HERE" "$TMP/kit5"
+sed -i '/print(f"Q\\t{graded}/d' "$TMP/kit5/gen_build_index.py"
+write_pk_conf "$(printf 'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"')"
+o=$( cd "$_b1" && bash "$TMP/kit5/check-memory-hygiene.sh" 2>&1 )
+n=$((n+1))
+case "$o" in
+  *"the bindings parse printed N 0 and no Q row, so a generator without the audit-pin arm leaves every spec-audit record's @rev-N pin ungraded"*) echo "ok   check 21: a generator printing N and no Q row reds instead of leaving the audit pin ungraded" ;;
+  *) echo "FAIL check 21: a generator printing no Q row left the audit pin silently ungraded"; st=1 ;;
+esac
+rm -rf "$TMP/kit5"
+cp "$TMP/legacy.tn5" "$_b1/memory/project/legacy-files.txt"
+write_pk_conf ""
+( cd "$_b1" && git rm -q -r memory/builds/tTwo && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn5-out --no-verify ) >/dev/null 2>&1
+
 # ---- TOOL-aRepatriatedFork-10 S5 and S6: a FLAT install at `scripts/` with a govkit receipt,
 # ---- rendered through `--render`. The rendered HYGIENE.md states THIS tree's two conf values, and
 # ---- TEMPLATE-SPEC.md names the codebase-map generator under the receipt's prefix — the kit
@@ -4194,7 +4254,9 @@ fi
 # suite; OWED: observed at the close.
 # RAISED 648 -> 650 by TOOL-dTrueNorth-15: its two check-29 count-line assertions, each top-level and
 # skipped aloud with that block's twelve. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=650
+# RAISED 650 -> 656 by TOOL-dTrueNorth-5: its six check-21 audit-pin assertions, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=656
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

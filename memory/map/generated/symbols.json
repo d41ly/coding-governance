@@ -7128,6 +7128,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_past_pin_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_path_key",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -14318,6 +14323,11 @@
       "file": "tools/memory-recall/check-recall.py"
     },
     {
+      "id": "read_spec_revs",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_spec_uids",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -15106,6 +15116,16 @@
       "id": "renderAskQuote",
       "kind": "function",
       "file": "tools/unattended/gate-guard.js"
+    },
+    {
+      "id": "renderAuditBinding",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderAuditBinding",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
     },
     {
       "id": "renderBlankedLiterals",

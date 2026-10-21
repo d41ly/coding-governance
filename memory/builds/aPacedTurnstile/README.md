@@ -298,6 +298,8 @@ Records: 8 bound to this build, across 2 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: TOOL-aPacedTurnstile-14@rev-2.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

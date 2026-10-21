@@ -61,6 +61,8 @@ Records: 16 bound to this build, across 2 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aMeteredSweep-1.
+
+Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

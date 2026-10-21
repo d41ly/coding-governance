@@ -457,7 +457,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     never refuse the render. A record `legacy-files.txt` lists is not graded for a missing Serves
     line. `RECORD_UNDATED_ARTIFACTS` set to `exempt` drops an undated non-markdown file (a JSON result, an
     HTML report) from that branch and prints how many it dropped on every run; blank or `grade`
-    grades them.
+    grades them. From `SPEC_AUDIT_PIN_CUTOFF` its audit-pin branch fails each `spec-audit` record,
+    dated on or after the key or undated, that leaves an id without an `@rev-N` pin or pins it
+    above its spec's header revision, refuses a parse printing no `Q` row, and names on every run
+    how many records it graded, or that the arm is off.
 
 22. **review verdict vocabulary** — a review record whose filename date reaches
     `REVIEW_VERDICT_CUTOFF` carries exactly ONE `## Verdict:` line, and its token is a member of the
@@ -586,6 +589,7 @@ carry it too:
 
 ```
 **Serves:** <kind> <id> [<id> …]
+**Serves:** spec-audit <id>@rev-<N> [<id>@rev-<N> …]   (a spec audit, from SPEC_AUDIT_PIN_CUTOFF)
 **Serves:** none — <why this record serves no spec>
 **Commissions:** <id> [<id> …]          (optional, for a record that PRODUCED specs)
 ```
@@ -594,9 +598,13 @@ carry it too:
   code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs).
   An open kind field stops being groupable the first time two authors spell one relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
-  because one closing review legitimately covers two builds. It may carry a trailing `@rev-N`, which
-  is recorded and never validated, and a contiguous run may be written `N..M`, which EXPANDS at
-  authoring time and therefore cannot rot when the build later gains a unit.
+  because one closing review legitimately covers two builds. On a `spec-audit` record dated on or
+  after `SPEC_AUDIT_PIN_CUTOFF`, or carrying no date, each id is written `<id>@rev-<N>`, N the
+  `rev-N` of that spec's status header at the blob the audit read and never above its current
+  header: the pin is what makes a revision past it read as unaudited, so a range, which carries no
+  pin, is unpinned there. On any other record a trailing `@rev-N` is recorded and never validated.
+  A contiguous run may be written `N..M`, which EXPANDS at authoring time and therefore cannot rot
+  when the build later gains a unit.
 - Ids resolve against the set DEFINED BY A SPEC H1 — never against a build README's `ids:` roster,
   which is a reservation range that admits backlog and decision rows as if they were units.
 - The `none` form's REASON is mandatory; a bare `none` is malformed. The kind is optional there and

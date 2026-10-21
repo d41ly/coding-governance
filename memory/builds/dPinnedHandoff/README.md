@@ -87,6 +87,8 @@ Records: 0 bound to this build, across 1 record folder(s).
 Ids no record names: TOOL-dPinnedHandoff-1 TOOL-dPinnedHandoff-2 TOOL-dPinnedHandoff-3.
 
 Ids no `spec-audit` record has ever named: TOOL-dPinnedHandoff-1 TOOL-dPinnedHandoff-2 TOOL-dPinnedHandoff-3.
+
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

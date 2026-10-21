@@ -367,6 +367,15 @@ PROJECT_REGISTRY_EXTRA=""
 # A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.
 RECORD_SERVES_CUTOFF=""
 
+# SPEC_AUDIT_PIN_CUTOFF — an ISO date, read by `gen_build_index.py --print-bindings`, whose `P` rows
+# check 21 fails on (TOOL-dTrueNorth-5). A `spec-audit` record whose filename date is on or after it,
+# or carries no date, names each spec it read as `<id>@rev-<N>` on its Serves line, N the `rev-N` of
+# that spec's status header at the blob the audit read: an unpinned id reds, and so does a pin above
+# the spec's current header revision. Set it to the day AFTER the newest review record filename date
+# on any ref, so no record in flight reds at its merge. BLANK MEANS OFF, and check 21 says the arm is
+# off on every run. Any other value exits the bindings parse at 2 naming the key.
+SPEC_AUDIT_PIN_CUTOFF=""
+
 # RECORD_UNDATED_ARTIFACTS — `grade`, `exempt`, or blank (= `grade`). A JSON result, an HTML report
 # or a script kept under build/, prompts/ or reviews/ cannot carry a Serves line at any date. `exempt`
 # drops a file with NO leading ISO date AND no `.md` suffix from check 21's missing-Serves branch,

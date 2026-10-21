@@ -71,6 +71,8 @@ Records: 2 bound to this build, across 2 record folder(s).
 Ids no record names: TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5.
 
 Ids no `spec-audit` record has ever named: TOOL-aMouldedFolio-2 TOOL-aMouldedFolio-3 TOOL-aMouldedFolio-4 TOOL-aMouldedFolio-5.
+
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -494,7 +494,8 @@ def _parse_order(header: str, path: str):
 
 def _read_backlog_verbs(header: str, path: str, alt: str) -> dict:
     try:
-        return backlog.read_header_verbs(header, path, lambda rest: _expand_ids(rest, alt))
+        # The first two values only: `read_header_verbs` unpacks `ids, bad`, and a verb pins nothing.
+        return backlog.read_header_verbs(header, path, lambda rest: _expand_ids(rest, alt)[:2])
     except backlog.Problem as exc:
         raise Problem(str(exc)) from None
 
@@ -607,6 +608,28 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
     return out
 
 
+def read_spec_revs(root: str, tracked: list, conf: dict) -> dict:
+    """`{spec id: header revision}`, an integer, over the files `spec_ids` walks (TOOL-dTrueNorth-5 S3).
+
+    Through `parse_spec_text`, the parser the units table renders from, so this read and that table
+    cannot disagree about a spec's revision. A file with no parseable status header carries none.
+    """
+    m = conf["MEMORY_ROOT"]
+    alt = _id_alternation(conf)
+    sel = build_spec_path_re(m)
+    out: dict = {}
+    for rel in tracked:
+        if not sel.match(rel):
+            continue
+        text, _why = read_text_or_none(os.path.join(root, rel))
+        if text is None:
+            continue
+        unit = parse_spec_text(text, rel, alt)
+        if unit:
+            out[unit["id"]] = max(out.get(unit["id"], 0), int(unit["rev"]))
+    return out
+
+
 def record_paths(tracked: list, m: str) -> list:
     """Every tracked record: any depth, ANY extension, under a build's non-spec kind folders."""
     kinds = "|".join(k for k in RECORD_KINDS if k != "spec")
@@ -615,15 +638,22 @@ def record_paths(tracked: list, m: str) -> list:
 
 
 def _expand_ids(rest: str, alt: str) -> tuple:
-    """Return (ids, bad_tokens). A contiguous run may be written N..M and EXPANDS here, at authoring
-    time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit."""
-    ids, bad = [], []
-    one = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-\d+)?$")
+    """Return (ids, bad_tokens, pins). A contiguous run may be written N..M and EXPANDS here, at
+    authoring time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit.
+
+    `pins` maps an id to the highest N it carries as `@rev-N` on the line (TOOL-dTrueNorth-5 S3), the
+    revision a spec-audit record read. A range carries no pin, so its ids get none. A caller reading
+    no pin takes the first two values only."""
+    ids, bad, pins = [], [], {}
+    one = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-(?P<rev>\d+))?$")
     rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
     for tok in rest.split():
         mo = one.match(tok)
         if mo:
-            ids.append(f"{mo.group('fam')}-{mo.group('slug')}-{mo.group('seq')}")
+            ident = f"{mo.group('fam')}-{mo.group('slug')}-{mo.group('seq')}"
+            ids.append(ident)
+            if mo.group("rev") is not None:
+                pins[ident] = max(pins.get(ident, 0), int(mo.group("rev")))
             continue
         mr = rng.match(tok)
         if mr and int(mr.group("lo")) <= int(mr.group("hi")):
@@ -631,11 +661,14 @@ def _expand_ids(rest: str, alt: str) -> tuple:
                 ids.append(f"{mr.group('fam')}-{mr.group('slug')}-{n}")
             continue
         bad.append(tok)
-    return ids, bad
+    return ids, bad, pins
 
 
 def read_bindings(root: str, tracked: list, conf: dict) -> dict:
-    """path -> {state, kind, ids, commissions, reason, bad}.
+    """path -> {state, kind, ids, pins, commissions, reason, bad}.
+
+    `pins` is the kind line's `{id: N}`, the highest `@rev-N` each id carries there, empty when none
+    does (TOOL-dTrueNorth-5 S3). A `**Commissions:**` line pins nothing.
 
     Does not raise for an UNREADABLE file — a decode or IO failure becomes a `state` row carrying
     `why`. It CAN still raise for a malformed conf. The former docstring said "Never raises."
@@ -647,7 +680,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     alt = _id_alternation(conf)
     out = {}
     for rel in record_paths(tracked, m):
-        rec = {"state": "absent", "kind": None, "ids": [], "commissions": [], "reason": None,
+        rec = {"state": "absent", "kind": None, "ids": [], "pins": {}, "commissions": [], "reason": None,
                "bad": [], "why": "no Serves line in the first %d unfenced lines" % BIND_HEAD_LINES}
         try:
             text = read_text(os.path.join(root, rel))
@@ -678,7 +711,7 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
             if not rest:
                 continue
             if mo.group("key") == "Commissions":
-                cids, bad = _expand_ids(rest, alt)
+                cids, bad, _cpins = _expand_ids(rest, alt)
                 rec["commissions"] = cids
                 rec["bad"] += bad
                 continue
@@ -696,9 +729,10 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
                 continue
             toks = rest.split()
             if toks and toks[0] in RECORD_KIND_TOKENS:
-                ids, bad = _expand_ids(" ".join(toks[1:]), alt)
+                ids, bad, pins = _expand_ids(" ".join(toks[1:]), alt)
                 rec["kind"] = toks[0]
                 rec["ids"] = ids
+                rec["pins"] = pins
                 rec["bad"] += bad
                 if not ids:
                     rec["state"] = "malformed"
@@ -722,9 +756,23 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
     that disagree is structurally impossible here.
     """
     m = conf["MEMORY_ROOT"]
+    # TOOL-dTrueNorth-5 S3 — THE AUDIT PIN'S CUTOFF, read before any row so a malformed value prints
+    # one line and no partial population: exit 2, which check 21 reds as a parse that did not complete.
+    cutoff = (conf.get("SPEC_AUDIT_PIN_CUTOFF") or "").strip()
+    if cutoff:
+        try:
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", cutoff):
+                raise ValueError(cutoff)
+            datetime.date.fromisoformat(cutoff)
+        except ValueError:
+            print(f"build-index: SPEC_AUDIT_PIN_CUTOFF={cutoff!r} is neither blank nor an ISO YYYY-MM-DD "
+                  f"date, so no spec-audit record's pin can be graded")
+            return 2
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
     defined = spec_ids(root, tracked, conf)
     binds = read_bindings(root, tracked, conf)
+    revs = read_spec_revs(root, tracked, conf) if cutoff else {}
+    graded = 0
     unbound = 0
     for rel in sorted(binds):
         rec = binds[rel]
@@ -744,11 +792,30 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
         # place this build exists to remove it.
         if rec["state"] == "bound":
             print(f"S\t{rel}\t{rec['kind']}\t{' '.join(rec['ids'])}")
+        # TOOL-dTrueNorth-5 S3 — the P rows: per id of a graded spec-audit record, an id carrying no
+        # `@rev-N` pin, or a pin above its spec's header revision, which would read as audited at every
+        # revision to come. Graded: dated on or after the cutoff, or undated, because unparseable is
+        # not old (the rule check 21's population filter states). An id no spec defines has no header
+        # to compare, and its B row below already names it.
+        if cutoff and rec["state"] == "bound" and rec["kind"] == "spec-audit":
+            dated = re.match(r"(\d{4}-\d{2}-\d{2})-", os.path.basename(rel))
+            if not dated or dated.group(1) >= cutoff:
+                graded += 1
+                for i in dict.fromkeys(rec["ids"]):
+                    pin = (rec.get("pins") or {}).get(i)
+                    if pin is None:
+                        print(f"P\t{rel}\t{i} carries no @rev-N pin")
+                    elif i in revs and pin > revs[i]:
+                        print(f"P\t{rel}\t{i}@rev-{pin} pins a revision its spec has not reached, "
+                              f"header rev-{revs[i]}")
         for tok in rec["bad"]:
             print(f"B\t{rel}\t{tok} is not a family-qualified id or range")
         for i in rec["ids"] + rec["commissions"]:
             if i not in defined:
                 print(f"B\t{rel}\t{i} is named but no spec H1 in this tree defines it")
+    # The audit pin's LIVENESS row, on every run: how many records the P branch graded and from what
+    # cutoff, so a population of zero is announced rather than read as a clean corpus.
+    print(f"Q\t{graded}\t{cutoff or 'off'}")
     print(f"N\t{unbound}")
     return 0
 
@@ -1485,13 +1552,37 @@ def render_region(build: dict) -> str:
     # would render `Ids no record names.`, a different sentence, for the commonest case of all.
     out += [""] + (_render_wrapped_ids("Ids no record names:", gap) if gap else
                    ["Ids no record names: none — every unit id is named by a record."])
-    # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit record names
-    # EVER — a spec audited at rev-1 and since bumped does not appear here. An "unreviewed" label
-    # would be a coverage claim the data cannot support.
+    # This line reports ids no spec-audit record names EVER, so a spec audited at rev-1 and since bumped
+    # does not appear in it. The line below it is where "unaudited" is a claim the data supports, and
+    # only for the ids a record PINS (TOOL-dTrueNorth-5 S5): an unpinned id is not judged there.
     out += [""] + (_render_wrapped_ids("Ids no `spec-audit` record has ever named:", agap) if agap
                    else ["Ids no `spec-audit` record has ever named: none — every unit id has one."])
+    # UNCONDITIONAL, as both joins above are, and the none branch COUNTS the units a pin judged, so a
+    # build no pinned record covers reads `0 of <n>` and never as a build whose specs are all audited.
+    past = derive_past_pin_ids(build["units"], recs)
+    pinned = {i for r in recs if r.get("kind") == "spec-audit" for i in (r.get("pins") or {})}
+    out += [""] + (_render_wrapped_ids("Ids whose spec moved past its audited revision:", past) if past else
+                   [f"Ids whose spec moved past its audited revision: none — "
+                    f"{sum(1 for i in own if i in pinned)} of {len(own)} unit id(s) carry a pin."])
     out.append(MARK_CLOSE)
     return "\n".join(out)
+
+
+def derive_past_pin_ids(units: list, records: list) -> list:
+    """`<id>@rev-<N>` for each unit whose header revision exceeds `N`, the highest pin any of the
+    build's `spec-audit` records gives it (TOOL-dTrueNorth-5 S5), in unit order.
+
+    The token names the PIN; the current revision is the units table's `rev` column, so it is not
+    typed twice. A unit no record pins is not judged and is not returned.
+    """
+    top: dict = {}
+    for r in records:
+        if r.get("kind") != "spec-audit":
+            continue
+        for i, n in (r.get("pins") or {}).items():
+            top[i] = max(top.get(i, 0), n)
+    return [f"{u['id']}@rev-{top[u['id']]}" for u in units
+            if u["id"] in top and int(u["rev"]) > top[u["id"]]]
 
 
 IDS_WRAP = 300
@@ -3116,7 +3207,7 @@ def read_idlist(tokens, alt: str) -> list:
                 continue
             ids += [f"{stem}-{n}" for n in range(lo, hi + 1)]
             continue
-        got, wrong = _expand_ids(token, alt)
+        got, wrong, _pins = _expand_ids(token, alt)
         if wrong or not got:
             bad.append(f"`{token}` (neither an id, an id range, nor a `-N` continuation)")
             continue
@@ -5126,6 +5217,69 @@ def cmd_selftest() -> int:
         arm("--print-bindings still exits 0 with an S row present", "0",
             lambda: str(cmd_print_bindings(t13, conf13)))
 
+        # TOOL-dTrueNorth-5 AC4 — THE AUDIT PIN. The cutoff arms a P row per unpinned or over-pinned
+        # id of a spec-audit record dated on or after it, and a Q row counting the records graded.
+        # Five records, one per side of each line the branch draws: unpinned at the cutoff, pinned
+        # above the header, pinned at it, a diff review, and a spec audit dated before the cutoff.
+        # Against the base generator every arm here reds: it prints neither row.
+        def _pq(tree, cf):
+            rows = _rows(tree, cf).splitlines()
+            return "P=%d %s" % (sum(1 for r in rows if r.startswith("P\t")),
+                                " ".join(r for r in rows if r.startswith("Q\t")))
+
+        def _pin_conf(tree, value):
+            cpath = os.path.join(tree, ".memory-tree.conf")
+            kept = [ln for ln in read_text(cpath).split("\n") if not ln.startswith("SPEC_AUDIT_PIN_CUTOFF=")]
+            write_text(cpath, "\n".join(kept).rstrip("\n") + f'\nSPEC_AUDIT_PIN_CUTOFF="{value}"\n')
+            return load_conf(tree)
+
+        t5p = os.path.join(base, "pin"); os.makedirs(t5p)
+        _fixture(t5p)
+        rv5 = "memory/builds/tOne/reviews/"
+        for name, line in (("2026-01-01-review-ARCH-tOne-1-spec-audit.md", "spec-audit ARCH-tOne-1"),
+                           ("2026-02-02-review-ARCH-tOne-1-over.md", "spec-audit ARCH-tOne-1@rev-5"),
+                           ("2026-02-03-review-ARCH-tOne-1-held.md", "spec-audit ARCH-tOne-1@rev-1"),
+                           ("2026-02-04-review-ARCH-tOne-1-diff.md", "diff-review ARCH-tOne-1"),
+                           ("2025-12-31-review-ARCH-tOne-1-old.md", "spec-audit ARCH-tOne-1")):
+            _rec5 = os.path.join(t5p, rv5 + name)
+            os.makedirs(os.path.dirname(_rec5), exist_ok=True)
+            write_text(_rec5, f"**Serves:** {line}\n\n# r\n")
+        run("git", "add", "-A", cwd=t5p)
+        conf5 = _pin_conf(t5p, "2026-01-01")
+        arm("TOOL-dTrueNorth-5 AC4 — an unpinned spec-audit record dated AT the cutoff prints a P row",
+            "P\t" + rv5 + "2026-01-01-review-ARCH-tOne-1-spec-audit.md\tARCH-tOne-1 carries no @rev-N pin",
+            lambda: _rows(t5p, conf5))
+        arm("TOOL-dTrueNorth-5 AC4 — a pin above its spec's header prints a P row naming both revisions",
+            "P\t" + rv5 + "2026-02-02-review-ARCH-tOne-1-over.md\tARCH-tOne-1@rev-5 pins a revision its "
+            "spec has not reached, header rev-1", lambda: _rows(t5p, conf5))
+        arm("TOOL-dTrueNorth-5 AC4 — the held pin, the diff review and the pre-cutoff record print none, "
+            "and Q counts the three spec audits graded", "P=2 Q\t3\t2026-01-01", lambda: _pq(t5p, conf5))
+        arm("TOOL-dTrueNorth-5 AC4 — read_bindings keeps the pin on the record", "{'ARCH-tOne-1': 1}",
+            lambda: str(read_bindings(t5p, [rv5 + "2026-02-03-review-ARCH-tOne-1-held.md"], conf5)
+                        [rv5 + "2026-02-03-review-ARCH-tOne-1-held.md"]["pins"]))
+        arm("TOOL-dTrueNorth-5 AC4 — a blank cutoff prints no P row and a Q row saying off", "P=0 Q\t0\toff",
+            lambda: _pq(t5p, _pin_conf(t5p, "")))
+        arm("TOOL-dTrueNorth-5 AC4 — a cutoff that is no date exits 2 naming the key",
+            "2 build-index: SPEC_AUDIT_PIN_CUTOFF='soon'",
+            lambda: (lambda cf: "%s %s" % (cmd_print_bindings(t5p, cf), _rows(t5p, cf).strip()))(
+                _pin_conf(t5p, "soon")))
+        # TOOL-dTrueNorth-5 AC6 — THE PAST-PIN LINE, judged only over the ids a record pins. Here the
+        # highest pin, rev-5, is above the header, so nothing is past it and the count says one was judged.
+        arm("TOOL-dTrueNorth-5 AC6 — a spec at or below its highest pin renders none, counting the pinned ids",
+            "Ids whose spec moved past its audited revision: none — 1 of 1 unit id(s) carry a pin.",
+            lambda: plan(t5p, _pin_conf(t5p, "2026-01-01"))[0]["memory/builds/tOne/README.md"])
+        t5r = os.path.join(base, "pastpin"); os.makedirs(t5r)
+        conf5r = _fixture(t5r)
+        _spec5 = os.path.join(t5r, "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md")
+        write_text(_spec5, read_text(_spec5).replace(" · rev-1 · ", " · rev-3 · "))
+        _rec5 = os.path.join(t5r, rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md")
+        os.makedirs(os.path.dirname(_rec5), exist_ok=True)
+        write_text(_rec5, "**Serves:** spec-audit ARCH-tOne-1@rev-2\n\n# r\n")
+        run("git", "add", "-A", cwd=t5r)
+        arm("TOOL-dTrueNorth-5 AC6 — a spec whose header moved past its highest pin is named at the pin",
+            "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-2.",
+            lambda: plan(t5r, conf5r)[0]["memory/builds/tOne/README.md"])
+
         # ---- the rendered Records table and the two coverage joins.
         # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER
         # SENTENCE arm both lose their subject here. The sentence was the record selector's liveness
@@ -5163,6 +5317,9 @@ def cmd_selftest() -> int:
         arm("a build with NO records renders no table, and BOTH joins saying none", "True",
             lambda: str("| Record | Kind | Serves |" not in
                         plan(t15, conf15)[0]["memory/builds/tOne/README.md"]))
+        arm("TOOL-dTrueNorth-5 AC6 — a build no record pins judges none, and its count says zero",
+            "Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.",
+            lambda: plan(t15, conf15)[0]["memory/builds/tOne/README.md"])
         # TOOL-dRetiredFork-18. This arm grades the EMISSION, which is the gap the two arms on
         # `_render_wrapped_ids` could not see: that helper passed in isolation for as long as
         # nothing called it, while a 24-unit build rendered 509- and 531-character gap lines. The

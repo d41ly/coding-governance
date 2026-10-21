@@ -95,7 +95,11 @@ function readOutputTokens() {
 //   byDesign: "known/tracked issues reviewers must NOT re-report",
 //   reviewDir: "where synth writes the report (repo-relative)",
 //   kind: "diff-review" | "spec-audit",   // DEFAULTS to "diff-review" when absent
-//   subjects: [{ path, blob, prevBlob }], // spec-audit ONLY; blob is 7-40 hex, per subject; prevBlob, optional
+//   subjects: [{ path, blob, id, rev, prevBlob }], // spec-audit ONLY; blob is 7-40 hex, per subject; id,
+//                                         // REQUIRED at every round, is the unit id the spec defines and
+//                                         // rev the integer N of the rev-N its status header carries at
+//                                         // that blob, so the record's binding line pins `<id>@rev-<N>`;
+//                                         // prevBlob, optional
 //                                         // and legal at round > 1 only, is the 7-40 hex blob of that path
 //                                         // the previous round audited, and names the fold diff
 //   scratch: "<absolute session scratchpad>", // spec-audit ONLY and REQUIRED there: where a probing lens
@@ -298,6 +302,13 @@ const reviewScope = kind + ' round ' + round
 function renderAgentLabel(scope, stage) {
   return [reviewSlug, scope, stage].filter(Boolean).join(' · ')
 }
+// TOOL-dTrueNorth-5 S1 - a spec audit's binding line, RENDERED here and copied by the synthesis agent:
+// each subject's `<id>@rev-<rev>` in subject order, so the record pins the revision of every spec it
+// read and a revision past that pin reads as unaudited. Pure, and reached only with subjects the pin
+// refusal below has passed, so each id matches an anchored grammar and carries no newline.
+function renderAuditBinding(subjects) {
+  return '**Serves:** spec-audit ' + subjects.map(function (x) { return x.id + '@rev-' + x.rev }).join(' ')
+}
 // The run's identity is its first log line and the first key of every return: the tool titles the
 // run with `meta.name` alone.
 const identity = renderAgentLabel(reviewScope, 'review')
@@ -356,7 +367,7 @@ if (isSpec) {
   if (noSubjects || badIdx !== -1) {
     const badSubject = noSubjects ? 'none supplied' : subjects[badIdx]
     const why =
-      'tier2-review: a spec-audit needs `subjects`, a non-empty array of {path, blob}, where blob is ' +
+      'tier2-review: a spec-audit needs `subjects`, a non-empty array of {path, blob, id, rev}, where blob is ' +
       'an immutable 7-40 hex object id. Got ' + JSON.stringify(badSubject) + '. The anchor is what ' +
       'makes "which rev was reviewed" answerable from the record; a spec header base is the same on ' +
       'every rev and would prove nothing. Resolve one: git hash-object <path>.'
@@ -372,6 +383,27 @@ if (isSpec) {
     }
     if (round > 1) throw new Error(why)
     log('WARNING: ' + why)
+  }
+  // TOOL-dTrueNorth-5 S1 - THE PIN, refused at EVERY round. The record's binding line names each spec
+  // it read as `<id>@rev-<N>` (`renderAuditBinding`), so a subject with no well-formed `id` or `rev`
+  // leaves the record nothing to pin. Round 1 refuses too, unlike a malformed blob: the record is the
+  // point of the run, and an unpinned one is what this refusal exists to stop. The id grammar is
+  // `expand_id_runs`', anchored, which also keeps a newline out of the prompt line the id reaches.
+  const PIN_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
+  const pinWhy = ' The pin is what makes a revision of that spec past it read as unaudited.'
+  const pinnedIds = []
+  for (let i = 0; i < subjects.length; i++) {
+    const x = subjects[i] && typeof subjects[i] === 'object' ? subjects[i] : {}
+    if (typeof x.id !== 'string' || !PIN_ID.test(x.id))
+      throw new Error('tier2-review: spec-audit subject ' + i + "'s `id` must be the unit id its spec defines, matching " +
+        String(PIN_ID) + '. Got ' + JSON.stringify(x.id) + '.' + pinWhy)
+    if (!Number.isInteger(x.rev) || x.rev < 1)
+      throw new Error('tier2-review: spec-audit subject ' + i + "'s `rev` must be the integer N of the rev-N its spec's " +
+        'status header carries at that blob, 1 or more. Got ' + JSON.stringify(x.rev) + '.' + pinWhy)
+    if (pinnedIds.indexOf(x.id) !== -1)
+      throw new Error('tier2-review: spec-audit subject ' + i + "'s `id` " + x.id + ' repeats subject ' + pinnedIds.indexOf(x.id) +
+        "'s, and a binding line carries one pin per id." + pinWhy)
+    pinnedIds.push(x.id)
   }
   // TOOL-aEvidencedLens-4 S1 - `prevBlob`, the blob the previous round audited. Refused when malformed
   // and refused at round 1 at any shape (spec F1): it has no meaning there, so it is a caller error, and
@@ -1791,9 +1823,18 @@ const synth = await agent(
     // TOOL-dTieredTribunal-11 S8 - the kind token is the PARAMETER, not a hardcoded string. S1 closes
     // the legal set to two, and both are members of the memory tree's closed record-kind vocabulary,
     // so this token cannot leave that vocabulary without S1's refusal firing first.
-    `The report's FIRST line must be the record's binding line, exactly: **Serves:** ${kind} ` +
-    `followed by every unit id ${isSpec ? 'the reviewed spec set defines' : 'in the diff'}, space-separated. A kind with no id is malformed under the ` +
-    `project's record-binding grammar, so never emit the kind alone. ` +
+    // TOOL-dTrueNorth-5 S1 - on the spec kind the line is the HARNESS'S value, rendered from each
+    // subject's pin, and the agent copies it: an agent composing the id list cannot know the revision
+    // each spec's header carried at its blob, and a prompt-held list did not hold under a merging
+    // synthesis (the TOOL-dMergedTally-1 note below). The diff kind keeps its sentence.
+    (isSpec
+      ? `The report's FIRST line must be the record's binding line, which the harness rendered from each ` +
+        `subject's pinned revision: copy the line between the two marker lines below VERBATIM, alone on its ` +
+        `own line, neither marker line copied, and add, drop or reorder no id on it.\n` +
+        `<<<SERVES\n${renderAuditBinding(subjects)}\nSERVES>>>\n`
+      : `The report's FIRST line must be the record's binding line, exactly: **Serves:** ${kind} ` +
+        `followed by every unit id in the diff, space-separated. A kind with no id is malformed under the ` +
+        `project's record-binding grammar, so never emit the kind alone. `) +
     // TOOL-dMergedTally-1 - THE AGENT RETURNS IDS AND THIS FILE COUNTS THEM. TOOL-dTieredTribunal-1
     // S5 defined `blockers` and `highs` as the CONFIRMED findings at each severity and had the agent
     // type both integers, and its own note said the agreement was a property of this prompt and not
