@@ -30,7 +30,10 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
   `manifest-audit` block; `.memory-tree.conf` and `tools/memory-tree/check-memory-hygiene.sh` are on it) is refused
   by the pre-commit hook until that manifest's `last-audit` stamp is re-stamped in the same commit, with the delta
   line the manifest's stamp rule asks for in the commit message. Put the manifest in your write set when you touch one.
-- Do not regenerate the codebase map; the main loop runs the declared regenerations once, at the close.
+- When the pre-commit hook refuses on a stale codebase map (`memory/map/generated/`), run the map generator it
+  names and commit its output with your pass, declaring those paths in `--dispatch`. Regenerate nothing else.
+- A spec held `OPEN` refuses your product writes at the write gate: move its status to `INPROGRESS` first, as
+  unit 1's builder did, then `CLOSED` in the pass commit.
 - Run no gate leg, no `*.test.sh` suite, no merge bar. Verify each AC by the probe or fixture the spec names. A new
   suite arm goes in the suite file and on a `New arm:` line; the main loop observes it red and green at the close.
 
