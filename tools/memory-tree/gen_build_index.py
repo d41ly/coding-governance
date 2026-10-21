@@ -5222,12 +5222,12 @@ def cmd_selftest() -> int:
         # Five records, one per side of each line the branch draws: unpinned at the cutoff, pinned
         # above the header, pinned at it, a diff review, and a spec audit dated before the cutoff.
         # Against the base generator every arm here reds: it prints neither row.
-        def _pq(tree, cf):
+        def _read_pin_rows(tree, cf):
             rows = _rows(tree, cf).splitlines()
             return "P=%d %s" % (sum(1 for r in rows if r.startswith("P\t")),
                                 " ".join(r for r in rows if r.startswith("Q\t")))
 
-        def _pin_conf(tree, value):
+        def _set_pin_cutoff(tree, value):
             cpath = os.path.join(tree, ".memory-tree.conf")
             kept = [ln for ln in read_text(cpath).split("\n") if not ln.startswith("SPEC_AUDIT_PIN_CUTOFF=")]
             write_text(cpath, "\n".join(kept).rstrip("\n") + f'\nSPEC_AUDIT_PIN_CUTOFF="{value}"\n')
@@ -5245,7 +5245,7 @@ def cmd_selftest() -> int:
             os.makedirs(os.path.dirname(_rec5), exist_ok=True)
             write_text(_rec5, f"**Serves:** {line}\n\n# r\n")
         run("git", "add", "-A", cwd=t5p)
-        conf5 = _pin_conf(t5p, "2026-01-01")
+        conf5 = _set_pin_cutoff(t5p, "2026-01-01")
         arm("TOOL-dTrueNorth-5 AC4 — an unpinned spec-audit record dated AT the cutoff prints a P row",
             "P\t" + rv5 + "2026-01-01-review-ARCH-tOne-1-spec-audit.md\tARCH-tOne-1 carries no @rev-N pin",
             lambda: _rows(t5p, conf5))
@@ -5253,21 +5253,21 @@ def cmd_selftest() -> int:
             "P\t" + rv5 + "2026-02-02-review-ARCH-tOne-1-over.md\tARCH-tOne-1@rev-5 pins a revision its "
             "spec has not reached, header rev-1", lambda: _rows(t5p, conf5))
         arm("TOOL-dTrueNorth-5 AC4 — the held pin, the diff review and the pre-cutoff record print none, "
-            "and Q counts the three spec audits graded", "P=2 Q\t3\t2026-01-01", lambda: _pq(t5p, conf5))
+            "and Q counts the three spec audits graded", "P=2 Q\t3\t2026-01-01", lambda: _read_pin_rows(t5p, conf5))
         arm("TOOL-dTrueNorth-5 AC4 — read_bindings keeps the pin on the record", "{'ARCH-tOne-1': 1}",
             lambda: str(read_bindings(t5p, [rv5 + "2026-02-03-review-ARCH-tOne-1-held.md"], conf5)
                         [rv5 + "2026-02-03-review-ARCH-tOne-1-held.md"]["pins"]))
         arm("TOOL-dTrueNorth-5 AC4 — a blank cutoff prints no P row and a Q row saying off", "P=0 Q\t0\toff",
-            lambda: _pq(t5p, _pin_conf(t5p, "")))
+            lambda: _read_pin_rows(t5p, _set_pin_cutoff(t5p, "")))
         arm("TOOL-dTrueNorth-5 AC4 — a cutoff that is no date exits 2 naming the key",
             "2 build-index: SPEC_AUDIT_PIN_CUTOFF='soon'",
             lambda: (lambda cf: "%s %s" % (cmd_print_bindings(t5p, cf), _rows(t5p, cf).strip()))(
-                _pin_conf(t5p, "soon")))
+                _set_pin_cutoff(t5p, "soon")))
         # TOOL-dTrueNorth-5 AC6 — THE PAST-PIN LINE, judged only over the ids a record pins. Here the
         # highest pin, rev-5, is above the header, so nothing is past it and the count says one was judged.
         arm("TOOL-dTrueNorth-5 AC6 — a spec at or below its highest pin renders none, counting the pinned ids",
             "Ids whose spec moved past its audited revision: none — 1 of 1 unit id(s) carry a pin.",
-            lambda: plan(t5p, _pin_conf(t5p, "2026-01-01"))[0]["memory/builds/tOne/README.md"])
+            lambda: plan(t5p, _set_pin_cutoff(t5p, "2026-01-01"))[0]["memory/builds/tOne/README.md"])
         t5r = os.path.join(base, "pastpin"); os.makedirs(t5r)
         conf5r = _fixture(t5r)
         _spec5 = os.path.join(t5r, "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md")
