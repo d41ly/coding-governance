@@ -22,7 +22,7 @@ ran in a `git clone --shared` of that worktree under the session's scratch folde
 - `bash tools/unattended/unattended.sh --claims`: exit 0, answering from the remote (rows such as `aSparedSpawn
   daily-agent held`, `dHomedResolver d41ly landed`).
 - `check-wiring.sh`'s check mode: clean (exit 0).
-- The resume tick: NOT listed. This observation stays OPEN until the owner registers it.
+- The resume tick: listed since 2026-10-21 (`[owner-step-d]`).
 - `bash tools/unattended/unattended.sh --plan dClosedLoop --paths`: exit 0. It printed
   `2026-10-20-spec-PLAY-dClosedLoop-1.md - NOT A UNIT (no status header)` and `next: PLAY-dClosedLoop-1 (MISSING -
   spec it first)`: the driver's plan reader does not read the unit spec's status header. Raised with the owner; the
@@ -37,9 +37,18 @@ ran in a `git clone --shared` of that worktree under the session's scratch folde
 
 ## [owner-step-d]
 
-The one step P0.9 leaves on node d is the owner's: register the resume tick under the login whose `claude` CLI is
-authenticated, as `tools/unattended/README.md` describes it, then confirm it with `schtasks /query /tn
-gov-resume-tick`.
+The owner, 2026-10-21: "register the resume tick here and land". dClosedLoop's session ran the tick's dry run
+first, `bash tools/unattended/resume-tick.sh --repo C:/projects/coding-governance --dry-run`: exit 0, 364 decisions,
+every one a skip (runs leased on node a), so a tick launches nothing on node d today; one dry pass takes minutes,
+well inside the ten-minute interval. Then, from PowerShell, as `tools/unattended/README.md` gives it:
+
+```
+schtasks /create /sc minute /mo 10 /tn gov-resume-tick /tr '"C:\Program Files\Gitinash.exe" -lc "C:/projects/coding-governance/tools/unattended/resume-tick.sh --repo C:/projects/coding-governance"'
+```
+
+`SUCCESS: The scheduled task "gov-resume-tick" has successfully been created.` `schtasks /query /tn gov-resume-tick`
+reads `Status: Ready`, `Run As User: d41ly`, `Repeat: Every: 0 Hour(s), 10 Minute(s)`. All four of P0.9's observations
+now hold on node d; nodes a and b have not run their steps.
 
 ## [node-a]
 
