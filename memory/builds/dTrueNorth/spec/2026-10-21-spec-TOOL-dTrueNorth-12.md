@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-12-deviation-11.md](../build/2026-10-21-build-TOOL-dTrueNorth-12-deviation-11.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-12-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-12-build-brief.md) | journal | — |
 | [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 

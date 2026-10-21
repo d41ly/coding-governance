@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-19-deviation-18.md](../build/2026-10-21-build-TOOL-dTrueNorth-19-deviation-18.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-19-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-19-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

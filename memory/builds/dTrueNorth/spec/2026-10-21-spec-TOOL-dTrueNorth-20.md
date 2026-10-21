@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-20 — the round-2 spec audit's 38 minors: declared keys, honest exits, bounded reads, one reader each, and the records that name them
 
-**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
+**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-20-deviation-19.md](../build/2026-10-21-build-TOOL-dTrueNorth-20-deviation-19.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-20-deviation-20.md](../build/2026-10-21-build-TOOL-dTrueNorth-20-deviation-20.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-20-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-20-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
@@ -482,7 +484,7 @@ at the close is its targeted probe, as `TOOL-dTrueNorth-16` §7 states for its o
   the records, so the resolver is the main loop under the chain's rungs, or the owner. Rung 5 (veto 2 only, outside the grant): RESOLVED (agent, 2026-10-21, delegated): (a), citing
   ER:388 (`PLAY-dClosedLoop-6`), applied by the main loop before TOOL-dTrueNorth-15's dispatch, which the
   hits refused: two token rows (the three hits share two tokens), count 23 to 25, and ask `TOOL-dTrueNorth-21`
-  in this build's `BACKLOG.md`, naming dPinnedHandoff. widens: memory/project/spec-token-waivers.txt rises 23 to 25 · relaxes: none
+  in this build's `BACKLOG.md`, naming dPinnedHandoff. widens: memory/project/spec-token-waivers.txt · relaxes: none
 - **F4 — Which mechanism closes id 42?** (a) Two code-49 refusals at `--dispatch`. (b) A hygiene
   arm reporting a cycle at the bar. (c) The statement alone. (c) leaves the wedge, failing the
   finding (veto 1); (a) and (b) each change a governance carrier no dTrueNorth clause names, so veto 2
@@ -512,6 +514,7 @@ at the close is its targeted probe, as `TOOL-dTrueNorth-16` §7 states for its o
 - rev-1 · 2026-10-21 · initial draft, batching the round-2 spec audit's 21 MEDIUM and 17 LOW findings.
 - rev-2 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 - rev-3 · 2026-10-21 · §8 · F3 resolved by rung 5 and applied before unit 15's dispatch: two waiver rows and ask `TOOL-dTrueNorth-21`.
+- rev-4 · 2026-10-21 · §8 · F3's `widens:` value spelled as the commit's `Decided:` trailer spells it, so the departures report joins one record to both.
 
 ## 10. Reuse audit
 
