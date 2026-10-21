@@ -78,6 +78,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "DesignRefusal",
+      "kind": "class",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "Dossier",
       "kind": "class",
       "file": "tools/codebase-map/map_lib.py"
@@ -6508,6 +6513,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_clause_hash",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "derive_clauses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -8223,6 +8233,11 @@
       "file": "tools/memory-recall/extract.py"
     },
     {
+      "id": "extract_clause_tokens",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "extract_clauses",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -9865,6 +9880,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
@@ -11098,6 +11118,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "parse_binding_lines",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "parse_candidates",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
@@ -11506,6 +11531,11 @@
       "id": "print_bad",
       "kind": "function",
       "file": "tools/unattended/stop-guard.test.sh"
+    },
+    {
+      "id": "print_binding",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "print_canon_posture",
@@ -12748,6 +12778,16 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "read_design",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_design_view",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "read_digest_classes",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -13593,6 +13633,11 @@
       "file": "tools/run-gates/run-gates.test.sh"
     },
     {
+      "id": "read_owned_nodes",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "read_parity",
       "kind": "function",
       "file": "tools/run-gates/held_halves.py"
@@ -13913,9 +13958,19 @@
       "file": "tools/run-gates/post-merge.sh"
     },
     {
+      "id": "read_repo_root",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "read_report",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "read_retired_ids",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "read_rev",
@@ -18590,6 +18645,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
     },
     {
@@ -19631,6 +19691,11 @@
       "id": "scan_census_tick",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "scan_chain_specs",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "scan_claimed_paths",

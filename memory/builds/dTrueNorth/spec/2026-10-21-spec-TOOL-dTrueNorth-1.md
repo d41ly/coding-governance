@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-1 — the clause ids and binding lines, parsed once, behind a cutoff
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
 
 **Carries:** cl-dClosedLoop-0001@83b6b117 whole
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-1-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-1-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-build-brief.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-owner-audit-cap.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-owner-audit-cap.md) | research | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |

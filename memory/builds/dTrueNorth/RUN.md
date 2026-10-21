@@ -60,3 +60,9 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-21T16:09:52Z rescope · item add TOOL-dTrueNorth-20 · reason spec-audit round 2 (reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) the 38 confirmed minors batched into one unit: 21 MEDIUM, ids 2 4 5 11 12 13 24 25 26 27 28 29 30 33 36 37 39 40 41 42 43 (items M1 to M18), and 17 LOW, ids 3 6 7 9 10 14 15 16 18 19 20 23 31 32 35 45 46 (items L1 to L15); one unit, not two, because every candidate half writes a file the other reads as a contract
 
 2026-10-21T16:25:50Z review · item dTrueNorth-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 38 · disposition promote
+
+2026-10-21T16:43:18Z dispatch · item 4325e6a5 TOOL-dTrueNorth-1 · reason tools/memory-tree/design_lib.py .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-1.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-1-ledger.md memory/builds/dTrueNorth/README.md memory/LIVE.md
+
+2026-10-21T16:43:30Z brief · item TOOL-dTrueNorth-1 · reason ec958c5aaac2 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-build-brief.md
+
+2026-10-21T17:03:43Z dispatch · item 4325e6a5 TOOL-dTrueNorth-1 · reason memory/map/generated/symbols.json
