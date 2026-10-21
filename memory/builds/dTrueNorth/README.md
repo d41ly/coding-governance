@@ -91,7 +91,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg](spec/2026-10-21-spec-TOOL-dTrueNorth-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal](spec/2026-10-21-spec-TOOL-dTrueNorth-3.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-11 — the build-index and memory-hygiene self-test legs guard the spec-token checker their arms load](spec/2026-10-21-spec-TOOL-dTrueNorth-11.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-21 |
-| [TOOL-dTrueNorth-15 — check 29 counts what it graded on every run, and says so when nothing was](spec/2026-10-21-spec-TOOL-dTrueNorth-15.md) | 2 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-15 — check 29 counts what it graded on every run, and says so when nothing was](spec/2026-10-21-spec-TOOL-dTrueNorth-15.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-5 — every spec audit pins the revision it read](spec/2026-10-21-spec-TOOL-dTrueNorth-5.md) | 2 | 2 | OPEN | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-13 — a design-document subject of a spec audit: its id served bare, and no pin owed for it](spec/2026-10-21-spec-TOOL-dTrueNorth-13.md) | 3 | 2 | OPEN | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-14 — the audit-pin arm grades a record by the harness that wrote it, so a run in flight is not refused at its merge](spec/2026-10-21-spec-TOOL-dTrueNorth-14.md) | 3 | 2 | OPEN | rev-2 | 2026-10-21 |
@@ -109,7 +109,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 8 | 2 | OPEN | rev-2 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 29 bound to this build, across 4 record folder(s).
+Records: 30 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -4088,6 +4088,15 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
   out=$(run_cov29_gate --only 29); r29rc=$?
   n=$((n+1)); case "$r29rc:$out" in 0:*"HYGIENE --only 29 ran checks 29"*) ;; *) echo "FAIL check 29 through the engine: the clean INPROGRESS chain spec exited $r29rc, or check 29 never ran:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1 ;; esac
   cnot 29 "is INPROGRESS while"
+  # TOOL-dTrueNorth-15 AC1 AC3 — the coverage clean and no chain spec INPROGRESS, the harness's state:
+  # check 29 grades nothing, and its green run carries the verb's count line saying so. Red against a
+  # verb that prints nothing on a green run. LC_ALL=C and `.+` over each dash: the line is the
+  # generator's, so its dashes are whatever bytes that Python's stdout encoding wrote.
+  write_cov29_spec OPEN
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 0 ] || { echo "FAIL check 29 through the engine: a clean chain build with no INPROGRESS spec exited $r29rc, not 0"; st=1; }
+  n=$((n+1)); LC_ALL=C grep -qE '^memory-hygiene: check 29: coverage .+ check 29 graded 0 INPROGRESS chain spec\(s\) in 0 of 1 chain build\(s\) .+ nothing graded: no chain spec is INPROGRESS, and under the unattended harness a spec goes OPEN to CLOSED in its build commit, so this check grades attended builds only' <<<"$out" \
+    || { echo "FAIL check 29 through the engine: a green run grading no INPROGRESS chain spec printed no count line naming the empty population:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1; }
   # AC7 — the plant standing and the spec OPEN, before its Design exit: not refused.
   write_cov29_view '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n'
   write_cov29_spec OPEN
@@ -4112,7 +4121,7 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
   chit 29 "DESIGN_VIEW names memory/design/no-such-view.md"
   cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"
 else
-  echo "skip check 29 through the engine: no check-spec-tokens.py in this kit directory's parent, so its 12 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+12))
+  echo "skip check 29 through the engine: no check-spec-tokens.py in this kit directory's parent, so its 14 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+14))
 fi
 
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
@@ -4183,7 +4192,9 @@ fi
 # check-29 engine assertions, each top-level, the twelve skipped aloud with n_skip carrying them when
 # no spec-token checker sits in the kit directory's parent. Counted by reading, since the pass runs no
 # suite; OWED: observed at the close.
-FLOOR_ASSERTIONS=648
+# RAISED 648 -> 650 by TOOL-dTrueNorth-15: its two check-29 count-line assertions, each top-level and
+# skipped aloud with that block's twelve. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=650
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

@@ -2674,21 +2674,34 @@ def cmd_check_coverage(root: str, conf: dict) -> int:
     exit 1. A spec at any other status is not read: OPEN, SPECCED and BLOCKED precede the exit, and a
     terminal or DEFERRED spec is not building. Off, one line naming the blank key and exit 0; a
     Problem is `main()`'s exit 2. Hygiene check 29 is this verb's one caller.
+
+    TOOL-dTrueNorth-15 S1: every armed run, refused or green, ends on one count line — the INPROGRESS
+    chain specs graded, the chain builds holding one, and every chain build of the view — and at a
+    count of zero the line names the empty population and why. The harness takes each spec OPEN to
+    CLOSED in its build commit, so a silent green there would read as a refusal never applied.
     """
     value = read_carries_coverage(root, conf)
     if value["state"] == "off":
         print(f"build-index: coverage is not read — {value['key']} is blank, so no chain spec is refused")
         return 0
-    refused = 0
+    refused = graded = holding = 0
     for b in sorted(value["builds"]):
         e = value["builds"][b]
+        building = [path for path, status in e["specs"] if status == "INPROGRESS"]
+        graded += len(building)
+        holding += bool(building)
         if not e["findings"]:
             continue
         red = "; ".join(f"{arm} {ref}" for _where, arm, ref, _why in e["findings"])
-        for path, status in e["specs"]:
-            if status == "INPROGRESS":
-                print(f"build-index: coverage — {path} is INPROGRESS while {b}'s coverage is red: {red}")
-                refused += 1
+        for path in building:
+            print(f"build-index: coverage — {path} is INPROGRESS while {b}'s coverage is red: {red}")
+            refused += 1
+    count = (f"build-index: coverage — check 29 graded {graded} INPROGRESS chain spec(s) in {holding} of "
+             f"{len(value['builds'])} chain build(s)")
+    if not graded:
+        count += (" — nothing graded: no chain spec is INPROGRESS, and under the unattended harness a spec "
+                  "goes OPEN to CLOSED in its build commit, so this check grades attended builds only")
+    print(count)
     return 1 if refused else 0
 
 

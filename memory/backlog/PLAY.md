@@ -25,5 +25,6 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-17](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
 | [PLAY-dClosedLoop-18](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT… |
 | [PLAY-dClosedLoop-19](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | THE UNATTENDED KIT'S OWN SELF-TEST SUITES GO UNREAD AT dLinkedLibrary'S… |
+| [PLAY-dClosedLoop-20](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-21 | CHECK 29 GRADES ATTENDED BUILDS ONLY. dTrueNorth's hygiene check 29… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
