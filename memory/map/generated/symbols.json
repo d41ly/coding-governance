@@ -3633,6 +3633,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_baseline",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
       "id": "check_benched_probe_arms",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
@@ -5406,6 +5411,11 @@
       "id": "check_verdict_read",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "check_view",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "check_view_line",
@@ -9970,6 +9980,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/memory-tree/backlog.py"
     },
     {
@@ -11638,6 +11653,11 @@
       "file": "tools/roles/handoff.py"
     },
     {
+      "id": "print_asbuilt_verdicts",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "print_audit",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -13126,6 +13146,11 @@
       "id": "read_fixture_keys",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "read_fixture_row",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "read_flag_value",
@@ -14853,6 +14878,16 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "read_view_inputs",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "read_view_state",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
       "id": "read_visit_facts",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -15668,6 +15703,11 @@
       "file": "tools/run-gates/regen.py"
     },
     {
+      "id": "render_asbuilt_view",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "render_ask_detail",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -15861,6 +15901,11 @@
       "id": "render_family_view",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "render_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "render_gate_line",
@@ -16371,6 +16416,11 @@
       "id": "render_under_schema",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_view",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "render_view",
@@ -18880,6 +18930,11 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
@@ -19285,6 +19340,11 @@
     {
       "id": "run_plant_arms",
       "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
+      "id": "run_plant_arms",
+      "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
     },
     {
@@ -19501,6 +19561,11 @@
       "id": "run_selftest",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "run_selftest",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "run_selftest",
@@ -21346,6 +21411,11 @@
       "id": "test_argv_grammar_and_the_refusal_are_gated",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "test_asbuilt_view",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "test_asks_disposed_overrides",

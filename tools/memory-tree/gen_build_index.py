@@ -21,7 +21,7 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-SIX SOURCES, NOTHING ELSE
+SEVEN SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
   * for the ROSTER, and for the date of a build's last record, every tracked file under the memory
@@ -41,6 +41,11 @@ SIX SOURCES, NOTHING ELSE
     each chain build's README renders it as the `build-coverage` region, and `--check-coverage`
     refuses a chain build's INPROGRESS spec while it is red (TOOL-dTrueNorth-3). That join reads git
     history, the one exception to the line below. Blank or absent, the checker is never loaded.
+  * under declared DESIGN_RECORD, DESIGN_BASELINE and DESIGN_VIEW ONLY, the as-built view's inputs,
+    read by the sibling `asbuilt_view.py` after every other artifact renders: the design record's
+    `[chain]` at the baseline commit, a second exception to the line below, and every deviation
+    record. `--write` writes DESIGN_VIEW and `--check` compares it (TOOL-dTrueNorth-6). Blank, one
+    `as-built view: off` line is printed and nothing is read.
 No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
 source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
@@ -1608,6 +1613,46 @@ def print_verdicts(verdicts: list, guarded: dict, conf: dict) -> int:
     return 1
 
 
+def render_asbuilt_view(root: str, conf: dict) -> dict:
+    """TOOL-dTrueNorth-6 S5 — the as-built view, rendered by the sibling `asbuilt_view.py` and compared
+    with `DESIGN_VIEW`'s file, for `cmd_check` and `cmd_write` to call ONCE after every artifact `plan()`
+    returns, so no view finding blocks another artifact's write. `plan()`'s return is left as it is.
+
+    Off, `{"state": "off", "line"}`: the generator's one off line naming each blank key, and nothing is
+    read. Armed, `{"state": "armed", "rel", "text", "findings", "drift"}`: the view's path, its render,
+    the render's findings — a deviation with no row, a pinned hash its clause does not carry, a moved
+    `Baseline:` line, which `--write` cannot cure — and the file's drift from the render, a hand edit
+    named at its first differing line and a `baseline` row whose text is not the baseline's, which it
+    can. A pin whose design record cannot be read is a Problem: there is nothing to render.
+    """
+    import asbuilt_view  # a sibling of this file, loaded only when a verb renders
+    armed, line = asbuilt_view.read_view_state(conf)
+    if not armed:
+        return {"state": "off", "line": line}
+    try:
+        sha, clauses, records, serves, findings = asbuilt_view.read_view_inputs(root, conf)
+    except asbuilt_view.DesignRefusal as exc:
+        raise Problem(f"as-built view — {exc}; nothing was rendered, and DESIGN_VIEW is left as it is") from None
+    text, more = asbuilt_view.render_view(sha, clauses, records, serves)
+    rel = str(conf["DESIGN_VIEW"]).strip()
+    path = os.path.join(root, rel)
+    drift = (asbuilt_view.check_view(read_text(path), text, clauses) if os.path.isfile(path)
+             else ["missing — never rendered"])
+    return {"state": "armed", "rel": rel, "text": text, "findings": findings + more, "drift": drift}
+
+
+def print_asbuilt_verdicts(findings: list) -> int:
+    """TOOL-dTrueNorth-6 — the `as-built VERDICT` block, separate from the DRIFT list for print_verdicts'
+    reason: its remedy is the record or the design record each line names, which `--write` cannot cure."""
+    if not findings:
+        return 0
+    print("as-built VERDICT — the deviation records and the design record the as-built view renders from "
+          "disagree; --write cannot cure these, so edit the record each line names")
+    for f in findings:
+        print(f"    {f}")
+    return 1
+
+
 # ---------------------------------------------------------------------------------------- rendering
 def render_region(build: dict) -> str:
     fm = build["fm"]
@@ -2880,6 +2925,18 @@ def cmd_check(root: str, conf: dict) -> int:
         bad.append(f"{p} (orphaned ledger shard — no build opened in that month; --write deletes it)")
     for p in unmanaged:
         bad.append(f"{p} (unmanaged file under ledger/ — not a month shard; --write LEAVES IT ALONE)")
+    # TOOL-dTrueNorth-6 S5 — the as-built view, once, after every artifact plan() returned. Its drift
+    # joins the list below under the same --write remedy; a pin it cannot read is held until every
+    # other artifact's drift and verdict has printed, then raised.
+    view, refused = {"state": "unread"}, None
+    try:
+        view = render_asbuilt_view(root, conf)
+    except Problem as exc:
+        refused = exc
+    if view["state"] == "off":
+        print(view["line"])
+    elif view["state"] == "armed":
+        bad += [f"{view['rel']} ({d})" for d in view["drift"]]
     rc = 0
     if bad:
         print(f"build-index DRIFT — run: python {kit_rel()}/gen_build_index.py --write")
@@ -2889,8 +2946,11 @@ def cmd_check(root: str, conf: dict) -> int:
     # A GUARDED VIEW IS NEVER IN `bad`: it is not in `artifacts` at all, so the remedy above cannot
     # be printed against it. That is the whole point — the line it would have printed is `--write`.
     rc = print_verdicts(verdicts, guarded, conf) or rc
+    if refused:
+        raise refused
+    rc = (print_asbuilt_verdicts(view["findings"]) if view["state"] == "armed" else 0) or rc
     if rc == 0:
-        print(f"build-index: clean ({len(artifacts)} artifact(s))")
+        print(f"build-index: clean ({len(artifacts) + (view['state'] == 'armed')} artifact(s))")
     return rc
 
 
@@ -3101,6 +3161,15 @@ def cmd_write(root: str, conf: dict) -> int:
     # and it earns it: the view it names is the only artifact this verb did NOT write, and exiting
     # 0 after skipping a write would read as a successful render of it.
     print_verdicts(verdicts, guarded, conf)
+    # TOOL-dTrueNorth-6 S5 — the as-built view, written once every other artifact is, and its
+    # findings printed by the same rule: a render is not a verdict.
+    view = render_asbuilt_view(root, conf)
+    if view["state"] == "off":
+        print(view["line"])
+    else:
+        write_text(os.path.join(root, view["rel"]), view["text"])
+        print(f"build-index: wrote the as-built view {view['rel']}")
+        print_asbuilt_verdicts(view["findings"])
     return 1 if guarded else 0
 
 
@@ -4520,14 +4589,23 @@ def test_coverage_region(arm) -> None:
                    f"# ARCH-dAlpha-2 — a unit\n\n**Status:** OPEN · rev-1 · {cut} · node a · Tier-2 · "
                    f"base 0123abcd\n\n**Derived:** ARCH-dAlpha-1\n")
         write_view()
-        write_text(os.path.join(t, "memory", "design", "record.md"),
-                   "# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n")
+        # TOOL-dTrueNorth-6 — the record holds the `[chain]` the view's rows are, and its working tree's
+        # Baseline: line names the pin, because with the design keys declared --write renders DESIGN_VIEW
+        # from the record at DESIGN_BASELINE and --check compares the file with that render.
+        record = os.path.join(t, "memory", "design", "record.md")
+        record_text = ("# a design record\n\n**Serves:** research ARCH-dAlpha-1\n\n## [chain]\n\n"
+                       "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n"
+                       + "".join(f"| {b} | a | b | " + "; ".join(f"{text} `{cid}`" for cid, text in cl.items())
+                                 + " | c |\n" for b, cl in (("dAlpha", alpha), ("dBeta", beta)))
+                       + "\n## [clause-ids]\n\n")
+        write_text(record, record_text + "Retired: `cl-dAlpha-0009`\n")
         write_text(os.path.join(t, "memory", "design", "nodes.py"), 'OWNED = ("item",)\n\n\ndef derive():\n    '
                    'return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n')
         conf_off = write_conf("", "0" * 40)
         run("git", "add", "-A", cwd=t)
         run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=t)
         sha = run("git", "rev-parse", "HEAD", cwd=t).strip()
+        write_text(record, record_text + f"Baseline: `{sha}`\n\nRetired: `cl-dAlpha-0009`\n")
         conf_off = write_conf("", sha)
         # AC5 — blank, a tree with no pair gains none: the key decides creation before anything resolves.
         cmd_write(t, conf_off)
@@ -4635,6 +4713,110 @@ def test_coverage_region(arm) -> None:
                             for s in ("dAlpha", "dBeta"))))
         arm("TOOL-dTrueNorth-3 AC5 — and --check over it is clean", "rc=0",
             lambda: f"rc={_read_mode(cmd_check, t, conf_off)[0]}")
+
+
+def test_asbuilt_view(arm) -> None:
+    """TOOL-dTrueNorth-6's arms: every `asbuilt_view.py` fixture plant, and the host over a tree of its own.
+
+    MODULE-LEVEL, as `test_coverage_region` is. The plants read THIS tree's DESIGN_RECORD at its pin, as
+    the generator's own `--fixture` does, and skip aloud when the tree declares no design. The host case
+    is a fixture tree whose design record gives dAlpha two clauses in its `[chain]`, committed as the
+    baseline, and whose view sits in a build's `build/` folder, where a staged edit of it is a build-index
+    input: `--write` renders it; a hand edit staged there reds `--check` with the view under DRIFT; a
+    record departing from a clause through a `gap` row reds `--check` with an `as-built VERDICT` naming
+    it, while `--write` still writes every other artifact; a pin naming no commit is a named Problem;
+    and a blank DESIGN_VIEW prints the off line and reads nothing.
+    """
+    import asbuilt_view
+    here = run("git", "rev-parse", "--show-toplevel").strip()
+    here_conf = load_conf(here)
+    armed, line = asbuilt_view.read_view_state(here_conf)
+    if not armed:
+        print(f"arm skip  TOOL-dTrueNorth-6 plants — they read this tree's DESIGN_RECORD at its pin, and {line}")
+    else:
+        try:
+            plants = asbuilt_view.run_plant_arms(here, here_conf)
+        except Exception as exc:  # noqa: BLE001 — a traceback here IS the finding
+            plants = [(False, "TOOL-dTrueNorth-6 the fixture plants run", f"UNEXPECTED {type(exc).__name__}: {exc}")]
+        for ok, what, detail in plants:
+            arm(what, "plant held", lambda ok=ok, detail=detail: "plant held" if ok else detail)
+    texts = {"cl-dAlpha-0001": "The reader takes `alpha-one` first.", "cl-dAlpha-0002": "The run writes `alpha-two`."}
+    record_rel = "memory/design/record.md"
+    view_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-as-built.md"
+    dev_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-deviation-1.md"
+    record = ("# a design record\n\n**Serves:** research ARCH-tOne-1\n\n## [chain]\n\n"
+              "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | "
+              + "; ".join(f"{text} `{cid}`" for cid, text in texts.items()) + " | c |\n\n## [clause-ids]\n\n")
+    with tempfile.TemporaryDirectory() as tmp:
+        _fixture(tmp)
+        write_text(os.path.join(tmp, record_rel), record)
+        run("git", "add", "-A", cwd=tmp)
+        run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=tmp)
+        sha = run("git", "rev-parse", "HEAD", cwd=tmp).strip()
+        write_text(os.path.join(tmp, record_rel), record + f"Baseline: `{sha}`\n")
+
+        def write_conf(baseline=sha, view=view_rel):
+            write_text(os.path.join(tmp, ".memory-tree.conf"), _render_fixture_conf()
+                       + f'DESIGN_RECORD="{record_rel}"\nDESIGN_BASELINE="{baseline}"\nDESIGN_VIEW="{view}"\n')
+            return load_conf(tmp)
+
+        conf = write_conf()
+        view, live = os.path.join(tmp, view_rel), os.path.join(tmp, "memory", "LIVE.md")
+        row = "| dAlpha | `cl-dAlpha-0001` | The reader takes `alpha-one` first. | baseline |\n"
+        arm("TOOL-dTrueNorth-6 S5 — --write renders the view, a row per clause of the record at its pin", "True",
+            lambda: str(_read_mode(cmd_write, tmp, conf)[0] == 0 and row in read_text(view)
+                        and " 0 deviation records." in read_text(view)))
+        # The view is a record of the build's `build/` folder, which tOne's README indexes once it is
+        # tracked, so a second --write renders that index before the tree is committed clean.
+        run("git", "add", "-A", cwd=tmp)
+        _read_mode(cmd_write, tmp, conf)
+        run("git", "add", "-A", cwd=tmp)
+        run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=tmp)
+        arm("TOOL-dTrueNorth-6 S5 — --check after --write is clean, counting the view", "True",
+            lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1])(_read_mode(cmd_check, tmp, conf))))
+        write_text(view, read_text(view).replace("first. | baseline", "first, quietly. | baseline"))
+        run("git", "add", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-6 AC8 — a hand-edited view, staged, is a build-index input", "True",
+            lambda: str(check_staged_render(tmp, conf)[0]))
+        arm("TOOL-dTrueNorth-6 AC8 — and --check exits 1 listing the view under build-index DRIFT, at its first "
+            "differing line and naming the clause that cites no record", "True",
+            lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
+                f"    {view_rel} (the file differs from its render from line") and
+                f"    {view_rel} (cl-dAlpha-0001: its text differs from the baseline's and cites no record)" in r[1])(
+                _read_mode(cmd_check, tmp, conf))))
+        run("git", "reset", "-q", "--hard", cwd=tmp)
+        write_text(os.path.join(tmp, dev_rel), "\n".join([
+            "# ARCH-tOne-1 deviation 1 — a departure from a clause with no row", "",
+            "**Serves:** deviation ARCH-tOne-1", "",
+            f"- **Departs from:** `cl-dAlpha-0001@{asbuilt_view.derive_clause_hash(texts['cl-dAlpha-0001'])}` [chain]",
+            "- **Hand-off:** design-to-spec", f"- **Before:** {texts['cl-dAlpha-0001']}",
+            f"- **After:** {texts['cl-dAlpha-0001']}", "- **Cause:** builder discovery",
+            "- **Reason:** the fixture's departure", "- **Evidence:** the fixture", "- **Risk:** additive",
+            "- **Approver:** author", "- **Follow-through:** gap gap-mem-47", "- **Caused-by:** ARCH-tOne-1", ""]))
+        run("git", "add", "--", dev_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-6 AC8 — a record departing from a clause through a gap row reds --check with an "
+            "as-built VERDICT naming it", "True",
+            lambda: str((lambda r: r[0] == 1 and "as-built VERDICT" in r[1] and "2026-08-01-build-ARCH-tOne-1-"
+                         "deviation-1: departs from cl-dAlpha-0001 and carries no amends or supersedes row" in r[1])(
+                _read_mode(cmd_check, tmp, conf))))
+
+        def write_without_live():
+            os.remove(live)
+            rc, out = _read_mode(cmd_write, tmp, conf)
+            return str(rc == 0 and os.path.isfile(live) and "as-built VERDICT" in out
+                       and " 1 deviation records." in read_text(view))
+
+        arm("TOOL-dTrueNorth-6 AC8 — and --write still writes every other artifact and the view, printing the "
+            "verdict and exiting 0", "True", write_without_live)
+        conf_bad = write_conf(baseline="0" * 40)
+        arm("TOOL-dTrueNorth-6 S7 — a DESIGN_BASELINE naming no commit is the host's named Problem",
+            "build-index: as-built view — DESIGN_BASELINE " + "0" * 40 + " names no commit",
+            lambda: _read_mode(cmd_check, tmp, conf_bad)[1])
+        conf_off = write_conf(view="")
+        arm("TOOL-dTrueNorth-6 AC10 — a blank DESIGN_VIEW prints the off line naming it, and --check reads "
+            "nothing and stays clean", "True",
+            lambda: str((lambda r: r[0] == 0 and "\nas-built view: off — DESIGN_VIEW is blank in .memory-tree.conf"
+                         in r[1] and "build-index: clean (" in r[1])(_read_mode(cmd_check, tmp, conf_off))))
 
 
 def cmd_selftest() -> int:
@@ -7319,6 +7501,7 @@ def cmd_selftest() -> int:
 
     test_staged_render(arm)
     test_coverage_region(arm)
+    test_asbuilt_view(arm)
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it

@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate
 
-**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** CLOSED · rev-4 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0006@06ceb3cc whole
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-6-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-6-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-7 |
 | [2026-10-21-prompt-TOOL-dTrueNorth-6-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-6-build-brief.md) | journal | — |
 | [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-7 |
