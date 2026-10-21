@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-5 — every spec audit pins the revision it read
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59de · streams tooling · order 2 · ratified 2026-10-21
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59de · streams tooling · order 2 · ratified 2026-10-21
 
 **Carries:** cl-dClosedLoop-0005@5417efbc whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
+| [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 
 <!-- /gen:spec-records -->
 
@@ -75,6 +76,10 @@ spec and its code moving together after an audit from an audited spec (`gap-buil
   no Serves line itself
 - **hands-off** external — a pin-aware `specs-audited` term in the unattended driver, filed as an
   ask at this build's close, because that driver is unit 7's alone in this build
+- **hands-off** `TOOL-dTrueNorth-9` — `_expand_ids` kept at two values for its four callers, the pins read beside it (the round-1 spec audit's id 11)
+- **hands-off** `TOOL-dTrueNorth-13` — `renderAuditBinding` and the grading for a design-document subject (the round-1 spec audit's id 39)
+- **hands-off** `TOOL-dTrueNorth-14` — `cmd_print_bindings`' writer test for records written by a harness in flight (the round-1 spec audit's id 40)
+- **hands-off** `TOOL-dTrueNorth-16` — `cmd_print_bindings`' docs and contract clauses (the round-1 spec audit's ids 17 and 35)
 
 ## 4. Design
 
@@ -423,6 +428,9 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 · a fixtu
 
 - rev-1 · 2026-10-21 · initial draft, from the packet's Items 5, the brief's S7, and the two record
   writers and four Serves readers read at base `271aa59de`.
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
+  promoted against this one, TOOL-dTrueNorth-9, TOOL-dTrueNorth-13, TOOL-dTrueNorth-14 and
+  TOOL-dTrueNorth-16, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

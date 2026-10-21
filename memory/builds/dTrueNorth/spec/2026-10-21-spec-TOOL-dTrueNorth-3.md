@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
 
 **Carries:** cl-dClosedLoop-0003@d2811290 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
+| [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 
 <!-- /gen:spec-records -->
 
@@ -83,6 +84,9 @@ refusal cannot disagree.
 
 - **consumes-from** `TOOL-dTrueNorth-1` — `read_design_view`'s Build column, which names the chain builds whose README carries the region
 - **consumes-from** `TOOL-dTrueNorth-2` — `derive_carries_coverage`, the fields this region renders and the findings check 29 reads
+- **hands-off** `TOOL-dTrueNorth-11` — the guards of the two self-test legs this unit's arms run in, which must name `check-spec-tokens.py` (the round-1 spec audit's id 28)
+- **hands-off** `TOOL-dTrueNorth-15` — `cmd_check_coverage`'s graded count on every run (the round-1 spec audit's id 41)
+- **hands-off** `TOOL-dTrueNorth-16` — `read_carries_coverage` and check 29, which that unit amends for the round-1 spec audit's ids 6, 10, 18, 29, 37, 44 and 45
 
 ## 4. Design
 
@@ -324,6 +328,9 @@ New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC1 AC3 A
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft.
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
+  promoted against this one, TOOL-dTrueNorth-11, TOOL-dTrueNorth-15 and TOOL-dTrueNorth-16, the
+  mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

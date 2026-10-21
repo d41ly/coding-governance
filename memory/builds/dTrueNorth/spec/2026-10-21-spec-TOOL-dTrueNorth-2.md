@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
 
 **Carries:** cl-dClosedLoop-0002@6acd9ea9 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
+| [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 
 <!-- /gen:spec-records -->
 
@@ -83,6 +84,7 @@ instrument's thirteen plants (D3), which is stricter than the clause and recorde
 
 - **consumes-from** `TOOL-dTrueNorth-1` — the parser, the readers and `scan_chain_specs` in `design_lib.py`; without them this join has no clause and no binding to read
 - **hands-off** `TOOL-dTrueNorth-3` — `derive_carries_coverage`, the coverage fields and findings its region renders and its hygiene check reads
+- **hands-off** `TOOL-dTrueNorth-16` — `read_carries_specs`, `scan_carries` and `derive_carries_coverage`, which that unit amends for the round-1 spec audit's ids 4, 13, 14, 15, 19, 20, 22, 8 and 26
 
 ## 4. Design
 
@@ -328,6 +330,9 @@ retirement by dIndexedDesign. AC10, AC13 and AC17 are probes the close reads dir
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft.
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
+  promoted against this one, TOOL-dTrueNorth-16, the mirror of its consumes-from; no other section
+  moves.
 
 ## 10. Reuse audit
 

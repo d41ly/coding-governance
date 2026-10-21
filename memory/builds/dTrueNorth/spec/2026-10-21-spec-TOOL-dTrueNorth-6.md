@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0006@06ceb3cc whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-7 |
+| [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-7 |
 
 <!-- /gen:spec-records -->
 
@@ -84,6 +85,9 @@ the bootstrap instrument `asbuilt.py`.
 - **consumes-from** `TOOL-dTrueNorth-1` — `design_lib.py`: `DESIGN_KEYS`, `derive_clause_hash` and the view reader `read_design_view`; without them there is no baseline to render and no reader to read the view back
 - **consumes-from** `TOOL-dTrueNorth-4` — `read_record`, `deviation_join.read_records` with each record's `**After:**` and `**Follow-through:**`, and `read_chain_clauses` in `design_lib.py`; without them the generator has no records and no clause rows
 - **hands-off** external — dOrderedCharter's overlay grammar and help renderer, dTotalRecall's atlas, and dClosedLoop's report-switch step, which re-points the departures report from `asbuilt.py` to this generator
+- **hands-off** `TOOL-dTrueNorth-8` — `cmd_write` as the owner of the view's re-render in the commit that changes its inputs (the round-1 spec audit's id 1)
+- **hands-off** `TOOL-dTrueNorth-10` — `DESIGN_VIEW` re-rendered over deviation-2 and deviation-3 in their own commit (the round-1 spec audit's id 12)
+- **hands-off** `TOOL-dTrueNorth-16` — `asbuilt_view.py`, `check_view`, `VIEW_HEAD` and the host, which that unit amends for the round-1 spec audit's ids 16, 23, 24, 31, 42, 43, 44 and 46
 
 ## 4. Design
 
@@ -271,6 +275,9 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC5 AC8 
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft.
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
+  promoted against this one, TOOL-dTrueNorth-8, TOOL-dTrueNorth-10 and TOOL-dTrueNorth-16, the
+  mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

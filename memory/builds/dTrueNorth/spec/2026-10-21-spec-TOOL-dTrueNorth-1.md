@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-1 — the clause ids and binding lines, parsed once, behind a cutoff
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
 
 **Carries:** cl-dClosedLoop-0001@83b6b117 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
+| [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 
 <!-- /gen:spec-records -->
 
@@ -91,6 +92,7 @@ design is and from which spec date the chain builds' specs alone are read.
 - **hands-off** `TOOL-dTrueNorth-3` — `read_design_view`'s Build column, which names the chain builds whose README carries a coverage region
 - **hands-off** `TOOL-dTrueNorth-4` — the binding-line parser in `design_lib.py`, imported by its deviation population
 - **hands-off** `TOOL-dTrueNorth-6` — the view reader in `design_lib.py`, imported by its generator
+- **hands-off** `TOOL-dTrueNorth-16` — `design_lib.py`'s readers, which that unit extends with `read_design_keys`, `read_spec_revisions` and `SPEC_FILE_DATE` for the round-1 spec audit's ids 5, 20, 23, 25 and 43
 
 ## 4. Design
 
@@ -355,6 +357,9 @@ AC1 to AC11 are the probes the close reads for this unit.
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft.
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
+  promoted against this one, TOOL-dTrueNorth-16, the mirror of its consumes-from; no other section
+  moves.
 
 ## 10. Reuse audit
 

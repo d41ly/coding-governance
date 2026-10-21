@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0004@c374ccd0 whole
 **Carries:** node:record-kind.deviation
@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
+| [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 
 <!-- /gen:spec-records -->
 
@@ -124,6 +125,9 @@ instrument `deviations.py`'s population and join, and of no other part of it.
 - **consumes-from** `TOOL-dTrueNorth-5` — the `pins` map each `read_bindings` record gains, the `@rev-N` audit pin per id (brief S7); without it the pinned-revision arm has no pin to read and every unit prints under "no audit pin"
 - **hands-off** `TOOL-dTrueNorth-6` — the record reader, `read_record`, with its `**After:**` and `**Follow-through:**` values, and `read_chain_clauses` in `design_lib.py`, which the as-built generator renders from
 - **hands-off** external — dScopedBuild's `deviation.gate`, dDeclaredLoop's `deviation.approval` and dOrderedCharter's classifier re-point the stand-in values and the risk reading this unit ships
+- **hands-off** `TOOL-dTrueNorth-10` — deviation-2 and deviation-3, written in the grammar `read_record` grades (the round-1 spec audit's id 12)
+- **hands-off** `TOOL-dTrueNorth-12` — `deviation_join.py`'s strip read and fixture design, made reachable and hermetic for the shipped self-test (the round-1 spec audit's id 30)
+- **hands-off** `TOOL-dTrueNorth-16` — `read_population`, `read_record` and the fixture's plants, which that unit amends for the round-1 spec audit's ids 5, 20, 21, 46 and 47
 
 ## 4. Design
 
@@ -489,6 +493,9 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · `gen_build_index.
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft.
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
+  promoted against this one, TOOL-dTrueNorth-10, TOOL-dTrueNorth-12 and TOOL-dTrueNorth-16, the
+  mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

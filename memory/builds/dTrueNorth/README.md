@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7
+ids: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16
 spec-audit: 2026-10-21
 parents: dClosedLoop
 may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2
@@ -64,29 +64,47 @@ none
 | 5 | `TOOL-dTrueNorth-5` | `cl-dClosedLoop-0005@5417efbc` | every audit of a spec record pinning the revision it read as `@rev-N` on its Serves line |
 | 6 | `TOOL-dTrueNorth-6` | `cl-dClosedLoop-0006@06ceb3cc` | the as-built view: the design at its baseline commit with each deviation's amends or supersedes row applied |
 | 7 | `TOOL-dTrueNorth-7` | **Derived:** PLAY-dClosedLoop-2 | the carry-forward condition for every unit a spec run adds, once, and the starting-roster reading it rests on |
+| 8 | `TOOL-dTrueNorth-8` | **Derived:** PLAY-dClosedLoop-2 | the as-built view re-rendered in the commit that changes its inputs, with an owner and a moment |
+| 9 | `TOOL-dTrueNorth-9` | **Derived:** PLAY-dClosedLoop-2 | `_expand_ids` keeps its two-value return for all four callers, and the audit pins come from a sibling reader |
+| 10 | `TOOL-dTrueNorth-10` | **Derived:** PLAY-dClosedLoop-2 | deviation records 2 and 3, written verbatim at kind `deviation`, the view re-rendered in their commit |
+| 11 | `TOOL-dTrueNorth-11` | **Derived:** PLAY-dClosedLoop-2 | the build-index and memory-hygiene self-test legs guard the spec-token checker their arms load |
+| 12 | `TOOL-dTrueNorth-12` | **Derived:** PLAY-dClosedLoop-2 | the routed-commits self-test reaches the strip through a resolver and builds its own design in the fixture |
+| 13 | `TOOL-dTrueNorth-13` | **Derived:** PLAY-dClosedLoop-2 | a design-document subject of a spec audit: its id served bare, and no pin owed for it |
+| 14 | `TOOL-dTrueNorth-14` | **Derived:** PLAY-dClosedLoop-2 | the audit-pin arm grades a record by the harness that wrote it, so a run in flight is not refused at its merge |
+| 15 | `TOOL-dTrueNorth-15` | **Derived:** PLAY-dClosedLoop-2 | check 29 counts what it graded on every run, and says so when nothing was |
+| 16 | `TOOL-dTrueNorth-16` | **Derived:** PLAY-dClosedLoop-2 | the round-1 spec audit's 37 minors: one key rule, one revision reader, one conf read, honest exits and the docs that name them |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 7 unit(s) · node d · opened 2026-10-21 · streams tooling
-ids TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7
+**Build status:** OPEN · 16 unit(s) · node d · opened 2026-10-21 · streams tooling
+ids TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dTrueNorth-1 — the clause ids and binding lines, parsed once, behind a cutoff](spec/2026-10-21-spec-TOOL-dTrueNorth-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-21 |
-| [TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg](spec/2026-10-21-spec-TOOL-dTrueNorth-2.md) | 1 | 2 | OPEN | rev-1 | 2026-10-21 |
-| [TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal](spec/2026-10-21-spec-TOOL-dTrueNorth-3.md) | 1 | 2 | OPEN | rev-1 | 2026-10-21 |
-| [TOOL-dTrueNorth-5 — every spec audit pins the revision it read](spec/2026-10-21-spec-TOOL-dTrueNorth-5.md) | 2 | 2 | OPEN | rev-1 | 2026-10-21 |
-| [TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close](spec/2026-10-21-spec-TOOL-dTrueNorth-4.md) | 3 | 2 | OPEN | rev-1 | 2026-10-21 |
-| [TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate](spec/2026-10-21-spec-TOOL-dTrueNorth-6.md) | 3 | 2 | OPEN | rev-1 | 2026-10-21 |
-| [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-1 — the clause ids and binding lines, parsed once, behind a cutoff](spec/2026-10-21-spec-TOOL-dTrueNorth-1.md) | 1 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg](spec/2026-10-21-spec-TOOL-dTrueNorth-2.md) | 1 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal](spec/2026-10-21-spec-TOOL-dTrueNorth-3.md) | 1 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-11 — the build-index and memory-hygiene self-test legs guard the spec-token checker their arms load](spec/2026-10-21-spec-TOOL-dTrueNorth-11.md) | 2 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-15 — check 29 counts what it graded on every run, and says so when nothing was](spec/2026-10-21-spec-TOOL-dTrueNorth-15.md) | 2 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-5 — every spec audit pins the revision it read](spec/2026-10-21-spec-TOOL-dTrueNorth-5.md) | 2 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-13 — a design-document subject of a spec audit: its id served bare, and no pin owed for it](spec/2026-10-21-spec-TOOL-dTrueNorth-13.md) | 3 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-14 — the audit-pin arm grades a record by the harness that wrote it, so a run in flight is not refused at its merge](spec/2026-10-21-spec-TOOL-dTrueNorth-14.md) | 3 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close](spec/2026-10-21-spec-TOOL-dTrueNorth-4.md) | 3 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate](spec/2026-10-21-spec-TOOL-dTrueNorth-6.md) | 3 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-9 — `_expand_ids` keeps its two-value return for all four callers, and the audit pins come from a sibling reader](spec/2026-10-21-spec-TOOL-dTrueNorth-9.md) | 3 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-10 — deviation records 2 and 3, written verbatim at kind `deviation`, the view re-rendered in their commit](spec/2026-10-21-spec-TOOL-dTrueNorth-10.md) | 4 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-12 — the routed-commits self-test reaches the strip through a resolver and builds its own design in the fixture](spec/2026-10-21-spec-TOOL-dTrueNorth-12.md) | 4 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-8 — the as-built view re-rendered in the commit that changes its inputs, with an owner and a moment](spec/2026-10-21-spec-TOOL-dTrueNorth-8.md) | 4 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-16 — the round-1 spec audit's 37 minors: one key rule, one revision reader, one conf read, honest exits and the docs that name them](spec/2026-10-21-spec-TOOL-dTrueNorth-16.md) | 5 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 6 | 2 | OPEN | rev-1 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 2 record folder(s).
+Records: 3 bound to this build, across 3 record folder(s).
 
-Ids no record names: none — every unit id is named by a record.
+Ids no record names: TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9.
 
-Ids no `spec-audit` record has ever named: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7.
+Ids no `spec-audit` record has ever named: TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
@@ -94,9 +112,11 @@ Ids no `spec-audit` record has ever named: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 T
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-dTrueNorth-1`, `TOOL-dTrueNorth-2`, `TOOL-dTrueNorth-3` | yes |
-| 2 | `TOOL-dTrueNorth-5` | no |
-| 3 | `TOOL-dTrueNorth-4`, `TOOL-dTrueNorth-6` | yes |
-| 4 | `TOOL-dTrueNorth-7` | no |
+| 2 | `TOOL-dTrueNorth-11`, `TOOL-dTrueNorth-15`, `TOOL-dTrueNorth-5` | yes |
+| 3 | `TOOL-dTrueNorth-13`, `TOOL-dTrueNorth-14`, `TOOL-dTrueNorth-4`, `TOOL-dTrueNorth-6`, `TOOL-dTrueNorth-9` | yes |
+| 4 | `TOOL-dTrueNorth-10`, `TOOL-dTrueNorth-12`, `TOOL-dTrueNorth-8` | yes |
+| 5 | `TOOL-dTrueNorth-16` | no |
+| 6 | `TOOL-dTrueNorth-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
