@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-12-deviation-11.md](../build/2026-10-21-build-TOOL-dTrueNorth-12-deviation-11.md) | deviation | — |
 | [2026-10-21-build-TOOL-dTrueNorth-12-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-12-ledger.md) | journal | — |
+| [2026-10-22-build-TOOL-dTrueNorth-12-deviation-21.md](../build/2026-10-22-build-TOOL-dTrueNorth-12-deviation-21.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-12-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-12-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-12-1-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-12-1-spec-writer.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-12-divergence-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-12-divergence-brief.md) | research | — |

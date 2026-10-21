@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -368,7 +368,7 @@ defines it between its `kickoff_region` markers, and calls `baseline_units <RUN.
 
 ## 7. Gates
 
-`unattended kit gate` · `unattended skill wiring` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fork spent on builtin work)` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
+`unattended kit gate` · `routed-commits selftest` · `unattended skill wiring` · `recall floor` · `recall floor arms` · `lexicon naming predicates` · `harness arms (fail branches armed or pinned)` · `line length` · `shell hygiene (a loop fed by a command substitution)` · `shell hygiene (a fork spent on builtin work)` · `spec tokens (a spec's own names resolve)` · `memory hygiene`
 
 New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC12 AC14 AC17 · the spec-run block's FX fixtures, each case staged by its own fixture edit, and the moved TOOL-dUnstuckLanding-18 AC4 block · none
 
@@ -435,6 +435,7 @@ own clean reading is owed with `PLAY-dClosedLoop-11`.
   driver suite read at base `271aa59d`.
 - rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
   round-2 spec audit, the mirror of its consumes-from; no other section moves.
+- rev-3 · 2026-10-22 · §7 · the leg line names `routed-commits selftest`, whose guard TOOL-dTrueNorth-12 widened to `lib-unattended.sh`, a file this unit touches.
 
 ## 10. Reuse audit
 
