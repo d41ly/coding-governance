@@ -29,11 +29,10 @@ two `New arm:` lines' RED-first observations are owed to the close.
   `backlog.resolve_kit_dir` stubbed to raise `LookupError` all three printed a `P` row and the fourth
   field read `-`; a record committed after the harness was deleted printed its `P` row, graded rather
   than exempt; `derive_audit_writers` over no record returned the empty set.
-- AC4 — check 21's audit-pin branch — owed: the hygiene engine is a gate leg no role agent runs, and
-  the suite arm on the second `New arm:` line observes it at the close. Probed meanwhile by cutting the
-  branch out of `tools/memory-tree/check-memory-hygiene.sh` and evaluating it over AC1's fixture
-  capture: it printed `memory-hygiene: check 21: the audit-pin arm graded 1 spec-audit record(s) from
-  SPEC_AUDIT_PIN_CUTOFF=2026-01-01, 1 written by a harness before renderAuditBinding` and no failure; a
+- AC4 — `tools/memory-tree/check-memory-hygiene.sh` check 21, its audit-pin branch cut out and evaluated over AC1's fixture capture — printed `1 written by a harness before renderAuditBinding`
+  at the end of `the audit-pin arm graded 1 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=2026-01-01,`
+  and no failure. The engine's own run over that fixture is a gate leg no role agent runs: the
+  suite arm on the second `New arm:` line observes it at the close, owed. Beside it, a
   CR-terminated `Q<TAB>0<TAB>off<TAB>0` printed the off line; a parse with no `Q` row failed naming
   the missing row; a `P` row still failed. The `HEAD` engine's branch over the four-field row printed
   `SPEC_AUDIT_PIN_CUTOFF=2026-01-01<TAB>1` and no exempt count, the red.

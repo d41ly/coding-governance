@@ -5450,7 +5450,7 @@ def cmd_selftest() -> int:
             write_text(h14, "export function review() {}\n")
             conf14w = _set_pin_cutoff(t14w, "2026-01-01")
 
-            def _commit14(msg, day=None):
+            def _write_record14(msg, day=None):
                 rel = rv5 + f"2026-02-0{day}-review-ARCH-tOne-1-spec-audit.md" if day else None
                 if rel:
                     os.makedirs(os.path.join(t14w, rv5), exist_ok=True)
@@ -5460,21 +5460,21 @@ def cmd_selftest() -> int:
                     run("git", "commit", "-q", "-m", msg, "--no-verify", cwd=t14w)
                 return rel
 
-            _commit14("A")
+            _write_record14("A")
             trunk14 = run("git", "rev-parse", "--abbrev-ref", "HEAD", cwd=t14w).strip()
             run("git", "checkout", "-q", "-b", "run", cwd=t14w)
-            _commit14("run", 2)
+            _write_record14("run", 2)
             run("git", "checkout", "-q", trunk14, cwd=t14w)
             write_text(h14, "export function review() {}\nexport function renderAuditBinding() {}\n")
-            _commit14("L")
+            _write_record14("L")
             run("git", "merge", "-q", "--no-ff", "--no-edit", "run", cwd=t14w)
             arm("TOOL-dTrueNorth-14 AC1 — an unpinned record a branch committed before the pinning harness "
                 "landed prints no P row once merged, and the Q row counts it exempt",
                 "P=0 Q\t1\t2026-01-01\t1", lambda: _read_pin_rows(t14w, conf14w))
-            _commit14("main", 3)
+            _write_record14("main", 3)
             arm("TOOL-dTrueNorth-14 AC2 — an unpinned record the pinning harness wrote prints its P row",
                 "P=1 Q\t2\t2026-01-01\t1", lambda: _read_pin_rows(t14w, conf14w))
-            w14 = _commit14(None, 4)
+            w14 = _write_record14(None, 4)
             arm("TOOL-dTrueNorth-14 AC3 — a staged record, which has no adding commit, prints its P row",
                 f"P\t{w14}\tARCH-tOne-1 carries no @rev-N pin", lambda: _rows(t14w, conf14w))
 
