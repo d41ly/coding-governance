@@ -5796,14 +5796,14 @@ def cmd_selftest() -> int:
                 write_text(os.path.join(t19, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
                 return rel
 
-            def _commit19(msg):
+            def _run_commit19(msg):
                 run("git", "add", "-A", cwd=t19)
                 run("git", "commit", "-q", "-m", msg, "--no-verify", cwd=t19)
 
             os.makedirs(os.path.join(t19, rv5), exist_ok=True)
             recs19 = [_write_record19(rv5 + "2026-02-01-review-ARCH-tOne-1-padded-record-name-past-98-%03d-"
                                       "spec-audit.md" % n) for n in range(601)]
-            _commit19("601 records")
+            _run_commit19("601 records")
             arm("TOOL-dTrueNorth-19 AC1 — 601 graded records, every path at least 98 bytes, are read by one "
                 "spawn: 601 P rows and a Q row exempting none",
                 "long=True P=601 Q\t601\t2026-01-01\t0",
@@ -5811,11 +5811,11 @@ def cmd_selftest() -> int:
             run("git", "checkout", "-q", "-b", "readd", cwd=t19)
             write_text(h19, "export function review() {}\n")
             os.remove(os.path.join(t19, recs19[0]))
-            _commit19("drop the function and one record")
+            _run_commit19("drop the function and one record")
             first19 = _write_record19(rv5 + "2026-02-02-review-ARCH-tOne-1-first-added-beside-the-re-add-"
                                       "spec-audit.md")
             _write_record19(recs19[0])
-            _commit19("re-add")
+            _run_commit19("re-add")
             arm("TOOL-dTrueNorth-19 AC2 — a record deleted and re-added is keyed to its first adding commit, "
                 "and only the record first added beside the re-add is exempt",
                 f"[{first19!r}]",
@@ -5853,17 +5853,17 @@ def cmd_selftest() -> int:
                 finally:
                     subprocess.run = _real_run19
 
-            def _exec_stub19(argv, *a, **kw):
+            def _run_stub19(argv, *a, **kw):
                 return _real_run19((sys.executable, stub19), *a, **kw)
 
-            def _raise_unstartable19(argv, *a, **kw):
+            def _run_unstartable19(argv, *a, **kw):
                 raise FileNotFoundError(2, "the stub has no git to start", argv[0])
 
             arm("TOOL-dTrueNorth-19 AC3 — a git log exiting 128 raises Problem naming the command and its "
                 "first stderr line", "git-log=True stub=True start=False",
-                lambda: _read_failed_log19(_exec_stub19))
+                lambda: _read_failed_log19(_run_stub19))
             arm("TOOL-dTrueNorth-19 S2 — a git log that cannot start raises Problem naming the command",
-                "git-log=True stub=False start=True", lambda: _read_failed_log19(_raise_unstartable19))
+                "git-log=True stub=False start=True", lambda: _read_failed_log19(_run_unstartable19))
             arm("TOOL-dTrueNorth-19 AC3 — --print-bindings exits 2 on that refusal, naming the stub's line",
                 "rc=2 named=True",
                 lambda: (lambda d: f"rc={d.returncode} named={'fatal: the stub refuses git log' in d.stdout}")(
@@ -5873,7 +5873,7 @@ def cmd_selftest() -> int:
             os.remove(h19)
             no_harness19 = _write_record19(rv5 + "2026-02-03-review-ARCH-tOne-1-added-where-no-harness-is-"
                                            "spec-audit.md")
-            _commit19("remove the harness")
+            _run_commit19("remove the harness")
             arm("TOOL-dTrueNorth-19 AC4 — a record whose adding commit holds no harness prints its P row, and "
                 "only the record a present harness lacking the function wrote is exempt",
                 "absent=1 Q\t603\t2026-01-01\t1",
