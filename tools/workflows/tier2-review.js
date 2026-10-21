@@ -99,7 +99,10 @@ function readOutputTokens() {
 //                                         // REQUIRED at every round, is the unit id the spec defines and
 //                                         // rev the integer N of the rev-N its status header carries at
 //                                         // that blob, so the record's binding line pins `<id>@rev-<N>`;
-//                                         // prevBlob, optional
+//                                         // that is a SPEC subject, one whose path holds a
+//                                         // builds/<slug>/spec/ segment. Any other path is a DESIGN
+//                                         // subject: id required, rev refused, its id served bare and
+//                                         // free to repeat; prevBlob, optional
 //                                         // and legal at round > 1 only, is the 7-40 hex blob of that path
 //                                         // the previous round audited, and names the fold diff
 //   scratch: "<absolute session scratchpad>", // spec-audit ONLY and REQUIRED there: where a probing lens
@@ -303,11 +306,32 @@ function renderAgentLabel(scope, stage) {
   return [reviewSlug, scope, stage].filter(Boolean).join(' · ')
 }
 // TOOL-dTrueNorth-5 S1 - a spec audit's binding line, RENDERED here and copied by the synthesis agent:
-// each subject's `<id>@rev-<rev>` in subject order, so the record pins the revision of every spec it
+// each spec subject's `<id>@rev-<rev>` in subject order, so the record pins the revision of every spec it
 // read and a revision past that pin reads as unaudited. Pure, and reached only with subjects the pin
 // refusal below has passed, so each id matches an anchored grammar and carries no newline.
+// TOOL-dTrueNorth-13 S1/S2 - TWO subject classes, told apart by PATH and never by id: one id can name
+// both a spec and the design document it carries. A SPEC subject's path holds a builds/<slug>/spec/
+// segment and its id is pinned; every other subject is a DESIGN subject, served bare, because a design
+// document has no rev header to pin. Each id is rendered once, in first-seen order, and an id a spec
+// subject pins is never repeated bare beside its pin.
+const SPEC_SUBJECT_PATH = /(?:^|\/)builds\/[^/]+\/spec\//
 function renderAuditBinding(subjects) {
-  return '**Serves:** spec-audit ' + subjects.map(function (x) { return x.id + '@rev-' + x.rev }).join(' ')
+  const pins = {}
+  const ids = []
+  subjects.forEach(function (x) {
+    if (SPEC_SUBJECT_PATH.test(String(x.path))) pins[x.id] = x.rev
+    if (ids.indexOf(x.id) === -1) ids.push(x.id)
+  })
+  return '**Serves:** spec-audit ' + ids.map(function (id) {
+    return Object.prototype.hasOwnProperty.call(pins, id) ? id + '@rev-' + pins[id] : id
+  }).join(' ')
+}
+// TOOL-dTrueNorth-13 S3 - the record's SUBJECTS line, rendered here too, so its reader has one spelling
+// to read: `Reviewed: <path>@<blob>, ...` in subject order. The memory tree's pin grading reads which
+// paths a spec audit reviewed off this line, and the corpus spelled it three ways while an agent
+// composed it.
+function renderReviewedLine(subjects) {
+  return 'Reviewed: ' + subjects.map(function (x) { return x.path + '@' + x.blob }).join(', ')
 }
 // The run's identity is its first log line and the first key of every return: the tool titles the
 // run with `meta.name` alone.
@@ -385,8 +409,8 @@ if (isSpec) {
     log('WARNING: ' + why)
   }
   // TOOL-dTrueNorth-5 S1 - THE PIN, refused at EVERY round. The record's binding line names each spec
-  // it read as `<id>@rev-<N>` (`renderAuditBinding`), so a subject with no well-formed `id` or `rev`
-  // leaves the record nothing to pin. Round 1 refuses too, unlike a malformed blob: the record is the
+  // it read as `<id>@rev-<N>` (`renderAuditBinding`), so a subject with no well-formed `id`, or a spec
+  // subject with no well-formed `rev`, leaves the record nothing to pin. Round 1 refuses too, unlike a malformed blob: the record is the
   // point of the run, and an unpinned one is what this refusal exists to stop. The id grammar is
   // `expand_id_runs`', anchored, which also keeps a newline out of the prompt line the id reaches.
   const PIN_ID = /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/
@@ -397,13 +421,26 @@ if (isSpec) {
     if (typeof x.id !== 'string' || !PIN_ID.test(x.id))
       throw new Error('tier2-review: spec-audit subject ' + i + "'s `id` must be the unit id its spec defines, matching " +
         String(PIN_ID) + '. Got ' + JSON.stringify(x.id) + '.' + pinWhy)
+    // TOOL-dTrueNorth-13 S1 - a DESIGN subject, any path with no builds/<slug>/spec/ segment, carries
+    // its id bare: a `rev` on it is refused by name, since no rev header exists to pin, and it is exempt
+    // from the repeat refusal below, so two design documents of one id, or a design document beside its
+    // spec, audit together. This supersedes the refusal of every subject without a `rev`.
+    if (!SPEC_SUBJECT_PATH.test(String(x.path))) {
+      if (x.rev !== undefined)
+        throw new Error('tier2-review: spec-audit subject ' + i + "'s `rev` is refused: its path " + JSON.stringify(x.path) +
+          ' holds no builds/<slug>/spec/ segment, so it is a design-document subject, whose id the binding line ' +
+          'serves bare. Got ' + JSON.stringify(x.rev) + '. Drop the rev, or name the spec file the rev belongs to.')
+      continue
+    }
     if (!Number.isInteger(x.rev) || x.rev < 1)
       throw new Error('tier2-review: spec-audit subject ' + i + "'s `rev` must be the integer N of the rev-N its spec's " +
         'status header carries at that blob, 1 or more. Got ' + JSON.stringify(x.rev) + '.' + pinWhy)
     if (pinnedIds.indexOf(x.id) !== -1)
       throw new Error('tier2-review: spec-audit subject ' + i + "'s `id` " + x.id + ' repeats subject ' + pinnedIds.indexOf(x.id) +
         "'s, and a binding line carries one pin per id." + pinWhy)
-    pinnedIds.push(x.id)
+    // At the SUBJECT's index, so the repeat message names the subject: a design subject skipped above
+    // leaves a hole, and `indexOf` skips holes.
+    pinnedIds[i] = x.id
   }
   // TOOL-aEvidencedLens-4 S1 - `prevBlob`, the blob the previous round audited. Refused when malformed
   // and refused at round 1 at any shape (spec F1): it has no meaning there, so it is a caller error, and
@@ -1796,8 +1833,12 @@ const synth = await agent(
     (isSpec
       // S9 - a spec audit has no range. Its anchor is the pinned blob per subject, which is what
       // makes "which rev was reviewed" answerable from the record instead of from recollection.
-      ? `Open the report with a line naming each reviewed subject and the blob it was pinned at — ` +
-        subjects.map((x) => `${x.path}@${x.blob}`).join(', ') + `, and state the ROUND as ${round}. `
+      // TOOL-dTrueNorth-13 S3 - the subjects line is the HARNESS'S literal, copied like the binding line:
+      // the memory tree's pin grading reads its paths, so a word added to it reads as one more path.
+      ? `The report's subjects line is the harness's value too, rendered from each subject's path and pinned ` +
+        `blob: copy the line between the two marker lines below VERBATIM, alone on its own line, neither marker ` +
+        `line copied and nothing added to it, and state the ROUND as ${round} on a line of its own after it.\n` +
+        `<<<REVIEWED\n${renderReviewedLine(subjects)}\nREVIEWED>>>\n`
       : `Open the report with a line naming the reviewed range as ${baseSha}...${headSha}, and state the ROUND as ${round}. `) +
     // TOOL-dTieredTribunal-1 S4 - the record's opening ORDER. THREE sentences in this prompt each
     // claim the record's opening: the binding line below, the range line above, and the verdict

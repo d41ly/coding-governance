@@ -2547,7 +2547,10 @@ if (cleanRound && !attended) {
   const uncovered = auditUnits
     .filter(function (u) { return specRefused.indexOf(u.id) === -1 && owed.indexOf(u.id) === -1 })
     .map(function (u) { return u.id })
-  const subjectLines = subjects.map(function (s) { return s.path + '@' + s.blob }).join(', ')
+  // TOOL-dTrueNorth-13 S3 - the subjects line is the literal `renderReviewedLine` gives the callee's
+  // record, `Reviewed: <path>@<blob>, ...`: the memory tree's pin grading reads its paths, so this
+  // writer spells it as the other one does.
+  const reviewedLine = 'Reviewed: ' + subjects.map(function (s) { return s.path + '@' + s.blob }).join(', ')
   // TOOL-dTrueNorth-5 S2 - line 1 PINS each owed unit at the revision its subject carried, the line
   // `renderAuditBinding` gives a record the callee writes: this caller is the one other writer of a
   // spec-audit record, and a bare id here would read as audited at every later revision.
@@ -2563,8 +2566,8 @@ if (cleanRound && !attended) {
     '` and `specs-audited` refuses every one of those units at --close. Author `' + reviewDir +
     '/<date>-review-' + owed[0] + '-spec-audit-round' + (roundNo - subjectRound + 1) +
     '.md` in this order, which is the order the callee\'s own synthesis writes and hygiene check 22 ' +
-    'reads: line 1 exactly `' + pinnedLine + '`; a title line; a line naming ' +
-    'the reviewed subjects `' + subjectLines + '` and the round; then a heading that is exactly ' +
+    'reads: line 1 exactly `' + pinnedLine + '`; a title line; a line that is exactly `' + reviewedLine +
+    '`, with nothing added to it; a line stating the round; then a heading that is exactly ' +
     '`## Verdict: CLEAN`; then the body quoting the callee (the callee said: ' +
     (typeof auRaw.note === 'string' ? auRaw.note : 'no note') + '). ' +
     (uncovered.length

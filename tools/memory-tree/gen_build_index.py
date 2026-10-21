@@ -749,6 +749,23 @@ def read_bindings(root: str, tracked: list, conf: dict) -> dict:
     return out
 
 
+def read_reviewed_paths(text: str) -> list | None:
+    """The paths a record's `Reviewed:` line names, or None when its head holds no such line.
+
+    THE one reader of the line (TOOL-dTrueNorth-13 S4): the first of a record's first
+    `BIND_HEAD_LINES` unfenced lines that opens `Reviewed: `, in the form the review harness renders,
+    `Reviewed: <path>@<blob>, ...`. Each comma-separated entry is cut at its last `@`; an entry with
+    none is kept whole. Nothing is dropped, an empty entry included: the caller reads each path at
+    HEAD, and a path it cannot read there owes every id a pin, so an unparseable entry grades toward
+    the pin and never away from it.
+    """
+    for line in list(unfenced(text))[:BIND_HEAD_LINES]:
+        if line.startswith("Reviewed: "):
+            return [entry.strip().rpartition("@")[0] or entry.strip()
+                    for entry in line[len("Reviewed: "):].split(",")]
+    return None
+
+
 def cmd_print_bindings(root: str, conf: dict) -> int:
     """READ-ONLY. Classifies and prints; writes nothing and always exits 0.
 
@@ -772,6 +789,33 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
     defined = spec_ids(root, tracked, conf)
     binds = read_bindings(root, tracked, conf)
     revs = read_spec_revs(root, tracked, conf) if cutoff else {}
+    # TOOL-dTrueNorth-13 S4 — WHICH ids of a graded record owe a pin. A graded record is a spec-audit
+    # record dated on or after the cutoff, or undated, because unparseable is not old (the rule check
+    # 21's population filter states). One with no `Reviewed:` line owes a pin for every id, as before.
+    # One with that line owes a pin only for an id the H1 of a spec file it names defines, every path
+    # read at HEAD in ONE batch, so a design document audited alone owes none — UNLESS any path it
+    # names has no blob at HEAD: a path the grading cannot read cannot show that the record reviewed
+    # no spec, so then every id owes a pin, exactly as with no line. `owed` maps a record to the ids
+    # owing one; a graded record absent from it owes for every id.
+    graded_rels = set()
+    for rel, rec in binds.items():
+        if cutoff and rec["state"] == "bound" and rec["kind"] == "spec-audit":
+            dated = re.match(r"(\d{4}-\d{2}-\d{2})-", os.path.basename(rel))
+            if not dated or dated.group(1) >= cutoff:
+                graded_rels.add(rel)
+    named = {}
+    for rel in sorted(graded_rels):
+        text, _why = read_text_or_none(os.path.join(root, rel))
+        paths = read_reviewed_paths(text) if text is not None else None
+        if paths is not None:
+            named[rel] = paths
+    at_head = read_blobs_at_rev(root, "HEAD", sorted({p for ps in named.values() for p in ps}))
+    fams = [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
+    owed: dict = {}
+    for rel, paths in named.items():
+        if any(at_head.get(p) is None for p in paths):
+            continue
+        owed[rel] = {hit[1] for hit in (parse_spec_h1(p, at_head[p], m, fams) for p in paths) if hit}
     graded = 0
     unbound = 0
     for rel in sorted(binds):
@@ -796,18 +840,18 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
         # `@rev-N` pin, or a pin above its spec's header revision, which would read as audited at every
         # revision to come. Graded: dated on or after the cutoff, or undated, because unparseable is
         # not old (the rule check 21's population filter states). An id no spec defines has no header
-        # to compare, and its B row below already names it.
-        if cutoff and rec["state"] == "bound" and rec["kind"] == "spec-audit":
-            dated = re.match(r"(\d{4}-\d{2}-\d{2})-", os.path.basename(rel))
-            if not dated or dated.group(1) >= cutoff:
-                graded += 1
-                for i in dict.fromkeys(rec["ids"]):
-                    pin = (rec.get("pins") or {}).get(i)
-                    if pin is None:
+        # to compare, and its B row below already names it. An id the record owes no pin for (S4
+        # above) prints no unpinned row; a pin it carries anyway is still held to its header.
+        if rel in graded_rels:
+            graded += 1
+            for i in dict.fromkeys(rec["ids"]):
+                pin = (rec.get("pins") or {}).get(i)
+                if pin is None:
+                    if rel not in owed or i in owed[rel]:
                         print(f"P\t{rel}\t{i} carries no @rev-N pin")
-                    elif i in revs and pin > revs[i]:
-                        print(f"P\t{rel}\t{i}@rev-{pin} pins a revision its spec has not reached, "
-                              f"header rev-{revs[i]}")
+                elif i in revs and pin > revs[i]:
+                    print(f"P\t{rel}\t{i}@rev-{pin} pins a revision its spec has not reached, "
+                          f"header rev-{revs[i]}")
         for tok in rec["bad"]:
             print(f"B\t{rel}\t{tok} is not a family-qualified id or range")
         for i in rec["ids"] + rec["commissions"]:
@@ -5279,6 +5323,39 @@ def cmd_selftest() -> int:
         arm("TOOL-dTrueNorth-5 AC6 — a spec whose header moved past its highest pin is named at the pin",
             "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-2.",
             lambda: plan(t5r, conf5r)[0]["memory/builds/tOne/README.md"])
+        # TOOL-dTrueNorth-13 AC4 — the REVIEWED PATHS decide which ids owe a pin, read at HEAD. Four
+        # records over one committed tree: a design audit naming two committed build/ files owes none,
+        # one naming the spec owes its id, one with no Reviewed: line owes every id, and one naming a
+        # path absent at HEAD owes every id it serves. Against the base predicate, which owes every id
+        # a pin, the design-only record prints a row and the count reads design=1.
+        t13p = os.path.join(base, "reviewed"); os.makedirs(t13p)
+        _fixture(t13p)
+        b13 = "memory/builds/tOne/build/"
+        s13 = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
+        for name in ("a.md", "b.md"):
+            write_text(os.path.join(t13p, b13 + name), "# a design document\n")
+        for name, serves, reviewed in (
+                ("design", "ARCH-tOne-1", f"{b13}a.md@abc1234, {b13}b.md@def5678"),
+                ("spec", "ARCH-tOne-1", f"{s13}@abc1234"),
+                ("bare", "ARCH-tOne-1", ""),
+                ("missing", "ARCH-tOne-1 ARCH-tOne-2", f"{b13}a.md@abc1234, {b13}gone.md@abc1234")):
+            write_text(os.path.join(t13p, rv5 + f"2026-02-01-review-ARCH-tOne-1-{name}.md"),
+                       f"**Serves:** spec-audit {serves}\n\n# r\n\n" + (f"Reviewed: {reviewed}\n" if reviewed else ""))
+        run("git", "add", "-A", cwd=t13p)
+        run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=t13p)
+        conf13p = _set_pin_cutoff(t13p, "2026-01-01")
+        arm("TOOL-dTrueNorth-13 AC4 — a design-only audit owes no pin, a spec-reviewing one and one with no "
+            "Reviewed: line owe their id, and a path absent at HEAD owes every id the record serves",
+            "design=0 spec=1 bare=1 missing=2 Q\t4\t2026-01-01",
+            lambda: (lambda rows: " ".join(
+                "%s=%d" % (k, sum(1 for r in rows if r.startswith(f"P\t{rv5}2026-02-01-review-ARCH-tOne-1-{k}.md\t")))
+                for k in ("design", "spec", "bare", "missing")) + " " + " ".join(
+                r for r in rows if r.startswith("Q\t")))(_rows(t13p, conf13p).splitlines()))
+        arm("TOOL-dTrueNorth-13 S4 — read_reviewed_paths cuts each entry at its last @, keeps an empty one, "
+            "and reads no line past the head window",
+            "['memory/x/a.md', 'b.md', ''] None",
+            lambda: "%s %s" % (read_reviewed_paths("**Serves:** x\nReviewed: memory/x/a.md@abc1234, b.md@d, \n"),
+                               read_reviewed_paths("\n" * 12 + "Reviewed: a.md@abc1234\n")))
 
         # ---- the rendered Records table and the two coverage joins.
         # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER

@@ -813,7 +813,9 @@ has    "V5 attended: the main return carries the stage's counts" "$o" '"promoted
 # new one demands. One fixture therefore runs against either revision — observed RED on every arm
 # below against the unchanged render and callee, GREEN after.
 MT_T2="$HERE/tier2-review.js"
-MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"s1","blob":"abc1234","id":"A-tB-1","rev":1}],"round":1,"reviewDir":"r/","scratch":"/tmp/s"}'
+# TOOL-dTrueNorth-13 S5: the subject's path holds a builds/<slug>/spec/ segment, because the callee classes a
+# subject by its path and refuses a `rev` on any other.
+MT_ARGS='{"repo":"/tmp/r","kind":"spec-audit","subjects":[{"path":"memory/builds/tB/spec/s1.md","blob":"abc1234","id":"A-tB-1","rev":1}],"round":1,"reviewDir":"r/","scratch":"/tmp/s"}'
 # `build_merged_returns <items-json|absent> [judged] [shape-json]`: four lenses of twelve findings each
 # are ids 1-48, and the fifth spec lens, `failure-envelope` (TOOL-aEvidencedLens-1), returns none, so
 # every measured id range and merge keeps its place; the skeptic double judges ids 1 to `judged` (default 48), confirming the thirteen below
@@ -1404,6 +1406,11 @@ has    "D ...and nextAction demands the record BEFORE any dispatch" "$o" "WRITE 
 # the demanded line and is called out as uncovered instead.
 has    "D ...naming the ids the binding line must carry, each pinned — the AUDITED set" "$o" '**Serves:** spec-audit A-tB-1@rev-1 A-tB-2@rev-1`'
 hasnt_ "D ...and never a unit no subject covered" "$o" 'A-tB-3@rev-'
+# TOOL-dTrueNorth-13 AC3: the subjects line is the literal the callee's own record carries,
+# `Reviewed: <path>@<blob>, ...`, because the memory tree's pin grading reads its paths. Against the
+# harness TOOL-dTrueNorth-5 left, the instruction asks for an unprefixed line and both arms red.
+has    "TN13 ...and the subjects line it demands is exactly Reviewed: over the callee's subjects" "$o" 'a line that is exactly `Reviewed: s1@abc1234, s2@def5678`'
+hasnt_ "TN13 ...and it asks for no unprefixed subjects line" "$o" 'a line naming the reviewed subjects'
 has    "D ...and the uncovered unit is named as owing a later audit" "$o" 'NOT covered by this round and NOT to be named on that line: A-tB-3'
 # ROUND 3, CLUSTER C (id 10): the record hygiene check 22 reads needs a `## Verdict:` heading, and the
 # hand-out prescribes the callee's own opening order so the file it demands is one the bar accepts.
@@ -3043,7 +3050,10 @@ has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n'
 # callee's pinned subject and the demanded pinned line (2), the pinless resolver entry (1) and the
 # pinless caller subject by each field (2). Each runs once. Not measured by a run: the pass that wrote
 # it runs no suite.
-FLOOR_ASSERTIONS=691
+# RAISED 691 -> 693 by TOOL-dTrueNorth-13: its 2 static sites, counted by hand off the TN13 lines — the
+# demanded Reviewed: line and the absent unprefixed one (2). Each runs once. Not measured by a run: the
+# pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=693
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

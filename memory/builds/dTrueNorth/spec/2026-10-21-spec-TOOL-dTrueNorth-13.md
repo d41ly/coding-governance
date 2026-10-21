@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-13 — a design-document subject of a spec audit: its id served bare, and no pin owed for it
 
-**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** CLOSED · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-13-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-13-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-13-1-spec-writer.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-13-1-spec-writer.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-13-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-13-build-brief.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-13-divergence-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-13-divergence-brief.md) | research | — |

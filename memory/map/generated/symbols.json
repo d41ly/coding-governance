@@ -14028,6 +14028,11 @@
       "file": "tools/runlog/model.py"
     },
     {
+      "id": "read_reviewed_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_root_dir",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -15329,6 +15334,16 @@
     },
     {
       "id": "renderRerunTail",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.template.js"
+    },
+    {
+      "id": "renderReviewedLine",
+      "kind": "function",
+      "file": "tools/workflows/tier2-review.js"
+    },
+    {
+      "id": "renderReviewedLine",
       "kind": "function",
       "file": "tools/workflows/tier2-review.template.js"
     },
