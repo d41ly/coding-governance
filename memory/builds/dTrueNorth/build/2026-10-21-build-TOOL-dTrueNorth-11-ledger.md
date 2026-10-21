@@ -9,15 +9,17 @@ its `check_guard_trips` to the checker's path over every leg of the manifest, in
 at the pinned base read by `git show`, corroborated by the checker's `--legs-for` query; and a probe
 loading `tools/govkit/govkit.py` by path, building check 7c's inputs through govkit's own readers and
 applying 7c's six class tests as its block spells them. The probes stand in for the
-`govkit selfcheck` leg's check 7c; that leg, the `build-index selftest` and `memory-hygiene
-self-test` legs this guard now runs, and `spec tokens (a spec's own names resolve)` are owed to the
-close. The guard is data the runner reads, so no suite arm lands and no RED-first observation is owed.
+`govkit selfcheck` leg's check 7c; that leg, the two legs this guard now runs,
+`build-index selftest` and `memory-hygiene self-test`, and the
+`spec tokens (a spec's own names resolve)` leg are owed to the close. The guard is data the runner
+reads, so no suite arm lands and no RED-first observation is owed.
 
 **Evidences:** TOOL-dTrueNorth-11
 - AC1 — `check-spec-tokens.py` — the section's `python3 -c` over `tools/gate-legs.json` printed
-  `[['{prefix}/lib/', '{prefix}/memory-tree/', '{prefix}/check-spec-tokens.py'], ['{prefix}/lib/',
-  '{prefix}/memory-tree/', '{prefix}/check-spec-tokens.py']]`, the `memory-hygiene self-test` row
-  first in manifest order and `build-index selftest` second, each ending with the checker's pathspec.
+  two lists, each
+  `['{prefix}/lib/', '{prefix}/memory-tree/', '{prefix}/check-spec-tokens.py']`, the
+  `memory-hygiene self-test` row first in manifest order and `build-index selftest` second, each
+  ending with the checker's pathspec.
 - AC2 — `tools/gate-legs.json` — the trip probe, `{prefix}` resolved to `tools`, over the 142 legs of
   the working tree tripped 14 legs on `tools/check-spec-tokens.py`, `build-index selftest` and
   `memory-hygiene self-test` among them; over the 142 legs at `271aa59d` it tripped 12, the same list
