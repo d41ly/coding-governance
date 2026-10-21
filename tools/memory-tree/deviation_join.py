@@ -85,6 +85,7 @@ import os
 import pathlib
 import re
 import shutil
+import stat
 import subprocess
 import sys
 import tempfile
@@ -1058,6 +1059,19 @@ def build_fixture(root, plants):
     return fx
 
 
+def remove_tree(root):
+    """Delete a fixture repository. git writes its loose objects read-only, which Windows refuses to
+    delete, so a refused path is made writable and deleted again rather than left in the temp folder."""
+    def remove_read_only(func, path, _exc):
+        os.chmod(path, stat.S_IWRITE)
+        func(path)
+    try:
+        shutil.rmtree(root, **({"onexc": remove_read_only} if sys.version_info >= (3, 12)
+                               else {"onerror": remove_read_only}))
+    except OSError:
+        pass
+
+
 def read_fixture_conf(root):
     return parse_conf((pathlib.Path(root) / ".memory-tree.conf").read_text(encoding="utf-8"), {})
 
@@ -1094,7 +1108,7 @@ def run_fixture(plants, policy, approval, host=False):
         print(f"{SAY}: {label}nothing measured — {exc}")
         return 2
     finally:
-        shutil.rmtree(root, ignore_errors=True)
+        remove_tree(root)
 
 
 # -------------------------------------------------------------------------------------- the arms
@@ -1196,7 +1210,7 @@ def run_plant_arms():
         except Unmeasured as exc:
             arms.append((False, f"TOOL-dTrueNorth-4 plant {plant} could not build its fixture", str(exc)))
         finally:
-            shutil.rmtree(root, ignore_errors=True)
+            remove_tree(root)
     return arms
 
 

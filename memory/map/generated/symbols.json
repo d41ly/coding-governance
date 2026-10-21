@@ -15203,6 +15203,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "remove_tree",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "remove_wall_watcher",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
