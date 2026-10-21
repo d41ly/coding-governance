@@ -512,6 +512,7 @@ Cite ids, never line numbers.
 | [TOOL-dTotalRecall-27](../builds/dTotalRecall/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dTracedLedger-2](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aSparedSpawn's owner: memory hygiene check 23 is red at origin/main… |
 | [TOOL-dTracedLedger-3](../builds/dTracedLedger/BACKLOG.md) | OPEN | MED | — | 2026-10-14 | aOrientedCast's owner: memory hygiene check 23 is red at origin/main… |
+| [TOOL-dTrueNorth-21](../builds/dTrueNorth/BACKLOG.md) | DEFERRED | LOW | TOOL-dPinnedHandoff-2 | 2026-10-21 | TWO LIVE SPECS OF dPinnedHandoff OMIT TWO LEGS THEIR FILES TRIP. Since… |
 | [TOOL-dUnstalledConvoy-14](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | hygiene check 12 asserts the HEADER rev appears in section 9 and says… |
 | [TOOL-dUnstalledConvoy-15](../builds/dUnstalledConvoy/BACKLOG.md) | OPEN | — | — | 2026-08-20 | the bare-interpreter class survives outside govkit:… |
 | [TOOL-dUnstalledConvoy-16](../builds/dUnstalledConvoy/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-20 | a correction to a claim held by SEVERAL carriers lands in one of them… |
