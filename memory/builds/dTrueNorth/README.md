@@ -5,7 +5,6 @@ opened: 2026-10-21
 streams: tooling
 roster: TOOL
 ids: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7
-status: OPEN
 spec-audit: 2026-10-21
 parents: dClosedLoop
 may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2
@@ -68,23 +67,36 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 7 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dTrueNorth-1 — the clause ids and binding lines, parsed once, behind a cutoff](spec/2026-10-21-spec-TOOL-dTrueNorth-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg](spec/2026-10-21-spec-TOOL-dTrueNorth-2.md) | 1 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal](spec/2026-10-21-spec-TOOL-dTrueNorth-3.md) | 1 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-5 — every spec audit pins the revision it read](spec/2026-10-21-spec-TOOL-dTrueNorth-5.md) | 2 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close](spec/2026-10-21-spec-TOOL-dTrueNorth-4.md) | 3 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate](spec/2026-10-21-spec-TOOL-dTrueNorth-6.md) | 3 | 2 | OPEN | rev-1 | 2026-10-21 |
+| [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dTrueNorth-1`, `TOOL-dTrueNorth-2`, `TOOL-dTrueNorth-3` | yes |
+| 2 | `TOOL-dTrueNorth-5` | no |
+| 3 | `TOOL-dTrueNorth-4`, `TOOL-dTrueNorth-6` | yes |
+| 4 | `TOOL-dTrueNorth-7` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
