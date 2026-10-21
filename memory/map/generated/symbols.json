@@ -1703,6 +1703,11 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
+      "id": "build_design_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "build_diff_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3846,6 +3851,11 @@
       "id": "check_commitment",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "check_composed_run",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "check_conf",
@@ -13158,6 +13168,11 @@
       "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
+      "id": "read_fixture_skip",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "read_flag_value",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -13211,6 +13226,11 @@
       "id": "read_gates_record",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_gen_region_awk",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_gen_strip",
@@ -13676,11 +13696,6 @@
       "id": "read_live_census",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
-    },
-    {
-      "id": "read_live_design",
-      "kind": "function",
-      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_live_readmes",
@@ -20956,6 +20971,11 @@
       "id": "set_fixture_conf",
       "kind": "function",
       "file": "tools/memory-tree/routed_commits.py"
+    },
+    {
+      "id": "set_gen_strip",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "set_group",

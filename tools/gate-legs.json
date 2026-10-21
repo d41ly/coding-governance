@@ -538,7 +538,8 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/unattended/lib-unattended.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",

@@ -31,7 +31,10 @@ THE POPULATION, six arms over the chain builds' specs, the chain builds being th
     from `DESIGN_BASELINE`, listed first and joined by no record.
 Both revision arms exempt a revision whose text is unchanged once its `**Status:**` line and every
 generated region are stripped, the strip being the unattended kit's `GEN_REGION_AWK`, read from
-`lib-unattended.sh` and never copied.
+`lib-unattended.sh` and never copied, the kit found by `backlog.resolve_kit_dir` or by a resolver a
+caller injects (`read_gen_region_awk`, TOOL-dTrueNorth-12). The strip resolves as the population's
+first act, once per process, so a kit that does not resolve is nothing measured whatever the history
+holds: a population read without it would count a status-only revision as a member.
 
 THE FIRST PASS is the oldest commit, by committer date, among those `routed_commits.read_routed_commits`
 returns for HEAD that carry a `Pass:` trailer naming the unit (`Pass: none` names none), or carry no
@@ -62,14 +65,21 @@ With no `--range` the commit join reads every commit. `--host routed-commits` ca
 `routed_commits.check_routed_commits` in-process and prints the host's lines, over the fixture with
 `GATE_PUSH_BASE` set to its base, over the tree with the process environment. `--fixture` builds a
 temporary repository with every plant, or the base and one plant; `--selftest` runs every plant
-against the exit it must take, the arms `routed_commits.py --selftest` also runs.
+against the exit it must take, then every plant but `unmeasured` composed, the arms
+`routed_commits.py --selftest` also runs. The fixture's design is its own (TOOL-dTrueNorth-12 S3):
+two builds, `dFixA` holding every folder the fixture writes, and one `[chain]` clause per
+clause-moving role, so plants compose; nothing reads this tree's design. Where the unattended kit
+does not resolve, `--fixture` and the arms print one `deviation: SKIP` line naming why and the plants
+that read the strip, `STRIP_PLANTS`, and run every other plant under the strip stubbed to the
+identity, set for that call alone; the host's path in that call reads it too.
 Exit 0 green or `report` · 1 on any finding under `refuse` · 2 nothing measured.
 
 OFF unless `DESIGN_RECORD`, `DESIGN_BASELINE` and `DESIGN_VIEW` are all declared: one line, and no
-history read. NOTHING MEASURED, exit 2, when the baseline names no commit holding the record and no
-chain-build spec exists. COST, armed: one log for every chain-build spec, one blob batch for the
-revisions past a pass or a pin, one strip per such revision, and one pickaxe log per ledger line and
-rescope row; it grows with the chain-build specs' revisions, where the host's own leg is constant.
+history read. NOTHING MEASURED, exit 2, when the unattended kit does not resolve, or when the
+baseline names no commit holding the record and no chain-build spec exists. COST, armed: one read of
+the kit's library, one log for every chain-build spec, one blob batch for the revisions past a pass
+or a pin, one strip per such revision, and one pickaxe log per ledger line and rescope row; it grows
+with the chain-build specs' revisions, where the host's own leg is constant.
 
 What it does not read: whether a record's reason is true or its risk class honest, which the
 approver and the closing review judge; a departure in code that changes no spec; a hand edit inside a
@@ -98,7 +108,7 @@ if str(KIT) not in sys.path:
 import row_grammar  # noqa: E402  the kit's decision-row grammar
 import routed_commits  # noqa: E402  the host: its log pass, its routed-path test and its pinned git runner
 from design_lib import (  # noqa: E402  the one parser of the design
-    DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_view, read_repo_root, scan_chain_specs)
+    DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_view, scan_chain_specs)
 from tree_lib import parse_conf, parse_spec_h1  # noqa: E402
 
 SAY = "deviation"
@@ -310,29 +320,66 @@ def read_row_commit(root, row, path):
     return out[0].decode("ascii") if out else None
 
 
+def read_gen_region_awk(resolve=None):
+    """The value of the `GEN_REGION_AWK=` assignment in the unattended kit's `lib-unattended.sh`, read from
+    the file and never copied into this module, so check 23 and this join strip one way (P0.1 row 8a). The
+    kit is the one `backlog.resolve_kit_dir` finds, or `resolve`'s, a stand-in a caller injects taking the
+    same three arguments, as `gen_build_index.read_landed_unclosed` takes one (TOOL-dTrueNorth-12 S1). A kit
+    that does not resolve, or whose library cannot be read, raises `LookupError` naming the kit."""
+    import backlog       # the sibling-kit resolver, loaded only where the strip is asked for
+    try:
+        lib = pathlib.Path((resolve or backlog.resolve_kit_dir)("unattended", "lib-unattended.sh", str(KIT)),
+                           "lib-unattended.sh")
+        text = lib.read_text(encoding="utf-8")
+    except (LookupError, OSError) as exc:
+        raise LookupError(f"the unattended kit's lib-unattended.sh, which holds GEN_REGION_AWK, does not "
+                          f"resolve: {exc}") from None
+    found = re.findall(r"^GEN_REGION_AWK='([^']*)'$", text, flags=re.M)
+    if len(found) != 1:
+        raise Unmeasured(f"the generated-region strip needs {lib.as_posix()}'s one GEN_REGION_AWK; found "
+                         f"{len(found)}")
+    return found[0]
+
+
+GEN_STRIP = None                 # the strip a fixture entry point set for its call alone; None reads the kit's
+IDENTITY_STRIP = (None, None)    # the strip stubbed to the identity, under the fixture's named skip (S2)
+
+
 @functools.lru_cache(maxsize=None)
 def read_gen_strip():
-    """`(awk, program)`: the unattended kit's `GEN_REGION_AWK`, read from its `lib-unattended.sh` and never
-    copied, so check 23 and this join strip one way (P0.1 row 8a), and the awk that runs it."""
-    import backlog       # the sibling-kit resolver, loaded only when a revision is graded
+    """`(awk, program)`, the one strip in force for this process: the one `set_gen_strip` set, else the
+    unattended kit's `GEN_REGION_AWK` and the awk that runs it. A kit that does not resolve is Unmeasured
+    naming it (TOOL-dTrueNorth-12 S2)."""
+    if GEN_STRIP is not None:
+        return GEN_STRIP
     try:
-        lib = backlog.resolve_kit_dir("unattended", "lib-unattended.sh", str(KIT)) / "lib-unattended.sh"
-        found = re.findall(r"^GEN_REGION_AWK='([^']*)'$", lib.read_text(encoding="utf-8"), flags=re.M)
-    except (LookupError, OSError) as exc:
-        raise Unmeasured(f"the generated-region strip lives in the unattended kit's lib-unattended.sh, which "
-                         f"does not resolve: {exc}") from None
+        prog = read_gen_region_awk()
+    except LookupError as exc:
+        raise Unmeasured(f"the generated-region strip cannot be read, and a population read without it would "
+                         f"count a status-only revision as a member: {exc}") from None
     awk = shutil.which("awk")
-    if len(found) != 1 or not awk:
-        raise Unmeasured(f"the generated-region strip needs {lib.as_posix()}'s one GEN_REGION_AWK and an awk to "
-                         f"run it; found {len(found)} and {awk or 'no awk'}")
-    return awk, found[0]
+    if not awk:
+        raise Unmeasured("the generated-region strip needs an awk to run it, and none is on PATH")
+    return awk, prog
+
+
+def set_gen_strip(strip):
+    """Set `strip` as the one `read_gen_strip` returns, None restoring the kit's own, and clear the caches
+    holding either, so a strip a fixture set for its call never outlives that call (S2)."""
+    global GEN_STRIP
+    GEN_STRIP = strip
+    read_gen_strip.cache_clear()
+    extract_authored.cache_clear()
 
 
 @functools.lru_cache(maxsize=None)
 def extract_authored(text):
-    """A spec's text less its `**Status:**` line and every generated region (P0.1 row 8a)."""
+    """A spec's text less its `**Status:**` line and every generated region (P0.1 row 8a); under the
+    identity strip, less its `**Status:**` line alone."""
     awk, prog = read_gen_strip()
     body = re.sub(r"(?m)^\*\*Status:\*\*.*$", "", text)
+    if awk is None:
+        return body.encode("utf-8")
     done = subprocess.run([awk, prog], input=body.encode("utf-8"), capture_output=True)
     if done.returncode:
         raise Unmeasured(f"the generated-region strip exited {done.returncode}: "
@@ -398,7 +445,10 @@ def scan_clause_members(root, record, pin, now, old):
 
 def read_population(root, conf, commits):
     """`(members, facts)` of the tree at `root` (S4): `commits` is the WHOLE list `read_routed_commits`
-    already read, so the host reads history once. Raises Unmeasured when nothing can be measured."""
+    already read, so the host reads history once. Raises Unmeasured when nothing can be measured. Its
+    first act resolves the strip, before the view is read, so the CLI's armed join and the host's
+    `read_host_lines` each refuse an unresolved kit whatever the history holds (TOOL-dTrueNorth-12 S2)."""
+    read_gen_strip()
     import gen_build_index as gbi     # the binding classifier and the header grammar, loaded only armed
     root = pathlib.Path(root)
     memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
@@ -691,7 +741,8 @@ def read_host_lines(repo, conf, populations):
 
 # ------------------------------------------------------------------------------------ the fixture
 FIXTURE_FAMILY = "FIX"     # declared only in the fixture repository's own conf
-TN = "memory/builds/dTrueNorth/"
+FIXTURE_BUILDS = ("dFixA", "dFixB")     # the fixture design's chain builds; the first holds every folder
+TN = f"memory/builds/{FIXTURE_BUILDS[0]}/"
 EPOCH = 1792576800         # 2026-10-21T10:00Z, after the fixture's ROUTED_COMMIT_CUTOFF
 UNMEASURED_PIN = "0123456789abcdef0123456789abcdef01234567"
 PLANTS = ("baseline", "clause", "subject-pass", "pass-none", "status-flip", "two-branch", "header-rev", "gen",
@@ -700,16 +751,23 @@ PLANTS = ("baseline", "clause", "subject-pass", "pass-none", "status-flip", "two
           "fix-record", "audit-nopin",                       # the instrument's 26, deviations.py:851-854
           "pass-revision", "below-risk", "owner-cause", "status-only", "malformed-field", "malformed-risk",
           "malformed-follow", "duplicate-n", "record-late", "unmeasured")
+# The role map (TOOL-dTrueNorth-12 §4): every clause-moving role moves its own clause of the fixture design,
+# so plants compose. The base's owner amendment, which `quote` reads, and the `baseline` and `clause` plants:
+CLAUSE_ROLES = {"base": "cl-dFix-0001", "baseline": "cl-dFix-0002", "clause": "cl-dFix-0003"}
 # Each approver plant: the clause it moves, and the approver of the record departing from it (P0.1 row 6).
-APPROVER_PLANTS = {"owner-bare": ("cl-dClosedLoop-0001", "owner"),
-                   "owner-er": ("cl-dClosedLoop-0002", "owner, quoted at ER:189"),
-                   "owner-row5": ("cl-dClosedLoop-0003", "owner, FIX-dClosedLoop-6"),
-                   "owner-unknown-id": ("cl-dClosedLoop-0005", "owner, FIX-dClosedLoop-99"),
-                   "approver-none": ("cl-dClosedLoop-0006", None),
-                   "approver": ("cl-dClosedLoop-0007", "author")}
+APPROVER_PLANTS = {"owner-bare": ("cl-dFix-0004", "owner"),
+                   "owner-er": ("cl-dFix-0005", "owner, quoted at ER:189"),
+                   "owner-row5": ("cl-dFix-0006", "owner, FIX-dClosedLoop-6"),
+                   "owner-unknown-id": ("cl-dFix-0007", "owner, FIX-dClosedLoop-99"),
+                   "approver-none": ("cl-dFix-0008", None),
+                   "approver": ("cl-dFix-0009", "author")}
 # The by-risk plants: the clause each moves, and its record's risk, cause and approver.
-RISK_PLANTS = {"below-risk": ("cl-dClosedLoop-0010", "loosening", "builder discovery", "author"),
-               "owner-cause": ("cl-dClosedLoop-0011", "additive", "owner ruling", "spec writer")}
+RISK_PLANTS = {"below-risk": ("cl-dFix-0010", "loosening", "builder discovery", "author"),
+               "owner-cause": ("cl-dFix-0011", "additive", "owner ruling", "spec writer")}
+# The plants whose verdict reads the generated-region strip (TOOL-dTrueNorth-4 AC5), held back by the
+# fixture's named skip where the unattended kit does not resolve (TOOL-dTrueNorth-12 S2). Every plant run
+# under the identity strip moved gen's and status-gen's verdicts and no other's, so none is added.
+STRIP_PLANTS = ("status-only", "header-rev", "gen", "status-gen", "gen-text")
 # The unit each plant writes; the base writes FIX-dTrueNorth-1, -2 and -99.
 PLANT_UNITS = {p: f"FIX-dTrueNorth-{n}" for n, p in enumerate(
     ("subject-pass", "pass-none", "status-flip", "two-branch", "header-rev", "gen", "status-gen", "gen-text",
@@ -722,14 +780,14 @@ DECISIONS_TEXT = "\n".join([
     "as a departure (ER:84, ER:232, ER:320)",
     "- FIX-dClosedLoop-3 · the grant every chain build's may: line cites (ER:181)",
     "- FIX-dClosedLoop-4 · the chain's deviation values, report and author-recorded, and the departure from "
-    "cl-dClosedLoop-0004 (ER:103-104, ER:189)",
+    f"{CLAUSE_ROLES['base']} (ER:103-104, ER:189)",
     "- FIX-dClosedLoop-6 · the standing ruling for residual forks (ER:240, ER:388, ER:328)",
     "- FIX-dClosedLoop-7 · the driver-rewriting builds land through their own code, and dPlacedRequest's migration of "
     "cl-dClosedLoop-0120 (ER:248, ER:264)", ""])
 
 
 class Fixture:
-    """A temporary git repository written through `git fast-import`: the live design's `[chain]` and view,
+    """A temporary git repository written through `git fast-import`: the fixture's own design and its view,
     the fixture family, and the plants' histories. Every commit is streamed; a sha is resolved only when a
     plant needs one, by importing what is pending."""
 
@@ -874,21 +932,31 @@ class Fixture:
                           "- AC2 — `fixture` — observed", ""])
 
 
-def read_live_design():
-    """`(DESIGN_RECORD path, its text, DESIGN_VIEW path, its text)` of the tree this runs in, which the
-    fixture copies whole: the clause population and the view are the tree's, never a synthetic chain."""
-    root = read_repo_root()
-    conf_path = root / ".memory-tree.conf"
-    conf = parse_conf(conf_path.read_text(encoding="utf-8"), {}) if conf_path.exists() else {}
-    record, view = (str(conf.get(k) or "").strip() for k in ("DESIGN_RECORD", "DESIGN_VIEW"))
-    if not record or not view:
-        raise Unmeasured("the fixture copies this tree's DESIGN_RECORD [chain] and DESIGN_VIEW, and this tree's "
-                         ".memory-tree.conf declares no DESIGN_RECORD or no DESIGN_VIEW")
-    try:
-        return (record, (root / record).read_text(encoding="utf-8").replace("\r\n", "\n"), view,
-                (root / view).read_bytes())
-    except OSError as exc:
-        raise Unmeasured(f"the fixture cannot read this tree's design: {exc}") from None
+def build_design_fixture(repo):
+    """The fixture's own design, written as its pin commit, whose sha it returns (TOOL-dTrueNorth-12 S3).
+
+    The record's `[chain]` holds one clause per id the role map holds, `CLAUSE_ROLES`, `APPROVER_PLANTS`
+    and `RISK_PLANTS`, so each clause-moving role moves its own clause and plants compose, and a role added
+    to the map gets its clause with no second edit; the ids, in order, split across `FIXTURE_BUILDS`, the
+    first taking the larger half. Its `[clause-ids]` section reads `No baseline.`, and `repo.v2` holds the
+    record as it stands. The view is one `baseline` row per clause in the grammar `design_lib.VIEW_ROW`
+    reads. Nothing reads this tree's DESIGN_RECORD or DESIGN_VIEW.
+    """
+    ids = sorted({*CLAUSE_ROLES.values(), *(v[0] for v in APPROVER_PLANTS.values()),
+                  *(v[0] for v in RISK_PLANTS.values())})
+    half = (len(ids) + 1) // 2
+    clauses = [(FIXTURE_BUILDS[0] if n < half else FIXTURE_BUILDS[1], cid,
+                f"the fixture's clause {n + 1} holds `fixture-name-{n + 1}`") for n, cid in enumerate(ids)]
+    rows = [f"| {b} | Fixture | {'none' if b == FIXTURE_BUILDS[0] else FIXTURE_BUILDS[0]} | "
+            + "; ".join(f"{text} `{cid}`" for at, cid, text in clauses if at == b) + " | none |" for b in FIXTURE_BUILDS]
+    repo.v2 = "\n".join(["# The fixture's design record, its own two builds", "",
+                         "## [chain] The chain: the fixture's builds and their clauses", "",
+                         "| Build | Stage | Parents | Planned units | Gaps owned |", "|---|---|---|---|---|", *rows, "",
+                         "## [clause-ids] Clause ids", "", "No baseline.", ""])
+    view = "\n".join(["# The fixture's as-built view", "", "| Build | Clause | Text | Since |", "|---|---|---|---|",
+                      *(f"| {b} | `{cid}` | {text} | baseline |" for b, cid, text in clauses), ""])
+    return repo.read_sha(repo.write_commit({repo.record: repo.v2, repo.view: view},
+                                           "fixture: the design's [chain] and its view, the fixture's own"))
 
 
 def build_fixture_conf(record, view, pin):
@@ -915,13 +983,14 @@ def add_base(fx):
     fx.write_spec(u2, 1)
     fx.add_run_row(f"rescope · item supersede {u2} -> FIX-dTrueNorth-3 · reason building found it two units",
                    dict([fx.render_record(u2, f"{u2}@rev-1 [scope]", "spec writer", follow="new unit FIX-dTrueNorth-3")]))
-    h = fx.hashes["cl-dClosedLoop-0004"]
-    fx.set_moved_clause("cl-dClosedLoop-0004")
-    path, text = fx.render_record(u1, f"`cl-dClosedLoop-0004@{h}` [chain]", "owner, FIX-dClosedLoop-4", risk="stricter",
-                                  cause="owner ruling", hand="design-revised", follow=f"amends cl-dClosedLoop-0004@{h}")
-    fx.write_commit({fx.record: fx.v2, path: text}, "records(dTrueNorth): cl-dClosedLoop-0004 amended by the owner's row")
+    cid = CLAUSE_ROLES["base"]
+    h = fx.hashes[cid]
+    fx.set_moved_clause(cid)
+    path, text = fx.render_record(u1, f"`{cid}@{h}` [chain]", "owner, FIX-dClosedLoop-4", risk="stricter",
+                                  cause="owner ruling", hand="design-revised", follow=f"amends {cid}@{h}")
+    fx.write_commit({fx.record: fx.v2, path: text}, f"records(dTrueNorth): {cid} amended by the owner's row")
     fx.add_run_row("rescope · item add FIX-dTrueNorth-99 · reason dTrueNorth's extra unit, the owner's row 1",
-                   dict([fx.render_record("FIX-dTrueNorth-99", "dTrueNorth [chain]", "owner, FIX-dClosedLoop-2",
+                   dict([fx.render_record("FIX-dTrueNorth-99", f"{FIXTURE_BUILDS[0]} [chain]", "owner, FIX-dClosedLoop-2",
                                           hand="design-to-spec", follow="new unit FIX-dTrueNorth-99")]))
 
 
@@ -929,13 +998,13 @@ def add_plant(fx, plant):
     """One plant's history, on its own unit, clause or row, so every plant composes with every other."""
     u, u1 = PLANT_UNITS.get(plant), "FIX-dTrueNorth-1"
     if plant == "baseline":
-        fx.set_moved_clause("cl-dClosedLoop-0119", "loosened, so the owner is never asked, ")
-        loose = fx.read_sha(fx.write_commit({fx.record: fx.v2}, "records(dClosedLoop): cl-dClosedLoop-0119 loosened"))
+        fx.set_moved_clause(CLAUSE_ROLES[plant], "loosened, so the owner is never asked, ")
+        loose = fx.read_sha(fx.write_commit({fx.record: fx.v2}, f"records(dClosedLoop): {CLAUSE_ROLES[plant]} loosened"))
         fx.v2 = re.sub(r"(?m)^Baseline: `[0-9a-f]+`", f"Baseline: `{loose}`", fx.v2)
         fx.write_commit({fx.record: fx.v2}, "records(dClosedLoop): the baseline re-pointed past the loosening")
     elif plant == "clause":
-        fx.set_moved_clause("cl-dClosedLoop-0008")
-        fx.write_commit({fx.record: fx.v2}, "records(dClosedLoop): cl-dClosedLoop-0008 edited, and no record")
+        fx.set_moved_clause(CLAUSE_ROLES[plant])
+        fx.write_commit({fx.record: fx.v2}, f"records(dClosedLoop): {CLAUSE_ROLES[plant]} edited, and no record")
     elif plant in APPROVER_PLANTS or plant in RISK_PLANTS:
         if plant in APPROVER_PLANTS:
             (cid, approver), risk, cause = APPROVER_PLANTS[plant], "stricter", "review finding"
@@ -948,8 +1017,8 @@ def add_plant(fx, plant):
         fx.write_commit({fx.record: fx.v2, path: text}, f"records(dTrueNorth): {cid} amended, approver {approver}")
     elif plant == "owner-row1-added":
         fx.add_run_row(f"rescope · item add {u} · reason the spec audit promoted it",
-                       dict([fx.render_record(u, "dTrueNorth [chain]", "owner, FIX-dClosedLoop-2", hand="design-to-spec",
-                                              follow=f"new unit {u}")]))
+                       dict([fx.render_record(u, f"{FIXTURE_BUILDS[0]} [chain]", "owner, FIX-dClosedLoop-2",
+                                              hand="design-to-spec", follow=f"new unit {u}")]))
     elif plant in ("subject-pass", "pass-revision"):
         fx.write_spec(u, 1)
         fx.write_pass(u, trailer=plant == "pass-revision")
@@ -990,7 +1059,7 @@ def add_plant(fx, plant):
             line="the fixture line, changed with the render" if plant == "gen-text" else "the fixture line holds")},
             f"records(dTrueNorth): {u}'s spec-records region re-rendered", ["Pass: none"])
     elif plant == "quote":
-        quoted = next(t for _b, c, t, _h in read_chain_clauses(fx.v2) if c == "cl-dClosedLoop-0004")
+        quoted = next(t for _b, c, t, _h in read_chain_clauses(fx.v2) if c == CLAUSE_ROLES["base"])
         fx.write_spec(u, 1, extra=f"- AC2: quotes its clause, {quoted}")
     elif plant in ("amended", "amended-joined"):
         files = {f"{TN}build/2026-10-21-build-{u}-1-acceptance-ledger.md": fx.render_ledger(u, 3)}
@@ -1031,24 +1100,22 @@ def add_plant(fx, plant):
 
 
 def build_fixture(root, plants):
-    """The fixture repository at `root`: the pin, a second commit declaring the design keys at it, and the
-    run's branch with the base and each plant. `unmeasured` stands alone: a pin naming no commit, and no
-    chain-build spec, so it takes no base."""
-    record, v2_text, view, view_bytes = read_live_design()
-    fx = Fixture(root, record, view)
+    """The fixture repository at `root`: the fixture family and the decisions, the pin holding the fixture's
+    own design (`build_design_fixture`), a commit declaring the design keys at it, and the run's branch with
+    the base and each plant. `unmeasured` stands alone: a pin naming no commit, and no chain-build spec, so
+    it takes no base."""
+    fx = Fixture(root, "memory/design/record.md", "memory/design/view.md")
     if run_git(".", "init", "-q", str(root)) is None:
         raise RuntimeError(f"fixture: git init failed at {root}")
-    chain = v2_text.split("\n## [chain]", 1)[1].split("\n## ", 1)[0]
-    v2 = "# The fixture's design record, its [chain] copied whole\n\n## [chain]" + chain + \
-        "\n## [clause-ids] Clause ids\n\nNo baseline.\n"
-    pin = fx.read_sha(fx.write_commit({".memory-tree.conf": f'MEMORY_ROOT="memory"\nFAMILIES="fixture:{FIXTURE_FAMILY}"\n',
-                                       record: v2, view: view_bytes, "memory/DECISIONS.md": DECISIONS_TEXT},
-                                      "fixture: the design's [chain] and view, the fixture family and the decisions"))
-    fx.hashes = {cid: h for _b, cid, _t, h in read_chain_clauses(v2)}
-    fx.v2 = v2.replace("No baseline.", f"Baseline: `{pin}`, the fixture's own.")
+    fx.write_commit({".memory-tree.conf": f'MEMORY_ROOT="memory"\nFAMILIES="fixture:{FIXTURE_FAMILY}"\n',
+                     "memory/DECISIONS.md": DECISIONS_TEXT}, "fixture: the fixture family and the decisions")
+    pin = build_design_fixture(fx)
+    fx.hashes = {cid: h for _b, cid, _t, h in read_chain_clauses(fx.v2)}
+    fx.v2 = fx.v2.replace("No baseline.", f"Baseline: `{pin}`, the fixture's own.")
     unmeasured = "unmeasured" in plants
-    fx.base = fx.write_commit({".memory-tree.conf": build_fixture_conf(record, view, UNMEASURED_PIN if unmeasured else pin),
-                               record: fx.v2}, "fixture: the baseline taken, and the design keys declared")
+    fx.base = fx.write_commit({".memory-tree.conf": build_fixture_conf(fx.record, fx.view,
+                                                                       UNMEASURED_PIN if unmeasured else pin),
+                               fx.record: fx.v2}, "fixture: the baseline taken, and the design keys declared")
     fx.stream += b"reset refs/remotes/origin/main\nfrom :%d\n\n" % fx.base
     fx.set_branch("run", new=True)
     if not unmeasured:
@@ -1085,12 +1152,36 @@ def measure_fixture(fx):
                                                     {c["sha"] for c in commits})
 
 
-def run_fixture(plants, policy, approval, host=False):
-    """Build the fixture, print its lines, and return the exit (S8)."""
+def read_fixture_skip(resolve=None):
+    """The fixture's named SKIP line where the unattended kit does not resolve, through `resolve` or the
+    kit's own resolver, naming why and every plant `STRIP_PLANTS` holds back; '' where it resolves
+    (TOOL-dTrueNorth-12 S2). It sets no strip: the entry point that asked does, for its call alone."""
+    try:
+        read_gen_region_awk(resolve)
+    except LookupError as exc:
+        return (f"{SAY}: SKIP — the unattended kit does not resolve, so the plants that read the "
+                f"generated-region strip are not run: {exc} · {' '.join(STRIP_PLANTS)}")
+    return ""
+
+
+def run_fixture(plants, policy, approval, host=False, resolve=None):
+    """Build the fixture, print its lines, and return the exit (S8). Where the unattended kit does not
+    resolve, through `resolve` or the kit's own resolver, it prints the named SKIP line first and runs the
+    plants `STRIP_PLANTS` does not hold under the strip stubbed to the identity, set for this call alone
+    and restored in its `finally`, so the host's path inside the call reads it too (TOOL-dTrueNorth-12 S2);
+    a call asking only for held plants runs nothing and exits 0."""
     root = tempfile.mkdtemp(prefix="dj-")
     label = "fixture · " + (f"plant {plants[0]} · " if len(plants) == 1 else "every plant · " if plants
                             else "the base alone · ")
     try:
+        skip = read_fixture_skip(resolve)
+        if skip:
+            set_gen_strip(IDENTITY_STRIP)
+            print(skip)
+            kept = [p for p in plants if p not in STRIP_PLANTS]
+            if plants and not kept:
+                return 0
+            plants = kept
         fx = build_fixture(root, plants)
         if host:
             try:
@@ -1108,6 +1199,7 @@ def run_fixture(plants, policy, approval, host=False):
         print(f"{SAY}: {label}nothing measured — {exc}")
         return 2
     finally:
+        set_gen_strip(None)
         remove_tree(root)
 
 
@@ -1131,14 +1223,14 @@ def derive_plant_needle(plant):
     """The text a plant's red line must carry, so an arm reds for its own reason and not another's."""
     u = PLANT_UNITS.get(plant)
     nobody = "recorded by nobody"
-    return {"baseline": "the Baseline: line moved", "clause": "cl-dClosedLoop-0008 moved",
+    return {"baseline": "the Baseline: line moved", "clause": f"{CLAUSE_ROLES['clause']} moved",
             "subject-pass": f"at {u}@rev-1 (spec-revised): {nobody}", "pass-revision": f"at {u}@rev-1 (spec-revised): {nobody}",
             "two-branch": f"at {u}@rev-1 (spec-revised): {nobody}", "gen-text": f"at {u}@rev-1 (spec-revised): {nobody}",
             "amended": f"at {u}@rev-2 (spec-revised): {nobody}", "add": f"at new unit {u} (design-to-spec): {nobody}",
             "handback": f"at {u}@rev-1 (spec-to-code): {nobody}", "audit-pin": "past its audited revision rev-1",
             "audit-nopin": f"no audit pin: ", "approver-none": "it records no approver",
             "owner-bare": "names the owner and cites no decision id", "owner-er": "names the owner and cites no decision id",
-            "owner-row5": "whose row does not name cl-dClosedLoop-0003",
+            "owner-row5": f"whose row does not name {APPROVER_PLANTS['owner-row5'][0]}",
             "owner-unknown-id": "cites FIX-dClosedLoop-99, which no row", "owner-row1-added": f"whose row does not name {u}",
             "malformed-field": "Caused-by is missing", "malformed-risk": "Risk moderate is outside",
             "malformed-follow": "names no clause at an eight-hex hash", "duplicate-n": "shares deviation-",
@@ -1147,70 +1239,112 @@ def derive_plant_needle(plant):
             "owner-cause": "below owner, the least approver its cause owner ruling requires"}.get(plant)
 
 
-def run_plant_arms():
+def check_composed_run(counts):
+    """`(held, what, detail)` of the composed run (TOOL-dTrueNorth-12 S3): every plant `counts` holds, each
+    mapped to the member count of the base and that plant alone, built over one base. Its members must be
+    `BASE_MEMBERS` plus each plant's own increment, a sum derived from the single-plant builds and never
+    typed, and its one late member the `record-late` plant's, so two roles sharing a unit, clause or row,
+    which would lose a member and read the later record late, red."""
+    plants = list(counts)
+    want = BASE_MEMBERS + sum(n - BASE_MEMBERS for n in counts.values())
+    unit = PLANT_UNITS["record-late"]
+    what = (f"TOOL-dTrueNorth-12 AC6 the composed run of {len(plants)} plant(s) holds {want} members, the base's "
+            f"{BASE_MEMBERS} plus each plant's own, and one member recorded late, {unit}'s")
+    root = tempfile.mkdtemp(prefix="dj-")
+    try:
+        _conf, _commits, result, commit = measure_fixture(build_fixture(root, plants))
+        late = [m["address"] for m, _r, verdict in commit if verdict == "late"]
+        lines, _f = render_lines(result, "report", "author-recorded", "every plant · ", commit)
+        return (len(result["joins"]) == want and len(late) == 1 and late[0].startswith(f"{unit}@"), what,
+                f"members {len(result['joins'])}, late {late}\n" + "\n".join(lines))
+    except Unmeasured as exc:
+        return False, what, str(exc)
+    finally:
+        remove_tree(root)
+
+
+def run_plant_arms(resolve=None):
     """Every arm of the join over its fixture: `[(held, what, detail)]`. Each plant is built once with the
     base and measured under both policies, and under by-risk where that is what reds it; the base alone
-    is green under both approvals; and the host's RANGE and WHOLE halves read the late record (AC10)."""
-    arms = []
-    for plant in (None,) + PLANTS:
-        root = tempfile.mkdtemp(prefix="dj-")
-        try:
-            fx = build_fixture(root, [plant] if plant else [])
+    is green under both approvals; the host's RANGE and WHOLE halves read the late record (AC10); and last
+    the composed run of every plant measured here (`check_composed_run`). Where the unattended kit does not
+    resolve, through `resolve` or the kit's own resolver, it prints the named SKIP line and runs every plant
+    `STRIP_PLANTS` does not hold under the strip stubbed to the identity, set for this call alone and
+    restored in its `finally`, the record-late arm's host path included (TOOL-dTrueNorth-12 S2)."""
+    arms, counts = [], {}
+    try:
+        skip = read_fixture_skip(resolve)
+    except Unmeasured as exc:
+        return [(False, "TOOL-dTrueNorth-12 S2 the generated-region strip resolves, or its plants are skipped "
+                        "by name", str(exc))]
+    if skip:
+        set_gen_strip(IDENTITY_STRIP)
+        print(skip)
+    try:
+        for plant in (None,) + tuple(p for p in PLANTS if not (skip and p in STRIP_PLANTS)):
+            root = tempfile.mkdtemp(prefix="dj-")
             try:
-                _conf, _commits, result, commit = measure_fixture(fx)
-            except Unmeasured as exc:
-                arms.append((plant == "unmeasured" and "names no commit" in str(exc),
-                             f"TOOL-dTrueNorth-4 AC13 {'plant ' + plant if plant else 'the base'} measures nothing, "
-                             "exit 2 under both policies, naming why", str(exc)))
-                continue
-            # Liveness: the base plants six members, each joined, so a population that read nothing, or a
-            # join that matched nothing, cannot pass an exit-0 arm by finding nothing.
-            live = sum(1 for _m, r in result["joins"] if r is not None) >= BASE_MEMBERS
-            if plant is None:
-                for approval in APPROVALS:
-                    lines, findings = render_lines(result, "refuse", approval, "base · ", commit)
-                    arms.append((findings == 0 and live and len(result["joins"]) == BASE_MEMBERS,
-                                 f"TOOL-dTrueNorth-4 AC1 the base alone exits 0 under refuse and {approval}, its "
-                                 f"{BASE_MEMBERS} members each joined", "\n".join(lines)))
-                continue
-            needle = derive_plant_needle(plant)
-            approval = "by-risk" if plant in RISK_PLANTS else "author-recorded"
-
-            def check_needle(lines):
-                if plant == "audit-nopin":       # the base's units carry no pin either, so the unit is the needle
-                    return any(ln.startswith(f"{SAY}:   {needle}") and PLANT_UNITS[plant] in ln for ln in lines)
-                return needle is None or any(needle in ln for ln in lines)
-
-            lines, findings = render_lines(result, "refuse", approval, f"plant {plant} · ", commit)
-            want = PLANT_EXITS[plant] if plant not in RISK_PLANTS else 1
-            arms.append(((1 if findings else 0) == want and live and (want == 0 or check_needle(lines)),
-                         f"TOOL-dTrueNorth-4 plant {plant} exits {want} under refuse and {approval}"
-                         + (f", naming `{needle}`" if want else ""), "\n".join(lines)))
-            lines, _f = render_lines(result, "report", approval, f"plant {plant} · ", commit)
-            arms.append((check_needle(lines), f"TOOL-dTrueNorth-4 plant {plant} under report, which never refuses, "
-                                              "lists what it plants", "\n".join(lines)))
-            if plant in RISK_PLANTS:
-                lines, findings = render_lines(result, "refuse", "author-recorded", f"plant {plant} · ", commit)
-                arms.append((findings == 0, f"TOOL-dTrueNorth-4 AC4 plant {plant} exits 0 under author-recorded",
-                             "\n".join(lines)))
-            if plant == "record-late":
-                late = fx.read_sha(fx.marked[plant])[:8]
+                fx = build_fixture(root, [plant] if plant else [])
                 try:
-                    rc, host = routed_commits.check_routed_commits(fx.root, {"GATE_PUSH_BASE": fx.read_sha(fx.base)})
-                except routed_commits.Refusal as exc:
-                    rc, host = 2, [str(exc)]
-                out = "\n".join(host)
-                rng, _, whole = out.partition("routed-commits: deviation: WHOLE")
-                u = PLANT_UNITS[plant]
-                arms.append((rc == 0 and f"routed-commits: deviation: RANGE" in rng
-                             and f"at {u}@rev-1 (spec-revised): recorded after its departure at {late}" in rng
-                             and f"at {u}@rev-1 (spec-revised): joins " in whole,
-                             "TOOL-dTrueNorth-4 AC10 the host's RANGE half reads the record as written after its "
-                             "departure, its WHOLE half joins it, and the host exits 0", out))
-        except Unmeasured as exc:
-            arms.append((False, f"TOOL-dTrueNorth-4 plant {plant} could not build its fixture", str(exc)))
-        finally:
-            remove_tree(root)
+                    _conf, _commits, result, commit = measure_fixture(fx)
+                except Unmeasured as exc:
+                    arms.append((plant == "unmeasured" and "names no commit" in str(exc),
+                                 f"TOOL-dTrueNorth-4 AC13 {'plant ' + plant if plant else 'the base'} measures "
+                                 "nothing, exit 2 under both policies, naming why", str(exc)))
+                    continue
+                # Liveness: the base plants six members, each joined, so a population that read nothing, or a
+                # join that matched nothing, cannot pass an exit-0 arm by finding nothing.
+                live = sum(1 for _m, r in result["joins"] if r is not None) >= BASE_MEMBERS
+                if plant is None:
+                    for approval in APPROVALS:
+                        lines, findings = render_lines(result, "refuse", approval, "base · ", commit)
+                        arms.append((findings == 0 and live and len(result["joins"]) == BASE_MEMBERS,
+                                     f"TOOL-dTrueNorth-4 AC1 the base alone exits 0 under refuse and {approval}, "
+                                     f"its {BASE_MEMBERS} members each joined", "\n".join(lines)))
+                    continue
+                counts[plant] = len(result["joins"])
+                needle = derive_plant_needle(plant)
+                approval = "by-risk" if plant in RISK_PLANTS else "author-recorded"
+
+                def check_needle(lines):
+                    if plant == "audit-nopin":       # the base's units carry no pin either, so the unit is the needle
+                        return any(ln.startswith(f"{SAY}:   {needle}") and PLANT_UNITS[plant] in ln for ln in lines)
+                    return needle is None or any(needle in ln for ln in lines)
+
+                lines, findings = render_lines(result, "refuse", approval, f"plant {plant} · ", commit)
+                want = PLANT_EXITS[plant] if plant not in RISK_PLANTS else 1
+                arms.append(((1 if findings else 0) == want and live and (want == 0 or check_needle(lines)),
+                             f"TOOL-dTrueNorth-4 plant {plant} exits {want} under refuse and {approval}"
+                             + (f", naming `{needle}`" if want else ""), "\n".join(lines)))
+                lines, _f = render_lines(result, "report", approval, f"plant {plant} · ", commit)
+                arms.append((check_needle(lines), f"TOOL-dTrueNorth-4 plant {plant} under report, which never "
+                                                  "refuses, lists what it plants", "\n".join(lines)))
+                if plant in RISK_PLANTS:
+                    lines, findings = render_lines(result, "refuse", "author-recorded", f"plant {plant} · ", commit)
+                    arms.append((findings == 0, f"TOOL-dTrueNorth-4 AC4 plant {plant} exits 0 under author-recorded",
+                                 "\n".join(lines)))
+                if plant == "record-late":
+                    late = fx.read_sha(fx.marked[plant])[:8]
+                    try:
+                        rc, host = routed_commits.check_routed_commits(fx.root,
+                                                                       {"GATE_PUSH_BASE": fx.read_sha(fx.base)})
+                    except routed_commits.Refusal as exc:
+                        rc, host = 2, [str(exc)]
+                    out = "\n".join(host)
+                    rng, _, whole = out.partition("routed-commits: deviation: WHOLE")
+                    u = PLANT_UNITS[plant]
+                    arms.append((rc == 0 and f"routed-commits: deviation: RANGE" in rng
+                                 and f"at {u}@rev-1 (spec-revised): recorded after its departure at {late}" in rng
+                                 and f"at {u}@rev-1 (spec-revised): joins " in whole,
+                                 "TOOL-dTrueNorth-4 AC10 the host's RANGE half reads the record as written after its "
+                                 "departure, its WHOLE half joins it, and the host exits 0", out))
+            except Unmeasured as exc:
+                arms.append((False, f"TOOL-dTrueNorth-4 plant {plant} could not build its fixture", str(exc)))
+            finally:
+                remove_tree(root)
+        arms.append(check_composed_run(counts))
+    finally:
+        set_gen_strip(None)
     return arms
 
 

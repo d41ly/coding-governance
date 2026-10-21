@@ -53,7 +53,9 @@ declared design it cannot measure is REFUSED, exit 2.
 """
 from __future__ import annotations
 
+import contextlib
 import datetime
+import io
 import os
 import pathlib
 import re
@@ -652,9 +654,37 @@ def run_selftest() -> int:
 
         # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
         # plant's failing case staged by the plant itself, and the record-late plant through this host.
+        # TOOL-dTrueNorth-12 AC1 AC3 AC6: run from a tree whose conf declares no DESIGN_* key, so a fixture
+        # reading this tree's design cannot build, the composed run last; then again under a resolver
+        # stub raising LookupError, so the kit's absence is one named SKIP and every other plant, the
+        # record-late arm through this host included, runs under the identity strip.
         import deviation_join  # noqa: E402  the join's core, a sibling
-        for ok, what, detail in deviation_join.run_plant_arms():
-            print_arm(ok, what, detail)
+        repo, _s = build_fixture(root, "nodesign", [{"msg": "init", "files": {"README.md": "x\n"}}])
+        set_fixture_conf(repo)
+
+        def resolve_no_kit(*_args):
+            raise LookupError("the self-test's stub resolves no kit")
+
+        here, skipped = os.getcwd(), io.StringIO()
+        os.chdir(repo)
+        try:
+            for ok, what, detail in deviation_join.run_plant_arms():
+                print_arm(ok, what, detail)
+            with contextlib.redirect_stdout(skipped):
+                stubbed = deviation_join.run_plant_arms(resolve=resolve_no_kit)
+        finally:
+            os.chdir(here)
+        held = deviation_join.STRIP_PLANTS
+        out = skipped.getvalue()
+        print_arm(out.count("deviation: SKIP — the unattended kit does not resolve") == 1
+            and "the self-test's stub resolves no kit" in out and f"· {' '.join(held)}" in out
+            and not any(f" plant {p} " in what for _ok, what, _d in stubbed for p in held)
+            and any(" AC10 " in what for _ok, what, _d in stubbed) and any(" AC6 " in what for _ok, what, _d in stubbed),
+            "TOOL-dTrueNorth-12 AC1 a resolver stub raising LookupError is one SKIP line naming why and the "
+            f"plants it holds back, {' '.join(held)}, which run no arm, and the record-late host arm and the "
+            "composed run still run", out)
+        for ok, what, detail in stubbed:
+            print_arm(ok, f"under the resolver stub: {what}", detail)
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
