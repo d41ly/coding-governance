@@ -358,6 +358,14 @@ untracked file is counted with the `git add` remedy, and a folder with nothing t
 ungraded. It exits 1 on a failing rule and 2 when a grader cannot answer; the spec-token checker
 is not consulted.
 
+`--check-coverage` is hygiene check 29's delegate and writes nothing. With `SPEC_CARRIES_CUTOFF` set it
+loads the spec-token checker from the kit directory's parent and reads the carries join's coverage
+once, the value the `build-coverage` region renders, then prints one line per chain build's spec at
+`INPROGRESS` whose build has any finding at the Design exit, naming the spec and each finding's arm
+and reference. It exits 1 on a refused spec, 0 otherwise, and 2 when the coverage cannot be read: a
+checker that is not there or a design key that does not resolve. With the key blank it prints one
+line naming it and exits 0.
+
 ### Stragglers
 
 A branch that forked before the switch and kept editing authored shards carries row changes with no

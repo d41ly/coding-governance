@@ -88,6 +88,21 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 13 (cl-dClosedLoop-0018, cl-dClosedLoop-0019, cl-dClosedLoop-0020, cl-dClosedLoop-0021, cl-dClosedLoop-0022, cl-dClosedLoop-0023, cl-dClosedLoop-0024, cl-dClosedLoop-0025, cl-dClosedLoop-0026, cl-dClosedLoop-0027, cl-dClosedLoop-0028, cl-dClosedLoop-0029, cl-dClosedLoop-0030)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.help.enforce, policy-key.install.deprecation-window, policy-key.install.on-shim-call, policy-key.install.retired-edits, policy-key.platforms.provision
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0021
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

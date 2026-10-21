@@ -94,6 +94,24 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dTendedCadence's 18 clause(s) and 24 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 18 (cl-dClosedLoop-0442, cl-dClosedLoop-0443, cl-dClosedLoop-0444, cl-dClosedLoop-0445, cl-dClosedLoop-0446, cl-dClosedLoop-0447, cl-dClosedLoop-0448, cl-dClosedLoop-0449, cl-dClosedLoop-0450, cl-dClosedLoop-0451, cl-dClosedLoop-0452, cl-dClosedLoop-0453, cl-dClosedLoop-0454,
+  cl-dClosedLoop-0455, cl-dClosedLoop-0509, cl-dClosedLoop-0456, cl-dClosedLoop-0457, cl-dClosedLoop-0499)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.maintain.direct, item.maintain.file, item.maintain.lease, item.maintain.levels, item.maintain.patch, item.maintain.read, item.maintain.record, policy-key.maintain.cadence, policy-key.maintain.dead-after, policy-key.maintain.events, policy-key.maintain.fixes,
+  policy-key.maintain.host, policy-key.maintain.interpreter-eol, policy-key.maintain.node-readings, policy-key.maintain.on-breach, policy-key.maintain.reading-admission, policy-key.maintain.reading-tree, policy-key.maintain.record-when, policy-key.maintain.security-review, policy-key.maintain.tiers,
+  policy-key.observability.run-record, policy-key.retrofit.cadence, record-kind.maintenance-record, record-kind.run-record
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0442, cl-dClosedLoop-0444, cl-dClosedLoop-0446, cl-dClosedLoop-0449, cl-dClosedLoop-0451, cl-dClosedLoop-0453
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

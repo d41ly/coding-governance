@@ -92,6 +92,23 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dRankedPlan's 16 clause(s) and 18 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 16 (cl-dClosedLoop-0369, cl-dClosedLoop-0370, cl-dClosedLoop-0371, cl-dClosedLoop-0372, cl-dClosedLoop-0373, cl-dClosedLoop-0374, cl-dClosedLoop-0375, cl-dClosedLoop-0376, cl-dClosedLoop-0377, cl-dClosedLoop-0378, cl-dClosedLoop-0379, cl-dClosedLoop-0380, cl-dClosedLoop-0381,
+  cl-dClosedLoop-0382, cl-dClosedLoop-0497, cl-dClosedLoop-0498)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.plan.dedupe, item.plan.exit, item.plan.input, item.plan.lease, item.plan.place, item.plan.record, item.plan.research, item.plan.triage-judge, item.plan.triage-rule, policy-key.kickoff.runs, policy-key.plan.authority, policy-key.plan.kickoff,
+  policy-key.plan.ratification, policy-key.plan.triage, policy-key.plan.unplaced, record-kind.dupes, record-kind.plan, record-kind.triage
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0372, cl-dClosedLoop-0373, cl-dClosedLoop-0382, cl-dClosedLoop-0497, cl-dClosedLoop-0498
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

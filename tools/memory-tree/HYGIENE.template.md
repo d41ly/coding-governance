@@ -222,12 +222,12 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
    would hand the dossier bound to the whole tree. A build README is priced by its authored bytes:
-   its `wc -c` figure less every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->`
-   or `<!-- gen:build-edges -->` marker through its matching close, and less the front matter's
-   `ids:` line, so the generated half never bills the cap at any roster size; a README whose pairs
-   do not balance is priced whole. This check does NOT verify that a region's bytes really are
-   generated — check 9 does, by re-rendering the three regions and byte-comparing them
-   (TOOL-aMendedFleet-84). A cap that is not a whole number, or a zero BYTE cap, is refused before
+   its `wc -c` figure less every line from a `<!-- gen:build-index -->`, `<!-- gen:build-coverage -->`,
+   `<!-- gen:build-order -->` or `<!-- gen:build-edges -->` marker through its matching close, and less
+   the front matter's `ids:` line, so the generated half never bills the cap at any roster size; a
+   README whose pairs do not balance is priced whole. This check does NOT verify that a region's bytes
+   really are generated — check 9 does, by re-rendering the four regions and byte-comparing them
+   (TOOL-aMendedFleet-84, the coverage pair TOOL-dTrueNorth-3). A cap that is not a whole number, or a zero BYTE cap, is refused before
    any check runs: the gate exits 2 naming the key rather than reporting a tree it could not
    measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
@@ -276,6 +276,14 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
    reads `git ls-files`, so a half-staged rotation's moved rows look deleted. Stage the archive
    first (`TOOL-dHomedResolver-2`).
+   A build README carries four generated regions, in this order: `<!-- gen:build-index -->`,
+   `<!-- gen:build-coverage -->`, `<!-- gen:build-order -->` and `<!-- gen:build-edges -->`.
+   `--write` creates a missing pair and `--check` never demands one, save the coverage pair: it renders
+   the design clauses' coverage from the carries join `SPEC_CARRIES_CUTOFF` arms, every field with an
+   explicit none, so `--write` creates it only in a chain build's README, one the design view's Build
+   column names, and `--check` names a chain README without it and any other README holding one. With
+   the key blank no README gains it, and one that holds it renders a single line saying so
+   (`TOOL-dTrueNorth-3`).
 10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved at the stem's DECLARED HOME —
     `DECISIONS.md` at the memory root, `backlog/<FAMILY>.md` for a family — and never by searching
     for a file of that name, so a build file that shares a stem's name is not consulted
@@ -559,6 +567,17 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     NOT GRADED, and said out loud: a paraphrase, which is check 27's; an id held twice, which is
     20's and 24's, so a `snapshot` carry-forward is one identity; any record kind but those two;
     front matter; and a duplicate whose every holder had landed at the base.
+
+29. **a chain build's spec is not INPROGRESS while its coverage is red** — with `SPEC_CARRIES_CUTOFF`
+    set, a spec of a chain build at `INPROGRESS`, which is past that build's Design exit, fails while
+    the carries join finds anything for the build at that exit: an uncarried clause, an owned node no
+    spec names, a stale pin, or any other arm. Each refused spec is named with every finding's arm and
+    reference. Delegated to `{{KIT_DIR}}/gen_build_index.py --check-coverage`, which reads the one
+    value the `build-coverage` region renders (check 9), and a coverage it cannot read fails as well.
+    With the key blank it prints one line and passes. Under `--staged` it runs only when the commit
+    stages a path under a build's `spec/` folder or the conf, and otherwise prints its held line.
+    NOT GRADED: a spec at any other status, since `OPEN`, `SPECCED` and `BLOCKED` precede the exit and
+    a terminal or `DEFERRED` spec is not building; and a build the design view does not name.
 
 ## Record bindings — how a record names its spec
 

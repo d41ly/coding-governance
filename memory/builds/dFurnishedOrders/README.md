@@ -98,6 +98,23 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dFurnishedOrders's 20 clause(s) and 14 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 20 (cl-dClosedLoop-0192, cl-dClosedLoop-0193, cl-dClosedLoop-0194, cl-dClosedLoop-0195, cl-dClosedLoop-0196, cl-dClosedLoop-0197, cl-dClosedLoop-0198, cl-dClosedLoop-0199, cl-dClosedLoop-0200, cl-dClosedLoop-0201, cl-dClosedLoop-0202, cl-dClosedLoop-0203, cl-dClosedLoop-0204,
+  cl-dClosedLoop-0205, cl-dClosedLoop-0206, cl-dClosedLoop-0207, cl-dClosedLoop-0208, cl-dClosedLoop-0209, cl-dClosedLoop-0210, cl-dClosedLoop-0211)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.annotations.delivery, policy-key.instructions.slices, policy-key.memory.code-budget, policy-key.memory.code-roles, policy-key.memory.map-unfold, policy-key.memory.project-map, policy-key.notices.record, policy-key.prompts.batch, policy-key.retrofit.slot-bytes,
+  policy-key.roles.answered-calls, policy-key.roles.on-contradiction, policy-key.roles.orientation.house-index, policy-key.roles.trust, policy-key.roles.verifier-context
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0192, cl-dClosedLoop-0195, cl-dClosedLoop-0200, cl-dClosedLoop-0204, cl-dClosedLoop-0205, cl-dClosedLoop-0211
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

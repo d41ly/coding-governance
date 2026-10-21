@@ -105,6 +105,24 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dLinkedLibrary's 25 clause(s) and 25 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 25 (cl-dClosedLoop-0238, cl-dClosedLoop-0239, cl-dClosedLoop-0240, cl-dClosedLoop-0241, cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0244, cl-dClosedLoop-0245, cl-dClosedLoop-0246, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0249, cl-dClosedLoop-0250,
+  cl-dClosedLoop-0251, cl-dClosedLoop-0252, cl-dClosedLoop-0253, cl-dClosedLoop-0254, cl-dClosedLoop-0255, cl-dClosedLoop-0256, cl-dClosedLoop-0257, cl-dClosedLoop-0258, cl-dClosedLoop-0259, cl-dClosedLoop-0260, cl-dClosedLoop-0261, cl-dClosedLoop-0500)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.adopt.census, item.adopt.decisions, item.adopt.decisions-ratify, item.adopt.instructions, item.adopt.practices, item.adopt.reconstruct, policy-key.annotations.grammar, policy-key.annotations.lookup, policy-key.annotations.resolve-scope, policy-key.decisions.major,
+  policy-key.memory.code-enrich, policy-key.retrofit.decisions, policy-key.retrofit.practice-pending, policy-key.retrofit.reconstruct, policy-key.reuse.delivery, policy-key.reuse.propose, record-kind.annotation-index, record-kind.baseline, record-kind.census, record-kind.decision,
+  record-kind.gotcha, record-kind.recall-index, record-kind.research-return, record-kind.ruling, system.annotations
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0242, cl-dClosedLoop-0243, cl-dClosedLoop-0247, cl-dClosedLoop-0248, cl-dClosedLoop-0256, cl-dClosedLoop-0261
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

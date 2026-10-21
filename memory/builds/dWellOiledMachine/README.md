@@ -147,6 +147,32 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dWellOiledMachine's 61 clause(s) and 69 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 61 (cl-dClosedLoop-0279, cl-dClosedLoop-0280, cl-dClosedLoop-0281, cl-dClosedLoop-0282, cl-dClosedLoop-0283, cl-dClosedLoop-0284, cl-dClosedLoop-0285, cl-dClosedLoop-0286, cl-dClosedLoop-0287, cl-dClosedLoop-0288, cl-dClosedLoop-0289, cl-dClosedLoop-0290, cl-dClosedLoop-0291,
+  cl-dClosedLoop-0292, cl-dClosedLoop-0293, cl-dClosedLoop-0294, cl-dClosedLoop-0295, cl-dClosedLoop-0296, cl-dClosedLoop-0297, cl-dClosedLoop-0298, cl-dClosedLoop-0299, cl-dClosedLoop-0300, cl-dClosedLoop-0301, cl-dClosedLoop-0302, cl-dClosedLoop-0303, cl-dClosedLoop-0304, cl-dClosedLoop-0305,
+  cl-dClosedLoop-0306, cl-dClosedLoop-0307, cl-dClosedLoop-0308, cl-dClosedLoop-0309, cl-dClosedLoop-0310, cl-dClosedLoop-0311, cl-dClosedLoop-0312, cl-dClosedLoop-0313, cl-dClosedLoop-0314, cl-dClosedLoop-0315, cl-dClosedLoop-0316, cl-dClosedLoop-0317, cl-dClosedLoop-0318, cl-dClosedLoop-0319,
+  cl-dClosedLoop-0320, cl-dClosedLoop-0321, cl-dClosedLoop-0322, cl-dClosedLoop-0323, cl-dClosedLoop-0324, cl-dClosedLoop-0325, cl-dClosedLoop-0326, cl-dClosedLoop-0327, cl-dClosedLoop-0328, cl-dClosedLoop-0329, cl-dClosedLoop-0330, cl-dClosedLoop-0331, cl-dClosedLoop-0332, cl-dClosedLoop-0333,
+  cl-dClosedLoop-0334, cl-dClosedLoop-0335, cl-dClosedLoop-0505, cl-dClosedLoop-0336, cl-dClosedLoop-0337, cl-dClosedLoop-0338)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.entry.intake, item.life.close, item.life.notify, item.life.quiesce, item.life.request, item.life.snapshot, item.life.unlease, point.actor-kinds, point.cadence-items, point.command-adapters, point.harness-adapters, point.hook-packs, point.host-adapters,
+  point.journal-readers, point.memory-mirrors, point.notification-adapters, point.role-harnesses, point.spawn-backends, policy-key.attendance.scope, policy-key.build.push, policy-key.build.spend-cap, policy-key.build.unit-holders, policy-key.build.worktree, policy-key.commits.edge-check,
+  policy-key.memory.default-load, policy-key.memory.mirror, policy-key.notify.channel, policy-key.notify.owner-items, policy-key.roles.auth.<role>, policy-key.roles.harness.<role>, policy-key.roles.shape-enforce, policy-key.run.host, policy-key.run.on-owner-silence, policy-key.run.owner-deadline,
+  policy-key.runtime.act-auth, policy-key.runtime.act-ceiling, policy-key.runtime.act-harness, policy-key.runtime.admission-scope, policy-key.runtime.attended-allowance, policy-key.runtime.attended-judge, policy-key.runtime.binary, policy-key.runtime.harnesses, policy-key.runtime.hold-ceiling,
+  policy-key.runtime.hook-failure, policy-key.runtime.journal, policy-key.runtime.no-progress, policy-key.runtime.owner-harness, policy-key.runtime.refusal-repeats, policy-key.runtime.relaunch, policy-key.runtime.restarts, policy-key.runtime.secret-home, policy-key.runtime.secret-scan,
+  policy-key.runtime.spawn-backend, policy-key.trace.cost, policy-key.trace.identity, policy-key.trace.rows, record-kind.act, record-kind.attendance-override, record-kind.intake, record-kind.journal, record-kind.lifecycle-request, record-kind.node-ledger, record-kind.node-profile,
+  record-kind.quiesce, record-kind.return, record-kind.session-binding, record-kind.workspace, tag-namespace.hook, tag-namespace.point
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0283, cl-dClosedLoop-0285, cl-dClosedLoop-0286, cl-dClosedLoop-0290, cl-dClosedLoop-0291, cl-dClosedLoop-0292, cl-dClosedLoop-0296, cl-dClosedLoop-0299, cl-dClosedLoop-0300, cl-dClosedLoop-0302, cl-dClosedLoop-0308, cl-dClosedLoop-0309,
+  cl-dClosedLoop-0330, cl-dClosedLoop-0335, cl-dClosedLoop-0337, cl-dClosedLoop-0338
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

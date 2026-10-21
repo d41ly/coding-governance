@@ -112,6 +112,26 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 30 (cl-dClosedLoop-0339, cl-dClosedLoop-0340, cl-dClosedLoop-0341, cl-dClosedLoop-0342, cl-dClosedLoop-0343, cl-dClosedLoop-0344, cl-dClosedLoop-0345, cl-dClosedLoop-0346, cl-dClosedLoop-0347, cl-dClosedLoop-0348, cl-dClosedLoop-0349, cl-dClosedLoop-0350, cl-dClosedLoop-0351,
+  cl-dClosedLoop-0352, cl-dClosedLoop-0353, cl-dClosedLoop-0354, cl-dClosedLoop-0355, cl-dClosedLoop-0356, cl-dClosedLoop-0357, cl-dClosedLoop-0358, cl-dClosedLoop-0359, cl-dClosedLoop-0360, cl-dClosedLoop-0361, cl-dClosedLoop-0362, cl-dClosedLoop-0363, cl-dClosedLoop-0364, cl-dClosedLoop-0365,
+  cl-dClosedLoop-0366, cl-dClosedLoop-0367, cl-dClosedLoop-0368)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.test.attribute, item.test.exit, item.test.flakes, item.test.merge, item.test.route, item.test.seed, item.test.seen-red, item.test.select, item.test.verdict, policy-key.hooks.bypass, policy-key.retrofit.unseeded, policy-key.retrofit.widen,
+  policy-key.tests.landing-levels, policy-key.tests.product, policy-key.tests.without-cadence, policy-key.trace.leg-output, policy-key.verdict, policy-key.verdict.blocks, policy-key.verdict.flakes, policy-key.verdict.flakes.entry, policy-key.verdict.flakes.release, policy-key.verdict.held,
+  policy-key.verdict.red-route, policy-key.verdict.remote.pin, policy-key.verdict.remote.pin-scope, policy-key.verdict.remote.trust, policy-key.verdict.tree, record-kind.attribution, record-kind.flake, record-kind.routing, record-kind.seen-red, record-kind.selection, record-kind.verdict,
+  system.retrofit, tag-namespace.check, tag-namespace.leg, tag-namespace.pack
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0340, cl-dClosedLoop-0341, cl-dClosedLoop-0342, cl-dClosedLoop-0343, cl-dClosedLoop-0348, cl-dClosedLoop-0349, cl-dClosedLoop-0354, cl-dClosedLoop-0355, cl-dClosedLoop-0356, cl-dClosedLoop-0358, cl-dClosedLoop-0359, cl-dClosedLoop-0367
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

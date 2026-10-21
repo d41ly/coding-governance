@@ -19,7 +19,8 @@
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm, 23 and 26 (whose
 # population is the commit GRAPH) all skip, and the full run at the push boundary is where they
-# bind. Check 22 is NOT among them and still walks every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
+# bind. Check 29 is held unless the commit stages a path under a build's spec/ folder or the conf.
+# Check 22 is NOT among them and still walks every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
 # resolution reads the whole tracked tree whichever files are staged. This line used to read "set-checks tree-wide", which was
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
@@ -568,13 +569,14 @@ STAGED_MD=""; STAGED_NEW=""
 # list decide which NAMES pass, so a commit staging either is graded over the whole listing, as before
 # the narrowing. `-M` keeps a rename an `R` row for an adopter whose diff.renames is off, and a renamed
 # SOURCE that a registry lists arms the stale-line guard below, as a staged list does.
-_NAMES_WHOLE=""; _RENAMED_LISTED=""
+# _CONF_STAGED is the conf alone, which check 29 reads to decide whether it runs (TOOL-dTrueNorth-3).
+_NAMES_WHOLE=""; _RENAMED_LISTED=""; _CONF_STAGED=""
 if [ "$STAGED" = 1 ]; then
   declare -A _SBUILD
   while IFS=$'\t' read -r _st _p1 _p2; do
     [ -n "$_st" ] || continue
     _l=${_p2:-$_p1}
-    if [ "$_l" = .memory-tree.conf ]; then _NAMES_WHOLE=1; continue; fi
+    if [ "$_l" = .memory-tree.conf ]; then _NAMES_WHOLE=1; _CONF_STAGED=1; continue; fi
     case "$_st" in R*) [ -z "${LEGACY_SET[$_p1]+x}${DEBT_SET[$_p1]+x}" ] || _RENAMED_LISTED=1 ;; esac
     STAGED_SET["$_l"]=1
     case "$_st" in A*|C*|R*) STAGED_NEW+="$_l"$'\n' ;; esac
@@ -1002,14 +1004,15 @@ if [ -n "$sel6" ]; then
   # project that moves one key and not another changes it.
   #
   # A BUILD README IS PRICED BY ITS AUTHORED BYTES (TOOL-aMendedFleet-84): its `wc -c` figure less
-  # every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->` or
-  # `<!-- gen:build-edges -->` marker through its matching close, markers and newlines included, and
-  # less the front matter's one `ids:` line. Those bytes are rendered from the specs at about 308 per
-  # unit, so pricing them made the cap a bound on the roster rather than on what anyone wrote. A
+  # every line from a `<!-- gen:build-index -->`, `<!-- gen:build-coverage -->`,
+  # `<!-- gen:build-order -->` or `<!-- gen:build-edges -->` marker through its matching close,
+  # markers and newlines included, and less the front matter's one `ids:` line. Those bytes are
+  # rendered from the specs at about 308 per unit, so pricing them made the cap a bound on the roster
+  # rather than on what anyone wrote; the coverage pair joined at TOOL-dTrueNorth-3. A
   # nested pair (`gen:build-units` inside the index region) is counted once; a marker is column-0
   # equality after one trailing CR, the generator's own reading. A README whose pairs do not balance
   # prints -1 here and is priced WHOLE, which fails safe. NOT CHECKED HERE: that a region's bytes
-  # really are generated. Check 9 re-renders the three registered regions and byte-compares them, so
+  # really are generated. Check 9 re-renders the four registered regions and byte-compares them, so
   # prose cannot hide inside one; a pair under any other name is priced as authored. LC_ALL=C makes
   # `length` count bytes on every node.
   gen6=$(printf '%s\n' "$sel6" | while IFS= read -r f; do case "$f" in "$M"/builds/*/README.md) printf '%s\n' "$f" ;; esac; done \
@@ -1020,9 +1023,9 @@ if [ -n "$sel6" ]; then
     FNR==1 && x=="---" { fm=1; next }
     fm==1 && x=="---" { fm=2; next }
     fm==1 && x ~ /^ids:/ { s += length($0)+1; next }
-    x=="<!-- gen:build-index -->" || x=="<!-- gen:build-order -->" || x=="<!-- gen:build-edges -->" { d++ }
+    x=="<!-- gen:build-index -->" || x=="<!-- gen:build-coverage -->" || x=="<!-- gen:build-order -->" || x=="<!-- gen:build-edges -->" { d++ }
     d>0 { s += length($0)+1 }
-    x=="<!-- /gen:build-index -->" || x=="<!-- /gen:build-order -->" || x=="<!-- /gen:build-edges -->" { d--; if (d<0) bad=1 }
+    x=="<!-- /gen:build-index -->" || x=="<!-- /gen:build-coverage -->" || x=="<!-- /gen:build-order -->" || x=="<!-- /gen:build-edges -->" { d--; if (d<0) bad=1 }
     END { flush() }')
   bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" '
     # THREE streams, told apart by a file counter: `FNR==NR` names only the first. Each is a printf
@@ -1629,6 +1632,39 @@ if [ "$STAGED" = 0 ]; then
   [ -n "$tam" ] && printf '%s\n' "$tam"
   [ "$_tarc" -ne 0 ] && status=1
   [ "$_tarc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 26 $'\n'"$tam"
+fi
+
+fi
+
+if check_selected 29; then
+# 29 — A CHAIN BUILD'S SPEC IS NOT INPROGRESS WHILE ITS BUILD'S COVERAGE IS RED (TOOL-dTrueNorth-3).
+# INPROGRESS is past the build's Design exit, so an uncarried clause, an unnamed owned node or a stale
+# pin there is a design the build is already coding against. Delegated to the generator's
+# `--check-coverage`, as 24 and 26 delegate theirs: the coverage is the carries join's, read through
+# the one function the `build-coverage` region renders from, so this file spells no second reading of
+# it and the region and the refusal cannot disagree. The verb exits 1 naming each refused spec and each
+# finding's arm and reference, and 2 on a coverage it could not read; both fail here, because a
+# coverage nobody could read is no clearance. With SPEC_CARRIES_CUTOFF blank it prints one line, which
+# is printed here, and exits 0.
+#
+# UNDER --staged IT RUNS ONLY when the commit stages a path under a build's spec/ folder or the conf,
+# so the INPROGRESS flip is refused at its own commit, for a second of work only then; any other commit
+# holds it and says so. The full run at the push boundary grades it whatever is staged.
+_run29=1
+if [ "$STAGED" = 1 ]; then
+  _run29=$_CONF_STAGED
+  while IFS= read -r _l; do case "$_l" in "$M"/builds/*/spec/*) _run29=1; break ;; esac; done <<<"$STAGED_MD"
+  [ -n "$_run29" ] || echo "memory-hygiene: check 29: held under --staged, no chain spec or conf staged"
+fi
+if [ -n "$_run29" ]; then
+  cov29=$("$_PY" "$HERE/gen_build_index.py" --check-coverage 2>&1); _c29=$?
+  case "$_c29" in
+    0) while IFS= read -r _c29l; do [ -z "$_c29l" ] || printf 'memory-hygiene: check 29: %s\n' "${_c29l#build-index: }"; done <<<"$cov29" ;;
+    1) fail 29 "a chain build's spec is INPROGRESS while its build's coverage is red:
+$cov29" ;;
+    *) fail 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:
+$cov29" ;;
+  esac
 fi
 
 fi

@@ -3,6 +3,7 @@
 
     python <prefix>/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
     python <prefix>/memory-tree/gen_build_index.py --write         # (re)render every artifact
+    python <prefix>/memory-tree/gen_build_index.py --check-coverage  # a chain spec INPROGRESS on red coverage
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
@@ -20,7 +21,7 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-FIVE SOURCES, NOTHING ELSE
+SIX SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
   * for the ROSTER, and for the date of a build's last record, every tracked file under the memory
@@ -35,6 +36,11 @@ FIVE SOURCES, NOTHING ELSE
     join, called in-process through that kit's own signal and restated nowhere here, which greps
     tracked product source; LIVE.md renders its rows as a per-build `Landed-unclosed` count
     (TOOL-aMendedFleet-13). Blank or absent, the drift kit is never imported.
+  * under a set `SPEC_CARRIES_CUTOFF` ONLY, the carries join's coverage, `derive_carries_coverage` of
+    the spec-tokens checker in this kit directory's parent, loaded by path and restated nowhere here;
+    each chain build's README renders it as the `build-coverage` region, and `--check-coverage`
+    refuses a chain build's INPROGRESS spec while it is red (TOOL-dTrueNorth-3). That join reads git
+    history, the one exception to the line below. Blank or absent, the checker is never loaded.
 No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
 source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
@@ -57,6 +63,8 @@ from __future__ import annotations
 import ast
 import contextlib
 import datetime
+import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -86,8 +94,8 @@ PLAN_OPEN = "<!-- roster:units -->"
 PLAN_CLOSE = "<!-- /roster:units -->"
 
 # Every generated region, in CANONICAL SLOT ORDER. `--write` creates a missing pair at its position
-# here; `--check` never demands one (TOOL-aRuledFrontispiece-1 S1c). The order is a property of this
-# list rather than of whoever edited a README last.
+# here; `--check` never demands one (TOOL-aRuledFrontispiece-1 S1c), `build-coverage` excepted. The
+# order is a property of this list rather than of whoever edited a README last.
 #
 # The renderer is looked up by name at call time rather than stored, so this stays a plain data
 # declaration and a region cannot be half-registered.
@@ -98,11 +106,21 @@ PLAN_CLOSE = "<!-- /roster:units -->"
 UNITS_OPEN = "<!-- gen:build-units -->"
 UNITS_CLOSE = "<!-- /gen:build-units -->"
 
+# TOOL-dTrueNorth-3 S1 — `build-coverage` sits DIRECTLY AFTER `build-index`, beside the unit ids its
+# units table carries, which moved every later entry one index down: each renderer finds its own pair
+# BY NAME, never by tuple index. It is the one region whose creation is CONDITIONAL — `--write` adds it
+# only to a chain build's README while `SPEC_CARRIES_CUTOFF` is set, and `--check` demands it there
+# (section 8 F2), so the S1c rule below holds for every other region and not for this one.
 GEN_REGIONS = (
     ("build-index", MARK_OPEN, MARK_CLOSE),
+    ("build-coverage", "<!-- gen:build-coverage -->", "<!-- /gen:build-coverage -->"),
     ("build-order", "<!-- gen:build-order -->", "<!-- /gen:build-order -->"),
     ("build-edges", "<!-- gen:build-edges -->", "<!-- /gen:build-edges -->"),
 )
+# The key that arms the coverage region and `--check-coverage`, and the checker whose join it reads,
+# which sits in this kit directory's PARENT and is loaded by path only while the key is set.
+CARRIES_KEY = "SPEC_CARRIES_CUTOFF"
+CARRIES_CHECKER = "check-spec-tokens.py"
 # TOOL-dFramedEntrypoint-5 — `build-docs` was the LAST entry and is gone. Removing the last entry
 # shifts no surviving index, which is why no sibling region moved; the selftest arms that addressed
 # it BY TUPLE INDEX did have to move, and a grep for the marker name could not have found them.
@@ -828,7 +846,7 @@ def extract_roster_ids(text: str, id_re) -> list:
     return [(mm.group(0), mm.group(1)) for mm in id_re.finditer(text)]
 
 
-def check_index_input(rel: str, m: str, kit: str | None) -> bool:
+def check_index_input(rel: str, m: str, kit: str | None, carries: str | None = None) -> bool:
     """True when the renderer reads `rel` other than through its prose ids, or writes it.
 
     TOOL-aTrimmedHook-1. The STRUCTURAL half of the staged classifier: a staged edit to any of these
@@ -839,8 +857,14 @@ def check_index_input(rel: str, m: str, kit: str | None) -> bool:
     memory file reaches the render only through the ids its prose cites, which the id comparison in
     `check_staged_render()` decides. The selftest's parity arm asserts every artifact `plan()` writes
     is in this set, so an output added later cannot land outside it unnoticed.
+
+    `carries` is the repo-relative path of the carries checker, passed only while `CARRIES_KEY` is
+    set (TOOL-dTrueNorth-3 S6): the coverage region renders from that checker's join, so a staged
+    change to it moves the region however few ids it cites.
     """
     if rel == ".memory-tree.conf":
+        return True
+    if carries and rel == carries:
         return True
     if kit and (rel == kit or rel.startswith(kit + "/")):
         return True
@@ -893,7 +917,12 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
         kit = None
     if kit is not None and (kit == ".." or kit.startswith("../") or os.path.isabs(kit)):
         kit = None
-    specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else [])
+    # THE CARRIES CHECKER, in the kit directory's parent, is a render input while its key is set
+    # (TOOL-dTrueNorth-3 S6), so it joins the pathspec and the structural set together.
+    carries = None
+    if kit and (conf.get(CARRIES_KEY) or "").strip():
+        carries = "/".join(p for p in (os.path.dirname(kit), CARRIES_CHECKER) if p)
+    specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else []) + ([carries] if carries else [])
     # THE INDEX THE HOOK WAS HANDED (TOOL-aTrimmedHook-4). `_build_git_env()` drops GIT_INDEX_FILE for
     # every other caller, because an inherited pointer names a different tree. Here the staged set IS
     # that index: under `git commit -a`, `commit <paths>` or `commit -i` git hands the hook a temporary
@@ -925,7 +954,7 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
                           f"and the Landed-unclosed column reads tracked product source")
         if not st.startswith("M"):
             return True, f"{rel} is staged as {st}, and an added or deleted path moves the record set"
-        if check_index_input(rel, m, kit):
+        if check_index_input(rel, m, kit, carries):
             return True, f"{rel} is a build-index input or output"
         modified.append(rel)
     if not modified:
@@ -1504,7 +1533,8 @@ def _render_id_ranges(ids: list) -> str:
     return " ".join(out)
 
 
-def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
+def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP, sep: str = " ", indent: str = "",
+                        end: str = ".") -> list:
     """`<prefix> <id> <id> ….` as one or more lines, none wider than `cap`.
 
     Consecutive non-blank lines join into ONE markdown paragraph, so the wrap is invisible to a
@@ -1515,14 +1545,24 @@ def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
     carries, so a raise buys one build and reds the next. Same renderer-shaped class as
     `TOOL-dUnstalledConvoy-13` and NOT a fix for it: that row is the generated record-BINDINGS row,
     a different line with a different grammar, and it stays open.
+
+    `sep`, `indent` and `end` are TOOL-dTrueNorth-3's, for the coverage region's list bullets: `sep`
+    joins two ids and a wrapped line keeps its non-blank half, `indent` opens each continuation line,
+    and `end` closes the last. The prefix takes a space before its first id unless it ends in one or
+    in an opening parenthesis. The defaults render every present caller's lines byte for byte.
     """
-    lines, cur = [], prefix
+    lines, cur, held = [], prefix, False
     for i in ids:
-        if cur not in ("", prefix) and len(cur) + 1 + len(i) > cap:
-            lines.append(cur)
-            cur = ""
-        cur += (" " if cur else "") + i
-    lines.append(cur + ".")
+        if held and len(cur) + len(sep) + len(i) > cap:
+            lines.append(cur + sep.rstrip())
+            cur, held = indent, False
+        if held:
+            cur += sep
+        elif cur and not cur.endswith((" ", "(")):
+            cur += " "
+        cur += i
+        held = True
+    lines.append(cur + end)
     return lines
 
 
@@ -1542,7 +1582,7 @@ def _wrap_ids(roster: list) -> list:
 
 def render_order(build: dict) -> str:
     """The BUILD ORDER region. Units sharing an `order` value are the parallel group."""
-    mo, mc = GEN_REGIONS[1][1], GEN_REGIONS[1][2]
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-order")
     out = [mo, ""]
     steps = {}
     for u in build["units"]:
@@ -1573,7 +1613,7 @@ def render_edges(build: dict) -> str:
     roster and this region leaves LIVE.md and both ledger shards byte-neutral. A bare id in a leading
     table cell would additionally ANCHOR via the extractor and rewrite the other build's `ids:` line.
     """
-    mo, mc = GEN_REGIONS[2][1], GEN_REGIONS[2][2]
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-edges")
     out = [mo, ""]
     parents, children = build["parents"], build.get("children", [])
     if not parents and not children:
@@ -1587,8 +1627,53 @@ def render_edges(build: dict) -> str:
     return "\n".join(out)
 
 
+def render_coverage(build: dict) -> str:
+    """TOOL-dTrueNorth-3 S3 — the COVERAGE region: one line naming the build, its clause, owned-node and
+    spec counts and the cutoff, then one bullet per field the clause lists, an empty one reading `none`.
+
+    It computes NOTHING: every field is `derive_carries_coverage`'s, the checker's, attached to the
+    build by `plan()` under `coverage`, so this region and `--check-coverage` read one value. The
+    uncarried, stale and ambiguous fields carry their count with their ids, a released clause renders
+    `<id> <moved|retired|deferred> by <decision>`, and a derived spec its path relative to the build
+    folder, in backticks, with its decision. A long list wraps onto two-space continuation lines one
+    character inside `IDS_WRAP`, so no line, its closing parenthesis included, passes 300. With the key
+    blank the region is one line saying coverage is not read and which key is blank.
+    """
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-coverage")
+    cov = build.get("coverage") or {"state": "off", "key": CARRIES_KEY}
+    out = [mo, ""]
+    if cov["state"] == "off":
+        out.append(f"*Coverage is not read: {cov['key']} is blank.*")
+        out.append(mc)
+        return "\n".join(out)
+    e = cov["entry"]
+    if e is None:
+        raise Problem(f"{build['readme']}: renders a coverage region for {build['slug']}, which is no chain "
+                      f"build of the design view")
+    base = build["readme"].rsplit("/", 1)[0] + "/"
+    out += [f"Coverage of {build['slug']}'s {len(e['clauses'])} clause(s) and {len(e['nodes'])} owned "
+            f"node(s), over {len(e['specs'])} spec(s) at or after {CARRIES_KEY} {cov['cutoff']}:", "",
+            f"- carried whole: {len(e['whole'])}"]
+    # (bullet, items, counted): a counted field renders `<n> (<ids>)`, any other its items or `none`.
+    for head, items, counted in (
+            ("- carried in parts:", e["split"], True),
+            ("- moved, retired or deferred:", [f"{c} {k} by {d}" for c, k, d in e["released"]], False),
+            ("- uncarried:", e["uncarried"], True),
+            ("- stale:", e["stale"], True),
+            ("- ambiguous:", e["ambiguous"], True),
+            ("- owned nodes no spec names:", e["unnamed"], False),
+            ("- specs derived from no clause:",
+             [f"`{p[len(base):] if p.startswith(base) else p}` ({d})" for p, d in e["derived"]], False),
+            ("- clauses the token arm cannot see:", e["blind"], False)):
+        out += _render_wrapped_ids(f"{head} {len(items)} (" if counted else head, items or ["none"],
+                                   IDS_WRAP - 1, ", ", "  ", ")" if counted else "")
+    out.append(mc)
+    return "\n".join(out)
+
+
 REGION_RENDERERS = {
     "build-index": render_region,
+    "build-coverage": render_coverage,
     "build-order": render_order,
     "build-edges": render_edges,
 }
@@ -1711,6 +1796,46 @@ def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
                       f"evidence population (EVIDENCE_GLOBS resolves to no tracked file), so every "
                       f"Landed-unclosed count would be a reassuring zero")
     return record
+
+
+def read_carries_coverage(root: str, conf: dict) -> dict:
+    """TOOL-dTrueNorth-3 S2 — the carries join's coverage, the ONE read the coverage region and
+    `--check-coverage` share, so the two cannot disagree.
+
+    Blank `CARRIES_KEY` returns `{"state": "off", "key": CARRIES_KEY}` and resolves nothing. Set, it
+    loads `CARRIES_CHECKER` from this kit directory's parent by path, with no bytecode cache written,
+    as `read_landed_unclosed` reaches a sibling kit only under its key, and returns its
+    `derive_carries_coverage(root)` whole: `{"state": "armed", "cutoff", "builds", ...}`, `builds`
+    keyed by every chain build of the design view. A checker that is not there or does not load, and
+    a refusal it raises, are each a named Problem before anything is written, carrying whatever the
+    checker printed on its way to refusing.
+    """
+    if not (conf.get(CARRIES_KEY) or "").strip():
+        return {"state": "off", "key": CARRIES_KEY}
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), CARRIES_CHECKER)
+    if not os.path.isfile(path):
+        raise Problem(f"{CARRIES_KEY} is set and {CARRIES_CHECKER} is not in this kit directory's parent "
+                      f"({path}), so the coverage cannot be read")
+    spec = importlib.util.spec_from_file_location("check_spec_tokens", path)
+    mod = importlib.util.module_from_spec(spec)
+    said = io.StringIO()
+    cache, sys.dont_write_bytecode = sys.dont_write_bytecode, True
+    try:
+        with contextlib.redirect_stdout(said):
+            spec.loader.exec_module(mod)
+            value = mod.derive_carries_coverage(root)
+    except Exception as exc:  # noqa: BLE001 — narrowed below: only the checker's own refusals are Problems
+        dl = sys.modules.get("design_lib")
+        if not (isinstance(exc, (ImportError, SyntaxError)) or (dl and isinstance(exc, dl.DesignRefusal))):
+            raise
+        echo = " ".join(said.getvalue().split())
+        raise Problem(f"{CARRIES_KEY} is set and the carries join refused, so the coverage cannot be read: "
+                      f"{exc}" + (f" (it printed: {echo})" if echo else "")) from None
+    finally:
+        sys.dont_write_bytecode = cache
+    if value.get("state") != "armed":
+        return {"state": "off", "key": CARRIES_KEY}
+    return value
 
 
 def derive_landed_counts(record: dict, builds: list, m: str) -> dict:
@@ -2364,16 +2489,44 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
         pre = f"{m}/builds/{b['slug']}/"
         b["records"] = [dict(rec, path=p) for p, rec in binds_all.items()
                         if p.startswith(pre) and rec["state"] in ("bound", "unbound")]
+    # TOOL-dTrueNorth-3 — THE COVERAGE, READ ONCE for the whole render and attached per build before
+    # the region loop: a chain build carries its entry, any other build an empty one. Off, no build is
+    # a chain build, so no README gains the pair and a held pair renders the off line.
+    coverage = read_carries_coverage(root, conf)
+    chain = set(coverage.get("builds") or ())
+    for b in builds:
+        if coverage["state"] == "off":
+            b["coverage"] = coverage
+        else:
+            b["coverage"] = {"state": "armed", "cutoff": coverage["cutoff"],
+                             "entry": coverage["builds"].get(b["slug"])}
+    cov_mo, cov_mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-coverage")
+    unpaired, stray = [], []
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
         text = remove_dead_regions(read_text(path))
         text = apply_front_matter_ids(text, b["roster"], b["readme"])
         if create_missing:
-            for _name, mo, mc in GEN_REGIONS:
+            for name, mo, mc in GEN_REGIONS:
+                # CREATION IS CHAIN-ONLY for the coverage pair; the render loop below renders it in
+                # every README that holds it, so the asymmetry is in creation alone.
+                if name == "build-coverage" and b["slug"] not in chain:
+                    continue
                 lines = text.split("\n")
                 if _marker_index(lines, mo) is None and _marker_index(lines, mc) is None:
                     text = insert_region(text, mo, mc)
+        # DEMANDED WHERE IT BELONGS (section 8 F2): armed, a chain README without the pair shows the
+        # owner no coverage, and a non-chain README holding one is a region for nothing.
+        lines = text.split("\n")
+        held = _marker_index(lines, cov_mo) is not None or _marker_index(lines, cov_mc) is not None
+        if coverage["state"] == "armed":
+            if b["slug"] in chain and not held:
+                unpaired.append(b["readme"])
+            elif b["slug"] not in chain and held:
+                stray.append(b["readme"])
+        if unpaired or stray:
+            continue
         for name, mo, mc in GEN_REGIONS:
             renderer = REGION_RENDERERS[name]
             lines = text.split("\n")
@@ -2390,6 +2543,14 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
                 continue  # a region this README has not adopted — S1c
             text = apply_region(text, renderer(b), b["readme"], mo, mc)
         artifacts[b["readme"]] = text
+    if unpaired or stray:
+        raise Problem("coverage — the build-coverage region is out of place while "
+                      f"{CARRIES_KEY} is set:\n"
+                      + "".join(f"    {r} is a chain build's README with no '{cov_mo}' pair; run python "
+                                f"{kit_rel()}/gen_build_index.py --write to create it\n" for r in unpaired)
+                      + "".join(f"    {r} holds a '{cov_mo}' pair and is no chain build of the design view; "
+                                f"delete the pair, which renders for nothing\n" for r in stray)
+                      + "Nothing was written.")
     # TOOL-dFramedEntrypoint-6 — every record renders inside the SPEC it serves. The population is
     # every tracked spec carrying a status header, not only the ones a record names: an unnamed spec
     # renders an EXPLICIT empty case, because an absent region cannot be told from a spec nobody has
@@ -2501,6 +2662,34 @@ def cmd_check(root: str, conf: dict) -> int:
     if rc == 0:
         print(f"build-index: clean ({len(artifacts)} artifact(s))")
     return rc
+
+
+def cmd_check_coverage(root: str, conf: dict) -> int:
+    """TOOL-dTrueNorth-3 S5 — refuse a chain build's spec at INPROGRESS while that build's coverage is red.
+
+    INPROGRESS is past the build's Design exit, so the findings read are the ones
+    `derive_carries_coverage` returns at that exit, every arm, an uncarried clause and an unnamed
+    node beside a stale pin — the same value the coverage region renders, through
+    `read_carries_coverage`. One line per refused spec naming each finding's arm and reference, and
+    exit 1. A spec at any other status is not read: OPEN, SPECCED and BLOCKED precede the exit, and a
+    terminal or DEFERRED spec is not building. Off, one line naming the blank key and exit 0; a
+    Problem is `main()`'s exit 2. Hygiene check 29 is this verb's one caller.
+    """
+    value = read_carries_coverage(root, conf)
+    if value["state"] == "off":
+        print(f"build-index: coverage is not read — {value['key']} is blank, so no chain spec is refused")
+        return 0
+    refused = 0
+    for b in sorted(value["builds"]):
+        e = value["builds"][b]
+        if not e["findings"]:
+            continue
+        red = "; ".join(f"{arm} {ref}" for _where, arm, ref, _why in e["findings"])
+        for path, status in e["specs"]:
+            if status == "INPROGRESS":
+                print(f"build-index: coverage — {path} is INPROGRESS while {b}'s coverage is red: {red}")
+                refused += 1
+    return 1 if refused else 0
 
 
 def extract_build_readmes(paths: list, memory_root: str) -> list:
@@ -4030,6 +4219,181 @@ def test_staged_render(arm) -> None:
             lambda: str([p for p in plan(t, conf)[0] if not check_index_input(p, "memory", None)]))
 
 
+def test_coverage_region(arm) -> None:
+    """TOOL-dTrueNorth-3's arms: the `build-coverage` region and `--check-coverage`, over a fixture tree
+    whose conf arms SPEC_CARRIES_CUTOFF over a design of its own.
+
+    MODULE-LEVEL, as `test_staged_render` is. Two chain builds — dAlpha, whose two specs carry both its
+    clauses and its one owned node, one of them derived from a decision, and dBeta, thirty clauses with
+    no backticked name and no spec, so its lists wrap — and tOne, which the view does not name. The
+    checker is the one in this kit directory's parent, the reader the generator really loads; the
+    view, the record at the fixture's baseline and the deriver are the fixture's own. Every plant is
+    undone before the next arm reads the tree. With no checker beside the kit the arms skip aloud.
+    """
+    if not os.path.isfile(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                       CARRIES_CHECKER)):
+        print(f"arm skip  TOOL-dTrueNorth-3 — no {CARRIES_CHECKER} in this kit directory's parent, so the "
+              f"coverage arms have no join to read")
+        return
+    cut = "2026-09-02"
+    alpha = {"cl-dAlpha-0001": "The reader takes `alpha-one` first.", "cl-dAlpha-0002": "The run writes `alpha-two`."}
+    beta = {"cl-dBeta-%04d" % k: "Beta clause number %d." % k for k in range(1, 31)}
+    pins = {cid: hashlib.sha256(text.encode("utf-8")).hexdigest()[:8] for cid, text in alpha.items()}
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-coverage")
+    keys = ('DESIGN_RECORD="memory/design/record.md"\nDESIGN_VIEW="memory/design/view.md"\n'
+            'DESIGN_NODES="memory/design/nodes.py"\n')
+    with tempfile.TemporaryDirectory() as base:
+        t = os.path.join(base, "coverage"); os.makedirs(t)
+        run("git", "init", "-q", "--template=", ".", cwd=t)
+        conf_path = os.path.join(t, ".memory-tree.conf")
+        view = os.path.join(t, "memory", "design", "view.md")
+        s1 = os.path.join(t, "memory", "builds", "dAlpha", "spec", f"{cut}-spec-dAlpha-1.md")
+        readme = {s: os.path.join(t, "memory", "builds", s, "README.md") for s in ("dAlpha", "dBeta", "tOne")}
+
+        def write_view(extra=""):
+            write_text(view, "# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n" + "".join(
+                f"| {b} | `{cid}` | {text} | baseline |\n" for b, cl in (("dAlpha", alpha), ("dBeta", beta))
+                for cid, text in cl.items()) + extra)
+
+        def write_alpha(status):
+            write_text(s1, f"# ARCH-dAlpha-1 — a unit\n\n**Status:** {status} · rev-1 · {cut} · node a · Tier-2 · "
+                           f"base 0123abcd\n\n" + "".join(f"**Carries:** {cid}@{pins[cid]} whole\n" for cid in alpha)
+                       + "**Carries:** node:item.alpha-node\n\nIt reads `alpha-one` and writes `alpha-two`.\n")
+
+        def write_conf(cutoff, baseline, view_key="memory/design/view.md"):
+            write_text(conf_path, _render_fixture_conf() + f'SPEC_CARRIES_CUTOFF="{cutoff}"\n'
+                       + keys.replace("memory/design/view.md", view_key) + f'DESIGN_BASELINE="{baseline}"\n')
+            return load_conf(t)
+
+        write_text(os.path.join(t, "memory", STALE_HEADER_WAIVER), "# empty\n")
+        for slug in readme:
+            fm = ["---", f"slug: {slug}", "node: a", f"opened: {cut}", "streams: arch", "roster: ARCH",
+                  f"ids: ARCH-{slug}-1"] + (["status: OPEN"] if slug == "dBeta" else []) + ["---"]
+            write_text(readme[slug], "\n".join(fm + ["", f"# {slug}", "", MARK_OPEN, MARK_CLOSE]) + "\n")
+        write_text(os.path.join(t, "memory", "builds", "tOne", "spec", f"{cut}-spec-tOne-1.md"),
+                   f"# ARCH-tOne-1 — a unit\n\n**Status:** OPEN · rev-1 · {cut} · node a · Tier-2 · base 0123abcd\n")
+        write_alpha("INPROGRESS")
+        write_text(os.path.join(t, "memory", "builds", "dAlpha", "spec", f"{cut}-spec-dAlpha-2.md"),
+                   f"# ARCH-dAlpha-2 — a unit\n\n**Status:** OPEN · rev-1 · {cut} · node a · Tier-2 · "
+                   f"base 0123abcd\n\n**Derived:** ARCH-dAlpha-1\n")
+        write_view()
+        write_text(os.path.join(t, "memory", "design", "record.md"),
+                   "# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n")
+        write_text(os.path.join(t, "memory", "design", "nodes.py"), 'OWNED = ("item",)\n\n\ndef derive():\n    '
+                   'return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n')
+        conf_off = write_conf("", "0" * 40)
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=t)
+        sha = run("git", "rev-parse", "HEAD", cwd=t).strip()
+        conf_off = write_conf("", sha)
+        # AC5 — blank, a tree with no pair gains none: the key decides creation before anything resolves.
+        cmd_write(t, conf_off)
+        arm("TOOL-dTrueNorth-3 AC5 — with SPEC_CARRIES_CUTOFF blank, --write gives no README the pair", "0",
+            lambda: str(sum(mo in read_text(p) for p in readme.values())))
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "rendered off", "--no-verify", cwd=t)
+        before = {s: read_text(p) for s, p in readme.items()}
+        conf_on = write_conf(cut, sha)
+        cmd_write(t, conf_on)
+        # AC1 — the chain READMEs gain the pair DIRECTLY after the index region, a blank line between,
+        # and nothing outside it moves; the README the view does not name is untouched.
+        for slug in ("dAlpha", "dBeta"):
+            ls = read_text(readme[slug]).split("\n")
+            o, c = _marker_index(ls, mo), _marker_index(ls, mc)
+            arm(f"TOOL-dTrueNorth-3 AC1 — {slug}'s README gains the pair right after the index close and "
+                f"nothing else moves", "True",
+                lambda: str(o is not None and c is not None and ls[o - 2] == MARK_CLOSE and ls[o - 1] == ""
+                            and "\n".join(ls[:o - 1] + ls[c + 1:]) == before[slug]))
+        arm("TOOL-dTrueNorth-3 AC1 — a README the view's Build column does not name gains no pair", "True",
+            lambda: str(read_text(readme["tOne"]) == before["tOne"]))
+        alpha_r = read_text(readme["dAlpha"])
+        arm("TOOL-dTrueNorth-3 S3 — the region opens with the counts line naming build, clause, node, spec "
+            "and cutoff", f"Coverage of dAlpha's 2 clause(s) and 1 owned node(s), over 2 spec(s) at or after "
+                          f"SPEC_CARRIES_CUTOFF {cut}:", lambda: alpha_r)
+        arm("TOOL-dTrueNorth-3 S3 — every field renders, an empty one as none", "True", lambda: str(all(
+            f in alpha_r for f in ("- carried whole: 2\n", "- carried in parts: 0 (none)\n",
+                                   "- moved, retired or deferred: none\n", "- uncarried: 0 (none)\n",
+                                   "- stale: 0 (none)\n", "- ambiguous: 0 (none)\n",
+                                   "- owned nodes no spec names: none\n",
+                                   f"- specs derived from no clause: `spec/{cut}-spec-dAlpha-2.md` (ARCH-dAlpha-1)\n",
+                                   "- clauses the token arm cannot see: none\n"))))
+        # AC3 — a build with no spec: every clause uncarried, listed, and no line past 300.
+        beta_r = read_text(readme["dBeta"])
+        _bl = beta_r.split("\n")
+        _region = _bl[_marker_index(_bl, mo):_marker_index(_bl, mc) + 1]
+        _unc = " ".join(x.strip() for x in "\n".join(_region).split("- uncarried: ", 1)[1].split("\n- ", 1)[0].split("\n"))
+        arm("TOOL-dTrueNorth-3 AC3 — a chain build with no spec reads over 0 spec(s)", "over 0 spec(s)", lambda: beta_r)
+        arm("TOOL-dTrueNorth-3 AC3 — its uncarried field counts and lists every clause the view gives it", "True",
+            lambda: str(_unc == "30 (" + ", ".join(beta) + ")"))
+        arm("TOOL-dTrueNorth-3 AC3 — the long lists wrap onto two-space lines, none past 300", "True",
+            lambda: str(max(len(x) for x in _region) <= 300 and sum(x.startswith("  cl-dBeta-") for x in _region) >= 2))
+        # AC4 — fresh render is clean; a hand edit and a chain README with no pair are each named.
+        arm("TOOL-dTrueNorth-3 AC4 — --check after --write is clean", "rc=0",
+            lambda: f"rc={_read_mode(cmd_check, t, conf_on)[0]}")
+        write_text(readme["dAlpha"], alpha_r.replace("- carried whole: 2", "- carried whole: 3"))
+        arm("TOOL-dTrueNorth-3 AC4 — one hand-edited byte in the region reds --check naming that README",
+            "memory/builds/dAlpha/README.md (stale", lambda: _read_mode(cmd_check, t, conf_on)[1])
+        write_text(readme["dAlpha"], alpha_r)
+        _ls = beta_r.split("\n")
+        write_text(readme["dBeta"], "\n".join(_ls[:_marker_index(_ls, mo) - 1] + _ls[_marker_index(_ls, mc) + 1:]))
+        arm("TOOL-dTrueNorth-3 AC4 — a chain README with no pair is refused, naming it and --write", "True",
+            lambda: str((lambda r: r[0] == 1 and "memory/builds/dBeta/README.md is a chain build's README with no"
+                         in r[1] and "gen_build_index.py --write" in r[1])(_read_mode(cmd_check, t, conf_on))))
+        write_text(readme["dBeta"], beta_r)
+        write_text(readme["tOne"], before["tOne"] + "\n" + mo + "\n" + mc + "\n")
+        arm("TOOL-dTrueNorth-3 S4 — a README the view does not name that holds a pair is refused by --check",
+            "memory/builds/tOne/README.md holds a", lambda: _read_mode(cmd_check, t, conf_on)[1])
+        arm("TOOL-dTrueNorth-3 S4 — and by --write, which writes nothing", "rc=1",
+            lambda: f"rc={_read_mode(cmd_write, t, conf_on)[0]}")
+        write_text(readme["tOne"], before["tOne"])
+        # AC8 — the refusal reads the same value: clean is 0, a planted uncarried clause stops the
+        # INPROGRESS spec, the spec at OPEN is not read, and the region shows the plant.
+        arm("TOOL-dTrueNorth-3 AC8 — --check-coverage over a clean chain build at INPROGRESS exits 0", "rc=0",
+            lambda: "rc=%s" % _read_mode(cmd_check_coverage, t, conf_on)[0])
+        write_view("| dAlpha | `cl-dAlpha-0003` | A planted clause. | baseline |\n")
+        arm("TOOL-dTrueNorth-3 AC8 — a planted uncarried clause refuses the INPROGRESS spec, naming it and the "
+            "finding", f"rc=1 build-index: coverage — memory/builds/dAlpha/spec/{cut}-spec-dAlpha-1.md is "
+                       f"INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0003\n",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_coverage, t, conf_on))
+        write_alpha("OPEN")
+        arm("TOOL-dTrueNorth-3 AC7 — the same plant with every dAlpha spec OPEN is not refused", "rc=0",
+            lambda: "rc=%s" % _read_mode(cmd_check_coverage, t, conf_on)[0])
+        arm("TOOL-dTrueNorth-3 AC7 — and the region's uncarried field reads the plant", "- uncarried: 1 (cl-dAlpha-0003)\n",
+            lambda: plan(t, conf_on)[0]["memory/builds/dAlpha/README.md"])
+        write_alpha("INPROGRESS")
+        write_view()
+        arm("TOOL-dTrueNorth-3 AC8 — a blank key exits 0 on one line naming it", "rc=0 build-index: coverage is not "
+            "read — SPEC_CARRIES_CUTOFF is blank", lambda: "rc=%s %s" % _read_mode(cmd_check_coverage, t, conf_off))
+        write_conf(cut, sha, "memory/design/no-such-view.md")
+        _cli = subprocess.run([sys.executable, os.path.abspath(__file__), "--check-coverage"], cwd=t,
+                              capture_output=True, text=True, encoding="utf-8", errors="replace",
+                              env=_build_git_env())
+        arm("TOOL-dTrueNorth-3 AC8 — a DESIGN_VIEW naming a missing file exits 2 naming the key", "rc=2 True",
+            lambda: f"rc={_cli.returncode} {'DESIGN_VIEW names memory/design/no-such-view.md' in _cli.stdout}")
+        write_conf(cut, sha)
+        # AC11 — the checker staged alone owes a render while the key is set, and not while it is blank.
+        write_text(os.path.join(t, "pfx", "kit", "x.py"), "x = 1\n")
+        write_text(os.path.join(t, "pfx", CARRIES_CHECKER), "x = 1\n")
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "a checker beside a kit", "--no-verify", cwd=t)
+        write_text(os.path.join(t, "pfx", CARRIES_CHECKER), "x = 2\n")
+        run("git", "add", "--", f"pfx/{CARRIES_CHECKER}", cwd=t)
+        _kit = os.path.join(t, "pfx", "kit")
+        arm("TOOL-dTrueNorth-3 AC11 — a staged carries checker owes a render while the key is set",
+            f"(True, 'pfx/{CARRIES_CHECKER} is a build-index input", lambda: str(check_staged_render(t, conf_on, _kit)))
+        arm("TOOL-dTrueNorth-3 AC11 — with the key blank the same staged checker skips", "False",
+            lambda: str(check_staged_render(t, conf_off, _kit)[0]))
+        run("git", "reset", "-q", "--hard", cwd=t)
+        # AC5 — blank, a tree holding the pairs renders the off line in each, and --check agrees.
+        conf_off = write_conf("", sha)
+        cmd_write(t, conf_off)
+        arm("TOOL-dTrueNorth-3 AC5 — blank, each held pair renders the off line and no stale body", "True",
+            lambda: str(all(f"{mo}\n\n*Coverage is not read: SPEC_CARRIES_CUTOFF is blank.*\n{mc}" in read_text(readme[s])
+                            for s in ("dAlpha", "dBeta"))))
+        arm("TOOL-dTrueNorth-3 AC5 — and --check over it is clean", "rc=0",
+            lambda: f"rc={_read_mode(cmd_check, t, conf_off)[0]}")
+
+
 def cmd_selftest() -> int:
     fails = []
 
@@ -4066,6 +4430,10 @@ def cmd_selftest() -> int:
         len(_render_wrapped_ids("Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) > 1
         and max(len(x) for x in _render_wrapped_ids(
             "Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) <= IDS_WRAP + 1))
+    # TOOL-dTrueNorth-3 — the coverage bullets' form: no space after an opening parenthesis, the
+    # separator's comma kept at a wrap, continuation lines indented, and the closing `end`.
+    arm("the separator, indent and end arguments render a coverage bullet", "['- x: 3 (aaaa, bbbb,', '  cccc)']",
+        lambda: str(_render_wrapped_ids("- x: 3 (", ["aaaa", "bbbb", "cccc"], 20, ", ", "  ", ")")))
 
     with tempfile.TemporaryDirectory() as base:
         # TOOL-dHomedResolver-2 — A HALF-STAGED ROTATION IS REFUSED, by --write and by --check.
@@ -4254,7 +4622,9 @@ def cmd_selftest() -> int:
         # raised IndexError the moment TOOL-dFramedEntrypoint-5 removed the last entry — a break no
         # grep for the marker STRING could have predicted, which is why the spec names this as its
         # own blast-radius class.
-        _TRAILING = [r for r in GEN_REGIONS if r[0] != "build-index"]
+        # `build-coverage` is LEFT OUT: its creation is chain-only, this fixture's conf arms no
+        # SPEC_CARRIES_CUTOFF, so no write creates it here. TOOL-dTrueNorth-3's arms grade that pair.
+        _TRAILING = [r for r in GEN_REGIONS if r[0] not in ("build-index", "build-coverage")]
         _ls = read_text(rd12).split("\n")
         for _n, _mo, _mc in reversed(_TRAILING):
             _o, _c = _marker_index(_ls, _mo), _marker_index(_ls, _mc)
@@ -4262,12 +4632,12 @@ def cmd_selftest() -> int:
                 _ls = _ls[:_o] + _ls[_c + 1:]
         write_text(rd12, "\n".join(_ls))
         arm("check does not CREATE an absent pair", "0", lambda: str(cmd_check(t12, conf12)))
-        arm("every trailing pair really is absent for that arm", str(len(GEN_REGIONS) - 1),
+        arm("every trailing pair really is absent for that arm", str(len(_TRAILING)),
             lambda: str(sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         cmd_write(t12, conf12)
         arm("write restores them", "0", lambda: str(
             sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
-        arm("write CREATED every absent trailing pair", str(len(GEN_REGIONS) - 1),
+        arm("write CREATED every absent trailing pair", str(len(_TRAILING)),
             lambda: str(sum(mo in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         arm("created pairs land in CANONICAL order", "True", lambda: str(
             all(read_text(rd12).index(_TRAILING[k][1]) < read_text(rd12).index(_TRAILING[k + 1][1])
@@ -6533,6 +6903,7 @@ def cmd_selftest() -> int:
         lambda: render_spec_skeleton("# T\n\n" + _q_t2, *_q_args, "", []))
 
     test_staged_render(arm)
+    test_coverage_region(arm)
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
@@ -6868,9 +7239,10 @@ def main(argv: list) -> int:
                           GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
     if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
-                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor"):
+                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor",
+                    "--check-coverage"):
         print("usage: gen_build_index.py "
-              "[--check [--staged]|--write|--check-format|--survey|--report|--bump|"
+              "[--check [--staged]|--write|--check-coverage|--check-format|--survey|--report|--bump|"
               "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
         return 2
     try:
@@ -6897,6 +7269,14 @@ def main(argv: list) -> int:
     if mode == "--doctor":
         try:
             return cmd_doctor(root, conf, read_doctor_args(argv[2:]))
+        except Problem as exc:
+            print(f"build-index: {exc}")
+            return 2
+    # `--check-coverage` refuses with 2 for the same reason: 1 is its "a chain spec is refused" verdict,
+    # and a coverage it could not read must never read as either answer (TOOL-dTrueNorth-3 S5).
+    if mode == "--check-coverage":
+        try:
+            return cmd_check_coverage(root, conf)
         except Problem as exc:
             print(f"build-index: {exc}")
             return 2

@@ -91,6 +91,23 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dScopedBuild's 15 clause(s) and 23 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 15 (cl-dClosedLoop-0399, cl-dClosedLoop-0400, cl-dClosedLoop-0401, cl-dClosedLoop-0402, cl-dClosedLoop-0403, cl-dClosedLoop-0404, cl-dClosedLoop-0405, cl-dClosedLoop-0406, cl-dClosedLoop-0407, cl-dClosedLoop-0408, cl-dClosedLoop-0409, cl-dClosedLoop-0410, cl-dClosedLoop-0411,
+  cl-dClosedLoop-0412, cl-dClosedLoop-0506)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.build.acceptance, item.build.base, item.build.core, item.build.distill, item.build.exit, item.build.fix-pass, item.build.ratify, item.build.resolve, item.build.reuse-check, item.build.revert-pass, item.build.scope, item.build.unit-lease, item.build.unit-pass,
+  policy-key.build.reuse-check.second-pass, policy-key.build.scope, policy-key.deviation.gate, policy-key.retrofit.claim-cap, policy-key.retrofit.claim-on-touch, policy-key.retrofit.drain, policy-key.retrofit.drain-cap, policy-key.review.build.when, record-kind.core-result, record-kind.scope
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0399, cl-dClosedLoop-0401, cl-dClosedLoop-0403, cl-dClosedLoop-0404, cl-dClosedLoop-0405, cl-dClosedLoop-0409, cl-dClosedLoop-0411
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

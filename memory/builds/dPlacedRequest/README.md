@@ -100,6 +100,25 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dPlacedRequest's 21 clause(s) and 37 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 21 (cl-dClosedLoop-0120, cl-dClosedLoop-0121, cl-dClosedLoop-0122, cl-dClosedLoop-0123, cl-dClosedLoop-0503, cl-dClosedLoop-0124, cl-dClosedLoop-0125, cl-dClosedLoop-0126, cl-dClosedLoop-0127, cl-dClosedLoop-0128, cl-dClosedLoop-0129, cl-dClosedLoop-0130, cl-dClosedLoop-0131,
+  cl-dClosedLoop-0132, cl-dClosedLoop-0133, cl-dClosedLoop-0134, cl-dClosedLoop-0135, cl-dClosedLoop-0136, cl-dClosedLoop-0137, cl-dClosedLoop-0138, cl-dClosedLoop-0501)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.entry.claim, item.entry.orient, item.entry.place, item.entry.place-check, item.entry.place-owner, item.probe.design, item.probe.experiment, item.probe.judge, item.probe.judge-claimed, item.probe.pin, item.probe.return, item.probe.run, item.probe.trigger,
+  policy-key.card.follows, policy-key.card.snapshot, policy-key.card.store, policy-key.leases, policy-key.leases.expiry-hours, policy-key.leases.granularity, policy-key.leases.offer-seconds, policy-key.leases.offline, policy-key.leases.overlap, policy-key.leases.queued-claim-days,
+  policy-key.leases.renewal, policy-key.patch.ratify, policy-key.placement, policy-key.placement.check, policy-key.probe.experiment.authority, policy-key.probe.observations, policy-key.probe.points, policy-key.probe.raise, policy-key.resume.context, policy-key.resume.partial, record-kind.card,
+  record-kind.lease, record-kind.probe, record-kind.probe-trigger
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0122, cl-dClosedLoop-0126, cl-dClosedLoop-0129, cl-dClosedLoop-0133, cl-dClosedLoop-0136, cl-dClosedLoop-0137
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

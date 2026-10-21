@@ -93,6 +93,23 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dCalibratedLens's 17 clause(s) and 15 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 17 (cl-dClosedLoop-0458, cl-dClosedLoop-0459, cl-dClosedLoop-0460, cl-dClosedLoop-0461, cl-dClosedLoop-0462, cl-dClosedLoop-0463, cl-dClosedLoop-0464, cl-dClosedLoop-0465, cl-dClosedLoop-0466, cl-dClosedLoop-0467, cl-dClosedLoop-0468, cl-dClosedLoop-0469, cl-dClosedLoop-0470,
+  cl-dClosedLoop-0471, cl-dClosedLoop-0472, cl-dClosedLoop-0473, cl-dClosedLoop-0474)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.loop.file, item.loop.gather, item.loop.lease, item.loop.price, item.loop.propose, item.loop.record, policy-key.flow.promote, policy-key.review.<stage>.effort, policy-key.review.loop.cadence, policy-key.review.loop.catch-source, policy-key.review.loop.retire,
+  policy-key.review.loop.window-days, record-kind.loop-review, record-kind.value-ledger, tag-namespace.lens
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0459, cl-dClosedLoop-0462, cl-dClosedLoop-0466, cl-dClosedLoop-0467, cl-dClosedLoop-0468, cl-dClosedLoop-0469, cl-dClosedLoop-0472, cl-dClosedLoop-0473
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

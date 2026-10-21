@@ -103,6 +103,25 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 26 (cl-dClosedLoop-0212, cl-dClosedLoop-0213, cl-dClosedLoop-0214, cl-dClosedLoop-0215, cl-dClosedLoop-0216, cl-dClosedLoop-0217, cl-dClosedLoop-0218, cl-dClosedLoop-0219, cl-dClosedLoop-0220, cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0223, cl-dClosedLoop-0224,
+  cl-dClosedLoop-0225, cl-dClosedLoop-0226, cl-dClosedLoop-0227, cl-dClosedLoop-0228, cl-dClosedLoop-0229, cl-dClosedLoop-0230, cl-dClosedLoop-0231, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0234, cl-dClosedLoop-0235, cl-dClosedLoop-0236, cl-dClosedLoop-0237)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.asks.acceptance, policy-key.builds.agent-root, policy-key.builds.slug-date, policy-key.builds.slug-style, policy-key.builds.slug-words, policy-key.help.atlas, policy-key.memory.code-languages, policy-key.memory.item-budget, policy-key.memory.legacy-anchors,
+  policy-key.memory.load-budget, policy-key.memory.map-budget, policy-key.memory.map-overflow, policy-key.memory.map-purpose, policy-key.memory.over-budget, policy-key.memory.superseded-slices, record-kind.archive, record-kind.ask, record-kind.backlog-row, record-kind.build-readme,
+  record-kind.claim, record-kind.code, record-kind.design-record, record-kind.dossier, record-kind.instrument, record-kind.registry, record-kind.shape-run, record-kind.stream-plan, record-kind.view, record-kind.witness, system.memory-structure, system.project-map, tag-namespace.class,
+  tag-namespace.feature, tag-namespace.marker, tag-namespace.record, tag-namespace.section
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0234, cl-dClosedLoop-0236
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

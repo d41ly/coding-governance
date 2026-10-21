@@ -93,6 +93,22 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dMindYourWords's 17 clause(s) and 6 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 17 (cl-dClosedLoop-0262, cl-dClosedLoop-0263, cl-dClosedLoop-0264, cl-dClosedLoop-0265, cl-dClosedLoop-0266, cl-dClosedLoop-0267, cl-dClosedLoop-0268, cl-dClosedLoop-0269, cl-dClosedLoop-0270, cl-dClosedLoop-0271, cl-dClosedLoop-0272, cl-dClosedLoop-0273, cl-dClosedLoop-0274,
+  cl-dClosedLoop-0275, cl-dClosedLoop-0276, cl-dClosedLoop-0277, cl-dClosedLoop-0278)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.lexicon.at-commit, policy-key.lexicon.drift, policy-key.lexicon.forced, policy-key.lexicon.packs, policy-key.lexicon.pin, record-kind.lexicon-declaration
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0264, cl-dClosedLoop-0265, cl-dClosedLoop-0266, cl-dClosedLoop-0275, cl-dClosedLoop-0277, cl-dClosedLoop-0278
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

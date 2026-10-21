@@ -110,6 +110,28 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dShippedRelease's 31 clause(s) and 60 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 31 (cl-dClosedLoop-0413, cl-dClosedLoop-0507, cl-dClosedLoop-0414, cl-dClosedLoop-0415, cl-dClosedLoop-0508, cl-dClosedLoop-0416, cl-dClosedLoop-0417, cl-dClosedLoop-0418, cl-dClosedLoop-0419, cl-dClosedLoop-0420, cl-dClosedLoop-0421, cl-dClosedLoop-0422, cl-dClosedLoop-0423,
+  cl-dClosedLoop-0424, cl-dClosedLoop-0425, cl-dClosedLoop-0426, cl-dClosedLoop-0427, cl-dClosedLoop-0428, cl-dClosedLoop-0429, cl-dClosedLoop-0430, cl-dClosedLoop-0431, cl-dClosedLoop-0432, cl-dClosedLoop-0433, cl-dClosedLoop-0434, cl-dClosedLoop-0435, cl-dClosedLoop-0436, cl-dClosedLoop-0437,
+  cl-dClosedLoop-0438, cl-dClosedLoop-0439, cl-dClosedLoop-0440, cl-dClosedLoop-0441)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.adopt.declarations, item.deploy.close, item.deploy.core, item.deploy.current, item.deploy.distill, item.deploy.land, item.deploy.mandate, item.deploy.notify, item.deploy.parents, item.deploy.record, item.deploy.released, item.deploy.snapshot, item.deploy.unlease,
+  item.kits.adopters, item.kits.currency, item.kits.cut, item.kits.install, item.kits.install-attended, item.kits.offer, item.kits.update, item.kits.update-attended, item.kits.version, item.release.approve-auto, item.release.approve-owner, item.release.pick, item.release.promote,
+  item.release.record, item.release.route, item.release.verify, policy-key.build.closes, policy-key.build.release-ceiling, policy-key.build.release-hold, policy-key.commits.squash, policy-key.currency.max-behind, policy-key.currency.on-behind, policy-key.deploy.currency,
+  policy-key.deploy.on-verify-fail, policy-key.deploy.promotion, policy-key.deploy.runs, policy-key.deps.landing, policy-key.install.from, policy-key.install.guards, policy-key.install.steps, policy-key.integrations.tracker, policy-key.kits.cadence, policy-key.kits.host,
+  policy-key.kits.watch-cadence, policy-key.landing.order, policy-key.platforms.supported, policy-key.platforms.verify, policy-key.release.environments, record-kind.adopter-register, record-kind.adopters, record-kind.comparison, record-kind.currency, record-kind.kit-release, record-kind.landing,
+  record-kind.receipt, record-kind.release, record-kind.release-exit
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0413, cl-dClosedLoop-0416, cl-dClosedLoop-0419, cl-dClosedLoop-0420, cl-dClosedLoop-0433
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*

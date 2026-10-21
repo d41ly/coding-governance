@@ -89,7 +89,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20
 |---|---|---|---|---|---|
 | [TOOL-dTrueNorth-1 — the clause ids and binding lines, parsed once, behind a cutoff](spec/2026-10-21-spec-TOOL-dTrueNorth-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg](spec/2026-10-21-spec-TOOL-dTrueNorth-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-21 |
-| [TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal](spec/2026-10-21-spec-TOOL-dTrueNorth-3.md) | 1 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal](spec/2026-10-21-spec-TOOL-dTrueNorth-3.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-11 — the build-index and memory-hygiene self-test legs guard the spec-token checker their arms load](spec/2026-10-21-spec-TOOL-dTrueNorth-11.md) | 2 | 2 | OPEN | rev-3 | 2026-10-21 |
 | [TOOL-dTrueNorth-15 — check 29 counts what it graded on every run, and says so when nothing was](spec/2026-10-21-spec-TOOL-dTrueNorth-15.md) | 2 | 2 | OPEN | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-5 — every spec audit pins the revision it read](spec/2026-10-21-spec-TOOL-dTrueNorth-5.md) | 2 | 2 | OPEN | rev-2 | 2026-10-21 |
@@ -109,12 +109,30 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20
 | [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 8 | 2 | OPEN | rev-2 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 27 bound to this build, across 4 record folder(s).
+Records: 28 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 20 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 6
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 0 (none)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: none
+- specs derived from no clause: `spec/2026-10-21-spec-TOOL-dTrueNorth-10.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-11.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-12.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-13.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-21-spec-TOOL-dTrueNorth-14.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-15.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-16.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-17.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-21-spec-TOOL-dTrueNorth-18.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-19.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-20.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-7.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-21-spec-TOOL-dTrueNorth-8.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-9.md` (PLAY-dClosedLoop-2)
+- clauses the token arm cannot see: cl-dClosedLoop-0002
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

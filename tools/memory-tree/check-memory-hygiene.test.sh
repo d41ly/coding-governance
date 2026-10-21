@@ -2613,6 +2613,11 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
   { fm tGen; printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n'; rows 80; printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- gen:build-order -->\n'; rows 40; printf '<!-- /gen:build-order -->\n'; } > memory/builds/tGen/README.md
   { fm tGenA; rows 110; printf '<!-- gen:build-index -->\n'; rows 120; printf '<!-- /gen:build-index -->\n'; } > memory/builds/tGenA/README.md
   { fm tGenU; printf '<!-- gen:build-index -->\n'; rows 80; printf '<!-- /gen:build-index -->\n\n<!-- gen:build-order -->\n'; rows 40; } > memory/builds/tGenU/README.md
+  # (h) THE COVERAGE PAIR IS GENERATED (TOOL-dTrueNorth-3 AC9): tCov's authored rows sit under the
+  #     cap and its coverage region tips the whole file over it, so it is silent only while check 6
+  #     prices that pair as generated. Staged red by deleting the pair from check 6's marker lists.
+  mkdir -p memory/builds/tCov
+  { fm tCov; rows 95; printf '<!-- gen:build-index -->\n<!-- /gen:build-index -->\n\n<!-- gen:build-coverage -->\n'; rows 30; printf '<!-- /gen:build-coverage -->\n'; } > memory/builds/tCov/README.md
   # (e) and (f) — check 7's ENTRY budget, one fixture per class at a width BETWEEN the two shipped
   #     tiers. 320 characters is over the row-document 300 and under the build-README 350, so with
   #     nothing declared the row is named and the README is silent: one width, both defaults, and
@@ -2653,6 +2658,11 @@ n=$((n+1))
 _w=$(wc -c < "$C6/memory/builds/tGenU/README.md" | tr -d ' ')
 cblock "$out" 6 | grep -qF "memory/builds/tGenU/README.md (${_w}B > 25600B; generated region markers unbalanced" \
   || { echo "FAIL check 6 did not price a README with an unbalanced region pair at its whole wc -c figure (${_w}B)"; st=1; }
+# --- (h) the coverage pair: silent, and only because its region is not priced — the whole file is over.
+cnot 6 'memory/builds/tCov/README.md'
+n=$((n+1))
+_w=$(wc -c < "$C6/memory/builds/tCov/README.md" | tr -d ' ')
+[ "$_w" -gt 25600 ] || { echo "FAIL check 6's coverage-pair fixture is ${_w}B, not over the 25600B cap whole, so its silence proves nothing"; st=1; }
 # --- CHECK 7's entry budget at the SHIPPED defaults. One 320-char fixture line in each class: the
 # --- row document is over 300 and named, the build README is under 350 and silent. A single arm
 # --- would pass under one merged tier; the pair is what observes the split.
@@ -4021,6 +4031,90 @@ case "$r24rc:$o24" in
   *) echo "FAIL check 24 through the engine: the clean main exited $r24rc, or the green run did not print 'rotation-mode: clean (' - the block drops its capture on exit 0:"; printf '%s\n' "$o24" | sed 's/^/      /'; st=1 ;;
 esac
 
+# ---- TOOL-dTrueNorth-3 — CHECK 29 THROUGH THE ENGINE: a chain build's spec at INPROGRESS while its
+# ---- build's coverage is red. Copy-installed on the check-24 shape, with the spec-token checker in
+# ---- the kit directory's parent, where the generator loads it from, over a design of the fixture's
+# ---- own: a view giving the chain build dAlpha two clauses, a record at the fixture's baseline and a
+# ---- deriver owning one node, all of them carried by dAlpha's one spec. A row planted in the view
+# ---- gives dAlpha an uncarried clause and refuses the INPROGRESS spec; taken out, the run is green;
+# ---- with the plant standing and the spec OPEN nothing is refused; a DESIGN_VIEW naming a missing
+# ---- file fails on its own branch; and --staged holds the check unless a spec or the conf is staged.
+# ---- Every plant is undone before the next arm. Skipped aloud when no checker sits beside this kit.
+C29=$TMP/cov29
+C29S=memory/builds/dAlpha/spec/2026-09-02-spec-dAlpha-1.md
+C29A1='The reader takes `alpha-one` first.'
+C29A2='The run writes `alpha-two`.'
+write_cov29_view() {   # $1 = an extra view row ending in \n, or empty
+  printf '# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n| dAlpha | `cl-dAlpha-0001` | %s | baseline |\n| dAlpha | `cl-dAlpha-0002` | %s | baseline |\n%b' "$C29A1" "$C29A2" "$1" > "$C29/memory/design/view.md"
+}
+write_cov29_spec() {   # $1 = the spec's status word
+  printf '# ARCH-dAlpha-1 — a unit\n\n**Status:** %s · rev-1 · 2026-09-02 · node a · Tier-2 · base 0123abcd\n\n**Carries:** cl-dAlpha-0001@%s whole\n**Carries:** cl-dAlpha-0002@%s whole\n**Carries:** node:item.alpha-node\n\nIt reads `alpha-one` and writes `alpha-two`.\n' "$1" "$H29A1" "$H29A2" > "$C29/$C29S"
+}
+run_cov29_gate() { ( cd "$C29" && bash "$C29/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
+if [ -f "$HERE/../check-spec-tokens.py" ]; then
+  H29A1=$("$_PY" -c 'import hashlib,sys; print(hashlib.sha256(sys.argv[1].encode("utf-8")).hexdigest()[:8])' "$C29A1" | tr -d '\r')
+  H29A2=$("$_PY" -c 'import hashlib,sys; print(hashlib.sha256(sys.argv[1].encode("utf-8")).hexdigest()[:8])' "$C29A2" | tr -d '\r')
+  mkdir -p "$C29/$KIT_REL" "$C29/memory/builds/dAlpha/spec" "$C29/memory/project" "$C29/memory/design"
+  cp "$HERE"/*.sh "$HERE"/*.py "$C29/$KIT_REL"/
+  cp "$HERE/../check-spec-tokens.py" "$C29/$KIT_REL/../"
+  write_cov29_view ''
+  write_cov29_spec INPROGRESS
+  (
+    cd "$C29" || exit 1
+    git init -q --template= . && git symbolic-ref HEAD refs/heads/main
+    printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
+    printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
+    printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+    printf '# r\n' > memory/README.md
+    printf '# d\n' > memory/DECISIONS.md
+    printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
+    printf -- '---\nslug: dAlpha\nnode: a\nopened: 2026-09-02\nstreams: arch\nroster: ARCH\nids: ARCH-dAlpha-1\n---\n\n# dAlpha\n\n<!-- gen:build-index -->\n<!-- /gen:build-index -->\n' > memory/builds/dAlpha/README.md
+    printf '# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' > memory/design/record.md
+    printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > memory/design/nodes.py
+    git add -A && git -c commit.gpgsign=false commit -q -m design --no-verify
+    printf 'SPEC_CARRIES_CUTOFF="2026-09-02"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="memory/design/view.md"\nDESIGN_NODES="memory/design/nodes.py"\n' "$(git rev-parse HEAD)" >> .memory-tree.conf
+    "$_PY" "$KIT_REL/gen_build_index.py" --write
+    git add -A && git -c commit.gpgsign=false commit -q -m armed --no-verify
+  ) >/dev/null 2>&1
+  cp "$C29/.memory-tree.conf" "$TMP/cov29-conf"
+  # AC6 — the planted uncarried clause refuses the INPROGRESS spec, naming it and the finding.
+  write_cov29_view '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n'
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 1 ] || { echo "FAIL check 29 through the engine: a planted uncarried clause under an INPROGRESS chain spec exited $r29rc, not 1"; st=1; }
+  chit 29 "a chain build's spec is INPROGRESS while its build's coverage is red:"
+  chit 29 "$C29S is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0599"
+  # AC6 — the row taken out, the same spec passes.
+  write_cov29_view ''
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); case "$r29rc:$out" in 0:*"HYGIENE --only 29 ran checks 29"*) ;; *) echo "FAIL check 29 through the engine: the clean INPROGRESS chain spec exited $r29rc, or check 29 never ran:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1 ;; esac
+  cnot 29 "is INPROGRESS while"
+  # AC7 — the plant standing and the spec OPEN, before its Design exit: not refused.
+  write_cov29_view '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n'
+  write_cov29_spec OPEN
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 0 ] || { echo "FAIL check 29 through the engine: the planted clause refused a chain spec at OPEN, before its Design exit (exit $r29rc)"; st=1; }
+  cnot 29 "is INPROGRESS while"
+  write_cov29_spec INPROGRESS
+  # --staged — a commit staging no spec and no conf holds the check and says so; one staging the
+  # INPROGRESS spec over the standing plant is refused at that commit.
+  printf '# r, edited\n' > "$C29/memory/README.md"; git -C "$C29" add -- memory/README.md
+  out=$(run_cov29_gate --staged)
+  hit "memory-hygiene: check 29: held under --staged, no chain spec or conf staged"
+  printf '\n' >> "$C29/$C29S"; git -C "$C29" add -- "$C29S"
+  out=$(run_cov29_gate --staged)
+  chit 29 "$C29S is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0599"
+  git -C "$C29" reset -q --hard; write_cov29_view ''
+  # A DESIGN_VIEW naming a missing file is a coverage nobody could read, which fails on its own branch.
+  sed -i 's|^DESIGN_VIEW=.*$|DESIGN_VIEW="memory/design/no-such-view.md"|' "$C29/.memory-tree.conf"
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 1 ] || { echo "FAIL check 29 through the engine: a DESIGN_VIEW naming a missing file exited $r29rc, not 1"; st=1; }
+  chit 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:"
+  chit 29 "DESIGN_VIEW names memory/design/no-such-view.md"
+  cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"
+else
+  echo "skip check 29 through the engine: no check-spec-tokens.py in this kit directory's parent, so its 12 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+12))
+fi
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
@@ -4085,7 +4179,11 @@ esac
 # never skipped.
 # MERGED at the TOOL-aSparedSpawn-34 reconcile with local main: the shared 557, plus this build's
 # 61 (557 -> 618) and local main's 16 (557 -> 573) = 634, each side's raise counting only its own arms.
-FLOOR_ASSERTIONS=634
+# RAISED 634 -> 648 by TOOL-dTrueNorth-3: its two check-6 coverage-pair assertions and its twelve
+# check-29 engine assertions, each top-level, the twelve skipped aloud with n_skip carrying them when
+# no spec-token checker sits in the kit directory's parent. Counted by reading, since the pass runs no
+# suite; OWED: observed at the close.
+FLOOR_ASSERTIONS=648
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

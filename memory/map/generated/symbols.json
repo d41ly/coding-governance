@@ -5683,6 +5683,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "cmd_check_coverage",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "cmd_check_format",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -12568,6 +12573,11 @@
       "file": "tools/lexicon/selftest.py"
     },
     {
+      "id": "read_carries_coverage",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_carries_specs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -15541,6 +15551,11 @@
       "id": "render_convention",
       "kind": "function",
       "file": "tools/lexicon/subtokens.py"
+    },
+    {
+      "id": "render_coverage",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "render_coverage_line",
@@ -18543,6 +18558,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "run_cov29_gate",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
       "id": "run_dense",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -21303,6 +21323,11 @@
       "file": "tools/codebase-map/selftest.py"
     },
     {
+      "id": "test_coverage_region",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_cpu_clock_parses_every_shape",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -23586,6 +23611,16 @@
       "id": "write_conflict_candidate",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "write_cov29_spec",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
+    },
+    {
+      "id": "write_cov29_view",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
       "id": "write_decl",

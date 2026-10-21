@@ -115,6 +115,28 @@ Ids no record names: none — every unit id is named by a record.
 Ids no `spec-audit` record has ever named: none — every unit id has one.
 <!-- /gen:build-index -->
 
+<!-- gen:build-coverage -->
+
+Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 34 (cl-dClosedLoop-0086, cl-dClosedLoop-0087, cl-dClosedLoop-0088, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098,
+  cl-dClosedLoop-0099, cl-dClosedLoop-0100, cl-dClosedLoop-0101, cl-dClosedLoop-0102, cl-dClosedLoop-0103, cl-dClosedLoop-0104, cl-dClosedLoop-0105, cl-dClosedLoop-0106, cl-dClosedLoop-0107, cl-dClosedLoop-0108, cl-dClosedLoop-0109, cl-dClosedLoop-0110, cl-dClosedLoop-0111, cl-dClosedLoop-0112,
+  cl-dClosedLoop-0113, cl-dClosedLoop-0114, cl-dClosedLoop-0115, cl-dClosedLoop-0116, cl-dClosedLoop-0117, cl-dClosedLoop-0118, cl-dClosedLoop-0119)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.build.recommend, item.deploy.recommend, item.design.reason, item.design.recommend, item.plan.reason, item.plan.recommend, item.review.cost, item.review.dispose, item.review.fold, item.review.trigger, item.test.reason, item.test.recommend, policy-key.autonomy,
+  policy-key.deps.on-parent-withdrawn, policy-key.deviation.approval, policy-key.floor, policy-key.flow.adapt, policy-key.flow.on-exhausted, policy-key.flow.rework-budget, policy-key.flow.route-backs, policy-key.flow.scenario-conflict, policy-key.flow.scenario-default, policy-key.flow.wait-ceiling,
+  policy-key.policy-file.guard, policy-key.policy-file.on-missing-expansion, policy-key.policy-file.proof, policy-key.review.<stage>, policy-key.review.blocks, policy-key.review.breakpoints, policy-key.review.design.round-count, policy-key.review.design.rounds, policy-key.review.findings,
+  policy-key.review.follow-up, policy-key.review.left-shift, policy-key.review.max-rounds, policy-key.review.recommendation, policy-key.review.recommendation.source, policy-key.review.unverified, policy-key.transitions.record, record-kind.acceptance, record-kind.commit, record-kind.disposition,
+  record-kind.recommendation, record-kind.transition, tag-namespace.command, tag-namespace.item, tag-namespace.policy, tag-namespace.scenario, tag-namespace.step
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0086, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098, cl-dClosedLoop-0101,
+  cl-dClosedLoop-0102, cl-dClosedLoop-0111
+<!-- /gen:build-coverage -->
+
 <!-- gen:build-order -->
 
 *No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
