@@ -4773,9 +4773,10 @@ def test_asbuilt_view(arm) -> None:
     baseline, and whose view sits in a build's `build/` folder, where a staged edit of it is a build-index
     input: `--write` renders it; a hand edit staged there reds `--check` with the view under DRIFT; an
     `amends` record staged over the view rendered on zero records makes `--check --staged` render and
-    reds it with the view under DRIFT until `--write` re-renders it (TOOL-dTrueNorth-8 S3); a
-    record departing from a clause through a `gap` row reds `--check` with an `as-built VERDICT` naming
-    it, while `--write` still writes every other artifact; a pin naming no commit is a named Problem;
+    reds it with the view under DRIFT until `--write` re-renders it (TOOL-dTrueNorth-8 S3), and so does
+    an edit of a kit path staged alone over a committed record the view does not count (TOOL-dTrueNorth-17
+    S3), the render's code being a view input; a record departing from a clause through a `gap` row reds
+    `--check` with an `as-built VERDICT` naming it, while `--write` still writes every other artifact; a pin naming no commit is a named Problem;
     and a blank DESIGN_VIEW prints the off line and reads nothing.
     """
     import asbuilt_view
@@ -4843,7 +4844,7 @@ def test_asbuilt_view(arm) -> None:
         # citing it on the amended row. The reset leaves the tree as HEAD holds it for the arms below.
         amend_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-deviation-2.md"
         pin2, after2 = asbuilt_view.derive_clause_hash(texts["cl-dAlpha-0002"]), "The run writes `alpha-two` twice."
-        write_text(os.path.join(tmp, amend_rel), "\n".join([
+        amend_text = "\n".join([
             "# ARCH-tOne-1 deviation 2 — an amendment of a clause", "",
             "**Serves:** deviation ARCH-tOne-1", "",
             f"- **Departs from:** `cl-dAlpha-0002@{pin2}` [chain]",
@@ -4851,7 +4852,9 @@ def test_asbuilt_view(arm) -> None:
             f"- **After:** {after2}", "- **Cause:** builder discovery",
             "- **Reason:** the fixture's amendment", "- **Evidence:** the fixture", "- **Risk:** additive",
             "- **Approver:** author", f"- **Follow-through:** amends cl-dAlpha-0002@{pin2}",
-            "- **Caused-by:** ARCH-tOne-1", ""]))
+            "- **Caused-by:** ARCH-tOne-1", ""])
+        amend_row = f"| dAlpha | `cl-dAlpha-0002` | {after2} | deviation `2026-08-01-build-ARCH-tOne-1-deviation-2` |\n"
+        write_text(os.path.join(tmp, amend_rel), amend_text)
         run("git", "add", "--", amend_rel, cwd=tmp)
         arm("TOOL-dTrueNorth-8 S3 — an amends record staged over a view rendered on zero records is a "
             "build-index input, so --check --staged renders rather than skips", "True",
@@ -4866,11 +4869,42 @@ def test_asbuilt_view(arm) -> None:
         arm("TOOL-dTrueNorth-8 S3 — after --write, the view staged, --check is the fixed point over a view "
             "counting the record and citing it on the amended row", "True",
             lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1]
-                         and " 1 deviation records." in read_text(view)
-                         and f"| dAlpha | `cl-dAlpha-0002` | {after2} | deviation "
-                             "`2026-08-01-build-ARCH-tOne-1-deviation-2` |\n" in read_text(view))(
+                         and " 1 deviation records." in read_text(view) and amend_row in read_text(view))(
                 _read_mode(cmd_check, tmp, conf))))
         run("git", "reset", "-q", "--hard", cwd=tmp)
+        # TOOL-dTrueNorth-17 S3 — the render's code is a view input. A commit lands the same `amends`
+        # record without re-rendering, so HEAD's view counts no record; then an edit of a file under the
+        # kit's directory, the fixture's own beside its root, is staged alone. It is a build-index input,
+        # so `--check --staged` renders and exits 1 with the stale view under DRIFT, and after `--write`,
+        # the view staged, exits 0. TOOL-dTrueNorth-8 S3 stages the record; this stages the renderer.
+        # `check_staged` is main's `--staged` branch with `here` placing the kit under the fixture root.
+        # The reset drops the commit, so the arms below read the tree as it stood.
+        kit_dir, kit_rel = os.path.join(tmp, "pfx", "kit"), "pfx/kit/asbuilt_view.py"
+        write_text(os.path.join(tmp, kit_rel), '"""the render."""\n')
+        write_text(os.path.join(tmp, amend_rel), amend_text)
+        run("git", "add", "--", amend_rel, kit_rel, cwd=tmp)
+        run("git", "commit", "-q", "-m", "a record landed without its render", "--no-verify", cwd=tmp)
+        write_text(os.path.join(tmp, kit_rel), '"""the render, its docstring edited."""\n')
+        run("git", "add", "--", kit_rel, cwd=tmp)
+
+        def check_staged():
+            render, why = check_staged_render(tmp, conf, kit_dir)
+            return (_read_mode(cmd_check, tmp, conf) if render
+                    else (0, f"build-index: render SKIPPED under --staged — {why}"))
+
+        arm("TOOL-dTrueNorth-17 S3 — a kit path staged alone over a committed record the view does not count: "
+            "--check --staged exits 1 listing the stale view under build-index DRIFT", "True",
+            lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
+                f"    {view_rel} (the file differs from its render from line") and "as-built VERDICT" not in r[1])(
+                check_staged())))
+        _read_mode(cmd_write, tmp, conf)
+        run("git", "add", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-17 S3 — after --write, the view staged, the same --check --staged exits 0 over a "
+            "view counting the record and citing it on the amended row", "True",
+            lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1]
+                         and " 1 deviation records." in read_text(view) and amend_row in read_text(view))(
+                check_staged())))
+        run("git", "reset", "-q", "--hard", "HEAD~1", cwd=tmp)
         write_text(os.path.join(tmp, dev_rel), "\n".join([
             "# ARCH-tOne-1 deviation 1 — a departure from a clause with no row", "",
             "**Serves:** deviation ARCH-tOne-1", "",

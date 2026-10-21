@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-17 — the order-3 transition of the as-built view: the render's code is a view input, and the second of units 4 and 6 to land re-renders
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
+**Status:** CLOSED · rev-2 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-17-deviation-16.md](../build/2026-10-21-build-TOOL-dTrueNorth-17-deviation-16.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-17-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-17-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-17-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-17-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

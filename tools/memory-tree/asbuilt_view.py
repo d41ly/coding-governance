@@ -21,15 +21,21 @@ THE INPUTS, each read through the kit's one reader of it:
   - from `DESIGN_RECORD`'s working tree, its first `**Serves:**` line, which the head carries
     verbatim, and its `Baseline:` line, compared with the pin and never rendered from (P0.1 row 5a).
 
-THE RULE (TOOL-dTrueNorth-8), superseding TOOL-dTrueNorth-6's §3 non-goal and §4 Migration sentence
-on the view's bytes. The view's inputs are DESIGN_RECORD at DESIGN_BASELINE and every record the
-instrument's glob names, read as above.
+THE RULE (TOOL-dTrueNorth-8, widened by TOOL-dTrueNorth-17), superseding TOOL-dTrueNorth-6's §3
+non-goal and §4 Migration sentence on the view's bytes. The view's inputs are DESIGN_RECORD at
+DESIGN_BASELINE, every record the instrument's glob names, read as above, and the render's code, which
+renders and compares it: this file, `design_lib.py` and the host calls in `gen_build_index.py`.
 A commit adding or editing a record the glob `*/build/*-deviation-*.md` matches re-renders the view
-in that same commit, and `gen_build_index.py --write` is the one writer that re-renders it: no byte
-of the view is edited by hand. Check 9 holds the rule at the commit: a staged record is a build-index
-input by `check_index_input`, so `--check --staged` renders rather than skips, and lists a view
-stale against its records under `build-index DRIFT`. A `--no-verify` commit skips check 9; the full
-`--check` still reads the view.
+in that same commit, and so does a commit changing the render's code: `gen_build_index.py --write` is
+the one writer that re-renders it, and no byte of the view is edited by hand. Check 9 holds the rule
+at the commit: a staged record is a build-index input by `check_index_input`, and so is a staged path
+under this kit's directory, so `--check --staged` renders rather than skips, and lists a view stale
+against its inputs under `build-index DRIFT`. A `--no-verify` commit skips check 9; the full `--check`
+still reads the view.
+THE TRANSITION (TOOL-dTrueNorth-17). When the records and the render's code land in two passes at one
+order, as TOOL-dTrueNorth-4's records and TOOL-dTrueNorth-6's render did at order 3, the second order-3
+pass to land owns the transition: it runs `gen_build_index.py --write`, stages DESIGN_VIEW in its own
+commit, and is dispatched with DESIGN_VIEW among its `--dispatch --writes` paths.
 
 THE ROW is a record's `**Follow-through:**`, read as the instrument reads it:
   amends <clause id>@<hash8>                      the record's **After:** in the clause's place
