@@ -4771,7 +4771,9 @@ def test_asbuilt_view(arm) -> None:
     the generator's own `--fixture` does, and skip aloud when the tree declares no design. The host case
     is a fixture tree whose design record gives dAlpha two clauses in its `[chain]`, committed as the
     baseline, and whose view sits in a build's `build/` folder, where a staged edit of it is a build-index
-    input: `--write` renders it; a hand edit staged there reds `--check` with the view under DRIFT; a
+    input: `--write` renders it; a hand edit staged there reds `--check` with the view under DRIFT; an
+    `amends` record staged over the view rendered on zero records makes `--check --staged` render and
+    reds it with the view under DRIFT until `--write` re-renders it (TOOL-dTrueNorth-8 S3); a
     record departing from a clause through a `gap` row reds `--check` with an `as-built VERDICT` naming
     it, while `--write` still writes every other artifact; a pin naming no commit is a named Problem;
     and a blank DESIGN_VIEW prints the off line and reads nothing.
@@ -4832,6 +4834,41 @@ def test_asbuilt_view(arm) -> None:
             lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
                 f"    {view_rel} (the file differs from its render from line") and
                 f"    {view_rel} (cl-dAlpha-0001: its text differs from the baseline's and cites no record)" in r[1])(
+                _read_mode(cmd_check, tmp, conf))))
+        run("git", "reset", "-q", "--hard", cwd=tmp)
+        # TOOL-dTrueNorth-8 S3 — the commit that lands a record re-renders the view. HEAD's view is
+        # rendered over zero records; an `amends` record staged beside it is a build-index input, so
+        # `--check --staged` renders rather than skips and lists the stale view under DRIFT. After
+        # `--write`, the view staged, the check is the fixed point over a view counting the record and
+        # citing it on the amended row. The reset leaves the tree as HEAD holds it for the arms below.
+        amend_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-deviation-2.md"
+        pin2, after2 = asbuilt_view.derive_clause_hash(texts["cl-dAlpha-0002"]), "The run writes `alpha-two` twice."
+        write_text(os.path.join(tmp, amend_rel), "\n".join([
+            "# ARCH-tOne-1 deviation 2 — an amendment of a clause", "",
+            "**Serves:** deviation ARCH-tOne-1", "",
+            f"- **Departs from:** `cl-dAlpha-0002@{pin2}` [chain]",
+            "- **Hand-off:** design-to-spec", f"- **Before:** {texts['cl-dAlpha-0002']}",
+            f"- **After:** {after2}", "- **Cause:** builder discovery",
+            "- **Reason:** the fixture's amendment", "- **Evidence:** the fixture", "- **Risk:** additive",
+            "- **Approver:** author", f"- **Follow-through:** amends cl-dAlpha-0002@{pin2}",
+            "- **Caused-by:** ARCH-tOne-1", ""]))
+        run("git", "add", "--", amend_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-8 S3 — an amends record staged over a view rendered on zero records is a "
+            "build-index input, so --check --staged renders rather than skips", "True",
+            lambda: str(check_staged_render(tmp, conf)[0]))
+        arm("TOOL-dTrueNorth-8 S3 — and --check exits 1 listing the stale view under build-index DRIFT, with "
+            "no as-built VERDICT", "True",
+            lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
+                f"    {view_rel} (the file differs from its render from line") and "as-built VERDICT" not in r[1])(
+                _read_mode(cmd_check, tmp, conf))))
+        _read_mode(cmd_write, tmp, conf)
+        run("git", "add", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-8 S3 — after --write, the view staged, --check is the fixed point over a view "
+            "counting the record and citing it on the amended row", "True",
+            lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1]
+                         and " 1 deviation records." in read_text(view)
+                         and f"| dAlpha | `cl-dAlpha-0002` | {after2} | deviation "
+                             "`2026-08-01-build-ARCH-tOne-1-deviation-2` |\n" in read_text(view))(
                 _read_mode(cmd_check, tmp, conf))))
         run("git", "reset", "-q", "--hard", cwd=tmp)
         write_text(os.path.join(tmp, dev_rel), "\n".join([

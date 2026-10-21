@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-8 — the as-built view re-rendered in the commit that changes its inputs, with an owner and a moment
 
-**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** CLOSED · rev-3 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-8-deviation-7.md](../build/2026-10-21-build-TOOL-dTrueNorth-8-deviation-7.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-8-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-8-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-8-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-8-build-brief.md) | journal | — |
 | [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
