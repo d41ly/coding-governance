@@ -33,7 +33,10 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=132
+FLOOR_ASSERTIONS=168
+# RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
+# plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
+# bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
 # RAISED 126 -> 132 at TOOL-aMendedFleet-87, by its six --legs-for `arm` calls: the exact-file
 # guard, the directory guard, the glob guard, the footer, the untracked mark and the refusal.
 # RAISED 119 -> 126 at TOOL-aMendedFleet-75, by its seven covers-join `arm` calls: the dangling id,
@@ -1289,6 +1292,146 @@ arm "legs-for marks an untracked path beside a tracked one and still exits 0" 0 
 ARM_ARGS=(--legs-for nosuchpath)
 arm "legs-for REFUSES a query in which every path is untracked" 2 "$d" "legs-for: REFUSING — no path given is tracked at HEAD: nosuchpath"
 ARM_ARGS=()
+
+# ---- TOOL-dTrueNorth-2: the carries join. Scratch repos whose conf arms SPEC_CARRIES_CUTOFF over a
+#      fixture design of their own: a two-build view (dAlpha, dBeta), a record whose [clause-ids]
+#      section withdraws one id, committed at the fixture's baseline, and a tracked deriver owning
+#      one node. It never reads the bootstrap instrument, so it outlives that instrument's
+#      retirement. Each plant is ONE spec edit, observed red, then restored from a saved copy and
+#      observed green; the stopped arm, which reads history, commits its plant in a repo of its own.
+#      The pins are each text's SHA-256 here, not the checker's, so a wrong hash rule reds the clean arm.
+CCUT=2026-09-02
+CSPEC=memory/builds/dAlpha/spec
+CA1='The checker reads `alpha-one` first.'
+CA2='The run writes `alpha-two` and `alpha-three`.'
+CB1='The beta clause names `beta-one`.'
+CB2='The beta run keeps `beta-two`.'
+derive_carries_pin() { "$PY" -c 'import hashlib,sys; print(hashlib.sha256(sys.argv[1].encode("utf-8")).hexdigest()[:8])' "$1" | tr -d '\r'; }
+HA1=$(derive_carries_pin "$CA1"); HA2=$(derive_carries_pin "$CA2"); HB1=$(derive_carries_pin "$CB1"); HB2=$(derive_carries_pin "$CB2")
+write_carries_spec() {   # $1 dir · $2 build · $3 seq · $4 Status word · rest: body lines
+  local d=$1 b=$2 n=$3 st=$4; shift 4
+  mkdir -p "$d/memory/builds/$b/spec"
+  { printf '# TOOL-%s-%s — a unit\n\n' "$b" "$n"
+    printf '**Status:** %s · rev-1 · %s · node t · Tier-2 · base 0123abcd · streams tooling\n\n' "$st" "$CCUT"
+    printf '%s\n' "$@"; } > "$d/memory/builds/$b/spec/$CCUT-spec-TOOL-$b-$n.md"
+}
+seed_carries_repo() {    # $1 dir — scratch(), the fixture design, two dAlpha specs carrying all of dAlpha
+  local d=$1
+  scratch "$d"
+  mkdir -p "$d/memory/design"
+  printf '# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' > "$d/memory/design/record.md"
+  { printf '# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n'
+    printf '| dAlpha | `cl-dAlpha-0001` | %s | baseline |\n' "$CA1"
+    printf '| dAlpha | `cl-dAlpha-0002` | %s | baseline |\n' "$CA2"
+    printf '| dBeta | `cl-dBeta-0001` | %s | baseline |\n' "$CB1"
+    printf '| dBeta | `cl-dBeta-0002` | %s | baseline |\n' "$CB2"; } > "$d/memory/design/view.md"
+  printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > "$d/memory/design/nodes.py"
+  write_carries_spec "$d" dAlpha 1 OPEN "**Carries:** cl-dAlpha-0001@$HA1 whole" "**Carries:** node:item.alpha-node" "" "$CA1"
+  write_carries_spec "$d" dAlpha 2 OPEN "**Carries:** cl-dAlpha-0002@$HA2 whole" "" "$CA2"
+  git -C "$d" add -A >/dev/null; git -C "$d" commit -qm design --no-verify
+  printf 'SPEC_CARRIES_CUTOFF="%s"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="memory/design/view.md"\nDESIGN_NODES="memory/design/nodes.py"\n' \
+    "$CCUT" "$(git -C "$d" rev-parse HEAD)" > "$d/.memory-tree.conf"
+}
+CLINE="carries join · 2 chain spec(s) measured in 1 build(s), every status but WONTDO, not only live spec(s) · 4 clause(s) · 1 withdrawn · 1 owned node(s) · 0 finding(s), 0 at the Design exit only · SPEC_CARRIES_CUTOFF $CCUT"
+d=$base/carries; seed_carries_repo "$d"
+A1="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md"; A2="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-2.md"
+cp "$A1" "$base/carries-a1"; cp "$A2" "$base/carries-a2"; cp "$d/.memory-tree.conf" "$base/carries-conf"
+check_carries_restored() {   # $1 = the plant just undone: both specs back from their saved copies
+  mkdir -p "${A1%/*}"; cp "$base/carries-a1" "$A1"; cp "$base/carries-a2" "$A2"
+  arm "$1, green once restored" 0 "$d" "$CLINE" "[carries]"
+}
+# AC12, AC14 — the clean set grades both specs, every count derived from the fixture, and no hit.
+arm "the carries join over a clean two-build design is green and its line counts what it measured" 0 "$d" "$CLINE" "[carries]"
+# AC1 — a ghost id.
+printf '\n**Carries:** cl-dAlpha-0099@00000000 whole\n' >> "$A1"
+arm "a carry of an id no clause has REDS as [carries] ghost" 1 "$d" "[carries] \`carries <- ghost:cl-dAlpha-0099\`"
+check_carries_restored "the ghost plant"
+# AC2 — a spec carrying nothing and derived from nothing.
+write_carries_spec "$d" dAlpha 3 OPEN "A spec that carries nothing."
+git -C "$d" add -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "a chain spec carrying nothing and derived from nothing REDS as [carries] unbound" 1 "$d" "[carries] \`carries <- unbound:$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md\`"
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+check_carries_restored "the unbound plant"
+# AC3, AC14 — a pin changed to @deadbeef, compared with the view's hash.
+sed -i "s/@$HA1 whole/@deadbeef whole/" "$A1"
+arm "a pin that is not the view's hash REDS as [carries] stale, naming both hashes" 1 "$d" "[carries] \`carries <- stale:cl-dAlpha-0001\` — pins cl-dAlpha-0001@deadbeef, and the clause's text in the view hashes $HA1"
+# AC16 — the composite row waives that hit; a row keyed on the bare spec path does not.
+printf 'carries <- stale:cl-dAlpha-0001\t[carries] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+arm "a waiver row keyed carries <- stale:<clause> takes the hit and the checker exits 0" 0 "$d" "1 waiver(s)"
+ARM_ARGS=(--list)
+arm "--list reads the waived hit as WAIVED [carries]" 0 "$d" "WAIVED [carries] $CSPEC/$CCUT-spec-TOOL-dAlpha-1.md :: carries <- stale:cl-dAlpha-0001"
+ARM_ARGS=()
+printf '# waivers\n%s\t[path] deliberate, for this arm\n' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" > "$d/memory/project/spec-token-waivers.txt"
+arm "a waiver row keyed on the bare spec path does not take a carries hit" 1 "$d" "[carries] \`carries <- stale:cl-dAlpha-0001\`"
+printf '# waivers\n' > "$d/memory/project/spec-token-waivers.txt"
+# AC15 — blank, the stale pin still planted, grades no carry; a malformed date refuses.
+sed -i 's/^SPEC_CARRIES_CUTOFF=.*$/SPEC_CARRIES_CUTOFF=""/' "$d/.memory-tree.conf"
+arm "a blank SPEC_CARRIES_CUTOFF turns the join off over a planted stale pin, announced" 0 "$d" "carries join · 0 chain spec(s) measured in 0 build(s), every status but WONTDO, not only live spec(s) · 0 clause(s) · 0 withdrawn · 0 owned node(s) · 0 finding(s), 0 at the Design exit only · SPEC_CARRIES_CUTOFF blank (arm off)" "[carries]"
+sed -i 's/^SPEC_CARRIES_CUTOFF=.*$/SPEC_CARRIES_CUTOFF="2026-10-2"/' "$d/.memory-tree.conf"
+arm "a SPEC_CARRIES_CUTOFF that is not an ISO date is REFUSED, never read as off" 1 "$d" "REFUSING — SPEC_CARRIES_CUTOFF 2026-10-2 is not an ISO date"
+cp "$base/carries-conf" "$d/.memory-tree.conf"
+sed -i 's/^DESIGN_VIEW=.*$/DESIGN_VIEW=""/' "$d/.memory-tree.conf"
+arm "the cutoff set and a DESIGN_* key blank is a refusal naming the key" 1 "$d" "REFUSING — the carries join cannot read the design: DESIGN_VIEW is blank"
+cp "$base/carries-conf" "$d/.memory-tree.conf"
+check_carries_restored "the stale plant"
+# AC4 — two whole carriers of one clause; then its two part carriers pinned to two hashes.
+printf '\n**Carries:** cl-dAlpha-0002@%s whole\n' "$HA2" >> "$A1"
+arm "two whole carriers of one clause REDS as [carries] ambiguous" 1 "$d" "[carries] \`carries <- ambiguous:cl-dAlpha-0002\` — carried whole by 2 spec(s)"
+check_carries_restored "the two-whole-carriers plant"
+sed -i "s/@$HA2 whole/@$HA2 part 1\/2/" "$A2"; printf '\n**Carries:** cl-dAlpha-0002@deadbeef part 2/2\n' >> "$A1"
+arm "two part carriers pinning two hashes REDS as [carries] ambiguous, naming both" 1 "$d" "[carries] \`carries <- ambiguous:cl-dAlpha-0002\` — carried whole by 0 spec(s), pinned to 2 hashes"
+check_carries_restored "the two-pins plant"
+# AC11 — a parts gap, a withdrawn id, a malformed line, and a WONTDO second whole carrier.
+sed -i "s/@$HA2 whole/@$HA2 part 1\/3/" "$A2"; printf '\n**Carries:** cl-dAlpha-0002@%s part 3/3\n' "$HA2" >> "$A1"
+arm "parts 1/3 and 3/3 REDS as [carries] parts" 1 "$d" "[carries] \`carries <- parts:cl-dAlpha-0002\` — carried in parts part 1/3, part 3/3, not 1 to 3"
+check_carries_restored "the parts plant"
+printf '\n**Carries:** cl-dAlpha-0009@00000000 whole\n' >> "$A1"
+arm "a carry of an id the record withdraws at the baseline REDS as [carries] withdrawn" 1 "$d" "[carries] \`carries <- withdrawn:cl-dAlpha-0009\`" "ghost:"
+check_carries_restored "the withdrawn plant"
+printf '\n**Carries:** cl-dAlpha-0001 whole\n' >> "$A1"
+arm "a malformed Carries line REDS as [carries] malformed, and never as unbound" 1 "$d" "[carries] \`carries <- malformed:$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md\`" "unbound:"
+check_carries_restored "the malformed plant"
+write_carries_spec "$d" dAlpha 3 WONTDO "**Carries:** cl-dAlpha-0001@$HA1 whole" "" "$CA1"
+git -C "$d" add -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "a WONTDO second whole carrier is set apart: no ambiguous, and the line still measures 2" 0 "$d" "$CLINE" "[carries]"
+sed -i 's/^\*\*Status:\*\* WONTDO/**Status:** OPEN/' "$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "the same second carrier at OPEN REDS as [carries] ambiguous, so the status is what set it apart" 1 "$d" "[carries] \`carries <- ambiguous:cl-dAlpha-0001\`"
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+check_carries_restored "the WONTDO plant"
+# AC6 — a clause's backticked name dropped from its carrier's prose, its binding line left whole.
+sed -i 's/`alpha-one`//' "$A1"
+arm "a clause token in none of its carriers REDS as [carries] token, naming it" 1 "$d" "[carries] \`carries <- token:cl-dAlpha-0001\` — cl-dAlpha-0001's token \`alpha-one\` appears in none of its carriers"
+check_carries_restored "the token plant"
+# AC8 — another build's clause carried with no Moved line naming it here.
+printf '\n**Carries:** cl-dBeta-0001@%s whole\n\n%s\n' "$HB1" "$CB1" >> "$A1"
+arm "another build's clause carried with no Moved line REDS as [carries] crossbuild" 1 "$d" "[carries] \`carries <- crossbuild:cl-dBeta-0001\`"
+# AC9 — the owner build's spec moves it here: green; then the receiving carrier drops its token.
+write_carries_spec "$d" dBeta 1 OPEN "**Moved:** cl-dBeta-0001 to dAlpha by TOOL-dBeta-9" "**Carries:** cl-dBeta-0002@$HB2 whole" "" "$CB2"
+git -C "$d" add -- "memory/builds/dBeta/spec/$CCUT-spec-TOOL-dBeta-1.md"
+arm "the same carry with the owner build's Moved line naming this build is green over two builds" 0 "$d" "carries join · 3 chain spec(s) measured in 2 build(s)" "[carries]"
+sed -i 's/`beta-one`//' "$A1"
+arm "a moved clause's token is read from the RECEIVING build's carrier, and REDS when it lacks it" 1 "$d" "[carries] \`carries <- token:cl-dBeta-0001\` — cl-dBeta-0001's token \`beta-one\` appears in none of its carriers ($CSPEC/"
+git -C "$d" rm -qf -- "memory/builds/dBeta/spec/$CCUT-spec-TOOL-dBeta-1.md"
+check_carries_restored "the crossbuild and moved plants"
+# AC7 — every chain spec untracked: the join measured nothing, and refuses.
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$CSPEC/$CCUT-spec-TOOL-dAlpha-2.md"
+arm "an armed join that measured no chain spec REFUSES, never green on nothing" 1 "$d" "REFUSING — the carries join measured no chain spec at/after SPEC_CARRIES_CUTOFF $CCUT"
+mkdir -p "$d/$CSPEC"; cp "$base/carries-a1" "$A1"; cp "$base/carries-a2" "$A2"; git -C "$d" add -- "$CSPEC"
+check_carries_restored "the unmeasured plant"
+# AC5 — a revision drops a clause, a later one fixes a typo, so the drop sits two commits back. Its
+#       plant is HISTORY, so it is undone by rewinding the scratch branch to the seed commit; the
+#       copies then restore the LF bytes a reset under a global core.autocrlf would not keep.
+d=$base/carries-history; seed_carries_repo "$d"; cseed=$(git -C "$d" rev-parse HEAD)
+A1="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md"; A2="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-2.md"
+cp "$A1" "$base/carries-a1"; cp "$A2" "$base/carries-a2"
+grep -v "^\*\*Carries:\*\* cl-dAlpha-0001@" "$base/carries-a1" > "$A1"
+printf '\n**Carries:** cl-dAlpha-0001@%s whole\n\n%s\n' "$HA1" "$CA1" >> "$A2"
+git -C "$d" commit -qam drop --no-verify
+printf '\nA typo fixed in a later revision.\n' >> "$A1"
+git -C "$d" commit -qam typo --no-verify
+arm "a clause an earlier revision carried and this one does not REDS as [carries] stopped, read two commits back" 1 "$d" "[carries] \`carries <- stopped:cl-dAlpha-0001\`"
+git -C "$d" reset -q --hard "$cseed"
+check_carries_restored "the stopped plant"
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

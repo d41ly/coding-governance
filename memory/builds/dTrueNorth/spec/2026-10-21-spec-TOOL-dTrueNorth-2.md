@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
+**Status:** CLOSED · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 1
 
 **Carries:** cl-dClosedLoop-0002@6acd9ea9 whole
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-2-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-2-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-1 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
 | [2026-10-21-prompt-TOOL-dTrueNorth-2-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-2-build-brief.md) | journal | — |
 | [2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-1-spec-audit.md) | spec-audit | TOOL-dTrueNorth-1 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |

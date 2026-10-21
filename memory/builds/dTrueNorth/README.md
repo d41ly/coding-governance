@@ -88,7 +88,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
 | [TOOL-dTrueNorth-1 — the clause ids and binding lines, parsed once, behind a cutoff](spec/2026-10-21-spec-TOOL-dTrueNorth-1.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-21 |
-| [TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg](spec/2026-10-21-spec-TOOL-dTrueNorth-2.md) | 1 | 2 | OPEN | rev-2 | 2026-10-21 |
+| [TOOL-dTrueNorth-2 — the carries join, a further join of the spec tokens leg](spec/2026-10-21-spec-TOOL-dTrueNorth-2.md) | 1 | 2 | CLOSED | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-3 — the coverage region in each chain build's README, and the INPROGRESS refusal](spec/2026-10-21-spec-TOOL-dTrueNorth-3.md) | 1 | 2 | OPEN | rev-2 | 2026-10-21 |
 | [TOOL-dTrueNorth-11 — the build-index and memory-hygiene self-test legs guard the spec-token checker their arms load](spec/2026-10-21-spec-TOOL-dTrueNorth-11.md) | 2 | 2 | OPEN | rev-3 | 2026-10-21 |
 | [TOOL-dTrueNorth-15 — check 29 counts what it graded on every run, and says so when nothing was](spec/2026-10-21-spec-TOOL-dTrueNorth-15.md) | 2 | 2 | OPEN | rev-2 | 2026-10-21 |
@@ -109,7 +109,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20
 | [TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on](spec/2026-10-21-spec-TOOL-dTrueNorth-7.md) | 8 | 2 | OPEN | rev-2 | 2026-10-21 |
 <!-- /gen:build-units -->
 
-Records: 26 bound to this build, across 4 record folder(s).
+Records: 27 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

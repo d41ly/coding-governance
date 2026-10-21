@@ -66,3 +66,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-21T16:43:30Z brief · item TOOL-dTrueNorth-1 · reason ec958c5aaac2 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-build-brief.md
 
 2026-10-21T17:03:43Z dispatch · item 4325e6a5 TOOL-dTrueNorth-1 · reason memory/map/generated/symbols.json
+
+2026-10-21T17:12:11Z dispatch · item 102352ea TOOL-dTrueNorth-2 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-2.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-2-ledger.md memory/builds/dTrueNorth/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-21T17:12:15Z brief · item TOOL-dTrueNorth-2 · reason ddf031e79608 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-2-build-brief.md

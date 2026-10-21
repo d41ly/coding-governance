@@ -3703,6 +3703,11 @@
       "file": "skills/session-kickoff/manifest-check.test.sh"
     },
     {
+      "id": "check_carries_restored",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "check_carry_forward",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -6466,6 +6471,16 @@
       "id": "derive_carried_by_rung",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_carries_coverage",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "derive_carries_pin",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "derive_carry_map",
@@ -9428,6 +9443,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "load_design_lib",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "load_dossier_texts",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
@@ -11353,6 +11373,11 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
+      "id": "parse_spec_status",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "parse_spec_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -12541,6 +12566,11 @@
       "id": "read_canon_refusal",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_carries_specs",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "read_cell",
@@ -19688,6 +19718,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "scan_carries",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "scan_census_tick",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -20306,6 +20341,11 @@
       "id": "seed_cache_ok",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "seed_carries_repo",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "seed_cf_fixture",
@@ -23476,6 +23516,11 @@
       "id": "write_card",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.test.sh"
+    },
+    {
+      "id": "write_carries_spec",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "write_cf_backlog",
