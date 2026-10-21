@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-11 — the build-index and memory-hygiene self-test legs guard the spec-token checker their arms load
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 2
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -46,6 +48,7 @@ This unit adds the checker's exact path to both guards. It repairs `TOOL-dTrueNo
 ### Edges
 
 - **consumes-from** `TOOL-dTrueNorth-3` — the two arms its §7 declares, which load `check-spec-tokens.py` through `read_carries_coverage`; without them the guard widens over nothing the legs read
+- **hands-off** `TOOL-dTrueNorth-20` — the three guards-join hits S1's guard makes on dPinnedHandoff's live specs, and AC2 observed through `check-spec-tokens.py --legs-for` (the round-2 spec audit's ids 25 and 20)
 
 ## 4. Design
 
@@ -121,6 +124,8 @@ No suite arm lands with this unit: the guard is data the runner reads, and AC1 t
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 28 (HIGH, item H4).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
+  round-2 spec audit, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

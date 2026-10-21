@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-12 — the routed-commits self-test reaches the strip through a resolver and builds its own design in the fixture
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -71,6 +73,7 @@ self-test that copies gov's live design, `TOOL-dTrueNorth-6`'s, is the same clas
 
 - **consumes-from** `TOOL-dTrueNorth-4` — `deviation_join.py`, its fixture, its plants and the host call from `routed_commits.py`'s self-test; without them there is no strip read and no fixture to make hermetic
 - **hands-off** `TOOL-dTrueNorth-16` — `build_design_fixture`, the second instance of which its item for id 42 extracts into a shared factory
+- **hands-off** `TOOL-dTrueNorth-20` — the four `DESIGN_*` keys in `kit.toml`'s `conditional_keys` beside S5's row, which names all four, AC5 observed by a TOML read, `read_gen_region_awk` refusing a missing or empty strip, and the guards-join hit S4 makes on `TOOL-dTrueNorth-7` (the round-2 spec audit's ids 11, 26, 10, 15, 36 and 24)
 
 ## 4. Design
 
@@ -184,6 +187,8 @@ New arm: tools/memory-tree/routed_commits.py (its selftest) · covers AC1 AC3 ·
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 30 (HIGH, item H5).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
+  round-2 spec audit, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0004@c374ccd0 whole
 **Carries:** node:record-kind.deviation
@@ -128,6 +128,8 @@ instrument `deviations.py`'s population and join, and of no other part of it.
 - **hands-off** `TOOL-dTrueNorth-10` — deviation-2 and deviation-3, written in the grammar `read_record` grades (the round-1 spec audit's id 12)
 - **hands-off** `TOOL-dTrueNorth-12` — `deviation_join.py`'s strip read and fixture design, made reachable and hermetic for the shipped self-test (the round-1 spec audit's id 30)
 - **hands-off** `TOOL-dTrueNorth-16` — `read_population`, `read_record` and the fixture's plants, which that unit amends for the round-1 spec audit's ids 5, 20, 21, 46 and 47
+- **hands-off** `TOOL-dTrueNorth-17` — the order-3 transition: if this pass lands after `TOOL-dTrueNorth-6`, it runs `gen_build_index.py --write` and stages `DESIGN_VIEW` over deviation-1 and deviation-4 in its own commit, the view on its `--dispatch --writes` (the round-2 spec audit's id 1)
+- **hands-off** `TOOL-dTrueNorth-18` — `read_record`'s optional `**Supersedes:**` field, which that unit adds to order two amends of one clause (the round-2 spec audit's id 34)
 
 ## 4. Design
 
@@ -496,6 +498,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · `gen_build_index.
 - rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
   promoted against this one, TOOL-dTrueNorth-10, TOOL-dTrueNorth-12 and TOOL-dTrueNorth-16, the
   mirror of its consumes-from; no other section moves.
+- rev-3 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-17 and TOOL-dTrueNorth-18,
+  promoted by the round-2 spec audit, the mirror of their consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

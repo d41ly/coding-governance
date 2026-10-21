@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-15 — check 29 counts what it graded on every run, and says so when nothing was
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 2
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -48,6 +50,7 @@ the owner as an ask. It repairs `TOOL-dTrueNorth-3`.
 ### Edges
 
 - **consumes-from** `TOOL-dTrueNorth-3` — `cmd_check_coverage`, its `--check-coverage` verb and hygiene check 29's delegation; without them there is no check to count for
+- **hands-off** `TOOL-dTrueNorth-20` — the coverage off line's spelling, §4 Evidence's corrected command, and the ask commit's renders and id reconcile (the round-2 spec audit's ids 4, 14, 31 and 43)
 
 ## 4. Design
 
@@ -144,6 +147,8 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC1 AC3 · che
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 41 (HIGH, item H8).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
+  round-2 spec audit, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

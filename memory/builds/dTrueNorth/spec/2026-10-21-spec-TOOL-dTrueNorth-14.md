@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-14 — the audit-pin arm grades a record by the harness that wrote it, so a run in flight is not refused at its merge
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +62,8 @@ grades a record by the harness that wrote it: a record whose adding commit's rev
 
 - **consumes-from** `TOOL-dTrueNorth-5` — `cmd_print_bindings`' `P` and `Q` rows, `SPEC_AUDIT_PIN_CUTOFF`, `renderAuditBinding` and check 21's audit-pin branch; without them there is no arm to exempt a record from
 - **hands-off** `TOOL-dTrueNorth-16` — the `Q` row's four-field shape, which its contract clause for `--print-bindings` and its docs sentence for `memory/HYGIENE.md` must spell
+- **hands-off** `TOOL-dTrueNorth-19` — S1's adding-commit read over one glob pathspec, a failed git call as exit 2, and a missing harness blob graded (the round-2 spec audit's id 38)
+- **hands-off** `TOOL-dTrueNorth-20` — an injectable resolver for the harness, its repo-relative POSIX path, the producer-side pin of `renderAuditBinding`, and one adding-commit and one blob reader (the round-2 spec audit's ids 5, 12, 29, 18 and 19)
 
 ## 4. Design
 
@@ -165,6 +169,8 @@ New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC4 · check 2
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 40 (HIGH, item H7).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-19 and TOOL-dTrueNorth-20,
+  promoted by the round-2 spec audit, the mirror of their consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

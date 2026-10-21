@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-10 — deviation records 2 and 3, written verbatim at kind `deviation`, the view re-rendered in their commit
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +56,7 @@ at MEDIUM, id 2 (item M1), is batched into `TOOL-dTrueNorth-16`.
 - **consumes-from** `TOOL-dTrueNorth-4` — the record grammar `read_record` grades and the kind `deviation` in `RECORD_KIND_TOKENS`; without them check 21 reads both records as malformed
 - **consumes-from** `TOOL-dTrueNorth-6` — the generator whose `--write` re-renders `DESIGN_VIEW` over the new records; without it the instrument would be the view's writer
 - **hands-off** `TOOL-dTrueNorth-16` — the four records in the tree, which its item for id 2 observes and its item for id 33 reads on the view's `cl-dClosedLoop-0002` row
+- **hands-off** `TOOL-dTrueNorth-20` — the decline route for deviation-3's approval carried for the owner's walk (the round-2 spec audit's id 45)
 
 ## 4. Design
 
@@ -187,6 +190,8 @@ No suite arm lands with this unit: the records are data, read by the arms `TOOL-
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 12 (HIGH, item H3).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
+  round-2 spec audit, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

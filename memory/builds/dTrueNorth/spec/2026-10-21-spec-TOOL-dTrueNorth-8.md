@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-8 — the as-built view re-rendered in the commit that changes its inputs, with an owner and a moment
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +64,8 @@ id 33 (item L8), are batched into `TOOL-dTrueNorth-16`.
 ### Edges
 
 - **consumes-from** `TOOL-dTrueNorth-6` — the generator `asbuilt_view.py`, its host `cmd_write` that writes `DESIGN_VIEW`, and `cmd_check`'s drift compare; without them there is no writer to own the re-render and no refusal to hold it
+- **hands-off** `TOOL-dTrueNorth-17` — S1's rule extended to the render's code and the order-3 transition, and S3's arm extended to a staged kit edit (the round-2 spec audit's id 1)
+- **hands-off** `TOOL-dTrueNorth-20` — S1's trigger reworded from the view's whole input predicate, S3's arm given a record taken out, and the chain packets' re-render filed as an ask (the round-2 spec audit's ids 46 and 27)
 
 ## 4. Design
 
@@ -172,6 +176,8 @@ New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC3 · a 
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-17 and TOOL-dTrueNorth-20,
+  promoted by the round-2 spec audit, the mirror of their consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

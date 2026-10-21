@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0006@06ceb3cc whole
 
@@ -88,6 +88,8 @@ the bootstrap instrument `asbuilt.py`.
 - **hands-off** `TOOL-dTrueNorth-8` — `cmd_write` as the owner of the view's re-render in the commit that changes its inputs (the round-1 spec audit's id 1)
 - **hands-off** `TOOL-dTrueNorth-10` — `DESIGN_VIEW` re-rendered over deviation-2 and deviation-3 in their own commit (the round-1 spec audit's id 12)
 - **hands-off** `TOOL-dTrueNorth-16` — `asbuilt_view.py`, `check_view`, `VIEW_HEAD` and the host, which that unit amends for the round-1 spec audit's ids 16, 23, 24, 31, 42, 43, 44 and 46
+- **hands-off** `TOOL-dTrueNorth-17` — the order-3 transition: if this pass lands after `TOOL-dTrueNorth-4`, as the consumes-from above makes usual, it runs `gen_build_index.py --write` and stages `DESIGN_VIEW` in its own commit, the view on its `--dispatch --writes`, and §4 Migration's "the file is not rewritten" does not bind this pass (the round-2 spec audit's id 1)
+- **hands-off** `TOOL-dTrueNorth-18` — S2's row rule for two records naming one clause, which that unit orders by a declared `**Supersedes:**` where their texts differ (the round-2 spec audit's id 34)
 
 ## 4. Design
 
@@ -278,6 +280,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC5 AC8 
 - rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to each unit the round-1 spec audit
   promoted against this one, TOOL-dTrueNorth-8, TOOL-dTrueNorth-10 and TOOL-dTrueNorth-16, the
   mirror of its consumes-from; no other section moves.
+- rev-3 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-17 and TOOL-dTrueNorth-18,
+  promoted by the round-2 spec audit, the mirror of their consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

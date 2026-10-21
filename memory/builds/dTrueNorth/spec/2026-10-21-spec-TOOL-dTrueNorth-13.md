@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-13 — a design-document subject of a spec audit: its id served bare, and no pin owed for it
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +63,7 @@ the record reviewed. It repairs `TOOL-dTrueNorth-5`.
 ### Edges
 
 - **consumes-from** `TOOL-dTrueNorth-5` — the `id` and `rev` subject fields, `renderAuditBinding`, the clean-round binding line and `cmd_print_bindings`' `P` rows; without them there is no pin to exempt a design subject from
+- **hands-off** `TOOL-dTrueNorth-20` — `read_reviewed_paths` reading `Reviewed:` up to the record's first `## ` heading, past S4's twelve-line window (the round-2 spec audit's id 37)
 
 ## 4. Design
 
@@ -185,6 +188,8 @@ New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC4 · a 
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 39 (HIGH, item H6).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
+  round-2 spec audit, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

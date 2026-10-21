@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-7 — the carry-forward of a unit a spec run adds, once, and the starting roster it rests on
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -107,6 +107,7 @@ run carries a unit it added to its own build's next run, once. It is the executi
 - **hands-off** external — dGroundRules' two runs are the first to exercise the spec-run close and the
   build run's refusal of a re-deferred unit (plan:830-833); a disagreement found there is an ask in
   dClosedLoop's `BACKLOG.md`.
+- **hands-off** `TOOL-dTrueNorth-20` — the guards-join hit `TOOL-dTrueNorth-12`'s guard makes on this spec's Files touched, which this unit's CLOSED status ends and that unit observes ended (the round-2 spec audit's id 24)
 
 ## 4. Design
 
@@ -430,6 +431,8 @@ own clean reading is owed with `PLAY-dClosedLoop-11`.
   721-862 and `[deviations]` lines 1208-1295, decision rows `PLAY-dClosedLoop-2` and `-3`, the plan
   reviews' H1, fold-a ids 5 and 7 and fold-b M5, and the driver, library, checker, two templates and
   driver suite read at base `271aa59d`.
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
+  round-2 spec audit, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 

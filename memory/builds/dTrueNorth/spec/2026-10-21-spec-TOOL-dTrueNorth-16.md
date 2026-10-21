@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-16 — the round-1 spec audit's 37 minors: one key rule, one revision reader, one conf read, honest exits and the docs that name them
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 |
 
 <!-- /gen:spec-records -->
 
@@ -246,6 +248,7 @@ unit's pass makes that observation.
 - **consumes-from** `TOOL-dTrueNorth-10` — deviation-2 and deviation-3 in the tree; S1 and S33 observe them
 - **consumes-from** `TOOL-dTrueNorth-12` — `build_design_fixture`, which S19 moves into `design_lib.py` at its second instance
 - **consumes-from** `TOOL-dTrueNorth-14` — the `Q` row's four-field shape, which S28 and S29 spell
+- **hands-off** `TOOL-dTrueNorth-20` — the round-2 spec audit's minors on this spec, ids 2, 3, 4, 6, 7, 9, 16, 23, 28, 30 to 32 and 39 to 43
 
 ## 4. Design
 
@@ -605,6 +608,7 @@ at the close is its targeted probe, run before and after, as `TOOL-dTrueNorth-7`
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, batching the round-1 spec audit's 23 MEDIUM and 14 LOW findings.
+- rev-2 · 2026-10-21 · §3 · Edges gains the hands-off mirroring TOOL-dTrueNorth-20's consumes-from.
 
 ## 10. Reuse audit
 

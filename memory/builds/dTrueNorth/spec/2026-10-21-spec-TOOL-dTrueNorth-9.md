@@ -1,12 +1,14 @@
 # TOOL-dTrueNorth-9 — `_expand_ids` keeps its two-value return for all four callers, and the audit pins come from a sibling reader
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md](../reviews/2026-10-21-review-TOOL-dTrueNorth-8-spec-audit.md) | spec-audit | TOOL-dTrueNorth-8 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 |
 
 <!-- /gen:spec-records -->
 
@@ -58,6 +60,7 @@ defect at MEDIUM, id 27 (item M12), is batched into `TOOL-dTrueNorth-16`.
 ### Edges
 
 - **consumes-from** `TOOL-dTrueNorth-5` — the `pins` key of a `read_bindings` record and its grading in `cmd_print_bindings`; without that unit there is no pin to read and nothing calls this reader
+- **hands-off** `TOOL-dTrueNorth-20` — AC3's three distinct ids, which `read_bindings` yields once that unit folds a repeated id there: this pass keeps `_expand_ids`' list as base returns it and observes AC3's `pins` half, and that unit re-observes the ids and adds the duplicate case to S4's arm (the round-2 spec audit's ids 13 and 35)
 
 ## 4. Design
 
@@ -161,6 +164,8 @@ New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC2 AC3 �
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 11 (HIGH, item H2).
+- rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
+  round-2 spec audit, the mirror of its consumes-from; no other section moves.
 
 ## 10. Reuse audit
 
