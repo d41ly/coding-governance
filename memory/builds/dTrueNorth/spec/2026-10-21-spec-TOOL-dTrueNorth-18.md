@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-18 — two amends of one clause are ordered by a declared supersession, never by path
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -139,25 +139,25 @@ no single head, or a Supersedes outside the set -> finding; the row renders from
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant amends-order` runs, it
+- **AC1** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant amends-order` runs, it
   exits 0, and the clause's rendered row holds `deviation-10`'s `**After:**` and cites it although
   its path sorts first.
   Red when: the later path supplies the row, so the view cites `deviation-9`.
-- **AC2** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant unordered-amends` runs,
+- **AC2** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant unordered-amends` runs,
   it exits 1 with an `unordered amends of` line naming the clause and both records.
   Red when: either record is chosen silently.
-- **AC3** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant same-after` runs, it
+- **AC3** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant same-after` runs, it
   exits 0 citing the later path; and on the tree after the pass,
   `grep -c 'cl-dClosedLoop-0004.*deviation-4' memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md`
   prints 1.
   Red when: a pair whose texts agree is refused, or the view's bytes move for deviation-1 and -4.
-- **AC4** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant supersedes-stray` runs,
+- **AC4** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant supersedes-stray` runs,
   it exits 1 naming the record and the id it names.
   Red when: a field naming a record of another clause is ignored.
-- **AC5** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant malformed-supersedes --policy refuse`
+- **AC5** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant malformed-supersedes --policy refuse`
   runs, it exits 1 naming the file and `**Supersedes:**`.
   Red when: `read_record` accepts a value that is no record stem.
-- **AC6** — When `git grep -n "Supersedes" -- tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/README.md tools/memory-tree/asbuilt_view.py`
+- **AC6** — When `git grep -n "Supersedes" -- tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/README.md "tools/memory-tree/asbuilt_view.py"`
   runs, each file names the field and the head rule.
   Red when: one home still says the later path supplies the row.
 
@@ -192,6 +192,7 @@ New arm: tools/memory-tree/routed_commits.py (its selftest) · covers AC5 · the
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-2 spec audit's id 34 (HIGH, item H2).
+- rev-2 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

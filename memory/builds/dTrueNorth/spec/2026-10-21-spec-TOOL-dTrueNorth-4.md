@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-4 — the deviation record, its population from history, and its join at the commit and at the close
 
-**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0004@c374ccd0 whole
 **Carries:** node:record-kind.deviation
@@ -361,32 +361,32 @@ writes no `deviation` record.
 The plant names are the fixture's; each `refuse` criterion also holds under `report`, where the same
 plant exits 0 and lists its member.
 
-- **AC1** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant pass-revision --policy refuse`
+- **AC1** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant pass-revision --policy refuse`
   runs, it exits 1 and prints the planted unit's `@rev-1` member as recorded by nobody; the plants
   `subject-pass` and `two-branch` exit 1 the same way, and the base alone exits 0.
   Red when: the first pass is read only from a `Pass:` trailer, or a revision counts only when it
   descends from the pass, so a revision merged from another branch is no member.
-- **AC2** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant amended --policy refuse`
+- **AC2** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant amended --policy refuse`
   runs, it exits 1 naming `<unit>@rev-2` from the ledger's `amended rev-3` line, and
   `--plant amended-joined` exits 0.
   Red when: the ledger arm reads `AMENDED` on spec lines, or addresses the member at rev-3.
-- **AC3** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant audit-pin --policy refuse`
+- **AC3** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant audit-pin --policy refuse`
   runs, it exits 1 naming the revision past the pinned `@rev-1`, and `--plant audit-nopin` exits 0
   printing `no audit pin:` with that unit.
   Red when: the pin arm reads no `@rev-N` from the audit record's `**Serves:**`, so the edit after the
   audit is no member.
-- **AC4** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant below-risk --approval by-risk --policy refuse`
+- **AC4** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant below-risk --approval by-risk --policy refuse`
   runs, it exits 1 with a `refused:` line naming the planted `loosening` record approved by `author`
   and the role its risk requires; `--plant owner-cause` (cause `owner ruling`, approver
   `spec writer`) exits 1 the same way; and both plants exit 0 under the default `author-recorded`.
   Red when: the by-risk compare is absent, or `author-recorded` grades the risk too, which would
   undo deviation-1.
-- **AC5** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant status-only --policy refuse`
+- **AC5** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant status-only --policy refuse`
   runs, a post-pass commit changing only the `**Status:**` line exits 0; the plants `header-rev`,
   `gen` and `status-gen` exit 0, and `gen-text` exits 1.
   Red when: the strip is not `GEN_REGION_AWK` read from `lib-unattended.sh`, or a revision is
   addressed by commit count rather than its header `rev-N`.
-- **AC6** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant <case> --policy refuse`
+- **AC6** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant <case> --policy refuse`
   runs for each of the instrument's 26 plants, each exits as this table states, and under
   `--policy report` each exits 0 listing its member.
   Red when: any plant's exit differs from the table.
@@ -396,7 +396,7 @@ plant exits 0 and lists its member.
   |---|---|
   | `baseline` `clause` `subject-pass` `two-branch` `gen-text` `amended` `approver-none` `owner-bare` `owner-er` `owner-row5` `owner-row1-added` `owner-unknown-id` `add` `handback` `audit-pin` | `pass-none` `status-flip` `header-rev` `gen` `status-gen` `quote` `amended-joined` `approver` `defer` `fix-record` `audit-nopin` |
 
-- **AC7** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant malformed-field --policy refuse`
+- **AC7** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant malformed-field --policy refuse`
   runs, a record without `**Caused-by:**` exits 1 naming the file and the field; `malformed-risk`
   (a risk outside the five), `malformed-follow` (an `amends` row with no hash) and `duplicate-n`
   (two records of one build at one `<n>`) each exit 1 naming theirs.
@@ -412,28 +412,28 @@ plant exits 0 and lists its member.
   finds the pointer in `WIRE-INTO-PROJECT.md`, `adopt-memory-tree.sh` and the gotcha file, none of
   which still spells the four-kind list.
   Red when: one copy keeps its own enumeration of the kinds.
-- **AC10** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant record-late --host routed-commits`
+- **AC10** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant record-late --host routed-commits`
   runs, the host's RANGE lines name the planted revision as recorded after its departure at its
   revising commit, its WHOLE lines show the same member joined, and the host exits 0.
   Red when: the arm is not called from `check_routed_commits`, or the commit join asks HEAD's tree
   instead of the departing commit's.
-- **AC11** — When `python3 tools/memory-tree/deviation_join.py` runs on the tree after the pass, it
+- **AC11** — When `python3 "tools/memory-tree/deviation_join.py"` runs on the tree after the pass, it
   prints its summary with a non-zero chain-build spec count and exits 0 under `report`, and
-  `python3 tools/memory-tree/deviation_join.py --host routed-commits` prints the same members under
+  `python3 "tools/memory-tree/deviation_join.py" --host routed-commits` prints the same members under
   the host's `routed-commits: deviation` lines, the host's own verdict lines unchanged from a run of
   the same call with the arm off.
   Red when: the host's exit moves under `report`, or the summary reports zero chain-build specs.
-- **AC12** — When `python3 tools/memory-tree/deviation_join.py` runs in a scratch clone whose
+- **AC12** — When `python3 "tools/memory-tree/deviation_join.py"` runs in a scratch clone whose
   `.memory-tree.conf` blanks `DESIGN_VIEW`, it prints one `off` line naming the key and exits 0, and
-  `python3 tools/memory-tree/deviation_join.py --host routed-commits` there prints the host's
+  `python3 "tools/memory-tree/deviation_join.py" --host routed-commits` there prints the host's
   `deviation join off` line beside an otherwise unchanged summary.
   Red when: the off state reads history or prints a green verdict over nothing measured.
   fixture: the same scratch clone as AC8.
-- **AC13** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant unmeasured` runs,
+- **AC13** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant unmeasured` runs,
   its `DESIGN_BASELINE` naming no commit and no chain-build spec in the fixture, it exits 2 naming
   why, under both policies.
   Red when: nothing measured reads as exit 0.
-- **AC14** — When `python3 tools/memory-tree/deviation_join.py --approval by-risk` runs on the tree,
+- **AC14** — When `python3 "tools/memory-tree/deviation_join.py" --approval by-risk` runs on the tree,
   no `refused:` or malformed line names
   `2026-10-21-build-TOOL-dTrueNorth-4-deviation-1` or `2026-10-21-build-TOOL-dTrueNorth-4-deviation-4`.
   Red when: deviation-1's owner citation names a row that does not name `cl-dClosedLoop-0004`, or
@@ -501,6 +501,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · `gen_build_index.
   mirror of its consumes-from; no other section moves.
 - rev-3 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-17 and TOOL-dTrueNorth-18,
   promoted by the round-2 spec audit, the mirror of their consumes-from; no other section moves.
+- rev-4 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-16 — the round-1 spec audit's 37 minors: one key rule, one revision reader, one conf read, honest exits and the docs that name them
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -55,9 +55,8 @@ item in §2. Where the report merged ids into one item, each id still has its ow
 | L11 | LOW | 37 | S36 |
 | L12 | LOW | 38 | S37 |
 
-That is 23 MEDIUM and 14 LOW findings by raw id. Most land on the code units 1 to 6 build; a few
-restate a criterion of a frozen spec as the observation that criterion should have named, and this
-unit's pass makes that observation.
+That is 23 MEDIUM and 14 LOW by raw id. Most land on units 1 to 6's code; a few restate a frozen
+spec's criterion as the observation it should have named, which this pass makes.
 
 ## 2. Scope (IN)
 
@@ -379,21 +378,17 @@ The three ask rows go under `## Asks` and the three `SEV` rows under `## Disposi
 
 ## 5. Production-readiness checklist
 
-- security — S2 adds a refusal, never a write; S5 refuses a partial key set rather than reading half
-  a design; S18 narrows what a concurrent pass may declare. No new input crosses a trust boundary.
-- perf / scale — S12 makes the revision read two spawns whatever the revision count, where unit 4's
-  port spent two per revision; S17's verb reads what `--check` read before.
-- error / empty / loading states — every off state is one line, every partial state a refusal naming
-  its keys, and each "nothing measured" cause exits 2 on its own (S5, S7, S23).
-- observability — check 30's verdict lines, the SKIP lines of S16, and the refusal of S2 naming both
-  units and the edge.
-- risks — S2 refuses a dispatch the order gate admitted, so a build whose edges and orders disagree
-  stops at the consumer; that is the intent. S17 moves the as-built verdicts out of check 9, so a run
-  that selects check 9 alone no longer sees them; check 30 is in every full run.
-- testing — AC1 to AC38 as probes of the units' code and fixtures; the arms under §7.
-- migration — none: every change is additive or a refusal of a state no tree holds today.
-- user docs — `memory/HYGIENE.md` items 9 and 30, the kit README, the build-README dossier; no page
-  under `help/` covers these engines.
+- security — S2 adds a refusal, never a write; S5 refuses a partial key set; S18 narrows a pass's
+  declarable paths. No new input crosses a trust boundary.
+- perf / scale — S12 reads revisions in two spawns, not two per revision.
+- error / empty / loading states — each off state is one line, a partial state a refusal naming its keys, and
+  each "nothing measured" cause exits 2 (S5, S7, S23).
+- observability — check 30's verdicts, S16's SKIP lines, S2's refusal naming the edge.
+- risks — S2 stops a consumer whose edges and orders disagree; S17 moves the as-built
+  verdicts from check 9 to check 30, which every full run carries.
+- testing — AC1 to AC38 by probe and fixture; the arms under §7.
+- migration — none: all additive.
+- user docs — `memory/HYGIENE.md` items 9 and 30, the kit README, the build-README dossier.
 
 ## 6. Acceptance criteria
 
@@ -415,11 +410,11 @@ Every command runs from the repository root. A scratch clone is under a short `%
 - **AC4** — When the probe hands it the `moved-token` plant, the `token` finding names the receiving
   build's carrier and a token of the moved clause.
   Red when: the plant iterates a string's characters, or the finding is read from the owner's folder.
-- **AC5** — When `python3 tools/memory-tree/deviation_join.py` runs in a scratch clone whose conf blanks
+- **AC5** — When `python3 "tools/memory-tree/deviation_join.py"` runs in a scratch clone whose conf blanks
   all four `DESIGN_*` keys, it prints one off line and exits 0; with `DESIGN_VIEW` alone blank it exits
   2 naming `DESIGN_VIEW`.
   Red when: a partial key set reads as off.
-- **AC6** — When `python3 tools/memory-tree/asbuilt_view.py --check` runs in that clone with all four
+- **AC6** — When `python3 "tools/memory-tree/asbuilt_view.py" --check` runs in that clone with all four
   keys blank, it prints `as-built view: off` and exits 0; with `DESIGN_NODES` alone blank it exits 2
   naming `DESIGN_NODES`.
   Red when: the generator counts three keys, so a blank `DESIGN_NODES` reads as armed.
@@ -450,7 +445,7 @@ Every command runs from the repository root. A scratch clone is under a short `%
   scratch repository, both see the same revision list for each chain spec, and the reader makes two
   git spawns whatever the revision count.
   Red when: the two arms disagree on which revisions a spec has.
-- **AC13** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant subject-trailer --policy refuse`
+- **AC13** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant subject-trailer --policy refuse`
   runs, the commit naming X in its subject and Y in its trailer is the first pass of Y and of no X.
   Red when: the arm credits X, the union rule its docstring does not name.
 - **AC14** — When a scratch clone's conf declares `SPEC_CARRIES_CUTOFF` twice, and separately as
@@ -472,7 +467,7 @@ Every command runs from the repository root. A scratch clone is under a short `%
 - **AC18** — When a probe sources `tools/unattended/lib-unattended.sh` and calls
   `resolve_generated_indexes` with the conf's declared value, its output holds both of S18's pairs.
   Red when: a pass staging the re-rendered view is refused by `--check-commit` as undeclared.
-- **AC19** — When `python3 tools/memory-tree/asbuilt_view.py --fixture` runs in a scratch clone whose conf
+- **AC19** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture` runs in a scratch clone whose conf
   blanks every `DESIGN_*` key and which holds no `DESIGN_RECORD` file, it exits 0, and each plant exits
   as `TOOL-dTrueNorth-6` AC1 to AC5 and AC9 state.
   Red when: the fixture reads the live tree's design record.
@@ -484,15 +479,15 @@ Every command runs from the repository root. A scratch clone is under a short `%
   at `INPROGRESS`, `python3 tools/memory-tree/gen_build_index.py --check-coverage --staged` exits 1;
   staged with nothing the render reads, it prints the held line and exits 0.
   Red when: a staged view row is held.
-- **AC22** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant pipe-after --policy refuse`
-  runs it exits 1 naming the record and `**After:**`, and `python3 tools/memory-tree/asbuilt_view.py --fixture --plant pipe-after`
+- **AC22** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant pipe-after --policy refuse`
+  runs it exits 1 naming the record and `**After:**`, and `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant pipe-after`
   exits 1 with that clause's row rendered from the baseline.
   Red when: the pipe reaches a table cell and splits the row.
-- **AC23** — When `python3 tools/memory-tree/deviation_join.py --fixture --plant unmeasured-pin` and
+- **AC23** — When `python3 "tools/memory-tree/deviation_join.py" --fixture --plant unmeasured-pin` and
   `--plant unmeasured-specs` run under each policy, each exits 2 naming its own reason.
   Red when: either condition alone exits 0 over nothing measured.
 - **AC24** — When `sed -n 1,162p tools/check-spec-tokens.py | grep -nE 'SPEC_CARRIES_CUTOFF|carries join'`
-  runs after the pass it prints at least one line, and over `git show 271aa59d:tools/check-spec-tokens.py`
+  runs after the pass it prints at least one line, and over `git show "271aa59d:tools/check-spec-tokens.py"`
   it prints none.
   Red when: the command finds hits at base, so it cannot fail.
 - **AC25** — When the header is grepped once each for the population phrase, `SPEC_CARRIES_CUTOFF`,
@@ -503,7 +498,7 @@ Every command runs from the repository root. A scratch clone is under a short `%
   names the set key and the stub of S16.
   Red when: item 9 lags item 6, or the out-of-kit join goes unexplained.
 - **AC27** — When a scratch clone edits v2's first `**Serves:**` line and runs
-  `python3 tools/memory-tree/asbuilt_view.py --write --out <scratch>/p.md` beside the instrument's
+  `python3 "tools/memory-tree/asbuilt_view.py" --write --out <scratch>/p.md` beside the instrument's
   `--write --out <scratch>/i.md`, `cmp` exits 0.
   Red when: the product copies v2's line and the instrument holds its literal.
 - **AC28** — When `grep -n 'always exits 0' memory/HYGIENE.md tools/memory-tree/HYGIENE.template.md tools/memory-tree/gen_build_index.py`
@@ -517,13 +512,13 @@ Every command runs from the repository root. A scratch clone is under a short `%
   `carries.py --report dTrueNorth`'s after stripping `memory/builds/dTrueNorth/` and the backticks,
   the two are equal.
   Red when: the comparison still reads two spellings of one path as a difference.
-- **AC31** — When `git grep -n -e 'VIEW_ROW' -e 're.compile' -- tools/memory-tree/asbuilt_view.py` runs,
+- **AC31** — When `git grep -n -e 'VIEW_ROW' -e 're.compile' -- "tools/memory-tree/asbuilt_view.py"` runs,
   `check_view` reads `design_lib.VIEW_ROW` and the module compiles no row grammar of its own.
   Red when: a ported row regex sits beside the import.
-- **AC32** — When `git grep -n -e '-spec-' -- tools/check-spec-tokens.py tools/memory-tree/design_lib.py`
+- **AC32** — When `git grep -n -e '-spec-' -- tools/check-spec-tokens.py "tools/memory-tree/design_lib.py"`
   runs, one compiled date pattern prints, in `design_lib.py`, and the checker's `SPEC_DATE` is bound to it.
   Red when: the date pattern is spelled twice.
-- **AC33** — When `python3 tools/memory-tree/design_lib.py --design --build dTrueNorth` runs after the
+- **AC33** — When `python3 "tools/memory-tree/design_lib.py" --design --build dTrueNorth` runs after the
   records stand, `cl-dClosedLoop-0001`, `-0003`, `-0005` and `-0006` read `baseline`,
   `cl-dClosedLoop-0002` cites deviation-3 and `cl-dClosedLoop-0004` cites deviation-4.
   Red when: any cell differs from the record that amends it.
@@ -540,7 +535,7 @@ Every command runs from the repository root. A scratch clone is under a short `%
 - **AC37** — When `grep -n 'DESIGN_' tools/memory-tree/README.md` runs, the rows for `deviation_join.py`
   and `asbuilt_view.py` say the keys are absent in an adopter, so off.
   Red when: a row still says the keys ship blank.
-- **AC38** — When `python3 tools/memory-tree/deviation_join.py --approval by-risk` runs after the pass,
+- **AC38** — When `python3 "tools/memory-tree/deviation_join.py" --approval by-risk` runs after the pass,
   no `refused:` or malformed line names `2026-10-21-build-TOOL-dTrueNorth-16-deviation-5`, and its
   `**Surface:**` line names the `--dispatch` verb.
   Red when: the widening S2 takes is recorded nowhere, or its record falls outside the grammar.
@@ -560,15 +555,14 @@ at the close is its targeted probe, run before and after, as `TOOL-dTrueNorth-7`
 
 ## 8. Open questions
 
-- **F1 — Which binding line does a unit the spec audit promoted carry?** The carries join of
-  `TOOL-dTrueNorth-2` reds a chain spec carrying nothing and derived from nothing. (a) `**Derived:**`
+- **F1 — Which binding line does a unit the spec audit promoted carry?** Unit 2's join reds an unbound
+  spec. (a) `**Derived:**`
   naming `PLAY-dClosedLoop-2`, the owner's ruling that a run carries the units it adds (ER:320).
   (b) None. (c) A `part k/n` carry of a repaired unit's clause. (b) reds `unbound` and (c) reds
   `parts` against the repaired unit's whole carrier; veto 1 discards both. Recommendation (a).
   Rung 3. RESOLVED (agent, 2026-10-21, delegated): (a). widens: none · relaxes: none
 - **F2 — One batch unit or two?** M4 admits two only when the minors split into disjoint write sets by
-  M6. §4 "Why one unit and not two" shows the candidate halves share contracts both read, which M6's
-  clause 2 refuses. Recommendation one unit. Rung 3. RESOLVED (agent, 2026-10-21, delegated): one.
+  M6. §4 shows the halves share contracts, which M6's clause 2 refuses. Rung 3. RESOLVED (agent, 2026-10-21, delegated): one.
   widens: none · relaxes: none
 - **F3 — Which mechanism closes id 3 without renumbering?** (a) A `--dispatch` refusal of a consumer
   whose producer is not terminal. (b) A `gen_build_index.py --check` Problem for an edge between two
@@ -583,13 +577,12 @@ at the close is its targeted probe, run before and after, as `TOOL-dTrueNorth-7`
 - **F4 — For id 21, the replace rule or the union?** (a) Keep the trailer-replaces-subject rule and
   name it; (b) switch to `routed_commits.py`'s union and record the departure. The instrument's
   `read_first_pass` uses the replace rule, and `TOOL-dTrueNorth-4` AC6's plants are its plants, so (b)
-  moves their verdicts. Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-21, delegated): (a).
+  moves their verdicts. Rung 3. RESOLVED (agent, 2026-10-21, delegated): (a).
   widens: none · relaxes: none
-- **F5 — For id 46, refuse the pipe or escape it?** §4's last rejected alternative says why escaping
-  loses. Recommendation refuse. Rung 3. RESOLVED (agent, 2026-10-21, delegated): refuse.
+- **F5 — For id 46, refuse the pipe or escape it?** §4 says why escaping loses. Rung 3. RESOLVED (agent, 2026-10-21, delegated): refuse.
   widens: none · relaxes: none
 - **F6 — For id 31, a verb of its own or amended consumers?** §4's rejected alternative for S17 says
-  why. Recommendation a verb, delegated from check 30. Rung 3. RESOLVED (agent, 2026-10-21,
+  why. Rung 3. RESOLVED (agent, 2026-10-21,
   delegated): a verb and check 30. widens: none · relaxes: none
 - **F7 — Does the build's grant lift veto 2 for every other carrier edit here?** Each is a change a
   dTrueNorth clause names: the key rule, the revision reader, the conf read and the date pattern are
@@ -603,18 +596,18 @@ at the close is its targeted probe, run before and after, as `TOOL-dTrueNorth-7`
   widens: none · relaxes: none
 - **F8 — For id 25, where does the date pattern live?** (a) `design_lib.py`, inside the kit, the
   checker binding to it; (b) the checker, passed to `scan_chain_specs` as a parameter. Under (b) the
-  kit's other caller, the deviation join, has no pattern to pass. Recommendation (a). Rung 3.
+  kit's other caller, the deviation join, has no pattern to pass. Rung 3.
   RESOLVED (agent, 2026-10-21, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, batching the round-1 spec audit's 23 MEDIUM and 14 LOW findings.
 - rev-2 · 2026-10-21 · §3 · Edges gains the hands-off mirroring TOOL-dTrueNorth-20's consumes-from.
+- rev-3 · 2026-10-21 · §5 §6 §8 §10 · criteria name this build's new modules quoted or bare, so the spec-tokens paths join stops refusing `--dispatch` before they exist; §5, §8 and §10 tightened under the 49152-byte ceiling. No observation moves.
 
 ## 10. Reuse audit
 
-Every item extends a seam the units already build, read in their specs and verified against base
-where it exists: `design_lib.py`'s readers (unit 1), the carries join (unit 2), the coverage read and
+Every item extends a seam the units build: `design_lib.py`'s readers (unit 1), the carries join (unit 2), the coverage read and
 check 29 (unit 3), `deviation_join.py` (unit 4), `cmd_print_bindings` (unit 5), the as-built
 generator and its host (unit 6). At base the seams cited are `read_blobs_at_rev`
 (`tools/memory-tree/gen_build_index.py:2934`), `read_landed_unclosed`'s injectable resolver (`:1678`),

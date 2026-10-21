@@ -24,9 +24,13 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 - A Tier-2 unit that closes owes its acceptance ledger in a `journal` record (`memory/HYGIENE.md`, "Acceptance
   ledger"): `memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-12-ledger.md`, one line per AC with the
   probe you ran and what it printed. Commit it with the pass.
-- If yours is the first unit of this build to change a kit's shipped bytes, bump that kit's version in its
-  `kit.toml` and its version marker lines, as `python tools/govkit/govkit.py epoch --base 271aa59defcb695133a50a49dc07650f9058a930`
-  would demand. A later unit touching the same kit does not bump again.
+- Bump no kit version: the lander mints versions at landing (`govkit.py mint`, TOOL-aMendedFleet-65 S6), and a
+  branch owes none.
+- A commit staging a file on the kickoff manifest's `watch:` list (`memory/guides/SESSION-KICKOFF.md`, its
+  `manifest-audit` block; `.memory-tree.conf` and `tools/memory-tree/check-memory-hygiene.sh` are on it) is refused
+  by the pre-commit hook until that manifest's `last-audit` stamp is re-stamped in the same commit, with the delta
+  line the manifest's stamp rule asks for in the commit message. Put the manifest in your write set when you touch one.
+- Do not regenerate the codebase map; the main loop runs the declared regenerations once, at the close.
 - Run no gate leg, no `*.test.sh` suite, no merge bar. Verify each AC by the probe or fixture the spec names. A new
   suite arm goes in the suite file and on a `New arm:` line; the main loop observes it red and green at the close.
 

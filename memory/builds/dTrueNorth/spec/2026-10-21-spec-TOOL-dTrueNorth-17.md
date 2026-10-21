@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-17 — the order-3 transition of the as-built view: the render's code is a view input, and the second of units 4 and 6 to land re-renders
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 5
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -119,7 +119,7 @@ generator exists the instrument's view is not compared, so those commits are not
 ## 6. Acceptance criteria
 
 - **AC1** — When a probe walks `git rev-list 271aa59d..HEAD` and, for each commit whose tree holds
-  `tools/memory-tree/asbuilt_view.py` and whose diff touches `memory/builds/*/build/*-deviation-*.md`
+  tools/memory-tree/asbuilt_view.py and whose diff touches `memory/builds/*/build/*-deviation-*.md`
   or `tools/memory-tree/`, compares `git show <c>:memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md`'s
   `<n> deviation records` with the count `git ls-tree -r --name-only <c> -- memory/builds` gives for
   `/build/*-deviation-*.md`, every pair is equal.
@@ -129,13 +129,13 @@ generator exists the instrument's view is not compared, so those commits are not
   runs, the row of whichever of the two landed second names the view's path among its writes.
   Red when: the pass that re-rendered the view staged a path its dispatch never declared.
 - **AC3** — When a probe in a scratch clone under `%TEMP%` commits one `amends` record without
-  re-rendering the view, then stages only an edit of `tools/memory-tree/asbuilt_view.py`'s docstring
+  re-rendering the view, then stages only an edit of tools/memory-tree/asbuilt_view.py's docstring
   and runs `python3 tools/memory-tree/gen_build_index.py --check --staged`, it exits 1 with the view's
   path under `build-index DRIFT`; after `python3 tools/memory-tree/gen_build_index.py --write` and
   staging the view, the same command exits 0.
   Red when: a staged kit edit alone skips the view's render.
   fixture: a scratch clone under a short `%TEMP%` path, with no hook installed; the tree holds none.
-- **AC4** — When `git grep -n -e "render" -- tools/memory-tree/asbuilt_view.py tools/memory-tree/README.md`
+- **AC4** — When `git grep -n -e "render" -- "tools/memory-tree/asbuilt_view.py" tools/memory-tree/README.md`
   runs, both homes name the render's code among the view's inputs and the second order-3 pass as the
   owner of the transition.
   Red when: either home still names only the records and the design as inputs.
@@ -168,6 +168,7 @@ New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC3 · a 
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-2 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

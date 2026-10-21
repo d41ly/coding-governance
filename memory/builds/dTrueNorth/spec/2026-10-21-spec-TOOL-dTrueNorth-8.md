@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-8 — the as-built view re-rendered in the commit that changes its inputs, with an owner and a moment
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -130,7 +130,7 @@ id 33 (item L8), are batched into `TOOL-dTrueNorth-16`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python3 tools/memory-tree/asbuilt_view.py --check` and
+- **AC1** — When `python3 "tools/memory-tree/asbuilt_view.py" --check` and
   `python3 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py --check`
   run on the tree after the pass, both exit 0 against the one view file.
   Red when: the pass does not stage the re-rendered view, so its head still counts no record and
@@ -147,7 +147,7 @@ id 33 (item L8), are batched into `TOOL-dTrueNorth-16`.
   `python3 tools/memory-tree/gen_build_index.py --write` and staging the view, the same command exits 0.
   Red when: a staged record skips the render, or `--write` leaves the view unchanged.
   fixture: a scratch clone under a short `%TEMP%` path; the tree holds none today.
-- **AC4** — When `git grep -n -e "re-render" -- tools/memory-tree/README.md tools/memory-tree/asbuilt_view.py`
+- **AC4** — When `git grep -n -e "re-render" -- tools/memory-tree/README.md "tools/memory-tree/asbuilt_view.py"`
   runs, it prints the rule of S1 in both homes, naming the record glob and `--write`.
   Red when: either home still says the view is never rewritten.
 
@@ -179,6 +179,7 @@ New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC3 · a 
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 1 (HIGH, item H1).
 - rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-17 and TOOL-dTrueNorth-20,
   promoted by the round-2 spec audit, the mirror of their consumes-from; no other section moves.
+- rev-3 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

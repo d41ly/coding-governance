@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-20 — the round-2 spec audit's 38 minors: declared keys, honest exits, bounded reads, one reader each, and the records that name them
 
-**Status:** OPEN · rev-1 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
+**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 7
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -399,7 +399,7 @@ Every command runs from the repository root. A scratch clone or fixture reposito
   checker's `SPEC_DATE is design_lib.SPEC_FILE_DATE`, and an `ast` walk of `asbuilt_view.py` finds no
   `re.compile`, `re.match`, `re.search` or `re.fullmatch` call on a string literal.
   Red when: a second row grammar or date pattern compiles.
-- **AC22** — When `git grep -n -F '[0-9]{2})-spec-' -- tools/check-spec-tokens.py tools/memory-tree/design_lib.py`
+- **AC22** — When `git grep -n -F '[0-9]{2})-spec-' -- tools/check-spec-tokens.py "tools/memory-tree/design_lib.py"`
   runs, it prints one line, in `design_lib.py`.
   Red when: the pattern is spelled in both files.
 - **AC23** — When `grep -c 'Blank: this project adds no generator of its own' .unattended.conf` runs it
@@ -439,11 +439,11 @@ Every command runs from the repository root. A scratch clone or fixture reposito
 - **AC33** — When `git grep -n 'decline' -- tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md`
   runs, both name the ask and the superseding record.
   Red when: a declined approval has no route.
-- **AC34** — When `git grep -n 'moved or taken out' -- tools/memory-tree/README.md tools/memory-tree/asbuilt_view.py`
+- **AC34** — When `git grep -n 'moved or taken out' -- tools/memory-tree/README.md "tools/memory-tree/asbuilt_view.py"`
   prints both homes, and a scratch clone staging `git rm` of a record makes
   `python3 tools/memory-tree/gen_build_index.py --check --staged` exit 1 until `--write`.
   Red when: the rule names only adds and edits.
-- **AC35** — When `python3 tools/memory-tree/deviation_join.py --approval by-risk` runs after this pass,
+- **AC35** — When `python3 "tools/memory-tree/deviation_join.py" --approval by-risk` runs after this pass,
   no `refused:` or malformed line names `2026-10-21-build-TOOL-dTrueNorth-20-deviation-6`.
   Red when: S6's widening is recorded nowhere, or its record falls outside the grammar.
 
@@ -507,6 +507,7 @@ at the close is its targeted probe, as `TOOL-dTrueNorth-16` §7 states for its o
 ## 9. Revision log
 
 - rev-1 · 2026-10-21 · initial draft, batching the round-2 spec audit's 21 MEDIUM and 17 LOW findings.
+- rev-2 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

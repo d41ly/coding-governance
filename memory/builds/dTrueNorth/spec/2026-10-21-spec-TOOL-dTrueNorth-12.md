@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-12 — the routed-commits self-test reaches the strip through a resolver and builds its own design in the fixture
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -141,7 +141,7 @@ in a later commit; the baseline plant moves the record's `Baseline:` line.
 
 - **AC1** — When a probe copies `tools/lib/` and `tools/memory-tree/` into a scratch git repository
   under `%TEMP%` that holds no unattended kit and runs
-  `python3 <scratch>/tools/memory-tree/deviation_join.py --fixture --plant status-only --policy refuse`,
+  `python3 <scratch>/"tools/memory-tree/deviation_join.py" --fixture --plant status-only --policy refuse`,
   it prints the `deviation: SKIP` line naming the unattended kit and the held plants and exits 0, and
   `--fixture --plant pass-revision --policy refuse` there still exits 1.
   Red when: the fixture raises, or reds, when the kit is absent.
@@ -150,12 +150,12 @@ in a later commit; the baseline plant moves the record's `Baseline:` line.
   the bytes `sed -n "s/^GEN_REGION_AWK='\(.*\)'$/\1/p" tools/unattended/lib-unattended.sh` prints, and
   with `resolve` a stub raising `LookupError` it raises `LookupError` naming the kit.
   Red when: the value comes from a literal in the module.
-- **AC3** — When `python3 tools/memory-tree/deviation_join.py --fixture` runs in a scratch clone whose
+- **AC3** — When `python3 "tools/memory-tree/deviation_join.py" --fixture` runs in a scratch clone whose
   `.memory-tree.conf` blanks every `DESIGN_*` key and which holds no `DESIGN_RECORD` file, it exits 0,
   and each plant of `TOOL-dTrueNorth-4` AC6 exits as that table states.
   Red when: the fixture reads the live tree's design record or view.
   fixture: a scratch clone under a short `%TEMP%` path.
-- **AC4** — When `python3 -c "import json; print([l['guard'] for l in json.load(open('tools/gate-legs.json')) if l['name'] == 'routed-commits selftest'])"`
+- **AC4** — When `python3 -c "import json; print([l['guard'] for l in json.load(open( 'tools/gate-legs.json' )) if l['name'] == 'routed-commits selftest'])"`
   runs, the list holds the library's pathspec, the `{prefix}` token resolving so that it names
   `tools/unattended/lib-unattended.sh`.
   Red when: a commit touching only the library would skip the leg.
@@ -190,6 +190,7 @@ New arm: tools/memory-tree/routed_commits.py (its selftest) · covers AC1 AC3 ·
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 30 (HIGH, item H5).
 - rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
   round-2 spec audit, the mirror of its consumes-from; no other section moves.
+- rev-3 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

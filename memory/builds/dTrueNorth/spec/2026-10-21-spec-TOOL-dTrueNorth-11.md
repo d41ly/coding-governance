@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-11 — the build-index and memory-hygiene self-test legs guard the spec-token checker their arms load
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 2
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -88,7 +88,7 @@ This unit adds the checker's exact path to both guards. It repairs `TOOL-dTrueNo
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python3 -c "import json; print([l['guard'] for l in json.load(open('tools/gate-legs.json')) if l['name'] in ('build-index selftest', 'memory-hygiene self-test')])"`
+- **AC1** — When `python3 -c "import json; print([l['guard'] for l in json.load(open( 'tools/gate-legs.json' )) if l['name'] in ('build-index selftest', 'memory-hygiene self-test')])"`
   runs, both lists end with the checker's pathspec, the `{prefix}` token joined to the file name
   `check-spec-tokens.py`, which resolves to `tools/check-spec-tokens.py`.
   Red when: either leg's guard lacks the path.
@@ -127,6 +127,7 @@ No suite arm lands with this unit: the guard is data the runner reads, and AC1 t
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 28 (HIGH, item H4).
 - rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
   round-2 spec audit, the mirror of its consumes-from; no other section moves.
+- rev-3 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

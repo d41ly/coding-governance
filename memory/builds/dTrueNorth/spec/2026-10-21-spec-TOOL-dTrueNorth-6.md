@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-6 — the as-built view, generated from the baseline and the deviation records, and its gate
 
-**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
+**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0006@06ceb3cc whole
 
@@ -194,25 +194,25 @@ constant fall in no declared cell.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant hand-edit` runs, it
+- **AC1** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant hand-edit` runs, it
   exits 1 naming the first line where the edited body differs from its render, and
-  `python3 tools/memory-tree/asbuilt_view.py --fixture` with no plant exits 0.
+  `python3 "tools/memory-tree/asbuilt_view.py" --fixture` with no plant exits 0.
   Red when: `--check` compares row counts or rows only, so an edit inside a row's text passes.
-- **AC2** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant no-row` runs, it exits
+- **AC2** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant no-row` runs, it exits
   1 naming the record that departs from a clause and carries no `amends` or `supersedes` row.
   Red when: a record with a non-row `**Follow-through:**` departing from a clause is skipped silently.
-- **AC3** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant no-citation` runs, its
+- **AC3** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant no-citation` runs, its
   body citing `baseline` on an amended row, it exits 1 naming that clause as changed with no citation.
   Red when: the citation arm reads the render rather than the committed body.
-- **AC4** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant baseline` runs, with
+- **AC4** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant baseline` runs, with
   `cl-dClosedLoop-0119` loosened and the record's `Baseline:` re-pointed past it, it exits 1 with the
   moved-baseline finding, and the rendered row of `cl-dClosedLoop-0119` holds the pin's text.
   Red when: the view renders from the working tree's `Baseline:` line.
-- **AC5** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant pin-mismatch` runs, an
+- **AC5** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant pin-mismatch` runs, an
   `amends` record pinning a hash the clause did not carry at the baseline, it exits 1 naming the
   record, the pinned hash and the baseline's.
   Red when: the pinned hash is not compared with the clause's hash at the pin.
-- **AC6** — When `python3 tools/memory-tree/asbuilt_view.py --write --out <scratch>/product.md` and
+- **AC6** — When `python3 "tools/memory-tree/asbuilt_view.py" --write --out <scratch>/product.md` and
   `python3 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py --write --out <scratch>/instrument.md`
   run on the tree, `cmp <scratch>/product.md <scratch>/instrument.md` exits 0.
   Red when: one byte of the head, a row or the trailing newline differs.
@@ -230,17 +230,17 @@ constant fall in no declared cell.
   other artifact.
   Red when: the host is not called from `cmd_check`, or a view verdict stops `cmd_write` early.
   fixture: the scratch clone of AC7.
-- **AC9** — When `python3 tools/memory-tree/asbuilt_view.py --fixture --plant amends-reader` runs, it
+- **AC9** — When `python3 "tools/memory-tree/asbuilt_view.py" --fixture --plant amends-reader` runs, it
   prints the hash `read_design_view` returns for the amended clause, equal to
   `derive_clause_hash` of the record's `**After:**`, and the since cell `deviation` with the record's id.
   Red when: the rendered row and the reader disagree on the clause's text or its citation.
-- **AC10** — When `python3 tools/memory-tree/asbuilt_view.py --check` runs in a scratch clone whose
+- **AC10** — When `python3 "tools/memory-tree/asbuilt_view.py" --check` runs in a scratch clone whose
   `.memory-tree.conf` blanks `DESIGN_VIEW`, it prints `as-built view: off` naming the key and exits
   0, and `python3 tools/memory-tree/gen_build_index.py --check` there prints the same off line and
   its other output unchanged.
   Red when: the off state reads the design record or reports a clean view over nothing rendered.
   fixture: the scratch clone of AC7.
-- **AC11** — When `python3 tools/memory-tree/asbuilt_view.py --check` and
+- **AC11** — When `python3 "tools/memory-tree/asbuilt_view.py" --check` and
   `python3 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py --check`
   run on the tree after the pass, both exit 0 against the one `DESIGN_VIEW` file.
   Red when: the file holds bytes only one of the two renders.
@@ -283,6 +283,7 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 AC3 AC4 AC5 AC8 
   mirror of its consumes-from; no other section moves.
 - rev-3 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-17 and TOOL-dTrueNorth-18,
   promoted by the round-2 spec audit, the mirror of their consumes-from; no other section moves.
+- rev-4 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 

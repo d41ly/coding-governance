@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-10 — deviation records 2 and 3, written verbatim at kind `deviation`, the view re-rendered in their commit
 
-**Status:** OPEN · rev-2 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
+**Status:** OPEN · rev-3 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -153,7 +153,7 @@ at MEDIUM, id 2 (item M1), is batched into `TOOL-dTrueNorth-16`.
   it lists deviation-1, deviation-2, deviation-3 and deviation-4.
   Red when: either record of S1 or S2 is absent from the pass's commit.
   figure: four is DERIVED from `TOOL-dTrueNorth-4` S10 and this unit.
-- **AC2** — When `python3 tools/memory-tree/deviation_join.py --approval by-risk` runs on the tree,
+- **AC2** — When `python3 "tools/memory-tree/deviation_join.py" --approval by-risk` runs on the tree,
   no `refused:` or malformed line names `2026-10-21-build-TOOL-dTrueNorth-7-deviation-2` or
   `2026-10-21-build-TOOL-dTrueNorth-2-deviation-3`, and `python3 tools/memory-tree/gen_build_index.py --print-bindings`
   prints no `A` row for either.
@@ -161,9 +161,9 @@ at MEDIUM, id 2 (item M1), is batched into `TOOL-dTrueNorth-16`.
   `TOOL-dTrueNorth-7`, or a record's kind is not `deviation`.
 - **AC3** — When `grep -n 'cl-dClosedLoop-0002' memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md`
   runs after the pass, the row's last cell cites `2026-10-21-build-TOOL-dTrueNorth-2-deviation-3`, and
-  `python3 tools/memory-tree/asbuilt_view.py --check` exits 0.
+  `python3 "tools/memory-tree/asbuilt_view.py" --check` exits 0.
   Red when: the commit lands the records without re-rendering the view, so the row reads `baseline`.
-- **AC4** — When `python3 tools/memory-tree/design_lib.py --design --build dTrueNorth` runs after the
+- **AC4** — When `python3 "tools/memory-tree/design_lib.py" --design --build dTrueNorth` runs after the
   pass, `cl-dClosedLoop-0002` reads hash `6acd9ea9` with its since cell citing deviation-3.
   Red when: deviation-3's `**After:**` differs by one byte from the clause's text, so the view moves
   the hash and every carrier's pin reads stale.
@@ -193,6 +193,7 @@ No suite arm lands with this unit: the records are data, read by the arms `TOOL-
 - rev-1 · 2026-10-21 · initial draft, promoted from the round-1 spec audit's id 12 (HIGH, item H3).
 - rev-2 · 2026-10-21 · §3 · the Edges block gains a hands-off to TOOL-dTrueNorth-20, promoted by the
   round-2 spec audit, the mirror of its consumes-from; no other section moves.
+- rev-3 · 2026-10-21 · §6 · the acceptance criteria name the modules this build creates (`deviation_join.py`, `asbuilt_view.py`, `design_lib.py`) quoted or bare, and a `git show`/`json.load` argument quoted, so the spec-tokens paths join, which reads the live tree at every `--dispatch`, stops refusing every unit before those modules exist. No criterion's observation moves.
 
 ## 10. Reuse audit
 
