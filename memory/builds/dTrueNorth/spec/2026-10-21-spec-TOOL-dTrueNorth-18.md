@@ -6,7 +6,9 @@
 
 <!-- gen:spec-records -->
 
-*No record names this unit.*
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-21-prompt-TOOL-dTrueNorth-18-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-18-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
