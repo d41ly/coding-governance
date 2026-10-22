@@ -51,8 +51,13 @@ Usage (from the worktree root):
       the renderer's input while the arms read the sources whole); hand-edit; pin (carries.py's blob moved by a
       one-byte edit, the packet made stale by a new `[owed]` line and re-rendered keeping its pins; the controls
       drop the pin arm, or re-pin on write); run-live and run-landed (a chain build's `RUN.md` at a live and at a
-      terminal phase, read by the guard --repin and a first render share)
-A first render and --repin refuse inside a chain run: a chain build's `RUN.md` whose phase is not terminal.
+      terminal phase, read by the guard --repin and a first render share); run-pushed, run-unpushed and run-dirty (a
+      `RUN.md` at LANDING in a scratch clone of a scratch remote, its close commit pushed to the default branch,
+      committed and never pushed, or pushed and then edited, read by the guard's real LANDED derivation)
+A first render and --repin refuse inside a chain run: a chain build's `RUN.md` whose phase is not terminal. A LANDING
+record counts as terminal when the guard derives it LANDED as `unattended.sh --landed` does under an in-place landing,
+which writes LANDED nowhere: committed as it stands, its close commit on the default branch the remote advertises
+(PLAY-dClosedLoop-26).
 `render_packet(slug)` returns the path and the text --write would write; the opening imports it.
 Exit 0 green, 1 on a finding or a refusal, 2 when there is nothing to check.
 
@@ -74,6 +79,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 from pathlib import Path
 
 sys.dont_write_bytecode = True
@@ -97,7 +103,8 @@ ROW = re.compile(r"^\| (d[A-Z]\w+) \| ([^|]+) \| ([^|]+) \| (.+) \| ([^|]+) \|$"
 STANDIN = r"stand(s|ing)?[- ]in|until {o}|before {o}|{o}'s [\w-]+ (lands|land)"     # the probe's pattern
 PIN = re.compile(r"^- instrument: `([^`]+)` blob `([0-9a-f]{40,64})`$", re.M)
 AT = re.compile(r"^- rendered at: `([0-9a-f]{40,64})`$", re.M)
-PLANTS = ("clause", "gap", "parent", "owed", "roster", "ask", "hand-edit", "pin", "run-live", "run-landed")
+PLANTS = ("clause", "gap", "parent", "owed", "roster", "ask", "hand-edit", "pin", "run-live", "run-landed",
+          "run-pushed", "run-unpushed", "run-dirty")
 CONTROLS = ("no-pin-arm", "repin")
 UTF8 = dict(os.environ, PYTHONIOENCODING="utf-8")
 
@@ -492,16 +499,90 @@ def check_text(text, rerendered, src, blob_of, pin_arm=True):
     return findings + arms + moved, summary
 
 
-def scan_live_run(chain, read):
-    """Each chain build's RUN.md whose phase is not terminal: a chain run in this tree."""
+def run_git_in(root, *args, timeout=None):
+    """(exit code, stdout) of git in `root`; a timeout reads as exit 124, an unanswered observation."""
+    try:
+        done = subprocess.run(["git", *args], cwd=root, capture_output=True, text=True, encoding="utf-8",
+                              timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return 124, ""
+    return done.returncode, done.stdout
+
+
+def read_landed_derivation(path, root="."):
+    """(True, why) when the run record at `path` is an in-place landing's terminal, else (False, why). It is the
+    derivation `unattended.sh --landed` prints under in-place, `read_derived_phase` (`unattended.sh:1440`) over
+    `read_landing_commit` (`lib-unattended.sh:1688`): the record reads LANDING, is committed as it stands, and the
+    commit that last wrote it, the run's close commit, is an ancestor of the default branch the first remote
+    advertises. Stricter in one place: a working-tree change of any kind refuses, where the driver admits a
+    lease-only diff. An unanswered remote, or an advertised tip this clone lacks, is no derivation."""
+    if run_git_in(root, "diff", "--quiet", "HEAD", "--", path)[0]:
+        return False, "the LANDING record is not committed as it stands, so no commit carries it to any remote"
+    rc, landing = run_git_in(root, "log", "-1", "--format=%H", "HEAD", "--", path)
+    landing = landing.strip()
+    if rc or not landing:
+        return False, "no commit at HEAD carries the LANDING record"
+    remote = (run_git_in(root, "remote")[1].split() or [""])[0]
+    if not remote:
+        return False, "this clone declares no remote to observe"
+    rc, adv = run_git_in(root, "ls-remote", "--symref", "--exit-code", remote, "HEAD", timeout=60)
+    rows = [ln.split("\t") for ln in adv.split("\n") if ln.endswith("\tHEAD")]
+    ref = next((r[0][5:] for r in rows if r[0].startswith("ref: ")), "")
+    tip = next((r[0] for r in rows if re.match(r"^[0-9a-f]{40,64}$", r[0])), "")
+    if rc or not ref or not tip:
+        return False, f"the remote {remote} advertised no default branch (exit {rc}), so the tip is unknown"
+    if run_git_in(root, "cat-file", "-e", f"{tip}^{{commit}}")[0]:
+        return False, f"the advertised tip {tip[:8]} of {ref} is not in this clone, an unanswered observation"
+    if run_git_in(root, "merge-base", "--is-ancestor", landing, tip)[0]:
+        return False, f"its landing commit {landing[:8]} is not on {ref} at {tip[:8]}"
+    return True, f"derived LANDED: {landing[:8]} on {ref} at {tip[:8]}"
+
+
+def scan_live_run(chain, read, landed=read_landed_derivation):
+    """Each chain build's RUN.md whose phase is not terminal: a chain run in this tree. A LANDING record is terminal
+    when `landed` derives it LANDED, as `unattended.sh --landed` does under in-place, where no verb ever writes
+    LANDED into the record the push carried."""
     live = []
     for b in chain:
-        text = read(f"memory/builds/{b}/RUN.md")
+        path = f"memory/builds/{b}/RUN.md"
+        text = read(path)
         if text is not None:
             phases = re.findall(r"^phase: (\S+)", text, re.M)
-            if not phases or phases[-1] not in TERMINAL:
-                live.append(f"memory/builds/{b}/RUN.md (phase {phases[-1] if phases else 'unreadable'})")
+            if phases and phases[-1] == "LANDING":
+                derived, why = landed(path)
+                live += [] if derived else [f"{path} (phase LANDING: {why})"]
+            elif not phases or phases[-1] not in TERMINAL:
+                live.append(f"{path} (phase {phases[-1] if phases else 'unreadable'})")
     return live
+
+
+def run_landing_fixture(slug, plant):
+    """A LANDING record in a scratch clone of a scratch remote, read by the real derivation: its close commit pushed
+    to the default branch (run-pushed), committed after the pushed tip and never pushed (run-unpushed), or pushed and
+    then edited in the working tree (run-dirty)."""
+    path = f"memory/builds/{slug}/RUN.md"
+    who = ("-c", "user.name=fixture", "-c", "user.email=fixture@example.invalid")
+    with tempfile.TemporaryDirectory(prefix="packet-landing-", ignore_cleanup_errors=True) as tmp:
+        origin, clone = str(Path(tmp, "origin.git")), str(Path(tmp, "clone"))
+        steps = [(tmp, ("init", "-q", "--bare", origin)), (tmp, ("clone", "-q", origin, clone)),
+                 (clone, (*who, "commit", "-q", "--allow-empty", "-m", "base")),
+                 (clone, ("push", "-q", "origin", "HEAD:refs/heads/main")),
+                 (origin, ("symbolic-ref", "HEAD", "refs/heads/main"))]
+        for where, args in steps:
+            if run_git_in(where, *args)[0]:
+                raise Refusal(f"git {' '.join(args[:3])} failed in the landing fixture")
+        Path(clone, path).parent.mkdir(parents=True)
+        Path(clone, path).write_text(f"# {slug} - run state\n\n## Run facts\nphase: LANDING\n", encoding="utf-8")
+        steps = [("add", path), (*who, "commit", "-q", "-m", f"records({slug}): close — LANDING")]
+        steps += [] if plant == "run-unpushed" else [("push", "-q", "origin", "HEAD:refs/heads/main")]
+        for args in steps:
+            if run_git_in(clone, *args)[0]:
+                raise Refusal(f"git {' '.join(args[:3])} failed in the landing fixture")
+        if plant == "run-dirty":
+            with open(Path(clone, path), "a", encoding="utf-8", newline="\n") as fh:
+                fh.write("a working-tree edit\n")
+        return scan_live_run([slug], lambda p: Path(clone, p).read_text(encoding="utf-8")
+                             if Path(clone, p).is_file() else None, lambda p: read_landed_derivation(p, clone))
 
 
 def scan_packets(slug):
@@ -629,6 +710,10 @@ def run_fixture(slug, plant, control):
         phase = "BUILDING" if plant == "run-live" else "LANDED"
         tree = {f"memory/builds/{slug}/RUN.md": f"# {slug} - run state\n\n## Run facts\nphase: {phase}\n"}
         live = scan_live_run(full["chain"], tree.get)
+        print(f"{label} · --repin " + (f"refused: {'; '.join(live)}" if live else "not refused: no live chain run"))
+        return 1 if live else 0
+    if plant in ("run-pushed", "run-unpushed", "run-dirty"):
+        live = run_landing_fixture(slug, plant)
         print(f"{label} · --repin " + (f"refused: {'; '.join(live)}" if live else "not refused: no live chain run"))
         return 1 if live else 0
     head = run_git("rev-parse", "HEAD").strip()
