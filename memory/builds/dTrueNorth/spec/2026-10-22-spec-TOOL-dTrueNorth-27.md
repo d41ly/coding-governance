@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-27 — the nine bar legs this build turned red, each cleared at its cause
 
-**Status:** OPEN · rev-3 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 11
+**Status:** CLOSED · rev-3 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 11
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-27-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-27-ledger.md) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-bar1.log](../build/2026-10-22-build-TOOL-dTrueNorth-27-bar1.log) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-28.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-28.md) | deviation | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-29.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-29.md) | deviation | — |

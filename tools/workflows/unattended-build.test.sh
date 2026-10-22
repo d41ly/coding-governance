@@ -1746,15 +1746,20 @@ has    "GH15 ...with the remedy" "$o" "--plan tB --paths"
 # ---- line pins `<id>@rev-<rev>`; a resolver entry or a caller subject without the pin is refused by
 # ---- field before the callee is spawned. Against the base harness the callee is handed `{path, blob}`,
 # ---- the demanded line binds the bare id, and both pinless subjects proceed.
-TN5_NS=$(printf '%s' "$UNITS" | sed 's#"subjects":\[[^]]*\],##')
-rec CONVERGED >/dev/null; o=$(run_wf "$TN5_NS" "$(printf '{"spec-write":%s,"subjects":{"subjects":[{"path":"s2","blob":"%s","tree":"%s","rev":2}]},"workflow":%s,"record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$_rec")")
+# The subjects array cut by parameter expansion, its literal held in a variable (TOOL-dTrueNorth-27 S3).
+TN5_S=${UNITS#*'"subjects":['}; TN5_S='"subjects":['"${TN5_S%%]*}],"; TN5_NS=${UNITS/"$TN5_S"/}
+printf -v TN5_R '{"spec-write":%s,"subjects":{"subjects":[{"path":"s2","blob":"%s","tree":"%s","rev":2}]},"workflow":%s,"record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$_rec"
+rec CONVERGED >/dev/null; o=$(run_wf "$TN5_NS" "$TN5_R")
 has    "TN5-AC3 the callee's subject carries the roster's id and the resolver's rev" "$(printf '%s\n' "$o" | grep '^wargs:')" "\"subjects\":[{\"path\":\"s2\",\"blob\":\"$B40\",\"id\":\"A-tB-2\",\"rev\":2}]"
 has    "TN5-AC3 ...and the clean round's demanded line pins it" "$o" 'line 1 exactly `**Serves:** spec-audit A-tB-2@rev-2`'
-rec CONVERGED >/dev/null; o=$(run_wf "$TN5_NS" "$(printf '{"spec-write":%s,"subjects":{"subjects":[{"path":"s2","blob":"%s","tree":"%s"}]},"workflow":%s,"record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$_rec")")
+printf -v TN5_R '{"spec-write":%s,"subjects":{"subjects":[{"path":"s2","blob":"%s","tree":"%s"}]},"workflow":%s,"record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$_rec"
+rec CONVERGED >/dev/null; o=$(run_wf "$TN5_NS" "$TN5_R")
 has    "TN5-AC3 a resolver entry with no rev is refused naming the field" "$o" 'THROW unattended-build: resolved subject 0 does not carry `rev`'
-rec CONVERGED >/dev/null; o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"id":"A-tB-1","rev":1}#}#')" "$(returns CONVERGED 0)")
+TN5_P='"id":"A-tB-1","rev":1}'; TN5_U=${UNITS/"$TN5_P"/"}"}
+rec CONVERGED >/dev/null; o=$(run_wf "$TN5_U" "$(returns CONVERGED 0)")
 has    "TN5-AC3 a caller subject with no id is refused naming the field" "$o" 'THROW unattended-build: subject 0'"'"'s `id` is not a unit id'
-rec CONVERGED >/dev/null; o=$(run_wf "$(printf '%s' "$UNITS" | sed 's#"id":"A-tB-2","rev":1}#"id":"A-tB-2"}#')" "$(returns CONVERGED 0)")
+TN5_P='"id":"A-tB-2","rev":1}'; TN5_U=${UNITS/"$TN5_P"/'"id":"A-tB-2"}'}
+rec CONVERGED >/dev/null; o=$(run_wf "$TN5_U" "$(returns CONVERGED 0)")
 has    "TN5-AC3 a caller subject with no rev is refused naming the field" "$o" 'THROW unattended-build: subject 1'"'"'s `rev` is not an integer revision'
 
 # ---- TOOL-aEvidencedLens-5: the audit is handed its context, sibling specs, bug-class checklist and

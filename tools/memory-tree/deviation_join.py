@@ -59,9 +59,10 @@ THE JOIN. A member joins the record departing from its address, an `add` member 
 `**Follow-through:**` is `new unit <id>`. Each record's approver is graded under one approval value:
 `author-recorded`, the chain's (decision `PLAY-dClosedLoop-4`), or `by-risk`, the table final-questions
 `[deviation]` sets. Both refuse an approver opening with no role the grammar names, and an owner
-approver citing no decision id whose row `<MEMORY_ROOT>/DECISIONS.md` holds at `origin/main` and names
-the record's departed clause or its new unit, so a run cannot approve itself with a row it minted on
-its own branch. `by-risk` also refuses a role below its risk class, the risk read from the record.
+approver citing no decision id whose row `<MEMORY_ROOT>/DECISIONS.md` holds on the mainline the remote
+ladder resolves (`read_decision_ref`) and names the record's departed clause or its new unit, so a run
+cannot approve itself with a row it minted on its own branch. `by-risk` also refuses a role below its
+risk class, the risk read from the record.
 
 AT THE COMMIT AND AT THE CLOSE, hosted in `routed_commits.py` over the two populations it already
 grades: its RANGE half asks, for each member departing in `$GATE_PUSH_BASE..HEAD`, whether its joining
@@ -137,7 +138,6 @@ SAY = "deviation"
 POLICIES = ("report", "refuse")
 APPROVALS = ("author-recorded", "by-risk")
 HOST_POLICY, HOST_APPROVAL = "report", "author-recorded"   # the chain's values, PLAY-dClosedLoop-4
-REF = "origin/main"             # where an owner approval's decision row must already be held
 FIELD = re.compile(r"^- \*\*([A-Z][a-z-]+(?: [a-z]+)?):\*\* (.+)$")     # deviations.py:123
 REQUIRED = ("Departs from", "Hand-off", "Before", "After", "Cause", "Reason", "Evidence", "Risk", "Approver",
             "Follow-through", "Caused-by")
@@ -649,7 +649,19 @@ def derive_joins(members, records):
     return out
 
 
-def read_decision_rows(root, conf, ref=REF):
+def read_decision_ref(root):
+    """`(ref, why)`: the mainline an owner approval's decision row must already be held on, read from
+    `row_grammar.resolve_remote` as `row_grammar.derive_relation_base` reads its base: `<remote>/<branch>`,
+    the branch `main` where the ladder names none, the bare branch where there is no remote. A ladder
+    refusal is no ref and its text, so every owner citation is refused, as an unread DECISIONS.md is."""
+    remote, branch, _observed, refusal = row_grammar.resolve_remote(root)
+    if refusal:
+        return None, refusal
+    branch = branch.strip() or "main"
+    return (f"{remote}/{branch}" if remote else branch), ""
+
+
+def read_decision_rows(root, conf, ref):
     """`{decision id: its row}` of `<MEMORY_ROOT>/DECISIONS.md` at `ref`, read with the kit's row regex, or None."""
     memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
     raw = run_git(root, "show", f"{ref}:{memory_root}/DECISIONS.md")
@@ -662,8 +674,9 @@ def read_decision_rows(root, conf, ref=REF):
     return {m.group(1): ln for ln in raw.decode("utf-8", "replace").split("\n") for m in [rowre.match(ln)] if m}
 
 
-def check_approver(rec, rows, approval):
-    """Why `approval` refuses the record's approver, or None (S6, P0.1 row 6)."""
+def check_approver(rec, rows, approval, at=""):
+    """Why `approval` refuses the record's approver, or None (S6, P0.1 row 6); `at` says where the rows
+    were read, ` at <ref>`, or that the remote ladder resolved no ref."""
     a = (rec["approver"] or "").strip()
     role = next((r for r in ROLES if a.lower().startswith(r)), None)
     if role is None:
@@ -687,14 +700,14 @@ def check_approver(rec, rows, approval):
         if any(re.search(r"(?<![A-Za-z0-9-])" + re.escape(x) + r"(?![A-Za-z0-9-])", rows[c]) for x in names):
             return None
     if not held:
-        return f"its approver cites {', '.join(cited)}, which no row of DECISIONS.md at {REF} holds"
+        return f"its approver cites {', '.join(cited)}, which no row of DECISIONS.md holds{at}"
     return (f"its approver cites {', '.join(held)}, whose row does not name "
             + (" or ".join(names) if names else "a departed clause or a new unit, and the record names neither"))
 
 
-def check_approvers(records, rows, approval):
+def check_approvers(records, rows, approval, at=""):
     """`[(record id, why)]` for each record whose approver `approval` refuses."""
-    return [(r["id"], why) for r in records for why in [check_approver(r, rows, approval)] if why]
+    return [(r["id"], why) for r in records for why in [check_approver(r, rows, approval, at)] if why]
 
 
 def check_commit_join(root, members, records, range_shas):
@@ -716,14 +729,15 @@ def check_commit_join(root, members, records, range_shas):
 
 def measure_join(root, conf, commits):
     """Everything the join renders, read once: the members, their facts, the records, the joins and the
-    decision rows at `origin/main`."""
+    decision rows on the mainline `read_decision_ref` resolves, with that ref or the ladder's refusal."""
     members, facts = read_population(root, conf, commits)
     try:
         records = read_records(root, conf)
     except DesignRefusal as exc:
         raise Unmeasured(str(exc)) from None
+    ref, why = read_decision_ref(root)
     return {"members": members, "facts": facts, "records": records, "joins": derive_joins(members, records),
-            "rows": read_decision_rows(root, conf)}
+            "rows": read_decision_rows(root, conf, ref) if ref else None, "ref": ref, "ref_why": why}
 
 
 def render_member(m, tail):
@@ -745,7 +759,8 @@ def render_lines(result, policy, approval, label="", commit=None, close=True):
                                        if verdict == "late" else "recorded by nobody"))
         return lines, len(late) + len(nobody)
     facts, joins, records = result["facts"], result["joins"], result["records"]
-    refused = check_approvers(records, result["rows"], approval)
+    at = f" at {result['ref']}" if result["ref"] else ", the remote ladder resolving no ref"
+    refused = check_approvers(records, result["rows"], approval, at)
     malformed = [(r, field, why) for r in records for field, why in r["malformed"]]
     unjoined = sum(1 for _m, r in joins if r is None)
     lines = [f"{SAY}: {label}baseline {facts['pin'][:9]} {'read' if facts['baseline'] else 'unread'}, chain-build "
@@ -758,8 +773,8 @@ def render_lines(result, policy, approval, label="", commit=None, close=True):
     lines += [f"{SAY}:   malformed: {r['path']}: {field} {why}" for r, field, why in malformed]
     lines += [render_member(m, f"recorded after its departure at {m['sha'][:8]}, by {r['id']}") for m, r, _v in late]
     if result["rows"] is None:
-        lines.append(f"{SAY}:   {facts['memory_root']}/DECISIONS.md is unread at {REF}, so every owner citation "
-                     "is refused")
+        lines.append(f"{SAY}:   {facts['memory_root']}/DECISIONS.md is unread{at}, so every owner citation "
+                     "is refused" + (f": {result['ref_why']}" if result["ref_why"] else ""))
     if facts["nopin"]:
         lines.append(f"{SAY}:   no audit pin: {', '.join(facts['nopin'])}")
     return lines, unjoined + len(refused) + len(malformed) + len(late)
@@ -787,6 +802,7 @@ def read_host_lines(repo, conf, populations):
 FIXTURE_FAMILY = "FIX"     # declared only in the fixture repository's own conf
 FIXTURE_BUILDS = ("dFixA", "dFixB")     # the fixture design's chain builds; the first holds every folder
 TN = f"memory/builds/{FIXTURE_BUILDS[0]}/"
+FIXTURE_ROUTED = "src/"     # the fixture's one routed directory, as routed_commits.py routes its own fixture
 EPOCH = 1792576800         # 2026-10-21T10:00Z, after the fixture's ROUTED_COMMIT_CUTOFF
 UNMEASURED_PIN = "0123456789abcdef0123456789abcdef01234567"
 # TOOL-dTrueNorth-16 S23: each "nothing measured" cause on its own, superseding TOOL-dTrueNorth-4 S8's
@@ -949,7 +965,7 @@ class Fixture:
 
     def write_pass(self, unit, trailer=True):
         """The unit's `--dispatch --writes` row, then its product commit under ROUTED_PATHS."""
-        out = f"tools/fix-{unit.rsplit('-', 1)[1]}.txt"
+        out = f"{FIXTURE_ROUTED}fix-{unit.rsplit('-', 1)[1]}.txt"
         self.add_run_row(f"dispatch · item 0a1b2c3d {unit} · reason {out} {self.derive_spec_path(unit)}")
         return self.write_commit({out: "built\n"}, f"build {unit} from its spec", [f"Pass: {unit}"] if trailer else ())
 
@@ -1001,7 +1017,7 @@ def build_fixture_conf(record, view, pin):
     """The fixture's conf: its family and routed paths, and all four DESIGN_* keys, the key rule's armed
     state (TOOL-dTrueNorth-16 S5); the join reads no owned node, so DESIGN_NODES names a path no file holds."""
     return "".join(f'{k}="{v}"\n' for k, v in (
-        ("MEMORY_ROOT", "memory"), ("FAMILIES", f"fixture:{FIXTURE_FAMILY}"), ("ROUTED_PATHS", "tools/"),
+        ("MEMORY_ROOT", "memory"), ("FAMILIES", f"fixture:{FIXTURE_FAMILY}"), ("ROUTED_PATHS", FIXTURE_ROUTED),
         ("ROUTED_COMMIT_CUTOFF", "2026-01-01"), ("DESIGN_RECORD", record), ("DESIGN_BASELINE", pin),
         ("DESIGN_VIEW", view), ("DESIGN_NODES", "memory/design/nodes.py")))
 
@@ -1065,7 +1081,7 @@ def add_plant(fx, plant):
         fx.write_spec(u, 2, line="the fixture line, revised after the pass")
     elif plant == "pass-none":
         fx.write_spec(u, 1)
-        fx.write_commit({"tools/fix-11.txt": "built\n"}, f"build {u}, attributed to no pass", ["Pass: none"])
+        fx.write_commit({f"{FIXTURE_ROUTED}fix-11.txt": "built\n"}, f"build {u}, attributed to no pass", ["Pass: none"])
         fx.write_spec(u, 2, line="the fixture line, revised")
     elif plant == "status-flip":
         fx.write_spec(u, 1)
@@ -1097,7 +1113,7 @@ def add_plant(fx, plant):
             u, 2 if plant == "gen-text" else 1, status="INPROGRESS" if plant == "status-gen" else "OPEN",
             records="| 2026-10-21-review-fixture | spec-audit |",
             line="the fixture line, changed with the render" if plant == "gen-text" else "the fixture line holds")},
-            f"records(dTrueNorth): {u}'s spec-records region re-rendered", ["Pass: none"])
+            f"records(dTrueNorth): {u}'s spec-records region rendered again", ["Pass: none"])
     elif plant == "quote":
         quoted = next(t for _b, c, t, _h in read_chain_clauses(fx.v2) if c == CLAUSE_ROLES["base"])
         fx.write_spec(u, 1, extra=f"- AC2: quotes its clause, {quoted}")
@@ -1145,8 +1161,8 @@ def add_plant(fx, plant):
         y = SUBJECT_TRAILER_Y
         fx.write_spec(u, 1)
         fx.write_spec(y, 1)
-        fx.add_run_row(f"dispatch · item 0a1b2c3d {y} · reason tools/fix-97.txt {fx.derive_spec_path(y)}")
-        fx.write_commit({"tools/fix-97.txt": "built\n"}, f"build {u} from its spec", [f"Pass: {y}"])
+        fx.add_run_row(f"dispatch · item 0a1b2c3d {y} · reason {FIXTURE_ROUTED}fix-97.txt {fx.derive_spec_path(y)}")
+        fx.write_commit({f"{FIXTURE_ROUTED}fix-97.txt": "built\n"}, f"build {u} from its spec", [f"Pass: {y}"])
         fx.write_spec(u, 2, line="the fixture line, revised after a commit naming it in its subject alone")
         fx.write_spec(y, 2, files=dict([fx.render_record(y, f"{y}@rev-1 [acceptance]", "spec writer")]),
                       line="the fixture line, revised after its pass")
@@ -1196,7 +1212,6 @@ def build_fixture(root, plants):
                                                                        UNMEASURED_PIN if "unmeasured-pin" in plants
                                                                        else pin),
                                fx.record: fx.v2}, "fixture: the baseline taken, and the design keys declared")
-    fx.stream += b"reset refs/remotes/origin/main\nfrom :%d\n\n" % fx.base
     fx.set_branch("run", new=True)
     if "unmeasured-specs" not in plants:
         add_base(fx)
@@ -1477,6 +1492,9 @@ def run_plant_arms(resolve=None):
     if skip:
         set_gen_strip(IDENTITY_STRIP)
         print(skip)
+    # The fixtures have no remote, so the ladder's two keys the caller may have exported are held back
+    # for the call and restored after it: the rows are read on the fallback whatever the caller's shell.
+    ladder_env = {k: os.environ.pop(k) for k in ("GOV_REMOTE", "GOV_DEFAULT_BRANCH") if k in os.environ}
     try:
         for plant in (None,) + tuple(p for p in PLANTS if not (skip and p in STRIP_PLANTS)):
             root = tempfile.mkdtemp(prefix="dj-")
@@ -1500,6 +1518,23 @@ def run_plant_arms(resolve=None):
                         arms.append((findings == 0 and live and len(result["joins"]) == BASE_MEMBERS,
                                      f"TOOL-dTrueNorth-4 AC1 the base alone exits 0 under refuse and {approval}, "
                                      f"its {BASE_MEMBERS} members each joined", "\n".join(lines)))
+                    # TOOL-dTrueNorth-27 AC15: the fixture has no remote, so its rows are read on the
+                    # ladder's fallback, `main`; a GOV_REMOTE naming no remote of it is the ladder's refusal,
+                    # no ref, and the render names that refusal on its unread line.
+                    os.environ["GOV_REMOTE"] = "no-such-remote"
+                    try:
+                        ref, why = read_decision_ref(fx.root)
+                        refused_lines = render_lines(measure_fixture(fx)[2], "report", "author-recorded", "base · ",
+                                                     commit)[0]
+                    finally:
+                        os.environ.pop("GOV_REMOTE", None)
+                    arms.append((result["ref"] == "main" and ref is None and "GOV_REMOTE names no-such-remote" in why
+                                 and any("DECISIONS.md is unread, the remote ladder resolving no ref" in ln
+                                         and why in ln for ln in refused_lines),
+                                 "TOOL-dTrueNorth-27 AC15 the decision rows are read on the ref the remote ladder "
+                                 "resolves, `main` in a fixture with no remote, and a GOV_REMOTE naming no remote "
+                                 "of it is no ref and the ladder's refusal, named on the unread line",
+                                 f"ref {result['ref']!r}; refused ref {ref!r}: {why}\n" + "\n".join(refused_lines)))
                     continue
                 counts[plant] = len(result["joins"])
                 needle = derive_plant_needle(plant)
@@ -1572,6 +1607,7 @@ def run_plant_arms(resolve=None):
         arms.append(check_composed_run(counts))
     finally:
         set_gen_strip(None)
+        os.environ.update(ladder_env)
     return arms
 
 

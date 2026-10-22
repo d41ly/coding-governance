@@ -1773,11 +1773,6 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
-      "id": "build_el5_res",
-      "kind": "function",
-      "file": "tools/workflows/unattended-build.test.sh"
-    },
-    {
       "id": "build_entry",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -6913,6 +6908,11 @@
       "file": "tools/roles/render_agents.py"
     },
     {
+      "id": "derive_head_names",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
       "id": "derive_head_state",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -11778,6 +11778,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "print_check_verdicts",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "print_claims",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -13011,6 +13016,11 @@
       "id": "read_decision_ids",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "read_decision_ref",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "read_decision_rows",
@@ -17241,6 +17251,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/check-playbook-parity.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
     },
     {
       "id": "resolve_kit_dir",

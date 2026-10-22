@@ -13708,7 +13708,8 @@ verb_dispatch() { # slug · unit · writes...
   local _e_units _e_roster _e_producers _e_id _e_spec _e_st _e_block=""
   _e_units=$(unit_ids_of "$slug")
   if ! _e_roster=$(roster_ids "$slug"); then
-    fail 49 "--dispatch cannot read the authored roster:units pair of $(readme_of "$slug"), which is malformed, so a producer planned there with no spec yet could not block its consumer; repair the pair between $ROSTER_OPEN and $ROSTER_CLOSE: $unit"
+    readme_of "$slug" >/dev/null
+    fail 49 "--dispatch cannot read the authored roster:units pair of $_readme, which is malformed, so a producer planned there with no spec yet could not block its consumer; repair the pair between $ROSTER_OPEN and $ROSTER_CLOSE: $unit"
     return 1
   fi
   _e_producers=$(printf '%s\n%s\n' "$_e_units" "$_e_roster" | grep -E '.' | sort -u)
@@ -13739,7 +13740,7 @@ verb_dispatch() { # slug · unit · writes...
     return 1
   fi
   for _e_id in $(read_consumes_from "$_d_spec"); do
-    printf '%s\n' "$_e_producers" | grep -qxF -- "$_e_id" || continue
+    case $'\n'"$_e_producers"$'\n' in *$'\n'"$_e_id"$'\n'*) ;; *) continue ;; esac
     _e_spec="${SPEC_PATH[$_e_id]:-}"
     if [ -z "$_e_spec" ]; then
       _e_block="$_e_block $unit consumes-from $_e_id (no spec)"

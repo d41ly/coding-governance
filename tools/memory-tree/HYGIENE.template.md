@@ -583,7 +583,9 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     With the key blank it prints one line and passes. Under `--staged` the check passes `--staged`
     through, and the verb's trigger is the render's: it runs when a staged path is a build-index input,
     a staged view row and a staged spec alike, or the carries checker beside the kit, and otherwise
-    prints its held line (`TOOL-dTrueNorth-16`).
+    prints its held line (`TOOL-dTrueNorth-16`). A full run, `--staged` off and no `--only`, reads
+    this verdict from check 9's generator process, which runs the verb ahead of its own render, and
+    prints it as the standalone verb prints it (`TOOL-dTrueNorth-27`).
     NOT GRADED: a spec at any other status, since `OPEN`, `SPECCED` and `BLOCKED` precede the exit and
     a terminal or `DEFERRED` spec is not building; and a build the design view does not name.
 30. **the as-built view's verdicts** — with all four `DESIGN_*` keys set, the deviation records and
@@ -596,11 +598,15 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     draft never staged moves no verdict. These are the findings `--write` cannot cure, so they are not check 9's, whose
     message and remedy read only the view's byte drift. Delegated to
     `{{KIT_DIR}}/gen_build_index.py --check-asbuilt`, which renders through the host `--write` writes the
-    view with, and a view it cannot render, a partial key set or an unreadable pin, fails as well.
+    view with, and a view it cannot render, a partial key set, an unreadable pin or a `DESIGN_VIEW`
+    not named `<date>-build-<unit id>-as-built.md`, the record name its head's two names are read
+    from, fails as well.
     With every `DESIGN_*` key blank it prints one line and passes. Under `--staged` its trigger is the
     render's, as check 29's is: it runs when any staged path is a build-index input, the kit's own
     code included, or is `DESIGN_RECORD` or `DESIGN_VIEW` outside that set, and otherwise prints its
-    held line (`TOOL-dTrueNorth-16`, `TOOL-dTrueNorth-20`).
+    held line (`TOOL-dTrueNorth-16`, `TOOL-dTrueNorth-20`). A full run reads this verdict from check
+    9's generator process as check 29 reads its own, printed as the standalone verb prints it
+    (`TOOL-dTrueNorth-27`).
 
 ## Record bindings — how a record names its spec
 
@@ -664,8 +670,8 @@ finding naming every one, and a Supersedes naming a record outside its clause's 
 both; either renders the clause from the baseline, and neither path order nor a commit date decides.
 `deviation_join.py` computes the departures from history and joins each to its record. An
 approver is graded under one of two values: `author-recorded`, the default, passes a role the grammar
-names, and an owner only citing a decision row held at `origin/main` that names the departed clause or
-the new unit; `by-risk` also refuses a role below the risk class, `editorial` needing an `author`,
+names, and an owner only citing a decision row held on the mainline the remote ladder resolves that
+names the departed clause or the new unit; `by-risk` also refuses a role below the risk class, `editorial` needing an `author`,
 `additive` and `stricter` a `spec writer`, and `loosening`, `breaking` or a cause of `owner ruling` the
 `owner`. An approval carried for the owner's walk has a decline route: an owner decline is filed as an
 ask naming the record, and its follow-up is a new record naming the declined one in Supersedes, the

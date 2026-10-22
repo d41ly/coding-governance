@@ -209,6 +209,47 @@ def resolve_prefix_token(spelled, troot):
     return spelled.replace("{prefix}", troot)
 # <<< resolve_prefix_token
 
+# The sibling-kit resolution (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
 
 KIT_SPEC_TOKENS_VERSION = "1.1"  # gov:kit spec-tokens@1.1 — the deployer's read
 
@@ -354,8 +395,13 @@ HANDOFF_WHY = ("this bullet hands the token to that sibling and the sibling's ow
 # `parse_spec_text` from the same kit, loaded only while the key is set (S11).
 CARRIES_KEY = "SPEC_CARRIES_CUTOFF"
 CARRIES_EXIT_ARMS = ("uncarried", "node")
-KIT_DIR = HERE / "memory-tree"
-DESIGN_LIB = KIT_DIR / "design_lib.py"
+# The kit is RESOLVED, never guessed (TOOL-dTrueNorth-27 S5): a `LookupError` leaves it unresolved,
+# `KIT_MISS` holding the resolver's text, and the refusal in `main` prints it.
+try:
+    KIT_DIR, KIT_MISS = resolve_kit_dir("memory-tree", "design_lib.py", HERE), ""
+except LookupError as exc:
+    KIT_DIR, KIT_MISS = None, str(exc)
+DESIGN_LIB = KIT_DIR / "design_lib.py" if KIT_DIR else None
 CARRIES_RELEASES = ("moved", "retired", "deferred")
 
 # TOOL-dGatedProse-2: THE CLAIMS JOIN. A codebase-map dossier claims EXACT inventory keys and nothing
@@ -810,6 +856,9 @@ def load_kit_module(name):
     again. It loads with no bytecode cache written beside it, since no join here has a write path. An
     absent file is an ImportError naming it.
     """
+    if KIT_DIR is None:
+        raise ImportError(f"the memory-tree kit does not resolve, so the design, the binding lines, the spec "
+                          f"filename date and the status header cannot be read: {KIT_MISS}")
     path = KIT_DIR / f"{name}.py"
     mod = sys.modules.get(name)
     if mod is not None and pathlib.Path(getattr(mod, "__file__", None) or ".").resolve() == path.resolve():
@@ -836,7 +885,7 @@ def load_design_lib():
 # THE ONE SPEC FILENAME DATE (TOOL-dTrueNorth-16 S32), bound to the kit's compiled pattern, so the
 # dated joins here and the carries population read one date. A checker copied without the kit binds
 # none, and `main` refuses by name before any join that reads a date.
-SPEC_DATE = load_design_lib().SPEC_FILE_DATE if DESIGN_LIB.is_file() else None
+SPEC_DATE = load_design_lib().SPEC_FILE_DATE if DESIGN_LIB else None
 
 
 def read_carries_specs(root, design, cutoff, files=None, conf=None):
@@ -1318,9 +1367,9 @@ def main(argv):
     if "--legs-for" in argv:   # a query, branched ahead of the spec walk: it grades no spec
         return print_legs_for(root, files, argv[argv.index("--legs-for") + 1:])
     if SPEC_DATE is None:
-        print(f"spec-tokens: REFUSING — {DESIGN_LIB.as_posix()} is not there, and its SPEC_FILE_DATE is "
-              "the one spec filename date every dated join reads (TOOL-dTrueNorth-16 S32), so no spec "
-              "could be dated")
+        print(f"spec-tokens: REFUSING — the memory-tree kit's design_lib.py does not resolve ({KIT_MISS}), and "
+              "its SPEC_FILE_DATE is the one spec filename date every dated join reads (TOOL-dTrueNorth-16 "
+              "S32), so no spec could be dated")
         return 1
     allspecs = sorted(f for f in files
                       if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))

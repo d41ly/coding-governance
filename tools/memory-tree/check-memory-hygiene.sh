@@ -1253,9 +1253,27 @@ if check_selected 9; then
 # file, or a file whose cited ids change, because the roster reads ids out of EVERY memory file's
 # prose — and prints one SKIPPED line when nothing can. That line is printed here: a skip announces
 # itself. A render owed is the full `--check`, so its verdict and this fail branch are unchanged.
+#
+# ON A FULL RUN THIS ONE PROCESS ALSO PRINTS CHECKS 29 AND 30'S VERDICTS (TOOL-dTrueNorth-27 S4).
+# `--with-verdicts`, with `--staged` off and no `--only`, runs their two verbs in the generator ahead of
+# `--check` and prints each verb's lines under a `build-index: verdict <n> exit <rc>` line, then
+# `build-index: verdicts end`. The capture splits there by parameter expansion: `_v9` keeps the
+# sections for checks 29 and 30, and this check's message and its SKIPPED scan read only what follows
+# the marker. A capture with no marker, a traceback in this path, leaves `_v9end` 0, and both checks
+# then read the whole capture as their unreadable branch. Any other run calls each verb on its own.
+_v9=""; _v9on=0; _v9end=0
 if [ "$STAGED" = 0 ] || [ -n "$STAGED_MD" ]; then
   _c9=(--check); [ "$STAGED" = 1 ] && _c9+=(--staged)
-  if ! drift=$("$_PY" "$HERE/gen_build_index.py" "${_c9[@]}" 2>&1); then fail 9 "generated build index differs from a fresh render:
+  [ "$STAGED" = 0 ] && [ -z "$ONLY" ] && { _c9+=(--with-verdicts); _v9on=1; }
+  if ! drift=$("$_PY" "$HERE/gen_build_index.py" "${_c9[@]}" 2>&1); then _c9rc=1; else _c9rc=0; fi
+  if [ "$_v9on" = 1 ]; then
+    _v9=$drift
+    if [[ $drift == *"build-index: verdicts end"* ]]; then
+      _v9end=1; _v9=${drift%%build-index: verdicts end*}
+      drift=${drift#*build-index: verdicts end}; drift=${drift#$'\r'}; drift=${drift#$'\n'}
+    fi
+  fi
+  if [ "$_c9rc" = 1 ]; then fail 9 "generated build index differs from a fresh render:
 $drift"
   else
     # Per LINE (TOOL-aTrimmedHook-6): a warning printed first on the merged stream must not hide the skip.
@@ -1681,10 +1699,27 @@ if check_selected 29; then
 # no path itself and a second spelling of the trigger cannot drift from the render's. Any other
 # commit holds it, and the verb's held line is printed here. The full run at the push boundary grades
 # it whatever is staged.
+#
+# ON A FULL RUN THE VERDICT IS CHECK 9'S SECTION (TOOL-dTrueNorth-27 S4): check 9's process printed
+# this verb's lines under `build-index: verdict 29 exit <rc>`, so `_c29` and `cov29` are read from that
+# section, and a capture holding no end marker is exit 2 and the whole capture. The lines print by
+# parameter expansion, one per pass, never through a loop fed by a here-string.
 _c29a=(--check-coverage); [ "$STAGED" = 1 ] && _c29a+=(--staged)
-cov29=$("$_PY" "$HERE/gen_build_index.py" "${_c29a[@]}" 2>&1); _c29=$?
+if [ "${_v9on:-0}" = 1 ]; then
+  _c29=2; cov29=$_v9
+  if [ "$_v9end" = 1 ] && [[ $_v9 == *"build-index: verdict 29 exit "*"build-index: verdict 30 exit "* ]]; then
+    cov29=${_v9#*build-index: verdict 29 exit }; _c29=${cov29%%[!0-9]*}
+    cov29=${cov29#*$'\n'}; cov29=${cov29%build-index: verdict 30 exit *}; cov29=${cov29%$'\n'}; cov29=${cov29%$'\r'}
+  fi
+else
+  cov29=$("$_PY" "$HERE/gen_build_index.py" "${_c29a[@]}" 2>&1); _c29=$?
+fi
 case "$_c29" in
-  0) while IFS= read -r _c29l; do [ -z "$_c29l" ] || printf 'memory-hygiene: check 29: %s\n' "${_c29l#build-index: }"; done <<<"$cov29" ;;
+  0) _r29=$cov29$'\n'
+     while [ -n "$_r29" ]; do
+       _c29l=${_r29%%$'\n'*}; _r29=${_r29#*$'\n'}
+       [ -z "$_c29l" ] || printf 'memory-hygiene: check 29: %s\n' "${_c29l#build-index: }"
+     done ;;
   1) fail 29 "a chain build's spec is INPROGRESS while its build's coverage is red:
 $cov29" ;;
   *) fail 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:
@@ -1708,10 +1743,24 @@ if check_selected 30; then
 # 29's verb does (TOOL-dTrueNorth-20 S20): it runs when a staged path is a build-index input by
 # `check_index_input`, this kit's own code included, or is DESIGN_RECORD or DESIGN_VIEW outside that
 # set, and otherwise prints its held line, which is printed here.
+#
+# On a full run the verdict is check 9's section, read as check 29 reads its own (TOOL-dTrueNorth-27 S4).
 _c30a=(--check-asbuilt); [ "$STAGED" = 1 ] && _c30a+=(--staged)
-ab30=$("$_PY" "$HERE/gen_build_index.py" "${_c30a[@]}" 2>&1); _c30=$?
+if [ "${_v9on:-0}" = 1 ]; then
+  _c30=2; ab30=$_v9
+  if [ "$_v9end" = 1 ] && [[ $_v9 == *"build-index: verdict 30 exit "* ]]; then
+    ab30=${_v9#*build-index: verdict 30 exit }; _c30=${ab30%%[!0-9]*}
+    ab30=${ab30#*$'\n'}; ab30=${ab30%$'\n'}; ab30=${ab30%$'\r'}
+  fi
+else
+  ab30=$("$_PY" "$HERE/gen_build_index.py" "${_c30a[@]}" 2>&1); _c30=$?
+fi
 case "$_c30" in
-  0) while IFS= read -r _c30l; do [ -z "$_c30l" ] || printf 'memory-hygiene: check 30: %s\n' "${_c30l#build-index: }"; done <<<"$ab30" ;;
+  0) _r30=$ab30$'\n'
+     while [ -n "$_r30" ]; do
+       _c30l=${_r30%%$'\n'*}; _r30=${_r30#*$'\n'}
+       [ -z "$_c30l" ] || printf 'memory-hygiene: check 30: %s\n' "${_c30l#build-index: }"
+     done ;;
   1) fail 30 "the as-built view's deviation records and its design record disagree, which --write cannot cure:
 $ab30" ;;
   *) fail 30 "the as-built view could not be rendered, so none of its verdicts was read:

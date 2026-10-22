@@ -2,6 +2,7 @@
 """gen_build_index.py — the generated build index for a flat memory tree (memory-tree kit 1.5).
 
     python <prefix>/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
+    python <prefix>/memory-tree/gen_build_index.py --check --with-verdicts  # checks 29 and 30's verdicts first
     python <prefix>/memory-tree/gen_build_index.py --write         # (re)render every artifact
     python <prefix>/memory-tree/gen_build_index.py --check-coverage [--staged]  # a chain spec INPROGRESS on red coverage
     python <prefix>/memory-tree/gen_build_index.py --check-asbuilt [--staged]   # the as-built view's verdicts
@@ -1680,7 +1681,8 @@ def render_asbuilt_view(root: str, conf: dict) -> dict:
     `--check-asbuilt` prints (S17) —
     and the file's drift from the render, a hand edit named at its first differing line and a
     `baseline` row whose text is not the baseline's, which it can and `--check` lists. A partial key
-    set, and a pin whose design record cannot be read, is a Problem: there is nothing to render.
+    set, a pin whose design record cannot be read, and a DESIGN_VIEW not named as a dated record, whose
+    head has no names to derive (TOOL-dTrueNorth-27 S7), are each a Problem: there is nothing to render.
     """
     import asbuilt_view  # a sibling of this file, loaded only when a verb renders
     try:
@@ -1688,10 +1690,10 @@ def render_asbuilt_view(root: str, conf: dict) -> dict:
         if not armed:
             return {"state": "off", "line": line}
         sha, clauses, records, findings = asbuilt_view.read_view_inputs(root, conf)
+        rel = str(conf["DESIGN_VIEW"]).strip()
+        text, more = asbuilt_view.render_view(sha, clauses, records, rel)
     except asbuilt_view.DesignRefusal as exc:
         raise Problem(f"as-built view — {exc}; nothing was rendered, and DESIGN_VIEW is left as it is") from None
-    text, more = asbuilt_view.render_view(sha, clauses, records)
-    rel = str(conf["DESIGN_VIEW"]).strip()
     path = os.path.join(root, rel)
     drift = (asbuilt_view.check_view(read_text(path), text, clauses) if os.path.isfile(path)
              else ["missing — never rendered"])
@@ -3120,6 +3122,28 @@ def cmd_check_asbuilt(root: str, conf: dict, staged: bool = False, here: str | N
         return 0
     print(f"build-index: as-built {len(view['findings'])} finding(s)")
     return print_asbuilt_verdicts(view["findings"])
+
+
+def print_check_verdicts(root: str, conf: dict) -> None:
+    """TOOL-dTrueNorth-27 S4 — `--check --with-verdicts`' sections, printed ahead of `--check`'s own lines.
+
+    Hygiene check 29's verb, `--check-coverage`, and check 30's, `--check-asbuilt`, run in this process,
+    each under a captured stdout, a Problem mapped to exit 2 and its `build-index: <message>` line as
+    `main()` maps it. Each section opens `build-index: verdict <check> exit <rc>` above the verb's lines,
+    and `build-index: verdicts end` closes both, so a full hygiene run reads three verdicts from check 9's
+    one generator process and splits them at those marker lines.
+    """
+    for check, verb in ((29, cmd_check_coverage), (30, cmd_check_asbuilt)):
+        said = io.StringIO()
+        with contextlib.redirect_stdout(said):
+            try:
+                rc = verb(root, conf)
+            except Problem as exc:
+                print(f"build-index: {exc}")
+                rc = 2
+        print(f"build-index: verdict {check} exit {rc}")
+        sys.stdout.write(said.getvalue())
+    print("build-index: verdicts end")
 
 
 def extract_build_readmes(paths: list, memory_root: str) -> list:
@@ -4672,13 +4696,15 @@ def test_coverage_region(arm) -> None:
     beta = {"cl-dBeta-%04d" % k: "Beta clause number %d." % k for k in range(1, 31)}
     pins = {cid: hashlib.sha256(text.encode("utf-8")).hexdigest()[:8] for cid, text in alpha.items()}
     mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-coverage")
-    keys = ('DESIGN_RECORD="memory/design/record.md"\nDESIGN_VIEW="memory/design/view.md"\n'
+    # The view at a dated record name, so its head has the two names it derives (TOOL-dTrueNorth-27 S7).
+    view_rel = f"memory/design/{cut}-build-ARCH-dAlpha-1-as-built.md"
+    keys = (f'DESIGN_RECORD="memory/design/record.md"\nDESIGN_VIEW="{view_rel}"\n'
             'DESIGN_NODES="memory/design/nodes.py"\n')
     with tempfile.TemporaryDirectory() as base:
         t = os.path.join(base, "coverage"); os.makedirs(t)
         run("git", "init", "-q", "--template=", ".", cwd=t)
         conf_path = os.path.join(t, ".memory-tree.conf")
-        view = os.path.join(t, "memory", "design", "view.md")
+        view = os.path.join(t, *view_rel.split("/"))
         s1 = os.path.join(t, "memory", "builds", "dAlpha", "spec", f"{cut}-spec-dAlpha-1.md")
         readme = {s: os.path.join(t, "memory", "builds", s, "README.md") for s in ("dAlpha", "dBeta", "tOne")}
 
@@ -4692,9 +4718,9 @@ def test_coverage_region(arm) -> None:
                            f"base 0123abcd\n\n" + "".join(f"**Carries:** {cid}@{pins[cid]} whole\n" for cid in alpha)
                        + "**Carries:** node:item.alpha-node\n\nIt reads `alpha-one` and writes `alpha-two`.\n")
 
-        def write_conf(cutoff, baseline, view_key="memory/design/view.md"):
+        def write_conf(cutoff, baseline, view_key=view_rel):
             write_text(conf_path, _render_fixture_conf() + f'SPEC_CARRIES_CUTOFF="{cutoff}"\n'
-                       + keys.replace("memory/design/view.md", view_key) + f'DESIGN_BASELINE="{baseline}"\n')
+                       + keys.replace(view_rel, view_key) + f'DESIGN_BASELINE="{baseline}"\n')
             return load_conf(t)
 
         write_text(os.path.join(t, "memory", STALE_HEADER_WAIVER), "# empty\n")
@@ -5022,11 +5048,13 @@ def test_asbuilt_view(arm) -> None:
         run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=tmp)
         arm("TOOL-dTrueNorth-6 S5 — --check after --write is clean, counting the view", "True",
             lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1])(_read_mode(cmd_check, tmp, conf))))
-        # TOOL-dTrueNorth-16 S27 — the head's Serves line is the instrument's literal: the record's own
-        # names another unit, and an edit to it moves no byte of the view.
-        arm("TOOL-dTrueNorth-16 AC27 — the view's head carries the instrument's Serves line, never the record's",
-            "True", lambda: str("\n**Serves:** research PLAY-dClosedLoop-1\n" in read_text(view)
-                                and "ARCH-tOne-1" not in read_text(view).split("| Build |", 1)[0]))
+        # TOOL-dTrueNorth-16 S27, TOOL-dTrueNorth-27 S7 — the head's two names are the ones DESIGN_VIEW's
+        # dated record name carries, the unit and the instrument beside it, and an edit to the record's own
+        # Serves line moves no byte of the view.
+        arm("TOOL-dTrueNorth-27 AC12 — the view's head names the unit and the instrument its record name carries",
+            "True", lambda: str((lambda head: "\n**Serves:** research ARCH-tOne-1\n" in head
+                                 and "Generated by `build/2026-08-01-build-ARCH-tOne-1-asbuilt.py` from" in head)(
+                read_text(view).split("| Build |", 1)[0])))
         write_text(os.path.join(tmp, record_rel), read_text(os.path.join(tmp, record_rel)).replace(
             "**Serves:** research ARCH-tOne-1", "**Serves:** research ARCH-tOne-1, edited"))
         arm("TOOL-dTrueNorth-16 AC27 — an edit to the record's Serves line leaves --check clean", "rc=0",
@@ -5167,6 +5195,34 @@ def test_asbuilt_view(arm) -> None:
             "rc=0 build-index: as-built held under --staged",
             lambda: "rc=%s %s" % _read_mode(cmd_check_asbuilt, tmp, conf, True))
         run("git", "add", "--", dev_rel, cwd=tmp)
+        # TOOL-dTrueNorth-27 AC5 (S4) — `--check --with-verdicts` over the planted gap record: the CLI prints
+        # check 29's section, check 30's naming the record, the end marker, then `--check`'s own lines, each
+        # section the standalone verb's lines byte for byte, and exits as `--check` does. Red against a
+        # flag that prints nothing, a section that differs from its verb, or an exit that is not `--check`'s.
+        def read_with_verdicts():
+            cli = subprocess.run([sys.executable, os.path.abspath(__file__), "--check", "--with-verdicts"], cwd=tmp,
+                                 capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                 env=_build_git_env())
+            (rc29, out29), (rc30, out30), (rc9, out9) = (
+                _read_mode(cmd_check_coverage, tmp, conf), _read_mode(cmd_check_asbuilt, tmp, conf),
+                _read_mode(cmd_check, tmp, conf))
+            want = (f"build-index: verdict 29 exit {rc29}\n{out29}build-index: verdict 30 exit {rc30}\n{out30}"
+                    f"build-index: verdicts end\n{out9}")
+            return f"rc={cli.returncode == rc9} 30={rc30} gap={gap in out30} same={cli.stdout == want}"
+
+        arm("TOOL-dTrueNorth-27 AC5 — --check --with-verdicts prints the two verbs' sections, the end marker and "
+            "--check's lines, its exit --check's", "rc=True 30=1 gap=True same=True", read_with_verdicts)
+
+        def read_flag_refusals():
+            said = io.StringIO()
+            with contextlib.redirect_stdout(said):
+                got = [main(["gen_build_index.py", *argv]) for argv in (
+                    ("--check", "--staged", "--with-verdicts"), ("--write", "--with-verdicts"),
+                    ("--check-coverage", "--with-verdicts"))]
+            return f"{got} {said.getvalue().count('the flag takes --check alone')}"
+
+        arm("TOOL-dTrueNorth-27 S4 — --with-verdicts beside --staged, or with any mode but --check, is the usage "
+            "refusal, exit 2", "[2, 2, 2] 3", read_flag_refusals)
 
         def write_without_live():
             os.remove(live)
@@ -5191,6 +5247,12 @@ def test_asbuilt_view(arm) -> None:
         arm("TOOL-dTrueNorth-16 AC6 — DESIGN_VIEW alone blank is a partial set, the host's Problem naming it",
             "build-index: as-built view — DESIGN_VIEW is blank while DESIGN_RECORD, DESIGN_BASELINE, DESIGN_NODES are set",
             lambda: _read_mode(cmd_check, tmp, write_conf(view=""))[1])
+        # TOOL-dTrueNorth-27 AC12 — a DESIGN_VIEW named outside the dated record grammar is refused at render,
+        # the host's Problem naming the key, and nothing renders. Red against a head that falls back to names
+        # the view does not carry.
+        arm("TOOL-dTrueNorth-27 AC12 — a view named outside the record grammar is the host's Problem naming "
+            "DESIGN_VIEW", "build-index: as-built view — DESIGN_VIEW memory/design/view.md is not named",
+            lambda: _read_mode(cmd_check, tmp, write_conf(view="memory/design/view.md"))[1])
 
 
 def scan_glob_readers(kit_dir: str) -> list:
@@ -6118,17 +6180,19 @@ def cmd_selftest() -> int:
         # prints a P row and the Q row carries no fourth field.
         # TOOL-dTrueNorth-20 S7 — THE HARNESS IS THE FIXTURE'S, REACHED THROUGH A STAND-IN RESOLVER, so
         # these arms read no workflows kit of the machine's and run in any tree, an adopter holding the
-        # memory-tree kit alone included; they used to skip there. The fixture keeps its harness at the
-        # install's own path, `tools/workflows/tier2-review.js`, and the stub returns that directory.
+        # memory-tree kit alone included; they used to skip there. The fixture keeps its harness in one
+        # directory named for no kit, `harness/`, joined once from the fixture root, and the stub returns
+        # that directory (TOOL-dTrueNorth-27 S5).
         t14w = os.path.join(base, "writers"); os.makedirs(t14w)
         _fixture(t14w)
-        h14 = os.path.join(t14w, "tools", "workflows", "tier2-review.js")
-        os.makedirs(os.path.dirname(h14))
+        hd14 = os.path.join(t14w, "harness")
+        h14 = os.path.join(hd14, "tier2-review.js")
+        os.makedirs(hd14)
         write_text(h14, "export function review() {}\n")
         conf14w = _set_pin_cutoff(t14w, "2026-01-01")
 
         def _resolve_fixture14(*_args):
-            return pathlib.Path(t14w, "tools", "workflows")
+            return pathlib.Path(hd14)
 
         def _write_record14(msg, day=None):
             rel = rv5 + f"2026-02-0{day}-review-ARCH-tOne-1-spec-audit.md" if day else None
@@ -6184,7 +6248,7 @@ def cmd_selftest() -> int:
             f"[{run14!r}]",
             lambda: str(sorted(derive_audit_writers(
                 t14w, conf14w["MEMORY_ROOT"], {run14},
-                lambda *_a: str(pathlib.Path(t14w, "tools", "workflows").absolute()).replace("/", "\\")) or ())))
+                lambda *_a: str(pathlib.Path(hd14).absolute()).replace("/", "\\")) or ())))
         _write_record14("main", 3)
         arm("TOOL-dTrueNorth-14 AC2 — an unpinned record the pinning harness wrote prints its P row",
             "P=1 Q\t2\t2026-01-01\t1", lambda: _read_pin_rows(t14w, conf14w, _resolve_fixture14))
@@ -6203,13 +6267,14 @@ def cmd_selftest() -> int:
         # stand-in resolver (TOOL-dTrueNorth-20 S7), in the child process too.
         t19 = os.path.join(base, "scale"); os.makedirs(t19)
         _fixture(t19)
-        h19 = os.path.join(t19, "tools", "workflows", "tier2-review.js")
-        os.makedirs(os.path.dirname(h19))
+        hd19 = os.path.join(t19, "harness")     # the harness directory, named for no kit, as t14w's
+        h19 = os.path.join(hd19, "tier2-review.js")
+        os.makedirs(hd19)
         write_text(h19, "export function review() {}\nexport function renderAuditBinding() {}\n")
         conf19 = _set_pin_cutoff(t19, "2026-01-01")
 
         def _resolve_fixture19(*_args):
-            return pathlib.Path(t19, "tools", "workflows")
+            return pathlib.Path(hd19)
 
         def _write_record19(rel):
             write_text(os.path.join(t19, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
@@ -6280,7 +6345,7 @@ def cmd_selftest() -> int:
                            "subprocess.run = _resolve\nsys.argv = sys.argv[1:]\n"
                            "sys.path.insert(0, os.path.dirname(os.path.abspath(sys.argv[0])))\n"
                            "import backlog\n_kit = backlog.resolve_kit_dir\n"
-                           f"backlog.resolve_kit_dir = lambda home, *a: (pathlib.Path({t19!r}, 'tools', 'workflows') "
+                           f"backlog.resolve_kit_dir = lambda home, *a: (pathlib.Path({hd19!r}) "
                            "if home == 'workflows' else _kit(home, *a))\n"
                            "runpy.run_path(sys.argv[0], run_name='__main__')\n")
         _real_run19 = subprocess.run
@@ -8620,9 +8685,16 @@ def main(argv: list) -> int:
                     "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor",
                     "--check-coverage"):
         print("usage: gen_build_index.py "
-              "[--check [--staged]|--write|--check-coverage [--staged]|--check-asbuilt [--staged]|--check-format|"
-              "--survey|--report|--bump|"
+              "[--check [--staged|--with-verdicts]|--write|--check-coverage [--staged]|--check-asbuilt [--staged]|"
+              "--check-format|--survey|--report|--bump|"
               "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
+        return 2
+    # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
+    # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
+    with_verdicts = "--with-verdicts" in argv[2:]
+    if with_verdicts and (mode != "--check" or "--staged" in argv[2:]):
+        print("usage: gen_build_index.py --check --with-verdicts — the flag takes --check alone and never "
+              f"--staged; given {' '.join(argv[1:])}")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -8695,6 +8767,8 @@ def main(argv: list) -> int:
                 print(f"build-index: render SKIPPED under --staged — {why}; the push boundary renders in full")
                 return 0
             print(f"build-index: render owed under --staged — {why}")
+        if with_verdicts:
+            print_check_verdicts(root, conf)
         return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

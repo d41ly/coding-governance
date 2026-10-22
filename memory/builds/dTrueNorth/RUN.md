@@ -184,3 +184,9 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T04:21:17Z dispatch · item 83ead708 TOOL-dTrueNorth-26 · reason memory/guides/SESSION-KICKOFF.md
 
 2026-10-22T05:08:03Z rescope · item add TOOL-dTrueNorth-27 · reason the plain merge bar at f4b9849c9 reds 9 legs this build's units caused (memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-27-bar1.log); one unit clears them before the close
+
+2026-10-22T06:55:23Z dispatch · item f221e113 TOOL-dTrueNorth-27 · reason tools/memory-tree/check-memory-hygiene.sh tools/memory-tree/check-memory-hygiene.test.sh tools/memory-tree/gen_build_index.py tools/memory-tree/asbuilt_view.py tools/memory-tree/deviation_join.py tools/memory-tree/tree_lib.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/memory-tree/README.md tools/check-spec-tokens.py tools/check-spec-tokens.test.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/workflows/unattended-build.test.sh tools/drift-audit/drift_signals.py .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-27.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-27-ledger.md
+
+2026-10-22T06:55:27Z brief · item TOOL-dTrueNorth-27 · reason d2ab4235f67f memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-27-build-brief.md
+
+2026-10-22T07:08:27Z dispatch · item f221e113 TOOL-dTrueNorth-27 · reason memory/map/generated/symbols.json

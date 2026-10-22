@@ -191,6 +191,7 @@ GOVKIT="${GOVKIT_DIR##*/}"
 RUNLOG_DIR=$(resolve_kit_dir "$PY" runlog runlog.py "$HERE") || exit 2
 RUNLOG="${RUNLOG_DIR##*/}"
 CODEBASE_MAP_DIR=$(resolve_kit_dir "$PY" codebase-map map_lib.py "$HERE") || exit 2
+MEMORY_TREE_DIR=$(resolve_kit_dir "$PY" memory-tree design_lib.py "$HERE") || exit 2
 pass=0; fail=0
 ARM_ARGS=()          # the checker's argv for the next `arm`; empty is the gate's own run (TOOL-aMendedFleet-87)
 
@@ -1630,7 +1631,8 @@ else
   echo "arm FAIL  TOOL-dTrueNorth-26 AC11 the clause-id grammar is spelled once in the kit, in design_lib.py — files [$cl_files], lines $cl_lines"; fail=$((fail+1))
 fi
 date_in_lint=$(grep -c -F '[0-9]{2})-spec-' "$LINT")
-date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$HERE/memory-tree/design_lib.py")
+MEMORY_TREE="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$MEMORY_TREE_DIR"
+date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$MEMORY_TREE/design_lib.py")
 if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then
   echo "arm ok    the spec filename date's pattern is spelled in design_lib.py alone"; pass=$((pass+1))
 else

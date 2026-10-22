@@ -6426,7 +6426,7 @@ sed -i '/^### Edges$/,/ — the edge back$/d' memory/builds/tRun/spec/one.md
 sed -i 's/^- \*\*consumes-from\*\* `ARCH-tRun-1`/- **consumes-from**`ARCH-tRun-1`/' memory/builds/tRun/spec/two.md
 git add memory/builds/tRun/spec/one.md memory/builds/tRun/spec/two.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
-hit "$o" "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read"
+hit "$o" "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external"
 hit "$o" "or the word external: memory/builds/tRun/spec/two.md"
 sed -i 's/^- \*\*consumes-from\*\*`ARCH-tRun-1`/- **consumes-from** `ARCH-tRun-1`/' memory/builds/tRun/spec/two.md
 git add memory/builds/tRun/spec/two.md >/dev/null 2>&1
@@ -6461,7 +6461,7 @@ hit "$o" "dispatch declared"
 printf '\n%s\n' '<!-- roster:units -->' >> memory/builds/tRun/README.md
 git add memory/builds/tRun/README.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
-hit "$o" "--dispatch cannot read the authored roster:units pair of memory/builds/tRun/README.md, which is malformed, so a producer planned there with no spec yet could not block its consumer"
+hit "$o" "--dispatch cannot read the authored roster:units pair of memory/builds/tRun/README.md, which is malformed, so a producer planned there with no spec yet could not block its consumer; repair the pair between <!-- roster:units --> and <!-- /roster:units -->: ARCH-tRun-2"
 git rm -q --cached memory/builds/tRun/spec/three.md >/dev/null 2>&1; rm -f memory/builds/tRun/spec/three.md
 # Restore the passing-case spec and the one-unit README the arms below read.
 git rm -q --cached memory/builds/tRun/spec/two.md >/dev/null 2>&1; rm -f memory/builds/tRun/spec/two.md

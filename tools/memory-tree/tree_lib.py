@@ -253,7 +253,7 @@ def build_git_env() -> dict:
 #: they drift apart. That hook list is a subset of this one, unchanged.
 #:
 #: The FOUR pathspec-mode variables are taken VERBATIM from gov's own unset at
-#: `tools/check-playbook-parity.sh:334` (TOOL-aDistilledCharter-7 G6). Git exports none of them to a
+#: `<prefix>/check-playbook-parity.sh:334` (TOOL-aDistilledCharter-7 G6). Git exports none of them to a
 #: hook, but a caller's own environment can carry one, and `GIT_LITERAL_PATHSPECS` turns every
 #: `:(glob)` pathspec this kit reads into a literal name that matches nothing: the log answers empty,
 #: exit 0, and a join over it reports green over a population it never read (TOOL-dTrueNorth-23).
