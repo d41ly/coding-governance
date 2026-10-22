@@ -42,8 +42,8 @@ AC13's gate run over the tree, are owed to the close, RED-first and then GREEN.
 - AC8 — `deviation_join.measure_fixture` — the base fixture read `ref` `main` before the remote and
   `origin/main` with 5 rows after `add_fixture_remote`; the `owner-unknown-id` fixture with the same
   remote and a run-branch row `FIX-dClosedLoop-99` read `origin/main`, its rows lacking the id, and
-  the report render printed `its approver cites FIX-dClosedLoop-99, which no row of DECISIONS.md holds
-  at origin/main`; rows read at the run branch's tip held the id, the red direction.
+  the report render refused the citation, printing `which no row of DECISIONS.md holds at origin/main`;
+  rows read at the run branch's tip held the id, the red direction.
 - AC9 — `GOV_DEFAULT_BRANCH=trunk python tools/memory-tree/deviation_join.py --fixture --plant rotated --policy refuse`
   — exit 0, no `unread at trunk` line; the HEAD join exited 1 printing one.
 - AC10 — `grep -c` — `or the word external or none:\$_c_bad` in `unattended.sh` printed 1,
@@ -54,8 +54,8 @@ AC13's gate run over the tree, are owed to the close, RED-first and then GREEN.
 - AC12 — the AC2 child with `cmd_check_asbuilt` raising `KeyError("planted")` — `verdict 30 exit 2`
   then `build-index: KeyError: 'planted'`, then `verdicts end`, `n9`, `drift`, exit 0; the HEAD
   generator died with the traceback before `--check` ran.
-- AC13 — the closure line's counting expression over the review's 13 scanned paths printed
-  `11 sibling module(s) and 2 other scanned file(s)`, over the control fixture's three `2 and 1`;
+- AC13 — `11 sibling module(s) and 2 other scanned file(s)` — the closure line's counting expression
+  printed it over the review's 13 scanned paths, and `2 and 1` over the control fixture's three;
   `grep -c '2 sibling module(s) and 1 other scanned file(s)'` in the suite printed 1. The gate run
   over the tree is a leg, refused to this role, and owed to the close.
 - AC14 — `grep -c -F -- '- **consumes-from** none — it builds on nothing'` in the suite printed 1.
