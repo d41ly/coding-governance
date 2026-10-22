@@ -5,8 +5,8 @@
 No merge bar, no self-test suite and no gate leg ran in this pass: the role's hook refused
 `sh_hygiene.py` and the spec-token checker as legs, so every leg command an AC names is owed to the
 close, where the plain bar grades the nine legs `2026-10-22-build-TOOL-dTrueNorth-27-bar1.log`
-printed red. The naming lexicon answered the three functions the pass mints (`--suggest <name> --as
-py.function`, OK for each). Each line below is a probe of the changed code over `f221e1135`, with its
+printed red. The naming lexicon answered the three functions the pass mints
+(`--suggest <name> --as py.function`, OK for each). Each line below is a probe of the changed code over `f221e1135`, with its
 red side observed over HEAD's file where one is named. Fixture repositories sat under short `%TEMP%`
 paths with no hook installed. The `New arm:` lines' RED-first observations are owed to the close.
 
@@ -26,23 +26,27 @@ paths with no hook installed. The `New arm:` lines' RED-first observations are o
   checks 29 and 30 from check 9's one generator process, with no verdict marker line left in check
   9's own block. The `fork-count.sh --only memory-hygiene` count is owed.
 - AC5 — `python tools/memory-tree/gen_build_index.py --check --with-verdicts` — in the tree it
-  printed `build-index: verdict 29 exit 0`, `build-index: verdict 30 exit 0` and `build-index:
-  verdicts end` above `--check`'s lines, and each section split as check 29 and 30 split it equalled
-  its standalone verb byte for byte. Over the scratch fixture the full run's check 29 and 30 lines
+  printed `build-index: verdict 29 exit 0`, `build-index: verdict 30 exit 0` and
+  `build-index: verdicts end` above `--check`'s lines, and each section split as check 29 and 30
+  split it equalled its standalone verb byte for byte. Over the scratch fixture the full run's check 29 and 30 lines
   and FAILED blocks equalled the `--only 29` and `--only 30` runs red (a planted uncarried clause, a
   gap record) and green; a planted traceback gave both checks their unreadable branch.
-- AC6 — `bash tools/check-install-prefix.sh --list` — owed to the close; by `grep` none of the
-  thirteen spellings stands: no `HERE / "memory-tree"`, no `$HERE/memory-tree/design_lib.py`, no
-  `tools/fix-` in the deviation fixture, no `"tools", "workflows"` join in the generator selftest,
-  and `<prefix>/check-playbook-parity.sh:334` in `tree_lib.py`.
+- AC6 — `tools/check-spec-tokens.py` — by `grep` over it, its suite,
+  `tools/memory-tree/deviation_join.py`, `tools/memory-tree/gen_build_index.py` and
+  `tools/memory-tree/tree_lib.py`, none of the thirteen spellings stands: no `HERE / "memory-tree"`,
+  no `$HERE/memory-tree/design_lib.py`, no `tools/fix-` in the deviation fixture, no
+  `"tools", "workflows"` join in the generator selftest, and `<prefix>/check-playbook-parity.sh:334`
+  in `tree_lib.py`. The `bash tools/check-install-prefix.sh --list` run is owed to the close.
 - AC7 — `tools/lib/resolve_kit_dir.py` — `diff` of its block against the checker's between
   `# >>> resolve_kit_dir` and `# <<< resolve_kit_dir` printed nothing; from a scratch repository's
   `tools/` the resolver raised `LookupError` naming the receipt, `tools/memory-tree` and
   `memory-tree`, the text the checker's `REFUSING` line carries. The copied checker's own run, and
   `--legs-for`, were refused as the spec-token leg and are owed.
-- AC8 — `python tools/memory-tree/deviation_join.py --selftest` — owed to the close; its fixture,
-  routing `src/` through `FIXTURE_ROUTED`, ran as `--fixture` exit 0 with every base member joined,
-  and `asbuilt_view.py --fixture` rendered its dated view with `findings 0`, exit 0.
+- AC8 — `src/` — the deviation fixture, routing `src/` through `FIXTURE_ROUTED`, ran as
+  `deviation_join.py --fixture` exit 0 with every base member joined, and `asbuilt_view.py --fixture`
+  rendered its dated view with `findings 0`, exit 0. Both selftests,
+  `python tools/memory-tree/deviation_join.py --selftest` and
+  `python tools/memory-tree/gen_build_index.py --selftest`, are owed to the close.
 - AC9 — `tools/unattended/unattended.sh` — a probe reading the driver and its suite found branch 23's
   message free of command substitution and its arm the whole printed message, signature run
   included, and branch 24's prefix arm running to `or the word external`; over HEAD's two files the
@@ -65,8 +69,8 @@ paths with no hook installed. The `New arm:` lines' RED-first observations are o
   `check-remote-literals.sh` run is owed.
 - AC15 — `python tools/memory-tree/deviation_join.py --approval author-recorded` — in the tree, no
   line says `DECISIONS.md is unread`; in a scratch clone `deviation_join.read_decision_ref` returned
-  `None` and the ladder's text `GOV_REMOTE names no-such-remote, which is no remote of this
-  repository (origin)` with `GOV_REMOTE` exported, and `origin/main` with it unset.
+  `None` and the ladder's text, opening `GOV_REMOTE names no-such-remote, which is no remote`, with
+  `GOV_REMOTE` exported, and `origin/main` with it unset.
 - AC16 — `tools/memory-tree/deviation_join.py` — govkit's update and re-render sentence predicate,
   copied into a probe, found 0 sentences across the kit's tracked files, and 1 in HEAD's file, the
   `add_plant` paragraph pairing `files.update` with `re-rendered`. The `govkit selfcheck` run is owed.
