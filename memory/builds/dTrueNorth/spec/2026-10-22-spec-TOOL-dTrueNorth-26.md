@@ -17,6 +17,7 @@
 | [2026-10-22-prompt-TOOL-dTrueNorth-26-2-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-2-spec-writer.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-26-divergence-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-divergence-brief.md) | research | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-26-spec-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-spec-brief.md) | research | — |
+| [2026-10-22-review-TOOL-dTrueNorth-23-closing-diff-review-round2.md](../reviews/2026-10-22-review-TOOL-dTrueNorth-23-closing-diff-review-round2.md) | diff-review | TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-27 TOOL-dTrueNorth-29 TOOL-dTrueNorth-30 |
 
 <!-- /gen:spec-records -->
 

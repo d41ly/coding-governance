@@ -12,6 +12,7 @@
 | [2026-10-22-build-TOOL-dTrueNorth-24-deviation-23.md](../build/2026-10-22-build-TOOL-dTrueNorth-24-deviation-23.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-24-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-24-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-23-spec-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-23-spec-brief.md) | research | TOOL-dTrueNorth-23 TOOL-dTrueNorth-25 |
+| [2026-10-22-review-TOOL-dTrueNorth-23-closing-diff-review-round2.md](../reviews/2026-10-22-review-TOOL-dTrueNorth-23-closing-diff-review-round2.md) | diff-review | TOOL-dTrueNorth-23 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-27 TOOL-dTrueNorth-29 TOOL-dTrueNorth-30 |
 
 <!-- /gen:spec-records -->
 
