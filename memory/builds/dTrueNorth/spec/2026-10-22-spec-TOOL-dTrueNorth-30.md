@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-30 — the check 21 writer arm declares the undated-artifact exemption its fixture's neighbours declare
 
-**Status:** OPEN · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 13
+**Status:** CLOSED · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 13
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-30-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-30-ledger.md) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-30-deviation-32.md](../build/2026-10-22-build-TOOL-dTrueNorth-30-deviation-32.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-30-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-30-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-30-1-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-30-1-spec-writer.md) | journal | — |

@@ -3385,6 +3385,7 @@ write_pk_conf ""
 # ---- The record sits in the build's `reviews/` folder because the writer test reads that folder
 # ---- alone, one glob pathspec (TOOL-dTrueNorth-19 S1): planted under `build/`, its adding commit is
 # ---- never read and it is graded (TOOL-dTrueNorth-29 S6).
+# ---- Its conf exempts undated artifacts as the TOOL-aRepatriatedFork-32 confs do: the TOOL-aRepatriatedFork-10 block's result.json stays in this tree and would otherwise be the check 21 red the second arm reads (TOOL-dTrueNorth-30).
 WF_KIT=$(resolve_kit_dir "$_PY" workflows tier2-review.js "$HERE" 2>/dev/null) || WF_KIT=""
 if [ -z "$WF_KIT" ]; then
   echo "skip check 21's writer test through the engine: no workflows kit beside this one, so its two arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))
@@ -3400,7 +3401,7 @@ else
     && git add -A && git -c commit.gpgsign=false commit -q -m tn14-l --no-verify \
     && git -c commit.gpgsign=false merge -q --no-ff --no-edit tn14-run \
     && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn14-gen --no-verify ) >/dev/null 2>&1
-  write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"'; o=$(run_pk_gate)
+  write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"\nRECORD_UNDATED_ARTIFACTS="exempt"'; o=$(run_pk_gate)
   n=$((n+1))
   case "$o" in
     *"check 21: the audit-pin arm graded 1 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=2026-09-01, 1 written by a harness before renderAuditBinding"*) echo "ok   check 21: the audit-pin arm counts a record an older harness wrote as exempt, from the Q row's fourth field" ;;

@@ -198,3 +198,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T09:19:49Z brief · item TOOL-dTrueNorth-29 · reason 749a0bf50a8b memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-29-build-brief.md
 
 2026-10-22T10:10:28Z rescope · item add TOOL-dTrueNorth-30 · reason the check 21 writer arm TOOL-dTrueNorth-14 added has never been green: an earlier arm's undated result.json in the shared fixture reds check 21 under its conf; one micro-unit declares the exemption the neighbouring arms already declare
+
+2026-10-22T10:26:20Z dispatch · item 653e811e TOOL-dTrueNorth-30 · reason tools/memory-tree/check-memory-hygiene.test.sh memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-30.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-30-ledger.md
+
+2026-10-22T10:26:25Z brief · item TOOL-dTrueNorth-30 · reason 5fb781d0522c memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-30-build-brief.md
