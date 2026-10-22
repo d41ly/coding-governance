@@ -92,7 +92,25 @@ Records: 1 bound to this build, across 1 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 18 (cl-dClosedLoop-0068, cl-dClosedLoop-0069, cl-dClosedLoop-0070, cl-dClosedLoop-0071, cl-dClosedLoop-0072, cl-dClosedLoop-0073, cl-dClosedLoop-0074, cl-dClosedLoop-0075, cl-dClosedLoop-0076, cl-dClosedLoop-0077, cl-dClosedLoop-0078, cl-dClosedLoop-0079, cl-dClosedLoop-0080,
+  cl-dClosedLoop-0081, cl-dClosedLoop-0082, cl-dClosedLoop-0083, cl-dClosedLoop-0084, cl-dClosedLoop-0085)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.review.lens, item.review.pin, item.review.refute, item.review.report, policy-key.review.design-audit.runs, policy-key.review.design-audit.seed, policy-key.review.opt-in, policy-key.review.twin, policy-key.review.unclassed, record-kind.review
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0071, cl-dClosedLoop-0072, cl-dClosedLoop-0073, cl-dClosedLoop-0074, cl-dClosedLoop-0076, cl-dClosedLoop-0080, cl-dClosedLoop-0081, cl-dClosedLoop-0082, cl-dClosedLoop-0084
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

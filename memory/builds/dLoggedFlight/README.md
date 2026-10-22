@@ -155,6 +155,8 @@ Records: 40 bound to this build, across 4 record folder(s).
 Ids no record names: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19.
 
 Ids no `spec-audit` record has ever named: TOOL-dLoggedFlight-17 TOOL-dLoggedFlight-18 TOOL-dLoggedFlight-19 TOOL-dLoggedFlight-28 TOOL-dLoggedFlight-29 TOOL-dLoggedFlight-30.
+
+Ids whose spec moved past its audited revision: none — 0 of 30 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

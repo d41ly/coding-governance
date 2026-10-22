@@ -72,6 +72,8 @@ Records: 4 bound to this build, across 2 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dMuffledSentinel-1 TOOL-dMuffledSentinel-2 TOOL-dMuffledSentinel-3.
+
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

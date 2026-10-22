@@ -6,7 +6,7 @@ model: inherit
 workflow: closing-review
 reads: input:diff, input:spec?
 writes: none
-rules: verify, gate, class, left-shift, security, risk, bytes, cross-os?
+rules: verify, gate, class, docs, left-shift, security, risk, bytes, cross-os?
 returns: concrete findings, each with its file and line, the input that reaches it, the consequence and a proposed fix
 mandatory: for every closing review
 output: findings, to its harness

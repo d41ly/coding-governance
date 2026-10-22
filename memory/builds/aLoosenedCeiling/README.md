@@ -147,6 +147,8 @@ Records: 2 bound to this build, across 2 record folder(s).
 Ids no record names: TOOL-aLoosenedCeiling-4.
 
 Ids no `spec-audit` record has ever named: TOOL-aLoosenedCeiling-4.
+
+Ids whose spec moved past its audited revision: none — 0 of 4 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

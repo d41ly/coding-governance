@@ -101,7 +101,26 @@ Records: 1 bound to this build, across 1 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 26 (cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0169, cl-dClosedLoop-0170, cl-dClosedLoop-0171, cl-dClosedLoop-0172, cl-dClosedLoop-0173, cl-dClosedLoop-0174, cl-dClosedLoop-0175, cl-dClosedLoop-0176, cl-dClosedLoop-0177, cl-dClosedLoop-0178,
+  cl-dClosedLoop-0179, cl-dClosedLoop-0180, cl-dClosedLoop-0181, cl-dClosedLoop-0182, cl-dClosedLoop-0183, cl-dClosedLoop-0184, cl-dClosedLoop-0185, cl-dClosedLoop-0186, cl-dClosedLoop-0187, cl-dClosedLoop-0188, cl-dClosedLoop-0189, cl-dClosedLoop-0190, cl-dClosedLoop-0191)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.driver.reads, policy-key.instructions.task-charter, policy-key.prompts.author, policy-key.roles.effort.<role>, policy-key.roles.effort.<workflow>.<stage>, policy-key.roles.effort.default, policy-key.roles.model.<role>.<harness>, policy-key.roles.no-spawn,
+  policy-key.roles.retries, policy-key.run.on-owner-question, record-kind.work-order, system.role-shapes, tag-namespace.field, tag-namespace.role, tag-namespace.workflow
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0169, cl-dClosedLoop-0172, cl-dClosedLoop-0173, cl-dClosedLoop-0178, cl-dClosedLoop-0187, cl-dClosedLoop-0189
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

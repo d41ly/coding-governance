@@ -41,10 +41,21 @@ replace the subject; this file reads the H1 and the union, and NOTHING machine-j
 
 Every git call is pinned (`--no-replace-objects`, `tree_lib.build_git_env`) and counted: the
 self-test holds the number of spawns constant whatever the range holds.
+
+THE DEVIATION JOIN (TOOL-dTrueNorth-4) is hosted here, its core `deviation_join.py`, over the two
+populations this leg already reads: the RANGE half asks whether each design or spec departure in
+the pushed range had its deviation record in its departing commit's tree, the WHOLE half joins every
+departure at HEAD and grades every approver. Its lines follow this leg's under `routed-commits:
+deviation`, and it runs the chain's `report` value, so it never moves the exit. Off unless the conf
+declares all four DESIGN_* keys, in one line and with no git call, so the
+constant spawn count holds there; armed, its spawns grow with the chain-build specs' revisions. A
+declared design it cannot measure is REFUSED, exit 2.
 """
 from __future__ import annotations
 
+import contextlib
 import datetime
+import io
 import os
 import pathlib
 import re
@@ -59,16 +70,11 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
-from tree_lib import build_git_env, build_spec_path_re, parse_conf, parse_spec_h1  # noqa: E402
+from tree_lib import GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, parse_spec_h1  # noqa: E402
 
 SAY = "routed-commits"
 ZERO_SHA_RE = re.compile(r"^0+$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
-# The variables a hook exports that would point a `-C <repo>` call at ANOTHER repository. Every call
-# here names its repository explicitly, so dropping them is always correct, and it is what keeps a
-# self-test fixture from reading the real repository when the bar runs inside a hook.
-GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
-                     "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_PREFIX")
 #: Every git process this module starts, counted so the self-test can hold it constant (AC6).
 GIT_SPAWNS = [0]
 
@@ -78,11 +84,14 @@ class Refusal(Exception):
 
 
 def run_git(repo, *args, stdin: bytes | None = None, may_fail: bool = False):
-    """One pinned git call in `repo`, its stdout as bytes; None on failure when `may_fail`."""
+    """One pinned git call in `repo`, its stdout as bytes; None on failure when `may_fail`.
+
+    Its env is `build_git_env` less `tree_lib.GIT_ENV_LEAKS`, the kit's one list, `GIT_NAMESPACE`
+    included (TOOL-dTrueNorth-26 S1): every call here names its repository explicitly, so dropping the
+    variables a hook exports is always correct, and it is what keeps a self-test fixture from reading
+    the real repository when the bar runs inside a hook."""
     GIT_SPAWNS[0] += 1
-    env = build_git_env()
-    for key in GIT_LOCATION_VARS:
-        env.pop(key, None)
+    env = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}
     argv = ["git", "--no-replace-objects", "-c", "log.showSignature=false", "-C", str(repo), *args]
     proc = subprocess.run(argv, input=stdin, capture_output=True, env=env)
     if proc.returncode != 0:
@@ -251,9 +260,10 @@ def check_routed_commits(repo, env) -> tuple:
         populations.append(("WHOLE", ["HEAD"], "WHOLE beside RANGE (the history remote CI grades)", " WHOLE"))
     id_re = build_id_re(families)
     routed = " ".join(entries)
-    lines, failed, range_shas = [], False, set()
+    lines, failed, range_shas, read = [], False, set(), []
     for mode, rev_args, label, tag in populations:
         commits = read_routed_commits(repo, rev_args)
+        read.append((mode, label.split(" (")[0], commits))
         total = int(run_git(repo, "rev-list", "--count", *rev_args).decode("utf-8").strip())
         if total != len(commits):
             raise Refusal(f"the log pass parsed {len(commits)} commit(s) and `git rev-list --count` reports {total} "
@@ -316,7 +326,32 @@ def check_routed_commits(repo, env) -> tuple:
         for w in stale:
             lines.append(f"{SAY} FAILED — ROUTED_COMMIT_WAIVED lists {w}, which is not a violation in the graded "
                          f"population: a stale waiver widens nothing, remove it")
-    return (1 if failed else 0), lines
+    # TOOL-dTrueNorth-4 S7: the deviation join over the populations just read. It lists and never moves
+    # the exit, which stays this leg's own verdict.
+    return (1 if failed else 0), lines + check_deviation_join(repo, conf, read)
+
+
+def check_deviation_join(repo, conf, read) -> list:
+    """The deviation join's lines (TOOL-dTrueNorth-4 S7), hosted over the populations this leg read:
+    `read` is `[(mode, label, commits)]`, its WHOLE list among them, so the join reads history once.
+
+    Its RANGE half asks whether each member departing in the pushed range has its record in that
+    commit's tree; its WHOLE half joins every member at HEAD and grades every approver. It runs the
+    chain's values, `report` and `author-recorded`, so it lists and never moves the exit. Its states are
+    the key rule's, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S5): OFF when all four DESIGN_*
+    keys are blank, one line and no git call, so a tree declaring no design keeps this leg's constant
+    spawn count. ARMED, its spawns grow with the chain-build specs' revisions. A partial key set, and a
+    declared design it cannot measure, its pin unreadable among them, is a Refusal, exit 2, as an
+    unarmed conf is here.
+    """
+    import deviation_join  # noqa: E402  the join's core, a sibling loaded only here
+    try:
+        armed, why = deviation_join.read_join_state(repo, conf)
+        if not armed:
+            return [f"{SAY}: deviation join off — {why}"]
+        return [f"{SAY}: {ln}" for ln in deviation_join.read_host_lines(repo, conf, read)]
+    except deviation_join.Unmeasured as exc:
+        raise Refusal(f"the deviation join is armed and measures nothing: {exc}") from None
 
 
 def read_newest_unit(repo, rev_range: str) -> str:
@@ -356,7 +391,7 @@ def build_fixture(root: pathlib.Path, name: str, commits: list) -> tuple:
     1-based position; a commit's first parent defaults to the one before it."""
     repo = root / name
     repo.mkdir()
-    run_git(repo, "init", "-q")
+    run_git(repo, "init", "-q", "--template=")      # no template seeds node state (TOOL-dTrueNorth-32 S7)
     (repo / ".git" / "HEAD").write_bytes(b"ref: refs/heads/main\n")
     out = bytearray()
     for n, c in enumerate(commits, 1):
@@ -541,6 +576,11 @@ def run_selftest() -> int:
         rc, out = run_check(repo)
         print_arm(rc == 0 and "graded 0 — the range holds 3 commit(s)" in out and "ROUTED_PATHS src/" in out,
             "AC5 a range with no graded commit prints graded 0, its commit count and ROUTED_PATHS", out)
+        # TOOL-dTrueNorth-4 AC12: a conf declaring no design key prints ONE join-off line naming the keys,
+        # and the exit is the leg's own; the spawn arm below holds that it reads no history.
+        print_arm(rc == 0 and out.count(f"{SAY}: deviation join off — ") == 1
+            and "DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, DESIGN_NODES are blank" in out,
+            "TOOL-dTrueNorth-4 AC12 the deviation join is off with the design keys blank, in one line", out)
 
         # ---- AC6: the spawn count does not grow with the commits
         counts = []
@@ -610,6 +650,99 @@ def run_selftest() -> int:
         set_fixture_conf(repo)
         newest = read_newest_unit(repo, f"{s[1]}..HEAD")
         print_arm(newest == "TOOL-tFix-1", f"AC11 --newest-unit skips a newest merge commit's id (got '{newest}')")
+
+        # ---- TOOL-dTrueNorth-4 AC1-AC7 AC10 AC13: the deviation join's fixture over every plant, each
+        # plant's failing case staged by the plant itself, and the record-late plant through this host.
+        # TOOL-dTrueNorth-12 AC1 AC3 AC6: run from a tree whose conf declares no DESIGN_* key, so a fixture
+        # reading this tree's design cannot build, the composed run last; then again under a resolver
+        # stub raising LookupError, so the kit's absence is one named SKIP and every other plant, the
+        # record-late arm through this host included, runs under the identity strip.
+        import deviation_join  # noqa: E402  the join's core, a sibling
+        repo, _s = build_fixture(root, "nodesign", [{"msg": "init", "files": {"README.md": "x\n"}}])
+        set_fixture_conf(repo)
+
+        def resolve_no_kit(*_args):
+            raise LookupError("the self-test's stub resolves no kit")
+
+        here, skipped = os.getcwd(), io.StringIO()
+        os.chdir(repo)
+        try:
+            for ok, what, detail in deviation_join.run_plant_arms():
+                print_arm(ok, what, detail)
+            with contextlib.redirect_stdout(skipped):
+                stubbed = deviation_join.run_plant_arms(resolve=resolve_no_kit)
+        finally:
+            os.chdir(here)
+        held = deviation_join.STRIP_PLANTS
+        out = skipped.getvalue()
+        print_arm(out.count("deviation: SKIP — the unattended kit does not resolve") == 1
+            and "the self-test's stub resolves no kit" in out and f"· {' '.join(held)}" in out
+            and not any(f" plant {p} " in what for _ok, what, _d in stubbed for p in held)
+            and any(" AC10 " in what for _ok, what, _d in stubbed) and any(" AC6 " in what for _ok, what, _d in stubbed),
+            "TOOL-dTrueNorth-12 AC1 a resolver stub raising LookupError is one SKIP line naming why and the "
+            f"plants it holds back, {' '.join(held)}, which run no arm, and the record-late host arm and the "
+            "composed run still run", out)
+        for ok, what, detail in stubbed:
+            print_arm(ok, f"under the resolver stub: {what}", detail)
+
+        # ---- TOOL-dTrueNorth-20 AC15 (S16): a RESOLVED kit that cannot strip is the unresolved kit. A
+        # scratch kit whose lib-unattended.sh holds no single-line assignment, then an empty one, then a
+        # good one with no awk on PATH: each raises LookupError naming the file and GEN_REGION_AWK.
+        # Against the base reader the first raised Unmeasured, the second returned '', and every
+        # revision then read as status-only, and the third passed the strip to a run that cannot start.
+        kit20 = root / "kit20"
+        kit20.mkdir()
+        lib20 = kit20 / "lib-unattended.sh"
+        real_which = shutil.which
+        for case, text, which in (("no single-line assignment", "#!/usr/bin/env bash\nOTHER='x'\n", real_which),
+                                  ("an empty value", "GEN_REGION_AWK=''\n", real_which),
+                                  ("no awk on PATH", "GEN_REGION_AWK='{ print }'\n", lambda *_a, **_k: None)):
+            lib20.write_bytes(text.encode("utf-8"))
+            shutil.which = which
+            try:
+                got = f"returned {deviation_join.read_gen_region_awk(lambda *_a: kit20)!r}"
+            except LookupError as exc:
+                got = f"LookupError {exc}"
+            finally:
+                shutil.which = real_which
+            print_arm(got.startswith("LookupError ") and lib20.as_posix() in got and "GEN_REGION_AWK" in got,
+                f"TOOL-dTrueNorth-20 AC15 a resolved kit with {case} raises LookupError naming the file and "
+                "GEN_REGION_AWK", got)
+
+        # ---- TOOL-dTrueNorth-20 AC17 (S18): the revision reader over 601 spec paths, every one at least 98
+        # bytes, returns one revision each through ONE glob pathspec, where the paths on argv raise
+        # [WinError 206]; and a revision log exiting 128 is the named refusal, never an empty history.
+        import design_lib  # noqa: E402  the one revision reader, a sibling
+        specs20 = {f"memory/builds/dAlpha/spec/2026-10-21-spec-TOOL-dAlpha-{n}-a-padded-name-past-ninety-eight-"
+                   f"bytes-{n:03d}.md": f"# TOOL-dAlpha-{n} — one\n" for n in range(1, 602)}
+        repo, _s = build_fixture(root, "revs601", [{"msg": "601 specs", "files": specs20}])
+        try:
+            got = design_lib.read_spec_revisions(repo, list(specs20))
+            seen = f"read {sum(len(v) == 1 for v in got.values())} of {len(got)}"
+        except (OSError, design_lib.DesignRefusal) as exc:
+            seen = f"{type(exc).__name__} {exc}"
+        print_arm(min(len(p.encode("utf-8")) for p in specs20) >= 98 and seen == "read 601 of 601",
+            "TOOL-dTrueNorth-20 AC17 read_spec_revisions over 601 spec paths of at least 98 bytes reads one "
+            "revision each, raising no OSError", seen)
+        stub20 = root / "git_log_stub20.py"
+        stub20.write_bytes(b"import sys\nsys.stderr.write('fatal: the stub refuses git log\\n')\nsys.exit(128)\n")
+        real_run = subprocess.run
+
+        def run_log_stub(argv, *a, **kw):
+            if "log" in tuple(argv[:3]) and tuple(argv[:1]) == ("git",):
+                return real_run((sys.executable, str(stub20)), *a, **kw)
+            return real_run(argv, *a, **kw)
+
+        subprocess.run = run_log_stub
+        try:
+            design_lib.read_spec_revisions(repo, list(specs20))
+            seen = "no refusal"
+        except design_lib.DesignRefusal as exc:
+            seen = str(exc)
+        finally:
+            subprocess.run = real_run
+        print_arm("the spec revision log failed" in seen and "fatal: the stub refuses git log" in seen,
+            "TOOL-dTrueNorth-20 AC17 a revision log exiting 128 raises the named refusal, its stderr line in it", seen)
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
@@ -639,5 +772,7 @@ def main(argv: list) -> int:
 
 
 if __name__ == "__main__":
+    # The deviation join imports this module by name; one copy keeps one Refusal class and one counter.
+    sys.modules.setdefault("routed_commits", sys.modules[__name__])
     sys.stdout.reconfigure(encoding="utf-8")
     sys.exit(main(sys.argv))

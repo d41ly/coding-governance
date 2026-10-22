@@ -725,7 +725,10 @@ def read_header_verbs(header: str, path: str, expand) -> dict:
 
     `expand` is the generator's `_expand_ids` bound to this repo's family alternation, passed in
     rather than imported: this module owns no id alternation of its own and must not grow a second
-    one.
+    one. ITS CONTRACT is `expand(value) -> (ids, bad)`, the pair `_expand_ids` returns to every
+    caller; a return that is not a pair raises `Problem` naming that contract and the spec path, so a
+    caller stranded by a change to the expander is a named refusal, never a bare `ValueError` on an
+    unpack (TOOL-dTrueNorth-16 S15).
     """
     out: dict = {}
     for verb in _VERBS:
@@ -741,7 +744,13 @@ def read_header_verbs(header: str, path: str, expand) -> dict:
         if not value:
             raise Problem(f"{path}: status header carries `{verb}` with no value, and a verb naming "
                           f"no ask is not a link")
-        ids, bad = expand(value)
+        got = expand(value)
+        if not (isinstance(got, tuple) and len(got) == 2):
+            raise Problem(f"{path}: the expander handed to read_header_verbs returned "
+                          f"{len(got) if isinstance(got, tuple) else type(got).__name__}"
+                          f"{' values' if isinstance(got, tuple) else ''} for `{verb} {value}`, and its contract is "
+                          f"expand(value) -> (ids, bad), the pair `_expand_ids` returns")
+        ids, bad = got
         if bad:
             raise Problem(f"{path}: status header carries `{verb} {value}`, and "
                           f"{' '.join(bad)} is not an id or an id range")

@@ -2,7 +2,10 @@
 """gen_build_index.py — the generated build index for a flat memory tree (memory-tree kit 1.5).
 
     python <prefix>/memory-tree/gen_build_index.py --check         # drift gate (writes nothing)
+    python <prefix>/memory-tree/gen_build_index.py --check --with-verdicts  # checks 29 and 30's verdicts first
     python <prefix>/memory-tree/gen_build_index.py --write         # (re)render every artifact
+    python <prefix>/memory-tree/gen_build_index.py --check-coverage [--staged]  # a chain spec INPROGRESS on red coverage
+    python <prefix>/memory-tree/gen_build_index.py --check-asbuilt [--staged]   # the as-built view's verdicts
     python <prefix>/memory-tree/gen_build_index.py --check-format  # the slot contract + heading canon
     python <prefix>/memory-tree/gen_build_index.py --survey        # the canon over every README, never fails
     python <prefix>/memory-tree/gen_build_index.py --doctor <slug> # every failing rule for one build folder
@@ -20,7 +23,7 @@ It replaces the retired directory-listing generator. A listing carried paths, wh
 prints better; this carries STATUS, which git does not — and a build's status is a PURE FUNCTION of
 its units' statuses, so nothing here is authored and nothing rots.
 
-FIVE SOURCES, NOTHING ELSE
+SEVEN SOURCES, NOTHING ELSE
   * each build's README front matter (slug node opened streams roster [status])
   * every `**Status:**` header under that build's spec/, at any depth
   * for the ROSTER, and for the date of a build's last record, every tracked file under the memory
@@ -35,6 +38,19 @@ FIVE SOURCES, NOTHING ELSE
     join, called in-process through that kit's own signal and restated nowhere here, which greps
     tracked product source; LIVE.md renders its rows as a per-build `Landed-unclosed` count
     (TOOL-aMendedFleet-13). Blank or absent, the drift kit is never imported.
+  * under a set `SPEC_CARRIES_CUTOFF` ONLY, the carries join's coverage, `derive_carries_coverage` of
+    the spec-tokens checker in this kit directory's parent, loaded by path and restated nowhere here,
+    handed this module's parse of the conf (TOOL-dTrueNorth-16 S14); each chain build's README renders
+    it as the `build-coverage` region, and `--check-coverage` refuses a chain build's INPROGRESS spec
+    while it is red (TOOL-dTrueNorth-3). That join reads git history, the one exception to the line
+    below. Blank or absent, the checker is never loaded; set over a blank design, a refusal (S7).
+  * under all four DESIGN_* keys ONLY, the key rule `design_lib.read_design_keys` states, the as-built
+    view's inputs, read by the sibling `asbuilt_view.py` BEFORE every other artifact renders, so the
+    coverage regions read the view just written and one `--write` is a fixed point (TOOL-dTrueNorth-16
+    S20): the design record's `[chain]` at the baseline commit, a second exception to the line below,
+    and every deviation record. `--write` writes DESIGN_VIEW, `--check` compares its bytes, and
+    `--check-asbuilt` prints its verdicts (TOOL-dTrueNorth-6, S17). All four blank, one `as-built
+    view: off` line is printed and nothing is read; a partial set is a refusal naming each blank key.
 No git history and no mtimes. A source the renderer does not read cannot make the render drift; a
 source the renderer WRITES must not also be read, or a wrong value defends itself forever.
 
@@ -57,6 +73,8 @@ from __future__ import annotations
 import ast
 import contextlib
 import datetime
+import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -69,7 +87,6 @@ import sys
 import tempfile
 
 CR = chr(13)   # one carriage return; see _is() and _one_cr()
-RECORD_KINDS = ("spec", "build", "reviews", "prompts")
 MARK_OPEN = "<!-- gen:build-index -->"
 MARK_CLOSE = "<!-- /gen:build-index -->"
 
@@ -86,8 +103,8 @@ PLAN_OPEN = "<!-- roster:units -->"
 PLAN_CLOSE = "<!-- /roster:units -->"
 
 # Every generated region, in CANONICAL SLOT ORDER. `--write` creates a missing pair at its position
-# here; `--check` never demands one (TOOL-aRuledFrontispiece-1 S1c). The order is a property of this
-# list rather than of whoever edited a README last.
+# here; `--check` never demands one (TOOL-aRuledFrontispiece-1 S1c), `build-coverage` excepted. The
+# order is a property of this list rather than of whoever edited a README last.
 #
 # The renderer is looked up by name at call time rather than stored, so this stays a plain data
 # declaration and a region cannot be half-registered.
@@ -98,11 +115,21 @@ PLAN_CLOSE = "<!-- /roster:units -->"
 UNITS_OPEN = "<!-- gen:build-units -->"
 UNITS_CLOSE = "<!-- /gen:build-units -->"
 
+# TOOL-dTrueNorth-3 S1 — `build-coverage` sits DIRECTLY AFTER `build-index`, beside the unit ids its
+# units table carries, which moved every later entry one index down: each renderer finds its own pair
+# BY NAME, never by tuple index. It is the one region whose creation is CONDITIONAL — `--write` adds it
+# only to a chain build's README while `SPEC_CARRIES_CUTOFF` is set, and `--check` demands it there
+# (section 8 F2), so the S1c rule below holds for every other region and not for this one.
 GEN_REGIONS = (
     ("build-index", MARK_OPEN, MARK_CLOSE),
+    ("build-coverage", "<!-- gen:build-coverage -->", "<!-- /gen:build-coverage -->"),
     ("build-order", "<!-- gen:build-order -->", "<!-- /gen:build-order -->"),
     ("build-edges", "<!-- gen:build-edges -->", "<!-- /gen:build-edges -->"),
 )
+# The key that arms the coverage region and `--check-coverage`, and the checker whose join it reads,
+# which sits in this kit directory's PARENT and is loaded by path only while the key is set.
+CARRIES_KEY = "SPEC_CARRIES_CUTOFF"
+CARRIES_CHECKER = "check-spec-tokens.py"
 # TOOL-dFramedEntrypoint-5 — `build-docs` was the LAST entry and is gone. Removing the last entry
 # shifts no surviving index, which is why no sibling region moved; the selftest arms that addressed
 # it BY TUPLE INDEX did have to move, and a grep for the marker name could not have found them.
@@ -151,13 +178,16 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # module sits outside the resolved root (a test fixture, an odd checkout); the header is a pointer,
 # never a gate input.
 # TOOL-aRepatriatedFork-9 -- `kit_rel`, the status vocabulary, the conf parser and the fence reader
-# live in `tree_lib.py`, the one module every engine in this kit imports. They are re-imported here so
+# live in `tree_lib.py`, the one module every engine in this kit imports, and since TOOL-dTrueNorth-29
+# S2 the record-binding reader and the status-header grammar with them. They are re-imported here so
 # every caller that reaches them as `gen_build_index.<name>` keeps working, and so this module no
 # longer imports a sibling ENGINE: an adopter's own `corpus_ids.py` stops being able to kill it.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
-    STATUS_TOKENS, TERMINAL, build_spec_path_re, kit_rel, parse_conf, parse_spec_h1,
-    scan_missing_citations, unfenced_lines,
+    BIND_HEAD_LINES, BIND_RE, GIT_ENV_LEAKS, HDR_RE, RECORD_KIND_TOKENS, RECORD_KINDS, STATUS_TOKENS, TERMINAL,
+    UNBOUND_RE, _expand_ids, _id_alternation, build_id_token_re, build_spec_path_re, kit_rel, parse_conf,
+    parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at, read_id_pins, read_text, record_paths,
+    scan_missing_citations, unfenced, unfenced_lines,
 )
 
 
@@ -168,11 +198,6 @@ GEN_HEADER = (
 # Precedence for the derived status, most-live first. A build is as live as its liveliest unit.
 PRECEDENCE = ("INPROGRESS", "BLOCKED", "OPEN", "SPECCED", "DEFERRED")
 
-HDR_RE = re.compile(
-    r"^\*\*Status:\*\* (?P<token>" + "|".join(STATUS_TOKENS) + r")"
-    r" · rev-(?P<rev>\d+) · (?P<date>\d{4}-\d{2}-\d{2}) · node (?P<node>[a-z])"
-    r" · Tier-(?P<tier>[12]) · base (?P<base>[0-9a-f]{8,})"
-)
 H1_RE = re.compile(r"^#\s+(?P<id>[A-Za-z0-9][A-Za-z0-9-]*)\s+—\s+(?P<title>.+?)\s*$")
 # The build-order verb, appended after `base` in a spec's status header. Units sharing a value are
 # the parallel group; the owner resolved against a second `group` verb, which would have needed its
@@ -215,24 +240,14 @@ class StaleHeader(Problem):
 
 
 # --------------------------------------------------------------------------------------- plumbing
-#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts.
-#: TOOL-dRetiredFork-2, absorbed from adopter nc `nc carve-out 16/20`. Taken VERBATIM from gov's own
-#: hook-side scrub at `.githooks/pre-push` rather than re-derived, because these are two halves of
-#: ONE defect and a second list would be the place they drift apart.
-_GIT_ENV_LEAKS = (
-    "GIT_DIR",
-    "GIT_WORK_TREE",
-    "GIT_INDEX_FILE",
-    "GIT_OBJECT_DIRECTORY",
-    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-    "GIT_COMMON_DIR",
-    "GIT_NAMESPACE",
-    "GIT_PREFIX",
-)
+#: `tree_lib.GIT_ENV_LEAKS`, the kit's one list of what a git reader must not inherit: the comment
+#: above it there names its two halves and where each is taken from.
+_GIT_ENV_LEAKS = GIT_ENV_LEAKS
 
 
 def _build_git_env() -> dict[str, str]:
-    """The parent environment with git's exported repository pointers removed.
+    """The parent environment with git's exported repository pointers and the four pathspec modes
+    removed, the two halves of `GIT_ENV_LEAKS`.
 
     Git exports `GIT_DIR` whenever the repository is reached through a `.git` FILE rather than a
     `.git` directory — every linked worktree — so a generator started from a hook inherits a pointer
@@ -251,13 +266,6 @@ def run(*argv: str, cwd: str | None = None) -> str:
     return subprocess.run(
         argv, cwd=cwd, capture_output=True, text=True, encoding="utf-8", check=True, env=_build_git_env()
     ).stdout
-
-
-def read_text(path: str) -> str:
-    # Bytes in, decode, normalise CR. Windows checkouts hand back CRLF and every comparison below
-    # would then differ on every line — the exact green-by-accident shape a byte gate must not have.
-    with open(path, "rb") as fh:
-        return fh.read().decode("utf-8").replace("\r\n", "\n")
 
 
 def read_text_or_none(path: str) -> tuple[str | None, str]:
@@ -388,13 +396,6 @@ def read_conf_at_rev(root: str, rev: str) -> dict:
     conf = {"MEMORY_ROOT": "memory", "DISCIPLINES": "", "FAMILIES": ""}
     conf.update(declared)
     return conf
-
-
-def unfenced(text: str):
-    """The text-only view, kept as the one fence machine's façade rather than a second copy."""
-    for _n, line in unfenced_lines(text):
-        if line is not None:
-            yield line
 
 
 # ----------------------------------------------------------------------------------------- parsing
@@ -542,26 +543,6 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
 
 
 # ------------------------------------------------------------------------------ record -> spec bindings
-# Every record under a build's non-spec folders names the spec(s) it is
-# evidence about, in its own head. This parser READS that and CLASSIFIES; it never raises, because
-# `collect()` is reached by both --check and --write through one call site, so a raising parser would
-# let one unannotated record refuse to render every artifact.
-BIND_HEAD_LINES = 12
-RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research")
-# Optional leading whitespace and an optional comment marker: the corpus holds a non-markdown record
-# (a shell script), where the line can only be a comment. An extension-scoped rule would structurally
-# exclude the one file most easily forgotten.
-BIND_RE = re.compile(
-    r"^[ \t]*(?:#+|//|;)?[ \t]*\*\*(?P<key>Serves|Commissions):\*\*[ \t]+(?P<rest>.*\S)[ \t]*$"
-)
-UNBOUND_RE = re.compile(r"^none\b[\s—–:-]*(?P<reason>\S.*)$")
-
-
-def _id_alternation(conf: dict) -> str:
-    fams = [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
-    return "|".join(sorted(fams)) or "(?!)"
-
-
 def spec_ids(root: str, tracked: list, conf: dict) -> set:
     """The resolution set: ids DEFINED by a spec H1, one per file, at any depth under a build's spec/.
 
@@ -589,124 +570,177 @@ def spec_ids(root: str, tracked: list, conf: dict) -> set:
     return out
 
 
-def record_paths(tracked: list, m: str) -> list:
-    """Every tracked record: any depth, ANY extension, under a build's non-spec kind folders."""
-    kinds = "|".join(k for k in RECORD_KINDS if k != "spec")
-    sel = re.compile(r"^" + re.escape(m) + r"/builds/[^/]+/(?:" + kinds + r")/")
-    return [p for p in tracked if sel.match(p)]
+def read_spec_revs(root: str, tracked: list, conf: dict) -> dict:
+    """`{spec id: header revision}`, an integer, over the files `spec_ids` walks (TOOL-dTrueNorth-5 S3).
 
-
-def _expand_ids(rest: str, alt: str) -> tuple:
-    """Return (ids, bad_tokens). A contiguous run may be written N..M and EXPANDS here, at authoring
-    time, to a fixed set — unlike a wildcard it cannot rot when the build later gains a unit."""
-    ids, bad = [], []
-    one = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<seq>\d+)(?:@rev-\d+)?$")
-    rng = re.compile(r"^(?P<fam>" + alt + r")-(?P<slug>[A-Za-z0-9]+)-(?P<lo>\d+)\.\.(?P<hi>\d+)$")
-    for tok in rest.split():
-        mo = one.match(tok)
-        if mo:
-            ids.append(f"{mo.group('fam')}-{mo.group('slug')}-{mo.group('seq')}")
-            continue
-        mr = rng.match(tok)
-        if mr and int(mr.group("lo")) <= int(mr.group("hi")):
-            for n in range(int(mr.group("lo")), int(mr.group("hi")) + 1):
-                ids.append(f"{mr.group('fam')}-{mr.group('slug')}-{n}")
-            continue
-        bad.append(tok)
-    return ids, bad
-
-
-def read_bindings(root: str, tracked: list, conf: dict) -> dict:
-    """path -> {state, kind, ids, commissions, reason, bad}.
-
-    Does not raise for an UNREADABLE file — a decode or IO failure becomes a `state` row carrying
-    `why`. It CAN still raise for a malformed conf. The former docstring said "Never raises."
-    unqualified, which is what let the blanket catch at the caller look reasonable.
-
-    state is one of: bound · unbound · malformed · absent.
+    Through `parse_spec_text`, the parser the units table renders from, so this read and that table
+    cannot disagree about a spec's revision. A file with no parseable status header carries none.
     """
     m = conf["MEMORY_ROOT"]
     alt = _id_alternation(conf)
-    out = {}
-    for rel in record_paths(tracked, m):
-        rec = {"state": "absent", "kind": None, "ids": [], "commissions": [], "reason": None,
-               "bad": [], "why": "no Serves line in the first %d unfenced lines" % BIND_HEAD_LINES}
-        try:
-            text = read_text(os.path.join(root, rel))
-        except UnicodeDecodeError:
-            # NOT TEXT, so NOT A RECORD (TOOL-dScrubbedConduit-1 S1). A record is prose that carries a
-            # `**Serves:**` line binding it to a spec; a file that does not decode cannot carry one,
-            # and emitting it as an `A` row only moves the failure to hygiene check 21, which would
-            # then demand a Serves line from a PNG. record_paths admits ANY extension by design — a
-            # record's kind comes from its folder, not its suffix — so the exclusion belongs here,
-            # where the bytes are actually read, rather than in a filename guess upstream.
-            #
-            # An adopter carrying a UI review screenshot under `reviews/` is the case this serves.
+    sel = build_spec_path_re(m)
+    out: dict = {}
+    for rel in tracked:
+        if not sel.match(rel):
             continue
-        except OSError as exc:
-            # Present in the index and unreadable from disk is a REAL anomaly and stays a row.
-            rec["why"] = f"unreadable: {exc}"
-            out[rel] = rec
+        text, _why = read_text_or_none(os.path.join(root, rel))
+        if text is None:
             continue
-        for line in list(unfenced(text))[:BIND_HEAD_LINES]:
-            mo = BIND_RE.match(line)
-            if not mo:
-                continue
-            # A trailing HTML comment is a NOTE, not a token. The retrofit records the adjudication
-            # rule that produced an inferred binding on the line itself, so a reviewer grades it in
-            # the file rather than in a commit body no gate reads — and without this the note's
-            # every word parsed as a malformed id.
-            rest = mo.group("rest").split("<!--", 1)[0].strip()
-            if not rest:
-                continue
-            if mo.group("key") == "Commissions":
-                cids, bad = _expand_ids(rest, alt)
-                rec["commissions"] = cids
-                rec["bad"] += bad
-                continue
-            if rec["state"] != "absent":
-                continue                      # first Serves line wins
-            un = UNBOUND_RE.match(rest)
-            if un:
-                # The kind is OPTIONAL here and required below: an unbound record names no ids, so
-                # there is no relation for a kind token to describe. The REASON is mandatory either
-                # way — a bare `none` is malformed, because "no gate named" and "gate not yet
-                # written" are indistinguishable from outside and only one of them is acceptable.
-                rec["state"] = "unbound"
-                rec["reason"] = un.group("reason")
-                rec["why"] = ""
-                continue
-            toks = rest.split()
-            if toks and toks[0] in RECORD_KIND_TOKENS:
-                ids, bad = _expand_ids(" ".join(toks[1:]), alt)
-                rec["kind"] = toks[0]
-                rec["ids"] = ids
-                rec["bad"] += bad
-                if not ids:
-                    rec["state"] = "malformed"
-                    rec["why"] = "kind token with no resolvable id"
-                else:
-                    rec["state"] = "bound"
-                    rec["why"] = ""
-            else:
-                rec["state"] = "malformed"
-                got = toks[0] if toks else "(empty)"
-                rec["why"] = (f"first token {got} is not one of "
-                              + " ".join(RECORD_KIND_TOKENS) + ", and the line is not the none form")
-        out[rel] = rec
+        unit = parse_spec_text(text, rel, alt)
+        if unit:
+            out[unit["id"]] = max(out.get(unit["id"], 0), int(unit["rev"]))
     return out
 
 
-def cmd_print_bindings(root: str, conf: dict) -> int:
-    """READ-ONLY. Classifies and prints; writes nothing and always exits 0.
+def read_reviewed_paths(text: str) -> list | None:
+    """The paths a record's `Reviewed:` line names, or None when its head holds no such line.
 
+    THE one reader of the line (TOOL-dTrueNorth-13 S4): the first unfenced line opening `Reviewed: `
+    before the record's first `## ` heading, in the form the review harness renders,
+    `Reviewed: <path>@<blob>, ...`. THE WINDOW IS THE HEAD, NOT A LINE COUNT (TOOL-dTrueNorth-20 S17,
+    superseding S4's twelve lines): the harness puts the title and a provenance paragraph first, and a
+    tracked record holds the line at 15 or 16, so a count would grade a design-only audit's every id.
+    Each comma-separated entry is cut at its last `@`; an entry with
+    none is kept whole. Nothing is dropped, an empty entry included: the caller reads each path at
+    HEAD, and a path it cannot read there owes every id a pin, so an unparseable entry grades toward
+    the pin and never away from it.
+    """
+    for line in unfenced(text):
+        if line.startswith("## "):
+            break
+        if line.startswith("Reviewed: "):
+            return [entry.strip().rpartition("@")[0] or entry.strip()
+                    for entry in line[len("Reviewed: "):].split(",")]
+    return None
+
+
+#: THE READER'S ONE SPELLING of the review harness's binding render (TOOL-dTrueNorth-20 S14): a harness
+#: defining a function of this name wrote the audit pin, so one lacking it could not have. The literal
+#: is pinned from the PRODUCER's side: an arm of the workflows kit's tier2-review suite reads this
+#: constant out of this file and asserts the harness defines that function, so a rename reds the
+#: producer's own suite before it strands this reader and exempts every unpinned record.
+AUDIT_WRITER_MARK = "renderAuditBinding"
+
+
+def derive_audit_writers(root: str, memory_root: str, rels, resolve=None) -> set | None:
+    """The graded `spec-audit` records an OLDER review harness wrote, or None when none can be told.
+
+    TOOL-dTrueNorth-14 S1. A run whose base predates the audit pin keeps running its own harness and
+    writes unpinned records dated after SPEC_AUDIT_PIN_CUTOFF; merging main brings in the arm, which
+    would then fail bytes nobody can re-run. No filename date tells that record from one the pinning
+    harness wrote. The harness AT THE RECORD'S ADDING COMMIT does, because TOOL-dTrueNorth-5 landed
+    `AUDIT_WRITER_MARK`'s function and both writers in one commit: a harness lacking it could not have
+    pinned.
+
+    The kit is `backlog.resolve_kit_dir`'s, or `resolve`'s, a stand-in a caller injects taking the same
+    three arguments, the shape `read_landed_unclosed` takes (TOOL-dTrueNorth-20 S7), so the self-test
+    reads its fixture's harness and never the machine's. Its answer, a path or a string in either
+    separator, becomes the harness's path relative to the repository the kit sits in, POSIX, before
+    any `<sha>:<path>` request (S8): a Windows resolver's absolute backslash path would otherwise read
+    as `missing` at every commit. A kit that does not resolve, or sits in no repository, prints one
+    `build-index: SKIP audit-writer test` line naming why and returns None, exempting nothing, which
+    the Q row's `-` field reads.
+
+    ONE adding-commit reader and ONE blob reader, `tree_lib.read_adding_commits` and
+    `tree_lib.read_blobs_at` (S32, S33): one `git log` over the glob pathspec
+    `<memory_root>/builds/*/reviews/**`, its argv constant whatever the records (TOOL-dTrueNorth-19 S1),
+    a record keeping its OLDEST add, and one `git cat-file --batch` for the harness at each distinct
+    adding commit. Either failing raises `Problem` (S2), never an empty set. A record is in the set only
+    where that harness is a present text blob lacking the function. DENY BY DEFAULT for the rest (S3):
+    a record with no adding commit, staged and not yet committed or outside the pathspec, is graded,
+    since the tree's own harness is writing it; so is one whose adding commit holds no harness blob.
+    With no record it makes no git call.
+    """
+    here = os.path.dirname(os.path.abspath(__file__))
+    try:
+        found = (resolve or backlog.resolve_kit_dir)("workflows", "tier2-review.js", here)
+    except LookupError as exc:
+        print(f"build-index: SKIP audit-writer test — the workflows kit does not resolve, so no graded spec-audit "
+              f"record is exempt as an older harness's: {exc}")
+        return None
+    kit = pathlib.Path(str(found).replace("\\", "/")).absolute()
+    home = next((d for d in (kit, *kit.parents) if (d / ".git").exists()), None)
+    if home is None:
+        print(f"build-index: SKIP audit-writer test — the workflows kit at {kit.as_posix()} sits in no repository, "
+              "so no adding commit's harness can be read and no graded spec-audit record is exempt")
+        return None
+    harness = (kit / "tier2-review.js").relative_to(home).as_posix()
+    wanted = set(rels)
+    if not wanted:
+        return set()
+    try:
+        added = read_adding_commits(root, f":(glob){memory_root}/builds/*/reviews/**", wanted)
+        shas = sorted(set(added.values()))
+        blobs = read_blobs_at(root, [(sha, harness) for sha in shas])
+    except OSError as exc:
+        raise Problem(str(exc)) from None
+    older = {sha for sha in shas if blobs.get((sha, harness)) is not None
+             and AUDIT_WRITER_MARK not in blobs[(sha, harness)]}
+    return {rel for rel, sha in added.items() if sha in older}
+
+
+def cmd_print_bindings(root: str, conf: dict, resolve=None) -> int:
+    """READ-ONLY. Classifies and prints; writes nothing, and exits 0, or 2 on a malformed
+    `SPEC_AUDIT_PIN_CUTOFF` (TOOL-dTrueNorth-16 S28). Beside its A, U, S, B and N rows it prints a `P`
+    row per graded spec-audit id owing an `@rev-N` pin or pinning past its header, and one `Q` row,
+    `Q<TAB><graded><TAB><cutoff, or off><TAB><exempt, or ->`, the four-field shape TOOL-dTrueNorth-14
+    gives it: the graded records, the cutoff and the records an older harness wrote. Where the
+    workflows kit does not resolve, a `build-index: SKIP audit-writer test` line naming why prints
+    beside the `-` field (TOOL-dTrueNorth-20 S7). `resolve` is `derive_audit_writers`' stand-in.
+
+    A git read the audit pin needs and cannot make raises `Problem`, which `main` exits 2 on.
     It is the retrofit's own checklist AND the predicate the gate reads, so a seed list and a gate
     that disagree is structurally impossible here.
     """
     m = conf["MEMORY_ROOT"]
+    # TOOL-dTrueNorth-5 S3 — THE AUDIT PIN'S CUTOFF, read before any row so a malformed value prints
+    # one line and no partial population: exit 2, which check 21 reds as a parse that did not complete.
+    cutoff = (conf.get("SPEC_AUDIT_PIN_CUTOFF") or "").strip()
+    if cutoff:
+        try:
+            if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", cutoff):
+                raise ValueError(cutoff)
+            datetime.date.fromisoformat(cutoff)
+        except ValueError:
+            print(f"build-index: SPEC_AUDIT_PIN_CUTOFF={cutoff!r} is neither blank nor an ISO YYYY-MM-DD "
+                  f"date, so no spec-audit record's pin can be graded")
+            return 2
     tracked = [p for p in run("git", "ls-files", cwd=root).split("\n") if p]
     defined = spec_ids(root, tracked, conf)
     binds = read_bindings(root, tracked, conf)
+    revs = read_spec_revs(root, tracked, conf) if cutoff else {}
+    # TOOL-dTrueNorth-13 S4 — WHICH ids of a graded record owe a pin. A graded record is a spec-audit
+    # record dated on or after the cutoff, or undated, because unparseable is not old (the rule check
+    # 21's population filter states). One with no `Reviewed:` line owes a pin for every id, as before.
+    # One with that line owes a pin only for an id the H1 of a spec file it names defines, every path
+    # read at HEAD in ONE batch, so a design document audited alone owes none — UNLESS any path it
+    # names has no blob at HEAD: a path the grading cannot read cannot show that the record reviewed
+    # no spec, so then every id owes a pin, exactly as with no line. `owed` maps a record to the ids
+    # owing one; a graded record absent from it owes for every id.
+    graded_rels = set()
+    for rel, rec in binds.items():
+        if cutoff and rec["state"] == "bound" and rec["kind"] == "spec-audit":
+            dated = re.match(r"(\d{4}-\d{2}-\d{2})-", os.path.basename(rel))
+            if not dated or dated.group(1) >= cutoff:
+                graded_rels.add(rel)
+    named = {}
+    for rel in sorted(graded_rels):
+        text, _why = read_text_or_none(os.path.join(root, rel))
+        paths = read_reviewed_paths(text) if text is not None else None
+        if paths is not None:
+            named[rel] = paths
+    at_head = read_blobs_at_rev(root, "HEAD", sorted({p for ps in named.values() for p in ps}))
+    fams = [p.split(":", 1)[1] for p in conf.get("FAMILIES", "").split() if ":" in p]
+    owed: dict = {}
+    for rel, paths in named.items():
+        if any(at_head.get(p) is None for p in paths):
+            continue
+        owed[rel] = {hit[1] for hit in (parse_spec_h1(p, at_head[p], m, fams) for p in paths) if hit}
+    # TOOL-dTrueNorth-14 S2 — a graded record an older harness wrote prints no P row: its run could
+    # not have pinned it. It is still counted graded, and the Q row's fourth field counts it again as
+    # exempt, or reads `-` where the workflows kit does not resolve and so nothing is exempt.
+    writers = derive_audit_writers(root, m, graded_rels, resolve)
+    graded = 0
     unbound = 0
     for rel in sorted(binds):
         rec = binds[rel]
@@ -726,11 +760,32 @@ def cmd_print_bindings(root: str, conf: dict) -> int:
         # place this build exists to remove it.
         if rec["state"] == "bound":
             print(f"S\t{rel}\t{rec['kind']}\t{' '.join(rec['ids'])}")
+        # TOOL-dTrueNorth-5 S3 — the P rows: per id of a graded spec-audit record, an id carrying no
+        # `@rev-N` pin, or a pin above its spec's header revision, which would read as audited at every
+        # revision to come. Graded: dated on or after the cutoff, or undated, because unparseable is
+        # not old (the rule check 21's population filter states). An id no spec defines has no header
+        # to compare, and its B row below already names it. An id the record owes no pin for (S4
+        # above) prints no unpinned row; a pin it carries anyway is still held to its header. A record
+        # an older harness wrote (TOOL-dTrueNorth-14) prints no P row of either kind.
+        if rel in graded_rels:
+            graded += 1
+            for i in ([] if writers and rel in writers else dict.fromkeys(rec["ids"])):
+                pin = (rec.get("pins") or {}).get(i)
+                if pin is None:
+                    if rel not in owed or i in owed[rel]:
+                        print(f"P\t{rel}\t{i} carries no @rev-N pin")
+                elif i in revs and pin > revs[i]:
+                    print(f"P\t{rel}\t{i}@rev-{pin} pins a revision its spec has not reached, "
+                          f"header rev-{revs[i]}")
         for tok in rec["bad"]:
             print(f"B\t{rel}\t{tok} is not a family-qualified id or range")
         for i in rec["ids"] + rec["commissions"]:
             if i not in defined:
                 print(f"B\t{rel}\t{i} is named but no spec H1 in this tree defines it")
+    # The audit pin's LIVENESS row, on every run: how many records the P branch graded and from what
+    # cutoff, so a population of zero is announced rather than read as a clean corpus, and how many of
+    # them an older harness wrote: `Q<TAB><graded><TAB><cutoff, or off><TAB><exempt, or ->`.
+    print(f"Q\t{graded}\t{cutoff or 'off'}\t{'-' if writers is None else len(writers)}")
     print(f"N\t{unbound}")
     return 0
 
@@ -828,7 +883,7 @@ def extract_roster_ids(text: str, id_re) -> list:
     return [(mm.group(0), mm.group(1)) for mm in id_re.finditer(text)]
 
 
-def check_index_input(rel: str, m: str, kit: str | None) -> bool:
+def check_index_input(rel: str, m: str, kit: str | None, carries: str | None = None) -> bool:
     """True when the renderer reads `rel` other than through its prose ids, or writes it.
 
     TOOL-aTrimmedHook-1. The STRUCTURAL half of the staged classifier: a staged edit to any of these
@@ -839,8 +894,14 @@ def check_index_input(rel: str, m: str, kit: str | None) -> bool:
     memory file reaches the render only through the ids its prose cites, which the id comparison in
     `check_staged_render()` decides. The selftest's parity arm asserts every artifact `plan()` writes
     is in this set, so an output added later cannot land outside it unnoticed.
+
+    `carries` is the repo-relative path of the carries checker, passed only while `CARRIES_KEY` is
+    set (TOOL-dTrueNorth-3 S6): the coverage region renders from that checker's join, so a staged
+    change to it moves the region however few ids it cites.
     """
     if rel == ".memory-tree.conf":
+        return True
+    if carries and rel == carries:
         return True
     if kit and (rel == kit or rel.startswith(kit + "/")):
         return True
@@ -866,6 +927,44 @@ def build_blob_request(paths: list) -> bytes:
     return "".join(f"HEAD:{p}\n:{p}\n" for p in paths).encode("utf-8", "surrogateescape")
 
 
+def resolve_render_inputs(root: str, conf: dict, here: str | None = None) -> tuple:
+    """`(kit, carries)`: this kit's directory relative to `root`, None when it sits outside the
+    repository, and the carries checker's repo-relative path while `CARRIES_KEY` is set, else None —
+    the two `check_index_input` takes, derived once for `check_staged_render` and the staged triggers
+    of `--check-coverage` and `--check-asbuilt` (TOOL-dTrueNorth-16 S21)."""
+    # `here` is the kit's directory; a caller passes it only to place a fixture's kit under its root.
+    here = here or os.path.dirname(os.path.abspath(__file__))
+    try:
+        kit = os.path.relpath(here, root).replace(os.sep, "/")
+    except ValueError:
+        # Another Windows drive: the kit is outside this repository, the answer the branch below gives
+        # (TOOL-aTrimmedHook-7). It must never become a traceback the leg reports as drift.
+        kit = None
+    if kit is not None and (kit == ".." or kit.startswith("../") or os.path.isabs(kit)):
+        kit = None
+    # THE CARRIES CHECKER, in the kit directory's parent, is a render input while its key is set
+    # (TOOL-dTrueNorth-3 S6), so it joins the pathspec and the structural set together.
+    carries = None
+    if kit and (conf.get(CARRIES_KEY) or "").strip():
+        carries = "/".join(p for p in (os.path.dirname(kit), CARRIES_CHECKER) if p)
+    return kit, carries
+
+
+def read_staged_paths(root: str) -> list | None:
+    """Every path the index stages, a rename split into its two paths, or None when git cannot list
+    them, which a caller reads as "run": a wrong hold is the costly direction. It reads the index the
+    hook was handed, as `check_staged_render` does (TOOL-aTrimmedHook-4)."""
+    env = _build_git_env()
+    if os.environ.get("GIT_INDEX_FILE"):
+        env["GIT_INDEX_FILE"] = os.environ["GIT_INDEX_FILE"]
+    try:
+        out = subprocess.run(["git", "diff", "--cached", "--name-only", "--no-renames", "-z"], cwd=root,
+                             capture_output=True, check=True, env=env).stdout
+    except (OSError, subprocess.CalledProcessError):
+        return None
+    return [rel for rel in out.decode("utf-8", "surrogateescape").split("\0") if rel]
+
+
 def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple:
     """`(render, reason)` for `--check --staged`: can anything the INDEX stages move the render?
 
@@ -883,17 +982,8 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
     `--no-verify` commit is invisible to a skip. Both are the push boundary's, where the render is full.
     """
     m = conf["MEMORY_ROOT"]
-    # `here` is the kit's directory; a caller passes it only to place a fixture's kit under its root.
-    here = here or os.path.dirname(os.path.abspath(__file__))
-    try:
-        kit = os.path.relpath(here, root).replace(os.sep, "/")
-    except ValueError:
-        # Another Windows drive: the kit is outside this repository, the answer the branch below gives
-        # (TOOL-aTrimmedHook-7). It must never become a traceback the leg reports as drift.
-        kit = None
-    if kit is not None and (kit == ".." or kit.startswith("../") or os.path.isabs(kit)):
-        kit = None
-    specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else [])
+    kit, carries = resolve_render_inputs(root, conf, here)
+    specs = [m + "/", ".memory-tree.conf"] + ([kit + "/"] if kit else []) + ([carries] if carries else [])
     # THE INDEX THE HOOK WAS HANDED (TOOL-aTrimmedHook-4). `_build_git_env()` drops GIT_INDEX_FILE for
     # every other caller, because an inherited pointer names a different tree. Here the staged set IS
     # that index: under `git commit -a`, `commit <paths>` or `commit -i` git hands the hook a temporary
@@ -925,7 +1015,7 @@ def check_staged_render(root: str, conf: dict, here: str | None = None) -> tuple
                           f"and the Landed-unclosed column reads tracked product source")
         if not st.startswith("M"):
             return True, f"{rel} is staged as {st}, and an added or deleted path moves the record set"
-        if check_index_input(rel, m, kit):
+        if check_index_input(rel, m, kit, carries):
             return True, f"{rel} is a build-index input or output"
         modified.append(rel)
     if not modified:
@@ -1373,6 +1463,54 @@ def print_verdicts(verdicts: list, guarded: dict, conf: dict) -> int:
     return 1
 
 
+def render_asbuilt_view(root: str, conf: dict) -> dict:
+    """TOOL-dTrueNorth-6 S5 — the as-built view, rendered by the sibling `asbuilt_view.py` and compared
+    with `DESIGN_VIEW`'s file, for `cmd_check` and `cmd_write` to call ONCE after every artifact `plan()`
+    returns, so no view finding blocks another artifact's write. `plan()`'s return is left as it is.
+
+    Its states are the key rule's, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S6), so no
+    reader here hand-rolls the keys. Off, all four blank, `{"state": "off", "line"}`: the one off line,
+    and nothing is read. Armed, `{"state": "armed", "rel", "text", "records", "findings", "drift"}`: the
+    view's path, its render, the count of deviation records it renders from (TOOL-dTrueNorth-20 S4), the
+    render's findings — a deviation with no row, two amends of one clause no `**Supersedes:**` orders
+    and a `**Supersedes:**` naming a record outside its clause's set (TOOL-dTrueNorth-18), a pipe in an
+    `**After:**`, a pinned hash its clause does not carry, a moved `Baseline:` line, a view no
+    `merge=ours` attribute guards (TOOL-dTrueNorth-26 S16), which `--write` cannot cure and
+    `--check-asbuilt` prints (S17) —
+    and the file's drift from the render, a hand edit named at its first differing line and a
+    `baseline` row whose text is not the baseline's, which it can and `--check` lists. A partial key
+    set, a pin whose design record cannot be read, and a DESIGN_VIEW not named as a dated record, whose
+    head has no names to derive (TOOL-dTrueNorth-27 S7), are each a Problem: there is nothing to render.
+    """
+    import asbuilt_view  # a sibling of this file, loaded only when a verb renders
+    try:
+        armed, line = asbuilt_view.read_view_state(root, conf)
+        if not armed:
+            return {"state": "off", "line": line}
+        sha, clauses, records, findings = asbuilt_view.read_view_inputs(root, conf)
+        rel = str(conf["DESIGN_VIEW"]).strip()
+        text, more = asbuilt_view.render_view(sha, clauses, records, rel)
+    except asbuilt_view.DesignRefusal as exc:
+        raise Problem(f"as-built view — {exc}; nothing was rendered, and DESIGN_VIEW is left as it is") from None
+    path = os.path.join(root, rel)
+    drift = (asbuilt_view.check_view(read_text(path), text, clauses) if os.path.isfile(path)
+             else ["missing — never rendered"])
+    return {"state": "armed", "rel": rel, "text": text, "records": len(records), "findings": findings + more,
+            "drift": drift}
+
+
+def print_asbuilt_verdicts(findings: list) -> int:
+    """TOOL-dTrueNorth-6 — the `as-built VERDICT` block, separate from the DRIFT list for print_verdicts'
+    reason: its remedy is the record or the design record each line names, which `--write` cannot cure."""
+    if not findings:
+        return 0
+    print("as-built VERDICT — the deviation records and the design record the as-built view renders from "
+          "disagree; --write cannot cure these, so edit the record each line names")
+    for f in findings:
+        print(f"    {f}")
+    return 1
+
+
 # ---------------------------------------------------------------------------------------- rendering
 def render_region(build: dict) -> str:
     fm = build["fm"]
@@ -1456,13 +1594,37 @@ def render_region(build: dict) -> str:
     # would render `Ids no record names.`, a different sentence, for the commonest case of all.
     out += [""] + (_render_wrapped_ids("Ids no record names:", gap) if gap else
                    ["Ids no record names: none — every unit id is named by a record."])
-    # NOT "unreviewed". The reviewed rev is optional, so this reports ids no spec-audit record names
-    # EVER — a spec audited at rev-1 and since bumped does not appear here. An "unreviewed" label
-    # would be a coverage claim the data cannot support.
+    # This line reports ids no spec-audit record names EVER, so a spec audited at rev-1 and since bumped
+    # does not appear in it. The line below it is where "unaudited" is a claim the data supports, and
+    # only for the ids a record PINS (TOOL-dTrueNorth-5 S5): an unpinned id is not judged there.
     out += [""] + (_render_wrapped_ids("Ids no `spec-audit` record has ever named:", agap) if agap
                    else ["Ids no `spec-audit` record has ever named: none — every unit id has one."])
+    # UNCONDITIONAL, as both joins above are, and the none branch COUNTS the units a pin judged, so a
+    # build no pinned record covers reads `0 of <n>` and never as a build whose specs are all audited.
+    past = derive_past_pin_ids(build["units"], recs)
+    pinned = {i for r in recs if r.get("kind") == "spec-audit" for i in (r.get("pins") or {})}
+    out += [""] + (_render_wrapped_ids("Ids whose spec moved past its audited revision:", past) if past else
+                   [f"Ids whose spec moved past its audited revision: none — "
+                    f"{sum(1 for i in own if i in pinned)} of {len(own)} unit id(s) carry a pin."])
     out.append(MARK_CLOSE)
     return "\n".join(out)
+
+
+def derive_past_pin_ids(units: list, records: list) -> list:
+    """`<id>@rev-<N>` for each unit whose header revision exceeds `N`, the highest pin any of the
+    build's `spec-audit` records gives it (TOOL-dTrueNorth-5 S5), in unit order.
+
+    The token names the PIN; the current revision is the units table's `rev` column, so it is not
+    typed twice. A unit no record pins is not judged and is not returned.
+    """
+    top: dict = {}
+    for r in records:
+        if r.get("kind") != "spec-audit":
+            continue
+        for i, n in (r.get("pins") or {}).items():
+            top[i] = max(top.get(i, 0), n)
+    return [f"{u['id']}@rev-{top[u['id']]}" for u in units
+            if u["id"] in top and int(u["rev"]) > top[u["id"]]]
 
 
 IDS_WRAP = 300
@@ -1504,7 +1666,8 @@ def _render_id_ranges(ids: list) -> str:
     return " ".join(out)
 
 
-def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
+def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP, sep: str = " ", indent: str = "",
+                        end: str = ".") -> list:
     """`<prefix> <id> <id> ….` as one or more lines, none wider than `cap`.
 
     Consecutive non-blank lines join into ONE markdown paragraph, so the wrap is invisible to a
@@ -1515,14 +1678,24 @@ def _render_wrapped_ids(prefix: str, ids: list, cap: int = IDS_WRAP) -> list:
     carries, so a raise buys one build and reds the next. Same renderer-shaped class as
     `TOOL-dUnstalledConvoy-13` and NOT a fix for it: that row is the generated record-BINDINGS row,
     a different line with a different grammar, and it stays open.
+
+    `sep`, `indent` and `end` are TOOL-dTrueNorth-3's, for the coverage region's list bullets: `sep`
+    joins two ids and a wrapped line keeps its non-blank half, `indent` opens each continuation line,
+    and `end` closes the last. The prefix takes a space before its first id unless it ends in one or
+    in an opening parenthesis. The defaults render every present caller's lines byte for byte.
     """
-    lines, cur = [], prefix
+    lines, cur, held = [], prefix, False
     for i in ids:
-        if cur not in ("", prefix) and len(cur) + 1 + len(i) > cap:
-            lines.append(cur)
-            cur = ""
-        cur += (" " if cur else "") + i
-    lines.append(cur + ".")
+        if held and len(cur) + len(sep) + len(i) > cap:
+            lines.append(cur + sep.rstrip())
+            cur, held = indent, False
+        if held:
+            cur += sep
+        elif cur and not cur.endswith((" ", "(")):
+            cur += " "
+        cur += i
+        held = True
+    lines.append(cur + end)
     return lines
 
 
@@ -1542,7 +1715,7 @@ def _wrap_ids(roster: list) -> list:
 
 def render_order(build: dict) -> str:
     """The BUILD ORDER region. Units sharing an `order` value are the parallel group."""
-    mo, mc = GEN_REGIONS[1][1], GEN_REGIONS[1][2]
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-order")
     out = [mo, ""]
     steps = {}
     for u in build["units"]:
@@ -1573,7 +1746,7 @@ def render_edges(build: dict) -> str:
     roster and this region leaves LIVE.md and both ledger shards byte-neutral. A bare id in a leading
     table cell would additionally ANCHOR via the extractor and rewrite the other build's `ids:` line.
     """
-    mo, mc = GEN_REGIONS[2][1], GEN_REGIONS[2][2]
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-edges")
     out = [mo, ""]
     parents, children = build["parents"], build.get("children", [])
     if not parents and not children:
@@ -1587,8 +1760,53 @@ def render_edges(build: dict) -> str:
     return "\n".join(out)
 
 
+def render_coverage(build: dict) -> str:
+    """TOOL-dTrueNorth-3 S3 — the COVERAGE region: one line naming the build, its clause, owned-node and
+    spec counts and the cutoff, then one bullet per field the clause lists, an empty one reading `none`.
+
+    It computes NOTHING: every field is `derive_carries_coverage`'s, the checker's, attached to the
+    build by `plan()` under `coverage`, so this region and `--check-coverage` read one value. The
+    uncarried, stale and ambiguous fields carry their count with their ids, a released clause renders
+    `<id> <moved|retired|deferred> by <decision>`, and a derived spec its path relative to the build
+    folder, in backticks, with its decision. A long list wraps onto two-space continuation lines one
+    character inside `IDS_WRAP`, so no line, its closing parenthesis included, passes 300. With the key
+    blank the region is one line saying coverage is not read and which key is blank.
+    """
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-coverage")
+    cov = build.get("coverage") or {"state": "off", "key": CARRIES_KEY}
+    out = [mo, ""]
+    if cov["state"] == "off":
+        out.append(f"*Coverage is not read: {cov['key']} is blank.*")
+        out.append(mc)
+        return "\n".join(out)
+    e = cov["entry"]
+    if e is None:
+        raise Problem(f"{build['readme']}: renders a coverage region for {build['slug']}, which is no chain "
+                      f"build of the design view")
+    base = build["readme"].rsplit("/", 1)[0] + "/"
+    out += [f"Coverage of {build['slug']}'s {len(e['clauses'])} clause(s) and {len(e['nodes'])} owned "
+            f"node(s), over {len(e['specs'])} spec(s) at or after {CARRIES_KEY} {cov['cutoff']}:", "",
+            f"- carried whole: {len(e['whole'])}"]
+    # (bullet, items, counted): a counted field renders `<n> (<ids>)`, any other its items or `none`.
+    for head, items, counted in (
+            ("- carried in parts:", e["split"], True),
+            ("- moved, retired or deferred:", [f"{c} {k} by {d}" for c, k, d in e["released"]], False),
+            ("- uncarried:", e["uncarried"], True),
+            ("- stale:", e["stale"], True),
+            ("- ambiguous:", e["ambiguous"], True),
+            ("- owned nodes no spec names:", e["unnamed"], False),
+            ("- specs derived from no clause:",
+             [f"`{p[len(base):] if p.startswith(base) else p}` ({d})" for p, d in e["derived"]], False),
+            ("- clauses the token arm cannot see:", e["blind"], False)):
+        out += _render_wrapped_ids(f"{head} {len(items)} (" if counted else head, items or ["none"],
+                                   IDS_WRAP - 1, ", ", "  ", ")" if counted else "")
+    out.append(mc)
+    return "\n".join(out)
+
+
 REGION_RENDERERS = {
     "build-index": render_region,
+    "build-coverage": render_coverage,
     "build-order": render_order,
     "build-edges": render_edges,
 }
@@ -1711,6 +1929,68 @@ def read_landed_unclosed(root: str, conf: dict, resolve=None) -> dict | None:
                       f"evidence population (EVIDENCE_GLOBS resolves to no tracked file), so every "
                       f"Landed-unclosed count would be a reassuring zero")
     return record
+
+
+def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
+    """TOOL-dTrueNorth-3 S2 — the carries join's coverage, the ONE read the coverage region and
+    `--check-coverage` share, so the two cannot disagree.
+
+    Blank `CARRIES_KEY` returns `{"state": "off", "key": CARRIES_KEY}` and resolves nothing. Set, it
+    reaches the coverage function and returns its `derive(root, conf=conf)` whole, handed this
+    module's parse of the conf so the two read one value of each key (TOOL-dTrueNorth-16 S14):
+    `{"state": "armed", "cutoff", "builds", ...}`, `builds` keyed by every chain build of the design
+    view. A checker that is not there or does not load, and a refusal it raises, are each a named
+    Problem before anything is written, carrying whatever the checker printed on its way to refusing.
+
+    WHY THE JOIN SITS OUTSIDE THIS KIT (S26). The grammar and the population are `design_lib.py`'s,
+    inside the kit; the join is gov's own checker, `CARRIES_CHECKER` in this kit directory's parent,
+    reached by path ONLY under a set `CARRIES_KEY`, as `read_landed_unclosed` reaches a sibling kit
+    only under its key, and never shipped, so an adopter leaving the key blank never needs it.
+    `resolve`, the shape `read_landed_unclosed` takes, is a stand-in for that reach: called with the
+    checker's path, it returns the coverage function, and the self-test passes a stub, so its coverage
+    arms run in an adopter that holds no checker (S16). Unset, the checker loads by path with no
+    bytecode cache written.
+    """
+    if not (conf.get(CARRIES_KEY) or "").strip():
+        return {"state": "off", "key": CARRIES_KEY}
+    path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), CARRIES_CHECKER)
+    if resolve is None and not os.path.isfile(path):
+        raise Problem(f"{CARRIES_KEY} is set and {CARRIES_CHECKER} is not in this kit directory's parent "
+                      f"({path}), so the coverage cannot be read")
+    said = io.StringIO()
+    cache, sys.dont_write_bytecode = sys.dont_write_bytecode, True
+    mod = None
+    try:
+        with contextlib.redirect_stdout(said):
+            if resolve is not None:
+                derive = resolve(path)
+            else:
+                spec = importlib.util.spec_from_file_location("check_spec_tokens", path)
+                mod = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(mod)
+                derive = mod.derive_carries_coverage
+            value = derive(root, conf=conf)
+    except Exception as exc:  # noqa: BLE001 — narrowed below: only the checker's own refusals are Problems
+        # The refusal class is the one the checker loaded, read through its own cached load
+        # (TOOL-dTrueNorth-31 S11), so a namesake `design_lib` in the slot cannot hide it; an injected
+        # `resolve`'s stand-in brings its own module, read from the slot as before.
+        if isinstance(exc, (ImportError, SyntaxError)):
+            known = True
+        elif mod is not None and hasattr(mod, "load_design_lib"):
+            known = isinstance(exc, mod.load_design_lib().DesignRefusal)
+        else:
+            dl = sys.modules.get("design_lib")
+            known = bool(dl) and isinstance(exc, dl.DesignRefusal)
+        if not known:
+            raise
+        echo = " ".join(said.getvalue().split())
+        raise Problem(f"{CARRIES_KEY} is set and the carries join refused, so the coverage cannot be read: "
+                      f"{exc}" + (f" (it printed: {echo})" if echo else "")) from None
+    finally:
+        sys.dont_write_bytecode = cache
+    if value.get("state") != "armed":
+        return {"state": "off", "key": CARRIES_KEY}
+    return value
 
 
 def derive_landed_counts(record: dict, builds: list, m: str) -> dict:
@@ -2364,16 +2644,44 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
         pre = f"{m}/builds/{b['slug']}/"
         b["records"] = [dict(rec, path=p) for p, rec in binds_all.items()
                         if p.startswith(pre) and rec["state"] in ("bound", "unbound")]
+    # TOOL-dTrueNorth-3 — THE COVERAGE, READ ONCE for the whole render and attached per build before
+    # the region loop: a chain build carries its entry, any other build an empty one. Off, no build is
+    # a chain build, so no README gains the pair and a held pair renders the off line.
+    coverage = read_carries_coverage(root, conf)
+    chain = set(coverage.get("builds") or ())
+    for b in builds:
+        if coverage["state"] == "off":
+            b["coverage"] = coverage
+        else:
+            b["coverage"] = {"state": "armed", "cutoff": coverage["cutoff"],
+                             "entry": coverage["builds"].get(b["slug"])}
+    cov_mo, cov_mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-coverage")
+    unpaired, stray = [], []
     artifacts = {}
     for b in builds:
         path = os.path.join(root, b["readme"])
         text = remove_dead_regions(read_text(path))
         text = apply_front_matter_ids(text, b["roster"], b["readme"])
         if create_missing:
-            for _name, mo, mc in GEN_REGIONS:
+            for name, mo, mc in GEN_REGIONS:
+                # CREATION IS CHAIN-ONLY for the coverage pair; the render loop below renders it in
+                # every README that holds it, so the asymmetry is in creation alone.
+                if name == "build-coverage" and b["slug"] not in chain:
+                    continue
                 lines = text.split("\n")
                 if _marker_index(lines, mo) is None and _marker_index(lines, mc) is None:
                     text = insert_region(text, mo, mc)
+        # DEMANDED WHERE IT BELONGS (section 8 F2): armed, a chain README without the pair shows the
+        # owner no coverage, and a non-chain README holding one is a region for nothing.
+        lines = text.split("\n")
+        held = _marker_index(lines, cov_mo) is not None or _marker_index(lines, cov_mc) is not None
+        if coverage["state"] == "armed":
+            if b["slug"] in chain and not held:
+                unpaired.append(b["readme"])
+            elif b["slug"] not in chain and held:
+                stray.append(b["readme"])
+        if unpaired or stray:
+            continue
         for name, mo, mc in GEN_REGIONS:
             renderer = REGION_RENDERERS[name]
             lines = text.split("\n")
@@ -2390,6 +2698,14 @@ def plan(root: str, conf: dict, create_missing: bool = False, resolve=None) -> t
                 continue  # a region this README has not adopted — S1c
             text = apply_region(text, renderer(b), b["readme"], mo, mc)
         artifacts[b["readme"]] = text
+    if unpaired or stray:
+        raise Problem("coverage — the build-coverage region is out of place while "
+                      f"{CARRIES_KEY} is set:\n"
+                      + "".join(f"    {r} is a chain build's README with no '{cov_mo}' pair; run python "
+                                f"{kit_rel()}/gen_build_index.py --write to create it\n" for r in unpaired)
+                      + "".join(f"    {r} holds a '{cov_mo}' pair and is no chain build of the design view; "
+                                f"delete the pair, which renders for nothing\n" for r in stray)
+                      + "Nothing was written.")
     # TOOL-dFramedEntrypoint-6 — every record renders inside the SPEC it serves. The population is
     # every tracked spec carrying a status header, not only the ones a record names: an unnamed spec
     # renders an EXPLICIT empty case, because an absent region cannot be told from a spec nobody has
@@ -2489,6 +2805,22 @@ def cmd_check(root: str, conf: dict) -> int:
         bad.append(f"{p} (orphaned ledger shard — no build opened in that month; --write deletes it)")
     for p in unmanaged:
         bad.append(f"{p} (unmanaged file under ledger/ — not a month shard; --write LEAVES IT ALONE)")
+    # TOOL-dTrueNorth-6 S5 — the as-built view, once, after every artifact plan() returned. Its drift
+    # joins the list below under the same --write remedy; a pin it cannot read is held until every
+    # other artifact's drift and verdict has printed, then raised. Its VERDICTS are not read here
+    # (TOOL-dTrueNorth-16 S17): `--write` cannot cure one, so they are `--check-asbuilt`'s, and this
+    # verb's exit and its DRIFT list mean only what `--write` cures.
+    view, refused = {"state": "unread"}, None
+    try:
+        view = render_asbuilt_view(root, conf)
+    except Problem as exc:
+        refused = exc
+    if view["state"] == "off":
+        print(view["line"])
+    elif view["state"] == "armed":
+        bad += [f"{view['rel']} ({d})" for d in view["drift"]]
+    if not (conf.get(CARRIES_KEY) or "").strip():
+        print(f"build-index: coverage is not read — {CARRIES_KEY} is blank, so no README renders a coverage")
     rc = 0
     if bad:
         print(f"build-index DRIFT — run: python {kit_rel()}/gen_build_index.py --write")
@@ -2498,9 +2830,137 @@ def cmd_check(root: str, conf: dict) -> int:
     # A GUARDED VIEW IS NEVER IN `bad`: it is not in `artifacts` at all, so the remedy above cannot
     # be printed against it. That is the whole point — the line it would have printed is `--write`.
     rc = print_verdicts(verdicts, guarded, conf) or rc
+    if refused:
+        raise refused
     if rc == 0:
-        print(f"build-index: clean ({len(artifacts)} artifact(s))")
+        print(f"build-index: clean ({len(artifacts) + (view['state'] == 'armed')} artifact(s))")
     return rc
+
+
+def cmd_check_coverage(root: str, conf: dict, staged: bool = False, resolve=None) -> int:
+    """TOOL-dTrueNorth-3 S5 — refuse a chain build's spec at INPROGRESS while that build's coverage is red.
+
+    INPROGRESS is past the build's Design exit, so the findings read are the ones
+    `derive_carries_coverage` returns at that exit, every arm, an uncarried clause and an unnamed
+    node beside a stale pin — the same value the coverage region renders, through
+    `read_carries_coverage`. One line per refused spec naming each finding's arm and reference, and
+    exit 1. A spec at any other status is not read: OPEN, SPECCED and BLOCKED precede the exit, and a
+    terminal or DEFERRED spec is not building. Off, the one line `build-index: coverage off —
+    SPEC_CARRIES_CUTOFF is blank` (TOOL-dTrueNorth-20 S3) and exit 0; a Problem is `main()`'s exit 2.
+    Hygiene check 29 is this verb's one caller.
+
+    TOOL-dTrueNorth-15 S1: every armed run, refused or green, ends on one count line — the INPROGRESS
+    chain specs graded, the chain builds holding one, and every chain build of the view — and at a
+    count of zero the line names the empty population and why. The harness takes each spec OPEN to
+    CLOSED in its build commit, so a silent green there would read as a refusal never applied.
+
+    TOOL-dTrueNorth-16 S21: under `staged` its trigger is the render's. It runs when any staged path
+    is a build-index input by `check_index_input`, the carries checker beside the kit included while
+    the key is set, so a staged view row is graded like a staged spec; otherwise it prints one held
+    line and exits 0. Hygiene check 29 passes `--staged` through and tests no path itself.
+    """
+    if staged and (conf.get(CARRIES_KEY) or "").strip():
+        kit, carries = resolve_render_inputs(root, conf)
+        paths = read_staged_paths(root)
+        if paths is not None and not any(check_index_input(rel, conf["MEMORY_ROOT"], kit, carries) for rel in paths):
+            print("build-index: coverage held under --staged — no staged path is a build-index input or the "
+                  "carries checker, so no chain spec's coverage can have moved")
+            return 0
+    value = read_carries_coverage(root, conf, resolve)
+    if value["state"] == "off":
+        # TOOL-dTrueNorth-20 S3 — THE OFF LINE'S SPELLING, so the contract clause's
+        # `(?m)^build-index: coverage` matches it in an adopter, where the key is blank.
+        print(f"build-index: coverage off — {value['key']} is blank")
+        return 0
+    refused = graded = holding = 0
+    for b in sorted(value["builds"]):
+        e = value["builds"][b]
+        building = [path for path, status in e["specs"] if status == "INPROGRESS"]
+        graded += len(building)
+        holding += bool(building)
+        if not e["findings"]:
+            continue
+        red = "; ".join(f"{arm} {ref}" for _where, arm, ref, _why in e["findings"])
+        for path in building:
+            print(f"build-index: coverage — {path} is INPROGRESS while {b}'s coverage is red: {red}")
+            refused += 1
+    count = (f"build-index: coverage — check 29 graded {graded} INPROGRESS chain spec(s) in {holding} of "
+             f"{len(value['builds'])} chain build(s) at or after {CARRIES_KEY} {value['cutoff']}")
+    if not graded:
+        count += (" — nothing graded: no chain spec is INPROGRESS, and under the unattended harness a spec "
+                  "goes OPEN to CLOSED in its build commit, so this check grades attended builds only")
+    print(count)
+    return 1 if refused else 0
+
+
+def cmd_check_asbuilt(root: str, conf: dict, staged: bool = False, here: str | None = None) -> int:
+    """TOOL-dTrueNorth-16 S17 — the as-built view's verdicts, the findings `--write` cannot cure.
+
+    It prints TOOL-dTrueNorth-6 S4's findings other than the view's byte drift — a record departing
+    from a clause with no row, the head rule's two, a pipe in an `**After:**`, a pinned hash its clause
+    does not carry, a moved `Baseline:` line, a view no `merge=ours` attribute guards (TOOL-dTrueNorth-26
+    S16) — under `as-built VERDICT`, and exits 1. Its count line
+    opens `build-index: as-built` on every armed run (TOOL-dTrueNorth-20 S4): `build-index: as-built
+    clean · <n> deviation records` when no finding stands, and `build-index: as-built <k> finding(s)`
+    above the `as-built VERDICT` block when any does. Off, all four DESIGN_* keys blank, it prints the
+    one off line and exits 0; a partial key set and an unreadable pin are `main()`'s exit 2.
+
+    Under `staged` its trigger is the render's (TOOL-dTrueNorth-20 S20, superseding S17's hand list),
+    the one TOOL-dTrueNorth-16 S21 gives check 29: it runs when any staged path is a build-index input
+    by `check_index_input`, this kit's own directory and the carries checker beside it included, so a
+    staged edit of the verdict's own code is graded, plus DESIGN_RECORD and DESIGN_VIEW where they fall
+    outside that set; otherwise it prints one held line and exits 0. `here` places a fixture's kit
+    under its root, as `check_staged_render` takes it. Hygiene check 30 is its one caller.
+    """
+    if staged:
+        kit, carries = resolve_render_inputs(root, conf, here)
+        named = {str(conf.get(k) or "").strip() for k in ("DESIGN_RECORD", "DESIGN_VIEW")} - {""}
+        paths = read_staged_paths(root)
+        if paths is not None and not any(
+                rel in named or check_index_input(rel, conf["MEMORY_ROOT"], kit, carries) for rel in paths):
+            print("build-index: as-built held under --staged — no staged path is a build-index input, DESIGN_RECORD "
+                  "or DESIGN_VIEW, so no verdict can have moved")
+            return 0
+    view = render_asbuilt_view(root, conf)
+    if view["state"] == "off":
+        print(view["line"])
+        return 0
+    if not view["findings"]:
+        print(f"build-index: as-built clean · {view['records']} deviation records")
+        return 0
+    print(f"build-index: as-built {len(view['findings'])} finding(s)")
+    return print_asbuilt_verdicts(view["findings"])
+
+
+def print_check_verdicts(root: str, conf: dict) -> None:
+    """TOOL-dTrueNorth-27 S4 — `--check --with-verdicts`' sections, printed ahead of `--check`'s own lines.
+
+    Hygiene check 29's verb, `--check-coverage`, and check 30's, `--check-asbuilt`, run in this process,
+    each under a captured stdout, a Problem mapped to exit 2 and its `build-index: <message>` line as
+    `main()` maps it. Each section opens `build-index: verdict <check> exit <rc>` above the verb's lines,
+    and `build-index: verdicts end` closes both, so a full hygiene run reads three verdicts from check 9's
+    one generator process and splits them at those marker lines.
+
+    Each verb's stderr is captured with its stdout (TOOL-dTrueNorth-31 S2), so a notice it writes lands in
+    its own section and never ahead of the first marker, where the hygiene capture strips it; `main()`
+    binds `sys.stderr` to stdout for the rest of the call. Any other exception a verb raises is its
+    section's one `build-index: <type>: <message>` line with exit 2 (S12), so `--check` still runs and
+    check 9 reads its own verdict rather than a traceback.
+    """
+    for check, verb in ((29, cmd_check_coverage), (30, cmd_check_asbuilt)):
+        said = io.StringIO()
+        with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
+            try:
+                rc = verb(root, conf)
+            except Problem as exc:
+                print(f"build-index: {exc}")
+                rc = 2
+            except Exception as exc:  # noqa: BLE001  a crash stays in its own section (S12)
+                print(f"build-index: {type(exc).__name__}: {exc}")
+                rc = 2
+        print(f"build-index: verdict {check} exit {rc}")
+        sys.stdout.write(said.getvalue())
+    print("build-index: verdicts end")
 
 
 def extract_build_readmes(paths: list, memory_root: str) -> list:
@@ -2654,6 +3114,17 @@ def cmd_survey(root: str, conf: dict) -> int:
 
 def cmd_write(root: str, conf: dict) -> int:
     check_archives_tracked(root, conf)
+    # TOOL-dTrueNorth-16 S20 — THE VIEW FIRST. `plan()` renders the coverage regions from DESIGN_VIEW,
+    # so writing the view after it left them rendered from the view as it was, and one `--write` was
+    # no fixed point. A view verdict still blocks no write (TOOL-dTrueNorth-6 §4 "The host"), and a
+    # pin it cannot read is held until every other artifact is written, then raised.
+    view, refused = {"state": "unread"}, None
+    try:
+        view = render_asbuilt_view(root, conf)
+    except Problem as exc:
+        refused = exc
+    if view["state"] == "armed":
+        write_text(os.path.join(root, view["rel"]), view["text"])
     artifacts, orphans, unmanaged, verdicts, guarded = plan(root, conf, create_missing=True)
     for rel, text in sorted(artifacts.items()):
         write_text(os.path.join(root, rel), text)
@@ -2669,6 +3140,15 @@ def cmd_write(root: str, conf: dict) -> int:
     # and it earns it: the view it names is the only artifact this verb did NOT write, and exiting
     # 0 after skipping a write would read as a successful render of it.
     print_verdicts(verdicts, guarded, conf)
+    # TOOL-dTrueNorth-6 S5 — the as-built view, written above before every other artifact, and its
+    # findings printed by the same rule: a render is not a verdict.
+    if view["state"] == "off":
+        print(view["line"])
+    elif view["state"] == "armed":
+        print(f"build-index: wrote the as-built view {view['rel']}")
+        print_asbuilt_verdicts(view["findings"])
+    if refused:
+        raise refused
     return 1 if guarded else 0
 
 
@@ -2937,37 +3417,19 @@ def read_blobs_at_rev(root: str, rev: str, paths: list) -> dict:
     ONE PROCESS FOR THE WHOLE READ. A corpus is a few hundred blobs, and this repo's own memory
     note prices process creation as the dominant cost of a suite on the node that measured it.
 
-    BYTES, and deliberately not through `run()`. That helper decodes with the locale encoding and
-    universal-newlines the result; this reader must decode utf-8 and fold CRLF alone, exactly as
-    `read_text` does, or a pinned read and a working-tree read of one file would disagree about a
-    lone CR. It is the same split `read_conf_at_rev` records, for the same reason.
+    The read is `tree_lib.read_blobs_at`, the kit's one `<rev>:<path>` bytes reader (TOOL-dTrueNorth-20
+    S33): each body sliced by its byte size before it is decoded, then UTF-8 with CRLF folded alone,
+    exactly as `read_text` does, so a pinned read and a working-tree read of one file cannot disagree
+    about a lone CR. A missing object, a tree and a blob that is not UTF-8 each read None. A failed call
+    is a `Problem` naming it.
     """
     if not paths:
         return {}
-    stdin = "".join(f"{rev}:{p}\n" for p in paths).encode("utf-8")
-    done = subprocess.run(("git", "cat-file", "--batch"), cwd=root, input=stdin,
-                          capture_output=True, check=True, env=_build_git_env())
-    out: dict = {}
-    data, at = done.stdout, 0
-    for path in paths:
-        end = data.find(b"\n", at)
-        if end < 0:
-            out[path] = None
-            continue
-        header = data[at:end].decode("utf-8", "replace").split()
-        at = end + 1
-        # `<sha> blob <size>`, or `<name> missing` with no body. A TREE under a path this walk
-        # selected is not a file either, so it is `None` for the same reason a missing object is.
-        if len(header) < 3 or header[1] != "blob":
-            out[path] = None
-            continue
-        size = int(header[2])
-        try:
-            out[path] = data[at:at + size].decode("utf-8").replace("\r\n", "\n")
-        except UnicodeDecodeError:
-            out[path] = None
-        at += size + 1
-    return out
+    try:
+        blobs = read_blobs_at(root, [(rev, p) for p in paths])
+    except OSError as exc:
+        raise Problem(str(exc)) from None
+    return {p: blobs.get((rev, p)) for p in paths}
 
 
 def build_path_probe(paths):
@@ -4030,6 +4492,710 @@ def test_staged_render(arm) -> None:
             lambda: str([p for p in plan(t, conf)[0] if not check_index_input(p, "memory", None)]))
 
 
+def test_coverage_region(arm) -> None:
+    """TOOL-dTrueNorth-3's arms: the `build-coverage` region and `--check-coverage`, over a fixture tree
+    whose conf arms SPEC_CARRIES_CUTOFF over a design of its own.
+
+    MODULE-LEVEL, as `test_staged_render` is. Two chain builds — dAlpha, whose two specs carry both its
+    clauses and its one owned node, one of them derived from a decision, and dBeta, thirty clauses with
+    no backticked name and no spec, so its lists wrap — and tOne, which the view does not name. The
+    checker is the one in this kit directory's parent, the reader the generator really loads; the
+    view, the record at the fixture's baseline and the deriver are the fixture's own. Every plant is
+    undone before the next arm reads the tree. With no checker beside the kit the arms skip aloud.
+    """
+    if not os.path.isfile(os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                       CARRIES_CHECKER)):
+        print(f"arm skip  TOOL-dTrueNorth-3 — no {CARRIES_CHECKER} in this kit directory's parent, so the "
+              f"coverage arms have no join to read")
+        return
+    cut = "2026-09-02"
+    alpha = {"cl-dAlpha-0001": "The reader takes `alpha-one` first.", "cl-dAlpha-0002": "The run writes `alpha-two`."}
+    beta = {"cl-dBeta-%04d" % k: "Beta clause number %d." % k for k in range(1, 31)}
+    pins = {cid: hashlib.sha256(text.encode("utf-8")).hexdigest()[:8] for cid, text in alpha.items()}
+    mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-coverage")
+    # The view at a dated record name, so its head has the two names it derives (TOOL-dTrueNorth-27 S7).
+    view_rel = f"memory/design/{cut}-build-ARCH-dAlpha-1-as-built.md"
+    keys = (f'DESIGN_RECORD="memory/design/record.md"\nDESIGN_VIEW="{view_rel}"\n'
+            'DESIGN_NODES="memory/design/nodes.py"\n')
+    with tempfile.TemporaryDirectory() as base:
+        t = os.path.join(base, "coverage"); os.makedirs(t)
+        run("git", "init", "-q", "--template=", ".", cwd=t)
+        conf_path = os.path.join(t, ".memory-tree.conf")
+        view = os.path.join(t, *view_rel.split("/"))
+        s1 = os.path.join(t, "memory", "builds", "dAlpha", "spec", f"{cut}-spec-dAlpha-1.md")
+        readme = {s: os.path.join(t, "memory", "builds", s, "README.md") for s in ("dAlpha", "dBeta", "tOne")}
+
+        def write_view(extra=""):
+            write_text(view, "# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n" + "".join(
+                f"| {b} | `{cid}` | {text} | baseline |\n" for b, cl in (("dAlpha", alpha), ("dBeta", beta))
+                for cid, text in cl.items()) + extra)
+
+        def write_alpha(status):
+            write_text(s1, f"# ARCH-dAlpha-1 — a unit\n\n**Status:** {status} · rev-1 · {cut} · node a · Tier-2 · "
+                           f"base 0123abcd\n\n" + "".join(f"**Carries:** {cid}@{pins[cid]} whole\n" for cid in alpha)
+                       + "**Carries:** node:item.alpha-node\n\nIt reads `alpha-one` and writes `alpha-two`.\n")
+
+        def write_conf(cutoff, baseline, view_key=view_rel):
+            write_text(conf_path, _render_fixture_conf() + f'SPEC_CARRIES_CUTOFF="{cutoff}"\n'
+                       + keys.replace(view_rel, view_key) + f'DESIGN_BASELINE="{baseline}"\n')
+            return load_conf(t)
+
+        write_text(os.path.join(t, "memory", STALE_HEADER_WAIVER), "# empty\n")
+        for slug in readme:
+            fm = ["---", f"slug: {slug}", "node: a", f"opened: {cut}", "streams: arch", "roster: ARCH",
+                  f"ids: ARCH-{slug}-1"] + (["status: OPEN"] if slug == "dBeta" else []) + ["---"]
+            write_text(readme[slug], "\n".join(fm + ["", f"# {slug}", "", MARK_OPEN, MARK_CLOSE]) + "\n")
+        write_text(os.path.join(t, "memory", "builds", "tOne", "spec", f"{cut}-spec-tOne-1.md"),
+                   f"# ARCH-tOne-1 — a unit\n\n**Status:** OPEN · rev-1 · {cut} · node a · Tier-2 · base 0123abcd\n")
+        write_alpha("INPROGRESS")
+        write_text(os.path.join(t, "memory", "builds", "dAlpha", "spec", f"{cut}-spec-dAlpha-2.md"),
+                   f"# ARCH-dAlpha-2 — a unit\n\n**Status:** OPEN · rev-1 · {cut} · node a · Tier-2 · "
+                   f"base 0123abcd\n\n**Derived:** ARCH-dAlpha-1\n")
+        write_view()
+        # TOOL-dTrueNorth-6 — the record holds the `[chain]` the view's rows are, and its working tree's
+        # Baseline: line names the pin, because with the design keys declared --write renders DESIGN_VIEW
+        # from the record at DESIGN_BASELINE and --check compares the file with that render.
+        record = os.path.join(t, "memory", "design", "record.md")
+        record_text = ("# a design record\n\n**Serves:** research ARCH-dAlpha-1\n\n## [chain]\n\n"
+                       "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n"
+                       + "".join(f"| {b} | a | b | " + "; ".join(f"{text} `{cid}`" for cid, text in cl.items())
+                                 + " | c |\n" for b, cl in (("dAlpha", alpha), ("dBeta", beta)))
+                       + "\n## [clause-ids]\n\n")
+        write_text(record, record_text + "Retired: `cl-dAlpha-0009`\n")
+        write_text(os.path.join(t, "memory", "design", "nodes.py"), 'OWNED = ("item",)\n\n\ndef derive():\n    '
+                   'return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n')
+        conf_off = write_conf("", "0" * 40)
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=t)
+        sha = run("git", "rev-parse", "HEAD", cwd=t).strip()
+        write_text(record, record_text + f"Baseline: `{sha}`\n\nRetired: `cl-dAlpha-0009`\n")
+        conf_off = write_conf("", sha)
+        # AC5 — blank, a tree with no pair gains none: the key decides creation before anything resolves.
+        cmd_write(t, conf_off)
+        arm("TOOL-dTrueNorth-3 AC5 — with SPEC_CARRIES_CUTOFF blank, --write gives no README the pair", "0",
+            lambda: str(sum(mo in read_text(p) for p in readme.values())))
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "rendered off", "--no-verify", cwd=t)
+        before = {s: read_text(p) for s, p in readme.items()}
+        conf_on = write_conf(cut, sha)
+        cmd_write(t, conf_on)
+        # AC1 — the chain READMEs gain the pair DIRECTLY after the index region, a blank line between,
+        # and nothing outside it moves; the README the view does not name is untouched.
+        for slug in ("dAlpha", "dBeta"):
+            ls = read_text(readme[slug]).split("\n")
+            o, c = _marker_index(ls, mo), _marker_index(ls, mc)
+            arm(f"TOOL-dTrueNorth-3 AC1 — {slug}'s README gains the pair right after the index close and "
+                f"nothing else moves", "True",
+                lambda: str(o is not None and c is not None and ls[o - 2] == MARK_CLOSE and ls[o - 1] == ""
+                            and "\n".join(ls[:o - 1] + ls[c + 1:]) == before[slug]))
+        arm("TOOL-dTrueNorth-3 AC1 — a README the view's Build column does not name gains no pair", "True",
+            lambda: str(read_text(readme["tOne"]) == before["tOne"]))
+        alpha_r = read_text(readme["dAlpha"])
+        arm("TOOL-dTrueNorth-3 S3 — the region opens with the counts line naming build, clause, node, spec "
+            "and cutoff", f"Coverage of dAlpha's 2 clause(s) and 1 owned node(s), over 2 spec(s) at or after "
+                          f"SPEC_CARRIES_CUTOFF {cut}:", lambda: alpha_r)
+        arm("TOOL-dTrueNorth-3 S3 — every field renders, an empty one as none", "True", lambda: str(all(
+            f in alpha_r for f in ("- carried whole: 2\n", "- carried in parts: 0 (none)\n",
+                                   "- moved, retired or deferred: none\n", "- uncarried: 0 (none)\n",
+                                   "- stale: 0 (none)\n", "- ambiguous: 0 (none)\n",
+                                   "- owned nodes no spec names: none\n",
+                                   f"- specs derived from no clause: `spec/{cut}-spec-dAlpha-2.md` (ARCH-dAlpha-1)\n",
+                                   "- clauses the token arm cannot see: none\n"))))
+        # AC3 — a build with no spec: every clause uncarried, listed, and no line past 300.
+        beta_r = read_text(readme["dBeta"])
+        _bl = beta_r.split("\n")
+        _region = _bl[_marker_index(_bl, mo):_marker_index(_bl, mc) + 1]
+        _unc = " ".join(x.strip() for x in "\n".join(_region).split("- uncarried: ", 1)[1].split("\n- ", 1)[0].split("\n"))
+        arm("TOOL-dTrueNorth-3 AC3 — a chain build with no spec reads over 0 spec(s)", "over 0 spec(s)", lambda: beta_r)
+        arm("TOOL-dTrueNorth-3 AC3 — its uncarried field counts and lists every clause the view gives it", "True",
+            lambda: str(_unc == "30 (" + ", ".join(beta) + ")"))
+        arm("TOOL-dTrueNorth-3 AC3 — the long lists wrap onto two-space lines, none past 300", "True",
+            lambda: str(max(len(x) for x in _region) <= 300 and sum(x.startswith("  cl-dBeta-") for x in _region) >= 2))
+        # AC4 — fresh render is clean; a hand edit and a chain README with no pair are each named.
+        arm("TOOL-dTrueNorth-3 AC4 — --check after --write is clean", "rc=0",
+            lambda: f"rc={_read_mode(cmd_check, t, conf_on)[0]}")
+        write_text(readme["dAlpha"], alpha_r.replace("- carried whole: 2", "- carried whole: 3"))
+        arm("TOOL-dTrueNorth-3 AC4 — one hand-edited byte in the region reds --check naming that README",
+            "memory/builds/dAlpha/README.md (stale", lambda: _read_mode(cmd_check, t, conf_on)[1])
+        write_text(readme["dAlpha"], alpha_r)
+        _ls = beta_r.split("\n")
+        write_text(readme["dBeta"], "\n".join(_ls[:_marker_index(_ls, mo) - 1] + _ls[_marker_index(_ls, mc) + 1:]))
+        arm("TOOL-dTrueNorth-3 AC4 — a chain README with no pair is refused, naming it and --write", "True",
+            lambda: str((lambda r: r[0] == 1 and "memory/builds/dBeta/README.md is a chain build's README with no"
+                         in r[1] and "gen_build_index.py --write" in r[1])(_read_mode(cmd_check, t, conf_on))))
+        write_text(readme["dBeta"], beta_r)
+        write_text(readme["tOne"], before["tOne"] + "\n" + mo + "\n" + mc + "\n")
+        arm("TOOL-dTrueNorth-3 S4 — a README the view does not name that holds a pair is refused by --check",
+            "memory/builds/tOne/README.md holds a", lambda: _read_mode(cmd_check, t, conf_on)[1])
+        arm("TOOL-dTrueNorth-3 S4 — and by --write, which writes nothing", "rc=1",
+            lambda: f"rc={_read_mode(cmd_write, t, conf_on)[0]}")
+        write_text(readme["tOne"], before["tOne"])
+        # AC8 — the refusal reads the same value: clean is 0, a planted uncarried clause stops the
+        # INPROGRESS spec, the spec at OPEN is not read, and the region shows the plant.
+        arm("TOOL-dTrueNorth-3 AC8 — --check-coverage over a clean chain build at INPROGRESS exits 0", "rc=0",
+            lambda: "rc=%s" % _read_mode(cmd_check_coverage, t, conf_on)[0])
+        write_view("| dAlpha | `cl-dAlpha-0003` | A planted clause. | baseline |\n")
+        arm("TOOL-dTrueNorth-3 AC8 — a planted uncarried clause refuses the INPROGRESS spec, naming it and the "
+            "finding", f"rc=1 build-index: coverage — memory/builds/dAlpha/spec/{cut}-spec-dAlpha-1.md is "
+                       f"INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0003\n",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_coverage, t, conf_on))
+        write_alpha("OPEN")
+        arm("TOOL-dTrueNorth-3 AC7 — the same plant with every dAlpha spec OPEN is not refused", "rc=0",
+            lambda: "rc=%s" % _read_mode(cmd_check_coverage, t, conf_on)[0])
+        arm("TOOL-dTrueNorth-3 AC7 — and the region's uncarried field reads the plant", "- uncarried: 1 (cl-dAlpha-0003)\n",
+            lambda: plan(t, conf_on)[0]["memory/builds/dAlpha/README.md"])
+        write_alpha("INPROGRESS")
+        write_view()
+        # The line's spelling is TOOL-dTrueNorth-20 S3's, which the contract clause's expect matches.
+        arm("TOOL-dTrueNorth-3 AC8 — a blank key exits 0 on one line naming it", "rc=0 build-index: coverage off — "
+            "SPEC_CARRIES_CUTOFF is blank\n", lambda: "rc=%s %s" % _read_mode(cmd_check_coverage, t, conf_off))
+        write_conf(cut, sha, "memory/design/no-such-view.md")
+        _cli = subprocess.run([sys.executable, os.path.abspath(__file__), "--check-coverage"], cwd=t,
+                              capture_output=True, text=True, encoding="utf-8", errors="replace",
+                              env=_build_git_env())
+        arm("TOOL-dTrueNorth-3 AC8 — a DESIGN_VIEW naming a missing file exits 2 naming the key", "rc=2 True",
+            lambda: f"rc={_cli.returncode} {'DESIGN_VIEW names memory/design/no-such-view.md' in _cli.stdout}")
+        write_conf(cut, sha)
+        # AC11 — the checker staged alone owes a render while the key is set, and not while it is blank.
+        write_text(os.path.join(t, "pfx", "kit", "x.py"), "x = 1\n")
+        write_text(os.path.join(t, "pfx", CARRIES_CHECKER), "x = 1\n")
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "a checker beside a kit", "--no-verify", cwd=t)
+        write_text(os.path.join(t, "pfx", CARRIES_CHECKER), "x = 2\n")
+        run("git", "add", "--", f"pfx/{CARRIES_CHECKER}", cwd=t)
+        _kit = os.path.join(t, "pfx", "kit")
+        arm("TOOL-dTrueNorth-3 AC11 — a staged carries checker owes a render while the key is set",
+            f"(True, 'pfx/{CARRIES_CHECKER} is a build-index input", lambda: str(check_staged_render(t, conf_on, _kit)))
+        arm("TOOL-dTrueNorth-3 AC11 — with the key blank the same staged checker skips", "False",
+            lambda: str(check_staged_render(t, conf_off, _kit)[0]))
+        run("git", "reset", "-q", "--hard", cwd=t)
+        # AC5 — blank, a tree holding the pairs renders the off line in each, and --check agrees.
+        conf_off = write_conf("", sha)
+        cmd_write(t, conf_off)
+        arm("TOOL-dTrueNorth-3 AC5 — blank, each held pair renders the off line and no stale body", "True",
+            lambda: str(all(f"{mo}\n\n*Coverage is not read: SPEC_CARRIES_CUTOFF is blank.*\n{mc}" in read_text(readme[s])
+                            for s in ("dAlpha", "dBeta"))))
+        arm("TOOL-dTrueNorth-3 AC5 — and --check over it is clean", "rc=0",
+            lambda: f"rc={_read_mode(cmd_check, t, conf_off)[0]}")
+        # TOOL-dTrueNorth-16 AC7 — the key rule over the generator. Every DESIGN_* key and the cutoff
+        # blank: --check prints the as-built off line and the coverage off line, and raises no Problem.
+        # The four keys blank and the cutoff set: a Problem naming the cutoff and the keys.
+        write_text(conf_path, _render_fixture_conf())
+        conf_blank = load_conf(t)
+
+        def check_raises(c):
+            buf = io.StringIO()
+            try:
+                with contextlib.redirect_stdout(buf):
+                    cmd_check(t, c)
+            except Problem as exc:
+                return f"Problem: {exc}"
+            return buf.getvalue()
+
+        arm("TOOL-dTrueNorth-16 AC7 — every DESIGN_* key and the cutoff blank: the as-built off line, the "
+            "coverage off line and no Problem", "True",
+            lambda: str((lambda o: "as-built view: off — DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, DESIGN_NODES "
+                         "are blank" in o and "build-index: coverage is not read — SPEC_CARRIES_CUTOFF is blank" in o
+                         and not o.startswith("Problem: "))(check_raises(conf_blank))))
+        write_text(conf_path, _render_fixture_conf() + f'SPEC_CARRIES_CUTOFF="{cut}"\n')
+        arm("TOOL-dTrueNorth-16 AC7 — the cutoff set over four blank DESIGN_* keys is a Problem naming both",
+            f"Problem: {CARRIES_KEY} is set and the carries join refused, so the coverage cannot be read: "
+            f"{CARRIES_KEY} {cut} is set and every DESIGN_* key (DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, "
+            "DESIGN_NODES) is blank", lambda: check_raises(load_conf(t)))
+        # TOOL-dTrueNorth-16 AC20 — one --write is a fixed point: an amends record changing a clause a
+        # chain spec carries, then ONE --write, and --check exits 0. Red while the view was written after
+        # plan(), which rendered the coverage from the view as it stood before the write.
+        conf_on = write_conf(cut, sha)
+        amend_rel = f"memory/builds/dAlpha/build/{cut}-build-ARCH-dAlpha-1-deviation-1.md"
+        write_text(os.path.join(t, amend_rel), "\n".join([
+            "# ARCH-dAlpha-1 deviation 1 — an amendment of a carried clause", "",
+            "**Serves:** deviation ARCH-dAlpha-1", "",
+            f"- **Departs from:** `cl-dAlpha-0002@{pins['cl-dAlpha-0002']}` [chain]",
+            "- **Hand-off:** design-revised", f"- **Before:** {alpha['cl-dAlpha-0002']}",
+            "- **After:** The run writes `alpha-two` twice.", "- **Cause:** builder discovery",
+            "- **Reason:** the fixture's amendment", "- **Evidence:** the fixture", "- **Risk:** additive",
+            "- **Approver:** author", f"- **Follow-through:** amends cl-dAlpha-0002@{pins['cl-dAlpha-0002']}",
+            "- **Caused-by:** ARCH-dAlpha-1", ""]))
+        run("git", "add", "-A", cwd=t)
+        _read_mode(cmd_write, t, conf_on)
+        arm("TOOL-dTrueNorth-16 AC20 — an amends record changing a carried clause: ONE --write, then --check "
+            "exits 0", "rc=0 True", lambda: (lambda r: f"rc={r[0]} {'- stale: 1 (cl-dAlpha-0002)' in read_text(readme['dAlpha'])}")(
+                _read_mode(cmd_check, t, conf_on)))
+        run("git", "rm", "-q", "-f", "--", amend_rel, cwd=t)
+        _read_mode(cmd_write, t, conf_on)
+        # TOOL-dTrueNorth-16 AC21 — --check-coverage --staged runs on the render's trigger, so a view row
+        # staged alone, at a view path the render reads, refuses the INPROGRESS spec; a staged path the
+        # render does not read holds, saying so.
+        view_b = f"memory/builds/dAlpha/build/{cut}-build-ARCH-dAlpha-1-as-built.md"
+        conf_vb = write_conf(cut, sha, view_b)
+        write_text(os.path.join(t, view_b), read_text(view))
+        run("git", "add", "-A", cwd=t)
+        run("git", "commit", "-q", "-m", "the view in a build folder", "--no-verify", cwd=t)
+        write_text(os.path.join(t, view_b), read_text(view) + "| dAlpha | `cl-dAlpha-0003` | A planted clause. | baseline |\n")
+        run("git", "add", "--", view_b, cwd=t)
+        arm("TOOL-dTrueNorth-16 AC21 — a staged view row alone is graded under --staged, refusing the INPROGRESS "
+            "spec", f"rc=1 build-index: coverage — memory/builds/dAlpha/spec/{cut}-spec-dAlpha-1.md is INPROGRESS "
+                    "while dAlpha's coverage is red: uncarried cl-dAlpha-0003",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_coverage, t, conf_vb, True))
+        run("git", "reset", "-q", "--", view_b, cwd=t)
+        write_text(os.path.join(t, "notes.txt"), "a path the render does not read\n")
+        run("git", "add", "--", "notes.txt", cwd=t)
+        arm("TOOL-dTrueNorth-16 AC21 — staged with nothing the render reads, it prints the held line and exits 0",
+            "rc=0 build-index: coverage held under --staged",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_coverage, t, conf_vb, True))
+        run("git", "reset", "-q", "--hard", cwd=t)
+
+
+def test_coverage_stub(arm) -> None:
+    """TOOL-dTrueNorth-16 S16's arms: the coverage read through a stand-in resolver, which run in ANY tree,
+    an adopter holding no checker included. The stub supplies the coverage function, as the resolver
+    `read_landed_unclosed` takes stands in for a kit; the region and check 29's verb read its value; and
+    with the checker's name pointed at no file, the unstubbed read is the named Problem; and a scratch
+    checker raising its own `DesignRefusal` under a namesake `design_lib` is that Problem too."""
+    global CARRIES_CHECKER
+    import types
+    spec = "memory/builds/dAlpha/spec/2026-09-02-spec-dAlpha-1.md"
+    value = {"state": "armed", "cutoff": "2026-09-02", "measured": 1, "skipped": {}, "withdrawn": [],
+             "builds": {"dAlpha": {"clauses": ["cl-dAlpha-0001"], "nodes": [], "specs": [(spec, "INPROGRESS")],
+                                   "whole": [], "split": [], "released": [], "uncarried": ["cl-dAlpha-0001"],
+                                   "stale": [], "ambiguous": [], "unnamed": [], "derived": [], "blind": [],
+                                   "findings": [("dAlpha", "uncarried", "cl-dAlpha-0001", "carried by no spec")]}}}
+    asked = []
+
+    def resolve_stub(path):
+        asked.append(path)
+        return lambda root, conf=None: value
+
+    with tempfile.TemporaryDirectory() as t:
+        conf = {"MEMORY_ROOT": "memory", CARRIES_KEY: "2026-09-02"}
+        arm("TOOL-dTrueNorth-16 AC16 — read_carries_coverage with a stub resolve returns the stub's value, the "
+            "checker's path handed to it", "True",
+            lambda: str(read_carries_coverage(t, conf, resolve_stub) is value and asked[-1].endswith(CARRIES_CHECKER)))
+        arm("TOOL-dTrueNorth-16 S16 — check 29's verb over the stub refuses the INPROGRESS chain spec",
+            f"rc=1 build-index: coverage — {spec} is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0001",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_coverage, t, conf, False, resolve_stub))
+        arm("TOOL-dTrueNorth-16 S16 — the coverage region renders the stub's value", "- uncarried: 1 (cl-dAlpha-0001)",
+            lambda: render_coverage({"readme": "memory/builds/dAlpha/README.md", "slug": "dAlpha",
+                                     "coverage": {"state": "armed", "cutoff": "2026-09-02",
+                                                  "entry": value["builds"]["dAlpha"]}}))
+        held, CARRIES_CHECKER = CARRIES_CHECKER, "no-such-checker.py"
+        try:
+            arm("TOOL-dTrueNorth-16 AC16 — without the stub and with no checker beside the kit, the read is the "
+                "named Problem", f"{CARRIES_KEY} is set and no-such-checker.py is not in this kit directory's parent",
+                lambda: read_carries_coverage(t, conf))
+        finally:
+            CARRIES_CHECKER = held
+        # TOOL-dTrueNorth-32 S12 (AC12): the catch reads the refusal class the checker itself loaded. A
+        # scratch checker whose `load_design_lib` returns one object holding its own `DesignRefusal`, and
+        # whose `derive_carries_coverage` raises that class, is named by its absolute path, which
+        # `os.path.join` returns unchanged, while a namesake `design_lib` holding another `DesignRefusal`
+        # sits in `sys.modules`; unstubbed, the read is the named Problem. Red against a catch reading the
+        # class from `sys.modules` alone, where the checker's refusal escapes as itself.
+        checker = os.path.join(t, "scratch_checker.py")
+        write_text(checker, "import types\n\n\nclass DesignRefusal(ValueError):\n    pass\n\n\n"
+                            "LIB = types.SimpleNamespace(DesignRefusal=DesignRefusal)\n\n\n"
+                            "def load_design_lib():\n    return LIB\n\n\n"
+                            "def derive_carries_coverage(root, conf=None):\n"
+                            "    raise load_design_lib().DesignRefusal(\"the scratch checker's own refusal\")\n")
+        namesake = types.ModuleType("design_lib")
+        namesake.DesignRefusal = type("DesignRefusal", (ValueError,), {})
+        held, slot = CARRIES_CHECKER, sys.modules.get("design_lib")
+        CARRIES_CHECKER, sys.modules["design_lib"] = checker, namesake
+        try:
+            arm("TOOL-dTrueNorth-32 AC12 — a checker raising its own DesignRefusal under a namesake design_lib is the "
+                "named Problem", "carries join refused, so the coverage cannot be read: the scratch checker's own",
+                lambda: read_carries_coverage(t, conf))
+        finally:
+            CARRIES_CHECKER = held
+            if slot is None:
+                sys.modules.pop("design_lib", None)
+            else:
+                sys.modules["design_lib"] = slot
+
+
+def check_expand_contract() -> str:
+    """TOOL-dTrueNorth-16 AC15 — `backlog.read_header_verbs` over a `closes` header with an `expand` stub
+    returning three values: the refusal's text, or what came back instead."""
+    try:
+        backlog.read_header_verbs("**Status:** OPEN · rev-1 · closes TOOL-dX-1", "memory/builds/dX/spec/s.md",
+                                  lambda value: (["TOOL-dX-1"], [], "a third value"))
+    except backlog.Problem as exc:
+        return f"backlog.Problem: {exc}"
+    except ValueError as exc:
+        return f"a bare ValueError: {exc}"
+    return "no refusal"
+
+
+def test_asbuilt_view(arm) -> None:
+    """TOOL-dTrueNorth-6's arms: every `asbuilt_view.py` fixture plant, and the host over a tree of its own.
+
+    MODULE-LEVEL, as `test_coverage_region` is. The plants build their design in a fixture repository of
+    their own (TOOL-dTrueNorth-16 S19), so they run whatever this tree declares. The host case
+    is a fixture tree whose design record gives dAlpha two clauses in its `[chain]`, committed as the
+    baseline, and whose view sits in a build's `build/` folder, where a staged edit of it is a build-index
+    input: `--write` renders it; a hand edit staged there reds `--check` with the view under DRIFT; an
+    `amends` record staged over the view rendered on zero records makes `--check --staged` render and
+    reds it with the view under DRIFT until `--write` re-renders it (TOOL-dTrueNorth-8 S3), and so does
+    an edit of a kit path staged alone over a committed record the view does not count (TOOL-dTrueNorth-17
+    S3), the render's code being a view input; a record departing from a clause through a `gap` row leaves
+    `--check` at 0 and reds `--check-asbuilt` with an `as-built VERDICT` naming it (TOOL-dTrueNorth-16 S17),
+    while `--write` still writes every other artifact; a pin naming no commit is a named Problem; every
+    DESIGN_* key blank prints the off line and reads nothing; and DESIGN_VIEW alone blank is a partial
+    set, the named Problem (S6).
+    """
+    import asbuilt_view
+    import design_lib
+    # TOOL-dTrueNorth-16 S19 — the plants build their design in a fixture repository of their own, so
+    # they run whatever this tree's conf declares, and never skip.
+    try:
+        plants = asbuilt_view.run_plant_arms()
+    except Exception as exc:  # noqa: BLE001 — a traceback here IS the finding
+        plants = [(False, "TOOL-dTrueNorth-6 the fixture plants run", f"UNEXPECTED {type(exc).__name__}: {exc}")]
+    for ok, what, detail in plants:
+        arm(what, "plant held", lambda ok=ok, detail=detail: "plant held" if ok else detail)
+    arm("TOOL-dTrueNorth-16 AC31 — check_view matches rows with design_lib.VIEW_ROW, never a copy", "True",
+        lambda: str(asbuilt_view.VIEW_ROW is design_lib.VIEW_ROW))
+    texts = {"cl-dAlpha-0001": "The reader takes `alpha-one` first.", "cl-dAlpha-0002": "The run writes `alpha-two`."}
+    record_rel = "memory/design/record.md"
+    view_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-as-built.md"
+    dev_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-deviation-1.md"
+    record = ("# a design record\n\n**Serves:** research ARCH-tOne-1\n\n## [chain]\n\n"
+              "| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | "
+              + "; ".join(f"{text} `{cid}`" for cid, text in texts.items()) + " | c |\n\n## [clause-ids]\n\n")
+    with tempfile.TemporaryDirectory() as tmp:
+        _fixture(tmp)
+        write_text(os.path.join(tmp, record_rel), record)
+        # TOOL-dTrueNorth-26 S16 — the view's merge=ours line, so an arm asserting check 30 clean reads
+        # a guarded view, as the tree's own `.gitattributes` guards DESIGN_VIEW.
+        write_text(os.path.join(tmp, ".gitattributes"), f"{view_rel} merge=ours\n")
+        run("git", "add", "-A", cwd=tmp)
+        run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=tmp)
+        sha = run("git", "rev-parse", "HEAD", cwd=tmp).strip()
+        write_text(os.path.join(tmp, record_rel), record + f"Baseline: `{sha}`\n")
+
+        def write_conf(baseline=sha, view=view_rel, record=record_rel, nodes="memory/design/nodes.py"):
+            write_text(os.path.join(tmp, ".memory-tree.conf"), _render_fixture_conf()
+                       + f'DESIGN_RECORD="{record}"\nDESIGN_BASELINE="{baseline}"\nDESIGN_VIEW="{view}"\n'
+                       + f'DESIGN_NODES="{nodes}"\n')
+            return load_conf(tmp)
+
+        conf = write_conf()
+        view, live = os.path.join(tmp, view_rel), os.path.join(tmp, "memory", "LIVE.md")
+        row = "| dAlpha | `cl-dAlpha-0001` | The reader takes `alpha-one` first. | baseline |\n"
+        arm("TOOL-dTrueNorth-6 S5 — --write renders the view, a row per clause of the record at its pin", "True",
+            lambda: str(_read_mode(cmd_write, tmp, conf)[0] == 0 and row in read_text(view)
+                        and " 0 deviation records." in read_text(view)))
+        # The view is a record of the build's `build/` folder, which tOne's README indexes once it is
+        # tracked, so a second --write renders that index before the tree is committed clean.
+        run("git", "add", "-A", cwd=tmp)
+        _read_mode(cmd_write, tmp, conf)
+        run("git", "add", "-A", cwd=tmp)
+        run("git", "commit", "-q", "-m", "rendered", "--no-verify", cwd=tmp)
+        arm("TOOL-dTrueNorth-6 S5 — --check after --write is clean, counting the view", "True",
+            lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1])(_read_mode(cmd_check, tmp, conf))))
+        # TOOL-dTrueNorth-16 S27, TOOL-dTrueNorth-27 S7 — the head's two names are the ones DESIGN_VIEW's
+        # dated record name carries, the unit and the instrument beside it, and an edit to the record's own
+        # Serves line moves no byte of the view.
+        arm("TOOL-dTrueNorth-27 AC12 — the view's head names the unit and the instrument its record name carries",
+            "True", lambda: str((lambda head: "\n**Serves:** research ARCH-tOne-1\n" in head
+                                 and "Generated by `build/2026-08-01-build-ARCH-tOne-1-asbuilt.py` from" in head)(
+                read_text(view).split("| Build |", 1)[0])))
+        write_text(os.path.join(tmp, record_rel), read_text(os.path.join(tmp, record_rel)).replace(
+            "**Serves:** research ARCH-tOne-1", "**Serves:** research ARCH-tOne-1, edited"))
+        arm("TOOL-dTrueNorth-16 AC27 — an edit to the record's Serves line leaves --check clean", "rc=0",
+            lambda: f"rc={_read_mode(cmd_check, tmp, conf)[0]}")
+        run("git", "checkout", "-q", "--", record_rel, cwd=tmp)
+        write_text(view, read_text(view).replace("first. | baseline", "first, quietly. | baseline"))
+        run("git", "add", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-6 AC8 — a hand-edited view, staged, is a build-index input", "True",
+            lambda: str(check_staged_render(tmp, conf)[0]))
+        arm("TOOL-dTrueNorth-6 AC8 — and --check exits 1 listing the view under build-index DRIFT, at its first "
+            "differing line and naming the clause that cites no record", "True",
+            lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
+                f"    {view_rel} (the file differs from its render from line") and
+                f"    {view_rel} (cl-dAlpha-0001: its text differs from the baseline's and cites no record)" in r[1])(
+                _read_mode(cmd_check, tmp, conf))))
+        run("git", "reset", "-q", "--hard", cwd=tmp)
+        # TOOL-dTrueNorth-8 S3 — the commit that lands a record re-renders the view. HEAD's view is
+        # rendered over zero records; an `amends` record staged beside it is a build-index input, so
+        # `--check --staged` renders rather than skips and lists the stale view under DRIFT. After
+        # `--write`, the view staged, the check is the fixed point over a view counting the record and
+        # citing it on the amended row. The reset leaves the tree as HEAD holds it for the arms below.
+        amend_rel = "memory/builds/tOne/build/2026-08-01-build-ARCH-tOne-1-deviation-2.md"
+        pin2, after2 = asbuilt_view.derive_clause_hash(texts["cl-dAlpha-0002"]), "The run writes `alpha-two` twice."
+        amend_text = "\n".join([
+            "# ARCH-tOne-1 deviation 2 — an amendment of a clause", "",
+            "**Serves:** deviation ARCH-tOne-1", "",
+            f"- **Departs from:** `cl-dAlpha-0002@{pin2}` [chain]",
+            "- **Hand-off:** design-to-spec", f"- **Before:** {texts['cl-dAlpha-0002']}",
+            f"- **After:** {after2}", "- **Cause:** builder discovery",
+            "- **Reason:** the fixture's amendment", "- **Evidence:** the fixture", "- **Risk:** additive",
+            "- **Approver:** author", f"- **Follow-through:** amends cl-dAlpha-0002@{pin2}",
+            "- **Caused-by:** ARCH-tOne-1", ""])
+        amend_row = f"| dAlpha | `cl-dAlpha-0002` | {after2} | deviation `2026-08-01-build-ARCH-tOne-1-deviation-2` |\n"
+        write_text(os.path.join(tmp, amend_rel), amend_text)
+        run("git", "add", "--", amend_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-8 S3 — an amends record staged over a view rendered on zero records is a "
+            "build-index input, so --check --staged renders rather than skips", "True",
+            lambda: str(check_staged_render(tmp, conf)[0]))
+        arm("TOOL-dTrueNorth-8 S3 — and --check exits 1 listing the stale view under build-index DRIFT, with "
+            "no as-built VERDICT", "True",
+            lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
+                f"    {view_rel} (the file differs from its render from line") and "as-built VERDICT" not in r[1])(
+                _read_mode(cmd_check, tmp, conf))))
+        _read_mode(cmd_write, tmp, conf)
+        run("git", "add", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-8 S3 — after --write, the view staged, --check is the fixed point over a view "
+            "counting the record and citing it on the amended row", "True",
+            lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1]
+                         and " 1 deviation records." in read_text(view) and amend_row in read_text(view))(
+                _read_mode(cmd_check, tmp, conf))))
+        run("git", "reset", "-q", "--hard", cwd=tmp)
+        # TOOL-dTrueNorth-17 S3 — the render's code is a view input. A commit lands the same `amends`
+        # record without re-rendering, so HEAD's view counts no record; then an edit of a file under the
+        # kit's directory, the fixture's own beside its root, is staged alone. It is a build-index input,
+        # so `--check --staged` renders and exits 1 with the stale view under DRIFT, and after `--write`,
+        # the view staged, exits 0. TOOL-dTrueNorth-8 S3 stages the record; this stages the renderer.
+        # `check_staged` is main's `--staged` branch with `here` placing the kit under the fixture root.
+        # The reset drops the commit, so the arms below read the tree as it stood.
+        kit_dir, kit_rel = os.path.join(tmp, "pfx", "kit"), "pfx/kit/asbuilt_view.py"
+        write_text(os.path.join(tmp, kit_rel), '"""the render."""\n')
+        write_text(os.path.join(tmp, amend_rel), amend_text)
+        run("git", "add", "--", amend_rel, kit_rel, cwd=tmp)
+        run("git", "commit", "-q", "-m", "a record landed without its render", "--no-verify", cwd=tmp)
+        write_text(os.path.join(tmp, kit_rel), '"""the render, its docstring edited."""\n')
+        run("git", "add", "--", kit_rel, cwd=tmp)
+
+        def check_staged():
+            render, why = check_staged_render(tmp, conf, kit_dir)
+            return (_read_mode(cmd_check, tmp, conf) if render
+                    else (0, f"build-index: render SKIPPED under --staged — {why}"))
+
+        arm("TOOL-dTrueNorth-17 S3 — a kit path staged alone over a committed record the view does not count: "
+            "--check --staged exits 1 listing the stale view under build-index DRIFT", "True",
+            lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
+                f"    {view_rel} (the file differs from its render from line") and "as-built VERDICT" not in r[1])(
+                check_staged())))
+        _read_mode(cmd_write, tmp, conf)
+        run("git", "add", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-17 S3 — after --write, the view staged, the same --check --staged exits 0 over a "
+            "view counting the record and citing it on the amended row", "True",
+            lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1]
+                         and " 1 deviation records." in read_text(view) and amend_row in read_text(view))(
+                check_staged())))
+        # TOOL-dTrueNorth-20 AC19 (S20) — check 30's staged trigger is the render's: with the view unstaged
+        # and only the kit's `asbuilt_view.py` edit staged, `--check-asbuilt --staged` runs its verdict,
+        # the clean count line; with the kit outside the fixture's root the same staged set holds. Against
+        # S17's hand list, which names no kit path, the first holds too.
+        run("git", "reset", "-q", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-20 AC19 — a staged edit of the verdict's own code alone runs --check-asbuilt "
+            "--staged, which prints the clean count line", "rc=0 build-index: as-built clean · 1 deviation records",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_asbuilt, tmp, conf, True, kit_dir))
+        arm("TOOL-dTrueNorth-20 AC19 — and the same staged set, the kit outside the root, prints the held line",
+            "rc=0 build-index: as-built held under --staged",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_asbuilt, tmp, conf, True))
+        # TOOL-dTrueNorth-20 AC34 (S38) — A RECORD TAKEN OUT is a view input too: over a commit whose view
+        # counts the record, a staged `git rm` of it makes --check --staged render and exit 1 with the
+        # view under build-index DRIFT, and after --write, the view staged, exit 0 over a view counting
+        # none. The reset drops both fixture commits, so the arms below read the tree as it stood.
+        run("git", "add", "--", view_rel, cwd=tmp)
+        run("git", "commit", "-q", "-m", "the record, the render and the view", "--no-verify", cwd=tmp)
+        run("git", "rm", "-q", "--", amend_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-20 AC34 — a staged git rm of a record the view counts: --check --staged renders and "
+            "exits 1 listing the view under build-index DRIFT", "True",
+            lambda: str((lambda r: r[0] == 1 and r[1].index("build-index DRIFT") < r[1].index(
+                f"    {view_rel} (the file differs from its render from line"))(check_staged())))
+        _read_mode(cmd_write, tmp, conf)
+        run("git", "add", "--", view_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-20 AC34 — after --write, the view staged, --check --staged exits 0 over a view "
+            "counting no record", "True",
+            lambda: str((lambda r: r[0] == 0 and "build-index: clean (" in r[1]
+                         and " 0 deviation records." in read_text(view))(check_staged())))
+        run("git", "reset", "-q", "--hard", "HEAD~2", cwd=tmp)
+        write_text(os.path.join(tmp, dev_rel), "\n".join([
+            "# ARCH-tOne-1 deviation 1 — a departure from a clause with no row", "",
+            "**Serves:** deviation ARCH-tOne-1", "",
+            f"- **Departs from:** `cl-dAlpha-0001@{asbuilt_view.derive_clause_hash(texts['cl-dAlpha-0001'])}` [chain]",
+            "- **Hand-off:** design-to-spec", f"- **Before:** {texts['cl-dAlpha-0001']}",
+            f"- **After:** {texts['cl-dAlpha-0001']}", "- **Cause:** builder discovery",
+            "- **Reason:** the fixture's departure", "- **Evidence:** the fixture", "- **Risk:** additive",
+            "- **Approver:** author", "- **Follow-through:** gap gap-mem-47", "- **Caused-by:** ARCH-tOne-1", ""]))
+        run("git", "add", "--", dev_rel, cwd=tmp)
+        # TOOL-dTrueNorth-16 S17 — superseding TOOL-dTrueNorth-6 AC8's verdict half: --check reports only what
+        # --write cures, so once --write has rendered the view counting the gap record, which it cannot cure,
+        # --check is at 0 with no verdict line, and --check-asbuilt names the record.
+        gap = "2026-08-01-build-ARCH-tOne-1-deviation-1: departs from cl-dAlpha-0001 and carries no amends or supersedes row"
+        _read_mode(cmd_write, tmp, conf)
+        arm("TOOL-dTrueNorth-16 AC17 — a record departing through gap gap-mem-47 leaves --check at 0 with no "
+            "as-built VERDICT line", "True",
+            lambda: str((lambda r: r[0] == 0 and "as-built VERDICT" not in r[1])(_read_mode(cmd_check, tmp, conf))))
+        arm("TOOL-dTrueNorth-16 AC17 — and --check-asbuilt exits 1 naming the record under as-built VERDICT", "True",
+            lambda: str((lambda r: r[0] == 1 and "build-index: as-built 1 finding(s)" in r[1]
+                         and r[1].index("build-index: as-built 1 finding(s)") < r[1].index("as-built VERDICT")
+                         < r[1].index(gap))(_read_mode(cmd_check_asbuilt, tmp, conf))))
+        arm("TOOL-dTrueNorth-16 S17 — --check-asbuilt --staged runs with the record staged", "rc=1",
+            lambda: f"rc={_read_mode(cmd_check_asbuilt, tmp, conf, True)[0]}")
+        run("git", "reset", "-q", "--", dev_rel, cwd=tmp)
+        arm("TOOL-dTrueNorth-16 S17 — and holds, saying so, with no record, view, design record or conf staged",
+            "rc=0 build-index: as-built held under --staged",
+            lambda: "rc=%s %s" % _read_mode(cmd_check_asbuilt, tmp, conf, True))
+        run("git", "add", "--", dev_rel, cwd=tmp)
+        # TOOL-dTrueNorth-27 AC5 (S4) — `--check --with-verdicts` over the planted gap record: the CLI prints
+        # check 29's section, check 30's naming the record, the end marker, then `--check`'s own lines, each
+        # section the standalone verb's lines byte for byte, and exits as `--check` does. Red against a
+        # flag that prints nothing, a section that differs from its verb, or an exit that is not `--check`'s.
+        def read_with_verdicts():
+            cli = subprocess.run([sys.executable, os.path.abspath(__file__), "--check", "--with-verdicts"], cwd=tmp,
+                                 capture_output=True, text=True, encoding="utf-8", errors="replace",
+                                 env=_build_git_env())
+            (rc29, out29), (rc30, out30), (rc9, out9) = (
+                _read_mode(cmd_check_coverage, tmp, conf), _read_mode(cmd_check_asbuilt, tmp, conf),
+                _read_mode(cmd_check, tmp, conf))
+            want = (f"build-index: verdict 29 exit {rc29}\n{out29}build-index: verdict 30 exit {rc30}\n{out30}"
+                    f"build-index: verdicts end\n{out9}")
+            return f"rc={cli.returncode == rc9} 30={rc30} gap={gap in out30} same={cli.stdout == want}"
+
+        arm("TOOL-dTrueNorth-27 AC5 — --check --with-verdicts prints the two verbs' sections, the end marker and "
+            "--check's lines, its exit --check's", "rc=True 30=1 gap=True same=True", read_with_verdicts)
+        # TOOL-dTrueNorth-31 AC2 AC12 (S2, S12) — ONE PIPE, IN ORDER. A child loads this file by path and
+        # patches check 29's verb to write `n29` to stderr, check 30's to return 0 or to raise KeyError, and
+        # --check to write `n9` to stderr and `drift` to stdout, then runs --check --with-verdicts with its
+        # stderr on its stdout's pipe: `n29` lands in check 29's section, `n9` after the end marker, and
+        # the crash is check 30's one line under exit 2 while --check still runs. Red against stderr left
+        # unbound, which prints both notices ahead of the first marker, and a crash that escapes the verb.
+        child31 = "\n".join([
+            "import importlib.util, sys",
+            "spec = importlib.util.spec_from_file_location('gen_build_index_child31', sys.argv[1])",
+            "mod = importlib.util.module_from_spec(spec)",
+            "spec.loader.exec_module(mod)",
+            "def coverage(root, conf):",
+            "    sys.stderr.write('n29\\n')",
+            "    return 0",
+            "def asbuilt(root, conf):",
+            "    if sys.argv[2] == 'crash':",
+            "        raise KeyError('planted')",
+            "    return 0",
+            "def check(root, conf):",
+            "    sys.stderr.write('n9\\n')",
+            "    print('drift')",
+            "    return 0",
+            "mod.cmd_check_coverage, mod.cmd_check_asbuilt, mod.cmd_check = coverage, asbuilt, check",
+            "sys.exit(mod.main(['x', '--check', '--with-verdicts']))", ""])
+
+        def _read_one_pipe31(how):
+            cli = subprocess.run([sys.executable, "-c", child31, os.path.abspath(__file__), how], cwd=tmp,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+                                 errors="replace", env=_build_git_env())
+            return cli.returncode, cli.stdout.replace("\r\n", "\n")
+
+        def _read_ordered31():
+            (rc_plain, plain), (rc_crash, crash) = _read_one_pipe31("plain"), _read_one_pipe31("crash")
+            return "plain=%s crash=%s\n%s\n%s" % (
+                rc_plain == 0 and plain == ("build-index: verdict 29 exit 0\nn29\nbuild-index: verdict 30 exit 0\n"
+                                            "build-index: verdicts end\nn9\ndrift\n"),
+                rc_crash == 0 and crash == ("build-index: verdict 29 exit 0\nn29\nbuild-index: verdict 30 exit 2\n"
+                                            "build-index: KeyError: 'planted'\nbuild-index: verdicts end\nn9\n"
+                                            "drift\n"), plain, crash)
+
+        arm("TOOL-dTrueNorth-31 AC2 AC12 — under --with-verdicts every stderr line lands in its verb's section or "
+            "after the end marker, in order, and a verb's crash is its own section's line under exit 2 while "
+            "--check still runs", "plain=True crash=True", _read_ordered31)
+
+        def read_flag_refusals():
+            said = io.StringIO()
+            with contextlib.redirect_stdout(said):
+                got = [main(["gen_build_index.py", *argv]) for argv in (
+                    ("--check", "--staged", "--with-verdicts"), ("--write", "--with-verdicts"),
+                    ("--check-coverage", "--with-verdicts"))]
+            return f"{got} {said.getvalue().count('the flag takes --check alone')}"
+
+        arm("TOOL-dTrueNorth-27 S4 — --with-verdicts beside --staged, or with any mode but --check, is the usage "
+            "refusal, exit 2", "[2, 2, 2] 3", read_flag_refusals)
+
+        def write_without_live():
+            os.remove(live)
+            rc, out = _read_mode(cmd_write, tmp, conf)
+            return str(rc == 0 and os.path.isfile(live) and "as-built VERDICT" in out
+                       and " 1 deviation records." in read_text(view))
+
+        arm("TOOL-dTrueNorth-6 AC8 — and --write still writes every other artifact and the view, printing the "
+            "verdict and exiting 0", "True", write_without_live)
+        conf_bad = write_conf(baseline="0" * 40)
+        arm("TOOL-dTrueNorth-6 S7 — a DESIGN_BASELINE naming no commit is the host's named Problem",
+            "build-index: as-built view — DESIGN_BASELINE " + "0" * 40 + " names no commit",
+            lambda: _read_mode(cmd_check, tmp, conf_bad)[1])
+        # TOOL-dTrueNorth-16 S6, S7 — the key rule: all four blank is the off line, and TOOL-dTrueNorth-6
+        # AC10's off case is observed so; DESIGN_VIEW alone blank is a partial set, the named Problem.
+        conf_off = write_conf(baseline="", view="", record="", nodes="")
+        arm("TOOL-dTrueNorth-6 AC10 — every DESIGN_* key blank prints the off line naming them, and --check reads "
+            "nothing and stays clean", "True",
+            lambda: str((lambda r: r[0] == 0 and "\nas-built view: off — DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, "
+                         "DESIGN_NODES are blank in .memory-tree.conf" in r[1] and "build-index: clean (" in r[1])(
+                _read_mode(cmd_check, tmp, conf_off))))
+        arm("TOOL-dTrueNorth-16 AC6 — DESIGN_VIEW alone blank is a partial set, the host's Problem naming it",
+            "build-index: as-built view — DESIGN_VIEW is blank while DESIGN_RECORD, DESIGN_BASELINE, DESIGN_NODES are set",
+            lambda: _read_mode(cmd_check, tmp, write_conf(view=""))[1])
+        # TOOL-dTrueNorth-27 AC12 — a DESIGN_VIEW named outside the dated record grammar is refused at render,
+        # the host's Problem naming the key, and nothing renders. Red against a head that falls back to names
+        # the view does not carry.
+        arm("TOOL-dTrueNorth-27 AC12 — a view named outside the record grammar is the host's Problem naming "
+            "DESIGN_VIEW", "build-index: as-built view — DESIGN_VIEW memory/design/view.md is not named",
+            lambda: _read_mode(cmd_check, tmp, write_conf(view="memory/design/view.md"))[1])
+
+
+def scan_glob_readers(kit_dir: str) -> list:
+    """The names the string constants carrying a `:(glob)` pathspec are charged to, over each `*.py`
+    directly in `kit_dir`, sorted. A docstring is prose and never counts; a comment is not in the tree.
+
+    TOOL-dTrueNorth-23 S3: the population the pathspec-mode arm grades is DERIVED here, so a reader the
+    kit gains is named by the arm instead of skipped by it. THE CHARGE RULE (TOOL-dTrueNorth-32 S5, S9):
+    each such constant outside a docstring is charged to exactly one name, the first of these that holds:
+      1. the innermost enclosing function, its decorators and signature included, as
+         `<module>.<qualified name>` joining every enclosing class and function name, so a class built
+         inside a function is charged to that function, its one reader;
+      2. else, outside every function, each `Name` in the targets of the innermost enclosing `Assign`,
+         `AnnAssign` or `AugAssign`, qualified by the enclosing classes;
+      3. else the innermost enclosing class, qualified, as a class-level `PATHS.append(...)` is;
+      4. else the module, as `<module>`, as a module-level `SPECS.append(...)` is.
+    The rule is total, so every shape the tree can hold has an owner. NOT SEEN: a pathspec composed at
+    run time from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
+    """
+    magic = ":(" + "glob)"     # composed, so this walk's own needle is no constant it finds
+    scopes = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+    found = set()
+
+    def scan_scope(node, qual, function, assign, klass, docs):
+        # `qual` is the module, then each enclosing class and function name; `function`, `assign` and
+        # `klass` the charge rule's first three owners in force at `node`, None where none encloses it
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, ast.Constant) and isinstance(child.value, str) and magic in child.value \
+                    and id(child) not in docs:
+                found.update([function] if function else assign or [klass or qual[0]])
+            elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, ".".join(inner), None, klass, docs)
+            elif isinstance(child, ast.ClassDef):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, function, None, ".".join(inner), docs)
+            elif function is None and isinstance(child, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+                names = [".".join([*qual, n.id]) for t in targets for n in ast.walk(t) if isinstance(n, ast.Name)]
+                scan_scope(child, qual, None, names or assign, klass, docs)
+            else:
+                scan_scope(child, qual, function, assign, klass, docs)
+
+    for name in sorted(os.listdir(kit_dir)):
+        if not name.endswith(".py"):
+            continue
+        tree = ast.parse(read_text(os.path.join(kit_dir, name)), name)
+        docs = {id(node.body[0].value) for node in ast.walk(tree)
+                if isinstance(node, (ast.Module, *scopes))
+                and node.body and isinstance(node.body[0], ast.Expr)
+                and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
+        scan_scope(tree, [name[:-3]], None, None, None, docs)
+    return sorted(found)
+
+
 def cmd_selftest() -> int:
     fails = []
 
@@ -4066,6 +5232,10 @@ def cmd_selftest() -> int:
         len(_render_wrapped_ids("Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) > 1
         and max(len(x) for x in _render_wrapped_ids(
             "Ids no record names:", ["TOOL-dLongSlugHere-%d" % n for n in range(40)])) <= IDS_WRAP + 1))
+    # TOOL-dTrueNorth-3 — the coverage bullets' form: no space after an opening parenthesis, the
+    # separator's comma kept at a wrap, continuation lines indented, and the closing `end`.
+    arm("the separator, indent and end arguments render a coverage bullet", "['- x: 3 (aaaa, bbbb,', '  cccc)']",
+        lambda: str(_render_wrapped_ids("- x: 3 (", ["aaaa", "bbbb", "cccc"], 20, ", ", "  ", ")")))
 
     with tempfile.TemporaryDirectory() as base:
         # TOOL-dHomedResolver-2 — A HALF-STAGED ROTATION IS REFUSED, by --write and by --check.
@@ -4254,7 +5424,9 @@ def cmd_selftest() -> int:
         # raised IndexError the moment TOOL-dFramedEntrypoint-5 removed the last entry — a break no
         # grep for the marker STRING could have predicted, which is why the spec names this as its
         # own blast-radius class.
-        _TRAILING = [r for r in GEN_REGIONS if r[0] != "build-index"]
+        # `build-coverage` is LEFT OUT: its creation is chain-only, this fixture's conf arms no
+        # SPEC_CARRIES_CUTOFF, so no write creates it here. TOOL-dTrueNorth-3's arms grade that pair.
+        _TRAILING = [r for r in GEN_REGIONS if r[0] not in ("build-index", "build-coverage")]
         _ls = read_text(rd12).split("\n")
         for _n, _mo, _mc in reversed(_TRAILING):
             _o, _c = _marker_index(_ls, _mo), _marker_index(_ls, _mc)
@@ -4262,12 +5434,12 @@ def cmd_selftest() -> int:
                 _ls = _ls[:_o] + _ls[_c + 1:]
         write_text(rd12, "\n".join(_ls))
         arm("check does not CREATE an absent pair", "0", lambda: str(cmd_check(t12, conf12)))
-        arm("every trailing pair really is absent for that arm", str(len(GEN_REGIONS) - 1),
+        arm("every trailing pair really is absent for that arm", str(len(_TRAILING)),
             lambda: str(sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         cmd_write(t12, conf12)
         arm("write restores them", "0", lambda: str(
             sum(mo not in read_text(rd12) for _n, mo, _mc in _TRAILING)))
-        arm("write CREATED every absent trailing pair", str(len(GEN_REGIONS) - 1),
+        arm("write CREATED every absent trailing pair", str(len(_TRAILING)),
             lambda: str(sum(mo in read_text(rd12) for _n, mo, _mc in _TRAILING)))
         arm("created pairs land in CANONICAL order", "True", lambda: str(
             all(read_text(rd12).index(_TRAILING[k][1]) < read_text(rd12).index(_TRAILING[k + 1][1])
@@ -4724,11 +5896,11 @@ def cmd_selftest() -> int:
 
         # The S row: a BOUND record is not a finding, so nothing else in this output mentions it,
         # and check 21's filename-vs-header branch has no input without it.
-        def _rows(tree, cf):
+        def _rows(tree, cf, resolve=None):
             import io as _io, contextlib as _cl
             buf = _io.StringIO()
             with _cl.redirect_stdout(buf):
-                cmd_print_bindings(tree, cf)
+                cmd_print_bindings(tree, cf, resolve)
             return buf.getvalue()
 
         t13 = os.path.join(base, "srow"); os.makedirs(t13)
@@ -4742,6 +5914,595 @@ def cmd_selftest() -> int:
             lambda: _rows(t13, conf13))
         arm("--print-bindings still exits 0 with an S row present", "0",
             lambda: str(cmd_print_bindings(t13, conf13)))
+
+        # TOOL-dTrueNorth-4 AC8 — THE DEVIATION KIND JOINED TO ITS FILE NAME, both ways, each mismatch an
+        # A row naming it: a record named -deviation-<n>.md under another kind, and a deviation record
+        # named off that grammar; one in the grammar is an S row. Against the base generator the first
+        # is an S row and the other two are A rows for an unknown kind, so all three arms red there.
+        t4d = os.path.join(base, "deviation"); os.makedirs(t4d)
+        conf4d = _fixture(t4d)
+        bd4 = "memory/builds/tOne/build/"
+        for name, kind in (("2026-08-01-build-ARCH-tOne-1-deviation-1.md", "research"),
+                           ("2026-08-01-build-ARCH-tOne-1-departure-2.md", "deviation"),
+                           ("2026-08-01-build-ARCH-tOne-1-deviation-3.md", "deviation")):
+            _rec4 = os.path.join(t4d, bd4 + name)
+            os.makedirs(os.path.dirname(_rec4), exist_ok=True)
+            write_text(_rec4, f"# d\n\n**Serves:** {kind} ARCH-tOne-1\n")
+        run("git", "add", "-A", cwd=t4d)
+        arm("TOOL-dTrueNorth-4 AC8 — a record named as a deviation under another kind is an A row naming it",
+            "A\t" + bd4 + "2026-08-01-build-ARCH-tOne-1-deviation-1.md\tnamed as a deviation record",
+            lambda: _rows(t4d, conf4d))
+        arm("TOOL-dTrueNorth-4 AC8 — a deviation record named off the grammar is an A row naming it",
+            "A\t" + bd4 + "2026-08-01-build-ARCH-tOne-1-departure-2.md\tServes kind deviation, and the file is "
+            "not named", lambda: _rows(t4d, conf4d))
+        arm("TOOL-dTrueNorth-4 AC8 — a deviation record in the grammar is an S row",
+            "S\t" + bd4 + "2026-08-01-build-ARCH-tOne-1-deviation-3.md\tdeviation\tARCH-tOne-1",
+            lambda: _rows(t4d, conf4d))
+
+        # TOOL-dTrueNorth-5 AC4 — THE AUDIT PIN. The cutoff arms a P row per unpinned or over-pinned
+        # id of a spec-audit record dated on or after it, and a Q row counting the records graded.
+        # Five records, one per side of each line the branch draws: unpinned at the cutoff, pinned
+        # above the header, pinned at it, a diff review, and a spec audit dated before the cutoff.
+        # Against the base generator every arm here reds: it prints neither row.
+        def _read_pin_rows(tree, cf, resolve=None):
+            rows = _rows(tree, cf, resolve).splitlines()
+            return "P=%d %s" % (sum(1 for r in rows if r.startswith("P\t")),
+                                " ".join(r for r in rows if r.startswith("Q\t")))
+
+        def _set_pin_cutoff(tree, value):
+            cpath = os.path.join(tree, ".memory-tree.conf")
+            kept = [ln for ln in read_text(cpath).split("\n") if not ln.startswith("SPEC_AUDIT_PIN_CUTOFF=")]
+            write_text(cpath, "\n".join(kept).rstrip("\n") + f'\nSPEC_AUDIT_PIN_CUTOFF="{value}"\n')
+            return load_conf(tree)
+
+        t5p = os.path.join(base, "pin"); os.makedirs(t5p)
+        _fixture(t5p)
+        rv5 = "memory/builds/tOne/reviews/"
+        for name, line in (("2026-01-01-review-ARCH-tOne-1-spec-audit.md", "spec-audit ARCH-tOne-1"),
+                           ("2026-02-02-review-ARCH-tOne-1-over.md", "spec-audit ARCH-tOne-1@rev-5"),
+                           ("2026-02-03-review-ARCH-tOne-1-held.md", "spec-audit ARCH-tOne-1@rev-1"),
+                           ("2026-02-04-review-ARCH-tOne-1-diff.md", "diff-review ARCH-tOne-1"),
+                           ("2025-12-31-review-ARCH-tOne-1-old.md", "spec-audit ARCH-tOne-1")):
+            _rec5 = os.path.join(t5p, rv5 + name)
+            os.makedirs(os.path.dirname(_rec5), exist_ok=True)
+            write_text(_rec5, f"**Serves:** {line}\n\n# r\n")
+        run("git", "add", "-A", cwd=t5p)
+        conf5 = _set_pin_cutoff(t5p, "2026-01-01")
+        arm("TOOL-dTrueNorth-5 AC4 — an unpinned spec-audit record dated AT the cutoff prints a P row",
+            "P\t" + rv5 + "2026-01-01-review-ARCH-tOne-1-spec-audit.md\tARCH-tOne-1 carries no @rev-N pin",
+            lambda: _rows(t5p, conf5))
+        arm("TOOL-dTrueNorth-5 AC4 — a pin above its spec's header prints a P row naming both revisions",
+            "P\t" + rv5 + "2026-02-02-review-ARCH-tOne-1-over.md\tARCH-tOne-1@rev-5 pins a revision its "
+            "spec has not reached, header rev-1", lambda: _rows(t5p, conf5))
+        arm("TOOL-dTrueNorth-5 AC4 — the held pin, the diff review and the pre-cutoff record print none, "
+            "and Q counts the three spec audits graded", "P=2 Q\t3\t2026-01-01", lambda: _read_pin_rows(t5p, conf5))
+        arm("TOOL-dTrueNorth-5 AC4 — read_bindings keeps the pin on the record", "{'ARCH-tOne-1': 1}",
+            lambda: str(read_bindings(t5p, [rv5 + "2026-02-03-review-ARCH-tOne-1-held.md"], conf5)
+                        [rv5 + "2026-02-03-review-ARCH-tOne-1-held.md"]["pins"]))
+        arm("TOOL-dTrueNorth-5 AC4 — a blank cutoff prints no P row and a Q row saying off", "P=0 Q\t0\toff",
+            lambda: _read_pin_rows(t5p, _set_pin_cutoff(t5p, "")))
+        arm("TOOL-dTrueNorth-5 AC4 — a cutoff that is no date exits 2 naming the key",
+            "2 build-index: SPEC_AUDIT_PIN_CUTOFF='soon'",
+            lambda: (lambda cf: "%s %s" % (cmd_print_bindings(t5p, cf), _rows(t5p, cf).strip()))(
+                _set_pin_cutoff(t5p, "soon")))
+        # TOOL-dTrueNorth-5 AC6 — THE PAST-PIN LINE, judged only over the ids a record pins. Here the
+        # highest pin, rev-5, is above the header, so nothing is past it and the count says one was judged.
+        arm("TOOL-dTrueNorth-5 AC6 — a spec at or below its highest pin renders none, counting the pinned ids",
+            "Ids whose spec moved past its audited revision: none — 1 of 1 unit id(s) carry a pin.",
+            lambda: plan(t5p, _set_pin_cutoff(t5p, "2026-01-01"))[0]["memory/builds/tOne/README.md"])
+        t5r = os.path.join(base, "pastpin"); os.makedirs(t5r)
+        conf5r = _fixture(t5r)
+        _spec5 = os.path.join(t5r, "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md")
+        write_text(_spec5, read_text(_spec5).replace(" · rev-1 · ", " · rev-3 · "))
+        _rec5 = os.path.join(t5r, rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md")
+        os.makedirs(os.path.dirname(_rec5), exist_ok=True)
+        write_text(_rec5, "**Serves:** spec-audit ARCH-tOne-1@rev-2\n\n# r\n")
+        run("git", "add", "-A", cwd=t5r)
+        arm("TOOL-dTrueNorth-5 AC6 — a spec whose header moved past its highest pin is named at the pin",
+            "Ids whose spec moved past its audited revision: ARCH-tOne-1@rev-2.",
+            lambda: plan(t5r, conf5r)[0]["memory/builds/tOne/README.md"])
+        # TOOL-dTrueNorth-9 S4 — `_expand_ids` RETURNS A PAIR to all four callers, and the pins come
+        # from `read_id_pins`. One arm per caller that unpacks two values: a spec header carrying both
+        # backlog verbs, an ids list, and a record pinning one id twice beside a range. Against a
+        # three-value `_expand_ids` each of the three raises ValueError on its unpack and reds.
+        arm("TOOL-dTrueNorth-9 AC2 — a spec header carrying closes and advances reads both verbs",
+            "closes=['ARCH-tOne-4'] advances=['ARCH-tOne-5']",
+            lambda: (lambda u: f"closes={u['closes']} advances={u['advances']}")(parse_spec_text(
+                "# ARCH-tOne-9 — a unit\n\n**Status:** INPROGRESS · rev-1 · 2026-08-01 · node a · Tier-2 · "
+                "base 0123abcd · closes ARCH-tOne-4 · advances ARCH-tOne-5\n", "hdr.md", "ARCH")))
+        arm("TOOL-dTrueNorth-9 AC2 — an ids list read through read_idlist keeps a pinned id and its "
+            "continuation", "['ARCH-tOne-1', 'ARCH-tOne-3']",
+            lambda: str(read_idlist(["ARCH-tOne-1@rev-2", "-3"], "ARCH")))
+        t9p = os.path.join(base, "twopins"); os.makedirs(t9p)
+        conf9p = _fixture(t9p)
+        r9p = rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md"
+        os.makedirs(os.path.join(t9p, rv5), exist_ok=True)
+        write_text(os.path.join(t9p, r9p),
+                   "**Serves:** spec-audit ARCH-tOne-1@rev-2 ARCH-tOne-1@rev-3 ARCH-tOne-2..3\n\n# r\n")
+        run("git", "add", "-A", cwd=t9p)
+        arm("TOOL-dTrueNorth-9 AC3 — a record pinning one id twice keeps the higher pin, and its range pins "
+            "nothing", "{'ARCH-tOne-1': 3}", lambda: str(read_bindings(t9p, [r9p], conf9p)[r9p]["pins"]))
+        # TOOL-dTrueNorth-20 AC8 (S9, S36) — THE DUPLICATE CASE: the repeated id folds in `read_bindings`,
+        # first-seen order, and `_expand_ids` keeps its base return, the repeat included. Against a
+        # `read_bindings` storing the list unchanged the first half reds; against a fold moved into
+        # `_expand_ids` the second does.
+        arm("TOOL-dTrueNorth-20 AC8 — a record serving one id twice reads it once in its ids, first-seen order, "
+            "while _expand_ids on the same text returns all four",
+            "ids=['ARCH-tOne-1', 'ARCH-tOne-2', 'ARCH-tOne-3'] expand=4",
+            lambda: "ids=%s expand=%d" % (read_bindings(t9p, [r9p], conf9p)[r9p]["ids"], len(_expand_ids(
+                "ARCH-tOne-1@rev-2 ARCH-tOne-1@rev-3 ARCH-tOne-2..3", _id_alternation(conf9p))[0])))
+        # TOOL-dTrueNorth-13 AC4 — the REVIEWED PATHS decide which ids owe a pin, read at HEAD. Four
+        # records over one committed tree: a design audit naming two committed build/ files owes none,
+        # one naming the spec owes its id, one with no Reviewed: line owes every id, and one naming a
+        # path absent at HEAD owes every id it serves. Against the base predicate, which owes every id
+        # a pin, the design-only record prints a row and the count reads design=1.
+        t13p = os.path.join(base, "reviewed"); os.makedirs(t13p)
+        _fixture(t13p)
+        b13 = "memory/builds/tOne/build/"
+        s13 = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
+        for name in ("a.md", "b.md"):
+            write_text(os.path.join(t13p, b13 + name), "# a design document\n")
+        for name, serves, reviewed in (
+                ("design", "ARCH-tOne-1", f"{b13}a.md@abc1234, {b13}b.md@def5678"),
+                ("spec", "ARCH-tOne-1", f"{s13}@abc1234"),
+                ("bare", "ARCH-tOne-1", ""),
+                ("missing", "ARCH-tOne-1 ARCH-tOne-2", f"{b13}a.md@abc1234, {b13}gone.md@abc1234")):
+            write_text(os.path.join(t13p, rv5 + f"2026-02-01-review-ARCH-tOne-1-{name}.md"),
+                       f"**Serves:** spec-audit {serves}\n\n# r\n\n" + (f"Reviewed: {reviewed}\n" if reviewed else ""))
+        run("git", "add", "-A", cwd=t13p)
+        run("git", "commit", "-q", "-m", "r", "--no-verify", cwd=t13p)
+        conf13p = _set_pin_cutoff(t13p, "2026-01-01")
+        arm("TOOL-dTrueNorth-13 AC4 — a design-only audit owes no pin, a spec-reviewing one and one with no "
+            "Reviewed: line owe their id, and a path absent at HEAD owes every id the record serves",
+            "design=0 spec=1 bare=1 missing=2 Q\t4\t2026-01-01",
+            lambda: (lambda rows: " ".join(
+                "%s=%d" % (k, sum(1 for r in rows if r.startswith(f"P\t{rv5}2026-02-01-review-ARCH-tOne-1-{k}.md\t")))
+                for k in ("design", "spec", "bare", "missing")) + " " + " ".join(
+                r for r in rows if r.startswith("Q\t")))(_rows(t13p, conf13p).splitlines()))
+        # TOOL-dTrueNorth-20 S17, superseding S4's window: the head is every unfenced line before the first
+        # `## ` heading, so a line behind a ten-line provenance paragraph is read and one under a heading
+        # is not. Against the twelve-line window the second value reads None.
+        _prov20 = "**Serves:** x\n\n# a design audit\n\n" + "".join(f"provenance line {k}.\n" for k in range(10)) + "\n"
+        arm("TOOL-dTrueNorth-13 S4 — read_reviewed_paths cuts each entry at its last @, keeps an empty one, "
+            "reads the line behind a ten-line provenance paragraph, and none under a ## heading",
+            "['memory/x/a.md', 'b.md', ''] ['a.md'] None",
+            lambda: "%s %s %s" % (read_reviewed_paths("**Serves:** x\nReviewed: memory/x/a.md@abc1234, b.md@d, \n"),
+                                  read_reviewed_paths(_prov20 + "Reviewed: a.md@abc1234\n"),
+                                  read_reviewed_paths(_prov20 + "## Verdict: CLEAN\n\nReviewed: a.md@abc1234\n")))
+        # TOOL-dTrueNorth-20 AC16 — the same record graded: a design audit whose Reviewed: line sits behind
+        # that paragraph, naming the two committed build/ files, prints no P row for its design id.
+        write_text(os.path.join(t13p, rv5 + "2026-02-01-review-ARCH-tOne-1-late.md"),
+                   _prov20.replace("**Serves:** x", "**Serves:** spec-audit ARCH-tOne-1")
+                   + f"Reviewed: {b13}a.md@abc1234, {b13}b.md@def5678\n")
+        run("git", "add", "-A", cwd=t13p)
+        run("git", "commit", "-q", "-m", "late", "--no-verify", cwd=t13p)
+        arm("TOOL-dTrueNorth-20 AC16 — a design audit whose Reviewed: line follows a ten-line provenance "
+            "paragraph owes its design id no pin", "late=0 Q\t5\t2026-01-01",
+            lambda: (lambda rows: "late=%d %s" % (
+                sum(1 for r in rows if r.startswith(f"P\t{rv5}2026-02-01-review-ARCH-tOne-1-late.md\t")),
+                " ".join(r for r in rows if r.startswith("Q\t"))))(_rows(t13p, conf13p).splitlines()))
+        # TOOL-dTrueNorth-14 AC1 to AC3 — THE WRITER TEST. Commit A holds a fixture harness lacking
+        # renderAuditBinding; a branch from A commits an unpinned record; the trunk lands L, which adds
+        # the function, and merges the branch after it. Then the trunk commits a record and stages a
+        # third. Against the base predicate, which grades by filename date alone, the merged record
+        # prints a P row and the Q row carries no fourth field.
+        # TOOL-dTrueNorth-20 S7 — THE HARNESS IS THE FIXTURE'S, REACHED THROUGH A STAND-IN RESOLVER, so
+        # these arms read no workflows kit of the machine's and run in any tree, an adopter holding the
+        # memory-tree kit alone included; they used to skip there. The fixture keeps its harness in one
+        # directory named for no kit, `harness/`, joined once from the fixture root, and the stub returns
+        # that directory (TOOL-dTrueNorth-27 S5).
+        t14w = os.path.join(base, "writers"); os.makedirs(t14w)
+        _fixture(t14w)
+        hd14 = os.path.join(t14w, "harness")
+        h14 = os.path.join(hd14, "tier2-review.js")
+        os.makedirs(hd14)
+        write_text(h14, "export function review() {}\n")
+        conf14w = _set_pin_cutoff(t14w, "2026-01-01")
+
+        def _resolve_fixture14(*_args):
+            return pathlib.Path(hd14)
+
+        def _write_record14(msg, day=None):
+            rel = rv5 + f"2026-02-0{day}-review-ARCH-tOne-1-spec-audit.md" if day else None
+            if rel:
+                os.makedirs(os.path.join(t14w, rv5), exist_ok=True)
+                write_text(os.path.join(t14w, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
+            run("git", "add", "-A", cwd=t14w)
+            if msg:
+                run("git", "commit", "-q", "-m", msg, "--no-verify", cwd=t14w)
+            return rel
+
+        _write_record14("A")
+        trunk14 = run("git", "rev-parse", "--abbrev-ref", "HEAD", cwd=t14w).strip()
+        run("git", "checkout", "-q", "-b", "run", cwd=t14w)
+        run14 = _write_record14("run", 2)
+        run("git", "checkout", "-q", trunk14, cwd=t14w)
+        write_text(h14, "export function review() {}\nexport function renderAuditBinding() {}\n")
+        _write_record14("L")
+        run("git", "merge", "-q", "--no-ff", "--no-edit", "run", cwd=t14w)
+        arm("TOOL-dTrueNorth-14 AC1 — an unpinned record a branch committed before the pinning harness "
+            "landed prints no P row once merged, and the Q row counts it exempt",
+            "P=0 Q\t1\t2026-01-01\t1", lambda: _read_pin_rows(t14w, conf14w, _resolve_fixture14))
+        # TOOL-dTrueNorth-20 AC6 — the stand-in decides: a stub returning the fixture harness, which lacked
+        # the function at the record's adding commit, exempts it; a stub raising LookupError exempts
+        # nothing, and --print-bindings prints the named SKIP line beside the Q row's `-` field and the
+        # record's P row. Against a function reading the machine's kit whatever is injected, the second
+        # prints no SKIP in gov and the first exempts nothing in an adopter.
+        arm("TOOL-dTrueNorth-20 AC6 — a stub resolver returning a fixture harness lacking renderAuditBinding "
+            "exempts the record", f"[{run14!r}]",
+            lambda: str(sorted(derive_audit_writers(t14w, conf14w["MEMORY_ROOT"], {run14}, _resolve_fixture14) or ())))
+
+        def _resolve_no_kit14(*_args):
+            raise LookupError("the self-test's stub resolves no workflows kit")
+
+        def _derive_quietly14(resolve):
+            with contextlib.redirect_stdout(io.StringIO()):     # its SKIP line is the arm below's to read
+                return derive_audit_writers(t14w, conf14w["MEMORY_ROOT"], {run14}, resolve)
+
+        arm("TOOL-dTrueNorth-20 AC6 — a stub raising LookupError exempts nothing, and --print-bindings prints "
+            "the SKIP line naming why, the Q row's - field and the record's P row",
+            "none=True skip=True P=1 Q\t1\t2026-01-01\t-",
+            lambda: (lambda out: "none=%s skip=%s %s" % (
+                _derive_quietly14(_resolve_no_kit14) is None,
+                out.count("build-index: SKIP audit-writer test — the workflows kit does not resolve") == 1
+                and "the self-test's stub resolves no workflows kit" in out,
+                (lambda rows: "P=%d %s" % (sum(1 for r in rows if r.startswith("P\t")),
+                                           " ".join(r for r in rows if r.startswith("Q\t"))))(out.splitlines())))(
+                _rows(t14w, conf14w, _resolve_no_kit14)))
+        # TOOL-dTrueNorth-20 AC7 (S8) — a resolver answering an ABSOLUTE path in backslashes, as a Windows
+        # resolver's `str()` does: the request is repo-relative POSIX, so the record is still exempt.
+        # Against a request spelling the path as given, cat-file answers `missing` and nothing is exempt.
+        arm("TOOL-dTrueNorth-20 AC7 — a stub answering an absolute backslash path still exempts the record",
+            f"[{run14!r}]",
+            lambda: str(sorted(derive_audit_writers(
+                t14w, conf14w["MEMORY_ROOT"], {run14},
+                lambda *_a: str(pathlib.Path(hd14).absolute()).replace("/", "\\")) or ())))
+        _write_record14("main", 3)
+        arm("TOOL-dTrueNorth-14 AC2 — an unpinned record the pinning harness wrote prints its P row",
+            "P=1 Q\t2\t2026-01-01\t1", lambda: _read_pin_rows(t14w, conf14w, _resolve_fixture14))
+        w14 = _write_record14(None, 4)
+        arm("TOOL-dTrueNorth-14 AC3 — a staged record, which has no adding commit, prints its P row",
+            f"P\t{w14}\tARCH-tOne-1 carries no @rev-N pin", lambda: _rows(t14w, conf14w, _resolve_fixture14))
+
+        # TOOL-dTrueNorth-19 AC1 to AC4 — THE WRITER READ AT SCALE, AND ITS FAILURES, over one
+        # fixture. One commit adds 601 unpinned records, every path at least 98 bytes, beside a
+        # harness carrying renderAuditBinding; a branch drops the function and one record, then
+        # re-adds that record beside one added there first; git resolves to a stub on `log`; a last
+        # commit removes the harness and adds a record. Each reds on its own staged break: AC1 when
+        # the paths go on argv, [WinError 206] on Windows only, since a POSIX argv holds 61 KB;
+        # AC2 when the newest add is kept; AC3 when a failed log is an empty set or a traceback;
+        # AC4 when a missing harness blob exempts its record. The harness is the fixture's, through a
+        # stand-in resolver (TOOL-dTrueNorth-20 S7), in the child process too.
+        t19 = os.path.join(base, "scale"); os.makedirs(t19)
+        _fixture(t19)
+        hd19 = os.path.join(t19, "harness")     # the harness directory, named for no kit, as t14w's
+        h19 = os.path.join(hd19, "tier2-review.js")
+        os.makedirs(hd19)
+        write_text(h19, "export function review() {}\nexport function renderAuditBinding() {}\n")
+        conf19 = _set_pin_cutoff(t19, "2026-01-01")
+
+        def _resolve_fixture19(*_args):
+            return pathlib.Path(hd19)
+
+        def _write_record19(rel):
+            write_text(os.path.join(t19, rel), "**Serves:** spec-audit ARCH-tOne-1\n\n# r\n")
+            return rel
+
+        def _run_commit19(msg):
+            run("git", "add", "-A", cwd=t19)
+            run("git", "commit", "-q", "-m", msg, "--no-verify", cwd=t19)
+
+        os.makedirs(os.path.join(t19, rv5), exist_ok=True)
+        recs19 = [_write_record19(rv5 + "2026-02-01-review-ARCH-tOne-1-padded-record-name-past-98-%03d-"
+                                  "spec-audit.md" % n) for n in range(601)]
+        _run_commit19("601 records")
+        first_add19 = run("git", "rev-parse", "HEAD", cwd=t19).strip()
+        arm("TOOL-dTrueNorth-19 AC1 — 601 graded records, every path at least 98 bytes, are read by one "
+            "spawn: 601 P rows and a Q row exempting none",
+            "long=True P=601 Q\t601\t2026-01-01\t0",
+            lambda: f"long={min(len(r.encode('utf-8')) for r in recs19) >= 98} "
+                    + _read_pin_rows(t19, conf19, _resolve_fixture19))
+        run("git", "checkout", "-q", "-b", "readd", cwd=t19)
+        write_text(h19, "export function review() {}\n")
+        os.remove(os.path.join(t19, recs19[0]))
+        _run_commit19("drop the function and one record")
+        first19 = _write_record19(rv5 + "2026-02-02-review-ARCH-tOne-1-first-added-beside-the-re-add-"
+                                  "spec-audit.md")
+        _write_record19(recs19[0])
+        _run_commit19("re-add")
+        arm("TOOL-dTrueNorth-19 AC2 — a record deleted and re-added is keyed to its first adding commit, "
+            "and only the record first added beside the re-add is exempt",
+            f"[{first19!r}]",
+            lambda: str(sorted(derive_audit_writers(t19, conf19["MEMORY_ROOT"], {recs19[0], first19},
+                                                    _resolve_fixture19) or ())))
+        # TOOL-dTrueNorth-20 AC29 (S32) — ONE ADDING-COMMIT READER: the re-added record's adding commit is
+        # its OLDEST, the commit of the 601, read by `tree_lib.read_adding_commits`; the generator and the
+        # deviation join both bind that one function and neither module spells a `--diff-filter=A` log of
+        # its own. Against a caller keeping its own `git log`, the identity or the scan reds.
+        import deviation_join as _dj20
+        import tree_lib as _tl20
+
+        _filter20 = "--diff-filter=" + "A"     # composed, so this scan's own needle is no literal it finds
+
+        def _scan_own_log20(path):
+            tree = ast.parse(read_text(path))
+            return sorted({node.value for node in ast.walk(tree) if isinstance(node, ast.Constant)
+                           and node.value == _filter20})
+
+        arm("TOOL-dTrueNorth-20 AC29 — the re-added record's adding commit is its oldest, through the one "
+            "reader both callers bind, and neither caller's module spells its own adding-commit log",
+            "oldest=True one=True own=[] []",
+            lambda: "oldest=%s one=%s own=%s %s" % (
+                read_adding_commits(t19, f":(glob){conf19['MEMORY_ROOT']}/builds/*/reviews/**",
+                                    {recs19[0]}).get(recs19[0]) == first_add19,
+                read_adding_commits is _tl20.read_adding_commits is _dj20.read_adding_commits,
+                _scan_own_log20(os.path.abspath(__file__)), _scan_own_log20(_dj20.__file__)))
+        # AC3 — git RESOLVES TO A STUB on `log`: the spawn is redirected to a script that prints one
+        # stderr line and exits 128, in-process here and through `--print-bindings` in a child,
+        # which the same redirect, and the fixture's resolver, are installed in before the generator
+        # runs as __main__.
+        stub19 = os.path.join(base, "git_log_stub19.py")
+        write_text(stub19, "import sys\nsys.stderr.write('fatal: the stub refuses git log\\n')\n"
+                           "sys.exit(128)\n")
+        shim19 = os.path.join(base, "git_log_shim19.py")
+        write_text(shim19, "import os, pathlib, runpy, subprocess, sys\n_real = subprocess.run\n\n\n"
+                           "def _resolve(argv, *a, **kw):\n"
+                           "    if tuple(argv[:2]) == ('git', 'log'):\n"
+                           f"        argv = (sys.executable, {stub19!r})\n"
+                           "    return _real(argv, *a, **kw)\n\n\n"
+                           "subprocess.run = _resolve\nsys.argv = sys.argv[1:]\n"
+                           "sys.path.insert(0, os.path.dirname(os.path.abspath(sys.argv[0])))\n"
+                           "import backlog\n_kit = backlog.resolve_kit_dir\n"
+                           f"backlog.resolve_kit_dir = lambda home, *a: (pathlib.Path({hd19!r}) "
+                           "if home == 'workflows' else _kit(home, *a))\n"
+                           "runpy.run_path(sys.argv[0], run_name='__main__')\n")
+        _real_run19 = subprocess.run
+
+        def _read_failed_log19(redirect):
+            def _resolve(argv, *a, **kw):
+                if tuple(argv[:2]) == ("git", "log"):
+                    return redirect(argv, *a, **kw)
+                return _real_run19(argv, *a, **kw)
+
+            subprocess.run = _resolve
+            try:
+                _rows(t19, conf19, _resolve_fixture19)
+                return "no Problem raised"
+            except Problem as exc:
+                return (f"git-log={str(exc).startswith('`git log ')} "
+                        f"stub={'fatal: the stub refuses git log' in str(exc)} "
+                        f"start={'could not start' in str(exc)}")
+            finally:
+                subprocess.run = _real_run19
+
+        def _run_stub19(argv, *a, **kw):
+            return _real_run19((sys.executable, stub19), *a, **kw)
+
+        def _run_unstartable19(argv, *a, **kw):
+            raise FileNotFoundError(2, "the stub has no git to start", argv[0])
+
+        arm("TOOL-dTrueNorth-19 AC3 — a git log exiting 128 raises Problem naming the command and its "
+            "first stderr line", "git-log=True stub=True start=False",
+            lambda: _read_failed_log19(_run_stub19))
+        arm("TOOL-dTrueNorth-19 S2 — a git log that cannot start raises Problem naming the command",
+            "git-log=True stub=False start=True", lambda: _read_failed_log19(_run_unstartable19))
+        arm("TOOL-dTrueNorth-19 AC3 — --print-bindings exits 2 on that refusal, naming the stub's line",
+            "rc=2 named=True",
+            lambda: (lambda d: f"rc={d.returncode} named={'fatal: the stub refuses git log' in d.stdout}")(
+                _real_run19((sys.executable, shim19, os.path.abspath(__file__), "--print-bindings"),
+                            cwd=t19, capture_output=True, text=True, encoding="utf-8",
+                            env=_build_git_env())))
+        os.remove(h19)
+        no_harness19 = _write_record19(rv5 + "2026-02-03-review-ARCH-tOne-1-added-where-no-harness-is-"
+                                       "spec-audit.md")
+        _run_commit19("remove the harness")
+        arm("TOOL-dTrueNorth-19 AC4 — a record whose adding commit holds no harness prints its P row, and "
+            "only the record a present harness lacking the function wrote is exempt",
+            "absent=1 Q\t603\t2026-01-01\t1",
+            lambda: (lambda rows: "absent=%d %s" % (
+                sum(1 for r in rows if r.startswith(f"P\t{no_harness19}\t")),
+                " ".join(r for r in rows if r.startswith("Q\t"))))(_rows(t19, conf19, _resolve_fixture19).splitlines()))
+        # TOOL-dTrueNorth-20 AC30 (S33) — ONE BYTES READER: none of the three readers spells `cat-file`,
+        # and each calls `tree_lib.read_blobs_at`. Against a function keeping its own batch parser, the
+        # first half reds.
+        import design_lib as _dl20
+
+        def _scan_blob_reader20(path, name):
+            fn = next(node for node in ast.walk(ast.parse(read_text(path)))
+                      if isinstance(node, ast.FunctionDef) and node.name == name)
+            doc = fn.body[0].value if fn.body and isinstance(fn.body[0], ast.Expr) else None   # prose, not a call
+            spells = any(isinstance(n, ast.Constant) and n is not doc and isinstance(n.value, str)
+                         and "cat-file" in n.value for n in ast.walk(fn))
+            calls = any(isinstance(n, ast.Call) and getattr(n.func, "id", getattr(n.func, "attr", None)) == "read_blobs_at"
+                        for n in ast.walk(fn))
+            return f"{name}={'own' if spells else 'none'}/{'calls' if calls else 'no-call'}"
+
+        arm("TOOL-dTrueNorth-20 AC30 — read_blobs_at_rev, read_spec_revisions and derive_audit_writers spell "
+            "no cat-file and each calls tree_lib.read_blobs_at",
+            "read_blobs_at_rev=none/calls read_spec_revisions=none/calls derive_audit_writers=none/calls",
+            lambda: " ".join((_scan_blob_reader20(os.path.abspath(__file__), "read_blobs_at_rev"),
+                              _scan_blob_reader20(_dl20.__file__, "read_spec_revisions"),
+                              _scan_blob_reader20(os.path.abspath(__file__), "derive_audit_writers"))))
+
+        # TOOL-dTrueNorth-23 AC1 to AC5 — THE KIT'S GLOB-PATHSPEC READERS STRIP THE FOUR PATHSPEC MODES.
+        # The readers are DERIVED by `scan_glob_readers`, an `ast` walk of every module here, and must
+        # equal the table below both ways; each row names the reader its probe calls, and this suite's
+        # own fixtures are exempt by name. Over one fixture of the arm's own, a spec of two commits and a
+        # backlog shard holding one row of the declared family, and the two fixtures S7 names below for
+        # the two readers that read records (TOOL-dTrueNorth-31), each probe runs with
+        # the four unset, then under each set to `1` and restored in a `finally`, and must give the
+        # unset answer, which must not be empty. The env half reads the `env` each runner hands
+        # `subprocess.run` with all four set. Against the base runner the literal mode reads every probe
+        # empty and the env half finds all four keys; a planted reader the table lacks reds the walk.
+        # NOT CHECKED: the behavioural half reds on `GIT_LITERAL_PATHSPECS` alone, because a `:(glob)`
+        # pathspec answers alike under the other three on paths differing in no case; the env half is
+        # what reds on each of the four.
+        import design_lib as _dl23
+        import row_grammar as _rg23
+        import tree_lib as _tl23
+
+        modes23 = ("GIT_LITERAL_PATHSPECS", "GIT_GLOB_PATHSPECS", "GIT_NOGLOB_PATHSPECS", "GIT_ICASE_PATHSPECS")
+        t23 = os.path.join(base, "pathspec-modes"); os.makedirs(t23)
+        conf23 = _fixture(t23)
+        spec23 = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
+        write_text(os.path.join(t23, spec23), read_text(os.path.join(t23, spec23)) + "\nA second revision.\n")
+        write_text(os.path.join(t23, "memory", "backlog", "ARCH.md"), "# backlog\n\n- ARCH-tOne-9 · OPEN · a row\n")
+        # TOOL-dTrueNorth-32 S6: the backlog reader joins two pathspecs, the shards and every BACKLOG file,
+        # so a build's BACKLOG.md holding its own row sits beside the shard, and each pathspec reads a row.
+        write_text(os.path.join(t23, "memory", "builds", "tOne", "BACKLOG.md"),
+                   "# tOne backlog\n\n- ARCH-tOne-8 · OPEN · a build's row\n")
+        run("git", "add", "-A", cwd=t23)
+        run("git", "commit", "-q", "-m", "a second revision and a row", "--no-verify", cwd=t23)
+        # TOOL-dTrueNorth-31 S7 (AC7): each row CALLS the reader it names. `read_population` reads a
+        # deviation fixture of the `audit-pin` plant, whose pinned review and the base's divergence prompt
+        # each answer one of its two pathspecs, under the identity strip the arm sets, so no unattended kit
+        # is read; its probe keeps the members those pathspecs date. The audit-writer row reads
+        # TOOL-dTrueNorth-14's fixture, whose answer is its run record. Red against a row running a shared
+        # helper in place of its reader, which a reader spawning its own git passes.
+        # TOOL-dTrueNorth-32 S6 (AC6): each probe is empty unless each of its pathspecs read. The
+        # population probe answers only when the kinds it read hold both `audit` and `handback`, and the
+        # backlog probe only when it dates both ARCH-tOne-8 and ARCH-tOne-9, else an empty answer the arm
+        # names. Red against the deviation fixture built without the audit-pin plant, and against t23
+        # without its build's BACKLOG row.
+        import routed_commits as _rc23
+
+        dj23 = os.path.join(base, "deviation-population")
+        _dj20.build_fixture(dj23, ["audit-pin"])
+        djconf23, djcommits23 = _dj20.read_fixture_conf(dj23), _rc23.read_routed_commits(dj23, ["HEAD"])
+        probes23 = {
+            "design_lib.read_spec_revisions":
+                lambda: _dl23.read_spec_revisions(t23, [spec23], conf23["MEMORY_ROOT"])[spec23],
+            "deviation_join.read_population":
+                lambda: (lambda got: got if {kind for kind, _a, _s in got} >= {"audit", "handback"} else [])(
+                    sorted((m["kind"], m["address"], m["sha"])
+                           for m in _dj20.read_population(dj23, djconf23, djcommits23)[0]
+                           if m["kind"] in ("audit", "handback") and m["sha"])),
+            "gen_build_index.derive_audit_writers":
+                lambda: sorted(derive_audit_writers(t14w, conf14w["MEMORY_ROOT"], {run14}, _resolve_fixture14) or ()),
+            "row_grammar._build_backlog_pathspecs":
+                lambda: (lambda seen: seen if {"ARCH-tOne-8", "ARCH-tOne-9"} <= set(seen) else {})(
+                    _rg23.derive_first_seen(t23, conf23)),
+            "gen_build_index.cmd_selftest": None,    # the suite's own fixtures, exempt by name
+        }
+
+        def _read_under_modes23():
+            saved = {m: os.environ.pop(m, None) for m in modes23}
+            empty, moved = [], []
+            try:
+                for reader, probe in probes23.items():
+                    if probe is None:
+                        continue
+                    want = probe()
+                    if not want:
+                        empty.append(reader)
+                        continue
+                    for mode in modes23:
+                        os.environ[mode] = "1"
+                        try:
+                            got = probe()
+                        finally:
+                            del os.environ[mode]
+                        if got != want:
+                            moved.append(f"{reader} under {mode}")
+            finally:
+                os.environ.update({m: v for m, v in saved.items() if v is not None})
+            return f"probed={sum(p is not None for p in probes23.values())} empty={empty} moved={moved}"
+
+        _dj20.set_gen_strip(_dj20.IDENTITY_STRIP)     # the deviation row's, for this arm alone
+        try:
+            arm("TOOL-dTrueNorth-23 AC1 AC2 AC4 TOOL-dTrueNorth-31 AC7 — every glob-pathspec reader's probe, each "
+                "calling the reader it names, gives its unset answer, never empty, under each of the four pathspec "
+                "modes", "probed=4 empty=[] moved=[]", _read_under_modes23)
+        finally:
+            _dj20.set_gen_strip(None)
+
+        def _read_runner_env23(call):
+            handed = []
+
+            def _run_captured23(argv, *a, **kw):
+                handed.append(kw.get("env"))
+                return subprocess.CompletedProcess(argv, 0, b"", b"")
+
+            saved, real = {m: os.environ.get(m) for m in modes23}, subprocess.run
+            os.environ.update({m: "1" for m in modes23})
+            subprocess.run = _run_captured23
+            try:
+                call()
+            finally:
+                subprocess.run = real
+                for m, v in saved.items():
+                    if v is None:
+                        os.environ.pop(m, None)
+                    else:
+                        os.environ[m] = v
+            if not handed or any(env is None for env in handed):
+                return f"spawns={len(handed)}, and a spawn handed no env inherits every mode"
+            return f"reached={sorted({m for env in handed for m in modes23 if m in env})}"
+
+        location23 = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+                      "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX")
+        arm("TOOL-dTrueNorth-23 AC3 — with the four modes set, neither runner reading the kit's leak list hands "
+            "one to subprocess.run, and the list holds the eight location variables and the four modes",
+            "leaks=True read_git_output reached=[] _build_git_env reached=[]",
+            lambda: "leaks=%s read_git_output %s _build_git_env %s" % (
+                sorted(GIT_ENV_LEAKS) == sorted(location23 + modes23),
+                _read_runner_env23(lambda: _tl23.read_git_output(t23, ("rev-parse", "HEAD"))),
+                _read_runner_env23(lambda: run("git", "rev-parse", "HEAD", cwd=t23))))
+
+        def _scan_age_walk23():
+            fn = next(node for node in ast.parse(read_text(_rg23.__file__)).body
+                      if isinstance(node, ast.FunctionDef) and node.name == "derive_first_seen")
+            called = [node.func for node in ast.walk(fn) if isinstance(node, ast.Call)]
+            via = any(getattr(f, "id", getattr(f, "attr", None)) == "read_git_output" for f in called)
+            own = any(isinstance(f, ast.Attribute) and f.attr == "run" and getattr(f.value, "id", None) == "subprocess"
+                      for f in called)
+            return f"runner={via} own-spawn={own}"
+
+        arm("TOOL-dTrueNorth-23 AC4 — the age walk reaches git through tree_lib.read_git_output and spawns none "
+            "of its own", "runner=True own-spawn=False", _scan_age_walk23)
+
+        def _scan_table23(kit):
+            found = scan_glob_readers(kit)
+            return (f"met={bool(found)} unlisted={sorted(set(found) - set(probes23))} "
+                    f"stale={sorted(set(probes23) - set(found))}")
+
+        arm("TOOL-dTrueNorth-23 AC5 — the kit's glob-pathspec readers, derived by an ast walk of every module, "
+            "equal the arm's table both ways", "met=True unlisted=[] stale=[]",
+            lambda: _scan_table23(os.path.dirname(os.path.abspath(__file__))))
+        plant23 = os.path.join(base, "planted-kit"); os.makedirs(plant23)
+        for name in os.listdir(os.path.dirname(os.path.abspath(__file__))):
+            if name.endswith(".py"):
+                shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), name),
+                                os.path.join(plant23, name))
+        write_text(os.path.join(plant23, "planted23.py"),
+                   '"""A module docstring naming :(glob)memory/** is prose."""\n'
+                   'PLANTED = ":(glob)memory/builds/*/spec/**"\n\n\n'
+                   'def read_planted():\n    return ":(glob)memory/**"\n\n\n'
+                   'def read_prose():\n    """It names :(glob)memory/** in prose only."""\n    return "memory/**"\n\n\n'
+                   'class Planted:\n    """A class docstring naming :(glob)memory/** is prose."""\n\n'
+                   '    PATHS = []\n    PATHS.append(":(glob)memory/builds/*/prompts/**")\n\n'
+                   '    def read_method(self):\n        return ":(glob)memory/builds/*/reviews/**"\n\n\n'
+                   'if True:\n    GUARDED = ":(glob)memory/backlog/**"\n\n\n'
+                   'def outer_class():\n    class Inner:\n        P = ":(glob)memory/builds/**"\n    return Inner.P\n\n\n'
+                   'def outer():\n    def inner():\n        return ":(glob)memory/**"\n    return inner\n\n\n'
+                   'SPECS = []\nSPECS.append(":(glob)memory/backlog/*.md")\n')
+        write_text(os.path.join(plant23, "planted23.txt"), 'TEXT = ":(glob)memory/**"\n')
+        # TOOL-dTrueNorth-31 AC5 (S5): the class method and the constant guarded under `if True:` are
+        # readers too. Red against the top-level walk, which names neither. TOOL-dTrueNorth-32 AC5 AC9
+        # AC13 (S5, S9, S13), the charge rule: the class built inside `outer_class` is charged to that
+        # function, the class-level `PATHS.append` to `Planted`, the module-level `SPECS.append` to the
+        # module, and the constant `inner` returns to `inner` alone, never to `outer`. Red against a walk
+        # stopping at a class nested in a function, which names no `outer_class`, against one naming no
+        # expression statement, which names neither `planted23` nor `planted23.Planted`, and against a
+        # walk charging a nested def's constant to its enclosing function, which names `planted23.outer`.
+        arm("TOOL-dTrueNorth-23 AC5 TOOL-dTrueNorth-31 AC5 TOOL-dTrueNorth-32 AC5 AC9 AC13 — a planted module's "
+            "glob-pathspec function, constant, class method, guarded constant, class in a function, class-level and "
+            "module-level appends and nested def are readers the table lacks, each charged to exactly one name, "
+            "and neither a docstring nor a file that is no module is one",
+            "met=True unlisted=['planted23', 'planted23.GUARDED', 'planted23.PLANTED', 'planted23.Planted', "
+            "'planted23.Planted.read_method', 'planted23.outer.inner', 'planted23.outer_class', "
+            "'planted23.read_planted'] stale=[]",
+            lambda: _scan_table23(plant23))
 
         # ---- the rendered Records table and the two coverage joins.
         # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER
@@ -4780,6 +6541,9 @@ def cmd_selftest() -> int:
         arm("a build with NO records renders no table, and BOTH joins saying none", "True",
             lambda: str("| Record | Kind | Serves |" not in
                         plan(t15, conf15)[0]["memory/builds/tOne/README.md"]))
+        arm("TOOL-dTrueNorth-5 AC6 — a build no record pins judges none, and its count says zero",
+            "Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.",
+            lambda: plan(t15, conf15)[0]["memory/builds/tOne/README.md"])
         # TOOL-dRetiredFork-18. This arm grades the EMISSION, which is the gap the two arms on
         # `_render_wrapped_ids` could not see: that helper passed in isolation for as long as
         # nothing called it, while a 24-unit build rendered 509- and 531-character gap lines. The
@@ -6533,6 +8297,13 @@ def cmd_selftest() -> int:
         lambda: render_spec_skeleton("# T\n\n" + _q_t2, *_q_args, "", []))
 
     test_staged_render(arm)
+    test_coverage_region(arm)
+    test_coverage_stub(arm)
+    arm("TOOL-dTrueNorth-16 AC15 — read_header_verbs refuses an expand returning three values with backlog.Problem "
+        "naming the (ids, bad) contract and the spec path", "True",
+        lambda: str((lambda o: o.startswith("backlog.Problem: memory/builds/dX/spec/s.md:") and "(ids, bad)" in o)(
+            check_expand_contract())))
+    test_asbuilt_view(arm)
 
     # THE SIBLING MODULE'S OWN ARMS RUN HERE, inside this leg, rather than as a leg of their own.
     # `backlog.py` is a LIBRARY with no bar leg and no adopter-visible verb; a second leg for it
@@ -6867,11 +8638,20 @@ def main(argv: list) -> int:
                           GIT_COMMITTER_EMAIL="t@t.test", GIT_CONFIG_COUNT="1",
                           GIT_CONFIG_KEY_0="core.autocrlf", GIT_CONFIG_VALUE_0="false")
         return cmd_selftest()
-    if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey",
-                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor"):
+    if mode not in ("--check", "--write", "--check-format", "--print-bindings", "--survey", "--check-asbuilt",
+                    "--report", "--bump", "--asks", "--new-build", "--new-spec", "--doctor",
+                    "--check-coverage"):
         print("usage: gen_build_index.py "
-              "[--check [--staged]|--write|--check-format|--survey|--report|--bump|"
+              "[--check [--staged|--with-verdicts]|--write|--check-coverage [--staged]|--check-asbuilt [--staged]|"
+              "--check-format|--survey|--report|--bump|"
               "--print-bindings|--asks|--new-build|--new-spec|--doctor|--selftest]")
+        return 2
+    # TOOL-dTrueNorth-27 S4: `--with-verdicts` is `--check`'s alone, and never beside `--staged`, whose
+    # skip would print no verdict while a full run's checks 29 and 30 read them from these lines.
+    with_verdicts = "--with-verdicts" in argv[2:]
+    if with_verdicts and (mode != "--check" or "--staged" in argv[2:]):
+        print("usage: gen_build_index.py --check --with-verdicts — the flag takes --check alone and never "
+              f"--staged; given {' '.join(argv[1:])}")
         return 2
     try:
         root = run("git", "rev-parse", "--show-toplevel").strip()
@@ -6879,8 +8659,15 @@ def main(argv: list) -> int:
         print("build-index: not a git repo")
         return 2
     conf = load_conf(root)
+    # `--print-bindings` turns a `Problem` into 2, the exit check 21 reds as a parse that did not
+    # complete: a git read the audit-pin grading needs and could not make (TOOL-dTrueNorth-19 S2) is
+    # a named refusal, never a traceback and never an empty exempt set.
     if mode == "--print-bindings":
-        return cmd_print_bindings(root, conf)
+        try:
+            return cmd_print_bindings(root, conf)
+        except Problem as exc:
+            print(f"build-index: {exc}")
+            return 2
     # `--asks` IS DISPATCHED OUTSIDE THE HANDLER BELOW, which prints its message to stdout. That is
     # right for every other mode and wrong for this one, whose stdout is a value a program parses:
     # a refusal printed there is a decode error rather than a refusal. `cmd_asks` owns all of its
@@ -6897,6 +8684,22 @@ def main(argv: list) -> int:
     if mode == "--doctor":
         try:
             return cmd_doctor(root, conf, read_doctor_args(argv[2:]))
+        except Problem as exc:
+            print(f"build-index: {exc}")
+            return 2
+    # `--check-coverage` refuses with 2 for the same reason: 1 is its "a chain spec is refused" verdict,
+    # and a coverage it could not read must never read as either answer (TOOL-dTrueNorth-3 S5).
+    if mode == "--check-coverage":
+        try:
+            return cmd_check_coverage(root, conf, staged="--staged" in argv[2:])
+        except Problem as exc:
+            print(f"build-index: {exc}")
+            return 2
+    # `--check-asbuilt` likewise (TOOL-dTrueNorth-16 S17): 1 is its verdict, so an unreadable pin or a
+    # partial key set, a view nobody could render, exits 2.
+    if mode == "--check-asbuilt":
+        try:
+            return cmd_check_asbuilt(root, conf, staged="--staged" in argv[2:])
         except Problem as exc:
             print(f"build-index: {exc}")
             return 2
@@ -6921,6 +8724,17 @@ def main(argv: list) -> int:
                 print(f"build-index: render SKIPPED under --staged — {why}; the push boundary renders in full")
                 return 0
             print(f"build-index: render owed under --staged — {why}")
+        if with_verdicts:
+            # TOOL-dTrueNorth-31 S2: stderr IS stdout for the whole `--with-verdicts` call, so a line
+            # `--check` writes to stderr follows `build-index: verdicts end` in order instead of racing the
+            # block-buffered stdout ahead of the markers the hygiene capture splits at.
+            held = sys.stderr
+            sys.stderr = sys.stdout
+            try:
+                print_check_verdicts(root, conf)
+                return cmd_check(root, conf)
+            finally:
+                sys.stderr = held
         return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

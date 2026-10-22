@@ -43,6 +43,7 @@ and anything outside the specs you were handed, out of what you write and return
 - [verify] Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate.
 - [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
 - [class] Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards.
+- [docs] A user-facing change is not done until its page under `help/` is current.
 - [security] Security first: validate once at the write boundary, deny by default, give automation the narrowest grant, and keep secrets out of files, memory and chat.
 - [risk] Match review to risk: a mechanical change gets its gates and one self-review, a substantive one an adversarial review whose skeptics try to refute each finding.
 

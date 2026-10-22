@@ -19,7 +19,11 @@
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm, 23 and 26 (whose
 # population is the commit GRAPH) all skip, and the full run at the push boundary is where they
-# bind. Check 22 is NOT among them and still walks every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
+# bind. Checks 29 and 30 are not held by this file: each passes `--staged` through and its verb decides on the
+# render's trigger, `check_index_input`, plus the carries checker for check 29 and DESIGN_RECORD and
+# DESIGN_VIEW for check 30 (TOOL-dTrueNorth-16 S21, TOOL-dTrueNorth-20 S20). That rule is stated once, in the
+# block comments of checks 29 and 30 below, and this header points at them rather than restating it.
+# Check 22 is NOT among them and still walks every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
 # resolution reads the whole tracked tree whichever files are staged. This line used to read "set-checks tree-wide", which was
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
@@ -61,7 +65,7 @@ esac
 # no key at all, which the bar reads as a probe that could not answer rather than as a clean set.
 OFFENDERS=0; OFFENDER_KEYS=""
 if [ "${1:-}" = "--offenders" ]; then OFFENDERS=1; exec 3>&1 1>/dev/null; fi
-KIT_MEMORY_TREE_VERSION=2.150   # gov:kit memory-tree@2.150 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
+KIT_MEMORY_TREE_VERSION=2.151   # gov:kit memory-tree@2.151 — engine identity; set HERE, never from .memory-tree.conf (a project conf must not spoof it)
 ROOT="$(git rev-parse --show-toplevel)" || exit 2
 cd "$ROOT" || exit 2
 MEMORY_ROOT=memory
@@ -1002,14 +1006,15 @@ if [ -n "$sel6" ]; then
   # project that moves one key and not another changes it.
   #
   # A BUILD README IS PRICED BY ITS AUTHORED BYTES (TOOL-aMendedFleet-84): its `wc -c` figure less
-  # every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->` or
-  # `<!-- gen:build-edges -->` marker through its matching close, markers and newlines included, and
-  # less the front matter's one `ids:` line. Those bytes are rendered from the specs at about 308 per
-  # unit, so pricing them made the cap a bound on the roster rather than on what anyone wrote. A
+  # every line from a `<!-- gen:build-index -->`, `<!-- gen:build-coverage -->`,
+  # `<!-- gen:build-order -->` or `<!-- gen:build-edges -->` marker through its matching close,
+  # markers and newlines included, and less the front matter's one `ids:` line. Those bytes are
+  # rendered from the specs at about 308 per unit, so pricing them made the cap a bound on the roster
+  # rather than on what anyone wrote; the coverage pair joined at TOOL-dTrueNorth-3. A
   # nested pair (`gen:build-units` inside the index region) is counted once; a marker is column-0
   # equality after one trailing CR, the generator's own reading. A README whose pairs do not balance
   # prints -1 here and is priced WHOLE, which fails safe. NOT CHECKED HERE: that a region's bytes
-  # really are generated. Check 9 re-renders the three registered regions and byte-compares them, so
+  # really are generated. Check 9 re-renders the four registered regions and byte-compares them, so
   # prose cannot hide inside one; a pair under any other name is priced as authored. LC_ALL=C makes
   # `length` count bytes on every node.
   gen6=$(printf '%s\n' "$sel6" | while IFS= read -r f; do case "$f" in "$M"/builds/*/README.md) printf '%s\n' "$f" ;; esac; done \
@@ -1020,9 +1025,9 @@ if [ -n "$sel6" ]; then
     FNR==1 && x=="---" { fm=1; next }
     fm==1 && x=="---" { fm=2; next }
     fm==1 && x ~ /^ids:/ { s += length($0)+1; next }
-    x=="<!-- gen:build-index -->" || x=="<!-- gen:build-order -->" || x=="<!-- gen:build-edges -->" { d++ }
+    x=="<!-- gen:build-index -->" || x=="<!-- gen:build-coverage -->" || x=="<!-- gen:build-order -->" || x=="<!-- gen:build-edges -->" { d++ }
     d>0 { s += length($0)+1 }
-    x=="<!-- /gen:build-index -->" || x=="<!-- /gen:build-order -->" || x=="<!-- /gen:build-edges -->" { d--; if (d<0) bad=1 }
+    x=="<!-- /gen:build-index -->" || x=="<!-- /gen:build-coverage -->" || x=="<!-- /gen:build-order -->" || x=="<!-- /gen:build-edges -->" { d--; if (d<0) bad=1 }
     END { flush() }')
   bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" '
     # THREE streams, told apart by a file counter: `FNR==NR` names only the first. Each is a printf
@@ -1248,9 +1253,27 @@ if check_selected 9; then
 # file, or a file whose cited ids change, because the roster reads ids out of EVERY memory file's
 # prose — and prints one SKIPPED line when nothing can. That line is printed here: a skip announces
 # itself. A render owed is the full `--check`, so its verdict and this fail branch are unchanged.
+#
+# ON A FULL RUN THIS ONE PROCESS ALSO PRINTS CHECKS 29 AND 30'S VERDICTS (TOOL-dTrueNorth-27 S4).
+# `--with-verdicts`, with `--staged` off and no `--only`, runs their two verbs in the generator ahead of
+# `--check` and prints each verb's lines under a `build-index: verdict <n> exit <rc>` line, then
+# `build-index: verdicts end`. The capture splits there by parameter expansion: `_v9` keeps the
+# sections for checks 29 and 30, and this check's message and its SKIPPED scan read only what follows
+# the marker. A capture with no marker, a traceback in this path, leaves `_v9end` 0, and both checks
+# then read the whole capture as their unreadable branch. Any other run calls each verb on its own.
+_v9=""; _v9on=0; _v9end=0
 if [ "$STAGED" = 0 ] || [ -n "$STAGED_MD" ]; then
   _c9=(--check); [ "$STAGED" = 1 ] && _c9+=(--staged)
-  if ! drift=$("$_PY" "$HERE/gen_build_index.py" "${_c9[@]}" 2>&1); then fail 9 "generated build index differs from a fresh render:
+  [ "$STAGED" = 0 ] && [ -z "$ONLY" ] && { _c9+=(--with-verdicts); _v9on=1; }
+  if ! drift=$("$_PY" "$HERE/gen_build_index.py" "${_c9[@]}" 2>&1); then _c9rc=1; else _c9rc=0; fi
+  if [ "$_v9on" = 1 ]; then
+    _v9=$drift
+    if [[ $drift == *"build-index: verdicts end"* ]]; then
+      _v9end=1; _v9=${drift%%build-index: verdicts end*}
+      drift=${drift#*build-index: verdicts end}; drift=${drift#$'\r'}; drift=${drift#$'\n'}
+    fi
+  fi
+  if [ "$_c9rc" = 1 ]; then fail 9 "generated build index differs from a fresh render:
 $drift"
   else
     # Per LINE (TOOL-aTrimmedHook-6): a warning printed first on the merged stream must not hide the skip.
@@ -1413,6 +1436,32 @@ $miss21"
   bad21=$(printf '%s\n' "$b21" | sed -n 's/^B\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
   [ -n "$bad21" ] && fail 21 "Serves or Commissions lines naming an id that no spec in this tree defines:
 $bad21"
+  # THE AUDIT-PIN ARM (TOOL-dTrueNorth-5 S4). The generator holds the predicate and prints a P row per
+  # id of a spec-audit record dated on or after SPEC_AUDIT_PIN_CUTOFF that carries no `@rev-N` pin or
+  # pins a revision its spec's header has not reached; the shell fails on the rows, because
+  # `check-arms.py` finds its arms in tracked shell. The rows pass through `extract_graded_rows`, the
+  # ONE population filter, so a record the legacy registry lists or RECORD_SERVES_CUTOFF exempts is
+  # exempt here too. The Q row is the arm's LIVENESS half and names what it graded on every run: a
+  # parse printing N and no Q is a generator without the arm, refused as the U-row test below is.
+  # The row is `Q<TAB><graded><TAB><cutoff, or off><TAB><exempt>`, read by its `^Q\t` prefix and cut
+  # at its tabs (TOOL-dTrueNorth-14 S3): the exempt field counts the graded records an older review
+  # harness wrote, which print no P row, or is `-` where the workflows kit did not resolve. Its CR
+  # comes off first: a Windows python ends every row but the last, N, in CRLF, and a field cut from
+  # the middle of a line would carry it there, and `off` would never equal `off<CR>`.
+  if [ -n "$b21" ]; then
+    q21=$(printf '%s\n' "$b21" | sed -n '/^Q\t/{s/\r$//;p;}' | head -1)
+    IFS=$'\t' read -r _q21 qn21 qc21 qe21 _q21rest <<<"$q21"
+    if [ -z "$qn21" ]; then
+      fail 21 "the bindings parse printed N $n21 and no Q row, so a generator without the audit-pin arm leaves every spec-audit record's @rev-N pin ungraded"
+    elif [ "$qc21" = off ]; then
+      echo "memory-hygiene: check 21: the audit-pin arm is off (SPEC_AUDIT_PIN_CUTOFF blank)" >&2
+    else
+      echo "memory-hygiene: check 21: the audit-pin arm graded $qn21 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=$qc21, $qe21 written by a harness before renderAuditBinding" >&2
+    fi
+  fi
+  apin21=$(printf '%s\n' "$b21" | sed -n 's/^P\t\([^\t]*\)\t\(.*\)$/  \1 — \2/p' | extract_graded_rows)
+  [ -n "$apin21" ] && fail 21 "spec-audit records at or after SPEC_AUDIT_PIN_CUTOFF whose Serves line leaves an id unpinned or pins it past its spec's header revision:
+$apin21"
   # The unbound escape. An UNDECLARED pin is a refusal, not a disabled check: `none` is a deliberate
   # declaration and the number of them is the thing a reader is entitled to see bounded. `n21` was
   # read above, where its absence is the parse's liveness test.
@@ -1630,6 +1679,93 @@ if [ "$STAGED" = 0 ]; then
   [ "$_tarc" -ne 0 ] && status=1
   [ "$_tarc" -eq 0 ] || [ "$OFFENDERS" = 0 ] || add_offender_keys 26 $'\n'"$tam"
 fi
+
+fi
+
+if check_selected 29; then
+# 29 — A CHAIN BUILD'S SPEC IS NOT INPROGRESS WHILE ITS BUILD'S COVERAGE IS RED (TOOL-dTrueNorth-3).
+# INPROGRESS is past the build's Design exit, so an uncarried clause, an unnamed owned node or a stale
+# pin there is a design the build is already coding against. Delegated to the generator's
+# `--check-coverage`, as 24 and 26 delegate theirs: the coverage is the carries join's, read through
+# the one function the `build-coverage` region renders from, so this file spells no second reading of
+# it and the region and the refusal cannot disagree. The verb exits 1 naming each refused spec and each
+# finding's arm and reference, and 2 on a coverage it could not read; both fail here, because a
+# coverage nobody could read is no clearance. With SPEC_CARRIES_CUTOFF blank it prints one line, which
+# is printed here, and exits 0.
+#
+# UNDER --staged THE VERB DECIDES (TOOL-dTrueNorth-16 S21): `--staged` is passed through, and the
+# verb's trigger is the render's — any staged path the build index reads by `check_index_input`, a
+# staged view row and a staged spec alike, or the carries checker beside the kit — so this file tests
+# no path itself and a second spelling of the trigger cannot drift from the render's. Any other
+# commit holds it, and the verb's held line is printed here. The full run at the push boundary grades
+# it whatever is staged.
+#
+# ON A FULL RUN THE VERDICT IS CHECK 9'S SECTION (TOOL-dTrueNorth-27 S4): check 9's process printed
+# this verb's lines under `build-index: verdict 29 exit <rc>`, so `_c29` and `cov29` are read from that
+# section, and a capture holding no end marker is exit 2 and the whole capture. The lines print by
+# parameter expansion, one per pass, never through a loop fed by a here-string.
+_c29a=(--check-coverage); [ "$STAGED" = 1 ] && _c29a+=(--staged)
+if [ "${_v9on:-0}" = 1 ]; then
+  _c29=2; cov29=$_v9
+  if [ "$_v9end" = 1 ] && [[ $_v9 == *"build-index: verdict 29 exit "*"build-index: verdict 30 exit "* ]]; then
+    cov29=${_v9#*build-index: verdict 29 exit }; _c29=${cov29%%[!0-9]*}
+    cov29=${cov29#*$'\n'}; cov29=${cov29%build-index: verdict 30 exit *}; cov29=${cov29%$'\n'}; cov29=${cov29%$'\r'}
+  fi
+else
+  cov29=$("$_PY" "$HERE/gen_build_index.py" "${_c29a[@]}" 2>&1); _c29=$?
+fi
+case "$_c29" in
+  0) _r29=$cov29$'\n'
+     while [ -n "$_r29" ]; do
+       _c29l=${_r29%%$'\n'*}; _r29=${_r29#*$'\n'}
+       [ -z "$_c29l" ] || printf 'memory-hygiene: check 29: %s\n' "${_c29l#build-index: }"
+     done ;;
+  1) fail 29 "a chain build's spec is INPROGRESS while its build's coverage is red:
+$cov29" ;;
+  *) fail 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:
+$cov29" ;;
+esac
+
+fi
+
+if check_selected 30; then
+# 30 — THE AS-BUILT VIEW'S VERDICTS (TOOL-dTrueNorth-16 S17). The view's byte drift is check 9's, under
+# `--write`, its one remedy; a finding `--write` cannot cure — a record departing from a clause with no
+# row, two unordered amends of one clause, a pipe in an `**After:**`, a pinned hash the clause does not
+# carry, a moved `Baseline:` line, a view no `merge=ours` attribute guards (TOOL-dTrueNorth-26 S16) —
+# is this check's, so check 9's message and the runner's regeneration
+# check read only what `--write` cures. Delegated to the generator's `--check-asbuilt`, as 29 delegates
+# `--check-coverage`: the view is `asbuilt_view.py`'s, read through the host `--write` renders it with,
+# so this file spells no second reading of it. The verb exits 1 naming each finding, and 2 when the key
+# rule refuses or the pin cannot be read; both fail here, because a view nobody could render is no
+# clearance. With every DESIGN_* key blank it prints one off line, which is printed here, and exits 0.
+# Under --staged `--staged` is passed through, and the verb decides, on the render's trigger as check
+# 29's verb does (TOOL-dTrueNorth-20 S20): it runs when a staged path is a build-index input by
+# `check_index_input`, this kit's own code included, or is DESIGN_RECORD or DESIGN_VIEW outside that
+# set, and otherwise prints its held line, which is printed here.
+#
+# On a full run the verdict is check 9's section, read as check 29 reads its own (TOOL-dTrueNorth-27 S4).
+_c30a=(--check-asbuilt); [ "$STAGED" = 1 ] && _c30a+=(--staged)
+if [ "${_v9on:-0}" = 1 ]; then
+  _c30=2; ab30=$_v9
+  if [ "$_v9end" = 1 ] && [[ $_v9 == *"build-index: verdict 30 exit "* ]]; then
+    ab30=${_v9#*build-index: verdict 30 exit }; _c30=${ab30%%[!0-9]*}
+    ab30=${ab30#*$'\n'}; ab30=${ab30%$'\n'}; ab30=${ab30%$'\r'}
+  fi
+else
+  ab30=$("$_PY" "$HERE/gen_build_index.py" "${_c30a[@]}" 2>&1); _c30=$?
+fi
+case "$_c30" in
+  0) _r30=$ab30$'\n'
+     while [ -n "$_r30" ]; do
+       _c30l=${_r30%%$'\n'*}; _r30=${_r30#*$'\n'}
+       [ -z "$_c30l" ] || printf 'memory-hygiene: check 30: %s\n' "${_c30l#build-index: }"
+     done ;;
+  1) fail 30 "the as-built view's deviation records and its design record disagree, which --write cannot cure:
+$ab30" ;;
+  *) fail 30 "the as-built view could not be rendered, so none of its verdicts was read:
+$ab30" ;;
+esac
 
 fi
 

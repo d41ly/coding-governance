@@ -103,7 +103,27 @@ Records: 1 bound to this build, across 1 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dKeptSession's 28 clause(s) and 16 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 28 (cl-dClosedLoop-0139, cl-dClosedLoop-0140, cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0143, cl-dClosedLoop-0144, cl-dClosedLoop-0145, cl-dClosedLoop-0146, cl-dClosedLoop-0147, cl-dClosedLoop-0148, cl-dClosedLoop-0149, cl-dClosedLoop-0150, cl-dClosedLoop-0151,
+  cl-dClosedLoop-0152, cl-dClosedLoop-0153, cl-dClosedLoop-0154, cl-dClosedLoop-0155, cl-dClosedLoop-0156, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0159, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0162, cl-dClosedLoop-0504, cl-dClosedLoop-0163, cl-dClosedLoop-0164,
+  cl-dClosedLoop-0165)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.mailbox.answer, policy-key.actions.free, policy-key.attendance, policy-key.card.pointers, policy-key.context.on-full, policy-key.context.threshold, policy-key.deps.coordination, policy-key.deps.early-build, policy-key.deps.messaging,
+  policy-key.mailbox.fetch-seconds, policy-key.mailbox.notice, policy-key.mailbox.reads, policy-key.notify.owner, policy-key.orient.budget, policy-key.preset, record-kind.mailbox-message
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0141, cl-dClosedLoop-0142, cl-dClosedLoop-0144, cl-dClosedLoop-0153, cl-dClosedLoop-0157, cl-dClosedLoop-0158, cl-dClosedLoop-0160, cl-dClosedLoop-0161, cl-dClosedLoop-0163, cl-dClosedLoop-0165
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

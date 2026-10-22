@@ -271,4 +271,6 @@ Records: 8 bound to this build, across 3 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aBranchedMandate-12 TOOL-aBranchedMandate-13.
+
+Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry a pin.
 <!-- /gen:build-index -->

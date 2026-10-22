@@ -168,6 +168,8 @@ Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-cMendedVintage-15 DEPL-cMendedVintage-16 DEPL-cMendedVintage-17 DEPL-cMendedVintage-18 DEPL-cMendedVintage-19 DEPL-cMendedVintage-20 DEPL-cMendedVintage-21 DEPL-cMendedVintage-22 DEPL-cMendedVintage-23 DEPL-cMendedVintage-24 DEPL-cMendedVintage-25
 TOOL-cMendedVintage-10 TOOL-cMendedVintage-11 DEPL-cMendedVintage-26 DEPL-cMendedVintage-27 TOOL-cMendedVintage-12 DEPL-cMendedVintage-28.
+
+Ids whose spec moved past its audited revision: none — 0 of 40 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

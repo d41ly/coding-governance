@@ -721,4 +721,4 @@ echo "       c. THEN measure: set RECORD_UNBOUND_PIN to the GRADED count check 2
 echo "          ('grades <g> of N <n>'): N minus what RECORD_SERVES_CUTOFF or legacy-files.txt exempt."
 echo "          A pin above it is slack, and check 21 reds it."
 echo "       d. Drain it as you bind records for real: '**Serves:** <kind> <id> [<id>…]', kinds"
-echo "          spec-audit | diff-review | journal | research. Grammar: $M/HYGIENE.md, Record bindings."
+echo "          <kind> from the closed list, and the grammar, in $M/HYGIENE.md, Record bindings."

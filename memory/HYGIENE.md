@@ -1,4 +1,4 @@
-<!-- gov:kit memory-tree@2.150 -->
+<!-- gov:kit memory-tree@2.151 -->
 # memory/ retention & hygiene
 
 `memory/` is the project's AI-first memory: version-controlled, travelling to every node on clone.
@@ -222,12 +222,12 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    line cap for that class; and a codebase-map dossier ≤ `DOSSIER_CAP_BYTES` (20 KB) with no line cap,
    reached only where a map is adopted and guarded on a non-empty prefix, because an unguarded selector
    would hand the dossier bound to the whole tree. A build README is priced by its authored bytes:
-   its `wc -c` figure less every line from a `<!-- gen:build-index -->`, `<!-- gen:build-order -->`
-   or `<!-- gen:build-edges -->` marker through its matching close, and less the front matter's
-   `ids:` line, so the generated half never bills the cap at any roster size; a README whose pairs
-   do not balance is priced whole. This check does NOT verify that a region's bytes really are
-   generated — check 9 does, by re-rendering the three regions and byte-comparing them
-   (TOOL-aMendedFleet-84). A cap that is not a whole number, or a zero BYTE cap, is refused before
+   its `wc -c` figure less every line from a `<!-- gen:build-index -->`, `<!-- gen:build-coverage -->`,
+   `<!-- gen:build-order -->` or `<!-- gen:build-edges -->` marker through its matching close, and less
+   the front matter's `ids:` line, so the generated half never bills the cap at any roster size; a
+   README whose pairs do not balance is priced whole. This check does NOT verify that a region's bytes
+   really are generated — check 9 does, by re-rendering the four regions and byte-comparing them
+   (TOOL-aMendedFleet-84, the coverage pair TOOL-dTrueNorth-3). A cap that is not a whole number, or a zero BYTE cap, is refused before
    any check runs: the gate exits 2 naming the key rather than reporting a tree it could not
    measure (grandfather:
    `curation-debt.txt` exempts either). A guide is MANDATORY reading the charter points a session at,
@@ -276,6 +276,17 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
    reads `git ls-files`, so a half-staged rotation's moved rows look deleted. Stage the archive
    first (`TOOL-dHomedResolver-2`).
+   `--check` reports only what `--write` cures: the as-built view DESIGN_VIEW names is one more
+   artifact, its byte drift listed under the same `--write` remedy, and its other findings, which
+   `--write` cannot cure, are check 30's (`TOOL-dTrueNorth-16`).
+   A build README carries four generated regions, in this order: `<!-- gen:build-index -->`,
+   `<!-- gen:build-coverage -->`, `<!-- gen:build-order -->` and `<!-- gen:build-edges -->`.
+   `--write` creates a missing pair and `--check` never demands one, save the coverage pair: it renders
+   the design clauses' coverage from the carries join `SPEC_CARRIES_CUTOFF` arms, every field with an
+   explicit none, so `--write` creates it only in a chain build's README, one the design view's Build
+   column names, and `--check` names a chain README without it and any other README holding one. With
+   the key blank no README gains it, and one that holds it renders a single line saying so
+   (`TOOL-dTrueNorth-3`).
 10. **rotation note** — every rotated `archive/<STEM>.<date><suffix?>.md` is referenced from its live index, which is resolved at the stem's DECLARED HOME —
     `DECISIONS.md` at the memory root, `backlog/<FAMILY>.md` for a family — and never by searching
     for a file of that name, so a build file that shares a stem's name is not consulted
@@ -449,7 +460,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     never refuse the render. A record `legacy-files.txt` lists is not graded for a missing Serves
     line. `RECORD_UNDATED_ARTIFACTS` set to `exempt` drops an undated non-markdown file (a JSON result, an
     HTML report) from that branch and prints how many it dropped on every run; blank or `grade`
-    grades them.
+    grades them. From `SPEC_AUDIT_PIN_CUTOFF` its audit-pin branch fails each `spec-audit` record,
+    dated on or after the key or undated, that leaves an id without an `@rev-N` pin or pins it
+    above its spec's header revision, refuses a parse printing no `Q` row, and names on every run
+    how many records it graded, or that the arm is off.
 
 22. **review verdict vocabulary** — a review record whose filename date reaches
     `REVIEW_VERDICT_CUTOFF` carries exactly ONE `## Verdict:` line, and its token is a member of the
@@ -560,6 +574,45 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     20's and 24's, so a `snapshot` carry-forward is one identity; any record kind but those two;
     front matter; and a duplicate whose every holder had landed at the base.
 
+29. **a chain build's spec is not INPROGRESS while its coverage is red** — with `SPEC_CARRIES_CUTOFF`
+    set, a spec of a chain build at `INPROGRESS`, which is past that build's Design exit, fails while
+    the carries join finds anything for the build at that exit: an uncarried clause, an owned node no
+    spec names, a stale pin, or any other arm. Each refused spec is named with every finding's arm and
+    reference. Delegated to `tools/memory-tree/gen_build_index.py --check-coverage`, which reads the one
+    value the `build-coverage` region renders (check 9), and a coverage it cannot read fails as well.
+    With the key blank it prints one line and passes. Under `--staged` the check passes `--staged`
+    through, and the verb's trigger is the render's: it runs when a staged path is a build-index input,
+    a staged view row and a staged spec alike, or the carries checker beside the kit, and otherwise
+    prints its held line (`TOOL-dTrueNorth-16`). A full run, `--staged` off and no `--only`, reads
+    this verdict from check 9's generator process, which runs the verb ahead of its own render, and
+    prints it as the standalone verb prints it (`TOOL-dTrueNorth-27`).
+    NOT GRADED: a spec at any other status, since `OPEN`, `SPECCED` and `BLOCKED` precede the exit and
+    a terminal or `DEFERRED` spec is not building; and a build the design view does not name.
+30. **the as-built view's verdicts** — with all four `DESIGN_*` keys set, the deviation records and
+    the design record the as-built view renders from must agree: a record departing from a clause
+    with no `amends` or `supersedes` row, two amends of one clause no `**Supersedes:**` orders, a
+    `**Supersedes:**` naming a record outside its clause's set, an `**After:**` holding a `|`, a
+    pinned hash the clause does not carry at the baseline, a `Baseline:` line moved off the pin, a
+    view that does not answer `merge: ours` to `git check-attr merge`, so no `.gitattributes` line
+    guards it (`TOOL-dTrueNorth-26`), or a view answering `ours` only through an
+    untracked info/attributes line, tracked state alone answering otherwise, a macro either side
+    defines included (`TOOL-dTrueNorth-32`), each fail, named. Check 30 reads the merge attribute as
+    tracked state answers it: no system or global attributes file, no attribute source tree
+    (`attr.tree`, `GIT_ATTR_SOURCE`) and no untracked info/attributes line answers it, while the
+    work tree's `.gitattributes` files do, an untracked one included. The records read are the TRACKED ones, so a
+    draft never staged moves no verdict. These are the findings `--write` cannot cure, so they are not check 9's, whose
+    message and remedy read only the view's byte drift. Delegated to
+    `tools/memory-tree/gen_build_index.py --check-asbuilt`, which renders through the host `--write` writes the
+    view with, and a view it cannot render, a partial key set, an unreadable pin or a `DESIGN_VIEW`
+    not named `<date>-build-<unit id>-as-built.md`, the record name its head's two names are read
+    from, fails as well.
+    With every `DESIGN_*` key blank it prints one line and passes. Under `--staged` its trigger is the
+    render's, as check 29's is: it runs when any staged path is a build-index input, the kit's own
+    code included, or is `DESIGN_RECORD` or `DESIGN_VIEW` outside that set, and otherwise prints its
+    held line (`TOOL-dTrueNorth-16`, `TOOL-dTrueNorth-20`). A full run reads this verdict from check
+    9's generator process as check 29 reads its own, printed as the standalone verb prints it
+    (`TOOL-dTrueNorth-27`).
+
 ## Record bindings — how a record names its spec
 
 Within the first 12 unfenced lines, optionally behind a comment marker so a non-markdown record can
@@ -567,17 +620,23 @@ carry it too:
 
 ```
 **Serves:** <kind> <id> [<id> …]
+**Serves:** spec-audit <id>@rev-<N> [<id>@rev-<N> …]   (a spec audit, from SPEC_AUDIT_PIN_CUTOFF)
 **Serves:** none — <why this record serves no spec>
 **Commissions:** <id> [<id> …]          (optional, for a record that PRODUCED specs)
 ```
 
 - `<kind>` is closed: `spec-audit` (a pre-code pass over a spec) · `diff-review` (a pass over built
-  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs).
+  code) · `journal` (evidence of what was built) · `research` (a report that precedes the specs) ·
+  `deviation` (a departure from the design or from a spec, in the grammar under "Deviation records").
   An open kind field stops being groupable the first time two authors spell one relation differently.
 - `<id>` is family-qualified, so a record can name a spec in ANOTHER build — which real corpora need,
-  because one closing review legitimately covers two builds. It may carry a trailing `@rev-N`, which
-  is recorded and never validated, and a contiguous run may be written `N..M`, which EXPANDS at
-  authoring time and therefore cannot rot when the build later gains a unit.
+  because one closing review legitimately covers two builds. On a `spec-audit` record dated on or
+  after `SPEC_AUDIT_PIN_CUTOFF`, or carrying no date, each id is written `<id>@rev-<N>`, N the
+  `rev-N` of that spec's status header at the blob the audit read and never above its current
+  header: the pin is what makes a revision past it read as unaudited, so a range, which carries no
+  pin, is unpinned there. On any other record a trailing `@rev-N` is recorded and never validated.
+  A contiguous run may be written `N..M`, which EXPANDS at authoring time and therefore cannot rot
+  when the build later gains a unit.
 - Ids resolve against the set DEFINED BY A SPEC H1 — never against a build README's `ids:` roster,
   which is a reservation range that admits backlog and decision rows as if they were units.
 - The `none` form's REASON is mandatory; a bare `none` is malformed. The kind is optional there and
@@ -585,12 +644,44 @@ carry it too:
   count of `none` records — those `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave — is bounded
   shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus. Check 21 prints that count
   beside `N` on every run, and a pin above it is slack, which reds.
-- `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
-  nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
+- `gen_build_index.py --print-bindings` is the read-only report: it classifies every record and
+  writes nothing. It exits 0, or 2 on a `SPEC_AUDIT_PIN_CUTOFF` that is neither blank nor an ISO
+  date, or on a git read the audit pin needs and cannot make. Beside its A, U, S, B and N rows it
+  prints a `P` row per graded id owing a pin, and one `Q` row in four fields, the graded count, the
+  cutoff or `off`, and the exempt count or `-`, `Q<TAB><graded><TAB><cutoff><TAB><exempt>`
+  (`TOOL-dTrueNorth-14`). It is both the migration checklist and the gate's own predicate, so a
   seed list and a gate that disagree is structurally impossible.
 - The check REFUSES when that report exits non-zero or prints no `N` row. The report is the only
   thing check 21 reads, so a report that did not run would otherwise look exactly like a clean
   corpus. An adopter whose generator is a fork must carry the mode, or this check names that first.
+
+**Deviation records.** A departure from the frozen design, or from a spec once its code has started,
+is a `deviation` record named `<date>-build-<unit id>-deviation-<n>.md` in the departing build's
+`build/` folder, `<n>` unique within its build; check 21 joins that kind to that name both ways, each
+mismatch an `A` row. Its fields are `- **<Key>:** <value>` bullets, one line each: Departs from
+(`<clause id>@<hash8>`, `<unit>@rev-N` or a build slug, an optional ` [<section>]` tail), Hand-off
+(`design-to-spec` · `design-revised` · `spec-revised` · `spec-to-code` · `code-to-record`), Before,
+After, Cause (`design defect` · `owner ruling` · `builder discovery` · `review finding` · `external`),
+Reason, Evidence, Risk (`editorial` · `additive` · `stricter` · `loosening` · `breaking`), Approver
+(opening `author`, `spec writer` or `owner`, then where the approval is recorded), Follow-through
+(`amends <clause id>@<hash8>` · `supersedes <clause id>@<hash8> by <clause id>` · `new unit <id>` ·
+`gap <key>` · `ask <id>` · `usage <key>`) and Caused-by (one id), with Bound, Tier, Surface and
+Supersedes optional. Supersedes holds one record id, the stem `<date>-build-<unit id>-deviation-<n>`
+of another record, and orders two amends of one clause: the newer names the older there. The
+as-built view's row for a clause whose records' After texts all agree is cited by the later file by
+path; where they differ, the head supplies it, the one record no other names in Supersedes, whatever
+its path. A set left with two or more such records, or none, is an `unordered amends of <clause>`
+finding naming every one, and a Supersedes naming a record outside its clause's set a finding naming
+both; either renders the clause from the baseline, and neither path order nor a commit date decides.
+`deviation_join.py` computes the departures from history and joins each to its record. An
+approver is graded under one of two values: `author-recorded`, the default, passes a role the grammar
+names, and an owner only citing a decision row held on the mainline the remote ladder resolves that
+names the departed clause or the new unit; `by-risk` also refuses a role below the risk class, `editorial` needing an `author`,
+`additive` and `stricter` a `spec writer`, and `loosening`, `breaking` or a cause of `owner ruling` the
+`owner`. An approval carried for the owner's walk has a decline route: an owner decline is filed as an
+ask naming the record, and its follow-up is a new record naming the declined one in Supersedes, the
+as-built view re-rendered in that commit, so no landed record keeps citing a withdrawn approval
+(`TOOL-dTrueNorth-20`).
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

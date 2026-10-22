@@ -40,6 +40,8 @@ Records: 0 bound to this build, across 1 record folder(s).
 Ids no record names: TOOL-dNomadicAtlas-1.
 
 Ids no `spec-audit` record has ever named: TOOL-dNomadicAtlas-1.
+
+Ids whose spec moved past its audited revision: none — 0 of 1 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

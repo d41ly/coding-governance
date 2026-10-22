@@ -113,6 +113,8 @@ Records: 0 bound to this build, across 1 record folder(s).
 Ids no record names: TOOL-cTracedPromise-1 TOOL-cTracedPromise-2.
 
 Ids no `spec-audit` record has ever named: TOOL-cTracedPromise-1 TOOL-cTracedPromise-2.
+
+Ids whose spec moved past its audited revision: none — 0 of 2 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

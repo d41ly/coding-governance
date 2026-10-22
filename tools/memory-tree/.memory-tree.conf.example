@@ -367,6 +367,15 @@ PROJECT_REGISTRY_EXTRA=""
 # A cutoff dated after today is REFUSED — it would exempt every record and report a clean run.
 RECORD_SERVES_CUTOFF=""
 
+# SPEC_AUDIT_PIN_CUTOFF — an ISO date, read by `gen_build_index.py --print-bindings`, whose `P` rows
+# check 21 fails on (TOOL-dTrueNorth-5). A `spec-audit` record whose filename date is on or after it,
+# or carries no date, names each spec it read as `<id>@rev-<N>` on its Serves line, N the `rev-N` of
+# that spec's status header at the blob the audit read: an unpinned id reds, and so does a pin above
+# the spec's current header revision. Set it to the day AFTER the newest review record filename date
+# on any ref, so no record in flight reds at its merge. BLANK MEANS OFF, and check 21 says the arm is
+# off on every run. Any other value exits the bindings parse at 2 naming the key.
+SPEC_AUDIT_PIN_CUTOFF=""
+
 # RECORD_UNDATED_ARTIFACTS — `grade`, `exempt`, or blank (= `grade`). A JSON result, an HTML report
 # or a script kept under build/, prompts/ or reviews/ cannot carry a Serves line at any date. `exempt`
 # drops a file with NO leading ISO date AND no `.md` suffix from check 21's missing-Serves branch,
@@ -452,6 +461,20 @@ LIVE_DORMANT_DAYS=""
 # and an EVIDENCE_GLOBS that resolves to no tracked file each refuse by name before anything is
 # written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
 LIVE_LANDED_UNCLOSED=""
+
+# DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, DESIGN_NODES — the design chain's four keys, gov's own:
+# a frozen design record, the commit it was pinned at, the as-built view rendered from it and the
+# owned-node deriver. `design_lib.read_design_keys` reads them, and the deviation join, the as-built
+# view and the coverage read take their states from it. ALL FOUR BLANK OR ABSENT IS OFF: each reader
+# prints one off line and reads nothing. Some set and some blank is refused, naming each blank key.
+#   DESIGN_RECORD    the design record, read only at DESIGN_BASELINE
+#   DESIGN_BASELINE  the commit the design was pinned at, 40 hex
+#   DESIGN_VIEW      the as-built view, a dated record named <date>-build-<unit id>-as-built.md
+#   DESIGN_NODES     the owned-node deriver, a tracked .py file loaded by path for its derive()
+DESIGN_RECORD=""
+DESIGN_BASELINE=""
+DESIGN_VIEW=""
+DESIGN_NODES=""
 
 # ROUTED_PATHS — the product paths: whitespace-separated, repo-root-relative, a directory entry ending
 # in `/`. The write gate (scratch-guard) refuses an Edit, Write, MultiEdit or NotebookEdit under one

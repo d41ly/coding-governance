@@ -324,20 +324,111 @@ read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 w
 # WHAT IT DOES NOT CHECK: that the id is a unit of the same build, or that the block is well-formed.
 # Both are the hygiene engine's findings; a malformed block that engine reds reads here as fewer edges,
 # which is the direction that blocks nothing — so the engine is the guard and this is the reader.
+#
+# `--scan <spec>...` (TOOL-dTrueNorth-20 S6) is the same walk over many specs in ONE awk, printing
+# `<spec> TAB <id>` per edge and `<spec> TAB` (no id) per consumes-from line of an Edges block from
+# which no id is read — a column-0 bullet headed `**consumes-from**` whose head is not followed by
+# whitespace, or whose payload is neither a backticked id, `external` nor a `none` that no backtick
+# follows in its bullet, its wrapped lines included — so
+# `scan_consumes_cycles` below can refuse the shape this reader alone reads as fewer edges. The
+# `external` form is well formed, names no unit, and prints nothing in either mode, and so is a payload
+# of `none`, bare or backticked, the corpus form the hygiene engine's Edges arm admits
+# (TOOL-dTrueNorth-26 S6, its deviation-26): read as unreadable, it refused every later `--dispatch`
+# of a build whose CLOSED spec holds it, with a remedy that rewrites a frozen spec. A `none` is admitted
+# only when no backtick follows it in its bullet, its wrapped lines included (TOOL-dTrueNorth-31 S1,
+# its deviation-34, and TOOL-dTrueNorth-32 S4): a `none` whose prose holds a backticked token can name
+# a sibling the dispatch would then never wait on, so it stays unreadable and `--dispatch` refuses it;
+# `none until the reader lands`, which names no token, is admitted. A `none` bullet's verdict is HELD
+# until the bullet ends, at a blank line, a column-0 line opening another bullet (`-` or `*`, then
+# whitespace), a heading, a new file or the input's end, and each line before that end, indented or
+# lazy, joins its text, so a backticked id wrapped onto a continuation line is read. Only a `none`
+# payload is held, the one form admitted on what follows it; every other payload is read from its
+# first line, as before, and one from which no id is read stays unreadable. A wrapped or indented
+# line that only mentions the verb is prose, as the hygiene engine reads it, and is no edge.
 read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes from, one per line
-  [ -r "$1" ] || return 0
-  awk '
+  local mode=ids
+  if [ "${1:-}" = --scan ]; then mode=scan; shift; else [ -r "${1:-}" ] || return 0; fi
+  [ "$#" -gt 0 ] || return 0
+  awk -v mode="$mode" '
+    # The held `none` bullet ends here: unreadable when a backtick follows the word anywhere in it.
+    function print_held() {
+      if (held && mode == "scan" && rest ~ /`/) printf "%s\t\n", heldfile
+      held = 0
+    }
+    FNR == 1 { print_held(); in3 = 0; ined = 0 }
     { sub(/\r$/, "") }
+    held {
+      if ($0 ~ /^[ \t]*$/ || $0 ~ /^(-|\*)[ \t]/ || $0 ~ /^#+([ \t]|$)/) print_held()
+      else { rest = rest " " $0; next }
+    }
     /^## / { in3 = ($0 ~ /^## [0-9]+[.] Non-goals/); ined = 0; next }
     !in3 { next }
     /^### / { ined = ($0 ~ /^### Edges[ \t]*$/); next }
     !ined { next }
-    /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/ {
-      t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
-      if (t !~ /^`/) next
-      sub(/^`/, "", t); sub(/`.*$/, "", t)
-      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
-    }' "$1"
+    /^(-|\*)[ \t]*\*\*consumes-from\*\*/ {
+      id = ""
+      if ($0 ~ /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/) {
+        t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
+        if (t ~ /^external([ \t]|$)/) next
+        if (t ~ /^none([ \t]|$)/ || t ~ /^`none`([ \t]|$)/) {
+          held = 1; heldfile = FILENAME; rest = t; sub(/^`?none`?/, "", rest); next
+        }
+        if (t ~ /^`/) {
+          sub(/^`/, "", t); sub(/`.*$/, "", t)
+          if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) id = t
+        }
+      }
+      if (mode == "ids") { if (id != "") print id; next }
+      printf "%s\t%s\n", FILENAME, id
+    }
+    END { print_held() }' "$@"
+}
+
+# ------------------------------------------------------- a cycle among a build's consumes-from edges
+# TOOL-dTrueNorth-20 S6. `--dispatch` refuses a consumer while its producer is open, and an edge set
+# that holds a CYCLE has no order that satisfies that refusal: every unit on it waits on another, so
+# the run wedges at `--dispatch` with no named stop. And a malformed edge line reads as FEWER edges,
+# which blocks nothing. So this walks every unit's edges at once and names both shapes.
+#
+# ARGUMENTS are `<unit> <spec>` pairs, the build's units in the caller's order. It prints one
+# `unreadable TAB <spec>` line per spec holding a consumes-from line `read_consumes_from` reads no id
+# from, then at most one `cycle TAB <a> -> <b> -> <a>` line, the FIRST cycle a depth-first walk in
+# the given order meets, a self-edge being `<a> -> <a>`. An edge onto an id that is no unit given is
+# not followed: an edge onto another build blocks nothing here. Nothing printed is a clean edge set.
+# ONE `read_consumes_from --scan` and ONE awk, whatever the unit count.
+scan_consumes_cycles() { # <unit> <spec> ... -> unreadable/cycle lines, nothing when clean
+  local _sc_specs=() _sc_i
+  [ "$#" -ge 2 ] || return 0
+  for ((_sc_i = 2; _sc_i <= $#; _sc_i += 2)); do _sc_specs+=("${!_sc_i}"); done
+  { printf 'U\t%s\t%s\n' "$@"; read_consumes_from --scan "${_sc_specs[@]}"; } | awk -F'\t' '
+    function visit(u,    i, v, k, j, s) {
+      color[u] = 1; stack[++sp] = u
+      for (i = 1; i <= deg[u]; i++) {
+        v = adj[u, i]
+        if (color[v] == 1) {
+          k = sp
+          while (k > 1 && stack[k] != v) k--
+          s = ""
+          for (j = k; j <= sp; j++) s = s stack[j] " -> "
+          cyc = s v
+          return 1
+        }
+        if (color[v] == 0 && visit(v)) return 1
+      }
+      color[u] = 2; sp--
+      return 0
+    }
+    $1 == "U" && NF == 3 { order[++n] = $2; unit_of[$3] = $2; isunit[$2] = 1; next }
+    {
+      if ($2 == "") { if (!(($1) in bad)) { bad[$1] = 1; print "unreadable\t" $1 }; next }
+      u = unit_of[$1]
+      if (u == "" || !($2 in isunit)) next
+      if ((u, $2) in seen) next
+      seen[u, $2] = 1; adj[u, ++deg[u]] = $2
+    }
+    END {
+      for (i = 1; i <= n; i++) if (color[order[i]] == 0 && visit(order[i])) { print "cycle\t" cyc; exit }
+    }'
 }
 
 # ------------------------------------------------------------------------ the gate profile, once
@@ -1881,6 +1972,21 @@ next_anchor() {  # anchor · newline-separated candidate anchors
 # THE BASELINE IS THE COMMIT THE RUN ENTERED ITS LIVE PHASE AT, never the pinned BASE. A run that
 # classifies a unit MISSING and authors its spec is obeying the build method, and every such spec is
 # absent at BASE — keying on BASE would red a run for following the method.
+#
+# TOOL-dTrueNorth-7 S2 - THE AUTHORED FALLBACK, AND THE SECOND OUTPUT SHAPE IT BRINGS. A spec run
+# enters its live phase before it has specced anything, so the generated region at its baseline is a
+# well-formed pair naming no unit, and the refusal below then left every chain spec run unclosable.
+# There, and only there, the authored `roster:units` pair at the SAME commit answers instead, through
+# `read_roster_at`, and what prints is that pair's slug-scoped IDS, one per line, not region rows.
+# Two shapes from one producer is the format-derived-from-arity class, so every reader was checked
+# against both: condition 2, `--rescope --act add` and check 24's ADD arm ask membership through
+# `id_in`, which a bare id answers. Check 24's RETIRE arm falls back to this output for a unit the
+# pinned roster lacks and asks `id_rows … | grep '| WONTDO |'`; a bare id carries no status, so it
+# takes its strict direction and asks for the row, which is right, because a region naming no unit
+# held no WONTDO unit. A region naming SOME unit is the roster as before: the union of the two was
+# rejected (the unit's section 4).
+# When the authored pair refuses too, one reason names both regions; every refusal above it, the
+# `UNITS_REGION_CUTOFF` grandfather included, still comes first.
 # The units region as it stood at a NAMED commit. A SEPARATE PREDICATE from `baseline_units`, not a
 # parameterised one: the two answer different questions - "what roster did this run enter its live
 # phase with" and "what roster did the owner authorize" - and one predicate serving callers whose
@@ -2013,10 +2119,61 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
   # as added.
   _bu_ids=$(printf '%s\n' "$_bu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
   if [ -z "$_bu_ids" ]; then
-    echo "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+    # S2 - the authored pair at the SAME commit, ids one per line (the header above says why).
+    if _bu_rr=$(read_roster_at "$_bu_base" "$_bu_bre"); then
+      printf '%s\n' "$_bu_rr"
+      return 0
+    fi
+    # The state, lifted off the sentence `read_roster_at` refused with, so its three states are
+    # spelled once, there.
+    _bu_st=${_bu_rr#"the authored roster:units pair at $_bu_base "}
+    echo "the baseline roster names no unit in its generated region, and the authored roster:units pair at the same commit $_bu_st, so every unit this build has would read as added and the comparison would accuse rather than check"
     return 1
   fi
   printf '%s\n' "$_bu_was"
+}
+
+# TOOL-dTrueNorth-7 S1 - THE AUTHORED ROSTER AT A COMMIT: the `<!-- roster:units -->` pair a build
+# README carries, read from its blob at a NAMED commit, and SCOPED TO THE BUILD'S OWN SLUG the way the
+# driver's `roster_ids` scopes the working tree's, because a foreign id in a Carries or Clause column
+# is a reference and not a unit. The slug is the README's parent folder. Prints the ids, one per line,
+# sorted. Exits 1 with its reason as its ONLY output, the shape `pinned_units` gives, when the pair is
+# absent, malformed or names no id of the slug: an empty roster is a refusal and never an empty
+# success, for the reason `baseline_units` gives above. Each of the three reasons reads
+# `the authored roster:units pair at <commit> <state>`, and `baseline_units` lifts the state off it.
+# Called by `baseline_units` at its baseline and by the driver's `check_spec_run` at the pinned BASE.
+# `check_prompt_brief`'s read of the same pair is the prior instance and is not routed here (its F7).
+#
+# WHAT IT DOES NOT CHECK: that a named id has a spec, or where in the README the pair sits.
+read_roster_at() {  # commit · build-README-path -> the slug's unit ids that pair names there
+  _rr_c=$1; _rr_bre=$2
+  _rr_slug=${_rr_bre%/README.md}; _rr_slug=${_rr_slug##*/}
+  command -v region >/dev/null 2>&1 || {
+    echo "read_roster_at needs a region() in the calling shell and this one has none, so the authored roster would read as empty and be reported as an empty roster"
+    return 1
+  }
+  # GIVEN its commit, as `pinned_units` is, so it validates it: an empty value is INDEX syntax to
+  # `GIT show` and would read the working index rather than fail.
+  if [ -z "$_rr_c" ] || ! GIT cat-file -e "$_rr_c^{commit}" 2>/dev/null; then
+    echo "the authored roster:units pair cannot be read at a commit that does not resolve, and an empty value would read the working index instead: [$_rr_c]"
+    return 1
+  fi
+  _rr_blob=$(GIT show "$_rr_c:$_rr_bre" 2>/dev/null || true)
+  # ABSENT is neither marker; one marker without the other is MALFORMED, which `region` refuses.
+  if [[ $_rr_blob != *'<!-- roster:units -->'* && $_rr_blob != *'<!-- /roster:units -->'* ]]; then
+    echo "the authored roster:units pair at $_rr_c is absent"
+    return 1
+  fi
+  if ! _rr_reg=$(printf '%s\n' "$_rr_blob" | region - '<!-- roster:units -->' '<!-- /roster:units -->' 2>/dev/null); then
+    echo "the authored roster:units pair at $_rr_c is malformed"
+    return 1
+  fi
+  _rr_ids=$(printf '%s\n' "$_rr_reg" | grep -oE "[A-Z]+-$_rr_slug-[0-9]+" | sort -u)
+  if [ -z "$_rr_ids" ]; then
+    echo "the authored roster:units pair at $_rr_c names no unit of this build"
+    return 1
+  fi
+  printf '%s\n' "$_rr_ids"
 }
 
 # ------------------------------------------------------------------------- the ask FILING match

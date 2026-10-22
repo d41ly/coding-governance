@@ -1,4 +1,4 @@
-# build README surface — the slot contract, the heading canon and the three generated regions
+# build README surface — the slot contract, the heading canon and the four generated regions
 
 ```toml
 feature = "build-readme-surface"
@@ -28,11 +28,15 @@ globs = [
 ## Constraints & why
 
 **The slot sequence is positional, not delimited.** Front matter, title, ONE authored prose block,
-the authored `roster:units` plan, then the generated regions. Bounding the prose with markers instead
+the authored `roster:units` plan, then the four generated regions, `build-index`, `build-coverage`,
+`build-order` and `build-edges`. Bounding the prose with markers instead
 was considered and refused by the owner: it would have let authored content sit anywhere and made the
 contract a labelling convention rather than a shape.
 
-**`--write` creates a missing region pair; `--check` never demands one.** This asymmetry is the whole
+**`--write` creates a missing region pair; `--check` never demands one, the coverage pair excepted.**
+`--check` demands the coverage pair on a chain build's README while `SPEC_CARRIES_CUTOFF` is set, and
+refuses one on any other README, so the asymmetry holds for the other three of the four generated
+regions (TOOL-dTrueNorth-3). This asymmetry is the whole
 reason a new region can ship without a corpus-wide re-render inside its own commit. Both verbs call
 `plan()`, so the flag lives there — `create_missing`, default false, set only on the write path. If a
 create-if-missing step ever runs under `--check`, every un-paired README reports stale and the
@@ -136,8 +140,8 @@ seam: `apply_region(text, region, path, mark_open, mark_close)` — splice a mar
 any authored markdown file, with three refusals (no pair, more than one pair, inverted order) that
 name the pair they were called with.
 seam: `slot_violations(text, path)` — the two-trigger slot walk, returning `(line, reason)` pairs.
-seam: `GEN_REGIONS` — the canonical region order; appending an entry registers a new region for both
-creation and rendering.
+seam: `GEN_REGIONS` — the canonical order of the four generated regions; appending an entry registers
+a new region for both creation and rendering.
 
 ## Gaps
 

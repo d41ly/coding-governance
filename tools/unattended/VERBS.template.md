@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.109 -->
+<!-- gov:kit unattended@1.110 -->
 # Unattended runs — the verbs
 
 *This file is the second half of the binding contract; `UNATTENDED-PROTOCOL.md` is the first. Two
@@ -791,8 +791,9 @@ state it answers (the rule is M4 and M8; the verb entry above states the recordi
   as a SPEC, built and closed; a MEDIUM or LOW is PROMOTED too, on every subject, batched as the
   paragraph below states. Never folded, parked, waived, RETIRED or re-reviewed — a promoted unit
   flipped to `WONTDO` would satisfy both the promotion count and `build-complete` — and never
-  DEFERRED to be carried forward, since `build-complete` carries only a unit the roster held when the
-  run started. Record `--highs`, `--minors` and `--disposition promote`; `fold` is refused at every
+  DEFERRED to be carried forward, except once by a spec run: `build-complete` carries a unit the
+  run added only from a spec run whose `--rescope --act add` row stands, and the build run after it
+  must build it. Record `--highs`, `--minors` and `--disposition promote`; `fold` is refused at every
   exit of every subject.
 - **BOUNDED** — `REVIEW_ROUNDS` (kit default 1) reached on a subject that is not the build slug.
   Disposed exactly as `NON-CONVERGENT`, recorded with both counts and `promote`. A promotion here is
@@ -895,8 +896,12 @@ Read the run-state file before anything else (`UNATTENDED-STOPS.md` §8 and §9 
    the carry-forward term. A unit of the roster the run started with, waiting on an open ask this
    build filed, gets spec status `DEFERRED` with `closes` or `advances` naming that ask, and
    `--rescope <slug> --act defer --item <unit-id> --reason "<why it waits>"`. `build-complete` then
-   meets and prints one `carried forward` line per unit. It stays unmet, naming the unit and the
-   condition, when the unit was added during the run, its ask is not open, or a CLOSED unit declares
+   meets and prints one `carried forward` line per unit. A unit the run added is carried too, ONCE,
+   when this is a spec run — its pinned `base:` holds an open ask of the build and an authored unit
+   with no spec — and its `--rescope <slug> --act add` row stands beside the defer row; its line
+   reads `added by this spec run and carried once`, and the build run after it must build it. It
+   stays unmet, naming the unit and the condition, when a unit was added and this is no spec run, a
+   unit an earlier landed run added is deferred again, its ask is not open, or a CLOSED unit declares
    `consumes-from` onto it; that build is a `--handoff` under `owner-decision`, never an override.
 
 ### Record the run

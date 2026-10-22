@@ -86,6 +86,8 @@ Records: 14 bound to this build, across 4 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aQuotedBrief-1 TOOL-aQuotedBrief-2 TOOL-aQuotedBrief-3 TOOL-aQuotedBrief-4 TOOL-aQuotedBrief-5 TOOL-aQuotedBrief-6.
+
+Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

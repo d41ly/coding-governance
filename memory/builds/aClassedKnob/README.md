@@ -70,6 +70,8 @@ Records: 0 bound to this build, across 1 record folder(s).
 Ids no record names: TOOL-aClassedKnob-1 TOOL-aClassedKnob-2 TOOL-aClassedKnob-3.
 
 Ids no `spec-audit` record has ever named: TOOL-aClassedKnob-1 TOOL-aClassedKnob-2 TOOL-aClassedKnob-3.
+
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

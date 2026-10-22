@@ -3789,11 +3789,56 @@ hit "$out" "so the scope moved with nothing on the record saying so: ARCH-tRos-9
 
 # ---- THE EMPTY BASELINE SKIPS rather than accusing, and the REPORT CHANNEL is what makes that
 # ---- visible. A skip nobody can see is indistinguishable from coverage; the default run stays silent.
+# ---- The shared `tRun` README carries no authored roster pair, so since TOOL-dTrueNorth-7 S2 the
+# ---- reason names both regions: the generated one names no unit and the authored one is absent.
 reset_tree
-hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+hit "$(GOV_UNATTENDED_REPORT=1 bash "$SCRIPT" 2>&1)" "the baseline roster names no unit in its generated region, and the authored roster:units pair at the same commit is absent, so every unit this build has would read as added and the comparison would accuse rather than check"
 out=$(run)
 miss "$out" "check 24 skipped"
 miss "$out" "check 24 FAILED"
+reset_tree
+
+# ---- TOOL-dTrueNorth-7 S2 — A SPEC RUN'S BASELINE names no unit, because it went live before it
+# ---- specced any, and the ADD arm used to skip it whole. The baseline now FALLS BACK to the authored
+# ---- roster:units pair at the same commit. `seed_spc` pins a run live over an empty generated region
+# ---- beside that pair, then specs three units, the third beyond the authored roster, with no row.
+seed_spc() { # the authored pair's body, or `absent` for no pair at all
+  reset_tree
+  build tSpc
+  if [ "$1" != absent ]; then
+    printf '\n<!-- roster:units -->\n%s\n<!-- /roster:units -->\n' "$1" >> memory/builds/tSpc/README.md
+  fi
+  sed -i "s/^witness: WITNESS$/witness: $(git rev-parse HEAD)/" memory/builds/tSpc/RUN.md
+  git add -A && git commit -q -m "tSpc baseline" --no-verify
+  sed -i "s/^base: .*$/base: $(git rev-parse HEAD)/" memory/builds/tSpc/RUN.md
+  git add -A && git commit -q -m "tSpc baseline pin" --no-verify
+  awk -v e="$UEND" '$0 == e { for (i = 1; i <= 3; i++) print "| [ARCH-tSpc-" i " — a unit](spec/u" i ".md) | DEFERRED | rev-1 | 2026-08-01 |" } { print }' \
+    memory/builds/tSpc/README.md > /tmp/tspc.$$ && mv /tmp/tspc.$$ memory/builds/tSpc/README.md
+  git add -A && git commit -q -m "three units specced, the third beyond the authored roster" --no-verify
+}
+# ---- AC11 — the fallback names units 1 and 2, so unit 3 owes its `add` row and the two planned units
+# ---- owe none (RED at base: the arm skipped with "the baseline roster names no unit").
+seed_spc "1. ARCH-tSpc-1 — the first
+2. ARCH-tSpc-2 — the second"
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "so the scope moved with nothing on the record saying so: ARCH-tSpc-3 in memory/builds/tSpc/RUN.md"
+miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tSpc-1 in"
+miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tSpc-2 in"
+miss "$out" "check 24's ADD arm skipped for memory/builds/tSpc/RUN.md"
+# ...and the `add` row accounts for it.
+printf '\n2026-08-20T00:00:00Z rescope · item add ARCH-tSpc-3 · reason promoted by the closing diff review\n' >> memory/builds/tSpc/RUN.md
+git add -A && git commit -q -m "the add, recorded" --no-verify
+miss "$(run)" "ARCH-tSpc-3 in memory/builds/tSpc/RUN.md"
+# ---- AC13 — an authored pair enclosing no row, and no pair at all: the arm SKIPS, its reason naming
+# ---- which (RED with an empty pair read as an empty success: every specced unit fails 24).
+seed_spc ""
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "check 24's ADD arm skipped for memory/builds/tSpc/RUN.md — the baseline roster names no unit in its generated region, and the authored roster:units pair at the same commit names no unit of this build"
+miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tSpc-1 in"
+seed_spc absent
+out=$(GOV_UNATTENDED_REPORT=1 run)
+hit  "$out" "check 24's ADD arm skipped for memory/builds/tSpc/RUN.md — the baseline roster names no unit in its generated region, and the authored roster:units pair at the same commit is absent"
+miss "$out" "so the scope moved with nothing on the record saying so: ARCH-tSpc-1 in"
 reset_tree
 
 # ---- check 23 (TOOL-dUnstalledConvoy-10): a DECLARED write set against what the pass COMMITTED.

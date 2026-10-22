@@ -1130,7 +1130,7 @@ done
 # ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
 # ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
 _hs_union=""
-for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28; do
+for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28 29 30; do
   run_scoped "$_hs_s"
   _hs_union+=$(grep -v '^HYGIENE --only ' <<<"$sout" || true)$'\n'
 done
@@ -2613,6 +2613,11 @@ c6run() {  # $1 = extra conf lines (%b, so \n works); leaves $out set and assert
   { fm tGen; printf '<!-- gen:build-index -->\n<!-- gen:build-units -->\n'; rows 80; printf '<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- gen:build-order -->\n'; rows 40; printf '<!-- /gen:build-order -->\n'; } > memory/builds/tGen/README.md
   { fm tGenA; rows 110; printf '<!-- gen:build-index -->\n'; rows 120; printf '<!-- /gen:build-index -->\n'; } > memory/builds/tGenA/README.md
   { fm tGenU; printf '<!-- gen:build-index -->\n'; rows 80; printf '<!-- /gen:build-index -->\n\n<!-- gen:build-order -->\n'; rows 40; } > memory/builds/tGenU/README.md
+  # (h) THE COVERAGE PAIR IS GENERATED (TOOL-dTrueNorth-3 AC9): tCov's authored rows sit under the
+  #     cap and its coverage region tips the whole file over it, so it is silent only while check 6
+  #     prices that pair as generated. Staged red by deleting the pair from check 6's marker lists.
+  mkdir -p memory/builds/tCov
+  { fm tCov; rows 95; printf '<!-- gen:build-index -->\n<!-- /gen:build-index -->\n\n<!-- gen:build-coverage -->\n'; rows 30; printf '<!-- /gen:build-coverage -->\n'; } > memory/builds/tCov/README.md
   # (e) and (f) — check 7's ENTRY budget, one fixture per class at a width BETWEEN the two shipped
   #     tiers. 320 characters is over the row-document 300 and under the build-README 350, so with
   #     nothing declared the row is named and the README is silent: one width, both defaults, and
@@ -2653,6 +2658,11 @@ n=$((n+1))
 _w=$(wc -c < "$C6/memory/builds/tGenU/README.md" | tr -d ' ')
 cblock "$out" 6 | grep -qF "memory/builds/tGenU/README.md (${_w}B > 25600B; generated region markers unbalanced" \
   || { echo "FAIL check 6 did not price a README with an unbalanced region pair at its whole wc -c figure (${_w}B)"; st=1; }
+# --- (h) the coverage pair: silent, and only because its region is not priced — the whole file is over.
+cnot 6 'memory/builds/tCov/README.md'
+n=$((n+1))
+_w=$(wc -c < "$C6/memory/builds/tCov/README.md" | tr -d ' ')
+[ "$_w" -gt 25600 ] || { echo "FAIL check 6's coverage-pair fixture is ${_w}B, not over the 25600B cap whole, so its silence proves nothing"; st=1; }
 # --- CHECK 7's entry budget at the SHIPPED defaults. One 320-char fixture line in each class: the
 # --- row document is over 300 and named, the build README is under 350 and silent. A single arm
 # --- would pass under one merged tier; the pair is what observes the split.
@@ -3304,6 +3314,109 @@ case "$o" in
 esac
 rm -rf "$TMP/kit32"
 ( cd "$_b1" && git rm -q memory/builds/tOne/build/2026-0[89]-02-build-* && git -c commit.gpgsign=false commit -q -m rf32-out --no-verify ) >/dev/null 2>&1
+
+# ---- TOOL-dTrueNorth-5: check 21's AUDIT-PIN ARM. A second build whose one spec carries a status
+# ---- header at rev-2, so a pin has a header to be read against, and two spec-audit records dated
+# ---- after SPEC_AUDIT_PIN_CUTOFF: one naming the id with no pin, one pinning it at rev-5. Rendered
+# ---- by the generator so check 9 stays quiet, and taken out again after the arms. Against the base
+# ---- engine and generator every positive arm here reds: neither prints a pin row or the arm's line.
+mkdir -p "$_b1/memory/builds/tTwo/spec" "$_b1/memory/builds/tTwo/build"
+printf -- '---\nslug: tTwo\nnode: a\nopened: 2026-08-01\nstreams: arch\nroster: ARCH\nids: ARCH-tTwo-1\n---\n\n# tTwo\n\n<!-- gen:build-index -->\n\n<!-- /gen:build-index -->\n' > "$_b1/memory/builds/tTwo/README.md"
+printf '# ARCH-tTwo-1 — a pinned unit\n\n**Status:** OPEN · rev-2 · 2026-08-01 · node a · Tier-2 · base 0123abcd\n' > "$_b1/memory/builds/tTwo/spec/2026-08-01-spec-tTwo-1.md"
+printf '# r\n\n**Serves:** spec-audit ARCH-tTwo-1\n' > "$_b1/memory/builds/tTwo/build/2026-09-02-build-ARCH-tTwo-1-u.md"
+printf '# r\n\n**Serves:** spec-audit ARCH-tTwo-1@rev-5\n' > "$_b1/memory/builds/tTwo/build/2026-09-02-build-ARCH-tTwo-1-o.md"
+cp "$_b1/memory/project/legacy-files.txt" "$TMP/legacy.tn5"
+( cd "$_b1" && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn5 --no-verify ) >/dev/null 2>&1
+write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"'; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"spec-audit records at or after SPEC_AUDIT_PIN_CUTOFF whose Serves line leaves an id unpinned or pins it past its spec's header revision"*"2026-09-02-build-ARCH-tTwo-1-o.md — ARCH-tTwo-1@rev-5 pins a revision its spec has not reached, header rev-2"*"2026-09-02-build-ARCH-tTwo-1-u.md — ARCH-tTwo-1 carries no @rev-N pin"*) echo "ok   check 21: the audit-pin arm names the over-pinned and the unpinned spec-audit records" ;;
+  *) echo "FAIL check 21: the audit-pin arm did not name both the over-pinned and the unpinned spec-audit record"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"check 21: the audit-pin arm graded 2 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=2026-09-01"*) echo "ok   check 21: the audit-pin arm prints what it graded and from what cutoff" ;;
+  *) echo "FAIL check 21: the audit-pin arm did not print its graded count and cutoff"; st=1 ;;
+esac
+# The ONE population filter: a record legacy-files.txt lists is exempt from this branch too, and the
+# over-pinned record beside it is the control that the branch still ran.
+printf 'memory/builds/tTwo/build/2026-09-02-build-ARCH-tTwo-1-u.md\n' >> "$_b1/memory/project/legacy-files.txt"
+( cd "$_b1" && git add -A && git -c commit.gpgsign=false commit -q -m tn5-legacy --no-verify ) >/dev/null 2>&1
+o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"2026-09-02-build-ARCH-tTwo-1-u.md — ARCH-tTwo-1 carries no @rev-N pin"*) echo "FAIL check 21: the audit-pin arm grades a record legacy-files.txt lists — its rows skip extract_graded_rows"; st=1 ;;
+  *"2026-09-02-build-ARCH-tTwo-1-o.md — ARCH-tTwo-1@rev-5 pins a revision its spec has not reached, header rev-2"*) echo "ok   check 21: the audit-pin arm exempts a legacy-listed record and still grades its sibling" ;;
+  *) echo "FAIL check 21: the audit-pin arm stopped naming the over-pinned control record"; st=1 ;;
+esac
+write_pk_conf 'RECORD_UNBOUND_PIN="0"'; o=$(run_pk_gate)
+n=$((n+1))
+case "$o" in
+  *"check 21: the audit-pin arm is off (SPEC_AUDIT_PIN_CUTOFF blank)"*) echo "ok   check 21: a blank SPEC_AUDIT_PIN_CUTOFF prints the arm's off line" ;;
+  *) echo "FAIL check 21: a blank SPEC_AUDIT_PIN_CUTOFF printed no off line"; st=1 ;;
+esac
+n=$((n+1))
+case "$o" in
+  *"pins a revision its spec has not reached"*) echo "FAIL check 21: the audit-pin arm graded a record with SPEC_AUDIT_PIN_CUTOFF blank"; st=1 ;;
+  *) echo "ok   check 21: a blank SPEC_AUDIT_PIN_CUTOFF grades no record" ;;
+esac
+# A generator without the arm prints N and no Q row, which would leave every pin ungraded in silence.
+rm -rf "$TMP/kit5"; cp -r "$HERE" "$TMP/kit5"
+sed -i '/print(f"Q\\t{graded}/d' "$TMP/kit5/gen_build_index.py"
+write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"'
+o=$( cd "$_b1" && bash "$TMP/kit5/check-memory-hygiene.sh" 2>&1 )
+n=$((n+1))
+case "$o" in
+  *"the bindings parse printed N 0 and no Q row, so a generator without the audit-pin arm leaves every spec-audit record's @rev-N pin ungraded"*) echo "ok   check 21: a generator printing N and no Q row reds instead of leaving the audit pin ungraded" ;;
+  *) echo "FAIL check 21: a generator printing no Q row left the audit pin silently ungraded"; st=1 ;;
+esac
+rm -rf "$TMP/kit5"
+cp "$TMP/legacy.tn5" "$_b1/memory/project/legacy-files.txt"
+write_pk_conf ""
+( cd "$_b1" && git rm -q -r memory/builds/tTwo && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn5-out --no-verify ) >/dev/null 2>&1
+
+# ---- TOOL-dTrueNorth-14 AC4: check 21's audit-pin arm over a record an OLDER HARNESS wrote. Commit
+# ---- A plants a fixture review harness lacking renderAuditBinding where the generator reads it, the
+# ---- workflows kit's path in its own repository; a branch from A commits an unpinned spec-audit
+# ---- record dated after SPEC_AUDIT_PIN_CUTOFF; the trunk lands L, which adds the function, then
+# ---- merges the branch. Check 21 passes and its line counts the exempt record from the four-field Q
+# ---- row. Against the base engine, which cuts the row in three, the line carries no exempt count;
+# ---- against the base generator the record prints a P row and check 21 fails. Taken out after.
+# ---- The record sits in the build's `reviews/` folder because the writer test reads that folder
+# ---- alone, one glob pathspec (TOOL-dTrueNorth-19 S1): planted under `build/`, its adding commit is
+# ---- never read and it is graded (TOOL-dTrueNorth-29 S6).
+# ---- Its conf exempts undated artifacts as the TOOL-aRepatriatedFork-32 confs do: the TOOL-aRepatriatedFork-10 block's result.json stays in this tree and would otherwise be the check 21 red the second arm reads (TOOL-dTrueNorth-30).
+WF_KIT=$(resolve_kit_dir "$_PY" workflows tier2-review.js "$HERE" 2>/dev/null) || WF_KIT=""
+if [ -z "$WF_KIT" ]; then
+  echo "skip check 21's writer test through the engine: no workflows kit beside this one, so its two arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))
+else
+  ( cd "$_b1" && mkdir -p "$WF_KIT" memory/builds/tOne/reviews \
+    && printf 'export function review() {}\n' > "$WF_KIT/tier2-review.js" \
+    && git add -A && git -c commit.gpgsign=false commit -q -m tn14-a --no-verify \
+    && git checkout -q -b tn14-run \
+    && printf '# r\n\n**Serves:** spec-audit ARCH-tOne-1\n' > memory/builds/tOne/reviews/2026-09-02-review-ARCH-tOne-1-w.md \
+    && git add -A && git -c commit.gpgsign=false commit -q -m tn14-run --no-verify \
+    && git checkout -q - \
+    && printf 'export function renderAuditBinding() {}\n' >> "$WF_KIT/tier2-review.js" \
+    && git add -A && git -c commit.gpgsign=false commit -q -m tn14-l --no-verify \
+    && git -c commit.gpgsign=false merge -q --no-ff --no-edit tn14-run \
+    && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn14-gen --no-verify ) >/dev/null 2>&1
+  write_pk_conf $'RECORD_UNBOUND_PIN="0"\nSPEC_AUDIT_PIN_CUTOFF="2026-09-01"\nRECORD_UNDATED_ARTIFACTS="exempt"'; o=$(run_pk_gate)
+  n=$((n+1))
+  case "$o" in
+    *"check 21: the audit-pin arm graded 1 spec-audit record(s) from SPEC_AUDIT_PIN_CUTOFF=2026-09-01, 1 written by a harness before renderAuditBinding"*) echo "ok   check 21: the audit-pin arm counts a record an older harness wrote as exempt, from the Q row's fourth field" ;;
+    *) echo "FAIL check 21: the audit-pin arm did not count the record an older harness wrote as exempt"; st=1 ;;
+  esac
+  n=$((n+1))
+  case "$o" in
+    *"HYGIENE check 21 FAILED"*) echo "FAIL check 21: a record an older harness wrote, merged after the pinning harness landed, fails check 21"; st=1 ;;
+    *"check 21: the audit-pin arm graded 1 spec-audit record(s)"*) echo "ok   check 21: passes over a merged record an older harness wrote" ;;
+    *) echo "FAIL check 21: the audit-pin arm printed no graded line, so its pass over the exempt record is unobserved"; st=1 ;;
+  esac
+  write_pk_conf ""
+  ( cd "$_b1" && git rm -q "$WF_KIT/tier2-review.js" memory/builds/tOne/reviews/2026-09-02-review-ARCH-tOne-1-w.md && git branch -q -D tn14-run \
+    && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn14-out --no-verify ) >/dev/null 2>&1
+fi
 
 # ---- TOOL-aRepatriatedFork-10 S5 and S6: a FLAT install at `scripts/` with a govkit receipt,
 # ---- rendered through `--render`. The rendered HYGIENE.md states THIS tree's two conf values, and
@@ -4021,6 +4134,159 @@ case "$r24rc:$o24" in
   *) echo "FAIL check 24 through the engine: the clean main exited $r24rc, or the green run did not print 'rotation-mode: clean (' - the block drops its capture on exit 0:"; printf '%s\n' "$o24" | sed 's/^/      /'; st=1 ;;
 esac
 
+# ---- TOOL-dTrueNorth-3 — CHECK 29 THROUGH THE ENGINE: a chain build's spec at INPROGRESS while its
+# ---- build's coverage is red. Copy-installed on the check-24 shape, with the spec-token checker in
+# ---- the kit directory's parent, where the generator loads it from, over a design of the fixture's
+# ---- own: a view giving the chain build dAlpha two clauses, a record at the fixture's baseline and a
+# ---- deriver owning one node, all of them carried by dAlpha's one spec. A row planted in the view
+# ---- gives dAlpha an uncarried clause and refuses the INPROGRESS spec; taken out, the run is green;
+# ---- with the plant standing and the spec OPEN nothing is refused; a DESIGN_VIEW naming a missing
+# ---- file fails on its own branch; and --staged holds the check unless a spec or the conf is staged.
+# ---- Every plant is undone before the next arm. Skipped aloud when no checker sits beside this kit.
+C29=$TMP/cov29
+C29S=memory/builds/dAlpha/spec/2026-09-02-spec-dAlpha-1.md
+C29A1='The reader takes `alpha-one` first.'
+C29A2='The run writes `alpha-two`.'
+# TOOL-dTrueNorth-27 S7: the view at a dated record name, so check 30's render derives its head's names.
+C29W=memory/design/2026-09-02-build-ARCH-dAlpha-1-as-built.md
+write_cov29_view() {   # $1 = an extra view row ending in \n, or empty
+  printf '# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n| dAlpha | `cl-dAlpha-0001` | %s | baseline |\n| dAlpha | `cl-dAlpha-0002` | %s | baseline |\n%b' "$C29A1" "$C29A2" "$1" > "$C29/$C29W"
+}
+write_cov29_spec() {   # $1 = the spec's status word
+  printf '# ARCH-dAlpha-1 — a unit\n\n**Status:** %s · rev-1 · 2026-09-02 · node a · Tier-2 · base 0123abcd\n\n**Carries:** cl-dAlpha-0001@%s whole\n**Carries:** cl-dAlpha-0002@%s whole\n**Carries:** node:item.alpha-node\n\nIt reads `alpha-one` and writes `alpha-two`.\n' "$1" "$H29A1" "$H29A2" > "$C29/$C29S"
+}
+run_cov29_gate() { ( cd "$C29" && bash "$C29/$KIT_REL/check-memory-hygiene.sh" "$@" 2>&1 ); }
+if [ -f "$HERE/../check-spec-tokens.py" ]; then
+  H29A1=$("$_PY" -c 'import hashlib,sys; print(hashlib.sha256(sys.argv[1].encode("utf-8")).hexdigest()[:8])' "$C29A1" | tr -d '\r')
+  H29A2=$("$_PY" -c 'import hashlib,sys; print(hashlib.sha256(sys.argv[1].encode("utf-8")).hexdigest()[:8])' "$C29A2" | tr -d '\r')
+  mkdir -p "$C29/$KIT_REL" "$C29/memory/builds/dAlpha/spec" "$C29/memory/project" "$C29/memory/design"
+  cp "$HERE"/*.sh "$HERE"/*.py "$C29/$KIT_REL"/
+  cp "$HERE/../check-spec-tokens.py" "$C29/$KIT_REL/../"
+  write_cov29_view ''
+  write_cov29_spec INPROGRESS
+  (
+    cd "$C29" || exit 1
+    git init -q --template= . && git symbolic-ref HEAD refs/heads/main
+    printf '/%s/\n__pycache__/\n' "${KIT_REL%%/*}" > .gitignore
+    printf 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\nCHARTER="AGENTS.md"\n' > .memory-tree.conf
+    printf '# charter\n\nRead `memory/README.md` first.\n' > AGENTS.md
+    printf '# r\n' > memory/README.md
+    printf '# d\n' > memory/DECISIONS.md
+    printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
+    printf -- '---\nslug: dAlpha\nnode: a\nopened: 2026-09-02\nstreams: arch\nroster: ARCH\nids: ARCH-dAlpha-1\n---\n\n# dAlpha\n\n<!-- gen:build-index -->\n<!-- /gen:build-index -->\n' > memory/builds/dAlpha/README.md
+    printf '# a design record\n\n## [chain]\n\n| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | %s `cl-dAlpha-0001`; %s `cl-dAlpha-0002` | c |\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' "$C29A1" "$C29A2" > memory/design/record.md
+    printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > memory/design/nodes.py
+    # TOOL-dTrueNorth-26 S16: the view's merge=ours line, so check 30's clean arm reads a guarded view.
+    printf '%s merge=ours\n' "$C29W" > .gitattributes
+    git add -A && git -c commit.gpgsign=false commit -q -m design --no-verify
+    printf '\nBaseline: `%s`\n' "$(git rev-parse HEAD)" >> memory/design/record.md
+    printf 'SPEC_CARRIES_CUTOFF="2026-09-02"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="%s"\nDESIGN_NODES="memory/design/nodes.py"\n' "$(git rev-parse HEAD)" "$C29W" >> .memory-tree.conf
+    "$_PY" "$KIT_REL/gen_build_index.py" --write
+    git add -A && git -c commit.gpgsign=false commit -q -m armed --no-verify
+  ) >/dev/null 2>&1
+  cp "$C29/.memory-tree.conf" "$TMP/cov29-conf"
+  # AC6 — the planted uncarried clause refuses the INPROGRESS spec, naming it and the finding.
+  write_cov29_view '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n'
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 1 ] || { echo "FAIL check 29 through the engine: a planted uncarried clause under an INPROGRESS chain spec exited $r29rc, not 1"; st=1; }
+  chit 29 "a chain build's spec is INPROGRESS while its build's coverage is red:"
+  chit 29 "$C29S is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0599"
+  # AC6 — the row taken out, the same spec passes.
+  write_cov29_view ''
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); case "$r29rc:$out" in 0:*"HYGIENE --only 29 ran checks 29"*) ;; *) echo "FAIL check 29 through the engine: the clean INPROGRESS chain spec exited $r29rc, or check 29 never ran:"; printf '      %s\n' "${out//$'\n'/$'\n'      }"; st=1 ;; esac
+  cnot 29 "is INPROGRESS while"
+  # TOOL-dTrueNorth-15 AC1 AC3 — the coverage clean and no chain spec INPROGRESS, the harness's state:
+  # check 29 grades nothing, and its green run carries the verb's count line saying so. Red against a
+  # verb that prints nothing on a green run. LC_ALL=C and `.+` over each dash: the line is the
+  # generator's, so its dashes are whatever bytes that Python's stdout encoding wrote.
+  write_cov29_spec OPEN
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 0 ] || { echo "FAIL check 29 through the engine: a clean chain build with no INPROGRESS spec exited $r29rc, not 0"; st=1; }
+  n=$((n+1)); LC_ALL=C grep -qE '^memory-hygiene: check 29: coverage .+ check 29 graded 0 INPROGRESS chain spec\(s\) in 0 of 1 chain build\(s\) .+ nothing graded: no chain spec is INPROGRESS, and under the unattended harness a spec goes OPEN to CLOSED in its build commit, so this check grades attended builds only' <<<"$out" \
+    || { echo "FAIL check 29 through the engine: a green run grading no INPROGRESS chain spec printed no count line naming the empty population:"; printf '      %s\n' "${out//$'\n'/$'\n'      }"; st=1; }
+  # AC7 — the plant standing and the spec OPEN, before its Design exit: not refused.
+  write_cov29_view '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n'
+  write_cov29_spec OPEN
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 0 ] || { echo "FAIL check 29 through the engine: the planted clause refused a chain spec at OPEN, before its Design exit (exit $r29rc)"; st=1; }
+  cnot 29 "is INPROGRESS while"
+  write_cov29_spec INPROGRESS
+  # --staged — a commit staging no spec and no conf holds the check and says so; one staging the
+  # INPROGRESS spec over the standing plant is refused at that commit.
+  printf '# r, edited\n' > "$C29/memory/README.md"; git -C "$C29" add -- memory/README.md
+  out=$(run_cov29_gate --staged)
+  hit "memory-hygiene: check 29: coverage held under --staged — no staged path is a build-index input or the carries checker"
+  printf '\n' >> "$C29/$C29S"; git -C "$C29" add -- "$C29S"
+  out=$(run_cov29_gate --staged)
+  chit 29 "$C29S is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0599"
+  git -C "$C29" reset -q --hard; write_cov29_view ''
+  # TOOL-dTrueNorth-16 AC21 — the staged trigger is the render's, passed through: with DESIGN_VIEW in a
+  # build's build/ folder, a build-index input, a view row staged ALONE refuses the INPROGRESS spec.
+  # Red before this unit, whose check tested a spec/ path or the conf itself and held.
+  C29V=memory/builds/dAlpha/build/2026-09-02-build-ARCH-dAlpha-1-view.md
+  mkdir -p "$C29/memory/builds/dAlpha/build"; cp "$C29/$C29W" "$C29/$C29V"
+  sed -i "s|^DESIGN_VIEW=.*\$|DESIGN_VIEW=\"$C29V\"|" "$C29/.memory-tree.conf"
+  git -C "$C29" add -A >/dev/null 2>&1; git -C "$C29" -c commit.gpgsign=false commit -q -m view-in-build --no-verify >/dev/null 2>&1
+  printf '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n' >> "$C29/$C29V"; git -C "$C29" add -- "$C29V"
+  out=$(run_cov29_gate --staged)
+  chit 29 "$C29S is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0599"
+  git -C "$C29" reset -q --hard HEAD~1; cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"; write_cov29_view ''
+  # A DESIGN_VIEW naming a missing file is a coverage nobody could read, which fails on its own branch.
+  sed -i 's|^DESIGN_VIEW=.*$|DESIGN_VIEW="memory/design/no-such-view.md"|' "$C29/.memory-tree.conf"
+  out=$(run_cov29_gate --only 29); r29rc=$?
+  n=$((n+1)); [ "$r29rc" = 1 ] || { echo "FAIL check 29 through the engine: a DESIGN_VIEW naming a missing file exited $r29rc, not 1"; st=1; }
+  chit 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:"
+  chit 29 "DESIGN_VIEW names memory/design/no-such-view.md"
+  cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"
+  # TOOL-dTrueNorth-16 AC17 — CHECK 30 THROUGH THE ENGINE: a record departing from a clause through a
+  # gap row fails check 30, whose finding check 9 no longer reads; taken out, check 30 prints its clean
+  # count line; a pin naming no commit is a view nobody could render, failing on its own branch; and
+  # --staged holds it, saying so, while no record, design record, view or conf is staged.
+  C29G=memory/builds/dAlpha/build/2026-09-02-build-ARCH-dAlpha-1-deviation-1.md
+  mkdir -p "$C29/memory/builds/dAlpha/build"
+  printf -- '# ARCH-dAlpha-1 deviation 1 — a departure through a gap row\n\n**Serves:** deviation ARCH-dAlpha-1\n\n- **Departs from:** `cl-dAlpha-0001@%s` [chain]\n- **Hand-off:** design-to-spec\n- **Before:** the clause\n- **After:** the clause\n- **Cause:** builder discovery\n- **Reason:** the fixture departs\n- **Evidence:** the fixture\n- **Risk:** additive\n- **Approver:** author\n- **Follow-through:** gap gap-mem-47\n- **Caused-by:** ARCH-dAlpha-1\n' "$H29A1" > "$C29/$C29G"
+  # TOOL-dTrueNorth-26 S7: the view reads TRACKED records, so the record is staged to be read.
+  git -C "$C29" add -- "$C29G"
+  out=$(run_cov29_gate --only 30); r30rc=$?
+  n=$((n+1)); [ "$r30rc" = 1 ] || { echo "FAIL check 30 through the engine: a record departing through a gap row exited $r30rc, not 1"; st=1; }
+  chit 30 "the as-built view's deviation records and its design record disagree, which --write cannot cure:"
+  chit 30 "2026-09-02-build-ARCH-dAlpha-1-deviation-1: departs from cl-dAlpha-0001 and carries no amends or supersedes row"
+  # TOOL-dTrueNorth-27 AC5 — A FULL RUN READS CHECKS 29 AND 30 FROM CHECK 9'S PROCESS and prints what their
+  # standalone verbs print. Over the INPROGRESS spec on a planted uncarried clause and the planted gap
+  # record, the full run's check 29 and 30 lines and FAILED blocks equal the two --only runs', each block
+  # naming its plant; and once both plants are out, the two green count lines equal theirs. Red against a
+  # section split that drops, adds or reorders a line, and against a full run whose two checks read nothing.
+  write_cov29_view '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n'
+  full29=$(run_cov29_gate); only29=$(run_cov29_gate --only 29); only30=$(run_cov29_gate --only 30)
+  # An --only run's block runs on through its `HYGIENE --only` scope line, which a full run never prints.
+  f29=$({ grep -E '^memory-hygiene: check (29|30): ' <<<"$full29"; cblock "$full29" 29; cblock "$full29" 30; } | grep -v '^HYGIENE --only ')
+  s29=$({ grep -E '^memory-hygiene: check (29|30): ' <<<"$only29"$'\n'"$only30"; cblock "$only29" 29; cblock "$only30" 30; } | grep -v '^HYGIENE --only ')
+  n=$((n+1)); { [ "$f29" = "$s29" ] && [[ $f29 == *"uncarried cl-dAlpha-0599"* ]] \
+    && [[ $f29 == *"departs from cl-dAlpha-0001 and carries no amends or supersedes row"* ]]; } \
+    || { echo "FAIL check 29 and 30 through the engine: the full run's red verdicts differ from the --only runs', or name no plant:"; printf '      %s\n' "${f29//$'\n'/$'\n'      }" "---- the --only runs:" "${s29//$'\n'/$'\n'      }"; st=1; }
+  write_cov29_view ''
+  git -C "$C29" rm -qf -- "$C29G"
+  full29=$(run_cov29_gate); only29=$(run_cov29_gate --only 29); only30=$(run_cov29_gate --only 30)
+  f29=$(grep -E '^memory-hygiene: check (29|30): ' <<<"$full29")
+  s29=$(grep -E '^memory-hygiene: check (29|30): ' <<<"$only29"$'\n'"$only30")
+  n=$((n+1)); { [ "$f29" = "$s29" ] && [[ $f29 == *"memory-hygiene: check 29: coverage"*"memory-hygiene: check 30: as-built clean · 0 deviation records"* ]]; } \
+    || { echo "FAIL check 29 and 30 through the engine: the full run's green count lines differ from the --only runs':"; printf '      %s\n' "${f29//$'\n'/$'\n'      }" "---- the --only runs:" "${s29//$'\n'/$'\n'      }"; st=1; }
+  out=$(run_cov29_gate --only 30); r30rc=$?
+  n=$((n+1)); case "$r30rc:$out" in 0:*"memory-hygiene: check 30: as-built clean · 0 deviation records"*) ;; *) echo "FAIL check 30 through the engine: the clean view exited $r30rc, or check 30 printed no clean count line:"; printf '      %s\n' "${out//$'\n'/$'\n'      }"; st=1 ;; esac
+  sed -i 's|^DESIGN_BASELINE=.*$|DESIGN_BASELINE="0000000000000000000000000000000000000000"|' "$C29/.memory-tree.conf"
+  out=$(run_cov29_gate --only 30); r30rc=$?
+  n=$((n+1)); [ "$r30rc" = 1 ] || { echo "FAIL check 30 through the engine: a pin naming no commit exited $r30rc, not 1"; st=1; }
+  chit 30 "the as-built view could not be rendered, so none of its verdicts was read:"
+  cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"
+  printf '# r, edited again\n' > "$C29/memory/README.md"; git -C "$C29" add -- memory/README.md
+  out=$(run_cov29_gate --staged)
+  hit "memory-hygiene: check 30: as-built held under --staged"
+  git -C "$C29" reset -q --hard
+else
+  echo "skip check 29 and check 30 through the engine: no check-spec-tokens.py in this kit directory's parent, so their 24 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+24))
+fi
+
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
 # 235; the merged suite measures 251, so 235 is satisfied and 224 would be a silent LOWERING of a
 # shrink-only pin. A discount from the new measurement would give ~202, which is lower still - the
@@ -4085,7 +4351,23 @@ esac
 # never skipped.
 # MERGED at the TOOL-aSparedSpawn-34 reconcile with local main: the shared 557, plus this build's
 # 61 (557 -> 618) and local main's 16 (557 -> 573) = 634, each side's raise counting only its own arms.
-FLOOR_ASSERTIONS=634
+# RAISED 634 -> 648 by TOOL-dTrueNorth-3: its two check-6 coverage-pair assertions and its twelve
+# check-29 engine assertions, each top-level, the twelve skipped aloud with n_skip carrying them when
+# no spec-token checker sits in the kit directory's parent. Counted by reading, since the pass runs no
+# suite; OWED: observed at the close.
+# RAISED 648 -> 650 by TOOL-dTrueNorth-15: its two check-29 count-line assertions, each top-level and
+# skipped aloud with that block's twelve. Counted by reading; OWED: observed at the close.
+# RAISED 650 -> 656 by TOOL-dTrueNorth-5: its six check-21 audit-pin assertions, each top-level and
+# never skipped. Counted by reading; OWED: observed at the close.
+# RAISED 656 -> 658 by TOOL-dTrueNorth-14: its two check-21 writer-test assertions, each top-level and
+# skipped aloud with n_skip carrying them when no workflows kit sits beside this one. Counted by
+# reading; OWED: observed at the close.
+# RAISED 658 -> 666 by TOOL-dTrueNorth-16: its one check-29 staged-view-row assertion and its seven
+# check-30 engine assertions, each top-level and skipped aloud with the check-29 block's fourteen when no
+# spec-token checker sits in the kit directory's parent. Counted by reading; OWED: observed at the close.
+# RAISED 666 -> 668 by TOOL-dTrueNorth-27: its two full-run check-29-and-30 assertions, each top-level and
+# skipped aloud with that block's others. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=668
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

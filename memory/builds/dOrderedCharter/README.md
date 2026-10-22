@@ -118,7 +118,28 @@ Records: 1 bound to this build, across 1 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dOrderedCharter's 37 clause(s) and 30 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 37 (cl-dClosedLoop-0031, cl-dClosedLoop-0032, cl-dClosedLoop-0033, cl-dClosedLoop-0034, cl-dClosedLoop-0035, cl-dClosedLoop-0036, cl-dClosedLoop-0037, cl-dClosedLoop-0038, cl-dClosedLoop-0039, cl-dClosedLoop-0040, cl-dClosedLoop-0041, cl-dClosedLoop-0042, cl-dClosedLoop-0043,
+  cl-dClosedLoop-0044, cl-dClosedLoop-0045, cl-dClosedLoop-0046, cl-dClosedLoop-0047, cl-dClosedLoop-0048, cl-dClosedLoop-0049, cl-dClosedLoop-0050, cl-dClosedLoop-0051, cl-dClosedLoop-0052, cl-dClosedLoop-0053, cl-dClosedLoop-0054, cl-dClosedLoop-0055, cl-dClosedLoop-0056, cl-dClosedLoop-0057,
+  cl-dClosedLoop-0058, cl-dClosedLoop-0059, cl-dClosedLoop-0060, cl-dClosedLoop-0061, cl-dClosedLoop-0062, cl-dClosedLoop-0063, cl-dClosedLoop-0064, cl-dClosedLoop-0065, cl-dClosedLoop-0066, cl-dClosedLoop-0067)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.charter.override, policy-key.charter.practices, policy-key.core.bypass, policy-key.core.exceptions, policy-key.instructions.checks, policy-key.instructions.edit, policy-key.instructions.exclude, policy-key.instructions.legacy, policy-key.instructions.proof,
+  policy-key.instructions.stale, policy-key.tags.bare-refs, policy-key.tags.bundle, policy-key.tags.bundle-rows, policy-key.tags.positional, policy-key.tags.retired-cites, policy-key.tags.slice, record-kind.exception, record-kind.override, system.instruction-writing, system.tags, tag-namespace.doc,
+  tag-namespace.kind, tag-namespace.kit, tag-namespace.layer, tag-namespace.level, tag-namespace.practice, tag-namespace.principle, tag-namespace.reader, tag-namespace.repo, tag-namespace.unit
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0033, cl-dClosedLoop-0034, cl-dClosedLoop-0035, cl-dClosedLoop-0038, cl-dClosedLoop-0042, cl-dClosedLoop-0043, cl-dClosedLoop-0044, cl-dClosedLoop-0050, cl-dClosedLoop-0051, cl-dClosedLoop-0067
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

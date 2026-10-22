@@ -1,0 +1,807 @@
+**Serves:** journal TOOL-dTrueNorth-27
+
+gate profile: capable  (cores 16 via nproc, ram 32419 MB via getconf; width 8 uncalibrated: absent, timeout off, ceilings live, wall 21600s, spawnpause off, mempause 90%; detected)
+regen: fresh · stage 1 · branch-reconcile · the branch-reconcile render (0s)
+regen: fresh · stage 1 · drift-audit · the drift-audit render (0s)
+regen: fresh · stage 1 · lexicon · the lexicon render (0s)
+regen: fresh · stage 1 · memory-recall · the memory-recall render (0s)
+regen: fresh · stage 1 · memory-tree · the memory-tree render (1s)
+regen: fresh · stage 1 · playbook-render · AGENTS.md (0s)
+regen: fresh · stage 1 · review-harness · the review-harness render (2s)
+regen: fresh · stage 1 · runlog · the runlog render (0s)
+regen: fresh · stage 1 · unattended · the unattended render (1s)
+regen: fresh · stage 2 · memory-tree · memory/LIVE.md, memory/ledger, memory/backlog (7s)
+regen: fresh · stage 2 · memory-tree · memory/gotchas/INDEX.md (26s)
+regen: fresh · stage 3 · codebase-map · memory/map/generated (5s)
+regen: 12 declared · 12 fresh · 0 stale · 27s
+gate queue: waited 0s
+gate queue: acquired 2026-10-22T04:58:16Z from held
+TMPDIR entries 47609
+run-gates: process-monitor: delegating tree kills to process-monitor
+GATE FAIL  kickoff-manifest ratchet  (exit 1)
+    MANIFEST check 9 FAILED — the manifest body has not changed across ten or more watched commits, so its front-loaded claims are drifting unverified; re-read §B and advance last-body-change to a current sha: 10 non-merge commits since f8bbdc85df8368b138199a82c32e235784805a24
+GATE ok    build README slot contract
+GATE ok    process-monitor wiring
+GATE ok    memory hygiene
+---- chunk records: RED  (4 ran, 1 failed, 0 skipped, 0 reused, 0 held)
+GATE ok    template size <=48KiB
+GATE ok    charter size
+GATE ok    micro-format definitions
+GATE ok    line length
+GATE ok    playbook parity
+GATE ok    build-method size
+GATE ok    unattended protocol size
+GATE ok    unattended skill size
+GATE ok    kickoff engine size <=18KiB
+GATE FAIL  shell hygiene (a loop fed by a command substitution)  (exit 1)
+    sh-hygiene: 168 tracked *.sh scanned
+    sh-hygiene:   [GATED] 18 site(s) in 5 file(s) — loop fed by a heredoc holding a command substitution
+    sh-hygiene:   [GATED] 2 site(s) in 1 file(s) — loop fed by a here-string holding a command substitution
+    sh-hygiene:   [GATED] 40 site(s) in 20 file(s) — loop fed by a heredoc or here-string over a VARIABLE assigned from a command substitution — the same defect, one assignment away
+    sh-hygiene:   [near miss] 17 site(s) in 9 file(s) — loop fed by a heredoc with NO command substitution
+    sh-hygiene:   [near miss] 9 site(s) in 4 file(s) — non-loop heredoc holding a command substitution
+    sh-hygiene:   [near miss] 23 site(s) in 5 file(s) — non-loop here-string holding a command substitution
+    sh-hygiene:   [near miss] 59 site(s) in 14 file(s) — loop fed by a process substitution, `done < <(...)` — REPORTED, NOT GATED
+    sh-hygiene: 1 finding(s). A `while … done` fed by a heredoc or here-string whose body holds a command substitution reads until EOF, and EOF can never arrive.
+      tools/memory-tree/check-memory-hygiene.sh: the registry declares 8 site(s) at `<<<` and the scan measures 10 — the count may fall with the sites and may not rise
+GATE ok    shell hygiene (a location probe asked from a moved directory)
+GATE FAIL  shell hygiene (a fork spent on builtin work)  (exit 1)
+    sh-hygiene: spawn idioms — 68 product shell source(s) and 68 suite(s) scanned; a BANNED class grades the 68 product source(s) only
+    sh-hygiene:   [BANNED] epoch-date: 68 scanned · 0 site(s) in 0 file(s) · 2 near miss(es) — `$(date [-u] +%s)` or `+%s%N)` — `$EPOCHSECONDS`, or `${EPOCHREALTIME/[.,]/}` scaled, is the same answer with no fork
+    sh-hygiene:   [BANNED] cat-heredoc: 68 scanned · 0 site(s) in 0 file(s) · 0 near miss(es) — `$(cat <<…` — read the heredoc with `IFS= read -r -d '' v <<'TAG' || :` instead
+    sh-hygiene:   [BANNED] redirected-read: 68 scanned · 0 site(s) in 0 file(s) · 4 near miss(es) — `$(<f …)` with another redirection inside — bash's no-fork read is defeated, so it reads EMPTY and still forks
+    sh-hygiene:   [registry] pure-fn-subst: 136 scanned · 253 site(s) in 29 file(s) · 4050 near miss(es) — `$(f …)`, `f` defined in the file or a library it sources, its body spawning nothing
+    sh-hygiene:   [registry] printf-subst: 136 scanned · 200 site(s) in 30 file(s) · 1089 near miss(es) — `$(printf FMT ARGS)` with no pipe or redirect, FMT not ending `\n` — `printf -v`
+    sh-hygiene:   [registry] cat-file: 136 scanned · 223 site(s) in 30 file(s) · 37 near miss(es) — `$(cat <one word> [2>/dev/null])` — `$(<file)`
+    sh-hygiene:   [registry] path-subst: 136 scanned · 429 site(s) in 114 file(s) · 2 near miss(es) — `$(basename …)` or `$(dirname …)` — parameter expansion
+    sh-hygiene:   [registry] date-fmt: 136 scanned · 38 site(s) in 17 file(s) · 32 near miss(es) — `$(date [-u] +FMT)` with no `-d`/`-r` and a FMT `printf %(…)T` spells
+    sh-hygiene:   [registry] var-pipe: 136 scanned · 1046 site(s) in 83 file(s) · 5 near miss(es) — `printf`/`echo` of one expansion piped into `grep -q/-c`, `wc -l`, `tr`, `sed s///`, `head -1` or `cut` — a parameter expansion or a `[[ =~ ]]`
+    sh-hygiene: registered — .githooks/pre-commit: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-commit: `var-pipe` × 4 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-commit.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-commit.test.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-commit.test.sh: `var-pipe` × 6 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push: `date-fmt` × 1 — arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push: `pure-fn-subst` × 10 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: green_label×4 print_kitroot_miss×2 read_policy_key×4
+    sh-hygiene: registered — .githooks/pre-push: `var-pipe` × 9 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push.runlog.test.sh: `cat-file` × 6 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push.runlog.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push.runlog.test.sh: `printf-subst` × 4 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push.runlog.test.sh: `pure-fn-subst` × 5 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: check_shape_run×5
+    sh-hygiene: registered — .githooks/pre-push.runlog.test.sh: `var-pipe` × 16 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push.test.sh: `cat-file` × 17 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-push.test.sh: `pure-fn-subst` × 3 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: read_h49_mark×3
+    sh-hygiene: registered — .githooks/pre-push.test.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/pre-rebase: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/straggler-guard.sh: `var-pipe` × 5 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/straggler-guard.test.sh: `cat-file` × 3 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/straggler-guard.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — .githooks/straggler-guard.test.sh: `var-pipe` × 7 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.sh: `path-subst` × 3 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.sh: `printf-subst` × 2 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.sh: `pure-fn-subst` × 2 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_health_log×1 render_tree_cell×1
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.sh: `var-pipe` × 5 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.test.sh: `cat-file` × 3 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.test.sh: `path-subst` × 8 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.test.sh: `printf-subst` × 10 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.test.sh: `pure-fn-subst` × 20 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: render_ready_line×19 print_route_ready×1
+    sh-hygiene: registered — skills/session-kickoff/manifest-check.test.sh: `var-pipe` × 15 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/agent-instructions/adopt-agent-instructions.sh: `path-subst` × 3 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/agent-instructions/adopt-agent-instructions.sh: `pure-fn-subst` × 2 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: alias_path×2
+    sh-hygiene: registered — tools/agent-instructions/adopt-agent-instructions.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/agent-instructions/adopt-agent-instructions.test.sh: `cat-file` × 3 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/agent-instructions/adopt-agent-instructions.test.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/agent-instructions/adopt-agent-instructions.test.sh: `var-pipe` × 5 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-agent-cap-restatement.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-agent-cap-restatement.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-agent-cap-restatement.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-agent-cap-restatement.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-agent-cap-restatement.test.sh: `var-pipe` × 11 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-dead-paths.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-dead-paths.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-dead-paths.sh: `pure-fn-subst` × 1 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_prefix_sh×1
+    sh-hygiene: registered — tools/check-dead-paths.sh: `var-pipe` × 10 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-dead-paths.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-hook-destinations.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-hook-destinations.sh: `var-pipe` × 10 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-hook-destinations.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-install-prefix.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-install-prefix.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-install-prefix.test.sh: `cat-file` × 1 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-install-prefix.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-install-prefix.test.sh: `printf-subst` × 2 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-install-prefix.test.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-kit-placeholders.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-kit-versions.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-line-length.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-line-length.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-line-length.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-microformats.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-microformats.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-microformats.test.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-placeholders.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-placeholders.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-playbook-parity.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-playbook-parity.sh: `printf-subst` × 3 — arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-playbook-parity.sh: `var-pipe` × 4 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-playbook-parity.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-playbook-parity.test.sh: `var-pipe` × 5 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-remote-literals.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-remote-literals.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-remote-literals.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-spec-tokens.test.sh: `path-subst` × 6 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-spec-tokens.test.sh: `var-pipe` × 22 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-template-size.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-template-size.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-template-size.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-template-size.test.sh: `var-pipe` × 4 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-testsuite-counts.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-testsuite-counts.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-wiring.sh: `path-subst` × 19 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-wiring.sh: `pure-fn-subst` × 5 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: settings_json×5
+    sh-hygiene: registered — tools/check-wiring.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-wiring.test.sh: `cat-file` × 2 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-wiring.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/check-wiring.test.sh: `pure-fn-subst` × 10 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: src_of×10
+    sh-hygiene: registered — tools/check-wiring.test.sh: `var-pipe` × 162 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/codebase-map/adopt-codebase-map.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/codebase-map/adopt-codebase-map.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/codebase-map/adopt-codebase-map.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/codebase-map/adopt-codebase-map.test.sh: `var-pipe` × 10 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/drift-audit/adopt-drift-audit.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/drift-audit/adopt-drift-audit.sh: `pure-fn-subst` × 2 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: _wf_missing×2
+    sh-hygiene: registered — tools/govkit/census.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/hooks/agent-cap.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/hooks/agent-cap.test.sh: `pure-fn-subst` × 11 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: apay×10 render_cap_harness×1
+    sh-hygiene: registered — tools/hooks/agent-cap.test.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/hooks/scratch-guard.test.sh: `cat-file` × 11 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/hooks/scratch-guard.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/hooks/scratch-guard.test.sh: `printf-subst` × 2 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/hooks/scratch-guard.test.sh: `var-pipe` × 5 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/lexicon/adopt-lexicon.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/lexicon/adopt-lexicon.sh: `path-subst` × 3 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/lexicon/adopt-lexicon.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/extract-arms.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/extract-arms.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/kit-rel.sh: `path-subst` × 3 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/lib-selftest.test.sh: `cat-file` × 13 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/lib-selftest.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/pyrun.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/resolve-python.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/resolve-python.test.sh: `var-pipe` × 8 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/lib/resolve-remote.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-recall/adopt-memory-recall.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-recall/recall-opened.test.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-recall/recall-opened.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-recall/recall-opened.test.sh: `var-pipe` × 12 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/adopt-memory-tree.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/adopt-memory-tree.sh: `path-subst` × 3 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/adopt-memory-tree.sh: `pure-fn-subst` × 3 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: FAMILY_of×3
+    sh-hygiene: registered — tools/memory-tree/adopt-memory-tree.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.sh: `printf-subst` × 5 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.sh: `pure-fn-subst` × 1 — callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: resolve_live_index_home×1
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.sh: `var-pipe` × 25 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.test.sh: `cat-file` × 1 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.test.sh: `path-subst` × 7 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.test.sh: `printf-subst` × 19 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.test.sh: `pure-fn-subst` × 8 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_bm_r3×8
+    sh-hygiene: registered — tools/memory-tree/check-memory-hygiene.test.sh: `var-pipe` × 48 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-method-carriers.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-method-carriers.sh: `var-pipe` × 6 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-method-carriers.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-verdict-epoch.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-verdict-epoch.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-verdict-epoch.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/check-verdict-epoch.test.sh: `var-pipe` × 4 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/hygiene-parity.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/hygiene-parity.test.sh: `printf-subst` × 5 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/hygiene-parity.test.sh: `pure-fn-subst` × 25 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: S×25
+    sh-hygiene: registered — tools/memory-tree/kit-dogfood-parity.test.sh: `path-subst` × 3 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/marker-contract.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/marker-contract.test.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/marker-contract.test.sh: `var-pipe` × 8 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/merge-rows.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/merge-rows.test.sh: `path-subst` × 8 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/merge-rows.test.sh: `printf-subst` × 6 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/merge-rows.test.sh: `pure-fn-subst` × 1 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: minus×1
+    sh-hygiene: registered — tools/memory-tree/merge-rows.test.sh: `var-pipe` × 43 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/transition-audit.test.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/memory-tree/transition-audit.test.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/playbook/adopt-playbook.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/process-monitor/adopt-process-monitor.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/process-monitor/adopt-process-monitor.test.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/process-monitor/adopt-process-monitor.test.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/push-main.sh: `date-fmt` × 1 — arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/push-main.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/push-main.sh: `pure-fn-subst` × 1 — callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: read_policy_key×1
+    sh-hygiene: registered — tools/push-main.sh: `var-pipe` × 10 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/push-main.test.sh: `cat-file` × 10 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/push-main.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/push-main.test.sh: `var-pipe` × 15 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/pytest-parallel-guardrails/pytest-parallel-guardrails.test.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/adopt-run-gates.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/adopt-run-gates.sh: `pure-fn-subst` × 1 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: extract_head×1
+    sh-hygiene: registered — tools/run-gates/adopt-run-gates.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/adopt-run-gates.test.sh: `var-pipe` × 8 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/foreign-prefix.gov.test.sh: `path-subst` × 6 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/foreign-prefix.gov.test.sh: `var-pipe` × 3 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/lib-attribute.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/post-merge.sh: `date-fmt` × 2 — arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/post-merge.sh: `path-subst` × 4 — arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/post-merge.sh: `pure-fn-subst` × 3 — callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: read_policy_key×3
+    sh-hygiene: registered — tools/run-gates/post-merge.sh: `var-pipe` × 3 — arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/profile_bar.test.sh: `cat-file` × 2 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/profile_bar.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.evidence.test.sh: `cat-file` × 13 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.evidence.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.evidence.test.sh: `printf-subst` × 2 — arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.evidence.test.sh: `var-pipe` × 43 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.gov.test.sh: `path-subst` × 6 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.runlog.test.sh: `cat-file` × 5 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.runlog.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.runlog.test.sh: `printf-subst` × 4 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.runlog.test.sh: `var-pipe` × 10 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.sh: `cat-file` × 13 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.sh: `date-fmt` × 10 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.sh: `path-subst` × 7 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.sh: `pure-fn-subst` × 7 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_fail_tail×2 derive_health_log×2 prof_n×2 measure_neighbours×1
+    sh-hygiene: registered — tools/run-gates/run-gates.sh: `var-pipe` × 6 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.test.sh: `cat-file` × 25 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.test.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.test.sh: `path-subst` × 12 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.test.sh: `printf-subst` × 2 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.test.sh: `pure-fn-subst` × 11 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_mp_record×11
+    sh-hygiene: registered — tools/run-gates/run-gates.test.sh: `var-pipe` × 141 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.turnstile.test.sh: `cat-file` × 15 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.turnstile.test.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.turnstile.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-gates.turnstile.test.sh: `pure-fn-subst` × 16 — callees arrived with origin/main fcba0600 at the TOOL-aSparedSpawn-32 reconcile, drained by a follow-up unit: beacon×16
+    sh-hygiene: registered — tools/run-gates/run-gates.turnstile.test.sh: `var-pipe` × 36 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-held-wsl.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-held-wsl.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-held-wsl.sh: `var-pipe` × 3 — arrived with the inlined `remote_ladder_sh` block at TOOL-aSweptBar-4, which converts only with its canonical and every copy, the parity arm reading them byte for byte; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-selftests.sh: `date-fmt` × 1 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-selftests.sh: `path-subst` × 9 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-selftests.sh: `pure-fn-subst` × 3 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: read_now_ms×2 read_registry_tags×1
+    sh-hygiene: registered — tools/run-gates/run-selftests.sh: `var-pipe` × 10 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-selftests.test.sh: `cat-file` × 1 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-selftests.test.sh: `path-subst` × 12 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/run-gates/run-selftests.test.sh: `printf-subst` × 3 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/runlog/adopt-runlog.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/runlog/adopt-runlog.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/adopt-unattended.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/adopt-unattended.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/adopt-unattended.test.sh: `cat-file` × 16 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/adopt-unattended.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-arms-groups.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-arms-groups.test.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-brief-recorded.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-brief-recorded.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-brief-recorded.test.sh: `path-subst` × 8 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-pass-order.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-pass-order.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-pass-order.test.sh: `path-subst` × 6 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-playbook.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-playbook.sh: `printf-subst` × 1 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-playbook.sh: `pure-fn-subst` × 8 — declared_list and declared_scalar keep their substitution: check 28 of check-unattended.sh enumerates refusing-parser calls and key reads by the `$(declared_* ` spelling
+    sh-hygiene: registered — tools/unattended/check-playbook.sh: `var-pipe` × 9 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-playbook.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-playbook.test.sh: `printf-subst` × 4 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-playbook.test.sh: `var-pipe` × 4 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.sh: `cat-file` × 5 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.sh: `path-subst` × 8 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.sh: `printf-subst` × 2 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.sh: `pure-fn-subst` × 1 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_shared_records×1
+    sh-hygiene: registered — tools/unattended/check-unattended.sh: `var-pipe` × 25 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.test.sh: `cat-file` × 16 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.test.sh: `path-subst` × 10 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.test.sh: `printf-subst` × 8 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/check-unattended.test.sh: `pure-fn-subst` × 1 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: resolve_shared_records×1
+    sh-hygiene: registered — tools/unattended/check-unattended.test.sh: `var-pipe` × 6 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/cross-component.test.sh: `cat-file` × 2 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/cross-component.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/gate-guard.test.sh: `cat-file` × 4 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/gate-guard.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/gate-guard.test.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/lib-unattended.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/lib-unattended.sh: `var-pipe` × 6 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.sh: `date-fmt` × 3 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.test.sh: `cat-file` × 3 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.test.sh: `date-fmt` × 2 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.test.sh: `printf-subst` × 4 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/resume-tick.test.sh: `var-pipe` × 18 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/run-unattended-gates.sh: `path-subst` × 2 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/run-unattended-gates.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/runlog-writer.test.sh: `cat-file` × 3 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/runlog-writer.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/runlog-writer.test.sh: `printf-subst` × 3 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/runlog-writer.test.sh: `var-pipe` × 8 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/stall-recorder.test.sh: `cat-file` × 3 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/stall-recorder.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/stall-recorder.test.sh: `pure-fn-subst` × 22 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: derive_sidecar×22
+    sh-hygiene: registered — tools/unattended/stall-recorder.test.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/stop-guard.test.sh: `cat-file` × 3 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/stop-guard.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/stop-guard.test.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.sh: `cat-file` × 6 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.sh: `date-fmt` × 8 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.sh: `path-subst` × 13 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.sh: `printf-subst` × 8 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.sh: `pure-fn-subst` × 41 — declared_list and declared_scalar keep their substitution: check 28 of check-unattended.sh enumerates refusing-parser calls and key reads by the `$(declared_* ` spelling; callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: ask_sev_rank×1 declared_list×2 declared_scalar×5 derive_next_shape×1 directives×2 dod×4 grep×5 halt_codes×2 id_rows×1 kinds_re×1 park_kinds_unowed×1 phases×1 read_cli_version×2 read_hold_codes×2 read_policy_key×5 resolve_shared_records×1 review_exit_note×2 review_state×1 set×1 verbs_all×1
+    sh-hygiene: registered — tools/unattended/unattended.sh: `var-pipe` × 60 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.test.sh: `cat-file` × 17 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.test.sh: `date-fmt` × 2 — predates the lint; `printf -v v '%(FMT)T' -1` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.test.sh: `path-subst` × 13 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.test.sh: `printf-subst` × 23 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/unattended/unattended.test.sh: `var-pipe` × 20 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-protocol-parity.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-protocol-parity.test.sh: `var-pipe` × 2 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-review-join.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-review-join.sh: `var-pipe` × 4 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-review-join.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-review-join.test.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-verifier-fanout.sh: `path-subst` × 1 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-verifier-fanout.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-verifier-fanout.test.sh: `path-subst` × 5 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/check-verifier-fanout.test.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/tier2-review.test.sh: `path-subst` × 4 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/tier2-review.test.sh: `var-pipe` × 1 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/unattended-build.test.sh: `cat-file` × 1 — predates the lint; `$(<file)` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/unattended-build.test.sh: `path-subst` × 6 — predates the lint; `${p##*/}` and `${p%/*}` are the no-fork forms, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/unattended-build.test.sh: `printf-subst` × 66 — predates the lint; `printf -v` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: registered — tools/workflows/unattended-build.test.sh: `pure-fn-subst` × 28 — callees outside the reader set TOOL-aSparedSpawn-8 converts, drained by a follow-up unit: build_gh33_writer×14 build_dispose×9 build_gh33_args×5
+    sh-hygiene: registered — tools/workflows/unattended-build.test.sh: `var-pipe` × 62 — predates the lint; a parameter expansion or `[[ =~ ]]` is the no-fork form, drained by a follow-up unit
+    sh-hygiene: 6 finding(s). Each idiom below forks a process for work bash does in-process, at 89 to 315 ms a fork under MSYS.
+      tools/memory-tree/check-memory-hygiene.test.sh: the registry declares 19 site(s) at `printf-subst` and the scan measures 22 — the count may fall with the sites and may not rise
+      tools/memory-tree/check-memory-hygiene.test.sh: the registry declares 48 site(s) at `var-pipe` and the scan measures 51 — the count may fall with the sites and may not rise
+      tools/unattended/unattended.sh: the registry declares 41 site(s) at `pure-fn-subst` and the scan measures 42 — the count may fall with the sites and may not rise
+      tools/unattended/unattended.sh: the registry declares 60 site(s) at `var-pipe` and the scan measures 61 — the count may fall with the sites and may not rise
+      tools/workflows/unattended-build.test.sh: the registry declares 66 site(s) at `printf-subst` and the scan measures 68 — the count may fall with the sites and may not rise
+      tools/workflows/unattended-build.test.sh: the registry declares 62 site(s) at `var-pipe` and the scan measures 65 — the count may fall with the sites and may not rise
+GATE ok    shell hygiene (a fixed-name temp renamed into place)
+GATE FAIL  spawn budget (forks per hot entrypoint)  (exit 1)
+    fork-count: calibrated — the specimen's 5 fork(s) counted exactly
+    fork-count: ok unattended-status · measured 47 · ceiling 47 · base 57
+    fork-count: ok check-unattended · measured 682 · ceiling 684 · base 709
+    fork-count: ok run-gates-1leg · measured 55 · ceiling 55 · base 72
+    fork-count: ok run-gates-2leg · measured 57 · ceiling 57 · base 97
+    fork-count: RED memory-hygiene · measured 191 · ceiling 189 · delta +2 · base 219 — the sites the most forked subshells first traced at:
+        4 check-memory-hygiene.sh:618
+        4 check-memory-hygiene.sh:710
+        4 check-memory-hygiene.sh:805
+        4 check-memory-hygiene.sh:1064
+        3 check-memory-hygiene.sh:524
+        3 check-memory-hygiene.sh:525
+        3 check-memory-hygiene.sh:526
+        3 check-memory-hygiene.sh:527
+        3 check-memory-hygiene.sh:533
+        3 check-memory-hygiene.sh:640
+    fork-count:   a site that grew by one can tie below these ten: run --only memory-hygiene --sites here and at the parent, and diff the two
+    fork-count: ok manifest-check · measured 90 · ceiling 90 · base 108
+    fork-count: ok check-wiring · measured 44 · ceiling 44 · base 55
+    fork-count: 6 passed · 1 red · 0 skipped — a skipped row is not a pass
+GATE ok    encoding posture (text IO names its encoding)
+GATE FAIL  install-prefix (shipped surface)  (exit 1)
+    install-prefix: a tracked file spells a kit path. `govkit apply` writes these bytes verbatim,
+    install-prefix: so at a target installed at any other prefix they resolve to nothing. Derive the
+    install-prefix: path from the file's own location, route a sibling kit through resolve_kit_dir,
+    install-prefix: or spell it through a drained token. This is a pure ban: there is no waiver.
+      tools/check-spec-tokens.py:357  memory-tree  KIT_DIR = HERE / "memory-tree"
+      tools/check-spec-tokens.test.sh:1633  memory-tree  date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$HERE/memory-tree/design_lib.py")
+      tools/memory-tree/deviation_join.py:1068  (loose)  fx.write_commit({"tools/fix-11.txt": "built\n"}, f"build {u}, attributed to no pass", ["Pa
+      tools/memory-tree/deviation_join.py:1148  (loose)  fx.add_run_row(f"dispatch · item 0a1b2c3d {y} · reason tools/fix-97.txt {fx.derive_spec_pa
+      tools/memory-tree/deviation_join.py:1149  (loose)  fx.write_commit({"tools/fix-97.txt": "built\n"}, f"build {u} from its spec", [f"Pass: {y}"
+      tools/memory-tree/gen_build_index.py:6122  workflows  # install's own path, `tools/workflows/tier2-review.js`, and the stub returns that directo
+      tools/memory-tree/gen_build_index.py:6125  workflows  h14 = os.path.join(t14w, "tools", "workflows", "tier2-review.js")
+      tools/memory-tree/gen_build_index.py:6131  workflows  return pathlib.Path(t14w, "tools", "workflows")
+      tools/memory-tree/gen_build_index.py:6187  workflows  lambda *_a: str(pathlib.Path(t14w, "tools", "workflows").absolute()).replace("/", "\\")) o
+      tools/memory-tree/gen_build_index.py:6206  workflows  h19 = os.path.join(t19, "tools", "workflows", "tier2-review.js")
+      tools/memory-tree/gen_build_index.py:6212  workflows  return pathlib.Path(t19, "tools", "workflows")
+      tools/memory-tree/gen_build_index.py:6283  workflows  f"backlog.resolve_kit_dir = lambda home, *a: (pathlib.Path({t19!r}, 'tools', 'workflows') 
+      tools/memory-tree/tree_lib.py:256  (loose)  #: `tools/check-playbook-parity.sh:334` (TOOL-aDistilledCharter-7 G6). Git exports none of
+    install-prefix: RED — 409 tracked file(s) graded, 7 render(s) left out as matching their template, 13 kit-path spelling(s) on 13 line(s)
+GATE ok    hook destinations (every declared hook path ships)
+GATE ok    agent-cap restatement
+GATE ok    playbook placeholder catalogue
+---- chunk product: RED  (19 ran, 4 failed, 0 skipped, 0 reused, 0 held)
+GATE held  micro-format gate selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  line-length gate selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  playbook parity selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  template size gate selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  shell-hygiene selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  verdict-epoch self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  manifest-check self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  agent-cap self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  scratch-guard self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  format-guard self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  agent-instructions self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  memory-hygiene self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  row-keyed merge driver replay  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  method-carriers self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  build-index selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  corpus-ids selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  gotchas selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  routed-commits selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  row-grammar selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  backlog migration selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  check-arms selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  branch-guard self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  pre-push self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  pre-push run-log line  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  pre-push bar self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  push-main self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  check-wiring self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  verifier fan-out self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  tier2-review self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  unattended-build self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  review-join self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  review-replay selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  pytest-guardrails self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  codebase-map kit selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  settings-merge selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  memory-recall kit selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  recall floor arms  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  drift-audit selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  process-monitor census selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  process-monitor adopter selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  runlog selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  branch-reconcile selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  run-gates canary  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  run-gates evidence  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  run-gates turnstile  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  run-gates gov canary  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  foreign-prefix parity (every self-test at three prefixes)  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  run-gates run-log line  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  profile-bar selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  held-halves selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  measure-legs selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  hook destinations self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  agent-cap restatement self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  install-prefix self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  dead-path carriers self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  remote literals self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  govkit selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  lexicon selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  placeholder-catalogue self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  testsuite counts self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  playbook render selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  roles render selftest  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  roles adopter self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  spec-tokens self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  kit-placeholders self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  selftest harness self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  extract-arms self-test  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  run-selftests self-test  (self-test, set GATE_SELFTESTS=1 to run)
+---- chunk selftests: skipped  (0 ran, 0 failed, 0 skipped, 0 reused, 68 held)
+GATE ok    kit version markers
+GATE ok    verdict epoch (kit version dates the engine)
+GATE ok    row-driver view refusal
+GATE ok    kit/dogfood doc parity
+GATE ok    method carriers (every pointer declared)
+GATE FAIL  harness arms (fail branches armed or pinned)  (exit 1)
+    check-arms: waived skills/session-kickoff/manifest-check.sh:1149 exit — no arm in skills/session-kickoff/manifest-check.test.sh stages `[ "$CARD_TOKENS" -gt 0 ]` failing
+    check-arms: waived skills/session-kickoff/manifest-check.sh:1203 exit — skills/session-kickoff/manifest-check.test.sh:1186 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived skills/session-kickoff/manifest-check.sh:1210 exit — no arm in skills/session-kickoff/manifest-check.test.sh stages `[ "$CARD_TOKENS" -gt 0 ]` failing
+    check-arms: waived tools/agent-instructions/adopt-agent-instructions.sh:72 exit — no arm in tools/agent-instructions/adopt-agent-instructions.test.sh stages `[ -f "$CANON" ]` failing
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:51 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:55 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:62 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:99 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:100 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:130 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; both sites are driven by the kit self-test's arm_old_render (TOOL-dSweptBranches-23 AC1 to AC3), which asserts their exit and named path
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:131 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:139 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:142 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:143 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; the kit's --check drift exit was observed by hand at TOOL-dSweptBranches-5 AC1, and the wiring leg runs --check on every bar
+    check-arms: waived tools/branch-reconcile/adopt-branch-reconcile.sh:145 exit — no sibling suite: tools/branch-reconcile/adopt-branch-reconcile.test.sh does not exist; both sites are driven by the kit self-test's arm_old_render (TOOL-dSweptBranches-23 AC1 to AC3), which asserts their exit and named path
+    check-arms: waived tools/check-agent-cap-restatement.sh:167 status — no arm in tools/check-agent-cap-restatement.test.sh stages `[ -n "${bad%$'\n'}" ]` holding
+    check-arms: waived tools/check-agent-cap-restatement.sh:175 status — no arm in tools/check-agent-cap-restatement.test.sh stages the block opened by `case "$texts" in`
+    check-arms: waived tools/check-dead-paths.sh:166 exit — tools/check-dead-paths.test.sh:297 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/check-dead-paths.sh:172 exit — no arm in tools/check-dead-paths.test.sh stages `! printf '%s\n' "$needles" | grep -qxF "$SENTINEL"` holding
+    check-arms: waived tools/check-dead-paths.sh:180 exit — tools/check-dead-paths.test.sh:281 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/check-dead-paths.sh:254 exit — tools/check-dead-paths.test.sh:231 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/check-dead-paths.sh:288 exit — tools/check-dead-paths.test.sh:124 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/check-dead-paths.sh:305 exit — no arm in tools/check-dead-paths.test.sh stages `[ "$stale" = 0 ]` failing
+    check-arms: waived tools/check-hook-destinations.sh:98 exit — no arm in tools/check-hook-destinations.test.sh stages `[ -z "$FRAGS" ]` holding
+    check-arms: waived tools/check-hook-destinations.sh:125 exit — no arm in tools/check-hook-destinations.test.sh stages `[ -n "$DESTS" ]` failing
+    check-arms: waived tools/check-hook-destinations.sh:149 exit — no arm in tools/check-hook-destinations.test.sh stages `[ -n "$PFX" ]` failing
+    check-arms: waived tools/check-hook-destinations.sh:152 exit — no arm in tools/check-hook-destinations.test.sh stages `[ -n "$FLAT_HOMES" ]` failing
+    check-arms: waived tools/check-hook-destinations.sh:238 exit — no arm in tools/check-hook-destinations.test.sh stages `[ -z "$ADOPTERS" ]` holding
+    check-arms: waived tools/check-install-prefix.sh:219 exit — tools/check-install-prefix.test.sh:236 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/check-install-prefix.sh:234 exit — no arm in tools/check-install-prefix.test.sh stages the block opened by `_shipped=$("$PY_GATE" "${REGISTRY%/*}/govkit.py" shipped) |…`
+    check-arms: waived tools/check-install-prefix.sh:464 exit — no arm in tools/check-install-prefix.test.sh stages the case arm `*)`
+    check-arms: waived tools/check-kit-versions.sh:413 exit — no sibling suite: tools/check-kit-versions.test.sh does not exist, so nothing stages the script reaching it
+    check-arms: waived tools/check-playbook-parity.sh:206 exit — no arm in tools/check-playbook-parity.test.sh stages `[ ! -f "$WAIVERS" ]` holding
+    check-arms: waived tools/check-playbook-parity.sh:286 exit — no arm in tools/check-playbook-parity.test.sh stages `! : > "$PPTMP" 2>/dev/null || [ ! -w "$PPTMP" ]` holding
+    check-arms: waived tools/check-wiring.sh:1997 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/check-wiring.test.sh stages `[ "$unwired" = 0 ]` holding through this script
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:52 exit — no arm in tools/codebase-map/adopt-codebase-map.test.sh stages the block opened by `[ "$_CWD_ROOT" -ef "$ROOT" ] || {`
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:98 exit — no arm in tools/codebase-map/adopt-codebase-map.test.sh stages the block opened by `[ -n "$KIT_REL" ] || {`
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:101 exit — no arm in tools/codebase-map/adopt-codebase-map.test.sh stages the block opened by `case "$KIT_REL" in`
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:113 exit — tools/codebase-map/adopt-codebase-map.test.sh:139 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:150 exit — no arm in tools/codebase-map/adopt-codebase-map.test.sh stages `[ ! -f "$ROOT/.codebase-map.conf" ]` holding
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:184 exit — no arm in tools/codebase-map/adopt-codebase-map.test.sh stages the block opened by `[ -f "$HERE/map_extractors.py" ] || {`
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:189 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/codebase-map/adopt-codebase-map.test.sh stages `"$PY" "$HERE/gen_map.py" --write` failing through this script
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:191 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/codebase-map/adopt-codebase-map.test.sh stages `"$PY" "$HERE/gen_map.py" --scaffold` failing through this script
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:199 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/codebase-map/adopt-codebase-map.test.sh stages `"$PY" "$HERE/gen_map.py" --seed-affordance-baseline` failing through this script
+    check-arms: waived tools/codebase-map/adopt-codebase-map.sh:212 exit — no arm in tools/codebase-map/adopt-codebase-map.test.sh stages the script reaching it
+    check-arms: waived tools/drift-audit/adopt-drift-audit.sh:69 exit — no sibling suite: tools/drift-audit/adopt-drift-audit.test.sh does not exist, so nothing stages `[ -f "$TEMPLATE" ]` failing
+    check-arms: waived tools/drift-audit/adopt-drift-audit.sh:197 exit — no sibling suite: tools/drift-audit/adopt-drift-audit.test.sh does not exist, so nothing stages `out=$( cat "$TEMPLATE"` failing
+    check-arms: waived tools/drift-audit/adopt-drift-audit.sh:207 exit — no sibling suite: tools/drift-audit/adopt-drift-audit.test.sh does not exist, so nothing stages `[ -f "$SKILL_OUT" ]` failing
+    check-arms: waived tools/drift-audit/adopt-drift-audit.sh:214 exit — no sibling suite: tools/drift-audit/adopt-drift-audit.test.sh does not exist, so nothing stages `! diff -q <(tr -d '\r' < "$SKILL_OUT") "$TMP" >/dev/null 2>&1` holding
+    check-arms: waived tools/drift-audit/adopt-drift-audit.sh:217 exit — no sibling suite: tools/drift-audit/adopt-drift-audit.test.sh does not exist, so nothing stages `[ -f "$KIT_DIR/drift_signals.py" ]` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:162 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `out=$( cat "$TEMPLATE"` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:273 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `[ -f "$CONF" ]` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:274 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `write_skill` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:283 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist; selftest.py asserts the DRIFTED text check_skill prints, which this gate cannot read
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:299 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages the block opened by `[ -f "$CONF" ] || {`
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:321 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `[ -n "${expanded// /}" ]` holding
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:323 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `"$PY" "$KIT_DIR/lexicon.py" --expand` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:346 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `! git diff --quiet || ! git diff --cached --quiet` holding
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:360 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `! git ls-files --error-unmatch -- "$CONF" >/dev/null 2>&1` holding
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:379 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `[ -z "$sha" ]` holding
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:386 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `tmp="$(mktemp)"` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:389 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `"$CONF" > "$tmp"` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:390 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `cat "$tmp" > "$CONF"` failing
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:415 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `[ -n "$_cm" ] \` holding
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:574 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages `[ -f "$CONF" ]` holding
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:576 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages the script reaching it
+    check-arms: waived tools/lexicon/adopt-lexicon.sh:585 exit — no sibling suite: tools/lexicon/adopt-lexicon.test.sh does not exist, so nothing stages the block opened by `write_skill || {`
+    check-arms: waived tools/lib/lib-selftest.sh:269 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/lib/lib-selftest.test.sh stages `[ "$probe" = 1 ]; then [ "$fails" -eq 0 ]` holding through this script
+    check-arms: waived tools/lib/render-doc.sh:47 exit — no sibling suite: tools/lib/render-doc.test.sh does not exist, so nothing stages `out=$( cat "$1"` failing
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:104 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `conf="$("$PY" "$HERE/recall_conf.py")"` failing
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:127 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `[ -f "$SKILL" ]` holding
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:131 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `[ ! -f "$TEMPLATE" ]` holding
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:146 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `out=$( cat "$TEMPLATE"` failing
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:159 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `[ -n "$leftover" ]` holding
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:163 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `[ -f "$SKILL" ]` failing
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:167 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `[ -s "$TMP" ]` failing
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:175 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `[ "$mode" = "--check" ]` holding
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:179 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `render > "$SKILL.tmp"` holding
+    check-arms: waived tools/memory-recall/adopt-memory-recall.sh:185 exit — no sibling suite: tools/memory-recall/adopt-memory-recall.test.sh does not exist, so nothing stages `[ ! -f "$HERE/recall-opened.js" ]` holding
+    check-arms: waived tools/memory-tree/adopt-memory-tree.sh:101 exit — no sibling suite: tools/memory-tree/adopt-memory-tree.test.sh does not exist, so nothing stages `[ ! -f "$ROOT/.memory-tree.conf" ]` holding
+    check-arms: waived tools/memory-tree/adopt-memory-tree.sh:136 exit — no sibling suite: tools/memory-tree/adopt-memory-tree.test.sh does not exist, so nothing stages `[ -z "$READINESS_ROWS" ]` holding
+    check-arms: waived tools/memory-tree/adopt-memory-tree.sh:395 exit — no sibling suite: tools/memory-tree/adopt-memory-tree.test.sh does not exist, so nothing stages `out=$( cat "$1"` failing
+    check-arms: waived tools/memory-tree/adopt-memory-tree.sh:499 exit — no sibling suite: tools/memory-tree/adopt-memory-tree.test.sh does not exist, so nothing stages `render_all` failing
+    check-arms: waived tools/memory-tree/adopt-memory-tree.sh:510 exit — no sibling suite: tools/memory-tree/adopt-memory-tree.test.sh does not exist, so nothing stages `[ -d "$M" ]` holding
+    check-arms: waived tools/memory-tree/check-memory-hygiene.sh:1661 status — delegated and unmarked: its callee prints the reason, and no arm in tools/memory-tree/check-memory-hygiene.test.sh stages `[ "$_tarc" -ne 0 ]` holding through this script
+    check-arms: waived tools/memory-tree/check-memory-hygiene.sh:1753 status — no arm in tools/memory-tree/check-memory-hygiene.test.sh stages `[ -n "$READINESS_ROWS_CUTOFF" ] && [ -z "$READINESS_ROWS" ]` holding
+    check-arms: waived tools/memory-tree/check-memory-hygiene.sh:2886 status — delegated and unmarked: its callee prints the reason, and no arm in tools/memory-tree/check-memory-hygiene.test.sh stages `[ "$_gotrc" -ne 0 ]` holding through this script
+    check-arms: waived tools/memory-tree/check-memory-hygiene.sh:2905 status — delegated and unmarked: its callee prints the reason, and no arm in tools/memory-tree/check-memory-hygiene.test.sh stages the else branch of its `if` through this script
+    check-arms: waived tools/memory-tree/check-verdict-epoch.sh:474 exit — no arm in tools/memory-tree/check-verdict-epoch.test.sh stages `[ -z "$S" ]` holding
+    check-arms: waived tools/push-main.sh:960 exit — no arm in tools/push-main.test.sh stages `! t=$(check_prepared_merge "$R")` holding
+    check-arms: waived tools/push-main.sh:962 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/push-main.test.sh stages `check_carry_set "$R"` failing through this script
+    check-arms: waived tools/push-main.sh:982 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/push-main.test.sh stages `write_lander_marker` failing through this script
+    check-arms: waived tools/push-main.sh:1009 exit — no arm in tools/push-main.test.sh stages the block opened by `cmd_land() {`
+    check-arms: waived tools/push-main.sh:1022 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/push-main.test.sh stages `check_carry_set "$R"` failing through this script
+    check-arms: waived tools/push-main.sh:1031 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/push-main.test.sh stages `t=$(check_prepared_merge "$R")` failing through this script
+    check-arms: waived tools/push-main.sh:1073 exit — no arm in tools/push-main.test.sh stages `! git merge --no-ff "$remote/$def" -m "Merge $remote/$def into $def (push-main reconcile)"` holding
+    check-arms: waived tools/push-main.sh:1087 exit — no arm in tools/push-main.test.sh stages `! run_minter "$mt"` holding
+    check-arms: waived tools/push-main.sh:1094 exit — no arm in tools/push-main.test.sh stages `! git commit -q --no-verify -m "mint: kit versions onto $remote/$def at ${mt:0:8}"` holding
+    check-arms: waived tools/push-main.sh:1113 exit — no arm in tools/push-main.test.sh stages `! git commit -q --no-verify -m "regen: generated outputs onto $remote/$def at ${mt:0:8}${regen_unit:+ for $regen_unit}" -m "Pass: none"` holding
+    check-arms: waived tools/push-main.sh:1132 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/push-main.test.sh stages `write_lander_marker` failing through this script
+    check-arms: waived tools/push-main.sh:1154 exit — no arm in tools/push-main.test.sh stages the script reaching it
+    check-arms: waived tools/run-gates/fixtures/measure-legs/stall.sh:9 exit — delegated and unmarked: its callee prints the reason, and no sibling suite: this is a measure-legs fixture leg, not a gate, and its one reader is measure_legs.py --selftest's AC6 arm, which reads any non-zero exit as a failed arm without asserting a text
+    check-arms: waived tools/run-gates/fixtures/measure-legs/stall.sh:10 exit — delegated and unmarked: its callee prints the reason, and no sibling suite: this is a measure-legs fixture leg, not a gate, and its one reader is measure_legs.py --selftest's AC6 arm, which reads any non-zero exit as a failed arm without asserting a text
+    check-arms: waived tools/run-gates/post-merge.sh:410 exit — no sibling suite: tools/run-gates/post-merge.test.sh does not exist, so nothing stages a failed publish; landed with TOOL-aFrugalTurnstile-8 without a bar, pinned at the aPrimedIndex close
+    check-arms: waived tools/run-gates/run-gates.sh:1362 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/run-gates/run-gates.test.sh stages `[ -f "$WORK/wall.breach" ]` holding through this script
+    check-arms: waived tools/run-gates/run-gates.sh:5374 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/run-gates/run-gates.test.sh stages the else branch of its `if` through this script
+    check-arms: waived tools/runlog/adopt-runlog.sh:75 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `[ -f "$SKILL" ]` holding
+    check-arms: waived tools/runlog/adopt-runlog.sh:79 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `[ ! -f "$TEMPLATE" ]` holding
+    check-arms: waived tools/runlog/adopt-runlog.sh:129 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages the script reaching it
+    check-arms: waived tools/runlog/adopt-runlog.sh:138 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `out=$( cat "$TEMPLATE"` failing
+    check-arms: waived tools/runlog/adopt-runlog.sh:180 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `render_skill > "$TMP"` failing
+    check-arms: waived tools/runlog/adopt-runlog.sh:181 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `check_render "$TMP"` failing
+    check-arms: waived tools/runlog/adopt-runlog.sh:184 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `[ -f "$SKILL" ]` failing
+    check-arms: waived tools/runlog/adopt-runlog.sh:192 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `[ "$MODE" = "--check" ]` holding
+    check-arms: waived tools/runlog/adopt-runlog.sh:195 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `mkdir -p "$(dirname "$SKILL")"` failing
+    check-arms: waived tools/runlog/adopt-runlog.sh:196 exit — no sibling suite: tools/runlog/adopt-runlog.test.sh does not exist, so nothing stages `cp "$TMP" "$SKILL.tmp"` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:626 exit — no arm in tools/unattended/adopt-unattended.test.sh stages the block opened by `done < "$CONF" > "$CONF.new" && mv "$CONF.new" "$CONF" \`
+    check-arms: waived tools/unattended/adopt-unattended.sh:628 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `grep -qE "$STAMP_RE" "$CONF"` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:698 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/unattended/adopt-unattended.test.sh stages `out=$( cat "$TEMPLATE"` failing through this script
+    check-arms: waived tools/unattended/adopt-unattended.sh:738 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -f "$SKILL_OUT" ]` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:741 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `render > "$TMP"` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:742 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -s "$TMP" ]` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:758 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `! diff -q <(tr -d '\r' < "$SKILL_OUT") "$TMP" >/dev/null 2>&1` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:765 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `grep -qE '\{\{[A-Z_]+\}\}' "$SKILL_OUT"` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:773 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ ! -f "$PROTO_OUT" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:776 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `! diff -q <(tr -d ' ' < "$PROTO_OUT") "$PROTO_SHIP" >/dev/null 2>&1` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:782 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ ! -f "$PBT_OUT" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:785 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `! diff -q <(tr -d ' ' < "$PBT_OUT") "$PBT_SHIP" >/dev/null 2>&1` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:790 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ ! -f "$VERBS_OUT" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:793 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `! diff -q <(tr -d ' ' < "$VERBS_OUT") "$VERBS_SHIP" >/dev/null 2>&1` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:798 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ ! -f "$STOPS_OUT" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:801 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `! diff -q <(tr -d ' ' < "$STOPS_OUT") "$STOPS_SHIP" >/dev/null 2>&1` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:805 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ ! -f "$ASKS_OUT" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:808 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `! diff -q <(tr -d ' ' < "$ASKS_OUT") "$ASKS_SHIP" >/dev/null 2>&1` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:816 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ ! -f "$FIXTURE_OUT" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:819 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `render "$FIXTURE_SHIP" > "$FTMP"` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:820 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -s "$FTMP" ]` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:825 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `! diff -q <(tr -d ' ' < "$FIXTURE_OUT") "$FTMP" >/dev/null 2>&1` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:834 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `grep -qE '[{][{][A-Z_]+[}][}]' "$FIXTURE_OUT"` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:870 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -n "${GOV_SETTINGS_JSON:-}" ] && [ ! -f "$GOV_SETTINGS_JSON" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:881 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -n "$GG_NAME" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:884 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -n "$GG_EVENT" ]` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:887 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -f "$KIT_DIR/$GG_MARK" ]` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:911 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ "$N_FRAG" -gt 0 ]` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:977 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `grep -qE '[{][{][A-Z_]+[}][}]' "$FTMP"` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:985 exit — no arm in tools/unattended/adopt-unattended.test.sh stages the else branch of its `if`
+    check-arms: waived tools/unattended/adopt-unattended.sh:1008 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -f "$_fx_tpl" ]` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:1016 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `grep -qE '[{][{][A-Z_]+[}][}]' "$RTMP"` holding
+    check-arms: waived tools/unattended/adopt-unattended.sh:1024 exit — no arm in tools/unattended/adopt-unattended.test.sh stages the else branch of its `if`
+    check-arms: waived tools/unattended/adopt-unattended.sh:1030 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `render > "$TMPW"` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:1033 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `[ -s "$TMPW" ]` failing
+    check-arms: waived tools/unattended/adopt-unattended.sh:1044 exit — no arm in tools/unattended/adopt-unattended.test.sh stages `grep -qE '\{\{[A-Z_]+\}\}' "$TMPW"` holding
+    check-arms: waived tools/unattended/check-pass-order.sh:549 exit — no arm in tools/unattended/check-pass-order.test.sh stages `[ -n "$stale" ]` holding
+    check-arms: waived tools/unattended/unattended.sh:10755 status — no arm in tools/unattended/unattended.test.sh stages `[ -n "$TB" ]` holding
+    check-arms: waived tools/unattended/unattended.sh:14431 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/unattended/unattended.test.sh stages `--plan) shift; refuse_waive_unless_preflight --plan` failing through this script
+    check-arms: waived tools/unattended/unattended.sh:14478 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/unattended/unattended.test.sh stages `refuse_waive_unless_preflight --phase` failing through this script
+    check-arms: waived tools/unattended/unattended.sh:14484 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/unattended/unattended.test.sh stages `--claims) refuse_waive_unless_preflight --claims` failing through this script
+    check-arms: waived tools/unattended/unattended.sh:14506 exit — delegated and unmarked: its callee prints the reason, and no arm in tools/unattended/unattended.test.sh stages `case "$VERB" in --preflight) ;; *) refuse_waive_unless_preflight "${VERB:-(none)}"` failing through this script
+    check-arms: waived tools/workflows/check-review-join.sh:215 exit — tools/workflows/check-review-join.test.sh:307 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/workflows/check-review-join.sh:231 exit — tools/workflows/check-review-join.test.sh:226 drives this refusal but asserts a shorter text than its signature; lengthening it edits another kit's shipped suite, outside this unit's write set
+    check-arms: waived tools/workflows/check-verifier-fanout.sh:194 exit — no arm in tools/workflows/check-verifier-fanout.test.sh stages `[ -z "$SCAN" ]` holding
+    check-arms: ceiling tools/unattended/check-unattended.sh 264/264 · 2026-10-12 · TOOL-aSparedSpawn-14
+    check-arms: ceiling tools/unattended/unattended.sh 323/319 · 2026-10-13 · TOOL-aSweptBar-6
+    check-arms: family tools/unattended/unattended.sh missing-run-state 1/1 · 2026-10-12 · TOOL-aSparedSpawn-14
+    check-arms: family tools/unattended/unattended.sh required-flag 11/11 · 2026-10-12 · TOOL-aSparedSpawn-14
+    check-arms: family tools/unattended/unattended.sh field-shape 37/37 · 2026-10-12 · TOOL-aSparedSpawn-14
+    check-arms: retirements — 5 row(s) read from memory/project/refusal-retirements.txt
+    check-arms: refusal signature — 190 site(s) in 31 script(s): 29 armed, 161 waived; 10 unreasoned line(s) not graded
+    HYGIENE check-arms: tools/unattended/unattended.sh:13711 check 49 branch 23 has no POSITIVE assertion naming its own failure text ('--dispatch cannot read the authored roster:units pair of $(readme_of') and is not pinned in memory/project/unarmed-branches.txt or a sidecar beside the gate — a STRANDED prefix at tools/unattended/unattended.test.sh:6464 stops short of the signature; copy the whole row --report prints
+    HYGIENE check-arms: tools/unattended/unattended.sh:13734 check 49 branch 24 has no POSITIVE assertion naming its own failure text ("--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external") and is not pinned in memory/project/unarmed-branches.txt or a sidecar beside the gate — a STRANDED prefix at tools/unattended/unattended.test.sh:6429 stops short of the signature; copy the whole row --report prints
+    HYGIENE check-arms: tools/unattended/unattended.sh has 323 fail branch(es) and refusal site(s) against a ceiling of 319 (REFUSAL_CEILINGS, 2026-10-13, TOOL-aSweptBar-6) — growth past the budget is raised only through the retirement review in the memory-tree README, with a dated decision id; retire or consolidate a site first
+GATE ok    review-protocol parity (kit vs dogfood)
+GATE ok    review-join ban (no ref-keyed join)
+GATE skip  codebase-map gate coverage  (unchanged vs main)
+GATE ok    codebase-map coverage + freshness
+GATE ok    recall floor
+GATE ok    runlog record schema
+GATE FAIL  drift-audit records  (exit 1)
+    
+    drift-report: non_terminal_specs_cited_by_product_source = 3 against BASELINES (2 listed in tools/drift-audit/drift_signals.py) — this set is shrink-only
+      new   PLAY-dClosedLoop-1 — an offender the set does not list: remove its cause, never list it
+    
+    drift-report: cutoff_keys_armed = 36 (pin 34) — this list is shrink-only
+      {'file': '.memory-tree.conf', 'key': 'ROUTED_COMMIT_CUTOFF', 'value': '2026-10-09'}
+      {'file': '.memory-tree.conf', 'key': 'SPEC_FORMAT_CUTOFF', 'value': '2026-07-15'}
+      {'file': '.memory-tree.conf', 'key': 'STREAMS_CUTOFF', 'value': '2026-08-09'}
+      {'file': '.memory-tree.conf', 'key': 'REVIEW_VERDICT_CUTOFF', 'value': '2026-08-22'}
+      {'file': '.memory-tree.conf', 'key': 'FORK_MARK_CUTOFF', 'value': '2026-08-21'}
+      {'file': '.memory-tree.conf', 'key': 'FORK_ITEM_CUTOFF', 'value': '2026-09-30'}
+      {'file': '.memory-tree.conf', 'key': 'SPEC_WITNESS_CUTOFF', 'value': '2026-08-15'}
+      {'file': '.memory-tree.conf', 'key': 'SPEC10_CUTOFF', 'value': '2026-08-04'}
+      {'file': '.memory-tree.conf', 'key': 'SPEC10_EVIDENCE_CUTOFF', 'value': '2026-09-01'}
+      {'file': '.memory-tree.conf', 'key': 'REV_SCOPE_CUTOFF', 'value': '2026-09-08'}
+    # drift-report at f4b9849c (base refs/remotes/origin/main @ 271aa59d) · kit 1.30
+    # dead-for-N: 38 readings recorded at C:\projects\coding-governance\.git\drift-history.tsv · limit 10
+    # signal                                             value     of  status
+      lexicon_marginal_offense_rate                        707   5721  report only, no pin
+      ledger_rows_contradicting_git                          0      0  empty by declaration — nothing to measure here yet
+      non_terminal_specs_cited_by_product_source             3     36  OVER BASELINE — gateable
+      shrink_only_lists_not_shrinking                        3      5  over pin 0 (report only)
+      handkept_inventories_disagreeing_with_source           0     27  ok (pin 0)
+      dangling_pointers_in_own_ledger                       11     80  report only, no pin
+      closed_specs_with_no_product_commit                    1   1268  ok (baseline 1)
+      lexicon_verbs_declared_but_unused                      0     23  ok (pin 0)
+      lexicon_ratified_older_than_language_surface           0      1  ok (pin 0)
+      live_backlog_rows_per_shard                          560    150  report only, no pin
+      asks_disposed_overrides                                0     90  ok
+      readme_mechanism_drift                                 4     22  ok (pin 4, drain it)
+      backlog_asks_contested                                 0    898  ok
+      backlog_evidence_sha                                   0     72  ok
+      backlog_asks_unlabelled                              435    560  ok (pin 447, drain it)
+      open_asks_cited_by_product_source                     54    560  report only, no pin
+      cutoff_keys_armed                                     36     36  OVER PIN 34 — gateable
+      source_cited_ids_resolving_to_no_record                4   1314  over pin 2 (report only)
+      backlog_stragglers                                     0     54  ok
+      run_records_nonterminal_but_merged                    10     99  over pin 2 (report only)
+      aborted_work_landed                                    0     13  ok
+      discarded_work_landed                                  0     13  DEAD PROBE for 38 readings — take it out of SIGNALS, or file an ask and declare it in DEAD_FILED
+      legs_retried_after_timeout                             3     51  over pin 0 (report only)
+      fleet_over_budget                                      0      4  ok
+      remote_ci_red_streak                                   0      0  not asked — skipped under --check and --offenders: the merge bar's leg makes no network call for a value it does not grade
+      dossiers_older_than_their_paths                       29     31  over pin 26 (report only)
+      live_builds_without_activity                          22     47  report only, no pin
+    
+    # detail: rerun with --json
+    drift-report: 27 history rows appended to C:\projects\coding-governance\.git\drift-history.tsv
+GATE ok    unattended kit gate
+GATE ok    pass-order history
+GATE ok    routed commits name a specced unit
+GATE ok    brief-recorded
+GATE ok    playbook validity gate
+GATE ok    dead-path carriers (deleted files still named)
+GATE FAIL  remote literals (kit code names no remote)  (exit 1)
+    tools/memory-tree/deviation_join.py:62:approver citing no decision id whose row `<MEMORY_ROOT>/DECISIONS.md` holds at `origin/main` and names
+    tools/memory-tree/deviation_join.py:140:REF = "origin/main"             # where an owner approval's decision row must already be held
+    tools/memory-tree/deviation_join.py:719:    decision rows at `origin/main`."""
+    tools/memory-tree/deviation_join.py:1199:    fx.stream += b"reset refs/remotes/origin/main\nfrom :%d\n\n" % fx.base
+    remote-literals: FAILED — 4 line(s) in 163 file(s) name a remote by literal. Resolve it through the remote ladder (resolve_remote / resolve_remote_sh in the gov lib dir, inlined), never by name.
+GATE FAIL  govkit selfcheck  (exit 1)
+    govkit: adopters: 14 descriptor(s) declare one, 9 with [[regenerate]], 5 with a stated why_no_regenerate
+    govkit: adopter defaults: 14 required key/adopter pair(s) read
+    govkit: entry 'playbook' declares a version constant in 'coding-governance-agents.template.md' that tools/check-kit-versions.sh does not assert — reported, not repaired
+    govkit: entry 'branch-reconcile' declares a version constant in 'tools/branch-reconcile/branch_reconcile.py' that tools/check-kit-versions.sh does not assert — reported, not repaired
+    govkit: entry 'check-wiring' declares a version constant in 'tools/check-wiring.sh' that tools/check-kit-versions.sh does not assert — reported, not repaired
+    govkit: entry 'playbook-render' declares a version constant in 'tools/playbook/render_playbook.py' that tools/check-kit-versions.sh does not assert — reported, not repaired
+    govkit: entry 'process-monitor' declares a version constant in 'tools/process-monitor/adopt-process-monitor.sh' that tools/check-kit-versions.sh does not assert — reported, not repaired
+    govkit: entry 'runlog' declares a version constant in 'tools/runlog/runlog_lib.py' that tools/check-kit-versions.sh does not assert — reported, not repaired
+    govkit: entry 'review-harness' declares a version constant in 'tools/workflows/tier2-review.template.js' that tools/check-kit-versions.sh does not assert — reported, not repaired
+    govkit: tools/check-kit-versions.sh asserts a constant in 'tools/govkit/govkit.py' that no registry entry claims — reported, not repaired
+    govkit: tools/check-kit-versions.sh asserts a constant in 'tools/workflows/drift-audit-code.js' that no registry entry claims — reported, not repaired
+    govkit: tools/check-kit-versions.sh asserts a constant in 'tools/workflows/drift-audit-state.js' that no registry entry claims — reported, not repaired
+    govkit: tools/check-kit-versions.sh asserts a constant in 'tools/workflows/tier2-review.js' that no registry entry claims — reported, not repaired
+    govkit: entry 'playbook' is exempt from the gov:kit marker rule by its own declared version_from.kind = "marker" — it versions by another convention
+    govkit: contract memory-tree/gen-build-index (memory-tree:gen_build_index.py): 7 clause(s)
+    govkit: contract memory-tree/corpus-ids (memory-tree:corpus_ids.py): 2 clause(s)
+    govkit: contract memory-tree/gotchas (memory-tree:gotchas.py): 1 clause(s)
+    govkit: contract memory-tree/hygiene-print-modes (memory-tree:check-memory-hygiene.sh): 3 clause(s)
+    govkit: hole probes on an empty tree: 20 ran, 0 exited 0, 0 could not launch
+    govkit: generated outputs: 8 [[generated]] row(s) declared across the descriptors
+    govkit: guarded bar legs graded 8 · root-conf readers 1
+    govkit: precedence: 0 destination(s) won by a later rule than the first match · 83 carve-out source(s) declared, of which 14 change a write
+    govkit: legs: 142 in the manifest · 68 claimed · 74 exempt
+    govkit: subject pins: 142 pinned · 71 held
+    govkit: gate policy: 1 file(s) assign a key of GATE_SELFTESTS INHERITED_RED INHERITED_RED_MAX_AGE GATE_DOC_PATHS · 351 shipped path(s) derived from the descriptors
+    govkit: shipped-gate arms: 8 shipped gate(s), each graded for a shipped sibling suite
+    govkit: gate legs: 29 of 29 registry entries graded · 172 argv element(s) offered against a bare target · 0 naming a path no rule produces · 405 planned destination(s) graded against the reserved `{memory_root}/project/` prefix, 0 under it
+    govkit: cross-entry argv: 282 argv element(s) offered by [adopt], [check], [[gate_leg]] and [[regenerate]] across 29 entries, 106 graded, 0 naming a file only another entry ships
+    govkit: per-file claim: 0 unclaimed file(s) under a non-flat home
+    govkit: check wiring: 27 shipped script(s) read
+    govkit: declared check: 29 entries, 0 silent · withheld-path legs: 68 descriptor leg(s) graded
+    govkit: held self-test legs: 68 graded, 25 self-test-shaped, exempt by chunk: kit/dogfood doc parity, marker contracts, review-protocol parity (kit vs dogfood) · population 68 in chunk selftests
+    govkit: entry scope: 29 declaration(s) checked against their derived value
+    govkit: rendered rows: 9 descriptor(s) ship at least one, 9 of those declare [[regenerate]]
+    govkit: re-render claims: 36 sentence(s) naming `update` and a re-render, and 0 calling a flag-off run silent, across 10 kit(s) declaring [[regenerate]]
+    govkit: surface 77 tracked path(s) · 29 entr(y|ies) · 28 exemption(s) · 0 unclaimed
+    govkit: root-join writes on receipt-supplied values: 0 ungraded
+    govkit: adopter names: 3 from 3 adopters.toml row(s) over 346 shipped file(s) · 0 site(s)
+    govkit: 'tools/memory-tree/deviation_join.py' (kit 'memory-tree', which declares [[regenerate]]) says `update` re-renders without naming GOVKIT_RERENDER in the same sentence, and with GOVKIT_RERENDER=0 exported `update` declines the regenerate: def add_plant(fx, plant): """One plant's history, on its own unit, clause or row, so every plant composes with every other.""" u, u1 = PLANT_UNITS.get(plant), "FIX-dTrueNorth-1" if plant == "baseline"
+    govkit: 1 problem(s)
+GATE ok    kit epoch (shipped bytes move, the version moves)
+GATE ok    lexicon naming predicates
+GATE ok    transition-audit arms
+GATE ok    straggler-guard arms
+GATE ok    marker contracts
+GATE ok    verifier fan-out
+GATE skip  govkit refusal join  (unchanged vs main)
+GATE ok    govkit runbook parity
+GATE skip  govkit acceptance matrix  (unchanged vs main)
+GATE ok    testsuite counts (every bar self-test prints one)
+GATE ok    spec tokens (a spec's own names resolve)
+GATE ok    kit placeholders (a declared token its adopter substitutes)
+GATE ok    roles catalogue
+GATE ok    leg ceilings clear their evidenced maximum
+GATE ok    every held leg is budgeted, every budget row resolves
+GATE ok    receipt sync (installed files match the receipt)
+---- chunk declarations: RED  (34 ran, 4 failed, 3 skipped, 0 reused, 0 held)
+GATE ok    agent-instructions wiring
+GATE held  python resolver (behaviour + inline parity + idiom ban)  (self-test, set GATE_SELFTESTS=1 to run)
+GATE ok    workflow script syntax
+GATE ok    memory-recall skill wiring
+GATE ok    drift-audit wiring
+GATE ok    runlog skill wiring
+GATE ok    cleanup skill wiring
+GATE ok    unattended skill wiring
+GATE ok    run-gates wiring
+GATE ok    lexicon wiring
+GATE ok    playbook render wiring
+GATE ok    roles render wiring
+---- chunk wiring: green  (11 ran, 0 failed, 0 skipped, 0 reused, 1 held)
+GATE held  codebase-map adopter e2e  (self-test, set GATE_SELFTESTS=1 to run)
+GATE held  run-gates adopter e2e  (self-test, set GATE_SELFTESTS=1 to run)
+---- chunk e2e: skipped  (0 ran, 0 failed, 0 skipped, 0 reused, 2 held)
+memory: no pause  (peak 72% used, threshold 90%)
+----
+gates RED — 9/68 legs failed (3 skipped) (71 held: subject kit or chunk selftests, GATE_SELFTESTS=1 runs them)
+gate summary saved to C:/projects/coding-governance/.git/worktrees/unattended-dtruenorth-4cb56e/gate-last-summary.txt
+gate failure record saved to C:/projects/coding-governance/.git/worktrees/unattended-dtruenorth-4cb56e/gate-last-failure.txt
+rc=1
