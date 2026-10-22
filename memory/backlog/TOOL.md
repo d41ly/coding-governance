@@ -441,6 +441,7 @@ Cite ids, never line numbers.
 | [TOOL-dHonouredPark-9](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | The verdict-epoch bump is only ever discovered AFTER a red bar.… |
 | [TOOL-dHonouredPark-10](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | check 29 has no terminal-run exemption, so an ABORTED run that used the… |
 | [TOOL-dIndexedDesign-17](../builds/dIndexedDesign/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dIndexedDesign-18](../builds/dIndexedDesign/BACKLOG.md) | OPEN | LOW | — | 2026-10-23 | THE CARRIES INSTRUMENT READS NO AMENDMENT. carries.py (the bootstrap… |
 | [TOOL-dLinkedLibrary-26](../builds/dLinkedLibrary/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dMindYourWords-18](../builds/dMindYourWords/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dMispairedQuote-4](../builds/dMispairedQuote/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | agent-cap.js models no regex literal, which is the ROOT of every… |
