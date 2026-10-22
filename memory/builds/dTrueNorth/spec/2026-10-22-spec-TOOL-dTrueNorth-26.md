@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-26 — the closing diff review's minors: one scrubbed runner, one spec predicate, tracked records, one clause grammar, honest edges, and the comments that name them
 
-**Status:** OPEN · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 10
+**Status:** OPEN · rev-2 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 10
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,8 @@
 | [2026-10-22-build-TOOL-dTrueNorth-26-deviation-25.md](../build/2026-10-22-build-TOOL-dTrueNorth-26-deviation-25.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-26-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-26-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-26-1-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-1-spec-writer.md) | journal | — |
+| [2026-10-22-prompt-TOOL-dTrueNorth-26-2-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-2-spec-writer.md) | journal | — |
+| [2026-10-22-prompt-TOOL-dTrueNorth-26-divergence-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-divergence-brief.md) | research | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-26-spec-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -95,8 +97,10 @@ That is 10 MEDIUM and 9 LOW findings by raw id, 18 of them scope items here. Fin
   fixture's records and specs are tracked. A failed `ls-files` is a `DesignRefusal` naming it, which
   each caller maps as it maps the design's other refusals. Observed by AC9 and AC10.
 - **S8** — finding 21, the skeptic's fix. `asbuilt_view.py` (`:122`) and `deviation_join.py` (`:145`)
-  import `_CL` from `design_lib`, whose `VIEW_ROW` (`:120`) builds from `_CL` too, so the clause-id
-  grammar is spelled once (`design_lib.py:107`). `TOOL-dTrueNorth-20` AC21's scan
+  import `_CL` from `design_lib`. In the same change, `design_lib.py`'s `VIEW_ROW` (`:120`), which
+  spells the clause grammar literally in its clause cell today, is rebuilt from `_CL` as `CARRY`
+  (`:112`) is, so the clause-id grammar is spelled once (`design_lib.py:107`) and AC11's one-line
+  git grep can hold. `TOOL-dTrueNorth-20` AC21's scan
   (`tools/check-spec-tokens.test.sh:1523-1531`) walks each `re.compile`, `re.match`, `re.search` and
   `re.fullmatch` call's pattern argument and flags any call whose subtree holds a str Constant leaf;
   the assignments to `ROW_FOLLOW` and `ROW_DEPARTS` (`asbuilt_view.py:123-124`) are the allowed
@@ -201,9 +205,14 @@ nothing else at order 10 builds beside it, so a split buys no concurrency.
   writes the attribute: `asbuilt_view.build_view_fixture`, the generator selftest's design fixtures
   (`gen_build_index.py:4995-5010`), and the hygiene suite's check 29 and 30 fixture
   (`tools/memory-tree/check-memory-hygiene.test.sh:4175`).
-- S18: the arm count of the routed-commits selftest stays the same; eleven of its arms stop being
-  constant. The figure is DERIVED at writing: `derive_plant_needle` returns None for eleven plants,
-  each exiting 0 and none in `RISK_PLANTS`.
+- S18: it moves no arm count of the routed-commits selftest, and S5's `spec-notes` plant adds its
+  own refuse and report arms; twelve report arms stop being constant. The figure is DERIVED at
+  writing: `derive_plant_needle` returns None for eleven plants at `190c1eea`, each exiting 0 and
+  none in `RISK_PLANTS`, and the twelfth is `spec-notes`, which enters `PLANTS` with exit 0 in
+  `PLANT_EXITS` and no needle. The plant table can honour no needle for it: the plant's claim is
+  that a notes file adds no finding, and the join's report render prints no line naming the file,
+  so a needle would need a render line this unit has no use for. Its report arm is therefore the
+  findings-count-0 arm S18 makes.
 
 ### Deviation-26 (S6)
 
@@ -260,7 +269,7 @@ pass's commit with the view re-rendered:
 | `read_tracked_builds` | function, `design_lib.py` | `py.function`, OK |
 | `check_view_merge` | function, `asbuilt_view.py` | `py.function`, OK |
 | `unnamed` | `scan_chain_specs` skip reason | none |
-| `spec-notes` | deviation fixture plant, `PLANTS` | none |
+| `spec-notes` | deviation fixture plant, `PLANTS`, exit 0 in `PLANT_EXITS`, no needle (§4, S18) | none |
 
 ### Files touched (estimate)
 
@@ -410,11 +419,22 @@ short `%TEMP%` path with no hook installed.
   fails; unwrapped, all hold.
   Red when: a needle-less report arm holds over a planted finding.
   cost: minutes, one fixture per plant.
-  figure: eleven such plants at writing, DERIVED by the probe from `derive_plant_needle`.
-- **AC22** — When `python tools/memory-tree/deviation_join.py --approval by-risk` runs after this
-  pass, no `refused:` or malformed line names `2026-10-22-build-TOOL-dTrueNorth-26-deviation-26`,
-  `2026-10-22-build-TOOL-dTrueNorth-26-deviation-27` or `2026-10-22-build-TOOL-dTrueNorth-26-deviation-25`.
-  Red when: a dispatch change is recorded nowhere, or a record falls outside the grammar.
+  figure: twelve such plants after this pass, the eleven at `190c1eea` and `spec-notes`, DERIVED by
+  the probe from `derive_plant_needle`.
+- **AC22** — When `python tools/memory-tree/deviation_join.py --approval author-recorded` runs after
+  this pass, under the chain's value (`PLAY-dClosedLoop-4`), the one the routed-commits host runs
+  (`HOST_APPROVAL`, `deviation_join.py:136`), no `refused:` or malformed line names
+  `2026-10-22-build-TOOL-dTrueNorth-26-deviation-26`, `2026-10-22-build-TOOL-dTrueNorth-26-deviation-27`
+  or `2026-10-22-build-TOOL-dTrueNorth-26-deviation-25`. A run of
+  `python tools/memory-tree/deviation_join.py --approval by-risk` does refuse
+  deviation-26, whose loosening risk asks an owner where §4 records a spec writer (`LEAST`,
+  `:146-147`), as it refuses deviation-20 and deviation-21 at HEAD. Its departures report, under the
+  default `report` policy, lists deviation-26 on a `refused:` line beside those two and exits 0.
+  Deviation-27, stricter, is not refused there.
+  Red when: a dispatch change is recorded nowhere, a record falls outside the grammar, or the
+  author-recorded run refuses the spec writer's approval.
+  figure: the by-risk header's refused count was 2 at `190c1eea`, DERIVED by the same command; this
+  pass adds one.
 
 ## 7. Gates
 
@@ -477,6 +497,12 @@ for its own. `KIT_MEMORY_TREE_VERSION` is minted by the lander for the delegates
 ## 9. Revision log
 
 - rev-1 · 2026-10-22 · initial draft, batching the closing diff review's 10 MEDIUM and 9 LOW findings, M7 handed to TOOL-dTrueNorth-25.
+- rev-2 · 2026-10-22 · AC22 · AC21 · S8 · S18 · §4 · the builder's DIVERGENCE: AC22 ran
+  `--approval by-risk`, which refuses §4's verbatim deviation-26, a loosening with a spec-writer
+  approver. Ruling (a) of the run: AC22 runs `--approval author-recorded`, the chain's value and the
+  host's, and states the by-risk refusal and its report listing. `spec-notes` takes no needle, so
+  AC21's figure is twelve; S8 states that `VIEW_ROW` is rebuilt from `_CL`. §4's deviation text is
+  unchanged.
 
 ## 10. Reuse audit
 
