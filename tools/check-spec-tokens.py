@@ -123,7 +123,11 @@ status but WONTDO, with its history.
          `design_lib.py`, loaded by path from the kit beside this file, so this join parses nothing
          itself. ITS POPULATION IS NOT THE LIVE SPECS: every status carries but WONTDO, which is set
          apart and counted, because under the unattended harness each unit's spec closes in its own
-         build commit and a live-only join would lose each carrier as its unit closed. A hit names
+         build commit and a live-only join would lose each carrier as its unit closed.
+         The carries join reads each status through the generator's header grammar, a header it
+         cannot parse set apart and counted as unparsed, and each history through
+         `read_spec_revisions`, the revision reader the deviation population reads too
+         (TOOL-dTrueNorth-16). A hit names
          its arm: malformed, unbound, withdrawn, ghost, crossbuild, stale and stopped per spec,
          ambiguous, parts and token per clause; its token is `carries <- <arm>:<ref>`, so a `[path]`
          waiver row on a bare spec path never takes one. The exit arms, uncarried and node, are
@@ -269,7 +273,8 @@ GATES_HEAD = re.compile(r"^## [0-9]+[.] Gates[ \t]*$", re.M)
 # whole of the Tier-1 accommodation: under the light profile a spec may legally omit the section, and
 # one that omits it stays silent rather than red. Blank or absent turns the arm off.
 LEGLINE_KEY = "SPEC_LEGLINE_CUTOFF"
-SPEC_DATE = re.compile(r"/([0-9]{4}-[0-9]{2}-[0-9]{2})-spec-")
+# `SPEC_DATE`, a spec's filename date, is bound below `load_design_lib` to the kit's one compiled
+# pattern, `design_lib.SPEC_FILE_DATE` (TOOL-dTrueNorth-16 S32), so this file spells no second copy.
 # TOOL-aDeferredBar-2: the bar join's key, heading pattern and predicate. Blank or absent is OFF.
 DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
 # TOOL-aBlindedTrial-8: the guards join's key and the sub-head it reads. The corpus spells the
@@ -343,14 +348,14 @@ HANDOFF_WHY = ("this bullet hands the token to that sibling and the sibling's ow
                "it: name it there, or correct the bullet — the join proves the sibling NAMES the "
                "token, never that it does the work")
 # TOOL-dTrueNorth-2: the carries join's key, the two arms only a Design exit grades, and the parser.
-# The parser is the memory-tree kit's `design_lib.py`, loaded by path from the kit beside this file
-# and only while the key is set, so a tree that leaves the key blank needs no such kit beside it.
+# The parser is the memory-tree kit's `design_lib.py`, loaded by path from the kit beside this file.
+# Since TOOL-dTrueNorth-16 S32 it is loaded on every run, its date pattern being `SPEC_DATE`, so a
+# checker copied without that kit beside it refuses by name; the status header is the generator's
+# `parse_spec_text` from the same kit, loaded only while the key is set (S11).
 CARRIES_KEY = "SPEC_CARRIES_CUTOFF"
 CARRIES_EXIT_ARMS = ("uncarried", "node")
-DESIGN_LIB = HERE / "memory-tree" / "design_lib.py"
-# A spec's status token, read in its first five unfenced lines: `WONTDO` is set apart, every other
-# status carries, CLOSED and DEFERRED included, since a landed carrier is what carries a landed clause.
-CARRIES_STATUS = re.compile(r"^\*\*Status:\*\*\s*([A-Z]+)")
+KIT_DIR = HERE / "memory-tree"
+DESIGN_LIB = KIT_DIR / "design_lib.py"
 CARRIES_RELEASES = ("moved", "retired", "deferred")
 
 # TOOL-dGatedProse-2: THE CLAIMS JOIN. A codebase-map dossier claims EXACT inventory keys and nothing
@@ -681,13 +686,19 @@ def read_conf_key(root, key):
 
 
 def read_cutoff_key(root, key):
-    """`read_conf_key` for a DATE key. A set value that is not a real ISO date is a REFUSAL, never OFF
-    and never armed (closing review F10; round 2 R7 and R11): every cutoff this file reads is armed
-    by a string comparison, so `2026-9-8` reports the join as set while grading nothing, and
-    `2026-13-45` has the shape and no day. ONE helper for EVERY cutoff key, because F10 gated the
-    instance and left SPEC_LEGLINE_CUTOFF standing. Returns None on the refusal, after printing it.
+    """`read_conf_key` for a DATE key, its value tested by `check_cutoff_value`. ONE helper for EVERY
+    cutoff key but the carries key, whose value comes from `design_lib.read_design_conf` (S14)."""
+    return check_cutoff_value(key, read_conf_key(root, key))
+
+
+def check_cutoff_value(key, value):
+    """A DATE key's value, the body of `read_cutoff_key` factored out (TOOL-dTrueNorth-16 S14). A set
+    value that is not a real ISO date is a REFUSAL, never OFF and never armed (closing review F10;
+    round 2 R7 and R11): every cutoff this file reads is armed by a string comparison, so `2026-9-8`
+    reports the join as set while grading nothing, and `2026-13-45` has the shape and no day. ONE test
+    for EVERY cutoff key, because F10 gated the instance and left SPEC_LEGLINE_CUTOFF standing.
+    Returns the value, "" when blank, and None on the refusal, after printing it.
     """
-    value = read_conf_key(root, key)
     if not value:
         return value
     try:
@@ -789,107 +800,89 @@ def scan_handoffs(root, specs, uids, cutoff):
     return hits, bullets, tokens, silent
 
 
-def load_design_lib():
-    """The memory-tree kit's `design_lib.py`, loaded by path from `DESIGN_LIB`, once (TOOL-dTrueNorth-2).
+def load_kit_module(name):
+    """The memory-tree kit's module `name`, loaded by path from `KIT_DIR`, once (TOOL-dTrueNorth-2, its
+    second instance TOOL-dTrueNorth-16 S11).
 
-    A module already loaded as `design_lib` FROM THAT FILE is reused, so a caller that imported it
-    itself catches the one `DesignRefusal` class this join raises. It loads with no bytecode cache
-    written beside it, since the join has no write path. An absent file is an ImportError naming it.
+    A module already loaded under `name` FROM THAT FILE is reused, so a caller that imported it itself
+    catches the one refusal class it raises. It loads with no bytecode cache written beside it, since
+    no join here has a write path. An absent file is an ImportError naming it.
     """
-    mod = sys.modules.get("design_lib")
-    if mod is not None and pathlib.Path(getattr(mod, "__file__", None) or ".").resolve() == DESIGN_LIB.resolve():
+    path = KIT_DIR / f"{name}.py"
+    mod = sys.modules.get(name)
+    if mod is not None and pathlib.Path(getattr(mod, "__file__", None) or ".").resolve() == path.resolve():
         return mod
-    if not DESIGN_LIB.is_file():
-        raise ImportError(f"{CARRIES_KEY} is set and {DESIGN_LIB.as_posix()} is not there, so the design "
-                          "and the binding lines cannot be read")
-    spec = importlib.util.spec_from_file_location("design_lib", DESIGN_LIB)
+    if not path.is_file():
+        raise ImportError(f"{path.as_posix()} is not there, so the design, the binding lines, the spec "
+                          "filename date and the status header cannot be read")
+    spec = importlib.util.spec_from_file_location(name, path)
     mod = importlib.util.module_from_spec(spec)
     cache, sys.dont_write_bytecode = sys.dont_write_bytecode, True
     try:
         spec.loader.exec_module(mod)
     finally:
         sys.dont_write_bytecode = cache
-    return sys.modules.setdefault("design_lib", mod)
+    return sys.modules.setdefault(name, mod)
 
 
-def parse_spec_status(text):
-    """The word after `**Status:**` in the spec's first five unfenced lines, or "" (TOOL-dTrueNorth-2)."""
-    for k, (_, line) in enumerate(load_design_lib().unfenced_lines(text)):
-        if k == 5 or line is None:
-            break
-        m = CARRIES_STATUS.match(line)
-        if m:
-            return m.group(1)
-    return ""
+def load_design_lib():
+    """The memory-tree kit's `design_lib.py`, `load_kit_module`'s first caller (TOOL-dTrueNorth-2)."""
+    return load_kit_module("design_lib")
 
 
-def read_carries_specs(root, design, cutoff, files=None):
+# THE ONE SPEC FILENAME DATE (TOOL-dTrueNorth-16 S32), bound to the kit's compiled pattern, so the
+# dated joins here and the carries population read one date. A checker copied without the kit binds
+# none, and `main` refuses by name before any join that reads a date.
+SPEC_DATE = load_design_lib().SPEC_FILE_DATE if DESIGN_LIB.is_file() else None
+
+
+def read_carries_specs(root, design, cutoff, files=None, conf=None):
     """THE CARRIES JOIN'S POPULATION (TOOL-dTrueNorth-2): `(specs, statuses, skipped)`.
 
     `specs` is `{build: [(path, text, revisions)]}`, the shape `scan_carries` reads: every TRACKED spec
     `design_lib.scan_chain_specs` selects for the view's chain builds at or after `cutoff`, its
-    working-tree text, and its text at every commit that touched it, newest first. `statuses` maps
-    each kept path to its status token. A `WONTDO` spec is set apart before its history is read and
-    counted under `wontdo` beside the selector's own reasons. The history is ONE `git log` over the
-    chain builds' spec folders and ONE `git cat-file --batch`; a commit at which the path is absent,
-    its deletion, is skipped. Read per path without `--follow`, so a rename starts a new history.
+    working-tree text, and its text after every non-merge commit that changed it, oldest first, from
+    `design_lib.read_spec_revisions`, the one reader the deviation population reads too (S12); its
+    deletion, a revision with no text, is skipped. `statuses` maps each kept path to its status.
+
+    THE ONE HOME OF THE WONTDO FILTER (TOOL-dTrueNorth-16 S9): each status is the generator's
+    `parse_spec_text`, loaded by path from the kit beside this file, with the conf's family
+    alternation, so the join and the units table read one header grammar (S11). A `WONTDO` spec is set
+    apart before its history is read and counted under `wontdo`, and a spec whose header does not
+    parse, or carries a verb the grammar refuses, under `unparsed`, beside the selector's own reasons.
+    Read per path without following a rename, so a rename starts a new history.
     """
     dl = load_design_lib()
+    gbi = load_kit_module("gen_build_index")
     root = pathlib.Path(root)
     if files is None:
         files = read_tracked(root)
+    alt = gbi._id_alternation(conf or {})
     kept, skipped = dl.scan_chain_specs(files, design["builds"], cutoff)
-    skipped = dict(skipped, wontdo=0)
+    skipped = dict(skipped, wontdo=0, unparsed=0)
     statuses, texts = {}, {}
     for build, path in kept:
         try:
             text = (root / path).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         except OSError as e:
             raise dl.DesignRefusal(f"{path} is a tracked chain spec that cannot be read: {e}") from None
-        status = parse_spec_status(text)
-        if status == "WONTDO":
+        try:
+            unit = gbi.parse_spec_text(text, path, alt)
+        except gbi.Problem:
+            unit = None
+        if unit is None:
+            skipped["unparsed"] += 1
+            continue
+        if unit["status"] == "WONTDO":
             skipped["wontdo"] += 1
             continue
-        statuses[path] = status
+        statuses[path] = unit["status"]
         texts[path] = (build, text)
-    shas = {}
-    if texts:
-        folders = sorted({f"memory/builds/{b}/spec" for b, _ in texts.values()})
-        r = dl.run_git(root, "-c", "core.quotepath=off", "log", "--format=%H", "--name-only", "--", *folders)
-        if r.returncode:
-            raise dl.DesignRefusal("git log over the chain builds' spec folders failed, so no revision was "
-                                   f"read: {r.stderr.decode('utf-8', 'replace').strip()}")
-        sha = None
-        for line in r.stdout.decode("utf-8", "replace").splitlines():
-            if re.fullmatch(r"[0-9a-f]{40}(?:[0-9a-f]{24})?", line):
-                sha = line
-            elif sha and line in texts:
-                shas.setdefault(line, []).append(sha)
-    asks = [(p, s) for p in texts for s in shas.get(p, [])]
-    revs = {p: [] for p in texts}
-    if asks:
-        r = subprocess.run(["git", "--no-replace-objects", "-C", str(root), "cat-file", "--batch"],
-                           input="".join(f"{s}:{p}\n" for p, s in asks).encode("utf-8"),
-                           capture_output=True, env=dl.build_git_env())
-        if r.returncode:
-            raise dl.DesignRefusal("git cat-file --batch over the chain specs' revisions failed, so no "
-                                   f"revision was read: {r.stderr.decode('utf-8', 'replace').strip()}")
-        out, pos = r.stdout, 0
-        for p, s in asks:
-            nl = out.find(b"\n", pos)
-            head = out[pos:nl].decode("utf-8", "replace") if nl >= 0 else ""
-            pos = nl + 1
-            if head.endswith((" missing", " ambiguous")):
-                continue
-            size = head.rsplit(" ", 1)[-1]
-            if nl < 0 or not size.isdigit():
-                raise dl.DesignRefusal(f"git cat-file --batch answered `{head}` for {s}:{p}, so the "
-                                       "revisions cannot be read")
-            revs[p].append(out[pos:pos + int(size)].decode("utf-8", "replace").replace("\r\n", "\n"))
-            pos += int(size) + 1
+    history = dl.read_spec_revisions(root, list(texts))
     specs = {}
     for p, (build, text) in texts.items():
-        specs.setdefault(build, []).append((p, text, revs[p]))
+        specs.setdefault(build, []).append((p, text, [after for _sha, _before, after in history.get(p, [])
+                                                      if after is not None]))
     return specs, statuses, skipped
 
 
@@ -910,8 +903,9 @@ def scan_carries(design, specs, exit_mode=False):
       exit only   uncarried · node, and only with `exit_mode=True`
 
     Two changes from the instrument, each named: the withdrawn ids are the design's, read at its
-    baseline, and the clause population is the view's. A `WONTDO` spec is set apart before any arm
-    runs, so a superseded unit's binding lines neither carry nor collide with its successor's.
+    baseline, and the clause population is the view's. It parses NO status (TOOL-dTrueNorth-16 S9):
+    `read_carries_specs` is the WONTDO filter's one home, so a superseded unit's binding lines never
+    reach this function to carry or collide with its successor's, and `specs` is measured whole.
     Returns `{"findings", "carriers", "measured", "bindings"}`: `carriers` maps `("clause", id)` and
     `("node", key)` to `[(path, "whole" or "part k/n", hash)]`, `measured` is `{build: [path]}` over
     the specs the arms read, and `bindings` each one's parsed lines, None where it was malformed.
@@ -922,8 +916,6 @@ def scan_carries(design, specs, exit_mode=False):
     findings, carriers, measured, bindings, texts = [], {}, {}, {}, {}
     for b, items in specs.items():
         for path, text, _ in items:
-            if parse_spec_status(text) == "WONTDO":
-                continue
             measured.setdefault(b, []).append(path)
             texts[path] = text
             try:
@@ -1006,27 +998,36 @@ def scan_carries(design, specs, exit_mode=False):
     return {"findings": findings, "carriers": carriers, "measured": measured, "bindings": bindings}
 
 
-def derive_carries_coverage(root, files=None):
+def derive_carries_coverage(root, files=None, conf=None):
     """The carries join's coverage, read once (TOOL-dTrueNorth-2): the one value the leg and the
-    coverage region read. Blank `SPEC_CARRIES_CUTOFF` is `{"state": "off", "why": ...}`, read before
-    anything else. Set, it reads the four `DESIGN_*` keys through `read_conf_key`, the design through
-    `read_design`, the population through `read_carries_specs`, and runs `scan_carries` once with
-    `exit_mode=True`; it returns `{"state": "armed", "cutoff", "measured", "skipped", "withdrawn",
-    "builds"}`, `builds` carrying an entry for EVERY chain build of the view, a build with no spec
-    included: its clauses, owned nodes, specs with their statuses, the fields `carries.py:293-312`
-    computes, computed the same way, and its findings with their arm labels. A cutoff
-    `read_cutoff_key` refused, a blank or unreadable design key and an unreadable history each raise
-    `DesignRefusal`; a measured count of zero is returned, and refusing it is the leg's.
+    coverage region read. The keys come from `conf`, the caller's parse of `.memory-tree.conf`, or
+    from `design_lib.read_design_conf`'s when it passes none, so the leg and the generator read one
+    value of each (TOOL-dTrueNorth-16 S14). THE KEY RULE AND THE CUTOFF (S7), stated in
+    `design_lib.py`'s docstring: blank `SPEC_CARRIES_CUTOFF` is `{"state": "off", "why": ...}` whatever
+    the design keys hold; set with every `DESIGN_*` key blank, a refusal naming the cutoff and the
+    keys; set over a partial set, `read_design_keys`' refusal naming each blank key. Armed, it reads
+    the design through `read_design`, the population through `read_carries_specs`, and runs
+    `scan_carries` once with `exit_mode=True`; it returns `{"state": "armed", "cutoff", "measured",
+    "skipped", "withdrawn", "builds"}`, `builds` carrying an entry for EVERY chain build of the view, a
+    build with no spec included: its clauses, owned nodes, specs with their statuses, the fields
+    `carries.py:293-312` computes, computed the same way, and its findings with their arm labels. A
+    cutoff `check_cutoff_value` refused, a blank or unreadable design key and an unreadable history
+    each raise `DesignRefusal`; a measured count of zero is returned, and refusing it is the leg's.
     """
     root = pathlib.Path(root)
-    cutoff = read_cutoff_key(root, CARRIES_KEY)
+    dl = load_design_lib()
+    if conf is None:
+        conf = dl.read_design_conf(root)
+    cutoff = check_cutoff_value(CARRIES_KEY, str(conf.get(CARRIES_KEY) or "").strip())
     if cutoff == "":
         return {"state": "off", "why": f"{CARRIES_KEY} blank"}
-    dl = load_design_lib()
     if cutoff is None:
         raise dl.DesignRefusal(f"{CARRIES_KEY} is not an ISO date, as the refusal above says")
-    design = dl.read_design(root, {k: read_conf_key(root, k) for k in dl.DESIGN_KEYS})
-    specs, statuses, skipped = read_carries_specs(root, design, cutoff, files)
+    if dl.read_design_keys(root, conf) is None:
+        raise dl.DesignRefusal(f"{CARRIES_KEY} {cutoff} is set and every DESIGN_* key ({', '.join(dl.DESIGN_KEYS)}) "
+                               "is blank, so the carries join has no design to read", blank=dl.DESIGN_KEYS)
+    design = dl.read_design(root, conf)
+    specs, statuses, skipped = read_carries_specs(root, design, cutoff, files, conf)
     scan = scan_carries(design, specs, exit_mode=True)
     carriers, bindings, measured = scan["carriers"], scan["bindings"], scan["measured"]
     home = {p: b for b, ps in measured.items() for p in ps}
@@ -1307,6 +1308,11 @@ def main(argv):
     files = read_tracked(root)
     if "--legs-for" in argv:   # a query, branched ahead of the spec walk: it grades no spec
         return print_legs_for(root, files, argv[argv.index("--legs-for") + 1:])
+    if SPEC_DATE is None:
+        print(f"spec-tokens: REFUSING — {DESIGN_LIB.as_posix()} is not there, and its SPEC_FILE_DATE is "
+              "the one spec filename date every dated join reads (TOOL-dTrueNorth-16 S32), so no spec "
+              "could be dated")
+        return 1
     allspecs = sorted(f for f in files
                       if re.match(r"memory/builds/[^/]+/spec/.*\.md$", f))
     specs, frozen = [], 0
@@ -1562,7 +1568,7 @@ def main(argv):
     # as NEAR, never graded, because they are a Design exit's. Armed over nothing, it refuses.
     try:
         cov = derive_carries_coverage(root, files)
-    except ImportError as exc:
+    except (ImportError, SyntaxError) as exc:
         print(f"spec-tokens: REFUSING — the carries join cannot load its parser: {exc}")
         return 1
     except ValueError as exc:

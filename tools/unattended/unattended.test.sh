@@ -6395,6 +6395,30 @@ git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-1 --writes ${PFX}a.sh)
 n=$((n+1)); case "$o" in *"dispatch declared"*) ;; *) echo "FAIL dispatch: a READY unit was REFUSED, so the guard cannot be satisfied -- $o"; st=1 ;; esac
 
+# ---- TOOL-dTrueNorth-16 S2 - THE EDGE REFUSAL. Two units at ONE order are one parallel group, which
+# ---- the order gate never blocks, so the consumer ARCH-tRun-2 declaring `consumes-from` ARCH-tRun-1
+# ---- is refused while that producer is OPEN, even though its pass was dispatched just above, and
+# ---- proceeds once the producer's spec is CLOSED. Its own path, so condition 1 finds no overlap with
+# ---- the producer's open pass. RED-first: the driver before this unit declared the consumer.
+mkdir -p memory/builds/tRun/spec
+printf '# ARCH-tRun-1 — u\n\n**Status:** %s · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order 1\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' OPEN > memory/builds/tRun/spec/one.md
+printf '# ARCH-tRun-2 — the consumer\n\n**Status:** OPEN · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order 1\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n- **consumes-from** `ARCH-tRun-1` — the code it builds on\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/two.md
+cp memory/builds/tRun/README.md "$TMP/edge-readme"
+readme tRun
+sed -i 's#^<!-- /gen:build-units -->$#| [ARCH-tRun-2 — the consumer](spec/two.md) | OPEN | rev-1 | 2026-08-20 |\n&#' memory/builds/tRun/README.md
+git add memory/builds/tRun/spec/one.md memory/builds/tRun/spec/two.md memory/builds/tRun/README.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+n=$((n+1)); case "$o" in *"--dispatch declares a build pass for a unit whose spec consumes from a unit of its own build that is neither CLOSED nor WONTDO, so the consumer would build against code its producer has not landed: ARCH-tRun-2 consumes-from ARCH-tRun-1 (OPEN)"*) echo "ok   dispatch: a consumer is refused while its producer at the same order is OPEN, naming both and the edge" ;; *) echo "FAIL dispatch: a consumer was dispatched while its producer at the same order is OPEN -- $o"; st=1 ;; esac
+sed -i 's/^\*\*Status:\*\* OPEN /**Status:** CLOSED /' memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+n=$((n+1)); case "$o" in *"dispatch declared"*) echo "ok   dispatch: the same consumer proceeds once its producer's spec is CLOSED" ;; *) echo "FAIL dispatch: the consumer was REFUSED with its producer CLOSED, so the edge refusal cannot be satisfied -- $o"; st=1 ;; esac
+# Restore the passing-case spec and the one-unit README the arms below read.
+git rm -q --cached memory/builds/tRun/spec/two.md >/dev/null 2>&1; rm -f memory/builds/tRun/spec/two.md
+cp "$TMP/edge-readme" memory/builds/tRun/README.md
+printf '# ARCH-tRun-1 — u\n\n**Status:** SPECCED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md memory/builds/tRun/README.md >/dev/null 2>&1
+
 
 # ---- aDeferredBar closing review F3 - THE DECLARED SPEC-TOKEN CHECKER RUNS BEFORE THE DISPATCH.
 # ---- The memory kit's bar join grades LIVE specs and this harness closes every unit spec in its
@@ -6407,6 +6431,10 @@ STC="$HERE/../check-spec-tokens.py"
 if [ -f "$STC" ]; then
   mkdir -p "./${PFX}" memory/project
   cp "$STC" ${PFX}check-spec-tokens.py
+  # The checker's spec filename date is the memory-tree kit's one pattern (TOOL-dTrueNorth-16 S32), so
+  # its design_lib.py and the tree_lib.py that imports sit beside it, where the checker loads them.
+  mkdir -p "./${PFX}memory-tree"
+  cp "$HERE/../$MT_KIT/design_lib.py" "$HERE/../$MT_KIT/tree_lib.py" "./${PFX}memory-tree/"
   printf '[{"name":"g"}]\n' > ${PFX}gate-legs.json
   printf '# waivers\n' > memory/project/spec-token-waivers.txt
   printf 'SPEC_DIRECT_CUTOFF="2026-08-01"\n' > .memory-tree.conf
@@ -6440,6 +6468,7 @@ if [ -f "$STC" ]; then
   sed -i '/^SPEC_TOKENS_CLI=/d' .unattended.conf
   git mv memory/builds/tRun/spec/2026-08-20-spec-ARCH-tRun-1.md memory/builds/tRun/spec/one.md
   rm -f ${PFX}check-spec-tokens.py ${PFX}stub-tokens.py ${PFX}gate-legs.json memory/project/spec-token-waivers.txt .memory-tree.conf
+  rm -rf "./${PFX}memory-tree"
 elif [ -n "$GOVKIT_DIR" ] && [ -f "$GOVKIT_DIR/registry.toml" ]; then
   # A KIT SOURCE, whose govkit registry sits beside this kit: there the checker belongs, and losing
   # it is a real red. This suite is not a leg in the bar's manifest, so no assertion floor would.

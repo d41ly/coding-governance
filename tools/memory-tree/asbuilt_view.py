@@ -4,10 +4,13 @@
 TOOL-dTrueNorth-6. THE VIEW is the file `DESIGN_VIEW` names: `DESIGN_RECORD`'s `[chain]` at
 `DESIGN_BASELINE`, each deviation record's `amends` or `supersedes` row applied, each changed clause
 citing its record. It is generated and never edited by hand. Its host is the build-index generator:
-`gen_build_index.py --write` writes it after every other artifact, and `gen_build_index.py --check`
-compares the file with its render, a hand edit joining its `build-index DRIFT` list under the `--write`
-remedy and every other finding printed in an `as-built VERDICT` block, each exiting 1. The coverage
-join, and later the help and atlas renders, read the view through `design_lib.read_design_view`.
+`gen_build_index.py --write` writes it BEFORE every other artifact, so the coverage regions `plan()`
+renders read the view just written and one `--write` reaches a fixed point (TOOL-dTrueNorth-16 S20).
+`gen_build_index.py --check` compares the file with its render, a hand edit joining its `build-index
+DRIFT` list under the `--write` remedy, and reports nothing `--write` cannot cure; every other finding
+is `gen_build_index.py --check-asbuilt`'s, printed in an `as-built VERDICT` block, exit 1, the verb
+hygiene check 30 delegates to (S17). The coverage join, and later the help and atlas renders, read the
+view through `design_lib.read_design_view`.
 
 It is the product successor of the bootstrap instrument `asbuilt.py` (the dClosedLoop build's records,
 blob `97c8f8fb`). Until the report-switch step re-points the departures report, it renders byte for
@@ -18,8 +21,10 @@ THE INPUTS, each read through the kit's one reader of it:
   - the clauses, `design_lib.read_chain_clauses` over `git show <DESIGN_BASELINE>:<DESIGN_RECORD>`;
   - the records, `deviation_join.read_records`: every `<MEMORY_ROOT>/builds/*/build/*-deviation-*.md`,
     sorted by path, each one's `**Departs from:**`, `**After:**` and `**Follow-through:**`;
-  - from `DESIGN_RECORD`'s working tree, its first `**Serves:**` line, which the head carries
-    verbatim, and its `Baseline:` line, compared with the pin and never rendered from (P0.1 row 5a).
+  - from `DESIGN_RECORD`'s working tree, its `Baseline:` line, compared with the pin and never
+    rendered from (P0.1 row 5a). The head's `**Serves:**` line is `VIEW_HEAD`'s literal, the line the
+    instrument holds (`asbuilt.py:75`), so an edit to the record's own cannot move the view's bytes
+    (TOOL-dTrueNorth-16 S27).
 
 THE RULE (TOOL-dTrueNorth-8, widened by TOOL-dTrueNorth-17), superseding TOOL-dTrueNorth-6's §3
 non-goal and §4 Migration sentence on the view's bytes. The view's inputs are DESIGN_RECORD at
@@ -53,27 +58,35 @@ outside its clause's set is a finding naming both; either renders the clause's r
 as a refused record's does. Neither path order nor a commit date decides.
 
 THE FINDINGS, each naming its record or clause: a record departing from a clause with no amends or
-supersedes row; the head rule's two, above; a record pinning a hash its clause does not carry at the
-baseline; the working tree's `Baseline:` line differing from the pin, the view still rendering from
-the pin; and under `--check`, a file differing from its render, named at its first differing line,
-and a `baseline` row whose text is not the baseline's, a changed clause with no citation.
+supersedes row; the head rule's two, above; a record whose `**After:**` holds a `|`, which would split
+its row's Text cell, the clause then rendering its baseline row (TOOL-dTrueNorth-16 S22); a record
+pinning a hash its clause does not carry at the baseline; the working tree's `Baseline:` line
+differing from the pin, the view still rendering from the pin; and under `--check`, a file differing
+from its render, named at its first differing line, and a `baseline` row whose text is not the
+baseline's, a changed clause with no citation.
 
 Usage (from the worktree root):
   python asbuilt_view.py --write [--out <path>]      render the view, by default to DESIGN_VIEW
   python asbuilt_view.py --check [--out <path>]      render it again and compare the bytes with the file
-  python asbuilt_view.py --fixture [--plant <case>]  this tree's DESIGN_RECORD at its pin with fixture
-                                                     records, in memory, damaged one way per plant
+  python asbuilt_view.py --fixture [--plant <case>]  a fixture design with fixture records, in memory,
+                                                     damaged one way per plant
   python asbuilt_view.py --selftest                  every plant against the exit it must take
-The plants: hand-edit, no-row, no-citation and baseline, ported from the instrument's, then
-pin-mismatch, supersedes and amends-reader, which writes its render to a temporary file and reads it
-back through `read_design_view`; then the head rule's, each record read through `read_record`:
-amends-order, `…-deviation-10` naming `…-deviation-9` in `**Supersedes:**` although its path sorts
-first, unordered-amends, the two with no field, same-after, two amends with one `**After:**`, and
-supersedes-stray, a field naming a record of another clause. Exit 0 green, 1 on a finding, 2 when the
-pin's design record cannot be read, so there is nothing to render.
+THE FIXTURE builds its design in a scratch repository of its own, through
+`design_lib.write_design_fixture`, the builder the deviation fixture writes its design with
+(TOOL-dTrueNorth-16 S19), so it reads nothing of this tree's design and runs whatever the conf
+declares; each plant reads its clause from that design. The plants: hand-edit, no-row, no-citation
+and baseline, ported from the instrument's, then pin-mismatch, supersedes and amends-reader, which
+writes its render into the fixture repository and reads it back through `read_design_view`; then the
+head rule's, each record read through `read_record`: amends-order, `…-deviation-10` naming
+`…-deviation-9` in `**Supersedes:**` although its path sorts first, unordered-amends, the two with no
+field, same-after, two amends with one `**After:**`, and supersedes-stray, a field naming a record of
+another clause; and pipe-after, an `**After:**` holding a `|`. Exit 0 green, 1 on a finding, 2 when
+the key rule refuses or the pin's design record cannot be read, so there is nothing to render.
 
-OFF when DESIGN_RECORD, DESIGN_BASELINE or DESIGN_VIEW is blank, as an adopter's conf ships them: one
-`as-built view: off` line naming the key, nothing read, exit 0. The host prints the same line.
+ITS STATES ARE THE KEY RULE's, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S6): OFF when all
+four `DESIGN_*` keys are blank or absent, the keys being gov's and absent from the kit's example
+conf, so an adopter reads them as off: one `as-built view: off` line, nothing read, exit 0. A partial
+set is a refusal naming each blank key, exit 2. The host prints the same line and the same refusal.
 
 What it does not read: whether a record's new text is what its approver approved, which the deviation
 join and the closing review judge; a record's grammar beyond the row and the `**Supersedes:**` it
@@ -93,31 +106,34 @@ import tempfile
 KIT = os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
-from deviation_join import read_baseline_line, read_record, read_records  # noqa: E402  the record grammar's one reader
+from deviation_join import (  # noqa: E402  the record grammar's one reader, and the fixture repository
+    Fixture, read_baseline_line, read_record, read_records, remove_tree)
 from design_lib import (  # noqa: E402  the one parser of the design
-    DESIGN_KEYS, VIEW_ROW, DesignRefusal, derive_clause_hash, read_chain_clauses, read_design_view, read_repo_root,
-    run_git)
-from tree_lib import parse_conf  # noqa: E402
+    DESIGN_KEYS, VIEW_ROW, DesignRefusal, derive_clause_hash, read_chain_clauses, read_design_conf, read_design_keys,
+    read_design_view, read_repo_root, run_git, write_design_fixture)
 
 SAY = "as-built view"
-VIEW_KEYS = DESIGN_KEYS[:3]     # DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW: the view reads no owned node
 _CL = r"cl-d[A-Z]\w+-\d{4}"
 ROW_FOLLOW = re.compile(r"(amends|supersedes) (" + _CL + r")@([0-9a-f]{8})(?: by (" + _CL + r"))?")   # asbuilt.py:59
 ROW_DEPARTS = re.compile(r"`?(" + _CL + r")@")                                                          # asbuilt.py:60
-# The instrument's own head (asbuilt.py:72-76), its three slots the **Serves:** line, the pin and the
-# record count. It names the instrument until the report-switch step's follow-on re-points it (§8 F2).
-VIEW_HEAD = ("# As built: the design at its baseline, with its deviations\n\n{serves}\n\n"
+# The instrument's own head (asbuilt.py:72-76), its two slots the pin and the record count, and its
+# `**Serves:**` line the instrument's literal (asbuilt.py:75), never the design record's, so an edit
+# to v2 cannot move the view's bytes (TOOL-dTrueNorth-16 S27). It names the instrument until the
+# report-switch step's follow-on re-points it (§8 F2).
+VIEW_HEAD = ("# As built: the design at its baseline, with its deviations\n\n**Serves:** research PLAY-dClosedLoop-1\n\n"
              "Generated by `build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` from v2's `[chain]` at `{sha}` and "
              "{count} deviation records. Never edit it by hand: `--check` renders it again and compares the bytes.")
 ORDER_PLANTS = ("amends-order", "unordered-amends", "same-after", "supersedes-stray")    # TOOL-dTrueNorth-18's
-PLANTS = ("hand-edit", "no-row", "no-citation", "baseline", "pin-mismatch", "supersedes", "amends-reader") + ORDER_PLANTS
+PLANTS = ("hand-edit", "no-row", "no-citation", "baseline", "pin-mismatch", "supersedes", "amends-reader") + ORDER_PLANTS \
+    + ("pipe-after",)                                                                     # TOOL-dTrueNorth-16's
 PLANT_EXITS = {None: 0, "hand-edit": 1, "no-row": 1, "no-citation": 1, "baseline": 1, "pin-mismatch": 1,
                "supersedes": 0, "amends-reader": 0, "amends-order": 0, "unordered-amends": 1, "same-after": 0,
-               "supersedes-stray": 1}
-SUCCESSOR = "cl-dClosedLoop-9999"     # the supersedes plant's new id, which the pin's [chain] must not hold
-LOOSENED = "cl-dClosedLoop-0119"      # the baseline plant's clause, the instrument's (asbuilt.py:110)
+               "supersedes-stray": 1, "pipe-after": 1}
+SUCCESSOR = "cl-dClosedLoop-9999"     # the supersedes plant's new id, which the fixture's [chain] does not hold
+LOOSENED = "cl-dFix-0002"             # the baseline plant's clause, the fixture design's second
 # The head rule's two records, older first: by path `…-deviation-10` sorts before `…-deviation-9`.
 ORDER_IDS = tuple(f"2026-10-21-build-FIX-dTrueNorth-18-deviation-{n}" for n in (9, 10))
+PIPE_ID = "2026-10-21-build-FIX-dTrueNorth-16-deviation-1"     # the pipe-after plant's record
 BASELINE_NOTE = "the row is the baseline's text, citing none"
 # What a plant's lines must carry, so an arm holds for its own reason and not another's.
 PLANT_NEEDLES = {None: ("findings 0 · view at",), "hand-edit": ("differs from its render from line",),
@@ -133,17 +149,19 @@ PLANT_NEEDLES = {None: ("findings 0 · view at",), "hand-edit": ("differs from i
                                       BASELINE_NOTE),
                  "same-after": (f"two amends with one **After:** cite the later path, {ORDER_IDS[0]}",),
                  "supersedes-stray": (f"{ORDER_IDS[0]}: its **Supersedes:** names {ORDER_IDS[1]}, no amends of",
-                                      BASELINE_NOTE)}
+                                      BASELINE_NOTE),
+                 "pipe-after": (f"{PIPE_ID}: its **After:** holds a `|`", BASELINE_NOTE)}
 
 
-def read_view_state(conf):
-    """`(armed, line)`: armed only when the three keys the view reads are all declared, else the one off
-    line naming each blank key. It reads no file and makes no git call, so the host prints it for free."""
-    blank = [k for k in VIEW_KEYS if not str(conf.get(k) or "").strip()]
-    if not blank:
+def read_view_state(root, conf):
+    """`(armed, line)` by the key rule, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S6): off, with
+    no git call, when all four `DESIGN_*` keys are blank, `line` the one off line; armed when all four
+    are set and the pin names a commit. A partial set, or a pin naming no commit, raises the rule's
+    `DesignRefusal` naming the key."""
+    if read_design_keys(root, conf) is not None:
         return True, ""
-    return False, (f"{SAY}: off — {', '.join(blank)} {'is' if len(blank) == 1 else 'are'} blank in "
-                   ".memory-tree.conf, so nothing is read and no view is rendered")
+    return False, (f"{SAY}: off — {', '.join(DESIGN_KEYS)} are blank in .memory-tree.conf, so nothing is read "
+                   "and no view is rendered")
 
 
 def check_baseline(text, pin, record):
@@ -157,21 +175,19 @@ def check_baseline(text, pin, record):
 
 
 def read_view_inputs(root, conf):
-    """`(sha, clauses, records, serves, findings)`, everything the view renders from (S1).
+    """`(sha, clauses, records, findings)`, everything the view renders from (S1).
 
     `sha` is DESIGN_BASELINE; `clauses` are `read_chain_clauses` over DESIGN_RECORD at that commit,
-    `(build, clause id, text, hash8)` in row order; `records` are `read_records`, sorted by path;
-    `serves` is the first `**Serves:**` line of DESIGN_RECORD's working tree, verbatim; and `findings`
-    holds its moved `Baseline:` line. A blank key, a pin naming no commit, a record absent at the pin or
-    holding no `[chain]` there, and a working tree that cannot be read are each a `DesignRefusal`: there
-    is nothing to render.
+    `(build, clause id, text, hash8)` in row order; `records` are `read_records`, sorted by path; and
+    `findings` holds the moved `Baseline:` line of DESIGN_RECORD's working tree. The key rule's off
+    state and its refusals, a pin naming no commit among them, a record absent at the pin or holding no
+    `[chain]` there, and a working tree that cannot be read are each a `DesignRefusal`: there is
+    nothing to render.
     """
-    armed, line = read_view_state(conf)
-    if not armed:
-        raise DesignRefusal(line, blank=[k for k in VIEW_KEYS if not str(conf.get(k) or "").strip()])
-    record, sha = (str(conf[k]).strip() for k in ("DESIGN_RECORD", "DESIGN_BASELINE"))
-    if run_git(root, "cat-file", "-e", f"{sha}^{{commit}}").returncode:
-        raise DesignRefusal(f"DESIGN_BASELINE {sha} names no commit, so the view has no baseline to render")
+    values = read_design_keys(root, conf)
+    if values is None:
+        raise DesignRefusal(read_view_state(root, conf)[1], blank=DESIGN_KEYS)
+    record, sha = values["DESIGN_RECORD"], values["DESIGN_BASELINE"]
     pinned = run_git(root, "show", f"{sha}:{record}")
     if pinned.returncode:
         raise DesignRefusal(f"DESIGN_RECORD {record} is absent at DESIGN_BASELINE {sha[:9]}, so the view has no "
@@ -180,11 +196,10 @@ def read_view_inputs(root, conf):
     try:
         now = (pathlib.Path(root) / record).read_bytes().decode("utf-8").replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError) as exc:
-        raise DesignRefusal(f"DESIGN_RECORD {record} cannot be read in the working tree, so the view's head has "
-                            f"no **Serves:** line to carry: {exc}") from None
-    serves = re.search(r"^\*\*Serves:\*\*.*$", now, flags=re.M)
+        raise DesignRefusal(f"DESIGN_RECORD {record} cannot be read in the working tree, so its Baseline: line "
+                            f"cannot be compared with the pin: {exc}") from None
     moved = check_baseline(now, sha, record)
-    return sha, clauses, read_records(root, conf), serves.group(0) if serves else "", [moved] if moved else []
+    return sha, clauses, read_records(root, conf), [moved] if moved else []
 
 
 def resolve_clause_rows(records):
@@ -198,6 +213,8 @@ def resolve_clause_rows(records):
     names in `**Supersedes:**`, whatever its path. Two or more such members or none is an `unordered
     amends of <clause>` finding naming every member, and a `**Supersedes:**` naming a record outside the
     set is a finding naming both; either leaves the clause out of `changes`, so it renders the baseline.
+    So does a member whose `**After:**` holds a `|`, which would split the row's Text cell, each such
+    record a finding (TOOL-dTrueNorth-16 S22).
     """
     findings, sets, changes = [], {}, {}
     for r in records:
@@ -215,6 +232,12 @@ def resolve_clause_rows(records):
         for rid, named in stray:
             findings.append(f"{rid}: its **Supersedes:** names {named}, no amends of {cid}, whose amends are "
                             f"{', '.join(ids)}; {cid} renders its baseline row")
+        piped = [r["id"] for r, _row in members if "|" in (r.get("after") or "")]
+        for rid in piped:
+            findings.append(f"{rid}: its **After:** holds a `|`, which would split the Text cell of {cid}'s row in "
+                            f"two; {cid} renders its baseline row")
+        if piped:
+            continue
         head = members[-1:]
         if len({(r.get("after") or "").strip() for r, _row in members}) > 1:
             superseded = {r["supersedes"] for r, _row in members if r.get("supersedes") not in (None, r["id"])}
@@ -231,9 +254,10 @@ def resolve_clause_rows(records):
     return changes, findings
 
 
-def render_view(sha, clauses, records, serves):
-    """`(text, findings)`: the view, a port of `asbuilt.py:54-79` that keeps every byte — the head, the
-    table head, one row per baseline clause, the record count over every record read, a trailing newline.
+def render_view(sha, clauses, records):
+    """`(text, findings)`: the view, a port of `asbuilt.py:54-79` that keeps every byte — the head, its
+    `**Serves:**` line the instrument's literal, the table head, one row per baseline clause, the record
+    count over every record read, a trailing newline.
 
     The row each clause takes, and the findings that refuse one, are `resolve_clause_rows`'s; a record
     pinning a hash the clause does not carry at the baseline is a finding while the row still renders.
@@ -248,7 +272,7 @@ def render_view(sha, clauses, records, serves):
             rows.append(f"| {build} | `{new_id or cid}` | {after} | deviation `{rid}` |")
         else:
             rows.append(f"| {build} | `{cid}` | {text} | baseline |")
-    head = VIEW_HEAD.format(serves=serves, sha=sha, count=len(records))
+    head = VIEW_HEAD.format(sha=sha, count=len(records))
     return "\n".join([head, "", "| Build | Clause | Text | Since |", "|---|---|---|---|"] + rows) + "\n", findings
 
 
@@ -287,16 +311,33 @@ def build_fixture_record(stem, cid, h, after, supersedes=None):
     return read_record(f"memory/builds/dFixture/build/{stem}.md", "".join(f"- **{k}:** {v}\n" for k, v in fields))
 
 
+def build_view_fixture(root):
+    """The fixture repository at `root`, its design its own (TOOL-dTrueNorth-16 S19), and the conf that
+    names it: `design_lib.write_design_fixture` writes the record and its view as the pin commit, through
+    the deviation fixture's repository, and a second commit records the pin in the record's `Baseline:`
+    line, so the base reads no moved line. Nothing reads this tree's DESIGN_RECORD, DESIGN_VIEW or conf.
+    """
+    fx = Fixture(root, "memory/design/record.md", "memory/design/view.md")
+    if run_git(".", "init", "-q", str(root)).returncode:
+        raise DesignRefusal(f"the fixture repository cannot be initialised at {root}")
+    pin = write_design_fixture(fx)
+    fx.v2 = fx.v2.replace("No baseline.", f"Baseline: `{pin}`, the fixture's own.")
+    fx.write_commit({fx.record: fx.v2}, "fixture: the baseline taken")
+    fx.write_tree()
+    return {"MEMORY_ROOT": "memory", "DESIGN_RECORD": fx.record, "DESIGN_BASELINE": pin, "DESIGN_VIEW": fx.view,
+            "DESIGN_NODES": "memory/design/nodes.py"}
+
+
 def render_fixture(root, conf, plant=None):
-    """`(body, rendered, clauses, findings, notes, sha)` of the fixture: this tree's DESIGN_RECORD at its
-    pin, never a synthetic chain, with fixture records in memory and `plant`'s damage in `body`.
+    """`(body, rendered, clauses, findings, notes, sha)` of the fixture: the design `build_view_fixture`
+    wrote at its pin, with fixture records in memory and `plant`'s damage in `body`.
 
     The base, as the instrument's (`asbuilt.py:96-122`): the seventh clause amended, and a record
-    departing from no clause. The head rule's plants amend the ninth, and the stray's named record the
-    eleventh. `findings` are the render's and a plant's own observation; `notes` are what a plant
-    observed holding. Nothing is written but amends-reader's temporary view.
+    departing from no clause. The head rule's plants and pipe-after amend the ninth, and the stray's
+    named record the eleventh. `findings` are the render's and a plant's own observation; `notes` are
+    what a plant observed holding. Nothing is written but amends-reader's view, inside the fixture.
     """
-    sha, clauses, _records, serves, _moved = read_view_inputs(root, conf)
+    sha, clauses, _records, _moved = read_view_inputs(root, conf)
     if len(clauses) < 11 or any(c == SUCCESSOR for _b, c, _t, _h in clauses):
         raise DesignRefusal(f"the fixture plants on clauses 7, 9 and 11 of the pin's [chain], which holds "
                             f"{len(clauses)}, and on the new id {SUCCESSOR}, which it must not hold")
@@ -319,7 +360,7 @@ def render_fixture(root, conf, plant=None):
         head = run_git(root, "rev-parse", "HEAD").stdout.decode("utf-8", "replace").strip()
         now = re.sub(r"(?m)^Baseline: `[0-9a-f]+`", f"Baseline: `{head}`", now)
         moved = check_baseline(now, sha, record)
-        rendered, more = render_view(sha, clauses, [], serves)
+        rendered, more = render_view(sha, clauses, [])
         pin = {c: t for _b, c, t, _h in clauses}.get(LOOSENED)
         loose = {c: t for _b, c, t, _h in read_chain_clauses(now, record)}.get(LOOSENED)
         row = read_fixture_row(rendered, LOOSENED)
@@ -352,7 +393,10 @@ def render_fixture(root, conf, plant=None):
                                                                 ", amended again"),
                                          supersedes=old if plant == "amends-order" else None)]
         records += sorted(pair, key=lambda r: r["path"])
-    rendered, more = render_view(sha, clauses, records, serves)
+    elif plant == "pipe-after":
+        _b, oid, otext, oh = clauses[8]
+        records.append(build_fixture_record(PIPE_ID, oid, oh, otext + " | a planted pipe"))
+    rendered, more = render_view(sha, clauses, records)
     body = rendered
     if plant == "hand-edit":
         body = rendered.replace("a planted amendment", "a quiet amendment")
@@ -368,9 +412,8 @@ def render_fixture(root, conf, plant=None):
             findings.append(f"{tid}'s supersedes row does not carry {SUCCESSOR}, its **After:** and its "
                             f"citation: {row}")
     elif plant == "amends-reader":
-        with tempfile.TemporaryDirectory() as tmp:
-            pathlib.Path(tmp, "view.md").write_bytes(rendered.encode("utf-8"))
-            got = next((r for r in read_design_view("view.md", tmp) if r[1] == cid), None)
+        pathlib.Path(root, "amends-reader-view.md").write_bytes(rendered.encode("utf-8"))
+        got = next((r for r in read_design_view("amends-reader-view.md", root) if r[1] == cid), None)
         after = records[0]["after"]
         want = derive_clause_hash(after)
         notes.append(f"{cid}: read_design_view reads hash {got[3] if got else 'none'} and since "
@@ -394,6 +437,12 @@ def render_fixture(root, conf, plant=None):
         else:
             findings.append(f"{oid}: the head rule's row is not the plant's: {row}, the eleventh clause {other}; "
                             + "; ".join(bad))
+    elif plant == "pipe-after":
+        row = read_fixture_row(rendered, oid)
+        if row == (otext, "baseline"):
+            notes.append(f"{oid}: {BASELINE_NOTE}")
+        else:
+            findings.append(f"{oid}: a record whose **After:** holds a `|` did not leave the baseline row: {row}")
     return body, rendered, clauses, more + findings, notes, sha
 
 
@@ -412,28 +461,37 @@ def run_fixture(root, conf, plant=None):
                                     + [f"  {f}" for f in findings]), live
 
 
-def run_plant_arms(root, conf):
+def run_plant_arms():
     """Every plant, and the fixture with none, against the exit it must take and the lines it must
-    print: `[(held, what, detail)]`. The build-index generator's self-test runs these arms too."""
-    arms = []
-    for plant in (None,) + PLANTS:
-        want = PLANT_EXITS[plant]
-        unit = "TOOL-dTrueNorth-18" if plant in ORDER_PLANTS else "TOOL-dTrueNorth-6"
-        what = (f"{unit} {'plant ' + plant if plant else 'the fixture with no plant'} exits {want}, "
-                f"naming {' and '.join(repr(n) for n in PLANT_NEEDLES[plant])}")
-        try:
-            rc, lines, live = run_fixture(root, conf, plant)
-        except DesignRefusal as exc:
-            arms.append((False, what, f"nothing to render: {exc}"))
-            continue
-        out = "\n".join(lines)
-        arms.append((rc == want and live and all(n in out for n in PLANT_NEEDLES[plant]), what, out))
+    print: `[(held, what, detail)]`, over ONE fixture repository `build_view_fixture` writes, removed
+    after, so the arms run whatever this tree's conf declares. The build-index generator's self-test runs
+    these arms too."""
+    arms, root = [], tempfile.mkdtemp(prefix="av-")
+    try:
+        conf = build_view_fixture(root)
+        for plant in (None,) + PLANTS:
+            want = PLANT_EXITS[plant]
+            unit = ("TOOL-dTrueNorth-18" if plant in ORDER_PLANTS else "TOOL-dTrueNorth-16" if plant == "pipe-after"
+                    else "TOOL-dTrueNorth-6")
+            what = (f"{unit} {'plant ' + plant if plant else 'the fixture with no plant'} exits {want}, "
+                    f"naming {' and '.join(repr(n) for n in PLANT_NEEDLES[plant])}")
+            try:
+                rc, lines, live = run_fixture(root, conf, plant)
+            except DesignRefusal as exc:
+                arms.append((False, what, f"nothing to render: {exc}"))
+                continue
+            out = "\n".join(lines)
+            arms.append((rc == want and live and all(n in out for n in PLANT_NEEDLES[plant]), what, out))
+    except DesignRefusal as exc:
+        arms.append((False, "TOOL-dTrueNorth-16 S19 the fixture repository builds its own design", str(exc)))
+    finally:
+        remove_tree(root)
     return arms
 
 
-def run_selftest(root, conf):
+def run_selftest():
     held = 0
-    arms = run_plant_arms(root, conf)
+    arms = run_plant_arms()
     for ok, what, detail in arms:
         held += bool(ok)
         print(f"  {'ok  ' if ok else 'FAIL'} — {what}" + ("" if ok else f"\n{detail}"))
@@ -453,25 +511,29 @@ def main(argv):
         ap.error("--plant takes --fixture")
     if a.out and not (a.write or a.check):
         ap.error("--out takes --write or --check")
+    if a.selftest:
+        return run_selftest()
     root = read_repo_root()
-    path = root / ".memory-tree.conf"
-    conf = parse_conf(path.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"), {}) if path.is_file() else {}
-    armed, line = read_view_state(conf)
-    if not armed:
-        print(line)
-        return 0
     try:
-        if a.selftest:
-            return run_selftest(root, conf)
         if a.fixture:
-            rc, lines, _live = run_fixture(root, conf, a.plant)
+            # The fixture's design is its own (S19), so it runs whatever this tree's conf declares.
+            fixture_root = tempfile.mkdtemp(prefix="av-")
+            try:
+                rc, lines, _live = run_fixture(fixture_root, build_view_fixture(fixture_root), a.plant)
+            finally:
+                remove_tree(fixture_root)
             print("\n".join(lines))
             return rc
-        sha, clauses, records, serves, findings = read_view_inputs(root, conf)
+        conf = read_design_conf(root)
+        armed, line = read_view_state(root, conf)
+        if not armed:
+            print(line)
+            return 0
+        sha, clauses, records, findings = read_view_inputs(root, conf)
     except DesignRefusal as exc:
         print(f"{SAY}: {exc}; nothing was rendered")
         return 2
-    rendered, more = render_view(sha, clauses, records, serves)
+    rendered, more = render_view(sha, clauses, records)
     findings += more
     out = pathlib.Path(a.out) if a.out else root / str(conf["DESIGN_VIEW"]).strip()
     if a.write:

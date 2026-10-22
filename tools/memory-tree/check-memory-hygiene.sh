@@ -569,14 +569,13 @@ STAGED_MD=""; STAGED_NEW=""
 # list decide which NAMES pass, so a commit staging either is graded over the whole listing, as before
 # the narrowing. `-M` keeps a rename an `R` row for an adopter whose diff.renames is off, and a renamed
 # SOURCE that a registry lists arms the stale-line guard below, as a staged list does.
-# _CONF_STAGED is the conf alone, which check 29 reads to decide whether it runs (TOOL-dTrueNorth-3).
-_NAMES_WHOLE=""; _RENAMED_LISTED=""; _CONF_STAGED=""
+_NAMES_WHOLE=""; _RENAMED_LISTED=""
 if [ "$STAGED" = 1 ]; then
   declare -A _SBUILD
   while IFS=$'\t' read -r _st _p1 _p2; do
     [ -n "$_st" ] || continue
     _l=${_p2:-$_p1}
-    if [ "$_l" = .memory-tree.conf ]; then _NAMES_WHOLE=1; _CONF_STAGED=1; continue; fi
+    if [ "$_l" = .memory-tree.conf ]; then _NAMES_WHOLE=1; continue; fi
     case "$_st" in R*) [ -z "${LEGACY_SET[$_p1]+x}${DEBT_SET[$_p1]+x}" ] || _RENAMED_LISTED=1 ;; esac
     STAGED_SET["$_l"]=1
     case "$_st" in A*|C*|R*) STAGED_NEW+="$_l"$'\n' ;; esac
@@ -1673,25 +1672,45 @@ if check_selected 29; then
 # coverage nobody could read is no clearance. With SPEC_CARRIES_CUTOFF blank it prints one line, which
 # is printed here, and exits 0.
 #
-# UNDER --staged IT RUNS ONLY when the commit stages a path under a build's spec/ folder or the conf,
-# so the INPROGRESS flip is refused at its own commit, for a second of work only then; any other commit
-# holds it and says so. The full run at the push boundary grades it whatever is staged.
-_run29=1
-if [ "$STAGED" = 1 ]; then
-  _run29=$_CONF_STAGED
-  while IFS= read -r _l; do case "$_l" in "$M"/builds/*/spec/*) _run29=1; break ;; esac; done <<<"$STAGED_MD"
-  [ -n "$_run29" ] || echo "memory-hygiene: check 29: held under --staged, no chain spec or conf staged"
-fi
-if [ -n "$_run29" ]; then
-  cov29=$("$_PY" "$HERE/gen_build_index.py" --check-coverage 2>&1); _c29=$?
-  case "$_c29" in
-    0) while IFS= read -r _c29l; do [ -z "$_c29l" ] || printf 'memory-hygiene: check 29: %s\n' "${_c29l#build-index: }"; done <<<"$cov29" ;;
-    1) fail 29 "a chain build's spec is INPROGRESS while its build's coverage is red:
+# UNDER --staged THE VERB DECIDES (TOOL-dTrueNorth-16 S21): `--staged` is passed through, and the
+# verb's trigger is the render's — any staged path the build index reads by `check_index_input`, a
+# staged view row and a staged spec alike, or the carries checker beside the kit — so this file tests
+# no path itself and a second spelling of the trigger cannot drift from the render's. Any other
+# commit holds it, and the verb's held line is printed here. The full run at the push boundary grades
+# it whatever is staged.
+_c29a=(--check-coverage); [ "$STAGED" = 1 ] && _c29a+=(--staged)
+cov29=$("$_PY" "$HERE/gen_build_index.py" "${_c29a[@]}" 2>&1); _c29=$?
+case "$_c29" in
+  0) while IFS= read -r _c29l; do [ -z "$_c29l" ] || printf 'memory-hygiene: check 29: %s\n' "${_c29l#build-index: }"; done <<<"$cov29" ;;
+  1) fail 29 "a chain build's spec is INPROGRESS while its build's coverage is red:
 $cov29" ;;
-    *) fail 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:
+  *) fail 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:
 $cov29" ;;
-  esac
+esac
+
 fi
+
+if check_selected 30; then
+# 30 — THE AS-BUILT VIEW'S VERDICTS (TOOL-dTrueNorth-16 S17). The view's byte drift is check 9's, under
+# `--write`, its one remedy; a finding `--write` cannot cure — a record departing from a clause with no
+# row, two unordered amends of one clause, a pipe in an `**After:**`, a pinned hash the clause does not
+# carry, a moved `Baseline:` line — is this check's, so check 9's message and the runner's regeneration
+# check read only what `--write` cures. Delegated to the generator's `--check-asbuilt`, as 29 delegates
+# `--check-coverage`: the view is `asbuilt_view.py`'s, read through the host `--write` renders it with,
+# so this file spells no second reading of it. The verb exits 1 naming each finding, and 2 when the key
+# rule refuses or the pin cannot be read; both fail here, because a view nobody could render is no
+# clearance. With every DESIGN_* key blank it prints one off line, which is printed here, and exits 0.
+# Under --staged `--staged` is passed through, and the verb runs when a staged path is a deviation
+# record, DESIGN_RECORD, DESIGN_VIEW or the conf, and otherwise prints its held line.
+_c30a=(--check-asbuilt); [ "$STAGED" = 1 ] && _c30a+=(--staged)
+ab30=$("$_PY" "$HERE/gen_build_index.py" "${_c30a[@]}" 2>&1); _c30=$?
+case "$_c30" in
+  0) while IFS= read -r _c30l; do [ -z "$_c30l" ] || printf 'memory-hygiene: check 30: %s\n' "${_c30l#build-index: }"; done <<<"$ab30" ;;
+  1) fail 30 "the as-built view's deviation records and its design record disagree, which --write cannot cure:
+$ab30" ;;
+  *) fail 30 "the as-built view could not be rendered, so none of its verdicts was read:
+$ab30" ;;
+esac
 
 fi
 

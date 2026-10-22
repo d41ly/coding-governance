@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-14
 streams: playbook+kickoff+tooling+deployer
 roster: PLAY
-ids: PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15 PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19 PLAY-dClosedLoop-20
+ids: PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15 PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19 PLAY-dClosedLoop-20 PLAY-dClosedLoop-21 PLAY-dClosedLoop-22 PLAY-dClosedLoop-23
 spec-audit: 2026-10-14
 authorized-by: prompt
 ---
@@ -66,7 +66,7 @@ asks, 435 of them unlabelled. The owner's prompt is recorded verbatim under `pro
 <!-- gen:build-index -->
 **Build status:** INPROGRESS · 1 unit(s) · node d · opened 2026-10-14 · streams playbook+kickoff+tooling+deployer
 ids PLAY-dClosedLoop-1 PLAY-dClosedLoop-2 PLAY-dClosedLoop-3 PLAY-dClosedLoop-4 PLAY-dClosedLoop-5 PLAY-dClosedLoop-6 PLAY-dClosedLoop-7 PLAY-dClosedLoop-8 PLAY-dClosedLoop-9 PLAY-dClosedLoop-10 PLAY-dClosedLoop-11 PLAY-dClosedLoop-12 PLAY-dClosedLoop-13 PLAY-dClosedLoop-14 PLAY-dClosedLoop-15
-ids PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19 PLAY-dClosedLoop-20
+ids PLAY-dClosedLoop-16 PLAY-dClosedLoop-17 PLAY-dClosedLoop-18 PLAY-dClosedLoop-19 PLAY-dClosedLoop-20 PLAY-dClosedLoop-21 PLAY-dClosedLoop-22 PLAY-dClosedLoop-23
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |

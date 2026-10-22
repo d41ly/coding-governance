@@ -4168,9 +4168,10 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
     printf '# d\n' > memory/DECISIONS.md
     printf '# stale-header-waiver.txt -- EMPTY is expected; the file must exist.\n' > memory/project/stale-header-waiver.txt
     printf -- '---\nslug: dAlpha\nnode: a\nopened: 2026-09-02\nstreams: arch\nroster: ARCH\nids: ARCH-dAlpha-1\n---\n\n# dAlpha\n\n<!-- gen:build-index -->\n<!-- /gen:build-index -->\n' > memory/builds/dAlpha/README.md
-    printf '# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' > memory/design/record.md
+    printf '# a design record\n\n## [chain]\n\n| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | %s `cl-dAlpha-0001`; %s `cl-dAlpha-0002` | c |\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' "$C29A1" "$C29A2" > memory/design/record.md
     printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > memory/design/nodes.py
     git add -A && git -c commit.gpgsign=false commit -q -m design --no-verify
+    printf '\nBaseline: `%s`\n' "$(git rev-parse HEAD)" >> memory/design/record.md
     printf 'SPEC_CARRIES_CUTOFF="2026-09-02"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="memory/design/view.md"\nDESIGN_NODES="memory/design/nodes.py"\n' "$(git rev-parse HEAD)" >> .memory-tree.conf
     "$_PY" "$KIT_REL/gen_build_index.py" --write
     git add -A && git -c commit.gpgsign=false commit -q -m armed --no-verify
@@ -4207,11 +4208,22 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
   # INPROGRESS spec over the standing plant is refused at that commit.
   printf '# r, edited\n' > "$C29/memory/README.md"; git -C "$C29" add -- memory/README.md
   out=$(run_cov29_gate --staged)
-  hit "memory-hygiene: check 29: held under --staged, no chain spec or conf staged"
+  hit "memory-hygiene: check 29: coverage held under --staged — no staged path is a build-index input or the carries checker"
   printf '\n' >> "$C29/$C29S"; git -C "$C29" add -- "$C29S"
   out=$(run_cov29_gate --staged)
   chit 29 "$C29S is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0599"
   git -C "$C29" reset -q --hard; write_cov29_view ''
+  # TOOL-dTrueNorth-16 AC21 — the staged trigger is the render's, passed through: with DESIGN_VIEW in a
+  # build's build/ folder, a build-index input, a view row staged ALONE refuses the INPROGRESS spec.
+  # Red before this unit, whose check tested a spec/ path or the conf itself and held.
+  C29V=memory/builds/dAlpha/build/2026-09-02-build-ARCH-dAlpha-1-view.md
+  mkdir -p "$C29/memory/builds/dAlpha/build"; cp "$C29/memory/design/view.md" "$C29/$C29V"
+  sed -i "s|^DESIGN_VIEW=.*\$|DESIGN_VIEW=\"$C29V\"|" "$C29/.memory-tree.conf"
+  git -C "$C29" add -A >/dev/null 2>&1; git -C "$C29" -c commit.gpgsign=false commit -q -m view-in-build --no-verify >/dev/null 2>&1
+  printf '| dAlpha | `cl-dAlpha-0599` | a planted clause | baseline |\n' >> "$C29/$C29V"; git -C "$C29" add -- "$C29V"
+  out=$(run_cov29_gate --staged)
+  chit 29 "$C29S is INPROGRESS while dAlpha's coverage is red: uncarried cl-dAlpha-0599"
+  git -C "$C29" reset -q --hard HEAD~1; cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"; write_cov29_view ''
   # A DESIGN_VIEW naming a missing file is a coverage nobody could read, which fails on its own branch.
   sed -i 's|^DESIGN_VIEW=.*$|DESIGN_VIEW="memory/design/no-such-view.md"|' "$C29/.memory-tree.conf"
   out=$(run_cov29_gate --only 29); r29rc=$?
@@ -4219,8 +4231,31 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
   chit 29 "the coverage could not be read, so no chain build's INPROGRESS spec was graded:"
   chit 29 "DESIGN_VIEW names memory/design/no-such-view.md"
   cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"
+  # TOOL-dTrueNorth-16 AC17 — CHECK 30 THROUGH THE ENGINE: a record departing from a clause through a
+  # gap row fails check 30, whose finding check 9 no longer reads; taken out, check 30 prints its clean
+  # count line; a pin naming no commit is a view nobody could render, failing on its own branch; and
+  # --staged holds it, saying so, while no record, design record, view or conf is staged.
+  C29G=memory/builds/dAlpha/build/2026-09-02-build-ARCH-dAlpha-1-deviation-1.md
+  mkdir -p "$C29/memory/builds/dAlpha/build"
+  printf -- '# ARCH-dAlpha-1 deviation 1 — a departure through a gap row\n\n**Serves:** deviation ARCH-dAlpha-1\n\n- **Departs from:** `cl-dAlpha-0001@%s` [chain]\n- **Hand-off:** design-to-spec\n- **Before:** the clause\n- **After:** the clause\n- **Cause:** builder discovery\n- **Reason:** the fixture departs\n- **Evidence:** the fixture\n- **Risk:** additive\n- **Approver:** author\n- **Follow-through:** gap gap-mem-47\n- **Caused-by:** ARCH-dAlpha-1\n' "$H29A1" > "$C29/$C29G"
+  out=$(run_cov29_gate --only 30); r30rc=$?
+  n=$((n+1)); [ "$r30rc" = 1 ] || { echo "FAIL check 30 through the engine: a record departing through a gap row exited $r30rc, not 1"; st=1; }
+  chit 30 "the as-built view's deviation records and its design record disagree, which --write cannot cure:"
+  chit 30 "2026-09-02-build-ARCH-dAlpha-1-deviation-1: departs from cl-dAlpha-0001 and carries no amends or supersedes row"
+  rm -f "$C29/$C29G"
+  out=$(run_cov29_gate --only 30); r30rc=$?
+  n=$((n+1)); case "$r30rc:$out" in 0:*"memory-hygiene: check 30: as-built — 0 verdict(s) over memory/design/view.md, clean"*) ;; *) echo "FAIL check 30 through the engine: the clean view exited $r30rc, or check 30 printed no clean count line:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1 ;; esac
+  sed -i 's|^DESIGN_BASELINE=.*$|DESIGN_BASELINE="0000000000000000000000000000000000000000"|' "$C29/.memory-tree.conf"
+  out=$(run_cov29_gate --only 30); r30rc=$?
+  n=$((n+1)); [ "$r30rc" = 1 ] || { echo "FAIL check 30 through the engine: a pin naming no commit exited $r30rc, not 1"; st=1; }
+  chit 30 "the as-built view could not be rendered, so none of its verdicts was read:"
+  cp "$TMP/cov29-conf" "$C29/.memory-tree.conf"
+  printf '# r, edited again\n' > "$C29/memory/README.md"; git -C "$C29" add -- memory/README.md
+  out=$(run_cov29_gate --staged)
+  hit "memory-hygiene: check 30: as-built held under --staged"
+  git -C "$C29" reset -q --hard
 else
-  echo "skip check 29 through the engine: no check-spec-tokens.py in this kit directory's parent, so its 14 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+14))
+  echo "skip check 29 and check 30 through the engine: no check-spec-tokens.py in this kit directory's parent, so their 22 arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+22))
 fi
 
 # THE HIGHER OF THE TWO PINS, not the merge's arithmetic. This branch carried 224 and main carried
@@ -4298,7 +4333,10 @@ fi
 # RAISED 656 -> 658 by TOOL-dTrueNorth-14: its two check-21 writer-test assertions, each top-level and
 # skipped aloud with n_skip carrying them when no workflows kit sits beside this one. Counted by
 # reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=658
+# RAISED 658 -> 666 by TOOL-dTrueNorth-16: its one check-29 staged-view-row assertion and its seven
+# check-30 engine assertions, each top-level and skipped aloud with the check-29 block's fourteen when no
+# spec-token checker sits in the kit directory's parent. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=666
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

@@ -1703,11 +1703,6 @@
       "file": "tools/memory-recall/bench.py"
     },
     {
-      "id": "build_design_fixture",
-      "kind": "function",
-      "file": "tools/memory-tree/deviation_join.py"
-    },
-    {
       "id": "build_diff_lines",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -2948,6 +2943,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "build_view_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
       "id": "build_visit_fixture",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -3938,6 +3938,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_cutoff_value",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "check_dead_worktree",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -4061,6 +4066,11 @@
       "id": "check_exits",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
+    },
+    {
+      "id": "check_expand_contract",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "check_extract_covers",
@@ -4938,6 +4948,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "check_rev_probe",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "check_role_move",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
@@ -5761,6 +5776,11 @@
       "id": "cmd_check",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
+    },
+    {
+      "id": "cmd_check_asbuilt",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "cmd_check_content",
@@ -9618,6 +9638,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "load_kit_module",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "load_last_queries",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -11513,11 +11538,6 @@
       "file": "tools/memory-tree/tree_lib.py"
     },
     {
-      "id": "parse_spec_status",
-      "kind": "function",
-      "file": "tools/check-spec-tokens.py"
-    },
-    {
       "id": "parse_spec_text",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -12994,6 +13014,16 @@
     },
     {
       "id": "read_design",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_design_conf",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
+      "id": "read_design_keys",
       "kind": "function",
       "file": "tools/memory-tree/design_lib.py"
     },
@@ -14575,7 +14605,7 @@
     {
       "id": "read_spec_revisions",
       "kind": "function",
-      "file": "tools/memory-tree/deviation_join.py"
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "read_spec_revs",
@@ -14591,6 +14621,11 @@
       "id": "read_spec_words",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_staged_paths",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "read_stale_dossiers",
@@ -18136,6 +18171,11 @@
       "id": "resolve_remote_sh",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "resolve_render_inputs",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
     },
     {
       "id": "resolve_repair_sides",
@@ -21708,6 +21748,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "test_coverage_stub",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "test_cpu_clock_parses_every_shape",
       "kind": "function",
       "file": "tools/process-monitor/selftest.py"
@@ -24021,6 +24066,11 @@
       "id": "write_deletions",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "write_design_fixture",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "write_dl_landing",

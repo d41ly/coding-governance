@@ -13551,6 +13551,30 @@ verb_dispatch() { # slug · unit · writes...
     fail 49 "--dispatch declares a build pass out of the build's own declared order: $unit is at order $_d_ord and an earlier step still holds a unit that is neither terminal nor dispatched:$_blockers"
     return 1
   fi
+  # --------------------------------------------------- TOOL-dTrueNorth-16 S2, THE EDGE REFUSAL
+  # The order gate's blind spot: units sharing an order are one parallel group and never block each
+  # other, so a consumer and its producer at one order dispatch in either sequence, and the consumer
+  # builds against code that does not exist yet. So the dispatched unit's own `consumes-from` edges,
+  # read by `read_consumes_from`, refuse it while a producer that is a unit of this build is neither
+  # CLOSED nor WONTDO, its status read as the order gate reads it. A producer that is DISPATCHED but
+  # not built still blocks: a consumer needs the producer's code, not its dispatch row. An id that is
+  # no unit of the build (`unit_ids_of`) is skipped, so an edge onto another build blocks nothing here.
+  # Beside code 49, the question the order gate asks over a second source of the same sequence.
+  # WHAT IT DOES NOT CHECK: a malformed Edges block, which `read_consumes_from` reads as fewer edges
+  # and the hygiene engine reds, and an edge the producer's spec declares in the other direction.
+  local _e_units _e_id _e_spec _e_st _e_block=""
+  _e_units=$(unit_ids_of "$slug")
+  for _e_id in $(read_consumes_from "$_d_spec"); do
+    printf '%s\n' "$_e_units" | grep -qxF -- "$_e_id" || continue
+    _e_spec="${SPEC_PATH[$_e_id]:-}"; [ -n "$_e_spec" ] || continue
+    _e_st="${SPEC_ST[$_e_spec]:-}"
+    case "$_e_st" in CLOSED|WONTDO) continue ;; esac
+    _e_block="$_e_block $unit consumes-from $_e_id (${_e_st:-no status})"
+  done
+  if [ -n "$_e_block" ]; then
+    fail 49 "--dispatch declares a build pass for a unit whose spec consumes from a unit of its own build that is neither CLOSED nor WONTDO, so the consumer would build against code its producer has not landed:$_e_block"
+    return 1
+  fi
   # -------------------------------------------------- TOOL-dDerivedDocket-16 S9, THE HOLD GATE
   # The order gate above enforces DECLARED orders and nothing else, so a unit whose spec closes an
   # ask that is BLOCKED on another mandated ask sails through it whenever nobody typed an `order`

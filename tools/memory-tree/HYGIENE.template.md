@@ -276,6 +276,9 @@ Carried from the charter's v3.5 node section when v4.0 cut it to one `[ids]` pra
    file under `archive/` is untracked, `--check` and `--write` both REFUSE and name it: the index
    reads `git ls-files`, so a half-staged rotation's moved rows look deleted. Stage the archive
    first (`TOOL-dHomedResolver-2`).
+   `--check` reports only what `--write` cures: the as-built view DESIGN_VIEW names is one more
+   artifact, its byte drift listed under the same `--write` remedy, and its other findings, which
+   `--write` cannot cure, are check 30's (`TOOL-dTrueNorth-16`).
    A build README carries four generated regions, in this order: `<!-- gen:build-index -->`,
    `<!-- gen:build-coverage -->`, `<!-- gen:build-order -->` and `<!-- gen:build-edges -->`.
    `--write` creates a missing pair and `--check` never demands one, save the coverage pair: it renders
@@ -577,10 +580,24 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     spec names, a stale pin, or any other arm. Each refused spec is named with every finding's arm and
     reference. Delegated to `{{KIT_DIR}}/gen_build_index.py --check-coverage`, which reads the one
     value the `build-coverage` region renders (check 9), and a coverage it cannot read fails as well.
-    With the key blank it prints one line and passes. Under `--staged` it runs only when the commit
-    stages a path under a build's `spec/` folder or the conf, and otherwise prints its held line.
+    With the key blank it prints one line and passes. Under `--staged` the check passes `--staged`
+    through, and the verb's trigger is the render's: it runs when a staged path is a build-index input,
+    a staged view row and a staged spec alike, or the carries checker beside the kit, and otherwise
+    prints its held line (`TOOL-dTrueNorth-16`).
     NOT GRADED: a spec at any other status, since `OPEN`, `SPECCED` and `BLOCKED` precede the exit and
     a terminal or `DEFERRED` spec is not building; and a build the design view does not name.
+30. **the as-built view's verdicts** — with all four `DESIGN_*` keys set, the deviation records and
+    the design record the as-built view renders from must agree: a record departing from a clause
+    with no `amends` or `supersedes` row, two amends of one clause no `**Supersedes:**` orders, a
+    `**Supersedes:**` naming a record outside its clause's set, an `**After:**` holding a `|`, a
+    pinned hash the clause does not carry at the baseline, or a `Baseline:` line moved off the pin
+    each fail, named. These are the findings `--write` cannot cure, so they are not check 9's, whose
+    message and remedy read only the view's byte drift. Delegated to
+    `{{KIT_DIR}}/gen_build_index.py --check-asbuilt`, which renders through the host `--write` writes the
+    view with, and a view it cannot render, a partial key set or an unreadable pin, fails as well.
+    With every `DESIGN_*` key blank it prints one line and passes. Under `--staged` it runs only when
+    the commit stages a deviation record, `DESIGN_RECORD`, `DESIGN_VIEW` or the conf, and otherwise
+    prints its held line (`TOOL-dTrueNorth-16`).
 
 ## Record bindings — how a record names its spec
 
@@ -613,8 +630,12 @@ carry it too:
   count of `none` records — those `RECORD_SERVES_CUTOFF` and `legacy-files.txt` leave — is bounded
   shrink-only by `RECORD_UNBOUND_PIN`, measured against YOUR corpus. Check 21 prints that count
   beside `N` on every run, and a pin above it is slack, which reds.
-- `gen_build_index.py --print-bindings` is the read-only report: it classifies every record, writes
-  nothing, and always exits 0. It is both the migration checklist and the gate's own predicate, so a
+- `gen_build_index.py --print-bindings` is the read-only report: it classifies every record and
+  writes nothing. It exits 0, or 2 on a `SPEC_AUDIT_PIN_CUTOFF` that is neither blank nor an ISO
+  date, or on a git read the audit pin needs and cannot make. Beside its A, U, S, B and N rows it
+  prints a `P` row per graded id owing a pin, and one `Q` row in four fields, the graded count, the
+  cutoff or `off`, and the exempt count or `-`, `Q<TAB><graded><TAB><cutoff><TAB><exempt>`
+  (`TOOL-dTrueNorth-14`). It is both the migration checklist and the gate's own predicate, so a
   seed list and a gate that disagree is structurally impossible.
 - The check REFUSES when that report exits non-zero or prints no `N` row. The report is the only
   thing check 21 reads, so a report that did not run would otherwise look exactly like a clean

@@ -181,10 +181,21 @@ if _ve_py=$(resolve_python 2>/dev/null); then
 else
   echo "verdict-epoch: note — no usable python, so the memory-recall kit was not resolved and its lines are not in the scan set"
 fi
-DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py $_recall ${_kit}merge-rows.py"
+# TOOL-dTrueNorth-16 S34: the modules checks 29 and 30 run join the delegates — `design_lib.py`, the
+# design's one parser; `asbuilt_view.py`, check 30's render; and the spec-token checker beside the
+# kit, check 29's join. The `[ -f ]` guard passes over one an install does not carry, and a `..`
+# segment is folded so every scanned path is the repo-relative spelling git and the receipt print.
+DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py $_recall ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}../check-spec-tokens.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
-for _d in $DELEGATES; do [ -f "$_d" ] && SCAN="$SCAN $_d"; done
+for _d in $DELEGATES; do
+  [ -f "$_d" ] || continue
+  case "$_d" in
+    ../*) continue ;;      # a kit at the repository root has no parent inside the repository
+    */../*) _dp=${_d%%/../*}; case "$_dp" in */*) _d="${_dp%/*}/${_d#*/../}" ;; *) _d=${_d#*/../} ;; esac ;;
+  esac
+  SCAN="$SCAN $_d"
+done
 
 # The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
 # named on its marker line and gated by the resolve-python self-test.

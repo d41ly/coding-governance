@@ -16,8 +16,32 @@ WHERE THE DESIGN IS comes from four keys of `.memory-tree.conf`, `DESIGN_KEYS`:
                     text and `since` cell, the hash derived from the text
   DESIGN_NODES      the owned-node deriver, a tracked `.py` file loaded by path: its `derive()` and its
                     own `OWNED` tuple, nothing else in it
-Blank or absent, nothing is read: `read_design` refuses naming each blank key, and the CLI exits 2.
+THE KEY RULE, `read_design_keys`, the one reading of the four keys (TOOL-dTrueNorth-16 S5), which
+`read_design`, the deviation join, the as-built view and its host all take their states from, so no
+reader of the keys hand-rolls them: all four blank or absent is OFF, nothing read; some set and some
+not is a refusal naming each blank key; all four set is ARMED, `DESIGN_BASELINE` a 40-hex commit pin
+that resolves to a commit in the repository or a refusal naming it. `read_design` refuses the off
+state as well, naming every key, and the CLI exits 2 on a blank key. The keys are gov's: they are
+absent from the kit's example conf, so an adopter's engines read them as off.
 The chain builds are the view's Build column; no build list is typed anywhere.
+
+THE CUTOFF AND THE KEY RULE (S7), applied by the carries join and the coverage read:
+`SPEC_CARRIES_CUTOFF` blank is off, one line, whatever the design keys hold; set with every design key
+blank, a refusal naming the cutoff and the keys; set over a partial set, the key rule's refusal; set
+over all four, armed. The deviation join and the as-built view read the key rule alone.
+
+ONE CONF READ, `read_design_conf`: `.memory-tree.conf` through `tree_lib.parse_conf`, the last
+declaration of a key winning and an `export ` prefix read as bash reads it, so the carries join and
+the generator read one value of each key (S14).
+
+ONE REVISION READER, `read_spec_revisions` (S10, S12): every non-merge commit that changed a spec,
+oldest first, with its text before and after, in two git spawns whatever the revision count, the
+stream read as bytes and sliced by each header's size before any blob is decoded. The carries join
+and the deviation population both read it.
+
+ONE SPEC FILENAME DATE, `SPEC_FILE_DATE`, the spec-token checker's pattern, which its `SPEC_DATE` is
+bound to (S32), and one fixture design, `write_design_fixture`, which the deviation join's and the
+as-built view's fixtures both write their designs with (S19).
 
 THE `[chain]` ROWS of a design record are read by `read_chain_clauses` (TOOL-dTrueNorth-4 S9), the
 one reader the deviation population's clause-move arm and the as-built generator share; it takes the
@@ -49,8 +73,8 @@ rule of the spec-token checker's claims join; the instrument reads fences, so a 
 keeps a column-0 example out of prose.
 
 THE CUTOFF GATES THE POPULATION, NOT THE PARSER. `SPEC_CARRIES_CUTOFF` reaches this module only as a
-parameter of `scan_chain_specs`, read by the caller through `read_cutoff_key` in
-`<prefix>/check-spec-tokens.py`, so the date has one reader. This module reads no date key.
+parameter of `scan_chain_specs`, its value tested by the caller through `check_cutoff_value` in
+`<prefix>/check-spec-tokens.py`, so the date has one test. This module reads no date key.
 
 Usage (from the repository root):
   python design_lib.py --parse <path>...           every binding of each file, or its refusal
@@ -59,8 +83,8 @@ Usage (from the repository root):
 Exit 0 clean · 1 on a malformed line or a refusal · 2 when a DESIGN_* key is blank, so nothing was read.
 
 What it does not read: whether a spec carries a clause it names, which is the carries join's; which
-statuses carry; and any reader for an adopter — the keys are gov's, and an adopter's tree leaves them
-blank.
+statuses carry; and any reader for an adopter — the keys are gov's, absent from the example conf, so
+an adopter's engines read them as off.
 """
 from __future__ import annotations
 
@@ -94,7 +118,9 @@ BINDING_HEAD = re.compile(r"^\*\*(Carries|Derived|Moved|Retired|Deferred):\*\*")
 VIEW_ROW = re.compile(r"^\| (d[A-Z]\w+) \| `(cl-d[A-Z]\w+-\d{4})` \| (.*) \| (baseline|deviation `([^`]+)`) \|$")
 DESIGN_KEYS = ("DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES")
 
-_SPEC_DATE = re.compile(r"/(\d{4}-\d{2}-\d{2})-spec-")
+# A spec's filename date, the spec-token checker's own pattern, compiled here once: the checker's
+# `SPEC_DATE` is bound to this object and `scan_chain_specs` reads it (TOOL-dTrueNorth-16 S32).
+SPEC_FILE_DATE = re.compile(r"/([0-9]{4}-[0-9]{2}-[0-9]{2})-spec-")
 _TABLE_RULE = re.compile(r"^\|(\s*:?-+:?\s*\|)+\s*$")
 _GRAMMARS = {
     "Carries": "`**Carries:** <cl-id>@<hash8> whole`, `**Carries:** <cl-id>@<hash8> part k/n` "
@@ -116,12 +142,12 @@ class DesignRefusal(ValueError):
         self.blank = tuple(blank)
 
 
-def run_git(root, *args):
-    """One git call at `root` under the kit's pin policy, its stdout as bytes; never raises on a
-    non-zero exit, so each caller names its own refusal. Pathspecs are literal: a conf value is a
-    path, never a glob or a magic signature."""
+def run_git(root, *args, stdin=None):
+    """One git call at `root` under the kit's pin policy, its stdout as bytes and `stdin` its input;
+    never raises on a non-zero exit, so each caller names its own refusal. Pathspecs are literal: a
+    conf value is a path, never a glob or a magic signature."""
     return subprocess.run(["git", "--no-replace-objects", "--literal-pathspecs", "-C", str(root), *args],
-                          capture_output=True, env=build_git_env())
+                          input=stdin, capture_output=True, env=build_git_env())
 
 
 def derive_clause_hash(text):
@@ -364,9 +390,9 @@ def parse_binding_lines(text, path, strict=True):
 def scan_chain_specs(paths, builds, cutoff, memory_root="memory"):
     """The chain builds' spec files among `paths`, `([(build, path)], {reason: count})`.
 
-    A path is a spec when it sits under `<memory_root>/builds/<slug>/spec/`, at any depth, and ends
-    `.md`; any other path is no spec and is not counted. A spec is kept when its build is one of
-    `builds` and its filename date, read as `/(\\d{4}-\\d{2}-\\d{2})-spec-`, is on or after `cutoff`;
+    A path is a spec when `tree_lib.build_spec_path_re` places it under `<memory_root>/builds/<slug>/spec/`,
+    at any depth, and it ends `.md`; any other path is no spec and is not counted. A spec is kept when
+    its build is one of `builds` and its filename date, read by `SPEC_FILE_DATE`, is on or after `cutoff`;
     what is passed over is counted as `other-build`, `pre-cutoff` and `undated`. A blank `cutoff`
     reads no date and keeps every chain-build spec, as the instrument reads them. Statuses are not
     read here: which statuses carry is the join's choice.
@@ -384,7 +410,7 @@ def scan_chain_specs(paths, builds, cutoff, memory_root="memory"):
             skipped["other-build"] += 1
             continue
         if cutoff:
-            m = _SPEC_DATE.search(p)
+            m = SPEC_FILE_DATE.search(p)
             if not m:
                 skipped["undated"] += 1
                 continue
@@ -395,24 +421,142 @@ def scan_chain_specs(paths, builds, cutoff, memory_root="memory"):
     return kept, skipped
 
 
+def read_design_conf(root):
+    """`.memory-tree.conf` at `root` through `tree_lib.parse_conf`, `{}` where there is none (S14).
+
+    The ONE read of the conf for the carries keys and the design keys: the carries join takes it
+    when its caller passes no conf, and the generator passes its own parse of the same file, so a key
+    declared twice, or behind an `export ` prefix, reads one value in both.
+    """
+    p = pathlib.Path(root) / ".memory-tree.conf"
+    if not p.is_file():
+        return {}
+    return parse_conf(p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"), {})
+
+
+def read_design_keys(root, conf):
+    """THE KEY RULE (S5): the four `DESIGN_KEYS` values of `conf`, validated, or None when all four are
+    blank or absent, the off state, read with no git call.
+
+    Some set and some not is a `DesignRefusal` naming each blank key, its `blank` holding them. All
+    four set, `DESIGN_BASELINE` must be a 40-hex pin naming a commit in `root`, else a refusal naming
+    it; one `git cat-file -e` decides. Returns `{key: value}` for the four. What it does not check:
+    that the other three name readable files, which each one's own reader refuses by name.
+    """
+    values = {k: str(conf.get(k) or "").strip() for k in DESIGN_KEYS}
+    blank = [k for k in DESIGN_KEYS if not values[k]]
+    if len(blank) == len(DESIGN_KEYS):
+        return None
+    if blank:
+        held = [k for k in DESIGN_KEYS if k not in blank]
+        raise DesignRefusal(f"{', '.join(blank)} {'is' if len(blank) == 1 else 'are'} blank while "
+                            f"{', '.join(held)} {'is' if len(held) == 1 else 'are'} set, so the design is half "
+                            "declared and nothing was read", blank=blank)
+    pin = values["DESIGN_BASELINE"]
+    if not re.fullmatch(r"[0-9a-f]{40}", pin):
+        raise DesignRefusal(f"DESIGN_BASELINE {pin} is not a 40-hex commit pin, so nothing was read")
+    if run_git(root, "cat-file", "-e", f"{pin}^{{commit}}").returncode:
+        raise DesignRefusal(f"DESIGN_BASELINE {pin} names no commit, so nothing was read")
+    return values
+
+
+def read_spec_revisions(root, paths):
+    """`{path: [(sha, before, after)]}`, oldest first, for every path of `paths` (S10, S12): one entry per
+    non-merge commit that changed it, `before` its text at that commit's first parent, None at its
+    creation, and `after` its text at the commit, None at its deletion.
+
+    TWO GIT SPAWNS whatever the revision count: one `git log --full-history --no-merges --no-renames
+    --date-order --reverse` at HEAD over the paths, read without following a rename, and one `git
+    cat-file --batch` for every blob it names. THE STREAM IS BYTES: each body is sliced by its header's
+    byte size before it is decoded, then decoded as UTF-8 with CRLF folded, the discipline
+    `gen_build_index.read_blobs_at_rev` documents, because a stream decoded first is shorter than its
+    byte sizes after any multi-byte character and cuts the next blob short. A failed or truncated call
+    is a refusal naming it.
+    """
+    paths = list(dict.fromkeys(str(p) for p in paths))
+    out = {p: [] for p in paths}
+    if not paths:
+        return out
+    r = run_git(root, "log", "-z", "--full-history", "--no-merges", "--no-renames", "--date-order", "--reverse",
+                "--name-only", "--format=%x1e%H%x1f%P%x1f", "HEAD", "--", *paths)
+    if r.returncode:
+        raise DesignRefusal("the spec revision log failed, so no revision was read: "
+                            f"{r.stderr.decode('utf-8', 'replace').strip()}")
+    revs = []
+    for rec in r.stdout.decode("utf-8", "surrogateescape").split("\x1e")[1:]:
+        sha, parents, rest = rec.split("\x1f", 2)
+        parent = (parents.split() or [None])[0]
+        revs += [(p, sha, parent) for p in dict.fromkeys(x for x in re.split(r"[\0\n]", rest) if x) if p in out]
+    asks = list(dict.fromkeys(a for p, sha, parent in revs for a in ([f"{parent}:{p}"] if parent else [])
+                              + [f"{sha}:{p}"]))
+    blobs = {}
+    if asks:
+        r = run_git(root, "cat-file", "--batch", stdin="".join(a + "\n" for a in asks).encode("utf-8"))
+        if r.returncode:
+            raise DesignRefusal("git cat-file --batch over the spec revisions failed, so no revision was read: "
+                                f"{r.stderr.decode('utf-8', 'replace').strip()}")
+        raw, pos = r.stdout, 0
+        for a in asks:
+            nl = raw.find(b"\n", pos)
+            if nl < 0:
+                raise DesignRefusal(f"git cat-file --batch ended before {a}, so the revisions cannot be read")
+            head, pos = raw[pos:nl], nl + 1
+            if head.endswith(b" missing"):
+                blobs[a] = None
+                continue
+            fields = head.rsplit(b" ", 2)
+            if len(fields) != 3 or fields[1] != b"blob" or not fields[2].isdigit():
+                raise DesignRefusal(f"git cat-file --batch answered `{head.decode('utf-8', 'replace')}` for {a}, "
+                                    "so the revisions cannot be read")
+            size = int(fields[2])
+            blobs[a] = raw[pos:pos + size].decode("utf-8", "replace").replace("\r\n", "\n")
+            pos += size + 1
+    for p, sha, parent in revs:
+        out[p].append((sha, blobs.get(f"{parent}:{p}") if parent else None, blobs.get(f"{sha}:{p}")))
+    return out
+
+
+def write_design_fixture(repo):
+    """A fixture's own design, written as one commit through `repo.write_commit`, whose sha it returns:
+    the builder TOOL-dTrueNorth-12 S3 gave the deviation fixture, moved here at its second instance, the
+    as-built view's fixture (TOOL-dTrueNorth-16 S19).
+
+    `repo` is a fixture repository holding `record` and `view`, the two paths, `clause_ids`, the
+    clause ids in order, and `builds`, the two chain builds, with `write_commit(files, subject)`
+    returning a mark and `read_sha(mark)`. The record's `[chain]` holds one clause per id, the ids
+    split across the builds, the first taking the larger half; its `[clause-ids]` section reads
+    `No baseline.`, and `repo.v2` holds the record as written. The view is one `baseline` row per
+    clause in the grammar `VIEW_ROW` reads. Nothing reads the tree's own DESIGN_RECORD or DESIGN_VIEW.
+    """
+    ids, (first, second) = list(repo.clause_ids), repo.builds
+    half = (len(ids) + 1) // 2
+    clauses = [(first if n < half else second, cid, f"the fixture's clause {n + 1} holds `fixture-name-{n + 1}`")
+               for n, cid in enumerate(ids)]
+    rows = [f"| {b} | Fixture | {'none' if b == first else first} | "
+            + "; ".join(f"{text} `{cid}`" for at, cid, text in clauses if at == b) + " | none |" for b in (first, second)]
+    repo.v2 = "\n".join(["# The fixture's design record, its own two builds", "",
+                         "## [chain] The chain: the fixture's builds and their clauses", "",
+                         "| Build | Stage | Parents | Planned units | Gaps owned |", "|---|---|---|---|---|", *rows, "",
+                         "## [clause-ids] Clause ids", "", "No baseline.", ""])
+    view = "\n".join(["# The fixture's as-built view", "", "| Build | Clause | Text | Since |", "|---|---|---|---|",
+                      *(f"| {b} | `{cid}` | {text} | baseline |" for b, cid, text in clauses), ""])
+    return repo.read_sha(repo.write_commit({repo.record: repo.v2, repo.view: view},
+                                           "fixture: the design's [chain] and its view, the fixture's own"))
+
+
 def read_design(root, conf):
     """The design, read once from the four `DESIGN_KEYS` values of the caller's conf.
 
     Returns `{"baseline", "view", "rows", "builds", "retired", "nodes"}`: the pin, the view's path, its
     rows in view order, `{build: {cid: (text, hash8, since)}}`, the withdrawn ids at the baseline, and
-    `{build: {"<ns>.<key>"}}`. A blank key is a refusal naming it, raised before anything is read.
+    `{build: {"<ns>.<key>"}}`. Its states are `read_design_keys`', the off state among its refusals:
+    every key blank is a refusal naming them all, raised before anything is read.
     """
-    values = {k: str(conf.get(k) or "").strip() for k in DESIGN_KEYS}
-    blank = [k for k in DESIGN_KEYS if not values[k]]
-    if len(blank) == len(DESIGN_KEYS):
+    values = read_design_keys(root, conf)
+    if values is None:
         raise DesignRefusal("every DESIGN_* key is blank (" + ", ".join(DESIGN_KEYS) + "), so nothing was "
-                            "read", blank=blank)
-    if blank:
-        raise DesignRefusal(f"{', '.join(blank)} {'is' if len(blank) == 1 else 'are'} blank, so nothing was "
-                            "read", blank=blank)
+                            "read", blank=DESIGN_KEYS)
     baseline = values["DESIGN_BASELINE"]
-    if not re.fullmatch(r"[0-9a-f]{40}", baseline):
-        raise DesignRefusal(f"DESIGN_BASELINE {baseline} is not a 40-hex commit pin")
     rows = read_design_view(values["DESIGN_VIEW"], root)
     builds = {}
     for build, cid, text, h, since in rows:
@@ -481,8 +625,7 @@ def main(argv):
             print(f"design-lib: REFUSING — --chain-specs takes one ISO date (YYYY-MM-DD), not [{cutoff}]")
             return 1
     root = read_repo_root()
-    conf_path = root / ".memory-tree.conf"
-    conf = parse_conf(conf_path.read_text(encoding="utf-8"), {}) if conf_path.exists() else {}
+    conf = read_design_conf(root)
     try:
         design = read_design(root, conf)
     except DesignRefusal as e:

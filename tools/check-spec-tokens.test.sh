@@ -33,7 +33,10 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=168
+# RAISED 168 -> 176 by TOOL-dTrueNorth-16: its unparsed-header arm and the restore after it, its two
+# conf-read arms and its four one-reader probe arms, each top-level. Counted by reading; OWED: observed
+# at the close.
+FLOOR_ASSERTIONS=176
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1398,6 +1401,23 @@ sed -i 's/^\*\*Status:\*\* WONTDO/**Status:** OPEN/' "$d/$CSPEC/$CCUT-spec-TOOL-
 arm "the same second carrier at OPEN REDS as [carries] ambiguous, so the status is what set it apart" 1 "$d" "[carries] \`carries <- ambiguous:cl-dAlpha-0001\`"
 git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
 check_carries_restored "the WONTDO plant"
+# TOOL-dTrueNorth-16 AC11 — the status is the generator's header grammar: a second whole carrier whose
+# header misses its base field does not parse, so it is set apart as unparsed and never collides. Red
+# against the base join, whose own status reader read OPEN there and reported the clause ambiguous.
+write_carries_spec "$d" dAlpha 3 OPEN "**Carries:** cl-dAlpha-0001@$HA1 whole" "" "$CA1"
+sed -i 's/ · base 0123abcd//' "$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+git -C "$d" add -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "a second carrier whose status header does not parse is set apart, never ambiguous" 0 "$d" "$CLINE" "[carries]"
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+check_carries_restored "the unparsed plant"
+# TOOL-dTrueNorth-16 AC14 — one conf read, the generator's parse: a cutoff declared twice reads its LAST
+# value, and one behind `export ` reads as bash reads it. Red against the base join, which took the first
+# declaration and read the exported one as blank, turning the join off while the generator kept it armed.
+{ printf 'SPEC_CARRIES_CUTOFF=""\n'; cat "$base/carries-conf"; } > "$d/.memory-tree.conf"
+arm "a cutoff declared twice, blank then set, reads its last value" 0 "$d" "$CLINE" "[carries]"
+sed 's/^SPEC_CARRIES_CUTOFF=/export SPEC_CARRIES_CUTOFF=/' "$base/carries-conf" > "$d/.memory-tree.conf"
+arm "a cutoff behind export reads as set" 0 "$d" "$CLINE" "[carries]"
+cp "$base/carries-conf" "$d/.memory-tree.conf"
 # AC6 — a clause's backticked name dropped from its carrier's prose, its binding line left whole.
 sed -i 's/`alpha-one`//' "$A1"
 arm "a clause token in none of its carriers REDS as [carries] token, naming it" 1 "$d" "[carries] \`carries <- token:cl-dAlpha-0001\` — cl-dAlpha-0001's token \`alpha-one\` appears in none of its carriers"
@@ -1432,6 +1452,54 @@ git -C "$d" commit -qam typo --no-verify
 arm "a clause an earlier revision carried and this one does not REDS as [carries] stopped, read two commits back" 1 "$d" "[carries] \`carries <- stopped:cl-dAlpha-0001\`"
 git -C "$d" reset -q --hard "$cseed"
 check_carries_restored "the stopped plant"
+# TOOL-dTrueNorth-16 AC9 AC10 AC12 AC32 — ONE revision reader, ONE status filter and ONE date pattern,
+# probed in-process over a history of the fixture's own: dAlpha-1 gains a line holding multi-byte
+# characters, then a later line. Each arm is red against the base join, which had no
+# `read_spec_revisions`, parsed the status inside `scan_carries` and compiled its own date pattern.
+d=$base/carries-revs; seed_carries_repo "$d"
+A1="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm seeded --no-verify
+printf '\nThe caf\303\251 line \342\200\224 \342\234\223 multi-byte before the change.\n' >> "$A1"; git -C "$d" commit -qam multibyte --no-verify
+printf '\nA later line, changed.\n' >> "$A1"; git -C "$d" commit -qam later --no-verify
+rev_out=$(cd "$d" && "$PY" -c 'import importlib.util, subprocess, sys
+path, kit, lint = sys.argv[1:4]
+sys.path.insert(0, kit)
+import design_lib as dl
+import deviation_join as dj
+spec = importlib.util.spec_from_file_location("cst", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+calls, real = [], dl.run_git
+def counted(*a, **k):
+    calls.append(1)
+    return real(*a, **k)
+dl.run_git = counted
+revs = dl.read_spec_revisions(".", [path])[path]
+dl.run_git = real
+shown = subprocess.run(["git", "show", revs[-1][0] + ":" + path], capture_output=True).stdout.decode("utf-8").replace("\r\n", "\n")
+print("AC10 revisions", len(revs), "after", "equal" if revs[-1][2] == shown else "differs", "spawns", len(calls))
+seen, orig = [], dl.read_spec_revisions
+def recorded(root, paths):
+    seen.append(sorted(paths))
+    return orig(root, paths)
+dl.read_spec_revisions = recorded
+conf = dl.read_design_conf(".")
+design = dl.read_design(".", conf)
+specs, _st, skipped = cst.read_carries_specs(".", design, conf["SPEC_CARRIES_CUTOFF"], conf=conf)
+dl.read_spec_revisions = orig
+print("AC12 one reader", dj.read_spec_revisions is orig and path in (seen[0] if seen else []))
+wont = "**Status:** WONTDO · rev-1 · 2026-09-02 · node t · Tier-2 · base 0123abcd\n\n" + open(path, encoding="utf-8").read()
+specs["dAlpha"].append(("memory/builds/dAlpha/spec/wontdo.md", wont, []))
+amb = [f for f in cst.scan_carries(design, specs, exit_mode=True)["findings"] if f[1] == "ambiguous"]
+print("AC9 scan_carries parses no status", len(amb) == 1)
+print("AC32 one date pattern", cst.SPEC_DATE is dl.SPEC_FILE_DATE)' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$HERE/memory-tree" "$LINT" 2>&1)
+check_rev_probe() {   # $1 label · $2 the probe line it must print
+  case "$rev_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$rev_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_rev_probe "read_spec_revisions reads bytes: the last revision after a multi-byte line equals git show, in two spawns" "AC10 revisions 3 after equal spawns 2"
+check_rev_probe "read_carries_specs and the deviation population read one revision reader" "AC12 one reader True"
+check_rev_probe "scan_carries parses no status: a WONTDO carrier handed past the filter collides" "AC9 scan_carries parses no status True"
+check_rev_probe "the checker's SPEC_DATE is design_lib's one compiled pattern" "AC32 one date pattern True"
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

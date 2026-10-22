@@ -47,7 +47,7 @@ populations this leg already reads: the RANGE half asks whether each design or s
 the pushed range had its deviation record in its departing commit's tree, the WHOLE half joins every
 departure at HEAD and grades every approver. Its lines follow this leg's under `routed-commits:
 deviation`, and it runs the chain's `report` value, so it never moves the exit. Off unless the conf
-declares DESIGN_RECORD, DESIGN_BASELINE and DESIGN_VIEW, in one line and with no git call, so the
+declares all four DESIGN_* keys, in one line and with no git call, so the
 constant spawn count holds there; armed, its spawns grow with the chain-build specs' revisions. A
 declared design it cannot measure is REFUSED, exit 2.
 """
@@ -339,17 +339,18 @@ def check_deviation_join(repo, conf, read) -> list:
 
     Its RANGE half asks whether each member departing in the pushed range has its record in that
     commit's tree; its WHOLE half joins every member at HEAD and grades every approver. It runs the
-    chain's values, `report` and `author-recorded`, so it lists and never moves the exit. OFF unless the
-    conf declares DESIGN_RECORD, DESIGN_BASELINE and DESIGN_VIEW: one line, and no git call, so a tree
-    declaring no design keeps this leg's constant spawn count. ARMED, its spawns grow with the
-    chain-build specs' revisions. A declared design it cannot measure, its pin unreadable among them,
-    is a Refusal, exit 2, as an unarmed conf is here.
+    chain's values, `report` and `author-recorded`, so it lists and never moves the exit. Its states are
+    the key rule's, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S5): OFF when all four DESIGN_*
+    keys are blank, one line and no git call, so a tree declaring no design keeps this leg's constant
+    spawn count. ARMED, its spawns grow with the chain-build specs' revisions. A partial key set, and a
+    declared design it cannot measure, its pin unreadable among them, is a Refusal, exit 2, as an
+    unarmed conf is here.
     """
     import deviation_join  # noqa: E402  the join's core, a sibling loaded only here
-    armed, why = deviation_join.read_join_state(conf)
-    if not armed:
-        return [f"{SAY}: deviation join off — {why}"]
     try:
+        armed, why = deviation_join.read_join_state(repo, conf)
+        if not armed:
+            return [f"{SAY}: deviation join off — {why}"]
         return [f"{SAY}: {ln}" for ln in deviation_join.read_host_lines(repo, conf, read)]
     except deviation_join.Unmeasured as exc:
         raise Refusal(f"the deviation join is armed and measures nothing: {exc}") from None
@@ -580,7 +581,7 @@ def run_selftest() -> int:
         # TOOL-dTrueNorth-4 AC12: a conf declaring no design key prints ONE join-off line naming the keys,
         # and the exit is the leg's own; the spawn arm below holds that it reads no history.
         print_arm(rc == 0 and out.count(f"{SAY}: deviation join off — ") == 1
-            and "DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW are blank" in out,
+            and "DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, DESIGN_NODES are blank" in out,
             "TOOL-dTrueNorth-4 AC12 the deviation join is off with the design keys blank, in one line", out)
 
         # ---- AC6: the spawn count does not grow with the commits

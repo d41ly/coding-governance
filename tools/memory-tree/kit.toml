@@ -396,6 +396,21 @@ consumer = "check-memory-hygiene.sh"
 probe = ["python3", "{own}", "--print-bindings"]
 expect = '(?m)^U\t|^N\t0$'
 consumer = "check-memory-hygiene.sh"
+# TOOL-dTrueNorth-16 S29: the rows check 21's pin branch and checks 29 and 30 read. The Q row is the
+# pin branch's liveness row; the coverage and as-built lines open every run of the two verbs, off or
+# armed, so a generator that stopped printing either breaks its consumer here first.
+[[contract.clause]]
+probe = ["python3", "{own}", "--print-bindings"]
+expect = '(?m)^Q\t'
+consumer = "check-memory-hygiene.sh"
+[[contract.clause]]
+probe = ["python3", "{own}", "--check-coverage"]
+expect = '(?m)^build-index: coverage'
+consumer = "check-memory-hygiene.sh"
+[[contract.clause]]
+probe = ["python3", "{own}", "--check-asbuilt"]
+expect = '(?m)^(build-index: as-built|as-built view: off)'
+consumer = "check-memory-hygiene.sh"
 [[contract.clause]]
 imports = ["apply_region", "Problem", "MARK_OPEN", "MARK_CLOSE"]
 consumer = "marker-contract.test.sh"
