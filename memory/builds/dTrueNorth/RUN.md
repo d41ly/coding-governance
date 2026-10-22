@@ -13,8 +13,8 @@ gates-run: unattended-17926761784118913086-672420 850d13eb
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: ba0afae101a4b8105f06e40ea71107c88f4967d4
-phase: BUILDING
+witness: e634ce986cb13f5d2f5a67909cbf79ba22ab10eb
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2
 mode: slug
