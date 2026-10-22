@@ -81,7 +81,7 @@ ids TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassag
 *No spec under this build carries a status header; the status above is declared in the front matter.*
 <!-- /gen:build-units -->
 
-Records: 1 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 1 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
