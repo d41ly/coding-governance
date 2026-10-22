@@ -259,9 +259,13 @@ J=$(newrepo closure)
 engine "$J" 1.5 ""
 printf 'def render(root):\n    from deviation_join import read_record\n    return read_record(root)\n' > "$J/$KIT_REL/asbuilt_view.py"
 printf 'def read_record(path):\n    return path\n' > "$J/$KIT_REL/deviation_join.py"
+# TOOL-dTrueNorth-31 S13: a scanned file that is no sibling, the checker DELEGATES folds
+# `../check-spec-tokens.py` to at the tool root, is counted apart from the two siblings; red against
+# the label that counted every scanned file a sibling, which read 3.
+printf 'X = 1\n' > "$J/${PFX}check-spec-tokens.py"
 ( cd "$J" && git add -A && git commit -qm base --no-verify ) >/dev/null
 BASE_J=$(cd "$J" && git rev-parse HEAD)
-arm 'a delegate list holding every sibling its delegates import prints the closure line (control)' 0 "the delegates' import closure is 2 sibling module(s), every one in DELEGATES" "$J" "$BASE_J"
+arm 'a delegate list holding every sibling its delegates import prints the closure line, the non-sibling counted apart (control)' 0 "the delegates' import closure is 2 sibling module(s) and 1 other scanned file(s), every sibling in DELEGATES" "$J" "$BASE_J"
 printf 'def read_record(path):\n    return path.strip()\n' > "$J/$KIT_REL/deviation_join.py"
 ( cd "$J" && git add -A && git commit -qm "the record reader moves, no bump" --no-verify ) >/dev/null
 arm '...and an edit of deviation_join.py with no bump FAILS naming it' 1 "moved: $KIT_REL/deviation_join.py" "$J" "$BASE_J"

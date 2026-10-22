@@ -206,3 +206,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T10:56:10Z rescope · item add TOOL-dTrueNorth-31 · reason closing diff review round 2 (reviews/2026-10-22-review-TOOL-dTrueNorth-23-closing-diff-review-round2.md) the 16 confirmed findings, items M1 to M9 and L1 to L6, batched into one unit
 
 2026-10-22T10:56:20Z review · item dTrueNorth-diff-r2 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 16 · disposition promote
+
+2026-10-22T11:22:35Z dispatch · item ef8fd59d TOOL-dTrueNorth-31 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/memory-tree/gen_build_index.py tools/memory-tree/asbuilt_view.py tools/memory-tree/design_lib.py tools/memory-tree/deviation_join.py tools/memory-tree/check-verdict-epoch.sh tools/memory-tree/check-verdict-epoch.test.sh tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-31-deviation-34.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-31-ledger.md memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-31.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
+
+2026-10-22T11:22:41Z brief · item TOOL-dTrueNorth-31 · reason 9daeb77a6cb6 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-31-build-brief.md

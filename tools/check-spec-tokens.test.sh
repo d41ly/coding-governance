@@ -1499,7 +1499,7 @@ wont = "**Status:** WONTDO · rev-1 · 2026-09-02 · node t · Tier-2 · base 01
 specs["dAlpha"].append(("memory/builds/dAlpha/spec/wontdo.md", wont, []))
 amb = [f for f in cst.scan_carries(design, specs, exit_mode=True)["findings"] if f[1] == "ambiguous"]
 print("AC9 scan_carries parses no status", len(amb) == 1)
-print("AC32 one date pattern", cst.SPEC_DATE is dl.SPEC_FILE_DATE)' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$HERE/memory-tree" "$LINT" 2>&1)
+print("AC32 one date pattern", cst.SPEC_DATE is dl.SPEC_FILE_DATE)' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$MEMORY_TREE" "$LINT" 2>&1)
 check_rev_probe() {   # $1 label · $2 the probe line it must print
   case "$rev_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$rev_out" | tail -3; fail=$((fail+1)) ;; esac
 }
@@ -1548,7 +1548,7 @@ flagged = scan_literal_patterns(ast.parse(src))
 print("AC21 literal patterns", [f for f in flagged if f not in ALLOWED],
       "the walk flagged exactly the allowed targets before the allow-list", sorted(flagged) == sorted(ALLOWED))
 planted = scan_literal_patterns(ast.parse(src + "\nSECOND = re.compile(r\"^\\| \" + _CL)\n"))
-print("AC12 planted", [f for f in planted if f not in ALLOWED])' "$HERE/memory-tree" "$LINT" 2>&1)
+print("AC12 planted", [f for f in planted if f not in ALLOWED])' "$MEMORY_TREE" "$LINT" 2>&1)
 check_one_probe() {   # $1 label · $2 the probe line it must print
   case "$one_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$one_out" | tail -3; fail=$((fail+1)) ;; esac
 }
@@ -1565,7 +1565,12 @@ check_one_probe "TOOL-dTrueNorth-26 AC12 a BinOp pattern with a literal leaf, re
 # AC11: the view's and the join's clause grammar is design_lib's object, red against a module spelling
 # it again. AC14: a bare CR in a view row stays in its text cell, red against the text-mode read, which
 # split the row. AC15: a namesake tree_lib in sys.modules is left there and the kit's file is returned,
-# red against the base loader, which returned the namesake.
+# red against the base loader, which returned the namesake. TOOL-dTrueNorth-31 AC6 (S6): each captured
+# env is recorded as handed, and a runner handed none prints `inherits`, since git then inherits every
+# leak; a scratch copy of routed_commits.run_git with `env=` taken out prints it, red against the
+# `or {}` reading, which printed `leaks []` there. TOOL-dTrueNorth-31 AC11 (S11): under a namesake
+# design_lib, a refusal raised through one load_design_lib is caught through a second, red against the
+# loader that executed the kit file afresh on every call.
 d=$base/minors26; mkdir -p "$d"
 m26_out=$(cd "$d" && "$PY" -c 'import ast, importlib.util, os, pathlib, subprocess, sys
 kit, lint = sys.argv[1:3]
@@ -1575,18 +1580,28 @@ envs, real = [], subprocess.run
 class Done:
     returncode, stdout, stderr = 0, b"", b""
 def captured(*a, **k):
-    envs.append(dict(k.get("env") or {}))
+    envs.append(k.get("env"))
     return Done()
+def leaks(env):
+    return "inherits" if env is None else sorted(set(env) & set(tree_lib.GIT_ENV_LEAKS))
+src = pathlib.Path(routed_commits.__file__).read_text(encoding="utf-8")
+pathlib.Path("noenv").mkdir(exist_ok=True)
+pathlib.Path("noenv", "routed_commits.py").write_text(src.replace(", env=env)", ")"), encoding="utf-8")
+ne = importlib.util.spec_from_file_location("routed_commits_noenv", "noenv/routed_commits.py")
+noenv = importlib.util.module_from_spec(ne)
+ne.loader.exec_module(noenv)
 for name in tree_lib.GIT_ENV_LEAKS:
     os.environ[name] = "leaked"
 subprocess.run = captured
 design_lib.run_git(".", "status")
 routed_commits.run_git(".", "status", may_fail=True)
+noenv.run_git(".", "status", may_fail=True)
 subprocess.run = real
 for name in tree_lib.GIT_ENV_LEAKS:
     del os.environ[name]
-print("AC1 design_lib leaks", sorted(set(envs[0]) & set(tree_lib.GIT_ENV_LEAKS)), "routed_commits leaks",
-      sorted(set(envs[1]) & set(tree_lib.GIT_ENV_LEAKS)), "second list", hasattr(routed_commits, "GIT_LOCATION_VARS"))
+print("AC1 design_lib leaks", leaks(envs[0]), "routed_commits leaks", leaks(envs[1]), "second list",
+      hasattr(routed_commits, "GIT_LOCATION_VARS"))
+print("AC6 env= taken out", src.count(", env=env)") == 1, "routed_commits leaks", leaks(envs[2]))
 spec = importlib.util.spec_from_file_location("cst26", lint)
 cst = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cst)
@@ -1615,7 +1630,22 @@ ns.loader.exec_module(namesake)
 sys.modules["tree_lib"] = namesake
 got = cst.load_kit_module("tree_lib")
 print("AC15 kit module", pathlib.Path(got.__file__).resolve() == pathlib.Path(kit, "tree_lib.py").resolve(),
-      "namesake kept", sys.modules["tree_lib"] is namesake)' "$HERE/memory-tree" "$LINT" 2>&1)
+      "namesake kept", sys.modules["tree_lib"] is namesake)
+sys.modules["tree_lib"] = tree_lib
+pathlib.Path("namesake", "design_lib.py").write_text("class DesignRefusal(ValueError):\n    pass\n", encoding="utf-8")
+ns = importlib.util.spec_from_file_location("design_lib", "namesake/design_lib.py")
+dl_namesake = importlib.util.module_from_spec(ns)
+ns.loader.exec_module(dl_namesake)
+sys.modules["design_lib"] = dl_namesake
+first, second = cst.load_design_lib(), cst.load_design_lib()
+try:
+    raise first.DesignRefusal("x")
+except second.DesignRefusal:
+    caught = True
+except ValueError:
+    caught = False
+print("AC11 of 31 one load", first is second, "caught", caught, "namesake kept", sys.modules["design_lib"] is dl_namesake,
+      "kit file", pathlib.Path(first.__file__).resolve() == pathlib.Path(kit, "design_lib.py").resolve())' "$MEMORY_TREE" "$LINT" 2>&1)
 check_m26_probe() {   # $1 label · $2 the probe line it must print
   case "$m26_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$m26_out" | tail -3; fail=$((fail+1)) ;; esac
 }
@@ -1625,8 +1655,10 @@ check_m26_probe "TOOL-dTrueNorth-26 AC3 part 1/2 with part 2/2 is no parts findi
 check_m26_probe "TOOL-dTrueNorth-26 AC11 the view and the join read design_lib's own clause grammar" "AC11 one clause grammar True True"
 check_m26_probe "TOOL-dTrueNorth-26 AC14 a bare CR in a view row stays in its text cell" "AC14 bare CR kept True"
 check_m26_probe "TOOL-dTrueNorth-26 AC15 load_kit_module returns the kit's file and leaves a namesake in sys.modules" "AC15 kit module True namesake kept True"
-cl_files=$(grep -l -F 'cl-d[A-Z]\w+-\d{4}' "$HERE"/memory-tree/*.py | sed 's#.*/##' | tr '\n' ' ')
-cl_lines=$(cat "$HERE"/memory-tree/*.py | grep -c -F 'cl-d[A-Z]\w+-\d{4}')
+check_m26_probe "TOOL-dTrueNorth-31 AC6 a runner with env= taken out hands subprocess.run no env, which inherits every leak, and the probe says so" "AC6 env= taken out True routed_commits leaks inherits"
+check_m26_probe "TOOL-dTrueNorth-31 AC11 under a namesake design_lib, two load_design_lib calls return one cached kit load, so a refusal raised through one is caught through the other" "AC11 of 31 one load True caught True namesake kept True kit file True"
+cl_files=$(grep -l -F 'cl-d[A-Z]\w+-\d{4}' "$MEMORY_TREE"/*.py | sed 's#.*/##' | tr '\n' ' ')
+cl_lines=$(cat "$MEMORY_TREE"/*.py | grep -c -F 'cl-d[A-Z]\w+-\d{4}')
 if [ "$cl_files:$cl_lines" = "design_lib.py :1" ]; then
   echo "arm ok    TOOL-dTrueNorth-26 AC11 the clause-id grammar is spelled once in the kit, in design_lib.py"; pass=$((pass+1))
 else

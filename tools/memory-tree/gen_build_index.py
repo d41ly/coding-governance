@@ -1959,6 +1959,7 @@ def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
                       f"({path}), so the coverage cannot be read")
     said = io.StringIO()
     cache, sys.dont_write_bytecode = sys.dont_write_bytecode, True
+    mod = None
     try:
         with contextlib.redirect_stdout(said):
             if resolve is not None:
@@ -1970,8 +1971,17 @@ def read_carries_coverage(root: str, conf: dict, resolve=None) -> dict:
                 derive = mod.derive_carries_coverage
             value = derive(root, conf=conf)
     except Exception as exc:  # noqa: BLE001 — narrowed below: only the checker's own refusals are Problems
-        dl = sys.modules.get("design_lib")
-        if not (isinstance(exc, (ImportError, SyntaxError)) or (dl and isinstance(exc, dl.DesignRefusal))):
+        # The refusal class is the one the checker loaded, read through its own cached load
+        # (TOOL-dTrueNorth-31 S11), so a namesake `design_lib` in the slot cannot hide it; an injected
+        # `resolve`'s stand-in brings its own module, read from the slot as before.
+        if isinstance(exc, (ImportError, SyntaxError)):
+            known = True
+        elif mod is not None and hasattr(mod, "load_design_lib"):
+            known = isinstance(exc, mod.load_design_lib().DesignRefusal)
+        else:
+            dl = sys.modules.get("design_lib")
+            known = bool(dl) and isinstance(exc, dl.DesignRefusal)
+        if not known:
             raise
         echo = " ".join(said.getvalue().split())
         raise Problem(f"{CARRIES_KEY} is set and the carries join refused, so the coverage cannot be read: "
@@ -2930,14 +2940,23 @@ def print_check_verdicts(root: str, conf: dict) -> None:
     `main()` maps it. Each section opens `build-index: verdict <check> exit <rc>` above the verb's lines,
     and `build-index: verdicts end` closes both, so a full hygiene run reads three verdicts from check 9's
     one generator process and splits them at those marker lines.
+
+    Each verb's stderr is captured with its stdout (TOOL-dTrueNorth-31 S2), so a notice it writes lands in
+    its own section and never ahead of the first marker, where the hygiene capture strips it; `main()`
+    binds `sys.stderr` to stdout for the rest of the call. Any other exception a verb raises is its
+    section's one `build-index: <type>: <message>` line with exit 2 (S12), so `--check` still runs and
+    check 9 reads its own verdict rather than a traceback.
     """
     for check, verb in ((29, cmd_check_coverage), (30, cmd_check_asbuilt)):
         said = io.StringIO()
-        with contextlib.redirect_stdout(said):
+        with contextlib.redirect_stdout(said), contextlib.redirect_stderr(said):
             try:
                 rc = verb(root, conf)
             except Problem as exc:
                 print(f"build-index: {exc}")
+                rc = 2
+            except Exception as exc:  # noqa: BLE001  a crash stays in its own section (S12)
+                print(f"build-index: {type(exc).__name__}: {exc}")
                 rc = 2
         print(f"build-index: verdict {check} exit {rc}")
         sys.stdout.write(said.getvalue())
@@ -5010,6 +5029,49 @@ def test_asbuilt_view(arm) -> None:
 
         arm("TOOL-dTrueNorth-27 AC5 — --check --with-verdicts prints the two verbs' sections, the end marker and "
             "--check's lines, its exit --check's", "rc=True 30=1 gap=True same=True", read_with_verdicts)
+        # TOOL-dTrueNorth-31 AC2 AC12 (S2, S12) — ONE PIPE, IN ORDER. A child loads this file by path and
+        # patches check 29's verb to write `n29` to stderr, check 30's to return 0 or to raise KeyError, and
+        # --check to write `n9` to stderr and `drift` to stdout, then runs --check --with-verdicts with its
+        # stderr on its stdout's pipe: `n29` lands in check 29's section, `n9` after the end marker, and
+        # the crash is check 30's one line under exit 2 while --check still runs. Red against stderr left
+        # unbound, which prints both notices ahead of the first marker, and a crash that escapes the verb.
+        child31 = "\n".join([
+            "import importlib.util, sys",
+            "spec = importlib.util.spec_from_file_location('gen_build_index_child31', sys.argv[1])",
+            "mod = importlib.util.module_from_spec(spec)",
+            "spec.loader.exec_module(mod)",
+            "def coverage(root, conf):",
+            "    sys.stderr.write('n29\\n')",
+            "    return 0",
+            "def asbuilt(root, conf):",
+            "    if sys.argv[2] == 'crash':",
+            "        raise KeyError('planted')",
+            "    return 0",
+            "def check(root, conf):",
+            "    sys.stderr.write('n9\\n')",
+            "    print('drift')",
+            "    return 0",
+            "mod.cmd_check_coverage, mod.cmd_check_asbuilt, mod.cmd_check = coverage, asbuilt, check",
+            "sys.exit(mod.main(['x', '--check', '--with-verdicts']))", ""])
+
+        def _read_one_pipe31(how):
+            cli = subprocess.run([sys.executable, "-c", child31, os.path.abspath(__file__), how], cwd=tmp,
+                                 stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, encoding="utf-8",
+                                 errors="replace", env=_build_git_env())
+            return cli.returncode, cli.stdout.replace("\r\n", "\n")
+
+        def _read_ordered31():
+            (rc_plain, plain), (rc_crash, crash) = _read_one_pipe31("plain"), _read_one_pipe31("crash")
+            return "plain=%s crash=%s\n%s\n%s" % (
+                rc_plain == 0 and plain == ("build-index: verdict 29 exit 0\nn29\nbuild-index: verdict 30 exit 0\n"
+                                            "build-index: verdicts end\nn9\ndrift\n"),
+                rc_crash == 0 and crash == ("build-index: verdict 29 exit 0\nn29\nbuild-index: verdict 30 exit 2\n"
+                                            "build-index: KeyError: 'planted'\nbuild-index: verdicts end\nn9\n"
+                                            "drift\n"), plain, crash)
+
+        arm("TOOL-dTrueNorth-31 AC2 AC12 — under --with-verdicts every stderr line lands in its verb's section or "
+            "after the end marker, in order, and a verb's crash is its own section's line under exit 2 while "
+            "--check still runs", "plain=True crash=True", _read_ordered31)
 
         def read_flag_refusals():
             said = io.StringIO()
@@ -5054,35 +5116,60 @@ def test_asbuilt_view(arm) -> None:
 
 
 def scan_glob_readers(kit_dir: str) -> list:
-    """`<module>.<name>` for every top-level function, and every module-level assignment's target, of
-    each `*.py` directly in `kit_dir` whose statement holds a string constant carrying a `:(glob)`
-    pathspec, sorted. A docstring is prose and never counts; a comment is not in the tree at all.
+    """`<module>.<qualified name>` for every function, at any depth, and every assignment's target outside
+    a function, of each `*.py` directly in `kit_dir` whose statement holds a string constant carrying a
+    `:(glob)` pathspec, sorted. A docstring is prose and never counts; a comment is not in the tree at all.
 
     TOOL-dTrueNorth-23 S3: the population the pathspec-mode arm grades is DERIVED here, so a reader the
-    kit gains is named by the arm instead of skipped by it. NOT SEEN: a pathspec composed at run time
-    from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
+    kit gains is named by the arm instead of skipped by it. The walk reaches every depth
+    (TOOL-dTrueNorth-31 S5): a function or method nested in a class or another function is named with
+    its enclosing class and function names joined by dots, and charged with the constants of its own
+    `def`, its signature's included, outside the functions and classes nested in it; an `Assign`,
+    `AnnAssign` or `AugAssign` outside every function, in a class body or an `if`, `try`, `with` or loop
+    block, is named by its targets, qualified by the enclosing classes. NOT SEEN: a pathspec composed at
+    run time from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
     """
     magic = ":(" + "glob)"     # composed, so this walk's own needle is no constant it finds
+    scopes = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
     found = set()
+
+    def check_glob_constant(node, docs):
+        # a glob constant under `node`, never descending into a function or class nested in it
+        todo = [node]
+        while todo:
+            cur = todo.pop()
+            if (isinstance(cur, ast.Constant) and isinstance(cur.value, str) and magic in cur.value
+                    and id(cur) not in docs):
+                return True
+            todo.extend(c for c in ast.iter_child_nodes(cur) if not isinstance(c, scopes))
+        return False
+
+    def scan_scope(node, qual, in_function, docs):
+        # `qual` is the module, then each enclosing class and function name
+        for child in ast.iter_child_nodes(node):
+            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                if check_glob_constant(child, docs):
+                    found.add(".".join([*qual, child.name]))
+                scan_scope(child, [*qual, child.name], True, docs)
+            elif isinstance(child, ast.ClassDef):
+                scan_scope(child, [*qual, child.name], in_function, docs)
+            elif not in_function and isinstance(child, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                targets = child.targets if isinstance(child, ast.Assign) else [child.target]
+                if check_glob_constant(child, docs):
+                    found.update(".".join([*qual, n.id]) for t in targets for n in ast.walk(t)
+                                 if isinstance(n, ast.Name))
+            else:
+                scan_scope(child, qual, in_function, docs)
+
     for name in sorted(os.listdir(kit_dir)):
         if not name.endswith(".py"):
             continue
         tree = ast.parse(read_text(os.path.join(kit_dir, name)), name)
         docs = {id(node.body[0].value) for node in ast.walk(tree)
-                if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                if isinstance(node, (ast.Module, *scopes))
                 and node.body and isinstance(node.body[0], ast.Expr)
                 and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
-        for stmt in tree.body:
-            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                names = [stmt.name]
-            elif isinstance(stmt, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
-                targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
-                names = [n.id for t in targets for n in ast.walk(t) if isinstance(n, ast.Name)]
-            else:
-                continue
-            if any(isinstance(n, ast.Constant) and isinstance(n.value, str) and magic in n.value
-                   and id(n) not in docs for n in ast.walk(stmt)):
-                found.update(f"{name[:-3]}.{n}" for n in names)
+        scan_scope(tree, [name[:-3]], False, docs)
     return sorted(found)
 
 
@@ -6217,8 +6304,9 @@ def cmd_selftest() -> int:
         # TOOL-dTrueNorth-23 AC1 to AC5 — THE KIT'S GLOB-PATHSPEC READERS STRIP THE FOUR PATHSPEC MODES.
         # The readers are DERIVED by `scan_glob_readers`, an `ast` walk of every module here, and must
         # equal the table below both ways; each row names the reader its probe calls, and this suite's
-        # own fixtures are exempt by name. Over one fixture of the arm's own, a spec of two commits, a
-        # review record and a backlog shard holding one row of the declared family, each probe runs with
+        # own fixtures are exempt by name. Over one fixture of the arm's own, a spec of two commits and a
+        # backlog shard holding one row of the declared family, and the two fixtures S7 names below for
+        # the two readers that read records (TOOL-dTrueNorth-31), each probe runs with
         # the four unset, then under each set to `1` and restored in a `finally`, and must give the
         # unset answer, which must not be empty. The env half reads the `env` each runner hands
         # `subprocess.run` with all four set. Against the base runner the literal mode reads every probe
@@ -6234,18 +6322,30 @@ def cmd_selftest() -> int:
         t23 = os.path.join(base, "pathspec-modes"); os.makedirs(t23)
         conf23 = _fixture(t23)
         spec23 = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
-        rec23 = rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md"
         write_text(os.path.join(t23, spec23), read_text(os.path.join(t23, spec23)) + "\nA second revision.\n")
-        write_text(os.path.join(t23, rec23), "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")
         write_text(os.path.join(t23, "memory", "backlog", "ARCH.md"), "# backlog\n\n- ARCH-tOne-9 · OPEN · a row\n")
         run("git", "add", "-A", cwd=t23)
-        run("git", "commit", "-q", "-m", "a second revision, a record and a row", "--no-verify", cwd=t23)
-        reviews23 = f":(glob){conf23['MEMORY_ROOT']}/builds/*/reviews/**"
+        run("git", "commit", "-q", "-m", "a second revision and a row", "--no-verify", cwd=t23)
+        # TOOL-dTrueNorth-31 S7 (AC7): each row CALLS the reader it names. `read_population` reads a
+        # deviation fixture of the `audit-pin` plant, whose pinned review and the base's divergence prompt
+        # each answer one of its two pathspecs, under the identity strip the arm sets, so no unattended kit
+        # is read; its probe keeps the members those pathspecs date, empty when either reads nothing. The
+        # audit-writer row reads TOOL-dTrueNorth-14's fixture, whose answer is its run record. Red against a
+        # row running a shared helper in place of its reader, which a reader spawning its own git passes.
+        import routed_commits as _rc23
+
+        dj23 = os.path.join(base, "deviation-population")
+        _dj20.build_fixture(dj23, ["audit-pin"])
+        djconf23, djcommits23 = _dj20.read_fixture_conf(dj23), _rc23.read_routed_commits(dj23, ["HEAD"])
         probes23 = {
             "design_lib.read_spec_revisions":
                 lambda: _dl23.read_spec_revisions(t23, [spec23], conf23["MEMORY_ROOT"])[spec23],
-            "deviation_join.read_population": lambda: read_adding_commits(t23, reviews23, {rec23}),
-            "gen_build_index.derive_audit_writers": lambda: read_adding_commits(t23, reviews23, {rec23}),
+            "deviation_join.read_population":
+                lambda: sorted((m["kind"], m["address"], m["sha"])
+                               for m in _dj20.read_population(dj23, djconf23, djcommits23)[0]
+                               if m["kind"] in ("audit", "handback") and m["sha"]),
+            "gen_build_index.derive_audit_writers":
+                lambda: sorted(derive_audit_writers(t14w, conf14w["MEMORY_ROOT"], {run14}, _resolve_fixture14) or ()),
             "row_grammar._build_backlog_pathspecs": lambda: _rg23.derive_first_seen(t23, conf23),
             "gen_build_index.cmd_selftest": None,    # the suite's own fixtures, exempt by name
         }
@@ -6273,8 +6373,13 @@ def cmd_selftest() -> int:
                 os.environ.update({m: v for m, v in saved.items() if v is not None})
             return f"probed={sum(p is not None for p in probes23.values())} empty={empty} moved={moved}"
 
-        arm("TOOL-dTrueNorth-23 AC1 AC2 AC4 — every glob-pathspec reader's probe gives its unset answer, never "
-            "empty, under each of the four pathspec modes", "probed=4 empty=[] moved=[]", _read_under_modes23)
+        _dj20.set_gen_strip(_dj20.IDENTITY_STRIP)     # the deviation row's, for this arm alone
+        try:
+            arm("TOOL-dTrueNorth-23 AC1 AC2 AC4 TOOL-dTrueNorth-31 AC7 — every glob-pathspec reader's probe, each "
+                "calling the reader it names, gives its unset answer, never empty, under each of the four pathspec "
+                "modes", "probed=4 empty=[] moved=[]", _read_under_modes23)
+        finally:
+            _dj20.set_gen_strip(None)
 
         def _read_runner_env23(call):
             handed = []
@@ -6338,11 +6443,18 @@ def cmd_selftest() -> int:
                    '"""A module docstring naming :(glob)memory/** is prose."""\n'
                    'PLANTED = ":(glob)memory/builds/*/spec/**"\n\n\n'
                    'def read_planted():\n    return ":(glob)memory/**"\n\n\n'
-                   'def read_prose():\n    """It names :(glob)memory/** in prose only."""\n    return "memory/**"\n')
+                   'def read_prose():\n    """It names :(glob)memory/** in prose only."""\n    return "memory/**"\n\n\n'
+                   'class Planted:\n    """A class docstring naming :(glob)memory/** is prose."""\n\n'
+                   '    def read_method(self):\n        return ":(glob)memory/builds/*/reviews/**"\n\n\n'
+                   'if True:\n    GUARDED = ":(glob)memory/backlog/**"\n')
         write_text(os.path.join(plant23, "planted23.txt"), 'TEXT = ":(glob)memory/**"\n')
-        arm("TOOL-dTrueNorth-23 AC5 — a planted module's glob-pathspec function and constant are readers the table "
-            "lacks, and neither a docstring nor a file that is no module is one",
-            "met=True unlisted=['planted23.PLANTED', 'planted23.read_planted'] stale=[]",
+        # TOOL-dTrueNorth-31 AC5 (S5): the walk reaches every depth, so the class method and the constant
+        # guarded under `if True:` are readers too. Red against the top-level walk, which names neither.
+        arm("TOOL-dTrueNorth-23 AC5 TOOL-dTrueNorth-31 AC5 — a planted module's glob-pathspec function, constant, "
+            "class method and guarded constant are readers the table lacks, and neither a docstring nor a file "
+            "that is no module is one",
+            "met=True unlisted=['planted23.GUARDED', 'planted23.PLANTED', 'planted23.Planted.read_method', "
+            "'planted23.read_planted'] stale=[]",
             lambda: _scan_table23(plant23))
 
         # ---- the rendered Records table and the two coverage joins.
@@ -8566,7 +8678,16 @@ def main(argv: list) -> int:
                 return 0
             print(f"build-index: render owed under --staged — {why}")
         if with_verdicts:
-            print_check_verdicts(root, conf)
+            # TOOL-dTrueNorth-31 S2: stderr IS stdout for the whole `--with-verdicts` call, so a line
+            # `--check` writes to stderr follows `build-index: verdicts end` in order instead of racing the
+            # block-buffered stdout ahead of the markers the hygiene capture splits at.
+            held = sys.stderr
+            sys.stderr = sys.stdout
+            try:
+                print_check_verdicts(root, conf)
+                return cmd_check(root, conf)
+            finally:
+                sys.stderr = held
         return cmd_check(root, conf) if mode == "--check" else cmd_write(root, conf)
     except Problem as exc:
         print(f"build-index: {exc}")

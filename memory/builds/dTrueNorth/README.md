@@ -88,7 +88,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 28 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** CLOSED · 28 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16
 ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 TOOL-dTrueNorth-21 TOOL-dTrueNorth-22 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-27 TOOL-dTrueNorth-28 TOOL-dTrueNorth-29 TOOL-dTrueNorth-30 TOOL-dTrueNorth-31
 ids TOOL-dTrueNorth-98 TOOL-dTrueNorth-99
@@ -123,10 +123,10 @@ ids TOOL-dTrueNorth-98 TOOL-dTrueNorth-99
 | [TOOL-dTrueNorth-27 — the nine bar legs this build turned red, each cleared at its cause](spec/2026-10-22-spec-TOOL-dTrueNorth-27.md) | 11 | 2 | CLOSED | rev-3 | 2026-10-22 |
 | [TOOL-dTrueNorth-29 — the self-test arms this build turned red, each turned green at its cause](spec/2026-10-22-spec-TOOL-dTrueNorth-29.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-22 |
 | [TOOL-dTrueNorth-30 — the check 21 writer arm declares the undated-artifact exemption its fixture's neighbours declare](spec/2026-10-22-spec-TOOL-dTrueNorth-30.md) | 13 | 2 | CLOSED | rev-1 | 2026-10-22 |
-| [TOOL-dTrueNorth-31 — the round-2 closing diff review's minors: a guarded none, ordered stderr, tracked attributes, held environments, whole walks and arms that can red](spec/2026-10-22-spec-TOOL-dTrueNorth-31.md) | 14 | 2 | OPEN | rev-1 | 2026-10-22 |
+| [TOOL-dTrueNorth-31 — the round-2 closing diff review's minors: a guarded none, ordered stderr, tracked attributes, held environments, whole walks and arms that can red](spec/2026-10-22-spec-TOOL-dTrueNorth-31.md) | 14 | 2 | CLOSED | rev-1 | 2026-10-22 |
 <!-- /gen:build-units -->
 
-Records: 122 bound to this build, across 4 record folder(s).
+Records: 124 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -149,13 +149,16 @@ class DesignRefusal(ValueError):
         self.blank = tuple(blank)
 
 
-def run_git(root, *args, stdin=None):
+def run_git(root, *args, stdin=None, extra_env=None):
     """One git call at `root` under the kit's pin policy, its stdout as bytes and `stdin` its input;
     never raises on a non-zero exit, so each caller names its own refusal. Pathspecs are literal: a
     conf value is a path, never a glob or a magic signature. Its env is `build_git_env` less
     `tree_lib.GIT_ENV_LEAKS`, the strip `tree_lib.read_git_output` applies, so an exported `GIT_DIR`
-    never points the call at another repository than `root` (TOOL-dTrueNorth-26 S1)."""
+    never points the call at another repository than `root` (TOOL-dTrueNorth-26 S1). `extra_env` is laid
+    over that stripped env, for the one call whose answer must also not read a node's state the strip
+    keeps, as the as-built merge check's attribute read (TOOL-dTrueNorth-31 S3)."""
     env = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}
+    env.update(extra_env or {})
     return subprocess.run(["git", "--no-replace-objects", "--literal-pathspecs", "-C", str(root), *args],
                           input=stdin, capture_output=True, env=env)
 

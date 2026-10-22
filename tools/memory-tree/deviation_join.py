@@ -111,9 +111,11 @@ the instrument's.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import datetime
 import functools
 import hashlib
+import io
 import os
 import pathlib
 import re
@@ -133,7 +135,8 @@ import routed_commits  # noqa: E402  the host: its log pass, its routed-path tes
 from design_lib import (  # noqa: E402  the one parser of the design, and its clause-id grammar
     _CL, DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_keys, read_design_view, read_spec_revisions,
     read_tracked_builds, scan_chain_specs, write_design_fixture)
-from tree_lib import HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at  # noqa: E402
+from tree_lib import (  # noqa: E402
+    GIT_ENV_LEAKS, HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at)
 
 SAY = "deviation"
 POLICIES = ("report", "refuse")
@@ -169,6 +172,19 @@ class Unmeasured(Exception):
 def run_git(root, *args, stdin=None):
     """One pinned git call through the host's counted runner: stdout bytes, or None on a non-zero exit."""
     return routed_commits.run_git(root, *args, stdin=stdin, may_fail=True)
+
+
+@contextlib.contextmanager
+def set_env_aside(names):
+    """Hold each of `names` present in `os.environ` out of it for the block, and put the held values back
+    in its `finally` (TOOL-dTrueNorth-31 S4, S9): a reader that spawns git with the caller's environment,
+    and a fixture whose verdict a caller's exported key would move, read the same answer whatever the
+    caller exported. A name the block sets itself is the block's to restore."""
+    held = {k: os.environ.pop(k) for k in names if k in os.environ}
+    try:
+        yield held
+    finally:
+        os.environ.update(held)
 
 
 def read_join_state(root, conf):
@@ -653,8 +669,12 @@ def read_decision_ref(root):
     """`(ref, why)`: the mainline an owner approval's decision row must already be held on, read from
     `row_grammar.resolve_remote` as `row_grammar.derive_relation_base` reads its base: `<remote>/<branch>`,
     the branch `main` where the ladder names none, the bare branch where there is no remote. A ladder
-    refusal is no ref and its text, so every owner citation is refused, as an unread DECISIONS.md is."""
-    remote, branch, _observed, refusal = row_grammar.resolve_remote(root)
+    refusal is no ref and its text, so every owner citation is refused, as an unread DECISIONS.md is.
+    The ladder's spawns inherit the caller's environment, so they run with `GIT_ENV_LEAKS` held aside, as
+    `read_decision_rows`' runner strips them: an exported `GIT_DIR` never resolves the ref in one
+    repository for rows read in another (TOOL-dTrueNorth-31 S4)."""
+    with set_env_aside(GIT_ENV_LEAKS):
+        remote, branch, _observed, refusal = row_grammar.resolve_remote(root)
     if refusal:
         return None, refusal
     branch = branch.strip() or "main"
@@ -1239,6 +1259,16 @@ def read_fixture_conf(root):
     return parse_conf((pathlib.Path(root) / ".memory-tree.conf").read_text(encoding="utf-8"), {})
 
 
+def add_fixture_remote(fx):
+    """Give a built fixture the instrument's ref shape (`deviations.py:539`): a remote `origin` naming the
+    fixture's own root, and `refs/remotes/origin/main` at its base commit, so the ladder's remote half
+    resolves `origin/main` there (TOOL-dTrueNorth-31 S8). Nothing is fetched."""
+    base = fx.read_sha(fx.base)
+    if (run_git(fx.root, "remote", "add", "origin", fx.root.as_posix()) is None
+            or run_git(fx.root, "update-ref", "refs/remotes/origin/main", base) is None):
+        raise RuntimeError(f"fixture: the origin remote cannot be added in {fx.root}")
+
+
 def measure_fixture(fx):
     """`(conf, the WHOLE commits, the join's result, the commit join over every sha)` of a built fixture."""
     conf = read_fixture_conf(fx.root)
@@ -1260,12 +1290,15 @@ def read_fixture_skip(resolve=None):
     return ""
 
 
+@set_env_aside(("GOV_REMOTE", "GOV_DEFAULT_BRANCH"))
 def run_fixture(plants, policy, approval, host=False, resolve=None):
     """Build the fixture, print its lines, and return the exit (S8). Where the unattended kit does not
     resolve, through `resolve` or the kit's own resolver, it prints the named SKIP line first and runs the
     plants `STRIP_PLANTS` does not hold under the strip stubbed to the identity, set for this call alone
     and restored in its `finally`, so the host's path inside the call reads it too (TOOL-dTrueNorth-12 S2);
-    a call asking only for held plants runs nothing and exits 0."""
+    a call asking only for held plants runs nothing and exits 0. Its whole body runs with the remote
+    ladder's two keys held aside, so the `--fixture` verdict reads the decision rows on the fixture's own
+    ref whatever the caller's shell exported (TOOL-dTrueNorth-31 S9)."""
     root = tempfile.mkdtemp(prefix="dj-")
     label = "fixture · " + (f"plant {plants[0]} · " if len(plants) == 1 else "every plant · " if plants
                             else "the base alone · ")
@@ -1472,6 +1505,7 @@ def check_composed_run(counts):
         remove_tree(root)
 
 
+@set_env_aside(("GOV_REMOTE", "GOV_DEFAULT_BRANCH"))
 def run_plant_arms(resolve=None):
     """Every arm of the join over its fixture: `[(held, what, detail)]`. Each plant is built once with the
     base and measured under both policies, and under by-risk where that is what reds it; the base alone
@@ -1482,7 +1516,9 @@ def run_plant_arms(resolve=None):
     (`check_blob_reader`); and last the composed run of every plant measured here (`check_composed_run`). Where the unattended kit does not
     resolve, through `resolve` or the kit's own resolver, it prints the named SKIP line and runs every plant
     `STRIP_PLANTS` does not hold under the strip stubbed to the identity, set for this call alone and
-    restored in its `finally`, the record-late arm's host path included (TOOL-dTrueNorth-12 S2)."""
+    restored in its `finally`, the record-late arm's host path included (TOOL-dTrueNorth-12 S2). The
+    fixtures' remote is their own, so the ladder's two keys the caller may have exported are held aside
+    for the whole call, as `run_fixture` holds them (TOOL-dTrueNorth-31 S9)."""
     arms, counts, bites = [], {}, []
     try:
         skip = read_fixture_skip(resolve)
@@ -1492,9 +1528,6 @@ def run_plant_arms(resolve=None):
     if skip:
         set_gen_strip(IDENTITY_STRIP)
         print(skip)
-    # The fixtures have no remote, so the ladder's two keys the caller may have exported are held back
-    # for the call and restored after it: the rows are read on the fallback whatever the caller's shell.
-    ladder_env = {k: os.environ.pop(k) for k in ("GOV_REMOTE", "GOV_DEFAULT_BRANCH") if k in os.environ}
     try:
         for plant in (None,) + tuple(p for p in PLANTS if not (skip and p in STRIP_PLANTS)):
             root = tempfile.mkdtemp(prefix="dj-")
@@ -1535,6 +1568,34 @@ def run_plant_arms(resolve=None):
                                  "resolves, `main` in a fixture with no remote, and a GOV_REMOTE naming no remote "
                                  "of it is no ref and the ladder's refusal, named on the unread line",
                                  f"ref {result['ref']!r}; refused ref {ref!r}: {why}\n" + "\n".join(refused_lines)))
+                    # TOOL-dTrueNorth-31 S8 (AC8): the ladder's remote half. The base fixture gains the
+                    # instrument's ref shape, and its rows are read at `origin/main`, and read. Red against a
+                    # remote half joining a wrong ref or a blank branch, which reads no rows.
+                    add_fixture_remote(fx)
+                    remote = measure_fixture(fx)[2]
+                    arms.append((remote["ref"] == "origin/main" and bool(remote["rows"]),
+                                 "TOOL-dTrueNorth-31 AC8 a fixture with an origin remote reads its decision rows at "
+                                 "origin/main", f"ref {remote['ref']!r} ({remote['ref_why']}); rows "
+                                                f"{sorted(remote['rows'] or ())}"))
+                    # TOOL-dTrueNorth-31 S4 (AC4): an exported GIT_DIR naming that fixture, which now has a
+                    # remote, moves no answer of a remote-less repository: the ladder resolves `main` there,
+                    # and the export holds after the call. Red against a ladder spawned with the caller's
+                    # GIT_DIR, which answers `origin/main`, resolved in one repository for rows read in another.
+                    lone, exported = tempfile.mkdtemp(prefix="dj-"), str(fx.root / ".git")
+                    try:
+                        run_git(".", "init", "-q", lone)
+                        with set_env_aside(("GIT_DIR",)):
+                            os.environ["GIT_DIR"] = exported
+                            try:
+                                lone_ref, kept = read_decision_ref(lone), os.environ.get("GIT_DIR")
+                            finally:
+                                os.environ.pop("GIT_DIR", None)
+                    finally:
+                        remove_tree(lone)
+                    arms.append((lone_ref == ("main", "") and kept == exported,
+                                 "TOOL-dTrueNorth-31 AC4 under an exported GIT_DIR naming a repository with a "
+                                 "remote, a remote-less repository's decision ref is still `main`, and the "
+                                 "export holds after the call", f"ref {lone_ref!r}; GIT_DIR after {kept!r}"))
                     continue
                 counts[plant] = len(result["joins"])
                 needle = derive_plant_needle(plant)
@@ -1575,6 +1636,22 @@ def run_plant_arms(resolve=None):
                                  f"and of no {x}", "\n".join(lines)))
                 if plant == "rotated":
                     arms.append(check_rotated_dates(fx, result))
+                if plant == "owner-unknown-id":
+                    # TOOL-dTrueNorth-31 S8 (AC8): with the same remote, a row of the cited id committed on
+                    # the run branch alone is on no mainline, so the report render still refuses the
+                    # citation. Red against rows read at the run branch's tip, which hold the row and approve.
+                    add_fixture_remote(fx)
+                    fx.write_commit({"memory/DECISIONS.md": DECISIONS_TEXT + "- FIX-dClosedLoop-99 · the departure "
+                                     f"from {APPROVER_PLANTS[plant][0]}, approved on the run branch alone\n"},
+                                    "fixture: a decision row on the run branch alone")
+                    fx.write_tree()
+                    _conf, _commits, branch_only, branch_commit = measure_fixture(fx)
+                    branch_lines = render_lines(branch_only, "report", approval, f"plant {plant} · ", branch_commit)[0]
+                    arms.append((branch_only["ref"] == "origin/main"
+                                 and any("FIX-dClosedLoop-99" in ln and "which no row" in ln for ln in branch_lines),
+                                 "TOOL-dTrueNorth-31 AC8 with an origin remote, an owner citation whose row is on the "
+                                 "run branch alone is refused, naming FIX-dClosedLoop-99 and `which no row`",
+                                 f"ref {branch_only['ref']!r}\n" + "\n".join(branch_lines)))
                 if plant in RISK_PLANTS:
                     lines, findings = render_lines(result, "refuse", "author-recorded", f"plant {plant} · ", commit)
                     arms.append((findings == 0, f"TOOL-dTrueNorth-4 AC4 plant {plant} exits 0 under author-recorded",
@@ -1605,9 +1682,24 @@ def run_plant_arms(resolve=None):
         arms += check_tracked_population()
         arms.append(check_blob_reader())
         arms.append(check_composed_run(counts))
+        # TOOL-dTrueNorth-31 S9 (AC9): the `--fixture` entry point holds the ladder's keys too, last here
+        # because its `finally` clears the strip. With GOV_DEFAULT_BRANCH=trunk exported around it, the
+        # rotated plant exits 0 under refuse with no `unread at trunk` line, and the export holds after the
+        # call. Red against a run_fixture reading the caller's key, whose rows are then read at `trunk`.
+        os.environ["GOV_DEFAULT_BRANCH"] = "trunk"
+        said = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(said):
+                rc = run_fixture(["rotated"], "refuse", "author-recorded", resolve=resolve)
+            kept = os.environ.get("GOV_DEFAULT_BRANCH")
+        finally:
+            os.environ.pop("GOV_DEFAULT_BRANCH", None)
+        arms.append((rc == 0 and "unread at trunk" not in said.getvalue() and kept == "trunk",
+                     "TOOL-dTrueNorth-31 AC9 --fixture --plant rotated --policy refuse exits 0 with "
+                     "GOV_DEFAULT_BRANCH=trunk exported around it, reading no row at trunk, and the export holds",
+                     f"exit {rc}; GOV_DEFAULT_BRANCH after {kept!r}\n{said.getvalue()}"))
     finally:
         set_gen_strip(None)
-        os.environ.update(ladder_env)
     return arms
 
 

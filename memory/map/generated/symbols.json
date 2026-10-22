@@ -473,6 +473,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "add_fixture_remote",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "add_health_event",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
@@ -4586,6 +4591,11 @@
       "id": "check_names_id",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "check_node_merge_arm",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "check_noop",
@@ -13578,6 +13588,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "read_info_merge",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
       "id": "read_input",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -13866,6 +13881,11 @@
       "id": "read_memory_root",
       "kind": "function",
       "file": "tools/branch-reconcile/branch_reconcile.py"
+    },
+    {
+      "id": "read_merge_answer",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "read_merge_heads",
@@ -21126,6 +21146,11 @@
       "id": "set_docs_stamp",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "set_env_aside",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
     },
     {
       "id": "set_environ",

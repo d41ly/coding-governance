@@ -210,9 +210,12 @@ done
 # since a lazy import in a function is reached the moment that function runs. A first name `<n>` is a
 # sibling when `${_kit}<n>.py` is a file, and each sibling reached is walked the same way. A reached
 # sibling the scan set does not hold exits 2 naming it and its importer; a scanned module that does
-# not parse exits 2 naming it, because its imports were not read; else one line counts every module
-# the walk read. It binds on and off the push boundary, because it grades this gate's own list, not
-# a bump. It over-counts as the gate does: a module only a self-test imports is a delegate.
+# not parse exits 2 naming it, because its imports were not read; else one line counts the modules
+# the walk read in two populations (TOOL-dTrueNorth-31 S13): <k> sibling module(s), the read paths
+# directly inside the kit directory, and <m> other scanned file(s), the rest, the recall kit's
+# extractor and the checker beside the kit among them, so a dropped sibling offset by an added outside
+# file moves both figures. It binds on and off the push boundary, because it grades this gate's own
+# list, not a bump. It over-counts as the gate does: a module only a self-test imports is a delegate.
 # WHAT IT DOES NOT CHECK: a module loaded by computed path, through `importlib` or by a shell
 # invocation, is no edge; a relative import is no sibling; another kit's siblings are not walked;
 # and with no python the walk does not run, which its note line says.
@@ -254,7 +257,8 @@ for path, why in broken:
     print_line("verdict-epoch: FAILED %s %s does not parse, so its imports were not read and the import closure is unknown (%s)" % (dash, path, why))
 if missing or broken:
     sys.exit(2)
-print_line("verdict-epoch: the delegates%s import closure is %d sibling module(s), every one in DELEGATES" % (tick, len(read)))
+sibs = sum(1 for p in read if p.startswith(kit) and "/" not in p[len(kit):])
+print_line("verdict-epoch: the delegates%s import closure is %d sibling module(s) and %d other scanned file(s), every sibling in DELEGATES" % (tick, sibs, len(read) - sibs))
 ' "$_kit" $SCAN
   case $? in
     0) ;;

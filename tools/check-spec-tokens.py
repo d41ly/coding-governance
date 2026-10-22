@@ -402,6 +402,9 @@ try:
 except LookupError as exc:
     KIT_DIR, KIT_MISS = None, str(exc)
 DESIGN_LIB = KIT_DIR / "design_lib.py" if KIT_DIR else None
+# The kit's own loads while a namesake from another file holds their `sys.modules` slot, keyed by the
+# resolved path, so one process loads each kit file once (TOOL-dTrueNorth-31 S11).
+KIT_LOADS = {}
 CARRIES_RELEASES = ("moved", "retired", "deferred")
 
 # TOOL-dGatedProse-2: THE CLAIMS JOIN. A codebase-map dossier claims EXACT inventory keys and nothing
@@ -852,9 +855,11 @@ def load_kit_module(name):
     A module already loaded under `name` FROM THAT FILE is reused, so a caller that imported it itself
     catches the one refusal class it raises. Otherwise the kit's file is loaded and RETURNED, registered
     under `name` only when that slot is free (TOOL-dTrueNorth-26 S11): a namesake from another file
-    already in `sys.modules` stays where it is, so while it holds the slot each call loads the kit's file
-    again. It loads with no bytecode cache written beside it, since no join here has a write path. An
-    absent file is an ImportError naming it.
+    already in `sys.modules` stays where it is. While it holds the slot, the kit's load is kept in
+    `KIT_LOADS` by its resolved path and every later call reuses that one cached load
+    (TOOL-dTrueNorth-31 S11), so one process sees one module and one `DesignRefusal` class, and a refusal
+    raised through one load is caught through another. It loads with no bytecode cache written beside
+    it, since no join here has a write path. An absent file is an ImportError naming it.
     """
     if KIT_DIR is None:
         raise ImportError(f"the memory-tree kit does not resolve, so the design, the binding lines, the spec "
@@ -863,6 +868,8 @@ def load_kit_module(name):
     mod = sys.modules.get(name)
     if mod is not None and pathlib.Path(getattr(mod, "__file__", None) or ".").resolve() == path.resolve():
         return mod
+    if path.resolve() in KIT_LOADS:
+        return KIT_LOADS[path.resolve()]
     if not path.is_file():
         raise ImportError(f"{path.as_posix()} is not there, so the design, the binding lines, the spec "
                           "filename date and the status header cannot be read")
@@ -873,7 +880,8 @@ def load_kit_module(name):
         spec.loader.exec_module(kit)
     finally:
         sys.dont_write_bytecode = cache
-    sys.modules.setdefault(name, kit)
+    if sys.modules.setdefault(name, kit) is not kit:
+        KIT_LOADS[path.resolve()] = kit
     return kit
 
 
