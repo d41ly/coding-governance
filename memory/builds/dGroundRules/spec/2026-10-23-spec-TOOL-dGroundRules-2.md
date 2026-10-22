@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-2 — the policy reader, at the landed revision, parsed and never sourced
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
 
 **Carries:** cl-dClosedLoop-0008@6598846f whole
 
@@ -88,6 +88,11 @@ legacy homes.
 - **consumes-from** `TOOL-dGroundRules-1` — the module `policy.py` with `load_catalogue`, the inlined `resolve_remote` and `main`'s subcommand table, and `check_policy.py` with its `CASES`, its `--fixture` mode and the `policy fixtures` leg
 - **hands-off** `TOOL-dGroundRules-3` — the unset refusals in `resolve`, which that unit replaces with the order after `read_file_value`
 - **hands-off** `TOOL-dGroundRules-4` — the parse refusal in `resolve`, which that unit replaces with the branch `policy-file.on-invalid` names, over `parse_policy` and `read_policy_text`
+- **hands-off** `TOOL-dGroundRules-5` — `resolve`, `derive_landed_revision`, `read_policy_text`, `Resolution`, `Refusal` and the `get` verb, which that unit gives `--json` and renders into the mirror
+- **hands-off** `TOOL-dGroundRules-7` — the landed-revision resolution `resolve` uses for `rev=None`, which that unit's shrink-only comparison reads its baseline list at
+- **hands-off** `TOOL-dGroundRules-8` — the landed-revision resolution `resolve` uses for `rev=None`, and the CLI shape `policy.py get <key>` that unit's reader scan matches
+- **hands-off** `TOOL-dGroundRules-9` — `resolve` at the landed revision and its blob reader, which that unit calls for the file layer and for the limits home
+- **hands-off** `TOOL-dGroundRules-10` — `resolve`, `Resolution` and the `get` verb, which that unit extends with the lowered in-flight value and calls from the agent cap
 
 ## 4. Design
 
@@ -279,6 +284,7 @@ New arm: tools/policy/check_policy.py --fixture (the `reader-parsed` cases) · c
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the reciprocal **hands-off** edges to TOOL-dGroundRules-5, TOOL-dGroundRules-7, TOOL-dGroundRules-8, TOOL-dGroundRules-9, TOOL-dGroundRules-10 added, each naming what that unit's own §3 **consumes-from** line takes from this one; hygiene check 12's edge join read them as missing. No scope, design or acceptance moved.
 
 ## 10. Reuse audit
 

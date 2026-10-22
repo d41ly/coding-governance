@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
 
 **Carries:** cl-dClosedLoop-0010@cd629be7 whole
 **Carries:** node:policy-key.policy-file.on-invalid
@@ -97,6 +97,8 @@ the last valid revision whenever the current file is invalid.
 - **consumes-from** `TOOL-dGroundRules-1` — `check_value` and the catalogue rows it reads, `arm_schema`, `check_policy.py`'s `ARMS`, `CASES` and `--fixture` mode, and the `policy check` and `policy fixtures` legs
 - **consumes-from** `TOOL-dGroundRules-2` — `resolve`, `read_policy_text`, `parse_policy`, `parse_key`, `Refusal`, and the parse refusal this unit replaces
 - **consumes-from** `TOOL-dGroundRules-3` — `RESOLUTION_ORDER`, run over the last valid revision's table
+- **hands-off** `TOOL-dGroundRules-5` — `validate` and the invalid-file branch with its read of `policy-file.on-invalid`, which that unit's mirror render reaches once per revision
+- **hands-off** `TOOL-dGroundRules-9` — `validate` and its `Problem`, which that unit extends with one call
 
 ## 4. Design
 
@@ -341,6 +343,7 @@ New arm: tools/policy/check_policy.py (`arm_on_invalid` in `ARMS`) · covers AC4
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the reciprocal **hands-off** edges to TOOL-dGroundRules-5, TOOL-dGroundRules-9 added, each naming what that unit's own §3 **consumes-from** line takes from this one; hygiene check 12's edge join read them as missing. No scope, design or acceptance moved.
 
 ## 10. Reuse audit
 

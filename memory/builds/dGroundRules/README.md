@@ -78,9 +78,9 @@ ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRule
 |---|---|---|---|---|---|
 | [TOOL-dGroundRules-1 — the policy file, the policy kit, its catalogue and the catalogue's shape audit](spec/2026-10-23-spec-TOOL-dGroundRules-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dGroundRules-11 — every loop bound and deadline key declares that raising it is a loosening](spec/2026-10-23-spec-TOOL-dGroundRules-11.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-2 — the policy reader, at the landed revision, parsed and never sourced](spec/2026-10-23-spec-TOOL-dGroundRules-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason](spec/2026-10-23-spec-TOOL-dGroundRules-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults](spec/2026-10-23-spec-TOOL-dGroundRules-4.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-2 — the policy reader, at the landed revision, parsed and never sourced](spec/2026-10-23-spec-TOOL-dGroundRules-2.md) | 2 | 2 | OPEN | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason](spec/2026-10-23-spec-TOOL-dGroundRules-3.md) | 2 | 2 | OPEN | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults](spec/2026-10-23-spec-TOOL-dGroundRules-4.md) | 2 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob](spec/2026-10-23-spec-TOOL-dGroundRules-5.md) | 3 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dGroundRules-6 — the minimal guard over the policy file and its three neighbours](spec/2026-10-23-spec-TOOL-dGroundRules-6.md) | 3 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard](spec/2026-10-23-spec-TOOL-dGroundRules-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-23 |
