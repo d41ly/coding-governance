@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-1-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-1-ledger.md) | journal | — |
+| [2026-10-22-build-TOOL-dTrueNorth-1-departures-build.md](../build/2026-10-22-build-TOOL-dTrueNorth-1-departures-build.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-build-brief.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-owner-audit-cap.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-owner-audit-cap.md) | research | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-spec-brief.md) | research | TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 |
