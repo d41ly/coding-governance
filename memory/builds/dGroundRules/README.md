@@ -5,7 +5,6 @@ opened: 2026-10-21
 streams: tooling
 roster: TOOL
 ids: TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12
-status: OPEN
 spec-audit: 2026-10-21
 parents: dTrueNorth
 may: PLAY-dClosedLoop-3
@@ -71,40 +70,58 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 11 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dGroundRules-1 — the policy file, the policy kit, its catalogue and the catalogue's shape audit](spec/2026-10-23-spec-TOOL-dGroundRules-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-11 — every loop bound and deadline key declares that raising it is a loosening](spec/2026-10-23-spec-TOOL-dGroundRules-11.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-2 — the policy reader, at the landed revision, parsed and never sourced](spec/2026-10-23-spec-TOOL-dGroundRules-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason](spec/2026-10-23-spec-TOOL-dGroundRules-3.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults](spec/2026-10-23-spec-TOOL-dGroundRules-4.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob](spec/2026-10-23-spec-TOOL-dGroundRules-5.md) | 3 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-6 — the minimal guard over the policy file and its three neighbours](spec/2026-10-23-spec-TOOL-dGroundRules-6.md) | 3 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard](spec/2026-10-23-spec-TOOL-dGroundRules-7.md) | 4 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-8 — the reader-coverage arm: a key whose Owner build has landed has a reader](spec/2026-10-23-spec-TOOL-dGroundRules-8.md) | 4 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired](spec/2026-10-23-spec-TOOL-dGroundRules-10.md) | 5 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader](spec/2026-10-23-spec-TOOL-dGroundRules-9.md) | 5 | 2 | OPEN | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 2 bound to this build, across 2 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dGroundRules-1 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 11 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 11
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 11 (cl-dClosedLoop-0007, cl-dClosedLoop-0008, cl-dClosedLoop-0009, cl-dClosedLoop-0010, cl-dClosedLoop-0011, cl-dClosedLoop-0012, cl-dClosedLoop-0013, cl-dClosedLoop-0014, cl-dClosedLoop-0015, cl-dClosedLoop-0016, cl-dClosedLoop-0017)
+- uncarried: 0 (none)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: policy-key.budgets.*, policy-key.budgets.enforce, policy-key.budgets.pinned, policy-key.policy-file.on-invalid, policy-key.runtime.agents-in-flight
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0009, cl-dClosedLoop-0014, cl-dClosedLoop-0017
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dGroundRules-1`, `TOOL-dGroundRules-11` | yes |
+| 2 | `TOOL-dGroundRules-2`, `TOOL-dGroundRules-3`, `TOOL-dGroundRules-4` | yes |
+| 3 | `TOOL-dGroundRules-5`, `TOOL-dGroundRules-6` | yes |
+| 4 | `TOOL-dGroundRules-7`, `TOOL-dGroundRules-8` | yes |
+| 5 | `TOOL-dGroundRules-10`, `TOOL-dGroundRules-9` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
