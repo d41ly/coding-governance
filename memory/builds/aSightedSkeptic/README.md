@@ -95,6 +95,8 @@ Records: 30 bound to this build, across 4 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-aSightedSkeptic-1 TOOL-aSightedSkeptic-10 TOOL-aSightedSkeptic-2 TOOL-aSightedSkeptic-3 TOOL-aSightedSkeptic-4 TOOL-aSightedSkeptic-5 TOOL-aSightedSkeptic-6 TOOL-aSightedSkeptic-7 TOOL-aSightedSkeptic-8 TOOL-aSightedSkeptic-9 TOOL-aSightedSkeptic-13.
+
+Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

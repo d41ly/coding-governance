@@ -101,7 +101,25 @@ Records: 1 bound to this build, across 1 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dConvergedCharter's 23 clause(s) and 1 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 23 (cl-dClosedLoop-0475, cl-dClosedLoop-0476, cl-dClosedLoop-0477, cl-dClosedLoop-0478, cl-dClosedLoop-0479, cl-dClosedLoop-0480, cl-dClosedLoop-0481, cl-dClosedLoop-0482, cl-dClosedLoop-0483, cl-dClosedLoop-0484, cl-dClosedLoop-0485, cl-dClosedLoop-0486, cl-dClosedLoop-0487,
+  cl-dClosedLoop-0488, cl-dClosedLoop-0489, cl-dClosedLoop-0490, cl-dClosedLoop-0491, cl-dClosedLoop-0492, cl-dClosedLoop-0493, cl-dClosedLoop-0494, cl-dClosedLoop-0495, cl-dClosedLoop-0496, cl-dClosedLoop-0502)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.help.explanation
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0475, cl-dClosedLoop-0476, cl-dClosedLoop-0477, cl-dClosedLoop-0478, cl-dClosedLoop-0479, cl-dClosedLoop-0480, cl-dClosedLoop-0484, cl-dClosedLoop-0487, cl-dClosedLoop-0493, cl-dClosedLoop-0494, cl-dClosedLoop-0496
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

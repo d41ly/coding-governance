@@ -415,7 +415,8 @@ on an already-adopted tree, so a rule added after your adoption reaches you here
    another repo is either vacuous or permanently red, and a pin above the graded count is slack,
    which check 21 reds.
 4. **Drain it.** As you bind records for real, replace `none` with
-   `**Serves:** <kind> <id> [<id>…]`, kinds `spec-audit` · `diff-review` · `journal` · `research`.
+   `**Serves:** <kind> <id> [<id>…]`, `<kind>` from the closed list in `<MEMORY_ROOT>/HYGIENE.md`,
+   "Record bindings".
    The pin is shrink-only, so the ratchet points down from wherever you started.
 
 Worked example, measured on this repo at kit 2.19: 78 records, of which 72 bound and 6 carry `none`

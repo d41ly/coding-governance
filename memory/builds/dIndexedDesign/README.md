@@ -90,7 +90,27 @@ Records: 1 bound to this build, across 1 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dIndexedDesign's 16 clause(s) and 28 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 16 (cl-dClosedLoop-0383, cl-dClosedLoop-0384, cl-dClosedLoop-0385, cl-dClosedLoop-0386, cl-dClosedLoop-0387, cl-dClosedLoop-0388, cl-dClosedLoop-0389, cl-dClosedLoop-0390, cl-dClosedLoop-0391, cl-dClosedLoop-0392, cl-dClosedLoop-0393, cl-dClosedLoop-0394, cl-dClosedLoop-0395,
+  cl-dClosedLoop-0396, cl-dClosedLoop-0397, cl-dClosedLoop-0398)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: item.design.decompose, item.design.exit, item.design.input, item.design.inventory, item.design.overlaps, item.design.ready, item.design.reentry, item.design.research, item.design.seams, item.design.streams, item.design.unit-spec, policy-key.design.coverage,
+  policy-key.design.coverage.semantic, policy-key.design.forks, policy-key.design.handoff, policy-key.design.overlap, policy-key.design.reentry, policy-key.design.streams-when, record-kind.diff, record-kind.feature-design, record-kind.fork, record-kind.inventory, record-kind.overlap,
+  record-kind.playbook, record-kind.playbook-set, record-kind.roster, record-kind.seams, record-kind.spec
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0385, cl-dClosedLoop-0386, cl-dClosedLoop-0388, cl-dClosedLoop-0389, cl-dClosedLoop-0391, cl-dClosedLoop-0393, cl-dClosedLoop-0395, cl-dClosedLoop-0396
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

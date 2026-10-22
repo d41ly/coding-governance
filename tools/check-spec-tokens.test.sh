@@ -33,7 +33,17 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # The shrink-only assertion floor. A suite that stops running arms must RED rather than report a
 # smaller success: `check-testsuite-counts.sh` reads this pin, the printed count, and the comparison
 # between them, because a pin nothing reads is the same nothing as no pin.
-FLOOR_ASSERTIONS=132
+# RAISED 168 -> 176 by TOOL-dTrueNorth-16: its unparsed-header arm and the restore after it, its two
+# conf-read arms and its four one-reader probe arms, each top-level. Counted by reading; OWED: observed
+# at the close.
+# RAISED 176 -> 181 by TOOL-dTrueNorth-20: its two conf-grammar arms, its two one-grammar probe arms and
+# its one date-pattern arm, each top-level. Counted by reading; OWED: observed at the close.
+# RAISED 181 -> 189 by TOOL-dTrueNorth-26: its planted-BinOp arm, its six minors probe arms and its
+# one-grammar grep arm, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=189
+# RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
+# plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
+# bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
 # RAISED 126 -> 132 at TOOL-aMendedFleet-87, by its six --legs-for `arm` calls: the exact-file
 # guard, the directory guard, the glob guard, the footer, the untracked mark and the refusal.
 # RAISED 119 -> 126 at TOOL-aMendedFleet-75, by its seven covers-join `arm` calls: the dangling id,
@@ -181,6 +191,8 @@ GOVKIT="${GOVKIT_DIR##*/}"
 RUNLOG_DIR=$(resolve_kit_dir "$PY" runlog runlog.py "$HERE") || exit 2
 RUNLOG="${RUNLOG_DIR##*/}"
 CODEBASE_MAP_DIR=$(resolve_kit_dir "$PY" codebase-map map_lib.py "$HERE") || exit 2
+MEMORY_TREE_DIR=$(resolve_kit_dir "$PY" memory-tree design_lib.py "$HERE") || exit 2
+MEMORY_TREE="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$MEMORY_TREE_DIR"
 pass=0; fail=0
 ARM_ARGS=()          # the checker's argv for the next `arm`; empty is the gate's own run (TOOL-aMendedFleet-87)
 
@@ -1109,15 +1121,16 @@ check_break_refuses() {   # $1 = a broken copy of the checker
   local out rc; out=$(cd "$d" && "$PY" "$1" 2>&1); rc=$?
   [ "$rc" != 0 ] && printf '%s' "$out" | grep -qF 'REFUSING — CLAIM_CANARY' && ! printf '%s' "$out" | grep -qF 'spec-tokens: claims join'
 }
-for a in active passive noun fronted; do sed "s|(\"$a\", r\"|(\"$a\", r\"(?!)|" "$LINT" > "$base/claims-break-$a.py"; done
-sed 's|CLAIM_PARTS), re\.I)|CLAIM_PARTS))|' "$LINT" > "$base/claims-break-fold.py"
-sed '/cleared by the space clause/d' "$LINT" > "$base/claims-break-space.py"
-if check_break_refuses "$base/claims-break-active.py"; then echo "arm ok    AC6 the active arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 active arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-passive.py"; then echo "arm ok    AC6 the passive arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 passive arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-noun.py"; then echo "arm ok    AC6 the noun arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 noun arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-fronted.py"; then echo "arm ok    AC6 the fronted arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 fronted arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-fold.py"; then echo "arm ok    AC6 the arms compiled without the case fold refuse naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 case-fold break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-space.py"; then echo "arm ok    AC6 the space clause dropped refuses naming CLAIM_CANARY, the LOUDER direction"; pass=$((pass+1)); else echo "arm FAIL  AC6 space-clause break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+brk=$base/claims-break; mkdir -p "$brk"; cp -R "$MEMORY_TREE" "$brk/${MEMORY_TREE_DIR##*/}"
+for a in active passive noun fronted; do sed "s|(\"$a\", r\"|(\"$a\", r\"(?!)|" "$LINT" > "$brk/claims-break-$a.py"; done
+sed 's|CLAIM_PARTS), re\.I)|CLAIM_PARTS))|' "$LINT" > "$brk/claims-break-fold.py"
+sed '/cleared by the space clause/d' "$LINT" > "$brk/claims-break-space.py"
+if check_break_refuses "$brk/claims-break-active.py"; then echo "arm ok    AC6 the active arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 active arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-passive.py"; then echo "arm ok    AC6 the passive arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 passive arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-noun.py"; then echo "arm ok    AC6 the noun arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 noun arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-fronted.py"; then echo "arm ok    AC6 the fronted arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 fronted arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-fold.py"; then echo "arm ok    AC6 the arms compiled without the case fold refuse naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 case-fold break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-space.py"; then echo "arm ok    AC6 the space clause dropped refuses naming CLAIM_CANARY, the LOUDER direction"; pass=$((pass+1)); else echo "arm FAIL  AC6 space-clause break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
 
 # AC8 — the join's line prints on EVERY run: a tree with no claim sentence reports three zeros.
 arm "a tree with no dossier-claim sentence still prints the claims line, zeros and all" 0 "$d" "claims join · 0 dossier-claim sentence(s) examined · 0 live spec(s) carry one · 0 object(s) cleared"
@@ -1289,6 +1302,375 @@ arm "legs-for marks an untracked path beside a tracked one and still exits 0" 0 
 ARM_ARGS=(--legs-for nosuchpath)
 arm "legs-for REFUSES a query in which every path is untracked" 2 "$d" "legs-for: REFUSING — no path given is tracked at HEAD: nosuchpath"
 ARM_ARGS=()
+
+# ---- TOOL-dTrueNorth-2: the carries join. Scratch repos whose conf arms SPEC_CARRIES_CUTOFF over a
+#      fixture design of their own: a two-build view (dAlpha, dBeta), a record whose [clause-ids]
+#      section withdraws one id, committed at the fixture's baseline, and a tracked deriver owning
+#      one node. It never reads the bootstrap instrument, so it outlives that instrument's
+#      retirement. Each plant is ONE spec edit, observed red, then restored from a saved copy and
+#      observed green; the stopped arm, which reads history, commits its plant in a repo of its own.
+#      The pins are each text's SHA-256 here, not the checker's, so a wrong hash rule reds the clean arm.
+CCUT=2026-09-02
+CSPEC=memory/builds/dAlpha/spec
+CA1='The checker reads `alpha-one` first.'
+CA2='The run writes `alpha-two` and `alpha-three`.'
+CB1='The beta clause names `beta-one`.'
+CB2='The beta run keeps `beta-two`.'
+derive_carries_pin() { "$PY" -c 'import hashlib,sys; print(hashlib.sha256(sys.argv[1].encode("utf-8")).hexdigest()[:8])' "$1" | tr -d '\r'; }
+HA1=$(derive_carries_pin "$CA1"); HA2=$(derive_carries_pin "$CA2"); HB1=$(derive_carries_pin "$CB1"); HB2=$(derive_carries_pin "$CB2")
+write_carries_spec() {   # $1 dir · $2 build · $3 seq · $4 Status word · rest: body lines
+  local d=$1 b=$2 n=$3 st=$4; shift 4
+  mkdir -p "$d/memory/builds/$b/spec"
+  { printf '# TOOL-%s-%s — a unit\n\n' "$b" "$n"
+    printf '**Status:** %s · rev-1 · %s · node t · Tier-2 · base 0123abcd · streams tooling\n\n' "$st" "$CCUT"
+    printf '%s\n' "$@"; } > "$d/memory/builds/$b/spec/$CCUT-spec-TOOL-$b-$n.md"
+}
+seed_carries_repo() {    # $1 dir — scratch(), the fixture design, two dAlpha specs carrying all of dAlpha
+  local d=$1
+  scratch "$d"
+  mkdir -p "$d/memory/design"
+  printf '# a design record\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' > "$d/memory/design/record.md"
+  { printf '# the view\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n'
+    printf '| dAlpha | `cl-dAlpha-0001` | %s | baseline |\n' "$CA1"
+    printf '| dAlpha | `cl-dAlpha-0002` | %s | baseline |\n' "$CA2"
+    printf '| dBeta | `cl-dBeta-0001` | %s | baseline |\n' "$CB1"
+    printf '| dBeta | `cl-dBeta-0002` | %s | baseline |\n' "$CB2"; } > "$d/memory/design/view.md"
+  printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > "$d/memory/design/nodes.py"
+  write_carries_spec "$d" dAlpha 1 OPEN "**Carries:** cl-dAlpha-0001@$HA1 whole" "**Carries:** node:item.alpha-node" "" "$CA1"
+  write_carries_spec "$d" dAlpha 2 OPEN "**Carries:** cl-dAlpha-0002@$HA2 whole" "" "$CA2"
+  git -C "$d" add -A >/dev/null; git -C "$d" commit -qm design --no-verify
+  printf 'SPEC_CARRIES_CUTOFF="%s"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="memory/design/view.md"\nDESIGN_NODES="memory/design/nodes.py"\n' \
+    "$CCUT" "$(git -C "$d" rev-parse HEAD)" > "$d/.memory-tree.conf"
+}
+CLINE="carries join · 2 chain spec(s) measured in 1 build(s), every status but WONTDO, not only live spec(s) · 4 clause(s) · 1 withdrawn · 1 owned node(s) · 0 finding(s), 0 at the Design exit only · SPEC_CARRIES_CUTOFF $CCUT"
+d=$base/carries; seed_carries_repo "$d"
+A1="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md"; A2="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-2.md"
+cp "$A1" "$base/carries-a1"; cp "$A2" "$base/carries-a2"; cp "$d/.memory-tree.conf" "$base/carries-conf"
+check_carries_restored() {   # $1 = the plant just undone: both specs back from their saved copies
+  mkdir -p "${A1%/*}"; cp "$base/carries-a1" "$A1"; cp "$base/carries-a2" "$A2"
+  arm "$1, green once restored" 0 "$d" "$CLINE" "[carries]"
+}
+# AC12, AC14 — the clean set grades both specs, every count derived from the fixture, and no hit.
+arm "the carries join over a clean two-build design is green and its line counts what it measured" 0 "$d" "$CLINE" "[carries]"
+# AC1 — a ghost id.
+printf '\n**Carries:** cl-dAlpha-0099@00000000 whole\n' >> "$A1"
+arm "a carry of an id no clause has REDS as [carries] ghost" 1 "$d" "[carries] \`carries <- ghost:cl-dAlpha-0099\`"
+check_carries_restored "the ghost plant"
+# AC2 — a spec carrying nothing and derived from nothing.
+write_carries_spec "$d" dAlpha 3 OPEN "A spec that carries nothing."
+git -C "$d" add -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "a chain spec carrying nothing and derived from nothing REDS as [carries] unbound" 1 "$d" "[carries] \`carries <- unbound:$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md\`"
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+check_carries_restored "the unbound plant"
+# AC3, AC14 — a pin changed to @deadbeef, compared with the view's hash.
+sed -i "s/@$HA1 whole/@deadbeef whole/" "$A1"
+arm "a pin that is not the view's hash REDS as [carries] stale, naming both hashes" 1 "$d" "[carries] \`carries <- stale:cl-dAlpha-0001\` — pins cl-dAlpha-0001@deadbeef, and the clause's text in the view hashes $HA1"
+# AC16 — the composite row waives that hit; a row keyed on the bare spec path does not.
+printf 'carries <- stale:cl-dAlpha-0001\t[carries] deliberate, for this arm\n' >> "$d/memory/project/spec-token-waivers.txt"
+arm "a waiver row keyed carries <- stale:<clause> takes the hit and the checker exits 0" 0 "$d" "1 waiver(s)"
+ARM_ARGS=(--list)
+arm "--list reads the waived hit as WAIVED [carries]" 0 "$d" "WAIVED [carries] $CSPEC/$CCUT-spec-TOOL-dAlpha-1.md :: carries <- stale:cl-dAlpha-0001"
+ARM_ARGS=()
+printf '# waivers\n%s\t[path] deliberate, for this arm\n' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" > "$d/memory/project/spec-token-waivers.txt"
+arm "a waiver row keyed on the bare spec path does not take a carries hit" 1 "$d" "[carries] \`carries <- stale:cl-dAlpha-0001\`"
+printf '# waivers\n' > "$d/memory/project/spec-token-waivers.txt"
+# AC15 — blank, the stale pin still planted, grades no carry; a malformed date refuses.
+sed -i 's/^SPEC_CARRIES_CUTOFF=.*$/SPEC_CARRIES_CUTOFF=""/' "$d/.memory-tree.conf"
+arm "a blank SPEC_CARRIES_CUTOFF turns the join off over a planted stale pin, announced" 0 "$d" "carries join · 0 chain spec(s) measured in 0 build(s), every status but WONTDO, not only live spec(s) · 0 clause(s) · 0 withdrawn · 0 owned node(s) · 0 finding(s), 0 at the Design exit only · SPEC_CARRIES_CUTOFF blank (arm off)" "[carries]"
+sed -i 's/^SPEC_CARRIES_CUTOFF=.*$/SPEC_CARRIES_CUTOFF="2026-10-2"/' "$d/.memory-tree.conf"
+arm "a SPEC_CARRIES_CUTOFF that is not an ISO date is REFUSED, never read as off" 1 "$d" "REFUSING — SPEC_CARRIES_CUTOFF 2026-10-2 is not an ISO date"
+cp "$base/carries-conf" "$d/.memory-tree.conf"
+sed -i 's/^DESIGN_VIEW=.*$/DESIGN_VIEW=""/' "$d/.memory-tree.conf"
+arm "the cutoff set and a DESIGN_* key blank is a refusal naming the key" 1 "$d" "REFUSING — the carries join cannot read the design: DESIGN_VIEW is blank"
+cp "$base/carries-conf" "$d/.memory-tree.conf"
+check_carries_restored "the stale plant"
+# AC4 — two whole carriers of one clause; then its two part carriers pinned to two hashes.
+printf '\n**Carries:** cl-dAlpha-0002@%s whole\n' "$HA2" >> "$A1"
+arm "two whole carriers of one clause REDS as [carries] ambiguous" 1 "$d" "[carries] \`carries <- ambiguous:cl-dAlpha-0002\` — carried whole by 2 spec(s)"
+check_carries_restored "the two-whole-carriers plant"
+sed -i "s/@$HA2 whole/@$HA2 part 1\/2/" "$A2"; printf '\n**Carries:** cl-dAlpha-0002@deadbeef part 2/2\n' >> "$A1"
+arm "two part carriers pinning two hashes REDS as [carries] ambiguous, naming both" 1 "$d" "[carries] \`carries <- ambiguous:cl-dAlpha-0002\` — carried whole by 0 spec(s), pinned to 2 hashes"
+check_carries_restored "the two-pins plant"
+# AC11 — a parts gap, a withdrawn id, a malformed line, and a WONTDO second whole carrier.
+sed -i "s/@$HA2 whole/@$HA2 part 1\/3/" "$A2"; printf '\n**Carries:** cl-dAlpha-0002@%s part 3/3\n' "$HA2" >> "$A1"
+arm "parts 1/3 and 3/3 REDS as [carries] parts" 1 "$d" "[carries] \`carries <- parts:cl-dAlpha-0002\` — carried in parts part 1/3, part 3/3, not 1 to 3"
+check_carries_restored "the parts plant"
+printf '\n**Carries:** cl-dAlpha-0009@00000000 whole\n' >> "$A1"
+arm "a carry of an id the record withdraws at the baseline REDS as [carries] withdrawn" 1 "$d" "[carries] \`carries <- withdrawn:cl-dAlpha-0009\`" "ghost:"
+check_carries_restored "the withdrawn plant"
+printf '\n**Carries:** cl-dAlpha-0001 whole\n' >> "$A1"
+arm "a malformed Carries line REDS as [carries] malformed, and never as unbound" 1 "$d" "[carries] \`carries <- malformed:$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md\`" "unbound:"
+check_carries_restored "the malformed plant"
+write_carries_spec "$d" dAlpha 3 WONTDO "**Carries:** cl-dAlpha-0001@$HA1 whole" "" "$CA1"
+git -C "$d" add -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "a WONTDO second whole carrier is set apart: no ambiguous, and the line still measures 2" 0 "$d" "$CLINE" "[carries]"
+sed -i 's/^\*\*Status:\*\* WONTDO/**Status:** OPEN/' "$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "the same second carrier at OPEN REDS as [carries] ambiguous, so the status is what set it apart" 1 "$d" "[carries] \`carries <- ambiguous:cl-dAlpha-0001\`"
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+check_carries_restored "the WONTDO plant"
+# TOOL-dTrueNorth-16 AC11 — the status is the generator's header grammar: a second whole carrier whose
+# header misses its base field does not parse, so it is set apart as unparsed and never collides. Red
+# against the base join, whose own status reader read OPEN there and reported the clause ambiguous.
+write_carries_spec "$d" dAlpha 3 OPEN "**Carries:** cl-dAlpha-0001@$HA1 whole" "" "$CA1"
+sed -i 's/ · base 0123abcd//' "$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+git -C "$d" add -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+arm "a second carrier whose status header does not parse is set apart, never ambiguous" 0 "$d" "$CLINE" "[carries]"
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-3.md"
+check_carries_restored "the unparsed plant"
+# TOOL-dTrueNorth-16 AC14 — one conf read, the generator's parse: a cutoff declared twice reads its LAST
+# value, and one behind `export ` reads as bash reads it. Red against the base join, which took the first
+# declaration and read the exported one as blank, turning the join off while the generator kept it armed.
+{ printf 'SPEC_CARRIES_CUTOFF=""\n'; cat "$base/carries-conf"; } > "$d/.memory-tree.conf"
+arm "a cutoff declared twice, blank then set, reads its last value" 0 "$d" "$CLINE" "[carries]"
+sed 's/^SPEC_CARRIES_CUTOFF=/export SPEC_CARRIES_CUTOFF=/' "$base/carries-conf" > "$d/.memory-tree.conf"
+arm "a cutoff behind export reads as set" 0 "$d" "$CLINE" "[carries]"
+cp "$base/carries-conf" "$d/.memory-tree.conf"
+# AC6 — a clause's backticked name dropped from its carrier's prose, its binding line left whole.
+sed -i 's/`alpha-one`//' "$A1"
+arm "a clause token in none of its carriers REDS as [carries] token, naming it" 1 "$d" "[carries] \`carries <- token:cl-dAlpha-0001\` — cl-dAlpha-0001's token \`alpha-one\` appears in none of its carriers"
+check_carries_restored "the token plant"
+# AC8 — another build's clause carried with no Moved line naming it here.
+printf '\n**Carries:** cl-dBeta-0001@%s whole\n\n%s\n' "$HB1" "$CB1" >> "$A1"
+arm "another build's clause carried with no Moved line REDS as [carries] crossbuild" 1 "$d" "[carries] \`carries <- crossbuild:cl-dBeta-0001\`"
+# AC9 — the owner build's spec moves it here: green; then the receiving carrier drops its token.
+write_carries_spec "$d" dBeta 1 OPEN "**Moved:** cl-dBeta-0001 to dAlpha by TOOL-dBeta-9" "**Carries:** cl-dBeta-0002@$HB2 whole" "" "$CB2"
+git -C "$d" add -- "memory/builds/dBeta/spec/$CCUT-spec-TOOL-dBeta-1.md"
+arm "the same carry with the owner build's Moved line naming this build is green over two builds" 0 "$d" "carries join · 3 chain spec(s) measured in 2 build(s)" "[carries]"
+sed -i 's/`beta-one`//' "$A1"
+arm "a moved clause's token is read from the RECEIVING build's carrier, and REDS when it lacks it" 1 "$d" "[carries] \`carries <- token:cl-dBeta-0001\` — cl-dBeta-0001's token \`beta-one\` appears in none of its carriers ($CSPEC/"
+git -C "$d" rm -qf -- "memory/builds/dBeta/spec/$CCUT-spec-TOOL-dBeta-1.md"
+check_carries_restored "the crossbuild and moved plants"
+# AC7 — every chain spec untracked: the join measured nothing, and refuses.
+git -C "$d" rm -qf -- "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$CSPEC/$CCUT-spec-TOOL-dAlpha-2.md"
+arm "an armed join that measured no chain spec REFUSES, never green on nothing" 1 "$d" "REFUSING — the carries join measured no chain spec at/after SPEC_CARRIES_CUTOFF $CCUT"
+mkdir -p "$d/$CSPEC"; cp "$base/carries-a1" "$A1"; cp "$base/carries-a2" "$A2"; git -C "$d" add -- "$CSPEC"
+check_carries_restored "the unmeasured plant"
+# AC5 — a revision drops a clause, a later one fixes a typo, so the drop sits two commits back. Its
+#       plant is HISTORY, so it is undone by rewinding the scratch branch to the seed commit; the
+#       copies then restore the LF bytes a reset under a global core.autocrlf would not keep.
+d=$base/carries-history; seed_carries_repo "$d"; cseed=$(git -C "$d" rev-parse HEAD)
+A1="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md"; A2="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-2.md"
+cp "$A1" "$base/carries-a1"; cp "$A2" "$base/carries-a2"
+grep -v "^\*\*Carries:\*\* cl-dAlpha-0001@" "$base/carries-a1" > "$A1"
+printf '\n**Carries:** cl-dAlpha-0001@%s whole\n\n%s\n' "$HA1" "$CA1" >> "$A2"
+git -C "$d" commit -qam drop --no-verify
+printf '\nA typo fixed in a later revision.\n' >> "$A1"
+git -C "$d" commit -qam typo --no-verify
+arm "a clause an earlier revision carried and this one does not REDS as [carries] stopped, read two commits back" 1 "$d" "[carries] \`carries <- stopped:cl-dAlpha-0001\`"
+git -C "$d" reset -q --hard "$cseed"
+check_carries_restored "the stopped plant"
+# TOOL-dTrueNorth-16 AC9 AC10 AC12 AC32 — ONE revision reader, ONE status filter and ONE date pattern,
+# probed in-process over a history of the fixture's own: dAlpha-1 gains a line holding multi-byte
+# characters, then a later line. Each arm is red against the base join, which had no
+# `read_spec_revisions`, parsed the status inside `scan_carries` and compiled its own date pattern.
+d=$base/carries-revs; seed_carries_repo "$d"
+A1="$d/$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm seeded --no-verify
+printf '\nThe caf\303\251 line \342\200\224 \342\234\223 multi-byte before the change.\n' >> "$A1"; git -C "$d" commit -qam multibyte --no-verify
+printf '\nA later line, changed.\n' >> "$A1"; git -C "$d" commit -qam later --no-verify
+rev_out=$(cd "$d" && "$PY" -c 'import importlib.util, subprocess, sys
+path, kit, lint = sys.argv[1:4]
+sys.path.insert(0, kit)
+import design_lib as dl
+import deviation_join as dj
+spec = importlib.util.spec_from_file_location("cst", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+calls, real = [], subprocess.run
+def counted(*a, **k):
+    calls.append(1)
+    return real(*a, **k)
+subprocess.run = counted
+revs = dl.read_spec_revisions(".", [path])[path]
+subprocess.run = real
+shown = subprocess.run(["git", "show", revs[-1][0] + ":" + path], capture_output=True).stdout.decode("utf-8").replace("\r\n", "\n")
+print("AC10 revisions", len(revs), "after", "equal" if revs[-1][2] == shown else "differs", "spawns", len(calls))
+seen, orig = [], dl.read_spec_revisions
+def recorded(root, paths):
+    seen.append(sorted(paths))
+    return orig(root, paths)
+dl.read_spec_revisions = recorded
+conf = dl.read_design_conf(".")
+design = dl.read_design(".", conf)
+specs, _st, skipped = cst.read_carries_specs(".", design, conf["SPEC_CARRIES_CUTOFF"], conf=conf)
+dl.read_spec_revisions = orig
+print("AC12 one reader", dj.read_spec_revisions is orig and path in (seen[0] if seen else []))
+wont = "**Status:** WONTDO · rev-1 · 2026-09-02 · node t · Tier-2 · base 0123abcd\n\n" + open(path, encoding="utf-8").read()
+specs["dAlpha"].append(("memory/builds/dAlpha/spec/wontdo.md", wont, []))
+amb = [f for f in cst.scan_carries(design, specs, exit_mode=True)["findings"] if f[1] == "ambiguous"]
+print("AC9 scan_carries parses no status", len(amb) == 1)
+print("AC32 one date pattern", cst.SPEC_DATE is dl.SPEC_FILE_DATE)' "$CSPEC/$CCUT-spec-TOOL-dAlpha-1.md" "$MEMORY_TREE" "$LINT" 2>&1)
+check_rev_probe() {   # $1 label · $2 the probe line it must print
+  case "$rev_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$rev_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_rev_probe "read_spec_revisions reads bytes: the last revision after a multi-byte line equals git show, in two spawns" "AC10 revisions 3 after equal spawns 2"
+check_rev_probe "read_carries_specs and the deviation population read one revision reader" "AC12 one reader True"
+check_rev_probe "scan_carries parses no status: a WONTDO carrier handed past the filter collides" "AC9 scan_carries parses no status True"
+check_rev_probe "the checker's SPEC_DATE is design_lib's one compiled pattern" "AC32 one date pattern True"
+# TOOL-dTrueNorth-20 AC18 AC21 AC22 — ONE conf grammar, ONE row grammar and ONE date pattern, in-process.
+# AC18: a cutoff key outside the carries keys, declared twice and then behind `export `, reads its LAST
+# value through `read_conf_key`, red against the base reader, which took the first declaration and read
+# the exported one as blank. AC21: the view's row grammar and the checker's date pattern are design_lib's
+# own objects, and no `re.compile`/`re.match`/`re.search`/`re.fullmatch` call in asbuilt_view.py takes a
+# string literal for its pattern, red against a second grammar compiled there. AC22: the date pattern's
+# text is spelled in design_lib.py alone, red against a second copy in the checker.
+d=$base/one-grammar; mkdir -p "$d"
+one_out=$(cd "$d" && "$PY" -c 'import ast, importlib.util, pathlib, sys
+kit, lint = sys.argv[1:3]
+sys.path.insert(0, kit)
+import asbuilt_view, design_lib
+spec = importlib.util.spec_from_file_location("cst20", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+root = pathlib.Path(".")
+for name, text in (("twice", "SPEC_GUARD_LEGS_CUTOFF=\"2026-01-01\"\nSPEC_GUARD_LEGS_CUTOFF=\"2026-02-02\"\n"),
+                   ("export", "export SPEC_GUARD_LEGS_CUTOFF=\"2026-03-03\"\n")):
+    (root / ".memory-tree.conf").write_text(text, encoding="utf-8")
+    print("AC18", name, cst.read_conf_key(root, "SPEC_GUARD_LEGS_CUTOFF"))
+print("AC21 one row grammar", asbuilt_view.VIEW_ROW is design_lib.VIEW_ROW, "one date pattern",
+      cst.SPEC_DATE is design_lib.SPEC_FILE_DATE)
+ALLOWED = ("ROW_FOLLOW", "ROW_DEPARTS")
+def scan_literal_patterns(tree):
+    # TOOL-dTrueNorth-26 S8: a call is flagged when ANY str Constant leaf sits in its pattern argument,
+    # so `r"^\| " + _CL` is seen as a literal is; each flag is named by the assignment it sits in.
+    owner = {}
+    for st in ast.walk(tree):
+        if isinstance(st, ast.Assign):
+            names = [t.id for t in st.targets if isinstance(t, ast.Name)]
+            for sub in ast.walk(st.value):
+                owner.setdefault(id(sub), names[0] if names else None)
+    return [owner.get(id(n)) or "line %d" % n.lineno for n in ast.walk(tree)
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and isinstance(n.func.value, ast.Name)
+            and n.func.value.id == "re" and n.func.attr in ("compile", "match", "search", "fullmatch") and n.args
+            and any(isinstance(x, ast.Constant) and isinstance(x.value, str) for x in ast.walk(n.args[0]))]
+src = pathlib.Path(asbuilt_view.__file__).read_text(encoding="utf-8")
+flagged = scan_literal_patterns(ast.parse(src))
+print("AC21 literal patterns", [f for f in flagged if f not in ALLOWED],
+      "the walk flagged exactly the allowed targets before the allow-list", sorted(flagged) == sorted(ALLOWED))
+planted = scan_literal_patterns(ast.parse(src + "\nSECOND = re.compile(r\"^\\| \" + _CL)\n"))
+print("AC12 planted", [f for f in planted if f not in ALLOWED])' "$MEMORY_TREE" "$LINT" 2>&1)
+check_one_probe() {   # $1 label · $2 the probe line it must print
+  case "$one_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$one_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_one_probe "a cutoff declared twice reads its last declaration through read_conf_key" "AC18 twice 2026-02-02"
+check_one_probe "a cutoff behind export reads as bash reads it through read_conf_key" "AC18 export 2026-03-03"
+check_one_probe "the view's row grammar and the checker's date pattern are design_lib's own" "AC21 one row grammar True one date pattern True"
+check_one_probe "no re call in asbuilt_view.py holds a string-literal leaf in its pattern but ROW_FOLLOW and ROW_DEPARTS, which the walk flagged before the allow-list" "AC21 literal patterns [] the walk flagged exactly the allowed targets before the allow-list True"
+check_one_probe "TOOL-dTrueNorth-26 AC12 a BinOp pattern with a literal leaf, re.compile(r\"^\\| \" + _CL), is flagged" "AC12 planted ['SECOND']"
+# TOOL-dTrueNorth-26 AC1 AC3 AC11 AC14 AC15 — the closing diff review's minors, in-process. AC1: with
+# every name of tree_lib.GIT_ENV_LEAKS exported, neither design_lib.run_git nor routed_commits.run_git
+# passes one through, and routed_commits holds no second list, red against the base runners, which
+# passed the env whole or lacked GIT_NAMESPACE. AC3: part 1/2 and part 2/3 are ONE parts finding naming
+# both totals, and 1/2 with 2/2 none, red against the base arm, which read n from the first carrier.
+# AC11: the view's and the join's clause grammar is design_lib's object, red against a module spelling
+# it again. AC14: a bare CR in a view row stays in its text cell, red against the text-mode read, which
+# split the row. AC15: a namesake tree_lib in sys.modules is left there and the kit's file is returned,
+# red against the base loader, which returned the namesake. TOOL-dTrueNorth-31 AC6 (S6): each captured
+# env is recorded as handed, and a runner handed none prints `inherits`, since git then inherits every
+# leak; a scratch copy of routed_commits.run_git with `env=` taken out prints it, red against the
+# `or {}` reading, which printed `leaks []` there. TOOL-dTrueNorth-31 AC11 (S11): under a namesake
+# design_lib, a refusal raised through one load_design_lib is caught through a second, red against the
+# loader that executed the kit file afresh on every call.
+d=$base/minors26; mkdir -p "$d"
+m26_out=$(cd "$d" && "$PY" -c 'import ast, importlib.util, os, pathlib, subprocess, sys
+kit, lint = sys.argv[1:3]
+sys.path.insert(0, kit)
+import asbuilt_view, design_lib, deviation_join, routed_commits, tree_lib
+envs, real = [], subprocess.run
+class Done:
+    returncode, stdout, stderr = 0, b"", b""
+def captured(*a, **k):
+    envs.append(k.get("env"))
+    return Done()
+def leaks(env):
+    return "inherits" if env is None else sorted(set(env) & set(tree_lib.GIT_ENV_LEAKS))
+src = pathlib.Path(routed_commits.__file__).read_text(encoding="utf-8")
+pathlib.Path("noenv").mkdir(exist_ok=True)
+pathlib.Path("noenv", "routed_commits.py").write_text(src.replace(", env=env)", ")"), encoding="utf-8")
+ne = importlib.util.spec_from_file_location("routed_commits_noenv", "noenv/routed_commits.py")
+noenv = importlib.util.module_from_spec(ne)
+ne.loader.exec_module(noenv)
+for name in tree_lib.GIT_ENV_LEAKS:
+    os.environ[name] = "leaked"
+subprocess.run = captured
+design_lib.run_git(".", "status")
+routed_commits.run_git(".", "status", may_fail=True)
+noenv.run_git(".", "status", may_fail=True)
+subprocess.run = real
+for name in tree_lib.GIT_ENV_LEAKS:
+    del os.environ[name]
+print("AC1 design_lib leaks", leaks(envs[0]), "routed_commits leaks", leaks(envs[1]), "second list",
+      hasattr(routed_commits, "GIT_LOCATION_VARS"))
+print("AC6 env= taken out", src.count(", env=env)") == 1, "routed_commits leaks", leaks(envs[2]))
+spec = importlib.util.spec_from_file_location("cst26", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+text = "The reader takes one step."
+h = design_lib.derive_clause_hash(text)
+design = {"builds": {"dAb": {"cl-dAb-0001": (text, h, "baseline")}}, "retired": set(), "nodes": {}}
+def parts(a, b):
+    specs = {"dAb": [("memory/builds/dAb/spec/2026-09-02-spec-TOOL-dAb-%d.md" % n,
+                      "# TOOL-dAb-%d\n\n**Carries:** cl-dAb-0001@%s part %s\n" % (n, h, p), []) for n, p in ((1, a), (2, b))]}
+    return [f for f in cst.scan_carries(design, specs)["findings"] if f[1] == "parts"]
+two = parts("1/2", "2/3")
+print("AC3 totals 2 and 3 one finding", len(two) == 1 and "the totals 2 and 3" in two[0][3])
+print("AC3 one n no finding", parts("1/2", "2/2") == [])
+print("AC11 one clause grammar", asbuilt_view._CL is design_lib._CL, deviation_join._CL is design_lib._CL)
+pathlib.Path("view.md").write_bytes(b"# v\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n| dAb | `cl-dAb-0001` | one\rtwo | baseline |\n")
+try:
+    kept = [r[2] for r in design_lib.read_design_view("view.md", ".")] == ["one\rtwo"]
+except design_lib.DesignRefusal as exc:
+    kept = "refused: %s" % str(exc).replace("\n", " ")
+print("AC14 bare CR kept", kept)
+pathlib.Path("namesake").mkdir(exist_ok=True)
+pathlib.Path("namesake", "tree_lib.py").write_text("WHO = \"namesake\"\n", encoding="utf-8")
+ns = importlib.util.spec_from_file_location("tree_lib", "namesake/tree_lib.py")
+namesake = importlib.util.module_from_spec(ns)
+ns.loader.exec_module(namesake)
+sys.modules["tree_lib"] = namesake
+got = cst.load_kit_module("tree_lib")
+print("AC15 kit module", pathlib.Path(got.__file__).resolve() == pathlib.Path(kit, "tree_lib.py").resolve(),
+      "namesake kept", sys.modules["tree_lib"] is namesake)
+sys.modules["tree_lib"] = tree_lib
+pathlib.Path("namesake", "design_lib.py").write_text("class DesignRefusal(ValueError):\n    pass\n", encoding="utf-8")
+ns = importlib.util.spec_from_file_location("design_lib", "namesake/design_lib.py")
+dl_namesake = importlib.util.module_from_spec(ns)
+ns.loader.exec_module(dl_namesake)
+sys.modules["design_lib"] = dl_namesake
+first, second = cst.load_design_lib(), cst.load_design_lib()
+try:
+    raise first.DesignRefusal("x")
+except second.DesignRefusal:
+    caught = True
+except ValueError:
+    caught = False
+print("AC11 of 31 one load", first is second, "caught", caught, "namesake kept", sys.modules["design_lib"] is dl_namesake,
+      "kit file", pathlib.Path(first.__file__).resolve() == pathlib.Path(kit, "design_lib.py").resolve())' "$MEMORY_TREE" "$LINT" 2>&1)
+check_m26_probe() {   # $1 label · $2 the probe line it must print
+  case "$m26_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$m26_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_m26_probe "TOOL-dTrueNorth-26 AC1 neither kit git runner passes a GIT_ENV_LEAKS name through, and routed_commits holds no second list" "AC1 design_lib leaks [] routed_commits leaks [] second list False"
+check_m26_probe "TOOL-dTrueNorth-26 AC3 part 1/2 with part 2/3 is one parts finding naming both totals" "AC3 totals 2 and 3 one finding True"
+check_m26_probe "TOOL-dTrueNorth-26 AC3 part 1/2 with part 2/2 is no parts finding" "AC3 one n no finding True"
+check_m26_probe "TOOL-dTrueNorth-26 AC11 the view and the join read design_lib's own clause grammar" "AC11 one clause grammar True True"
+check_m26_probe "TOOL-dTrueNorth-26 AC14 a bare CR in a view row stays in its text cell" "AC14 bare CR kept True"
+check_m26_probe "TOOL-dTrueNorth-26 AC15 load_kit_module returns the kit's file and leaves a namesake in sys.modules" "AC15 kit module True namesake kept True"
+check_m26_probe "TOOL-dTrueNorth-31 AC6 a runner with env= taken out hands subprocess.run no env, which inherits every leak, and the probe says so" "AC6 env= taken out True routed_commits leaks inherits"
+check_m26_probe "TOOL-dTrueNorth-31 AC11 under a namesake design_lib, two load_design_lib calls return one cached kit load, so a refusal raised through one is caught through the other" "AC11 of 31 one load True caught True namesake kept True kit file True"
+cl_files=$(grep -l -F 'cl-d[A-Z]\w+-\d{4}' "$MEMORY_TREE"/*.py | sed 's#.*/##' | tr '\n' ' ')
+cl_lines=$(cat "$MEMORY_TREE"/*.py | grep -c -F 'cl-d[A-Z]\w+-\d{4}')
+if [ "$cl_files:$cl_lines" = "design_lib.py :1" ]; then
+  echo "arm ok    TOOL-dTrueNorth-26 AC11 the clause-id grammar is spelled once in the kit, in design_lib.py"; pass=$((pass+1))
+else
+  echo "arm FAIL  TOOL-dTrueNorth-26 AC11 the clause-id grammar is spelled once in the kit, in design_lib.py — files [$cl_files], lines $cl_lines"; fail=$((fail+1))
+fi
+date_in_lint=$(grep -c -F '[0-9]{2})-spec-' "$LINT")
+date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$MEMORY_TREE/design_lib.py")
+if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then
+  echo "arm ok    the spec filename date's pattern is spelled in design_lib.py alone"; pass=$((pass+1))
+else
+  echo "arm FAIL  the spec filename date's pattern is spelled in design_lib.py alone — checker $date_in_lint, design_lib $date_in_lib"; fail=$((fail+1))
+fi
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

@@ -25,8 +25,8 @@ move — the id was never meant to exist.
 ## The fix
 
 Within the record's first twelve unfenced lines, `**Serves:** <kind> <id> [<id> …]`, with `<kind>`
-one of `spec-audit` · `diff-review` · `journal` · `research`; the grammar and its `none — <why>`
-escape are `memory/HYGIENE.md`, "Record bindings". Name the file so it PROJECTS the binding —
+from the closed list in `memory/HYGIENE.md`, "Record bindings", which also holds the grammar and its
+`none — <why>` escape. Name the file so it PROJECTS the binding —
 family, slug, ordinal of the LOWEST id served — and put a round in a suffix that is not a number:
 `…-<slug>-1-round2.md`. Check `ids:` on the README after `gen_build_index.py --write`; a phantom
 there is the tell.

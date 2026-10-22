@@ -103,6 +103,8 @@ Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: KICK-aRoutedQuill-1 PLAY-aRoutedQuill-1 TOOL-aRoutedQuill-1 TOOL-aRoutedQuill-2 TOOL-aRoutedQuill-3 TOOL-aRoutedQuill-4 TOOL-aRoutedQuill-5 TOOL-aRoutedQuill-6 TOOL-aRoutedQuill-7 TOOL-aRoutedQuill-10 TOOL-aRoutedQuill-11 TOOL-aRoutedQuill-12
 TOOL-aRoutedQuill-9.
+
+Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

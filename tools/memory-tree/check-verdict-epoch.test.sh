@@ -248,6 +248,37 @@ commit_engine "$V2" 1.6 "echo gov's engine change" 'pull 2: the engine bytes'
 write_receipt "$V2" 1.5
 ARM_GPB=$BASE_V2 arm '...and a receipt naming another version than the constant still FAILS' 1 'the bump is OLDER' "$V2"
 
+# ---- 5e. THE DELEGATES' IMPORT CLOSURE (TOOL-dTrueNorth-25). A module a delegate hands off to was
+# missing from DELEGATES four times, so its change moved a verdict while this gate printed `clean`.
+# The first fixture is H3's shape: `asbuilt_view.py` imports `deviation_join.py`'s reader, the
+# closure line counts both, and an edit of that reader with no bump FAILS naming it. The second
+# fixture's `design_lib.py` imports a sibling the list omits, inside a function, so a walk of the
+# module level alone misses it; then the same file does not parse. The base gate, whose list lacked
+# `deviation_join.py` and which walked no import, exits 0 clean on every one of them.
+J=$(newrepo closure)
+engine "$J" 1.5 ""
+printf 'def render(root):\n    from deviation_join import read_record\n    return read_record(root)\n' > "$J/$KIT_REL/asbuilt_view.py"
+printf 'def read_record(path):\n    return path\n' > "$J/$KIT_REL/deviation_join.py"
+# TOOL-dTrueNorth-31 S13: a scanned file that is no sibling, the checker DELEGATES folds
+# `../check-spec-tokens.py` to at the tool root, is counted apart from the two siblings; red against
+# the label that counted every scanned file a sibling, which read 3.
+printf 'X = 1\n' > "$J/${PFX}check-spec-tokens.py"
+( cd "$J" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_J=$(cd "$J" && git rev-parse HEAD)
+arm 'a delegate list holding every sibling its delegates import prints the closure line, the non-sibling counted apart (control)' 0 "the delegates' import closure is 2 sibling module(s) and 1 other scanned file(s), every sibling in DELEGATES" "$J" "$BASE_J"
+printf 'def read_record(path):\n    return path.strip()\n' > "$J/$KIT_REL/deviation_join.py"
+( cd "$J" && git add -A && git commit -qm "the record reader moves, no bump" --no-verify ) >/dev/null
+arm '...and an edit of deviation_join.py with no bump FAILS naming it' 1 "moved: $KIT_REL/deviation_join.py" "$J" "$BASE_J"
+Q=$(newrepo outgrown)
+engine "$Q" 1.5 ""
+printf 'def load():\n    import newmod\n    return newmod\n' > "$Q/$KIT_REL/design_lib.py"
+printf 'X = 1\n' > "$Q/$KIT_REL/newmod.py"
+( cd "$Q" && git add -A && git commit -qm base --no-verify ) >/dev/null
+BASE_Q=$(cd "$Q" && git rev-parse HEAD)
+arm 'a sibling a delegate imports and DELEGATES omits exits 2 naming both' 2 "$KIT_REL/newmod.py is imported by $KIT_REL/design_lib.py and is not in DELEGATES" "$Q" "$BASE_Q"
+printf 'def load(:\n    import newmod\n' > "$Q/$KIT_REL/design_lib.py"
+arm '...and a delegate that does not parse exits 2 naming it' 2 "$KIT_REL/design_lib.py does not parse, so its imports were not read" "$Q" "$BASE_Q"
+
 # ---- 6. this repo, right now --------------------------------------------------------------------
 # The live tree must be clean, and it must be clean because the constant MOVED — not because nothing
 # changed. Asserting the message discriminates the two.

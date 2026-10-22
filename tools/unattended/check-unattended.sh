@@ -58,7 +58,7 @@
 # THE CORE SETS ARE READ FROM THE DRIVER, never restated here. A second spelling of `PHASES_CORE` one
 # file away from the thing that enforces it is the drift this leg exists to catch.
 set -u
-KIT_UNATTENDED_VERSION=1.109 # gov:kit unattended@1.109 — must match unattended.sh; check-kit-versions.sh pairs them
+KIT_UNATTENDED_VERSION=1.110 # gov:kit unattended@1.110 — must match unattended.sh; check-kit-versions.sh pairs them
 
 # ------------------------------------------------------------------------------ the dereference pin
 # Identical to the driver's, and for the identical reason: `git replace` rewrites what a sha MEANS for
@@ -3898,6 +3898,15 @@ for f in $RUNS; do
   # ---- here because hygiene check 9 refuses a stale index, so a spec committed by then is in the
   # ---- region by then; that dependency is the reason this shortcut is sound and is stated rather
   # ---- than assumed.
+  # ----
+  # ---- A SPEC RUN'S BASELINE REGION NAMES NO UNIT, because it went live before it specced any, and
+  # ---- this arm skipped it whole on that refusal. `baseline_units` now FALLS BACK to the authored
+  # ---- `roster:units` pair at the same commit there (TOOL-dTrueNorth-7 S2) and prints that pair's
+  # ---- slug-scoped ids, one per line, so a unit the run specced beyond the authored roster owes its
+  # ---- `add` row here exactly as the driver's carry-forward term reads it added. Membership below is
+  # ---- `id_in`, which a bare id answers; a bare id carries no status, so the RETIRE arm's fallback
+  # ---- read of it takes the strict direction. Both regions refusing is still a skip, its reason
+  # ---- naming both.
   # ONE DERIVATION, in lib-unattended.sh, called by the driver too. Deciding "what roster did this
   # run start with" separately in each is what made check 24 and check 48 unsatisfiable together:
   # this file asked whether a unit was in the BASELINE roster, and the driver asked whether it was

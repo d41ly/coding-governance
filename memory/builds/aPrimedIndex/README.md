@@ -91,6 +91,8 @@ Records: 16 bound to this build, across 4 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: DEPL-aPrimedIndex-1 TOOL-aPrimedIndex-1 TOOL-aPrimedIndex-10 TOOL-aPrimedIndex-2 TOOL-aPrimedIndex-3 TOOL-aPrimedIndex-4 TOOL-aPrimedIndex-6 TOOL-aPrimedIndex-7 TOOL-aPrimedIndex-8 TOOL-aPrimedIndex-9 TOOL-aPrimedIndex-16.
+
+Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

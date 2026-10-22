@@ -83,7 +83,24 @@ Records: 1 bound to this build, across 1 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: none — every unit id has one.
+
+Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
 <!-- /gen:build-index -->
+
+<!-- gen:build-coverage -->
+
+Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+
+- carried whole: 0
+- carried in parts: 0 (none)
+- moved, retired or deferred: none
+- uncarried: 11 (cl-dClosedLoop-0007, cl-dClosedLoop-0008, cl-dClosedLoop-0009, cl-dClosedLoop-0010, cl-dClosedLoop-0011, cl-dClosedLoop-0012, cl-dClosedLoop-0013, cl-dClosedLoop-0014, cl-dClosedLoop-0015, cl-dClosedLoop-0016, cl-dClosedLoop-0017)
+- stale: 0 (none)
+- ambiguous: 0 (none)
+- owned nodes no spec names: policy-key.budgets.*, policy-key.budgets.enforce, policy-key.budgets.pinned, policy-key.policy-file.on-invalid, policy-key.runtime.agents-in-flight
+- specs derived from no clause: none
+- clauses the token arm cannot see: cl-dClosedLoop-0009, cl-dClosedLoop-0014, cl-dClosedLoop-0017
+<!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 

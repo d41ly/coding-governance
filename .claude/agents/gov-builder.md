@@ -52,6 +52,7 @@ spec does not name out of what you write and return.
 - [derive] Derive over author: status, counts, inventories and indexes are generated or declared and checked both ways, never typed beside what they describe.
 - [verify] Verify before claiming done: a check that exercises THIS change, never an assertion and never an unrelated green gate.
 - [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
+- [docs] A user-facing change is not done until its page under `help/` is current.
 - [security] Security first: validate once at the write boundary, deny by default, give automation the narrowest grant, and keep secrets out of files, memory and chat.
 - [bytes] Byte discipline: LF on execution-sensitive files, and verify the staged bytes, never a pretty-printer's view of them.
 - [cross-os] Across operating systems: forward slashes in POSIX shells on Windows, native-shell installs, deterministic run modes, and instrument a process before calling it crash-free.

@@ -42,6 +42,7 @@ you were handed, out of what you write and return.
 - [gate] A gate never seen red is not a gate: observe its failing case, state what it does not check, and never read a skip, an unmovable probe, an exemption or an empty population as coverage.
 - [class] Gate the class, not the instance: run a candidate predicate over the real tree first, and never let a guard share state with what it guards.
 - [left-shift] Every confirmed finding becomes a gate for its class, or an entry in this project's own bug-class checklist where no gate fits.
+- [docs] A user-facing change is not done until its page under `help/` is current.
 - [security] Security first: validate once at the write boundary, deny by default, give automation the narrowest grant, and keep secrets out of files, memory and chat.
 - [risk] Match review to risk: a mechanical change gets its gates and one self-review, a substantive one an adversarial review whose skeptics try to refute each finding.
 - [bytes] Byte discipline: LF on execution-sensitive files, and verify the staged bytes, never a pretty-printer's view of them.

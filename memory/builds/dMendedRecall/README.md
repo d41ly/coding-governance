@@ -61,6 +61,8 @@ Records: 8 bound to this build, across 4 record folder(s).
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dMendedRecall-1 TOOL-dMendedRecall-2 TOOL-dMendedRecall-3.
+
+Ids whose spec moved past its audited revision: none — 0 of 3 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->

@@ -79,7 +79,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 # made both a hard prerequisite of this module, and at an adopter whose copies of those two are its
 # own programs this check died on import. `scan_engine_imports` below keeps it that way.
 from tree_lib import (  # noqa: E402  the kit's shared helpers
-    CENSUS_TERMINAL, FM_RE, STATUS_TOKENS, TERMINAL as TERMINAL_STATUS, parse_conf, unfenced_lines,
+    CENSUS_TERMINAL, FM_RE, STATUS_TOKENS, TERMINAL as TERMINAL_STATUS, parse_conf, read_git_output,
+    unfenced_lines,
 )
 
 CHECK = 20
@@ -1671,17 +1672,21 @@ def derive_first_seen(root, conf):
     walk never matched one, and adopter ic, which declares `ABL` and its siblings as families, would have
     had every live legacy row reported undated at exit 1. The families stay the gate on purpose: a
     families list that recognises nothing still dates nothing, which is the vacuity `cmd_ages` refuses.
+
+    GIT IS REACHED THROUGH `tree_lib.read_git_output`, the kit's one runner (TOOL-dTrueNorth-23 S2), so
+    the walk inherits neither a hook's location variables nor a caller's pathspec mode: under an
+    ambient `GIT_LITERAL_PATHSPECS` its own spawn dated zero ids at exit 0. The bytes decode as UTF-8
+    with replacement and their line ends fold to `\\n`, as the text-mode spawn it replaced read them.
     """
     fams = "|".join(sorted(re.escape(f) for f in derive_families(conf)))
     rowre = re.compile(r"^\+" + _DIFF_ROW_TAIL + r"(?:" + fams + r")(?:-[A-Za-z0-9]+)+)\b")
-    out = subprocess.run(
-        ["git", "log", "--reverse", "--date=short", "--format=__C__ %H %ad", "-p", "-m",
-         "--no-color", "--"] + _build_backlog_pathspecs(conf),
-        cwd=root, capture_output=True, text=True, encoding="utf-8", errors="replace")
-    if out.returncode != 0:
-        raise Problem(f"row-grammar: the age walk's `git log` failed: {out.stderr.strip()}")
+    try:
+        out = read_git_output(root, ["log", "--reverse", "--date=short", "--format=__C__ %H %ad", "-p", "-m",
+                                     "--no-color", "--"] + _build_backlog_pathspecs(conf))
+    except OSError as exc:
+        raise Problem(f"row-grammar: the age walk's `git log` failed: {exc}") from None
     first, date = {}, None
-    for line in out.stdout.split("\n"):
+    for line in out.decode("utf-8", "replace").replace("\r\n", "\n").replace("\r", "\n").split("\n"):
         if line.startswith("__C__ "):
             parts = line.split()
             date = parts[2] if len(parts) > 2 else None

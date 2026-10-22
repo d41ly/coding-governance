@@ -400,7 +400,8 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/check-spec-tokens.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -480,7 +481,8 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/check-spec-tokens.py"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -536,7 +538,8 @@
     ],
     "guard": [
       "{prefix}/lib/",
-      "{prefix}/memory-tree/"
+      "{prefix}/memory-tree/",
+      "{prefix}/unattended/lib-unattended.sh"
     ],
     "chunk": "selftests",
     "subject": "kit",
@@ -737,7 +740,8 @@
       "{prefix}/workflows/tier2-review.test.sh"
     ],
     "guard": [
-      "{prefix}/workflows/"
+      "{prefix}/workflows/",
+      "{prefix}/memory-tree/gen_build_index.py"
     ],
     "chunk": "selftests",
     "subject": "kit",

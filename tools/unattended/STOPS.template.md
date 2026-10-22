@@ -1,4 +1,4 @@
-<!-- gov:kit unattended@1.109 -->
+<!-- gov:kit unattended@1.110 -->
 # The unattended stop contract — HELD, the hold codes and the lease
 
 *Installed beside `UNATTENDED-PROTOCOL.md` from the unattended kit and byte-compared against the
@@ -700,8 +700,15 @@ prints one `carried forward` line naming it and its ask, only when ALL FIVE hold
 order and each unmet one named with its unit:
 
 1. its spec status is `DEFERRED`;
-2. the roster this run started with carries it, so a unit the run added — a promoted finding, an
-   adopted discovery — is never carried;
+2. the roster this run started with carries it — the generated units region at the commit the run
+   went live, or, where that region names no unit, the authored `roster:units` pair at that commit —
+   or it is a unit the run ADDED and this run is a **spec run**: at its pinned `base:` the build's
+   `BACKLOG.md` files an ask of its own that `ASKS_CMD` reads open, and the authored roster names a
+   unit the generated region does not. A spec run carries a unit it added only when its
+   `rescope · item add <unit>` row stands, and ONCE: no unit an earlier landed run of this build
+   added and deferred, as its rotated `RUN.LANDED.<blob8>.md` archive records, is carried again, so
+   the build run after it builds it. A unit a build run or a whole run added — a promoted finding,
+   an adopted discovery — is never carried;
 3. the run-state file carries its `rescope · item defer <unit>` row, written by
    `--rescope <slug> --act defer` and owed to the owner at the wrap-up;
 4. its spec header `closes` or `advances` an ask this build's own `BACKLOG.md` files under this

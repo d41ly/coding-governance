@@ -103,6 +103,8 @@ Records: 24 bound to this build, across 4 record folder(s).
 Ids no record names: TOOL-aQuenchedHarness-9.
 
 Ids no `spec-audit` record has ever named: TOOL-aQuenchedHarness-10 TOOL-aQuenchedHarness-9 TOOL-aQuenchedHarness-11 TOOL-aQuenchedHarness-13.
+
+Ids whose spec moved past its audited revision: none — 0 of 12 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-order -->
