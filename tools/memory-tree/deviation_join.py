@@ -831,6 +831,10 @@ FIXTURE_FAMILY = "FIX"     # declared only in the fixture repository's own conf
 FIXTURE_BUILDS = ("dFixA", "dFixB")     # the fixture design's chain builds; the first holds every folder
 TN = f"memory/builds/{FIXTURE_BUILDS[0]}/"
 FIXTURE_ROUTED = "src/"     # the fixture's one routed directory, as routed_commits.py routes its own fixture
+# The fixture's remote, named through one constant and deliberately not the conventional name, as
+# migrate_backlog.py's FX_REMOTE is: the ladder takes a lone remote whatever its name, so the AC8 arms
+# also red a join that reads a hard-coded name (TOOL-dTrueNorth-33 S1).
+FIXTURE_REMOTE = "upstream"
 EPOCH = 1792576800         # 2026-10-21T10:00Z, after the fixture's ROUTED_COMMIT_CUTOFF
 UNMEASURED_PIN = "0123456789abcdef0123456789abcdef01234567"
 # TOOL-dTrueNorth-16 S23: each "nothing measured" cause on its own, superseding TOOL-dTrueNorth-4 S8's
@@ -1268,13 +1272,14 @@ def read_fixture_conf(root):
 
 
 def add_fixture_remote(fx):
-    """Give a built fixture the instrument's ref shape (`deviations.py:539`): a remote `origin` naming the
-    fixture's own root, and `refs/remotes/origin/main` at its base commit, so the ladder's remote half
-    resolves `origin/main` there (TOOL-dTrueNorth-31 S8). Nothing is fetched."""
+    """Give a built fixture the instrument's ref shape (`deviations.py:539`): a remote named by
+    `FIXTURE_REMOTE`, its URL the fixture's own root, and that remote's tracking ref for `main` at the
+    base commit, so the ladder's remote half resolves the remote's `main` there (TOOL-dTrueNorth-31 S8,
+    TOOL-dTrueNorth-33 S1). Nothing is fetched."""
     base = fx.read_sha(fx.base)
-    if (run_git(fx.root, "remote", "add", "origin", fx.root.as_posix()) is None
-            or run_git(fx.root, "update-ref", "refs/remotes/origin/main", base) is None):
-        raise RuntimeError(f"fixture: the origin remote cannot be added in {fx.root}")
+    if (run_git(fx.root, "remote", "add", FIXTURE_REMOTE, fx.root.as_posix()) is None
+            or run_git(fx.root, "update-ref", f"refs/remotes/{FIXTURE_REMOTE}/main", base) is None):
+        raise RuntimeError(f"fixture: the remote {FIXTURE_REMOTE!r} cannot be added in {fx.root}")
 
 
 def measure_fixture(fx):
@@ -1577,18 +1582,20 @@ def run_plant_arms(resolve=None):
                                  "of it is no ref and the ladder's refusal, named on the unread line",
                                  f"ref {result['ref']!r}; refused ref {ref!r}: {why}\n" + "\n".join(refused_lines)))
                     # TOOL-dTrueNorth-31 S8 (AC8): the ladder's remote half. The base fixture gains the
-                    # instrument's ref shape, and its rows are read at `origin/main`, and read. Red against a
-                    # remote half joining a wrong ref or a blank branch, which reads no rows.
+                    # instrument's ref shape, and its rows are read at FIXTURE_REMOTE's `main`, and read. Red
+                    # against a remote half joining a wrong ref, a hard-coded remote name or a blank branch,
+                    # which reads no rows (TOOL-dTrueNorth-33 S1).
                     add_fixture_remote(fx)
                     remote = measure_fixture(fx)[2]
-                    arms.append((remote["ref"] == "origin/main" and bool(remote["rows"]),
-                                 "TOOL-dTrueNorth-31 AC8 a fixture with an origin remote reads its decision rows at "
-                                 "origin/main", f"ref {remote['ref']!r} ({remote['ref_why']}); rows "
-                                                f"{sorted(remote['rows'] or ())}"))
+                    arms.append((remote["ref"] == f"{FIXTURE_REMOTE}/main" and bool(remote["rows"]),
+                                 f"TOOL-dTrueNorth-31 AC8 a fixture with the remote {FIXTURE_REMOTE!r} reads its "
+                                 f"decision rows at {FIXTURE_REMOTE}/main", f"ref {remote['ref']!r} "
+                                 f"({remote['ref_why']}); rows {sorted(remote['rows'] or ())}"))
                     # TOOL-dTrueNorth-31 S4 (AC4): an exported GIT_DIR naming that fixture, which now has a
                     # remote, moves no answer of a remote-less repository: the ladder resolves `main` there,
                     # and the export holds after the call. Red against a ladder spawned with the caller's
-                    # GIT_DIR, which answers `origin/main`, resolved in one repository for rows read in another.
+                    # GIT_DIR, which answers FIXTURE_REMOTE's `main`, resolved in one repository for rows
+                    # read in another.
                     # TOOL-dTrueNorth-32 S7 (AC7): every fixture init passes `--template=`, so with GIT_TEMPLATE_DIR
                     # exported naming a template whose `config` declares an `origin` remote, a repository
                     # `build_fixture` writes and the lone repository each list no remote. Red against an init
@@ -1670,10 +1677,11 @@ def run_plant_arms(resolve=None):
                     fx.write_tree()
                     _conf, _commits, branch_only, branch_commit = measure_fixture(fx)
                     branch_lines = render_lines(branch_only, "report", approval, f"plant {plant} · ", branch_commit)[0]
-                    arms.append((branch_only["ref"] == "origin/main"
+                    arms.append((branch_only["ref"] == f"{FIXTURE_REMOTE}/main"
                                  and any("FIX-dClosedLoop-99" in ln and "which no row" in ln for ln in branch_lines),
-                                 "TOOL-dTrueNorth-31 AC8 with an origin remote, an owner citation whose row is on the "
-                                 "run branch alone is refused, naming FIX-dClosedLoop-99 and `which no row`",
+                                 f"TOOL-dTrueNorth-31 AC8 with the remote {FIXTURE_REMOTE!r}, an owner citation whose "
+                                 "row is on the run branch alone is refused, naming FIX-dClosedLoop-99 and `which no "
+                                 "row`",
                                  f"ref {branch_only['ref']!r}\n" + "\n".join(branch_lines)))
                 if plant in RISK_PLANTS:
                     lines, findings = render_lines(result, "refuse", "author-recorded", f"plant {plant} · ", commit)

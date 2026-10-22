@@ -223,3 +223,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T12:43:07Z brief · item TOOL-dTrueNorth-32 · reason c300daeff6c9 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-32-build-brief.md
 
 2026-10-22T13:54:45Z rescope · item add TOOL-dTrueNorth-33 · reason the close's bar on the prepared merge reds two legs this build caused: remote literals in deviation_join.py's fixture remote (TOOL-dTrueNorth-31 S8) and the kickoff-manifest ratchet over three watched files; one micro-unit clears both
+
+2026-10-22T14:06:43Z dispatch · item 490a77bb TOOL-dTrueNorth-33 · reason tools/memory-tree/deviation_join.py memory/guides/SESSION-KICKOFF.md memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-33.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-33-ledger.md memory/builds/dTrueNorth/README.md
+
+2026-10-22T14:06:47Z brief · item TOOL-dTrueNorth-33 · reason b5d9e92ddf68 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-33-build-brief.md

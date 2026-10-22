@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-33 — the two legs the close's bar redded: a fixture remote named through one constant, and the manifest re-stamped past the merge
 
-**Status:** OPEN · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 16
+**Status:** CLOSED · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 16
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-33-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-33-ledger.md) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-33-deviation-41.md](../build/2026-10-22-build-TOOL-dTrueNorth-33-deviation-41.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-33-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-33-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-33-1-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-33-1-spec-writer.md) | journal | — |
