@@ -1410,10 +1410,10 @@ def check_blob_reader():
         got = read_blobs(root, asks)
         real, refused = tree_lib.read_git_output, ""
 
-        def raise_oserror(*_a, **_k):
+        def read_refused(*_a, **_k):        # the stand-in reader, refusing as a failed spawn does
             raise OSError("the stand-in reader cannot start")
 
-        tree_lib.read_git_output = raise_oserror
+        tree_lib.read_git_output = read_refused
         try:
             read_blobs(root, asks)
         except Unmeasured as exc:
