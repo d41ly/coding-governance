@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0018@ed08a364 whole
 
@@ -9,7 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md) | deviation | — |
-| [2026-10-23-build-TOOL-dSafePassage-1-deviation-12.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-12.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 
 <!-- /gen:spec-records -->
@@ -481,9 +482,10 @@ branch has not landed.
   (b) leaves the tree between the unit's commit and the landing with a registry row and a file that
   disagree. (a) survives veto 1, and if the landed guard refuses a value-preserving step write it
   fails only veto 3. Recommendation (a), rung 5, "Standing ruling takes it (Recommended)" (ER:388):
-  the build run re-grounds against the landed guard first, and only where it refuses, admits the one
-  step-write shape whose every `budgets.*` value reads unchanged through the reader, recorded as
-  `memory/builds/dSafePassage/build/2026-10-23-build-TOOL-dSafePassage-1-deviation-12.md`.
+  the one step-write shape whose every `budgets.*` value reads unchanged through the reader is asked
+  of dGroundRules as `TOOL-dGroundRules-13` in `memory/builds/dGroundRules/BACKLOG.md`, since this
+  run reaches another build only through an ask row, and the build run re-grounds against the guard
+  dGroundRules lands before S7 writes gov's policy file.
   RESOLVED (agent, 2026-10-23, delegated): (a) · widens: the minimal guard's admitted agent-write
   shapes, by one value-preserving step write of the policy file, only where the landed guard refuses
   it · relaxes: none.
@@ -513,6 +515,10 @@ branch has not landed.
 - rev-1 · 2026-10-23 · initial draft, from the spec brief
   `memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md` and the
   packet's Items 1.
+- rev-2 · 2026-10-23 · §8 F8 cites the ask `TOOL-dGroundRules-13` in place of the withdrawn
+  deviation-12, whose clause is dGroundRules', and says the build run re-grounds against the guard
+  dGroundRules lands, from
+  `memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md`.
 
 ## 10. Reuse audit
 

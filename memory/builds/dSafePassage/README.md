@@ -79,7 +79,7 @@ ids TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassag
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it](spec/2026-10-23-spec-TOOL-dSafePassage-3.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left](spec/2026-10-23-spec-TOOL-dSafePassage-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal](spec/2026-10-23-spec-TOOL-dSafePassage-4.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
@@ -94,7 +94,7 @@ ids TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassag
 | [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | OPEN | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 11 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -112,7 +112,7 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 13 spec(s) at 
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: 0 (none)
-- stale: 1 (cl-dClosedLoop-0018)
+- stale: 3 (cl-dClosedLoop-0018, cl-dClosedLoop-0028, cl-dClosedLoop-0030)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
 - specs derived from no clause: none
