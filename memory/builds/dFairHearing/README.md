@@ -99,13 +99,13 @@ ids TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHea
 | [TOOL-dFairHearing-10 — the review records brought back in line with the code at their sources, each live copy re-rendered](spec/2026-10-23-spec-TOOL-dFairHearing-10.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dFairHearing-12 — the scorer factory: one replay scorer, with aScoutedSeam's grader as its second instance](spec/2026-10-23-spec-TOOL-dFairHearing-12.md) | 13 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dFairHearing-14 — the experiment shape's method, enforced or recorded by the scorer factory](spec/2026-10-23-spec-TOOL-dFairHearing-14.md) | 14 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-1.md) | 15 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches](spec/2026-10-23-spec-TOOL-dFairHearing-1.md) | 15 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-15 — the review's bug-class checklist, selected by the pinned range and handed by the harness itself](spec/2026-10-23-spec-TOOL-dFairHearing-15.md) | 16 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record](spec/2026-10-23-spec-TOOL-dFairHearing-17.md) | 17 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record](spec/2026-10-23-spec-TOOL-dFairHearing-17.md) | 17 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dFairHearing-18 — the whole-design walk as a preset of the design audit, and its recall grade](spec/2026-10-23-spec-TOOL-dFairHearing-18.md) | 18 | 2 | OPEN | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 10 bound to this build, across 3 record folder(s).
+Records: 14 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -123,7 +123,7 @@ Coverage of dFairHearing's 18 clause(s) and 10 owned node(s), over 18 spec(s) at
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: 0 (none)
-- stale: 2 (cl-dClosedLoop-0068, cl-dClosedLoop-0084)
+- stale: 0 (none)
 - ambiguous: 0 (none)
 - owned nodes no spec names: none
 - specs derived from no clause: none

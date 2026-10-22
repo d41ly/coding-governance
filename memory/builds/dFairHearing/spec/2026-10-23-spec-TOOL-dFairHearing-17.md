@@ -1,8 +1,8 @@
 # TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
 
-**Carries:** cl-dClosedLoop-0084@5c5896a3 whole
+**Carries:** cl-dClosedLoop-0084@b793fdd5 whole
 
 **Carries:** node:record-kind.review
 
@@ -11,6 +11,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-17-deviation-171.md](../build/2026-10-23-build-TOOL-dFairHearing-17-deviation-171.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-amend-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-amend-fix-brief.md) | research | TOOL-dFairHearing-1 |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md) | research | TOOL-dFairHearing-1 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-18 |
 
@@ -367,6 +369,9 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
 
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 17, the brief's S8, the driver's
   `review_state` and the harness's returns read at base `3708a705`.
+- rev-2 · 2026-10-23 · §8 F4 · the `**Carries:**` pin moves from `5c5896a3` to `b793fdd5`, following
+  the `amends cl-dClosedLoop-0084@5c5896a3` row of this spec's own deviation record,
+  `2026-10-23-build-TOOL-dFairHearing-17-deviation-171`; nothing else changed.
 
 ## 10. Reuse audit
 
