@@ -664,25 +664,24 @@ def check_cutoff_relation(root, key, value):
 
 
 def read_conf_key(root, key):
-    """One key out of `.memory-tree.conf`, by plain assignment. Absent or blank means OFF."""
+    """One key out of `.memory-tree.conf`. Absent or blank means OFF.
+
+    ONE CONF GRAMMAR (TOOL-dTrueNorth-20 S19): every line goes through `tree_lib.parse_conf_line`, the
+    memory-tree kit's parser, loaded by path from the kit beside this file as the generator is, so the
+    LAST declaration of a key wins and an `export ` prefix is read as bash reads it, the way the
+    carries keys' `design_lib.read_design_conf` reads them. A quoted value ends at its matching quote
+    and an unquoted one at a `#` beginning a word; whitespace right after `=` ends the assignment.
+    """
     p = root / ".memory-tree.conf"
     if not p.exists():
         return ""
-    m = re.search(r'^%s=(.*)$' % re.escape(key), p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"), re.M)
-    if not m:
-        return ""
-    # TOOL-aRepatriatedFork-38: a quoted value ends at its matching quote and an unquoted one at a
-    # `#` beginning a word. The old pattern demanded nothing after the closing quote, so a cutoff
-    # carrying a trailing comment read as BLANK, which switches its check off.
-    # rev-3 (C4): whitespace right after `=` ends the assignment, and a `#` begins a comment only
-    # after whitespace, so `K=#x` keeps `#x` and `K= # note` is blank, as bash reads them.
-    if m.group(1)[:1].isspace():
-        return ""
-    v = m.group(1).strip()
-    close = v.find(v[0], 1) if v[:1] in ("'", '"') else -1
-    if close >= 0:
-        return v[1:close].strip()
-    return re.split(r"\s#", v, maxsplit=1)[0].strip()
+    parse_conf_line = load_kit_module("tree_lib").parse_conf_line
+    value = ""
+    for line in p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").split("\n"):
+        kv = parse_conf_line(line)
+        if kv is not None and kv[0] == key:
+            value = kv[1].strip()
+    return value
 
 
 def read_cutoff_key(root, key):

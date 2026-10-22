@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-20 — the round-2 spec audit's 38 minors: declared keys, honest exits, bounded reads, one reader each, and the records that name them
 
-**Status:** OPEN · rev-4 · 2026-10-21 · node d · Tier-2 · base 271aa59d · streams tooling · order 8
+**Status:** CLOSED · rev-4 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-20-deviation-19.md](../build/2026-10-21-build-TOOL-dTrueNorth-20-deviation-19.md) | deviation | — |
 | [2026-10-21-build-TOOL-dTrueNorth-20-deviation-20.md](../build/2026-10-21-build-TOOL-dTrueNorth-20-deviation-20.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-20-deviation-6.md](../build/2026-10-21-build-TOOL-dTrueNorth-20-deviation-6.md) | deviation | — |
+| [2026-10-21-build-TOOL-dTrueNorth-20-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-20-ledger.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-20-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-20-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->

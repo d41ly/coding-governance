@@ -1700,8 +1700,10 @@ if check_selected 30; then
 # so this file spells no second reading of it. The verb exits 1 naming each finding, and 2 when the key
 # rule refuses or the pin cannot be read; both fail here, because a view nobody could render is no
 # clearance. With every DESIGN_* key blank it prints one off line, which is printed here, and exits 0.
-# Under --staged `--staged` is passed through, and the verb runs when a staged path is a deviation
-# record, DESIGN_RECORD, DESIGN_VIEW or the conf, and otherwise prints its held line.
+# Under --staged `--staged` is passed through, and the verb decides, on the render's trigger as check
+# 29's verb does (TOOL-dTrueNorth-20 S20): it runs when a staged path is a build-index input by
+# `check_index_input`, this kit's own code included, or is DESIGN_RECORD or DESIGN_VIEW outside that
+# set, and otherwise prints its held line, which is printed here.
 _c30a=(--check-asbuilt); [ "$STAGED" = 1 ] && _c30a+=(--staged)
 ab30=$("$_PY" "$HERE/gen_build_index.py" "${_c30a[@]}" 2>&1); _c30=$?
 case "$_c30" in

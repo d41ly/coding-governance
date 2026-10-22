@@ -19,6 +19,7 @@ from __future__ import annotations
 import os
 import pathlib
 import re
+import subprocess
 
 # The lifecycle vocabulary, one declaration for the index generator's front-matter check, check 24's
 # rotation grading and the backlog-row census.
@@ -238,3 +239,96 @@ def build_git_env() -> dict:
     env = dict(os.environ)
     env["GIT_GRAFT_FILE"] = "/dev/null"
     return env
+
+
+#: The repository pointers git exports into a hook's environment. A reader started from a hook in a
+#: linked worktree inherits a `GIT_DIR` naming a different tree than `root`, and reads it silently.
+GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+                     "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX")
+
+
+def read_git_output(root, argv, stdin=None) -> bytes:
+    """A git command's stdout as bytes, run at `root` under `build_git_env` less `GIT_LOCATION_VARS`, or
+    `OSError` naming the command and git's first stderr line, or why it could not start. A caller
+    reading through it never passes a failed call for an empty answer; each turns the error into its
+    own named refusal."""
+    cmd = ("git", *argv)
+    shown = " ".join(cmd)
+    env = {k: v for k, v in build_git_env().items() if k not in GIT_LOCATION_VARS}
+    try:
+        done = subprocess.run(cmd, cwd=root, input=stdin, capture_output=True, env=env)
+    except OSError as exc:
+        raise OSError(f"`{shown}` could not start: {exc}") from None
+    if done.returncode:
+        first = next((ln.strip() for ln in done.stderr.decode("utf-8", "replace").splitlines() if ln.strip()),
+                     "git printed nothing on stderr")
+        raise OSError(f"`{shown}` exited {done.returncode}: {first}")
+    return done.stdout
+
+
+def read_adding_commits(root, pathspec, wanted) -> dict:
+    """`{path: sha}`, the commit that ADDED each path of `wanted`, the OLDEST where a path was added
+    twice, from ONE `git log --reverse --no-renames --diff-filter=A` at HEAD over ONE glob `pathspec`.
+
+    THE one adding-commit reader (TOOL-dTrueNorth-20 S32): the audit-writer test and the deviation
+    join's pin anchors both call it, so the two cannot disagree on a record deleted and re-added. The
+    argv is constant whatever `wanted` holds, never the paths themselves (TOOL-dTrueNorth-19 S1); every
+    add outside `wanted` is ignored. A path with no add under the pathspec, staged and not committed
+    say, is absent from the answer. A failed git call is `OSError` naming it; an empty `wanted` makes
+    no call.
+    """
+    wanted = set(wanted)
+    if not wanted:
+        return {}
+    log = read_git_output(root, ("log", "--no-renames", "--diff-filter=A", "--reverse", "--format=%x00%H",
+                                  "--name-only", "--", pathspec))
+    added: dict = {}
+    for chunk in log.decode("utf-8", "replace").split("\x00")[1:]:
+        sha, _, names = chunk.partition("\n")
+        for name in names.split("\n"):
+            name = name.rstrip("\r")
+            if name in wanted:
+                added.setdefault(name, sha.strip())      # oldest first, so the first add seen is kept
+    return added
+
+
+def read_blobs_at(root, requests) -> dict:
+    """`{(rev, path): text, or None}` for every `(rev, path)` pair, in ONE `git cat-file --batch`.
+
+    THE one `<rev>:<path>` bytes reader (TOOL-dTrueNorth-20 S33). THE STREAM IS BYTES: each body is
+    sliced by its header's byte size before it is decoded, because a stream decoded first is shorter
+    than its sizes after any multi-byte character and cuts the next blob short; then it is decoded as
+    UTF-8 with CRLF folded, as a working-tree read is. None for an object the rev does not hold
+    (`missing`, `ambiguous`), for one that is not a blob, its body skipped so the next header is read
+    where it starts, and for one that is not UTF-8. A failed call, a stream ending before a request's
+    header, or a header of no known shape is `OSError` naming it, never a partial answer.
+    """
+    requests = list(dict.fromkeys((str(rev), str(path)) for rev, path in requests))
+    if not requests:
+        return {}
+    data = read_git_output(root, ("cat-file", "--batch"),
+                            "".join(f"{rev}:{path}\n" for rev, path in requests).encode("utf-8"))
+    out: dict = {}
+    at = 0
+    for rev, path in requests:
+        end = data.find(b"\n", at)
+        if end < 0:
+            raise OSError(f"`git cat-file --batch` ended before {rev}:{path}, so its blob cannot be read")
+        head, at = data[at:end], end + 1
+        if head.endswith((b" missing", b" ambiguous")):
+            out[(rev, path)] = None
+            continue
+        fields = head.rsplit(b" ", 2)
+        if len(fields) != 3 or not fields[2].isdigit():
+            raise OSError(f"`git cat-file --batch` answered `{head.decode('utf-8', 'replace')}` for {rev}:{path}, "
+                          "so its blob cannot be read")
+        size = int(fields[2])
+        body, at = data[at:at + size], at + size + 1
+        if fields[1] != b"blob":
+            out[(rev, path)] = None
+            continue
+        try:
+            out[(rev, path)] = body.decode("utf-8").replace("\r\n", "\n")
+        except UnicodeDecodeError:
+            out[(rev, path)] = None
+    return out

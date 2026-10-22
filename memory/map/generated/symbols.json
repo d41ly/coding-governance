@@ -4588,6 +4588,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "check_one_probe",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "check_operand",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
@@ -5226,6 +5231,11 @@
       "id": "check_spec_audit",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "check_spec_run",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "check_ssh_keepalive",
@@ -12450,7 +12460,7 @@
     {
       "id": "read_adding_commits",
       "kind": "function",
-      "file": "tools/memory-tree/deviation_join.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_advertised_head",
@@ -12676,6 +12686,11 @@
       "id": "read_blobs",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "read_blobs_at",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_blobs_at_rev",
@@ -13288,11 +13303,6 @@
       "file": "tools/run-gates/held_halves.py"
     },
     {
-      "id": "read_git_bytes",
-      "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
-    },
-    {
       "id": "read_git_dirs",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -13301,6 +13311,11 @@
       "id": "read_git_lines",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_git_output",
+      "kind": "function",
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_git_path",
@@ -14318,6 +14333,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "read_roster_at",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "read_roster_family",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -14621,6 +14641,11 @@
       "id": "read_spec_words",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_sr_close",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "read_staged_paths",
@@ -19743,6 +19768,21 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "run_sr",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_sr_add",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_sr_defer",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
       "id": "run_stop",
       "kind": "function",
       "file": "tools/hooks/format-guard.test.sh"
@@ -20188,6 +20228,11 @@
       "file": "tools/check-kit-placeholders.py"
     },
     {
+      "id": "scan_consumes_cycles",
+      "kind": "function",
+      "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
       "id": "scan_corpus",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -20331,6 +20376,11 @@
       "id": "scan_js_definitions",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "scan_landed_carry",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
     },
     {
       "id": "scan_landing_nodes",
@@ -20928,9 +20978,19 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "seed_spc",
+      "kind": "function",
+      "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
       "id": "seed_spec_h1",
       "kind": "function",
       "file": "tools/memory-recall/selftest.py"
+    },
+    {
+      "id": "seed_sr_fixture",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "seed_ssh_fixture",
@@ -21066,6 +21126,11 @@
       "id": "set_share_rule",
       "kind": "function",
       "file": "tools/run-gates/run-gates.turnstile.test.sh"
+    },
+    {
+      "id": "set_sr_landed",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "set_tool_root",
@@ -24646,6 +24711,21 @@
       "id": "write_specimen",
       "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "write_sr_backlog",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_sr_commit",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "write_sr_units",
+      "kind": "function",
+      "file": "tools/unattended/unattended.test.sh"
     },
     {
       "id": "write_staged",

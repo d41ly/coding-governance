@@ -324,20 +324,85 @@ read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 w
 # WHAT IT DOES NOT CHECK: that the id is a unit of the same build, or that the block is well-formed.
 # Both are the hygiene engine's findings; a malformed block that engine reds reads here as fewer edges,
 # which is the direction that blocks nothing — so the engine is the guard and this is the reader.
+#
+# `--scan <spec>...` (TOOL-dTrueNorth-20 S6) is the same walk over many specs in ONE awk, printing
+# `<spec> TAB <id>` per edge and `<spec> TAB` (no id) per consumes-from line of an Edges block from
+# which no id is read — a column-0 bullet headed `**consumes-from**` whose head is not followed by
+# whitespace, or whose payload is neither a backticked id nor `external` — so `scan_consumes_cycles`
+# below can refuse the shape this reader alone reads as fewer edges. The `external` form is well
+# formed, names no unit, and prints nothing in either mode; a wrapped or indented line that only
+# mentions the verb is prose, as the hygiene engine reads it, and is no edge.
 read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes from, one per line
-  [ -r "$1" ] || return 0
-  awk '
+  local mode=ids
+  if [ "${1:-}" = --scan ]; then mode=scan; shift; else [ -r "${1:-}" ] || return 0; fi
+  [ "$#" -gt 0 ] || return 0
+  awk -v mode="$mode" '
+    FNR == 1 { in3 = 0; ined = 0 }
     { sub(/\r$/, "") }
     /^## / { in3 = ($0 ~ /^## [0-9]+[.] Non-goals/); ined = 0; next }
     !in3 { next }
     /^### / { ined = ($0 ~ /^### Edges[ \t]*$/); next }
     !ined { next }
-    /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/ {
-      t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
-      if (t !~ /^`/) next
-      sub(/^`/, "", t); sub(/`.*$/, "", t)
-      if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) print t
-    }' "$1"
+    /^(-|\*)[ \t]*\*\*consumes-from\*\*/ {
+      id = ""
+      if ($0 ~ /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/) {
+        t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
+        if (t ~ /^external([ \t]|$)/) next
+        if (t ~ /^`/) {
+          sub(/^`/, "", t); sub(/`.*$/, "", t)
+          if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) id = t
+        }
+      }
+      if (mode == "ids") { if (id != "") print id; next }
+      printf "%s\t%s\n", FILENAME, id
+    }' "$@"
+}
+
+# ------------------------------------------------------- a cycle among a build's consumes-from edges
+# TOOL-dTrueNorth-20 S6. `--dispatch` refuses a consumer while its producer is open, and an edge set
+# that holds a CYCLE has no order that satisfies that refusal: every unit on it waits on another, so
+# the run wedges at `--dispatch` with no named stop. And a malformed edge line reads as FEWER edges,
+# which blocks nothing. So this walks every unit's edges at once and names both shapes.
+#
+# ARGUMENTS are `<unit> <spec>` pairs, the build's units in the caller's order. It prints one
+# `unreadable TAB <spec>` line per spec holding a consumes-from line `read_consumes_from` reads no id
+# from, then at most one `cycle TAB <a> -> <b> -> <a>` line, the FIRST cycle a depth-first walk in
+# the given order meets, a self-edge being `<a> -> <a>`. An edge onto an id that is no unit given is
+# not followed: an edge onto another build blocks nothing here. Nothing printed is a clean edge set.
+# ONE `read_consumes_from --scan` and ONE awk, whatever the unit count.
+scan_consumes_cycles() { # <unit> <spec> ... -> unreadable/cycle lines, nothing when clean
+  local _sc_specs=() _sc_i
+  [ "$#" -ge 2 ] || return 0
+  for ((_sc_i = 2; _sc_i <= $#; _sc_i += 2)); do _sc_specs+=("${!_sc_i}"); done
+  { printf 'U\t%s\t%s\n' "$@"; read_consumes_from --scan "${_sc_specs[@]}"; } | awk -F'\t' '
+    function visit(u,    i, v, k, j, s) {
+      color[u] = 1; stack[++sp] = u
+      for (i = 1; i <= deg[u]; i++) {
+        v = adj[u, i]
+        if (color[v] == 1) {
+          k = sp
+          while (k > 1 && stack[k] != v) k--
+          s = ""
+          for (j = k; j <= sp; j++) s = s stack[j] " -> "
+          cyc = s v
+          return 1
+        }
+        if (color[v] == 0 && visit(v)) return 1
+      }
+      color[u] = 2; sp--
+      return 0
+    }
+    $1 == "U" && NF == 3 { order[++n] = $2; unit_of[$3] = $2; isunit[$2] = 1; next }
+    {
+      if ($2 == "") { if (!(($1) in bad)) { bad[$1] = 1; print "unreadable\t" $1 }; next }
+      u = unit_of[$1]
+      if (u == "" || !($2 in isunit)) next
+      if ((u, $2) in seen) next
+      seen[u, $2] = 1; adj[u, ++deg[u]] = $2
+    }
+    END {
+      for (i = 1; i <= n; i++) if (color[order[i]] == 0 && visit(order[i])) { print "cycle\t" cyc; exit }
+    }'
 }
 
 # ------------------------------------------------------------------------ the gate profile, once

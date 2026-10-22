@@ -241,6 +241,25 @@ arm('pin: a pinned subject proceeds', { kind: 'spec-audit', round: 1, subjects: 
   ck(rendered === '**Serves:** spec-audit TOOL-x-1@rev-3 TOOL-x-2@rev-1',
     'pin: renderAuditBinding pins each subject in subject order: ' + JSON.stringify(rendered))
 }
+// ---- TOOL-dTrueNorth-20 AC13 (S14) — THE PRODUCER PINS THE READER'S LITERAL. The memory-tree kit's
+// gen_build_index.py exempts a spec-audit record whose harness, at its adding commit, defines no function
+// named by its AUDIT_WRITER_MARK constant, its one spelling of it. This arm reads that constant out of the
+// file and asserts this harness defines the function, so renaming it reds THIS suite, before the reader
+// is stranded and every unpinned record reads as an older harness's. The kit is the one the gotchas arms
+// resolve, passed as the third argument; a kit that is not there fails the arm naming why.
+{
+  const mtd = process.argv[4] || ''
+  let mark = null
+  let why = ''
+  try {
+    const m = /^AUDIT_WRITER_MARK = "([A-Za-z_$][\w$]*)"\s*$/m.exec(fs.readFileSync(require('path').join(mtd, 'gen_build_index.py'), 'utf8'))
+    if (m) mark = m[1]
+    else why = 'gen_build_index.py spells no AUDIT_WRITER_MARK = "<name>" line'
+  } catch (e) { why = "the memory-tree kit's gen_build_index.py could not be read: " + e.message }
+  const defined = mark !== null && new RegExp('^(?:export\\s+)?(?:async\\s+)?function\\s+' + mark.replace(/\$/g, '\\$') + '\\s*\\(', 'm').test(src)
+  ck(defined, 'mark: the harness defines the function AUDIT_WRITER_MARK names in gen_build_index.py (' + (mark || why) +
+    '), so a rename reds here before it strands that reader')
+}
 // ---- TOOL-dTrueNorth-13 AC1 — TWO subject classes, told apart by path. A subject whose path holds no
 // builds/<slug>/spec/ segment is a DESIGN subject: its id is required in the same grammar, a `rev` on it
 // is refused naming the field, and it is exempt from the repeat refusal, which runs over spec subjects
@@ -2092,7 +2111,7 @@ if [ -z "$bd_why" ]; then
 fi
 [ -z "$bd_why" ] || printf 'PRODUCER-FAILED %s\n' "$bd_why" > "$BD_OUT"
 
-out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT"); rc=$?
+out=$(node "$TMP/run.js" "$ROOT/$FILE" "$BD_OUT" "$bd_mtd"); rc=$?
 printf '%s\n' "$out"
 
 # The arms run inside a node process, so the count crosses a process boundary and this shell cannot
@@ -2194,7 +2213,9 @@ printf '%s\n' "$out"
 # subject-class arms (4), the mixed binding, the subjects line and the pin over a bare first sight (3),
 # the synthesis prompt's rendered Reviewed: line (1) and a whole design audit's synthesis (1). Counted
 # by hand, not by a run: the pass runs no suite.
-FLOOR_ASSERTIONS=342
+# RAISED 342 -> 343 by TOOL-dTrueNorth-20: 1 assertion, the `mark:` arm, the harness defining the function
+# gen_build_index.py's AUDIT_WRITER_MARK names. Counted by hand, not by a run: the pass runs no suite.
+FLOOR_ASSERTIONS=343
 executed=$(printf '%s\n' "$out" | sed -n 's/^---- \([0-9][0-9]*\) passed.*/\1/p' | tail -1)
 if [ -z "$executed" ]; then
   echo "FAIL the runner printed no assertion count at all — it died before its summary line"

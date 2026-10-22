@@ -36,7 +36,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RAISED 168 -> 176 by TOOL-dTrueNorth-16: its unparsed-header arm and the restore after it, its two
 # conf-read arms and its four one-reader probe arms, each top-level. Counted by reading; OWED: observed
 # at the close.
-FLOOR_ASSERTIONS=176
+# RAISED 176 -> 181 by TOOL-dTrueNorth-20: its two conf-grammar arms, its two one-grammar probe arms and
+# its one date-pattern arm, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=181
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1469,13 +1471,13 @@ import deviation_join as dj
 spec = importlib.util.spec_from_file_location("cst", lint)
 cst = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cst)
-calls, real = [], dl.run_git
+calls, real = [], subprocess.run
 def counted(*a, **k):
     calls.append(1)
     return real(*a, **k)
-dl.run_git = counted
+subprocess.run = counted
 revs = dl.read_spec_revisions(".", [path])[path]
-dl.run_git = real
+subprocess.run = real
 shown = subprocess.run(["git", "show", revs[-1][0] + ":" + path], capture_output=True).stdout.decode("utf-8").replace("\r\n", "\n")
 print("AC10 revisions", len(revs), "after", "equal" if revs[-1][2] == shown else "differs", "spawns", len(calls))
 seen, orig = [], dl.read_spec_revisions
@@ -1500,6 +1502,47 @@ check_rev_probe "read_spec_revisions reads bytes: the last revision after a mult
 check_rev_probe "read_carries_specs and the deviation population read one revision reader" "AC12 one reader True"
 check_rev_probe "scan_carries parses no status: a WONTDO carrier handed past the filter collides" "AC9 scan_carries parses no status True"
 check_rev_probe "the checker's SPEC_DATE is design_lib's one compiled pattern" "AC32 one date pattern True"
+# TOOL-dTrueNorth-20 AC18 AC21 AC22 — ONE conf grammar, ONE row grammar and ONE date pattern, in-process.
+# AC18: a cutoff key outside the carries keys, declared twice and then behind `export `, reads its LAST
+# value through `read_conf_key`, red against the base reader, which took the first declaration and read
+# the exported one as blank. AC21: the view's row grammar and the checker's date pattern are design_lib's
+# own objects, and no `re.compile`/`re.match`/`re.search`/`re.fullmatch` call in asbuilt_view.py takes a
+# string literal for its pattern, red against a second grammar compiled there. AC22: the date pattern's
+# text is spelled in design_lib.py alone, red against a second copy in the checker.
+d=$base/one-grammar; mkdir -p "$d"
+one_out=$(cd "$d" && "$PY" -c 'import ast, importlib.util, pathlib, sys
+kit, lint = sys.argv[1:3]
+sys.path.insert(0, kit)
+import asbuilt_view, design_lib
+spec = importlib.util.spec_from_file_location("cst20", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+root = pathlib.Path(".")
+for name, text in (("twice", "SPEC_GUARD_LEGS_CUTOFF=\"2026-01-01\"\nSPEC_GUARD_LEGS_CUTOFF=\"2026-02-02\"\n"),
+                   ("export", "export SPEC_GUARD_LEGS_CUTOFF=\"2026-03-03\"\n")):
+    (root / ".memory-tree.conf").write_text(text, encoding="utf-8")
+    print("AC18", name, cst.read_conf_key(root, "SPEC_GUARD_LEGS_CUTOFF"))
+print("AC21 one row grammar", asbuilt_view.VIEW_ROW is design_lib.VIEW_ROW, "one date pattern",
+      cst.SPEC_DATE is design_lib.SPEC_FILE_DATE)
+tree = ast.parse(pathlib.Path(asbuilt_view.__file__).read_text(encoding="utf-8"))
+print("AC21 literal patterns", [n.lineno for n in ast.walk(tree) if isinstance(n, ast.Call)
+      and isinstance(n.func, ast.Attribute) and isinstance(n.func.value, ast.Name) and n.func.value.id == "re"
+      and n.func.attr in ("compile", "match", "search", "fullmatch") and n.args
+      and isinstance(n.args[0], ast.Constant) and isinstance(n.args[0].value, str)])' "$HERE/memory-tree" "$LINT" 2>&1)
+check_one_probe() {   # $1 label · $2 the probe line it must print
+  case "$one_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$one_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_one_probe "a cutoff declared twice reads its last declaration through read_conf_key" "AC18 twice 2026-02-02"
+check_one_probe "a cutoff behind export reads as bash reads it through read_conf_key" "AC18 export 2026-03-03"
+check_one_probe "the view's row grammar and the checker's date pattern are design_lib's own" "AC21 one row grammar True one date pattern True"
+check_one_probe "no re call in asbuilt_view.py compiles a string-literal pattern" "AC21 literal patterns []"
+date_in_lint=$(grep -c -F '[0-9]{2})-spec-' "$LINT")
+date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$HERE/memory-tree/design_lib.py")
+if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then
+  echo "arm ok    the spec filename date's pattern is spelled in design_lib.py alone"; pass=$((pass+1))
+else
+  echo "arm FAIL  the spec filename date's pattern is spelled in design_lib.py alone — checker $date_in_lint, design_lib $date_in_lib"; fail=$((fail+1))
+fi
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

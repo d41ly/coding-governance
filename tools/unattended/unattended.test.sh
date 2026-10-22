@@ -6413,6 +6413,25 @@ sed -i 's/^\*\*Status:\*\* OPEN /**Status:** CLOSED /' memory/builds/tRun/spec/o
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
 n=$((n+1)); case "$o" in *"dispatch declared"*) echo "ok   dispatch: the same consumer proceeds once its producer's spec is CLOSED" ;; *) echo "FAIL dispatch: the consumer was REFUSED with its producer CLOSED, so the edge refusal cannot be satisfied -- $o"; st=1 ;; esac
+# ---- TOOL-dTrueNorth-20 S6 - THE EDGE SET'S OWN SHAPE. A consumes-from CYCLE among the build's units has
+# ---- no dispatch order that the edge refusal admits, so it is refused naming the cycle, its producer
+# ---- CLOSED or not; and an Edges bullet from which read_consumes_from reads no id, which that refusal
+# ---- reads as no edge at all, is refused naming its spec. Well formed and acyclic, the same consumer
+# ---- proceeds. RED-first: the driver before this unit declared both refused dispatches.
+printf '# ARCH-tRun-1 — u\n\n**Status:** CLOSED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order 1\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n- **consumes-from** `ARCH-tRun-2` — the edge back\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "--dispatch declares a build pass while this build's consumes-from edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: ARCH-tRun-1 -> ARCH-tRun-2 -> ARCH-tRun-1"
+sed -i '/^### Edges$/,/ — the edge back$/d' memory/builds/tRun/spec/one.md
+sed -i 's/^- \*\*consumes-from\*\* `ARCH-tRun-1`/- **consumes-from**`ARCH-tRun-1`/' memory/builds/tRun/spec/two.md
+git add memory/builds/tRun/spec/one.md memory/builds/tRun/spec/two.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read"
+hit "$o" "or the word external: memory/builds/tRun/spec/two.md"
+sed -i 's/^- \*\*consumes-from\*\*`ARCH-tRun-1`/- **consumes-from** `ARCH-tRun-1`/' memory/builds/tRun/spec/two.md
+git add memory/builds/tRun/spec/two.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "dispatch declared"
 # Restore the passing-case spec and the one-unit README the arms below read.
 git rm -q --cached memory/builds/tRun/spec/two.md >/dev/null 2>&1; rm -f memory/builds/tRun/spec/two.md
 cp "$TMP/edge-readme" memory/builds/tRun/README.md

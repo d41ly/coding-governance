@@ -4244,7 +4244,7 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
   chit 30 "2026-09-02-build-ARCH-dAlpha-1-deviation-1: departs from cl-dAlpha-0001 and carries no amends or supersedes row"
   rm -f "$C29/$C29G"
   out=$(run_cov29_gate --only 30); r30rc=$?
-  n=$((n+1)); case "$r30rc:$out" in 0:*"memory-hygiene: check 30: as-built — 0 verdict(s) over memory/design/view.md, clean"*) ;; *) echo "FAIL check 30 through the engine: the clean view exited $r30rc, or check 30 printed no clean count line:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1 ;; esac
+  n=$((n+1)); case "$r30rc:$out" in 0:*"memory-hygiene: check 30: as-built clean · 0 deviation records"*) ;; *) echo "FAIL check 30 through the engine: the clean view exited $r30rc, or check 30 printed no clean count line:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1 ;; esac
   sed -i 's|^DESIGN_BASELINE=.*$|DESIGN_BASELINE="0000000000000000000000000000000000000000"|' "$C29/.memory-tree.conf"
   out=$(run_cov29_gate --only 30); r30rc=$?
   n=$((n+1)); [ "$r30rc" = 1 ] || { echo "FAIL check 30 through the engine: a pin naming no commit exited $r30rc, not 1"; st=1; }

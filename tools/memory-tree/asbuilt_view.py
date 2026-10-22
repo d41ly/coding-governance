@@ -30,10 +30,13 @@ THE RULE (TOOL-dTrueNorth-8, widened by TOOL-dTrueNorth-17), superseding TOOL-dT
 non-goal and §4 Migration sentence on the view's bytes. The view's inputs are DESIGN_RECORD at
 DESIGN_BASELINE, every record the instrument's glob names, read as above, and the render's code, which
 renders and compares it: this file, `design_lib.py` and the host calls in `gen_build_index.py`.
-A commit adding or editing a record the glob `*/build/*-deviation-*.md` matches re-renders the view
-in that same commit, and so does a commit changing the render's code: `gen_build_index.py --write` is
+The trigger is worded from that input set (TOOL-dTrueNorth-20 S38): a commit that changes any view
+input, a record matching the glob `*/build/*-deviation-*.md` added, edited, moved or taken out, a
+`DESIGN_*` key changed, or the render's code changed, re-renders the view in that same commit:
+`gen_build_index.py --write` is
 the one writer that re-renders it, and no byte of the view is edited by hand. Check 9 holds the rule
-at the commit: a staged record is a build-index input by `check_index_input`, and so is a staged path
+at the commit: a staged record, an added, modified or deleted one, is a build-index input by
+`check_index_input`, and so are a staged conf and a staged path
 under this kit's directory, so `--check --staged` renders rather than skips, and lists a view stale
 against its inputs under `build-index DRIFT`. A `--no-verify` commit skips check 9; the full `--check`
 still reads the view.

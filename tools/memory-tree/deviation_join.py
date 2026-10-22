@@ -125,7 +125,7 @@ import routed_commits  # noqa: E402  the host: its log pass, its routed-path tes
 from design_lib import (  # noqa: E402  the one parser of the design
     DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_keys, read_design_view, read_spec_revisions,
     scan_chain_specs, write_design_fixture)
-from tree_lib import parse_conf, parse_spec_h1  # noqa: E402
+from tree_lib import parse_conf, parse_spec_h1, read_adding_commits  # noqa: E402
 
 SAY = "deviation"
 POLICIES = ("report", "refuse")
@@ -313,21 +313,6 @@ def read_first_passes(commits, units, entries, when):
     return first
 
 
-def read_adding_commits(root, rels):
-    """`{rel: the commit that added it}`, the oldest add where a path was added twice, from ONE log."""
-    if not rels:
-        return {}
-    raw = run_git(root, "log", "--no-renames", "--diff-filter=A", "--format=%x00%H", "--name-only", "HEAD", "--",
-                  *rels)
-    added = {}
-    for chunk in (raw or b"").decode("utf-8", "replace").split("\x00")[1:]:
-        sha, _, names = chunk.partition("\n")
-        for name in names.split("\n"):
-            if name.strip():
-                added[name.strip()] = sha.strip()       # newest first, so the last one seen is the oldest
-    return added
-
-
 def read_row_commit(root, row, path):
     """The commit that added `row` to `path`, `git log --reverse -S` as `deviations.py:378-380` finds it."""
     out = (run_git(root, "log", "--reverse", "--format=%H", f"-S{row}", "HEAD", "--", path) or b"").split()
@@ -339,7 +324,13 @@ def read_gen_region_awk(resolve=None):
     the file and never copied into this module, so check 23 and this join strip one way (P0.1 row 8a). The
     kit is the one `backlog.resolve_kit_dir` finds, or `resolve`'s, a stand-in a caller injects taking the
     same three arguments, as `gen_build_index.read_landed_unclosed` takes one (TOOL-dTrueNorth-12 S1). A kit
-    that does not resolve, or whose library cannot be read, raises `LookupError` naming the kit."""
+    that does not resolve, or whose library cannot be read, raises `LookupError` naming the kit.
+
+    A RESOLVED KIT THAT CANNOT STRIP IS THE UNRESOLVED KIT (TOOL-dTrueNorth-20 S16): a library holding no
+    single-line `GEN_REGION_AWK='…'`, or more than one, an empty value, and a PATH with no `awk` to run it
+    each raise the same `LookupError`, naming the file and the variable, so the live join exits 2 and the
+    fixture prints its named SKIP. An empty program prints nothing, so every revision would read as
+    status-only and the population would be empty while the join reported green over it."""
     import backlog       # the sibling-kit resolver, loaded only where the strip is asked for
     try:
         lib = pathlib.Path((resolve or backlog.resolve_kit_dir)("unattended", "lib-unattended.sh", str(KIT)),
@@ -350,8 +341,14 @@ def read_gen_region_awk(resolve=None):
                           f"resolve: {exc}") from None
     found = re.findall(r"^GEN_REGION_AWK='([^']*)'$", text, flags=re.M)
     if len(found) != 1:
-        raise Unmeasured(f"the generated-region strip needs {lib.as_posix()}'s one GEN_REGION_AWK; found "
-                         f"{len(found)}")
+        raise LookupError(f"{lib.as_posix()} holds {len(found)} single-line GEN_REGION_AWK='…' assignments, not "
+                          "one, so the generated-region strip cannot be read")
+    if not found[0].strip():
+        raise LookupError(f"{lib.as_posix()} holds an empty GEN_REGION_AWK, and an empty strip prints nothing, so "
+                          "every revision would read as status-only")
+    if not shutil.which("awk"):
+        raise LookupError(f"no awk is on PATH to run {lib.as_posix()}'s GEN_REGION_AWK, so the generated-region "
+                          "strip cannot run")
     return found[0]
 
 
@@ -526,7 +523,13 @@ def read_population(root, conf, commits):
     audits = [r for r in rels if "/reviews/" in r and binds.get(r, {}).get("state") == "bound"
               and binds[r]["kind"] == "spec-audit" and binds[r]["pins"]]
     handbacks = [r for r in rels if "/prompts/" in r and DIVERGENCE.search(read_text(r))]
-    adding = read_adding_commits(root, audits + handbacks)
+    # THE ONE ADDING-COMMIT READER (TOOL-dTrueNorth-20 S32), the audit-writer test's too: the oldest add
+    # of each record, one glob pathspec per folder and the records never on argv.
+    try:
+        adding = {**read_adding_commits(root, f":(glob){memory_root}/builds/*/reviews/**", audits),
+                  **read_adding_commits(root, f":(glob){memory_root}/builds/*/prompts/**", handbacks)}
+    except OSError as exc:
+        raise Unmeasured(f"the records' adding commits cannot be read: {exc}") from None
     candidates = {}
     for rel in audits:
         if adding.get(rel) in when:
@@ -538,7 +541,7 @@ def read_population(root, conf, commits):
     # THE ONE REVISION READER (TOOL-dTrueNorth-16 S12), the carries join's too: each revision with its
     # text at its first parent and at the commit, in two spawns whatever the count.
     try:
-        revisions = read_spec_revisions(root, list(spec_of.values()))
+        revisions = read_spec_revisions(root, list(spec_of.values()), memory_root)
     except DesignRefusal as exc:
         raise Unmeasured(str(exc)) from None
     graded = []

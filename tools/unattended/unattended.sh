@@ -13697,10 +13697,36 @@ verb_dispatch() { # slug · unit · writes...
   # not built still blocks: a consumer needs the producer's code, not its dispatch row. An id that is
   # no unit of the build (`unit_ids_of`) is skipped, so an edge onto another build blocks nothing here.
   # Beside code 49, the question the order gate asks over a second source of the same sequence.
-  # WHAT IT DOES NOT CHECK: a malformed Edges block, which `read_consumes_from` reads as fewer edges
-  # and the hygiene engine reds, and an edge the producer's spec declares in the other direction.
+  # WHAT IT DOES NOT CHECK: an edge the producer's spec declares in the other direction. A malformed
+  # Edges line, which `read_consumes_from` reads as fewer edges, is refused just below.
   local _e_units _e_id _e_spec _e_st _e_block=""
   _e_units=$(unit_ids_of "$slug")
+  # ------------------------------------------- TOOL-dTrueNorth-20 S6, THE EDGE SET'S OWN SHAPE
+  # The refusal below reads edges and blocks on them, so the two shapes that defeat it are refused
+  # first, both under code 49 beside it, over EVERY unit of the build and not the dispatched one
+  # alone: a consumes-from line of a spec's Edges block from which `read_consumes_from` reads no id,
+  # which reads as fewer edges and so blocks nothing, naming each such spec; and a consumes-from
+  # CYCLE among the build's units, a self-edge included, which no dispatch order can satisfy, so the
+  # run would wedge here with no named stop, naming the cycle. ONE `scan_consumes_cycles` call. An
+  # edge onto another build's unit is not followed, as below; the `external` form names no unit.
+  local _c_args=() _c_kind _c_what _c_bad="" _c_cycle=""
+  for _e_id in $_e_units; do
+    [ -n "${SPEC_PATH[$_e_id]:-}" ] && _c_args+=("$_e_id" "${SPEC_PATH[$_e_id]}")
+  done
+  while IFS=$'\t' read -r _c_kind _c_what; do
+    case "$_c_kind" in
+      unreadable) _c_bad="$_c_bad $_c_what" ;;
+      cycle) _c_cycle=$_c_what ;;
+    esac
+  done < <(scan_consumes_cycles "${_c_args[@]}")
+  if [ -n "$_c_bad" ]; then
+    fail 49 "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external:$_c_bad"
+    return 1
+  fi
+  if [ -n "$_c_cycle" ]; then
+    fail 49 "--dispatch declares a build pass while this build's consumes-from edges form a cycle, so no unit on it can be dispatched after its producer closes and the run would wedge here with no named stop: $_c_cycle"
+    return 1
+  fi
   for _e_id in $(read_consumes_from "$_d_spec"); do
     printf '%s\n' "$_e_units" | grep -qxF -- "$_e_id" || continue
     _e_spec="${SPEC_PATH[$_e_id]:-}"; [ -n "$_e_spec" ] || continue

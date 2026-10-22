@@ -595,9 +595,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     message and remedy read only the view's byte drift. Delegated to
     `{{KIT_DIR}}/gen_build_index.py --check-asbuilt`, which renders through the host `--write` writes the
     view with, and a view it cannot render, a partial key set or an unreadable pin, fails as well.
-    With every `DESIGN_*` key blank it prints one line and passes. Under `--staged` it runs only when
-    the commit stages a deviation record, `DESIGN_RECORD`, `DESIGN_VIEW` or the conf, and otherwise
-    prints its held line (`TOOL-dTrueNorth-16`).
+    With every `DESIGN_*` key blank it prints one line and passes. Under `--staged` its trigger is the
+    render's, as check 29's is: it runs when any staged path is a build-index input, the kit's own
+    code included, or is `DESIGN_RECORD` or `DESIGN_VIEW` outside that set, and otherwise prints its
+    held line (`TOOL-dTrueNorth-16`, `TOOL-dTrueNorth-20`).
 
 ## Record bindings — how a record names its spec
 
@@ -664,7 +665,10 @@ approver is graded under one of two values: `author-recorded`, the default, pass
 names, and an owner only citing a decision row held at `origin/main` that names the departed clause or
 the new unit; `by-risk` also refuses a role below the risk class, `editorial` needing an `author`,
 `additive` and `stricter` a `spec writer`, and `loosening`, `breaking` or a cause of `owner ruling` the
-`owner`.
+`owner`. An approval carried for the owner's walk has a decline route: an owner decline is filed as an
+ask naming the record, and its follow-up is a new record naming the declined one in Supersedes, the
+as-built view re-rendered in that commit, so no landed record keeps citing a withdrawn approval
+(`TOOL-dTrueNorth-20`).
 
 ## Acceptance ledger — how a built unit evidences its criteria
 

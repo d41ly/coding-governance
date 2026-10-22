@@ -35,9 +35,10 @@ declaration of a key winning and an `export ` prefix read as bash reads it, so t
 the generator read one value of each key (S14).
 
 ONE REVISION READER, `read_spec_revisions` (S10, S12): every non-merge commit that changed a spec,
-oldest first, with its text before and after, in two git spawns whatever the revision count, the
-stream read as bytes and sliced by each header's size before any blob is decoded. The carries join
-and the deviation population both read it.
+oldest first, with its text before and after, in two git spawns whatever the revision count or the
+path count, the log over one glob pathspec and the blobs through `tree_lib.read_blobs_at`, the kit's
+one bytes reader (TOOL-dTrueNorth-20 S18, S33). The carries join and the deviation population both
+read it.
 
 ONE SPEC FILENAME DATE, `SPEC_FILE_DATE`, the spec-token checker's pattern, which its `SPEC_DATE` is
 bound to (S32), and one fixture design, `write_design_fixture`, which the deviation join's and the
@@ -100,7 +101,8 @@ import sys
 KIT = os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
-from tree_lib import build_git_env, build_spec_path_re, parse_conf, unfenced_lines  # noqa: E402
+from tree_lib import (  # noqa: E402
+    build_git_env, build_spec_path_re, parse_conf, read_blobs_at, read_git_output, unfenced_lines)
 
 _CL = r"cl-d[A-Z]\w+-\d{4}"
 _DECISION = r"[A-Z]+-d[A-Z]\w+-\d+"
@@ -460,59 +462,49 @@ def read_design_keys(root, conf):
     return values
 
 
-def read_spec_revisions(root, paths):
+def read_spec_revisions(root, paths, memory_root="memory"):
     """`{path: [(sha, before, after)]}`, oldest first, for every path of `paths` (S10, S12): one entry per
     non-merge commit that changed it, `before` its text at that commit's first parent, None at its
     creation, and `after` its text at the commit, None at its deletion.
 
-    TWO GIT SPAWNS whatever the revision count: one `git log --full-history --no-merges --no-renames
-    --date-order --reverse` at HEAD over the paths, read without following a rename, and one `git
-    cat-file --batch` for every blob it names. THE STREAM IS BYTES: each body is sliced by its header's
-    byte size before it is decoded, then decoded as UTF-8 with CRLF folded, the discipline
-    `gen_build_index.read_blobs_at_rev` documents, because a stream decoded first is shorter than its
-    byte sizes after any multi-byte character and cuts the next blob short. A failed or truncated call
-    is a refusal naming it.
+    TWO GIT SPAWNS whatever the revision count AND whatever the path count: ONE `git log --full-history
+    --no-merges --no-renames --date-order --reverse` at HEAD over ONE glob pathspec,
+    `:(glob)<memory_root>/builds/*/spec/**/*-spec-*.md`, filtered to `paths` here, never the paths on
+    argv (TOOL-dTrueNorth-20 S18), since a few hundred chain specs on one command line raise
+    [WinError 206]; and one `git cat-file --batch` for every blob it names, through
+    `tree_lib.read_blobs_at`, the kit's one bytes reader (S33). Read without following a rename. A path
+    the pathspec cannot match is a refusal naming it, since it would read as no revisions; so is a log
+    or a batch that fails or cannot start, which the callers exit 2 on.
     """
-    paths = list(dict.fromkeys(str(p) for p in paths))
+    paths = list(dict.fromkeys(str(p).replace("\\", "/") for p in paths))
     out = {p: [] for p in paths}
     if not paths:
         return out
-    r = run_git(root, "log", "-z", "--full-history", "--no-merges", "--no-renames", "--date-order", "--reverse",
-                "--name-only", "--format=%x1e%H%x1f%P%x1f", "HEAD", "--", *paths)
-    if r.returncode:
-        raise DesignRefusal("the spec revision log failed, so no revision was read: "
-                            f"{r.stderr.decode('utf-8', 'replace').strip()}")
+    memory_root = str(memory_root).replace("\\", "/").rstrip("/")
+    pathspec = f":(glob){memory_root}/builds/*/spec/**/*-spec-*.md"
+    inside = re.compile(re.escape(memory_root) + r"/builds/[^/]+/spec/(?:[^/]+/)*[^/]*-spec-[^/]*\.md")
+    outside = [p for p in paths if not inside.fullmatch(p)]
+    if outside:
+        raise DesignRefusal(f"{outside[0]} is outside the revision log's pathspec {pathspec}, so its revisions "
+                            "would read as none" + (f", and {len(outside) - 1} more" if len(outside) > 1 else ""))
+    try:
+        log = read_git_output(root, ("--no-replace-objects", "log", "-z", "--full-history", "--no-merges",
+                                     "--no-renames", "--date-order", "--reverse", "--name-only",
+                                     "--format=%x1e%H%x1f%P%x1f", "HEAD", "--", pathspec))
+    except OSError as exc:
+        raise DesignRefusal(f"the spec revision log failed, so no revision was read: {exc}") from None
     revs = []
-    for rec in r.stdout.decode("utf-8", "surrogateescape").split("\x1e")[1:]:
+    for rec in log.decode("utf-8", "surrogateescape").split("\x1e")[1:]:
         sha, parents, rest = rec.split("\x1f", 2)
         parent = (parents.split() or [None])[0]
         revs += [(p, sha, parent) for p in dict.fromkeys(x for x in re.split(r"[\0\n]", rest) if x) if p in out]
-    asks = list(dict.fromkeys(a for p, sha, parent in revs for a in ([f"{parent}:{p}"] if parent else [])
-                              + [f"{sha}:{p}"]))
-    blobs = {}
-    if asks:
-        r = run_git(root, "cat-file", "--batch", stdin="".join(a + "\n" for a in asks).encode("utf-8"))
-        if r.returncode:
-            raise DesignRefusal("git cat-file --batch over the spec revisions failed, so no revision was read: "
-                                f"{r.stderr.decode('utf-8', 'replace').strip()}")
-        raw, pos = r.stdout, 0
-        for a in asks:
-            nl = raw.find(b"\n", pos)
-            if nl < 0:
-                raise DesignRefusal(f"git cat-file --batch ended before {a}, so the revisions cannot be read")
-            head, pos = raw[pos:nl], nl + 1
-            if head.endswith(b" missing"):
-                blobs[a] = None
-                continue
-            fields = head.rsplit(b" ", 2)
-            if len(fields) != 3 or fields[1] != b"blob" or not fields[2].isdigit():
-                raise DesignRefusal(f"git cat-file --batch answered `{head.decode('utf-8', 'replace')}` for {a}, "
-                                    "so the revisions cannot be read")
-            size = int(fields[2])
-            blobs[a] = raw[pos:pos + size].decode("utf-8", "replace").replace("\r\n", "\n")
-            pos += size + 1
+    asks = list(dict.fromkeys(a for p, sha, parent in revs for a in ([(parent, p)] if parent else []) + [(sha, p)]))
+    try:
+        blobs = read_blobs_at(root, asks)
+    except OSError as exc:
+        raise DesignRefusal(f"the spec revisions' blobs could not be read, so no revision was read: {exc}") from None
     for p, sha, parent in revs:
-        out[p].append((sha, blobs.get(f"{parent}:{p}") if parent else None, blobs.get(f"{sha}:{p}")))
+        out[p].append((sha, blobs.get((parent, p)) if parent else None, blobs.get((sha, p))))
     return out
 
 

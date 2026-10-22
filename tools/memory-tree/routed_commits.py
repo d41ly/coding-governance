@@ -686,6 +686,65 @@ def run_selftest() -> int:
             "composed run still run", out)
         for ok, what, detail in stubbed:
             print_arm(ok, f"under the resolver stub: {what}", detail)
+
+        # ---- TOOL-dTrueNorth-20 AC15 (S16): a RESOLVED kit that cannot strip is the unresolved kit. A
+        # scratch kit whose lib-unattended.sh holds no single-line assignment, then an empty one, then a
+        # good one with no awk on PATH: each raises LookupError naming the file and GEN_REGION_AWK.
+        # Against the base reader the first raised Unmeasured, the second returned '', and every
+        # revision then read as status-only, and the third passed the strip to a run that cannot start.
+        kit20 = root / "kit20"
+        kit20.mkdir()
+        lib20 = kit20 / "lib-unattended.sh"
+        real_which = shutil.which
+        for case, text, which in (("no single-line assignment", "#!/usr/bin/env bash\nOTHER='x'\n", real_which),
+                                  ("an empty value", "GEN_REGION_AWK=''\n", real_which),
+                                  ("no awk on PATH", "GEN_REGION_AWK='{ print }'\n", lambda *_a, **_k: None)):
+            lib20.write_bytes(text.encode("utf-8"))
+            shutil.which = which
+            try:
+                got = f"returned {deviation_join.read_gen_region_awk(lambda *_a: kit20)!r}"
+            except LookupError as exc:
+                got = f"LookupError {exc}"
+            finally:
+                shutil.which = real_which
+            print_arm(got.startswith("LookupError ") and lib20.as_posix() in got and "GEN_REGION_AWK" in got,
+                f"TOOL-dTrueNorth-20 AC15 a resolved kit with {case} raises LookupError naming the file and "
+                "GEN_REGION_AWK", got)
+
+        # ---- TOOL-dTrueNorth-20 AC17 (S18): the revision reader over 601 spec paths, every one at least 98
+        # bytes, returns one revision each through ONE glob pathspec, where the paths on argv raise
+        # [WinError 206]; and a revision log exiting 128 is the named refusal, never an empty history.
+        import design_lib  # noqa: E402  the one revision reader, a sibling
+        specs20 = {f"memory/builds/dAlpha/spec/2026-10-21-spec-TOOL-dAlpha-{n}-a-padded-name-past-ninety-eight-"
+                   f"bytes-{n:03d}.md": f"# TOOL-dAlpha-{n} — one\n" for n in range(1, 602)}
+        repo, _s = build_fixture(root, "revs601", [{"msg": "601 specs", "files": specs20}])
+        try:
+            got = design_lib.read_spec_revisions(repo, list(specs20))
+            seen = f"read {sum(len(v) == 1 for v in got.values())} of {len(got)}"
+        except (OSError, design_lib.DesignRefusal) as exc:
+            seen = f"{type(exc).__name__} {exc}"
+        print_arm(min(len(p.encode("utf-8")) for p in specs20) >= 98 and seen == "read 601 of 601",
+            "TOOL-dTrueNorth-20 AC17 read_spec_revisions over 601 spec paths of at least 98 bytes reads one "
+            "revision each, raising no OSError", seen)
+        stub20 = root / "git_log_stub20.py"
+        stub20.write_bytes(b"import sys\nsys.stderr.write('fatal: the stub refuses git log\\n')\nsys.exit(128)\n")
+        real_run = subprocess.run
+
+        def run_log_stub(argv, *a, **kw):
+            if "log" in tuple(argv[:3]) and tuple(argv[:1]) == ("git",):
+                return real_run((sys.executable, str(stub20)), *a, **kw)
+            return real_run(argv, *a, **kw)
+
+        subprocess.run = run_log_stub
+        try:
+            design_lib.read_spec_revisions(repo, list(specs20))
+            seen = "no refusal"
+        except design_lib.DesignRefusal as exc:
+            seen = str(exc)
+        finally:
+            subprocess.run = real_run
+        print_arm("the spec revision log failed" in seen and "fatal: the stub refuses git log" in seen,
+            "TOOL-dTrueNorth-20 AC17 a revision log exiting 128 raises the named refusal, its stderr line in it", seen)
     finally:
         shutil.rmtree(root, ignore_errors=True)
     print(f"{SAY} selftest: {'all arms held' if not failed else f'{len(failed)} arm(s) FAILED'}")
