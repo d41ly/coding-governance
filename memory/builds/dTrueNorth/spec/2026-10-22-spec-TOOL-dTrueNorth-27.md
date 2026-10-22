@@ -13,6 +13,7 @@
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-28.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-28.md) | deviation | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-29.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-29.md) | deviation | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-30.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-30.md) | deviation | — |
+| [2026-10-22-build-TOOL-dTrueNorth-27-deviation-40.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-40.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-27-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-27-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-27-1-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-1-spec-writer.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-27-2-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-2-spec-writer.md) | journal | — |
