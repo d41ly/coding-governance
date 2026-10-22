@@ -130,7 +130,7 @@ ids TOOL-dTrueNorth-32 TOOL-dTrueNorth-33 TOOL-dTrueNorth-98 TOOL-dTrueNorth-99 
 | [TOOL-dTrueNorth-33 — the two legs the close's bar redded: a fixture remote named through one constant, and the manifest re-stamped past the merge](spec/2026-10-22-spec-TOOL-dTrueNorth-33.md) | 16 | 2 | CLOSED | rev-1 | 2026-10-22 |
 <!-- /gen:build-units -->
 
-Records: 144 bound to this build, across 4 record folder(s).
+Records: 145 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
