@@ -172,3 +172,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T03:27:29Z brief · item TOOL-dTrueNorth-24 · reason e566089e5446 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-24-build-brief.md
 
 2026-10-22T03:36:45Z dispatch · item 5e6acda4 TOOL-dTrueNorth-24 · reason memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-24-ledger.md
+
+2026-10-22T03:39:27Z dispatch · item 6f90a854 TOOL-dTrueNorth-25 · reason tools/memory-tree/check-verdict-epoch.sh tools/memory-tree/check-verdict-epoch.test.sh tools/memory-tree/README.md tools/memory-tree/asbuilt_view.py memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-25.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-25-ledger.md memory/builds/dTrueNorth/README.md
+
+2026-10-22T03:39:32Z brief · item TOOL-dTrueNorth-25 · reason 344568a67a64 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-25-build-brief.md

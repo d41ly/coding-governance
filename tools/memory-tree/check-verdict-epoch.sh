@@ -185,7 +185,13 @@ fi
 # design's one parser; `asbuilt_view.py`, check 30's render; and the spec-token checker beside the
 # kit, check 29's join. The `[ -f ]` guard passes over one an install does not carry, and a `..`
 # segment is folded so every scanned path is the repo-relative spelling git and the receipt print.
-DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py $_recall ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}../check-spec-tokens.py"
+# TOOL-dTrueNorth-25 S1: and the three siblings those delegates import, the same one-hop-short shape
+# found a fourth time — `deviation_join.py`, whose `read_records` is what `asbuilt_view.py` returns
+# for check 30's `--check-asbuilt` to judge, so its record grammar moves that verdict;
+# `routed_commits.py`, which `deviation_join.py` imports at module level; and `backlog.py`, the ask
+# grammar `gen_build_index.py` imports at module level and `row_grammar.py`, `corpus_ids.py` and
+# `merge-rows.py` import lazily. The import-closure check below is what keeps this list whole.
+DELEGATES="${_kit}tree_lib.py ${_kit}row_grammar.py ${_kit}gen_build_index.py ${_kit}corpus_ids.py ${_kit}gotchas.py $_recall ${_kit}merge-rows.py ${_kit}design_lib.py ${_kit}asbuilt_view.py ${_kit}deviation_join.py ${_kit}routed_commits.py ${_kit}backlog.py ${_kit}../check-spec-tokens.py"
 [ -f "$ENGINE" ] || { echo "verdict-epoch: $ENGINE is missing — this gate reads the engine's own source"; exit 2; }
 SCAN="$ENGINE"
 for _d in $DELEGATES; do
@@ -196,6 +202,68 @@ for _d in $DELEGATES; do
   esac
   SCAN="$SCAN $_d"
 done
+
+# THE LIST IS GRADED AGAINST WHAT THE DELEGATES IMPORT (TOOL-dTrueNorth-25 S2). Four times a module a
+# delegate hands off to was missing from DELEGATES, so its change moved a verdict while this gate
+# printed `clean`. One python run reads every `.py` file the scan set holds, as UTF-8, parses it with
+# `ast` and walks every absolute `import` and `from ... import` node in it, nested ones included,
+# since a lazy import in a function is reached the moment that function runs. A first name `<n>` is a
+# sibling when `${_kit}<n>.py` is a file, and each sibling reached is walked the same way. A reached
+# sibling the scan set does not hold exits 2 naming it and its importer; a scanned module that does
+# not parse exits 2 naming it, because its imports were not read; else one line counts every module
+# the walk read. It binds on and off the push boundary, because it grades this gate's own list, not
+# a bump. It over-counts as the gate does: a module only a self-test imports is a delegate.
+# WHAT IT DOES NOT CHECK: a module loaded by computed path, through `importlib` or by a shell
+# invocation, is no edge; a relative import is no sibling; another kit's siblings are not walked;
+# and with no python the walk does not run, which its note line says.
+if [ -n "${_ve_py:-}" ]; then
+  "$_ve_py" -c '
+import ast, os, sys
+kit, scan = sys.argv[1], sys.argv[2:]
+def print_line(line):
+    sys.stdout.buffer.write((line + "\n").encode("utf-8"))
+    sys.stdout.buffer.flush()
+queue = [p for p in scan if p.endswith(".py")]
+read, importer, missing, broken = set(queue), {}, [], []
+for path in queue:
+    try:
+        with open(path, encoding="utf-8") as fh:
+            tree = ast.parse(fh.read(), filename=path)
+    except (OSError, UnicodeDecodeError, SyntaxError, ValueError) as e:
+        broken.append((path, " ".join(("%s: %s" % (type(e).__name__, e)).split())))
+        continue
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            names = [a.name for a in node.names]
+        elif isinstance(node, ast.ImportFrom) and not node.level and node.module:
+            names = [node.module]
+        else:
+            continue
+        for name in names:
+            sib = kit + name.split(".")[0] + ".py"
+            if sib in read or not os.path.isfile(sib):
+                continue
+            read.add(sib)
+            queue.append(sib)
+            importer[sib] = path
+            missing.append(sib)
+dash, tick = chr(0x2014), chr(0x27)
+for sib in missing:
+    print_line("verdict-epoch: FAILED %s %s is imported by %s and is not in DELEGATES, so a change to it moves a verdict this gate never dates; add it to DELEGATES" % (dash, sib, importer[sib]))
+for path, why in broken:
+    print_line("verdict-epoch: FAILED %s %s does not parse, so its imports were not read and the import closure is unknown (%s)" % (dash, path, why))
+if missing or broken:
+    sys.exit(2)
+print_line("verdict-epoch: the delegates%s import closure is %d sibling module(s), every one in DELEGATES" % (tick, len(read)))
+' "$_kit" $SCAN
+  case $? in
+    0) ;;
+    2) exit 2 ;;
+    *) echo "verdict-epoch: FAILED — the delegates' import-closure walk did not finish, so whether DELEGATES is whole is unknown"; exit 2 ;;
+  esac
+else
+  echo "verdict-epoch: note — no usable python, so the delegates' import closure was not checked"
+fi
 
 # The remote ladder (TOOL-dLadderedRemote-2), INLINED byte-identically from the canonical copy
 # named on its marker line and gated by the resolve-python self-test.

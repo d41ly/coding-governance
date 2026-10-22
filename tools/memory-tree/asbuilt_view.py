@@ -28,8 +28,8 @@ THE INPUTS, each read through the kit's one reader of it:
 
 THE RULE (TOOL-dTrueNorth-8, widened by TOOL-dTrueNorth-17), superseding TOOL-dTrueNorth-6's §3
 non-goal and §4 Migration sentence on the view's bytes. The view's inputs are DESIGN_RECORD at
-DESIGN_BASELINE, every record the instrument's glob names, read as above, and the render's code, which
-renders and compares it: this file, `design_lib.py` and the host calls in `gen_build_index.py`.
+DESIGN_BASELINE, every record the instrument's glob names, read as above, and the render's code,
+which renders and compares it: this file, `design_lib.py`, `deviation_join.py` and the host calls in `gen_build_index.py`.
 The trigger is worded from that input set (TOOL-dTrueNorth-20 S38): a commit that changes any view
 input, a record matching the glob `*/build/*-deviation-*.md` added, edited, moved or taken out, a
 `DESIGN_*` key changed, or the render's code changed, re-renders the view in that same commit:

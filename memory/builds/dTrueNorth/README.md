@@ -113,11 +113,11 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-20 — the round-2 spec audit's 38 minors: declared keys, honest exits, bounded reads, one reader each, and the records that name them](spec/2026-10-21-spec-TOOL-dTrueNorth-20.md) | 8 | 2 | CLOSED | rev-4 | 2026-10-22 |
 | [TOOL-dTrueNorth-23 — the kit's glob-pathspec readers strip the four pathspec-mode variables](spec/2026-10-22-spec-TOOL-dTrueNorth-23.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-22 |
 | [TOOL-dTrueNorth-24 — a rescope row in a rotated RUN archive is dated by the commit that wrote it](spec/2026-10-22-spec-TOOL-dTrueNorth-24.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-22 |
-| [TOOL-dTrueNorth-25 — the verdict-epoch gate sees deviation_join.py, and refuses a delegate list its imports outgrow](spec/2026-10-22-spec-TOOL-dTrueNorth-25.md) | 9 | 2 | OPEN | rev-1 | 2026-10-22 |
+| [TOOL-dTrueNorth-25 — the verdict-epoch gate sees deviation_join.py, and refuses a delegate list its imports outgrow](spec/2026-10-22-spec-TOOL-dTrueNorth-25.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-22 |
 | [TOOL-dTrueNorth-26 — the closing diff review's minors: one scrubbed runner, one spec predicate, tracked records, one clause grammar, honest edges, and the comments that name them](spec/2026-10-22-spec-TOOL-dTrueNorth-26.md) | 10 | 2 | OPEN | rev-1 | 2026-10-22 |
 <!-- /gen:build-units -->
 
-Records: 86 bound to this build, across 4 record folder(s).
+Records: 87 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
