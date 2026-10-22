@@ -4993,6 +4993,11 @@
       "file": "tools/process-monitor/scope.py"
     },
     {
+      "id": "check_rotated_dates",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "check_rotation",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"

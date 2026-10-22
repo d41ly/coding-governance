@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-24 — a rescope row in a rotated RUN archive is dated by the commit that wrote it
 
-**Status:** OPEN · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 9
+**Status:** CLOSED · rev-1 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 9
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-24-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-24-ledger.md) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-24-deviation-23.md](../build/2026-10-22-build-TOOL-dTrueNorth-24-deviation-23.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-24-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-24-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-23-spec-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-23-spec-brief.md) | research | TOOL-dTrueNorth-23 TOOL-dTrueNorth-25 |

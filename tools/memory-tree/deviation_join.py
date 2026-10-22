@@ -30,7 +30,9 @@ THE POPULATION, six arms over the chain builds' specs, the chain builds being th
   - an `amended rev-N` ledger line under an `**Evidences:** <unit>` block of a `journal` record,
     `<unit>@rev-<N-1>`;
   - a divergence hand-back, a `prompts/` record whose `### Goal` opens `DIVERGENCE:`;
-  - a rescope row of a chain build's `RUN.md` or rotated `RUN.*.md`, but a `defer` row;
+  - a rescope row of a chain build's `RUN.md` or rotated `RUN.*.md`, but a `defer` row, dated by the
+    oldest commit changing its count anywhere in its build folder, so a row dates alike from the live
+    file and from an archive (TOOL-dTrueNorth-24);
   - a clause of `DESIGN_RECORD`'s `[chain]` whose hash at HEAD differs from its hash at
     `DESIGN_BASELINE`, or that is new or absent at HEAD; and the record's `Baseline:` line differing
     from `DESIGN_BASELINE`, listed first and joined by no record.
@@ -106,6 +108,7 @@ from __future__ import annotations
 import argparse
 import datetime
 import functools
+import hashlib
 import os
 import pathlib
 import re
@@ -314,7 +317,15 @@ def read_first_passes(commits, units, entries, when):
 
 
 def read_row_commit(root, row, path):
-    """The commit that added `row` to `path`, `git log --reverse -S` as `deviations.py:378-380` finds it."""
+    """The oldest commit whose diff changes the count of `row` under `path`, `git log --reverse -S` as
+    `deviations.py:378-380` finds it. THE PATH IS EACH CALLER'S (TOOL-dTrueNorth-24 S1). The rescope arm
+    passes the row's build folder, `<MEMORY_ROOT>/builds/<build>`, as the instrument's
+    `scan_rescope_members` does: the oldest commit changing the row's count anywhere in that folder is the
+    one that wrote it into `RUN.md`, so a row dates alike from the live file and from a rotated
+    `RUN.<phase>.<blob8>.md`, where a pickaxe over the archive alone answers the commit that rotated it.
+    The ledger arm passes the one journal record the line sits in: a journal record is never rotated, and
+    two ledgers of one build folder can hold one ledger line's text, so a folder pickaxe there would date
+    the line by the other record's commit."""
     out = (run_git(root, "log", "--reverse", "--format=%H", f"-S{row}", "HEAD", "--", path) or b"").split()
     return out[0].decode("ascii") if out else None
 
@@ -587,12 +598,13 @@ def read_population(root, conf, commits):
     rows, backs = [], []
     for b in builds:
         folder = root / memory_root / "builds" / b
+        scope = folder.relative_to(root).as_posix()     # a row's pickaxe reads its folder, never its file (S1)
         for p in sorted(folder.glob("RUN*.md")) if folder.is_dir() else ():
             if RUN_FILE.match(p.name):
                 rel = p.relative_to(root).as_posix()
                 for m in RESCOPE.finditer(p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")):
                     if m.group(1) != "defer":
-                        rows.append((b, rel, m.group(1), m.group(2), m.group(0), read_row_commit(root, m.group(0), rel)))
+                        rows.append((b, rel, m.group(1), m.group(2), m.group(0), read_row_commit(root, m.group(0), scope)))
     for rel in handbacks:
         ids = binds.get(rel, {}).get("ids") or []
         backs.append((derive_slug(rel), rel, ids[0] if ids else None, adding.get(rel)))
@@ -780,9 +792,12 @@ PLANTS = ("baseline", "clause", "subject-pass", "pass-none", "status-flip", "two
           "fix-record", "audit-nopin",                       # the instrument's 26, deviations.py:851-854
           "pass-revision", "below-risk", "owner-cause", "status-only", "malformed-field", "malformed-risk",
           "malformed-follow", "malformed-supersedes", "duplicate-n", "record-late",
-          "subject-trailer", "pipe-after") + UNMEASURED_PLANTS      # the last four TOOL-dTrueNorth-16's
+          "subject-trailer", "pipe-after",                   # with UNMEASURED_PLANTS, TOOL-dTrueNorth-16's four
+          "rotated") + UNMEASURED_PLANTS                     # TOOL-dTrueNorth-24's
 # The subject-trailer plant's second unit, Y, whose `Pass:` trailer rides a commit whose subject names X.
 SUBJECT_TRAILER_Y = "FIX-dTrueNorth-97"
+# The successor the rotated plant's supersede row names; no spec carries it, as none carries the base's.
+ROTATED_SUCCESSOR = "FIX-dTrueNorth-96"
 # The role map (TOOL-dTrueNorth-12 §4): every clause-moving role moves its own clause of the fixture design,
 # so plants compose. The base's owner amendment, which `quote` reads, and the `baseline` and `clause` plants:
 CLAUSE_ROLES = {"base": "cl-dFix-0001", "baseline": "cl-dFix-0002", "clause": "cl-dFix-0003"}
@@ -806,7 +821,7 @@ PLANT_UNITS = {p: f"FIX-dTrueNorth-{n}" for n, p in enumerate(
      "quote", "amended", "amended-joined", "owner-row1-added", "add", "handback", "audit-pin", "defer",
      "fix-record", "audit-nopin", "record-late", "pass-revision", "status-only", "malformed-field",
      "malformed-risk", "malformed-follow", "duplicate-n", "malformed-supersedes", "subject-trailer",
-     "pipe-after"), 10)}
+     "pipe-after", "rotated"), 10)}
 DECISIONS_TEXT = "\n".join([
     "# Decisions", "",
     "- FIX-dClosedLoop-2 · the spec-run close by carry-forward, and dTrueNorth's extra unit FIX-dTrueNorth-99 approved "
@@ -1129,6 +1144,21 @@ def add_plant(fx, plant):
         fx.write_commit(dict([fx.render_record(u, f"{u}@rev-1 [scope]", "spec writer",
                                                after="the text | that replaced it")]),
                         f"records(dTrueNorth): {u}'s deviation, a pipe in its After")
+    elif plant == "rotated":
+        # TOOL-dTrueNorth-24 S2: a supersede row written beside its record, the spec revised past it, then
+        # the driver's rotation: RUN.md's bytes move to `RUN.LANDED.<blob8>.md`, named by their blob as
+        # `archive_name_of` names it, beside a fresh RUN.md holding none of the old rows. A pickaxe over the
+        # archive alone dates every row it holds by the rotation; one over the folder, by the row's writer.
+        fx.write_spec(u, 1)
+        row = fx.add_run_row(f"rescope · item supersede {u} -> {ROTATED_SUCCESSOR} · reason the spec run found it "
+                             "two units", dict([fx.render_record(u, f"{u}@rev-1 [scope]", "spec writer",
+                                                                 follow=f"new unit {ROTATED_SUCCESSOR}")]))
+        fx.write_spec(u, 2, line="the fixture line, revised after its supersede row")
+        body = fx.branches[fx.branch]["files"][TN + "RUN.md"]
+        blob = hashlib.sha1(b"blob %d\0" % len(body) + body).hexdigest()[:8]
+        fx.rows = []
+        fx.marked[plant] = (row, fx.write_commit({f"{TN}RUN.LANDED.{blob}.md": body, TN + "RUN.md": fx.render_run()},
+                                                 "unattended(dTrueNorth): landed, the run state rotated"))
 
 
 def build_fixture(root, plants):
@@ -1247,7 +1277,7 @@ PLANT_EXITS = dict({p: 1 for p in ("baseline", "clause", "subject-pass", "two-br
                                    "malformed-supersedes", "duplicate-n", "record-late", "pipe-after")},
                    **{p: 0 for p in ("pass-none", "status-flip", "header-rev", "gen", "status-gen", "quote",
                                      "amended-joined", "approver", "defer", "fix-record", "audit-nopin",
-                                     "below-risk", "owner-cause", "status-only", "subject-trailer")},
+                                     "below-risk", "owner-cause", "status-only", "subject-trailer", "rotated")},
                    **{p: 2 for p in UNMEASURED_PLANTS})
 
 
@@ -1275,8 +1305,28 @@ def derive_plant_needle(plant):
             "unmeasured-specs": "reads, and no chain build of memory/design/view.md holds a spec",
             "pipe-after": "After holds a `|`: the as-built view renders **After:** as the Text cell",
             "subject-trailer": f"at {SUBJECT_TRAILER_Y}@rev-1 (spec-revised): joins ",
+            "rotated": f"at {u}@rev-1 (spec-revised): joins ",
             "below-risk": "below owner, the least approver its risk loosening requires",
             "owner-cause": "below owner, the least approver its cause owner ruling requires"}.get(plant)
+
+
+def check_rotated_dates(fx, result):
+    """`(held, what, detail)` of the rotated plant's own arm (TOOL-dTrueNorth-24 S2): its supersede member
+    carries the row commit's sha and the address `<unit>@rev-1`, and no member read from the archive, the
+    base's supersede and add among them, carries the rotation commit's. An archive holding no other rescope
+    member and no add is no witness of the second half, so it reds too."""
+    row, rotation = (fx.read_sha(m) for m in fx.marked["rotated"])
+    u = PLANT_UNITS["rotated"]
+    archived = [m for m in result["members"] if f", in {TN}RUN.LANDED." in m["what"]]
+    own = next((m for m in archived if m["what"].startswith(f"the rescope supersede of {u},")), None)
+    others = [m for m in archived if m is not own]
+    held = (own is not None and own["sha"] == row and own["address"] == f"{u}@rev-1"
+            and any(m["kind"] == "add" for m in others) and any(m["kind"] == "rescope" for m in others)
+            and not any(m["sha"] == rotation for m in archived))
+    what = (f"TOOL-dTrueNorth-24 AC2 the rotated plant's supersede member dates by its row commit {row[:8]} at "
+            f"{u}@rev-1, and no member read from the archive, the base's supersede and add included, by the "
+            f"rotation commit {rotation[:8]}")
+    return held, what, "\n".join(f"{(m['sha'] or 'none')[:8]} {m['address']}: {m['what']}" for m in archived)
 
 
 def check_composed_run(counts):
@@ -1306,7 +1356,8 @@ def check_composed_run(counts):
 def run_plant_arms(resolve=None):
     """Every arm of the join over its fixture: `[(held, what, detail)]`. Each plant is built once with the
     base and measured under both policies, and under by-risk where that is what reds it; the base alone
-    is green under both approvals; the host's RANGE and WHOLE halves read the late record (AC10); and last
+    is green under both approvals; the host's RANGE and WHOLE halves read the late record (AC10); the
+    rotated plant's members date by the commits that wrote their rows (`check_rotated_dates`); and last
     the composed run of every plant measured here (`check_composed_run`). Where the unattended kit does not
     resolve, through `resolve` or the kit's own resolver, it prints the named SKIP line and runs every plant
     `STRIP_PLANTS` does not hold under the strip stubbed to the identity, set for this call alone and
@@ -1367,6 +1418,8 @@ def run_plant_arms(resolve=None):
                                  f"TOOL-dTrueNorth-16 AC13 the commit naming {x} in its subject and "
                                  f"{SUBJECT_TRAILER_Y} in its trailer is the first pass of {SUBJECT_TRAILER_Y} "
                                  f"and of no {x}", "\n".join(lines)))
+                if plant == "rotated":
+                    arms.append(check_rotated_dates(fx, result))
                 if plant in RISK_PLANTS:
                     lines, findings = render_lines(result, "refuse", "author-recorded", f"plant {plant} · ", commit)
                     arms.append((findings == 0, f"TOOL-dTrueNorth-4 AC4 plant {plant} exits 0 under author-recorded",
