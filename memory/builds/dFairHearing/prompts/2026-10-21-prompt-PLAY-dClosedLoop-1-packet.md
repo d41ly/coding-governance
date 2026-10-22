@@ -18,7 +18,7 @@ Every unit of dFairHearing specced and built, so that each of the 18 clauses of 
 
 Each clause of the row, in its order: its id at its baseline hash, its hash now in the as-built view with the record behind any change, its tokens as `carries.py`'s token arm reads them, and its text.
 
-1. `cl-dClosedLoop-0068@b4e6c04e` · now `b4e6c04e`, as at the baseline · tokens: `review_replay.py` — the owed replays first: the design-audit preset run blind at blob 767187aa, from a bundle of the history to 6cfd21619 cloned outside the repository, scored by `review_replay.py` against a known-set file of all 59 known defects, each with its address, grade and escape flag, counting each matched defect once, at 45 of 59 known defects, 4 of 6 escapes and 7 of 8 highs in each run, a miss keeping the unit-spec preset for design records, the verify stage with batches by address, the synthesis with twins shown, and aRoutedQuill #23's fix re-judged by class
+1. `cl-dClosedLoop-0068@b4e6c04e` · now `89c89732` by deviation `2026-10-23-build-TOOL-dFairHearing-1-deviation-11` · tokens: `review_replay.py` — the same replays, scored by `review_replay.py` against a known-set file of 65 rows, the 59 defects the two baseline rounds confirmed with `escaped` `no` and the 6 escapes with `escaped` `yes`, each with its address and grade, counting each matched defect once, at 45 of the 59 reviewed rows, 4 of the 6 escaped rows and 7 of the 8 high rows in each run
 2. `cl-dClosedLoop-0069@a762d009` · now `a762d009`, as at the baseline · tokens: `preset` — the design-audit preset of the spec-audit kind for design and architecture records, chosen by a `preset` argument that Design's breakpoint passes when every pinned spec revision is one (RV-1) (coherence, grounding flagging untested assumptions, reuse held to precedent, failure-envelope extended to trust boundaries, and alternatives-and-cost in place of blast-radius)
 3. `cl-dClosedLoop-0070@00ce4e3c` · now `00ce4e3c`, as at the baseline · tokens: `optIn`, `preset`, `review.opt-in`, `review.pin`, `review.trigger` — opt-in lenses (security, alternatives, cost, portability, adopter migration, topology), each swapped for a named default lens of its preset in the five-element literal, passed as per-run `optIn` and `preset` arguments that `review.pin` maps from `review.opt-in` and the pinned revisions' record kind, checked once at the argument boundary, and each shipping on its losing test, `review.pin` run directly with its pin arguments, a stand-in until dDeclaredLoop's `review.trigger` lands (the whole-design audit's C2-F6)
 4. `cl-dClosedLoop-0071@8d3a19dc` · now `8d3a19dc`, as at the baseline · tokens: none, so the token arm cannot see this clause — skeptic batches sorted by cited address
@@ -34,7 +34,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 14. `cl-dClosedLoop-0081@3ad56b8f` · now `3ad56b8f`, as at the baseline · tokens: none, so the token arm cannot see this clause — the experiment shape's method, from aScoutedSeam's measurements: cases with objective evidence, a held-out set frozen before any tuning and never read to change a prompt, one variable per arm, parsed replies counted before any score is read, one blind judge per case with labels rotated, and the arms' union read as one system, its held-out cases joining the benchmark's replay (the night pass two, point 2)
 15. `cl-dClosedLoop-0082@8ac81dad` · now `8ac81dad`, as at the baseline · tokens: none, so the token arm cannot see this clause — the review's bug-class checklist selected by the pinned range and ordered by anchors, the cut of fully gated classes left to dLinkedLibrary's derived status (the night pass two's review), and a replay with the checklist and without it over the known-defect corpus deciding whether review keeps that selection or takes every ungated class, the lookup's charter line retired as the harness hands the checklist itself (the night pass two, point 6, the owner's NT-25)
 16. `cl-dClosedLoop-0083@bd47ee4e` · now `bd47ee4e`, as at the baseline · tokens: `check-review-join.sh` — agent-cap's review rules moved to the review kit: the verifier total and the loop markers to the merge bar's harness checks, the ref-keyed join ban to `check-review-join.sh` alone, and the spec-audit opt-in to a review-kit pack on Workflow calls, each seen red on its planted case before agent-cap stops carrying it (the night pass two, point 7, the owner's NT-27)
-17. `cl-dClosedLoop-0084@5c5896a3` · now `5c5896a3`, as at the baseline · tokens: none, so the token arm cannot see this clause — each round's state in the review report, CONVERGED, NON-CONVERGENT, BOUNDED or CEILING, computed against the round before from its blocker and high count at the round limit its caller passes, seen red on a planted flat sequence and an oscillating one, and on a strictly falling sequence that reaches its caller's limit, read BOUNDED, and one run past it, read CEILING (P39, the owner's SL-3, the parked debt's review)
+17. `cl-dClosedLoop-0084@5c5896a3` · now `145be745` by deviation `2026-10-23-build-TOOL-dFairHearing-17-deviation-171` · tokens: none, so the token arm cannot see this clause — each round's state in the review report, CONVERGED, NON-CONVERGENT, BOUNDED or CEILING, or CONVERGING on a round that is still falling under its limit, computed against the round before from its blocker and high count at the round limit its caller passes, seen red on a planted flat sequence and an oscillating one, and on a strictly falling sequence that reaches its caller's limit, read BOUNDED, and one run past it, read CEILING (P39, the owner's SL-3, the parked debt's review)
 18. `cl-dClosedLoop-0085@796d40aa` · now `796d40aa`, as at the baseline · tokens: `[tag]`, `review.design-audit.runs`, `review.design-audit.seed` — the whole-design walk as a preset of the design audit: walkers sliced by scenario and by step under `review.design-audit.runs`, each returning its findings and a walk table of every item and scenario with its actor, needs, witness, route and verdict, a synthesis red on an empty cell, skeptics refuting a sample of clean cells, the replay scorer reading `[tag]` addresses, and recall graded on seeded past escapes as `review.design-audit.seed` says, seen red on a planted gap the walk misses and on an empty cell (the owner's FQ-1)
 
 ### Acceptance
@@ -61,7 +61,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `11e4ed05973078820ffbaeceb753fa2cde34a1ce`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `9bade02332c7dde0a64443650020c3a83101c908`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `69a96671a2dabb8270068076915b032624bc5e2b`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -69,7 +69,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `a760897638807d50fb7f73e4d0adc2595554750b`
+- rendered at: `455442c67de0424e7147430d948f3ff0c4718d76`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -134,24 +134,24 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dFairHear
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dFairHearing-1` · README:61 | 1 | `TOOL-dFairHearing-1` | `cl-dClosedLoop-0068@b4e6c04e` | the owed replays first: the design-audit preset run blind at blob 767187aa |
-- unit id `TOOL-dFairHearing-2` · README:62 | 2 | `TOOL-dFairHearing-2` | `cl-dClosedLoop-0069@a762d009` | the design-audit preset of the spec-audit kind for design and architecture records |
-- unit id `TOOL-dFairHearing-3` · README:63 | 3 | `TOOL-dFairHearing-3` | `cl-dClosedLoop-0070@00ce4e3c` | opt-in lenses (security |
-- unit id `TOOL-dFairHearing-4` · README:64 | 4 | `TOOL-dFairHearing-4` | `cl-dClosedLoop-0071@8d3a19dc` | skeptic batches sorted by cited address |
-- unit id `TOOL-dFairHearing-5` · README:65 | 5 | `TOOL-dFairHearing-5` | `cl-dClosedLoop-0072@4afd6a04` | duplicates counted as merged confirmations |
-- unit id `TOOL-dFairHearing-6` · README:66 | 6 | `TOOL-dFairHearing-6` | `cl-dClosedLoop-0073@242e109b` | items carrying a grade per id |
-- unit id `TOOL-dFairHearing-7` · README:67 | 7 | `TOOL-dFairHearing-7` | `cl-dClosedLoop-0074@51869353` | refuted claims and same-address twins handed to the synthesizer to flag |
-- unit id `TOOL-dFairHearing-8` · README:68 | 8 | `TOOL-dFairHearing-8` | `cl-dClosedLoop-0075@8c43970c` | fix verdicts judged by class |
-- unit id `TOOL-dFairHearing-9` · README:69 | 9 | `TOOL-dFairHearing-9` | `cl-dClosedLoop-0076@8bf57ee9` | portability |
-- unit id `TOOL-dFairHearing-10` · README:70 | 10 | `TOOL-dFairHearing-10` | `cl-dClosedLoop-0077@58d0099e` | the review records brought back in line with the code at their sources (`tools/workflows/REVIEW-PROTOCOL.template.md`'s lens list |
-- unit id `TOOL-dFairHearing-11` · README:71 | 11 | `TOOL-dFairHearing-11` | `cl-dClosedLoop-0078@ed5e83ae` | the panel's internals |
-- unit id `TOOL-dFairHearing-12` · README:72 | 12 | `TOOL-dFairHearing-12` | `cl-dClosedLoop-0079@d8e61ab6` | the scorer factory: one deterministic scorer that re-derives every figure from committed raw outputs |
-- unit id `TOOL-dFairHearing-13` · README:73 | 13 | `TOOL-dFairHearing-13` | `cl-dClosedLoop-0080@8c9e5de7` | the lens catalogue as data in the review kit |
-- unit id `TOOL-dFairHearing-14` · README:74 | 14 | `TOOL-dFairHearing-14` | `cl-dClosedLoop-0081@3ad56b8f` | the experiment shape's method |
-- unit id `TOOL-dFairHearing-15` · README:75 | 15 | `TOOL-dFairHearing-15` | `cl-dClosedLoop-0082@8ac81dad` | the review's bug-class checklist selected by the pinned range and ordered by anchors |
-- unit id `TOOL-dFairHearing-16` · README:76 | 16 | `TOOL-dFairHearing-16` | `cl-dClosedLoop-0083@bd47ee4e` | agent-cap's review rules moved to the review kit: the verifier total and the loop markers to the merge bar's harness checks |
-- unit id `TOOL-dFairHearing-17` · README:77 | 17 | `TOOL-dFairHearing-17` | `cl-dClosedLoop-0084@5c5896a3` | each round's state in the review report |
-- unit id `TOOL-dFairHearing-18` · README:78 | 18 | `TOOL-dFairHearing-18` | `cl-dClosedLoop-0085@796d40aa` | the whole-design walk as a preset of the design audit: walkers sliced by scenario and by step under `review.design-audit.runs` |
+- unit id `TOOL-dFairHearing-1` · README:60 | 1 | `TOOL-dFairHearing-1` | `cl-dClosedLoop-0068@b4e6c04e` | the owed replays first: the design-audit preset run blind at blob 767187aa |
+- unit id `TOOL-dFairHearing-2` · README:61 | 2 | `TOOL-dFairHearing-2` | `cl-dClosedLoop-0069@a762d009` | the design-audit preset of the spec-audit kind for design and architecture records |
+- unit id `TOOL-dFairHearing-3` · README:62 | 3 | `TOOL-dFairHearing-3` | `cl-dClosedLoop-0070@00ce4e3c` | opt-in lenses (security |
+- unit id `TOOL-dFairHearing-4` · README:63 | 4 | `TOOL-dFairHearing-4` | `cl-dClosedLoop-0071@8d3a19dc` | skeptic batches sorted by cited address |
+- unit id `TOOL-dFairHearing-5` · README:64 | 5 | `TOOL-dFairHearing-5` | `cl-dClosedLoop-0072@4afd6a04` | duplicates counted as merged confirmations |
+- unit id `TOOL-dFairHearing-6` · README:65 | 6 | `TOOL-dFairHearing-6` | `cl-dClosedLoop-0073@242e109b` | items carrying a grade per id |
+- unit id `TOOL-dFairHearing-7` · README:66 | 7 | `TOOL-dFairHearing-7` | `cl-dClosedLoop-0074@51869353` | refuted claims and same-address twins handed to the synthesizer to flag |
+- unit id `TOOL-dFairHearing-8` · README:67 | 8 | `TOOL-dFairHearing-8` | `cl-dClosedLoop-0075@8c43970c` | fix verdicts judged by class |
+- unit id `TOOL-dFairHearing-9` · README:68 | 9 | `TOOL-dFairHearing-9` | `cl-dClosedLoop-0076@8bf57ee9` | portability |
+- unit id `TOOL-dFairHearing-10` · README:69 | 10 | `TOOL-dFairHearing-10` | `cl-dClosedLoop-0077@58d0099e` | the review records brought back in line with the code at their sources (`tools/workflows/REVIEW-PROTOCOL.template.md`'s lens list |
+- unit id `TOOL-dFairHearing-11` · README:70 | 11 | `TOOL-dFairHearing-11` | `cl-dClosedLoop-0078@ed5e83ae` | the panel's internals |
+- unit id `TOOL-dFairHearing-12` · README:71 | 12 | `TOOL-dFairHearing-12` | `cl-dClosedLoop-0079@d8e61ab6` | the scorer factory: one deterministic scorer that re-derives every figure from committed raw outputs |
+- unit id `TOOL-dFairHearing-13` · README:72 | 13 | `TOOL-dFairHearing-13` | `cl-dClosedLoop-0080@8c9e5de7` | the lens catalogue as data in the review kit |
+- unit id `TOOL-dFairHearing-14` · README:73 | 14 | `TOOL-dFairHearing-14` | `cl-dClosedLoop-0081@3ad56b8f` | the experiment shape's method |
+- unit id `TOOL-dFairHearing-15` · README:74 | 15 | `TOOL-dFairHearing-15` | `cl-dClosedLoop-0082@8ac81dad` | the review's bug-class checklist selected by the pinned range and ordered by anchors |
+- unit id `TOOL-dFairHearing-16` · README:75 | 16 | `TOOL-dFairHearing-16` | `cl-dClosedLoop-0083@bd47ee4e` | agent-cap's review rules moved to the review kit: the verifier total and the loop markers to the merge bar's harness checks |
+- unit id `TOOL-dFairHearing-17` · README:76 | 17 | `TOOL-dFairHearing-17` | `cl-dClosedLoop-0084@5c5896a3` | each round's state in the review report |
+- unit id `TOOL-dFairHearing-18` · README:77 | 18 | `TOOL-dFairHearing-18` | `cl-dClosedLoop-0085@796d40aa` | the whole-design walk as a preset of the design audit: walkers sliced by scenario and by step under `review.design-audit.runs` |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -173,11 +173,11 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dFairHearing`:
 
-Coverage of dFairHearing's 18 clauses and 10 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dFairHearing's 18 clauses and 10 owned nodes, over 18 specs:
+- carried whole: 18; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0068, cl-dClosedLoop-0069, cl-dClosedLoop-0070, cl-dClosedLoop-0071, cl-dClosedLoop-0072, cl-dClosedLoop-0073, cl-dClosedLoop-0074, cl-dClosedLoop-0075, cl-dClosedLoop-0076, cl-dClosedLoop-0077, cl-dClosedLoop-0078, cl-dClosedLoop-0079, cl-dClosedLoop-0080, cl-dClosedLoop-0081, cl-dClosedLoop-0082, cl-dClosedLoop-0083, cl-dClosedLoop-0084, cl-dClosedLoop-0085; stale: none; ambiguous: none
-- owned nodes no spec names: item.review.lens, item.review.pin, item.review.refute, item.review.report, policy-key.review.design-audit.runs, policy-key.review.design-audit.seed, policy-key.review.opt-in, policy-key.review.twin, policy-key.review.unclassed, record-kind.review
+- uncarried: none; stale: none; ambiguous: none
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0071, cl-dClosedLoop-0072, cl-dClosedLoop-0073, cl-dClosedLoop-0074, cl-dClosedLoop-0076, cl-dClosedLoop-0080, cl-dClosedLoop-0081, cl-dClosedLoop-0082, cl-dClosedLoop-0084
 
