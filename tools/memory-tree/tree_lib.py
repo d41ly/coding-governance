@@ -241,20 +241,33 @@ def build_git_env() -> dict:
     return env
 
 
-#: The repository pointers git exports into a hook's environment. A reader started from a hook in a
-#: linked worktree inherits a `GIT_DIR` naming a different tree than `root`, and reads it silently.
-GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
-                     "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX")
+#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts: a reader
+#: started from a hook in a linked worktree inherits a `GIT_DIR` naming a different tree than the one
+#: it was asked about, and reads it silently. TOOL-dRetiredFork-2, absorbed from adopter nc `nc
+#: carve-out 16/20`, taken VERBATIM from gov's own hook-side scrub at `.githooks/pre-push`, because
+#: these are two halves of ONE defect and a second list is where they drift apart. ONE list for the
+#: kit: it moved here from `gen_build_index.py`, which re-imports it, when the readers below became
+#: its second caller (TOOL-dTrueNorth-20).
+GIT_ENV_LEAKS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_COMMON_DIR",
+    "GIT_NAMESPACE",
+    "GIT_PREFIX",
+)
 
 
 def read_git_output(root, argv, stdin=None) -> bytes:
-    """A git command's stdout as bytes, run at `root` under `build_git_env` less `GIT_LOCATION_VARS`, or
+    """A git command's stdout as bytes, run at `root` under `build_git_env` less `GIT_ENV_LEAKS`, or
     `OSError` naming the command and git's first stderr line, or why it could not start. A caller
     reading through it never passes a failed call for an empty answer; each turns the error into its
     own named refusal."""
     cmd = ("git", *argv)
     shown = " ".join(cmd)
-    env = {k: v for k, v in build_git_env().items() if k not in GIT_LOCATION_VARS}
+    env = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}
     try:
         done = subprocess.run(cmd, cwd=root, input=stdin, capture_output=True, env=env)
     except OSError as exc:

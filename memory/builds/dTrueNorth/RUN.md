@@ -148,3 +148,5 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T01:15:04Z brief · item TOOL-dTrueNorth-20 · reason cca93d2f4834 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-20-build-brief.md
 
 2026-10-22T01:42:34Z dispatch · item 7ee19044 TOOL-dTrueNorth-20 · reason tools/memory-tree/check-memory-hygiene.sh
+
+2026-10-22T02:02:45Z dispatch · item 8d11da83 TOOL-dTrueNorth-20 · reason tools/memory-tree/tree_lib.py tools/memory-tree/gen_build_index.py tools/check-spec-tokens.test.sh memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-20-ledger.md memory/map/generated/symbols.json

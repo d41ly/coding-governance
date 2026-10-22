@@ -1525,17 +1525,18 @@ for name, text in (("twice", "SPEC_GUARD_LEGS_CUTOFF=\"2026-01-01\"\nSPEC_GUARD_
 print("AC21 one row grammar", asbuilt_view.VIEW_ROW is design_lib.VIEW_ROW, "one date pattern",
       cst.SPEC_DATE is design_lib.SPEC_FILE_DATE)
 tree = ast.parse(pathlib.Path(asbuilt_view.__file__).read_text(encoding="utf-8"))
-print("AC21 literal patterns", [n.lineno for n in ast.walk(tree) if isinstance(n, ast.Call)
-      and isinstance(n.func, ast.Attribute) and isinstance(n.func.value, ast.Name) and n.func.value.id == "re"
-      and n.func.attr in ("compile", "match", "search", "fullmatch") and n.args
-      and isinstance(n.args[0], ast.Constant) and isinstance(n.args[0].value, str)])' "$HERE/memory-tree" "$LINT" 2>&1)
+calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+         and isinstance(n.func.value, ast.Name) and n.func.value.id == "re"
+         and n.func.attr in ("compile", "match", "search", "fullmatch") and n.args]
+print("AC21 literal patterns", [n.lineno for n in calls if isinstance(n.args[0], ast.Constant)
+      and isinstance(n.args[0].value, str)], "over a walk that met re calls", bool(calls))' "$HERE/memory-tree" "$LINT" 2>&1)
 check_one_probe() {   # $1 label · $2 the probe line it must print
   case "$one_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$one_out" | tail -3; fail=$((fail+1)) ;; esac
 }
 check_one_probe "a cutoff declared twice reads its last declaration through read_conf_key" "AC18 twice 2026-02-02"
 check_one_probe "a cutoff behind export reads as bash reads it through read_conf_key" "AC18 export 2026-03-03"
 check_one_probe "the view's row grammar and the checker's date pattern are design_lib's own" "AC21 one row grammar True one date pattern True"
-check_one_probe "no re call in asbuilt_view.py compiles a string-literal pattern" "AC21 literal patterns []"
+check_one_probe "no re call in asbuilt_view.py compiles a string-literal pattern, over a walk that met re calls" "AC21 literal patterns [] over a walk that met re calls True"
 date_in_lint=$(grep -c -F '[0-9]{2})-spec-' "$LINT")
 date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$HERE/memory-tree/design_lib.py")
 if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then

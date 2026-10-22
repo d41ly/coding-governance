@@ -183,7 +183,7 @@ SPEC_RECORDS_CLOSE = "<!-- /gen:spec-records -->"
 # longer imports a sibling ENGINE: an adopter's own `corpus_ids.py` stops being able to kill it.
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from tree_lib import (  # noqa: E402  the kit's shared helpers
-    STATUS_TOKENS, TERMINAL, build_spec_path_re, kit_rel, parse_conf, parse_spec_h1, read_adding_commits,
+    GIT_ENV_LEAKS, STATUS_TOKENS, TERMINAL, build_spec_path_re, kit_rel, parse_conf, parse_spec_h1, read_adding_commits,
     read_blobs_at, scan_missing_citations, unfenced_lines,
 )
 
@@ -242,20 +242,11 @@ class StaleHeader(Problem):
 
 
 # --------------------------------------------------------------------------------------- plumbing
-#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts.
-#: TOOL-dRetiredFork-2, absorbed from adopter nc `nc carve-out 16/20`. Taken VERBATIM from gov's own
-#: hook-side scrub at `.githooks/pre-push` rather than re-derived, because these are two halves of
-#: ONE defect and a second list would be the place they drift apart.
-_GIT_ENV_LEAKS = (
-    "GIT_DIR",
-    "GIT_WORK_TREE",
-    "GIT_INDEX_FILE",
-    "GIT_OBJECT_DIRECTORY",
-    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
-    "GIT_COMMON_DIR",
-    "GIT_NAMESPACE",
-    "GIT_PREFIX",
-)
+#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts:
+#: `tree_lib.GIT_ENV_LEAKS`, the kit's one list, taken VERBATIM from gov's own hook-side scrub at
+#: `.githooks/pre-push` (TOOL-dRetiredFork-2). It moved there when the tree library's git readers
+#: became its second caller (TOOL-dTrueNorth-20), so the two cannot drift apart.
+_GIT_ENV_LEAKS = GIT_ENV_LEAKS
 
 
 def _build_git_env() -> dict[str, str]:
