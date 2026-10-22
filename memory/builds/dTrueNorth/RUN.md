@@ -160,3 +160,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T02:29:17Z rescope · item add TOOL-dTrueNorth-25 · reason closing diff review round 1 (reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md) finding 11 HIGH, item H3: the verdict-epoch gate cannot see deviation_join.py (finding 20, M7, is the same defect)
 
 2026-10-22T02:29:18Z rescope · item add TOOL-dTrueNorth-26 · reason closing diff review round 1 (reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md) the 19 confirmed minors batched into one unit: items M1 to M9 and L1 to L7
+
+2026-10-22T03:12:34Z dispatch · item 06dec3a4 TOOL-dTrueNorth-23 · reason tools/memory-tree/tree_lib.py tools/memory-tree/row_grammar.py tools/memory-tree/gen_build_index.py memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-23.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-23-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
+
+2026-10-22T03:12:39Z brief · item TOOL-dTrueNorth-23 · reason 66090be2a0f6 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-23-build-brief.md

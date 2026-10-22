@@ -241,13 +241,22 @@ def build_git_env() -> dict:
     return env
 
 
-#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts: a reader
-#: started from a hook in a linked worktree inherits a `GIT_DIR` naming a different tree than the one
-#: it was asked about, and reads it silently. TOOL-dRetiredFork-2, absorbed from adopter nc `nc
-#: carve-out 16/20`, taken VERBATIM from gov's own hook-side scrub at `.githooks/pre-push`, because
-#: these are two halves of ONE defect and a second list is where they drift apart. ONE list for the
-#: kit: it moved here from `gen_build_index.py`, which re-imports it, when the readers below became
-#: its second caller (TOOL-dTrueNorth-20).
+#: What a git reader of this kit must not inherit, in TWO HALVES. ONE list for the kit: it moved here
+#: from `gen_build_index.py`, which re-imports it, when the readers below became its second caller
+#: (TOOL-dTrueNorth-20), and every runner that reads it strips both halves.
+#:
+#: The EIGHT location variables are the ones git EXPORTS to a hook, which then reach any subprocess
+#: that hook starts: a reader started from a hook in a linked worktree inherits a `GIT_DIR` naming a
+#: different tree than the one it was asked about, and reads it silently. TOOL-dRetiredFork-2,
+#: absorbed from adopter nc `nc carve-out 16/20`, taken VERBATIM from gov's own hook-side scrub at
+#: `.githooks/pre-push:100`, because these are two halves of ONE defect and a second list is where
+#: they drift apart. That hook list is a subset of this one, unchanged.
+#:
+#: The FOUR pathspec-mode variables are taken VERBATIM from gov's own unset at
+#: `tools/check-playbook-parity.sh:334` (TOOL-aDistilledCharter-7 G6). Git exports none of them to a
+#: hook, but a caller's own environment can carry one, and `GIT_LITERAL_PATHSPECS` turns every
+#: `:(glob)` pathspec this kit reads into a literal name that matches nothing: the log answers empty,
+#: exit 0, and a join over it reports green over a population it never read (TOOL-dTrueNorth-23).
 GIT_ENV_LEAKS = (
     "GIT_DIR",
     "GIT_WORK_TREE",
@@ -257,6 +266,10 @@ GIT_ENV_LEAKS = (
     "GIT_COMMON_DIR",
     "GIT_NAMESPACE",
     "GIT_PREFIX",
+    "GIT_LITERAL_PATHSPECS",
+    "GIT_GLOB_PATHSPECS",
+    "GIT_NOGLOB_PATHSPECS",
+    "GIT_ICASE_PATHSPECS",
 )
 
 
@@ -264,7 +277,12 @@ def read_git_output(root, argv, stdin=None) -> bytes:
     """A git command's stdout as bytes, run at `root` under `build_git_env` less `GIT_ENV_LEAKS`, or
     `OSError` naming the command and git's first stderr line, or why it could not start. A caller
     reading through it never passes a failed call for an empty answer; each turns the error into its
-    own named refusal."""
+    own named refusal.
+
+    The four pathspec-mode variables are stripped with the location ones, because the caller's
+    environment is not the reader's: under an ambient `GIT_LITERAL_PATHSPECS` a `:(glob)` pathspec
+    matches nothing and git still exits 0, so the empty answer would be read as the true one, which
+    no refusal above can catch (TOOL-dTrueNorth-23)."""
     cmd = ("git", *argv)
     shown = " ".join(cmd)
     env = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}

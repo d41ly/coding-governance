@@ -20338,6 +20338,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_glob_readers",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "scan_grant_writes",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"

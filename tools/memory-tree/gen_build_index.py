@@ -242,15 +242,14 @@ class StaleHeader(Problem):
 
 
 # --------------------------------------------------------------------------------------- plumbing
-#: The variables git EXPORTS to a hook, which then reach any subprocess that hook starts:
-#: `tree_lib.GIT_ENV_LEAKS`, the kit's one list, taken VERBATIM from gov's own hook-side scrub at
-#: `.githooks/pre-push` (TOOL-dRetiredFork-2). It moved there when the tree library's git readers
-#: became its second caller (TOOL-dTrueNorth-20), so the two cannot drift apart.
+#: `tree_lib.GIT_ENV_LEAKS`, the kit's one list of what a git reader must not inherit: the comment
+#: above it there names its two halves and where each is taken from.
 _GIT_ENV_LEAKS = GIT_ENV_LEAKS
 
 
 def _build_git_env() -> dict[str, str]:
-    """The parent environment with git's exported repository pointers removed.
+    """The parent environment with git's exported repository pointers and the four pathspec modes
+    removed, the two halves of `GIT_ENV_LEAKS`.
 
     Git exports `GIT_DIR` whenever the repository is reached through a `.git` FILE rather than a
     `.git` directory — every linked worktree — so a generator started from a hook inherits a pointer
@@ -5189,6 +5188,39 @@ def test_asbuilt_view(arm) -> None:
             lambda: _read_mode(cmd_check, tmp, write_conf(view=""))[1])
 
 
+def scan_glob_readers(kit_dir: str) -> list:
+    """`<module>.<name>` for every top-level function, and every module-level assignment's target, of
+    each `*.py` directly in `kit_dir` whose statement holds a string constant carrying a `:(glob)`
+    pathspec, sorted. A docstring is prose and never counts; a comment is not in the tree at all.
+
+    TOOL-dTrueNorth-23 S3: the population the pathspec-mode arm grades is DERIVED here, so a reader the
+    kit gains is named by the arm instead of skipped by it. NOT SEEN: a pathspec composed at run time
+    from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
+    """
+    magic = ":(" + "glob)"     # composed, so this walk's own needle is no constant it finds
+    found = set()
+    for name in sorted(os.listdir(kit_dir)):
+        if not name.endswith(".py"):
+            continue
+        tree = ast.parse(read_text(os.path.join(kit_dir, name)), name)
+        docs = {id(node.body[0].value) for node in ast.walk(tree)
+                if isinstance(node, (ast.Module, ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                and node.body and isinstance(node.body[0], ast.Expr)
+                and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
+        for stmt in tree.body:
+            if isinstance(stmt, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                names = [stmt.name]
+            elif isinstance(stmt, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                targets = stmt.targets if isinstance(stmt, ast.Assign) else [stmt.target]
+                names = [n.id for t in targets for n in ast.walk(t) if isinstance(n, ast.Name)]
+            else:
+                continue
+            if any(isinstance(n, ast.Constant) and isinstance(n.value, str) and magic in n.value
+                   and id(n) not in docs for n in ast.walk(stmt)):
+                found.update(f"{name[:-3]}.{n}" for n in names)
+    return sorted(found)
+
+
 def cmd_selftest() -> int:
     fails = []
 
@@ -6313,6 +6345,137 @@ def cmd_selftest() -> int:
             lambda: " ".join((_scan_blob_reader20(os.path.abspath(__file__), "read_blobs_at_rev"),
                               _scan_blob_reader20(_dl20.__file__, "read_spec_revisions"),
                               _scan_blob_reader20(os.path.abspath(__file__), "derive_audit_writers"))))
+
+        # TOOL-dTrueNorth-23 AC1 to AC5 — THE KIT'S GLOB-PATHSPEC READERS STRIP THE FOUR PATHSPEC MODES.
+        # The readers are DERIVED by `scan_glob_readers`, an `ast` walk of every module here, and must
+        # equal the table below both ways; each row names the reader its probe calls, and this suite's
+        # own fixtures are exempt by name. Over one fixture of the arm's own, a spec of two commits, a
+        # review record and a backlog shard holding one row of the declared family, each probe runs with
+        # the four unset, then under each set to `1` and restored in a `finally`, and must give the
+        # unset answer, which must not be empty. The env half reads the `env` each runner hands
+        # `subprocess.run` with all four set. Against the base runner the literal mode reads every probe
+        # empty and the env half finds all four keys; a planted reader the table lacks reds the walk.
+        # NOT CHECKED: the behavioural half reds on `GIT_LITERAL_PATHSPECS` alone, because a `:(glob)`
+        # pathspec answers alike under the other three on paths differing in no case; the env half is
+        # what reds on each of the four.
+        import design_lib as _dl23
+        import row_grammar as _rg23
+        import tree_lib as _tl23
+
+        modes23 = ("GIT_LITERAL_PATHSPECS", "GIT_GLOB_PATHSPECS", "GIT_NOGLOB_PATHSPECS", "GIT_ICASE_PATHSPECS")
+        t23 = os.path.join(base, "pathspec-modes"); os.makedirs(t23)
+        conf23 = _fixture(t23)
+        spec23 = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
+        rec23 = rv5 + "2026-08-02-review-ARCH-tOne-1-spec-audit.md"
+        write_text(os.path.join(t23, spec23), read_text(os.path.join(t23, spec23)) + "\nA second revision.\n")
+        write_text(os.path.join(t23, rec23), "**Serves:** spec-audit ARCH-tOne-1@rev-1\n\n# r\n")
+        write_text(os.path.join(t23, "memory", "backlog", "ARCH.md"), "# backlog\n\n- ARCH-tOne-9 · OPEN · a row\n")
+        run("git", "add", "-A", cwd=t23)
+        run("git", "commit", "-q", "-m", "a second revision, a record and a row", "--no-verify", cwd=t23)
+        reviews23 = f":(glob){conf23['MEMORY_ROOT']}/builds/*/reviews/**"
+        probes23 = {
+            "design_lib.read_spec_revisions":
+                lambda: _dl23.read_spec_revisions(t23, [spec23], conf23["MEMORY_ROOT"])[spec23],
+            "deviation_join.read_population": lambda: read_adding_commits(t23, reviews23, {rec23}),
+            "gen_build_index.derive_audit_writers": lambda: read_adding_commits(t23, reviews23, {rec23}),
+            "row_grammar._build_backlog_pathspecs": lambda: _rg23.derive_first_seen(t23, conf23),
+            "gen_build_index.cmd_selftest": None,    # the suite's own fixtures, exempt by name
+        }
+
+        def _read_under_modes23():
+            saved = {m: os.environ.pop(m, None) for m in modes23}
+            empty, moved = [], []
+            try:
+                for reader, probe in probes23.items():
+                    if probe is None:
+                        continue
+                    want = probe()
+                    if not want:
+                        empty.append(reader)
+                        continue
+                    for mode in modes23:
+                        os.environ[mode] = "1"
+                        try:
+                            got = probe()
+                        finally:
+                            del os.environ[mode]
+                        if got != want:
+                            moved.append(f"{reader} under {mode}")
+            finally:
+                os.environ.update({m: v for m, v in saved.items() if v is not None})
+            return f"probed={sum(p is not None for p in probes23.values())} empty={empty} moved={moved}"
+
+        arm("TOOL-dTrueNorth-23 AC1 AC2 AC4 — every glob-pathspec reader's probe gives its unset answer, never "
+            "empty, under each of the four pathspec modes", "probed=4 empty=[] moved=[]", _read_under_modes23)
+
+        def _read_runner_env23(call):
+            handed = []
+
+            def _capture(argv, *a, **kw):
+                handed.append(kw.get("env"))
+                return subprocess.CompletedProcess(argv, 0, b"", b"")
+
+            saved, real = {m: os.environ.get(m) for m in modes23}, subprocess.run
+            os.environ.update({m: "1" for m in modes23})
+            subprocess.run = _capture
+            try:
+                call()
+            finally:
+                subprocess.run = real
+                for m, v in saved.items():
+                    if v is None:
+                        os.environ.pop(m, None)
+                    else:
+                        os.environ[m] = v
+            if not handed or any(env is None for env in handed):
+                return f"spawns={len(handed)}, and a spawn handed no env inherits every mode"
+            return f"reached={sorted({m for env in handed for m in modes23 if m in env})}"
+
+        location23 = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
+                      "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX")
+        arm("TOOL-dTrueNorth-23 AC3 — with the four modes set, neither runner reading the kit's leak list hands "
+            "one to subprocess.run, and the list holds the eight location variables and the four modes",
+            "leaks=True read_git_output reached=[] _build_git_env reached=[]",
+            lambda: "leaks=%s read_git_output %s _build_git_env %s" % (
+                sorted(GIT_ENV_LEAKS) == sorted(location23 + modes23),
+                _read_runner_env23(lambda: _tl23.read_git_output(t23, ("rev-parse", "HEAD"))),
+                _read_runner_env23(lambda: run("git", "rev-parse", "HEAD", cwd=t23))))
+
+        def _scan_age_walk23():
+            fn = next(node for node in ast.parse(read_text(_rg23.__file__)).body
+                      if isinstance(node, ast.FunctionDef) and node.name == "derive_first_seen")
+            called = [node.func for node in ast.walk(fn) if isinstance(node, ast.Call)]
+            via = any(getattr(f, "id", getattr(f, "attr", None)) == "read_git_output" for f in called)
+            own = any(isinstance(f, ast.Attribute) and f.attr == "run" and getattr(f.value, "id", None) == "subprocess"
+                      for f in called)
+            return f"runner={via} own-spawn={own}"
+
+        arm("TOOL-dTrueNorth-23 AC4 — the age walk reaches git through tree_lib.read_git_output and spawns none "
+            "of its own", "runner=True own-spawn=False", _scan_age_walk23)
+
+        def _scan_table23(kit):
+            found = scan_glob_readers(kit)
+            return (f"met={bool(found)} unlisted={sorted(set(found) - set(probes23))} "
+                    f"stale={sorted(set(probes23) - set(found))}")
+
+        arm("TOOL-dTrueNorth-23 AC5 — the kit's glob-pathspec readers, derived by an ast walk of every module, "
+            "equal the arm's table both ways", "met=True unlisted=[] stale=[]",
+            lambda: _scan_table23(os.path.dirname(os.path.abspath(__file__))))
+        plant23 = os.path.join(base, "planted-kit"); os.makedirs(plant23)
+        for name in os.listdir(os.path.dirname(os.path.abspath(__file__))):
+            if name.endswith(".py"):
+                shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), name),
+                                os.path.join(plant23, name))
+        write_text(os.path.join(plant23, "planted23.py"),
+                   '"""A module docstring naming :(glob)memory/** is prose."""\n'
+                   'PLANTED = ":(glob)memory/builds/*/spec/**"\n\n\n'
+                   'def read_planted():\n    return ":(glob)memory/**"\n\n\n'
+                   'def read_prose():\n    """It names :(glob)memory/** in prose only."""\n    return "memory/**"\n')
+        write_text(os.path.join(plant23, "planted23.txt"), 'TEXT = ":(glob)memory/**"\n')
+        arm("TOOL-dTrueNorth-23 AC5 — a planted module's glob-pathspec function and constant are readers the table "
+            "lacks, and neither a docstring nor a file that is no module is one",
+            "met=True unlisted=['planted23.PLANTED', 'planted23.read_planted'] stale=[]",
+            lambda: _scan_table23(plant23))
 
         # ---- the rendered Records table and the two coverage joins.
         # TOOL-dFramedEntrypoint-5 S4 classes (b) and (c). The RECORDS TABLE arm and the FOLDER
