@@ -95,8 +95,9 @@ another clause; and pipe-after, an `**After:**` holding a `|`. Exit 0 green, 1 o
 the key rule refuses or the pin's design record cannot be read, so there is nothing to render.
 
 ITS STATES ARE THE KEY RULE's, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S6): OFF when all
-four `DESIGN_*` keys are blank or absent, the keys being gov's and absent from the kit's example
-conf, so an adopter reads them as off: one `as-built view: off` line, nothing read, exit 0. A partial
+four `DESIGN_*` keys are blank or absent, the keys being gov's and declared blank in the kit's
+example conf, which is off, so an adopter reads them as off: one `as-built view: off` line, nothing
+read, exit 0. A partial
 set is a refusal naming each blank key, exit 2. The host prints the same line and the same refusal.
 
 What it does not read: whether a record's new text is what its approver approved, which the deviation

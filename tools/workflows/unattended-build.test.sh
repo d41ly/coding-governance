@@ -1755,7 +1755,7 @@ has    "TN5-AC3 ...and the clean round's demanded line pins it" "$o" 'line 1 exa
 printf -v TN5_R '{"spec-write":%s,"subjects":{"subjects":[{"path":"s2","blob":"%s","tree":"%s"}]},"workflow":%s,"record":%s}' "$SPEC_C" "$B40" "$B40" "$CLEAN" "$_rec"
 rec CONVERGED >/dev/null; o=$(run_wf "$TN5_NS" "$TN5_R")
 has    "TN5-AC3 a resolver entry with no rev is refused naming the field" "$o" 'THROW unattended-build: resolved subject 0 does not carry `rev`'
-TN5_P='"id":"A-tB-1","rev":1}'; TN5_U=${UNITS/"$TN5_P"/"}"}
+TN5_P=',"id":"A-tB-1","rev":1}'; TN5_U=${UNITS/"$TN5_P"/"}"}
 rec CONVERGED >/dev/null; o=$(run_wf "$TN5_U" "$(returns CONVERGED 0)")
 has    "TN5-AC3 a caller subject with no id is refused naming the field" "$o" 'THROW unattended-build: subject 0'"'"'s `id` is not a unit id'
 TN5_P='"id":"A-tB-2","rev":1}'; TN5_U=${UNITS/"$TN5_P"/'"id":"A-tB-2"}'}

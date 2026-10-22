@@ -462,6 +462,20 @@ LIVE_DORMANT_DAYS=""
 # written. BLANK OR ABSENT RENDERS LIVE.md AS BEFORE, byte for byte, and never imports that kit.
 LIVE_LANDED_UNCLOSED=""
 
+# DESIGN_RECORD, DESIGN_BASELINE, DESIGN_VIEW, DESIGN_NODES — the design chain's four keys, gov's own:
+# a frozen design record, the commit it was pinned at, the as-built view rendered from it and the
+# owned-node deriver. `design_lib.read_design_keys` reads them, and the deviation join, the as-built
+# view and the coverage read take their states from it. ALL FOUR BLANK OR ABSENT IS OFF: each reader
+# prints one off line and reads nothing. Some set and some blank is refused, naming each blank key.
+#   DESIGN_RECORD    the design record, read only at DESIGN_BASELINE
+#   DESIGN_BASELINE  the commit the design was pinned at, 40 hex
+#   DESIGN_VIEW      the as-built view, a dated record named <date>-build-<unit id>-as-built.md
+#   DESIGN_NODES     the owned-node deriver, a tracked .py file loaded by path for its derive()
+DESIGN_RECORD=""
+DESIGN_BASELINE=""
+DESIGN_VIEW=""
+DESIGN_NODES=""
+
 # ROUTED_PATHS — the product paths: whitespace-separated, repo-root-relative, a directory entry ending
 # in `/`. The write gate (scratch-guard) refuses an Edit, Write, MultiEdit or NotebookEdit under one
 # unless the session's card routes a buildable unit; a shell write passes the gate, and the

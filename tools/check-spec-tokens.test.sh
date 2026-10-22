@@ -192,6 +192,7 @@ RUNLOG_DIR=$(resolve_kit_dir "$PY" runlog runlog.py "$HERE") || exit 2
 RUNLOG="${RUNLOG_DIR##*/}"
 CODEBASE_MAP_DIR=$(resolve_kit_dir "$PY" codebase-map map_lib.py "$HERE") || exit 2
 MEMORY_TREE_DIR=$(resolve_kit_dir "$PY" memory-tree design_lib.py "$HERE") || exit 2
+MEMORY_TREE="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$MEMORY_TREE_DIR"
 pass=0; fail=0
 ARM_ARGS=()          # the checker's argv for the next `arm`; empty is the gate's own run (TOOL-aMendedFleet-87)
 
@@ -1120,15 +1121,16 @@ check_break_refuses() {   # $1 = a broken copy of the checker
   local out rc; out=$(cd "$d" && "$PY" "$1" 2>&1); rc=$?
   [ "$rc" != 0 ] && printf '%s' "$out" | grep -qF 'REFUSING — CLAIM_CANARY' && ! printf '%s' "$out" | grep -qF 'spec-tokens: claims join'
 }
-for a in active passive noun fronted; do sed "s|(\"$a\", r\"|(\"$a\", r\"(?!)|" "$LINT" > "$base/claims-break-$a.py"; done
-sed 's|CLAIM_PARTS), re\.I)|CLAIM_PARTS))|' "$LINT" > "$base/claims-break-fold.py"
-sed '/cleared by the space clause/d' "$LINT" > "$base/claims-break-space.py"
-if check_break_refuses "$base/claims-break-active.py"; then echo "arm ok    AC6 the active arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 active arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-passive.py"; then echo "arm ok    AC6 the passive arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 passive arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-noun.py"; then echo "arm ok    AC6 the noun arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 noun arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-fronted.py"; then echo "arm ok    AC6 the fronted arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 fronted arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-fold.py"; then echo "arm ok    AC6 the arms compiled without the case fold refuse naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 case-fold break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
-if check_break_refuses "$base/claims-break-space.py"; then echo "arm ok    AC6 the space clause dropped refuses naming CLAIM_CANARY, the LOUDER direction"; pass=$((pass+1)); else echo "arm FAIL  AC6 space-clause break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+brk=$base/claims-break; mkdir -p "$brk"; cp -R "$MEMORY_TREE" "$brk/${MEMORY_TREE_DIR##*/}"
+for a in active passive noun fronted; do sed "s|(\"$a\", r\"|(\"$a\", r\"(?!)|" "$LINT" > "$brk/claims-break-$a.py"; done
+sed 's|CLAIM_PARTS), re\.I)|CLAIM_PARTS))|' "$LINT" > "$brk/claims-break-fold.py"
+sed '/cleared by the space clause/d' "$LINT" > "$brk/claims-break-space.py"
+if check_break_refuses "$brk/claims-break-active.py"; then echo "arm ok    AC6 the active arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 active arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-passive.py"; then echo "arm ok    AC6 the passive arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 passive arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-noun.py"; then echo "arm ok    AC6 the noun arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 noun arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-fronted.py"; then echo "arm ok    AC6 the fronted arm matching nothing refuses naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 fronted arm break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-fold.py"; then echo "arm ok    AC6 the arms compiled without the case fold refuse naming CLAIM_CANARY"; pass=$((pass+1)); else echo "arm FAIL  AC6 case-fold break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
+if check_break_refuses "$brk/claims-break-space.py"; then echo "arm ok    AC6 the space clause dropped refuses naming CLAIM_CANARY, the LOUDER direction"; pass=$((pass+1)); else echo "arm FAIL  AC6 space-clause break — expected a CLAIM_CANARY refusal and no claims line"; fail=$((fail+1)); fi
 
 # AC8 — the join's line prints on EVERY run: a tree with no claim sentence reports three zeros.
 arm "a tree with no dossier-claim sentence still prints the claims line, zeros and all" 0 "$d" "claims join · 0 dossier-claim sentence(s) examined · 0 live spec(s) carry one · 0 object(s) cleared"
@@ -1631,7 +1633,6 @@ else
   echo "arm FAIL  TOOL-dTrueNorth-26 AC11 the clause-id grammar is spelled once in the kit, in design_lib.py — files [$cl_files], lines $cl_lines"; fail=$((fail+1))
 fi
 date_in_lint=$(grep -c -F '[0-9]{2})-spec-' "$LINT")
-MEMORY_TREE="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$MEMORY_TREE_DIR"
 date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$MEMORY_TREE/design_lib.py")
 if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then
   echo "arm ok    the spec filename date's pattern is spelled in design_lib.py alone"; pass=$((pass+1))

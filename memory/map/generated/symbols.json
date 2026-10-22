@@ -2040,7 +2040,7 @@
     {
       "id": "build_id_token_re",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "build_idle_fixture",
@@ -12695,7 +12695,7 @@
     {
       "id": "read_bindings",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_blind_ab_arms",
@@ -13540,7 +13540,7 @@
     {
       "id": "read_id_pins",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_id_tokens",
@@ -14810,12 +14810,12 @@
     {
       "id": "read_text",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
       "id": "read_text",
       "kind": "function",
-      "file": "tools/memory-tree/migrate_backlog.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "read_text_or_none",
@@ -15160,7 +15160,7 @@
     {
       "id": "record_paths",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "record_piece",
@@ -23745,7 +23745,7 @@
     {
       "id": "unfenced",
       "kind": "function",
-      "file": "tools/memory-tree/gen_build_index.py"
+      "file": "tools/memory-tree/tree_lib.py"
     },
     {
       "id": "unfenced_lines",

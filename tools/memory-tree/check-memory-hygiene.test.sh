@@ -1130,7 +1130,7 @@ done
 # ---- equals the union of the scoped runs' lines, liveness lines set aside, over one selection per
 # ---- `check_selected` call, named by its first id. The list is this suite's pin of the population.
 _hs_union=""
-for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28; do
+for _hs_s in 1 2 3 4 5 6 9 10 11 12 13 17 20 21 22 23 24 26 27 28 29 30; do
   run_scoped "$_hs_s"
   _hs_union+=$(grep -v '^HYGIENE --only ' <<<"$sout" || true)$'\n'
 done
@@ -3382,15 +3382,18 @@ write_pk_conf ""
 # ---- merges the branch. Check 21 passes and its line counts the exempt record from the four-field Q
 # ---- row. Against the base engine, which cuts the row in three, the line carries no exempt count;
 # ---- against the base generator the record prints a P row and check 21 fails. Taken out after.
+# ---- The record sits in the build's `reviews/` folder because the writer test reads that folder
+# ---- alone, one glob pathspec (TOOL-dTrueNorth-19 S1): planted under `build/`, its adding commit is
+# ---- never read and it is graded (TOOL-dTrueNorth-29 S6).
 WF_KIT=$(resolve_kit_dir "$_PY" workflows tier2-review.js "$HERE" 2>/dev/null) || WF_KIT=""
 if [ -z "$WF_KIT" ]; then
   echo "skip check 21's writer test through the engine: no workflows kit beside this one, so its two arms are UNEXERCISED here"; n_skip=$((${n_skip:-0}+2))
 else
-  ( cd "$_b1" && mkdir -p "$WF_KIT" memory/builds/tOne/build \
+  ( cd "$_b1" && mkdir -p "$WF_KIT" memory/builds/tOne/reviews \
     && printf 'export function review() {}\n' > "$WF_KIT/tier2-review.js" \
     && git add -A && git -c commit.gpgsign=false commit -q -m tn14-a --no-verify \
     && git checkout -q -b tn14-run \
-    && printf '# r\n\n**Serves:** spec-audit ARCH-tOne-1\n' > memory/builds/tOne/build/2026-09-02-build-ARCH-tOne-1-w.md \
+    && printf '# r\n\n**Serves:** spec-audit ARCH-tOne-1\n' > memory/builds/tOne/reviews/2026-09-02-review-ARCH-tOne-1-w.md \
     && git add -A && git -c commit.gpgsign=false commit -q -m tn14-run --no-verify \
     && git checkout -q - \
     && printf 'export function renderAuditBinding() {}\n' >> "$WF_KIT/tier2-review.js" \
@@ -3410,7 +3413,7 @@ else
     *) echo "FAIL check 21: the audit-pin arm printed no graded line, so its pass over the exempt record is unobserved"; st=1 ;;
   esac
   write_pk_conf ""
-  ( cd "$_b1" && git rm -q "$WF_KIT/tier2-review.js" memory/builds/tOne/build/2026-09-02-build-ARCH-tOne-1-w.md && git branch -q -D tn14-run \
+  ( cd "$_b1" && git rm -q "$WF_KIT/tier2-review.js" memory/builds/tOne/reviews/2026-09-02-review-ARCH-tOne-1-w.md && git branch -q -D tn14-run \
     && git add -A && "$_PY" "$HERE/gen_build_index.py" --write && git add -A && git -c commit.gpgsign=false commit -q -m tn14-out --no-verify ) >/dev/null 2>&1
 fi
 

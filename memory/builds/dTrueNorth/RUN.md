@@ -192,3 +192,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T07:08:27Z dispatch · item f221e113 TOOL-dTrueNorth-27 · reason memory/map/generated/symbols.json
 
 2026-10-22T08:48:54Z rescope · item add TOOL-dTrueNorth-29 · reason the flagged bar at e583a7f42 reds five self-test legs this build caused (spec-tokens AC6 broken copies, row-grammar sibling import, tier2-review fixture path, unattended-build TN5-AC3, memory-hygiene conf example, check 21 and partition); one unit clears them before the close
+
+2026-10-22T09:19:45Z dispatch · item c01f0f86 TOOL-dTrueNorth-29 · reason tools/check-spec-tokens.test.sh tools/memory-tree/tree_lib.py tools/memory-tree/gen_build_index.py tools/memory-tree/deviation_join.py tools/memory-tree/design_lib.py tools/memory-tree/asbuilt_view.py tools/memory-tree/README.md tools/memory-tree/kit.toml tools/memory-tree/.memory-tree.conf.example tools/memory-tree/check-memory-hygiene.test.sh tools/workflows/tier2-review.test.sh tools/workflows/unattended-build.test.sh .memory-tree.conf memory/guides/SESSION-KICKOFF.md memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-29.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-29-ledger.md memory/map/generated/symbols.json
+
+2026-10-22T09:19:49Z brief · item TOOL-dTrueNorth-29 · reason 749a0bf50a8b memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-29-build-brief.md

@@ -94,7 +94,8 @@ required_keys_render = ["MEMORY_ROOT", "READINESS_ROWS"]
 optional_keys = ["SPEC_FORMAT_CUTOFF", "STREAMS_CUTOFF", "SPEC_WITNESS_CUTOFF", "DEAD_PATH_EXCLUDE", "READ_PATH_WAIVER", "BUILD_SLUG_RE", "PROJECT_REGISTRY_EXTRA", "RECORD_SERVES_CUTOFF", "SPEC_AUDIT_PIN_CUTOFF", "RECORD_UNDATED_ARTIFACTS", "ENTRY_CAP_UNIT", "READINESS_ROWS_CUTOFF", "ARMS_FLOORS", "ARMS_REFUSALS", "LIVE_ROW_PIN", "SEVERITY_UNLABELLED_PIN", "BACKLOG_MODE", "ASK_CUTOFF", "BACKLOG_EXCERPT_CHARS", "PROBE_ALLOW", "ROUTED_COMMIT_CUTOFF", "ROUTED_COMMIT_WAIVED", "ROUTED_PATHS"]
 # TOOL-dTrueNorth-20 S1: the four DESIGN_* keys are gov's, the as-built view's and the deviation join's,
 # and blank or absent is off. Listed so govkit's check 7 resolves the unattended row's condition keys;
-# that check is the list's one reader and writes nothing, so they stay absent from the example conf.
+# that check is the list's one reader and writes nothing. The example conf declares them blank, which
+# is off, as it declares the list's other three (TOOL-dTrueNorth-29 S5).
 conditional_keys = ["DEAD_PATH_PIN", "ORPHAN_ID_PIN", "LIVE_LANDED_UNCLOSED", "DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES"]
 defaults = { MEMORY_ROOT = "memory" }
 

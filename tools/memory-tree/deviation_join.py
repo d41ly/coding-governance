@@ -29,7 +29,7 @@ hand-off and its departing commit:
   - a spec revision that is not an ancestor of its unit's FIRST PASS, `<unit>@rev-N`, N the header
     revision the commit changed;
   - a spec revision that is not an ancestor of the commit adding the newest `spec-audit` record whose
-    `**Serves:**` pins `<unit>@rev-N`, read from `gen_build_index.read_bindings`' `pins`;
+    `**Serves:**` pins `<unit>@rev-N`, read from `tree_lib.read_bindings`' `pins`;
   - an `amended rev-N` ledger line under an `**Evidences:** <unit>` block of a `journal` record,
     `<unit>@rev-<N-1>`;
   - a divergence hand-back, a `prompts/` record whose `### Goal` opens `DIVERGENCE:`;
@@ -93,7 +93,8 @@ Exit 0 green or `report` · 1 on any finding under `refuse` · 2 nothing measure
 ITS STATES ARE THE KEY RULE's, `design_lib.read_design_keys` (TOOL-dTrueNorth-16 S5): OFF when all
 four `DESIGN_*` keys are blank or absent, one line and no history read; a partial set, or a
 `DESIGN_BASELINE` naming no commit, is nothing measured, exit 2, naming the key. The keys are gov's,
-absent from the kit's example conf, so an adopter's join reads them as off. NOTHING MEASURED, exit 2,
+declared blank in the kit's example conf, which is off, so an adopter's join reads them as off.
+NOTHING MEASURED, exit 2,
 on each cause alone (S23): the unattended kit does not resolve; the baseline names no commit, or no
 commit holding the record, whatever the specs; or the pin reads and no chain-build spec exists.
 COST, armed: one read of the kit's library, the two git spawns of `design_lib.read_spec_revisions`
@@ -132,7 +133,7 @@ import routed_commits  # noqa: E402  the host: its log pass, its routed-path tes
 from design_lib import (  # noqa: E402  the one parser of the design, and its clause-id grammar
     _CL, DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_keys, read_design_view, read_spec_revisions,
     read_tracked_builds, scan_chain_specs, write_design_fixture)
-from tree_lib import parse_conf, parse_spec_h1, read_adding_commits, read_blobs_at  # noqa: E402
+from tree_lib import HDR_RE, parse_conf, parse_spec_h1, read_adding_commits, read_bindings, read_blobs_at  # noqa: E402
 
 SAY = "deviation"
 POLICIES = ("report", "refuse")
@@ -470,7 +471,6 @@ def read_population(root, conf, commits):
     first act resolves the strip, before the view is read, so the CLI's armed join and the host's
     `read_host_lines` each refuse an unresolved kit whatever the history holds (TOOL-dTrueNorth-12 S2)."""
     read_gen_strip()
-    import gen_build_index as gbi     # the binding classifier and the header grammar, loaded only armed
     root = pathlib.Path(root)
     memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
     # The key rule first (TOOL-dTrueNorth-16 S5, S23): a partial set, or a pin naming no commit, is
@@ -521,9 +521,9 @@ def read_population(root, conf, commits):
                          "is measured and the run is never green")
     spec_of = {u: p for _b, p, u in specs if u}
     members = scan_clause_members(root, record, pin, now, old)
-    # The records a chain build holds, classified once by the generator's binding reader.
+    # The records a chain build holds, classified once by the kit's binding reader, `tree_lib.read_bindings`.
     rels = [p for p in found if re.match(re.escape(memory_root) + r"/builds/[^/]+/(?:build|reviews|prompts)/", p)]
-    binds = gbi.read_bindings(str(root), rels, conf)
+    binds = read_bindings(str(root), rels, conf)
     texts = {}
 
     def derive_slug(rel):
@@ -570,7 +570,7 @@ def read_population(root, conf, commits):
     for b, path, unit, sha, before, after, after_pass, after_audit in graded:
         if before is None or not check_material(before, after or ""):
             continue                                    # its creation, or no material change
-        rev = read_header_rev(before, gbi.HDR_RE)
+        rev = read_header_rev(before, HDR_RE)
         address = f"{unit}@rev-{rev if rev is not None else '?'}"
         if after_pass:
             members.append({"kind": "revision", "build": b, "address": address, "hand": "spec-revised", "sha": sha,
@@ -616,7 +616,7 @@ def read_population(root, conf, commits):
                     + [(sha, spec_of[unit]) for _b, _r, unit, sha in backs if sha and unit in spec_of])
 
     def read_rev_at(unit, sha):
-        rev = read_header_rev(at.get((sha, spec_of[unit])), gbi.HDR_RE) if sha and unit in spec_of else None
+        rev = read_header_rev(at.get((sha, spec_of[unit])), HDR_RE) if sha and unit in spec_of else None
         return f"{unit}@rev-{rev if rev is not None else '?'}"
 
     for b, rel, act, item, _row, sha in rows:

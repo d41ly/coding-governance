@@ -842,7 +842,7 @@ async function runWholeScriptArms() {
       'specs refused before any agent: ' + what + (r.threw ? '' : ' (accepted)'))
   }
   // ---- AC5: on a spec audit, `specs` is sibling context and may not name a subject.
-  r = await runReview(Object.assign({}, SPEC, { specs: ['s.md'] }), ALL_OK)
+  r = await runReview(Object.assign({}, SPEC, { specs: [SPEC.subjects[0].path] }), ALL_OK)
   ck(typeof r.threw === 'string' && r.threw.indexOf('`specs`') !== -1 && r.trace.length === 0,
     'spec-audit: a spec that is also a subject is refused')
   r = await runReview(Object.assign({}, SPEC, { specs: ['overview.md'] }), ALL_OK)

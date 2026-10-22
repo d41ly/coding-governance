@@ -21,8 +21,8 @@ THE KEY RULE, `read_design_keys`, the one reading of the four keys (TOOL-dTrueNo
 reader of the keys hand-rolls them: all four blank or absent is OFF, nothing read; some set and some
 not is a refusal naming each blank key; all four set is ARMED, `DESIGN_BASELINE` a 40-hex commit pin
 that resolves to a commit in the repository or a refusal naming it. `read_design` refuses the off
-state as well, naming every key, and the CLI exits 2 on a blank key. The keys are gov's: they are
-absent from the kit's example conf, so an adopter's engines read them as off.
+state as well, naming every key, and the CLI exits 2 on a blank key. The keys are gov's: the kit's
+example conf declares them blank, which is off, so an adopter's engines read them as off.
 The chain builds are the view's Build column; no build list is typed anywhere.
 
 THE CUTOFF AND THE KEY RULE (S7), applied by the carries join and the coverage read:
@@ -87,8 +87,8 @@ Usage (from the repository root):
 Exit 0 clean · 1 on a malformed line or a refusal · 2 when a DESIGN_* key is blank, so nothing was read.
 
 What it does not read: whether a spec carries a clause it names, which is the carries join's; which
-statuses carry; and any reader for an adopter — the keys are gov's, absent from the example conf, so
-an adopter's engines read them as off.
+statuses carry; and any reader for an adopter — the keys are gov's, declared blank in the example
+conf, which is off, so an adopter's engines read them as off.
 """
 from __future__ import annotations
 
