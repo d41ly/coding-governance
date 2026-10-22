@@ -49,5 +49,5 @@ You build ONE unit from its spec; the spec is the contract and this brief only a
 
 ## For this unit
 
-- You are the last unit, and the one driver-changing unit: you edit `tools/unattended/`. The run that dispatched you runs that driver from this worktree, so keep `unattended.sh` runnable at every step you leave it in; a syntax error there strands the run. Verify with `bash -n` on every shell file you touch.
+- You are the extra unit and the main driver change: you edit `tools/unattended/`. TOOL-dTrueNorth-20 builds after you (order 8) and consumes your CLOSED status, and TOOL-dTrueNorth-16 already added an edge refusal to `--dispatch` (fce3865a4), so read the driver at HEAD. The run that dispatched you runs that driver from this worktree, so keep `unattended.sh` runnable at every step you leave it in; a syntax error there strands the run. Verify with `bash -n` on every shell file you touch.
 
