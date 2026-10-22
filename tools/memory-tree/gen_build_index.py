@@ -4987,17 +4987,19 @@ def check_expand_contract() -> str:
 def test_asbuilt_view(arm) -> None:
     """TOOL-dTrueNorth-6's arms: every `asbuilt_view.py` fixture plant, and the host over a tree of its own.
 
-    MODULE-LEVEL, as `test_coverage_region` is. The plants read THIS tree's DESIGN_RECORD at its pin, as
-    the generator's own `--fixture` does, and skip aloud when the tree declares no design. The host case
+    MODULE-LEVEL, as `test_coverage_region` is. The plants build their design in a fixture repository of
+    their own (TOOL-dTrueNorth-16 S19), so they run whatever this tree declares. The host case
     is a fixture tree whose design record gives dAlpha two clauses in its `[chain]`, committed as the
     baseline, and whose view sits in a build's `build/` folder, where a staged edit of it is a build-index
     input: `--write` renders it; a hand edit staged there reds `--check` with the view under DRIFT; an
     `amends` record staged over the view rendered on zero records makes `--check --staged` render and
     reds it with the view under DRIFT until `--write` re-renders it (TOOL-dTrueNorth-8 S3), and so does
     an edit of a kit path staged alone over a committed record the view does not count (TOOL-dTrueNorth-17
-    S3), the render's code being a view input; a record departing from a clause through a `gap` row reds
-    `--check` with an `as-built VERDICT` naming it, while `--write` still writes every other artifact; a pin naming no commit is a named Problem;
-    and a blank DESIGN_VIEW prints the off line and reads nothing.
+    S3), the render's code being a view input; a record departing from a clause through a `gap` row leaves
+    `--check` at 0 and reds `--check-asbuilt` with an `as-built VERDICT` naming it (TOOL-dTrueNorth-16 S17),
+    while `--write` still writes every other artifact; a pin naming no commit is a named Problem; every
+    DESIGN_* key blank prints the off line and reads nothing; and DESIGN_VIEW alone blank is a partial
+    set, the named Problem (S6).
     """
     import asbuilt_view
     import design_lib
@@ -5145,8 +5147,10 @@ def test_asbuilt_view(arm) -> None:
             "- **Approver:** author", "- **Follow-through:** gap gap-mem-47", "- **Caused-by:** ARCH-tOne-1", ""]))
         run("git", "add", "--", dev_rel, cwd=tmp)
         # TOOL-dTrueNorth-16 S17 — superseding TOOL-dTrueNorth-6 AC8's verdict half: --check reports only what
-        # --write cures, so the gap record leaves it at 0 with no verdict line, and --check-asbuilt names it.
+        # --write cures, so once --write has rendered the view counting the gap record, which it cannot cure,
+        # --check is at 0 with no verdict line, and --check-asbuilt names the record.
         gap = "2026-08-01-build-ARCH-tOne-1-deviation-1: departs from cl-dAlpha-0001 and carries no amends or supersedes row"
+        _read_mode(cmd_write, tmp, conf)
         arm("TOOL-dTrueNorth-16 AC17 — a record departing through gap gap-mem-47 leaves --check at 0 with no "
             "as-built VERDICT line", "True",
             lambda: str((lambda r: r[0] == 0 and "as-built VERDICT" not in r[1])(_read_mode(cmd_check, tmp, conf))))

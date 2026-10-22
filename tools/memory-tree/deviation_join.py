@@ -424,15 +424,15 @@ def read_baseline_line(text):
 
 def scan_clause_members(root, record, pin, now, old):
     """The clause-move arm: the moved `Baseline:` line first, then each clause whose hash differs from the
-    pin's, departing at the oldest commit since the pin touching the record where its hash differs."""
+    pin's, departing at the oldest commit since the pin touching the record where its hash differs. `old`,
+    the record at the pin, is always read: an unreadable pin is nothing measured before this is reached
+    (TOOL-dTrueNorth-16 S23)."""
     members = []
     line = read_baseline_line(now)
     if not (line and pin.startswith(line)):
         members.append({"kind": "baseline", "build": None, "address": "DESIGN_RECORD's Baseline: line",
                         "hand": "design-revised", "sha": None,
                         "what": f"the Baseline: line moved from {pin[:9]} to {line[:9] if line else 'none'}"})
-    if old is None:
-        return members
     o = {cid: (b, h) for b, cid, _t, h in read_chain_clauses(old, f"{record} at {pin[:9]}")}
     n = {cid: (b, h) for b, cid, _t, h in read_chain_clauses(now, record)}
     moved = [cid for cid in sorted(set(o) | set(n)) if cid not in n or cid not in o or o[cid][1] != n[cid][1]]

@@ -40,7 +40,10 @@ still reads the view.
 THE TRANSITION (TOOL-dTrueNorth-17). When the records and the render's code land in two passes at one
 order, as TOOL-dTrueNorth-4's records and TOOL-dTrueNorth-6's render did at order 3, the second order-3
 pass to land owns the transition: it runs `gen_build_index.py --write`, stages DESIGN_VIEW in its own
-commit, and is dispatched with DESIGN_VIEW among its `--dispatch --writes` paths.
+commit, and was dispatched with DESIGN_VIEW among its `--dispatch --writes` paths. Since
+TOOL-dTrueNorth-16 S18 the view is a declared generated output of this file and of the generator, so a
+pass re-rendering it stages it WITHOUT declaring it, and declaring it beside either generator is the
+pairing `--dispatch` refuses.
 
 THE ROW is a record's `**Follow-through:**`, read as the instrument reads it:
   amends <clause id>@<hash8>                      the record's **After:** in the clause's place
