@@ -30,5 +30,7 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-22](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE BINDING-LINE GRAMMAR HAS NO TEMPLATE HOME. TOOL-dTrueNorth-1 states… |
 | [PLAY-dClosedLoop-23](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE PROMPT-MODE BRIEF CHECK READS THE AUTHORED ROSTER ITS OWN WAY.… |
 | [PLAY-dClosedLoop-24](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-22 | THE CHAIN PACKETS GO STALE WHEN dTrueNorth LANDS. Each chain build's… |
+| [PLAY-dClosedLoop-25](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE DEPARTURES REPORT STILL RUNS THE TWO INSTRUMENTS dTrueNorth… |
+| [PLAY-dClosedLoop-26](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-22 | THE PACKET RE-PIN GUARD READS AN IN-PLACE LANDING AS A LIVE RUN.… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
