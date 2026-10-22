@@ -150,3 +150,13 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T01:42:34Z dispatch · item 7ee19044 TOOL-dTrueNorth-20 · reason tools/memory-tree/check-memory-hygiene.sh
 
 2026-10-22T02:02:45Z dispatch · item 8d11da83 TOOL-dTrueNorth-20 · reason tools/memory-tree/tree_lib.py tools/memory-tree/gen_build_index.py tools/check-spec-tokens.test.sh memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-20-ledger.md memory/map/generated/symbols.json
+
+2026-10-22T02:29:03Z review · item dTrueNorth · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 3 · minors 19 · disposition promote
+
+2026-10-22T02:29:14Z rescope · item add TOOL-dTrueNorth-23 · reason closing diff review round 1 (reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md) finding 2 HIGH, item H1: the :(glob) revision readers read zero revisions under an ambient GIT_LITERAL_PATHSPECS
+
+2026-10-22T02:29:15Z rescope · item add TOOL-dTrueNorth-24 · reason closing diff review round 1 (reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md) finding 4 HIGH, item H2: rescope rows in a rotated RUN archive are dated by the rotation commit
+
+2026-10-22T02:29:17Z rescope · item add TOOL-dTrueNorth-25 · reason closing diff review round 1 (reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md) finding 11 HIGH, item H3: the verdict-epoch gate cannot see deviation_join.py (finding 20, M7, is the same defect)
+
+2026-10-22T02:29:18Z rescope · item add TOOL-dTrueNorth-26 · reason closing diff review round 1 (reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md) the 19 confirmed minors batched into one unit: items M1 to M9 and L1 to L7
