@@ -5,7 +5,6 @@ opened: 2026-10-21
 streams: tooling
 roster: TOOL
 ids: TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14
-status: OPEN
 spec-audit: 2026-10-21
 parents: dGroundRules
 may: PLAY-dClosedLoop-3
@@ -74,40 +73,61 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 13 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it](spec/2026-10-23-spec-TOOL-dSafePassage-3.md) | 1 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left](spec/2026-10-23-spec-TOOL-dSafePassage-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal](spec/2026-10-23-spec-TOOL-dSafePassage-4.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field](spec/2026-10-23-spec-TOOL-dSafePassage-7.md) | 2 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step](spec/2026-10-23-spec-TOOL-dSafePassage-11.md) | 3 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-12 — gov's remote CI at the interpreter floor, read from its one declaration, with the floor's preflight as the bar's first step](spec/2026-10-23-spec-TOOL-dSafePassage-12.md) | 3 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt](spec/2026-10-23-spec-TOOL-dSafePassage-8.md) | 3 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip](spec/2026-10-23-spec-TOOL-dSafePassage-10.md) | 4 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window](spec/2026-10-23-spec-TOOL-dSafePassage-6.md) | 4 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered](spec/2026-10-23-spec-TOOL-dSafePassage-9.md) | 4 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce](spec/2026-10-23-spec-TOOL-dSafePassage-13.md) | 5 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | OPEN | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 2 bound to this build, across 1 record folder(s).
+Records: 10 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dSafePassage-1 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8
+TOOL-dSafePassage-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 13 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 13 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 13
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 13 (cl-dClosedLoop-0018, cl-dClosedLoop-0019, cl-dClosedLoop-0020, cl-dClosedLoop-0021, cl-dClosedLoop-0022, cl-dClosedLoop-0023, cl-dClosedLoop-0024, cl-dClosedLoop-0025, cl-dClosedLoop-0026, cl-dClosedLoop-0027, cl-dClosedLoop-0028, cl-dClosedLoop-0029, cl-dClosedLoop-0030)
-- stale: 0 (none)
+- uncarried: 0 (none)
+- stale: 1 (cl-dClosedLoop-0018)
 - ambiguous: 0 (none)
-- owned nodes no spec names: policy-key.help.enforce, policy-key.install.deprecation-window, policy-key.install.on-shim-call, policy-key.install.retired-edits, policy-key.platforms.provision
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0021
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dSafePassage-1`, `TOOL-dSafePassage-3` | yes |
+| 2 | `TOOL-dSafePassage-2`, `TOOL-dSafePassage-4`, `TOOL-dSafePassage-7` | yes |
+| 3 | `TOOL-dSafePassage-11`, `TOOL-dSafePassage-12`, `TOOL-dSafePassage-8` | yes |
+| 4 | `TOOL-dSafePassage-10`, `TOOL-dSafePassage-6`, `TOOL-dSafePassage-9` | yes |
+| 5 | `TOOL-dSafePassage-13`, `TOOL-dSafePassage-5` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
