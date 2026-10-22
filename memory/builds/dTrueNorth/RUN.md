@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+gates-run: unattended-17926761784118913086-672420 850d13eb
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
@@ -220,3 +221,5 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T12:43:03Z dispatch · item 1dec4fbf TOOL-dTrueNorth-32 · reason tools/memory-tree/asbuilt_view.py tools/memory-tree/design_lib.py tools/memory-tree/deviation_join.py tools/memory-tree/routed_commits.py tools/memory-tree/gen_build_index.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-32.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-32-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
 
 2026-10-22T12:43:07Z brief · item TOOL-dTrueNorth-32 · reason c300daeff6c9 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-32-build-brief.md
+
+2026-10-22T13:54:45Z rescope · item add TOOL-dTrueNorth-33 · reason the close's bar on the prepared merge reds two legs this build caused: remote literals in deviation_join.py's fixture remote (TOOL-dTrueNorth-31 S8) and the kickoff-manifest ratchet over three watched files; one micro-unit clears both
