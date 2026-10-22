@@ -43,3 +43,5 @@ RED-first observation are owed to the close.
   `:(glob)` string beside a module-level constant holding one and a function naming one in its
   docstring only, it named `planted23.PLANTED` and `planted23.read_planted` as readers the table does
   not hold, and nothing stale.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `gen_build_index.py` selftest, break `u23-leaks`, 2 of its 5 arms red; under the `gen_build_index.py` selftest, breaks `u23-own-spawn` and `u23-table`, 4 of its 5 arms red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

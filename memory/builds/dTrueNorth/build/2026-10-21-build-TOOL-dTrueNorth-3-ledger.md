@@ -64,3 +64,5 @@ the close.
   arms; with that key off in a probe commit, `check_staged_render` answered `(True,
   'tools/check-spec-tokens.py is a build-index input or output')` with the cutoff set and `(False,
   'nothing is staged under the memory root, the conf or the kit')` with it blank.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `gen_build_index.py` selftest, breaks `u3-no-pair`, `u3-verb-never-refuses` and `u3-carries-input`, 4 of its 24 arms red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

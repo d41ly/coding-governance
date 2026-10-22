@@ -79,3 +79,5 @@ which is the deviation selftest's own body.
   `refused 3`, deviation-20, deviation-21 and deviation-26 on `refused:` lines and deviation-27 on
   none, exit 0; under `--approval author-recorded` it read 27 records, none malformed and none
   refused, no line naming deviation-25, deviation-26 or deviation-27, exit 0.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `routed_commits.py` selftest, which runs `deviation_join.py`'s plant arms, break `u26-untracked`, 1 of its 4 arm lines red; under the `asbuilt_view.py` selftest, the splice break (each product function the unit's pass commit changed put back to its text at that commit's parent, each function it added stubbed to raise), its 1 arm red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

@@ -40,3 +40,5 @@ this pass adds, scenario for scenario; the arms themselves, the `build-index sel
 Over the real tree, `--print-bindings` exits 0 printing `Q<TAB>0<TAB>2026-10-22<TAB>0`. With the cutoff
 passed in-process as 2026-09-01 it graded 159 `spec-audit` records, and the glob reader's
 record-to-adding-commit map equalled the argv reader's for all 159; none sits outside the pathspec.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `gen_build_index.py` selftest, the splice break (each product function the unit's pass commit changed put back to its text at that commit's parent, each function it added stubbed to raise), 6 of its 6 arms red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

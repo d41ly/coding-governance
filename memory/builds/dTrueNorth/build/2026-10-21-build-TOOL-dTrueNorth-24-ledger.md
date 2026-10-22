@@ -33,3 +33,5 @@ arms, and the `New arm:` line's RED-first observation are owed to the close.
   `DEPL-aRepatriatedFork-21`, as the row: `a25844711bfbc467c30fc8bdd485b27cf04b7a02` for the folder
   `memory/builds/aRepatriatedFork`, and `a73fe338770267f5c0f5a65e48bd484b0e714300` for the archive's
   own path. The two answers differ.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `routed_commits.py` selftest, which runs `deviation_join.py`'s plant arms, break `u24-file-pickaxe`, its 1 arm line red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

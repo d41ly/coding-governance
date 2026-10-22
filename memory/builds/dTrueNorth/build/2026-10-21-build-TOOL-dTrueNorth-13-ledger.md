@@ -51,3 +51,5 @@ to the close.
   `tools/workflows/tier2-review.test.sh` and the `^MT_ARGS=.*"path":"s1"` grep over
   `tools/workflows/unattended-build.test.sh`, each printed 0; over the `HEAD` files they printed 24,
   21, 1 and 1.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `gen_build_index.py` selftest, the splice break (each product function the unit's pass commit changed put back to its text at that commit's parent, each function it added stubbed to raise), 2 of its 2 arms red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

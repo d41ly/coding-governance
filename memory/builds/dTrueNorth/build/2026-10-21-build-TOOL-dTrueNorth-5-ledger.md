@@ -65,3 +65,5 @@ RED-first observations, are owed to the close.
   `python tools/roles/render_agents.py --check` exited 0, grading 9 agent types and 1 index; the
   `gov-builder`, `gov-spec-reviewer` and `gov-diff-reviewer` rows of the catalogue in
   `tools/roles/README.md` list `docs`, three of three.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `gen_build_index.py` selftest, the splice break (each product function the unit's pass commit changed put back to its text at that commit's parent, each function it added stubbed to raise), 9 of its 9 arms red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

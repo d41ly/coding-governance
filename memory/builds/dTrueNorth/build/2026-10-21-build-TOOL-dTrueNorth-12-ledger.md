@@ -50,3 +50,5 @@ so none was added.
   exited 2, `deviation: nothing measured — the generated-region strip cannot be read, ...: the
   unattended kit's lib-unattended.sh, which holds GEN_REGION_AWK, does not resolve: ...`, naming no
   view; `HEAD`'s module there exited 2 naming `DESIGN_VIEW`.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `routed_commits.py` selftest, which runs `deviation_join.py`'s plant arms, break `u12-stub-ignored`, 1 of its 2 arm lines red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

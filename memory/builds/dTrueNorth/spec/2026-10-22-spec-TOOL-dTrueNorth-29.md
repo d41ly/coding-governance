@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-21-build-TOOL-dTrueNorth-29-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-29-ledger.md) | journal | — |
+| [2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md](../build/2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-29-deviation-31.md](../build/2026-10-22-build-TOOL-dTrueNorth-29-deviation-31.md) | deviation | — |
 | [2026-10-22-build-TOOL-dTrueNorth-29-flagged-bar.md](../build/2026-10-22-build-TOOL-dTrueNorth-29-flagged-bar.md) | journal | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-29-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-29-build-brief.md) | journal | — |

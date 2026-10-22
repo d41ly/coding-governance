@@ -121,7 +121,7 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-29 — the self-test arms this build turned red, each turned green at its cause](spec/2026-10-22-spec-TOOL-dTrueNorth-29.md) | 12 | 2 | CLOSED | rev-1 | 2026-10-22 |
 <!-- /gen:build-units -->
 
-Records: 111 bound to this build, across 4 record folder(s).
+Records: 112 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

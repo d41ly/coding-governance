@@ -24,3 +24,5 @@ spec's own names resolve)`, and the `New arm:` line's RED-first observation agai
   `ids` printed `['TOOL-tPin-1', 'TOOL-tPin-1', 'TOOL-tPin-2', 'TOOL-tPin-3']`: the three distinct
   ids with the repeated one kept, the list `_expand_ids` returns at base, which §3 Edges hands to
   `TOOL-dTrueNorth-20` to fold and re-observe.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `gen_build_index.py` selftest, break `u9-three-value-expand`, the three-value `_expand_ids` the line names, 3 of its 3 arms red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.

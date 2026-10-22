@@ -60,3 +60,5 @@ observation over `gen_build_index.py`'s self-test, are owed to the close.
   exit 0 with findings 0 against the same file.
 - AC12 — `git grep -n "asbuilt_view.py" -- tools/memory-tree/README.md` — printed the "What's here" row
   naming the generator, its host `gen_build_index.py` and its `as-built view: off` state.
+
+The `New arm:` lines of this unit on the Python selftests were observed at the close, in a scratch clone of `e583a7f42` with the breaks of `2026-10-22-build-TOOL-dTrueNorth-29-arm-breaks.md` staged one set at a time: under the `gen_build_index.py` selftest, the splice break (each product function the unit's pass commit changed put back to its text at that commit's parent, each function it added stubbed to raise), 2 of its 3 arms red; under the `asbuilt_view.py` selftest, break `u6-checkview`, 2 of its 8 plant arms red. Each staged break was restored with a checkout, and at `92a0dcb96` every one of those selftests printed all arms held. Its lines on the shell suites the flagged bar runs are owed with that bar, which the owner deferred past this landing.
