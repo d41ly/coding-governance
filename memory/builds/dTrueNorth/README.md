@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 TOOL-dTrueNorth-21 TOOL-dTrueNorth-22 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-98 TOOL-dTrueNorth-99
+ids: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16 TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 TOOL-dTrueNorth-21 TOOL-dTrueNorth-22 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-27 TOOL-dTrueNorth-28 TOOL-dTrueNorth-98 TOOL-dTrueNorth-99
 spec-audit: 2026-10-21
 parents: dClosedLoop
 may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2
@@ -81,12 +81,13 @@ none
 | 24 | `TOOL-dTrueNorth-24` | **Derived:** PLAY-dClosedLoop-2 | a rescope row in a rotated RUN archive is dated by the commit that wrote it |
 | 25 | `TOOL-dTrueNorth-25` | **Derived:** PLAY-dClosedLoop-2 | the verdict-epoch gate sees deviation_join.py, and refuses a delegate list its imports outgrow |
 | 26 | `TOOL-dTrueNorth-26` | **Derived:** PLAY-dClosedLoop-2 | the closing diff review's minors: one scrubbed runner, one spec predicate, tracked records, one clause grammar, honest edges, and the comments that name them |
+| 27 | `TOOL-dTrueNorth-27` | **Derived:** PLAY-dClosedLoop-2 | the nine bar legs this build turned red, each cleared at its cause |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 24 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 25 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-4 TOOL-dTrueNorth-5 TOOL-dTrueNorth-6 TOOL-dTrueNorth-7 TOOL-dTrueNorth-8 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-11 TOOL-dTrueNorth-12 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-15 TOOL-dTrueNorth-16
-ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 TOOL-dTrueNorth-21 TOOL-dTrueNorth-22 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-98 TOOL-dTrueNorth-99
+ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 TOOL-dTrueNorth-21 TOOL-dTrueNorth-22 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-27 TOOL-dTrueNorth-28 TOOL-dTrueNorth-98 TOOL-dTrueNorth-99
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -115,20 +116,21 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-24 — a rescope row in a rotated RUN archive is dated by the commit that wrote it](spec/2026-10-22-spec-TOOL-dTrueNorth-24.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-22 |
 | [TOOL-dTrueNorth-25 — the verdict-epoch gate sees deviation_join.py, and refuses a delegate list its imports outgrow](spec/2026-10-22-spec-TOOL-dTrueNorth-25.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-22 |
 | [TOOL-dTrueNorth-26 — the closing diff review's minors: one scrubbed runner, one spec predicate, tracked records, one clause grammar, honest edges, and the comments that name them](spec/2026-10-22-spec-TOOL-dTrueNorth-26.md) | 10 | 2 | CLOSED | rev-2 | 2026-10-22 |
+| [TOOL-dTrueNorth-27 — the nine bar legs this build turned red, each cleared at its cause](spec/2026-10-22-spec-TOOL-dTrueNorth-27.md) | 11 | 2 | OPEN | rev-1 | 2026-10-22 |
 <!-- /gen:build-units -->
 
-Records: 92 bound to this build, across 4 record folder(s).
+Records: 98 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26.
+Ids no `spec-audit` record has ever named: TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-27.
 
-Ids whose spec moved past its audited revision: none — 0 of 24 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 25 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 24 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 25 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 6
 - carried in parts: 0 (none)
@@ -141,7 +143,7 @@ Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 24 spec(s) at or 
   `spec/2026-10-21-spec-TOOL-dTrueNorth-14.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-15.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-16.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-17.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-21-spec-TOOL-dTrueNorth-18.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-19.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-20.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-7.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-21-spec-TOOL-dTrueNorth-8.md` (PLAY-dClosedLoop-2), `spec/2026-10-21-spec-TOOL-dTrueNorth-9.md` (PLAY-dClosedLoop-2), `spec/2026-10-22-spec-TOOL-dTrueNorth-23.md` (PLAY-dClosedLoop-2), `spec/2026-10-22-spec-TOOL-dTrueNorth-24.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-22-spec-TOOL-dTrueNorth-25.md` (PLAY-dClosedLoop-2), `spec/2026-10-22-spec-TOOL-dTrueNorth-26.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-22-spec-TOOL-dTrueNorth-25.md` (PLAY-dClosedLoop-2), `spec/2026-10-22-spec-TOOL-dTrueNorth-26.md` (PLAY-dClosedLoop-2), `spec/2026-10-22-spec-TOOL-dTrueNorth-27.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0002
 <!-- /gen:build-coverage -->
 
@@ -158,6 +160,7 @@ Coverage of dTrueNorth's 6 clause(s) and 1 owned node(s), over 24 spec(s) at or 
 | 8 | `TOOL-dTrueNorth-20` | no |
 | 9 | `TOOL-dTrueNorth-23`, `TOOL-dTrueNorth-24`, `TOOL-dTrueNorth-25` | yes |
 | 10 | `TOOL-dTrueNorth-26` | no |
+| 11 | `TOOL-dTrueNorth-27` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

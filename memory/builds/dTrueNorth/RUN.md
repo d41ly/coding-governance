@@ -182,3 +182,5 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T04:18:37Z brief · item TOOL-dTrueNorth-26 · reason 5c5641a89fcf memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-26-build-brief.md
 
 2026-10-22T04:21:17Z dispatch · item 83ead708 TOOL-dTrueNorth-26 · reason memory/guides/SESSION-KICKOFF.md
+
+2026-10-22T05:08:03Z rescope · item add TOOL-dTrueNorth-27 · reason the plain merge bar at f4b9849c9 reds 9 legs this build's units caused (memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-27-bar1.log); one unit clears them before the close
