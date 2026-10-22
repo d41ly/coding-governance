@@ -72,9 +72,14 @@ its row's Text cell, the clause then rendering its baseline row (TOOL-dTrueNorth
 pinning a hash its clause does not carry at the baseline; the working tree's `Baseline:` line
 differing from the pin, the view still rendering from the pin; a view that does not answer `merge:
 ours` to `git check-attr merge`, `check_view_merge`, so no `.gitattributes` line guards the head count
-line two runs both rewrite (TOOL-dTrueNorth-26 S16); and under `--check`, a file differing
+line two runs both rewrite (TOOL-dTrueNorth-26 S16); a view answering `ours` only through an
+untracked info/attributes line, tracked state alone answering otherwise, a macro either side
+defines included (TOOL-dTrueNorth-32 S2); and under `--check`, a file differing
 from its render, named at its first differing line, and a `baseline` row whose text is not the
-baseline's, a changed clause with no citation.
+baseline's, a changed clause with no citation. Check 30 reads the merge attribute as tracked state
+answers it: no system or global attributes file, no attribute source tree (`attr.tree`,
+`GIT_ATTR_SOURCE`) and no untracked info/attributes line answers it, while the work tree's
+`.gitattributes` files do, an untracked one included.
 
 Usage (from the worktree root):
   python asbuilt_view.py --write [--out <path>]      render the view, by default to DESIGN_VIEW
@@ -113,6 +118,7 @@ import datetime
 import os
 import pathlib
 import re
+import subprocess
 import sys
 import tempfile
 
@@ -120,15 +126,20 @@ KIT = os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
 from deviation_join import (  # noqa: E402  the record grammar's one reader, and the fixture repository
-    Fixture, read_baseline_line, read_record, read_records, remove_tree)
+    Fixture, read_baseline_line, read_record, read_records, remove_tree, set_env_aside)
 from design_lib import (  # noqa: E402  the one parser of the design, and its clause-id grammar
     _CL, DESIGN_KEYS, VIEW_ROW, DesignRefusal, derive_clause_hash, read_chain_clauses, read_design_conf,
     read_design_keys, read_design_view, read_repo_root, run_git, write_design_fixture)
 
 SAY = "as-built view"
-# The env the merge check's attribute reads run under (TOOL-dTrueNorth-31 S3): no system attributes
-# file answers, as the call's own `-c core.attributesFile=/dev/null` keeps a global one out.
-ATTR_ENV = {"GIT_ATTR_NOSYSTEM": "1"}
+# The argv and the env every attribute read of the merge check runs with, one pair so no read carries a
+# different subset of it (TOOL-dTrueNorth-31 S3, TOOL-dTrueNorth-32 S1): `ATTR_ARGS` points
+# `core.attributesFile` at the null device and blanks `attr.tree`, so no global attributes file and no
+# configured attribute source tree answers, the command line outranking every config scope; `ATTR_ENV`
+# keeps the system attributes file out and takes `GIT_ATTR_SOURCE` out of the call's env, the None
+# value `design_lib.run_git` reads as "absent".
+ATTR_ARGS = ("-c", "core.attributesFile=/dev/null", "-c", "attr.tree=")
+ATTR_ENV = {"GIT_ATTR_NOSYSTEM": "1", "GIT_ATTR_SOURCE": None}
 ROW_FOLLOW = re.compile(r"(amends|supersedes) (" + _CL + r")@([0-9a-f]{8})(?: by (" + _CL + r"))?")   # asbuilt.py:59
 ROW_DEPARTS = re.compile(r"`?(" + _CL + r")@")                                                          # asbuilt.py:60
 # The instrument's own head (asbuilt.py:72-76), its slots the pin and the record count, and its two
@@ -197,54 +208,81 @@ def read_merge_answer(r):
 
 
 def read_info_merge(root, view):
-    """`(file, answer)` when the repository's `info/attributes` sets `merge` for `view`, else None
-    (TOOL-dTrueNorth-31 S3). That file is untracked node state outranking every tracked `.gitattributes`
-    line, so it is read where `git rev-parse --git-path info/attributes` puts it and, where it exists,
-    evaluated ALONE: as the `core.attributesFile` of an empty scratch repository initialised with
-    `--template=`, which no template can seed, under `ATTR_ENV`. Any answer but `unspecified` is
-    returned; a scratch evaluation that fails answers `nothing, exit <n>`, the refusing direction."""
+    """`(file, said)` when `view`'s `merge: ours` comes only through the repository's `info/attributes`,
+    else None (TOOL-dTrueNorth-31 S3, TOOL-dTrueNorth-32 S2, S10). That file is untracked node state
+    outranking every tracked `.gitattributes` line, and a macro either side defines can carry the view's
+    line across them, so the view is read as tracked state alone answers it, never the file alone:
+
+    1. `git rev-parse --git-path info/attributes` failing or printing nothing answers
+       `("info/attributes", "nothing, exit <n>")`, so check 30 refuses, as a failed scratch read does;
+    2. a resolved path that is no file answers None;
+    3. otherwise an empty scratch git directory, initialised `--bare --template=` under `ATTR_ENV` so no
+       template seeds it an `info/attributes`, reads the view with `--git-dir` naming it, `--work-tree`
+       naming the root, `ATTR_ARGS` and `ATTR_ENV`: the work tree's `.gitattributes` files answer with
+       their macros, and no `info/attributes` at all. `ours` answers None; any other answer is the
+       resolved path and that answer in backticks, and a failed read the path and `nothing, exit <n>`.
+       The scratch directory is taken out in a `finally`.
+
+    Its caller reads it only where the view answers `ours`, so a node without `info/attributes` pays no
+    git call beyond the path read. NOT CHECKED: a tracked `.gitattributes` missing from the work tree
+    answers from the index in the real read and not in the scratch one, so on a node that also holds
+    `info/attributes` it is this finding naming the wrong file, the refusing direction."""
     r = run_git(root, "rev-parse", "--git-path", "info/attributes", extra_env=ATTR_ENV)
     rel = r.stdout.decode("utf-8", "replace").strip() if r.returncode == 0 else ""
     if not rel:
-        return None
+        return "info/attributes", f"nothing, exit {r.returncode}"
     path = pathlib.Path(rel) if os.path.isabs(rel) else pathlib.Path(root, rel)
     if not path.is_file():
         return None
     scratch = tempfile.mkdtemp(prefix="av-attr-")
     try:
-        r = run_git(".", "init", "-q", "--template=", scratch, extra_env=ATTR_ENV)
+        r = run_git(".", "init", "-q", "--bare", "--template=", scratch, extra_env=ATTR_ENV)
         if r.returncode == 0:
-            r = run_git(scratch, "-c", f"core.attributesFile={path.as_posix()}", "check-attr", "merge", "--", view,
-                        extra_env=ATTR_ENV)
+            r = run_git(root, f"--git-dir={pathlib.Path(scratch).as_posix()}",
+                        f"--work-tree={pathlib.Path(os.path.abspath(root)).as_posix()}", *ATTR_ARGS,
+                        "check-attr", "merge", "--", view, extra_env=ATTR_ENV)
         value = read_merge_answer(r)
     finally:
         remove_tree(scratch)
-    if value == "unspecified":
+    if value == "ours":
         return None
     return rel, (f"`{value}`" if value else f"nothing, exit {r.returncode}")
 
 
 def check_view_merge(root, view):
     """The finding when `view`, the path DESIGN_VIEW names, does not answer `merge: ours` to `git
-    check-attr merge`, else None (TOOL-dTrueNorth-26 S16). Two concurrent runs both rewrite the view's
-    head count line, and the attribute is what lets a merge take one side for the generator to
-    re-render. It reads the attribute git resolves for the path, so a `.gitattributes` pattern covering
-    the view passes as the literal line does; a `check-attr` that fails is the finding too.
+    check-attr merge` as tracked state answers it, else None (TOOL-dTrueNorth-26 S16). Two concurrent
+    runs both rewrite the view's head count line, and the attribute is what lets a merge take one side
+    for the generator to re-render. It reads the attribute git resolves for the path, so a
+    `.gitattributes` pattern covering the view passes as the literal line does; a `check-attr` that
+    fails is the finding too.
 
-    The answer is tracked state's alone (TOOL-dTrueNorth-31 S3): the call sets `core.attributesFile` to
-    the null device and runs under `ATTR_ENV`, so no global or system attributes file answers, and where
-    it answers `ours`, `read_info_merge` evaluates the repository's `info/attributes`, which outranks
-    every tracked line: a merge it sets for the view is the finding, naming that file. No call reads
-    `--cached`: the work tree's `.gitattributes` answers, an untracked one included, as it always has."""
-    r = run_git(root, "-c", "core.attributesFile=/dev/null", "check-attr", "merge", "--", view, extra_env=ATTR_ENV)
+    THE SOURCES (TOOL-dTrueNorth-31 S3, TOOL-dTrueNorth-32 S1). Every attribute read here carries
+    `ATTR_ARGS` and runs under `ATTR_ENV`. Each source git consults beside the work tree's
+    `.gitattributes` files, and what keeps it out:
+      - the system attributes file, whose path is git's install prefix: `GIT_ATTR_NOSYSTEM=1` in
+        `ATTR_ENV`. No arm plants it: no variable relocates it, and an arm writes no file outside its
+        scratch directories;
+      - the global attributes file, `core.attributesFile` at any scope, by default under
+        `XDG_CONFIG_HOME` or `HOME`: `-c core.attributesFile=/dev/null` in `ATTR_ARGS`;
+      - an attribute source tree, which `--attr-source`, `GIT_ATTR_SOURCE` or `attr.tree` selects: no
+        call passes the option, `ATTR_ENV` takes the variable out of the call's env, and
+        `-c attr.tree=` in `ATTR_ARGS` blanks the config, the command line outranking every scope;
+      - `info/attributes`, in the git directory, the common one in a linked worktree: where the view
+        answers `ours`, `read_info_merge` reads it as tracked state alone answers it, and any other
+        answer there is the finding naming that file.
+    The work tree's `.gitattributes` files answer, an untracked one included, and the index answers
+    for one missing from the work tree: no call reads `--cached`, as TOOL-dTrueNorth-31 S3 chose."""
+    r = run_git(root, *ATTR_ARGS, "check-attr", "merge", "--", view, extra_env=ATTR_ENV)
     value = read_merge_answer(r)
     if value == "ours":
         info = read_info_merge(root, view)
         if info is None:
             return None
-        return (f"DESIGN_VIEW {view}: {info[0]} answers {info[1]} for its merge attribute, untracked node state "
-                "that outranks every tracked `.gitattributes` line, so this node merges the view as no other node "
-                f"does; delete that line and keep the tracked `{view} merge=ours` line")
+        return (f"DESIGN_VIEW {view}: answers `ours` for its merge attribute only through {info[0]}, untracked "
+                "node state that outranks every tracked `.gitattributes` line, and tracked state alone answers "
+                f"{info[1]}, so this node merges the view as no other node does; take the view's line, or the "
+                f"macro it uses, out of that file and keep the tracked `{view} merge=ours` line")
     said = f"`{value}`" if value else f"nothing, exit {r.returncode}"
     return (f"DESIGN_VIEW {view}: `git check-attr merge` answers {said}, not `ours`, so no `.gitattributes` line "
             f"`{view} merge=ours` guards it and two runs' re-renders conflict on its head count line; the path's "
@@ -588,32 +626,50 @@ def check_merge_arm(root, conf):
 
 
 def check_node_merge_arm(root, conf):
-    """`(held, what, detail)` of TOOL-dTrueNorth-31 AC3's arm over the fixture `build_view_fixture` wrote,
-    its work-tree `.gitattributes` emptied throughout: with `GIT_CONFIG_GLOBAL` naming a scratch config
-    whose `core.attributesFile` sets the view `merge=ours`, the one finding is still the unguarded view's,
-    naming DESIGN_VIEW; with that unset and the line in the repository's `info/attributes`, the one
-    finding names `info/attributes`; and with both gone and the tracked line restored, nothing. Red
-    against an attribute read that a global attributes file or `info/attributes` answers."""
+    """`(held, what, detail)` of TOOL-dTrueNorth-31 AC3's arm, with TOOL-dTrueNorth-32 AC1 and AC2's halves,
+    over the fixture `build_view_fixture` wrote. Each half plants one node state, its environment set
+    through `set_env_aside`'s keywords (TOOL-dTrueNorth-32 S15); no read here leaves `ATTR_ARGS` out,
+    so the plants' reach is the RED-first observation of the arm, and `git config attr.tree` must set:
+      - with the work-tree `.gitattributes` emptied: `GIT_CONFIG_GLOBAL` naming a scratch config whose
+        `core.attributesFile` sets the view `merge=ours`, an exported `GIT_ATTR_SOURCE` naming HEAD,
+        whose tree holds the tracked line, and a local `attr.tree` naming HEAD each leave the unguarded
+        view's finding, naming DESIGN_VIEW and `merge=ours`; the line in `info/attributes` is the
+        finding naming `info/attributes`;
+      - `[attr]keep merge=ours` in the work tree with `<view> keep` in `info/attributes`, and the
+        reverse, are that finding too, a macro either side defines included;
+      - the tracked line with the same line in `info/attributes` agrees, and is no finding;
+    and with every plant gone and the tracked line restored, nothing. Red against an attribute read that
+    a global attributes file, an attribute source tree or `info/attributes` answers, and against an
+    `info/attributes` evaluation that reads that file alone, which resolves no tracked macro."""
     attrs, git = pathlib.Path(root, ".gitattributes"), pathlib.Path(root, ".git")
-    line = attrs.read_bytes()
+    view, line = conf["DESIGN_VIEW"], attrs.read_bytes()
     node_attrs, node_conf, info = git / "node-attributes", git / "node-config", git / "info" / "attributes"
-    node_attrs.write_bytes(f"{conf['DESIGN_VIEW']} merge=ours\n".encode("utf-8"))
+    node_attrs.write_bytes(f"{view} merge=ours\n".encode("utf-8"))
     node_conf.write_bytes(f"[core]\n\tattributesFile = {node_attrs.as_posix()}\n".encode("utf-8"))
-    held = os.environ.get("GIT_CONFIG_GLOBAL")
+    macro, keep = b"[attr]keep merge=ours\n", f"{view} keep\n".encode("utf-8")
+    got = {}
+
+    def read_half(half):
+        got[half] = read_view_inputs(root, conf)[3]
+
     attrs.write_bytes(b"")
     try:
-        os.environ["GIT_CONFIG_GLOBAL"] = node_conf.as_posix()
+        with set_env_aside(GIT_CONFIG_GLOBAL=node_conf.as_posix()):
+            read_half("global")
+        with set_env_aside(GIT_ATTR_SOURCE="HEAD"):
+            read_half("GIT_ATTR_SOURCE")
+        tree_set = run_git(root, "config", "attr.tree", "HEAD").returncode
         try:
-            global_ = read_view_inputs(root, conf)[3]
+            read_half("attr.tree")
         finally:
-            if held is None:
-                os.environ.pop("GIT_CONFIG_GLOBAL", None)
-            else:
-                os.environ["GIT_CONFIG_GLOBAL"] = held
+            run_git(root, "config", "--unset", "attr.tree")
         info.parent.mkdir(exist_ok=True)
-        info.write_bytes(node_attrs.read_bytes())
         try:
-            local = read_view_inputs(root, conf)[3]
+            for half, tracked, local in (("info/attributes", b"", line), ("tracked macro", macro, keep),
+                                         ("info macro", keep, macro), ("agreeing", line, line)):
+                attrs.write_bytes(tracked)
+                info.write_bytes(local)
+                read_half(half)
         finally:
             info.unlink(missing_ok=True)
     finally:
@@ -621,14 +677,75 @@ def check_node_merge_arm(root, conf):
         node_attrs.unlink(missing_ok=True)
         node_conf.unlink(missing_ok=True)
     after = read_view_inputs(root, conf)[3]
-    ok = (len(global_) == 1 and global_[0].startswith("DESIGN_VIEW ") and "merge=ours" in global_[0]
-          and "info/attributes" not in global_[0]
-          and len(local) == 1 and local[0].startswith("DESIGN_VIEW ") and "info/attributes" in local[0]
-          and after == [])
-    return (ok, "TOOL-dTrueNorth-31 AC3 with the tracked line emptied, a global attributes file answering ours "
-                "leaves the unguarded view's finding, an info/attributes line answering ours is the finding naming "
-                "info/attributes, and the tracked line alone is clean",
-            f"global: {global_}\ninfo/attributes: {local}\ntracked alone: {after}")
+    unguarded = all(len(got[h]) == 1 and got[h][0].startswith("DESIGN_VIEW ") and "merge=ours" in got[h][0]
+                    and "info/attributes" not in got[h][0] for h in ("global", "GIT_ATTR_SOURCE", "attr.tree"))
+    local = all(len(got[h]) == 1 and got[h][0].startswith("DESIGN_VIEW ") and "info/attributes" in got[h][0]
+                for h in ("info/attributes", "tracked macro", "info macro"))
+    ok = tree_set == 0 and unguarded and local and got["agreeing"] == [] and after == []
+    return (ok, "TOOL-dTrueNorth-31 AC3 TOOL-dTrueNorth-32 AC1 AC2 with the tracked line emptied, a global attributes "
+                "file, an exported GIT_ATTR_SOURCE and a local attr.tree answering ours each leave the unguarded "
+                "view's finding; an info/attributes line, a tracked macro it uses and its macro a tracked line uses "
+                "are each the finding naming info/attributes; an agreeing info/attributes line and the tracked line "
+                "alone are clean",
+            "\n".join(f"{h}: {got[h]}" for h in got)
+            + f"\ngit config attr.tree exit {tree_set}\ntracked alone: {after}")
+
+
+def check_path_read_arm(root, conf):
+    """`(held, what, detail)` of TOOL-dTrueNorth-32 AC10's arm over the fixture `build_view_fixture` wrote:
+    with the module's `run_git` swapped, through a `global` statement, for a stand-in answering exit 128
+    with no stdout to `rev-parse` and calling the real runner otherwise, `read_info_merge` answers the
+    pair of `info/attributes` and `nothing, exit 128`; with the real runner restored in a `finally`, over
+    a fixture holding no `info/attributes` file, None. Red against a failed path read answering None,
+    the clean answer."""
+    global run_git
+    real, view = run_git, conf["DESIGN_VIEW"]
+
+    def run_rev_parse_failing(where, *args, **kw):      # the stand-in: rev-parse fails, every other call runs
+        if args[:1] == ("rev-parse",):
+            return subprocess.CompletedProcess(["git", *args], 128, b"", b"")
+        return real(where, *args, **kw)
+
+    run_git = run_rev_parse_failing
+    try:
+        failed = read_info_merge(root, view)
+    finally:
+        run_git = real
+    clean = read_info_merge(root, view)
+    held = failed is not None and failed[0] == "info/attributes" and "exit 128" in failed[1] and clean is None
+    return (held, "TOOL-dTrueNorth-32 AC10 a failed info/attributes path read is the pair naming info/attributes "
+                  "and exit 128, and with the real runner and no info/attributes file, None",
+            f"failed: {failed}\nreal runner: {clean}")
+
+
+def check_template_arm():
+    """`[(held, what, detail)]`, TOOL-dTrueNorth-32 AC14's two arms over a second fixture `build_view_fixture`
+    writes with `GIT_TEMPLATE_DIR` exported, through `set_env_aside`'s keywords, naming a scratch template:
+    with its `info/attributes` setting `*.md merge=binary`, `check_merge_arm` holds over the fixture, so
+    the fixture's own init took no template; with it setting `*.md merge=ours`, `check_node_merge_arm`
+    holds, which reds if `read_info_merge`'s scratch initialisation takes a template, its tracked-alone
+    read then answering `ours` through it. Both removed after."""
+    root, template = tempfile.mkdtemp(prefix="av-"), tempfile.mkdtemp(prefix="av-")
+    info = pathlib.Path(template, "info", "attributes")
+    arms = []
+    try:
+        info.parent.mkdir()
+        info.write_bytes(b"*.md merge=binary\n")
+        with set_env_aside(GIT_TEMPLATE_DIR=template):
+            conf = build_view_fixture(root)
+            held, what, detail = check_merge_arm(root, conf)
+            arms.append((held, "TOOL-dTrueNorth-32 AC14 a fixture built under a template whose info/attributes "
+                               f"sets *.md merge=binary: {what}", detail))
+            info.write_bytes(b"*.md merge=ours\n")
+            held, what, detail = check_node_merge_arm(root, conf)
+            arms.append((held, "TOOL-dTrueNorth-32 AC14 under a template whose info/attributes sets *.md merge=ours, "
+                               f"no scratch read takes it: {what}", detail))
+    except DesignRefusal as exc:
+        arms.append((False, "TOOL-dTrueNorth-32 AC14 a fixture builds under a template", str(exc)))
+    finally:
+        remove_tree(root)
+        remove_tree(template)
+    return arms
 
 
 def run_plant_arms():
@@ -654,6 +771,7 @@ def run_plant_arms():
             arms.append((rc == want and live and all(n in out for n in PLANT_NEEDLES[plant]), what, out))
         arms.append(check_merge_arm(root, conf))
         arms.append(check_node_merge_arm(root, conf))
+        arms.append(check_path_read_arm(root, conf))
         # TOOL-dTrueNorth-27 AC12: the fixture's view at its dated record name renders a head naming the
         # unit and the instrument that name carries, and a view named outside the record grammar is refused,
         # naming DESIGN_VIEW. Red against a head spelling one unit whatever DESIGN_VIEW names.
@@ -669,6 +787,7 @@ def run_plant_arms():
                      "TOOL-dTrueNorth-27 AC12 the head names the unit and the instrument of DESIGN_VIEW's dated "
                      "record name, and a view named outside that grammar is refused naming DESIGN_VIEW",
                      f"{head}\nmisnamed: {misnamed}"))
+        arms += check_template_arm()
     except DesignRefusal as exc:
         arms.append((False, "TOOL-dTrueNorth-16 S19 the fixture repository builds its own design", str(exc)))
     finally:

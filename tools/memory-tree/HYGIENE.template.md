@@ -592,9 +592,14 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     the design record the as-built view renders from must agree: a record departing from a clause
     with no `amends` or `supersedes` row, two amends of one clause no `**Supersedes:**` orders, a
     `**Supersedes:**` naming a record outside its clause's set, an `**After:**` holding a `|`, a
-    pinned hash the clause does not carry at the baseline, a `Baseline:` line moved off the pin, or
-    a view that does not answer `merge: ours` to `git check-attr merge`, so no `.gitattributes` line
-    guards it (`TOOL-dTrueNorth-26`), each fail, named. The records read are the TRACKED ones, so a
+    pinned hash the clause does not carry at the baseline, a `Baseline:` line moved off the pin, a
+    view that does not answer `merge: ours` to `git check-attr merge`, so no `.gitattributes` line
+    guards it (`TOOL-dTrueNorth-26`), or a view answering `ours` only through an
+    untracked info/attributes line, tracked state alone answering otherwise, a macro either side
+    defines included (`TOOL-dTrueNorth-32`), each fail, named. Check 30 reads the merge attribute as
+    tracked state answers it: no system or global attributes file, no attribute source tree
+    (`attr.tree`, `GIT_ATTR_SOURCE`) and no untracked info/attributes line answers it, while the
+    work tree's `.gitattributes` files do, an untracked one included. The records read are the TRACKED ones, so a
     draft never staged moves no verdict. These are the findings `--write` cannot cure, so they are not check 9's, whose
     message and remedy read only the view's byte drift. Delegated to
     `{{KIT_DIR}}/gen_build_index.py --check-asbuilt`, which renders through the host `--write` writes the

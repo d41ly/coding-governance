@@ -4688,6 +4688,11 @@
       "file": "tools/codebase-map/replay-phrases.py"
     },
     {
+      "id": "check_path_read_arm",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
+    },
+    {
       "id": "check_path_repoint",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -5346,6 +5351,11 @@
       "id": "check_temp_source",
       "kind": "function",
       "file": "tools/gate-lint/sh_hygiene.py"
+    },
+    {
+      "id": "check_template_arm",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "check_time_classes",

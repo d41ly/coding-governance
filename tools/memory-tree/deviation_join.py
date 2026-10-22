@@ -175,15 +175,23 @@ def run_git(root, *args, stdin=None):
 
 
 @contextlib.contextmanager
-def set_env_aside(names):
+def set_env_aside(names=(), **put):
     """Hold each of `names` present in `os.environ` out of it for the block, and put the held values back
     in its `finally` (TOOL-dTrueNorth-31 S4, S9): a reader that spawns git with the caller's environment,
     and a fixture whose verdict a caller's exported key would move, read the same answer whatever the
-    caller exported. A name the block sets itself is the block's to restore."""
-    held = {k: os.environ.pop(k) for k in names if k in os.environ}
+    caller exported. A name the block sets itself is the block's to restore.
+
+    Each keyword of `put` is held too where present, and set to its value for the block; the `finally`
+    takes each `put` key out before it restores what was held (TOOL-dTrueNorth-32 S15). An arm exporting
+    a variable names it as a keyword, so no line of the kit spells a quoted environment subscript the
+    conf-example parity scan would read as a conf key."""
+    held = {k: os.environ.pop(k) for k in (*names, *put) if k in os.environ}
     try:
+        os.environ.update(put)
         yield held
     finally:
+        for k in put:
+            os.environ.pop(k, None)
         os.environ.update(held)
 
 
@@ -1221,7 +1229,7 @@ def build_fixture(root, plants):
     `unmeasured-pin` declares a pin naming no commit over the base's specs, and `unmeasured-specs` the
     readable pin with no base, so no chain-build spec."""
     fx = Fixture(root, "memory/design/record.md", "memory/design/view.md")
-    if run_git(".", "init", "-q", str(root)) is None:
+    if run_git(".", "init", "-q", "--template=", str(root)) is None:     # no template seeds a remote (S7)
         raise RuntimeError(f"fixture: git init failed at {root}")
     fx.write_commit({".memory-tree.conf": f'MEMORY_ROOT="memory"\nFAMILIES="fixture:{FIXTURE_FAMILY}"\n',
                      "memory/DECISIONS.md": DECISIONS_TEXT}, "fixture: the fixture family and the decisions")
@@ -1450,7 +1458,7 @@ def check_blob_reader():
             "UTF-8, Unmeasured on the reader's OSError, and no batch spawn of its own")
     try:
         fx = Fixture(root, "memory/design/record.md", "memory/design/view.md")
-        if run_git(".", "init", "-q", str(root)) is None:
+        if run_git(".", "init", "-q", "--template=", str(root)) is None:
             raise RuntimeError(f"fixture: git init failed at {root}")
         sha = fx.read_sha(fx.write_commit({"memory/ok.md": "ok\n", "memory/bad.md": b"\xff\xfe not UTF-8\n"},
                                           "fixture: a blob that is UTF-8 and one that is not"))
@@ -1581,9 +1589,19 @@ def run_plant_arms(resolve=None):
                     # remote, moves no answer of a remote-less repository: the ladder resolves `main` there,
                     # and the export holds after the call. Red against a ladder spawned with the caller's
                     # GIT_DIR, which answers `origin/main`, resolved in one repository for rows read in another.
+                    # TOOL-dTrueNorth-32 S7 (AC7): every fixture init passes `--template=`, so with GIT_TEMPLATE_DIR
+                    # exported naming a template whose `config` declares an `origin` remote, a repository
+                    # `build_fixture` writes and the lone repository each list no remote. Red against an init
+                    # that takes the template, whose repository lists `origin`.
                     lone, exported = tempfile.mkdtemp(prefix="dj-"), str(fx.root / ".git")
+                    template, shaped = tempfile.mkdtemp(prefix="dj-"), tempfile.mkdtemp(prefix="dj-")
                     try:
-                        run_git(".", "init", "-q", lone)
+                        pathlib.Path(template, "config").write_bytes(
+                            b'[remote "origin"]\n\turl = https://example.invalid/origin.git\n')
+                        with set_env_aside(GIT_TEMPLATE_DIR=template):
+                            run_git(".", "init", "-q", "--template=", lone)
+                            build_fixture(shaped, [])
+                        remotes = {"build_fixture": run_git(shaped, "remote"), "lone": run_git(lone, "remote")}
                         with set_env_aside(("GIT_DIR",)):
                             os.environ["GIT_DIR"] = exported
                             try:
@@ -1591,11 +1609,16 @@ def run_plant_arms(resolve=None):
                             finally:
                                 os.environ.pop("GIT_DIR", None)
                     finally:
-                        remove_tree(lone)
+                        for scratch in (lone, template, shaped):
+                            remove_tree(scratch)
                     arms.append((lone_ref == ("main", "") and kept == exported,
                                  "TOOL-dTrueNorth-31 AC4 under an exported GIT_DIR naming a repository with a "
                                  "remote, a remote-less repository's decision ref is still `main`, and the "
                                  "export holds after the call", f"ref {lone_ref!r}; GIT_DIR after {kept!r}"))
+                    arms.append((all(said == b"" for said in remotes.values()),
+                                 "TOOL-dTrueNorth-32 AC7 with GIT_TEMPLATE_DIR naming a template whose config "
+                                 "declares an origin remote, a repository build_fixture writes and the lone "
+                                 "repository each list no remote", f"git remote: {remotes}"))
                     continue
                 counts[plant] = len(result["joins"])
                 needle = derive_plant_needle(plant)

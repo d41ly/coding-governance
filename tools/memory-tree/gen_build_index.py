@@ -4750,8 +4750,10 @@ def test_coverage_stub(arm) -> None:
     """TOOL-dTrueNorth-16 S16's arms: the coverage read through a stand-in resolver, which run in ANY tree,
     an adopter holding no checker included. The stub supplies the coverage function, as the resolver
     `read_landed_unclosed` takes stands in for a kit; the region and check 29's verb read its value; and
-    with the checker's name pointed at no file, the unstubbed read is the named Problem."""
+    with the checker's name pointed at no file, the unstubbed read is the named Problem; and a scratch
+    checker raising its own `DesignRefusal` under a namesake `design_lib` is that Problem too."""
     global CARRIES_CHECKER
+    import types
     spec = "memory/builds/dAlpha/spec/2026-09-02-spec-dAlpha-1.md"
     value = {"state": "armed", "cutoff": "2026-09-02", "measured": 1, "skipped": {}, "withdrawn": [],
              "builds": {"dAlpha": {"clauses": ["cl-dAlpha-0001"], "nodes": [], "specs": [(spec, "INPROGRESS")],
@@ -4783,6 +4785,32 @@ def test_coverage_stub(arm) -> None:
                 lambda: read_carries_coverage(t, conf))
         finally:
             CARRIES_CHECKER = held
+        # TOOL-dTrueNorth-32 S12 (AC12): the catch reads the refusal class the checker itself loaded. A
+        # scratch checker whose `load_design_lib` returns one object holding its own `DesignRefusal`, and
+        # whose `derive_carries_coverage` raises that class, is named by its absolute path, which
+        # `os.path.join` returns unchanged, while a namesake `design_lib` holding another `DesignRefusal`
+        # sits in `sys.modules`; unstubbed, the read is the named Problem. Red against a catch reading the
+        # class from `sys.modules` alone, where the checker's refusal escapes as itself.
+        checker = os.path.join(t, "scratch_checker.py")
+        write_text(checker, "import types\n\n\nclass DesignRefusal(ValueError):\n    pass\n\n\n"
+                            "LIB = types.SimpleNamespace(DesignRefusal=DesignRefusal)\n\n\n"
+                            "def load_design_lib():\n    return LIB\n\n\n"
+                            "def derive_carries_coverage(root, conf=None):\n"
+                            "    raise load_design_lib().DesignRefusal(\"the scratch checker's own refusal\")\n")
+        namesake = types.ModuleType("design_lib")
+        namesake.DesignRefusal = type("DesignRefusal", (ValueError,), {})
+        held, slot = CARRIES_CHECKER, sys.modules.get("design_lib")
+        CARRIES_CHECKER, sys.modules["design_lib"] = checker, namesake
+        try:
+            arm("TOOL-dTrueNorth-32 AC12 — a checker raising its own DesignRefusal under a namesake design_lib is the "
+                "named Problem", "carries join refused, so the coverage cannot be read: the scratch checker's own",
+                lambda: read_carries_coverage(t, conf))
+        finally:
+            CARRIES_CHECKER = held
+            if slot is None:
+                sys.modules.pop("design_lib", None)
+            else:
+                sys.modules["design_lib"] = slot
 
 
 def check_expand_contract() -> str:
@@ -5116,50 +5144,45 @@ def test_asbuilt_view(arm) -> None:
 
 
 def scan_glob_readers(kit_dir: str) -> list:
-    """`<module>.<qualified name>` for every function, at any depth, and every assignment's target outside
-    a function, of each `*.py` directly in `kit_dir` whose statement holds a string constant carrying a
-    `:(glob)` pathspec, sorted. A docstring is prose and never counts; a comment is not in the tree at all.
+    """The names the string constants carrying a `:(glob)` pathspec are charged to, over each `*.py`
+    directly in `kit_dir`, sorted. A docstring is prose and never counts; a comment is not in the tree.
 
     TOOL-dTrueNorth-23 S3: the population the pathspec-mode arm grades is DERIVED here, so a reader the
-    kit gains is named by the arm instead of skipped by it. The walk reaches every depth
-    (TOOL-dTrueNorth-31 S5): a function or method nested in a class or another function is named with
-    its enclosing class and function names joined by dots, and charged with the constants of its own
-    `def`, its signature's included, outside the functions and classes nested in it; an `Assign`,
-    `AnnAssign` or `AugAssign` outside every function, in a class body or an `if`, `try`, `with` or loop
-    block, is named by its targets, qualified by the enclosing classes. NOT SEEN: a pathspec composed at
+    kit gains is named by the arm instead of skipped by it. THE CHARGE RULE (TOOL-dTrueNorth-32 S5, S9):
+    each such constant outside a docstring is charged to exactly one name, the first of these that holds:
+      1. the innermost enclosing function, its decorators and signature included, as
+         `<module>.<qualified name>` joining every enclosing class and function name, so a class built
+         inside a function is charged to that function, its one reader;
+      2. else, outside every function, each `Name` in the targets of the innermost enclosing `Assign`,
+         `AnnAssign` or `AugAssign`, qualified by the enclosing classes;
+      3. else the innermost enclosing class, qualified, as a class-level `PATHS.append(...)` is;
+      4. else the module, as `<module>`, as a module-level `SPECS.append(...)` is.
+    The rule is total, so every shape the tree can hold has an owner. NOT SEEN: a pathspec composed at
     run time from pieces, as this function's own needle is, and one spelled in a shell script of the kit.
     """
     magic = ":(" + "glob)"     # composed, so this walk's own needle is no constant it finds
     scopes = (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
     found = set()
 
-    def check_glob_constant(node, docs):
-        # a glob constant under `node`, never descending into a function or class nested in it
-        todo = [node]
-        while todo:
-            cur = todo.pop()
-            if (isinstance(cur, ast.Constant) and isinstance(cur.value, str) and magic in cur.value
-                    and id(cur) not in docs):
-                return True
-            todo.extend(c for c in ast.iter_child_nodes(cur) if not isinstance(c, scopes))
-        return False
-
-    def scan_scope(node, qual, in_function, docs):
-        # `qual` is the module, then each enclosing class and function name
+    def scan_scope(node, qual, function, assign, klass, docs):
+        # `qual` is the module, then each enclosing class and function name; `function`, `assign` and
+        # `klass` the charge rule's first three owners in force at `node`, None where none encloses it
         for child in ast.iter_child_nodes(node):
-            if isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                if check_glob_constant(child, docs):
-                    found.add(".".join([*qual, child.name]))
-                scan_scope(child, [*qual, child.name], True, docs)
+            if isinstance(child, ast.Constant) and isinstance(child.value, str) and magic in child.value \
+                    and id(child) not in docs:
+                found.update([function] if function else assign or [klass or qual[0]])
+            elif isinstance(child, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, ".".join(inner), None, klass, docs)
             elif isinstance(child, ast.ClassDef):
-                scan_scope(child, [*qual, child.name], in_function, docs)
-            elif not in_function and isinstance(child, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                inner = [*qual, child.name]
+                scan_scope(child, inner, function, None, ".".join(inner), docs)
+            elif function is None and isinstance(child, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
                 targets = child.targets if isinstance(child, ast.Assign) else [child.target]
-                if check_glob_constant(child, docs):
-                    found.update(".".join([*qual, n.id]) for t in targets for n in ast.walk(t)
-                                 if isinstance(n, ast.Name))
+                names = [".".join([*qual, n.id]) for t in targets for n in ast.walk(t) if isinstance(n, ast.Name)]
+                scan_scope(child, qual, None, names or assign, klass, docs)
             else:
-                scan_scope(child, qual, in_function, docs)
+                scan_scope(child, qual, function, assign, klass, docs)
 
     for name in sorted(os.listdir(kit_dir)):
         if not name.endswith(".py"):
@@ -5169,7 +5192,7 @@ def scan_glob_readers(kit_dir: str) -> list:
                 if isinstance(node, (ast.Module, *scopes))
                 and node.body and isinstance(node.body[0], ast.Expr)
                 and isinstance(node.body[0].value, ast.Constant) and isinstance(node.body[0].value.value, str)}
-        scan_scope(tree, [name[:-3]], False, docs)
+        scan_scope(tree, [name[:-3]], None, None, None, docs)
     return sorted(found)
 
 
@@ -6324,14 +6347,23 @@ def cmd_selftest() -> int:
         spec23 = "memory/builds/tOne/spec/2026-08-01-spec-tOne-1.md"
         write_text(os.path.join(t23, spec23), read_text(os.path.join(t23, spec23)) + "\nA second revision.\n")
         write_text(os.path.join(t23, "memory", "backlog", "ARCH.md"), "# backlog\n\n- ARCH-tOne-9 · OPEN · a row\n")
+        # TOOL-dTrueNorth-32 S6: the backlog reader joins two pathspecs, the shards and every BACKLOG file,
+        # so a build's BACKLOG.md holding its own row sits beside the shard, and each pathspec reads a row.
+        write_text(os.path.join(t23, "memory", "builds", "tOne", "BACKLOG.md"),
+                   "# tOne backlog\n\n- ARCH-tOne-8 · OPEN · a build's row\n")
         run("git", "add", "-A", cwd=t23)
         run("git", "commit", "-q", "-m", "a second revision and a row", "--no-verify", cwd=t23)
         # TOOL-dTrueNorth-31 S7 (AC7): each row CALLS the reader it names. `read_population` reads a
         # deviation fixture of the `audit-pin` plant, whose pinned review and the base's divergence prompt
         # each answer one of its two pathspecs, under the identity strip the arm sets, so no unattended kit
-        # is read; its probe keeps the members those pathspecs date, empty when either reads nothing. The
-        # audit-writer row reads TOOL-dTrueNorth-14's fixture, whose answer is its run record. Red against a
-        # row running a shared helper in place of its reader, which a reader spawning its own git passes.
+        # is read; its probe keeps the members those pathspecs date. The audit-writer row reads
+        # TOOL-dTrueNorth-14's fixture, whose answer is its run record. Red against a row running a shared
+        # helper in place of its reader, which a reader spawning its own git passes.
+        # TOOL-dTrueNorth-32 S6 (AC6): each probe is empty unless each of its pathspecs read. The
+        # population probe answers only when the kinds it read hold both `audit` and `handback`, and the
+        # backlog probe only when it dates both ARCH-tOne-8 and ARCH-tOne-9, else an empty answer the arm
+        # names. Red against the deviation fixture built without the audit-pin plant, and against t23
+        # without its build's BACKLOG row.
         import routed_commits as _rc23
 
         dj23 = os.path.join(base, "deviation-population")
@@ -6341,12 +6373,15 @@ def cmd_selftest() -> int:
             "design_lib.read_spec_revisions":
                 lambda: _dl23.read_spec_revisions(t23, [spec23], conf23["MEMORY_ROOT"])[spec23],
             "deviation_join.read_population":
-                lambda: sorted((m["kind"], m["address"], m["sha"])
-                               for m in _dj20.read_population(dj23, djconf23, djcommits23)[0]
-                               if m["kind"] in ("audit", "handback") and m["sha"]),
+                lambda: (lambda got: got if {kind for kind, _a, _s in got} >= {"audit", "handback"} else [])(
+                    sorted((m["kind"], m["address"], m["sha"])
+                           for m in _dj20.read_population(dj23, djconf23, djcommits23)[0]
+                           if m["kind"] in ("audit", "handback") and m["sha"])),
             "gen_build_index.derive_audit_writers":
                 lambda: sorted(derive_audit_writers(t14w, conf14w["MEMORY_ROOT"], {run14}, _resolve_fixture14) or ()),
-            "row_grammar._build_backlog_pathspecs": lambda: _rg23.derive_first_seen(t23, conf23),
+            "row_grammar._build_backlog_pathspecs":
+                lambda: (lambda seen: seen if {"ARCH-tOne-8", "ARCH-tOne-9"} <= set(seen) else {})(
+                    _rg23.derive_first_seen(t23, conf23)),
             "gen_build_index.cmd_selftest": None,    # the suite's own fixtures, exempt by name
         }
 
@@ -6445,15 +6480,27 @@ def cmd_selftest() -> int:
                    'def read_planted():\n    return ":(glob)memory/**"\n\n\n'
                    'def read_prose():\n    """It names :(glob)memory/** in prose only."""\n    return "memory/**"\n\n\n'
                    'class Planted:\n    """A class docstring naming :(glob)memory/** is prose."""\n\n'
+                   '    PATHS = []\n    PATHS.append(":(glob)memory/builds/*/prompts/**")\n\n'
                    '    def read_method(self):\n        return ":(glob)memory/builds/*/reviews/**"\n\n\n'
-                   'if True:\n    GUARDED = ":(glob)memory/backlog/**"\n')
+                   'if True:\n    GUARDED = ":(glob)memory/backlog/**"\n\n\n'
+                   'def outer_class():\n    class Inner:\n        P = ":(glob)memory/builds/**"\n    return Inner.P\n\n\n'
+                   'def outer():\n    def inner():\n        return ":(glob)memory/**"\n    return inner\n\n\n'
+                   'SPECS = []\nSPECS.append(":(glob)memory/backlog/*.md")\n')
         write_text(os.path.join(plant23, "planted23.txt"), 'TEXT = ":(glob)memory/**"\n')
-        # TOOL-dTrueNorth-31 AC5 (S5): the walk reaches every depth, so the class method and the constant
-        # guarded under `if True:` are readers too. Red against the top-level walk, which names neither.
-        arm("TOOL-dTrueNorth-23 AC5 TOOL-dTrueNorth-31 AC5 — a planted module's glob-pathspec function, constant, "
-            "class method and guarded constant are readers the table lacks, and neither a docstring nor a file "
-            "that is no module is one",
-            "met=True unlisted=['planted23.GUARDED', 'planted23.PLANTED', 'planted23.Planted.read_method', "
+        # TOOL-dTrueNorth-31 AC5 (S5): the class method and the constant guarded under `if True:` are
+        # readers too. Red against the top-level walk, which names neither. TOOL-dTrueNorth-32 AC5 AC9
+        # AC13 (S5, S9, S13), the charge rule: the class built inside `outer_class` is charged to that
+        # function, the class-level `PATHS.append` to `Planted`, the module-level `SPECS.append` to the
+        # module, and the constant `inner` returns to `inner` alone, never to `outer`. Red against a walk
+        # stopping at a class nested in a function, which names no `outer_class`, against one naming no
+        # expression statement, which names neither `planted23` nor `planted23.Planted`, and against a
+        # walk charging a nested def's constant to its enclosing function, which names `planted23.outer`.
+        arm("TOOL-dTrueNorth-23 AC5 TOOL-dTrueNorth-31 AC5 TOOL-dTrueNorth-32 AC5 AC9 AC13 — a planted module's "
+            "glob-pathspec function, constant, class method, guarded constant, class in a function, class-level and "
+            "module-level appends and nested def are readers the table lacks, each charged to exactly one name, "
+            "and neither a docstring nor a file that is no module is one",
+            "met=True unlisted=['planted23', 'planted23.GUARDED', 'planted23.PLANTED', 'planted23.Planted', "
+            "'planted23.Planted.read_method', 'planted23.outer.inner', 'planted23.outer_class', "
             "'planted23.read_planted'] stale=[]",
             lambda: _scan_table23(plant23))
 

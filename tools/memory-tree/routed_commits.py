@@ -391,7 +391,7 @@ def build_fixture(root: pathlib.Path, name: str, commits: list) -> tuple:
     1-based position; a commit's first parent defaults to the one before it."""
     repo = root / name
     repo.mkdir()
-    run_git(repo, "init", "-q")
+    run_git(repo, "init", "-q", "--template=")      # no template seeds node state (TOOL-dTrueNorth-32 S7)
     (repo / ".git" / "HEAD").write_bytes(b"ref: refs/heads/main\n")
     out = bytearray()
     for n, c in enumerate(commits, 1):

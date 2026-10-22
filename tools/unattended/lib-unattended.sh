@@ -328,24 +328,39 @@ read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 w
 # `--scan <spec>...` (TOOL-dTrueNorth-20 S6) is the same walk over many specs in ONE awk, printing
 # `<spec> TAB <id>` per edge and `<spec> TAB` (no id) per consumes-from line of an Edges block from
 # which no id is read — a column-0 bullet headed `**consumes-from**` whose head is not followed by
-# whitespace, or whose payload is neither a backticked id, `external` nor `none` — so
+# whitespace, or whose payload is neither a backticked id, `external` nor a `none` that no backtick
+# follows in its bullet, its wrapped lines included — so
 # `scan_consumes_cycles` below can refuse the shape this reader alone reads as fewer edges. The
 # `external` form is well formed, names no unit, and prints nothing in either mode, and so is a payload
 # of `none`, bare or backticked, the corpus form the hygiene engine's Edges arm admits
 # (TOOL-dTrueNorth-26 S6, its deviation-26): read as unreadable, it refused every later `--dispatch`
 # of a build whose CLOSED spec holds it, with a remedy that rewrites a frozen spec. A `none` is admitted
-# only when no backtick follows it (TOOL-dTrueNorth-31 S1, its deviation-34): a `none` whose prose
-# holds a backticked token can name a sibling the dispatch would then never wait on, so it stays
-# unreadable and `--dispatch` refuses it; `none until the reader lands`, which names no token, is
-# admitted. Every other payload from which no id is read stays unreadable. A wrapped or indented line
-# that only mentions the verb is prose, as the hygiene engine reads it, and is no edge.
+# only when no backtick follows it in its bullet, its wrapped lines included (TOOL-dTrueNorth-31 S1,
+# its deviation-34, and TOOL-dTrueNorth-32 S4): a `none` whose prose holds a backticked token can name
+# a sibling the dispatch would then never wait on, so it stays unreadable and `--dispatch` refuses it;
+# `none until the reader lands`, which names no token, is admitted. A `none` bullet's verdict is HELD
+# until the bullet ends, at a blank line, a column-0 line opening another bullet (`-` or `*`, then
+# whitespace), a heading, a new file or the input's end, and each line before that end, indented or
+# lazy, joins its text, so a backticked id wrapped onto a continuation line is read. Only a `none`
+# payload is held, the one form admitted on what follows it; every other payload is read from its
+# first line, as before, and one from which no id is read stays unreadable. A wrapped or indented
+# line that only mentions the verb is prose, as the hygiene engine reads it, and is no edge.
 read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes from, one per line
   local mode=ids
   if [ "${1:-}" = --scan ]; then mode=scan; shift; else [ -r "${1:-}" ] || return 0; fi
   [ "$#" -gt 0 ] || return 0
   awk -v mode="$mode" '
-    FNR == 1 { in3 = 0; ined = 0 }
+    # The held `none` bullet ends here: unreadable when a backtick follows the word anywhere in it.
+    function print_held() {
+      if (held && mode == "scan" && rest ~ /`/) printf "%s\t\n", heldfile
+      held = 0
+    }
+    FNR == 1 { print_held(); in3 = 0; ined = 0 }
     { sub(/\r$/, "") }
+    held {
+      if ($0 ~ /^[ \t]*$/ || $0 ~ /^(-|\*)[ \t]/ || $0 ~ /^#+([ \t]|$)/) print_held()
+      else { rest = rest " " $0; next }
+    }
     /^## / { in3 = ($0 ~ /^## [0-9]+[.] Non-goals/); ined = 0; next }
     !in3 { next }
     /^### / { ined = ($0 ~ /^### Edges[ \t]*$/); next }
@@ -354,7 +369,10 @@ read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes 
       id = ""
       if ($0 ~ /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/) {
         t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
-        if (t ~ /^external([ \t]|$)/ || t ~ /^none([ \t][^`]*)?$/ || t ~ /^`none`([ \t][^`]*)?$/) next
+        if (t ~ /^external([ \t]|$)/) next
+        if (t ~ /^none([ \t]|$)/ || t ~ /^`none`([ \t]|$)/) {
+          held = 1; heldfile = FILENAME; rest = t; sub(/^`?none`?/, "", rest); next
+        }
         if (t ~ /^`/) {
           sub(/^`/, "", t); sub(/`.*$/, "", t)
           if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) id = t
@@ -362,7 +380,8 @@ read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes 
       }
       if (mode == "ids") { if (id != "") print id; next }
       printf "%s\t%s\n", FILENAME, id
-    }' "$@"
+    }
+    END { print_held() }' "$@"
 }
 
 # ------------------------------------------------------- a cycle among a build's consumes-from edges

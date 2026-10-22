@@ -13721,7 +13721,10 @@ verb_dispatch() { # slug · unit · writes...
   # CYCLE among the build's units, a self-edge included, which no dispatch order can satisfy, so the
   # run would wedge here with no named stop, naming the cycle. ONE `scan_consumes_cycles` call. An
   # edge onto another build's unit is not followed, as below; the `external` form names no unit, nor
-  # does `none` when no backtick follows it, and a `none` whose prose holds one is unreadable here.
+  # does `none` when no backtick follows it in its bullet, its wrapped lines included, and a `none`
+  # whose prose holds one is unreadable here (TOOL-dTrueNorth-32 S4). The remedy names that rule.
+  # Hygiene check 12 reads the bullet's first line alone and passes any `none`, a divergence the
+  # spec of TOOL-dTrueNorth-32 declares as owed work in its Edges.
   local _c_args=() _c_kind _c_what _c_bad="" _c_cycle=""
   for _e_id in $_e_units; do
     [ -n "${SPEC_PATH[$_e_id]:-}" ] && _c_args+=("$_e_id" "${SPEC_PATH[$_e_id]}")
@@ -13733,7 +13736,7 @@ verb_dispatch() { # slug · unit · writes...
     esac
   done < <(scan_consumes_cycles "${_c_args[@]}")
   if [ -n "$_c_bad" ]; then
-    fail 49 "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external or none:$_c_bad"
+    fail 49 "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external, or the word none with no backticked token after it in the bullet:$_c_bad"
     return 1
   fi
   if [ -n "$_c_cycle" ]; then

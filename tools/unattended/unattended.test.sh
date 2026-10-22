@@ -6418,7 +6418,8 @@ n=$((n+1)); case "$o" in *"dispatch declared"*) echo "ok   dispatch: the same co
 # ---- CLOSED or not; and an Edges bullet from which read_consumes_from reads no id, which that refusal
 # ---- reads as no edge at all, is refused naming its spec. Well formed and acyclic, the same consumer
 # ---- proceeds. RED-first: the driver before this unit declared both refused dispatches. The remedy
-# ---- names `none` beside `external` (TOOL-dTrueNorth-31 S10).
+# ---- names `none` beside `external` (TOOL-dTrueNorth-31 S10), and the rule a `none` is admitted by:
+# ---- no backticked token after it in the bullet (TOOL-dTrueNorth-32 S3).
 printf '# ARCH-tRun-1 — u\n\n**Status:** CLOSED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order 1\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n- **consumes-from** `ARCH-tRun-2` — the edge back\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
@@ -6427,8 +6428,8 @@ sed -i '/^### Edges$/,/ — the edge back$/d' memory/builds/tRun/spec/one.md
 sed -i 's/^- \*\*consumes-from\*\* `ARCH-tRun-1`/- **consumes-from**`ARCH-tRun-1`/' memory/builds/tRun/spec/two.md
 git add memory/builds/tRun/spec/one.md memory/builds/tRun/spec/two.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
-hit "$o" "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external or none"
-hit "$o" "or the word external or none: memory/builds/tRun/spec/two.md"
+hit "$o" "--dispatch declares a build pass while a spec of this build holds a consumes-from line in its Edges block from which no unit id is read, so every edge refusal here would read fewer edges than the spec declares, the direction that blocks nothing; write each as a column-0 bullet headed **consumes-from**, a space, then the producer's id in backticks, or the word external, or the word none with no backticked token after it in the bullet"
+hit "$o" "or the word external, or the word none with no backticked token after it in the bullet: memory/builds/tRun/spec/two.md"
 sed -i 's/^- \*\*consumes-from\*\*`ARCH-tRun-1`/- **consumes-from** `ARCH-tRun-1`/' memory/builds/tRun/spec/two.md
 git add memory/builds/tRun/spec/two.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
@@ -6450,7 +6451,17 @@ printf '# ARCH-tRun-1 — u\n\n**Status:** CLOSED · rev-1 · 2026-08-20 · node
 git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
 hit "$o" "from which no unit id is read"
-hit "$o" "or the word external or none: memory/builds/tRun/spec/one.md"
+hit "$o" "or the word external, or the word none with no backticked token after it in the bullet: memory/builds/tRun/spec/one.md"
+miss "$o" "dispatch declared"
+# ---- TOOL-dTrueNorth-32 S4 - THE `none` BULLET IS READ WHOLE: the same bullet wrapped, its backticked
+# ---- ARCH-tRun-2 on an indented continuation line, is still the unreadable refusal naming that spec,
+# ---- whose remedy names the rule. RED-first: the driver at 2057f2272 read the bullet's first line
+# ---- alone, admitted the wrapped `none` as no edge and dispatched the consumer.
+printf '# ARCH-tRun-1 — u\n\n**Status:** CLOSED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order 1\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n- **consumes-from** none until the producer\n  `ARCH-tRun-2` lands\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "from which no unit id is read"
+hit "$o" "or the word external, or the word none with no backticked token after it in the bullet: memory/builds/tRun/spec/one.md"
 miss "$o" "dispatch declared"
 # ---- TOOL-dTrueNorth-31 S14 - THE BARE `none` IS ADMITTED TOO, each admitted form its own plant: the
 # ---- CLOSED sibling's bullet unbackticked, with dash prose, dispatches its consumer. RED-first: with

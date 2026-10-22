@@ -214,3 +214,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T12:11:59Z review · item dTrueNorth-diff-r3 · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 0 · minors 16 · disposition promote
 
 2026-10-22T12:12:00Z rescope · item add TOOL-dTrueNorth-32 · reason closing diff review round 3 (reviews/2026-10-22-review-TOOL-dTrueNorth-31-closing-diff-review-round3.md) the 16 confirmed findings in 14 items, with the memory-hygiene conf-example parity red unit 31's GIT_CONFIG_GLOBAL read caused, batched into one unit
+
+2026-10-22T12:43:03Z dispatch · item 1dec4fbf TOOL-dTrueNorth-32 · reason tools/memory-tree/asbuilt_view.py tools/memory-tree/design_lib.py tools/memory-tree/deviation_join.py tools/memory-tree/routed_commits.py tools/memory-tree/gen_build_index.py tools/memory-tree/HYGIENE.template.md memory/HYGIENE.md tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/unattended.test.sh memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-32.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-32-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
+
+2026-10-22T12:43:07Z brief · item TOOL-dTrueNorth-32 · reason c300daeff6c9 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-32-build-brief.md

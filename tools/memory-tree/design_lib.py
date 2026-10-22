@@ -156,9 +156,12 @@ def run_git(root, *args, stdin=None, extra_env=None):
     `tree_lib.GIT_ENV_LEAKS`, the strip `tree_lib.read_git_output` applies, so an exported `GIT_DIR`
     never points the call at another repository than `root` (TOOL-dTrueNorth-26 S1). `extra_env` is laid
     over that stripped env, for the one call whose answer must also not read a node's state the strip
-    keeps, as the as-built merge check's attribute read (TOOL-dTrueNorth-31 S3)."""
+    keeps, as the as-built merge check's attribute read (TOOL-dTrueNorth-31 S3). A None value in it
+    reads as "absent from this call's env": its key is taken out, so a caller's exported
+    `GIT_ATTR_SOURCE` never reaches that read (TOOL-dTrueNorth-32 S1)."""
     env = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}
     env.update(extra_env or {})
+    env = {k: v for k, v in env.items() if v is not None}
     return subprocess.run(["git", "--no-replace-objects", "--literal-pathspecs", "-C", str(root), *args],
                           input=stdin, capture_output=True, env=env)
 
