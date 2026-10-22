@@ -4170,6 +4170,8 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
     printf -- '---\nslug: dAlpha\nnode: a\nopened: 2026-09-02\nstreams: arch\nroster: ARCH\nids: ARCH-dAlpha-1\n---\n\n# dAlpha\n\n<!-- gen:build-index -->\n<!-- /gen:build-index -->\n' > memory/builds/dAlpha/README.md
     printf '# a design record\n\n## [chain]\n\n| Build | Node | Owner | Clauses | Note |\n|---|---|---|---|---|\n| dAlpha | a | b | %s `cl-dAlpha-0001`; %s `cl-dAlpha-0002` | c |\n\n## [clause-ids]\n\nRetired: `cl-dAlpha-0009`\n' "$C29A1" "$C29A2" > memory/design/record.md
     printf 'OWNED = ("item",)\n\n\ndef derive():\n    return None, {"item": [{"key": "alpha-node", "rels": [("owner", ["dAlpha"])]}]}\n' > memory/design/nodes.py
+    # TOOL-dTrueNorth-26 S16: the view's merge=ours line, so check 30's clean arm reads a guarded view.
+    printf 'memory/design/view.md merge=ours\n' > .gitattributes
     git add -A && git -c commit.gpgsign=false commit -q -m design --no-verify
     printf '\nBaseline: `%s`\n' "$(git rev-parse HEAD)" >> memory/design/record.md
     printf 'SPEC_CARRIES_CUTOFF="2026-09-02"\nDESIGN_RECORD="memory/design/record.md"\nDESIGN_BASELINE="%s"\nDESIGN_VIEW="memory/design/view.md"\nDESIGN_NODES="memory/design/nodes.py"\n' "$(git rev-parse HEAD)" >> .memory-tree.conf
@@ -4238,11 +4240,13 @@ if [ -f "$HERE/../check-spec-tokens.py" ]; then
   C29G=memory/builds/dAlpha/build/2026-09-02-build-ARCH-dAlpha-1-deviation-1.md
   mkdir -p "$C29/memory/builds/dAlpha/build"
   printf -- '# ARCH-dAlpha-1 deviation 1 — a departure through a gap row\n\n**Serves:** deviation ARCH-dAlpha-1\n\n- **Departs from:** `cl-dAlpha-0001@%s` [chain]\n- **Hand-off:** design-to-spec\n- **Before:** the clause\n- **After:** the clause\n- **Cause:** builder discovery\n- **Reason:** the fixture departs\n- **Evidence:** the fixture\n- **Risk:** additive\n- **Approver:** author\n- **Follow-through:** gap gap-mem-47\n- **Caused-by:** ARCH-dAlpha-1\n' "$H29A1" > "$C29/$C29G"
+  # TOOL-dTrueNorth-26 S7: the view reads TRACKED records, so the record is staged to be read.
+  git -C "$C29" add -- "$C29G"
   out=$(run_cov29_gate --only 30); r30rc=$?
   n=$((n+1)); [ "$r30rc" = 1 ] || { echo "FAIL check 30 through the engine: a record departing through a gap row exited $r30rc, not 1"; st=1; }
   chit 30 "the as-built view's deviation records and its design record disagree, which --write cannot cure:"
   chit 30 "2026-09-02-build-ARCH-dAlpha-1-deviation-1: departs from cl-dAlpha-0001 and carries no amends or supersedes row"
-  rm -f "$C29/$C29G"
+  git -C "$C29" rm -qf -- "$C29G"
   out=$(run_cov29_gate --only 30); r30rc=$?
   n=$((n+1)); case "$r30rc:$out" in 0:*"memory-hygiene: check 30: as-built clean · 0 deviation records"*) ;; *) echo "FAIL check 30 through the engine: the clean view exited $r30rc, or check 30 printed no clean count line:"; printf '%s\n' "$out" | sed 's/^/      /'; st=1 ;; esac
   sed -i 's|^DESIGN_BASELINE=.*$|DESIGN_BASELINE="0000000000000000000000000000000000000000"|' "$C29/.memory-tree.conf"

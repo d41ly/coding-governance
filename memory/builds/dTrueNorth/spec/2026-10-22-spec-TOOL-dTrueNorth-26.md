@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-26 — the closing diff review's minors: one scrubbed runner, one spec predicate, tracked records, one clause grammar, honest edges, and the comments that name them
 
-**Status:** OPEN · rev-2 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 10
+**Status:** CLOSED · rev-2 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 10
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-21-build-TOOL-dTrueNorth-26-ledger.md](../build/2026-10-21-build-TOOL-dTrueNorth-26-ledger.md) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-26-deviation-25.md](../build/2026-10-22-build-TOOL-dTrueNorth-26-deviation-25.md) | deviation | — |
+| [2026-10-22-build-TOOL-dTrueNorth-26-deviation-26.md](../build/2026-10-22-build-TOOL-dTrueNorth-26-deviation-26.md) | deviation | — |
+| [2026-10-22-build-TOOL-dTrueNorth-26-deviation-27.md](../build/2026-10-22-build-TOOL-dTrueNorth-26-deviation-27.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-26-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-26-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-26-1-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-1-spec-writer.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-26-2-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-26-2-spec-writer.md) | journal | — |

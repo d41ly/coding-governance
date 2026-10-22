@@ -328,10 +328,14 @@ read_fork_cutoff() { # conf file -> the cutoff on stdout, blank when off; rc 2 w
 # `--scan <spec>...` (TOOL-dTrueNorth-20 S6) is the same walk over many specs in ONE awk, printing
 # `<spec> TAB <id>` per edge and `<spec> TAB` (no id) per consumes-from line of an Edges block from
 # which no id is read — a column-0 bullet headed `**consumes-from**` whose head is not followed by
-# whitespace, or whose payload is neither a backticked id nor `external` — so `scan_consumes_cycles`
-# below can refuse the shape this reader alone reads as fewer edges. The `external` form is well
-# formed, names no unit, and prints nothing in either mode; a wrapped or indented line that only
-# mentions the verb is prose, as the hygiene engine reads it, and is no edge.
+# whitespace, or whose payload is neither a backticked id, `external` nor `none` — so
+# `scan_consumes_cycles` below can refuse the shape this reader alone reads as fewer edges. The
+# `external` form is well formed, names no unit, and prints nothing in either mode, and so is a payload
+# of `none`, bare or backticked, the corpus form the hygiene engine's Edges arm admits
+# (TOOL-dTrueNorth-26 S6, its deviation-26): read as unreadable, it refused every later `--dispatch`
+# of a build whose CLOSED spec holds it, with a remedy that rewrites a frozen spec. Every other payload
+# from which no id is read stays unreadable. A wrapped or indented line that only mentions the verb is
+# prose, as the hygiene engine reads it, and is no edge.
 read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes from, one per line
   local mode=ids
   if [ "${1:-}" = --scan ]; then mode=scan; shift; else [ -r "${1:-}" ] || return 0; fi
@@ -347,7 +351,7 @@ read_consumes_from() { # spec file -> the unit ids its §3 Edges block consumes 
       id = ""
       if ($0 ~ /^(-|\*)[ \t]*\*\*consumes-from\*\*[ \t]/) {
         t = $0; sub(/^[^*]*\*\*[^*]*\*\*[ \t]*/, "", t)
-        if (t ~ /^external([ \t]|$)/) next
+        if (t ~ /^external([ \t]|$)/ || t ~ /^none([ \t]|$)/ || t ~ /^`none`([ \t]|$)/) next
         if (t ~ /^`/) {
           sub(/^`/, "", t); sub(/`.*$/, "", t)
           if (t ~ /^[A-Z]+-[A-Za-z0-9]+-[0-9]+$/) id = t

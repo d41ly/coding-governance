@@ -19,7 +19,10 @@
 # `--staged` is NOT the full check with a narrower file list. Several checks whose population is the
 # CORPUS rather than the diff are HELD: 13-16, 17-19, 21, the row-grammar arm, 23 and 26 (whose
 # population is the commit GRAPH) all skip, and the full run at the push boundary is where they
-# bind. Check 29 is held unless the commit stages a path under a build's spec/ folder or the conf.
+# bind. Checks 29 and 30 are not held by this file: each passes `--staged` through and its verb decides on the
+# render's trigger, `check_index_input`, plus the carries checker for check 29 and DESIGN_RECORD and
+# DESIGN_VIEW for check 30 (TOOL-dTrueNorth-16 S21, TOOL-dTrueNorth-20 S20). That rule is stated once, in the
+# block comments of checks 29 and 30 below, and this header points at them rather than restating it.
 # Check 22 is NOT among them and still walks every tracked review record here, and neither is check 25: its verdict is per spec, and its by-name
 # resolution reads the whole tracked tree whichever files are staged. This line used to read "set-checks tree-wide", which was
 # already false of 13-19 — one rule returning two verdicts, the
@@ -1694,7 +1697,8 @@ if check_selected 30; then
 # 30 — THE AS-BUILT VIEW'S VERDICTS (TOOL-dTrueNorth-16 S17). The view's byte drift is check 9's, under
 # `--write`, its one remedy; a finding `--write` cannot cure — a record departing from a clause with no
 # row, two unordered amends of one clause, a pipe in an `**After:**`, a pinned hash the clause does not
-# carry, a moved `Baseline:` line — is this check's, so check 9's message and the runner's regeneration
+# carry, a moved `Baseline:` line, a view no `merge=ours` attribute guards (TOOL-dTrueNorth-26 S16) —
+# is this check's, so check 9's message and the runner's regeneration
 # check read only what `--write` cures. Delegated to the generator's `--check-asbuilt`, as 29 delegates
 # `--check-coverage`: the view is `asbuilt_view.py`'s, read through the host `--write` renders it with,
 # so this file spells no second reading of it. The verb exits 1 naming each finding, and 2 when the key

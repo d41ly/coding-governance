@@ -70,16 +70,11 @@ sys.dont_write_bytecode = True
 KIT = pathlib.Path(__file__).resolve().parent
 if str(KIT) not in sys.path:
     sys.path.append(str(KIT))
-from tree_lib import build_git_env, build_spec_path_re, parse_conf, parse_spec_h1  # noqa: E402
+from tree_lib import GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, parse_spec_h1  # noqa: E402
 
 SAY = "routed-commits"
 ZERO_SHA_RE = re.compile(r"^0+$")
 SHA_RE = re.compile(r"^[0-9a-f]{7,40}$")
-# The variables a hook exports that would point a `-C <repo>` call at ANOTHER repository. Every call
-# here names its repository explicitly, so dropping them is always correct, and it is what keeps a
-# self-test fixture from reading the real repository when the bar runs inside a hook.
-GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_COMMON_DIR",
-                     "GIT_OBJECT_DIRECTORY", "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_PREFIX")
 #: Every git process this module starts, counted so the self-test can hold it constant (AC6).
 GIT_SPAWNS = [0]
 
@@ -89,11 +84,14 @@ class Refusal(Exception):
 
 
 def run_git(repo, *args, stdin: bytes | None = None, may_fail: bool = False):
-    """One pinned git call in `repo`, its stdout as bytes; None on failure when `may_fail`."""
+    """One pinned git call in `repo`, its stdout as bytes; None on failure when `may_fail`.
+
+    Its env is `build_git_env` less `tree_lib.GIT_ENV_LEAKS`, the kit's one list, `GIT_NAMESPACE`
+    included (TOOL-dTrueNorth-26 S1): every call here names its repository explicitly, so dropping the
+    variables a hook exports is always correct, and it is what keeps a self-test fixture from reading
+    the real repository when the bar runs inside a hook."""
     GIT_SPAWNS[0] += 1
-    env = build_git_env()
-    for key in GIT_LOCATION_VARS:
-        env.pop(key, None)
+    env = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}
     argv = ["git", "--no-replace-objects", "-c", "log.showSignature=false", "-C", str(repo), *args]
     proc = subprocess.run(argv, input=stdin, capture_output=True, env=env)
     if proc.returncode != 0:

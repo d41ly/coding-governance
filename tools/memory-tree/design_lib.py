@@ -42,7 +42,10 @@ read it.
 
 ONE SPEC FILENAME DATE, `SPEC_FILE_DATE`, the spec-token checker's pattern, which its `SPEC_DATE` is
 bound to (S32), and one fixture design, `write_design_fixture`, which the deviation join's and the
-as-built view's fixtures both write their designs with (S19).
+as-built view's fixtures both write their designs with (S19). ONE SPEC FILE PREDICATE,
+`build_spec_file_re`, which the revision reader refuses by and `scan_chain_specs` selects by, and ONE
+TRACKED READ of the build folders, `read_tracked_builds`, which `--chain-specs` and the deviation
+join's records and specs read (TOOL-dTrueNorth-26 S5, S7).
 
 THE `[chain]` ROWS of a design record are read by `read_chain_clauses` (TOOL-dTrueNorth-4 S9), the
 one reader the deviation population's clause-move arm and the as-built generator share; it takes the
@@ -102,7 +105,7 @@ KIT = os.path.dirname(os.path.abspath(__file__))
 if KIT not in sys.path:
     sys.path.insert(0, KIT)
 from tree_lib import (  # noqa: E402
-    build_git_env, build_spec_path_re, parse_conf, read_blobs_at, read_git_output, unfenced_lines)
+    GIT_ENV_LEAKS, build_git_env, build_spec_path_re, parse_conf, read_blobs_at, read_git_output, unfenced_lines)
 
 _CL = r"cl-d[A-Z]\w+-\d{4}"
 _DECISION = r"[A-Z]+-d[A-Z]\w+-\d+"
@@ -117,7 +120,9 @@ DERIVED = re.compile(r"^\*\*Derived:\*\* (" + _DECISION + r")\s*$")
 RELEASED = re.compile(r"^\*\*(Moved|Retired|Deferred):\*\* (" + _CL + r")(?: to (" + _BUILD + r"))? by ("
                       + _DECISION + r")\s*$")
 BINDING_HEAD = re.compile(r"^\*\*(Carries|Derived|Moved|Retired|Deferred):\*\*")
-VIEW_ROW = re.compile(r"^\| (d[A-Z]\w+) \| `(cl-d[A-Z]\w+-\d{4})` \| (.*) \| (baseline|deviation `([^`]+)`) \|$")
+# Built from `_CL` and `_BUILD` as `CARRY` is, so the clause-id grammar is spelled once in the kit and
+# the view's two importers read `_CL` from here (TOOL-dTrueNorth-26 S8).
+VIEW_ROW = re.compile(r"^\| (" + _BUILD + r") \| `(" + _CL + r")` \| (.*) \| (baseline|deviation `([^`]+)`) \|$")
 DESIGN_KEYS = ("DESIGN_RECORD", "DESIGN_BASELINE", "DESIGN_VIEW", "DESIGN_NODES")
 
 # A spec's filename date, the spec-token checker's own pattern, compiled here once: the checker's
@@ -147,9 +152,12 @@ class DesignRefusal(ValueError):
 def run_git(root, *args, stdin=None):
     """One git call at `root` under the kit's pin policy, its stdout as bytes and `stdin` its input;
     never raises on a non-zero exit, so each caller names its own refusal. Pathspecs are literal: a
-    conf value is a path, never a glob or a magic signature."""
+    conf value is a path, never a glob or a magic signature. Its env is `build_git_env` less
+    `tree_lib.GIT_ENV_LEAKS`, the strip `tree_lib.read_git_output` applies, so an exported `GIT_DIR`
+    never points the call at another repository than `root` (TOOL-dTrueNorth-26 S1)."""
+    env = {k: v for k, v in build_git_env().items() if k not in GIT_ENV_LEAKS}
     return subprocess.run(["git", "--no-replace-objects", "--literal-pathspecs", "-C", str(root), *args],
-                          input=stdin, capture_output=True, env=build_git_env())
+                          input=stdin, capture_output=True, env=env)
 
 
 def derive_clause_hash(text):
@@ -173,10 +181,14 @@ def read_design_view(view, root="."):
     indent, is a row and must match `VIEW_ROW` at column 0, so a hand edit that breaks or indents a
     row, or a blank line that splits the table, cannot shrink the clause population silently. A view
     with no row, a row whose id repeats, or a path naming no readable file is a refusal.
+
+    The file is read as bytes, decoded as UTF-8 with CRLF folded, as the view's writer and its
+    `--check` read it, so a bare CR stays in its row's text cell for every reader (TOOL-dTrueNorth-26
+    S10); a file that is not UTF-8 is the refusal.
     """
     path = pathlib.Path(root) / view
     try:
-        text = path.read_text(encoding="utf-8")
+        text = path.read_bytes().decode("utf-8").replace("\r\n", "\n")
     except (OSError, UnicodeDecodeError) as e:
         raise DesignRefusal(f"DESIGN_VIEW names {view}, which cannot be read: {e}") from None
     lines = text.split("\n")
@@ -389,21 +401,35 @@ def parse_binding_lines(text, path, strict=True):
     return bindings
 
 
+def build_spec_file_re(memory_root="memory"):
+    """THE ONE PREDICATE of what a spec file is (TOOL-dTrueNorth-26 S5), compiled for `fullmatch`: a
+    `.md` under `<memory_root>/builds/<slug>/spec/`, at any depth, whose filename holds `-spec-`, the
+    shape the revision log's pathspec `:(glob)<memory_root>/builds/*/spec/**/*-spec-*.md` matches.
+    `read_spec_revisions` refuses a path it does not match, and `scan_chain_specs` passes over a
+    spec-folder `.md` it does not match, counted as `unnamed`, so no selector hands the revision reader
+    a file it refuses. What bans a free-named spec-folder file is hygiene check 5, not this."""
+    memory_root = str(memory_root).replace("\\", "/").rstrip("/")
+    return re.compile(re.escape(memory_root) + r"/builds/[^/]+/spec/(?:[^/]+/)*[^/]*-spec-[^/]*\.md")
+
+
 def scan_chain_specs(paths, builds, cutoff, memory_root="memory"):
     """The chain builds' spec files among `paths`, `([(build, path)], {reason: count})`.
 
-    A path is a spec when `tree_lib.build_spec_path_re` places it under `<memory_root>/builds/<slug>/spec/`,
-    at any depth, and it ends `.md`; any other path is no spec and is not counted. A spec is kept when
-    its build is one of `builds` and its filename date, read by `SPEC_FILE_DATE`, is on or after `cutoff`;
-    what is passed over is counted as `other-build`, `pre-cutoff` and `undated`. A blank `cutoff`
-    reads no date and keeps every chain-build spec, as the instrument reads them. Statuses are not
-    read here: which statuses carry is the join's choice.
+    A path is a spec-folder file when `tree_lib.build_spec_path_re` places it under
+    `<memory_root>/builds/<slug>/spec/`, at any depth, and it ends `.md`; any other path is not
+    counted. One is kept when its build is one of `builds`, its filename date, read by
+    `SPEC_FILE_DATE`, is on or after `cutoff`, and `build_spec_file_re` calls it a spec; what is passed
+    over is counted as `other-build`, `pre-cutoff`, `undated` and `unnamed`, the last a spec-folder
+    file whose name holds no `-spec-` (TOOL-dTrueNorth-26 S5). A blank `cutoff` reads no date and keeps
+    every chain-build spec, as the instrument reads them. Statuses are not read here: which statuses
+    carry is the join's choice.
     """
     memory_root = str(memory_root).replace("\\", "/").rstrip("/")   # `memory/` would match no path
     spec_re = build_spec_path_re(memory_root)
+    spec_file = build_spec_file_re(memory_root)
     chain = set(builds)
     lead = len(memory_root) + len("/builds/")
-    kept, skipped = [], {"other-build": 0, "pre-cutoff": 0, "undated": 0}
+    kept, skipped = [], {"other-build": 0, "pre-cutoff": 0, "undated": 0, "unnamed": 0}
     for p in sorted({str(p).replace("\\", "/") for p in paths}):
         if not spec_re.match(p) or not p.endswith(".md"):
             continue
@@ -419,8 +445,29 @@ def scan_chain_specs(paths, builds, cutoff, memory_root="memory"):
             if m.group(1) < cutoff:
                 skipped["pre-cutoff"] += 1
                 continue
+        if not spec_file.fullmatch(p):
+            skipped["unnamed"] += 1
+            continue
         kept.append((build, p))
     return kept, skipped
+
+
+def read_tracked_builds(root, memory_root="memory"):
+    """Every TRACKED path under `<memory_root>/builds`, repo-relative POSIX in `git ls-files` order: ONE
+    `ls-files` through `run_git`, the read `--chain-specs` makes, lifted here so the deviation join's
+    records and spec list read the population `gen_build_index.plan()` reads (TOOL-dTrueNorth-26 S7).
+
+    A path in the index is tracked, so a record staged and not committed is read and a draft never
+    staged is not. A failed `ls-files` is a `DesignRefusal` naming it, which each caller maps as it
+    maps the design's other refusals."""
+    memory_root = str(memory_root).replace("\\", "/").strip("/") or "memory"
+    r = run_git(root, "ls-files", "-z", "--", f"{memory_root}/builds")
+    if r.returncode:
+        first = next((ln.strip() for ln in r.stderr.decode("utf-8", "replace").splitlines() if ln.strip()),
+                     "git printed nothing on stderr")
+        raise DesignRefusal(f"git ls-files over {memory_root}/builds exited {r.returncode}, so no tracked "
+                            f"record or spec was read: {first}")
+    return [p for p in r.stdout.decode("utf-8", "replace").split("\0") if p]
 
 
 def read_design_conf(root):
@@ -482,7 +529,7 @@ def read_spec_revisions(root, paths, memory_root="memory"):
         return out
     memory_root = str(memory_root).replace("\\", "/").rstrip("/")
     pathspec = f":(glob){memory_root}/builds/*/spec/**/*-spec-*.md"
-    inside = re.compile(re.escape(memory_root) + r"/builds/[^/]+/spec/(?:[^/]+/)*[^/]*-spec-[^/]*\.md")
+    inside = build_spec_file_re(memory_root)    # the predicate `scan_chain_specs` selects by (TOOL-dTrueNorth-26 S5)
     outside = [p for p in paths if not inside.fullmatch(p)]
     if outside:
         raise DesignRefusal(f"{outside[0]} is outside the revision log's pathspec {pathspec}, so its revisions "
@@ -625,17 +672,17 @@ def main(argv):
         return 2 if e.blank else 1
     if verb == "--chain-specs":
         memory_root = (conf.get("MEMORY_ROOT") or "memory").replace("\\", "/").rstrip("/")
-        r = run_git(root, "ls-files", "--", f"{memory_root}/builds")
-        if r.returncode:
-            print(f"design-lib: REFUSING — git ls-files over {memory_root}/builds failed, so no spec was read")
+        try:
+            tracked = read_tracked_builds(root, memory_root)
+        except DesignRefusal as e:
+            print(f"design-lib: REFUSING — {e}")
             return 1
-        kept, skipped = scan_chain_specs(r.stdout.decode("utf-8", "replace").splitlines(), design["builds"],
-                                         cutoff, memory_root)
+        kept, skipped = scan_chain_specs(tracked, design["builds"], cutoff, memory_root)
         for b, p in kept:
             print(f"  {b} {p}")
         print(f"design-lib: chain specs {len(kept)} in {len({b for b, _ in kept})} build(s) dated on or after "
               f"{cutoff} · passed over: other-build {skipped['other-build']}, pre-cutoff "
-              f"{skipped['pre-cutoff']}, undated {skipped['undated']}")
+              f"{skipped['pre-cutoff']}, undated {skipped['undated']}, unnamed {skipped['unnamed']}")
         return 0
     nodes = design["nodes"]
     print(f"design-lib: design at {design['baseline'][:9]} · view {design['view']} · {len(design['rows'])} "

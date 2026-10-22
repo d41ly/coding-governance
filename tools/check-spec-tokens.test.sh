@@ -38,7 +38,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # at the close.
 # RAISED 176 -> 181 by TOOL-dTrueNorth-20: its two conf-grammar arms, its two one-grammar probe arms and
 # its one date-pattern arm, each top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=181
+# RAISED 181 -> 189 by TOOL-dTrueNorth-26: its planted-BinOp arm, its six minors probe arms and its
+# one-grammar grep arm, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=189
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1524,19 +1526,109 @@ for name, text in (("twice", "SPEC_GUARD_LEGS_CUTOFF=\"2026-01-01\"\nSPEC_GUARD_
     print("AC18", name, cst.read_conf_key(root, "SPEC_GUARD_LEGS_CUTOFF"))
 print("AC21 one row grammar", asbuilt_view.VIEW_ROW is design_lib.VIEW_ROW, "one date pattern",
       cst.SPEC_DATE is design_lib.SPEC_FILE_DATE)
-tree = ast.parse(pathlib.Path(asbuilt_view.__file__).read_text(encoding="utf-8"))
-calls = [n for n in ast.walk(tree) if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
-         and isinstance(n.func.value, ast.Name) and n.func.value.id == "re"
-         and n.func.attr in ("compile", "match", "search", "fullmatch") and n.args]
-print("AC21 literal patterns", [n.lineno for n in calls if isinstance(n.args[0], ast.Constant)
-      and isinstance(n.args[0].value, str)], "over a walk that met re calls", bool(calls))' "$HERE/memory-tree" "$LINT" 2>&1)
+ALLOWED = ("ROW_FOLLOW", "ROW_DEPARTS")
+def scan_literal_patterns(tree):
+    # TOOL-dTrueNorth-26 S8: a call is flagged when ANY str Constant leaf sits in its pattern argument,
+    # so `r"^\| " + _CL` is seen as a literal is; each flag is named by the assignment it sits in.
+    owner = {}
+    for st in ast.walk(tree):
+        if isinstance(st, ast.Assign):
+            names = [t.id for t in st.targets if isinstance(t, ast.Name)]
+            for sub in ast.walk(st.value):
+                owner.setdefault(id(sub), names[0] if names else None)
+    return [owner.get(id(n)) or "line %d" % n.lineno for n in ast.walk(tree)
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute) and isinstance(n.func.value, ast.Name)
+            and n.func.value.id == "re" and n.func.attr in ("compile", "match", "search", "fullmatch") and n.args
+            and any(isinstance(x, ast.Constant) and isinstance(x.value, str) for x in ast.walk(n.args[0]))]
+src = pathlib.Path(asbuilt_view.__file__).read_text(encoding="utf-8")
+flagged = scan_literal_patterns(ast.parse(src))
+print("AC21 literal patterns", [f for f in flagged if f not in ALLOWED],
+      "the walk flagged exactly the allowed targets before the allow-list", sorted(flagged) == sorted(ALLOWED))
+planted = scan_literal_patterns(ast.parse(src + "\nSECOND = re.compile(r\"^\\| \" + _CL)\n"))
+print("AC12 planted", [f for f in planted if f not in ALLOWED])' "$HERE/memory-tree" "$LINT" 2>&1)
 check_one_probe() {   # $1 label · $2 the probe line it must print
   case "$one_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$one_out" | tail -3; fail=$((fail+1)) ;; esac
 }
 check_one_probe "a cutoff declared twice reads its last declaration through read_conf_key" "AC18 twice 2026-02-02"
 check_one_probe "a cutoff behind export reads as bash reads it through read_conf_key" "AC18 export 2026-03-03"
 check_one_probe "the view's row grammar and the checker's date pattern are design_lib's own" "AC21 one row grammar True one date pattern True"
-check_one_probe "no re call in asbuilt_view.py compiles a string-literal pattern, over a walk that met re calls" "AC21 literal patterns [] over a walk that met re calls True"
+check_one_probe "no re call in asbuilt_view.py holds a string-literal leaf in its pattern but ROW_FOLLOW and ROW_DEPARTS, which the walk flagged before the allow-list" "AC21 literal patterns [] the walk flagged exactly the allowed targets before the allow-list True"
+check_one_probe "TOOL-dTrueNorth-26 AC12 a BinOp pattern with a literal leaf, re.compile(r\"^\\| \" + _CL), is flagged" "AC12 planted ['SECOND']"
+# TOOL-dTrueNorth-26 AC1 AC3 AC11 AC14 AC15 — the closing diff review's minors, in-process. AC1: with
+# every name of tree_lib.GIT_ENV_LEAKS exported, neither design_lib.run_git nor routed_commits.run_git
+# passes one through, and routed_commits holds no second list, red against the base runners, which
+# passed the env whole or lacked GIT_NAMESPACE. AC3: part 1/2 and part 2/3 are ONE parts finding naming
+# both totals, and 1/2 with 2/2 none, red against the base arm, which read n from the first carrier.
+# AC11: the view's and the join's clause grammar is design_lib's object, red against a module spelling
+# it again. AC14: a bare CR in a view row stays in its text cell, red against the text-mode read, which
+# split the row. AC15: a namesake tree_lib in sys.modules is left there and the kit's file is returned,
+# red against the base loader, which returned the namesake.
+d=$base/minors26; mkdir -p "$d"
+m26_out=$(cd "$d" && "$PY" -c 'import ast, importlib.util, os, pathlib, subprocess, sys
+kit, lint = sys.argv[1:3]
+sys.path.insert(0, kit)
+import asbuilt_view, design_lib, deviation_join, routed_commits, tree_lib
+envs, real = [], subprocess.run
+class Done:
+    returncode, stdout, stderr = 0, b"", b""
+def captured(*a, **k):
+    envs.append(dict(k.get("env") or {}))
+    return Done()
+for name in tree_lib.GIT_ENV_LEAKS:
+    os.environ[name] = "leaked"
+subprocess.run = captured
+design_lib.run_git(".", "status")
+routed_commits.run_git(".", "status", may_fail=True)
+subprocess.run = real
+for name in tree_lib.GIT_ENV_LEAKS:
+    del os.environ[name]
+print("AC1 design_lib leaks", sorted(set(envs[0]) & set(tree_lib.GIT_ENV_LEAKS)), "routed_commits leaks",
+      sorted(set(envs[1]) & set(tree_lib.GIT_ENV_LEAKS)), "second list", hasattr(routed_commits, "GIT_LOCATION_VARS"))
+spec = importlib.util.spec_from_file_location("cst26", lint)
+cst = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(cst)
+text = "The reader takes one step."
+h = design_lib.derive_clause_hash(text)
+design = {"builds": {"dAb": {"cl-dAb-0001": (text, h, "baseline")}}, "retired": set(), "nodes": {}}
+def parts(a, b):
+    specs = {"dAb": [("memory/builds/dAb/spec/2026-09-02-spec-TOOL-dAb-%d.md" % n,
+                      "# TOOL-dAb-%d\n\n**Carries:** cl-dAb-0001@%s part %s\n" % (n, h, p), []) for n, p in ((1, a), (2, b))]}
+    return [f for f in cst.scan_carries(design, specs)["findings"] if f[1] == "parts"]
+two = parts("1/2", "2/3")
+print("AC3 totals 2 and 3 one finding", len(two) == 1 and "the totals 2 and 3" in two[0][3])
+print("AC3 one n no finding", parts("1/2", "2/2") == [])
+print("AC11 one clause grammar", asbuilt_view._CL is design_lib._CL, deviation_join._CL is design_lib._CL)
+pathlib.Path("view.md").write_bytes(b"# v\n\n| Build | Clause | Text | Since |\n|---|---|---|---|\n| dAb | `cl-dAb-0001` | one\rtwo | baseline |\n")
+try:
+    kept = [r[2] for r in design_lib.read_design_view("view.md", ".")] == ["one\rtwo"]
+except design_lib.DesignRefusal as exc:
+    kept = "refused: %s" % str(exc).replace("\n", " ")
+print("AC14 bare CR kept", kept)
+pathlib.Path("namesake").mkdir(exist_ok=True)
+pathlib.Path("namesake", "tree_lib.py").write_text("WHO = \"namesake\"\n", encoding="utf-8")
+ns = importlib.util.spec_from_file_location("tree_lib", "namesake/tree_lib.py")
+namesake = importlib.util.module_from_spec(ns)
+ns.loader.exec_module(namesake)
+sys.modules["tree_lib"] = namesake
+got = cst.load_kit_module("tree_lib")
+print("AC15 kit module", pathlib.Path(got.__file__).resolve() == pathlib.Path(kit, "tree_lib.py").resolve(),
+      "namesake kept", sys.modules["tree_lib"] is namesake)' "$HERE/memory-tree" "$LINT" 2>&1)
+check_m26_probe() {   # $1 label · $2 the probe line it must print
+  case "$m26_out" in *"$2"*) echo "arm ok    $1"; pass=$((pass+1)) ;; *) echo "arm FAIL  $1 — expected the probe to print: $2"; printf '%s\n' "$m26_out" | tail -3; fail=$((fail+1)) ;; esac
+}
+check_m26_probe "TOOL-dTrueNorth-26 AC1 neither kit git runner passes a GIT_ENV_LEAKS name through, and routed_commits holds no second list" "AC1 design_lib leaks [] routed_commits leaks [] second list False"
+check_m26_probe "TOOL-dTrueNorth-26 AC3 part 1/2 with part 2/3 is one parts finding naming both totals" "AC3 totals 2 and 3 one finding True"
+check_m26_probe "TOOL-dTrueNorth-26 AC3 part 1/2 with part 2/2 is no parts finding" "AC3 one n no finding True"
+check_m26_probe "TOOL-dTrueNorth-26 AC11 the view and the join read design_lib's own clause grammar" "AC11 one clause grammar True True"
+check_m26_probe "TOOL-dTrueNorth-26 AC14 a bare CR in a view row stays in its text cell" "AC14 bare CR kept True"
+check_m26_probe "TOOL-dTrueNorth-26 AC15 load_kit_module returns the kit's file and leaves a namesake in sys.modules" "AC15 kit module True namesake kept True"
+cl_files=$(grep -l -F 'cl-d[A-Z]\w+-\d{4}' "$HERE"/memory-tree/*.py | sed 's#.*/##' | tr '\n' ' ')
+cl_lines=$(cat "$HERE"/memory-tree/*.py | grep -c -F 'cl-d[A-Z]\w+-\d{4}')
+if [ "$cl_files:$cl_lines" = "design_lib.py :1" ]; then
+  echo "arm ok    TOOL-dTrueNorth-26 AC11 the clause-id grammar is spelled once in the kit, in design_lib.py"; pass=$((pass+1))
+else
+  echo "arm FAIL  TOOL-dTrueNorth-26 AC11 the clause-id grammar is spelled once in the kit, in design_lib.py — files [$cl_files], lines $cl_lines"; fail=$((fail+1))
+fi
 date_in_lint=$(grep -c -F '[0-9]{2})-spec-' "$LINT")
 date_in_lib=$(grep -c -F '[0-9]{2})-spec-' "$HERE/memory-tree/design_lib.py")
 if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then

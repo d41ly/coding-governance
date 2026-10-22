@@ -88,6 +88,9 @@ memory/gotchas/INDEX.md merge=ours
 # deviation record re-renders this one file, so two concurrent runs both rewrite its head count line.
 # A merge takes this side, and push-main's `regen.py --write` re-renders it through the generator's
 # existing `[[generated]]` row, `gen_build_index.py --write`, so the result counts both runs' records.
+# The path has THREE HOMES that move together: this line, DESIGN_VIEW in `.memory-tree.conf`, and the
+# view's two GENERATED_INDEXES pairs in `.unattended.conf`. Check 30 reds a view this line no longer
+# guards (`check_view_merge`, TOOL-dTrueNorth-26 S16), reading the attribute git resolves for the path.
 memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md merge=ours
 
 # The governance template is under a STRICT byte gate — pin it (+ companions) to LF so a CRLF

@@ -1675,8 +1675,9 @@ def render_asbuilt_view(root: str, conf: dict) -> dict:
     view's path, its render, the count of deviation records it renders from (TOOL-dTrueNorth-20 S4), the
     render's findings — a deviation with no row, two amends of one clause no `**Supersedes:**` orders
     and a `**Supersedes:**` naming a record outside its clause's set (TOOL-dTrueNorth-18), a pipe in an
-    `**After:**`, a pinned hash its clause does not carry, a moved `Baseline:` line, which `--write`
-    cannot cure and `--check-asbuilt` prints (S17) —
+    `**After:**`, a pinned hash its clause does not carry, a moved `Baseline:` line, a view no
+    `merge=ours` attribute guards (TOOL-dTrueNorth-26 S16), which `--write` cannot cure and
+    `--check-asbuilt` prints (S17) —
     and the file's drift from the render, a hand edit named at its first differing line and a
     `baseline` row whose text is not the baseline's, which it can and `--check` lists. A partial key
     set, and a pin whose design record cannot be read, is a Problem: there is nothing to render.
@@ -3087,7 +3088,8 @@ def cmd_check_asbuilt(root: str, conf: dict, staged: bool = False, here: str | N
 
     It prints TOOL-dTrueNorth-6 S4's findings other than the view's byte drift — a record departing
     from a clause with no row, the head rule's two, a pipe in an `**After:**`, a pinned hash its clause
-    does not carry, a moved `Baseline:` line — under `as-built VERDICT`, and exits 1. Its count line
+    does not carry, a moved `Baseline:` line, a view no `merge=ours` attribute guards (TOOL-dTrueNorth-26
+    S16) — under `as-built VERDICT`, and exits 1. Its count line
     opens `build-index: as-built` on every armed run (TOOL-dTrueNorth-20 S4): `build-index: as-built
     clean · <n> deviation records` when no finding stands, and `build-index: as-built <k> finding(s)`
     above the `as-built VERDICT` block when any does. Off, all four DESIGN_* keys blank, it prints the
@@ -4992,6 +4994,9 @@ def test_asbuilt_view(arm) -> None:
     with tempfile.TemporaryDirectory() as tmp:
         _fixture(tmp)
         write_text(os.path.join(tmp, record_rel), record)
+        # TOOL-dTrueNorth-26 S16 — the view's merge=ours line, so an arm asserting check 30 clean reads
+        # a guarded view, as the tree's own `.gitattributes` guards DESIGN_VIEW.
+        write_text(os.path.join(tmp, ".gitattributes"), f"{view_rel} merge=ours\n")
         run("git", "add", "-A", cwd=tmp)
         run("git", "commit", "-q", "-m", "design", "--no-verify", cwd=tmp)
         sha = run("git", "rev-parse", "HEAD", cwd=tmp).strip()

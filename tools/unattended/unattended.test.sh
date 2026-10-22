@@ -6432,6 +6432,37 @@ sed -i 's/^- \*\*consumes-from\*\*`ARCH-tRun-1`/- **consumes-from** `ARCH-tRun-1
 git add memory/builds/tRun/spec/two.md >/dev/null 2>&1
 o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
 hit "$o" "dispatch declared"
+# ---- TOOL-dTrueNorth-26 S6 - A CONSUMES-FROM `none` NAMES NO UNIT, as `external` does. The CLOSED
+# ---- sibling ARCH-tRun-1 declares it backticked, the corpus form the hygiene engine admits, and the
+# ---- consumer's dispatch is not refused. RED-first: the driver at 83ead708 read the line as unreadable
+# ---- and refused every later dispatch of the build, with a remedy that rewrites a frozen spec.
+printf '# ARCH-tRun-1 — u\n\n**Status:** CLOSED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order 1\n\n## 2. Scope (IN)\n\n- s\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n- **consumes-from** `none` — it builds on nothing\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/one.md
+git add memory/builds/tRun/spec/one.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "dispatch declared"
+miss "$o" "from which no unit id is read"
+# ---- TOOL-dTrueNorth-26 S9 - A PRODUCER ON THE AUTHORED ROSTER WITH NO SPEC BLOCKS ITS CONSUMER. The
+# ---- consumer ARCH-tRun-2 declares consumes-from ARCH-tRun-3, which the README's roster:units pair
+# ---- names and no spec defines: --dispatch refuses it with code 49 naming both units and `(no spec)`,
+# ---- and proceeds once ARCH-tRun-3's spec is CLOSED; a malformed pair is refused naming the README.
+# ---- RED-first: the driver at 83ead708 read the producer set from the generated region alone, so the
+# ---- unspecced producer was skipped and the consumer dispatched.
+roster tRun 'ARCH-tRun-1
+ARCH-tRun-2
+ARCH-tRun-3'
+sed -i 's/`ARCH-tRun-1` — the code it builds on/`ARCH-tRun-3` — the code it builds on/' memory/builds/tRun/spec/two.md
+git add memory/builds/tRun/spec/two.md memory/builds/tRun/README.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "--dispatch declares a build pass for a unit whose spec consumes from a unit of its own build that is neither CLOSED nor WONTDO, so the consumer would build against code its producer has not landed: ARCH-tRun-2 consumes-from ARCH-tRun-3 (no spec)"
+printf '# ARCH-tRun-3 — the producer\n\n**Status:** CLOSED · rev-1 · 2026-08-20 · node a · Tier-2 · base 0123abcd · order 1\n\n## 2. Scope (IN)\n\n- s\n\n## 6. Acceptance criteria\n\n- AC1 observable.\n\n## 7. Gates\n\n- g\n\n## 8. Open questions\n\nnone\n' > memory/builds/tRun/spec/three.md
+git add memory/builds/tRun/spec/three.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "dispatch declared"
+printf '\n%s\n' '<!-- roster:units -->' >> memory/builds/tRun/README.md
+git add memory/builds/tRun/README.md >/dev/null 2>&1
+o=$(run --dispatch tRun --pass ARCH-tRun-2 --writes ${PFX}b.sh)
+hit "$o" "--dispatch cannot read the authored roster:units pair of memory/builds/tRun/README.md, which is malformed, so a producer planned there with no spec yet could not block its consumer"
+git rm -q --cached memory/builds/tRun/spec/three.md >/dev/null 2>&1; rm -f memory/builds/tRun/spec/three.md
 # Restore the passing-case spec and the one-unit README the arms below read.
 git rm -q --cached memory/builds/tRun/spec/two.md >/dev/null 2>&1; rm -f memory/builds/tRun/spec/two.md
 cp "$TMP/edge-readme" memory/builds/tRun/README.md

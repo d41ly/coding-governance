@@ -590,8 +590,10 @@ imported, and with a pin set and the kit absent the failure is NAMED, not a trac
     the design record the as-built view renders from must agree: a record departing from a clause
     with no `amends` or `supersedes` row, two amends of one clause no `**Supersedes:**` orders, a
     `**Supersedes:**` naming a record outside its clause's set, an `**After:**` holding a `|`, a
-    pinned hash the clause does not carry at the baseline, or a `Baseline:` line moved off the pin
-    each fail, named. These are the findings `--write` cannot cure, so they are not check 9's, whose
+    pinned hash the clause does not carry at the baseline, a `Baseline:` line moved off the pin, or
+    a view that does not answer `merge: ours` to `git check-attr merge`, so no `.gitattributes` line
+    guards it (`TOOL-dTrueNorth-26`), each fail, named. The records read are the TRACKED ones, so a
+    draft never staged moves no verdict. These are the findings `--write` cannot cure, so they are not check 9's, whose
     message and remedy read only the view's byte drift. Delegated to
     `tools/memory-tree/gen_build_index.py --check-asbuilt`, which renders through the host `--write` writes the
     view with, and a view it cannot render, a partial key set or an unreadable pin, fails as well.

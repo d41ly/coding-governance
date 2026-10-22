@@ -2748,6 +2748,11 @@
       "file": "tools/workflows/unattended-build.test.sh"
     },
     {
+      "id": "build_spec_file_re",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "build_spec_index",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -3663,6 +3668,11 @@
       "file": "tools/gate-lint/encoding_posture.py"
     },
     {
+      "id": "check_blob_reader",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "check_branch",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4463,6 +4473,11 @@
       "file": "tools/unattended/resume-tick.sh"
     },
     {
+      "id": "check_m26_probe",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
       "id": "check_marker_line",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4471,6 +4486,11 @@
       "id": "check_material",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_merge_arm",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "check_merge_clean",
@@ -5353,6 +5373,11 @@
       "file": "tools/workflows/check-protocol-parity.test.sh"
     },
     {
+      "id": "check_tracked_population",
+      "kind": "function",
+      "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
       "id": "check_tree_claim",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -5471,6 +5496,11 @@
       "id": "check_view_line",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "check_view_merge",
+      "kind": "function",
+      "file": "tools/memory-tree/asbuilt_view.py"
     },
     {
       "id": "check_waiver_scope",
@@ -14841,6 +14871,11 @@
       "id": "read_tracked_asks",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "read_tracked_builds",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "read_tree_clocks",

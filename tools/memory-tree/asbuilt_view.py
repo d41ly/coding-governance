@@ -19,8 +19,9 @@ one may write the file and the other's `--check` stays green.
 
 THE INPUTS, each read through the kit's one reader of it:
   - the clauses, `design_lib.read_chain_clauses` over `git show <DESIGN_BASELINE>:<DESIGN_RECORD>`;
-  - the records, `deviation_join.read_records`: every `<MEMORY_ROOT>/builds/*/build/*-deviation-*.md`,
-    sorted by path, each one's `**Departs from:**`, `**After:**` and `**Follow-through:**`;
+  - the records, `deviation_join.read_records`: every TRACKED `<MEMORY_ROOT>/builds/*/build/*-deviation-*.md`,
+    sorted by path, each one's `**Departs from:**`, `**After:**` and `**Follow-through:**`, so a draft
+    never staged moves no byte of the view (TOOL-dTrueNorth-26 S7);
   - from `DESIGN_RECORD`'s working tree, its `Baseline:` line, compared with the pin and never
     rendered from (P0.1 row 5a). The head's `**Serves:**` line is `VIEW_HEAD`'s literal, the line the
     instrument holds (`asbuilt.py:75`), so an edit to the record's own cannot move the view's bytes
@@ -67,7 +68,9 @@ THE FINDINGS, each naming its record or clause: a record departing from a clause
 supersedes row; the head rule's two, above; a record whose `**After:**` holds a `|`, which would split
 its row's Text cell, the clause then rendering its baseline row (TOOL-dTrueNorth-16 S22); a record
 pinning a hash its clause does not carry at the baseline; the working tree's `Baseline:` line
-differing from the pin, the view still rendering from the pin; and under `--check`, a file differing
+differing from the pin, the view still rendering from the pin; a view that does not answer `merge:
+ours` to `git check-attr merge`, `check_view_merge`, so no `.gitattributes` line guards the head count
+line two runs both rewrite (TOOL-dTrueNorth-26 S16); and under `--check`, a file differing
 from its render, named at its first differing line, and a `baseline` row whose text is not the
 baseline's, a changed clause with no citation.
 
@@ -114,12 +117,11 @@ if KIT not in sys.path:
     sys.path.insert(0, KIT)
 from deviation_join import (  # noqa: E402  the record grammar's one reader, and the fixture repository
     Fixture, read_baseline_line, read_record, read_records, remove_tree)
-from design_lib import (  # noqa: E402  the one parser of the design
-    DESIGN_KEYS, VIEW_ROW, DesignRefusal, derive_clause_hash, read_chain_clauses, read_design_conf, read_design_keys,
-    read_design_view, read_repo_root, run_git, write_design_fixture)
+from design_lib import (  # noqa: E402  the one parser of the design, and its clause-id grammar
+    _CL, DESIGN_KEYS, VIEW_ROW, DesignRefusal, derive_clause_hash, read_chain_clauses, read_design_conf,
+    read_design_keys, read_design_view, read_repo_root, run_git, write_design_fixture)
 
 SAY = "as-built view"
-_CL = r"cl-d[A-Z]\w+-\d{4}"
 ROW_FOLLOW = re.compile(r"(amends|supersedes) (" + _CL + r")@([0-9a-f]{8})(?: by (" + _CL + r"))?")   # asbuilt.py:59
 ROW_DEPARTS = re.compile(r"`?(" + _CL + r")@")                                                          # asbuilt.py:60
 # The instrument's own head (asbuilt.py:72-76), its two slots the pin and the record count, and its
@@ -180,15 +182,34 @@ def check_baseline(text, pin, record):
             "renders from the pin; only the owner's re-pin of DESIGN_BASELINE moves it")
 
 
+def check_view_merge(root, view):
+    """The finding when `view`, the path DESIGN_VIEW names, does not answer `merge: ours` to `git
+    check-attr merge`, else None (TOOL-dTrueNorth-26 S16). Two concurrent runs both rewrite the view's
+    head count line, and the attribute is what lets a merge take one side for the generator to
+    re-render. It reads the attribute git resolves for the path, so a `.gitattributes` pattern covering
+    the view passes as the literal line does; a `check-attr` that fails is the finding too."""
+    r = run_git(root, "check-attr", "merge", "--", view)
+    answer = r.stdout.decode("utf-8", "replace").strip()
+    value = answer.rsplit(": ", 1)[-1] if r.returncode == 0 and answer else None
+    if value == "ours":
+        return None
+    said = f"`{value}`" if value else f"nothing, exit {r.returncode}"
+    return (f"DESIGN_VIEW {view}: `git check-attr merge` answers {said}, not `ours`, so no `.gitattributes` line "
+            f"`{view} merge=ours` guards it and two runs' re-renders conflict on its head count line; the path's "
+            "three homes, DESIGN_VIEW in .memory-tree.conf, GENERATED_INDEXES in .unattended.conf and that line, "
+            "move together")
+
+
 def read_view_inputs(root, conf):
     """`(sha, clauses, records, findings)`, everything the view renders from (S1).
 
     `sha` is DESIGN_BASELINE; `clauses` are `read_chain_clauses` over DESIGN_RECORD at that commit,
     `(build, clause id, text, hash8)` in row order; `records` are `read_records`, sorted by path; and
-    `findings` holds the moved `Baseline:` line of DESIGN_RECORD's working tree. The key rule's off
+    `findings` holds the moved `Baseline:` line of DESIGN_RECORD's working tree and `check_view_merge`'s
+    finding, a view no `merge=ours` attribute guards (TOOL-dTrueNorth-26 S16). The key rule's off
     state and its refusals, a pin naming no commit among them, a record absent at the pin or holding no
-    `[chain]` there, and a working tree that cannot be read are each a `DesignRefusal`: there is
-    nothing to render.
+    `[chain]` there, a working tree that cannot be read, and a failed `ls-files` of the tracked records
+    are each a `DesignRefusal`: there is nothing to render.
     """
     values = read_design_keys(root, conf)
     if values is None:
@@ -204,8 +225,8 @@ def read_view_inputs(root, conf):
     except (OSError, UnicodeDecodeError) as exc:
         raise DesignRefusal(f"DESIGN_RECORD {record} cannot be read in the working tree, so its Baseline: line "
                             f"cannot be compared with the pin: {exc}") from None
-    moved = check_baseline(now, sha, record)
-    return sha, clauses, read_records(root, conf), [moved] if moved else []
+    findings = [f for f in (check_baseline(now, sha, record), check_view_merge(root, values["DESIGN_VIEW"])) if f]
+    return sha, clauses, read_records(root, conf), findings
 
 
 def resolve_clause_rows(records):
@@ -321,14 +342,17 @@ def build_view_fixture(root):
     """The fixture repository at `root`, its design its own (TOOL-dTrueNorth-16 S19), and the conf that
     names it: `design_lib.write_design_fixture` writes the record and its view as the pin commit, through
     the deviation fixture's repository, and a second commit records the pin in the record's `Baseline:`
-    line, so the base reads no moved line. Nothing reads this tree's DESIGN_RECORD, DESIGN_VIEW or conf.
+    line, so the base reads no moved line, and writes the view's `merge=ours` line, so the base reads
+    no unguarded view (TOOL-dTrueNorth-26 S16). Nothing reads this tree's DESIGN_RECORD, DESIGN_VIEW or
+    conf.
     """
     fx = Fixture(root, "memory/design/record.md", "memory/design/view.md")
     if run_git(".", "init", "-q", str(root)).returncode:
         raise DesignRefusal(f"the fixture repository cannot be initialised at {root}")
     pin = write_design_fixture(fx)
     fx.v2 = fx.v2.replace("No baseline.", f"Baseline: `{pin}`, the fixture's own.")
-    fx.write_commit({fx.record: fx.v2}, "fixture: the baseline taken")
+    fx.write_commit({fx.record: fx.v2, ".gitattributes": f"{fx.view} merge=ours\n"},
+                    "fixture: the baseline taken, and the view's merge=ours line")
     fx.write_tree()
     return {"MEMORY_ROOT": "memory", "DESIGN_RECORD": fx.record, "DESIGN_BASELINE": pin, "DESIGN_VIEW": fx.view,
             "DESIGN_NODES": "memory/design/nodes.py"}
@@ -467,6 +491,27 @@ def run_fixture(root, conf, plant=None):
                                     + [f"  {f}" for f in findings]), live
 
 
+def check_merge_arm(root, conf):
+    """`(held, what, detail)` of TOOL-dTrueNorth-26 AC18's arm over the fixture `build_view_fixture`
+    wrote: its view answers `merge: ours`, so `read_view_inputs` finds nothing; with the fixture's
+    `.gitattributes` emptied in the work tree, the one finding names DESIGN_VIEW and `merge=ours`; and
+    restored, nothing again. Red against a view whose attribute moves no verdict."""
+    attrs = pathlib.Path(root, ".gitattributes")
+    line = attrs.read_bytes()
+    before = read_view_inputs(root, conf)[3]
+    attrs.write_bytes(b"")
+    try:
+        dropped = read_view_inputs(root, conf)[3]
+    finally:
+        attrs.write_bytes(line)
+    after = read_view_inputs(root, conf)[3]
+    held = (before == [] and after == [] and len(dropped) == 1 and dropped[0].startswith("DESIGN_VIEW ")
+            and "merge=ours" in dropped[0])
+    return (held, "TOOL-dTrueNorth-26 AC18 a fixture view with no merge=ours attribute is one finding naming "
+                  "DESIGN_VIEW and merge=ours, and none once the attribute is restored",
+            f"with the line: {before}\nwithout it: {dropped}\nrestored: {after}")
+
+
 def run_plant_arms():
     """Every plant, and the fixture with none, against the exit it must take and the lines it must
     print: `[(held, what, detail)]`, over ONE fixture repository `build_view_fixture` writes, removed
@@ -488,6 +533,7 @@ def run_plant_arms():
                 continue
             out = "\n".join(lines)
             arms.append((rc == want and live and all(n in out for n in PLANT_NEEDLES[plant]), what, out))
+        arms.append(check_merge_arm(root, conf))
     except DesignRefusal as exc:
         arms.append((False, "TOOL-dTrueNorth-16 S19 the fixture repository builds its own design", str(exc)))
     finally:

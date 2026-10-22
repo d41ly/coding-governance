@@ -13699,8 +13699,19 @@ verb_dispatch() { # slug · unit · writes...
   # Beside code 49, the question the order gate asks over a second source of the same sequence.
   # WHAT IT DOES NOT CHECK: an edge the producer's spec declares in the other direction. A malformed
   # Edges line, which `read_consumes_from` reads as fewer edges, is refused just below.
-  local _e_units _e_id _e_spec _e_st _e_block=""
+  # TOOL-dTrueNorth-26 S9, its deviation-27: THE PRODUCER SET is the generated region's units
+  # (`unit_ids_of`) together with the authored roster and this folder's `unit` asks (`roster_ids`), the
+  # driver's reader of a PLANNED unit with no spec yet, so a same-build producer with no `SPEC_PATH`
+  # blocks its consumer as `(no spec)`; the region alone lists specced units only and let it through.
+  # A malformed roster pair, `roster_ids`' exit 3, is refused here by name. WHAT IT DOES NOT SEE: a
+  # unit added by a rescope row alone, named in neither the pair nor an ask.
+  local _e_units _e_roster _e_producers _e_id _e_spec _e_st _e_block=""
   _e_units=$(unit_ids_of "$slug")
+  if ! _e_roster=$(roster_ids "$slug"); then
+    fail 49 "--dispatch cannot read the authored roster:units pair of $(readme_of "$slug"), which is malformed, so a producer planned there with no spec yet could not block its consumer; repair the pair between $ROSTER_OPEN and $ROSTER_CLOSE: $unit"
+    return 1
+  fi
+  _e_producers=$(printf '%s\n%s\n' "$_e_units" "$_e_roster" | grep -E '.' | sort -u)
   # ------------------------------------------- TOOL-dTrueNorth-20 S6, THE EDGE SET'S OWN SHAPE
   # The refusal below reads edges and blocks on them, so the two shapes that defeat it are refused
   # first, both under code 49 beside it, over EVERY unit of the build and not the dispatched one
@@ -13728,8 +13739,12 @@ verb_dispatch() { # slug · unit · writes...
     return 1
   fi
   for _e_id in $(read_consumes_from "$_d_spec"); do
-    printf '%s\n' "$_e_units" | grep -qxF -- "$_e_id" || continue
-    _e_spec="${SPEC_PATH[$_e_id]:-}"; [ -n "$_e_spec" ] || continue
+    printf '%s\n' "$_e_producers" | grep -qxF -- "$_e_id" || continue
+    _e_spec="${SPEC_PATH[$_e_id]:-}"
+    if [ -z "$_e_spec" ]; then
+      _e_block="$_e_block $unit consumes-from $_e_id (no spec)"
+      continue
+    fi
     _e_st="${SPEC_ST[$_e_spec]:-}"
     case "$_e_st" in CLOSED|WONTDO) continue ;; esac
     _e_block="$_e_block $unit consumes-from $_e_id (${_e_st:-no status})"

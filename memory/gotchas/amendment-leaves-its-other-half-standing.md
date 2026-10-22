@@ -78,6 +78,14 @@ called the re-read before the push safe, flow-steps' unlease items still deleted
 record's own `[chain]` kept a plant from before the owner's fleet. The stall fold left the route-back rule's
 owner item standing twice in flow-steps, and two layer-runtime fixtures asserting the outcomes it replaced.
 
+It bit again in dTrueNorth's closing diff review, 2026-10-22
+(memory/builds/dTrueNorth/reviews/2026-10-22-review-TOOL-dTrueNorth-1-closing-diff-review-round1.md, findings 10,
+15 and 24). TOOL-dTrueNorth-16 S21 moved check 29's staged trigger into its verb, and its body comment, the
+HYGIENE item and the kit README took the new rule; the hygiene engine's header kept TOOL-dTrueNorth-3 S5's
+"held unless the commit stages a path under a build's spec/ folder or the conf", and never named check 30,
+whose own staged trigger landed beside it. TOOL-dTrueNorth-26 S12 to S14 rewrote the header to point at the
+two block comments, so the rule is stated once and the header carries no second copy to strand.
+
 ## The fix
 
 **Amend the RULE, not the sentence.** Before writing the new wording, find everything whose truth

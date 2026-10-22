@@ -800,12 +800,15 @@ def scan_handoffs(root, specs, uids, cutoff):
 
 
 def load_kit_module(name):
-    """The memory-tree kit's module `name`, loaded by path from `KIT_DIR`, once (TOOL-dTrueNorth-2, its
-    second instance TOOL-dTrueNorth-16 S11).
+    """The memory-tree kit's module `name`, loaded by path from `KIT_DIR` (TOOL-dTrueNorth-2, its second
+    instance TOOL-dTrueNorth-16 S11).
 
     A module already loaded under `name` FROM THAT FILE is reused, so a caller that imported it itself
-    catches the one refusal class it raises. It loads with no bytecode cache written beside it, since
-    no join here has a write path. An absent file is an ImportError naming it.
+    catches the one refusal class it raises. Otherwise the kit's file is loaded and RETURNED, registered
+    under `name` only when that slot is free (TOOL-dTrueNorth-26 S11): a namesake from another file
+    already in `sys.modules` stays where it is, so while it holds the slot each call loads the kit's file
+    again. It loads with no bytecode cache written beside it, since no join here has a write path. An
+    absent file is an ImportError naming it.
     """
     path = KIT_DIR / f"{name}.py"
     mod = sys.modules.get(name)
@@ -815,13 +818,14 @@ def load_kit_module(name):
         raise ImportError(f"{path.as_posix()} is not there, so the design, the binding lines, the spec "
                           "filename date and the status header cannot be read")
     spec = importlib.util.spec_from_file_location(name, path)
-    mod = importlib.util.module_from_spec(spec)
+    kit = importlib.util.module_from_spec(spec)
     cache, sys.dont_write_bytecode = sys.dont_write_bytecode, True
     try:
-        spec.loader.exec_module(mod)
+        spec.loader.exec_module(kit)
     finally:
         sys.dont_write_bytecode = cache
-    return sys.modules.setdefault(name, mod)
+    sys.modules.setdefault(name, kit)
+    return kit
 
 
 def load_design_lib():
@@ -974,10 +978,16 @@ def scan_carries(design, specs, exit_mode=False):
                              + (f", pinned to {len(pins)} hashes ({', '.join(pins)})" if len(pins) > 1 else "")
                              + f": {', '.join(c[0] for c in cs)}"))
         if not whole:
+            # TOOL-dTrueNorth-26 S2: n is every part carrier's, so carriers stating two totals are a
+            # finding naming each, and only one n is compared with the sorted k values.
             parts = sorted(c[1] for c in cs)
-            n = int(parts[0].split("/")[1])
-            if sorted(int(p.split()[1].split("/")[0]) for p in parts) != list(range(1, n + 1)):
-                findings.append((owner[ref], "parts", ref, f"carried in parts {', '.join(parts)}, not 1 to {n}"))
+            totals = sorted({int(p.split("/")[1]) for p in parts})
+            if len(totals) > 1:
+                named = ", ".join(str(t) for t in totals[:-1]) + f" and {totals[-1]}"
+                findings.append((owner[ref], "parts", ref, f"carried in parts {', '.join(parts)}, whose carriers "
+                                 f"state the totals {named}, not one n"))
+            elif sorted(int(p.split()[1].split("/")[0]) for p in parts) != list(range(1, totals[0] + 1)):
+                findings.append((owner[ref], "parts", ref, f"carried in parts {', '.join(parts)}, not 1 to {totals[0]}"))
     for b in sorted(measured):
         released = {x["clause"] for p in measured[b] for x in bindings[p] or [] if x["kind"] in CARRIES_RELEASES}
         for cid, (text, _, _) in clauses.get(b, {}).items():

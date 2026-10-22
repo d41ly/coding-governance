@@ -22,7 +22,10 @@ renders it as its clause row's Text cell and the pipe would split that cell in t
 S22); the view renders that clause from the baseline and reports the record.
 
 THE POPULATION, six arms over the chain builds' specs, the chain builds being the Build column of
-`DESIGN_VIEW`; each member carries an address, its hand-off and its departing commit:
+`DESIGN_VIEW`, their specs and records the TRACKED files `design_lib.read_tracked_builds` lists, as
+the records tables read them, and a spec a file `design_lib.build_spec_file_re` names, the predicate
+the revision reader refuses by (TOOL-dTrueNorth-26 S5, S7); each member carries an address, its
+hand-off and its departing commit:
   - a spec revision that is not an ancestor of its unit's FIRST PASS, `<unit>@rev-N`, N the header
     revision the commit changed;
   - a spec revision that is not an ancestor of the commit adding the newest `spec-audit` record whose
@@ -125,10 +128,10 @@ if str(KIT) not in sys.path:
     sys.path.insert(0, str(KIT))
 import row_grammar  # noqa: E402  the kit's decision-row grammar
 import routed_commits  # noqa: E402  the host: its log pass, its routed-path test and its pinned git runner
-from design_lib import (  # noqa: E402  the one parser of the design
-    DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_keys, read_design_view, read_spec_revisions,
-    scan_chain_specs, write_design_fixture)
-from tree_lib import parse_conf, parse_spec_h1, read_adding_commits  # noqa: E402
+from design_lib import (  # noqa: E402  the one parser of the design, and its clause-id grammar
+    _CL, DESIGN_KEYS, DesignRefusal, read_chain_clauses, read_design_keys, read_design_view, read_spec_revisions,
+    read_tracked_builds, scan_chain_specs, write_design_fixture)
+from tree_lib import parse_conf, parse_spec_h1, read_adding_commits, read_blobs_at  # noqa: E402
 
 SAY = "deviation"
 POLICIES = ("report", "refuse")
@@ -145,8 +148,7 @@ ROLES = ("spec writer", "author", "owner")      # the record grammar's approver 
 RANK = {"author": 0, "spec writer": 1, "owner": 2}
 LEAST = {"editorial": "author", "additive": "spec writer", "stricter": "spec writer", "loosening": "owner",
          "breaking": "owner"}                   # final-questions `[deviation]`, the by-risk table
-_CL = r"cl-d[A-Z]\w+-\d{4}"
-_ID = r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
+_ID =r"[A-Za-z]+-[A-Za-z0-9]+-\d+"
 DEPARTS = re.compile(r"^(`?)(?:" + _CL + r"@[0-9a-f]{8}|" + _ID + r"@rev-\d+|d[A-Z]\w+)\1(?: \[[^\]]+\])?$")
 FOLLOW = re.compile(r"^(?:amends " + _CL + r"@[0-9a-f]{8}|supersedes " + _CL + r"@[0-9a-f]{8} by " + _CL
                     + r"|new unit " + _ID + r"|(?:gap|ask|usage) \S+)$")
@@ -239,13 +241,21 @@ def read_record(path, text):
 
 
 def read_records(root, conf):
-    """Every file the instrument's glob finds, `<MEMORY_ROOT>/builds/*/build/*-deviation-*.md`, each read
-    by `read_record`; two files of one build at one `<n>` are each malformed, naming the other."""
+    """Every TRACKED path the instrument's glob names, `<MEMORY_ROOT>/builds/*/build/*-deviation-*.md`,
+    sorted by path and each read by `read_record` from its working copy; two files of one build at one
+    `<n>` are each malformed, naming the other.
+
+    The population is `design_lib.read_tracked_builds`', the one the records tables read through
+    `gen_build_index.plan()`, so an untracked draft moves neither the view nor the join, and a record
+    staged and not committed is read (TOOL-dTrueNorth-26 S7). A tracked path absent from the working
+    tree is read as absent. A failed `ls-files` is its `DesignRefusal`, which each caller maps."""
     memory_root = (conf.get("MEMORY_ROOT") or "memory").strip().strip("/")
+    glob = re.compile(re.escape(memory_root) + r"/builds/[^/]+/build/[^/]*-deviation-[^/]*\.md")
     records = []
-    for p in sorted(pathlib.Path(root, memory_root, "builds").glob("*/build/*-deviation-*.md")):
-        rel = p.relative_to(root).as_posix()
-        records.append(read_record(rel, p.read_bytes().decode("utf-8", "replace")))
+    for rel in sorted(p for p in read_tracked_builds(root, memory_root) if glob.fullmatch(p)):
+        p = pathlib.Path(root, rel)
+        if p.is_file():
+            records.append(read_record(rel, p.read_bytes().decode("utf-8", "replace")))
     shared = {}
     for r in records:
         if r["n"] is not None:
@@ -258,26 +268,15 @@ def read_records(root, conf):
 
 
 # ------------------------------------------------------------------------------------ the history
-def read_blobs(root, specs):
-    """`{"<rev>:<path>": text, or None where absent}` in ONE `git cat-file --batch`, read as bytes."""
-    specs = list(dict.fromkeys(specs))
-    if not specs:
-        return {}
-    raw = run_git(root, "cat-file", "--batch", stdin="".join(s + "\n" for s in specs).encode("utf-8"))
-    if raw is None:
-        raise Unmeasured("`git cat-file --batch` failed, so no revision could be read")
-    out, at = {}, 0
-    for s in specs:
-        end = raw.index(b"\n", at)
-        head = raw[at:end].split()
-        at = end + 1
-        if len(head) != 3 or head[1] != b"blob":
-            out[s] = None
-            continue
-        size = int(head[2])
-        out[s] = raw[at:at + size].decode("utf-8", "replace").replace("\r\n", "\n")
-        at += size + 1
-    return out
+def read_blobs(root, requests):
+    """`{(rev, path): text, or None}` for every `(rev, path)` pair, through `tree_lib.read_blobs_at`, the
+    kit's one blob-batch parser (TOOL-dTrueNorth-26 S17): None for an object the rev does not hold, one
+    that is not a blob and one that is not UTF-8, the absence each caller already reads as a legal
+    answer. Only the reader's `OSError`, a failed call or a stream short of a request, is Unmeasured."""
+    try:
+        return read_blobs_at(root, requests)
+    except OSError as exc:
+        raise Unmeasured(f"the blobs of {len(requests)} revision(s) could not be read: {exc}") from None
 
 
 def read_commit_times(commits):
@@ -447,10 +446,10 @@ def scan_clause_members(root, record, pin, now, old):
     departed = {}
     if moved:
         shas = (run_git(root, "log", "--reverse", "--format=%H", f"{pin}..HEAD", "--", record) or b"").decode().split()
-        blobs = read_blobs(root, [f"{s}:{record}" for s in shas])
+        blobs = read_blobs(root, [(s, record) for s in shas])
         for s in shas:
             try:
-                at = {cid: h for _b, cid, _t, h in read_chain_clauses(blobs[f"{s}:{record}"] or "", record)}
+                at = {cid: h for _b, cid, _t, h in read_chain_clauses(blobs[(s, record)] or "", record)}
             except DesignRefusal:
                 at = {}
             for cid in moved:
@@ -491,7 +490,7 @@ def read_population(root, conf, commits):
         raise Unmeasured(str(exc)) from None
     except OSError as exc:
         raise Unmeasured(f"DESIGN_RECORD names {record}, which cannot be read: {exc}") from None
-    old = read_blobs(root, [f"{pin}:{record}"])[f"{pin}:{record}"]
+    old = read_blobs(root, [(pin, record)])[(pin, record)]
     if old is None:
         raise Unmeasured(f"DESIGN_BASELINE {pin} names no commit holding DESIGN_RECORD {record}, so the clause "
                          "population has no pin and nothing is measured, whatever the specs hold")
@@ -504,10 +503,14 @@ def read_population(root, conf, commits):
         while entry.startswith("./"):
             entry = entry[2:]
         entries.append(entry)
-    found = []
-    for b in builds:
-        folder = root / memory_root / "builds" / b
-        found += [p.relative_to(root).as_posix() for p in sorted(folder.rglob("*.md"))] if folder.is_dir() else []
+    # The TRACKED `.md` under each chain build (TOOL-dTrueNorth-26 S7), the population the records
+    # tables read, so a draft never staged is no spec and no record of the join.
+    try:
+        tracked = read_tracked_builds(root, memory_root)
+    except DesignRefusal as exc:
+        raise Unmeasured(str(exc)) from None
+    found = [p for b in builds for p in sorted(t for t in tracked if t.startswith(f"{memory_root}/builds/{b}/")
+                                                and t.endswith(".md") and (root / t).is_file())]
     kept, _skipped = scan_chain_specs(found, builds, "", memory_root)
     specs = []
     for b, rel in kept:
@@ -608,12 +611,12 @@ def read_population(root, conf, commits):
     for rel in handbacks:
         ids = binds.get(rel, {}).get("ids") or []
         backs.append((derive_slug(rel), rel, ids[0] if ids else None, adding.get(rel)))
-    at = read_blobs(root, [f"{sha}:{spec_of[item]}" for _b, _r, act, item, _row, sha in rows
+    at = read_blobs(root, [(sha, spec_of[item]) for _b, _r, act, item, _row, sha in rows
                            if sha and act != "add" and item in spec_of]
-                    + [f"{sha}:{spec_of[unit]}" for _b, _r, unit, sha in backs if sha and unit in spec_of])
+                    + [(sha, spec_of[unit]) for _b, _r, unit, sha in backs if sha and unit in spec_of])
 
     def read_rev_at(unit, sha):
-        rev = read_header_rev(at.get(f"{sha}:{spec_of[unit]}"), gbi.HDR_RE) if sha and unit in spec_of else None
+        rev = read_header_rev(at.get((sha, spec_of[unit])), gbi.HDR_RE) if sha and unit in spec_of else None
         return f"{unit}@rev-{rev if rev is not None else '?'}"
 
     for b, rel, act, item, _row, sha in rows:
@@ -715,7 +718,10 @@ def measure_join(root, conf, commits):
     """Everything the join renders, read once: the members, their facts, the records, the joins and the
     decision rows at `origin/main`."""
     members, facts = read_population(root, conf, commits)
-    records = read_records(root, conf)
+    try:
+        records = read_records(root, conf)
+    except DesignRefusal as exc:
+        raise Unmeasured(str(exc)) from None
     return {"members": members, "facts": facts, "records": records, "joins": derive_joins(members, records),
             "rows": read_decision_rows(root, conf)}
 
@@ -793,7 +799,8 @@ PLANTS = ("baseline", "clause", "subject-pass", "pass-none", "status-flip", "two
           "pass-revision", "below-risk", "owner-cause", "status-only", "malformed-field", "malformed-risk",
           "malformed-follow", "malformed-supersedes", "duplicate-n", "record-late",
           "subject-trailer", "pipe-after",                   # with UNMEASURED_PLANTS, TOOL-dTrueNorth-16's four
-          "rotated") + UNMEASURED_PLANTS                     # TOOL-dTrueNorth-24's
+          "rotated",                                         # TOOL-dTrueNorth-24's
+          "spec-notes") + UNMEASURED_PLANTS                  # TOOL-dTrueNorth-26's
 # The subject-trailer plant's second unit, Y, whose `Pass:` trailer rides a commit whose subject names X.
 SUBJECT_TRAILER_Y = "FIX-dTrueNorth-97"
 # The successor the rotated plant's supersede row names; no spec carries it, as none carries the base's.
@@ -821,7 +828,7 @@ PLANT_UNITS = {p: f"FIX-dTrueNorth-{n}" for n, p in enumerate(
      "quote", "amended", "amended-joined", "owner-row1-added", "add", "handback", "audit-pin", "defer",
      "fix-record", "audit-nopin", "record-late", "pass-revision", "status-only", "malformed-field",
      "malformed-risk", "malformed-follow", "duplicate-n", "malformed-supersedes", "subject-trailer",
-     "pipe-after", "rotated"), 10)}
+     "pipe-after", "rotated", "spec-notes"), 10)}
 DECISIONS_TEXT = "\n".join([
     "# Decisions", "",
     "- FIX-dClosedLoop-2 · the spec-run close by carry-forward, and dTrueNorth's extra unit FIX-dTrueNorth-99 approved "
@@ -913,9 +920,13 @@ class Fixture:
         return (self.shas.get(f":{mark}") or self.write_stream()[f":{mark}"]).strip()
 
     def write_tree(self):
-        """Import everything, point HEAD at the run's branch, and write that branch's tree to the work tree."""
+        """Import everything, point HEAD at the run's branch, read that branch's tree into the index, and
+        write it to the work tree, so the fixture's records and specs are TRACKED, the population the
+        join reads (TOOL-dTrueNorth-26 S7)."""
         self.write_stream()
         (self.root / ".git" / "HEAD").write_bytes(f"ref: refs/heads/{self.branch}\n".encode("utf-8"))
+        if run_git(self.root, "read-tree", f"refs/heads/{self.branch}") is None:
+            raise RuntimeError(f"fixture: git read-tree {self.branch} failed in {self.root}")
         for rel, body in self.branches[self.branch]["files"].items():
             p = self.root / rel
             p.parent.mkdir(parents=True, exist_ok=True)
@@ -1159,6 +1170,12 @@ def add_plant(fx, plant):
         fx.rows = []
         fx.marked[plant] = (row, fx.write_commit({f"{TN}RUN.LANDED.{blob}.md": body, TN + "RUN.md": fx.render_run()},
                                                  "unattended(dTrueNorth): landed, the run state rotated"))
+    elif plant == "spec-notes":
+        # TOOL-dTrueNorth-26 S5: a notes file in a chain build's spec folder whose H1 defines a unit and
+        # whose name holds no `-spec-`. The selector counts it `unnamed`, so the revision reader, which
+        # refuses any path outside its pathspec, is never handed it and the join stays measured.
+        fx.write_commit({f"{TN}spec/notes.md": f"# {u} — notes beside the specs, named as no spec is\n\nA note.\n"},
+                        "records(dTrueNorth): notes in the spec folder", ["Pass: none"])
 
 
 def build_fixture(root, plants):
@@ -1277,7 +1294,8 @@ PLANT_EXITS = dict({p: 1 for p in ("baseline", "clause", "subject-pass", "two-br
                                    "malformed-supersedes", "duplicate-n", "record-late", "pipe-after")},
                    **{p: 0 for p in ("pass-none", "status-flip", "header-rev", "gen", "status-gen", "quote",
                                      "amended-joined", "approver", "defer", "fix-record", "audit-nopin",
-                                     "below-risk", "owner-cause", "status-only", "subject-trailer", "rotated")},
+                                     "below-risk", "owner-cause", "status-only", "subject-trailer", "rotated",
+                                     "spec-notes")},
                    **{p: 2 for p in UNMEASURED_PLANTS})
 
 
@@ -1329,6 +1347,92 @@ def check_rotated_dates(fx, result):
     return held, what, "\n".join(f"{(m['sha'] or 'none')[:8]} {m['address']}: {m['what']}" for m in archived)
 
 
+def check_tracked_population():
+    """`[(held, what, detail)]`, TOOL-dTrueNorth-26 AC10 and AC9 over one base fixture. AC10: after
+    `Fixture.write_tree` the index lists every path of the branch's tree, so the fixture's records and
+    specs are tracked. AC9: a record written to the work tree alone moves neither `read_records` nor the
+    as-built view's `read_view_inputs`, and once staged both read it. Red against a fixture whose index
+    is empty, and against a reader that globs the work tree, which reads the draft."""
+    import asbuilt_view     # the view's inputs; it imports this module, so it is loaded here and not above
+    root = tempfile.mkdtemp(prefix="dj-")
+    arms = []
+    try:
+        fx = build_fixture(root, [])
+        conf = read_fixture_conf(fx.root)
+        index = sorted(p for p in (run_git(fx.root, "ls-files", "-z") or b"").decode("utf-8").split("\0") if p)
+        tree = sorted(p for p in (run_git(fx.root, "ls-tree", "-r", "-z", "--name-only", "HEAD") or b"")
+                      .decode("utf-8").split("\0") if p)
+        arms.append((bool(tree) and index == tree, "TOOL-dTrueNorth-26 AC10, the fixture's index lists every path "
+                     "of its branch's tree, so its records and specs are tracked",
+                     f"index {len(index)} path(s), tree {len(tree)}: {sorted(set(tree) - set(index))[:5]}"))
+
+        def read_ids():
+            return ([r["id"] for r in read_records(fx.root, conf)],
+                    [r["id"] for r in asbuilt_view.read_view_inputs(fx.root, conf)[2]])
+
+        before = read_ids()
+        path, text = fx.render_record("FIX-dTrueNorth-1", "FIX-dTrueNorth-1@rev-1 [scope]", "spec writer", n=77)
+        (fx.root / path).write_bytes(text.encode("utf-8"))
+        draft = read_ids()
+        run_git(fx.root, "add", "--", path)
+        staged = read_ids()
+        rid = pathlib.PurePosixPath(path).stem
+        held = (bool(before[0]) and draft == before
+                and all(rid in s and len(s) == len(b) + 1 for s, b in zip(staged, before)))
+        arms.append((held, "TOOL-dTrueNorth-26 AC9, an untracked deviation record moves neither the join's records "
+                     "nor the view's, and staged it joins both", f"before {before}\ndraft {draft}\nstaged {staged}"))
+    except (Unmeasured, DesignRefusal, RuntimeError) as exc:
+        arms.append((False, "TOOL-dTrueNorth-26 AC9 and AC10's fixture builds and reads", str(exc)))
+    finally:
+        remove_tree(root)
+    return arms
+
+
+def check_blob_reader():
+    """`(held, what, detail)`, TOOL-dTrueNorth-26 AC20: `read_blobs` answers None for a blob that is not
+    UTF-8 and for a path the rev does not hold, the text for one that is, maps the reader's `OSError` to
+    Unmeasured, and holds no batch parser of its own, read from its own source. Red against the reader it
+    replaced, which decoded with replacement characters and parsed a batch it spawned itself."""
+    import ast
+    import inspect
+    import textwrap
+    import tree_lib
+    root = tempfile.mkdtemp(prefix="dj-")
+    what = ("TOOL-dTrueNorth-26 AC20, read_blobs routes through tree_lib.read_blobs_at: None for a blob that is not "
+            "UTF-8, Unmeasured on the reader's OSError, and no batch spawn of its own")
+    try:
+        fx = Fixture(root, "memory/design/record.md", "memory/design/view.md")
+        if run_git(".", "init", "-q", str(root)) is None:
+            raise RuntimeError(f"fixture: git init failed at {root}")
+        sha = fx.read_sha(fx.write_commit({"memory/ok.md": "ok\n", "memory/bad.md": b"\xff\xfe not UTF-8\n"},
+                                          "fixture: a blob that is UTF-8 and one that is not"))
+        asks = [(sha, "memory/ok.md"), (sha, "memory/bad.md"), (sha, "memory/absent.md")]
+        got = read_blobs(root, asks)
+        real, refused = tree_lib.read_git_output, ""
+
+        def raise_oserror(*_a, **_k):
+            raise OSError("the stand-in reader cannot start")
+
+        tree_lib.read_git_output = raise_oserror
+        try:
+            read_blobs(root, asks)
+        except Unmeasured as exc:
+            refused = str(exc)
+        finally:
+            tree_lib.read_git_output = real
+        body = ast.parse(textwrap.dedent(inspect.getsource(read_blobs)))
+        calls = {n.func.id for n in ast.walk(body) if isinstance(n, ast.Call) and isinstance(n.func, ast.Name)}
+        batch = [c.value for c in ast.walk(body) if isinstance(c, ast.Constant) and isinstance(c.value, str)
+                 and "--batch" in c.value]
+        held = ([got.get(a) for a in asks] == ["ok\n", None, None] and "cannot start" in refused
+                and "read_blobs_at" in calls and not batch)
+        return held, what, f"answers {[got.get(a) for a in asks]}\nrefused: {refused}\ncalls {sorted(calls)} batch {batch}"
+    except (Unmeasured, RuntimeError, OSError) as exc:
+        return False, what, str(exc)
+    finally:
+        remove_tree(root)
+
+
 def check_composed_run(counts):
     """`(held, what, detail)` of the composed run (TOOL-dTrueNorth-12 S3): every plant `counts` holds, each
     mapped to the member count of the base and that plant alone, built over one base. Its members must be
@@ -1357,12 +1461,14 @@ def run_plant_arms(resolve=None):
     """Every arm of the join over its fixture: `[(held, what, detail)]`. Each plant is built once with the
     base and measured under both policies, and under by-risk where that is what reds it; the base alone
     is green under both approvals; the host's RANGE and WHOLE halves read the late record (AC10); the
-    rotated plant's members date by the commits that wrote their rows (`check_rotated_dates`); and last
-    the composed run of every plant measured here (`check_composed_run`). Where the unattended kit does not
+    rotated plant's members date by the commits that wrote their rows (`check_rotated_dates`); a plant
+    with no needle has its report arm read the render's findings count, which a planted finding moves
+    (TOOL-dTrueNorth-26 S18); the tracked population (`check_tracked_population`) and the one blob reader
+    (`check_blob_reader`); and last the composed run of every plant measured here (`check_composed_run`). Where the unattended kit does not
     resolve, through `resolve` or the kit's own resolver, it prints the named SKIP line and runs every plant
     `STRIP_PLANTS` does not hold under the strip stubbed to the identity, set for this call alone and
     restored in its `finally`, the record-late arm's host path included (TOOL-dTrueNorth-12 S2)."""
-    arms, counts = [], {}
+    arms, counts, bites = [], {}, []
     try:
         skip = read_fixture_skip(resolve)
     except Unmeasured as exc:
@@ -1400,18 +1506,32 @@ def run_plant_arms(resolve=None):
                 approval = "by-risk" if plant in RISK_PLANTS else "author-recorded"
 
                 def check_needle(lines):
+                    if needle is None:               # a needle-less plant's arms read the findings count
+                        raise ValueError(f"plant {plant} has no needle, so no line of it can be checked")
                     if plant == "audit-nopin":       # the base's units carry no pin either, so the unit is the needle
                         return any(ln.startswith(f"{SAY}:   {needle}") and PLANT_UNITS[plant] in ln for ln in lines)
-                    return needle is None or any(needle in ln for ln in lines)
+                    return any(needle in ln for ln in lines)
 
                 lines, findings = render_lines(result, "refuse", approval, f"plant {plant} · ", commit)
                 want = PLANT_EXITS[plant] if plant not in RISK_PLANTS else 1
                 arms.append(((1 if findings else 0) == want and live and (want == 0 or check_needle(lines)),
                              f"TOOL-dTrueNorth-4 plant {plant} exits {want} under refuse and {approval}"
                              + (f", naming `{needle}`" if want else ""), "\n".join(lines)))
-                lines, _f = render_lines(result, "report", approval, f"plant {plant} · ", commit)
-                arms.append((check_needle(lines), f"TOOL-dTrueNorth-4 plant {plant} under report, which never "
-                                                  "refuses, lists what it plants", "\n".join(lines)))
+                lines, report_findings = render_lines(result, "report", approval, f"plant {plant} · ", commit)
+                # TOOL-dTrueNorth-26 S18: a plant with no needle plants no line, so its report arm asserts the
+                # report render's own findings count is 0, the value `render_lines` returns whatever the
+                # policy; a constant True arm asserted nothing.
+                arms.append((check_needle(lines) if needle is not None else report_findings == 0,
+                             f"TOOL-dTrueNorth-4 plant {plant} under report, which never refuses, "
+                             + ("lists what it plants" if needle is not None else "renders no finding"),
+                             "\n".join(lines)))
+                if needle is None:
+                    # The count that arm reads must move: one malformed record planted beside the
+                    # plant's own records is a finding the same report render counts (AC21).
+                    planted = dict(result, records=result["records"] + [read_record(
+                        f"{TN}build/2026-10-21-build-FIX-dTrueNorth-1-deviation-999.md", "- **Risk:** moderate\n")])
+                    bites.append((plant, report_findings,
+                                  render_lines(planted, "report", approval, f"plant {plant} · ", commit)[1]))
                 if plant == "subject-trailer":
                     x = PLANT_UNITS[plant]
                     arms.append((check_needle(lines) and not any(f"at {x}@rev-" in ln for ln in lines),
@@ -1443,6 +1563,12 @@ def run_plant_arms(resolve=None):
                 arms.append((False, f"TOOL-dTrueNorth-4 plant {plant} could not build its fixture", str(exc)))
             finally:
                 remove_tree(root)
+        arms.append((bool(bites) and all(f == 0 and p > 0 for _p, f, p in bites),
+                     f"TOOL-dTrueNorth-26 AC21, the report arm of each of the {len(bites)} plant(s) with no needle reads "
+                     "the render's findings count: 0 over the plant, above 0 over a planted finding",
+                     "\n".join(f"{p}: findings {f}, planted {n}" for p, f, n in bites)))
+        arms += check_tracked_population()
+        arms.append(check_blob_reader())
         arms.append(check_composed_run(counts))
     finally:
         set_gen_strip(None)
