@@ -6411,13 +6411,13 @@ def cmd_selftest() -> int:
         def _read_runner_env23(call):
             handed = []
 
-            def _capture(argv, *a, **kw):
+            def _run_captured23(argv, *a, **kw):
                 handed.append(kw.get("env"))
                 return subprocess.CompletedProcess(argv, 0, b"", b"")
 
             saved, real = {m: os.environ.get(m) for m in modes23}, subprocess.run
             os.environ.update({m: "1" for m in modes23})
-            subprocess.run = _capture
+            subprocess.run = _run_captured23
             try:
                 call()
             finally:

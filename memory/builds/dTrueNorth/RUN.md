@@ -164,3 +164,5 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T03:12:34Z dispatch · item 06dec3a4 TOOL-dTrueNorth-23 · reason tools/memory-tree/tree_lib.py tools/memory-tree/row_grammar.py tools/memory-tree/gen_build_index.py memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-23.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-23-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
 
 2026-10-22T03:12:39Z brief · item TOOL-dTrueNorth-23 · reason 66090be2a0f6 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-23-build-brief.md
+
+2026-10-22T03:23:57Z dispatch · item 1478e396 TOOL-dTrueNorth-23 · reason tools/memory-tree/gen_build_index.py
