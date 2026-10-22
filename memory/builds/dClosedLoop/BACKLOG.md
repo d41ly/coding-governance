@@ -37,3 +37,6 @@
 - SEV · PLAY-dClosedLoop-24 · MED · a chain build cannot start its first pass until its packet is re-rendered
 - SEV · PLAY-dClosedLoop-25 · LOW · the departures report shows the retired instruments' outputs, not the product's
 - SEV · PLAY-dClosedLoop-26 · MED · the report-switch re-pin cannot run until packet.py's guard changes in an owner-asked landing
+- CLOSED · PLAY-dClosedLoop-24 · by a76089763 · every chain packet re-rendered by the re-pin, its other pins kept, and packet.py --check green for each chain build
+- CLOSED · PLAY-dClosedLoop-25 · by a76089763 · deviations.py --report reads the product as-built view and the README coverage region (720d219c3), every packet re-pinned in this owner-asked landing, PLAY-dClosedLoop-28
+- CLOSED · PLAY-dClosedLoop-26 · by 106785b03 · the guard derives an in-place landing's LANDED from its close commit on the advertised default branch, PLAY-dClosedLoop-27
