@@ -16745,11 +16745,16 @@ hit  "$out" "a DEFERRED unit is carried forward only against an ask the witness 
 # ---- AC4 — a unit the run ADDED is never carried forward. The roster at BASE holds unit 1 alone, on
 # ---- MAIN, because preflight's check 20 refuses a scope narrowed since BASE; unit 2 enters after the
 # ---- run went live, through `--rescope --act add`, and is then deferred. `set_cf_tree` restores MAIN.
+# ---- MOVED by TOOL-dTrueNorth-7 S8: the AUTHORED roster at BASE is narrowed to unit 1 too. Left naming
+# ---- unit 2 unspecced beside the open ask, BASE reads as a SPEC RUN under `check_spec_run`, and a spec
+# ---- run carries a unit it added once - so this would stop being the build-run case it was written for.
 set_cf_tree
 git checkout -qf main
 setunits tCarry '| Unit | Status | Rev | Last change |
 |---|---|---|---|
 | [ARCH-tCarry-1 — the unit](spec/one.md) | CLOSED | rev-1 | 2026-08-01 |'
+sed -i '/^2\. ARCH-tCarry-2 — the deferred unit$/d' memory/builds/tCarry/README.md
+same "AC4 the narrowed authored roster names unit 1 alone" "$(grep -c '^[0-9]\. ARCH-tCarry-' memory/builds/tCarry/README.md)" "1"
 git add -A >/dev/null && git commit -q -m cf-base-one-unit --no-verify && git push -q -f origin main
 git checkout -qf unit && git merge -q --no-edit main >/dev/null 2>&1
 run --preflight tCarry --keepalive-id KC-1 >/dev/null; write_cf_commit
@@ -16761,6 +16766,7 @@ run_cf_defer >/dev/null; write_cf_commit
 out=$(run --close tCarry)
 hit  "$out" "$CF_UNMET"
 hit  "$out" "a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close: ARCH-tCarry-2"
+hit  "$out" "ARCH-tCarry-2; this run is not a spec run, so it carries no unit it added: every unit the authored roster:units pair names at the pinned base"
 
 # ---- AC5 — no defer row on the record: unmet, naming the missing row and the act that writes it.
 run_cf_preflight
@@ -16768,6 +16774,227 @@ out=$(run --close tCarry)
 hit  "$out" "$CF_UNMET"
 hit  "$out" "a DEFERRED unit has no \`rescope · item defer\` row in the run-state file, so the deferral was never declared where the wrap-up surfaces it; record it with --rescope tCarry --act defer --item ARCH-tCarry-2"
 reset_tree
+
+# ======= TOOL-dTrueNorth-7 — a spec run's carry-forward of a unit it added, once, and its roster ======
+# SELF-CONTAINED, a scratch repository per fixture (the spec's FX fixtures). `seed_sr_fixture` puts on
+# MAIN a build whose authored `roster:units` pair plans units no spec carries yet, a generated pair
+# that is well formed and names no unit, and a BACKLOG.md filing the ask the units are set aside
+# against; the run branch then preflights, so its baseline region names nothing and the starting
+# roster is the authored fallback (S2). Each case is staged by its own fixture edit and runs `--close`
+# once, the tree reset after it. Every case's red half was observed as a targeted probe, against the
+# kit at the unit's base and against the staged break its criterion names; README rule 8 of the
+# dTrueNorth build waives this suite's verdict at that landing.
+if in_shard 8; then
+[ -n "${ASKSTUB:-}" ] && [ -f "$ASKSTUB" ] || build_ask_stub
+askmode ok; askrows ''
+sr_root=$(mktemp -d)
+SR_UNMET="a machine-checked DoD item is unmet, so --close blocks: build-complete"
+SR_5183="a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close:"
+SR_ONCE="a DEFERRED unit was added and carried forward by an earlier landed run of this build, and a unit a spec run adds is carried once, so this run must build it:"
+SR_SLUG=tSpec; SR_ASK=EXMP-tSpec-9
+SR_TWO="1. ARCH-tSpec-1 — the first
+2. ARCH-tSpec-2 — the second"
+run_sr() { ( cd "$sr_root/repo" && unset GATE_SELFTESTS && export GOV_DEFAULT_BRANCH=main && run_main_at_head run_driver "$@" 2>&1 ); }
+write_sr_commit() { git -C "$sr_root/repo" add -A >/dev/null; git -C "$sr_root/repo" commit -q -m "${1:-sr-edit}" --no-verify; }
+write_sr_backlog() { # slug · ask id, or empty for a BACKLOG.md filing none
+  if [ -n "$2" ]; then
+    printf '# %s — asks\n\n## Asks\n- %s · filed 2026-09-10 · the scope the spec run sets aside · seen `memory/builds/%s/BACKLOG.md` · accept done\n\n## Dispositions\n- KEEP · %s · the deferred units wait on it\n' \
+      "$1" "$2" "$1" "$2" > "$sr_root/repo/memory/builds/$1/BACKLOG.md"
+  else
+    printf '# %s — asks\n\n## Asks\n\n## Dispositions\n' "$1" > "$sr_root/repo/memory/builds/$1/BACKLOG.md"
+  fi
+}
+seed_sr_fixture() { # slug · id prefix · ask id or empty · authored roster body -> a fresh repo, preflighted
+  rm -rf "$sr_root/repo" "$sr_root/origin.git"; mkdir -p "$sr_root/repo"
+  git init -q --bare "$sr_root/origin.git"
+  git --git-dir="$sr_root/origin.git" symbolic-ref HEAD refs/heads/main
+  (
+    cd "$sr_root/repo" || exit 2
+    git init -q -b main . && git config user.email t@t.test && git config user.name t && git config core.autocrlf false
+    git remote add origin "$sr_root/origin.git"
+    mkdir -p memory/guides "memory/builds/$1/spec"
+    printf '# build method (stub)\n\n## M1\n\nExistence is what the driver tests.\n' > memory/guides/BUILD-METHOD.md
+    mkconf; askconf
+    printf -- '---\nslug: %s\nnode: a\nopened: 2026-08-01\nstreams: architecture\nroster: %s\nids:\n---\n\n# %s\n\n<!-- gen:build-index -->\n**Build status:** OPEN · 0 unit(s)\n\n<!-- gen:build-units -->\n*No spec under this build carries a status header.*\n<!-- /gen:build-units -->\n<!-- /gen:build-index -->\n\n<!-- roster:units -->\n%s\n<!-- /roster:units -->\n' \
+      "$1" "$2" "$1" "$4" > "memory/builds/$1/README.md"
+    write_sr_backlog "$1" "$3"
+    git add -A >/dev/null && git commit -q -m sr-base --no-verify && git push -q origin main
+    git checkout -q -b unit && git commit -q --allow-empty -m "unit work" --no-verify
+  )
+  run_sr --preflight "$1" --keepalive-id KS-1 >/dev/null; write_sr_commit sr-preflight
+}
+write_sr_units() { # n:STATUS... -> every unit's spec, advancing SR_ASK, and the region rendered from them
+  local _u _n _rows='| Unit | Status | Rev | Last change |
+|---|---|---|---|' _p=ARCH
+  [ "$SR_SLUG" = tGround ] && _p=TOOL
+  for _u in "$@"; do
+    _n=${_u%%:*}
+    printf '# %s-%s-%s the unit\n\n**Status:** %s · rev-1 · 2026-08-01 · node a · Tier-1 · base 00000000 · streams architecture · advances %s\n' \
+      "$_p" "$SR_SLUG" "$_n" "${_u#*:}" "$SR_ASK" > "$sr_root/repo/memory/builds/$SR_SLUG/spec/u$_n.md"
+    _rows="$_rows
+| [$_p-$SR_SLUG-$_n — the unit](spec/u$_n.md) | ${_u#*:} | rev-1 | 2026-08-01 |"
+  done
+  ( cd "$sr_root/repo" && setunits "$SR_SLUG" "$_rows" )
+  write_sr_commit sr-units
+}
+run_sr_defer() { # unit ids... -> one defer row each, committed
+  local _i
+  for _i in "$@"; do run_sr --rescope "$SR_SLUG" --act defer --item "$_i" --reason "the build run takes it" >/dev/null; done
+  write_sr_commit sr-defer
+}
+run_sr_add() { run_sr --rescope "$SR_SLUG" --act add --item "$1" --reason "${2:-promoted by the closing diff review}"; }
+read_sr_close() { run_sr --close "$SR_SLUG"; git -C "$sr_root/repo" reset -q --hard; git -C "$sr_root/repo" clean -qfd; }
+set_sr_landed() { # -> the record LANDED, the run branch on main, and the build run preflighted on top
+  sed -i 's/^phase: .*/phase: LANDED/' "$sr_root/repo/memory/builds/$SR_SLUG/RUN.md"; write_sr_commit sr-landed
+  git -C "$sr_root/repo" branch -qf main HEAD; git -C "$sr_root/repo" push -q -f origin HEAD:main
+  git -C "$sr_root/repo" checkout -q -b build; git -C "$sr_root/repo" commit -q --allow-empty -m "build work" --no-verify
+  run_sr --preflight "$SR_SLUG" --keepalive-id KS-2 >/dev/null; write_sr_commit sr-build-preflight
+}
+
+# ---- AC14 — one roster unit, specced DEFERRED by the spec run: met, one plain carried line. RED at
+# ---- base, and with S2's fallback removed: term 2 "cannot be read".
+seed_sr_fixture tSpec ARCH EXMP-tSpec-9 "1. ARCH-tSpec-1 — the only unit"
+write_sr_units 1:DEFERRED; run_sr_defer ARCH-tSpec-1
+out=$(read_sr_close)
+hit  "$out" "carried forward — ARCH-tSpec-1, DEFERRED against the open ask EXMP-tSpec-9"
+miss "$out" "$SR_UNMET"
+
+# ---- AC12, then AC1 — FX-spec, then FX-added. A unit the spec run specs into the region and then adds
+# ---- records as LATE against the authored fallback (RED at base: fail 48 "cannot be derived"), and the
+# ---- close carries it once beside the two roster units (RED with S4's spec-run branch staged out).
+seed_sr_fixture tSpec ARCH EXMP-tSpec-9 "$SR_TWO"
+write_sr_units 1:DEFERRED 2:DEFERRED; run_sr_defer ARCH-tSpec-1 ARCH-tSpec-2
+write_sr_units 1:DEFERRED 2:DEFERRED 3:DEFERRED
+out=$(run_sr_add ARCH-tSpec-3)
+hit  "$out" "LATE record — ARCH-tSpec-3 entered the roster after this run went live"
+same "AC12 the add row is written" "$(grep -c ' rescope · item add ARCH-tSpec-3 · reason ' "$sr_root/repo/memory/builds/tSpec/RUN.md")" "1"
+write_sr_commit sr-add; run_sr_defer ARCH-tSpec-3
+SR_ADDED=$(git -C "$sr_root/repo" rev-parse HEAD)
+out=$(read_sr_close)
+hit  "$out" "carried forward — ARCH-tSpec-3, added by this spec run and carried once, DEFERRED against the open ask EXMP-tSpec-9"
+hit  "$out" "carried forward — ARCH-tSpec-1, DEFERRED against the open ask EXMP-tSpec-9"
+hit  "$out" "carried forward — ARCH-tSpec-2, DEFERRED against the open ask EXMP-tSpec-9"
+miss "$out" "$SR_UNMET"
+# ---- AC2 — the add row's reason an adopted discovery: the same added line, because no reason is read.
+sed -i 's/item add ARCH-tSpec-3 · reason promoted by the closing diff review$/item add ARCH-tSpec-3 · reason an adopted discovery/' \
+  "$sr_root/repo/memory/builds/tSpec/RUN.md"
+same "AC2 the add row now names an adopted discovery" \
+  "$(grep -c 'item add ARCH-tSpec-3 · reason an adopted discovery$' "$sr_root/repo/memory/builds/tSpec/RUN.md")" "1"
+write_sr_commit sr-discovery
+out=$(read_sr_close)
+hit  "$out" "carried forward — ARCH-tSpec-3, added by this spec run and carried once"
+miss "$out" "$SR_UNMET"
+
+# ---- AC9 — FX-added's run ABORTED and rotated; the second run re-adds ARCH-tSpec-3 and re-defers all
+# ---- three: an archive of any other phase is no witness, so all three are carried (RED with the scan
+# ---- reading every rotated RUN.*.md, which names the ABORTED archive).
+git -C "$sr_root/repo" reset -q --hard "$SR_ADDED"
+sed -i 's/^phase: .*/phase: ABORTED/' "$sr_root/repo/memory/builds/tSpec/RUN.md"; write_sr_commit sr-aborted
+run_sr --preflight tSpec --keepalive-id KS-2 >/dev/null; write_sr_commit sr-second-preflight
+same "AC9 the rotation archived the aborted record" "$(ls "$sr_root/repo/memory/builds/tSpec" | grep -c '^RUN\.ABORTED\.')" "1"
+run_sr_add ARCH-tSpec-3 >/dev/null; write_sr_commit sr-readd
+run_sr_defer ARCH-tSpec-1 ARCH-tSpec-2 ARCH-tSpec-3
+out=$(read_sr_close)
+hit  "$out" "carried forward — ARCH-tSpec-3, added by this spec run and carried once"
+hit  "$out" "carried forward — ARCH-tSpec-1, DEFERRED against the open ask EXMP-tSpec-9"
+miss "$out" "RUN.ABORTED."
+miss "$out" "$SR_UNMET"
+
+# ---- FX-landed — FX-added LANDED, on main, and the build run preflighted on top of it, rotating it.
+git -C "$sr_root/repo" reset -q --hard "$SR_ADDED"
+set_sr_landed
+same "the build run's preflight archived the landed record" "$(ls "$sr_root/repo/memory/builds/tSpec" | grep -c '^RUN\.LANDED\.')" "1"
+SR_LANDED=$(git -C "$sr_root/repo" rev-parse HEAD)
+# ---- AC7 — the build run closes nothing and re-defers all three: the once refusal names ARCH-tSpec-3
+# ---- and no refusal names a roster unit (RED with a defer row alone as the witness: ARCH-tSpec-1).
+run_sr_defer ARCH-tSpec-1 ARCH-tSpec-2 ARCH-tSpec-3
+out=$(read_sr_close)
+hit  "$out" "$SR_UNMET"
+hit  "$out" "$SR_ONCE ARCH-tSpec-3 in memory/builds/tSpec/RUN.LANDED."
+miss "$out" "$SR_ONCE ARCH-tSpec-1"
+miss "$out" "$SR_ONCE ARCH-tSpec-2"
+# ---- AC3 — the build run closes both roster units and defers ARCH-tSpec-3 again: the once refusal
+# ---- (RED at base, which carries it, and with the scan staged to print nothing).
+git -C "$sr_root/repo" reset -q --hard "$SR_LANDED"
+write_sr_units 1:CLOSED 2:CLOSED 3:DEFERRED; run_sr_defer ARCH-tSpec-3
+out=$(read_sr_close)
+hit  "$out" "$SR_ONCE ARCH-tSpec-3 in memory/builds/tSpec/RUN.LANDED."
+miss "$out" "carried forward — ARCH-tSpec-3"
+# ---- AC4 — the build run, having closed units, adds ARCH-tSpec-4 and defers it: every authored unit is
+# ---- specced at its BASE, so it is no spec run (RED with S3's roster half staged out: carried).
+git -C "$sr_root/repo" reset -q --hard "$SR_LANDED"
+write_sr_units 1:CLOSED 2:CLOSED 3:CLOSED
+run_sr_add ARCH-tSpec-4 >/dev/null; write_sr_commit sr-add4
+write_sr_units 1:CLOSED 2:CLOSED 3:CLOSED 4:DEFERRED; run_sr_defer ARCH-tSpec-4
+out=$(read_sr_close)
+hit  "$out" "$SR_5183 ARCH-tSpec-4; this run is not a spec run, so it carries no unit it added: every unit the authored roster:units pair names at the pinned base"
+miss "$out" "carried forward — ARCH-tSpec-4"
+# ---- AC6 — the build run closes NO unit (it retires 3 and re-defers 1 and 2) and adds and defers 4: the
+# ---- same refusal, because the roster half reads BASE and never whether this run closed anything.
+git -C "$sr_root/repo" reset -q --hard "$SR_LANDED"
+write_sr_units 1:DEFERRED 2:DEFERRED 3:WONTDO; run_sr_defer ARCH-tSpec-1 ARCH-tSpec-2
+run_sr_add ARCH-tSpec-4 >/dev/null; write_sr_commit sr-add4
+write_sr_units 1:DEFERRED 2:DEFERRED 3:WONTDO 4:DEFERRED; run_sr_defer ARCH-tSpec-4
+out=$(read_sr_close)
+hit  "$out" "$SR_5183 ARCH-tSpec-4; this run is not a spec run, so it carries no unit it added: every unit the authored roster:units pair names at the pinned base"
+
+# ---- AC8 — FX-whole: BASE files no ask; the run files one itself, then adds and defers ARCH-tSpec-3.
+# ---- An ask filed after BASE does not count (RED with the ask half reading HEAD's BACKLOG.md).
+seed_sr_fixture tSpec ARCH "" "$SR_TWO"
+write_sr_backlog tSpec EXMP-tSpec-9; write_sr_commit sr-own-ask
+write_sr_units 1:DEFERRED 2:DEFERRED; run_sr_defer ARCH-tSpec-1 ARCH-tSpec-2
+run_sr_add ARCH-tSpec-3 >/dev/null; write_sr_commit sr-add
+write_sr_units 1:DEFERRED 2:DEFERRED 3:DEFERRED; run_sr_defer ARCH-tSpec-3
+out=$(read_sr_close)
+hit  "$out" "$SR_5183 ARCH-tSpec-3; this run is not a spec run, so it carries no unit it added: the build's BACKLOG.md at the pinned base"
+hit  "$out" "files no ask under tSpec, and an ask this run filed after it does not count"
+
+# ---- AC5, then AC10 — FX-clone's shape: eleven authored units in a table whose Carries column holds a
+# ---- foreign token, a generated region holding a prose line alone, and the opening's ask. The spec run
+# ---- defers the eleven and closes met; check 24's roster read names the same eleven (RED at base, and
+# ---- with S2's fallback removed). It then adds a twelfth unit, carried once with the added line, and the
+# ---- build run after the landing that re-defers it is refused once (RED with the scan printing nothing).
+SR_SLUG=tGround; SR_ASK=TOOL-tGround-12
+_sr_tab='| # | Unit | Carries | Clause |
+|---|---|---|---|'
+_sr_units=""; _sr_closed=""; _sr_ids=""
+for _sr_n in 1 2 3 4 5 6 7 8 9 10 11; do
+  _sr_tab="$_sr_tab
+| $_sr_n | \`TOOL-tGround-$_sr_n\` | \`cl-dClosedLoop-00$_sr_n@b0458b78\` | a clause |"
+  _sr_units="$_sr_units $_sr_n:DEFERRED"; _sr_closed="$_sr_closed $_sr_n:CLOSED"; _sr_ids="$_sr_ids TOOL-tGround-$_sr_n"
+done
+seed_sr_fixture tGround TOOL TOOL-tGround-12 "$_sr_tab"
+write_sr_units $_sr_units; run_sr_defer $_sr_ids
+out=$(read_sr_close)
+miss "$out" "$SR_UNMET"
+for _sr_n in 1 2 3 4 5 6 7 8 9 10 11; do
+  hit "$out" "carried forward — TOOL-tGround-$_sr_n, DEFERRED against the open ask TOOL-tGround-12"
+done
+_sr_base=$(sed -n 's/^base: //p' "$sr_root/repo/memory/builds/tGround/RUN.md" | head -1)
+same "AC5 check 24's roster read, the checker's arguments, names the same eleven" \
+  "$(cd "$sr_root/repo" && baseline_units memory/builds/tGround/RUN.md memory/builds/tGround/README.md "" "$_sr_base" | grep -c '^TOOL-tGround-[0-9]*$')" "11"
+run_sr_add TOOL-tGround-13 >/dev/null; write_sr_commit sr-add13
+write_sr_units $_sr_units 13:DEFERRED; run_sr_defer TOOL-tGround-13
+out=$(read_sr_close)
+hit  "$out" "carried forward — TOOL-tGround-13, added by this spec run and carried once, DEFERRED against the open ask TOOL-tGround-12"
+hit  "$out" "carried forward — TOOL-tGround-1, DEFERRED against the open ask TOOL-tGround-12"
+miss "$out" "$SR_UNMET"
+set_sr_landed
+write_sr_units $_sr_closed 13:DEFERRED; run_sr_defer TOOL-tGround-13
+out=$(read_sr_close)
+hit  "$out" "$SR_ONCE TOOL-tGround-13 in memory/builds/tGround/RUN.LANDED."
+
+# ---- AC17 — one definition, the callers unedited, and the rule's comment names the spec run.
+same "AC17 read_roster_at is defined once, in the library" "$(grep -c '^read_roster_at()' "$HERE/lib-unattended.sh")" "1"
+same "AC17 the driver defines no read_roster_at" "$(grep -c '^read_roster_at()' "$HERE/unattended.sh")" "0"
+same "AC17 the checker defines no read_roster_at" "$(grep -c '^read_roster_at()' "$HERE/check-unattended.sh")" "0"
+same "AC17 the driver's non-comment baseline_units calls stay 2" "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'baseline_units ')" "2"
+same "AC17 the checker's non-comment baseline_units calls stay 1" "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'baseline_units ')" "1"
+_sr_cmt=$(awk '/^# =+ TOOL-dUnstuckLanding-18 S2/ { c = 1 } c && /^#/ && /spec run/ { k++ } /^check_carry_forward\(\)/ { print k + 0; exit }' "$HERE/unattended.sh")
+same "AC17 the comment above check_carry_forward names the spec run" "$(( ${_sr_cmt:-0} > 0 ))" "1"
+rm -rf "$sr_root"
+SR_SLUG=tSpec
+fi
 
 # ============================ TOOL-dUnstuckLanding-19 — refresh before a verdict, `refreshed-at` ====
 # ---- SELF-CONTAINED, for the settle block's reason: every arm moves the remote's main three commits

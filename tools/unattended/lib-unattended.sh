@@ -1881,6 +1881,21 @@ next_anchor() {  # anchor · newline-separated candidate anchors
 # THE BASELINE IS THE COMMIT THE RUN ENTERED ITS LIVE PHASE AT, never the pinned BASE. A run that
 # classifies a unit MISSING and authors its spec is obeying the build method, and every such spec is
 # absent at BASE — keying on BASE would red a run for following the method.
+#
+# TOOL-dTrueNorth-7 S2 - THE AUTHORED FALLBACK, AND THE SECOND OUTPUT SHAPE IT BRINGS. A spec run
+# enters its live phase before it has specced anything, so the generated region at its baseline is a
+# well-formed pair naming no unit, and the refusal below then left every chain spec run unclosable.
+# There, and only there, the authored `roster:units` pair at the SAME commit answers instead, through
+# `read_roster_at`, and what prints is that pair's slug-scoped IDS, one per line, not region rows.
+# Two shapes from one producer is the format-derived-from-arity class, so every reader was checked
+# against both: condition 2, `--rescope --act add` and check 24's ADD arm ask membership through
+# `id_in`, which a bare id answers. Check 24's RETIRE arm falls back to this output for a unit the
+# pinned roster lacks and asks `id_rows … | grep '| WONTDO |'`; a bare id carries no status, so it
+# takes its strict direction and asks for the row, which is right, because a region naming no unit
+# held no WONTDO unit. A region naming SOME unit is the roster as before: the union of the two was
+# rejected (the unit's section 4).
+# When the authored pair refuses too, one reason names both regions; every refusal above it, the
+# `UNITS_REGION_CUTOFF` grandfather included, still comes first.
 # The units region as it stood at a NAMED commit. A SEPARATE PREDICATE from `baseline_units`, not a
 # parameterised one: the two answer different questions - "what roster did this run enter its live
 # phase with" and "what roster did the owner authorize" - and one predicate serving callers whose
@@ -2013,10 +2028,61 @@ baseline_units() {  # run-state-path · build-README-path · [cutoff-date] · [f
   # as added.
   _bu_ids=$(printf '%s\n' "$_bu_was" | grep -oE '[A-Z]+-[A-Za-z0-9]+-[0-9]+' | sort -u)
   if [ -z "$_bu_ids" ]; then
-    echo "the baseline roster names no unit, so every unit this build has would read as added and the comparison would accuse rather than check"
+    # S2 - the authored pair at the SAME commit, ids one per line (the header above says why).
+    if _bu_rr=$(read_roster_at "$_bu_base" "$_bu_bre"); then
+      printf '%s\n' "$_bu_rr"
+      return 0
+    fi
+    # The state, lifted off the sentence `read_roster_at` refused with, so its three states are
+    # spelled once, there.
+    _bu_st=${_bu_rr#"the authored roster:units pair at $_bu_base "}
+    echo "the baseline roster names no unit in its generated region, and the authored roster:units pair at the same commit $_bu_st, so every unit this build has would read as added and the comparison would accuse rather than check"
     return 1
   fi
   printf '%s\n' "$_bu_was"
+}
+
+# TOOL-dTrueNorth-7 S1 - THE AUTHORED ROSTER AT A COMMIT: the `<!-- roster:units -->` pair a build
+# README carries, read from its blob at a NAMED commit, and SCOPED TO THE BUILD'S OWN SLUG the way the
+# driver's `roster_ids` scopes the working tree's, because a foreign id in a Carries or Clause column
+# is a reference and not a unit. The slug is the README's parent folder. Prints the ids, one per line,
+# sorted. Exits 1 with its reason as its ONLY output, the shape `pinned_units` gives, when the pair is
+# absent, malformed or names no id of the slug: an empty roster is a refusal and never an empty
+# success, for the reason `baseline_units` gives above. Each of the three reasons reads
+# `the authored roster:units pair at <commit> <state>`, and `baseline_units` lifts the state off it.
+# Called by `baseline_units` at its baseline and by the driver's `check_spec_run` at the pinned BASE.
+# `check_prompt_brief`'s read of the same pair is the prior instance and is not routed here (its F7).
+#
+# WHAT IT DOES NOT CHECK: that a named id has a spec, or where in the README the pair sits.
+read_roster_at() {  # commit · build-README-path -> the slug's unit ids that pair names there
+  _rr_c=$1; _rr_bre=$2
+  _rr_slug=${_rr_bre%/README.md}; _rr_slug=${_rr_slug##*/}
+  command -v region >/dev/null 2>&1 || {
+    echo "read_roster_at needs a region() in the calling shell and this one has none, so the authored roster would read as empty and be reported as an empty roster"
+    return 1
+  }
+  # GIVEN its commit, as `pinned_units` is, so it validates it: an empty value is INDEX syntax to
+  # `GIT show` and would read the working index rather than fail.
+  if [ -z "$_rr_c" ] || ! GIT cat-file -e "$_rr_c^{commit}" 2>/dev/null; then
+    echo "the authored roster:units pair cannot be read at a commit that does not resolve, and an empty value would read the working index instead: [$_rr_c]"
+    return 1
+  fi
+  _rr_blob=$(GIT show "$_rr_c:$_rr_bre" 2>/dev/null || true)
+  # ABSENT is neither marker; one marker without the other is MALFORMED, which `region` refuses.
+  if [[ $_rr_blob != *'<!-- roster:units -->'* && $_rr_blob != *'<!-- /roster:units -->'* ]]; then
+    echo "the authored roster:units pair at $_rr_c is absent"
+    return 1
+  fi
+  if ! _rr_reg=$(printf '%s\n' "$_rr_blob" | region - '<!-- roster:units -->' '<!-- /roster:units -->' 2>/dev/null); then
+    echo "the authored roster:units pair at $_rr_c is malformed"
+    return 1
+  fi
+  _rr_ids=$(printf '%s\n' "$_rr_reg" | grep -oE "[A-Z]+-$_rr_slug-[0-9]+" | sort -u)
+  if [ -z "$_rr_ids" ]; then
+    echo "the authored roster:units pair at $_rr_c names no unit of this build"
+    return 1
+  fi
+  printf '%s\n' "$_rr_ids"
 }
 
 # ------------------------------------------------------------------------- the ask FILING match

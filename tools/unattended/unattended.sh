@@ -5129,6 +5129,105 @@ asks_filed_by() { # BACKLOG.md text · slug -> every ask id this build filed und
   done
 }
 
+# ================================ TOOL-dTrueNorth-7 S3 — IS THIS RUN A SPEC RUN =====================
+# README rule 1 of a chain build, read by the driver rather than declared by the run: a spec run is
+# one whose build, at the run's pinned `base:`, files an OPEN ask of its own and plans a unit it has
+# not specced. BOTH HALVES READ `base:` (its F2), so nothing this run writes can make it one: an ask
+# the run files itself, or a spec it authors, is past `base:` and is not read.
+#   the ASK half, first - the build's `BACKLOG.md` at `base:` files an ask under the build's own slug
+#     (`asks_filed_by` over `backlog_blob_of`), and the ask witness called `--at <base>` reads at
+#     least one of them neither CLOSED nor WONTDO (its F8: filing alone counts an ask closed there);
+#   the ROSTER half - the authored `roster:units` pair at `base:` (`read_roster_at`) names a unit the
+#     generated region at `base:` does not, which is a unit MISSING there.
+# 0 is a spec run, 1 is not one, 2 is that the question cannot be read; each with its reason in
+# SR_WHY. A generated pair absent or malformed at `base:` cannot say which unit is missing, so it is
+# 2 and never 1. Whether the run closes a unit plays no part: a build run that closes none is still a
+# build run. THE WITNESS CALL OVERWRITES `AW_ROWS`, so the statuses are read here at once, and the
+# carry-forward term's own call at HEAD comes after this one.
+#
+# WHAT IT DOES NOT CHECK: that `deviations.py`'s run kind agrees. That instrument answers the same
+# question from a BACKLOG parse and spec H1s, and the two agree while hygiene check 9 keeps the index
+# fresh; a disagreement is an ask, not a branch here.
+SR_WHY=""
+check_spec_run() { # slug · run-state file -> 0 a spec run, 1 not one, 2 unreadable; SR_WHY says which
+  local _sr_slug="$1" _sr_rel="$2" _sr_base _sr_filed _sr_a _sr_st _sr_open="" _sr_auth _sr_blob _sr_gen _sr_id _sr_miss=""
+  SR_WHY=""
+  fact "$_sr_rel" base >/dev/null; _sr_base=$_fact
+  if [ -z "$_sr_base" ] || ! GIT cat-file -e "$_sr_base^{commit}" 2>/dev/null; then
+    SR_WHY="the run-state file's pinned base: is absent or names no commit, and both halves of the spec-run test read that commit: [$_sr_base]"
+    return 2
+  fi
+  # The ask half.
+  _sr_filed=$(asks_filed_by "$(backlog_blob_of "$_sr_slug" "$_sr_base")" "$_sr_slug")
+  if [ -z "$_sr_filed" ]; then
+    SR_WHY="the build's BACKLOG.md at the pinned base $_sr_base files no ask under $_sr_slug, and an ask this run filed after it does not count"
+    return 1
+  fi
+  if ! run_ask_witness "$_sr_slug" "$_sr_base" $_sr_filed; then
+    SR_WHY="the ask witness did not answer at the pinned base $_sr_base for the asks the build files there: $AW_WHY"
+    return 2
+  fi
+  for _sr_a in $_sr_filed; do
+    _sr_st=$(ask_field "$_sr_a" status)
+    case "$_sr_st" in CLOSED|WONTDO) ;; *) _sr_open=$_sr_a; break ;; esac
+  done
+  if [ -z "$_sr_open" ]; then
+    SR_WHY="none of the asks the build's BACKLOG.md at the pinned base $_sr_base files under $_sr_slug reads open there: ${_sr_filed//$'\n'/ }"
+    return 1
+  fi
+  # The roster half.
+  readme_of "$_sr_slug" >/dev/null
+  if ! _sr_auth=$(read_roster_at "$_sr_base" "$_readme"); then
+    SR_WHY=$_sr_auth
+    return 1
+  fi
+  _sr_blob=$(GIT show "$_sr_base:$_readme" 2>/dev/null)
+  if [[ $_sr_blob != *"$UNITS_OPEN"* && $_sr_blob != *"$UNITS_CLOSE"* ]]; then
+    SR_WHY="the build README at the pinned base $_sr_base carries no generated units pair, so which authored unit was unspecced there cannot be read"
+    return 2
+  fi
+  if ! _sr_gen=$(printf '%s\n' "$_sr_blob" | region - "$UNITS_OPEN" "$UNITS_CLOSE" 2>/dev/null); then
+    SR_WHY="the build README at the pinned base $_sr_base carries a generated units marker but not exactly one well-formed pair, so which authored unit was unspecced there cannot be read"
+    return 2
+  fi
+  for _sr_id in $_sr_auth; do
+    id_in "$_sr_gen" "$_sr_id" || _sr_miss="$_sr_miss $_sr_id"
+  done
+  if [ -z "$_sr_miss" ]; then
+    SR_WHY="every unit the authored roster:units pair names at the pinned base $_sr_base is specced there, so this run built from specs it did not write and is a build run"
+    return 1
+  fi
+  SR_WHY="the pinned base $_sr_base holds the open ask $_sr_open and plans units it has not specced:$_sr_miss"
+  return 0
+}
+
+# =========================== TOOL-dTrueNorth-7 S5 — ONCE, AND ITS WITNESS ===========================
+# A unit a spec run adds is carried forward ONCE: the build run after it builds it. The witness is the
+# record that spec run LANDED - the build's rotated `RUN.LANDED.<blob8>.md` archives tracked at the
+# graded commit, named by `archive_name_of`'s grammar - and an archive carrying BOTH a `rescope · item
+# add <unit>` row and a `rescope · item defer <unit>` row says an earlier landed run added that unit
+# and carried it. The first such archive prints, and exit 0 means one exists; 1 means none does.
+# An archive of ANY OTHER PHASE IS NO WITNESS, so an aborted run's rows do not spend the once (its
+# review fold-a id 7), and a roster unit an earlier run deferred, with no `add` row, is not named
+# (its F3): a roster unit set aside against a still-open ask may wait over two runs.
+#
+# WHAT IT DOES NOT CHECK: that the archive is an honest rotation - `check_honest_rotation` and the
+# gate leg grade that - or an archive that was deleted, which history keeps and this does not read.
+scan_landed_carry() { # slug · unit · commit -> 0 and the first LANDED archive that added and deferred the unit, or 1
+  local _lc_dir="$M/builds/$1" _lc_unit="$2" _lc_rev="$3" _lc_p
+  while IFS= read -r _lc_p; do
+    [[ ${_lc_p##*/} =~ ^RUN\.LANDED\.[0-9a-f]{8}\.md$ ]] || continue
+    if GIT show "$_lc_rev:$_lc_p" 2>/dev/null | U="$_lc_unit" awk '
+        /^[0-9][0-9-]*T[0-9:]*Z rescope · item add / && index($0, " item add " ENVIRON["U"] " · ") { a = 1 }
+        /^[0-9][0-9-]*T[0-9:]*Z rescope · item defer / && index($0, " item defer " ENVIRON["U"] " · ") { d = 1 }
+        END { exit !(a && d) }'; then
+      printf '%s\n' "$_lc_p"
+      return 0
+    fi
+  done < <(GIT ls-tree --name-only "$_lc_rev" -- "$_lc_dir/" 2>/dev/null)
+  return 1
+}
+
 # ============================== TOOL-dUnstuckLanding-18 S2 — THE CARRY-FORWARD TERM ===============
 # `build-complete`'s fifth term, for the rows it hands over: every non-terminal unit row of the
 # build, each already known DEFERRED. Owner ruling TOOL-dUnstuckLanding-23 lands a build's CLOSED
@@ -5136,8 +5235,16 @@ asks_filed_by() { # BACKLOG.md text · slug -> every ask id this build filed und
 # names this as the `land a partial build` row. A unit is carried forward only when ALL FIVE hold:
 #   1. its status is DEFERRED - decided by the caller, re-asserted here so this cannot carry an OPEN row;
 #   2. the roster this run started with carries it (`baseline_units`, falling back to the pinned
-#      `base:`), so a unit the run ADDED - a promoted finding, an adopted discovery - never lands
-#      deferred, which M4's severity rule forbids;
+#      `base:`, and to the authored `roster:units` pair where the generated region there names no
+#      unit), OR this is a SPEC RUN carrying a unit it ADDED, once (TOOL-dTrueNorth-7). A unit is
+#      ADDED when this run's record carries its `rescope · item add <unit>` row or the starting roster
+#      does not carry it. An added unit is carried only when `check_spec_run` reads README rule 1 at
+#      `base:` as a spec run - an open ask the build files there and an authored unit unspecced there
+#      - AND the add row stands, because that row is the witness the next run's once-check reads. A
+#      build run or a whole run still never lands a unit it added - a promoted finding, an adopted
+#      discovery - deferred. And NO DEFERRED UNIT, roster or added, that an earlier LANDED run of this
+#      build added and deferred is carried again (`scan_landed_carry` over the rotated `RUN.LANDED.`
+#      archives): a spec run carries what it added once, and the build run after it must build it;
 #   3. the run-state file carries its `rescope · item defer <unit>` row, owed through PARK_ACTS_OWED,
 #      so the owner's one read is told the scope was set aside;
 #   4. its spec header `closes` or `advances` an ask this build's own BACKLOG.md at HEAD files under
@@ -5145,9 +5252,11 @@ asks_filed_by() { # BACKLOG.md text · slug -> every ask id this build filed und
 #      `asks-disposed` already reads, and no second one;
 #   5. no CLOSED unit's spec declares a `consumes-from` edge onto it, because a closed half that needs
 #      the open half is not landable and is a HAND OFF instead.
-# Checked per unit in that order, each returning early with its own message. ONE witness call per
-# close: conditions 1-3 and the filing half of 4 run for every unit first, then the status half of 4
-# and condition 5. Everything unreadable leaves the term UNMET with the reason - nothing reads as met.
+# Checked per unit in that order, each returning early with its own message. ONE witness call at HEAD
+# per close: conditions 1-3 and the filing half of 4 run for every unit first, then the status half of
+# 4 and condition 5. The spec-run test makes the one other call, at `base:`, at most once per close and
+# only when an added unit is met, inside the first loop and so before the call at HEAD. Everything
+# unreadable leaves the term UNMET with the reason - nothing reads as met.
 #
 # WHAT IT DOES NOT CHECK: that the ask's derived status is DEFERRED rather than merely OPEN. Any
 # status but CLOSED or WONTDO is an open question the unit can wait on, and `asks-disposed` grades
@@ -5156,8 +5265,8 @@ BC_CARRIED=""
 check_carry_forward() { # slug · run-state file · unit rows · non-terminal rows -> 0 and BC_CARRIED, or 1 and DOD_OUT
   local _cf_slug="$1" _cf_rel="$2" _cf_rows="$3" _cf_non="$4"
   local _cf_ids _cf_id _cf_base _cf_baserc=0 _cf_rev _cf_filed _cf_sp _cf_asks _cf_a _cf_st _cf_open
-  local _cf_union="" _cf_c _cf_csp _cf_closed
-  local -A _cf_cand=()
+  local _cf_union="" _cf_c _cf_csp _cf_closed _cf_srrc="" _cf_added _cf_addrow _cf_arch
+  local -A _cf_cand=() _cf_isadd=()
   BC_CARRIED=""
   # 1 - re-asserted. The caller filters on the same row shape; a caller that stops filtering must
   # not turn this into a way to carry an OPEN or INPROGRESS unit.
@@ -5174,13 +5283,36 @@ check_carry_forward() { # slug · run-state file · unit rows · non-terminal ro
   _cf_rev=$(GIT rev-parse HEAD 2>/dev/null)
   _cf_filed=" $(asks_filed_by "$(backlog_blob_of "$_cf_slug" "$_cf_rev")" "$_cf_slug" | tr '\n' ' ')"
   for _cf_id in $_cf_ids; do
-    # 2 - the roster this run started with.
+    # 2 - the roster this run started with, or a unit this spec run added and carries once.
     if [ "$_cf_baserc" != 0 ]; then
       DOD_OUT="a DEFERRED unit can be carried forward only when the roster this run started with carries it, and that roster cannot be read, so $_cf_id cannot be: $_cf_base"
       return 1
     fi
-    if ! id_in "$_cf_base" "$_cf_id"; then
-      DOD_OUT="a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close: $_cf_id"
+    _cf_added=0; _cf_addrow=0
+    if grep -E '^[0-9][0-9-]*T[0-9:]*Z rescope · item add ' "$_cf_rel" 2>/dev/null | grep -qF -- " item add $_cf_id · "; then
+      _cf_added=1; _cf_addrow=1
+    fi
+    id_in "$_cf_base" "$_cf_id" || _cf_added=1
+    if [ "$_cf_added" = 1 ]; then
+      # The spec-run test, run at most ONCE per close and only here, where an added unit is met.
+      if [ -z "$_cf_srrc" ]; then check_spec_run "$_cf_slug" "$_cf_rel"; _cf_srrc=$?; fi
+      if [ "$_cf_srrc" = 2 ]; then
+        DOD_OUT="whether this run is a spec run cannot be read, so $_cf_id, which it added, cannot be carried forward: $SR_WHY"
+        return 1
+      fi
+      if [ "$_cf_srrc" != 0 ]; then
+        DOD_OUT="a DEFERRED unit was added during this run - the roster this run started with does not carry it - so it cannot be carried forward; a unit the run added is finished or retired, never deferred past the close: $_cf_id; this run is not a spec run, so it carries no unit it added: $SR_WHY"
+        return 1
+      fi
+      if [ "$_cf_addrow" = 0 ]; then
+        DOD_OUT="a spec run carries a unit it added only when its run-state file records the add, because that row is the witness the next run's once-check reads; record it with --rescope $_cf_slug --act add --item $_cf_id --reason \"<why>\": $_cf_id"
+        return 1
+      fi
+      _cf_isadd[$_cf_id]=1
+    fi
+    # 2, once - every DEFERRED unit, roster or added, an earlier LANDED run added and carried.
+    if _cf_arch=$(scan_landed_carry "$_cf_slug" "$_cf_id" "$_cf_rev"); then
+      DOD_OUT="a DEFERRED unit was added and carried forward by an earlier landed run of this build, and a unit a spec run adds is carried once, so this run must build it: $_cf_id in $_cf_arch"
       return 1
     fi
     # 3 - the declared deferral.
@@ -5241,8 +5373,13 @@ check_carry_forward() { # slug · run-state file · unit rows · non-terminal ro
         return 1
       fi
     done
-    BC_CARRIED="${BC_CARRIED:+$BC_CARRIED
+    if [ -n "${_cf_isadd[$_cf_id]:-}" ]; then
+      BC_CARRIED="${BC_CARRIED:+$BC_CARRIED
+}carried forward — $_cf_id, added by this spec run and carried once, DEFERRED against the open ask $_cf_open"
+    else
+      BC_CARRIED="${BC_CARRIED:+$BC_CARRIED
 }carried forward — $_cf_id, DEFERRED against the open ask $_cf_open"
+    fi
   done
   return 0
 }

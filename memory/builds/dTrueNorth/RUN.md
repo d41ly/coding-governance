@@ -138,3 +138,7 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-21T23:17:37Z brief · item TOOL-dTrueNorth-16 · reason 485042f4eeac memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-16-build-brief.md
 
 2026-10-22T00:21:43Z dispatch · item 055d6250 TOOL-dTrueNorth-16 · reason tools/memory-tree/gen_build_index.py tools/memory-tree/asbuilt_view.py tools/memory-tree/deviation_join.py tools/memory-tree/README.md memory/map/generated/symbols.json memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-16-ledger.md
+
+2026-10-22T00:30:26Z dispatch · item ab02d357 TOOL-dTrueNorth-7 · reason tools/unattended/lib-unattended.sh tools/unattended/unattended.sh tools/unattended/check-unattended.sh tools/unattended/STOPS.template.md tools/unattended/VERBS.template.md memory/guides/UNATTENDED-STOPS.md memory/guides/UNATTENDED-VERBS.md tools/unattended/unattended.test.sh tools/unattended/check-unattended.test.sh memory/builds/dTrueNorth/spec/2026-10-21-spec-TOOL-dTrueNorth-7.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-7-ledger.md memory/builds/dTrueNorth/README.md memory/map/generated/symbols.json
+
+2026-10-22T00:30:38Z brief · item TOOL-dTrueNorth-7 · reason 8acbf312f778 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-7-build-brief.md
