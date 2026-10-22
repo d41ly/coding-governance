@@ -1,6 +1,6 @@
 # TOOL-dTrueNorth-27 — the nine bar legs this build turned red, each cleared at its cause
 
-**Status:** OPEN · rev-2 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 11
+**Status:** OPEN · rev-3 · 2026-10-22 · node d · Tier-2 · base 271aa59d · streams tooling · order 11
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,12 +8,15 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-22-build-TOOL-dTrueNorth-27-bar1.log](../build/2026-10-22-build-TOOL-dTrueNorth-27-bar1.log) | journal | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-28.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-28.md) | deviation | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-29.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-29.md) | deviation | — |
 | [2026-10-22-build-TOOL-dTrueNorth-27-deviation-30.md](../build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-30.md) | deviation | — |
 | [2026-10-21-prompt-TOOL-dTrueNorth-27-build-brief.md](../prompts/2026-10-21-prompt-TOOL-dTrueNorth-27-build-brief.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-27-1-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-1-spec-writer.md) | journal | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-27-2-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-2-spec-writer.md) | journal | — |
+| [2026-10-22-prompt-TOOL-dTrueNorth-27-3-spec-writer.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-3-spec-writer.md) | journal | — |
+| [2026-10-22-prompt-TOOL-dTrueNorth-27-divergence-2-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-divergence-2-brief.md) | research | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-27-divergence-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-divergence-brief.md) | research | — |
 | [2026-10-22-prompt-TOOL-dTrueNorth-27-spec-brief.md](../prompts/2026-10-22-prompt-TOOL-dTrueNorth-27-spec-brief.md) | research | — |
 
@@ -76,9 +79,8 @@ The install-prefix count is thirteen, not the twelve the brief lists: the bar al
   no-fork form (`:4659`), so no command substitution's inner quotes cut its signature. The retirement
   review in §4 finds no candidate among the build's four new code-49 sites, and
   `REFUSAL_CEILINGS`'s token for the driver rises 319 to 323 under the decision row
-  `TOOL-dTrueNorth-28`, which this unit mints in `memory/DECISIONS.md` in its own `Pass: none`
-  records commit: the file is a shared record (`.unattended.conf:417`), and `--dispatch` refuses a
-  pass declaring it (`tools/unattended/unattended.sh:13833`). Settled by §8 F4, recorded as
+  `TOOL-dTrueNorth-28`, already the last line of `memory/DECISIONS.md` from the `Pass: none` records
+  commit `53321feef` (§4). The pass does not edit `memory/DECISIONS.md`. Settled by §8 F4, recorded as
   deviation-29. Observed by AC9 and AC10.
 - **S7** — the as-built view's head derives its `**Serves:**` id and its instrument's file name from
   `DESIGN_VIEW`'s dated record name, `<date>-build-<unit id>-as-built.md`, so no product source spells
@@ -92,9 +94,11 @@ The install-prefix count is thirteen, not the twelve the brief lists: the bar al
   mainline the remote ladder resolves, through `row_grammar.resolve_remote`, the kit's inline copy of
   the gov lib's ladder (`tools/memory-tree/row_grammar.py:1146`), never a remote spelled by name. The
   module constant `REF` (`tools/memory-tree/deviation_join.py:140`) retires, and its two docstrings
-  (`:62`, `:719`) and its fixture's remote-tracking ref line (`:1199`) spell no remote. The module's
-  selftest holds `GOV_REMOTE` and `GOV_DEFAULT_BRANCH` out of its fixtures' environment, since the
-  ladder reads both from it (`row_grammar.py:1175`, `:1196`), a post-merge run can export
+  (`:62`, `:719`) and its fixture's remote-tracking ref line (`:1199`) spell no remote.
+  `run_plant_arms` (`deviation_join.py:1460`) holds `GOV_REMOTE` and `GOV_DEFAULT_BRANCH` out of its
+  fixtures' environment, so both selftests that call it, the module's own (`run_selftest`, `:1580`)
+  and the routed-commits selftest (`tools/memory-tree/routed_commits.py:670`, `:673`), run under the
+  hold. The ladder reads both variables (`row_grammar.py:1175`, `:1196`), a post-merge run can export
   `GOV_REMOTE` (`tools/run-gates/post-merge.sh:86`), and the fixtures carry no remote.
   **Readers:** by name: `read_decision_rows`, `check_approver` and `render_lines` in
   `tools/memory-tree/deviation_join.py`, the three functions spelling the constant; no other module
@@ -279,9 +283,11 @@ remote, as `row_grammar.py:1219-1222` reads its base; a ladder refusal returns n
 citation is refused, as an unread `DECISIONS.md` is today (`:761-762`). The two messages name the ref
 read, or the refusal. The fixture's `main` never moves past its base (`:1081-1083`, `:1200`), so with
 no remote configured the ladder's fallback reads the commit the old ref line pointed at. That holds
-only while the two variables are unset, so `run_selftest` takes both out of `os.environ` before its
-arms and restores them in a `finally`, as `run_fixture` restores the strip (`:1248-1253`); the
-`GOV_REMOTE` arm of AC15 sets its own value inside that hold.
+only while the two variables are unset, so `run_plant_arms` takes both out of `os.environ` on entry
+and restores them in a `finally` around its whole body, as it already restores the strip
+(`:1572-1574`) and as `run_fixture` does (`:1248-1253`). The hold lives there, not in `run_selftest`, because the routed-commits selftest calls
+`run_plant_arms` directly (`routed_commits.py:670`, `:673`) and never passes through `run_selftest`.
+The `GOV_REMOTE` arm of AC15 sets its own value inside that hold.
 `tools/memory-tree/HYGIENE.template.md:667` says the row is held on the mainline the remote ladder
 resolves, and `memory/HYGIENE.md` is re-rendered from it.
 
@@ -290,16 +296,24 @@ Every new or edited sentence in the memory-tree kit avoids pairing `update` with
 
 ### The decision row
 
-Appended at the end of `memory/DECISIONS.md`, the append-only file whose newest rows sit below its
-last heading (`memory/DECISIONS.md:5-6`, `:140`), in `TOOL-aSweptBar-6`'s form. It lands in its own
-`Pass: none` records commit, because the file is a shared record (`.unattended.conf:417`) that
-`--dispatch` refuses a pass declaring (`tools/unattended/unattended.sh:13833`). It names
+Already committed: the last line of `memory/DECISIONS.md` at `53321feef`, a `Pass: none` records
+commit that landed ahead of this unit's pass. It had to land first because check-arms refuses a
+`REFUSAL_CEILINGS` token whose decision id no `DECISIONS.md` row carries
+(`tools/memory-tree/check-arms.py:986-988`, joined by `check_id_carried`, `:651-653`), so the
+pass's raise to 323 could not go green before the row existed; and the file is a shared record
+(`.unattended.conf:417`) that `--dispatch` refuses a pass declaring
+(`tools/unattended/unattended.sh:13833`), so the row could ride no pass. It sits below the file's last
+heading (`memory/DECISIONS.md:5-6`, `:140`) in `TOOL-aSweptBar-6`'s form, and it names
 `TOOL-aSweptBar-6`, the older row check 27 ranks it a near match of, so the check's "must name it"
-holds (`tools/memory-tree/check-memory-hygiene.sh:2913-2914`):
+holds (`tools/memory-tree/check-memory-hygiene.sh:2913-2914`). The pass does not edit the file:
 
 ```markdown
-- **TOOL-dTrueNorth-28** - **the driver's refusal ceiling rises 319 -> 323 and the drift pin cutoff_keys_armed 34 -> 36, each to its census, under TOOL-aSparedSpawn-14's rule, as TOOL-aSweptBar-6 raised it 318 -> 319, and the standing ruling**: agent, 2026-10-22, under ER:388 (PLAY-dClosedLoop-6). A retirement review of dTrueNorth's four code-49 dispatch refusals found no candidate; the two keys are SPEC_CARRIES_CUTOFF and SPEC_AUDIT_PIN_CUTOFF. Detail `builds/dTrueNorth/`.
+- **TOOL-dTrueNorth-28** - **the driver's refusal ceiling rises 319 -> 323 and the drift pin cutoff_keys_armed 34 -> 36 to their census, under TOOL-aSparedSpawn-14's rule, as TOOL-aSweptBar-6 raised it 318 -> 319**: agent, 2026-10-22, under ER:388 (PLAY-dClosedLoop-6). Detail `builds/dTrueNorth/`.
 ```
+
+The retirement review and the two key names are not in the row. They live in deviation-29 (the
+review of the four code-49 sites, none a candidate) and deviation-30 (`SPEC_CARRIES_CUTOFF` and
+`SPEC_AUDIT_PIN_CUTOFF`), under the build folder the row's closing Detail pointer names.
 
 ### Inventory
 
@@ -331,7 +345,7 @@ holds (`tools/memory-tree/check-memory-hygiene.sh:2913-2914`):
 - `tools/workflows/unattended-build.test.sh`
 - `tools/drift-audit/drift_signals.py`
 - `.memory-tree.conf`
-- `memory/DECISIONS.md` (its own `Pass: none` records commit)
+- `memory/DECISIONS.md` (not edited by the pass: its row landed in the `Pass: none` records commit `53321feef`)
 - `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` (re-rendered by `--write`, never edited)
 - `memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-28.md` (new, this spec pass)
 - `memory/builds/dTrueNorth/build/2026-10-22-build-TOOL-dTrueNorth-27-deviation-29.md` (new, this spec pass)
@@ -467,7 +481,7 @@ Every command runs from the repository root under bash 5.3. A scratch repository
 New arm: tools/memory-tree/check-memory-hygiene.test.sh · covers AC5 · a full run over the check 29 and 30 fixture with an INPROGRESS spec on red coverage and a planted view finding, beside its `--only` runs · none
 New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC5 AC12 · `--check --with-verdicts` over a fixture with a planted verdict, and a view named outside the record grammar · none
 New arm: tools/memory-tree/asbuilt_view.py (its selftest) · covers AC12 · the fixture view at a dated record name, its head's two names asserted · none
-New arm: tools/memory-tree/deviation_join.py (its selftest, run by the routed-commits selftest) · covers AC15 · a `GOV_REMOTE` naming no remote of the fixture, set inside the selftest's hold that keeps an exported `GOV_REMOTE` or `GOV_DEFAULT_BRANCH` out of every other arm's fixture · none
+New arm: tools/memory-tree/deviation_join.py (its selftest, run by the routed-commits selftest) · covers AC15 · a `GOV_REMOTE` naming no remote of the fixture, set inside `run_plant_arms`' hold that keeps an exported `GOV_REMOTE` or `GOV_DEFAULT_BRANCH` out of every other arm's fixture under both selftests that call it · none
 New arm: tools/unattended/unattended.test.sh · covers AC9 · the two arms lengthened to their signatures · none
 
 The nine red legs are graded by the merged bar at the close; each AC above runs its leg's own command
@@ -532,6 +546,7 @@ lengthened arms through `check-arms.py`, which reads them without running them.
 
 - rev-1 · 2026-10-22 · initial draft, one scope item per red leg of the plain bar at `f4b9849c9`, with deviation records 28 to 30.
 - rev-2 · 2026-10-22 · the builder's DIVERGENCE: §4's verbatim `TOOL-dTrueNorth-28` row failed check 27, a near match of `TOOL-aSweptBar-6` it did not name, so the row names it; the row appends at the file's end, not a TOOL section, in its own `Pass: none` records commit, since `--dispatch` refuses the shared record (§4, S6); S8 and §7's deviation arm state the selftest's hold on `GOV_REMOTE` and `GOV_DEFAULT_BRANCH`.
+- rev-3 · 2026-10-22 · §4's row disagreed with the one `53321feef` committed, whose text check 7's 300-character cap had cut: §4 now quotes the committed row, says it landed ahead of the pass because check-arms refuses a ceiling token no row carries, and puts the review and the key names in deviations 29 and 30; S6 and Files touched say the pass does not edit `memory/DECISIONS.md`; S8 put the hold in `run_selftest`, which the routed-commits selftest bypasses, so S8 and §7 now name `run_plant_arms`.
 
 ## 10. Reuse audit
 

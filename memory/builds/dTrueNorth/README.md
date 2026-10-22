@@ -116,10 +116,10 @@ ids TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-19 TOOL-dTrueNorth-20 
 | [TOOL-dTrueNorth-24 — a rescope row in a rotated RUN archive is dated by the commit that wrote it](spec/2026-10-22-spec-TOOL-dTrueNorth-24.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-22 |
 | [TOOL-dTrueNorth-25 — the verdict-epoch gate sees deviation_join.py, and refuses a delegate list its imports outgrow](spec/2026-10-22-spec-TOOL-dTrueNorth-25.md) | 9 | 2 | CLOSED | rev-1 | 2026-10-22 |
 | [TOOL-dTrueNorth-26 — the closing diff review's minors: one scrubbed runner, one spec predicate, tracked records, one clause grammar, honest edges, and the comments that name them](spec/2026-10-22-spec-TOOL-dTrueNorth-26.md) | 10 | 2 | CLOSED | rev-2 | 2026-10-22 |
-| [TOOL-dTrueNorth-27 — the nine bar legs this build turned red, each cleared at its cause](spec/2026-10-22-spec-TOOL-dTrueNorth-27.md) | 11 | 2 | OPEN | rev-2 | 2026-10-22 |
+| [TOOL-dTrueNorth-27 — the nine bar legs this build turned red, each cleared at its cause](spec/2026-10-22-spec-TOOL-dTrueNorth-27.md) | 11 | 2 | OPEN | rev-3 | 2026-10-22 |
 <!-- /gen:build-units -->
 
-Records: 100 bound to this build, across 4 record folder(s).
+Records: 103 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

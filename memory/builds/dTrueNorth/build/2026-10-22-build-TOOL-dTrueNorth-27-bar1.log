@@ -1,3 +1,5 @@
+**Serves:** journal TOOL-dTrueNorth-27
+
 gate profile: capable  (cores 16 via nproc, ram 32419 MB via getconf; width 8 uncalibrated: absent, timeout off, ceilings live, wall 21600s, spawnpause off, mempause 90%; detected)
 regen: fresh · stage 1 · branch-reconcile · the branch-reconcile render (0s)
 regen: fresh · stage 1 · drift-audit · the drift-audit render (0s)
