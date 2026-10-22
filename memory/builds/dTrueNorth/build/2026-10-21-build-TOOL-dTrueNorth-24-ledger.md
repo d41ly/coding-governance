@@ -13,10 +13,10 @@ arms, and the `New arm:` line's RED-first observation are owed to the close.
 
 **Evidences:** TOOL-dTrueNorth-24
 - AC1 — `python3 tools/memory-tree/deviation_join.py --fixture --plant rotated --policy refuse` — run
-  as `python`: exit 0, summary `members 7 (0 unjoined), records 5 (0 malformed) · refused 0 · commit
-  join 7 departing, 0 recorded late`, and 0 lines holding `recorded by nobody`. The plant's line reads
-  `the rescope supersede of FIX-dTrueNorth-38, in memory/builds/dFixA/RUN.LANDED.8d489e05.md, at
-  FIX-dTrueNorth-38@rev-1 (spec-revised): joins 2026-10-21-build-FIX-dTrueNorth-38-deviation-5`.
+  as `python`: exit 0, its summary `members 7 (0 unjoined)` and `0 recorded late`, and 0 lines
+  holding `recorded by nobody`. The plant's line names the archive
+  `memory/builds/dFixA/RUN.LANDED.8d489e05.md` and reads its member at `FIX-dTrueNorth-38@rev-1`,
+  joining `2026-10-21-build-FIX-dTrueNorth-38-deviation-5`.
   Under the per-file stub the plant's member read `FIX-dTrueNorth-38@rev-2`, and `--policy refuse`
   counted 1 finding, the one `recorded by nobody` line.
 - AC2 — `deviation_join.build_fixture` — with `["rotated"]`, then `deviation_join.measure_fixture`
