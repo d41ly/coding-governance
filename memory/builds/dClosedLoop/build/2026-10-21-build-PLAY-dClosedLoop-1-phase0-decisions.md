@@ -272,3 +272,26 @@ carries the report-switch step of the execution plan (`[phase-1]`, the retiremen
   with the previous instrument at `3e236a8ee`. `deviations.py --report dTrueNorth` reads 355 entries and a
   validating arm with 0 findings. dTrueNorth's written report is not re-rendered: it is that run's landed record,
   and its byte compare already differed at `dbb735b29`, where the landing had moved the §8 marks it cites one line.
+
+## [row-12]
+
+**PLAY-dClosedLoop-29 — the departures report's validating arm holds the report-switch step's ask.**
+- Source: the owner, 2026-10-23, choosing between three carriers for the class dTrueNorth's landing showed: "Arm in
+  deviations.py (Recommended)". The alternatives were a line in four chain READMEs' rule 4 (prose, never seen red)
+  and a check the bar runs (a new leg or a shipped-kit check, dead after dScopedBuild). Cause: the report-switch
+  step's ask lives only in the plan's [phase-1], no chain README names it, and the bar and `--close` read neither
+  instrument, so dTrueNorth's landing filed none and `PLAY-dClosedLoop-25` was filed late.
+- `deviations.py --report <slug>` reads the landing set from the "Lands with" column of the plan's [phase-1]
+  retirement table. For a build run of a slug in it, the validating arm is red until
+  `memory/builds/dClosedLoop/BACKLOG.md` at HEAD holds an ask row, read by the index generator's backlog grammar,
+  naming `report-switch` and minted under that slug (P0.6 rule 3), or filed late under dClosedLoop's slug with the
+  slug in its text. The head names the ask, "owed, none filed", or why none is owed. A spec run owes none.
+- It does not see a close that never runs `--report`, an owner landing by hand (ER:248) included, which leaves no
+  departures report for the owner's read at that landing ([owner]); the ask's content beyond its minter and the
+  word; or the switch itself, which every packet's field 9 and dClosedLoop's own asks-disposed carry.
+- `packet.py --repin deviations.py` moved that one pin in all 22 chain packets, every other pin kept (P0.3), in an
+  owner-asked landing that lands nothing else. No chain README changes.
+- Seen: `--report dTrueNorth --fixture --plant switch-missing` red, naming the owed ask, and green under the `no-arm`
+  control; `switch-foreign` red; `switch-spec` and `switch-late` green; every earlier report plant and control
+  and the population base at the verdict it gave at `3708a705e`, 53 of 53. On the tree, `--report dTrueNorth`
+  reads 170 entries and 0 findings, its head naming `PLAY-dClosedLoop-25`. `packet.py --check` green for all 22.
