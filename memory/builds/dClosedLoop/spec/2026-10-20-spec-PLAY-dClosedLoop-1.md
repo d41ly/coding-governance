@@ -378,7 +378,6 @@
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-spec.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-brief-spec.md) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-checks.md) | research | — |
 | [2026-10-21-build-PLAY-dClosedLoop-1-phase0-decisions.md](../build/2026-10-21-build-PLAY-dClosedLoop-1-phase0-decisions.md) | research | — |
-| [2026-10-22-build-PLAY-dClosedLoop-1-report-switch.md](../build/2026-10-22-build-PLAY-dClosedLoop-1-report-switch.md) | research | — |
 | [2026-10-14-prompt-PLAY-dClosedLoop-1-1-researcher.md](../prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-1-researcher.md) | journal | — |
 | [2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md](../prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-10-researcher.md) | journal | — |
 | [2026-10-14-prompt-PLAY-dClosedLoop-1-11-researcher.md](../prompts/2026-10-14-prompt-PLAY-dClosedLoop-1-11-researcher.md) | journal | — |
