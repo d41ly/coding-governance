@@ -471,11 +471,11 @@ at the close is its targeted probe, as `TOOL-dTrueNorth-16` §7 states for its o
   `TOOL-dTrueNorth-2` reds a chain spec carrying nothing and derived from nothing. (a) `**Derived:**`
   naming `PLAY-dClosedLoop-2`, the owner's ruling that a run carries the units it adds (ER:320).
   (b) None. (c) A `part k/n` carry. (b) reds `unbound` and (c) reds `parts`; veto 1 discards both.
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-21, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-21, delegated): (a).
+  widens: none · relaxes: none
 - **F2 — One batch unit or two?** §4 "Why one unit and not two" shows every split shares a contract.
-  Recommendation one. Rung 3. RESOLVED (agent, 2026-10-21, delegated): one. widens: none ·
-  relaxes: none
+  Recommendation one. Rung 3. RESOLVED (agent, 2026-10-21, delegated): one.
+  widens: none · relaxes: none
 - **F3 — How do S11's three hits on dPinnedHandoff's live specs clear before the close?** (a) Three
   rows in `memory/project/spec-token-waivers.txt`, each naming the spec and why, beside an ask row
   asking dPinnedHandoff to name both legs on its §7 lines; the file declares itself SHRINK-ONLY, so

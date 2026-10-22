@@ -168,8 +168,8 @@ New arm: tools/memory-tree/gen_build_index.py (its selftest) · covers AC3 · a 
   `PLAY-dClosedLoop-2`, the owner's ruling that a run carries the units it adds (ER:320).
   (b) No binding line. (c) A `part k/n` carry of the repaired unit's clause. (b) reds `unbound` and
   (c) reds `parts` against the repaired unit's whole carrier, so veto 1 discards both.
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-21, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-21, delegated): (a).
+  widens: none · relaxes: none
 - **F2 — Does the build's grant lift veto 2 for the kit edits here?** Every path under `tools/` is
   a governance carrier by `PLAY-dClosedLoop-10`'s list. `cl-dClosedLoop-0006` names the view as
   "generated and never hand-edited", and S1 and S3 are that clause's own generation and refusal.

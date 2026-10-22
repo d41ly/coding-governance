@@ -459,8 +459,8 @@ for its own. `KIT_MEMORY_TREE_VERSION` is minted by the lander for the delegates
   `TOOL-dTrueNorth-2` reds a chain spec carrying nothing and derived from nothing. (a) `**Derived:**`
   naming `PLAY-dClosedLoop-2`, the owner's ruling that a run carries the units it adds (ER:320).
   (b) None. (c) A `part k/n` carry. (b) reds `unbound` and (c) reds `parts`; veto 1 discards both.
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-22, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-22, delegated): (a).
+  widens: none · relaxes: none
 - **F2 — One batch unit or two?** BUILD-METHOD M4 permits a second batch for a disjoint write set,
   and S6 with S9 is one. (a) One unit. (b) Two, the second needing its own rescope add, record and
   spec. Both close every finding; the tie-break is fewer open questions, and (b) opens a unit the

@@ -174,8 +174,8 @@ New arm: tools/memory-tree/deviation_join.py (the plant arms the routed-commits 
   reading. (b) The folder's `RUN.md` path alone, about three times faster. (c) Every RUN path the
   folder holds. (b) and (c) depart from `TOOL-dTrueNorth-4` S4's "as `deviations.py` reads them",
   the bound this arm was built to, so veto 1 holds against both; (a) passes every veto.
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-22, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-22, delegated): (a).
+  widens: none · relaxes: none
 - **F3 — Does the build's grant lift veto 2 for the join's edit here?** `cl-dClosedLoop-0004` names
   the deviation record and its join, and this unit corrects the departing commit that join reads.
   RESOLVED (agent, 2026-10-22, delegated): lifted by `PLAY-dClosedLoop-3`, rung 3. grants:

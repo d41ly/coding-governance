@@ -541,8 +541,8 @@ lengthened arms through `check-arms.py`, which reads them without running them.
   S6's message edit change no output for any input, and S1 is a record. RESOLVED (agent, 2026-10-22,
   delegated): lifted by `PLAY-dClosedLoop-3`, rung 3, for S2, S4 and S7 to S9; S3, S5 and S6's edit
   change no carrier's behaviour. grants: PLAY-dClosedLoop-3 the memory-tree kit edits S2, S4 and S7
-  to S9 make for cl-dClosedLoop-0003, cl-dClosedLoop-0004 and cl-dClosedLoop-0006 · widens: none ·
-  relaxes: none
+  to S9 make for cl-dClosedLoop-0003, cl-dClosedLoop-0004
+  and cl-dClosedLoop-0006 · widens: none · relaxes: none
 
 ## 9. Revision log
 

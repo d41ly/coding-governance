@@ -128,7 +128,7 @@ ids TOOL-dTrueNorth-32 TOOL-dTrueNorth-98 TOOL-dTrueNorth-99
 | [TOOL-dTrueNorth-32 — the round-3 closing diff review's minors: one attribute read, a whole bullet, every constant charged, each pathspec probed, and an environment hold the parity scan reads as none](spec/2026-10-22-spec-TOOL-dTrueNorth-32.md) | 15 | 2 | CLOSED | rev-1 | 2026-10-22 |
 <!-- /gen:build-units -->
 
-Records: 131 bound to this build, across 4 record folder(s).
+Records: 133 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
