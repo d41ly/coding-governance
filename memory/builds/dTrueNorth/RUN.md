@@ -190,3 +190,5 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T06:55:27Z brief · item TOOL-dTrueNorth-27 · reason d2ab4235f67f memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-27-build-brief.md
 
 2026-10-22T07:08:27Z dispatch · item f221e113 TOOL-dTrueNorth-27 · reason memory/map/generated/symbols.json
+
+2026-10-22T08:48:54Z rescope · item add TOOL-dTrueNorth-29 · reason the flagged bar at e583a7f42 reds five self-test legs this build caused (spec-tokens AC6 broken copies, row-grammar sibling import, tier2-review fixture path, unattended-build TN5-AC3, memory-hygiene conf example, check 21 and partition); one unit clears them before the close
