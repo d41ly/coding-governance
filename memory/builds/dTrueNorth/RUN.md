@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17926761784118913086-672420 850d13eb
+asks-at-landing: TOOL-dTrueNorth-21=DEFERRED TOOL-dTrueNorth-22=DEFERRED TOOL-dTrueNorth-100=OPEN TOOL-dTrueNorth-101=OPEN TOOL-dTrueNorth-102=OPEN TOOL-dTrueNorth-103=OPEN TOOL-dTrueNorth-104=OPEN TOOL-dTrueNorth-105=OPEN TOOL-dTrueNorth-106=OPEN
+units-at-landing: TOOL-dTrueNorth-1 TOOL-dTrueNorth-2 TOOL-dTrueNorth-3 TOOL-dTrueNorth-11 TOOL-dTrueNorth-15 TOOL-dTrueNorth-5 TOOL-dTrueNorth-13 TOOL-dTrueNorth-14 TOOL-dTrueNorth-4 TOOL-dTrueNorth-6 TOOL-dTrueNorth-9 TOOL-dTrueNorth-10 TOOL-dTrueNorth-12 TOOL-dTrueNorth-19 TOOL-dTrueNorth-8 TOOL-dTrueNorth-16 TOOL-dTrueNorth-17 TOOL-dTrueNorth-18 TOOL-dTrueNorth-7 TOOL-dTrueNorth-20 TOOL-dTrueNorth-23 TOOL-dTrueNorth-24 TOOL-dTrueNorth-25 TOOL-dTrueNorth-26 TOOL-dTrueNorth-27 TOOL-dTrueNorth-29 TOOL-dTrueNorth-30 TOOL-dTrueNorth-31 TOOL-dTrueNorth-32 TOOL-dTrueNorth-33
+gates-run: unattended-179267879211294019735-886019 3e236a8e
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: e634ce986cb13f5d2f5a67909cbf79ba22ab10eb
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3 PLAY-dClosedLoop-2
 mode: slug
@@ -227,3 +229,5 @@ base: 271aa59defcb695133a50a49dc07650f9058a930
 2026-10-22T14:06:43Z dispatch · item 490a77bb TOOL-dTrueNorth-33 · reason tools/memory-tree/deviation_join.py memory/guides/SESSION-KICKOFF.md memory/builds/dTrueNorth/spec/2026-10-22-spec-TOOL-dTrueNorth-33.md memory/builds/dTrueNorth/build/2026-10-21-build-TOOL-dTrueNorth-33-ledger.md memory/builds/dTrueNorth/README.md
 
 2026-10-22T14:06:47Z brief · item TOOL-dTrueNorth-33 · reason b5d9e92ddf68 memory/builds/dTrueNorth/prompts/2026-10-21-prompt-TOOL-dTrueNorth-33-build-brief.md
+
+2026-10-22T14:31:23Z override · item specs-audited · reason the owner capped the spec audit at round 2 (prompts/2026-10-21-prompt-TOOL-dTrueNorth-1-owner-audit-cap.md: "enough with the spec reviews after this"); the units promoted after it (TOOL-dTrueNorth-8 to -20 by round 2's exit, and -23 to -27, -29 to -33 by the closing review and the bars) were built from their specs as written, unaudited; an audit of each would meet it
