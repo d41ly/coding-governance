@@ -70,7 +70,11 @@ seam: `policy.check_value` — reuse for any question of whether a value is one 
 extend via a new `type` in the `allowed` grammar, never a second value checker.
 
 seam: `policy.scan_keys` — reuse for any walk of a parsed policy document to its graded keys and the
-catalogue rows naming them; extend via the row matcher `resolve_row`, never a joined-string compare.
+catalogue rows naming them; extend via the row matcher `read_catalogue_row`, never a joined-string compare.
+
+seam: `policy.resolve` — reuse for any read of a policy key's value, at the landed revision or a
+named one, parsed and never sourced; extend via a resolution step after `read_file_value`, never a
+second reader or a working-tree read.
 
 ## Gaps
 

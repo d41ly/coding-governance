@@ -5,9 +5,9 @@ and never sourced. This kit owns that file's schema: the catalogue `catalogue.to
 row per policy key, taken row for row and in order from the design's `[policies]` table, each row's
 `name` and `owner` that table's own. Contract: TOOL-dGroundRules-1.
 
-The kit lands dark: nothing reads `.governance/policy.toml` yet. The reader, the resolution order,
-the invalid-file branch, the JSON mirror and the guard are later units of dGroundRules, and each
-re-points one consumer.
+The kit lands dark: one reader reads `.governance/policy.toml`, `policy.py get` (TOOL-dGroundRules-2),
+and no consumer calls it yet. The resolution order, the invalid-file branch, the JSON mirror and the
+guard are later units of dGroundRules, and each re-points one consumer.
 
 ## Files
 
@@ -15,7 +15,7 @@ re-points one consumer.
 |---|---|
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
-| `policy.py` | the module: `load_catalogue`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, and the `lists` and `scaffold` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve`, and the `lists`, `scaffold` and `get` verbs |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 
@@ -95,6 +95,36 @@ owner-silence rule that declines a raise is a later build's reader.
   still owes and never adds one. An absent list is seeded with every owed row.
 - `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
   build owns that has a literal default, one table per first segment.
+- `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain]` — run in the repository to
+  read: the key's value on stdout, a string as itself, a number or a boolean in TOML's spelling, a
+  list one member per line, LF-ended. `--explain` adds `policy: <key> · <source> · <reason>` on
+  stderr, the reason naming the sha8 and how the revision was found. Exit 0, or 2 with one
+  `policy: refused · <path>:<line> · <why>` line.
+
+## The reader
+
+`resolve(key, repo=".", rev=None)` is the one reader every consumer calls, `get` its CLI. It carries
+`read_policy_key`'s contract (the unattended kit, `THE POLICY IS READ AT R AND NEVER FROM THE TREE`)
+to TOML: the file as committed at a revision, read with `git show`, parsed with `tomllib`, never
+sourced and never opened from the working tree. The shell parser and its copies stay as they are
+for the legacy homes.
+
+- **The revision.** `rev` given: the commit it names, else a refusal. `rev` absent, the landed
+  revision: `refs/remotes/<remote>/<branch>`, the remote and branch the inlined remote ladder
+  resolves (`GOV_REMOTE`, the branch's remote, the only remote; `GOV_DEFAULT_BRANCH`, the remote's
+  HEAD, else `main`); with no remote at all, the local `refs/heads/<branch>`, which the reason says.
+  A ladder refusal is the reader's. Nothing is fetched, so a clone that never fetched reads a stale
+  tip, and the reason's sha shows which.
+- **The key.** `parse_key` admits one TOML key, bare or quoted segments, and walks tomllib's load of
+  `<key> = 0`, so `budgets."CLAUDE.md"` is two segments. `read_catalogue_row` finds its row by the
+  name rule above; no row refuses, naming the catalogue.
+- **The value.** `parse_policy` maps each leaf's segment tuple to its value; a table is never a
+  value. `read_file_value` answers `Resolution(value, "file", reason)` where the file sets the key.
+- **Until TOOL-dGroundRules-3 and -4.** An absent file and a key the file does not set refuse, since
+  no default is read yet; text that is not TOML refuses naming the decoder's line.
+- **Git's environment.** Every git call drops the location variables git exports to a hook
+  (`GIT_LOCATION_VARS`), so a reader started inside a hook or a fixture reads the repository it was
+  pointed at.
 
 ## The arms
 
@@ -109,7 +139,14 @@ The fixture's cases: one `schema-empty-<name>` per never-empty row, then `shape-
 `shape-unknown-field`, `usage-out-of-set`, `summary-new-key`, `usage-new-key`, `list-grew`,
 `direction-missing` (the first selected row loses its `direction`), `direction-new-bound` (a new
 `retry-count` row `zz.loop` with none), `direction-wrong-value` (the first selected row declares
-`raise-tightens`) and `adopter-fresh-target`, an outcome case with no plant, below.
+`raise-tightens`), `adopter-fresh-target`, an outcome case with no plant, below, and the reader's two
+outcome cases. `reader-landed` builds a bare remote whose `main` sets `warn` and a clone whose
+unpushed commit and working tree set `refuse`: `get` must print `warn`, `--rev HEAD` `refuse`, and
+refuse an unknown key, a malformed key and a revision naming no commit; then a two-remote clone,
+which refuses with `GOV_REMOTE` unset and reads the second remote with it set, and a remote-less
+repository, which reads its local `main`. `reader-parsed` commits a policy file whose first line is
+`touch <marker>`, which must refuse naming line 1, and one whose comments carry `$(touch <marker>)`
+and a backticked `touch`, which must read its value; the marker must not exist after both.
 
 ## Each arm in an adopter
 
@@ -139,5 +176,5 @@ The `policy check` leg ships to adopters; `policy fixtures` is gov's own.
 
 It proves each file key is a value its row admits and each row is well formed. It does not prove a
 row's `allowed` and `default` say what the design means: that is the build's acceptance probe, which
-compares the catalogue with the design's table. Nothing reads the file yet, so a valid value changes
-no behaviour until a later unit re-points its consumer.
+compares the catalogue with the design's table. No consumer reads the file yet, so a valid value
+changes no behaviour until a later unit re-points its consumer.

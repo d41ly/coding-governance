@@ -5,8 +5,9 @@ cap's breach warns or refuses. The policy kit's catalogue, `tools/policy/catalog
 repository, is the file's schema. It has one row per key, giving the values the key admits, its
 default, and the build that owns it. A key the file does not set takes its default.
 
-Nothing reads the file yet. Later dGroundRules units re-point each consumer to it, one at a time, so
-a value you set today is checked but changes no behaviour.
+One reader reads the file: `python tools/policy/policy.py get <key>`, below. No gate or hook calls it
+yet. Later dGroundRules units re-point each consumer to it, one at a time, so a value you set today
+is checked but changes no behaviour.
 
 The kit README, `tools/policy/README.md`, is the full reference: the row fields, the grammar of
 allowed values and every check.
@@ -20,6 +21,21 @@ allowed values and every check.
   enforce = "refuse"
   ```
 
+- **Read a key:** `python tools/policy/policy.py get budgets.enforce` prints the key's value: a
+  string as itself, a number or `true`/`false` as TOML spells it, a list one member per line. It
+  reads the file **as committed at the landed revision**: the tip of the remote's default branch,
+  or, in a clone with no remote, your local `main`. It never reads your working tree, so an edit
+  you have not committed and pushed does not change what it prints, and once a gate reads its
+  policy through it, an uncommitted edit cannot change what that gate enforces.
+  - `--rev <rev>` reads the file at that commit instead, `--rev HEAD` for your last commit.
+  - `--explain` adds one line on stderr naming where the value came from and the commit:
+    `policy: budgets.enforce · file · set in .governance/policy.toml at 3708a705, <remote>/main, the landed revision`.
+  - It refuses, exit 2 with one `policy: refused · <path>:<line> · <why>` line, a key no catalogue
+    row names, a string that is not one TOML key, a revision that names no commit, a file that
+    is not TOML (naming its line), and, for now, an absent file or a key the file does not set: the
+    defaults are read once a later unit adds them.
+  - With several remotes and none chosen it refuses too: `export GOV_REMOTE=<remote>` names one.
+  - The file is parsed as TOML and never run, so a line in it cannot execute anything.
 - **Check the file:** `python tools/policy/check_policy.py`. It refuses a value outside its key's
   allowed values, an empty set for a key that is never empty, and a key no catalogue row names. Each
   check prints one line with the number it read; a check that read nothing is red too.

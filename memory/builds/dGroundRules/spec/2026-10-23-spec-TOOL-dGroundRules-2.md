@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-2 — the policy reader, at the landed revision, parsed and never sourced
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0008@6598846f whole
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dGroundRules-2-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-2-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-2-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-2-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-2-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-2-build-brief.md) | journal | — |

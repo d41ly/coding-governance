@@ -47,3 +47,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-23T20:23:34Z brief · item TOOL-dGroundRules-16 · reason b33cb6e219e8 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-16-build-brief.md
 
 2026-10-23T20:44:00Z decision · item Should a near-miss key under the budgets.* wildcard row (e.g. budgets.enforse) be refused rather than resolve to budgets.* and read its default once unit 3 lands? · reason Options: (a) unit 2 AC4 probes a key no row matches and the near-miss stays fail-open under budgets.* (taken for unit 2); (b) unit 9's caps census narrows budgets.* to the cap names it lists, so a near-miss refuses. Refused to decide (b) here: it amends unit 9's audited spec beyond the divergence, and unit 2 cannot depend on a later unit (M2 ordering); owner call whether unit 9 owes it.
+
+2026-10-23T20:52:19Z dispatch · item 500570f2 TOOL-dGroundRules-2 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md help/policy.md help/README.md memory/map/features/policy.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-2.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-2-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/LIVE.md
+
+2026-10-23T20:52:25Z brief · item TOOL-dGroundRules-2 · reason 96345c68347a memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-2-build-brief.md

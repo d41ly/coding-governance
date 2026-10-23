@@ -26,6 +26,12 @@ fresh `git init` by a copy, `--scaffold`, then `--check` before and after the fi
 arm must grade clean or announce; and the README's "Each arm in an adopter" table joined to ARMS both
 ways. Green on a correct build; its RED is an arm that finds a problem in an adopter's tree.
 
+`reader-landed` and `reader-parsed` are outcome cases too (TOOL-dGroundRules-2): each builds its own
+repositories, runs `policy.py get` in them and prints one line per observation. `reader-landed`
+reds a read of the working tree or of local HEAD without `--rev`, a fallback past a refused revision,
+key or remote ladder; `reader-parsed` reds a policy file line that runs, or one that is not TOML
+read as a value.
+
 Later units add arms to ARMS and cases to CASES.
 """
 import os
@@ -366,6 +372,118 @@ def run_fresh_target(name):
     return asserted, len(wrong)
 
 
+# ---- the reader (TOOL-dGroundRules-2) ----------------------------------------------------------
+
+FIXTURE_SECOND = "mirror"
+READER_POLICY = '[budgets]\nenforce = "{enforce}"\n\n[runtime]\nagents-in-flight = 3\n'
+
+
+def write_policy(repo, text):
+    Path(repo, POLICY_FILE[0]).mkdir(exist_ok=True)
+    Path(repo, *POLICY_FILE).write_text(text, encoding="utf-8", newline="\n")
+
+
+def build_reader_repo(path, text):
+    """A git repository at `path` on `main`, its one commit holding `text` as the policy file."""
+    path.mkdir()
+    run_fixture_git(path, "init", "-q")
+    run_fixture_git(path, "symbolic-ref", "HEAD", "refs/heads/main")
+    write_policy(path, text)
+    run_fixture_git(path, "add", "-A")
+    run_fixture_git(path, "commit", "-q", "-m", "policy")
+    return path
+
+
+def check_get(scenario, repo, args, want, env=None):
+    """`policy.py get <args>` run in `repo` -> (scenario, what, ok, what it observed), `want` judging
+    (exit code, stdout, stderr), CR stripped."""
+    p = subprocess.run([sys.executable, str(KIT / "policy.py"), "get", *args], cwd=repo, env=env,
+                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+    out, err = p.stdout.replace("\r", ""), p.stderr.replace("\r", "")
+    seen = f"exit {p.returncode} · stdout {out.strip() or '(none)'!r} · stderr {err.strip() or '(none)'!r}"
+    return scenario, "get " + " ".join(args), want(p.returncode, out, err), seen
+
+
+def print_checks(name, checks):
+    """One `policy-fixture:` line per check, the outcome it observed. -> (assertions, wrong)."""
+    for scenario, what, ok, seen in checks:
+        print(f"policy-fixture: {name} · {scenario} · {what} · " + (seen if ok else f"WRONG: {seen}"))
+    return len(checks), sum(not c[2] for c in checks)
+
+
+def run_reader_landed(name):
+    """The reader at the landed revision. `remote`: a bare remote whose main sets warn and 3, a clone
+    with an unpushed commit and a working-tree edit both setting refuse. `two-remote`: two remotes, no
+    upstream, GOV_REMOTE unset then naming the second. `no-remote`: local main warn, the tree refuse."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        build_reader_repo(t / "s", READER_POLICY.format(enforce="warn"))
+        run_fixture_git(t, "clone", "-q", "--bare", "s", "r.git")
+        run_fixture_git(t, "clone", "-q", "-o", FIXTURE_REMOTE, "r.git", "c")
+        c = t / "c"
+        write_policy(c, READER_POLICY.format(enforce="refuse"))
+        run_fixture_git(c, "commit", "-q", "-am", "unpushed")
+        write_policy(c, "# an uncommitted edit\n" + READER_POLICY.format(enforce="refuse"))
+        tip = (policy.run_git(c, "rev-parse", f"refs/remotes/{FIXTURE_REMOTE}/main") or "").strip()[:8] or "(no tip)"
+        checks = [
+            check_get("remote", c, ["budgets.enforce"], lambda rc, o, e: rc == 0 and o == "warn\n"),
+            check_get("remote", c, ["budgets.enforce", "--rev", "HEAD"], lambda rc, o, e: rc == 0 and o == "refuse\n"),
+            check_get("remote", c, ["budgets.enforce", "--explain"],
+                      lambda rc, o, e: rc == 0 and f" · file · set in {POLICY_REL} at {tip}," in e),
+            check_get("remote", c, ["budgets.enforce", "--rev", "nosuchrev"],
+                      lambda rc, o, e: rc == 2 and not o and e.startswith("policy: refused · ") and "nosuchrev" in e),
+            check_get("remote", c, ["runtime.agents-in-flite"],
+                      lambda rc, o, e: rc == 2 and not o and "catalogue.toml" in e and "not a catalogue key" in e),
+            check_get("remote", c, ["budgets."], lambda rc, o, e: rc == 2 and not o and "not one TOML key" in e),
+            check_get("remote", c, ["runtime.agents-in-flight"], lambda rc, o, e: rc == 0 and o == "3\n"),
+        ]
+        w = t / "w"
+        w.mkdir()
+        run_fixture_git(w, "init", "-q")
+        run_fixture_git(w, "symbolic-ref", "HEAD", "refs/heads/main")
+        for remote, enforce in ((FIXTURE_REMOTE, "warn"), (FIXTURE_SECOND, "refuse")):
+            src = build_reader_repo(t / f"src-{enforce}", READER_POLICY.format(enforce=enforce))
+            run_fixture_git(w, "remote", "add", remote, src.as_posix())
+            run_fixture_git(w, "fetch", "-q", remote)
+        checks += [
+            check_get("two-remote", w, ["budgets.enforce"],
+                      lambda rc, o, e: rc == 2 and not o and "Name it: export GOV_REMOTE=<remote>." in e),
+            check_get("two-remote", w, ["budgets.enforce"], lambda rc, o, e: rc == 0 and o == "refuse\n",
+                      env={**os.environ, "GOV_REMOTE": FIXTURE_SECOND}),
+        ]
+        n = build_reader_repo(t / "n", READER_POLICY.format(enforce="warn"))
+        write_policy(n, READER_POLICY.format(enforce="refuse"))
+        checks += [
+            check_get("no-remote", n, ["budgets.enforce"], lambda rc, o, e: rc == 0 and o == "warn\n"),
+            check_get("no-remote", n, ["budgets.enforce", "--explain"],
+                      lambda rc, o, e: rc == 0 and "local main" in e and "no remote" in e),
+        ]
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_reader_parsed(name):
+    """The reader parses and never sources: a policy file whose first line is a shell command refuses
+    naming line 1, one whose comments carry command substitutions reads its value, and the marker
+    either would create by running does not exist after both."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        marker = (t / "marker").as_posix()
+        cmd = build_reader_repo(t / "cmd", f"touch {marker}\n" + READER_POLICY.format(enforce="warn"))
+        sub = build_reader_repo(t / "sub", f"# $(touch {marker})\nbudgets.enforce = \"warn\"  # `touch {marker}`\n")
+        checks = [
+            check_get("command-line", cmd, ["budgets.enforce"],
+                      lambda rc, o, e: rc == 2 and not o and e.startswith(f"policy: refused · {POLICY_REL}:1 · ")),
+            check_get("substitution-comments", sub, ["budgets.enforce"], lambda rc, o, e: rc == 0 and o == "warn\n"),
+        ]
+        ran = Path(marker).exists()
+        checks.append(("marker", "no line of either file ran", not ran, f"the marker {'exists' if ran else 'does not exist'}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -377,6 +495,8 @@ CASES = [
     ("direction-new-bound", arm_direction, seed_direction_new_bound),
     ("direction-wrong-value", arm_direction, seed_direction_wrong_value),
     (FRESH_TARGET, None, run_fresh_target),  # an outcome case: no plant and no one arm
+    ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
+    ("reader-parsed", None, run_reader_parsed),
 ]
 
 

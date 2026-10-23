@@ -280,6 +280,11 @@
     {
       "id": "Refusal",
       "kind": "class",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "Refusal",
+      "kind": "class",
       "file": "tools/run-gates/regen.py"
     },
     {
@@ -2428,6 +2433,11 @@
       "file": "tools/process-monitor/selftest.py"
     },
     {
+      "id": "build_reader_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_readme_mechanism_drift",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -4191,6 +4201,11 @@
       "id": "check_generated_render",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
+    },
+    {
+      "id": "check_get",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "check_git_arms",
@@ -5978,6 +5993,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "cmd_get",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "cmd_intake",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -7221,6 +7241,11 @@
       "id": "derive_landed_counts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "derive_landed_revision",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "derive_last_move",
@@ -11618,6 +11643,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "parse_key",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "parse_legacy_rows",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -11651,6 +11681,11 @@
       "id": "parse_pin",
       "kind": "function",
       "file": "tools/memory-tree/check-arms.py"
+    },
+    {
+      "id": "parse_policy",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "parse_posix",
@@ -11916,6 +11951,11 @@
       "id": "print_check_verdicts",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "print_checks",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "print_claims",
@@ -12953,6 +12993,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "read_catalogue_row",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_cell",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -13346,6 +13391,11 @@
       "id": "read_field",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "read_file_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_filed_days",
@@ -14296,6 +14346,11 @@
       "id": "read_policy_key",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "read_policy_text",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_population",
@@ -16838,6 +16893,11 @@
       "file": "tools/memory-recall/recall_conf.py"
     },
     {
+      "id": "resolve",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "resolveAllowedRoots",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
@@ -17111,6 +17171,11 @@
       "id": "resolve_clean_oids",
       "kind": "function",
       "file": "tools/run-gates/check-receipt.py"
+    },
+    {
+      "id": "resolve_commit",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "resolve_commit_build",
@@ -18508,11 +18573,6 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
-      "id": "resolve_row",
-      "kind": "function",
-      "file": "tools/policy/policy.py"
-    },
-    {
       "id": "resolve_row_docs",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -19806,6 +19866,16 @@
       "id": "run_raw",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
+    },
+    {
+      "id": "run_reader_landed",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_reader_parsed",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_reaper",
@@ -24801,6 +24871,11 @@
       "id": "write_pm_red",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "write_policy",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "write_post_merge_record",
