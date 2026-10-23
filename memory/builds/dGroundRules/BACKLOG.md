@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · TOOL-dGroundRules-12 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dGroundRules-12 · until TOOL-dGroundRules-52 · the spec run specced and deferred every unit of the roster; the build run builds them, and the last to close carries `closes` for this ask
