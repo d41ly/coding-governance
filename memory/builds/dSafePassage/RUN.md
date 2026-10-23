@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179273486688331521946-215 728b6eb8
+asks-at-landing: TOOL-dSafePassage-14=DEFERRED TOOL-dSafePassage-60=DEFERRED
+units-at-landing: TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-16 TOOL-dSafePassage-2 TOOL-dSafePassage-20 TOOL-dSafePassage-4 TOOL-dSafePassage-43 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-21 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-5 TOOL-dSafePassage-26 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-41 TOOL-dSafePassage-38 TOOL-dSafePassage-42 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 TOOL-dSafePassage-49 TOOL-dSafePassage-52 TOOL-dSafePassage-51 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-59
+gates-run: unattended-179273668328029618926-1944 2a2d97e1
 parked-surfaced: yes, 58 surfaced
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 30acf270735f54418c6a61ed9071a0667916118a
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -253,3 +255,7 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T05:25:43Z rescope · item defer TOOL-dSafePassage-8 · reason specced; built by this build's build run (README rule 1)
 
 2026-10-23T05:25:44Z rescope · item defer TOOL-dSafePassage-9 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:34:13Z override · item specs-audited · reason the owner stopped the spec reviews after round 7 (memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md): TOOL-dSafePassage-53 to -59, the round-7 promotions, are specced and deferred to the build run with no audit
+
+2026-10-23T06:34:13Z override · item closing-review-recorded · reason the owner stopped the spec reviews after round 7 (memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md): the spec run's closing review would review the same spec-only diff, and the build run's closing review over code still runs
