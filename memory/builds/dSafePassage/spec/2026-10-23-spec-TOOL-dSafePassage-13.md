@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0030@274077d4 whole
 **Carries:** node:policy-key.help.enforce
@@ -13,6 +13,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-7 TOOL-dSafePassage-11 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -121,6 +122,7 @@ dSafePassage on".
 - **consumes-from** external — dGroundRules' catalogue (`cl-dClosedLoop-0007`), whose rows give each policy key's values, default, summary and usage, and its reader (`cl-dClosedLoop-0008`), through which `help.enforce` is read; without them the `policy` class is empty and the leg exits 2
 - **hands-off** `TOOL-dSafePassage-5` — a `[[usage]]` row in `tools/govkit/usage.toml` and an anchor for each `upgrade_walk.py` command its help section shows, since that unit's page lands after this leg
 - **hands-off** external — each later build whose class joins the step gate adds its `[[class]]` row to `tools/govkit/usage.toml` and its members' rows, the clause's "each later class's rows joining when its build lands it"
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -446,6 +448,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC8 · a new
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

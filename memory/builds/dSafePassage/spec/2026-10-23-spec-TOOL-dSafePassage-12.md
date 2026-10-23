@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-12 — gov's remote CI at the interpreter floor, read from its one declaration, with the floor's preflight as the bar's first step
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0029@4aeb7648 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +70,7 @@ is applied to gov's own tree first, with its witness recorded. Today the workflo
 - **consumes-from** `TOOL-dSafePassage-11` — the declaration `python-floor.txt`, `python-floor.sh preflight` and the floor query `python_floor.py check`; without them S3 has nothing to read, S4 nothing to run and AC3's query nothing to grade
 - **consumes-from** `TOOL-dSafePassage-8` — the lander's gov-first walk, which records `lib/python-floor-3.15` in gov's source-mode receipt; without it AC7 observes nothing
 - **consumes-from** external — GitHub's `actions/setup-python` serving Python 3.15 for `windows-latest`, which is UNVERIFIED on 2026-10-23 and is observed by AC8
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -253,6 +255,7 @@ copy.
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

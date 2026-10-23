@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md) | research | — |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 |
 
 <!-- /gen:spec-records -->
 
@@ -114,6 +115,11 @@ Two siblings are read and declare no edge to this unit, so they are named here r
 TOOL-dSafePassage-6's `read_shim_rows`, `read_releases` and `check_shim_windows` in
 `tools/govkit/shims.py`, which the `shims` case calls, and TOOL-dSafePassage-9's `retired-edited`
 order, which the `edited-retired` plant expects.
+- **consumes-from** `TOOL-dSafePassage-15` — the forward walk from a schema-3 receipt through the schema step; without it the release-0 walk refuses at its first record
+- **consumes-from** `TOOL-dSafePassage-17` — the reverted rule and the no-image down; without them the rollback stops at the floor step and the two legacy-home steps
+- **consumes-from** `TOOL-dSafePassage-18` — the reverse walk past the schema step writing no row; without it the rollback to release-0 refuses after its last down
+- **consumes-from** `TOOL-dSafePassage-19` — the stamp and the record after the schema step's down, and the re-run after a kill; without them the rollback cases end unspecified
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -418,6 +424,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-15`, `TOOL-dSafePassage-17`, `TOOL-dSafePassage-18`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

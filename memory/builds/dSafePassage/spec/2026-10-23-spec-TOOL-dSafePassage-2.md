@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0019@6e0cd313 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -135,6 +136,10 @@ holder is dead, and the paths that run staged are read as gov's own staging.
 - **hands-off** `TOOL-dSafePassage-4` — `write_attended_order`, the receipt hand-off, the staging journal, and the `failed` rows a killed or failed walk leaves for a down to tolerate
 - **hands-off** `TOOL-dSafePassage-11` — the walk that runs the floor step's row in its place and stops when that step fails
 - **hands-off** `TOOL-dSafePassage-5` — the walk over the release-0 tree, killed after each step's first write and made to fail at each step in turn, its converged tree compared byte for byte
+- **hands-off** `TOOL-dSafePassage-15` — the walk asking the step record's precondition before each record, so a schema-3 receipt reaches the schema step, the repair of finding 1
+- **hands-off** `TOOL-dSafePassage-19` — the post-spawn re-read dropping a key the receipt on disk no longer holds, part of the repair of finding 52
+- **hands-off** `TOOL-dSafePassage-22` — the reclaim reading its clock before the census, the repair of finding 16
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -387,6 +392,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-15`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-22`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

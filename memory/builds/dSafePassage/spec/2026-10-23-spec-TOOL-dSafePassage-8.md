@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0025@4e486ab9 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -110,6 +111,10 @@ closes `gap-deploy-20`.
 - **hands-off** `TOOL-dSafePassage-12` — gov's receipt in the prepared merge, holding `lib/python-floor-3.15` as `applied`, which its AC7 reads
 - **hands-off** `TOOL-dSafePassage-10` — gov's source-mode receipt at `.governance/install.json`, whose `files` rows, one per planned destination, are the step gate's `file` class
 - **consumes-from** external — dGroundRules' minimal guard (`cl-dClosedLoop-0012`) admitting the writes TOOL-dSafePassage-1's two legacy-home steps make to gov's policy file when the lander runs them; if it refuses them, gov first refuses the landing and names the step
+- **consumes-from** `TOOL-dSafePassage-20` — the writer taking the reader's unlanded value as null; without it every step this landing introduces refuses at its record
+- **hands-off** `TOOL-dSafePassage-21` — the derivation of gov's planned destinations, shared by the source receipt's rows and the step gate's file class, the repair of finding 5
+- **hands-off** `TOOL-dSafePassage-25` — the refused landing removing the untracked files its walk made, the repair of finding 54
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -362,6 +367,7 @@ stands in for.
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-20`, `TOOL-dSafePassage-21`, `TOOL-dSafePassage-25`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

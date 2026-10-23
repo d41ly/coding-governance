@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0027@46290183 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -79,6 +80,8 @@ renames or retires such a surface with no step reds at dSafePassage's step gate 
 - **consumes-from** external — dGroundRules' policy schema catalogue (`cl-dClosedLoop-0007`), the population of the `policy` class; without it that class is empty and the gate refuses
 - **hands-off** `TOOL-dSafePassage-13` — the one population reader of S2, which the docs leg imports over the same class registry rather than reading members a second way
 - **hands-off** external — each later build whose class joins the registry writes its own class row, its reader and its plant, as the clause's "each later class joining" sets
+- **hands-off** `TOOL-dSafePassage-21` — the file class reading gov's planned destinations when the tree carries no source receipt, the repair of finding 5
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -373,6 +376,7 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 · a
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-21`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0028@032ca791 whole
 **Carries:** node:policy-key.platforms.provision
@@ -12,6 +12,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-11-deviation-31.md](../build/2026-10-23-build-TOOL-dSafePassage-11-deviation-31.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-7 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -112,6 +113,10 @@ run under the floor it restores, and the step is the template a later raise copi
 - **consumes-from** external — dGroundRules, landed: the policy catalogue (`cl-dClosedLoop-0007`) this row joins, and `read_policy_key` (`cl-dClosedLoop-0008`, `cl-dClosedLoop-0009`)
 - **consumes-from** external — every node, and the build node first, running Python 3.15 (AP-31); node d runs 3.14.5 and 3.12 on 2026-10-23, so its resolver refuses once this lands
 - **hands-off** external — dWitnessedBar's real-interpreter floor arm and its TOML 1.0 arm
+- **consumes-from** `TOOL-dSafePassage-15` — the forward walk passing the schema step on a scratch adopter's schema-3 receipt; without it the walk refuses before it reaches the floor row
+- **hands-off** `TOOL-dSafePassage-17` — the floor row declaring that its down's own exit decides a rollback, the repair of finding 51
+- **hands-off** `TOOL-dSafePassage-23` — the resolver keeping an override's own name, the repair of finding 35
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -500,6 +505,7 @@ static mode's eight shapes.
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-15`, `TOOL-dSafePassage-17`, `TOOL-dSafePassage-23`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

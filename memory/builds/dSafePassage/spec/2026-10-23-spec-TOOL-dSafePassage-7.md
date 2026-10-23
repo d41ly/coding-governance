@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0024@7817c7d0 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-7-deviation-21.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-21.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -112,6 +113,8 @@ there and is marked attended. It closes no packet gap of its own; it is the exec
 - **hands-off** `TOOL-dSafePassage-4` — `run_step_isolated` for each `down`, and `attended` for a down that needs target code
 - **hands-off** `TOOL-dSafePassage-11` — the runner the floor step's argv runs under, which hands that step the target root through its placeholder
 - **hands-off** `TOOL-dSafePassage-5` — running this unit's needs-target check over the release-0 tree for every declared step, on a scratch clone of that tree because the plants change its bytes
+- **hands-off** `TOOL-dSafePassage-24` — refusing a step whose target declares an executor or a credential in its own git config, the repair of finding 53
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -332,6 +335,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · the s
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-24`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

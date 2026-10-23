@@ -55,7 +55,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `11e4ed05973078820ffbaeceb753fa2cde34a1ce`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `aa912a93ee772c83195a34e79f959e1308a178d5`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `69a96671a2dabb8270068076915b032624bc5e2b`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -63,7 +63,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `5fd9f90c2c11f77175e294e222ccca13ffca58e9`
+- rendered at: `a8c3c909deaa43cdb383ffe2afd9b653f50244d3`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -135,6 +135,18 @@ The opened README's roster, every unit with its row:
 - unit id `TOOL-dSafePassage-11` · README:70 | 11 | `TOOL-dSafePassage-11` | `cl-dClosedLoop-0028@032ca791` | the interpreter floor raised to Python 3.15 as the step kind's first step after the receipt's schema-4 step |
 - unit id `TOOL-dSafePassage-12` · README:71 | 12 | `TOOL-dSafePassage-12` | `cl-dClosedLoop-0029@4aeb7648` | gov's own executors at the floor in the landing that raises it: every job of `.github/workflows/remote-ci.yml` that runs Python setting it up at the floor |
 - unit id `TOOL-dSafePassage-13` · README:72 | 13 | `TOOL-dSafePassage-13` | `cl-dClosedLoop-0030@274077d4` | the docs leg |
+- unit id `TOOL-dSafePassage-15` · README:73 | 14 | `TOOL-dSafePassage-15` | **Derived:** PLAY-dClosedLoop-2 | the walk persists no step row below schema 4, so a schema-3 receipt reaches the schema step |
+- unit id `TOOL-dSafePassage-16` · README:74 | 15 | `TOOL-dSafePassage-16` | **Derived:** PLAY-dClosedLoop-2 | the step record's precondition, one predicate beside its one writer, and the schema-4 bootstrap it answers |
+- unit id `TOOL-dSafePassage-17` · README:75 | 16 | `TOOL-dSafePassage-17` | **Derived:** PLAY-dClosedLoop-2 | a down is judged by its row's declared `reverted` rule, and a down with no before-image by its exit |
+- unit id `TOOL-dSafePassage-18` · README:76 | 17 | `TOOL-dSafePassage-18` | **Derived:** PLAY-dClosedLoop-2 | the reverse walk writes no row once a down leaves the receipt below schema 4 |
+- unit id `TOOL-dSafePassage-19` · README:77 | 18 | `TOOL-dSafePassage-19` | **Derived:** PLAY-dClosedLoop-2 | a rollback past the schema step stamps schema 3 with no `steps`, finishes its record, and converges after a kill |
+- unit id `TOOL-dSafePassage-20` · README:78 | 19 | `TOOL-dSafePassage-20` | **Derived:** PLAY-dClosedLoop-2 | the reader's `unlanded` is recorded as `null` at the step record's one writer |
+- unit id `TOOL-dSafePassage-21` · README:79 | 20 | `TOOL-dSafePassage-21` | **Derived:** PLAY-dClosedLoop-2 | the step gate's `file` class reads gov's planned destinations when no source receipt is on the tree |
+- unit id `TOOL-dSafePassage-22` · README:80 | 21 | `TOOL-dSafePassage-22` | **Derived:** PLAY-dClosedLoop-2 | the lock reclaim reads its clock before the census, so a slow census errs toward live |
+- unit id `TOOL-dSafePassage-23` · README:81 | 22 | `TOOL-dSafePassage-23` | **Derived:** PLAY-dClosedLoop-2 | the resolver keeps an override's own name, and prefers the direct executable only for the launcher names |
+- unit id `TOOL-dSafePassage-24` · README:82 | 23 | `TOOL-dSafePassage-24` | **Derived:** PLAY-dClosedLoop-2 | a step is refused when the target's own git config declares an executor or a credential |
+- unit id `TOOL-dSafePassage-25` · README:83 | 24 | `TOOL-dSafePassage-25` | **Derived:** PLAY-dClosedLoop-2 | a refused gov-first landing removes the untracked files its walk made |
+- unit id `TOOL-dSafePassage-26` · README:84 | 25 | `TOOL-dSafePassage-26` | **Derived:** PLAY-dClosedLoop-2 | the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -156,12 +168,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dSafePassage`:
 
-Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 13 specs:
+Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 25 specs:
 - carried whole: 13; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: none; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-15.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-17.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-18.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-19.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-20.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-21.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-22.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-23.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-24.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-25.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0021
 
 ### Reading order

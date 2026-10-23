@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0021@ad0db541 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -113,6 +114,10 @@ downgrade refusal for a rollback only and is never run on its own after a failur
 - **consumes-from** `TOOL-dSafePassage-3` — `set_step_state` and the `rolled-back` state, and the schema step whose down restores schema 3 and runs last, after every other applied step's down
 - **consumes-from** `TOOL-dSafePassage-7` — `run_step_isolated` for each down, and its `attended` verdict
 - **hands-off** `TOOL-dSafePassage-5` — the rollback over the release-0 tree, from a whole walk and from a killed one, compared byte for byte with release-0, the outbox directory where the rollback record lives left out of that comparison as the lock's directory is
+- **hands-off** `TOOL-dSafePassage-17` — the reverse walk judging a down by the row's declared rule, or by its exit where no before-image exists, the repair of finding 51
+- **hands-off** `TOOL-dSafePassage-18` — the reverse walk writing no row once a down leaves the receipt below schema 4, the repair of finding 2
+- **hands-off** `TOOL-dSafePassage-19` — the stamp and the record of a rollback past the schema step, and its re-run after a kill, the repair of finding 52
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -304,6 +309,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · the s
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-17`, `TOOL-dSafePassage-18`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

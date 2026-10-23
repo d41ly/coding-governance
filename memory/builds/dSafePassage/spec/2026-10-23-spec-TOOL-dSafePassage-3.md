@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0020@42c7d579 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -88,6 +89,9 @@ receipt's schema is inventoried by value.
   before it landed recorded with a null introducing commit.
 - **hands-off** `TOOL-dSafePassage-11` — the floor step's row, placed second in the steps file, after
   this unit's.
+- **hands-off** `TOOL-dSafePassage-16` — the writer's below-schema-4 precondition exported as one predicate, and the bootstrap rule stated, the repair of finding 50
+- **hands-off** `TOOL-dSafePassage-20` — the reader's unlanded value taken as null at the writer's boundary, the repair of finding 3
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -334,6 +338,7 @@ persists the receipt after `set_step_state`, which is the walk's.
 - rev-1 · 2026-10-23 · initial draft, from the spec brief
   `memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md` and the
   packet's Items 3.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-16`, `TOOL-dSafePassage-20`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 

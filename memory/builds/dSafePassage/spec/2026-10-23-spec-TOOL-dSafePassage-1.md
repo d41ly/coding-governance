@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0018@ed08a364 whole
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
 
@@ -150,6 +151,9 @@ upgrade-step kind: a moved conf key is only reported).
   release-0 fixture.
 - **hands-off** external — dWitnessedBar's append-only factory, which the frozen rows join when it
   lands.
+- **hands-off** `TOOL-dSafePassage-17` — the per-row reverted rule and the no-image down this unit's grammar and restore helper gain, the repair of finding 51
+- **hands-off** `TOOL-dSafePassage-20` — the one spelling of the unlanded value this unit's reader returns, recorded as null at the writer, the repair of finding 3
+- **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
 
@@ -519,6 +523,7 @@ branch has not landed.
   deviation-12, whose clause is dGroundRules', and says the build run re-grounds against the guard
   dGroundRules lands, from
   `memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md`.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-17`, `TOOL-dSafePassage-20`, `TOOL-dSafePassage-26`; no other section moved.
 
 ## 10. Reuse audit
 
