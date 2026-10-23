@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-18 — the reverse walk writes no row once a down leaves the receipt below schema 4
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-18-deviation-64.md](../build/2026-10-23-build-TOOL-dSafePassage-18-deviation-64.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,7 @@ record, and its verdict goes to the run's rollback record. Id 52's promotion,
 - **consumes-from** `TOOL-dSafePassage-16` — the predicate asked after each re-read; without it the walk would copy the writer's schema test
 - **hands-off** `TOOL-dSafePassage-19` — the verdict list, naming the schema step rolled back, which the record and the stamp are written from
 - **hands-off** `TOOL-dSafePassage-5` — the rollback of the release-0 tree to before the schema step, which completes only through this rule
+- **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which reads this unit's inventory with its third plant
 
 ## 4. Design
 
@@ -143,6 +145,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 2 (HIGH, item D-3,
   shared with id 52).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-35`; no other section moved.
 
 ## 10. Reuse audit
 

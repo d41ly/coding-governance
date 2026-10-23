@@ -56,3 +56,23 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T00:15:56Z rescope · item add TOOL-dSafePassage-25 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: finding id 54 at HIGH (item D-9)
 
 2026-10-23T00:15:56Z rescope · item add TOOL-dSafePassage-26 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 4 26 42 65 7 8 37 9 10 11 62 12 19 27 28 29 61 30 31 36 38 39 40 43 44 46 47 48 49 55 56 57 58 59 60 63 64 66 67 (MEDIUM) and 6 13 14 20 41 15 17 21 22 23 24 25 33 34 45 (LOW)
+
+2026-10-23T01:12:53Z rescope · item add TOOL-dSafePassage-27 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 1 at HIGH (item D-1, shared with id 35)
+
+2026-10-23T01:12:53Z rescope · item add TOOL-dSafePassage-28 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 35 at HIGH (item D-1, shared with id 1)
+
+2026-10-23T01:12:54Z rescope · item add TOOL-dSafePassage-29 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 12 at HIGH (item D-2)
+
+2026-10-23T01:12:55Z rescope · item add TOOL-dSafePassage-30 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 38 at HIGH (item D-3)
+
+2026-10-23T01:12:55Z rescope · item add TOOL-dSafePassage-31 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 13 at HIGH (item D-4)
+
+2026-10-23T01:12:56Z rescope · item add TOOL-dSafePassage-32 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 37 at HIGH (item D-5)
+
+2026-10-23T01:12:57Z rescope · item add TOOL-dSafePassage-33 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 40 at HIGH (item D-6)
+
+2026-10-23T01:12:57Z rescope · item add TOOL-dSafePassage-34 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: finding id 29 at HIGH (item D-7)
+
+2026-10-23T01:12:58Z rescope · item add TOOL-dSafePassage-35 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 2 4 14 15 16 17 18 24 30 31 32 36 39 41 42 43 44 45 46 47 (MEDIUM) and 3 5 6 7 8 9 10 11 19 20 21 22 23 25 26 27 28 33 34 (LOW)
+
+2026-10-23T01:33:36Z review · item dSafePassage-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 39 · disposition promote

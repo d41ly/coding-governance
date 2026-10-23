@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-21 — the step gate's `file` class reads gov's planned destinations when no source receipt is on the tree
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-21-deviation-67.md](../build/2026-10-23-build-TOOL-dSafePassage-21-deviation-67.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-26 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,7 @@ reads the destinations gov's accepted plan derives, the population the receipt's
 - **consumes-from** `TOOL-dSafePassage-10` — `tools/govkit/step_gate.py`, its `file` class reader and the class registry; without them there is no class to give a second source
 - **consumes-from** `TOOL-dSafePassage-8` — gov's accepted plan and the source-mode rewrite of the receipt's `files`, the call site the derivation is extracted from; without them `plan --target .` refuses and the class has no rows to read
 - **hands-off** `TOOL-dSafePassage-26` — the observation on a prepared-merge fixture that carries a receipt, and the Rollout sentence that says the receipt arrives only in the one landing
+- **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which filters gov's planned destinations to the rows apply lands and makes the plan the file class's one source
 
 ## 4. Design
 
@@ -144,6 +146,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 5 (HIGH, item
   D-5; id 43, item D-27, is the same defect at MEDIUM, carried by `TOOL-dSafePassage-26`).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-35`; no other section moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-16 — the step record's precondition, one predicate beside its one writer, and the schema-4 bootstrap it answers
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-16-deviation-62.md](../build/2026-10-23-build-TOOL-dSafePassage-16-deviation-62.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
 <!-- /gen:spec-records -->
 
@@ -58,6 +59,7 @@ caller asks before it writes. Id 1's promotion, `TOOL-dSafePassage-15`, makes th
 - **hands-off** `TOOL-dSafePassage-15` — asking the predicate before every record the forward walk would persist, so a schema-3 receipt reaches the schema step's up
 - **hands-off** `TOOL-dSafePassage-18` — asking the predicate after each down's re-read, so a down that lowers the receipt below schema 4 writes no row
 - **hands-off** `TOOL-dSafePassage-19` — asking the predicate when the rollback's stamp and record are written after the schema step's down
+- **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which reads this unit's criteria against the page sentence and the predicate's one call
 
 ## 4. Design
 
@@ -157,6 +159,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 50 (BLOCKER,
   item D-1, shared with id 1).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-35`; no other section moved.
 
 ## 10. Reuse audit
 

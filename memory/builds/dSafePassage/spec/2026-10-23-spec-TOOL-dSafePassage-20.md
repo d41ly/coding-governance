@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-20 — the reader's `unlanded` is recorded as `null` at the step record's one writer
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-20-deviation-66.md](../build/2026-10-23-build-TOOL-dSafePassage-20-deviation-66.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,7 @@ writer, so the reader keeps printing `unlanded` and the receipt keeps recording 
 - **consumes-from** `TOOL-dSafePassage-3` — `set_step_state` and its validator, the writer this unit's mapping sits in front of; without it there is no boundary to translate at
 - **consumes-from** `TOOL-dSafePassage-1` — `read_steps` and its unlanded value, the reader whose every output kind the arm feeds through; without it there is no sentinel to map
 - **hands-off** `TOOL-dSafePassage-8` — the source-mode walk in the prepared merge, which records every step this landing introduces with a null introducing commit through this mapping
+- **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which reads the Goal's sibling cites by phrase and the inventory's refusal-join sentence
 
 ## 4. Design
 
@@ -145,6 +147,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 3 (HIGH, item
   D-4).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-35`; no other section moved.
 
 ## 10. Reuse audit
 

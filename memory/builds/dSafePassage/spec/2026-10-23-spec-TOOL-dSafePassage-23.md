@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-23 — the resolver keeps an override's own name, and prefers the direct executable only for the launcher names
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-23-deviation-69.md](../build/2026-10-23-build-TOOL-dSafePassage-23-deviation-69.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-25 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,7 @@ are replaced by the executable they start.
 
 - **consumes-from** `TOOL-dSafePassage-11` — the canonical block with its floor probe and its executable preference, the inline parity population and `help/python-floor.md`; without them there is no preference to narrow
 - **hands-off** `TOOL-dSafePassage-26` — the refusal's kept lines and their order, and the alias test for a printed executable, the two other findings on this block
+- **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which reads the parity criterion through the comparison that sees an echo-rule drift
 
 ## 4. Design
 
@@ -155,6 +157,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 35 (HIGH, item
   D-7).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-35`; no other section moved.
 
 ## 10. Reuse audit
 

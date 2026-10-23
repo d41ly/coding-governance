@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-25 — a refused gov-first landing removes the untracked files its walk made
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-25-deviation-71.md](../build/2026-10-23-build-TOOL-dSafePassage-25-deviation-71.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md) | research | TOOL-dSafePassage-24 TOOL-dSafePassage-26 |
+| [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-21 TOOL-dSafePassage-26 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,8 @@ and `remove_new_untracked` on refusal.
 
 - **consumes-from** `TOOL-dSafePassage-8` — `run_gov_first`, its two call sites in `tools/push-main.sh` and its `--prepare` fixture; without them there is no refusal to clean after
 - **hands-off** `TOOL-dSafePassage-26` — extracting the kit resolution the lander's stages repeat, which the refusal shape here leaves as it is
+- **hands-off** `TOOL-dSafePassage-27` — the one snapshot taken before the walk, kept alive so the regeneration refusal cleans against it, the repair of finding 1 of the round-1 audit of units 15 to 26
+- **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which routes every snapshot through one guarded helper and observes the attended cleanup by behaviour
 
 ## 4. Design
 
@@ -135,6 +138,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 54 (HIGH, item
   D-9).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-27`, `TOOL-dSafePassage-35`; no other section moved.
 
 ## 10. Reuse audit
 

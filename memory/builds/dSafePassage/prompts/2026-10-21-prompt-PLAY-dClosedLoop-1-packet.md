@@ -63,7 +63,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `acd7c168f86d963ab30ce703e593865f5e0cde1b`
+- rendered at: `c9675455c2b22e1a12d33838b52ce7e48070d900`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -147,6 +147,15 @@ The opened README's roster, every unit with its row:
 - unit id `TOOL-dSafePassage-24` · README:82 | 23 | `TOOL-dSafePassage-24` | **Derived:** PLAY-dClosedLoop-2 | a step is refused when the target's own git config declares an executor or a credential |
 - unit id `TOOL-dSafePassage-25` · README:83 | 24 | `TOOL-dSafePassage-25` | **Derived:** PLAY-dClosedLoop-2 | a refused gov-first landing removes the untracked files its walk made |
 - unit id `TOOL-dSafePassage-26` · README:84 | 25 | `TOOL-dSafePassage-26` | **Derived:** PLAY-dClosedLoop-2 | the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them |
+- unit id `TOOL-dSafePassage-27` · README:85 | 26 | `TOOL-dSafePassage-27` | **Derived:** PLAY-dClosedLoop-2 | the prepared landing's one untracked snapshot, taken before the walk, serves the regeneration's refusal too |
+- unit id `TOOL-dSafePassage-28` · README:86 | 27 | `TOOL-dSafePassage-28` | **Derived:** PLAY-dClosedLoop-2 | every refusal of the prepared landing after the walk leaves a clean tree, gated as a class |
+- unit id `TOOL-dSafePassage-29` · README:87 | 28 | `TOOL-dSafePassage-29` | **Derived:** PLAY-dClosedLoop-2 | the step contract's refused keys are the class git's own config list derives, held to it by an arm |
+- unit id `TOOL-dSafePassage-30` · README:88 | 29 | `TOOL-dSafePassage-30` | **Derived:** PLAY-dClosedLoop-2 | the step contract's config check reads every repository git can enter from the target, its submodules included |
+- unit id `TOOL-dSafePassage-31` · README:89 | 30 | `TOOL-dSafePassage-31` | **Derived:** PLAY-dClosedLoop-2 | the write lock records its holder's pid namespace, and a holder from another namespace reads unknown |
+- unit id `TOOL-dSafePassage-32` · README:90 | 31 | `TOOL-dSafePassage-32` | **Derived:** PLAY-dClosedLoop-2 | the reuse estimate compares like clocks: a POSIX census row is judged on the kernel's boot clock, never the wall clock |
+- unit id `TOOL-dSafePassage-33` · README:91 | 32 | `TOOL-dSafePassage-33` | **Derived:** PLAY-dClosedLoop-2 | a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such |
+- unit id `TOOL-dSafePassage-34` · README:92 | 33 | `TOOL-dSafePassage-34` | **Derived:** PLAY-dClosedLoop-2 | the `ac-order` join ships under a dated cutoff, over a population measured at HEAD with every current hit disposed |
+- unit id `TOOL-dSafePassage-35` · README:93 | 34 | `TOOL-dSafePassage-35` | **Derived:** PLAY-dClosedLoop-2 | the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -168,12 +177,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dSafePassage`:
 
-Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 25 specs:
+Coverage of dSafePassage's 13 clauses and 5 owned nodes, over 34 specs:
 - carried whole: 13; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: none; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-15.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-17.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-18.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-19.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-20.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-21.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-22.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-23.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-24.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-25.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md (PLAY-dClosedLoop-2)
+- specs derived from no clause: memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-15.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-16.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-17.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-18.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-19.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-20.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-21.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-22.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-23.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-24.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-25.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-27.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-28.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-29.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-30.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-31.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-32.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-33.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-34.md (PLAY-dClosedLoop-2), memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-35.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0021
 
 ### Reading order

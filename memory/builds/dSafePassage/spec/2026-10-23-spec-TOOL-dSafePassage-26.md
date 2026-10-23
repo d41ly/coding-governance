@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-26-deviation-72.md](../build/2026-10-23-build-TOOL-dSafePassage-26-deviation-72.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-26-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-26-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md) | research | TOOL-dSafePassage-24 TOOL-dSafePassage-25 |
+| [2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-16 TOOL-dSafePassage-20 TOOL-dSafePassage-15 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-22 TOOL-dSafePassage-24 TOOL-dSafePassage-17 TOOL-dSafePassage-23 TOOL-dSafePassage-25 TOOL-dSafePassage-21 |
 
 <!-- /gen:spec-records -->
 
@@ -368,6 +369,9 @@ here. Items whose fix the report records as REJECTED are built from the skeptic'
 - **consumes-from** `TOOL-dSafePassage-23` — the resolver's echo rule, beside which S20 and S47 set the refusal's lines and the alias gap
 - **consumes-from** `TOOL-dSafePassage-24` — the contract's repository-scope refusal, beside which S13 carries the line-ending keys
 - **consumes-from** `TOOL-dSafePassage-25` — `run_gov_first`'s refusal shape, which S52's extraction keeps
+- **hands-off** `TOOL-dSafePassage-31` — the lock's pid namespace recorded and judged, the repair of finding 13 of the round-1 audit of units 15 to 26
+- **hands-off** `TOOL-dSafePassage-34` — the ac-order join armed by a dated key over a measured population, the repair of finding 29 of the round-1 audit of units 15 to 26
+- **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which reads this unit's criteria and items against their sources and adds the boot rows of the namespace verdict
 
 ## 4. Design
 
@@ -715,6 +719,7 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the round-1 spec audit's 39 MEDIUM and 15 LOW
   findings, one scope item per raw id.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-31`, `TOOL-dSafePassage-34`, `TOOL-dSafePassage-35`; no other section moved.
 
 ## 10. Reuse audit
 
