@@ -12,6 +12,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md) | research | PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-55 |
 | [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-472.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-472.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-473.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-473.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
