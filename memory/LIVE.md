@@ -4,7 +4,7 @@
 Derived, never authored: a build leaves this file when every one of its units reaches a
 terminal status. Nothing here is edited by hand.
 
-Dormant: no record dated within 21 days of 2026-10-23, the newest record date in this tree (dGroundRules).
+Dormant: no record dated within 21 days of 2026-10-23, the newest record date in this tree (dClosedLoop).
 
 Landed-unclosed: the build's non-terminal units whose id tracked product source cites, by drift-audit's non_terminal_specs_cited_by_product_source join. A candidate to close, not a verdict.
 
@@ -15,7 +15,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [aScoutedSeam](builds/aScoutedSeam/README.md) | SPECCED | a | 2026-10-11 | tooling+kickoff+deployer | 5 | 2026-10-19 | active | 0 |
 | [dBoundRoles](builds/dBoundRoles/README.md) | OPEN | d | 2026-10-21 | tooling | 27 | 2026-10-21 | active | 0 |
 | [dCalibratedLens](builds/dCalibratedLens/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
-| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 29 | 2026-10-22 | active | 0 |
+| [dClosedLoop](builds/dClosedLoop/README.md) | INPROGRESS | d | 2026-10-14 | playbook+kickoff+tooling+deployer | 30 | 2026-10-23 | active | 0 |
 | [dConvergedCharter](builds/dConvergedCharter/README.md) | OPEN | d | 2026-10-21 | playbook | 24 | 2026-10-21 | active | 0 |
 | [dDeclaredLoop](builds/dDeclaredLoop/README.md) | OPEN | d | 2026-10-21 | tooling | 35 | 2026-10-21 | active | 0 |
 | [dFairHearing](builds/dFairHearing/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-21 | active | 0 |
