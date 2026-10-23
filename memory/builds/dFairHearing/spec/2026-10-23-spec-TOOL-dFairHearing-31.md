@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-31 — the version-line check resolves the bar's own base first, and refuses by name when it cannot, rather than passing on an empty diff
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-31-deviation-311.md](../build/2026-10-23-build-TOOL-dFairHearing-31-deviation-311.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-31-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-31-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,10 @@ diff.
 
 - **consumes-from** `TOOL-dFairHearing-27` — S15's version rule and the version-line pattern AC10 reads; this unit corrects how that check finds its base
 - **hands-off** `TOOL-dFairHearing-32` — finding id 20 of the same audit, the baseline from the bar's remote ladder rather than local `main`, which S1 takes and that unit names
+- **hands-off** `TOOL-dFairHearing-33` — finding id 22 (item H1, shared with id 31) of the round-4 spec audit: every declared kit version constant read by its own pattern; S3's constant alternative and AC1's constant clause are superseded there
+- **hands-off** `TOOL-dFairHearing-34` — finding id 31 (item H1, shared with id 22) of the same audit: every gov:kit marker in every file the build modified; S3's four-directory pathspec, its marker alternative and AC1's marker clause are superseded there
+- **hands-off** `TOOL-dFairHearing-36` — the same audit's minors on this spec, ids 9, 18 and 19: GATE_BASE taken unchanged and the ladder base read through resolve_compare_base, superseding S1's computation in §4 (its S11 to S13)
+
 
 ## 4. Design
 
@@ -177,6 +182,8 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 34 (item H3, HIGH) of the round-3 spec
   audit of specs 4, 14, 25, 26 and 27.
+- rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: hands-off edges to TOOL-dFairHearing-33 and -34 (item H1,
+  ids 22 and 31) and TOOL-dFairHearing-36 (three minors on the base).
 
 ## 10. Reuse audit
 

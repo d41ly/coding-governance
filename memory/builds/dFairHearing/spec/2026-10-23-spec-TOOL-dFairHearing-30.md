@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-30-deviation-301.md](../build/2026-10-23-build-TOOL-dFairHearing-30-deviation-301.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-30-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-30-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 
 <!-- /gen:spec-records -->
 
@@ -74,6 +75,9 @@ The decision then follows from these runs.
 - **consumes-from** `TOOL-dFairHearing-15` — the `resume:checklist` agent, the corpus, the two arms, the instrument and S6's product change
 - **consumes-from** `TOOL-dFairHearing-14` — `check_experiment` and the manifest's `parsed` lines, which AC3 reads literally
 - **hands-off** `TOOL-dFairHearing-32` — the minors that read this unit's verdict record: the behavioural `selected` check (id 4), the runs' orchestrating commit (ids 5, 13) and the one rule for a dead run (id 30)
+- **hands-off** `TOOL-dFairHearing-35` — finding id 32 (item H2) of the round-4 spec audit: the attempt rule that decides which completed attempt is scored, and with it the scoring and the decision; this unit's S4, the figure and decision half of S5 and AC3, AC4's ungated half, spec 15 S6's product files and the selftest arm on the flag are superseded by its S1 to S6 and AC1 to AC4
+- **hands-off** `TOOL-dFairHearing-37` — the same audit's minors on this spec, ids 1, 5, 12, 20, 26, 33 and 34: AC1 restated over the scored attempt, AC4's selected half observed by behaviour, and the per-arm clone, the forward-slash path and the checked status carried into the one replay procedure for every later replay (its S1, S4, S6, S8, S11, S12 and S18)
+
 
 ## 4. Design
 
@@ -188,6 +192,8 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 28 (item H2, HIGH) of the round-3 spec
   audit of specs 4, 14, 25, 26 and 27.
+- rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: hands-off edges to TOOL-dFairHearing-35 (the attempt rule,
+  the scoring and the decision, finding id 32) and TOOL-dFairHearing-37 (seven minors).
 
 ## 10. Reuse audit
 

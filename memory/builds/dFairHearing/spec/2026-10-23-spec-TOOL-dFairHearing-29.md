@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-29-deviation-291.md](../build/2026-10-23-build-TOOL-dFairHearing-29-deviation-291.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 | [2026-10-23-prompt-TOOL-dFairHearing-29-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-29-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,8 @@ named member, so no pinned total can hide one.
 ### Edges
 
 - **consumes-from** `TOOL-dFairHearing-26` — the move of rule 0 arms to the pack's suite and the census's membership claim this unit checks by name
+- **hands-off** `TOOL-dFairHearing-36` — the round-4 spec audit's minors on this spec, ids 3, 7, 21, 24, 28 and 30: S2's move sentence and AC2 superseded, the move being unit 28's alone and each member checked once there, the member check decoding and printing UTF-8, label() naming a quote-less line, AC1 recorded as a precondition, the extractor's path and the pack suite's leg (its S1, S4, S6, S7, S9 and S10)
+
 
 ## 4. Design
 
@@ -164,6 +167,8 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 1 (item H1, HIGH) of the round-3 spec audit
   of specs 4, 14, 25, 26 and 27.
+- rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-36 (six minors);
+  S2's move sentence and AC2 are superseded there.
 
 ## 10. Reuse audit
 

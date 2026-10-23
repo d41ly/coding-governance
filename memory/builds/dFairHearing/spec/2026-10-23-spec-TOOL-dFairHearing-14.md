@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-14 — the experiment shape's method, enforced or recorded by the scorer factory
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0081@3ad56b8f whole
 
@@ -83,6 +83,8 @@ outputs, and the factory refuses one that breaks a rule it can check.
 - **hands-off** `TOOL-dFairHearing-23` — finding id 2 of the round-1 spec audit: the review-replay manifest defined whole, its case, `dispatched`, `parsed` and `matched` (its S4, AC2)
 - **hands-off** `TOOL-dFairHearing-30` — unit 15's replay manifest, checked by `check_experiment` there in place of `TOOL-dFairHearing-25`
 - **hands-off** `TOOL-dFairHearing-32` — the round-3 spec audit's minors on this spec, ids 6, 7, 25 and 36: the runner floor raised (its S9, S10), `case_evidence` for a run-case (its S11) and the manifest's reference checks (its S12); the floor field `none` on this unit's `New arm:` line and S2's review-replay sentence are superseded there
+- **hands-off** `TOOL-dFairHearing-35` — unit 15's replay manifest, naming each record and arm's scored attempt, checked by `check_experiment` there in place of `TOOL-dFairHearing-30`
+
 
 ## 4. Design
 
@@ -253,6 +255,8 @@ New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay sel
 - rev-3 · 2026-10-23 · §3 · the hands-off edge to TOOL-dFairHearing-18 removed: spec 18's grade reads no experiment manifest (it takes `--key`, `--seed` and one review record per run, and TOOL-dFairHearing-23's S43 routes it through `measure_recall`), so spec 18 consumes nothing of this unit and declares no consumes-from back.
 - rev-4 · 2026-10-23 · §3 · the round-3 spec audit's disposal: hands-off edges to TOOL-dFairHearing-30
   (unit 15's manifest) and TOOL-dFairHearing-32 (four minors).
+- rev-5 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-35, which scores
+  unit 15's replay in place of TOOL-dFairHearing-30.
 
 ## 10. Reuse audit
 

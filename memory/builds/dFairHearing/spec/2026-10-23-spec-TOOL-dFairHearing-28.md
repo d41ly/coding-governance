@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-28-deviation-281.md](../build/2026-10-23-build-TOOL-dFairHearing-28-deviation-281.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
+| [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-32 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,8 @@ and runs unit 26's placement check over the whole population.
 ### Edges
 
 - **consumes-from** `TOOL-dFairHearing-26` — the census's placement rule, the two loop labels and the move of rule 0 and rule 5 arms; this unit corrects that census's population and totals
+- **hands-off** `TOOL-dFairHearing-36` — the round-4 spec audit's minors on this spec, ids 7, 11, 15, 24, 27 and 29: AC3's second half restated, the census decoding and printing UTF-8, its placement half seen red over planted misses with unit 26's AC3, AC1 and AC3 recorded as preconditions, the extractor's path and the pack suite's leg (its S2, S3, S5, S7, S8 and S10)
+
 
 ## 4. Design
 
@@ -179,6 +182,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 11 (item B1, BLOCKER) of the round-3 spec
   audit of specs 4, 14, 25, 26 and 27.
+- rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-36 (six minors).
 
 ## 10. Reuse audit
 

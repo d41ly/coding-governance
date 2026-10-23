@@ -60,3 +60,15 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T02:52:09Z rescope · item add TOOL-dFairHearing-31 · reason closes round-3 spec-audit finding id 34 (item H3), HIGH, of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md
 
 2026-10-23T02:52:10Z rescope · item add TOOL-dFairHearing-32 · reason closes the round-3 spec-audit minors of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md, batched: MEDIUM ids 2 3 5 6 7 12 13 14 17 20 23 24 25 26 30 31 32 33 35 36 37 (items M1 to M14) and LOW ids 4 8 9 10 15 16 19 21 27 29 38 (items L1 to L9)
+
+2026-10-23T03:51:44Z rescope · item add TOOL-dFairHearing-33 · reason closes round-4 spec-audit finding id 22 (item H1, shared with id 31), HIGH, of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md
+
+2026-10-23T03:51:45Z rescope · item add TOOL-dFairHearing-34 · reason closes round-4 spec-audit finding id 31 (item H1, shared with id 22), HIGH, of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md
+
+2026-10-23T03:51:46Z rescope · item add TOOL-dFairHearing-35 · reason closes round-4 spec-audit finding id 32 (item H2), HIGH, of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md
+
+2026-10-23T03:51:48Z rescope · item add TOOL-dFairHearing-36 · reason closes the round-4 spec-audit minors landing on units 28, 29 and 31 of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md, batched: MEDIUM ids 3 11 19 27 28 29 (items M3 M7 M10 M14 M15 M16) and LOW ids 7 9 15 18 21 24 30 (items L2 L4 L5 L7 L8 L10)
+
+2026-10-23T03:51:49Z rescope · item add TOOL-dFairHearing-37 · reason closes the round-4 spec-audit minors landing on units 30 and 32 of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md, batched: MEDIUM ids 1 2 4 5 10 12 13 20 23 25 33 34 35 36 (items M1 M2 M4 M5 M6 M8 M9 M11 M12 M13 M17 M18 M19 M20) and LOW ids 6 8 17 26 37 (items L1 L3 L6 L9 L11)
+
+2026-10-23T04:14:01Z review · item dFairHearing-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 32 · disposition promote
