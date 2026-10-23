@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0010@cd629be7 whole
 **Carries:** node:policy-key.policy-file.on-invalid
@@ -11,6 +11,8 @@
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-4-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-4-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-4-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-4-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-4-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-4-divergence-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
@@ -65,20 +67,27 @@ the last valid revision whenever the current file is invalid.
   `policy check` leg `TOOL-dGroundRules-1` declares refuses an invalid file with no fallback on the
   pre-push bar, which a default-branch push and every `tools/push-main.sh` landing run. This unit
   sets that leg's row in `tools/gate-legs.json` so its `guard` is absent or covers the policy file,
-  and the `policy fixtures` row's argv so it carries `--strict-from` (S10). Observed by AC4, AC10.
+  and the `policy fixtures` row's argv so it carries `--strict-from` (S10). It adds the arm's row to
+  the "Each arm in an adopter" table of `tools/policy/README.md`, which `TOOL-dGroundRules-16`'s
+  `adopter-fresh-target` case joins to `ARMS` both ways (`tools/policy/README.md:164-165`).
+  Observed by AC4, AC10.
 - **S9** — Cases in `CASES` of `tools/policy/check_policy.py`, grouped as `on-invalid-classes`,
   planting each failure class the clause lists in its own temporary repository and asserting its
   stated outcome; the class with no valid revision is also red as planted under `arm_on_invalid`.
-  Observed by AC2, AC3, AC4, AC5, AC6, AC7, AC8, AC11.
+  The unknown-key class plants a key no catalogue row matches, exact or wildcard: C's `[runtime]`
+  table setting `agents-in-flite = 3` (§8 F6). Observed by AC2, AC3, AC4, AC5, AC6, AC7, AC8, AC11.
 - **S10** — The case `on-invalid-strict`, reading v2 from the path `check_policy.py`'s new flag
   `--strict-from <path>` names; without the flag it prints `NOT RUN` with the reason, never a pass,
   and the leg always passes it. Its population is derived (§4): every key whose `strict` cell in
   v2's `[presets]` table parses, against its catalogue row, to an admitted value that differs from
   the row's default. It plants a valid revision setting each such key at that value and a malformed
   revision after it, and reads every key at the malformed one. Observed by AC9.
-- **S11** — `.lexicon.conf`'s `VERB_OFFENDER_PIN` moves by the one definition this unit adds outside
-  the verb table, `validate` (§8 F2), read off `python tools/lexicon/lexicon.py` and argued beside the
-  key. NOT OBSERVED by a criterion here: the `lexicon naming predicates` leg reads the pin at the
+- **S11** — `.lexicon.conf`'s `VERB_OFFENDER_PIN` is pinned at the reading this unit leaves, `1213`,
+  argued beside the key with both arrivals named: `Refusal.__str__` in `tools/policy/policy.py`,
+  which `TOOL-dGroundRules-2` landed unpinned, and this unit's `validate` (§8 F2). Re-measured
+  2026-10-24 at `bade102d` with `python tools/lexicon/lexicon.py`: `P1 verb offenders=1212` against
+  the pin's `1211`, and `--offenders` names `__str__` as the one offender under `tools/policy`;
+  `validate` makes `1213`, the builder's reading. NOT OBSERVED by a criterion here: the `lexicon naming predicates` leg reads the pin at the
   close, and this pass runs no gate.
 - **S12** — A paragraph on `help/policy.md`: what an invalid file reads, the two values of
   `policy-file.on-invalid`, and the `check` verb. Observed by AC12.
@@ -128,6 +137,10 @@ the last valid revision whenever the current file is invalid.
 - Python 3.14's `tomllib.TOMLDecodeError` carries `lineno`; on 3.11 to 3.13 the line is in the
   message as `at line <n>`. `derive_key_line`'s fallback and the decoder's line both answer `0` when
   neither yields one.
+- `read_catalogue_row` matches a `*` or `<word>` segment to any one segment
+  (`tools/policy/policy.py:165-188`). Probed 2026-10-24 at `bade102d` in-process over
+  `load_catalogue("tools/policy")`: `runtime.agents-in-flite` raises the `Refusal` "is not a catalogue
+  key", and `budgets.enforse` returns the `budgets.*` row (`tools/policy/catalogue.toml:1279`).
 
 ### Data model
 
@@ -199,6 +212,7 @@ Every function but `validate` leads with a verb `.lexicon.conf`'s `VERBS` declar
 - `tools/policy/policy.py`
 - `tools/policy/check_policy.py`
 - `tools/gate-legs.json`
+- `tools/policy/README.md`
 - `.lexicon.conf`
 - `help/policy.md`
 
@@ -282,9 +296,10 @@ reads with `--rev HEAD` at the case's newest commit, so no case rests on the lan
   and `policy fixtures`, the first's `guard` is absent or holds a pathspec covering the policy file,
   and the second's argv carries `--strict-from` and v2's path. Red when: a push changing only the
   policy file would skip the live arm under the scoped bar, or the strict case runs with no source.
-- **AC11** — When a case plants a valid-looking C whose `[budgets]` table sets `enforse = "warn"`
-  and a V before it, `policy.py get budgets.enforce --explain` reads V with source `last-valid` and a
-  reason naming `enforse` as no catalogue key. Red when: the unknown key is ignored and C read.
+- **AC11** — When a case plants a valid-looking C whose `[runtime]` table sets
+  `agents-in-flite = 3`, a key no catalogue row matches, exact or wildcard, and a valid V before it,
+  `policy.py get budgets.enforce --explain` reads V with source `last-valid` and a reason naming
+  `agents-in-flite` as matching no catalogue row. Red when: the unknown key is ignored and C read.
 - **AC12** — When `grep -n 'on-invalid'` runs over `policy.md` under `help/`, it prints the paragraph,
   and `grep -n 'policy.py check'` there prints the verb. Red when: the branch ships undocumented.
 
@@ -295,7 +310,7 @@ reads with `--rev HEAD` at the case's newest commit, so no case rests on the lan
 The `policy check` and `policy fixtures` legs `TOOL-dGroundRules-1` declares run these arms; they
 are named here rather than on the line above, because they do not exist at this spec's base.
 
-New arm: tools/policy/check_policy.py --fixture (the `on-invalid-classes` cases) · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC11 · a fixture repository per failure class: absent, malformed after a valid revision and with none, a missing key, an out-of-set value, an unknown key, `refuse` then malformed, and an out-of-set `policy-file.on-invalid` with and without a valid value before it · none
+New arm: tools/policy/check_policy.py --fixture (the `on-invalid-classes` cases) · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC11 · a fixture repository per failure class: absent, malformed after a valid revision and with none, a missing key, an out-of-set value, an unknown key no catalogue row matches (`agents-in-flite` under `[runtime]`), `refuse` then malformed, and an out-of-set `policy-file.on-invalid` with and without a valid value before it · none
 
 New arm: tools/policy/check_policy.py --fixture --strict-from (the `on-invalid-strict` case) · covers AC9 · a valid revision setting each derived guard-bearing key at strict's value, then a malformed revision · none
 
@@ -332,7 +347,9 @@ New arm: tools/policy/check_policy.py (`arm_on_invalid` in `ARMS`) · covers AC4
 - **F6 — Is a key no catalogue row names a problem?** (a) Yes, an out-of-set value, since no allowed
   set admits a value for it. (b) Ignore it. Under (b) a misspelt `enforse = "refuse"` leaves
   `budgets.enforce` at its default `warn` silently. Recommendation (a), the more capable. Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a).
+  RESOLVED (agent, 2026-10-23, delegated): (a). A near-miss under a wildcard row (`budgets.enforse`
+  against `budgets.*`) resolves to that row, so refusing it is the parked `budgets.*` census question
+  (`memory/builds/dGroundRules/RUN.md`, 2026-10-23T20:44:00Z), not this unit's mechanism.
 - **F7 — Where do strict's values for the plant come from?** (a) v2's `[presets]` table, read by the
   arm from the path `--strict-from` names. (b) A table typed into the fixture. (c) A `strict` field on
   each catalogue row. (b) types a copy beside its source, against `[derive]`. (c) builds presets, a
@@ -349,6 +366,7 @@ New arm: tools/policy/check_policy.py (`arm_on_invalid` in `ARMS`) · covers AC4
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the reciprocal **hands-off** edges to TOOL-dGroundRules-5, TOOL-dGroundRules-9 added, each naming what that unit's own §3 **consumes-from** line takes from this one; hygiene check 12's edge join read them as missing. No scope, design or acceptance moved.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-4 · 2026-10-24 · S8 S9 S11 · §4 · AC11 · §7 · §8 F6 · the builder handed the unit back as a divergence. AC11, S9 and the first `New arm:` line planted `[budgets]` `enforse = "warn"` for a no-catalogue-key reason, but S1 and S2 find each leaf's row with `read_catalogue_row`, which matches `budgets.enforse` to the `budgets.*` row; and S11's pin arithmetic was one short, because `TOOL-dGroundRules-2`'s `Refusal.__str__` arrived unpinned. The run's ruling, the one `TOOL-dGroundRules-2` rev-4 took: the plant is `[runtime]` `agents-in-flite = 3`, which matches no row at `bade102d`, and F6 parks the wildcard near-miss with the `budgets.*` census question. S11 pins `1213` naming both arrivals, and S8 with §4's files adds the arm's row in `tools/policy/README.md` that `TOOL-dGroundRules-16`'s `adopter-fresh-target` case requires.
 
 ## 10. Reuse audit
 
