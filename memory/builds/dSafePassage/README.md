@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52
+ids: TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59
 spec-audit: 2026-10-21
 parents: dGroundRules
 may: PLAY-dClosedLoop-3
@@ -108,14 +108,22 @@ none
 | 49 | `TOOL-dSafePassage-50` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 43 to 46, its five minors on TOOL-46: the lander arm placed after the scan it reads, its locator cited by content, and one owner for the cutoff paragraph |
 | 50 | `TOOL-dSafePassage-51` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 47 to 50, the step module's 15 minors: the build order observed in commit order, the walk's checks in one sequence and no link followed, the guard's keys in the guard, one section probe, and the readings that cite them |
 | 51 | `TOOL-dSafePassage-52` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 47 to 50, its seven minors on TOOL-50: a misplaced arm that aborts the suite, one scan line, the arm's place read by content, the template repaired through its render, and the readings that cite them |
+| 52 | `TOOL-dSafePassage-53` | **Derived:** PLAY-dClosedLoop-2 | the walk's listing handler: an absent directory is the empty population, and only an existing one that cannot be listed is refused |
+| 53 | `TOOL-dSafePassage-54` | **Derived:** PLAY-dClosedLoop-2 | the walk's sound baseline: a plain submodule git built and gov's own tree, each walked to exit 0 with no refusal |
+| 54 | `TOOL-dSafePassage-55` | **Derived:** PLAY-dClosedLoop-2 | the roster hand-out refuses on TOOL-49 AC2's whole order predicate, written once as one probe |
+| 55 | `TOOL-dSafePassage-56` | **Derived:** PLAY-dClosedLoop-2 | the walk tests for a link on every path it enters, the root and each `modules/` it recurses into, before listing it |
+| 56 | `TOOL-dSafePassage-57` | **Derived:** PLAY-dClosedLoop-2 | TOOL-52 AC1 reads the arm: its guard taken from the suite by content, evaluated after the scan and alone under `set -u` |
+| 57 | `TOOL-dSafePassage-58` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 51 and 52, its ten minors on TOOL-52: the arm probe staged, the placement anchored on the block's `fi`, the abort's real exit, and the render's four outputs |
+| 58 | `TOOL-dSafePassage-59` | **Derived:** PLAY-dClosedLoop-2 | the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 51 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 58 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-14
 ids TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28
 ids TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42
-ids TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52
+ids TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56
+ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -168,27 +176,34 @@ ids TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePas
 | [TOOL-dSafePassage-47 — the submodule walk lists a repository by git's own directory shape, and refuses one whose config git cannot read](spec/2026-10-23-spec-TOOL-dSafePassage-47.md) | 12 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-48 — the step contract refuses `sendemail.sendmailCmd` and every send-email executor key in its identity form](spec/2026-10-23-spec-TOOL-dSafePassage-48.md) | 12 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-50 — the spec audit of units 43 to 46, its five minors on TOOL-46: the lander arm placed after the scan it reads, its locator cited by content, and one owner for the cutoff paragraph](spec/2026-10-23-spec-TOOL-dSafePassage-50.md) | 12 | 2 | OPEN | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-49.md) | 13 | 2 | OPEN | rev-3 | 2026-10-23 |
-| [TOOL-dSafePassage-52 — the spec audit of units 47 to 50, its seven minors on TOOL-50: a misplaced arm that aborts the suite, one scan line, the arm's place read by content, the template repaired through its render, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-52.md) | 13 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dSafePassage-51 — the step module's 15 audit minors from units 47 to 50: build order in commit order, the walk's checks in one sequence, the guard's keys, one section probe](spec/2026-10-23-spec-TOOL-dSafePassage-51.md) | 14 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-49.md) | 13 | 2 | OPEN | rev-4 | 2026-10-23 |
+| [TOOL-dSafePassage-52 — the spec audit of units 47 to 50, its seven minors on TOOL-50: a misplaced arm that aborts the suite, one scan line, the arm's place read by content, the template repaired through its render, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-52.md) | 13 | 2 | OPEN | rev-2 | 2026-10-23 |
+| [TOOL-dSafePassage-51 — the step module's 15 audit minors from units 47 to 50: build order in commit order, the walk's checks in one sequence, the guard's keys, one section probe](spec/2026-10-23-spec-TOOL-dSafePassage-51.md) | 14 | 2 | OPEN | rev-2 | 2026-10-23 |
+| [TOOL-dSafePassage-57 — TOOL-52 AC1 reads the arm: its guard taken from the suite by content, evaluated after the scan and alone under `set -u`](spec/2026-10-23-spec-TOOL-dSafePassage-57.md) | 14 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-58 — the spec audit of units 51 and 52, its ten minors on TOOL-52: the arm probe staged, the placement anchored on the block's `fi`, the abort's real exit, and the render's four outputs](spec/2026-10-23-spec-TOOL-dSafePassage-58.md) | 14 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-53 — the walk's listing handler: an absent directory is the empty population, and only an existing one that cannot be listed is refused](spec/2026-10-23-spec-TOOL-dSafePassage-53.md) | 15 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-54 — the walk's sound baseline: a plain submodule git built and gov's own tree, each walked to exit 0 with no refusal](spec/2026-10-23-spec-TOOL-dSafePassage-54.md) | 15 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-55 — the roster hand-out refuses on TOOL-49 AC2's whole order predicate, written once as one probe](spec/2026-10-23-spec-TOOL-dSafePassage-55.md) | 15 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-56 — the walk tests for a link on every path it enters, the root and each `modules/` it recurses into, before listing it](spec/2026-10-23-spec-TOOL-dSafePassage-56.md) | 15 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | OPEN | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 65 bound to this build, across 4 record folder(s).
+Records: 76 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dSafePassage-51 TOOL-dSafePassage-52.
+Ids no `spec-audit` record has ever named: TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59.
 
 Ids whose spec moved past its audited revision: TOOL-dSafePassage-1@rev-2 TOOL-dSafePassage-10@rev-1 TOOL-dSafePassage-11@rev-1 TOOL-dSafePassage-12@rev-1 TOOL-dSafePassage-13@rev-1 TOOL-dSafePassage-16@rev-1 TOOL-dSafePassage-17@rev-1 TOOL-dSafePassage-18@rev-1 TOOL-dSafePassage-19@rev-1
 TOOL-dSafePassage-2@rev-1 TOOL-dSafePassage-20@rev-1 TOOL-dSafePassage-21@rev-1 TOOL-dSafePassage-22@rev-1 TOOL-dSafePassage-23@rev-1 TOOL-dSafePassage-24@rev-1 TOOL-dSafePassage-25@rev-1 TOOL-dSafePassage-26@rev-1 TOOL-dSafePassage-27@rev-1 TOOL-dSafePassage-28@rev-1 TOOL-dSafePassage-29@rev-1
 TOOL-dSafePassage-3@rev-1 TOOL-dSafePassage-30@rev-1 TOOL-dSafePassage-31@rev-1 TOOL-dSafePassage-32@rev-1 TOOL-dSafePassage-33@rev-1 TOOL-dSafePassage-34@rev-1 TOOL-dSafePassage-35@rev-1 TOOL-dSafePassage-36@rev-1 TOOL-dSafePassage-37@rev-1 TOOL-dSafePassage-38@rev-1 TOOL-dSafePassage-39@rev-1
 TOOL-dSafePassage-4@rev-1 TOOL-dSafePassage-41@rev-1 TOOL-dSafePassage-42@rev-1 TOOL-dSafePassage-43@rev-1 TOOL-dSafePassage-44@rev-1 TOOL-dSafePassage-45@rev-1 TOOL-dSafePassage-46@rev-1 TOOL-dSafePassage-47@rev-1 TOOL-dSafePassage-48@rev-1 TOOL-dSafePassage-49@rev-2 TOOL-dSafePassage-5@rev-1
-TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1.
+TOOL-dSafePassage-50@rev-1 TOOL-dSafePassage-51@rev-1 TOOL-dSafePassage-52@rev-1 TOOL-dSafePassage-6@rev-1 TOOL-dSafePassage-7@rev-1 TOOL-dSafePassage-8@rev-1 TOOL-dSafePassage-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 51 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 58 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 13
 - carried in parts: 0 (none)
@@ -206,7 +221,9 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 51 spec(s) at 
   `spec/2026-10-23-spec-TOOL-dSafePassage-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-40.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-41.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dSafePassage-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-44.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-45.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dSafePassage-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-48.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-49.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-23-spec-TOOL-dSafePassage-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-52.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-23-spec-TOOL-dSafePassage-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-53.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-23-spec-TOOL-dSafePassage-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-57.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-23-spec-TOOL-dSafePassage-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dSafePassage-59.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0021
 <!-- /gen:build-coverage -->
 
@@ -227,7 +244,8 @@ Coverage of dSafePassage's 13 clause(s) and 5 owned node(s), over 51 spec(s) at 
 | 11 | `TOOL-dSafePassage-45`, `TOOL-dSafePassage-46` | yes |
 | 12 | `TOOL-dSafePassage-47`, `TOOL-dSafePassage-48`, `TOOL-dSafePassage-50` | yes |
 | 13 | `TOOL-dSafePassage-49`, `TOOL-dSafePassage-52` | yes |
-| 14 | `TOOL-dSafePassage-51` | no |
+| 14 | `TOOL-dSafePassage-51`, `TOOL-dSafePassage-57`, `TOOL-dSafePassage-58` | yes |
+| 15 | `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56`, `TOOL-dSafePassage-59` | yes |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

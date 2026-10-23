@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -230,6 +230,7 @@ Their items here add what the second finding found beyond the high's edit.
 - **consumes-from** `TOOL-dSafePassage-47` — the candidate shape and the config-read refusal, beside which S7 adds the `rev-parse --git-dir` refusal
 - **consumes-from** `TOOL-dSafePassage-48` — the send-email rows in both forms and the `sendemail.sendmailCmd` row, which S8's arm holds to a derivation
 - **hands-off** `TOOL-dSafePassage-51` — F1(a)'s sweep ending on AC2's header probe, with no roster handed out while TOOL-dSafePassage-4's order is not above TOOL-dSafePassage-43's and TOOL-dSafePassage-7's, and amending the Rollouts of TOOL-dSafePassage-2, -7 and -43 to `TOOL-dSafePassage-4 builds at order 3`; S7's `rev-parse` run only after a config read that exited 0; no `UNLISTED_EXECUTOR_KEYS` in the module, the expected key a literal in `tools/govkit/selftest.py`; a staged move-3 copy for AC3; fixture code comparing through `test_step_row`; S18's `stat` before any open, with the `gitmodules-fifo` plant; S6's Readers reason; §4's section probe; and §10's lookups, findings 1, 10, 19, 2, 9, 14, 4, 3, 24, 13, 8 and 18 of the spec audit of units 47 to 50
+- **hands-off** `TOOL-dSafePassage-55` — F1(a)'s sweep ending on AC2 run as that unit's one order probe, all four relations, TOOL-dSafePassage-18 and TOOL-dSafePassage-19 above TOOL-dSafePassage-4 included, so no roster is handed out while the probe exits non-zero; the bullet to TOOL-dSafePassage-51 above is read with the same four relations, finding 1 of the spec audit of units 51 and 52
 
 ## 4. Design
 
@@ -448,6 +449,7 @@ between units no `consumes-from` bullet joins.
 - rev-2 · 2026-10-23 · §8 · F1 RESOLVED (agent, delegated) to (a) on rung 3: this build's build run
   applies S4's order move before it hands out the roster.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-51` of the spec audit of units 47 to 50, written by the disposal stage; no other section moved.
+- rev-4 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-55` of the spec audit of units 51 and 52, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 

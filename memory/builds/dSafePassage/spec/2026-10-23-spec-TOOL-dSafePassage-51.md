@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-51 — the step module's 15 audit minors from units 47 to 50: build order in commit order, the walk's checks in one sequence, the guard's keys, one section probe
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-51-deviation-97.md](../build/2026-10-23-build-TOOL-dSafePassage-51-deviation-97.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-51-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-51-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-51-title-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-51-title-fix.md) | research | — |
+| [2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-52 |
 
 <!-- /gen:spec-records -->
 
@@ -187,6 +188,11 @@ corrected fix.
 - **consumes-from** `TOOL-dSafePassage-47` — the walk, S2's config read and its refusal, AC2 and AC4, which S4, S5, S6, S7 and S12 order, word, bound and cite; without the walk there is nothing to sequence
 - **consumes-from** `TOOL-dSafePassage-48` — the `sendemail.sendmailCmd` row, the smtpServer pin and AC3, which S9's staged copy, S13 and S12 read
 - **consumes-from** `TOOL-dSafePassage-49` — F1(a)'s sweep and AC2, S6's Readers, S7's rev-parse refusal, S8's arm, S13's form, S18's file test, §4's section probe and §10, which S1 to S5 and S8 to S15 read and amend
+- **hands-off** `TOOL-dSafePassage-53` — S6's listing handler split by class, `except FileNotFoundError: return` before `except OSError: refuse d`, so an absent `modules/` is the empty population, with the `submodule-modules-not-a-directory` plant, finding 22 of the spec audit of units 51 and 52
+- **hands-off** `TOOL-dSafePassage-54` — the walk's sound baseline, a `submodule-sound-no-nested` plant built by `git submodule add` and the walk over gov's own tree, each exiting 0, finding 7 of the spec audit of units 51 and 52
+- **hands-off** `TOOL-dSafePassage-55` — S1's hand-out refusal widened to TOOL-dSafePassage-49 AC2's four relations, run as that unit's one order probe, finding 1 of the spec audit of units 51 and 52
+- **hands-off** `TOOL-dSafePassage-56` — S6's link test run by `test_path_linked` at the top of `walk(d)`, so the root and every `c/modules` are tested before they are listed, finding 8 of the spec audit of units 51 and 52
+- **hands-off** `TOOL-dSafePassage-59` — AC1 and AC2 recorded as the sweep's checks, the dispatch edge refusal cited, AC1's grep made whole-line by `-x`, S3's one-line phrase, the link test without `os.path.isjunction`, a root-link and a dangling-link plant, S15's `lstat` link refusal, S9's census at the build HEAD and the tilde fence, findings 2, 13, 16, 29, 18, 23, 24, 12, 4, 17, 5 and 19 of the spec audit of units 51 and 52
 
 ## 4. Design
 
@@ -360,6 +366,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 47 to 50's 6 MEDIUM and 9
   LOW findings on the step module, one scope item per raw id.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions `TOOL-dSafePassage-53`, `TOOL-dSafePassage-54`, `TOOL-dSafePassage-55`, `TOOL-dSafePassage-56` and `TOOL-dSafePassage-59` of the spec audit of units 51 and 52, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 

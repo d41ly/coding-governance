@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-52 — the spec audit of units 47 to 50, its seven minors on TOOL-50: a misplaced arm that aborts the suite, one scan line, the arm's place read by content, the template repaired through its render, and the readings that cite them
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-52-deviation-98.md](../build/2026-10-23-build-TOOL-dSafePassage-52-deviation-98.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-51 |
 
 <!-- /gen:spec-records -->
 
@@ -100,6 +101,8 @@ them.
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-50` — S1's failure mode, §4's arm place, AC1, S4's owner table, S5's route and the Rollout sentence, which S1 to S7 read; without the arm's placement there is nothing to bound
+- **hands-off** `TOOL-dSafePassage-57` — AC1 read as a probe of the arm itself: its guard line taken from `tools/push-main.test.sh` by content, evaluated after the scan and alone under `set -u`, and red at the base, finding 3 of the spec audit of units 51 and 52
+- **hands-off** `TOOL-dSafePassage-58` — AC1 staged over a wrong-file guard and an exported `_mt_rc`, the arm's skip line named apart, AC2 anchored on the 28-32 block's `fi` and loud on an absent anchor, S1's abort exiting 1 as a file, the `--render` route's four outputs with the other three left unchanged or restored, and a conditional `New arm:` line, findings 9, 14, 27, 15, 28, 10, 11, 20, 26 and 21 of the spec audit of units 51 and 52
 
 ## 4. Design
 
@@ -205,6 +208,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 47 to 50's 7 LOW findings
   on TOOL-dSafePassage-50, one scope item per raw id.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions `TOOL-dSafePassage-57` and `TOOL-dSafePassage-58` of the spec audit of units 51 and 52, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 
