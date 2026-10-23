@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-27 — every policy case that drives the deployer runs it from the snapshot, and a call over the source's own root refuses
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-27-deviation-15.md](../build/2026-10-23-build-TOOL-dGroundRules-27-deviation-15.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ added later cannot grade HEAD by accident.
 - **consumes-from** `TOOL-dGroundRules-26` — `build_source_snapshot` and the snapshot-installed fresh target, which this unit's helper requires of every case
 - **consumes-from** `TOOL-dGroundRules-25` — the cases `legacy-homes-withheld-install` and `census-default-adopter`, which this unit moves onto the snapshot
 - **hands-off** `TOOL-dGroundRules-32` — `run_govkit`, which that unit's shared target builder (finding 12) calls
+- **hands-off** `TOOL-dGroundRules-34` — `run_govkit` and its refusal, which that unit widens to every root no snapshot made and routes through `resolve_govkit` (ids 3, 23, 4, 34 and 20 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -164,6 +166,7 @@ New arm: tools/policy/check_policy.py (`--fixture legacy-homes-withheld-install`
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 7 (HIGH, item H1) of the round-1 spec
   audit of units 22 to 25, for the cases `TOOL-dGroundRules-25` S9 and S12 that inherit the defect,
   with govkit's `apply` and `read_descriptors` read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

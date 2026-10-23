@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-24 — the fresh target installed by the deployer, so the case grades an install govkit makes
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -69,6 +69,7 @@ own adopter there.
 - **hands-off** `TOOL-dGroundRules-25` — the installed target, which that unit's items for findings 36, 15 and 23 assert against
 - **hands-off** `TOOL-dGroundRules-26` — `adopter-fresh-target`'s `apply` from the source tree, which that unit points at a commit of the working tree made in a scratch clone (finding 1)
 - **hands-off** `TOOL-dGroundRules-32` — the fresh target's set-up, receipt compare and guard lines, which that unit moves into one builder with `[answers]`, a local identity and `govkit.py check` (findings 8, 12, 16, 21, 29)
+- **hands-off** `TOOL-dGroundRules-34` — S4's tool-root derivation and its locate refusal, which that unit moves into `resolve_govkit` (ids 3 and 23 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -179,6 +180,7 @@ New arm: tools/policy/check_policy.py (`--fixture adopter-fresh-target`) · cove
   audit of units 13 to 21, from the review's sound fix, corrected for `apply`'s refusal of an
   unselected `requires`, with govkit and its selftest read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-26, TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

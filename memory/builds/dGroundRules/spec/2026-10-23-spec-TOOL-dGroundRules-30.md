@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-30 — the writer-marker floor decided by the installed hook's own verdict, never by a kit version the lander has not minted
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-30-deviation-18.md](../build/2026-10-23-build-TOOL-dGroundRules-30-deviation-18.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-31 TOOL-dGroundRules-32 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,7 @@ and falls back when the hook does not admit it.
 
 - **consumes-from** `TOOL-dGroundRules-25` — the render's writer-marker floor and its fallback (S18), whose deciding predicate this unit replaces
 - **consumes-from** `TOOL-dGroundRules-18` — `WRITER_MARK`, the writer bound rule 2 judges and the template's `gov:fixed-writers` split, which the probe asks the hook to admit
+- **hands-off** `TOOL-dGroundRules-34` — the render's writer-marker probe and its fallback notice, which that unit makes quote the hook's reason, and AC3, whose zero count holds once that unit removes `TOOL-dGroundRules-25`'s AC18 arm (ids 1, 25, 8, 17 and 38 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -157,6 +159,7 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC1 AC4 · the 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 18 (HIGH, item H3) of the round-1 spec
   audit of units 22 to 25, from the review's sound fix, feature detection, taken through the hook's
   own verdict, with the hook, the lander's mint note and both workflows gates read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

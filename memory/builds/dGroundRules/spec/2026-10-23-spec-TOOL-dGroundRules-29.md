@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-29 — a receipt-less target is gov's source tree only when it holds the registry, so the census arm never grades a scratch target as gov
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-29-deviation-17.md](../build/2026-10-23-build-TOOL-dGroundRules-29-deviation-17.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,7 @@ every row is announced and none is graded.
 
 - **consumes-from** `TOOL-dGroundRules-22` — `derive_census_tree`, the census arm by tree and its README row, which this unit gives a third answer
 - **hands-off** `TOOL-dGroundRules-32` — the three answers of `derive_census_tree`, which that unit's receipt-shape item (finding 25) extends with `invalid`
+- **hands-off** `TOOL-dGroundRules-34` — `derive_census_tree`'s three answers and `arm_cap_census` under `unadopted`, which that unit observes at the depth window's edge and keeps joining (ids 5, 14, 28, 37, 24 and 33 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -174,6 +176,7 @@ New arm: tools/policy/check_policy.py (`--fixture census-receiptless-target`) ·
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 17 (HIGH, item H2) of the round-1 spec
   audit of units 22 to 25, from the skeptic's corrected fix, its three-way rule, with
   `derive_tool_root`, the registry's exemption and the receipt check read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

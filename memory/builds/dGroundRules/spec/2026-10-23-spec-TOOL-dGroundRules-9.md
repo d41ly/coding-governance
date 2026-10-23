@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5
 
 **Carries:** cl-dClosedLoop-0015@8ce57bfb whole
 
@@ -112,6 +112,7 @@ outside the switch.
 - **hands-off** `TOOL-dGroundRules-17` — the census's `ships` field and `arm_cap_census` graded by what ships (finding 37)
 - **hands-off** `TOOL-dGroundRules-20` — every census enforcer named in the `policy fixtures` guard, and the join that keeps them there (finding 35)
 - **hands-off** `TOOL-dGroundRules-21` — 0 as unchecked, the read-shape limits scanner, the refused-reader rule, `read_blob_at` and the regenerated codebase map (findings 8, 18, 36, 44, 10, 40)
+- **hands-off** `TOOL-dGroundRules-34` — `budgets-census-join` and the census-to-tree join of S7, which that unit keeps live under `unadopted` (id 24 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -379,6 +380,7 @@ AC8 and AC12 are probes the close reads directly.
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-17, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

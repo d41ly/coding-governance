@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-28 — the historical-sha oracle class widened to HEAD, so a spec driving the deployer from gov's tree is handed it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-28-deviation-16.md](../build/2026-10-23-build-TOOL-dGroundRules-28-deviation-16.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-26 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 |
 
 <!-- /gen:spec-records -->
 
@@ -51,7 +52,7 @@ is widened from a literal sha to HEAD and anchored on the files that drive the d
 
 ### Edges
 
-none
+- **hands-off** `TOOL-dGroundRules-34` — the HEAD paragraph of `test-oracle-read-from-a-historical-sha`, which that unit points at `suite-invalidated-by-a-commit-under-it` for the false-green shape (id 21 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -91,6 +92,7 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 23 (HIGH, item H1) of the round-1 spec
   audit of units 22 to 25 as the item's left-shift, with the record and `gotchas.py`'s anchor rule
   read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 9. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-31 — the install-day scaffold defers the mirror over uncommitted inputs, so the first `--scaffold` in a repository with history exits 0
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-31-deviation-19.md](../build/2026-10-23-build-TOOL-dGroundRules-31-deviation-19.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-32 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,7 @@ unit turns exactly that refusal into a named deferral and leaves every other ref
 
 - **consumes-from** `TOOL-dGroundRules-25` — `--scaffold`'s `mirror --write` call (S7), the widened refusal over every recorded input (S20) and AC7, whose second clause this unit observes on the re-run
 - **consumes-from** `TOOL-dGroundRules-5` — `mirror --write`'s exit 2 and its `uncommitted changes` refusal line, the one shape this unit defers
+- **hands-off** `TOOL-dGroundRules-34` — `--scaffold`'s deferral, which that unit makes wait for `arm_schema`, AC4, which that unit observes through the real verb, and the install text of `help/policy.md`, which that unit puts under `## Install` (ids 32 and 30 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -176,6 +178,7 @@ New arm: tools/policy/adopt-policy.test.sh · covers AC4 · `policy.py` staged t
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 24 (HIGH, item H4) of the round-1 spec
   audit of units 22 to 25, from the skeptic's corrected fix, with the refusal of `TOOL-dGroundRules-5`
   §4 and the install flow of `TOOL-dGroundRules-24` §4 read on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

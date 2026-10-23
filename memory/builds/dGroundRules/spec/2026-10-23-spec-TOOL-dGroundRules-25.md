@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -261,6 +261,8 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 - **hands-off** `TOOL-dGroundRules-30` — the render's writer-marker floor (S18), whose version predicate that unit replaces with the installed hook's own verdict, and AC18, which that unit's AC1 and AC2 observe in its place (finding 18)
 - **hands-off** `TOOL-dGroundRules-31` — `--scaffold`'s `mirror --write` call (S7), whose `uncommitted changes` refusal that unit defers, and AC7's second clause, which that unit observes on the re-run after the first commit (finding 24)
 - **hands-off** `TOOL-dGroundRules-32` — the build-order rule, the census and plan cases, the BOM strip, the map regeneration, the card criterion, the edge read and the widened refusal, which that unit amends (findings 3, 9, 10, 19, 14, 25, 27, 28, 6, 11, 12, 15, 22)
+- **hands-off** `TOOL-dGroundRules-33` — `fixtures-guard-census`'s pipe to `check-spec-tokens.py --legs-for -` (S25), which that unit's guard trace reuses (id 26 of the round-1 spec audit of units 26 to 32)
+- **hands-off** `TOOL-dGroundRules-34` — AC18's version-staging arm, which that unit removes, `TOOL-dGroundRules-30` AC1 and AC2 observing AC18 in its place, and `census-default-adopter`, which that unit lists among the census cases (ids 1, 25 and 33 of the round-1 spec audit of units 26 to 32)
 
 ## 4. Design
 
@@ -618,6 +620,7 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
   skeptics' corrected fixes for ids 2, 22, 23, 26 and 35, with each cited line read at base
   `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-27, TOOL-dGroundRules-30, TOOL-dGroundRules-31, TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-33, TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 
