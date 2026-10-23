@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-46-deviation-461.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-deviation-461.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-46-deviation-462.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-deviation-462.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md) | research | PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-55 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
@@ -177,9 +179,8 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 · the playb
   widens: none · relaxes: none
 - **F3 — How a write door renders its own row.** Options: (a) a candidate read admitted on render
   verbs and refused on checks; (b) commit inside the verb; (c) leave the render stale until a second
-  command. (b) takes the commit from the session and (c) is the defect. RESOLVED (agent, 2026-10-24,
-  delegated): (a), rung 3. widens: the renderer may read a caller-named overlay file on a render verb
-  · relaxes: none
+  command. (b) takes the commit from the session and (c) is the defect.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: the renderer may read a caller-named overlay file on a render verb · relaxes: none
 
 ## 9. Revision log
 

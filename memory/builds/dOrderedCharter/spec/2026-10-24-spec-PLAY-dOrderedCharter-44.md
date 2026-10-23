@@ -180,8 +180,8 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC5 · the p
   spec that carries nothing and is derived from nothing. Options: (a) `**Derived:**` naming
   `PLAY-dClosedLoop-2`, the owner's ruling that a run carries the units it adds, as 89 promoted specs
   in this tree do; (b) none; (c) a part of unit 19's clause. (b) reds unbound and (c) splits a clause
-  this unit does not carry. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  this unit does not carry.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
 - **F2 — What stamps an extractor's version.** Options: (a) a typed integer per registry row; (b) the
   hash of the module file's bytes, derived; (c) the hash of the function's source alone. (c) misses a
   module-level constant the function reads. RESOLVED (agent, 2026-10-24, delegated): (b), rung 3, the

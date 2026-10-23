@@ -301,9 +301,8 @@ New arm: tools/playbook/gov_tag.py · covers AC9 · the `retired-section` plant 
 - **F1 — What the practice's checks are joined to.** No catalogue row names the writing practice, and
   the meta-check grades only what a row declares. Options: a row `practice.writing` whose `rules` the
   legs enforce; a separate register of the practice's rules; no join. A separate register is a second
-  home for what the catalogue holds. RESOLVED (agent, 2026-10-23, delegated): the row, rung 3,
-  reusing PLAY-dOrderedCharter-30's `rules` field and PLAY-dOrderedCharter-7's join. widens: none ·
-  relaxes: none
+  home for what the catalogue holds.
+  RESOLVED (agent, 2026-10-23, delegated): the row, rung 3, reusing PLAY-dOrderedCharter-30's `rules` field and PLAY-dOrderedCharter-7's join. widens: none · relaxes: none
 - **F2 — Where records are read from.** Options: the tag index, through a record namespace; the
   tree, by this module. The `record` namespace is dTotalRecall's (`cl-dClosedLoop-0040`). RESOLVED
   (agent, 2026-10-23, delegated): the tree, rung 1. widens: none · relaxes: none

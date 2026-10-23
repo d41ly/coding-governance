@@ -235,9 +235,8 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 AC6 · the p
   field holds one string per type for the same reason. widens: none · relaxes: none
 - **F2 — Where `derive_pin_hash` lives.** Options: `design_lib.py`, beside `derive_clause_hash`;
   the edge parser. The clause hash's callers (`asbuilt_view.py:131`, `check-spec-tokens.test.sh:1609`)
-  already import `design_lib`. RESOLVED (agent, 2026-10-23, delegated): `design_lib.py`, rung 3, one
-  normaliser beside its first caller, the edge parser importing it core to core. widens: none ·
-  relaxes: none
+  already import `design_lib`.
+  RESOLVED (agent, 2026-10-23, delegated): `design_lib.py`, rung 3, one normaliser beside its first caller, the edge parser importing it core to core. widens: none · relaxes: none
 
 ## 9. Revision log
 

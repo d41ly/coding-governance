@@ -315,9 +315,8 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
 - **F1 — How the repository's part is marked.** No source spells it (scout C, interface 13). Options:
   (a) a `gov:repo` region pair in the shape of `gov:playbook`'s; (b) a `when:repo` fence; (c) a heading.
   (b) carries drop-when-absent semantics a repository part must never have, and (c) is a positional
-  address the region checks cannot read. RESOLVED (agent, 2026-10-23, delegated): (a), rung 3, reusing
-  the region-marker shape the renderer and its checks already read. grants: PLAY-dClosedLoop-3 the
-  marked part in every level-3 to level-5 document the clause names. widens: none · relaxes: none
+  address the region checks cannot read.
+  RESOLVED (agent, 2026-10-23, delegated): (a), rung 3, reusing the region-marker shape the renderer and its checks already read. grants: PLAY-dClosedLoop-3 the marked part in every level-3 to level-5 document the clause names. widens: none · relaxes: none
 - **F2 — Where the harness's own limit is read.** Options: (a) `CODEX_MAX`, through the reader unit 6's
   check uses; (b) a new per-harness cap under `budgets.*`; (c) a constant in the renderer. (b) and (c)
   are a second spelling beside `CODEX_MAX` until unit 31 moves it, and (c) is typed. RESOLVED (agent,
@@ -334,23 +333,15 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
   predicate rules each row, every ruling printed with its evidence, the owner's later ruling overriding
   it; (c) an agent's judgement per row. (a) leaves `gap-found-31` open with a moved set read as zero,
   which M3's counter-rule refuses as a decision; (b) and (c) drop the per-row owner turn, and (c) leaves
-  no observation a re-run reproduces. Every option fails a clause-tier bound. RESOLVED (agent,
-  2026-10-23, delegated): (b), rung 6, citing ER:328, relaxing the procedure (the owner's per-row turn)
-  and keeping the outcome the owner's IA-6 answer chose; deviation record
-  `2026-10-23-build-PLAY-dOrderedCharter-34-deviation-341.md` amends the clause, its new hash
-  `42692e4c` taken by this spec's pin when the as-built view takes the record. grants:
-  PLAY-dClosedLoop-3 the shipped foundation set's change. widens: none · relaxes: the owner rules each
-  practice of the census one by one before any moves
+  no observation a re-run reproduces. Every option fails a clause-tier bound.
+  RESOLVED (agent, 2026-10-23, delegated): (b), rung 6, citing ER:328, relaxing the procedure (the owner's per-row turn) and keeping the outcome the owner's IA-6 answer chose; deviation record `2026-10-23-build-PLAY-dOrderedCharter-34-deviation-341.md` amends the clause, its new hash `42692e4c` taken by this spec's pin when the as-built view takes the record. grants: PLAY-dClosedLoop-3 the shipped foundation set's change. widens: none · relaxes: the owner rules each practice of the census one by one before any moves
 - **F5 — Where a moved practice lands in gov.** Options: (a) a level-0 `repo.` unit of gov's overlay;
   (b) a repository-declared practice named in gov's `charter.practices`. (b) writes the policy file,
-  which the minimal guard refuses to an agent until dDeclaredLoop (`cl-dClosedLoop-0012`). RESOLVED
-  (agent, 2026-10-23, delegated): (a), rung 3, and the clause's "gov's own overlay". widens: none ·
-  relaxes: none
+  which the minimal guard refuses to an agent until dDeclaredLoop (`cl-dClosedLoop-0012`).
+  RESOLVED (agent, 2026-10-23, delegated): (a), rung 3, and the clause's "gov's own overlay". widens: none · relaxes: none
 - **F6 — The parent is unbuilt.** `budgets.*` and `budgets.enforce` are dGroundRules' and unread until
-  its reader lands. RESOLVED (agent, 2026-10-23, delegated): rung 1, v2's `[chain]` puts dGroundRules
-  and dSafePassage before this build; this unit reads caps through unit 11's reader, which reads the
-  legacy carrier until then, and the build run re-grounds against the landed parent. widens: none ·
-  relaxes: none
+  its reader lands.
+  RESOLVED (agent, 2026-10-23, delegated): rung 1, v2's `[chain]` puts dGroundRules and dSafePassage before this build; this unit reads caps through unit 11's reader, which reads the legacy carrier until then, and the build run re-grounds against the landed parent. widens: none · relaxes: none
 
 ## 9. Revision log
 

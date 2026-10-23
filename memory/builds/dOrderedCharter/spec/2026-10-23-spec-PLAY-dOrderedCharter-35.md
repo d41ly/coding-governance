@@ -322,15 +322,13 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   `item.<step>.adopter.<name>`). Options: (a) an `owner-seat` key in each kind's schema; (b) the
   segment admitted anywhere in a tag; (c) a typed list of seat positions in `owned` itself. (b) admits
   `fixture.x.adopter` as the repository's and lets the segment drift; (c) is a closed table in code,
-  which flow-roles-adoption item 12 refuses. RESOLVED (agent, 2026-10-23, delegated): (a), rung 3, the
-  one option that both closes the seat per kind and lets a later kind declare its own. widens: none ·
-  relaxes: none
+  which flow-roles-adoption item 12 refuses.
+  RESOLVED (agent, 2026-10-23, delegated): (a), rung 3, the one option that both closes the seat per kind and lets a later kind declare its own. widens: none · relaxes: none
 - **F2 — What a row's canonical form folds.** FA item 13: "its keys sorted and its values
   normalised". Options: (a) JSON, keys and set values sorted, each string through S7's whitespace
   fold; (b) the TOML text with whitespace folded; (c) a hash per field. (b) reads a key reorder as a
-  change, and (c) is a second pin grammar beside S7's. RESOLVED (agent, 2026-10-23, delegated): (a),
-  rung 1, v2's "pins over a row's canonical form" with the shared normaliser S7 names. widens: none ·
-  relaxes: none
+  change, and (c) is a second pin grammar beside S7's.
+  RESOLVED (agent, 2026-10-23, delegated): (a), rung 1, v2's "pins over a row's canonical form" with the shared normaliser S7 names. widens: none · relaxes: none
 - **F3 — Where the row half of the update's stale arms runs.** Options: (a) inside the update handler
   unit 33 lands for units, iterating every registered kind; (b) a second handler in `govkit.py` for
   rows; (c) only in each kind's composer, outside update. (b) is a second copy of the arms, and (c)

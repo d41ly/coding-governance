@@ -9,7 +9,9 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md) | research | PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-55 |
 | [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-472.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-472.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
@@ -152,9 +154,8 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 · the playbook-rend
   2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
 - **F2 — What grandfathers a record.** Options: (a) its adding commit's ancestry against the commit
   that added the check; (b) print-only for all of `memory/builds/`; (c) the adding commit's date. (b)
-  stops grading every new record, and (c) trusts a clock. RESOLVED (agent, 2026-10-24, delegated):
-  (a), rung 3. widens: none · relaxes: unit 26 S3's red, for a build record whose adding commit does
-  not descend from the check's landing
+  stops grading every new record, and (c) trusts a clock.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: unit 26 S3's red, for a build record whose adding commit does not descend from the check's landing
 
 ## 9. Revision log
 

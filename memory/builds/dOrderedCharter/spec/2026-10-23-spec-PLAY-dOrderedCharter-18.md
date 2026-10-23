@@ -305,10 +305,8 @@ New arm: tools/check-wiring.test.sh · covers none · the dead-grammar AC10 arm 
   (b) fold `KIT_MEMORY_TREE_VERSION`, read from `check-memory-hygiene.sh:68`, which moves on every
   memory-tree bump and rebuilds the recall cache about 6 s each time for changes that are not the
   grammar's; (c) fold the hash of `id_grammar.py`'s own bytes, which moves exactly when the grammar's
-  code does and is derived rather than typed. RESOLVED (agent, 2026-10-23, delegated): (c), rung 3,
-  the most capable survivor of the vetoes; the digest's own docstring states the property it wants,
-  the term moving when the grammar moves, and (c) has it without a typed constant. widens: none ·
-  relaxes: none
+  code does and is derived rather than typed.
+  RESOLVED (agent, 2026-10-23, delegated): (c), rung 3, the most capable survivor of the vetoes; the digest's own docstring states the property it wants, the term moving when the grammar moves, and (c) has it without a typed constant. widens: none · relaxes: none
 - **F2 — Whether `check-kit-versions.sh` is re-pointed.** The brief puts it in the inventory. It reads a
   constant that stays. RESOLVED (agent, 2026-10-23, delegated): kept, its arm re-observed (AC10),
   rung 1: the clause re-points the moved grammar's consumers, and this reader consumes no moved name.

@@ -8,8 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md) | research | PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-53 |
 | [2026-10-24-build-PLAY-dOrderedCharter-50-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-50-promoted-fix-return.md) | research | PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-54 |
 | [2026-10-24-build-PLAY-dOrderedCharter-55-deviation-551.md](../build/2026-10-24-build-PLAY-dOrderedCharter-55-deviation-551.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-55-deviation-552.md](../build/2026-10-24-build-PLAY-dOrderedCharter-55-deviation-552.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-54 |
 
 <!-- /gen:spec-records -->
@@ -439,9 +441,8 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 AC23 · the newline
   widens: none · relaxes: none
 - **F3 — Which adopters get the moved wiring leg (id 26).** Options: (a) every `playbook-render`
   adopter, recorded; (b) only targets that held the retired entry, through its `[[retired]]` successor
-  mapping. (b) needs a selector a descriptor's `[[gate_leg]]` row does not carry at base. RESOLVED
-  (agent, 2026-10-24, delegated): (a), rung 3. widens: the `playbook-render` entry's leg set gains
-  `agent-instructions wiring` for every adopter · relaxes: none
+  mapping. (b) needs a selector a descriptor's `[[gate_leg]]` row does not carry at base.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: the `playbook-render` entry's leg set gains `agent-instructions wiring` for every adopter · relaxes: none
 
 ## 9. Revision log
 

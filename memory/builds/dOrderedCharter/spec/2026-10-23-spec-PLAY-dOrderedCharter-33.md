@@ -277,10 +277,8 @@ New arm: tools/govkit/surface-classes.toml · covers AC7 · the step gate's arms
   unit 35 registers, printing `0 row kinds registered` with none. RESOLVED (agent, 2026-10-23,
   delegated): the register, rung 3, unit 35's own wording of the hand-over. widens: none · relaxes:
   none
-- **F4 — The parent's reader and step gate are unbuilt.** RESOLVED (agent, 2026-10-23, delegated): rung
-  1, v2's `[chain]` builds dGroundRules and dSafePassage before this build's build run; the build run
-  re-grounds S3 against the landed reader and S5 against the landed class registry. widens: none ·
-  relaxes: none
+- **F4 — The parent's reader and step gate are unbuilt.**
+  RESOLVED (agent, 2026-10-23, delegated): rung 1, v2's `[chain]` builds dGroundRules and dSafePassage before this build's build run; the build run re-grounds S3 against the landed reader and S5 against the landed class registry. widens: none · relaxes: none
 
 ## 9. Revision log
 

@@ -653,8 +653,8 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC2 · the canary's key set
   the second answer. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
 - **F8 — Where `resolve_fixed_by` lives (id 59).** Options: (a) `tools/playbook/instruction_units.py`,
   which both callers import; (b) `tools/playbook/overlay.py`. (b) makes the row checks import the
-  overlay module for a grammar. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  overlay module for a grammar.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
 - **F9 — Unit 16's descriptor reader (id 63).** Options: (a) extend `regen.py`'s tracked-file reader
   for `tools/govkit/entries/*.kit.toml`; (b) keep a glob reader under another name. (a) reads tracked
   files, the population the gates grade. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens:

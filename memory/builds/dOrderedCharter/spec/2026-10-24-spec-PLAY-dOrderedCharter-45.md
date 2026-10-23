@@ -186,8 +186,8 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC2 AC3 AC4 AC5 · the t
 - **F2 — How fine the merge's grain is.** Options: (a) per entry, every both-sides change a conflict;
   (b) per field inside an entry; (c) whole file, every concurrent edit a conflict. (b) can combine two
   edits into a unit neither author wrote; (c) conflicts on every pair of independent adds, which unit
-  15's AC1 requires to merge. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  15's AC1 requires to merge.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 

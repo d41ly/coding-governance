@@ -222,8 +222,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
   unit 2 re-founds the charter; the clause's red cases are still observed on today's charter, by AC3.
 - **F3** — The rendered marker is read by the kickoff engine's fallback and named by the deployer runbook.
   Options: re-point both in this unit; keep the marker in the render.
-  RESOLVED (agent, 2026-10-23, delegated): rung 3: re-point both (S5). grants: PLAY-dClosedLoop-3 the
-  kickoff Skill and the deployer runbook read the provenance lock where they read the rendered marker.
+  RESOLVED (agent, 2026-10-23, delegated): rung 3: re-point both (S5). grants: PLAY-dClosedLoop-3 the kickoff Skill and the deployer runbook read the provenance lock where they read the rendered marker.
 
 ## 9. Revision log
 

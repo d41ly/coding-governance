@@ -232,9 +232,8 @@ New arm: tools/playbook/gov_tag.py · covers AC1 · the `tags` leg reds on a pla
   Options: `reader.every` alone, which leaves a selector with one member and no unit that loads for
   one route only; `reader.every`, `reader.driver` and `reader.subagent`, the two load routes
   `gap-found-03` distinguishes (subagents load no charter); a reader per harness, which is
-  dWellOiledMachine's adapters'. RESOLVED (agent, 2026-10-23, delegated): the three, rung 3, the most
-  capable survivor; a harness reader joins when its adapter build registers it. widens: none ·
-  relaxes: none
+  dWellOiledMachine's adapters'.
+  RESOLVED (agent, 2026-10-23, delegated): the three, rung 3, the most capable survivor; a harness reader joins when its adapter build registers it. widens: none · relaxes: none
 - **F2 — How the lexicon receives the namespace words.** Options: the core passes them on the call;
   the lexicon reads the registry itself. RESOLVED (agent, 2026-10-23, delegated): the lexicon reads
   the registry through `resolve_kit_dir`, rung 3, optional reading core, so `--suggest --as tag.<ns>`

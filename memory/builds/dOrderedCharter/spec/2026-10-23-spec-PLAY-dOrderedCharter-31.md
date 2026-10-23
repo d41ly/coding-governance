@@ -330,11 +330,8 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
   the grammar refuses a retired id that is still a live entry or declared step and a successor that is
   not live, and states no rule that a retired step id was once declared; `surfaces` takes any
   `<class>:<name>`. Liveness: the same reader refuses `id = "playbook"`, a live entry, so the probe can
-  read a refusal. RESOLVED (agent, 2026-10-23, delegated): a `[[retired]]` row with the step-shaped id
-  `playbook/seeded-template`, `successor = "none"` and the seed's members in `surfaces`, rung 2; the
-  build run re-grounds against the landed reader, and if it refuses the id, the row becomes an
-  `[[upgrade]]` row whose `surfaces` names the same members, recorded as a deviation. widens: none ·
-  relaxes: none
+  read a refusal.
+  RESOLVED (agent, 2026-10-23, delegated): a `[[retired]]` row with the step-shaped id `playbook/seeded-template`, `successor = "none"` and the seed's members in `surfaces`, rung 2; the build run re-grounds against the landed reader, and if it refuses the id, the row becomes an `[[upgrade]]` row whose `surfaces` names the same members, recorded as a deviation. widens: none · relaxes: none
 - **FACT-QUESTION · F2 — Whether the `map_lib` deprecation fits a `[[shim]]` row.** Probe:
   TOOL-dSafePassage-6 S1 and S3, read at `ce13efbe`. Observation: a `module` row's forwarder is written
   at its `from` path and "stands in for itself in `sys.modules`", so a row whose `from` is

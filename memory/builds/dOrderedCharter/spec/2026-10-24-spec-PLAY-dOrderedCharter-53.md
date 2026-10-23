@@ -8,7 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-mark-rewrap-return.md) | research | PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-55 |
 | [2026-10-24-build-PLAY-dOrderedCharter-53-deviation-531.md](../build/2026-10-24-build-PLAY-dOrderedCharter-53-deviation-531.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-53-deviation-532.md](../build/2026-10-24-build-PLAY-dOrderedCharter-53-deviation-532.md) | deviation | — |
 
 <!-- /gen:spec-records -->
 
@@ -138,12 +140,12 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 · the playbook-
 
 - **F1 — Which binding line does a unit the spec audit promoted carry?** Options: (a) `**Derived:**`
   naming `PLAY-dClosedLoop-2`, as the tree's promoted specs do; (b) none; (c) a part of unit 26's
-  clause. (b) reds unbound and (c) splits a clause this unit does not carry. RESOLVED (agent,
-  2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+  clause. (b) reds unbound and (c) splits a clause this unit does not carry.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
 - **F2 — What grandfathers a reference.** Options: (a) the commit blame names for its line; (b) the
   file's adding commit, as unit 47 wrote; (c) write-once folders only. (b) is the finding and (c)
-  leaves specs ungraded. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none ·
-  relaxes: unit 26 S3's red, for a reference whose line a commit outside `L`'s descendants wrote
+  leaves specs ungraded.
+  RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: unit 26 S3's red, for a reference whose line a commit outside `L`'s descendants wrote
 
 ## 9. Revision log
 

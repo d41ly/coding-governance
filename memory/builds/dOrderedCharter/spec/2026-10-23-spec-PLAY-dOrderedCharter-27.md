@@ -139,9 +139,8 @@ New arm: tools/playbook/load_sets.py · covers AC1 AC3 · its selftest derives e
 
 - **F1 — How large a `k` is.** v2's `memory.code-budget` row says "KB per role per item" and does not
   define the unit. Options: (a) 1,000 bytes, as the systems record defines a KB for the sibling key
-  `memory.item-budget`; (b) 1,024. RESOLVED (agent, 2026-10-23, delegated): (a), rung 1, the design's
-  one definition of the unit for memory budgets; (b) types a second definition. widens: none ·
-  relaxes: none
+  `memory.item-budget`; (b) 1,024.
+  RESOLVED (agent, 2026-10-23, delegated): (a), rung 1, the design's one definition of the unit for memory budgets; (b) types a second definition. widens: none · relaxes: none
 - **F2 — Which roles get the slot before `memory.code-roles` is read.** Options: (a) every role, the
   key's default (NP-9, "Every role"); (b) the working roles only; (c) none until dFurnishedOrders lands.
   RESOLVED (agent, 2026-10-23, delegated): (a), rung 1, the clause says "each role's load set" and the

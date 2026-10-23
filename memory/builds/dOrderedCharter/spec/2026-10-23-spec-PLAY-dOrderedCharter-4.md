@@ -238,9 +238,8 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · `--selftest` arm
   and PLAY-dOrderedCharter-2's S3 names levels and documents only. Options: leave the preset out;
   read a preset key from `.governance/policy.toml`; print a constant naming the hand-over. No preset
   key exists until dKeptSession (`cl-dClosedLoop-0009`) and dGroundRules' reader is unbuilt at this
-  build's base. RESOLVED (agent, 2026-10-23, delegated): the constant, added to the shared function so
-  the charter and the replay agree, rung 1, v2's clause 0009 names when presets join. widens: none ·
-  relaxes: none
+  build's base.
+  RESOLVED (agent, 2026-10-23, delegated): the constant, added to the shared function so the charter and the replay agree, rung 1, v2's clause 0009 names when presets join. widens: none · relaxes: none
 
 ## 9. Revision log
 

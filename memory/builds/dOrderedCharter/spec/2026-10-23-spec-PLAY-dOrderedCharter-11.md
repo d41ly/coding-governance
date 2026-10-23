@@ -197,10 +197,8 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC5 · a fixtur
   the caller on a refusal, not on `record`. widens: none · relaxes: none
 - **F2 — Which budget mode applies before dGroundRules lands.** `budgets.enforce` does not exist yet.
   Options: (a) its catalogue default `warn` at render, the bar's existing size legs unchanged; (b)
-  `refuse` until it lands; (c) no render-time budget. RESOLVED (agent, 2026-10-23, delegated): (a),
-  rung 1, the brief's rule that an owned key reads its catalogue default until its reader lands, applied
-  to dGroundRules' key; the bar still refuses at the boundary, so nothing loosens. widens: none ·
-  relaxes: none
+  `refuse` until it lands; (c) no render-time budget.
+  RESOLVED (agent, 2026-10-23, delegated): (a), rung 1, the brief's rule that an owned key reads its catalogue default until its reader lands, applied to dGroundRules' key; the bar still refuses at the boundary, so nothing loosens. widens: none · relaxes: none
 - **F3 — Which harness limit applies per load point.** R-K gives harness limits to dWellOiledMachine's
   adapters. Options: (a) Codex's `CODEX_MAX` for the charter alone, read from
   `tools/agent-instructions/adopt-agent-instructions.sh:31`; (b) wait for the adapters. RESOLVED (agent,

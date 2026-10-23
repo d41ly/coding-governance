@@ -258,10 +258,7 @@ New arm: tools/playbook/gov_tag.py · covers AC10 · the `positional` arm inside
 - **F2** — The review producers mandate `file:line` today, so every review record after landing would red
   under `shrink-only`. Options: re-point the four producers and add the `pin` verb; the `pin` verb alone;
   exclude review records from the population.
-  RESOLVED (agent, 2026-10-23, delegated): rung 3, the most feature-rich survivor: re-point the producers
-  and add `pin` (S5, S6). Excluding records fails the clause (veto 1); `pin` alone keeps the mandate
-  that reds. grants: PLAY-dClosedLoop-3 the review protocol, the diff reviewer's role and the three review
-  prompts name the blob-pinned line where they named file:line.
+  RESOLVED (agent, 2026-10-23, delegated): rung 3, the most feature-rich survivor: re-point the producers and add `pin` (S5, S6). Excluding records fails the clause (veto 1); `pin` alone keeps the mandate that reds. grants: PLAY-dClosedLoop-3 the review protocol, the diff reviewer's role and the three review prompts name the blob-pinned line where they named file:line.
 - **F3** — Is an unresolved `path#symbol` in a frozen record red? Options: red everywhere; red in live
   text and printed in records.
   RESOLVED (agent, 2026-10-23, delegated): rung 3: printed in records (S4). Red everywhere would red the
