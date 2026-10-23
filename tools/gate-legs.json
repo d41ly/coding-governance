@@ -1772,7 +1772,9 @@
       "memory/builds/dClosedLoop/build/"
     ],
     "guard": [
-      "{prefix}/policy/"
+      "{prefix}/policy/",
+      "{prefix}/govkit/govkit.py",
+      "{prefix}/govkit/registry.toml"
     ],
     "chunk": "selftests",
     "subject": "kit",

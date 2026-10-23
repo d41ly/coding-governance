@@ -202,10 +202,14 @@ must be strict's value from `last-valid`, and an empty population reds.
 The `policy check` leg ships, so every arm in `ARMS` runs in an adopter's tree as well as in gov's.
 The table says what each one grades there. `check_policy.py --fixture adopter-fresh-target` joins its
 first column to `ARMS` both ways, so an arm added with no row reds as unlisted and a row whose arm
-left reds as stale. The same case copies this kit, and each kit its `kit.toml` `requires`, into a
-fresh `git init` at the path each holds in its own repository, runs `adopt-policy.sh --scaffold`, then
-runs `--check` before the first commit and again after it. Both runs must exit 0, and every arm must
-print a graded line with no finding or an announce line, `policy-check: <arm> · not graded · <why>`.
+left reds as stale. The same case installs this kit the way an adopter gets it: a fresh `git init`
+with a `.governance/deploy.toml`, committed once, then `govkit.py apply` with this kit and the closure
+of its `kit.toml` `requires`. A refused `apply`, or a `govkit.py` absent from the tool root, reds the
+case. Every file under the target's tool root must be a path the receipt records, and every engine or
+seed row of the receipt must be present. The case then runs the installed adopter,
+`adopt-policy.sh --scaffold`, and `--check` with the install staged and again once it is committed.
+Both runs must exit 0, and every arm must print a graded line with no finding or an announce line,
+`policy-check: <arm> · not graded · <why>`.
 
 | Arm | In an adopter it grades | When its subject is absent |
 |---|---|---|

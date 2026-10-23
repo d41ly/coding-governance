@@ -61,3 +61,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-23T22:20:54Z brief · item TOOL-dGroundRules-4 · reason 5a28547bec02 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-4-build-brief.md
 
 2026-10-23T22:27:14Z dispatch · item a5e02684 TOOL-dGroundRules-4 · reason tools/policy/policy.py tools/policy/check_policy.py tools/gate-legs.json tools/policy/README.md .lexicon.conf help/policy.md memory/map/features/policy.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-4.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-4-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/LIVE.md memory/guides/SESSION-KICKOFF.md
+
+2026-10-23T22:33:41Z dispatch · item d939a396 TOOL-dGroundRules-24 · reason tools/policy/check_policy.py tools/gate-legs.json tools/policy/README.md memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-24.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-24-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/LIVE.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-10-23T22:33:46Z brief · item TOOL-dGroundRules-24 · reason 80aaaba57eb5 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-24-build-brief.md

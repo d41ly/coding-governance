@@ -23,9 +23,11 @@ real shipped row where one serves. WHAT IT DOES NOT CHECK: that the shipped cata
 v2's, which is the build's acceptance probe, not an arm.
 
 `adopter-fresh-target` is an outcome case, no plant (TOOL-dGroundRules-16): this kit installed into a
-fresh `git init` by a copy, `--scaffold`, then `--check` before and after the first commit, where every
-arm must grade clean or announce; and the README's "Each arm in an adopter" table joined to ARMS both
-ways. Green on a correct build; its RED is an arm that finds a problem in an adopter's tree.
+fresh `git init` by the deployer, `govkit.py apply` with the closure of its `requires`, the tool root
+compared with the receipt both ways (TOOL-dGroundRules-24), `--scaffold`, then `--check` with the
+install staged and again once it is committed, where every arm must grade clean or announce; and the
+README's "Each arm in an adopter" table joined to ARMS both ways. Green on a correct build; its RED is
+a refused `apply`, a stray or missing receipt path, or an arm that finds a problem in an adopter's tree.
 
 `reader-landed` and `reader-parsed` are outcome cases too (TOOL-dGroundRules-2): each builds its own
 repositories, runs `policy.py get` in them and prints one line per observation. `reader-landed`
@@ -51,6 +53,7 @@ which is never a pass.
 
 Later units add arms to ARMS and cases to CASES.
 """
+import json
 import os
 import re
 import shutil
@@ -335,60 +338,103 @@ def check_arm_lines(out, names):
 
 
 def run_fresh_target(name):
-    """This kit and each kit its kit.toml `requires` copied into a fresh `git init` at their own paths,
-    as an install places them; `--scaffold`, then `--check` before the first commit and after it, each
-    exiting 0 with every arm graded clean or announced; and the README's table joined to ARMS both
-    ways. Prints its lines. -> (assertions, wrong)."""
+    """This kit installed by the deployer into a fresh target: `git init` with a pinned autocrlf, a
+    one-line README and a `.governance/deploy.toml`, committed once, then `govkit.py apply` with this
+    kit's id and the closure of its kit.toml `requires` (TOOL-dGroundRules-24). Every file under the
+    target's tool root must be a receipt row's `path`, and every engine or seed row's `path` must
+    exist. Then the installed `adopt-policy.sh`, found through its receipt row: `--scaffold`, and
+    `--check` with the install staged and again once it is committed, each exiting 0 with every arm
+    graded clean or announced; and the README's table joined to ARMS both ways. A missing `govkit.py`
+    or a refused `apply` is a WRONG, and nothing after it runs. Prints its lines. -> (assertions, wrong)."""
     names = [a.__name__ for a in ARMS]
     listed = extract_arm_rows((KIT / "README.md").read_text(encoding="utf-8"))
     wrong = [f"{n} is in ARMS with no row in README.md \"{ADOPTER_SECTION}\" (unlisted)" for n in names if n not in listed]
     wrong += [f"README.md \"{ADOPTER_SECTION}\" lists {n}, which ARMS lacks (stale)" for n in listed if n not in names]
-    asserted = len(set(names) | set(listed)) + 1
+    asserted = len(set(names) | set(listed)) + 2
     bash = resolve_bash()
+    desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
+    ids, todo = [desc["id"]], list(desc.get("requires", []))
+    # ponytail: `requires` names kit ids and is read as each kit's home, which they equal for every
+    # kit gov homes under its own id; a kit homed elsewhere is a WRONG naming it, never a skip.
+    while todo:
+        home = todo.pop(0)
+        if home in ids:
+            continue
+        ids.append(home)
+        try:
+            todo += tomllib.loads((resolve_kit_dir(home, "kit.toml", KIT) / "kit.toml").read_text(encoding="utf-8")).get("requires", [])
+        except LookupError as exc:
+            wrong.append(f"kit.toml requires {home}, which this tree does not resolve: {exc}")
+    root = KIT.parent  # this kit's own resolved tool root; the target's prefix is its name, never spelled
+    govkit = root / "govkit" / "govkit.py"
+    rows = None
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     try:
-        run_fixture_git(t, "init", "-q")
-        kits = [KIT]
-        # ponytail: `requires` names kit ids and is read as each kit's home, which they equal for every
-        # kit gov homes under its own id; a kit homed elsewhere is a WRONG naming it, never a skip.
-        for home in tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8")).get("requires", []):
-            try:
-                kits.append(resolve_kit_dir(home, "kit.toml", KIT))
-            except LookupError as exc:
-                wrong.append(f"kit.toml requires {home}, which this tree does not resolve: {exc}")
-        rels = {d: (policy.run_git(d, "rev-parse", "--show-prefix") or "").strip() for d in kits}  # derived, never spelled
-        for d, rel in rels.items():
-            shutil.copytree(d, t / rel, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__"))
-        adopter = (t / rels[KIT] / "adopt-policy.sh").as_posix()
-        if bash is None:
-            wrong.append("no bash on PATH shares this filesystem: each was a System32 or WindowsApps launcher, "
-                         "or none ran; set GOV_BASH")
+        if not govkit.is_file():
+            wrong.append(f"no deployer to install with: looked for govkit.py at {govkit.as_posix()}, under this kit's tool root")
         else:
-            def run_adopter(mode):
-                p = subprocess.run([bash, adopter, mode, "--target", t.as_posix()],
-                                   capture_output=True, text=True, encoding="utf-8", errors="replace")
-                return p.returncode, p.stdout + p.stderr
-            rc, out = run_adopter("--scaffold")
-            if rc:
-                wrong.append(f"--scaffold exited {rc}: {out.strip()}")
-            for phase in ("before the first commit", "after the first commit"):
-                if phase.startswith("after"):
-                    (t / "README.md").write_text("A fresh adopter of the policy kit.\n", encoding="utf-8", newline="\n")
-                    run_fixture_git(t, "add", "-A")
-                    run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
-                rc, out = run_adopter("--check")
-                bad = check_arm_lines(out, names)
-                asserted += len(names) + 1
-                wrong += [f"{phase}: {b}" for b in bad]
+            run_fixture_git(t, "init", "-q")
+            run_fixture_git(t, "config", "core.autocrlf", "false")
+            (t / "README.md").write_text("A fresh adopter of the policy kit.\n", encoding="utf-8", newline="\n")
+            Path(t, POLICY_FILE[0]).mkdir()
+            Path(t, POLICY_FILE[0], "deploy.toml").write_text(
+                f'gov_source = "local"\nprefix = {json.dumps(root.name)}\nkits = {json.dumps(ids)}\n', encoding="utf-8", newline="\n")
+            run_fixture_git(t, "add", "-A")
+            run_fixture_git(t, "commit", "-q", "-m", "a fresh target")
+            p = subprocess.run([sys.executable, str(govkit), "apply", "--target", t.as_posix(), "--kits", ",".join(ids)],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace",
+                               env=dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1"))
+            if p.returncode:
+                wrong.append(f"govkit.py apply --kits {','.join(ids)} exited {p.returncode}, so nothing was installed "
+                             f"to grade: {(p.stdout + p.stderr).strip()}")
+            else:
+                rows = [r for r in json.loads(Path(t, POLICY_FILE[0], "install.json").read_text(encoding="utf-8")).get("files") or []
+                        if isinstance(r, dict)]
+        if rows is not None:
+            paths = {r.get("path") for r in rows}
+            held = sorted(f.relative_to(t).as_posix() for f in (t / root.name).rglob("*") if f.is_file())
+            owed = [r["path"] for r in rows if r.get("role") in ("engine", "seed")]
+            stray = [f"{f} is under the tool root and is no receipt row's path (stray)" for f in held if f not in paths]
+            stray += [f"{f} is an engine or seed row of the receipt and is absent from the target (missing)"
+                      for f in owed if not Path(t, f).is_file()]
+            asserted += len(held) + len(owed)
+            wrong += stray
+            if not stray:
+                print(f"policy-fixture: {name} · apply --kits {','.join(ids)} exited 0 into its target · the "
+                      f"{len(held)} file(s) under {root.name}/ are each a receipt row's path, and its {len(owed)} "
+                      f"engine or seed row(s) are each present · no stray or missing receipt path")
+            adopter = next((r["path"] for r in rows if r.get("kit") == desc["id"]
+                            and str(r.get("path")).endswith("/adopt-policy.sh")), None)
+            if adopter is None:
+                wrong.append(f"the receipt has no row of kit {desc['id']} whose path ends in adopt-policy.sh")
+            elif bash is None:
+                wrong.append("no bash on PATH shares this filesystem: each was a System32 or WindowsApps launcher, "
+                             "or none ran; set GOV_BASH")
+            else:
+                def run_adopter(mode):
+                    p = subprocess.run([bash, (t / adopter).as_posix(), mode, "--target", t.as_posix()],
+                                       capture_output=True, text=True, encoding="utf-8", errors="replace")
+                    return p.returncode, p.stdout + p.stderr
+                rc, out = run_adopter("--scaffold")
                 if rc:
-                    wrong.append(f"{phase}: --check exited {rc}" + ("" if bad else f": {out.strip()}"))
+                    wrong.append(f"--scaffold exited {rc}: {out.strip()}")
+                for phase in ("with the install staged", "once the install is committed"):
+                    if phase.startswith("once"):
+                        run_fixture_git(t, "add", "-A")
+                        run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
+                    rc, out = run_adopter("--check")
+                    bad = check_arm_lines(out, names)
+                    asserted += len(names) + 1
+                    wrong += [f"{phase}: {b}" for b in bad]
+                    if rc:
+                        wrong.append(f"{phase}: --check exited {rc}" + ("" if bad else f": {out.strip()}"))
     finally:
         remove_repo(t)
     for w in wrong:
         print(f"policy-fixture: {name} · WRONG: {w}")
     if not wrong:
-        print(f"policy-fixture: {name} · every arm graded clean or announced, before and after the first "
-              f"commit · the README table names exactly the {len(names)} arm(s) of ARMS")
+        print(f"policy-fixture: {name} · every arm graded clean or announced, with the install staged and "
+              f"once it is committed · the README table names exactly the {len(names)} arm(s) of ARMS")
     return asserted, len(wrong)
 
 
