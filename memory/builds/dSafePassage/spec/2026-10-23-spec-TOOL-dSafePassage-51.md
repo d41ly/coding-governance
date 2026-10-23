@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-51 — the step module's 15 audit minors from units 47 to 50: build order in commit order, the walk's checks in one sequence, the guard's keys, one section probe
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

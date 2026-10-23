@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0030@274077d4 whole
 **Carries:** node:policy-key.help.enforce

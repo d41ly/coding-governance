@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-47 — the submodule walk lists a repository by git's own directory shape, and refuses one whose config git cannot read
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

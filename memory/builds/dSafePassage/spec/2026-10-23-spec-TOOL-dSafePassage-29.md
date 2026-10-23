@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-29 — the step contract's refused keys are the class git's own config list derives, held to it by an arm
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

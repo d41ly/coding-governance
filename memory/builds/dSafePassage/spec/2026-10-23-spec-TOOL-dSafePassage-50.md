@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-50 — the spec audit of units 43 to 46, its five minors on TOOL-46: the lander arm placed after the scan it reads, its locator cited by content, and one owner for the cutoff paragraph
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

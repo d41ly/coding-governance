@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-17 — a down is judged by its row's declared `reverted` rule, and a down with no before-image by its exit
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

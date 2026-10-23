@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0028@032ca791 whole
 **Carries:** node:policy-key.platforms.provision

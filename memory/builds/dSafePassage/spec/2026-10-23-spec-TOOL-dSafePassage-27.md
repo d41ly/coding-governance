@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-27 — the prepared landing's one untracked snapshot, taken before the walk, serves the regeneration's refusal too
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

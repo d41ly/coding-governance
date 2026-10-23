@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · TOOL-dSafePassage-14 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dSafePassage-14 · until TOOL-dSafePassage-1 · filed 2026-10-21; the build run, which builds TOOL-dSafePassage-1 first; the spec run specced and deferred every roster unit, each header advancing this ask, and the build run builds them (README rule 1)

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-58 — the spec audit of units 51 and 52, its ten minors on TOOL-52: the arm probe staged, the placement anchored on the block's `fi`, the abort's real exit, and the render's four outputs
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

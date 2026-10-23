@@ -479,7 +479,7 @@ Cite ids, never line numbers.
 | [TOOL-dRetiredFork-38](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
 | [TOOL-dRetiredFork-39](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
 | [TOOL-dRetiredFork-40](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | NINE LEG CEILINGS ARE AUTHORED IN MILLISECONDS AGAINST A FIELD THE… |
-| [TOOL-dSafePassage-14](../builds/dSafePassage/BACKLOG.md) | SPECCED | MED | TOOL-dSafePassage-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dSafePassage-14](../builds/dSafePassage/BACKLOG.md) | DEFERRED | MED | TOOL-dSafePassage-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dScaffoldedMirror-4](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-24 | PHASE 0, and a hard prerequisite for -9. Waiver hardening: re-key all… |
 | [TOOL-dScaffoldedMirror-9](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 4, blocked on -4 and -11. The grandfather set with a provenance… |
 | [TOOL-dScaffoldedMirror-11](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 3, blocked on a kit-owned ^visit_[A-Z]/generic_visit exemption… |

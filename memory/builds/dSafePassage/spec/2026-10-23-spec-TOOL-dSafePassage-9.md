@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0026@97d3c99b whole
 **Carries:** node:policy-key.install.retired-edits

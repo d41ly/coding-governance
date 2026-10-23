@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-23 — the resolver keeps an override's own name, and prefers the direct executable only for the launcher names
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

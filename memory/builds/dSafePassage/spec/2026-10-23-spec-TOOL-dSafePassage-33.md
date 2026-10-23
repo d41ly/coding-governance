@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-33 — a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

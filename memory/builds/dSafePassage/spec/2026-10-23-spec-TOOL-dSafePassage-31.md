@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-31 — the write lock records its holder's pid namespace, and a holder from another namespace reads unknown
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

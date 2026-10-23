@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-20 — the reader's `unlanded` is recorded as `null` at the step record's one writer
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

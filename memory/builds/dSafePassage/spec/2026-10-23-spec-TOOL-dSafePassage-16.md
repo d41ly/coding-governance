@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-16 — the step record's precondition, one predicate beside its one writer, and the schema-4 bootstrap it answers
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

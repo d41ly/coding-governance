@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-55 — the roster hand-out refuses on TOOL-49 AC2's whole order predicate, written once as one probe
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-15 — the walk persists no step row below schema 4, so a schema-3 receipt reaches the schema step
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

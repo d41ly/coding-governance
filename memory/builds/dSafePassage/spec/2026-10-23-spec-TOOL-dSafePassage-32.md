@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-32 — the reuse estimate compares like clocks: a POSIX census row is judged on the kernel's boot clock, never the wall clock
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

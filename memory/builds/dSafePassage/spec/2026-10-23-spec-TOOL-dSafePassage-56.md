@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-56 — the walk tests for a link on every path it enters, the root and each `modules/` it recurses into, before listing it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

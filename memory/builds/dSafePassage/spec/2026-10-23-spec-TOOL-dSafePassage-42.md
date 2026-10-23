@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

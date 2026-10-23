@@ -134,3 +134,119 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T05:03:40Z rescope · item add TOOL-dSafePassage-58 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): the MEDIUM and LOW batch of TOOL-dSafePassage-52, finding ids 9 14 27 15 28 (MEDIUM) and 10 11 20 26 21 (LOW)
 
 2026-10-23T05:03:40Z rescope · item add TOOL-dSafePassage-59 · reason spec audit of units 51 and 52, round 1 (2026-10-23-review-TOOL-dSafePassage-51-52-spec-audit-round1.md): the MEDIUM and LOW batch of TOOL-dSafePassage-51, finding ids 2 12 18 23 24 (MEDIUM) and 4 17 5 13 16 19 29 (LOW)
+
+2026-10-23T05:25:04Z rescope · item defer TOOL-dSafePassage-1 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:05Z rescope · item defer TOOL-dSafePassage-10 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:06Z rescope · item defer TOOL-dSafePassage-11 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:07Z rescope · item defer TOOL-dSafePassage-12 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:07Z rescope · item defer TOOL-dSafePassage-13 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:08Z rescope · item defer TOOL-dSafePassage-15 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:09Z rescope · item defer TOOL-dSafePassage-16 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:09Z rescope · item defer TOOL-dSafePassage-17 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:10Z rescope · item defer TOOL-dSafePassage-18 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:11Z rescope · item defer TOOL-dSafePassage-19 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:11Z rescope · item defer TOOL-dSafePassage-2 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:12Z rescope · item defer TOOL-dSafePassage-20 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:13Z rescope · item defer TOOL-dSafePassage-21 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:13Z rescope · item defer TOOL-dSafePassage-22 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:14Z rescope · item defer TOOL-dSafePassage-23 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:15Z rescope · item defer TOOL-dSafePassage-24 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:15Z rescope · item defer TOOL-dSafePassage-25 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:16Z rescope · item defer TOOL-dSafePassage-26 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:17Z rescope · item defer TOOL-dSafePassage-27 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:18Z rescope · item defer TOOL-dSafePassage-28 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:18Z rescope · item defer TOOL-dSafePassage-29 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:19Z rescope · item defer TOOL-dSafePassage-3 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:20Z rescope · item defer TOOL-dSafePassage-30 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:20Z rescope · item defer TOOL-dSafePassage-31 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:21Z rescope · item defer TOOL-dSafePassage-32 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:22Z rescope · item defer TOOL-dSafePassage-33 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:23Z rescope · item defer TOOL-dSafePassage-34 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:23Z rescope · item defer TOOL-dSafePassage-35 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:24Z rescope · item defer TOOL-dSafePassage-36 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:25Z rescope · item defer TOOL-dSafePassage-37 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:25Z rescope · item defer TOOL-dSafePassage-38 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:26Z rescope · item defer TOOL-dSafePassage-39 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:27Z rescope · item defer TOOL-dSafePassage-4 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:28Z rescope · item defer TOOL-dSafePassage-40 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:28Z rescope · item defer TOOL-dSafePassage-41 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:29Z rescope · item defer TOOL-dSafePassage-42 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:30Z rescope · item defer TOOL-dSafePassage-43 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:30Z rescope · item defer TOOL-dSafePassage-44 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:31Z rescope · item defer TOOL-dSafePassage-45 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:32Z rescope · item defer TOOL-dSafePassage-46 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:32Z rescope · item defer TOOL-dSafePassage-47 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:33Z rescope · item defer TOOL-dSafePassage-48 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:34Z rescope · item defer TOOL-dSafePassage-49 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:34Z rescope · item defer TOOL-dSafePassage-5 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:35Z rescope · item defer TOOL-dSafePassage-50 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:36Z rescope · item defer TOOL-dSafePassage-51 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:37Z rescope · item defer TOOL-dSafePassage-52 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:37Z rescope · item defer TOOL-dSafePassage-53 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:38Z rescope · item defer TOOL-dSafePassage-54 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:39Z rescope · item defer TOOL-dSafePassage-55 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:39Z rescope · item defer TOOL-dSafePassage-56 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:40Z rescope · item defer TOOL-dSafePassage-57 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:41Z rescope · item defer TOOL-dSafePassage-58 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:41Z rescope · item defer TOOL-dSafePassage-59 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:42Z rescope · item defer TOOL-dSafePassage-6 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:43Z rescope · item defer TOOL-dSafePassage-7 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:43Z rescope · item defer TOOL-dSafePassage-8 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T05:25:44Z rescope · item defer TOOL-dSafePassage-9 · reason specced; built by this build's build run (README rule 1)

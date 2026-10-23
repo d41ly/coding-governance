@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-40 — the forward walk marks a row `via: witness` only when nothing records that its up ever ran
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

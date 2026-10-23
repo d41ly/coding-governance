@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-48 — the step contract refuses `sendemail.sendmailCmd` and every send-email executor key in its identity form
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

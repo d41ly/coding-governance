@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-53 — the walk's listing handler: an absent directory is the empty population, and only an existing one that cannot be listed is refused
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

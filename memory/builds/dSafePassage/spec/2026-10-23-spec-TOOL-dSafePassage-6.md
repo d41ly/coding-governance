@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0023@6e1e2e99 whole
 **Carries:** node:policy-key.install.deprecation-window

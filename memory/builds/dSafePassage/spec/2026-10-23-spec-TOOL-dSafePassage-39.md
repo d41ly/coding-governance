@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

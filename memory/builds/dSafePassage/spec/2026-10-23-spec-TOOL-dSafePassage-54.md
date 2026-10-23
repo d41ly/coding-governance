@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-54 — the walk's sound baseline: a plain submodule git built and gov's own tree, each walked to exit 0 with no refusal
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

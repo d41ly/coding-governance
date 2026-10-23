@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0027@46290183 whole
 

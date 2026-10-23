@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-37 — the refused-key predicate keeps every key named as a hook, and the step environment closes the `ext::` transport by one command-scope pair
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

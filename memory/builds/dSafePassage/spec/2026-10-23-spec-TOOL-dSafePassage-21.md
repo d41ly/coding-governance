@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-21 — the step gate's `file` class reads gov's planned destinations when no source receipt is on the tree
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

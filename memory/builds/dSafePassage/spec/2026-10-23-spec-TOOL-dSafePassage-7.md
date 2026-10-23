@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field
 
-**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0024@7817c7d0 whole
 

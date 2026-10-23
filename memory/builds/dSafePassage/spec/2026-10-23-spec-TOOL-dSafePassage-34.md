@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-34 — the `ac-order` join ships under a dated cutoff, over a population measured at HEAD with every current hit disposed
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-44 — the credential predicate keeps an ssh-scheme URL's bare user, so an `ssh://git@host` remote is never refused, and holds itself to the repo's redaction negatives
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

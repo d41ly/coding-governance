@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-41 — the `ac-order` join lands in the pass that arms it, so no commit carries the join without its cutoff key
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 whole
 

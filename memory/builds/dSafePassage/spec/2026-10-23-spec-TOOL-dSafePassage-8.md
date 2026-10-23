@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0025@4e486ab9 whole
 

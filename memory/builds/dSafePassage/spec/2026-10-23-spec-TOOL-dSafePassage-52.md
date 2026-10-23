@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-52 — the spec audit of units 47 to 50, its seven minors on TOOL-50: a misplaced arm that aborts the suite, one scan line, the arm's place read by content, the template repaired through its render, and the readings that cite them
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

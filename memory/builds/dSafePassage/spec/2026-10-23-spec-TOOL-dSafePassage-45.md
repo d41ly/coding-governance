@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-45 — the spec audit of units 36 to 42, the step contract's 21 minors: a derived pair count, a credential class over keys and values, a walk by git's own test, declared exits, and the readings that cite them
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

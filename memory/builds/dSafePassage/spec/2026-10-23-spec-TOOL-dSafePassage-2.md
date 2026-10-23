@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left
 
-**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0019@6e0cd313 whole
 

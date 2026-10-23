@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-57 — TOOL-52 AC1 reads the arm: its guard taken from the suite by content, evaluated after the scan and alone under `set -u`
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

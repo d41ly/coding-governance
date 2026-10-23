@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-46 — the spec audit of units 36 to 42, its three minors off the step module: the drift pin raised in the pass that arms its key, a lander arm that finds its sibling kit, and the `ac-order` key documented
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

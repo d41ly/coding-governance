@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 

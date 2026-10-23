@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal
 
-**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0021@ad0db541 whole
 

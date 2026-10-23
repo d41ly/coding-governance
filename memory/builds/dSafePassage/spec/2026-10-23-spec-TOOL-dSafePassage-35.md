@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-35 — the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
