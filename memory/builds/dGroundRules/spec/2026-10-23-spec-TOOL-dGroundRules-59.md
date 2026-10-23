@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dGroundRules-59-deviation-47.md](../build/2026-10-23-build-TOOL-dGroundRules-59-deviation-47.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-58-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-task.md) | research | TOOL-dGroundRules-58 TOOL-dGroundRules-60 TOOL-dGroundRules-64 |
+| [2026-10-23-prompt-TOOL-dGroundRules-59-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-59-build-brief.md) | journal | — |
 
 <!-- /gen:spec-records -->
 
