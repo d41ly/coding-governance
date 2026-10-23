@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-15 — the `.agent-cap.conf` lowering in one home: inside `resolve_read`, so every reader of the limit sees it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-15-deviation-3.md](../build/2026-10-23-build-TOOL-dGroundRules-15-deviation-3.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ the lowering to one place every reader passes through: the end of `resolve_read`
 - **consumes-from** `TOOL-dGroundRules-10` — `read_legacy_fanout`, its reason text and refusal, the settings render and the `limit-` case fixture, which this unit re-homes and extends
 - **consumes-from** `TOOL-dGroundRules-5` — `resolve_read` and its per-revision read, the one composition the mirror renders through
 - **hands-off** `TOOL-dGroundRules-21` — the conf as a resolution input whose blob the mirror records and the helper compares (finding id 49)
+- **hands-off** `TOOL-dGroundRules-25` — `derive_lowered_limit`, which that unit's map regeneration records (finding 34)
 
 ## 4. Design
 
@@ -172,6 +174,8 @@ New arm: tools/policy/check_policy.py (`--fixture limit-conf-mirror limit-conf-l
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 2 (HIGH, item H1) of the round-1 spec
   audit, from the review's sound fix and specs 3, 5 and 10 read at their audited revisions.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
+  promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

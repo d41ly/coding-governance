@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-18 — a writer split bounded by the agent limit: rule 2 judges `gov:fixed-writers` against `runtime.agents-in-flight` and verifiers against `MAX_VERIFIERS`
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-18-deviation-6.md](../build/2026-10-23-build-TOOL-dGroundRules-18-deviation-6.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,7 @@ while a verifier split stays bounded by `MAX_VERIFIERS`.
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-10` — rule 2 with `boundedK` against `MAX_VERIFIERS`, rule 7's `readPolicy` read beside the hooks kit, the `{{FANOUT_CAP}}` render through the policy reader, and the `limit-` case fixture
+- **hands-off** `TOOL-dGroundRules-25` — the writer receiver in the review protocol, the hooks README's bounds, the map card and the workflows render's version floor (findings 27, 8, 14, 35, 44)
 
 ## 4. Design
 
@@ -180,6 +182,8 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 AC3 · a writer split above
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 13 (HIGH, item H3) of the round-1 spec
   audit, from the review's option (a) and `tools/hooks/agent-cap.js` and the template read at base
   `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
+  promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

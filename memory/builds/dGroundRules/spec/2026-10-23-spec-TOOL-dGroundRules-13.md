@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-13 — the mirror's bytes name no commit: each reason's revision phrase rendered as a placeholder the helper fills
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-13-deviation-1.md](../build/2026-10-23-build-TOOL-dGroundRules-13-deviation-1.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,7 @@ revision it read.
 - **consumes-from** `TOOL-dGroundRules-5` — `render_mirror`, `resolve_read` and its per-revision read, `readPolicy`, `mirror --check` and `CASES`; without them there is no render to normalise
 - **hands-off** `TOOL-dGroundRules-14` — the render invariant, which that unit's landing replay asserts green on the prepared merge
 - **hands-off** `TOOL-dGroundRules-19` — a render at HEAD whose bytes stay fresh at the commit that carries them, which the guard's mirror admission compares against
+- **hands-off** `TOOL-dGroundRules-25` — `mirror-commit-rewrite` and each reason builder's `rev_phrase`, which that unit runs once per reason kind (finding 39)
 
 ## 4. Design
 
@@ -197,6 +199,8 @@ New arm: tools/policy/check_policy.py (`--fixture mirror-commit-rewrite`) · cov
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 1 (BLOCKER, item B1) of the round-1 spec
   audit, from the review's sound fix and `tools/push-main.sh` read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
+  promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

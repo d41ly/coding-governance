@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-17 — the legacy-home list withheld from installs and the cap census graded by what ships, so neither arm reds an adopter
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-17-deviation-5.md](../build/2026-10-23-build-TOOL-dGroundRules-17-deviation-5.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +70,9 @@ grades each census row by whether its enforcer ships.
 - **consumes-from** `TOOL-dGroundRules-7` — `tools/policy/legacy-homes.txt`, the `legacy-homes` arm and the `lists --write` half that writes it
 - **consumes-from** `TOOL-dGroundRules-9` — `tools/policy/caps.toml`, `read_cap_census` and `arm_cap_census`
 - **consumes-from** `TOOL-dGroundRules-16` — `adopter-fresh-target`, the case that reds both arms in a fresh target until this unit lands
+- **hands-off** `TOOL-dGroundRules-22` — `ships`, `arm_cap_census` and its announce lines, which that unit grades by each row's `installed` destination and the install receipt (finding 10)
+- **hands-off** `TOOL-dGroundRules-23` — `budgets-ships-join`, which that unit extends to each row's `installed` and `kit` (finding 38)
+- **hands-off** `TOOL-dGroundRules-25` — the withheld list's plan row, its announce line, the adopter-tree announce, the real-install census case and the derived source paths (findings 3, 11, 37, 4, 33)
 
 ## 4. Design
 
@@ -188,6 +192,9 @@ New arm: tools/policy/check_policy.py (`--fixture legacy-homes-present budgets-s
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 37 (HIGH, item H2) of the round-1 spec
   audit, from the skeptic's corrected fix and the registry and runlog descriptor read at base
   `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-22`, `TOOL-dGroundRules-23`,
+  `TOOL-dGroundRules-25`, the reciprocal of each promotion of the round-1 spec audit of units 13 to
+  21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-21 — the round-1 spec audit's minors: forty-one findings closed in the code units 1 to 10 leave, one scope item each
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-21-deviation-9.md](../build/2026-10-23-build-TOOL-dGroundRules-21-deviation-9.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 |
 
 <!-- /gen:spec-records -->
 
@@ -261,6 +262,7 @@ fix. Where the review offered options, §8 records the pick.
 - **consumes-from** `TOOL-dGroundRules-10` — the settings render, rule 7, the retired readers and the version bump, which S32 to S40 amend
 - **consumes-from** `TOOL-dGroundRules-15` — the lowering inside `resolve_read`, whose input S17 records in the mirror
 - **consumes-from** `TOOL-dGroundRules-16` — `adopter-fresh-target`, which S5 and S15 turn green
+- **hands-off** `TOOL-dGroundRules-25` — `empty` on `ARMS`, `adopter-suite`, the decode path, `on-invalid-shallow`, the settings render, the parity re-point, the no-launcher branch and `adopt-policy.sh --scaffold`, which that unit amends (findings 5, 6, 21, 32, 43, 16, 40, 22, 28, 29, 35, 23, 9)
 
 ## 4. Design
 
@@ -644,6 +646,8 @@ New arm: tools/workflows/check-review-join.test.sh · covers AC33 · the D7 arm 
 - rev-1 · 2026-10-23 · initial draft, promoting the forty-one MEDIUM and LOW findings of the round-1
   spec audit in one batch, from the review's sound fixes and the corrected fix for id 11, with each
   cited line read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
+  promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

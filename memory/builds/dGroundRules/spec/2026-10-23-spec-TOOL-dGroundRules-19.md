@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-19 — the guard admits a regenerated mirror equal to its render, so an agent branch that edits the catalogue reaches a green bar
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-19-deviation-7.md](../build/2026-10-23-build-TOOL-dGroundRules-19-deviation-7.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,7 @@ render reads is staged beside it.
 - **consumes-from** `TOOL-dGroundRules-6` — `guard.py --staged`, its verdict order, its refusal and remedy lines, the hook block and the `guard-` cases, which this unit extends
 - **consumes-from** `TOOL-dGroundRules-5` — `render_mirror`, the `mirror` verb that gains `--print`, and `mirror --check`
 - **consumes-from** `TOOL-dGroundRules-13` — a render whose bytes do not name the commit that carries them; without it the admitted mirror is stale at its own commit
+- **hands-off** `TOOL-dGroundRules-25` — the guard's mirror shape and `mirror --print`, whose recorded input set and byte write that unit pins (findings 7, 25, 42, 24)
 
 ## 4. Design
 
@@ -181,6 +183,8 @@ New arm: tools/policy/check_policy.py (`--fixture guard-mirror-render guard-mirr
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 32 (HIGH, item H4) of the round-1 spec
   audit, from the review's option (a) and specs 5 and 6 read at their audited revisions.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
+  promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

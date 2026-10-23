@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-14 — the landing replay: the mirror a prepared merge carries is fresh at that merge
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-14-deviation-2.md](../build/2026-10-23-build-TOOL-dGroundRules-14-deviation-2.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ the review asked for, so the class cannot return through a later reason, field o
 
 - **consumes-from** `TOOL-dGroundRules-5` — `mirror --write` and `--check`, `arm_mirror_parity`, `readPolicy` with its CLI, and the fixture's bare remote, which the replay drives
 - **consumes-from** `TOOL-dGroundRules-13` — the render invariant this replay asserts green; without it the case is red on a correct replay
+- **hands-off** `TOOL-dGroundRules-25` — the lander observation and `mirror-landed-merge`, which that unit moves into the lander's own suite with `--slug` and the success line asserted (findings 18, 12, 30)
 
 ## 4. Design
 
@@ -161,6 +163,8 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 31 (BLOCKER, item B1) of the round-1
   spec audit, from the review's left-shift gate and `tools/push-main.sh` read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
+  promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

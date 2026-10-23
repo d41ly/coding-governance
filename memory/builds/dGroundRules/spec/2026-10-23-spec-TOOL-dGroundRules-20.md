@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-20 — the `policy fixtures` guard covers the sibling files its cases run, and a join keeps the census's enforcers inside it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-20-deviation-8.md](../build/2026-10-23-build-TOOL-dGroundRules-20-deviation-8.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,7 @@ when a census enforcer falls outside it.
 - **consumes-from** `TOOL-dGroundRules-8` — the reader-coverage cases, which read the memory-tree kit's `tree_lib.py`
 - **consumes-from** `TOOL-dGroundRules-9` — `tools/policy/caps.toml`, whose enforcers the `budgets-cap-` cases run
 - **consumes-from** `TOOL-dGroundRules-10` — the `limit-hook-` cases, which run `tools/hooks/agent-cap.js`
+- **hands-off** `TOOL-dGroundRules-25` — the `policy fixtures` guard and `fixtures-guard-census`, which that unit extends to the manifest, the enforcers' imports and the checker's own trip rule (findings 20, 41, 19, 33)
 
 ## 4. Design
 
@@ -146,6 +148,8 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 35 (HIGH, item H5) of the round-1 spec
   audit, from the review's sound fix and `tools/gate-legs.json` measured at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
+  promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 
 ## 10. Reuse audit
 

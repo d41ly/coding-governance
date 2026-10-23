@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-16 — the adopter's fresh target as a standing case: every arm of the shipped `policy check` leg green on install day
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-16-deviation-4.md](../build/2026-10-23-build-TOOL-dGroundRules-16-deviation-4.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,8 @@ promotion and by ids 47 and 51 in `TOOL-dGroundRules-21`.
 - **consumes-from** `TOOL-dGroundRules-1` — `adopt-policy.sh` with `--scaffold` and `--check`, `ARMS`, `CASES` and the `--fixture` mode the case runs in
 - **hands-off** `TOOL-dGroundRules-17` — the legacy-home and cap-census arms, which this case reds in a fresh target until that unit scopes them
 - **hands-off** `TOOL-dGroundRules-21` — the mirror-parity arm, `arm_on_invalid` over an unresolved HEAD and the empty-population rule (findings 47 and 51), which this case reds until that unit lands
+- **hands-off** `TOOL-dGroundRules-24` — `adopter-fresh-target`, which that unit builds with `govkit.py apply` in place of the directory copy (finding 17)
+- **hands-off** `TOOL-dGroundRules-25` — the fresh target's legacy-home, `requires`, preflight and table-column assertions (findings 36, 15, 23, 9)
 
 ## 4. Design
 
@@ -183,6 +186,9 @@ New arm: tools/policy/check_policy.py (`--fixture adopter-fresh-target`) · cove
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 4 (HIGH, item H2) of the round-1 spec
   audit, from the review's left-shift gate and specs 1, 5, 7 and 9 read at their audited revisions.
+- rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-24`, `TOOL-dGroundRules-25`,
+  the reciprocal of each promotion of the round-1 spec audit of units 13 to 21 that repairs this
+  unit; no scope moved.
 
 ## 10. Reuse audit
 
