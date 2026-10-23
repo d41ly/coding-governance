@@ -137,7 +137,7 @@ ids TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGrou
 | [TOOL-dGroundRules-11 — every loop bound and deadline key declares that raising it is a loosening](spec/2026-10-23-spec-TOOL-dGroundRules-11.md) | 1 | 2 | CLOSED | rev-1 | 2026-10-23 |
 | [TOOL-dGroundRules-16 — the adopter's fresh target as a standing case: every arm of the shipped `policy check` leg green on install day](spec/2026-10-23-spec-TOOL-dGroundRules-16.md) | 2 | 2 | CLOSED | rev-2 | 2026-10-23 |
 | [TOOL-dGroundRules-2 — the policy reader, at the landed revision, parsed and never sourced](spec/2026-10-23-spec-TOOL-dGroundRules-2.md) | 2 | 2 | CLOSED | rev-4 | 2026-10-23 |
-| [TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason](spec/2026-10-23-spec-TOOL-dGroundRules-3.md) | 2 | 2 | CLOSED | rev-3 | 2026-10-24 |
+| [TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason](spec/2026-10-23-spec-TOOL-dGroundRules-3.md) | 2 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults](spec/2026-10-23-spec-TOOL-dGroundRules-4.md) | 2 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-24 — the fresh target installed by the deployer, so the case grades an install govkit makes](spec/2026-10-23-spec-TOOL-dGroundRules-24.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-23 |
 | [TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob](spec/2026-10-23-spec-TOOL-dGroundRules-5.md) | 3 | 2 | DEFERRED | rev-5 | 2026-10-23 |
@@ -198,7 +198,7 @@ ids TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 164 bound to this build, across 4 record folder(s).
+Records: 166 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

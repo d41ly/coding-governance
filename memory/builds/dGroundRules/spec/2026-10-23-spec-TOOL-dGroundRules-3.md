@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason
 
-**Status:** CLOSED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0009@7d93fce9 whole
 
@@ -11,6 +11,8 @@
 | [2026-10-23-build-TOOL-dGroundRules-3-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-3-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-3-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-3-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-3-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-3-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-3-span-fold-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-3-span-fold-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
@@ -175,9 +177,9 @@ tracked set. The fixture repositories sit under `%TEMP%`, short-named. Every `ge
   `policy.py get runtime.agents-in-flight --explain` prints the catalogue default `6` with source
   `default` and a reason opening `not set in`. Red when: an unset key refuses, or reads anything but
   the row's `default`.
-- **AC3** — When a case plants a revision with no policy file, `policy.py get budgets.enforce
-  --explain` prints `warn` with source `default` and a reason naming `is absent at`.
-  Red when: an absent file refuses, or its reason reads as an unset key.
+- **AC3** — When a case plants a revision with no policy file,
+  `policy.py get budgets.enforce --explain` prints `warn` with source `default` and a reason
+  naming `is absent at`. Red when: an absent file refuses, or its reason reads as an unset key.
 - **AC4** — When a case plants a policy file setting only `preset = "strict"`,
   `policy.py get budgets.enforce --explain` prints `warn`, source `default`, and a reason naming
   `strict` and `not applied until dKeptSession`; with `budgets.enforce = "refuse"` added, it prints
@@ -188,9 +190,9 @@ tracked set. The fixture repositories sit under `%TEMP%`, short-named. Every `ge
   and the row. Red when: a value is printed for a row with no default.
   fixture: the catalogue is planted in the fixture's copy of the kit, never in the tracked one.
 - **AC6** — When `python -c` imports `policy.py` from `tools/policy/` and prints
-  `[f.__name__ for f in policy.RESOLUTION_ORDER]`, it prints `['read_file_value',
-  'read_default_value']`. Red when: the order is spelled elsewhere, a step that cannot fire stands in
-  for the preset, or the default precedes the file.
+  `[f.__name__ for f in policy.RESOLUTION_ORDER]`, it prints
+  `['read_file_value', 'read_default_value']`. Red when: the order is spelled elsewhere, a step
+  that cannot fire stands in for the preset, or the default precedes the file.
 - **AC7** — When `grep -n 'RESOLUTION_ORDER\|catalogue default'` runs over `policy.md` under
   `help/`, it prints the order's paragraph. Red when: the order ships undocumented.
 
@@ -231,6 +233,7 @@ New arm: tools/policy/check_policy.py --fixture (the `resolution-order` cases) �
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the reciprocal **hands-off** edges to TOOL-dGroundRules-9, TOOL-dGroundRules-10 added, each naming what that unit's own §3 **consumes-from** line takes from this one; hygiene check 12's edge join read them as missing. No scope, design or acceptance moved.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-4 · 2026-10-24 · §6 · AC3, AC6: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
 
 ## 10. Reuse audit
 
