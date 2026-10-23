@@ -61,15 +61,15 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `9bade02332c7dde0a64443650020c3a83101c908`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `b54bb9bc29c5cc0582cdc994ab24ec8d069d70c8`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
-- instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `69a96671a2dabb8270068076915b032624bc5e2b`
+- instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `c34fb6021372ab80cd1ea0b3079d222378c4209f`
+- rendered at: `ca4799b736cb45d746f78e5e75983174dd48c52c`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -173,12 +173,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dFairHearing`:
 
-Coverage of dFairHearing's 18 clauses and 10 owned nodes, over 18 specs:
+Coverage of dFairHearing's 18 clauses and 10 owned nodes, over 38 specs:
 - carried whole: 18; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0068, cl-dClosedLoop-0084; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-20.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-21.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-22.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-23.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-25.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-26.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-27.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-28.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-29.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-30.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-31.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-32.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-33.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-34.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-35.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-36.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-37.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-38.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-39.md (PLAY-dClosedLoop-2), memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-40.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0071, cl-dClosedLoop-0072, cl-dClosedLoop-0073, cl-dClosedLoop-0074, cl-dClosedLoop-0076, cl-dClosedLoop-0080, cl-dClosedLoop-0081, cl-dClosedLoop-0082, cl-dClosedLoop-0084
 
 ### Reading order
