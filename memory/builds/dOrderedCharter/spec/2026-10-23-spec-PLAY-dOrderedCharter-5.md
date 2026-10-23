@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-5 — ranked envelopes in every subagent handoff, the charter carried once
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 24 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 24 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0035@0d7d32c8 whole
 
@@ -67,6 +67,7 @@ v2:953-957 P13).
 - **consumes-from** `PLAY-dOrderedCharter-2` — the re-founded charter whose blocks the agent file carries
 - **hands-off** `PLAY-dOrderedCharter-8` — the ranked envelope order in the handoff, where the card's slice takes its place
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, finding 19, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC3, which unit 49 S22 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -175,6 +176,7 @@ New arm: tools/roles/render_agents.py · covers AC1 AC2 AC3 AC4 · the selftest'
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

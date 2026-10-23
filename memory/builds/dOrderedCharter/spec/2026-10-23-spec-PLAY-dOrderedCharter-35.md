@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0065@35e9932a whole
 **Carries:** node:policy-key.instructions.exclude
@@ -119,6 +119,7 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
 - **hands-off** `PLAY-dOrderedCharter-34` — printing each gov row's state from the S22 set in the update's delta report
 - **consumes-from** external — dGroundRules' policy reader and catalogue (`cl-dClosedLoop-0007`, `cl-dClosedLoop-0008`); until they land `instructions.exclude` reads `none` and `instructions.stale` its default `order`
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 7, 21 and 60, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC14's pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -351,6 +352,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

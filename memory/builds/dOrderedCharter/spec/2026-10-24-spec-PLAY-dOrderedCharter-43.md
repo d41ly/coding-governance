@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-43 — the card import written and checked by the one renderer's entry-files scope, never by a second writer
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-43-deviation-431.md](../build/2026-10-24-build-PLAY-dOrderedCharter-43-deviation-431.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +70,7 @@ It repairs unit 8 and is built right after it. Finding 1, the same item's other 
 - **consumes-from** `PLAY-dOrderedCharter-8` — the card file's path, the delivery table of its §4 wiring stand-in and its dark switch, which S1 to S4 move into the renderer
 - **consumes-from** `PLAY-dOrderedCharter-20` — the entry-files scope, the render and check verbs and the two legs S4 names; without them there is no renderer to carry the import
 - **hands-off** `PLAY-dOrderedCharter-39` — the card option and its check in the renderer, which that unit carries through the retirement of the agent-instructions kit
+- **hands-off** `PLAY-dOrderedCharter-55` — round-2 id 29: the `instruction render (one renderer of record)` leg is the one S4 edits
 
 ## 4. Design
 
@@ -176,6 +178,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 · the selftest
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 49 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

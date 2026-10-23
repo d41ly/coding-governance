@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-40 — gov's first instruction unit rows, one per reference page, and the pages' registry tags declared
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 38 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 38 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-40-deviation-401.md](../build/2026-10-24-build-PLAY-dOrderedCharter-40-deviation-401.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,7 @@ page's `doc.reference.*` tag from its declaring row. It repairs unit 37 and is b
 - **consumes-from** `PLAY-dOrderedCharter-9` — the row grammar and `read_units`, which the four rows are written in and read through
 - **consumes-from** `PLAY-dOrderedCharter-19` — `extract_doc` and the `doc` namespace row, which S4 extends
 - **consumes-from** `PLAY-dOrderedCharter-15` — the change record kind and its stand-in door, which S2 records each row through
+- **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 3, 5 and 12: AC1's filter on `playbook-render`, and unit 37's AC1 and AC8 observed at this pass
 
 ## 4. Design
 
@@ -177,6 +179,7 @@ Live at landing, order 38, after unit 37 at order 37, so the four pages exist wh
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 2 (HIGH, item H2).
+- rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

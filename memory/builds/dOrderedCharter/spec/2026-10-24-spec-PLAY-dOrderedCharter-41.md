@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-41 — the `cross-os` block stays live, so every v4 template renders after the practice catalogue lands
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-41-deviation-411.md](../build/2026-10-24-build-PLAY-dOrderedCharter-41-deviation-411.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,7 @@ it.
 ### Edges
 
 - **consumes-from** `PLAY-dOrderedCharter-1` — the catalogue, `resolve_active_practices` and S6's mapping of a dropped block onto the active set, which S2 keeps and S1 takes off the legacy path
+- **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 3, 9 and 17: unit 1 lands no `legacy` key, AC4 asserted on the line, and the selftest guard widened to the arm's inputs
 
 ## 4. Design
 
@@ -165,6 +167,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the selftest renders
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 30 (HIGH, item H3).
+- rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

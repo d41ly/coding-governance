@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0045@f345dc78 whole
 
@@ -141,6 +141,7 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
 - **hands-off** `PLAY-dOrderedCharter-45` — S1's table class given its whole conflict envelope and a parse postcondition (finding 79)
 - **hands-off** `PLAY-dOrderedCharter-46` — S2's re-render pointed at the overlay the write verb has just written, through the candidate read (finding 80)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 14, 67 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23)
 
 ## 4. Design
 
@@ -301,6 +302,7 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0045`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-45, PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 
 ## 10. Reuse audit
 

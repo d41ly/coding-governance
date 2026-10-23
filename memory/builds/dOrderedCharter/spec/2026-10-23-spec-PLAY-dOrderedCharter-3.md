@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -100,6 +100,7 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
 - **hands-off** `PLAY-dOrderedCharter-29` — the document registry the render-parity arm reads
 - **consumes-from** `PLAY-dOrderedCharter-20` — `INSTRUCTION_PATHSPECS`, the instruction-file population S6's load-bearing population reads in place of its own path list
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 22, 38, 57, 65 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23), the rows of its envelope leg and the size rows its envelopes cross among them
 
 ## 4. Design
 
@@ -276,6 +277,7 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · the `envelopes
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 
 ## 10. Reuse audit
 

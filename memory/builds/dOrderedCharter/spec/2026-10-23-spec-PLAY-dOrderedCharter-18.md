@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-18 — the moved grammar: every name the core imports from the recall kit moved into memory-tree, and every by-path reader re-pointed in the same unit
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 1 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 1 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0048@aab14736 whole
 
@@ -111,6 +111,7 @@ scan-set change is proven by a staged break in the moved module that reds
 - **hands-off** `PLAY-dOrderedCharter-28` — the moved `grammar_for`, from which the `FAMILY-<slug>-<seq>` native-id class resolves
 - **hands-off** `PLAY-dOrderedCharter-19` — `repo_root` and the moved grammar, through which the `doc` namespace reads the charter's path from the conf
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 16, 17, 33, 34, 35, 36, 37, 68, 69, 70, 72 and 73, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC1, AC3 and AC7, which unit 49 S16 to S20 and S69 correct, are observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -317,6 +318,7 @@ New arm: tools/check-wiring.test.sh · covers none · the dead-grammar AC10 arm 
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

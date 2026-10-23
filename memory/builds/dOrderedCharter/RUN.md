@@ -54,3 +54,17 @@ base: ce13efbe3d90cc8fcad100267e18ec2c9d03bdf8
 2026-10-23T21:09:41Z rescope · item add PLAY-dOrderedCharter-49 · reason closes spec-audit round 1 minors batch, MEDIUM findings 3 4 5 6 7 8 9 10 11 12 13 14 16 17 18 19 20 21 22 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 51 52 53 54 55 59 60 65 66 67 68 69 70 71 77 78 83 84 85 86 and LOW findings 15 23 24 25 26 27 28 29 47 50 57 61 63 64 72 73 74 75 87
 
 2026-10-23T21:34:30Z review · item dOrderedCharter-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 10 · minors 73 · disposition promote
+
+2026-10-23T22:17:19Z rescope · item add PLAY-dOrderedCharter-50 · reason closes spec-audit round 2 finding 23 (HIGH, item H1): the bar-keeping rows a new leg, key or retirement owes are written by the pass that creates them
+
+2026-10-23T22:17:20Z rescope · item add PLAY-dOrderedCharter-51 · reason closes spec-audit round 2 finding 30 (HIGH, item H2): the shared tag index keyed per extractor version, each worktree reading its own
+
+2026-10-23T22:17:21Z rescope · item add PLAY-dOrderedCharter-52 · reason closes spec-audit round 2 finding 33 (HIGH, item H3): the TOML-table merge envelope made total, theirs-side deletes and adds included
+
+2026-10-23T22:17:21Z rescope · item add PLAY-dOrderedCharter-53 · reason closes spec-audit round 2 finding 36 (HIGH, item H4): file:line citations grandfathered per line by the commit that wrote them
+
+2026-10-23T22:17:22Z rescope · item add PLAY-dOrderedCharter-54 · reason closes spec-audit round 2 finding 39 (HIGH, item H5): the card file owner's liveness defined, a dead owner's card taken over
+
+2026-10-23T22:17:27Z rescope · item add PLAY-dOrderedCharter-55 · reason closes spec-audit round 2 minors batch, MEDIUM findings 1 2 3 4 5 6 7 8 10 11 12 14 15 16 19 20 22 24 26 28 31 32 34 37 40 41 and LOW findings 9 17 18 29 35
+
+2026-10-23T22:33:35Z review · item dOrderedCharter-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 31 · disposition promote

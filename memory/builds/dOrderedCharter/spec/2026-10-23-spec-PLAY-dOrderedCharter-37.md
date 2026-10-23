@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0067@90e357b7 whole
 
@@ -93,6 +93,7 @@ copy of either.
 - **hands-off** `PLAY-dOrderedCharter-40` — the four unit rows its reference rows name and the declaration of their registry tags (finding 2)
 - **consumes-from** `PLAY-dOrderedCharter-46` — the landed-revision rule and the unarmed line, which S6's tutorial follows by committing the overlay before a standalone render (finding 80)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 3, 46 and 84, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC1 and AC8 are observed at `PLAY-dOrderedCharter-40`'s pass and recorded from that observation; this pass changes no code to satisfy them (round-2 id 3)
 
 ## 4. Design
 
@@ -257,6 +258,7 @@ New arm: tools/govkit/docs_leg.py · covers AC5 AC6 AC8 · its `--fixture --plan
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

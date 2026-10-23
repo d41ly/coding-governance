@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 
@@ -113,6 +113,7 @@ units 31 and 32.
 - **hands-off** `PLAY-dOrderedCharter-31` — the seeded template's `[[retired]]` row and the readers of `playbook_path`, the change records of the census's moved units, and `CODEX_MAX`'s new home when the agent-instructions kit leaves
 - **consumes-from** external — dGroundRules' `budgets.*` and `budgets.enforce` (v2:1346-1347); until its reader lands unit 11's reader reads the legacy carrier
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 6, 10, 21 and 29, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC11's pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -355,6 +356,7 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

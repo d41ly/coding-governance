@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0049@a87d159d whole
 **Carries:** node:system.tags
@@ -158,6 +158,8 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
 - **hands-off** `PLAY-dOrderedCharter-40` — the doc extractor reading the reference registry's rows, so each page's registry tag is declared (finding 2)
 - **hands-off** `PLAY-dOrderedCharter-44` — S4's freshness keyed on the extractor and its version as well as the blob, with a parse ledger and a schema stamp (finding 76)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 11, 44, 55, 77 and 78, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-51` — `tree_built` keyed on the tree and its extractor-versions digest, and every read filtered to the reading worktree's own versions (round-2 id 30)
+- **hands-off** `PLAY-dOrderedCharter-55` — the index's order-5 independence, its in-place schema rebuild and the dirty rows' canonical worktree key (round-2 ids 4, 31, 41)
 
 ## 4. Design
 
@@ -380,6 +382,7 @@ New arm: tools/codebase-map/selftest.py · covers AC10 · the selftest's coverag
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-44, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-51, PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

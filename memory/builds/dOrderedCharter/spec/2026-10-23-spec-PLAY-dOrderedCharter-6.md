@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 
@@ -96,6 +96,7 @@ F1-6, F1-7; v2:961-965 P15).
 - **hands-off** `PLAY-dOrderedCharter-37` — the drive table's `[[drive]]` rows its reference page renders
 - **consumes-from** external — dGroundRules' `budgets.*` keys and minimal guard, which the raise route names
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, finding 21, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC7's page pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -237,6 +238,7 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive` ve
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

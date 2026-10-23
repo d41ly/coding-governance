@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-39 — the card import survives the agent-instructions kit's retirement, with the wiring leg kept by name
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-deviation-391.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-deviation-391.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
 
@@ -69,6 +70,7 @@ unit 31 and is built right after it. Finding 49, the same item's other half, is
 
 - **consumes-from** `PLAY-dOrderedCharter-31` — the retirement of the agent-instructions kit, its registry rows and its inventory query, which S1 and S2 amend; without it there is nothing to carry the import through
 - **consumes-from** `PLAY-dOrderedCharter-43` — the card option and its check in the renderer, which S2 names as moved and S1's kept leg runs
+- **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 1, 10, 11, 22, 26 and 29: S3's probe read at the deleting commit's parent and keyed on behaviour, the map baseline and generated map, the moved leg's adopter population, and the renderer-of-record leg
 
 ## 4. Design
 
@@ -160,6 +162,7 @@ files.
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 1 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

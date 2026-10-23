@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 28 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 28 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0060@83e8c234 whole
 
@@ -86,6 +86,7 @@ pairing is a join the meta-check grades both ways, so a rule cannot exist as pro
 - **hands-off** `PLAY-dOrderedCharter-29` — the additive `rules` field, each rule read as a tag under its row, which the `practice.writing` row uses
 - **hands-off** external — dWitnessedBar's portability pack arms the pending rules and moves the existing legs into it; dSafePassage's floor arms back `interpreter-floor`
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, finding 20, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC6, which unit 49 S23 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -251,6 +252,7 @@ New arm: tools/playbook/core.py · covers AC3 AC4 · the meta-check's `fixture` 
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

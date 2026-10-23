@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-47 — a record written on a branch that never held the positional check is graded print-only, by its adding commit's ancestry
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md](../build/2026-10-24-build-PLAY-dOrderedCharter-47-deviation-471.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,8 @@ never red. It repairs unit 26 and is built right after it.
 ### Edges
 
 - **consumes-from** `PLAY-dOrderedCharter-26` — `positional.py`, its list check and its plants, whose verdict S3 narrows for records written before the check; without them there is nothing to grandfather
+- **hands-off** `PLAY-dOrderedCharter-53` — grandfathering per line by the commit blame names, never by the file's adding commit (round-2 id 36)
+- **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 15, 28 and 37: the spec-record and bulk-move faces of the per-line rule, and the plants run in `tags positional selftest`
 
 ## 4. Design
 
@@ -156,6 +159,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 · the playbook-rend
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 81 (HIGH, item H8).
+- rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-53, PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

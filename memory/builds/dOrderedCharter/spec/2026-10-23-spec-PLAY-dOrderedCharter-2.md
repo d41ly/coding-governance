@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override
@@ -127,6 +127,7 @@ C1-F11, C1-F12).
 - **consumes-from** external — dGroundRules' one policy reader; until it lands `charter.override` reads its default
 - **consumes-from** `PLAY-dOrderedCharter-42` — the override kind's token in the bindings reader, without which S4's record reads malformed (finding 31)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 21, 47, 75 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC7's page pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -302,6 +303,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

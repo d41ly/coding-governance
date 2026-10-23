@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0031@419dfa75 whole
 **Carries:** node:policy-key.charter.practices
@@ -109,6 +109,7 @@ that the renderer reads to write the charter's practice lines (v2:1143, P14).
 - **consumes-from** external — dGroundRules' one policy reader; until it lands the catalogue default is read
 - **hands-off** `PLAY-dOrderedCharter-41` — S6's cross-os block state and the Migration sentence on older templates: that unit keeps the block live, not legacy, and states the major-only rule (finding 30)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 18, 21 and 53, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — this pass lands no `legacy` key on the `cross-os` row, so AC4 holds here (round-2 id 3); AC1 and AC7, which unit 49 S21 and S24 correct, are observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -249,6 +250,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 · the selftest
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-41, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

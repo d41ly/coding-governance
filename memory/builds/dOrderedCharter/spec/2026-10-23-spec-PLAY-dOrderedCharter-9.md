@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-9 — the instruction-unit registry: one row per unit in each kit's manifest, its one reader, and documents rendered from units
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 14 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 14 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0039@ee1a0e99 whole
 
@@ -109,6 +109,7 @@ per-unit rendering a document is assembled from.
 - **hands-off** `PLAY-dOrderedCharter-37` — the unit rows and their `usage` field its pages render
 - **hands-off** `PLAY-dOrderedCharter-40` — writing gov's first unit rows, which §3 named unit 2 for; that unit writes one per reference page and is the writer S5's unarmed line names (finding 2)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 12 and 42, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — the `origin` S2 derives is the kit's `id =`, never its directory, and every filter compares that one value (round-2 ids 5, 12)
 
 ## 4. Design
 
@@ -241,6 +242,7 @@ New arm: tools/playbook/instruction_units.py · covers AC1 AC2 AC3 AC4 AC5 · th
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0039`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

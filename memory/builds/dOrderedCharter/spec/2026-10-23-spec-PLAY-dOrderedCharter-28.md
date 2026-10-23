@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0058@bc160feb whole
 
@@ -105,6 +105,7 @@ P34; the owner's FK-1-2; memory-plan `[frame]`, `[sites]`, `[edges]`).
 - **hands-off** `PLAY-dOrderedCharter-32` — the pinned address forms' checks on `amends` and `supersedes` targets
 - **hands-off** external — dTotalRecall arms `id#tag` and the record sites' `**Made-by:**` writer; dWellOiledMachine the act sites and the `Gov-*` trailer writers; dDeclaredLoop the marker's `item=`
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 6, 8, 21, 32 and 52, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — AC3's pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -275,6 +276,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC4 AC5 AC6 · the playb
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

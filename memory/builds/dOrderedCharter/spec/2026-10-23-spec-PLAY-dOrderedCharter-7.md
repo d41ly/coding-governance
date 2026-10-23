@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0037@0b2c8bff whole
 
@@ -142,6 +142,7 @@ build owns.
 - **hands-off** external — dShippedRelease runs the core legs on the landed tree and acts on a bypassed red as `core.bypass` says; dTotalRecall's record door adopts the exception door
 - **hands-off** `PLAY-dOrderedCharter-42` — the three typed record kinds admitted by the bindings reader and joined to their file names, and the factory's kind list made the reader's (finding 31)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 4, 5, 40, 61, 66, 67 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** `PLAY-dOrderedCharter-50` — `enforces` already in both canary key sets at order 10, and the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23)
 
 ## 4. Design
 
@@ -301,6 +302,7 @@ New arm: tools/memory-tree/deviation_join.py · covers AC7 · its existing suite
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0037`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 
 ## 10. Reuse audit
 

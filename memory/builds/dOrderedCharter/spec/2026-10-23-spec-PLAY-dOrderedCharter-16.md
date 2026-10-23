@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-16 — the layer register, the layer contract and the check that the core never depends on an expansion or an optional component
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 2 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 2 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0046@bd068162 whole
 
@@ -113,6 +113,7 @@ name a core memory-tree module imported from the recall kit (P28, v2 `[layers]`;
 - **hands-off** `PLAY-dOrderedCharter-19` — `tools/playbook/layers.toml` and the descriptor `layer` key, which the `owned` arm reads
 - **hands-off** `PLAY-dOrderedCharter-15` — the layer register's declared points, which the write command's arms read
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 43 and 63, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-55` — `import_walk.derive_import_closure`, over which the tag index's extractor version is hashed (round-2 id 19)
 
 ## 4. Design
 
@@ -323,6 +324,7 @@ New arm: tools/memory-tree/check-verdict-epoch.test.sh · covers AC1 · a case a
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

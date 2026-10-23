@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-12 — the statement grammar, its check, and render provenance in a sidecar lock
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 13 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 13 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0042@9958d12b whole
 
@@ -105,6 +105,8 @@ unit's text against its type and a rendered document against the four shapes R-D
 - **hands-off** `PLAY-dOrderedCharter-2` — the re-founded charter, which S3 grades once units render it
 - **hands-off** `PLAY-dOrderedCharter-15` — the grammar check the write command's S6 runs before every write
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 27, 39, 67, 74 and 83, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23)
+- **hands-off** `PLAY-dOrderedCharter-55` — AC1 and AC5, which unit 49 S60 and S71 correct, are observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
 ## 4. Design
 
@@ -227,6 +229,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0042`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

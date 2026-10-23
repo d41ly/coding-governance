@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0055@dc43d502 whole
 
@@ -85,6 +85,8 @@ edge's type is registered, and every target resolves, each seen red.
 - **consumes-from** external — dGroundRules' one policy reader (`cl-dClosedLoop-0008`); until it lands the keys read their catalogue defaults
 - **hands-off** external — dTotalRecall's span extractors fill the regions section; dBoundRoles fills the work order's code-notes slot from the bundle
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 23, 32, 52 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23)
+- **hands-off** `PLAY-dOrderedCharter-55` — `tools/playbook/edge_checks.py`, which that unit deletes with the rows of any leg running it, routing both `--only` arms through unit 24's `check_edges` (round-2 id 6)
 
 ## 4. Design
 
@@ -210,6 +212,7 @@ New arm: tools/playbook/gov_tag.py · covers AC6 AC7 · the `tags (the resolver'
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0055`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

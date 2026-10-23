@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-46 — the overlay's landed revision defined, its unborn-HEAD outcome stated, and a write door rendering the rows it just wrote
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-39-promoted-fix-return.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
 | [2026-10-24-build-PLAY-dOrderedCharter-46-deviation-461.md](../build/2026-10-24-build-PLAY-dOrderedCharter-46-deviation-461.md) | deviation | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-39-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 |
+| [2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md](../reviews/2026-10-24-review-PLAY-dOrderedCharter-39-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +65,7 @@ refuses. It repairs unit 32 and is built right after it.
 - **consumes-from** `PLAY-dOrderedCharter-15` — the write verbs and their re-render, which S4 points at the candidate
 - **hands-off** `PLAY-dOrderedCharter-31` — its adopter-rules step re-renders with the candidate read over the overlay it has just written, so update keeps the rules in the charter before any commit
 - **hands-off** `PLAY-dOrderedCharter-37` — its tutorial commits the overlay before a standalone render, or renders through a write door, and expects the unarmed line in a repository with no commit
+- **hands-off** `PLAY-dOrderedCharter-55` — round-2 ids 8 and 20: the census verb's candidate render, and `read_overlay` through `tree_lib.read_blobs_at`
 
 ## 4. Design
 
@@ -182,6 +184,7 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 · the playb
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's finding 80 (HIGH, item H7).
+- rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

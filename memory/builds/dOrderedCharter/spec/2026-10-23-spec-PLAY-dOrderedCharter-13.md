@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-13 — the ladder renumbered: levels 0 to 7, the charter at level 0, the platform above it
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0043@536226d0 whole
 
@@ -84,6 +84,7 @@ reads a level from, and one check that rendered text names a level only as "leve
 - **hands-off** `PLAY-dOrderedCharter-4` — the replayed map's level lines, drawn from `LEVELS`
 - **hands-off** `PLAY-dOrderedCharter-8` — the card's level, `LEVELS[1]`
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23)
 
 ## 4. Design
 
@@ -189,6 +190,7 @@ New arm: tools/playbook/instruction_units.py · covers AC2 AC3 AC4 · the `instr
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0043`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 
 ## 10. Reuse audit
 

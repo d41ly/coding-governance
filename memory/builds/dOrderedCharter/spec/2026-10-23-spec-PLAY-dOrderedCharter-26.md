@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0056@a91f3d50 whole
 
@@ -109,6 +109,8 @@ review producers that mandate a bare file:line today, so the ratchet does not re
 - **hands-off** `PLAY-dOrderedCharter-47` — S3's verdict for build records added before the check landed, made print-only by their adding commit's ancestry (finding 81)
 - **hands-off** `PLAY-dOrderedCharter-48` — S6's producers, made a query over the directive sources with a keyed keep list and a limb that reds a new producer (finding 82)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 28 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
+- **hands-off** `PLAY-dOrderedCharter-50` — the pin, descriptor and dossier rows of `tags positional selftest`, written at that unit's pass one order later (round-2 id 23)
+- **hands-off** `PLAY-dOrderedCharter-55` — AC10, which unit 49 S61 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2); and the positional plants of units 47, 48 and 53 run in `tags positional selftest` (round-2 id 28)
 
 ## 4. Design
 
@@ -270,6 +272,7 @@ New arm: tools/playbook/gov_tag.py · covers AC10 · the `positional` arm inside
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0056`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-47, PLAY-dOrderedCharter-48, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -120,6 +120,8 @@ what an adopter can see ships its successor with an upgrade step that runs up an
 - **hands-off** `PLAY-dOrderedCharter-39` — S1's leg removal and moving list: the agent-instructions wiring leg keeps its name on the renderer, and the card import moves by name beside CODEX_MAX (finding 1)
 - **consumes-from** `PLAY-dOrderedCharter-46` — the candidate read, which S4's step re-renders through over the overlay it has just written (finding 80)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 10, 21 and 71, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23), every registry row naming the deleted directory and every row of a retired leg among them
+- **hands-off** `PLAY-dOrderedCharter-55` — AC12's pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2); and unit 39's option probe reads the adopter at this pass's parent (round-2 id 1)
 
 ## 4. Design
 
@@ -363,6 +365,7 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-39, PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
 
 ## 10. Reuse audit
 
