@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -114,7 +114,7 @@ Every line below was read or run on 2026-10-23.
   `lib-unattended.sh`; at `0ced625e1` it found two, `34:509` and `40:125` (PINNED).
 - `packet.py --check` was run for each of the 22 chain builds holding a packet at `7810198ad`. Every
   one was byte-red at the as-built view's line, and dGroundRules' also carried 40 roster findings for
-  `TOOL-dGroundRules-13` to `TOOL-dGroundRules-52` (PINNED). One check of dGroundRules took 20
+  `TOOL-dGroundRules-65` to `TOOL-dGroundRules-52` (PINNED). One check of dGroundRules took 20
   seconds on node d.
 - `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py:100` declares
   `TERMINAL = ("LANDED", "ABORTED")`, and `:541-556` reads a chain build's last `phase:` line; a
@@ -161,7 +161,7 @@ docstring lists.
 
 ```text
 - Every unit of the roster, TOOL-dGroundRules-1 to TOOL-dGroundRules-11 as the README opened with
-  them, TOOL-dGroundRules-13 to TOOL-dGroundRules-52 as the audit promoted them, and each unit the
+  them, TOOL-dGroundRules-65 to TOOL-dGroundRules-52 as the audit promoted them, and each unit the
   closing review promotes, is deferred against TOOL-dGroundRules-12 and carried forward to the build
   run, which builds them (README rule 1).
 ```
@@ -270,7 +270,7 @@ ROSTER_JOIN  = python -c "import re; r=open('memory/builds/dGroundRules/README.m
   count line and no `[packet]` hit.
   Red when: the build run reaches this unit with its own packet red.
 - **AC8** — When `grep -c "forty-one" memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-1-owner-audit-cap.md`
-  runs it prints `0`, and `grep -c "TOOL-dGroundRules-13 to TOOL-dGroundRules-52"` over `RECORD`
+  runs it prints `0`, and `grep -c "TOOL-dGroundRules-65 to TOOL-dGroundRules-52"` over `RECORD`
   prints `1`.
   Red when: the record still counts the promoted units against its own round list.
 - **AC9** — When `ROSTER_JOIN` runs, it prints an empty line.
@@ -316,6 +316,7 @@ New arm: tools/check-spec-tokens.test.sh · covers AC4 AC6 · a scratch reposito
 - rev-1 · 2026-10-23 · initial draft, promoting the closing diff review's M1 (ids 6, 15, 21), M2's
   left-shift gate (id 22) and L1 (ids 7, 11, 18, 23) in one batch, from the skeptic's sound fixes,
   with unit 46's predicate re-run at `7810198ad` and every chain packet checked on 2026-10-23.
+- rev-2 · 2026-10-23 · §4 §6 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
 
 ## 10. Reuse audit
 

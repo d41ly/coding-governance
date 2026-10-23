@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0011@8312590d whole
 
@@ -11,7 +11,7 @@
 | [2026-10-23-build-TOOL-dGroundRules-5-deviation-53.md](../build/2026-10-23-build-TOOL-dGroundRules-5-deviation-53.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
-| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
 <!-- /gen:spec-records -->
 
@@ -83,7 +83,7 @@ as `policy-file.on-invalid` says.
 - **consumes-from** `TOOL-dGroundRules-4` — `validate` and the invalid-file branch with its read of `policy-file.on-invalid`, which the render reaches once per revision
 - **hands-off** `TOOL-dGroundRules-10` — `readPolicy` for `runtime.agents-in-flight` in `tools/hooks/agent-cap.js`, and `arm_mirror_landed`'s fixture hook replaced there by the real hook
 - **hands-off** external — dDeclaredLoop's guarded policy command, which regenerates the mirror in the commit of each policy write it admits
-- **hands-off** `TOOL-dGroundRules-13` — each reason's revision phrase rendered as a placeholder, so the mirror names no commit and is fresh at the commit that carries it (finding 1)
+- **hands-off** `TOOL-dGroundRules-65` — each reason's revision phrase rendered as a placeholder, so the mirror names no commit and is fresh at the commit that carries it (finding 1)
 - **hands-off** `TOOL-dGroundRules-14` — the landing replay that observes the mirror fresh at a prepared merge (finding 31)
 - **hands-off** `TOOL-dGroundRules-15` — `resolve_read` as the one home of the `.agent-cap.conf` lowering, so the render sees it (finding 2)
 - **hands-off** `TOOL-dGroundRules-19` — `mirror --print`, the render at HEAD a staged mirror is compared with (finding 32)
@@ -445,10 +445,11 @@ New arm: tools/policy/check_policy.py (`arm_mirror_readers`, live and `--fixture
 
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 5, the brief's S6, the owner's AF-2,
   and the lander, regen and ladder code read at base `3708a705`.
-- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-13, TOOL-dGroundRules-14, TOOL-dGroundRules-15, TOOL-dGroundRules-19, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-65, TOOL-dGroundRules-14, TOOL-dGroundRules-15, TOOL-dGroundRules-19, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-31 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-4 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-64`, the reciprocal end of the round-1 closing diff
   review's promotions; no scope or criterion moved.
+- rev-5 · 2026-10-23 · §3 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
 
 ## 10. Reuse audit
 

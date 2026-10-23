@@ -1,6 +1,6 @@
-# TOOL-dGroundRules-13 — the mirror's bytes name no commit: each reason's revision phrase rendered as a placeholder the helper fills
+# TOOL-dGroundRules-65 — the mirror's bytes name no commit: each reason's revision phrase rendered as a placeholder the helper fills
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,7 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-23-build-TOOL-dGroundRules-13-deviation-1.md](../build/2026-10-23-build-TOOL-dGroundRules-13-deviation-1.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-65-deviation-1.md](../build/2026-10-23-build-TOOL-dGroundRules-65-deviation-1.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dGroundRules-65-owner-renumber.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-65-owner-renumber.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
@@ -202,6 +203,7 @@ New arm: tools/policy/check_policy.py (`--fixture mirror-commit-rewrite`) · cov
   audit, from the review's sound fix and `tools/push-main.sh` read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
   promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
+- rev-3 · 2026-10-23 · §1, the H1 line · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
 
 ## 10. Reuse audit
 

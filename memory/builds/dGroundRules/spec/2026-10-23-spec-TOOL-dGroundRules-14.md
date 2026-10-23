@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-14 — the landing replay: the mirror a prepared merge carries is fresh at that merge
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,8 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-14-deviation-2.md](../build/2026-10-23-build-TOOL-dGroundRules-14-deviation-2.md) | deviation | — |
-| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
-| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-65 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 |
 
 <!-- /gen:spec-records -->
 
@@ -19,14 +19,14 @@
 The round-1 spec audit of this build
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md`)
 exited BOUNDED with finding **id 31 at BLOCKER**, which shares item **B1** with id 1
-(`TOOL-dGroundRules-13`). This unit is id 31's promotion. It repairs `TOOL-dGroundRules-5` and builds
+(`TOOL-dGroundRules-65`). This unit is id 31's promotion. It repairs `TOOL-dGroundRules-5` and builds
 at order 4, one step after that unit.
 
 Id 31 is B1 seen from the landing: `--prepare` regenerates the mirror at the merge and then folds it
 into a new commit with `commit-tree` (`tools/push-main.sh:911`, `:921`), and the bar runs
 `regen.py --check` before its first leg (`tools/run-gates/run-gates.sh:1449-1458`). As specified, the
 mirror is stale at the commit that lands, so the bar reds after every landing and no criterion of
-`TOOL-dGroundRules-5` replays the lander. `TOOL-dGroundRules-13` fixes the render; this unit is the
+`TOOL-dGroundRules-5` replays the lander. `TOOL-dGroundRules-65` fixes the render; this unit is the
 arm that replays the landing's shape every bar, plus the one-off observation of the real lander
 the review asked for, so the class cannot return through a later reason, field or regen order.
 
@@ -47,7 +47,7 @@ the review asked for, so the class cannot return through a later reason, field o
 
 ## 3. Non-goals (OUT)
 
-- The render's fix itself: `TOOL-dGroundRules-13`, id 1's promotion, owns `rev_phrase` and the
+- The render's fix itself: `TOOL-dGroundRules-65`, id 1's promotion, owns `rev_phrase` and the
   helper's fill. This unit adds no code to `tools/policy/policy.py`.
 - Changing `tools/push-main.sh` or `tools/run-gates/regen.py`: the landing's order is correct; the
   defect was the render's.
@@ -57,7 +57,7 @@ the review asked for, so the class cannot return through a later reason, field o
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-5` — `mirror --write` and `--check`, `arm_mirror_parity`, `readPolicy` with its CLI, and the fixture's bare remote, which the replay drives
-- **consumes-from** `TOOL-dGroundRules-13` — the render invariant this replay asserts green; without it the case is red on a correct replay
+- **consumes-from** `TOOL-dGroundRules-65` — the render invariant this replay asserts green; without it the case is red on a correct replay
 - **hands-off** `TOOL-dGroundRules-25` — the lander observation and `mirror-landed-merge`, which that unit moves into the lander's own suite with `--slug` and the success line asserted (findings 18, 12, 30)
 
 ## 4. Design
@@ -111,7 +111,7 @@ change; `bash tools/push-main.sh --prepare` on it; then `regen.py --check` at th
 - **A permanent case running `push-main.sh --prepare`.** It needs a remote, the minter and every
   generated output's kit in the fixture; the four git steps are the part of the lander the mirror
   depends on, and S3 observes the rest once.
-- **Folding this arm into `TOOL-dGroundRules-13`'s case.** That case rewrites one commit; a landing
+- **Folding this arm into `TOOL-dGroundRules-65`'s case.** That case rewrites one commit; a landing
   is a two-parent merge rendered after the merge and read by the helper through a remote, and the
   method makes a separate gate a separate unit.
 
@@ -166,6 +166,7 @@ none
   spec audit, from the review's left-shift gate and `tools/push-main.sh` read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
   promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
+- rev-3 · 2026-10-23 · §1 §3 §4 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-21 — the round-1 spec audit's minors: forty-one findings closed in the code units 1 to 10 leave, one scope item each
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,8 +12,8 @@
 | [2026-10-23-build-TOOL-dGroundRules-21-deviation-9.md](../build/2026-10-23-build-TOOL-dGroundRules-21-deviation-9.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-21-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-25 TOOL-dGroundRules-34 TOOL-dGroundRules-64 |
-| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
-| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
+| [2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 |
 
 <!-- /gen:spec-records -->
 
@@ -22,7 +22,7 @@
 The round-1 spec audit of this build
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md`)
 exited BOUNDED with 49 confirmed findings. Its two BLOCKERs and six HIGHs are promoted one unit each,
-`TOOL-dGroundRules-13` to `TOOL-dGroundRules-20`; BUILD-METHOD M4 batches the other forty-one,
+`TOOL-dGroundRules-65` to `TOOL-dGroundRules-20`; BUILD-METHOD M4 batches the other forty-one,
 thirty-three MEDIUM and eight LOW, into this unit. They land on units 1 to 10 and share
 `tools/policy/policy.py`, `tools/policy/check_policy.py`, the codebase map and `tools/gate-legs.json`'s
 neighbours, so M6's clauses yield no two disjoint write sets. It builds at order 7, after every unit
@@ -237,7 +237,7 @@ fix. Where the review offered options, §8 records the pick.
 
 ## 3. Non-goals (OUT)
 
-- Every BLOCKER and HIGH: `TOOL-dGroundRules-13` to `TOOL-dGroundRules-20`.
+- Every BLOCKER and HIGH: `TOOL-dGroundRules-65` to `TOOL-dGroundRules-20`.
 - Rewriting any reviewed spec's text: each defect is closed here in code and in the criteria it
   governs, and the repaired unit's §3 names this unit.
 - The other copies of the git location-variable list: `TOOL-dRetiredFork-23` stays their ask.
@@ -330,7 +330,7 @@ README table names the same choice per arm in its last column.
 {"catalogue_blob": "...", "keys": {...}, "legacy_blobs": {".agent-cap.conf": "<id or null>"}, "policy_blob": "..."}
 ```
 
-`TOOL-dGroundRules-13`'s invariant gains the legacy blobs: two commits with equal policy, catalogue
+`TOOL-dGroundRules-65`'s invariant gains the legacy blobs: two commits with equal policy, catalogue
 and legacy blobs and the same first-parent history render byte-identical mirrors.
 
 ### Inventory
@@ -626,6 +626,7 @@ New arm: tools/workflows/check-review-join.test.sh · covers AC33 · the D7 arm 
 - rev-4 · 2026-10-23 · §1 §2 §4 §5 §8 §10 · prose shortened under the spec ceiling after the closing
   review's records row: repeats between sections dropped, each resolved fork cut to its decision and
   reason; no meaning moved.
+- rev-5 · 2026-10-23 · §1 §3 §4 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
 
 ## 10. Reuse audit
 

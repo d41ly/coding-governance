@@ -23,20 +23,20 @@ hold-code: owner-decision
 held-from: VERIFYING
 refreshed-at: f3a36b5760ccf46f7e4c51643a9a122d32007b3c · handoff · 1 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 69d0e822af2922e992fee806f0fb243d1e52b03c
-phase: HELD
+witness: 548976824bdfcd3a90ba7b5af4f4f5ddc8e41526
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dgroundrules-0e6f4a
 anchor-kind: default-branch
 cli-version: 2.1.304
-lease-utc: 2026-10-23T05:00:24Z
+lease-utc: 2026-10-23T14:07:32Z
 pid-image: claude.exe
 host: compeeto-agent
-pid: 13172
+pid: 21252
 session: b814b019-d9ae-4d0f-83be-8b1c25fb814d
-keepalive: 23f9fd54
+keepalive: 89f7d607
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 3708a705e834709f340a2d160f9acdf9c18b699f
 anchor-ref: refs/heads/main
@@ -301,3 +301,9 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T06:53:41Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dGroundRules && bash tools/push-main.sh --land --slug dGroundRules && bash tools/unattended/unattended.sh --settle dGroundRules
 
 2026-10-23T06:53:41Z hold · item owner-decision · reason until owner · reaped 23f9fd54 · resume none(owner)
+
+2026-10-23T14:07:37Z resume · item dGroundRules · reason held · keepalive 89f7d607 · manual
+
+2026-10-23T14:08:42Z rescope · item add TOOL-dGroundRules-65 · reason the owner's renumbering of TOOL-dGroundRules-13, round-1 audit finding id 1 at BLOCKER (2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1), whose id a landed ask of dSafePassage holds; the add row of TOOL-dGroundRules-13 above stays as history
+
+2026-10-23T14:09:09Z rescope · item defer TOOL-dGroundRules-65 · reason specced; built by this build's build run (README rule 1)

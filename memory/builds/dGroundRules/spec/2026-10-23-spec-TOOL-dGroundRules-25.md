@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,7 +11,7 @@
 | [2026-10-23-build-TOOL-dGroundRules-25-deviation-13.md](../build/2026-10-23-build-TOOL-dGroundRules-25-deviation-13.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-25-deviation-59.md](../build/2026-10-23-build-TOOL-dGroundRules-25-deviation-59.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-21 TOOL-dGroundRules-34 TOOL-dGroundRules-64 |
-| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-24 TOOL-dGroundRules-22 TOOL-dGroundRules-23 |
 
 <!-- /gen:spec-records -->
@@ -19,7 +19,7 @@
 ## 1. Goal
 
 The round-1 spec audit of units 13 to 21
-(`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md`)
+(`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-65-21-spec-audit-round1.md`)
 exited CONVERGED with 42 confirmed findings. Its three HIGHs are promoted one unit each,
 `TOOL-dGroundRules-22` to `TOOL-dGroundRules-24`; BUILD-METHOD M4 batches the other thirty-nine,
 twenty-eight MEDIUM and eleven LOW, into this unit. They land on units 13 to 22 and 24, and nearly
@@ -74,7 +74,7 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 
 ## 2. Scope (IN)
 
-- **S1** — Finding 39. `mirror-commit-rewrite` (`TOOL-dGroundRules-13` S5) runs its render, commit
+- **S1** — Finding 39. `mirror-commit-rewrite` (`TOOL-dGroundRules-65` S5) runs its render, commit
   and `git commit-tree` rewrite once per reason kind: a policy file setting the key, a file present
   without it, the file absent, and an invalid file over a valid ancestor, the `last-valid` kind. Each
   asserts `mirror --check` exits 0 at the carrying commit and at its rewrite, and a failure names the
@@ -246,7 +246,7 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-13` — `mirror-commit-rewrite` and the reason builders' `rev_phrase`, which S1 runs per reason kind
+- **consumes-from** `TOOL-dGroundRules-65` — `mirror-commit-rewrite` and the reason builders' `rev_phrase`, which S1 runs per reason kind
 - **consumes-from** `TOOL-dGroundRules-14` — the lander observation and `mirror-landed-merge`, which S2 to S4 move into the lander's own suite
 - **consumes-from** `TOOL-dGroundRules-15` — `derive_lowered_limit`, which S36 maps
 - **consumes-from** `TOOL-dGroundRules-16` — `adopter-fresh-target`, its README table and the table join, which S5 to S8 extend
@@ -611,6 +611,7 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
 - rev-4 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling after the closing
   review's records row: repeats between sections dropped, each resolved fork cut to its decision and
   reason; no meaning moved.
+- rev-5 · 2026-10-23 · §1 §2 §3 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
 
 ## 10. Reuse audit
 
