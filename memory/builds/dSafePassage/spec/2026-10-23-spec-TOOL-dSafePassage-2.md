@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0019@6e0cd313 whole
 
@@ -134,6 +134,7 @@ holder is dead, and the paths that run staged are read as gov's own staging.
 - **consumes-from** `TOOL-dSafePassage-3` — `set_step_state`, the one writer of the `steps` field it owns, and the schema step whose up rewrites the receipt; without it no progress row has a schema to land in
 - **consumes-from** `TOOL-dSafePassage-7` — `run_step_isolated` and its `attended` verdict; without them a step would spawn on the node's whole environment
 - **hands-off** `TOOL-dSafePassage-4` — `write_attended_order`, the receipt hand-off, the staging journal, and the `failed` rows a killed or failed walk leaves for a down to tolerate
+- **hands-off** `TOOL-dSafePassage-8` — `run_step_walk` and `derive_pending_steps`, whose source-mode branch that unit adds, with the walk's `witness does not hold after up` stop and its lock reclaim, run on gov's own tree in the lander's prepared merge
 - **hands-off** `TOOL-dSafePassage-11` — the walk that runs the floor step's row in its place and stops when that step fails
 - **hands-off** `TOOL-dSafePassage-5` — the walk over the release-0 tree, killed after each step's first write and made to fail at each step in turn, its converged tree compared byte for byte
 - **hands-off** `TOOL-dSafePassage-15` — the walk asking the step record's precondition before each record, so a schema-3 receipt reaches the schema step, the repair of finding 1
@@ -393,6 +394,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-15`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-22`, `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the hands-off `TOOL-dSafePassage-8` that unit's
+  consumes-from already declared, so the reciprocity join of hygiene check 12 holds; no other
+  section moved.
 
 ## 10. Reuse audit
 

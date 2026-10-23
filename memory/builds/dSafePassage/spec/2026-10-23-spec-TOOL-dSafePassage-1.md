@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0018@ed08a364 whole
 
@@ -140,6 +140,8 @@ upgrade-step kind: a moved conf key is only reported).
   each by its argv, and staging every path a step writes, its before-image included.
 - **hands-off** `TOOL-dSafePassage-3` — the receipt step's row, placed first in the steps file this
   unit creates.
+- **hands-off** `TOOL-dSafePassage-4` — walking the rows this unit's reader returns in reverse,
+  running each applied row's `down` argv, and restoring from the before-image each up wrote.
 - **hands-off** `TOOL-dSafePassage-7` — resolving an argv's interpreter and placeholders under the
   isolation contract.
 - **hands-off** `TOOL-dSafePassage-8` — recording these two steps in gov's own receipt, where their
@@ -524,6 +526,9 @@ branch has not landed.
   dGroundRules lands, from
   `memory/builds/dSafePassage/prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md`.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-17`, `TOOL-dSafePassage-20`, `TOOL-dSafePassage-26`; no other section moved.
+- rev-4 · 2026-10-23 · §3 · the Edges gain the hands-off `TOOL-dSafePassage-4` that unit's
+  consumes-from already declared, so the reciprocity join of hygiene check 12 holds; no other
+  section moved.
 
 ## 10. Reuse audit
 

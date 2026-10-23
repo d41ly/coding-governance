@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0024@7817c7d0 whole
 
@@ -111,6 +111,7 @@ there and is marked attended. It closes no packet gap of its own; it is the exec
 - **consumes-from** `TOOL-dSafePassage-1` — the step row reader `read_steps`, its `needs-target`, `up`, `down`, `witness` and `resume` keys and its three placeholders, the help page this unit adds a section to, and `tools/govkit/upgrade_steps.py` itself with its import seam from `govkit.py`; without them there is no row to run
 - **hands-off** `TOOL-dSafePassage-2` — `run_step_isolated` and its `attended` verdict, the only spawn of a step argv the walk may use
 - **hands-off** `TOOL-dSafePassage-4` — `run_step_isolated` for each `down`, and `attended` for a down that needs target code
+- **hands-off** `TOOL-dSafePassage-8` — `run_step_isolated` for the source-mode walk and for the witness re-runs of `check_gov_first`, where the target is gov's own checkout and the contract still applies whole
 - **hands-off** `TOOL-dSafePassage-11` — the runner the floor step's argv runs under, which hands that step the target root through its placeholder
 - **hands-off** `TOOL-dSafePassage-5` — running this unit's needs-target check over the release-0 tree for every declared step, on a scratch clone of that tree because the plants change its bytes
 - **hands-off** `TOOL-dSafePassage-24` — refusing a step whose target declares an executor or a credential in its own git config, the repair of finding 53
@@ -336,6 +337,9 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · the s
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-24`, `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the hands-off `TOOL-dSafePassage-8` that unit's
+  consumes-from already declared, so the reciprocity join of hygiene check 12 holds; no other
+  section moved.
 
 ## 10. Reuse audit
 
