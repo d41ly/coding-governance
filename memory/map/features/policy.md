@@ -76,6 +76,10 @@ seam: `policy.resolve` — reuse for any read of a policy key's value, at the la
 named one, parsed and never sourced; extend via a step named in `RESOLUTION_ORDER`, never a second
 order, a second reader or a working-tree read.
 
+seam: `policy.validate` — reuse for any verdict on a whole policy file's text, problems with their
+lines; extend via `check_value` for a value rule, never a second judge, and never read a default
+for text it refuses (`read_last_valid_value` is the one fallback).
+
 ## Gaps
 
 - The value check reads one key at a time: a cross-key rule the design states in prose, such as a

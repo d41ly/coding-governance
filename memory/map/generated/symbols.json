@@ -883,6 +883,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_on_invalid",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "arm_patch",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -5053,6 +5058,11 @@
       "file": "tools/check-spec-tokens.test.sh"
     },
     {
+      "id": "check_revision",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_role_move",
       "kind": "function",
       "file": "tools/govkit/matrix.py"
@@ -5166,6 +5176,11 @@
       "id": "check_same_file",
       "kind": "function",
       "file": "tools/workflows/review_replay.py"
+    },
+    {
+      "id": "check_same_value",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "check_says",
@@ -5906,6 +5921,11 @@
       "id": "cmd_check",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "cmd_check",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "cmd_check",
@@ -7198,6 +7218,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "derive_key_line",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "derive_kit_glob",
       "kind": "function",
       "file": "tools/check-kit-placeholders.py"
@@ -7971,6 +7996,16 @@
       "id": "derive_stream_verdict",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "derive_strict_population",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_strict_value",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_supersession_map",
@@ -13898,6 +13933,16 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "read_last_valid",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "read_last_valid_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_lease_hash",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -14176,6 +14221,11 @@
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_ordered_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_origin_scope",
@@ -19728,6 +19778,16 @@
       "file": "tools/workflows/check_by_design_parity.py"
     },
     {
+      "id": "run_on_invalid_classes",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_on_invalid_strict",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_one",
       "kind": "function",
       "file": "tools/unattended/run-unattended-gates.sh"
@@ -24151,6 +24211,11 @@
       "id": "usage",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
+    },
+    {
+      "id": "validate",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "validate_gate_runner",

@@ -6,8 +6,9 @@ row per policy key, taken row for row and in order from the design's `[policies]
 `name` and `owner` that table's own. Contract: TOOL-dGroundRules-1.
 
 The kit lands dark: one reader reads `.governance/policy.toml`, `policy.py get` (TOOL-dGroundRules-2),
-and no consumer calls it yet. The resolution order, the invalid-file branch, the JSON mirror and the
-guard are later units of dGroundRules, and each re-points one consumer.
+in one resolution order (TOOL-dGroundRules-3), and an invalid file never reads defaults
+(TOOL-dGroundRules-4); no consumer calls the reader yet. The JSON mirror and the guard are later units
+of dGroundRules, and each re-points one consumer.
 
 ## Files
 
@@ -15,7 +16,7 @@ guard are later units of dGroundRules, and each re-points one consumer.
 |---|---|
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve`, and the `lists`, `scaffold` and `get` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve`, the file's one judge `validate`, and the `lists`, `scaffold`, `get` and `check` verbs |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 
@@ -82,10 +83,14 @@ owner-silence rule that declines a raise is a later build's reader.
   top level of the working directory by default. One line per arm,
   `policy-check: <arm> · <n> finding(s) · <population>`, then each finding. A population of zero is
   a finding. Exit 0 green, 1 red.
-- `python <prefix>/policy/check_policy.py --fixture [<case>]` — one scratch repository per case under
-  the system temp directory (`pol-` prefix): each case plants its break, its arm must red naming the
-  planted key, and the unplanted copy must be green. It ends with an executed-assertion count. A
-  `<case>` runs that case alone; a name no case carries is exit 2.
+- `python <prefix>/policy/check_policy.py --fixture [--strict-from <dir>] [<case>]` — one scratch
+  repository per case under the system temp directory (`pol-` prefix): each case plants its break,
+  its arm must red naming the planted key, and the unplanted copy must be green. It ends with an
+  executed-assertion count. A `<case>` runs that case alone; a name no case carries is exit 2.
+  `--strict-from` names the directory holding the design record whose `[presets]` table
+  `on-invalid-strict` reads: the one file directly in it whose name ends `-architecture-v2.md`, red
+  naming the count when there is none or more than one. Without it that case prints `NOT RUN`, never
+  a pass. Gov's `policy fixtures` leg always passes it.
 - `python <prefix>/policy/policy.py lists --check` — red on a row the catalogue owes and the list
   lacks, a row the list carries that the catalogue no longer owes (stale), and a row the list at the
   compare base did not carry. The base is the merge-base of HEAD and the remote default branch where
@@ -100,6 +105,10 @@ owner-silence rule that declines a raise is a later build's reader.
   list one member per line, LF-ended. `--explain` adds `policy: <key> · <source> · <reason>` on
   stderr, the reason naming the sha8 and how the revision was found. Exit 0, or 2 with one
   `policy: refused · <path>:<line> · <why>` line.
+- `python <prefix>/policy/policy.py check [--rev <rev>]` — run in the repository to check: the policy
+  file in that commit, `HEAD` by default, the candidate a push lands. Exit 0 with one
+  `policy: check · ...` line when the file is valid, absent, or invalid with a last valid revision
+  under `last-valid`, the line saying which; exit 2 with the refusal line otherwise.
 
 ## The reader
 
@@ -125,7 +134,19 @@ for the legacy homes.
   answers the row's `default` with source `default` and a reason naming the case, absent or not
   set, and any `preset` the file names, which no step applies until dKeptSession adds its step
   between the two. A row with no `default` refuses, naming it in the catalogue.
-- **Until TOOL-dGroundRules-4.** Text that is not TOML refuses naming the decoder's line.
+- **An invalid file** (TOOL-dGroundRules-4). `validate(text)` is the file's one judge, and
+  `arm_schema` grades through it: a list of `Problem(line, key, why)`, empty for a valid file. Text
+  that is not TOML is one problem at the decoder's line, key `""`; text that parses has one per leaf
+  `check_value` refuses and one per leaf no catalogue row matches, at the line `derive_key_line`
+  finds (`0` inside an inline table). `resolve` parses valid text only. For text with a problem it
+  takes `read_last_valid_value`: `read_last_valid` walks `git rev-list --first-parent <sha> --
+  .governance/policy.toml` to the newest revision whose file is present and valid, an absent file
+  counting as no valid revision. `policy-file.on-invalid` is read from THAT revision by
+  `RESOLUTION_ORDER`, never from the invalid file, so an out-of-set value of it is one more problem.
+  With no valid revision, or with `refuse`, the read refuses at the first problem's line. With
+  `last-valid`, the default, the WHOLE file falls back, never one key: the key resolves over the
+  valid revision's table, with source `last-valid` and a reason naming the invalid sha, the line,
+  the problem and the valid sha. An absent file is not invalid and reads defaults.
 - **Git's environment.** Every git call drops the location variables git exports to a hook
   (`GIT_LOCATION_VARS`), so a reader started inside a hook or a fixture reads the repository it was
   pointed at.
@@ -134,10 +155,15 @@ for the legacy homes.
 
 | Arm | Reads | Finds |
 |---|---|---|
-| `arm_schema` | `.governance/policy.toml`, the catalogue | each key `check_value` refuses, each key no row matches |
+| `arm_schema` | `.governance/policy.toml`, the catalogue | each problem `validate` finds: each key `check_value` refuses, each key no row matches |
 | `arm_shape` | the catalogue | a set-valued row with no `empty`, `empty` on any other row, a missing required field, an unknown field, a literal default or a `usage` its own row refuses, a `usage` that does not parse |
 | `arm_summaries` | the catalogue, the list, the list at the base | each `lists --check` finding |
 | `arm_direction` | the catalogue | each `check_direction` finding; its population is the loop bound and deadline rows |
+| `arm_on_invalid` | `.governance/policy.toml` as committed at HEAD, its history | the refusal `policy.py check` prints: an invalid file with no valid revision before it, or one whose last valid revision sets `policy-file.on-invalid = "refuse"` |
+
+`arm_on_invalid` is how an invalid file with no fallback reaches the push and landing gates: the
+`policy check` leg carries no guard, so the pre-push bar and every landing run it on a push that
+changes only the policy file.
 
 The fixture's cases: one `schema-empty-<name>` per never-empty row, then `shape-no-empty`,
 `shape-unknown-field`, `usage-out-of-set`, `summary-new-key`, `usage-new-key`, `list-grew`,
@@ -156,7 +182,20 @@ and a backticked `touch`, which must read its value; the marker must not exist a
 default `6` as `not set in`; a commit with no file must read `warn` as `is absent at`; a file setting
 only `preset = "strict"` must read `warn` with the unapplied preset in its reason, and `refuse` once
 it sets the key too; and a copy of this kit whose `budgets.enforce` row carries no `default` must
-refuse, naming `catalogue.toml` and the row.
+refuse, naming `catalogue.toml` and the row. `on-invalid-classes` plants each failure class of the
+invalid-file branch in its own repository, V a valid revision and C the one after it: an absent
+file reads defaults; a malformed C after V reads V with source `last-valid` and `check` names the
+fallback; a malformed revision with nothing before it refuses `get` and `check` naming its line,
+and `arm_on_invalid` reds over it and goes green once the file is made valid; a missing key reads
+its default; an out-of-set C and a C setting `runtime.agents-in-flite`, a key no row matches, read
+V whole; V setting `policy-file.on-invalid = "refuse"` refuses a malformed C; and C setting that key
+to `"never"` refuses every read after a V that sets `refuse`, and reads V after a V that sets
+nothing. `on-invalid-strict` reads v2's `[presets]` table from the one `-architecture-v2.md` file in
+the directory `--strict-from` names, keeps each key whose
+`strict` cell its catalogue row admits as a value other than its default, names every excluded row
+with why (no row, a placeholder key, a cell that is no value, the default, a dotted prefix of a kept
+key), and reads each kept key at a malformed revision after a valid one setting them all: every read
+must be strict's value from `last-valid`, and an empty population reds.
 
 ## Each arm in an adopter
 
@@ -174,6 +213,7 @@ print a graded line with no finding or an announce line, `policy-check: <arm> ·
 | `arm_shape` | the installed kit's catalogue, row by row | a finding: the catalogue ships in the kit, and one that does not read or parse reds |
 | `arm_summaries` | the installed shrink-only list against the installed catalogue, and against the list at the target's compare base | a finding per row an absent list owes; no remote or no fetched ref is no base, which its line says, and the catalogue alone is compared |
 | `arm_direction` | the installed catalogue's loop bound and deadline rows | a finding: the catalogue ships in the kit, and one that does not read or parse reds |
+| `arm_on_invalid` | the target's `.governance/policy.toml` as committed at HEAD, against the installed catalogue | an absent file at HEAD grades clean, since it reads defaults; a HEAD that names no commit, before the first commit, is a finding until TOOL-dGroundRules-21 announces it |
 
 ## The adopter
 

@@ -2,7 +2,7 @@
 one can red (TOOL-dGroundRules-1).
 
     python <this kit>/check_policy.py [--repo <dir>]   # every arm in ARMS; exit 0 green, 1 red
-    python <this kit>/check_policy.py --fixture [<case>]  # every case, or the one named
+    python <this kit>/check_policy.py --fixture [--strict-from <dir>] [<case>]  # every case, or the one named
 
 `<dir>` defaults to the git top level of the working directory. Each arm prints
 `policy-check: <arm> · <n> finding(s) · <population>`, then one line per finding; a population of
@@ -10,8 +10,9 @@ zero is a finding, so an arm that read nothing cannot read green.
 
 THE ARMS read the repository's `.governance/policy.toml` and this kit's catalogue and shrink-only
 list: `arm_schema` grades each file key with the value check, `arm_shape` audits the catalogue's
-rows, `arm_summaries` grades the list as `policy.py lists --check` does, and `arm_direction` reds a
-loop bound or deadline row that does not declare `direction = "raise-loosens"` (TOOL-dGroundRules-11).
+rows, `arm_summaries` grades the list as `policy.py lists --check` does, `arm_direction` reds a
+loop bound or deadline row that does not declare `direction = "raise-loosens"` (TOOL-dGroundRules-11),
+and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4).
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -37,6 +38,16 @@ read as a value.
 refuses or reads anything but the catalogue default with its case's reason, a named preset missing
 from the reason, and a row with no default that prints a value; that row is planted in a copy of
 this kit, never in the tracked catalogue.
+
+`on-invalid-classes` and `on-invalid-strict` are outcome cases (TOOL-dGroundRules-4). The first plants
+each failure class of the invalid-file branch in its own repository, and reds a default or the invalid
+file's own value read while the file is invalid, a fallback past `refuse`, and an `arm_on_invalid`
+silent over a malformed file with no valid revision. The second reads v2's `[presets]` table from the
+one file directly in the directory `--strict-from` names whose name ends `-architecture-v2.md`, red
+naming the count when there is none or more than one, derives its population, plants strict's value of
+each kept key in a valid revision with a malformed one after it, and reds any read that is not
+strict's value from `last-valid` or an empty population; with no `--strict-from` it prints NOT RUN,
+which is never a pass.
 
 Later units add arms to ARMS and cases to CASES.
 """
@@ -69,27 +80,20 @@ def load_rows(kit):
 
 
 def arm_schema(repo, kit):
-    """Each key of the policy file its catalogue row refuses, and each key no row matches."""
+    """Each problem `policy.validate` finds in the policy file: a key its catalogue row refuses, and a
+    key no row matches (TOOL-dGroundRules-4 re-points this arm through the one judge)."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
     path = Path(repo, *POLICY_FILE)
     if not path.is_file():
         return 0, f"{POLICY_REL} is absent, so no key was graded", []
-    try:
-        doc = tomllib.loads(path.read_text(encoding="utf-8"))
-    except tomllib.TOMLDecodeError as exc:
-        return 0, f"{POLICY_REL} did not parse", [(POLICY_REL, f"does not parse: {exc}")]
-    findings, n = [], 0
-    for segs, row, value in policy.scan_keys(doc, rows):
-        n += 1
-        if row is None:
-            findings.append((policy.render_dotted(segs), "no catalogue row matches this key"))
-            continue
-        why = policy.check_value(row, value)
-        if why:
-            findings.append((policy.render_dotted(segs), why))
-    return n, f"{n} key(s) of {POLICY_REL} against {len(rows)} row(s)", findings
+    text = path.read_text(encoding="utf-8")
+    problems = policy.validate(text, rows)
+    if problems and not problems[0].key:
+        return 0, f"{POLICY_REL} did not parse", [(POLICY_REL, f"does not parse: {problems[0].why}")]
+    n = sum(1 for _ in policy.scan_keys(tomllib.loads(text), rows))
+    return n, f"{n} key(s) of {POLICY_REL} against {len(rows)} row(s)", [(p.key, p.why) for p in problems]
 
 
 def arm_shape(repo, kit):
@@ -120,7 +124,17 @@ def arm_direction(repo, kit):
     return n, f"{n} loop bound and deadline row(s)", policy.check_direction(rows)
 
 
-ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction]
+def arm_on_invalid(repo, kit):
+    """The `policy.py check` verdict over the repository's HEAD, the candidate a push lands: its
+    Refusal, an invalid policy file with no fallback, is the one finding (TOOL-dGroundRules-4)."""
+    try:
+        line = policy.check_revision(repo, "HEAD")
+    except policy.Refusal as exc:
+        return 1, f"{POLICY_REL} at HEAD", [(f"{exc.path}:{exc.line}", exc.why)]
+    return 1, line.removeprefix("policy: check · "), []
+
+
+ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid]
 
 
 def run_arm(arm, repo, kit):
@@ -389,27 +403,30 @@ def write_policy(repo, text):
     Path(repo, *POLICY_FILE).write_text(text, encoding="utf-8", newline="\n")
 
 
-def build_reader_repo(path, text):
-    """A git repository at `path` on `main`, its one commit holding `text` as the policy file, or no
-    policy file where `text` is None."""
+def build_reader_repo(path, *texts):
+    """A git repository at `path` on `main`, one commit per text in order, each holding that text as
+    the policy file, or no policy file where the text is None."""
     path.mkdir()
     run_fixture_git(path, "init", "-q")
     run_fixture_git(path, "symbolic-ref", "HEAD", "refs/heads/main")
-    if text is not None:
-        write_policy(path, text)
-    run_fixture_git(path, "add", "-A")
-    run_fixture_git(path, "commit", "-q", "--allow-empty", "-m", "policy")
+    for text in texts:
+        if text is None:
+            Path(path, *POLICY_FILE).unlink(missing_ok=True)
+        else:
+            write_policy(path, text)
+        run_fixture_git(path, "add", "-A")
+        run_fixture_git(path, "commit", "-q", "--allow-empty", "-m", "policy")
     return path
 
 
-def check_get(scenario, repo, args, want, env=None, kit=KIT):
-    """`<kit>/policy.py get <args>` run in `repo` -> (scenario, what, ok, what it observed), `want`
+def check_get(scenario, repo, args, want, env=None, kit=KIT, verb="get"):
+    """`<kit>/policy.py <verb> <args>` run in `repo` -> (scenario, what, ok, what it observed), `want`
     judging (exit code, stdout, stderr), CR stripped."""
-    p = subprocess.run([sys.executable, str(kit / "policy.py"), "get", *args], cwd=repo, env=env,
+    p = subprocess.run([sys.executable, str(kit / "policy.py"), verb, *args], cwd=repo, env=env,
                        capture_output=True, text=True, encoding="utf-8", errors="replace")
     out, err = p.stdout.replace("\r", ""), p.stderr.replace("\r", "")
     seen = f"exit {p.returncode} · stdout {out.strip() or '(none)'!r} · stderr {err.strip() or '(none)'!r}"
-    return scenario, "get " + " ".join(args), want(p.returncode, out, err), seen
+    return scenario, f"{verb} " + " ".join(args), want(p.returncode, out, err), seen
 
 
 def print_checks(name, checks):
@@ -533,6 +550,203 @@ def run_resolution_order(name):
     return print_checks(name, checks)
 
 
+# ---- the invalid-file branch (TOOL-dGroundRules-4) ----------------------------------------------
+
+STRICT_FROM = None  # the directory `--fixture --strict-from` names; None prints `on-invalid-strict` NOT RUN
+V2_SUFFIX = "-architecture-v2.md"  # v2 is the one file in that directory whose name ends so
+PRESETS_HEADING = "\n## [presets]"
+PRESETS_HEADER = "| Key | velocity |"
+MALFORMED = "this line is not toml\n"
+
+
+def run_on_invalid_classes(name):
+    """One repository per failure class, each read at `--rev HEAD`, V a valid revision and C the one
+    after it: absent; malformed after V and with nothing before it, where `arm_on_invalid` reds and
+    then, the file made valid, does not; a missing key; an out-of-set value; a key no catalogue row
+    matches; `refuse` then malformed; and an out-of-set `policy-file.on-invalid` with and without a
+    value of it in V."""
+    good = '[budgets]\nenforce = "refuse"\n'
+    bad = '[budgets]\nenforce = refuse\n'  # line 2 is no TOML value
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        absent = build_reader_repo(t / "absent", None)
+        after = build_reader_repo(t / "after", good, bad)
+        alone = build_reader_repo(t / "alone", bad)
+        missing = build_reader_repo(t / "missing", '[budgets]\nenforce = "warn"\n')
+        oos = build_reader_repo(t / "oos", good, '[budgets]\nenforce = "refuze"\n\n[runtime]\nagents-in-flight = 3\n')
+        unknown = build_reader_repo(t / "unknown", good, '[budgets]\nenforce = "warn"\n\n[runtime]\nagents-in-flite = 3\n')
+        refuse = build_reader_repo(t / "refuse", '[policy-file]\non-invalid = "refuse"\n', bad)
+        never = build_reader_repo(t / "never", '[policy-file]\non-invalid = "refuse"\n', '[policy-file]\non-invalid = "never"\n')
+        unset = build_reader_repo(t / "unset", good, '[budgets]\nenforce = "warn"\n\n[policy-file]\non-invalid = "never"\n')
+        v = (policy.run_git(after, "rev-parse", "HEAD~1") or "").strip()[:8] or "(no V)"
+        get, head = ["--rev", "HEAD", "--explain"], ["--rev", "HEAD"]
+        refused = f"policy: refused · {POLICY_REL}:2 · "
+
+        def build_fallback(value, line, *needles):
+            return lambda rc, o, e: (rc == 0 and o == value and " · last-valid · " in e
+                                     and f"is invalid, line {line}: " in e and all(n in e for n in needles))
+        checks = [
+            check_get("absent", absent, ["budgets.enforce", *get],
+                      lambda rc, o, e: rc == 0 and o == "warn\n" and " · default · " in e),
+            check_get("absent", absent, head, lambda rc, o, e: rc == 0 and "is absent at" in o, verb="check"),
+            check_get("malformed-after-valid", after, ["budgets.enforce", *get],
+                      build_fallback("refuse\n", 2, f"the last valid revision {v}")),
+            check_get("malformed-after-valid", after, head,
+                      lambda rc, o, e: rc == 0 and f"the last valid revision {v}" in o, verb="check"),
+            check_get("malformed-alone", alone, ["budgets.enforce", *head],
+                      lambda rc, o, e: rc == 2 and not o and e.startswith(refused) and "no valid revision" in e),
+            check_get("malformed-alone", alone, head,
+                      lambda rc, o, e: rc == 2 and not o and e.startswith(refused), verb="check"),
+            check_get("missing-key", missing, ["runtime.agents-in-flight", *get],
+                      lambda rc, o, e: rc == 0 and o == "6\n" and " · default · " in e),
+            check_get("out-of-set", oos, ["budgets.enforce", *get], build_fallback("refuse\n", 2, "refuze")),
+            check_get("out-of-set", oos, ["runtime.agents-in-flight", *get], build_fallback("6\n", 2, "the catalogue default")),
+            check_get("unknown-key", unknown, ["budgets.enforce", *get],
+                      build_fallback("refuse\n", 5, "runtime.agents-in-flite: no catalogue row matches")),
+            check_get("refuse-then-malformed", refuse, ["budgets.enforce", *head],
+                      lambda rc, o, e: rc == 2 and not o and e.startswith(refused) and "on-invalid is refuse" in e),
+            check_get("refuse-then-malformed", refuse, head,
+                      lambda rc, o, e: rc == 2 and e.startswith(refused) and "on-invalid is refuse" in e, verb="check"),
+        ]
+        for args, verb in ((["budgets.enforce", *head], "get"), (["policy-file.on-invalid", *head], "get"), (head, "check")):
+            checks.append(check_get("on-invalid-out-of-set", never, args,
+                                    lambda rc, o, e: rc == 2 and e.startswith(refused) and "on-invalid is refuse" in e, verb=verb))
+        checks.append(check_get("on-invalid-out-of-set-unset", unset, ["budgets.enforce", *get], build_fallback("refuse\n", 5)))
+        for fixed in (False, True):
+            if fixed:
+                write_policy(alone, good)
+                run_fixture_git(alone, "commit", "-q", "-am", "the file made valid")
+            _n, population, findings = arm_on_invalid(alone, KIT)
+            ok = not findings if fixed else len(findings) == 1 and findings[0][0] == f"{POLICY_REL}:2"
+            checks.append(("malformed-alone" + (", made valid" if fixed else ""), "arm_on_invalid", ok,
+                           f"{len(findings)} finding(s) · " + ("; ".join(f"{k}: {w}" for k, w in findings) or population)))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def derive_strict_value(row, cell):
+    """A `strict` cell of v2's presets table read as `row` expects: a `, `-separated list for a
+    set-valued row, a number for a typed range, the member a closed list spells, else the cell's
+    text, which `check_value` then judges."""
+    allowed = row.get("allowed")
+    t = allowed.get("type") if isinstance(allowed, dict) else None
+    if t in policy.SET_TYPES:
+        return cell.split(", ")
+    if t in policy.COUNT_TYPES or t in policy.DURATION_TYPES:
+        for kind in (int, float) if t in policy.DURATION_TYPES else (int,):
+            try:
+                return kind(cell)
+            except ValueError:
+                pass
+        return cell
+    members = allowed if isinstance(allowed, list) else allowed.get("of", []) + allowed.get("or", []) if isinstance(allowed, dict) else []
+    return next((m for m in members if (m if isinstance(m, str) else policy.render_toml_value(m)) == cell), cell)
+
+
+def check_same_value(a, b):
+    """True when two policy values are one: a set-valued pair compared as a set, else type and value."""
+    if isinstance(a, list) and isinstance(b, list):
+        return {policy.render_json(m) for m in a} == {policy.render_json(m) for m in b}
+    return policy.check_member(a, [b])
+
+
+def derive_strict_population(text, rows):
+    """-> (kept {key: strict's value}, excluded [(key, why)], cells) from v2's `[presets]` table, the
+    one whose header row opens `| Key | velocity |`. A key is kept when its strict cell, read as its
+    catalogue row expects, is a value `check_value` admits and differs from the row's default; every
+    other row is excluded with why, and of two keys where one is a dotted prefix of the other, which
+    no TOML file can hold together, the longer is kept."""
+    parts = text.replace("\r", "").split(PRESETS_HEADING, 1)
+    lines = parts[1].split("\n## ", 1)[0].split("\n") if len(parts) == 2 else []
+    at = next((i for i, ln in enumerate(lines) if ln.startswith(PRESETS_HEADER)), None)
+    if at is None:
+        return {}, [], 0
+    col = [c.strip() for c in lines[at].strip().strip("|").split("|")].index("strict")
+    kept, excluded, cells = {}, [], 0
+    for ln in lines[at + 2:]:
+        if not ln.startswith("|"):
+            break
+        row_cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+        key, cell = row_cells[0].strip("`"), row_cells[col]
+        cells += 1
+        if "<" in key or "*" in key:
+            excluded.append((key, "a placeholder key, which names no one key to plant"))
+            continue
+        try:
+            row = policy.read_catalogue_row(policy.parse_key(key), rows)
+        except policy.Refusal as exc:
+            excluded.append((key, f"no catalogue row: {exc.why}"))
+            continue
+        value = derive_strict_value(row, cell)
+        why = policy.check_value(row, value)
+        if why:
+            excluded.append((key, f"the cell {cell!r} is no value its row admits: {why}"))
+        elif check_same_value(value, row.get("default")):
+            excluded.append((key, "strict's value is the default, which cannot tell a fallback from a read"))
+        else:
+            kept[key] = value
+    for key in sorted(kept):
+        longer = next((k for k in kept if k.startswith(key + ".")), None)
+        if longer:
+            excluded.append((key, f"a dotted prefix of {longer}, which no TOML file can hold beside it"))
+            del kept[key]
+    return kept, excluded, cells
+
+
+def run_on_invalid_strict(name):
+    """Strict's value of every derived key, read at a malformed revision after a valid one setting
+    each: every read must be strict's value with source `last-valid`, never a default. Without
+    `--strict-from` it prints NOT RUN, which is never a pass. v2 is the one file directly in that
+    directory whose name ends `-architecture-v2.md`; none, or more than one, is red naming the count."""
+    if STRICT_FROM is None:
+        print(f"policy-fixture: {name} · NOT RUN · no --strict-from <dir> names the directory holding v2's "
+              "architecture record, so strict's values have no source; this is not a pass")
+        return 0, 0
+    found = sorted(p for p in Path(STRICT_FROM).glob("*" + V2_SUFFIX) if p.is_file())
+    if len(found) != 1:
+        print(f"policy-fixture: {name} · WRONG: --strict-from {STRICT_FROM} holds {len(found)} file(s) whose "
+              f"name ends {V2_SUFFIX}, not one: {', '.join(p.name for p in found) or '(none)'}")
+        return 1, 1
+    v2 = found[0].as_posix()
+    try:
+        text = found[0].read_text(encoding="utf-8")
+    except OSError as exc:
+        print(f"policy-fixture: {name} · WRONG: {v2} does not read: {exc}")
+        return 1, 1
+    rows = policy.load_catalogue(KIT)
+    kept, excluded, cells = derive_strict_population(text, rows)
+    print(f"policy-fixture: {name} · {cells} strict cell(s) in {v2} · population {len(kept)} key(s), "
+          f"{len(excluded)} excluded")
+    for key, why in excluded:
+        print(f"policy-fixture: {name} · excluded {key}: {why}")
+    if not kept:
+        print(f"policy-fixture: {name} · WRONG: the population is empty, so nothing was planted")
+        return 1, 1
+    plant = "".join(f"{key} = {policy.render_toml_value(v)}\n" for key, v in kept.items())
+    wrong = [f"the valid revision is invalid, line {p.line}: {p.key}: {p.why}" for p in policy.validate(plant, rows)]
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        repo = build_reader_repo(t / "strict", plant, plant + MALFORMED)
+        for key, value in kept.items():
+            try:
+                hit = policy.resolve(key, repo, "HEAD")
+            except policy.Refusal as exc:
+                wrong.append(f"{key} refused: {exc}")
+                continue
+            if hit.source != "last-valid" or not check_same_value(hit.value, value):
+                wrong.append(f"{key} read {policy.render_json(hit.value)} from {hit.source}, "
+                             f"not strict's {policy.render_json(value)} from last-valid")
+    finally:
+        remove_repo(t)
+    for w in wrong:
+        print(f"policy-fixture: {name} · WRONG: {w}")
+    if not wrong:
+        print(f"policy-fixture: {name} · each of the {len(kept)} key(s) read strict's value from last-valid "
+              f"at the malformed revision")
+    return len(kept) + 2, len(wrong)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -547,6 +761,8 @@ CASES = [
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
     ("reader-parsed", None, run_reader_parsed),
     ("resolution-order", None, run_resolution_order),
+    ("on-invalid-classes", None, run_on_invalid_classes),
+    ("on-invalid-strict", None, run_on_invalid_strict),
 ]
 
 
@@ -635,12 +851,19 @@ def run_fixture(only=None):
     return 1 if wrong or not asserted else 0
 
 
-USAGE = "usage: python check_policy.py [--repo <dir>] | --fixture [<case>]"
+USAGE = "usage: python check_policy.py [--repo <dir>] | --fixture [--strict-from <dir>] [<case>]"
 
 
 def main(argv):
-    if argv[:1] == ["--fixture"] and len(argv) <= 2:
-        return run_fixture(*argv[1:])
+    global STRICT_FROM
+    if argv[:1] == ["--fixture"]:
+        rest = argv[1:]
+        if rest[:1] == ["--strict-from"] and len(rest) >= 2:
+            STRICT_FROM, rest = rest[1], rest[2:]
+        if len(rest) <= 1 and rest[:1] != ["--strict-from"]:
+            return run_fixture(*rest)
+        print(USAGE, file=sys.stderr)
+        return 2
     if argv and not (len(argv) == 2 and argv[0] == "--repo"):
         print(USAGE, file=sys.stderr)
         return 2

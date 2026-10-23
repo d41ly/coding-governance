@@ -1767,7 +1767,9 @@
     "argv": [
       "python",
       "{prefix}/policy/check_policy.py",
-      "--fixture"
+      "--fixture",
+      "--strict-from",
+      "memory/builds/dClosedLoop/build/"
     ],
     "guard": [
       "{prefix}/policy/"

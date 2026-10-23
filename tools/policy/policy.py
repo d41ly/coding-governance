@@ -1,12 +1,14 @@
 """policy.py - the policy kit's module: its catalogue, the value check, the shape audit, the
 shrink-only list of keys that carry no summary or no usage (TOOL-dGroundRules-1), the direction
 check over the loop bound and deadline rows (TOOL-dGroundRules-11), and the reader
-(TOOL-dGroundRules-2) with its one resolution order (TOOL-dGroundRules-3).
+(TOOL-dGroundRules-2) with its one resolution order (TOOL-dGroundRules-3) and its invalid-file
+branch (TOOL-dGroundRules-4).
 
     python <this kit>/policy.py lists --check   # the list against the catalogue and against its base
     python <this kit>/policy.py lists --write   # drain the list; it never gains a name
     python <this kit>/policy.py scaffold        # print the starter .governance/policy.toml
     python <this kit>/policy.py get <key> [--rev <rev>] [--explain]   # one key's value
+    python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
 
 The catalogue, `catalogue.toml` beside this file, is the schema: one row per policy key. A file key
 is matched to a row as a tuple of SEGMENTS, never as a joined string, because a quoted TOML segment
@@ -17,7 +19,9 @@ THE READER reads `.governance/policy.toml` as committed at the landed revision, 
 working tree, and parses it with tomllib, never by sourcing it: `read_policy_key`'s contract in the
 unattended kit, carried to TOML. The landed revision is the remote tip the remote ladder names, or
 with no remote at all the local default branch, and every reason names its sha. A key resolves in
-RESOLUTION_ORDER, spelled once: the file's value, then the catalogue default with its reason.
+RESOLUTION_ORDER, spelled once: the file's value, then the catalogue default with its reason. A
+file `validate` refuses never reads a default: the whole file falls back to its last valid revision
+on the first-parent history, or refuses at a line, as that revision's `policy-file.on-invalid` says.
 
 Exit 0 green, 1 red, 2 usage or a refused read.
 """
@@ -425,6 +429,104 @@ def parse_key(key):
     return path
 
 
+# ---- the invalid-file branch (TOOL-dGroundRules-4) --------------------------------------------
+
+Problem = namedtuple("Problem", "line key why")   # key "" for text that is not TOML
+TABLE_HEADER = re.compile(r"[ \t]*\[\[?(.*?)\]\]?[ \t]*(?:#.*)?")
+ASSIGNED_KEY = re.compile(rf"[ \t]*{KEY_SEGMENT}(?:[ \t]*\.[ \t]*{KEY_SEGMENT})*[ \t]*(?==)")
+
+
+def derive_key_line(text, path):
+    """The 1-based line of a policy file's text that assigns the key path `path`, reading each table
+    header and each assignment's key with `parse_key`; 0 where the key sits in an inline table or no
+    line assigns it."""
+    # ponytail: a line inside a multi-line string or array that looks like `k = v` is read as one;
+    # the cost is a wrong line number on such a file, never a wrong verdict.
+    table = ()
+    for n, ln in enumerate(text.splitlines(), 1):
+        hdr, key = TABLE_HEADER.fullmatch(ln), ASSIGNED_KEY.match(ln)
+        try:
+            if hdr:
+                table = parse_key(hdr[1])
+                if table == path:
+                    return n
+            elif key:
+                full = table + parse_key(key[0])
+                if full == path:
+                    return n
+                if path[:len(full)] == full:
+                    return 0  # the key sits in this line's inline table
+        except Refusal:
+            continue
+    return 0
+
+
+def validate(text, rows=None):
+    """[Problem] for a policy file's text, [] for a valid one. Text that is not TOML is one problem at
+    the decoder's line, key "". Text that parses yields one per leaf its catalogue row refuses, by
+    `check_value`, and one per leaf no row matches, each at the line `derive_key_line` finds. `rows`
+    is `load_catalogue`'s, this kit's by default. The module's one judge of a policy file."""
+    try:
+        doc = tomllib.loads(text)
+    except tomllib.TOMLDecodeError as exc:
+        at = re.search(r"at line (\d+)", str(exc))  # Python 3.14 carries `lineno`; 3.11 to 3.13 the message
+        return [Problem(getattr(exc, "lineno", None) or (int(at[1]) if at else 0), "", str(exc))]
+    out = []
+    for segs, row, value in scan_keys(doc, load_catalogue(KIT) if rows is None else rows):
+        why = "no catalogue row matches this key" if row is None else check_value(row, value)
+        if why:
+            out.append(Problem(derive_key_line(text, segs), render_dotted(segs), why))
+    return out
+
+
+def read_last_valid(repo, sha):
+    """(sha, parsed table) of the newest revision on `sha`'s first-parent history whose policy file is
+    present and `validate` admits, or None. Each commit of `git rev-list --first-parent <sha> --
+    <file>` is read through `read_policy_text`; a revision where the file is absent is not valid."""
+    for c in (run_git(repo, "rev-list", "--first-parent", sha, "--", POLICY_REL) or "").split():
+        text = read_policy_text(repo, c)
+        if text is not None and not validate(text):
+            return c, parse_policy(text)
+    return None
+
+
+def read_last_valid_value(path, row, repo, sha, how, problems):
+    """Resolution(value, "last-valid", reason) for `path` while the policy file at `sha` is invalid,
+    `problems` being `validate`'s: the whole file falls back, never one key. `policy-file.on-invalid`
+    is read from the last valid revision by RESOLUTION_ORDER, never from the invalid file; with no
+    valid revision, or with any value but `last-valid`, a Refusal at the first problem's line. Else
+    RESOLUTION_ORDER over that revision's table, its reason naming both shas, the line and the problem."""
+    first = problems[0]
+    what = (f"{first.key}: " if first.key else "") + first.why
+    found = read_last_valid(repo, sha)
+    if found is None:
+        raise Refusal(POLICY_REL, first.line, f"{what}; no valid revision of the file precedes {sha[:8]}")
+    valid, table = found
+    at = f"walked back from {sha[:8]}, {how}"
+    on_path = parse_key("policy-file.on-invalid")
+    on = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, valid, at).value
+    if on != "last-valid":  # deny by default: only the one fallback value falls back
+        raise Refusal(POLICY_REL, first.line, f"{what}; policy-file.on-invalid is {on} at {valid[:8]}")
+    hit = read_ordered_value(path, row, table, valid, at)
+    return Resolution(hit.value, "last-valid", f"{POLICY_REL} at {sha[:8]} is invalid, line {first.line}: {what}; "
+                      f"read from the last valid revision {valid[:8]}: {hit.reason}")
+
+
+def check_revision(repo, rev):
+    """The `check` verb's verdict on the policy file in the commit `rev` names: one line where it is
+    valid, absent, or invalid with a last valid revision under `last-valid`; a Refusal otherwise."""
+    sha = resolve_commit(repo, rev)
+    text = read_policy_text(repo, sha)
+    if text is None:
+        return f"policy: check · {POLICY_REL} is absent at {sha[:8]}, so every key reads its catalogue default"
+    problems = validate(text)
+    if not problems:
+        return f"policy: check · {POLICY_REL} at {sha[:8]} is valid"
+    on_path = parse_key("policy-file.on-invalid")
+    hit = read_last_valid_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), repo, sha, f"--rev {rev}", problems)
+    return f"policy: check · every key falls back to the last valid revision · policy-file.on-invalid is {hit.value}: {hit.reason}"
+
+
 def read_file_value(path, row, table, sha, how):
     """Resolution(value, "file", reason) when the parsed `table` sets `path`, else None. `row` is
     unread: every step of the resolution order shares this signature."""
@@ -454,28 +556,31 @@ def read_default_value(path, row, table, sha, how):
 RESOLUTION_ORDER = (read_file_value, read_default_value)
 
 
-def resolve(key, repo=".", rev=None):
-    """-> Resolution for `key`: its path and catalogue row, the revision (`rev` resolved to a full
-    sha, else the landed one), the policy text there and its parse (None for an absent file), then
-    the first answer of RESOLUTION_ORDER. Until TOOL-dGroundRules-4 lands, text that is not TOML refuses."""
-    path = parse_key(key)
-    row = read_catalogue_row(path, load_catalogue(KIT))
-    sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
-    text = read_policy_text(repo, sha)
-    table = None
-    if text is not None:
-        try:
-            table = parse_policy(text)
-        except tomllib.TOMLDecodeError as exc:
-            at = re.search(r"at line (\d+)", str(exc))
-            line = getattr(exc, "lineno", None) or (int(at[1]) if at else 0)
-            raise Refusal(POLICY_REL, line, f"not TOML at {sha[:8]}: {exc}") from None
+def read_ordered_value(path, row, table, sha, how):
+    """The first Resolution RESOLUTION_ORDER answers for `path` over a parsed `table`, None for an
+    absent file."""
     for step in RESOLUTION_ORDER:
         hit = step(path, row, table, sha, how)
         if hit is not None:
             return hit
     # Unreachable while the default step stands, which answers or refuses: deny, never a None value.
-    raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {key} at {sha[:8]}")
+    raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {render_dotted(path)} at {sha[:8]}")
+
+
+def resolve(key, repo=".", rev=None):
+    """-> Resolution for `key`: its path and catalogue row, the revision (`rev` resolved to a full
+    sha, else the landed one) and the policy text there. Text `validate` refuses takes
+    `read_last_valid_value`; valid text is parsed and, like an absent file (table None), answered by
+    RESOLUTION_ORDER."""
+    path = parse_key(key)
+    rows = load_catalogue(KIT)
+    row = read_catalogue_row(path, rows)
+    sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
+    text = read_policy_text(repo, sha)
+    problems = [] if text is None else validate(text, rows)
+    if problems:
+        return read_last_valid_value(path, row, repo, sha, how, problems)
+    return read_ordered_value(path, row, None if text is None else parse_policy(text), sha, how)
 
 
 def parse_list(text):
@@ -548,7 +653,8 @@ def render_scaffold(rows):
     return out
 
 
-USAGE = "usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain]"
+USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain]"
+         " | check [--rev <rev>]")
 
 
 def cmd_get(argv):
@@ -575,9 +681,30 @@ def cmd_get(argv):
     return 0
 
 
+def cmd_check(argv):
+    """`check [--rev <rev>]`, run in the repository to check: the policy file in the commit `rev`
+    names, `HEAD` by default, the candidate a push lands. Exit 0 printing one line when it is valid,
+    absent, or invalid with a last valid revision under `last-valid`; exit 2 printing the Refusal on
+    stderr otherwise."""
+    import argparse
+    ap = argparse.ArgumentParser(prog="policy.py check")
+    ap.add_argument("--rev", default="HEAD")
+    args = ap.parse_args(argv)
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")
+    try:
+        print(check_revision(".", args.rev))
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    return 0
+
+
 def main(argv):
     if argv[:1] == ["get"]:
         return cmd_get(argv[1:])
+    if argv[:1] == ["check"]:
+        return cmd_check(argv[1:])
     if argv == ["scaffold"]:
         sys.stdout.write(render_scaffold(load_catalogue(KIT)))
         return 0

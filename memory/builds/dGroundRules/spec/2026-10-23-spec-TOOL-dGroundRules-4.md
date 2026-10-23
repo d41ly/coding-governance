@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0010@cd629be7 whole
 **Carries:** node:policy-key.policy-file.on-invalid
@@ -9,6 +9,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dGroundRules-4-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-4-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-4-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-4-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-4-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-4-1-spec-writer.md) | journal | — |

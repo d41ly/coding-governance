@@ -5,9 +5,10 @@ cap's breach warns or refuses. The policy kit's catalogue, `tools/policy/catalog
 repository, is the file's schema. It has one row per key, giving the values the key admits, its
 default, and the build that owns it. A key the file does not set takes its default.
 
-One reader reads the file: `python tools/policy/policy.py get <key>`, below. No gate or hook calls it
-yet. Later dGroundRules units re-point each consumer to it, one at a time, so a value you set today
-is checked but changes no behaviour.
+One reader reads the file: `python tools/policy/policy.py get <key>`, below. No gate or hook reads a
+value through it yet. Later dGroundRules units re-point each consumer to it, one at a time, so a
+value you set today is checked but changes no behaviour. The one exception is an invalid file, which
+the push gate refuses when it has nothing to fall back to, below.
 
 The kit README, `tools/policy/README.md`, is the full reference: the row fields, the grammar of
 allowed values and every check.
@@ -31,9 +32,9 @@ allowed values and every check.
   - `--explain` adds one line on stderr naming where the value came from and the commit:
     `policy: budgets.enforce · file · set in .governance/policy.toml at 3708a705, <remote>/main, the landed revision`.
   - It refuses, exit 2 with one `policy: refused · <path>:<line> · <why>` line, a key no catalogue
-    row names, a string that is not one TOML key, a revision that names no commit, a file that
-    is not TOML (naming its line), and a key whose catalogue row carries no default when the file
-    does not set it.
+    row names, a string that is not one TOML key, a revision that names no commit, an invalid file
+    it cannot fall back from (below), and a key whose catalogue row carries no default when the
+    file does not set it.
   - With several remotes and none chosen it refuses too: `export GOV_REMOTE=<remote>` names one.
   - The file is parsed as TOML and never run, so a line in it cannot execute anything.
 - **Where a value comes from:** every key resolves in one order, `RESOLUTION_ORDER` in
@@ -46,6 +47,25 @@ allowed values and every check.
   A file that names a `preset` reads the catalogue default too, for now: the reason adds
   `; the file names preset <name>, not applied until dKeptSession adds presets to this reader`.
   A value you set in the file always wins over the default.
+- **When the file is invalid:** a file that is not TOML, sets a value outside its key's allowed
+  values, or sets a key no catalogue row names is invalid, and an invalid file NEVER reads the
+  catalogue defaults, because a default may be looser than what you chose. `policy-file.on-invalid`
+  decides what it reads instead, and it is itself read from the last valid revision of the file,
+  never from the invalid one, so an out-of-set value of it is one more problem:
+  - `last-valid` (the default): every key reads the newest earlier commit whose file was present and
+    valid, the whole file and never one key, with source `last-valid` and a reason naming the
+    invalid commit, the line, the problem and the valid commit. With no valid commit before it, the
+    read refuses, naming the line.
+  - `refuse`: every read refuses, naming the invalid file's line.
+
+  A missing file is not invalid: every key reads its default. A key the file does not set reads its
+  default too.
+- **Check the committed file:** `python tools/policy/policy.py check` checks the file as committed at
+  `HEAD`, the commit a push lands; `--rev <rev>` checks another commit. It exits 0 with one
+  `policy: check · ...` line when the file is valid, missing, or invalid with a valid commit to fall
+  back to under `last-valid`, the line saying which, and exits 2 with the refusal otherwise. The
+  `policy check` gate runs the same check on every push and landing, so an invalid file with nothing
+  to fall back to blocks the push.
 - **Check the file:** `python tools/policy/check_policy.py`. It refuses a value outside its key's
   allowed values, an empty set for a key that is never empty, and a key no catalogue row names. Each
   check prints one line with the number it read; a check that read nothing is red too.
@@ -79,6 +99,7 @@ python tools/policy/check_policy.py
 # policy-check: arm_shape · 0 finding(s) · 267 row(s), 19 set-valued, 10 never-empty
 # policy-check: arm_summaries · 0 finding(s) · 263 of 267 row(s) unsummarised · ...
 # policy-check: arm_direction · 0 finding(s) · 19 loop bound and deadline row(s)
+# policy-check: arm_on_invalid · 0 finding(s) · .governance/policy.toml at 7c8c0c4f is valid
 ```
 
 With `runtime.agents-in-flight = 0` in the file, the first line reads `1 finding(s)` and the next
