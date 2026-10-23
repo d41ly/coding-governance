@@ -126,7 +126,7 @@ ids TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHea
 | [TOOL-dFairHearing-40 — the round-5 spec audit's 35 minors: one build-wide version reading on one base, an attempt checker that refuses what it cannot place, and criteria a correct build can pass](spec/2026-10-23-spec-TOOL-dFairHearing-40.md) | 26 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 92 bound to this build, across 4 record folder(s).
+Records: 93 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

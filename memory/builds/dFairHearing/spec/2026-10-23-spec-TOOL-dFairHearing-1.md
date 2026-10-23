@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dFairHearing-1-departures-spec.md](../build/2026-10-23-build-TOOL-dFairHearing-1-departures-spec.md) | journal | — |
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-11.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-11.md) | deviation | — |
 | [2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md](../build/2026-10-23-build-TOOL-dFairHearing-1-deviation-19.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-1-reuse-scout.md) | journal | — |
