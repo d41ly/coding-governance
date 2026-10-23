@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-49-deviation-95.md](../build/2026-10-23-build-TOOL-dSafePassage-49-deviation-95.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-1-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -430,11 +432,19 @@ between units no `consumes-from` bullet joins.
     `tools/workflows/unattended-build.js`, outside this build's goal, and it too lands after this
     run's roster is sorted.
   - Recommendation: (a), the skeptic's judged-sound fix and the only option AC2 admits.
+  - RESOLVED (agent, 2026-10-23, delegated): (a), on rung 3 of the execution plan's fork rule
+    (`memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md:901-948`):
+    the mandate delegates the fork, and M3 takes the most feature-rich option that survives the vetoes.
+    (a) is the only option AC2 admits. (b) fails AC2, which is veto 1. (c) changes
+    `tools/workflows/unattended-build.js`, outside this build's goal, which is veto 2, and no grant names
+    it. The run that applies (a) is this build's build run, before it hands out the roster.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 43 to 46's 9 MEDIUM and 11
   LOW findings of the step module, one scope item per raw id.
+- rev-2 · 2026-10-23 · §8 · F1 RESOLVED (agent, delegated) to (a) on rung 3: this build's build run
+  applies S4's order move before it hands out the roster.
 
 ## 10. Reuse audit
 

@@ -166,10 +166,10 @@ ids TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePas
 | [TOOL-dSafePassage-47 — the submodule walk lists a repository by git's own directory shape, and refuses one whose config git cannot read](spec/2026-10-23-spec-TOOL-dSafePassage-47.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dSafePassage-48 — the step contract refuses `sendemail.sendmailCmd` and every send-email executor key in its identity form](spec/2026-10-23-spec-TOOL-dSafePassage-48.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
 | [TOOL-dSafePassage-50 — the spec audit of units 43 to 46, its five minors on TOOL-46: the lander arm placed after the scan it reads, its locator cited by content, and one owner for the cutoff paragraph](spec/2026-10-23-spec-TOOL-dSafePassage-50.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-49.md) | 13 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-49.md) | 13 | 2 | OPEN | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 58 bound to this build, across 4 record folder(s).
+Records: 60 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
