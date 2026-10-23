@@ -65,6 +65,9 @@ coverage, and the output of the product as-built view's `asbuilt_view.py --check
 the place of `carries.py --report <slug>` and `asbuilt.py --check` at the report-switch step after dTrueNorth's
 landing (the execution plan's [phase-1] retirement table, rows 1 and 2).
 Two checks, under --write and --check: the byte compare, and the validating arm, which parses the rendered report.
+The arm also holds the report-switch step (PLAY-dClosedLoop-29): a build run of a slug in the retirement table's
+"Lands with" column, read from the plan, is red until dClosedLoop's BACKLOG.md at HEAD holds an ask naming
+`report-switch`, minted under that slug (P0.6 rule 3) or filed late under dClosedLoop's naming it; the head says which.
 
 Usage (from the worktree root):
   python deviations.py [--policy report|refuse]
@@ -83,8 +86,8 @@ Usage (from the worktree root):
       base and one plant, a population plant or kind-spec, kind-build, kind-whole, kind-norun, stub-widens,
       stub-relaxes, stub-grants, stub-drop, omit-grant, record-no-tier, record-no-reason, record-no-surface,
       trailer-relaxes-only, trailer-widens-only, trailer-388-none, trailer-240-none, trailer-rung6, outside-packet,
-      outside-product, range, record-late, hand-edit, instrument-byte; no-arm drops the validating arm, and base-range
-      reads the range from the run's base
+      outside-product, range, record-late, hand-edit, instrument-byte, switch-missing, switch-foreign, switch-spec,
+      switch-late; no-arm drops the validating arm, and base-range reads the range from the run's base
 Exit 0 green, 1 on a refusal under refuse or a red check of the report, 2 when nothing is measured: neither the pin's
 v2 nor a chain build's spec, or for a report no live RUN.md, no base:, no prepared merge or no roster unit.
 
@@ -92,7 +95,10 @@ What it does not read: whether a record's reason is true or its risk class hones
 review judge; a departure in code that changes no spec, which Test's verdict and the closing review catch; a hand edit
 inside a gen region, which the strip cannot tell from a render; a hand-back whose record lands in the commit that also
 revises the spec, which reads the revised header; whether the README's coverage region is current, which
-`gen_build_index.py --check` grades in the bar; and in a fixture, the tree's own `asbuilt_view.py --check`, which
+`gen_build_index.py --check` grades in the bar; a close that never runs `--report`, an owner landing by hand
+included (ER:248), which leaves no departures report for the owner to read; whether the report-switch ask says more
+than its minter and the word, and whether dClosedLoop's session then makes the switch, which every packet's field 9
+and dClosedLoop's own asks-disposed carry; and in a fixture, the tree's own `asbuilt_view.py --check`, which
 the report runs in the worktree since the fixture holds none of its inputs.
 """
 import argparse
@@ -120,7 +126,13 @@ INSTRUMENTS = (B + "2026-10-19-build-PLAY-dClosedLoop-1-carries.py", SELF,
 # The product as-built view, cl-dClosedLoop-0006, which the report runs in asbuilt.py's place since the report-switch
 # step at dTrueNorth's landing (the execution plan's [phase-1] retirement table, row 1).
 VIEW = "tools/memory-tree/asbuilt_view.py"
-LIB = "tools/unattended/lib-unattended.sh"
+# The report-switch step (the execution plan's [phase-1]): a build run landing a row of the retirement table owes an
+# ask in dClosedLoop's BACKLOG.md (P0.6 rule 3). The landing set is that table's "Lands with" column, read from PLAN.
+PLAN = B + "2026-10-20-build-PLAY-dClosedLoop-1-execution-plan.md"
+RETIREMENT_HEAD = "| Instrument, or arm | Retired by | Lands with |"
+SWITCH_BACKLOG = "memory/builds/dClosedLoop/BACKLOG.md"
+SWITCH = "report-switch"
+LIB ="tools/unattended/lib-unattended.sh"
 ROLES = ("spec writer", "author", "owner")          # the record grammar's approver roles, the longest first
 RULINGS = ("ER:240", "ER:388", "ER:328", "P0.8 row 5")
 RECORD_SURFACE = ("memory/builds/", "memory/LIVE.md", "memory/ledger/", "memory/DECISIONS.md",
@@ -625,6 +637,36 @@ def check_ask_rows_only(root, start, path):
     return True
 
 
+@functools.lru_cache(maxsize=None)
+def read_switch_slugs():
+    """The chain builds whose landing owes the report-switch ask: each slug in the "Lands with" column of the [phase-1]
+    retirement table, read from the worktree's plan, in table order."""
+    phase1 = Path(PLAN).read_text(encoding="utf-8").split("\n## [phase-1]", 1)[-1].split("\n## ", 1)[0]
+    if RETIREMENT_HEAD not in phase1:
+        raise Unmeasured(f"{PLAN}'s [phase-1] holds no retirement table headed {RETIREMENT_HEAD}")
+    slugs = []
+    for ln in phase1.split(RETIREMENT_HEAD, 1)[1].split("\n\n", 1)[0].split("\n")[2:]:
+        cells = [c.strip() for c in ln.strip().strip("|").split("|")]
+        if len(cells) > 2 and re.fullmatch(r"d[A-Z][A-Za-z]+", cells[2]):
+            slugs.append(cells[2])
+    return tuple(dict.fromkeys(slugs))
+
+
+def read_switch_ask(root, slug, families):
+    """The report-switch ask `slug`'s landing filed in dClosedLoop's BACKLOG.md at HEAD, or None: an ask row, as the
+    index generator's backlog grammar reads it, naming `report-switch`, minted under `slug` (P0.6 rule 3) or filed late
+    under dClosedLoop's own slug with `slug` as a whole word in its text, as PLAY-dClosedLoop-25 was for dTrueNorth."""
+    grammar = gbi.backlog.build_grammar(families)
+    for ln in (run_git(root, "show", f"HEAD:{SWITCH_BACKLOG}") or "").split("\n"):
+        row = gbi.backlog.extract_row(ln, grammar)
+        if row is None or row.cls != "ask" or SWITCH not in ln:
+            continue
+        minter = row.target.split("-")[1]
+        if minter == slug or (minter == "dClosedLoop" and re.search(rf"\b{slug}\b", ln)):
+            return row.target
+    return None
+
+
 def check_gen_only(root, start, path):
     """True when the file exists at both ends of the range and differs only inside gen regions: a render."""
     a, b = run_git(root, "show", f"{start}:{path}"), run_git(root, "show", f"HEAD:{path}")
@@ -674,7 +716,9 @@ def read_report_sources(root, slug, pin, control=None):
     deferred = [u for act, u in rescopes if act == "defer"]
     product = {w for x in DISPATCH.finditer(run) for w in x.group(2).split()} if kind == "build" else set()
     blobs = [(i, (run_git(root, "rev-parse", "--verify", "--quiet", f"HEAD:{i}") or "").strip()) for i in INSTRUMENTS]
-    return {"root": root, "slug": slug, "kind": kind, "asks": asks, "missing": missing, "base": base, "p": p,
+    switch_owed = kind == "build" and slug in read_switch_slugs()
+    switch_ask = read_switch_ask(root, slug, families) if switch_owed else None
+    return {"switch_owed": switch_owed, "switch_ask": switch_ask,"root": root, "slug": slug, "kind": kind, "asks": asks, "missing": missing, "base": base, "p": p,
             "start": start, "first": roster[0], "members": members, "records": records, "facts": facts, "rows": rows,
             "conf": conf, "trailers": trailers, "paths": paths, "marks": marks, "parks": parks, "deferred": deferred,
             "added": [u for act, u in rescopes if act == "add"], "product": product, "blobs": blobs}
@@ -766,7 +810,12 @@ def render_report(src, entries):
              f"units with no spec {', '.join(s['missing']) or 'none'}",
              f"- range: `{s['start']}..HEAD`", f"- decisions read at: `{s['p']}`"]
     lines += [f"- instrument `{i}` blob `{b or 'untracked'}`" for i, b in s["blobs"]]
-    lines += [f"- no audit pin: {', '.join(s['facts']['nopin']) or 'none'}", "", "## Entries", ""]
+    lines += [f"- no audit pin: {', '.join(s['facts']['nopin']) or 'none'}",
+              "- report-switch ask: " + (f"{s['switch_ask']}, in `{SWITCH_BACKLOG}`" if s["switch_ask"]
+                                         else "owed, none filed" if s["switch_owed"]
+                                         else "not owed, a spec run" if s["kind"] == "spec"
+                                         else f"not owed, {slug} lands no row of the [phase-1] retirement table"),
+              "", "## Entries", ""]
     lines += [f"- entry {n} · {text}" for n, (_t, text) in enumerate(entries, 1)] or ["none"]
     lines += ["", f"## The coverage region of `memory/builds/{slug}/README.md`", "", "```text",
               cov if cov is not None else "no build-coverage region", "```", "",
@@ -812,6 +861,10 @@ def check_report(text, src):
             findings.append(f"the trailer of {sha[:9]} cites ER:388 and its widens: is none")
         if "ER:328" in cites and keys.get("relaxes") == "none":
             findings.append(f"the trailer of {sha[:9]} cites ER:328 and its relaxes: is none")
+    if src["switch_owed"] and not src["switch_ask"]:
+        findings.append(f"report-switch ask owed: {src['slug']} lands a row of the execution plan's [phase-1] "
+                        f"retirement table, and {SWITCH_BACKLOG} holds no ask minted under {src['slug']} naming "
+                        f"{SWITCH} (P0.6 rule 3)")
     return findings
 
 
@@ -874,7 +927,8 @@ REPORT_PLANTS = PLANTS + ("kind-spec", "kind-build", "kind-whole", "kind-norun",
                           "stub-grants", "stub-drop", "omit-grant", "record-no-tier", "record-no-reason",
                           "record-no-surface", "trailer-relaxes-only", "trailer-widens-only", "trailer-388-none",
                           "trailer-240-none", "trailer-rung6", "outside-packet", "outside-product", "range",
-                          "record-late", "hand-edit", "instrument-byte")
+                          "record-late", "hand-edit", "instrument-byte", "switch-missing", "switch-foreign",
+                          "switch-spec", "switch-late")
 CONTROLS = ("no-arm", "base-range")
 # Each approver plant: the clause it moves, and the approver of the record departing from it (P0.1 row 6).
 APPROVER_PLANTS = {"owner-bare": ("cl-dClosedLoop-0001", "owner"),
@@ -1009,6 +1063,15 @@ def render_fixture_backlog(ask):
     return "\n".join(["# dTrueNorth — asks", "", "## Asks", "",
                       f"- {ask} · filed 2026-10-21 · build every roster unit of this build from its spec", "",
                       "## Dispositions", "", f"- SEV · {ask} · MED · the build's units stay unbuilt", ""])
+
+
+def render_switch_backlog(ask):
+    """dClosedLoop's BACKLOG.md in the fixture: empty at the baseline, then the report-switch ask the landing files,
+    its text naming the landing build, as an ask the opening's own grammar reads."""
+    rows = [f"- {ask} · filed 2026-10-21 · THE {SWITCH} STEP AT dTrueNorth'S LANDING. the report still reads the "
+            "retired instruments · accept the report reads their successors"] if ask else []
+    sev = [f"- SEV · {ask} · LOW · the report reads the retired instruments"] if ask else []
+    return "\n".join(["# dClosedLoop — asks", "", "## Asks", ""] + rows + ["", "## Dispositions", ""] + sev + [""])
 
 
 def add_base(fx, plants):
@@ -1184,15 +1247,20 @@ def build_fixture(root, plants):
     fx.hashes = {cid: h for _b, cid, _t, h in read_chain_clauses(v2)}
     fx.v2 = v2.replace("No baseline.", f"Baseline: `{fx.pin}`, the fixture's own.")
     roster = ["FIX-dTrueNorth-80", "FIX-dTrueNorth-81"]
-    c2 = {V2: fx.v2, TN + "README.md": render_fixture_readme(roster)}
-    if "kind-spec" in plants or "kind-build" in plants:
+    c2 = {V2: fx.v2, TN + "README.md": render_fixture_readme(roster), SWITCH_BACKLOG: render_switch_backlog(None)}
+    if "kind-spec" in plants or "kind-build" in plants or "switch-spec" in plants:
         c2[TN + "BACKLOG.md"] = render_fixture_backlog("FIX-dTrueNorth-90")
-        for u in roster[:1] if "kind-spec" in plants else roster:
+        for u in roster[:1] if "kind-spec" in plants or "switch-spec" in plants else roster:
             c2[fx.derive_spec_path(u)] = fx.render_spec(u, 1)
     fx.base = fx.write_commit(c2, "fixture: the baseline taken, and dTrueNorth opened")
     fx.run("update-ref", "refs/remotes/origin/main", fx.base)
     fx.run("checkout", "-q", "-b", "run")
     add_base(fx, plants)
+    if not {"switch-missing", "switch-spec"} & set(plants):
+        ask = {"switch-foreign": "FIX-dSafePassage-91", "switch-late": "FIX-dClosedLoop-91"}.get(
+            next((p for p in plants if p in ("switch-foreign", "switch-late")), None), "FIX-dTrueNorth-91")
+        fx.write_commit({SWITCH_BACKLOG: render_switch_backlog(ask)},
+                        "records(dTrueNorth): the report-switch ask filed in dClosedLoop's BACKLOG.md")
     for p in plants:
         add_plant(fx, p)
     if "range" in plants:

@@ -56,13 +56,13 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
 - as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `11e4ed05973078820ffbaeceb753fa2cde34a1ce`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
-- instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `69a96671a2dabb8270068076915b032624bc5e2b`
+- instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` blob `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `a760897638807d50fb7f73e4d0adc2595554750b`
+- rendered at: `066b84771b822cd6dde0831d268f312566857837`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
