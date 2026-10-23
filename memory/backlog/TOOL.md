@@ -432,6 +432,7 @@ Cite ids, never line numbers.
 | [TOOL-dGatedProse-11](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | tools/check-spec-tokens.py grades a LIVE spec by a whitelist, OPEN,… |
 | [TOOL-dGatedProse-12](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | FIVE KIT SELF-TESTS ARE RED ON MAIN and no row records them: measured… |
 | [TOOL-dGroundRules-12](../builds/dGroundRules/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dGroundRules-13](../builds/dGroundRules/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | let the minimal guard of cl-dClosedLoop-0012 admit the agent write a… |
 | [TOOL-dHomedResolver-6](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended gate selftest shard 6/8 red at d006cfc5 on… |
 | [TOOL-dHomedResolver-7](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended cross-component red at d006cfc5 on the daily… |
 | [TOOL-dHonouredPark-5](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | A bespoke review fan-out must assign finding ids in the ORCHESTRATOR,… |
@@ -478,7 +479,8 @@ Cite ids, never line numbers.
 | [TOOL-dRetiredFork-38](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
 | [TOOL-dRetiredFork-39](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | CONFIRMED by the closing Tier-2 review of dRetiredFork (5 lenses, 35… |
 | [TOOL-dRetiredFork-40](../builds/dRetiredFork/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-03 | NINE LEG CEILINGS ARE AUTHORED IN MILLISECONDS AGAINST A FIELD THE… |
-| [TOOL-dSafePassage-14](../builds/dSafePassage/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dSafePassage-14](../builds/dSafePassage/BACKLOG.md) | DEFERRED | MED | TOOL-dSafePassage-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dSafePassage-60](../builds/dSafePassage/BACKLOG.md) | OPEN | LOW | — | 2026-10-23 | THE SPEC AUDIT'S DISPOSAL STAGE HANDS BACK SPECS THE MEMORY HYGIENE… |
 | [TOOL-dScaffoldedMirror-4](../builds/dScaffoldedMirror/BACKLOG.md) | OPEN | — | — | 2026-08-24 | PHASE 0, and a hard prerequisite for -9. Waiver hardening: re-key all… |
 | [TOOL-dScaffoldedMirror-9](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 4, blocked on -4 and -11. The grandfather set with a provenance… |
 | [TOOL-dScaffoldedMirror-11](../builds/dScaffoldedMirror/BACKLOG.md) | DEFERRED | — | TOOL-dDerivedDocket-66 | 2026-08-24 | PHASE 3, blocked on a kit-owned ^visit_[A-Z]/generic_visit exemption… |
