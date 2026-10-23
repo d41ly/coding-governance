@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dSafePassage-1-departures-spec.md](../build/2026-10-23-build-TOOL-dSafePassage-1-departures-spec.md) | journal | — |
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-106.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-106.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-107.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-107.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-108.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-108.md) | deviation | — |
