@@ -8,4 +8,6 @@
 ## Dispositions
 
 - SEV · TOOL-dGroundRules-12 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dGroundRules-12 · until TOOL-dGroundRules-52 · the spec run specced and deferred every unit of the roster; the build run builds them, and the last to close carries `closes` for this ask
 - SEV · TOOL-dGroundRules-13 · MED · where the landed guard refuses it, dSafePassage's `template-size-limits.txt` step cannot run on gov's own tree, and that build's run stops at TOOL-dSafePassage-1
+- DEFERRED · TOOL-dGroundRules-13 · until TOOL-dGroundRules-6 · filed by dSafePassage after this spec run audited its specs; the build run re-grounds TOOL-dGroundRules-6, the minimal guard, against it before that unit's first pass, as the execution plan's build-run step re-grounds every spec against what landed
