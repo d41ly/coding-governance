@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0018@ed08a364 whole
 
@@ -10,9 +10,11 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-widens-marks.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-widens-marks.md) | research | TOOL-dSafePassage-7 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -493,9 +495,9 @@ branch has not landed.
   of dGroundRules as `TOOL-dGroundRules-13` in `memory/builds/dGroundRules/BACKLOG.md`, since this
   run reaches another build only through an ask row, and the build run re-grounds against the guard
   dGroundRules lands before S7 writes gov's policy file.
-  RESOLVED (agent, 2026-10-23, delegated): (a) · widens: the minimal guard's admitted agent-write
-  shapes, by one value-preserving step write of the policy file, only where the landed guard refuses
-  it · relaxes: none.
+  RESOLVED (agent, 2026-10-23, delegated): (a) · widens: none · relaxes: none
+  The guard's second write shape is `TOOL-dGroundRules-13`'s to grant, not this build's, and the
+  build run re-grounds against the guard dGroundRules lands.
 - **F9 — What does this unit do while its parent is unbuilt?** dGroundRules has no spec yet, and its
   clauses are this unit's contract: `cl-dClosedLoop-0007` (the policy file), `cl-dClosedLoop-0008`
   (`read_policy_key`), `cl-dClosedLoop-0013` (the legacy-homes list), `cl-dClosedLoop-0015`
@@ -530,6 +532,9 @@ branch has not landed.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the hands-off `TOOL-dSafePassage-4` that unit's
   consumes-from already declared, so the reciprocity join of hygiene check 12 holds; no other
   section moved.
+- rev-5 · 2026-10-23 · §8 F8's mark reads `widens: none · relaxes: none`, since the widening was
+  the withdrawn deviation-12's and the guard's second write shape is `TOOL-dGroundRules-13`'s to
+  grant; no other section moved.
 
 ## 10. Reuse audit
 

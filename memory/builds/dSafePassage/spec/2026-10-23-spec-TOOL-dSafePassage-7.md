@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-7-deviation-21.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-21.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-widens-marks.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-widens-marks.md) | research | TOOL-dSafePassage-1 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -323,8 +324,8 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · the s
   runner returns `attended`, the check's `needs-target` verdict naming that remedy and the walk
   stopping on it (TOOL-dSafePassage-2). S4 of the brief fixes three receipt states, owned by
   TOOL-dSafePassage-3, and `install.steps` is dShippedRelease's (research F6), so veto 1 discards the
-  first two. RESOLVED (agent, 2026-10-23, delegated): the row's field, on rung 1. widens: none ·
-  relaxes: none
+  first two. RESOLVED (agent, 2026-10-23, delegated): the row's field, on rung 1.
+  widens: none · relaxes: none
 - **F4 — The parent, dGroundRules, is unbuilt.** RESOLVED (agent, 2026-10-23, delegated): this unit
   reads no key of `.governance/policy.toml` and calls no policy reader, so `cl-dClosedLoop-0007` and
   `cl-dClosedLoop-0008` bind nothing here; the build run re-grounds against the landed parent before
