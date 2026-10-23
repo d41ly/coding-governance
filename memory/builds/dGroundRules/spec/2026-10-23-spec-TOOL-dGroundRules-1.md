@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-1 — the policy file, the policy kit, its catalogue and the catalogue's shape audit
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0007@b0458b78 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-1-departures-spec.md](../build/2026-10-23-build-TOOL-dGroundRules-1-departures-spec.md) | journal | — |
+| [2026-10-23-build-TOOL-dGroundRules-1-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-1-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-build-brief.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-owner-audit-cap.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-owner-audit-cap.md) | research | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |

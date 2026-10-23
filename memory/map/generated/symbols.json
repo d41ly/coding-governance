@@ -908,6 +908,16 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_schema",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_shape",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "arm_stash",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -916,6 +926,11 @@
       "id": "arm_submodule",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_summaries",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "arm_unread",
@@ -2500,6 +2515,11 @@
     {
       "id": "build_repo",
       "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "build_repo",
+      "kind": "function",
       "file": "tools/run-gates/run-selftests.test.sh"
     },
     {
@@ -3973,6 +3993,11 @@
       "file": "tools/run-gates/foreign-prefix.gov.test.sh"
     },
     {
+      "id": "check_derived",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_derived_landed",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -4468,6 +4493,11 @@
       "file": "tools/runlog/runlog_lib.py"
     },
     {
+      "id": "check_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_login",
       "kind": "function",
       "file": "tools/unattended/resume-tick.sh"
@@ -4486,6 +4516,11 @@
       "id": "check_material",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "check_member",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "check_merge_arm",
@@ -5173,6 +5208,11 @@
       "file": "tools/process-monitor/reap.py"
     },
     {
+      "id": "check_shape",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_shape_run",
       "kind": "function",
       "file": ".githooks/pre-push.runlog.test.sh"
@@ -5491,6 +5531,11 @@
       "id": "check_user_clash",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "check_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "check_verb_flag",
@@ -6673,6 +6718,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "derive_cases",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_census_tokens",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -6876,6 +6926,11 @@
       "id": "derive_first_seen",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "derive_first_set_row",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_floor_breaches",
@@ -7956,6 +8011,11 @@
       "id": "derive_unsatisfied_requires",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_unsummarised",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "derive_verdict",
@@ -9550,6 +9610,11 @@
     {
       "id": "load_catalogue",
       "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "load_catalogue",
+      "kind": "function",
       "file": "tools/roles/render_agents.py"
     },
     {
@@ -9781,6 +9846,11 @@
       "id": "load_roles",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "load_rows",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "load_rules",
@@ -10156,6 +10226,16 @@
       "id": "main",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "main",
@@ -11516,6 +11596,11 @@
       "id": "parse_line",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
+    },
+    {
+      "id": "parse_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "parse_live_row_pins",
@@ -15368,6 +15453,11 @@
       "file": "tools/run-gates/post-merge.sh"
     },
     {
+      "id": "remove_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "remove_reset_rows",
       "kind": "function",
       "file": "tools/run-gates/derive-ceilings.py"
@@ -16033,6 +16123,11 @@
       "file": "tools/memory-tree/kit-dogfood-parity.test.sh"
     },
     {
+      "id": "render_dotted",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "render_drift_delta",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -16141,6 +16236,11 @@
       "id": "render_journal_bytes",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "render_json",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "render_kill",
@@ -16293,6 +16393,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "render_planted_row",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "render_pointer",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
@@ -16416,6 +16521,11 @@
       "id": "render_same_holder",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "render_scaffold",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "render_scope_row",
@@ -16571,6 +16681,11 @@
       "id": "render_tokens",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "render_toml_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "render_transition_conf",
@@ -16976,6 +17091,11 @@
       "id": "resolve_compare_base",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "resolve_compare_base",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "resolve_consumer_paths",
@@ -17985,6 +18105,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/policy/adopt-policy.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
     },
     {
@@ -18240,6 +18365,11 @@
     {
       "id": "resolve_remote",
       "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "resolve_remote",
+      "kind": "function",
       "file": "tools/runlog/model.py"
     },
     {
@@ -18336,6 +18466,11 @@
       "id": "resolve_root",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "resolve_row",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "resolve_row_docs",
@@ -18858,6 +18993,11 @@
       "file": "tools/check-install-prefix.test.sh"
     },
     {
+      "id": "run_arm",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_arms",
       "kind": "function",
       "file": "tools/lib/lib-selftest.sh"
@@ -19130,7 +19270,17 @@
     {
       "id": "run_fixture",
       "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_fixture",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "run_fixture_git",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_fixture_git",
@@ -19201,6 +19351,11 @@
       "id": "run_git",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "run_git",
@@ -20468,6 +20623,11 @@
       "file": "tools/codebase-map/map_lib.py"
     },
     {
+      "id": "scan_keys",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "scan_landed_carry",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -20958,6 +21118,11 @@
       "file": "tools/memory-tree/merge-rows.test.sh"
     },
     {
+      "id": "seed_empty_value",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "seed_env",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -21008,6 +21173,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "seed_list_grew",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "seed_log",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
@@ -21016,6 +21186,11 @@
       "id": "seed_mode_fixture",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
+    },
+    {
+      "id": "seed_no_empty",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "seed_publish",
@@ -21093,6 +21268,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "seed_summary_new_key",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "seed_transition",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -21101,6 +21281,21 @@
       "id": "seed_unattended_kit",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "seed_unknown_field",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_usage_new_key",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_usage_out_of_set",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "seed_witness",
@@ -21211,6 +21406,11 @@
       "id": "set_other_side",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "set_row_block",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "set_runstate_fact",
@@ -24248,6 +24448,11 @@
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
     },
     {
+      "id": "write_edit",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "write_envelope",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -24431,6 +24636,11 @@
       "id": "write_lin_fix",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
+    },
+    {
+      "id": "write_list",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "write_ln_dod_records",

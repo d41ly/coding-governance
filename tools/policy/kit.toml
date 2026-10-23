@@ -1,0 +1,37 @@
+# kit.toml — this entry, declared as data. Read by <prefix>/govkit/.
+# Contract: memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-1.md
+
+id = "policy"
+home = "policy"
+scope = "repo"
+
+# Everything the kit ships is engine, overwritten on every update: the catalogue, the shrink-only list
+# beside it, the module, the checker and the adopter. A repository's own policy is the file the
+# adopter scaffolds OUTSIDE this directory, `.governance/policy.toml`, which no update rewrites.
+[[files]]
+include = "**"
+role = "engine"
+
+# `--scaffold` writes the starter policy file only where none exists, and says "kept" otherwise.
+[adopt]
+argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold"]
+mutates_index = false
+
+[check]
+argv = ["bash", "{kit}/adopt-policy.sh", "--check"]
+
+[[outcome]]
+code = 0
+probe = { must_exist = ".governance/policy.toml" }
+means = "adopted"
+
+# THE POLICY LEG SHIPS. Its subject is the target's own policy file, which goes wrong with nobody
+# editing this kit, so a failure means the REPOSITORY's policy is wrong. The `policy fixtures` leg is
+# gov's alone, carried by an [[exempt_leg]] row in the deployer's registry: its subject is the code
+# in this directory.
+[[gate_leg]]
+name = "policy check"
+subject = "repo"
+argv = ["python", "{kit}/check_policy.py"]
+guard = []
+ceiling = 120

@@ -30,3 +30,9 @@ anchor-ref: refs/heads/main
 base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 
 ## Parked
+
+2026-10-23T19:39:07Z dispatch · item 35c1a533 TOOL-dGroundRules-1 · reason .governance/policy.toml tools/policy/kit.toml tools/policy/README.md tools/policy/catalogue.toml tools/policy/policy.py tools/policy/check_policy.py tools/policy/adopt-policy.sh tools/policy/unsummarised-keys.txt tools/gate-legs.json tools/govkit/registry.toml tools/govkit/subject-pins.tsv tools/run-gates/selftest-budgets.txt tools/playbook-kit-waivers.txt .gitattributes help/policy.md help/README.md memory/map/features/policy.md memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-1.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-1-ledger.md
+
+2026-10-23T19:39:13Z brief · item TOOL-dGroundRules-1 · reason cdc05f8541f6 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-1-build-brief.md
+
+2026-10-23T19:59:37Z dispatch · item 35c1a533 TOOL-dGroundRules-1 · reason memory/guides/SESSION-KICKOFF.md memory/backlog/TOOL.md memory/builds/dGroundRules/README.md

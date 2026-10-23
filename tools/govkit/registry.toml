@@ -123,6 +123,10 @@ id = "lexicon"
 descriptor = "{prefix}/lexicon/kit.toml"
 
 [[entry]]
+id = "policy"
+descriptor = "{prefix}/policy/kit.toml"
+
+[[entry]]
 id = "check-placeholders"
 descriptor = "{prefix}/govkit/entries/check-placeholders.kit.toml"
 why_split = "a FLAT entry for two depth-1 FILES under <prefix>/, not a kit directory; `<prefix>/*` is a depth-1 surface glob that includes files, so each one is its own unclaimed path"
@@ -678,3 +682,7 @@ why = "it runs `adopt-roles.test.sh`, which `<prefix>/roles/kit.toml` withholds 
 [[exempt_leg]]
 name = "encoding posture (text IO names its encoding)"
 why = "it grades GOV's own tools and skills Python against `memory/project/encoding-posture-sites.txt`, a registry of THIS repo's gov-internal sites. The scanner ships with the gate-lint kit's `**` include, but the leg does not: a declared adopter leg would red at every adopter's next pull until they seeded a registry, and whether gov's scanner replaces an adopter's own is theirs to decide. Owner ruling, TOOL-aRepatriatedFork-3 section 8 F2."
+
+[[exempt_leg]]
+name = "policy fixtures"
+why = "it runs `check_policy.py --fixture`, which plants each red case of the policy kit's arms into a scratch repository and asserts it red as planted and green without, so its subject is the arms and the catalogue in `<prefix>/policy/` and it has a job only when that source changes -- and none at all in a tree that copy-installs the kit and never edits it. The file ships, because the same script is the `policy check` leg every adopter runs; the LEG is gov's, held on GOV's bar like every other self-test. NOT a [[gate_leg]] in the descriptor, for the reason recorded beside `run-gates.gov.test.sh`: a descriptor row naming a leg the target cannot carry is what reds the deployer. TOOL-dGroundRules-1."

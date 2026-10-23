@@ -1752,6 +1752,31 @@
     "ceiling": 300
   },
   {
+    "name": "policy check",
+    "argv": [
+      "python",
+      "{prefix}/policy/check_policy.py"
+    ],
+    "reads": {"base": "its shrink-only list is compared with the one carried at the merge-base with the remote default branch (TOOL-dGroundRules-1).", "history": "it reads that list out of history (TOOL-dGroundRules-1)."},
+    "chunk": "declarations",
+    "subject": "repo",
+    "ceiling": 120
+  },
+  {
+    "name": "policy fixtures",
+    "argv": [
+      "python",
+      "{prefix}/policy/check_policy.py",
+      "--fixture"
+    ],
+    "guard": [
+      "{prefix}/policy/"
+    ],
+    "chunk": "selftests",
+    "subject": "kit",
+    "ceiling": 300
+  },
+  {
     "name": "leg ceilings clear their evidenced maximum",
     "argv": [
       "python",

@@ -1,0 +1,12 @@
+# .governance/policy.toml - this repository's policy: one value per key, each checked against the
+# policy kit's catalogue.toml. Every key, its allowed values and its default: help/policy.md.
+
+[budgets]
+enforce = "warn"
+pinned = []
+
+[policy-file]
+on-invalid = "last-valid"
+
+[runtime]
+agents-in-flight = 6

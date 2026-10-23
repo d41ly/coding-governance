@@ -193,6 +193,16 @@ A third authorization mode for repeatable content, and the playbook it follows
 - guides 1: `PLAYBOOK-TEMPLATE.md`
 - globs 6: `tools/unattended/check-playbook.sh`, `tools/unattended/check-playbook.test.sh`, `tools/unattended/PLAYBOOK-TEMPLATE.template.md`, `tools/unattended/playbook.fixture.md`, `tools/unattended/fixture-pieces/`, `tools/unattended/fixture-records/`
 
+## policy
+
+The policy file .governance/policy.toml, the policy kit's catalogue that is its schema, the value check and shape audit over them, and the shrink-only list o...
+
+- status `shipped` · streams `tooling` · dossier `memory/map/features/policy.md`
+- decisions 1: `TOOL-dGroundRules-1`
+- gate-legs 2: `policy check`, `policy fixtures`
+- kits 1: `policy`
+- globs 3: `tools/policy/**`, `.governance/policy.toml`, `help/policy.md`
+
 ## process-monitor
 
 identify, report and kill the processes an agent session launched and forgot

@@ -4,7 +4,7 @@
 
 Every machine-enumerable moving part, annotated with its claimant (`<feature>` dossier · `foundation` · `baseline` · `UNCLAIMED`). Claims live in the map tree; this file just renders them.
 
-Inventories: gate-legs: 142 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 148 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
+Inventories: gate-legs: 144 · kits: 20 · git-hooks: 4 · harness-hooks: 12 · workflow-scripts: 11 · skill-engines: 2 · rendered-skills: 7 · gotcha-classes: 148 · guides: 10 · backlog-shards: 4 · lexicon-verbs: 23
 
 ## gate-legs
 
@@ -85,6 +85,8 @@ Inventories: gate-legs: 142 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `playbook render selftest` | playbook |
 | `playbook render wiring` | playbook |
 | `playbook validity gate` | playbook-mode |
+| `policy check` | policy |
+| `policy fixtures` | policy |
 | `pre-push bar self-test` | run-gates |
 | `pre-push run-log line` | runlog |
 | `pre-push self-test` | push-main |
@@ -169,6 +171,7 @@ Inventories: gate-legs: 142 · kits: 19 · git-hooks: 4 · harness-hooks: 12 · 
 | `memory-recall` | memory-recall |
 | `memory-tree` | memory-tree-hygiene |
 | `playbook` | playbook |
+| `policy` | policy |
 | `process-monitor` | process-monitor |
 | `pytest-parallel-guardrails` | baseline |
 | `roles` | roles |
