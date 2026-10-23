@@ -98,6 +98,9 @@ memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md 
 coding-governance-agents.template.md text eol=lf
 AGENTS.md text eol=lf
 .governance/deploy.toml text eol=lf
+# The policy file's JSON mirror (TOOL-dGroundRules-5): `policy.py mirror --check` and the parity arm
+# compare its bytes with a fresh LF render, so a CRLF checkout would read a fresh mirror as stale.
+.governance/policy.json text eol=lf
 tools/line-length-limits.txt text eol=lf
 # TOOL-dHonouredPark-3: the dead-path registry became TAB-separated, so its bytes are load-bearing
 # in a way they were not while a row was `<path>:<line>` plus free whitespace.

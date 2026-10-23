@@ -1,14 +1,15 @@
 """policy.py - the policy kit's module: its catalogue, the value check, the shape audit, the
 shrink-only list of keys that carry no summary or no usage (TOOL-dGroundRules-1), the direction
 check over the loop bound and deadline rows (TOOL-dGroundRules-11), and the reader
-(TOOL-dGroundRules-2) with its one resolution order (TOOL-dGroundRules-3) and its invalid-file
-branch (TOOL-dGroundRules-4).
+(TOOL-dGroundRules-2) with its one resolution order (TOOL-dGroundRules-3), its invalid-file
+branch (TOOL-dGroundRules-4), and the JSON mirror the hooks read (TOOL-dGroundRules-5).
 
     python <this kit>/policy.py lists --check   # the list against the catalogue and against its base
     python <this kit>/policy.py lists --write   # drain the list; it never gains a name
     python <this kit>/policy.py scaffold        # print the starter .governance/policy.toml
-    python <this kit>/policy.py get <key> [--rev <rev>] [--explain]   # one key's value
+    python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
+    python <this kit>/policy.py mirror --write | --check   # .governance/policy.json, rendered at HEAD
 
 The catalogue, `catalogue.toml` beside this file, is the schema: one row per policy key. A file key
 is matched to a row as a tuple of SEGMENTS, never as a joined string, because a quoted TOML segment
@@ -22,6 +23,12 @@ with no remote at all the local default branch, and every reason names its sha. 
 RESOLUTION_ORDER, spelled once: the file's value, then the catalogue default with its reason. A
 file `validate` refuses never reads a default: the whole file falls back to its last valid revision
 on the first-parent history, or refuses at a line, as that revision's `policy-file.on-invalid` says.
+
+THE MIRROR, `.governance/policy.json`, is the copy JavaScript reads, since a hook cannot parse TOML.
+`render_mirror` renders it for one revision, carrying the blob ids of the policy file and of the
+catalogue there; `mirror --write` writes it at HEAD, which every landing runs through this kit's
+`[[generated]]` row; `policy-mirror.js` beside this file is its one reader, and takes a key from
+the landed revision's mirror only while both ids match the blobs there.
 
 Exit 0 green, 1 red, 2 usage or a refused read.
 """
@@ -490,21 +497,26 @@ def read_last_valid(repo, sha):
     return None
 
 
-def read_last_valid_value(path, row, repo, sha, how, problems):
-    """Resolution(value, "last-valid", reason) for `path` while the policy file at `sha` is invalid,
-    `problems` being `validate`'s: the whole file falls back, never one key. `policy-file.on-invalid`
-    is read from the last valid revision by RESOLUTION_ORDER, never from the invalid file; with no
-    valid revision, or with any value but `last-valid`, a Refusal at the first problem's line. Else
-    RESOLUTION_ORDER over that revision's table, its reason naming both shas, the line and the problem."""
-    first = problems[0]
+def read_last_valid_value(path, row, read):
+    """Resolution(value, "last-valid", reason) for `path` while the policy file of `read`, a
+    `read_revision` read, is invalid: the whole file falls back, never one key. The last valid
+    revision is walked to once per read and kept on it. `policy-file.on-invalid` is read from that
+    revision by RESOLUTION_ORDER, never from the invalid file; with no valid revision, or with any
+    value but `last-valid`, a Refusal at the first problem's line. Else RESOLUTION_ORDER over that
+    revision's table, its reason naming both shas, the line and the problem."""
+    sha, how, first = read["sha"], read["how"], read["problems"][0]
     what = (f"{first.key}: " if first.key else "") + first.why
-    found = read_last_valid(repo, sha)
+    if "last_valid" not in read:
+        read["last_valid"] = read_last_valid(read["repo"], sha)
+    found = read["last_valid"]
     if found is None:
         raise Refusal(POLICY_REL, first.line, f"{what}; no valid revision of the file precedes {sha[:8]}")
     valid, table = found
     at = f"walked back from {sha[:8]}, {how}"
-    on_path = parse_key("policy-file.on-invalid")
-    on = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, valid, at).value
+    if "on_invalid" not in read:
+        on_path = parse_key("policy-file.on-invalid")
+        read["on_invalid"] = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, valid, at).value
+    on = read["on_invalid"]
     if on != "last-valid":  # deny by default: only the one fallback value falls back
         raise Refusal(POLICY_REL, first.line, f"{what}; policy-file.on-invalid is {on} at {valid[:8]}")
     hit = read_ordered_value(path, row, table, valid, at)
@@ -515,15 +527,14 @@ def read_last_valid_value(path, row, repo, sha, how, problems):
 def check_revision(repo, rev):
     """The `check` verb's verdict on the policy file in the commit `rev` names: one line where it is
     valid, absent, or invalid with a last valid revision under `last-valid`; a Refusal otherwise."""
-    sha = resolve_commit(repo, rev)
-    text = read_policy_text(repo, sha)
-    if text is None:
+    read = read_revision(repo, rev)
+    sha = read["sha"]
+    if read["text"] is None:
         return f"policy: check · {POLICY_REL} is absent at {sha[:8]}, so every key reads its catalogue default"
-    problems = validate(text)
-    if not problems:
+    if not read["problems"]:
         return f"policy: check · {POLICY_REL} at {sha[:8]} is valid"
     on_path = parse_key("policy-file.on-invalid")
-    hit = read_last_valid_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), repo, sha, f"--rev {rev}", problems)
+    hit = resolve_read(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), read)
     return f"policy: check · every key falls back to the last valid revision · policy-file.on-invalid is {hit.value}: {hit.reason}"
 
 
@@ -567,20 +578,118 @@ def read_ordered_value(path, row, table, sha, how):
     raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {render_dotted(path)} at {sha[:8]}")
 
 
-def resolve(key, repo=".", rev=None):
-    """-> Resolution for `key`: its path and catalogue row, the revision (`rev` resolved to a full
-    sha, else the landed one) and the policy text there. Text `validate` refuses takes
-    `read_last_valid_value`; valid text is parsed and, like an absent file (table None), answered by
-    RESOLUTION_ORDER."""
-    path = parse_key(key)
-    rows = load_catalogue(KIT)
-    row = read_catalogue_row(path, rows)
+def read_revision(repo, rev=None, rows=None):
+    """The per-revision read `resolve_read` answers from (TOOL-dGroundRules-5): the revision, `rev`
+    resolved to a full sha, else the landed one, and how it was found; the policy text there;
+    `validate`'s problems; and the parsed table, None for an absent or invalid file. The last valid
+    revision and its `policy-file.on-invalid` join it on first need. A dict, so a render reads git
+    once for every key."""
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
     text = read_policy_text(repo, sha)
     problems = [] if text is None else validate(text, rows)
-    if problems:
-        return read_last_valid_value(path, row, repo, sha, how, problems)
-    return read_ordered_value(path, row, None if text is None else parse_policy(text), sha, how)
+    table = None if text is None or problems else parse_policy(text)
+    return {"repo": repo, "sha": sha, "how": how, "text": text, "problems": problems, "table": table}
+
+
+def resolve_read(path, row, read):
+    """-> Resolution for the key path `path`, `row` its catalogue row, over one `read_revision` read:
+    text `validate` refuses takes `read_last_valid_value`; valid text, and an absent file (table
+    None), are answered by RESOLUTION_ORDER. The one composition of the two."""
+    if read["problems"]:
+        return read_last_valid_value(path, row, read)
+    return read_ordered_value(path, row, read["table"], read["sha"], read["how"])
+
+
+def resolve(key, repo=".", rev=None):
+    """-> Resolution for `key`: its path and catalogue row, then `resolve_read` over the revision's
+    read, `rev` resolved to a full sha, else the landed revision."""
+    path = parse_key(key)
+    rows = load_catalogue(KIT)
+    row = read_catalogue_row(path, rows)
+    return resolve_read(path, row, read_revision(repo, rev, rows))
+
+
+# ---- the JSON mirror (TOOL-dGroundRules-5) -----------------------------------------------------
+
+MIRROR_REL = ".governance/policy.json"
+
+
+def check_json_value(key, value):
+    """`value` where JSON spells it, else a Refusal naming `key`: a TOML date or time, or a float
+    that is not finite, has no JSON spelling."""
+    try:
+        json.dumps(value, allow_nan=False)
+    except (TypeError, ValueError):
+        raise Refusal(POLICY_REL, 0, f"{key} holds {value!r}, which JSON cannot spell") from None
+    return value
+
+
+def derive_catalogue_rel():
+    """This kit's catalogue as a path from the top of the kit's repository, git's own spelling, or
+    a Refusal where the kit is in no repository. A repository the kit is copied into at its own
+    path, as the fixture does, holds the catalogue at the same path."""
+    prefix = run_git(KIT, "rev-parse", "--show-prefix")
+    if prefix is None:
+        raise Refusal((KIT / CATALOGUE).as_posix(), 0, "the policy kit is in no git repository, so its catalogue has no blob")
+    return prefix.strip() + CATALOGUE
+
+
+def check_pattern_name(name):
+    return any(s == "*" or (s.startswith("<") and s.endswith(">")) for s in str(name).split("."))
+
+
+def render_mirror(repo, rev="HEAD"):
+    """The mirror's bytes for the commit `rev` names: the blob ids of the policy file and of this
+    kit's catalogue there, null where absent, and the Resolution of every catalogue name with no
+    `*` or `<...>` segment and of every key the file there sets that a pattern row matches, each
+    through `resolve_read` over ONE `read_revision` read. Sorted keys, two-space indent, ASCII, LF:
+    one revision renders one byte string. The resolution's Refusal passes through."""
+    rows = load_catalogue(KIT)
+    read = read_revision(repo, rev, rows)
+    paths = {tuple(str(r["name"]).split(".")) for r in rows if r.get("name") and not check_pattern_name(r["name"])}
+    keys = {}
+
+    def add(p, row):
+        hit = resolve_read(p, row, read)
+        key = render_dotted(p)
+        keys[key] = {"reason": hit.reason, "source": hit.source, "value": check_json_value(key, hit.value)}
+    for p in sorted(paths):
+        add(p, read_catalogue_row(p, rows))
+    # The keys an invalid file reads come from its last valid revision, which the loop above walked to.
+    table = (read.get("last_valid") or (None, None))[1] if read["problems"] else read["table"]
+    for p in sorted(table or {}):
+        try:
+            row = read_catalogue_row(p, rows)
+        except Refusal:
+            continue
+        if check_pattern_name(row["name"]):
+            add(p, row)
+
+    def read_blob(rel):
+        return (run_git(repo, "rev-parse", "--verify", "-q", f"{read['sha']}:{rel}") or "").strip() or None
+    doc = {"catalogue_blob": read_blob(derive_catalogue_rel()), "keys": keys, "policy_blob": read_blob(POLICY_REL)}
+    return (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii")
+
+
+def check_mirror_text(want, have):
+    """None where the mirror's bytes `have` (None: absent) are the render `want`, else what differs
+    first: `absent`, `unparsable`, a blob field, the first key in sorted order whose entry differs or
+    that one side lacks, else `bytes`, a spelling no field shows."""
+    if have == want:
+        return None
+    if have is None:
+        return "absent"
+    try:
+        doc = json.loads(have.decode("utf-8"))
+    except ValueError:  # UnicodeDecodeError and JSONDecodeError are both
+        return "unparsable"
+    if not isinstance(doc, dict) or not isinstance(doc.get("keys"), dict):
+        return "unparsable"
+    w = json.loads(want)
+    for field in ("catalogue_blob", "policy_blob"):
+        if doc.get(field) != w[field]:
+            return field
+    return next((k for k in sorted(set(doc["keys"]) | set(w["keys"])) if doc["keys"].get(k) != w["keys"].get(k)), "bytes")
 
 
 def parse_list(text):
@@ -653,28 +762,35 @@ def render_scaffold(rows):
     return out
 
 
-USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain]"
-         " | check [--rev <rev>]")
+USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
+         " | check [--rev <rev>] | mirror --write | mirror --check")
 
 
 def cmd_get(argv):
-    """`get <key> [--rev <rev>] [--explain]`, run in the repository to read: the value on stdout, a
-    string as itself, a number or a boolean in TOML's spelling, a list one member per line. `--explain`
-    adds `policy: <key> · <source> · <reason>` on stderr. A Refusal prints its line there, exit 2."""
+    """`get <key> [--rev <rev>] [--explain] [--json]`, run in the repository to read: the value on
+    stdout, a string as itself, a number or a boolean in TOML's spelling, a list one member per line;
+    under `--json` one JSON object of the Resolution's three fields instead, the form the mirror
+    helper reads through its shim. `--explain` adds `policy: <key> · <source> · <reason>` on stderr.
+    A Refusal prints its line there, nothing on stdout, exit 2."""
     import argparse
     ap = argparse.ArgumentParser(prog="policy.py get")
     ap.add_argument("key")
     ap.add_argument("--rev")
     ap.add_argument("--explain", action="store_true")
+    ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")  # a shell reading the value gets no CR
     try:
         hit = resolve(args.key, ".", args.rev)
+        if args.json:
+            check_json_value(args.key, hit.value)
     except Refusal as exc:
         print(exc, file=sys.stderr)
         return 2
-    for v in hit.value if isinstance(hit.value, list) else [hit.value]:
+    if args.json:
+        print(json.dumps(hit._asdict(), sort_keys=True))
+    for v in [] if args.json else hit.value if isinstance(hit.value, list) else [hit.value]:
         print(v if isinstance(v, str) else render_toml_value(v))
     if args.explain:
         print(f"policy: {args.key} · {hit.source} · {hit.reason}", file=sys.stderr)
@@ -700,11 +816,54 @@ def cmd_check(argv):
     return 0
 
 
+def cmd_mirror(argv):
+    """`mirror --write | --check`, run in the repository: both refuse, exit 2, while the policy file
+    or this kit's catalogue in the working tree differs from its blob at HEAD, each absent on both
+    sides being equal, and then render at HEAD. `--write` writes `.governance/policy.json` only when
+    its bytes differ; `--check` compares them, exit 1 naming the first difference."""
+    if argv not in (["--write"], ["--check"]):
+        print(USAGE, file=sys.stderr)
+        return 2
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")
+    top = (run_git(".", "rev-parse", "--show-toplevel") or "").strip()
+    try:
+        if not top:
+            raise Refusal(MIRROR_REL, 0, "the working directory is in no git repository")
+        cat = derive_catalogue_rel()
+        for rel in (POLICY_REL, cat):
+            here = (run_git(top, "hash-object", "--", rel) or "").strip()
+            if here != (run_git(top, "rev-parse", "--verify", "-q", f"HEAD:{rel}") or "").strip():
+                raise Refusal(rel, 0, "uncommitted changes; the mirror renders a revision, commit first")
+        want = render_mirror(top, "HEAD")
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    path = Path(top, MIRROR_REL)
+    have = path.read_bytes() if path.is_file() else None
+    if argv == ["--check"]:
+        drift = check_mirror_text(want, have)
+        if drift:
+            print(f"policy: mirror stale · {MIRROR_REL} · {drift} · run: python {cat[:-len(CATALOGUE)]}policy.py mirror --write")
+            return 1
+    elif have != want:
+        path.parent.mkdir(exist_ok=True)
+        path.write_bytes(want)
+        doc = json.loads(want)
+        print(f"policy: mirror written · {len(doc['keys'])} keys · policy {(doc['policy_blob'] or 'absent')[:8]}"
+              f" · catalogue {(doc['catalogue_blob'] or 'absent')[:8]}")
+        return 0
+    print("policy: mirror fresh")
+    return 0
+
+
 def main(argv):
     if argv[:1] == ["get"]:
         return cmd_get(argv[1:])
     if argv[:1] == ["check"]:
         return cmd_check(argv[1:])
+    if argv[:1] == ["mirror"]:
+        return cmd_mirror(argv[1:])
     if argv == ["scaffold"]:
         sys.stdout.write(render_scaffold(load_catalogue(KIT)))
         return 0

@@ -12,7 +12,12 @@ THE ARMS read the repository's `.governance/policy.toml` and this kit's catalogu
 list: `arm_schema` grades each file key with the value check, `arm_shape` audits the catalogue's
 rows, `arm_summaries` grades the list as `policy.py lists --check` does, `arm_direction` reds a
 loop bound or deadline row that does not declare `direction = "raise-loosens"` (TOOL-dGroundRules-11),
-and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4).
+and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4). The mirror's
+three (TOOL-dGroundRules-5): `arm_mirror_parity` reds a working-tree `.governance/policy.json` that
+is absent or differs from its render at HEAD; `arm_mirror_landed` reds a key the policy file at the
+landed revision sets that the helper `policy-mirror.js` and the reader answer differently, one
+`node` call per key; `arm_mirror_readers` reds a tracked code file outside this kit, the memory root
+and `help/` that names `policy.json`.
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -50,6 +55,15 @@ naming the count when there is none or more than one, derives its population, pl
 each kept key in a valid revision with a malformed one after it, and reds any read that is not
 strict's value from `last-valid` or an empty population; with no `--strict-from` it prints NOT RUN,
 which is never a pass.
+
+The fixture's repository also carries a tracked consumer outside the kit, `hooks/consumer.js`, that
+reads policy through the helper, and the mirror rendered at its commit in the working tree.
+`mirror-hand-edited`, `mirror-absent` and `mirror-direct-reader` are plant cases of the mirror's
+parity and readers arms. `mirror-worktree-loosened`, `mirror-stale-last-valid`, `mirror-stale-refuse`
+and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies policy.py,
+policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
+and asserts what the helper, a four-line fixture hook and `arm_mirror_landed` answer there.
+`mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in four ladder states.
 
 Later units add arms to ARMS and cases to CASES.
 """
@@ -137,7 +151,99 @@ def arm_on_invalid(repo, kit):
     return 1, line.removeprefix("policy: check · "), []
 
 
-ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid]
+# ---- the JSON mirror (TOOL-dGroundRules-5) ------------------------------------------------------
+
+MIRROR_FILE = tuple(policy.MIRROR_REL.split("/"))
+MIRROR_KIT_FILES = ("policy.py", "policy-mirror.js", "policy-shim.sh")
+CODE_PATHSPECS = ("*.js", "*.mjs", "*.cjs", "*.py", "*.sh", ".githooks/*")
+MIRROR_REMEDY = "run: python <this kit>/policy.py mirror --write"
+
+
+def arm_mirror_parity(repo, kit):
+    """The working-tree mirror against `policy.render_mirror(repo, "HEAD")`: a mirror that differs,
+    named by its first difference, or one absent where this kit is present. A render the reader
+    refuses is the one finding."""
+    try:
+        want = policy.render_mirror(repo, "HEAD")
+    except policy.Refusal as exc:
+        return 1, f"{policy.MIRROR_REL} against its render at HEAD", [(f"{exc.path}:{exc.line}", exc.why)]
+    path = Path(repo, *MIRROR_FILE)
+    drift = policy.check_mirror_text(want, path.read_bytes() if path.is_file() else None)
+    n = len(json.loads(want)["keys"])
+    population = f"{n} key(s) of {policy.MIRROR_REL} against its render at HEAD"
+    if drift is None:
+        return n, population, []
+    if drift == "absent":
+        return n, population, [(policy.MIRROR_REL, f"absent; {MIRROR_REMEDY}")]
+    return n, population, [(drift, f"differs from the render at HEAD; {MIRROR_REMEDY}")]
+
+
+def render_get(value):
+    """A value as `policy.py get` prints it: a string as itself, a list one member per line."""
+    return "".join((v if isinstance(v, str) else policy.render_toml_value(v)) + "\n"
+                   for v in (value if isinstance(value, list) else [value]))
+
+
+def arm_mirror_landed(repo, kit):
+    """For each key the policy file at the landed revision L sets, the helper's CLI, `node
+    policy-mirror.js get <key> --repo <repo>`, one call per key, against the reader's `resolve` at L
+    as `get` prints it: a value the two answer differently, or one refusing where the other answers,
+    is a finding."""
+    try:
+        sha, _how = policy.derive_landed_revision(repo)
+        text = policy.read_policy_text(repo, sha)
+        keys = sorted(policy.render_dotted(p) for p in policy.parse_policy(text)) if text is not None else []
+    except policy.Refusal as exc:
+        return 0, f"no landed revision: {exc.why}", []
+    except tomllib.TOMLDecodeError:
+        return 0, f"{POLICY_REL} at {sha[:8]} is not TOML, so it sets no key to compare", []
+    out = []
+    for key in keys:
+        try:
+            want = (0, render_get(policy.resolve(key, repo).value))
+        except policy.Refusal as exc:
+            want = (2, str(exc))
+        try:
+            p = subprocess.run(["node", str(Path(kit) / "policy-mirror.js"), "get", key, "--repo", str(repo)],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+            got = (p.returncode, p.stdout.replace("\r", "") if p.returncode == 0 else p.stderr.strip())
+        except OSError as exc:
+            got = (None, f"node did not run: {exc}")
+        if got[0] != want[0] or (want[0] == 0 and got[1] != want[1]):
+            out.append((key, f"the helper answers {got[1].strip()!r} (exit {got[0]}), the reader {want[1].strip()!r} (exit {want[0]})"))
+    return len(keys), f"{len(keys)} key(s) the policy file sets at {sha[:8]}, the helper against the reader", out
+
+
+def read_memory_root(repo):
+    """MEMORY_ROOT from the repository's `.memory-tree.conf`, else `memory`."""
+    try:
+        text = Path(repo, ".memory-tree.conf").read_text(encoding="utf-8")
+    except OSError:
+        return "memory"
+    m = re.search(r'^\s*MEMORY_ROOT\s*=\s*"?([^"#\s]+)"?', text, flags=re.M)
+    return m[1].strip("/") if m else "memory"
+
+
+def arm_mirror_readers(repo, kit):
+    """Each tracked code file, `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*`, outside this
+    kit's directory, the memory root and `help/`, that names `policy.json`: every consumer reads the
+    mirror through the helper."""
+    skip = tuple(p for p in ((policy.run_git(kit, "rev-parse", "--show-prefix") or "").strip(),
+                             read_memory_root(repo) + "/", "help/") if p)
+    files = [f for f in (policy.run_git(repo, "ls-files", "-z", "--", *CODE_PATHSPECS) or "").split("\0")
+             if f and not f.startswith(skip)]
+    out = []
+    for f in files:
+        try:
+            if b"policy.json" in Path(repo, f).read_bytes():
+                out.append((f, "names policy.json; read the mirror through policy-mirror.js's readPolicy"))
+        except OSError:
+            continue
+    return len(files), f"{len(files)} tracked code file(s) outside the kit, the memory root and help/", out
+
+
+ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm_mirror_parity,
+        arm_mirror_landed, arm_mirror_readers]
 
 
 def run_arm(arm, repo, kit):
@@ -465,14 +571,23 @@ def build_reader_repo(path, *texts):
     return path
 
 
+def check_run(scenario, what, argv, want, cwd=None, env=None):
+    """`argv` run in `cwd` -> (scenario, what, ok, what it observed), `want` judging (exit code,
+    stdout, stderr), CR stripped. A program that does not start is exit None."""
+    try:
+        p = subprocess.run(argv, cwd=cwd, env=env, capture_output=True, text=True, encoding="utf-8", errors="replace")
+        rc, out, err = p.returncode, p.stdout.replace("\r", ""), p.stderr.replace("\r", "")
+    except OSError as exc:
+        rc, out, err = None, "", f"{argv[0]} did not run: {exc}"
+    seen = f"exit {rc} · stdout {out.strip() or '(none)'!r} · stderr {err.strip() or '(none)'!r}"
+    return scenario, what, want(rc, out, err), seen
+
+
 def check_get(scenario, repo, args, want, env=None, kit=KIT, verb="get"):
     """`<kit>/policy.py <verb> <args>` run in `repo` -> (scenario, what, ok, what it observed), `want`
     judging (exit code, stdout, stderr), CR stripped."""
-    p = subprocess.run([sys.executable, str(kit / "policy.py"), verb, *args], cwd=repo, env=env,
-                       capture_output=True, text=True, encoding="utf-8", errors="replace")
-    out, err = p.stdout.replace("\r", ""), p.stderr.replace("\r", "")
-    seen = f"exit {p.returncode} · stdout {out.strip() or '(none)'!r} · stderr {err.strip() or '(none)'!r}"
-    return scenario, f"{verb} " + " ".join(args), want(p.returncode, out, err), seen
+    return check_run(scenario, f"{verb} " + " ".join(args), [sys.executable, str(kit / "policy.py"), verb, *args],
+                     want, repo, env)
 
 
 def print_checks(name, checks):
@@ -793,6 +908,161 @@ def run_on_invalid_strict(name):
     return len(kept) + 2, len(wrong)
 
 
+# ---- the JSON mirror (TOOL-dGroundRules-5) ------------------------------------------------------
+
+AGENTS_KEY = "runtime.agents-in-flight"
+CONSUMER_FILE = ("hooks", "consumer.js")
+CONSUMER_TEXT = ("// A consumer outside the policy kit: it reads policy through the helper, never the file itself.\n"
+                 "const { readPolicy } = require(@helper@);\n"
+                 f"module.exports = () => readPolicy({json.dumps(AGENTS_KEY)}).value;\n")
+DIRECT_READER = 'module.exports = () => JSON.parse(require("fs").readFileSync(".governance/policy.json", "utf8"));\n'
+# The fixture hook: four lines of Node that require the helper, read the limit, and refuse a request above it.
+FIXTURE_HOOK = ("const { readPolicy } = require(@helper@);\n"
+                f"const limit = readPolicy({json.dumps(AGENTS_KEY)}, {{ repo: __dirname }}).value;\n"
+                "const asked = 3;\n"
+                "process.exit(asked > limit ? 2 : 0);\n")
+LANDED_POLICY = '[policy-file]\non-invalid = "{on}"\n\n[runtime]\nagents-in-flight = {n}\n'
+
+
+def seed_mirror_hand_edited(repo, kit, rows):
+    """The working-tree mirror's agents-in-flight value set to 8, its blob ids kept."""
+    path = Path(repo, *MIRROR_FILE)
+    doc = json.loads(path.read_bytes())
+    doc["keys"][AGENTS_KEY]["value"] = 8
+    path.write_bytes((json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
+    return AGENTS_KEY, "differs from the render"
+
+
+def seed_mirror_absent(repo, kit, rows):
+    Path(repo, *MIRROR_FILE).unlink()
+    return policy.MIRROR_REL, "absent"
+
+
+def seed_mirror_direct_reader(repo, kit, rows):
+    """The tracked consumer outside the kit made to read the mirror with readFileSync."""
+    Path(repo, *CONSUMER_FILE).write_text(DIRECT_READER, encoding="utf-8", newline="\n")
+    return "/".join(CONSUMER_FILE), "names policy.json"
+
+
+def build_landed_repo(rows):
+    """build_repo's fixture with this kit's policy.py, policy-mirror.js and policy-shim.sh copied beside
+    its catalogue and committed with no mirror, its remote moved to a bare repository. -> (repo, kit, bare)."""
+    repo, kit = build_repo(rows)
+    for f in MIRROR_KIT_FILES:
+        (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
+    Path(repo, *MIRROR_FILE).unlink()
+    bare = Path(tempfile.mkdtemp(prefix="pol-"))
+    run_fixture_git(bare, "init", "-q", "--bare")
+    run_fixture_git(repo, "remote", "set-url", FIXTURE_REMOTE, bare.as_posix())
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "-m", "the mirror helper")
+    return repo, kit, bare
+
+
+def set_landed(repo, on, n, render):
+    """One commit on main whose policy file sets `policy-file.on-invalid` and agents-in-flight, carrying,
+    when `render`, the mirror rendered at the commit before it; pushed, so the remote's main is L. -> L8."""
+    if render:
+        Path(repo, *MIRROR_FILE).write_bytes(policy.render_mirror(repo, "HEAD"))
+    write_policy(repo, LANDED_POLICY.format(on=on, n=n))
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", "landed")
+    run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+    return (policy.run_git(repo, "rev-parse", "HEAD") or "").strip()[:8]
+
+
+def run_mirror_landed(name):
+    """The helper over a landed revision L in a bare remote. `mirror-worktree-loosened`: L sets the
+    limit to 2 with its fresh mirror, the working-tree mirror says 8, and a fixture hook asked for 3
+    must refuse. `mirror-stale-last-valid`: L sets 3 and carries the mirror rendered at 2, read as 3
+    with a reason opening `mirror stale at`. `mirror-stale-refuse`: the same under `refuse`, a refusal
+    naming the mirror, which `arm_mirror_landed` reds. `mirror-absent-refuse`: L carries no mirror,
+    refused under `refuse`, then read as the reader reads it under `last-valid`."""
+    rows = policy.load_catalogue(KIT)
+    repo, kit, bare = build_landed_repo(rows)
+    try:
+        helper = ["node", str(kit / "policy-mirror.js"), "get", AGENTS_KEY, "--repo", str(repo)]
+        what, at_l = "policy-mirror.js get " + AGENTS_KEY, "at L"
+        refused = f"policy: refused · {policy.MIRROR_REL}:0 · "
+        checks = []
+        if name == "mirror-worktree-loosened":
+            set_landed(repo, "last-valid", 2, False)
+            set_landed(repo, "last-valid", 2, True)
+            mirror = Path(repo, *MIRROR_FILE)
+            doc = json.loads(mirror.read_bytes())
+            doc["keys"][AGENTS_KEY]["value"] = 8
+            mirror.write_bytes((json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
+            Path(repo, "hook.js").write_text(FIXTURE_HOOK.replace("@helper@", json.dumps(str(kit / "policy-mirror.js"))),
+                                             encoding="utf-8", newline="\n")
+            checks += [check_run(at_l, "the fixture hook asked for 3", ["node", str(repo / "hook.js")],
+                                 lambda rc, o, e: rc == 2, cwd=repo),
+                       check_run(at_l, what, helper, lambda rc, o, e: rc == 0 and o == "2\n")]
+        elif name == "mirror-stale-last-valid":
+            set_landed(repo, "last-valid", 2, False)
+            at = set_landed(repo, "last-valid", 3, True)
+            checks.append(check_run(at_l, what + " --explain", helper + ["--explain"], lambda rc, o, e: rc == 0
+                                    and o == "3\n" and f"policy: {AGENTS_KEY} · file · mirror stale at {at}; " in e))
+        elif name == "mirror-stale-refuse":
+            set_landed(repo, "last-valid", 2, False)
+            at = set_landed(repo, "refuse", 3, True)
+            checks.append(check_run(at_l, what, helper, lambda rc, o, e: rc == 2 and not o
+                                    and e.startswith(f"{refused}stale at {at}; policy-file.on-invalid is refuse")))
+        else:  # mirror-absent-refuse
+            at = set_landed(repo, "refuse", 3, False)
+            checks.append(check_run(at_l, what + " under refuse", helper, lambda rc, o, e: rc == 2 and not o
+                                    and e.startswith(f"{refused}absent at {at}; policy-file.on-invalid is refuse")))
+            at = set_landed(repo, "last-valid", 3, False)
+            want = render_get(policy.resolve(AGENTS_KEY, repo).value)
+            checks.append(check_run(at_l, what + " --explain under last-valid", helper + ["--explain"], lambda rc, o, e:
+                                    rc == 0 and o == want and f" · file · mirror absent at {at}; " in e))
+        _n, population, findings = arm_mirror_landed(repo, kit)
+        named = any(k == AGENTS_KEY for k, _w in findings)
+        ok = named if name == "mirror-stale-refuse" else not findings
+        checks.append((at_l, "arm_mirror_landed", ok, f"{len(findings)} finding(s) · "
+                       + ("; ".join(f"{k}: {w}" for k, w in findings) or population)))
+    finally:
+        remove_repo(repo)
+        remove_repo(bare)
+    return print_checks(name, checks)
+
+
+def run_mirror_landed_parity(name):
+    """The shim's `landed` against the reader's `derive_landed_revision` in four ladder states, each
+    remote's main a different commit: two remotes with GOV_REMOTE naming the second; two without;
+    one remote; no remote. The same sha, or both refusing, in each."""
+    bash = resolve_bash()
+    if bash is None:
+        print(f"policy-fixture: {name} · WRONG: no bash on PATH shares this filesystem; set GOV_BASH")
+        return 1, 1
+    repo, kit, bare = build_landed_repo(policy.load_catalogue(KIT))
+    checks = []
+    try:
+        run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+        run_fixture_git(repo, "remote", "add", FIXTURE_SECOND, repo.as_posix())
+        run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_SECOND}/main", "HEAD~1")
+        for state, drop, gov in (("two remotes, GOV_REMOTE", None, FIXTURE_SECOND), ("two remotes", None, None),
+                                 ("one remote", FIXTURE_SECOND, None), ("no remote", FIXTURE_REMOTE, None)):
+            if drop:
+                run_fixture_git(repo, "remote", "remove", drop)
+            if gov:
+                os.environ["GOV_REMOTE"] = gov
+            try:
+                want, why = policy.derive_landed_revision(repo)[0], ""
+            except policy.Refusal as exc:
+                want, why = None, exc.why
+            finally:
+                os.environ.pop("GOV_REMOTE", None)
+            checks.append(check_run(
+                state, f"policy-shim.sh landed against derive_landed_revision ({want[:8] if want else 'refused: ' + why})",
+                [bash, (kit / "policy-shim.sh").as_posix(), "landed"],
+                lambda rc, o, e, want=want: rc == 0 and o.strip() == want if want else rc == 2 and not o and e.startswith("policy: refused · "),
+                cwd=repo, env={**os.environ, **({"GOV_REMOTE": gov} if gov else {})}))
+    finally:
+        remove_repo(repo)
+        remove_repo(bare)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -809,6 +1079,14 @@ CASES = [
     ("resolution-order", None, run_resolution_order),
     ("on-invalid-classes", None, run_on_invalid_classes),
     ("on-invalid-strict", None, run_on_invalid_strict),
+    ("mirror-hand-edited", arm_mirror_parity, seed_mirror_hand_edited),
+    ("mirror-absent", arm_mirror_parity, seed_mirror_absent),
+    ("mirror-direct-reader", arm_mirror_readers, seed_mirror_direct_reader),
+    ("mirror-worktree-loosened", None, run_mirror_landed),  # outcome cases: the helper over a landed L
+    ("mirror-stale-last-valid", None, run_mirror_landed),
+    ("mirror-stale-refuse", None, run_mirror_landed),
+    ("mirror-absent-refuse", None, run_mirror_landed),
+    ("mirror-landed-parity", None, run_mirror_landed_parity),
 ]
 
 
@@ -824,7 +1102,8 @@ def run_fixture_git(repo, *args):
 
 def build_repo(rows):
     """A committed copy of this kit's catalogue and list at the kit's own path, the scaffold beside it,
-    and a remote-tracking ref at that commit. -> (repo, kit copy)."""
+    a consumer outside the kit that reads policy through the helper, and a remote-tracking ref at that
+    commit; then the mirror rendered at it, in the working tree. -> (repo, kit copy)."""
     repo = Path(tempfile.mkdtemp(prefix="pol-"))
     prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit = repo / prefix if prefix else repo
@@ -833,12 +1112,16 @@ def build_repo(rows):
         (kit / name).write_bytes((KIT / name).read_bytes().replace(b"\r\n", b"\n"))
     Path(repo, POLICY_FILE[0]).mkdir()
     Path(repo, *POLICY_FILE).write_bytes(policy.render_scaffold(rows).encode("utf-8"))
+    Path(repo, *CONSUMER_FILE[:-1]).mkdir()
+    Path(repo, *CONSUMER_FILE).write_text(CONSUMER_TEXT.replace("@helper@", json.dumps(f"../{prefix}policy-mirror.js")),
+                                          encoding="utf-8", newline="\n")
     run_fixture_git(repo, "init", "-q")
     run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
     run_fixture_git(repo, "add", "-A")
     run_fixture_git(repo, "commit", "-q", "-m", "policy fixture")
     run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, repo.as_posix())
     run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_REMOTE}/main", "HEAD")
+    Path(repo, *MIRROR_FILE).write_bytes(policy.render_mirror(repo, "HEAD"))
     return repo, kit
 
 
@@ -866,7 +1149,8 @@ def run_fixture(only=None):
             continue
         repo, kit = build_repo(rows)
         try:
-            files = [kit / policy.CATALOGUE, kit / policy.LIST, Path(repo, *POLICY_FILE)]
+            files = [kit / policy.CATALOGUE, kit / policy.LIST, Path(repo, *POLICY_FILE), Path(repo, *MIRROR_FILE),
+                     Path(repo, *CONSUMER_FILE)]
             saved = {p: p.read_bytes() for p in files}
             key, needle = seed(repo, kit, rows)
             _pop, findings = run_arm(arm, repo, kit)

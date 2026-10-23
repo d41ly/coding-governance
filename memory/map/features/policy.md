@@ -20,7 +20,7 @@ guides = []
 backlog-shards = []
 lexicon-verbs = []
 [paths]
-globs = ["tools/policy/**", ".governance/policy.toml", "help/policy.md"]
+globs = ["tools/policy/**", ".governance/policy.toml", ".governance/policy.json", "help/policy.md"]
 ```
 
 There was no single answer to "what is this repository's policy" (`gap-spine-06`): owner switches
@@ -52,6 +52,11 @@ a list absent at the base is no comparison rather than an empty one.
 fixture asserts each planted break reds NAMING the planted key, so a red for another reason is
 `WRONG`, not a pass.
 
+**The mirror is read from the landed blob, pinned by blob ids.** A hook reads
+`.governance/policy.json` only through `policy-mirror.js`, from the landed revision's blob, and only
+while the recorded blob ids of the policy file and the catalogue match that revision; a hand-edited
+working-tree mirror changes nothing a hook enforces. Every landing regenerates it.
+
 **Kit paths are derived, never spelled.** The fixture places its copy at the kit's own path in its
 repository, read from git, because a literal kit segment is wrong at any other install prefix.
 
@@ -61,6 +66,8 @@ repository, read from git, because a literal kit segment is wrong at any other i
   and held to it by the resolve-python parity arm.
 - `resolve_compare_base` — the map kit's compare base, copied rule for rule because a kit may not
   import a sibling.
+- `resolve_read` over one `read_revision` read — the reader's one composition of the resolution
+  order and the invalid-file branch; `resolve` and `render_mirror` both call it.
 - `ARMS` and `CASES` in `check_policy.py` — the seams the later dGroundRules units fill with their
   arms and fixture cases.
 
@@ -79,6 +86,12 @@ order, a second reader or a working-tree read.
 seam: `policy.validate` — reuse for any verdict on a whole policy file's text, problems with their
 lines; extend via `check_value` for a value rule, never a second judge, and never read a default
 for text it refuses (`read_last_valid_value` is the one fallback).
+
+seam: `policy.render_mirror` — reuse for any copy of the policy a non-Python consumer reads; extend
+via the keys and blob fields of the one render, never a second renderer or a hand-edited mirror.
+
+seam: `policy-mirror.js readPolicy` — reuse for any read of a policy key from JavaScript; extend via
+its evaluation order, never a read of the working-tree mirror or a JavaScript port of the ladder.
 
 ## Gaps
 

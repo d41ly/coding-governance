@@ -20,6 +20,18 @@ mutates_index = false
 [check]
 argv = ["bash", "{kit}/adopt-policy.sh", "--check"]
 
+# The JSON mirror the hooks read, rendered from the policy file at HEAD. The run-gates kit's
+# `regen.py --write` runs `write` in every landing the lander makes, so the landed revision carries
+# the render of its own policy file, and the bar's preflight runs `check` before its first leg.
+# Stage 2: it reads no other generated output, and the map at stage 3 reads the tree after it.
+[[generated]]
+path = ".governance/policy.json"
+generator = "policy.py"
+why = "the policy file's JSON mirror the hooks read, rendered at each landing (TOOL-dGroundRules-5)"
+write = ["python", "{kit}/policy.py", "mirror", "--write"]
+check = ["python", "{kit}/policy.py", "mirror", "--check"]
+stage = 2
+
 [[outcome]]
 code = 0
 probe = { must_exist = ".governance/policy.toml" }

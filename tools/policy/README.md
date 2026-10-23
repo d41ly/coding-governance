@@ -7,8 +7,9 @@ row per policy key, taken row for row and in order from the design's `[policies]
 
 The kit lands dark: one reader reads `.governance/policy.toml`, `policy.py get` (TOOL-dGroundRules-2),
 in one resolution order (TOOL-dGroundRules-3), and an invalid file never reads defaults
-(TOOL-dGroundRules-4); no consumer calls the reader yet. The JSON mirror and the guard are later units
-of dGroundRules, and each re-points one consumer.
+(TOOL-dGroundRules-4); no consumer calls the reader yet. The JSON mirror the hooks read,
+`.governance/policy.json`, is rendered at every landing and read by one helper (TOOL-dGroundRules-5);
+no hook reads it yet. The guard is a later unit of dGroundRules, and later units re-point consumers.
 
 ## Files
 
@@ -16,7 +17,9 @@ of dGroundRules, and each re-points one consumer.
 |---|---|
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve`, the file's one judge `validate`, and the `lists`, `scaffold`, `get` and `check` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, and the `lists`, `scaffold`, `get`, `check` and `mirror` verbs |
+| `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI |
+| `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 
@@ -100,11 +103,22 @@ owner-silence rule that declines a raise is a later build's reader.
   still owes and never adds one. An absent list is seeded with every owed row.
 - `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
   build owns that has a literal default, one table per first segment.
-- `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain]` — run in the repository to
+- `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain] [--json]` — run in the repository to
   read: the key's value on stdout, a string as itself, a number or a boolean in TOML's spelling, a
-  list one member per line, LF-ended. `--explain` adds `policy: <key> · <source> · <reason>` on
+  list one member per line, LF-ended. `--json` prints one JSON object of `reason`, `source` and
+  `value` instead, the form the mirror helper reads. `--explain` adds `policy: <key> · <source> · <reason>` on
   stderr, the reason naming the sha8 and how the revision was found. Exit 0, or 2 with one
-  `policy: refused · <path>:<line> · <why>` line.
+  `policy: refused · <path>:<line> · <why>` line and nothing on stdout.
+- `python <prefix>/policy/policy.py mirror --write | --check` — run in the repository: the mirror,
+  below, rendered at HEAD. Both refuse, exit 2 with `uncommitted changes`, while the policy file or
+  the catalogue in the working tree differs from its blob at HEAD. `--write` writes
+  `.governance/policy.json` only when its bytes differ and prints `policy: mirror written · <n> keys
+  · policy <blob8> · catalogue <blob8>` or `policy: mirror fresh`. `--check` exits 0 with
+  `policy: mirror fresh`, or 1 with `policy: mirror stale · .governance/policy.json · <what> · run: ...`,
+  `<what>` being `absent`, `unparsable`, a blob field, or the first key that differs.
+- `node <prefix>/policy/policy-mirror.js get <key> [--repo <dir>] [--explain]` — the helper's CLI:
+  the value as `get` prints it, `--explain` adding the same stderr line. Exit 0, or 2 with the
+  refusal line.
 - `python <prefix>/policy/policy.py check [--rev <rev>]` — run in the repository to check: the policy
   file in that commit, `HEAD` by default, the candidate a push lands. Exit 0 with one
   `policy: check · ...` line when the file is valid, absent, or invalid with a last valid revision
@@ -150,6 +164,44 @@ for the legacy homes.
 - **Git's environment.** Every git call drops the location variables git exports to a hook
   (`GIT_LOCATION_VARS`), so a reader started inside a hook or a fixture reads the repository it was
   pointed at.
+- **One read per revision.** `read_revision(repo, rev)` reads the revision, its text, `validate`'s
+  problems and the parsed table once; `resolve_read(path, row, read)` is the one composition of
+  `RESOLUTION_ORDER` and the invalid-file branch over it, the last valid revision walked to once per
+  read. `resolve` calls the two in turn.
+
+## The mirror
+
+A hook is JavaScript and cannot parse TOML, so it reads policy through `.governance/policy.json`,
+pinned LF in `.gitattributes`. `render_mirror(repo, rev)` renders it for one revision over one read:
+
+```json
+{
+  "catalogue_blob": "<blob id of this kit's catalogue at the revision>",
+  "keys": {"budgets.enforce": {"reason": "...", "source": "file", "value": "warn"}},
+  "policy_blob": "<blob id of .governance/policy.toml at the revision, or null when absent>"
+}
+```
+
+`keys` holds every catalogue name with no `*` or `<...>` segment, and every key the file sets that a
+pattern row matches, each with its `Resolution`. The bytes are sorted, two-space indented, ASCII and
+LF, so one revision renders one byte string. A value JSON cannot spell refuses naming its key; a read
+the reader refuses, an invalid file under `refuse` say, refuses the render, so a landing carrying
+one stops naming the line. The blob ids pin the mirror to its policy, never a commit id: a commit
+cannot carry its own id, and the lander renders before the merge commit exists.
+
+**Regenerated at every landing.** `kit.toml`'s `[[generated]]` row, stage 2, names `mirror --write`
+and `mirror --check`, so the run-gates kit's `regen.py --write` renders it into each landing the
+lander makes, and the bar's preflight runs the check. A branch carrying a policy change carries a
+stale mirror until it lands.
+
+**Read from the landed blob only.** `policy-mirror.js`'s `readPolicy(key, { repo })` finds the
+landed revision L through `policy-shim.sh landed`, reads the mirror's blob at L and the two blob ids
+there, and takes a key from the mirror only while both ids match. A stale or absent mirror, or a key
+it does not hold, is read through the reader by `policy-shim.sh get <key>`; a mirror failure first
+reads `policy-file.on-invalid`, and any value but `last-valid` refuses naming the mirror. A fallback's
+reason opens `mirror absent at <L8>` or `mirror stale at <L8>`. The working-tree mirror is never
+opened. The shim carries the remote ladder and the python resolver inline, byte-identical to their
+canonicals. Python and shell consumers call the reader, never the mirror.
 
 ## The arms
 
@@ -160,6 +212,9 @@ for the legacy homes.
 | `arm_summaries` | the catalogue, the list, the list at the base | each `lists --check` finding |
 | `arm_direction` | the catalogue | each `check_direction` finding; its population is the loop bound and deadline rows |
 | `arm_on_invalid` | `.governance/policy.toml` as committed at HEAD, its history | the refusal `policy.py check` prints: an invalid file with no valid revision before it, or one whose last valid revision sets `policy-file.on-invalid = "refuse"` |
+| `arm_mirror_parity` | the working-tree `.governance/policy.json` against `render_mirror` at HEAD | a mirror that differs, named by its first difference, or one that is absent |
+| `arm_mirror_landed` | `node policy-mirror.js get <key>` against the reader's `resolve`, for each key the policy file at the landed revision sets | a value the two answer differently, or one refusing where the other answers |
+| `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root and `help/` | a file naming `policy.json` |
 
 `arm_on_invalid` is how an invalid file with no fallback reaches the push and landing gates: the
 `policy check` leg carries no guard, so the pre-push bar and every landing run it on a push that
@@ -197,6 +252,22 @@ with why (no row, a placeholder key, a cell that is no value, the default, a dot
 key), and reads each kept key at a malformed revision after a valid one setting them all: every read
 must be strict's value from `last-valid`, and an empty population reds.
 
+The fixture's repository also carries `hooks/consumer.js`, a tracked consumer that reads policy
+through the helper, and the mirror rendered at its commit. `mirror-hand-edited` sets the working-tree
+mirror's `runtime.agents-in-flight` to 8 with its blob ids kept, and `mirror-absent` deletes it: each
+must red `arm_mirror_parity` naming the key, then `absent`. `mirror-direct-reader` makes the consumer
+read the mirror with `readFileSync`, which must red `arm_mirror_readers` naming it. The outcome cases
+copy `policy.py`, `policy-mirror.js` and `policy-shim.sh` into the kit copy and push a landed revision
+L to a bare remote: `mirror-worktree-loosened` lands a limit of 2 with its fresh mirror and loosens
+the working-tree mirror to 8, where a four-line fixture hook asked for 3 must refuse and the helper
+print `2`; `mirror-stale-last-valid` lands 3 with the mirror rendered at 2, read as `3` from `file`
+with a reason opening `mirror stale at`; `mirror-stale-refuse` lands the same under `refuse`, which
+must refuse naming `.governance/policy.json:0` and red `arm_mirror_landed`; `mirror-absent-refuse`
+lands no mirror, refused under `refuse` and read as the reader reads it under `last-valid`. Every
+other outcome case must leave `arm_mirror_landed` green. `mirror-landed-parity` runs the shim's
+`landed` beside `derive_landed_revision` with two remotes and `GOV_REMOTE`, two without, one, and
+none: the same sha, or both refusing, in each.
+
 ## Each arm in an adopter
 
 The `policy check` leg ships, so every arm in `ARMS` runs in an adopter's tree as well as in gov's.
@@ -218,6 +289,9 @@ Both runs must exit 0, and every arm must print a graded line with no finding or
 | `arm_summaries` | the installed shrink-only list against the installed catalogue, and against the list at the target's compare base | a finding per row an absent list owes; no remote or no fetched ref is no base, which its line says, and the catalogue alone is compared |
 | `arm_direction` | the installed catalogue's loop bound and deadline rows | a finding: the catalogue ships in the kit, and one that does not read or parse reds |
 | `arm_on_invalid` | the target's `.governance/policy.toml` as committed at HEAD, against the installed catalogue | an absent file at HEAD grades clean, since it reads defaults; a HEAD that names no commit, before the first commit, is a finding until TOOL-dGroundRules-21 announces it |
+| `arm_mirror_parity` | the target's `.governance/policy.json` against its render at HEAD | a finding: an absent mirror reds until the first landing renders one, which TOOL-dGroundRules-21 grades only where HEAD carries a policy file or a mirror |
+| `arm_mirror_landed` | the installed helper against the reader, for each key the target's policy file sets at its landed revision | a finding: a landed revision with no policy file is a zero population, until TOOL-dGroundRules-25 announces it |
+| `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root and `help/` | a finding: a target with no tracked code is a zero population, until TOOL-dGroundRules-21 announces it |
 
 ## The adopter
 

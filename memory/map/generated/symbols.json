@@ -198,6 +198,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "PolicyRefusal",
+      "kind": "class",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
       "id": "Problem",
       "kind": "class",
       "file": "tools/memory-tree/backlog.py"
@@ -871,6 +876,21 @@
       "id": "arm_minor",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
+    },
+    {
+      "id": "arm_mirror_landed",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_mirror_parity",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_mirror_readers",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "arm_noop",
@@ -2156,6 +2176,11 @@
       "id": "build_landed_fixture",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "build_landed_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "build_landing_index",
@@ -4453,6 +4478,11 @@
       "file": "tools/run-gates/run-gates.runlog.test.sh"
     },
     {
+      "id": "check_json_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_keepalive_reaped",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -4606,6 +4636,11 @@
       "id": "check_mint_verb",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "check_mirror_text",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "check_miss",
@@ -4776,6 +4811,11 @@
       "id": "check_paths_never_lost",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_pattern_name",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "check_payload",
@@ -5131,6 +5171,11 @@
       "id": "check_rule_tags",
       "kind": "function",
       "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "check_run",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "check_run_call",
@@ -6048,6 +6093,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "cmd_mirror",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "cmd_model",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
@@ -6781,6 +6831,11 @@
       "id": "derive_cases",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_catalogue_rel",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "derive_census_tokens",
@@ -10325,6 +10380,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/policy/policy.py"
     },
     {
@@ -12588,6 +12648,11 @@
       "file": "tools/hooks/format-guard.js"
     },
     {
+      "id": "readLandedRevision",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
       "id": "readLiveSlugs",
       "kind": "function",
       "file": "tools/hooks/format-guard.js"
@@ -12601,6 +12666,11 @@
       "id": "readMemoryRoot",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"
+    },
+    {
+      "id": "readMirrorAt",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
     },
     {
       "id": "readMode",
@@ -12621,6 +12691,11 @@
       "id": "readPaths",
       "kind": "function",
       "file": "tools/hooks/scratch-guard.js"
+    },
+    {
+      "id": "readPolicy",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
     },
     {
       "id": "readQuotedSubstitutions",
@@ -14108,6 +14183,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "read_memory_root",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_merge_answer",
       "kind": "function",
       "file": "tools/memory-tree/asbuilt_view.py"
@@ -14616,6 +14696,11 @@
       "id": "read_reviewed_paths",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_revision",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_root_dir",
@@ -16323,6 +16408,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "render_get",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "render_grade_tsv",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -16466,6 +16556,11 @@
       "id": "render_member",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
+    },
+    {
+      "id": "render_mirror",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "render_model_json",
@@ -18270,6 +18365,11 @@
     {
       "id": "resolve_python",
       "kind": "function",
+      "file": "tools/policy/policy-shim.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
       "file": "tools/process-monitor/adopt-process-monitor.sh"
     },
     {
@@ -18453,6 +18553,11 @@
       "file": "tools/memory-tree/gotchas.py"
     },
     {
+      "id": "resolve_read",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "resolve_recall_kit",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -18546,6 +18651,11 @@
       "id": "resolve_remote_sh",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.sh"
+    },
+    {
+      "id": "resolve_remote_sh",
+      "kind": "function",
+      "file": "tools/policy/policy-shim.sh"
     },
     {
       "id": "resolve_remote_sh",
@@ -19108,9 +19218,24 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "runGit",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
       "id": "runLiveness",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "runReader",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
+      "id": "runShim",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
     },
     {
       "id": "run_ac15_witness",
@@ -19761,6 +19886,16 @@
       "id": "run_minter",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "run_mirror_landed",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_mirror_landed_parity",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_mode",
@@ -21383,6 +21518,21 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "seed_mirror_absent",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_mirror_direct_reader",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_mirror_hand_edited",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "seed_mode_fixture",
       "kind": "function",
       "file": "tools/check-wiring.test.sh"
@@ -21591,6 +21741,11 @@
       "id": "set_ih_tip",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "set_landed",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "set_lease_fact",
