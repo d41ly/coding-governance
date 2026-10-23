@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-34 — the `ac-order` join ships under a dated cutoff, over a population measured at HEAD with every current hit disposed
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-34-deviation-80.md](../build/2026-10-23-build-TOOL-dSafePassage-34-deviation-80.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,8 @@ whole bar. This unit is id 29's promotion: the join is armed by a dated key in t
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-26` — the `ac-order` join of `tools/check-spec-tokens.py` and its scratch arm; without them there is no join to arm by a key
+- **hands-off** `TOOL-dSafePassage-41` — the `ac-order` join itself, with AC1, AC3 and the arm covering AC1, built at that unit's pass reading this unit's key: this unit's pass declares, reads and validates `AC_ORDER_KEY` with nothing yet graded by it, the repair of finding 22 of the spec audit of units 27 to 35
+- **hands-off** `TOOL-dSafePassage-42` — finding 21 of the spec audit of units 27 to 35, the `cutoff_keys_armed` raise this unit's key costs; finding 7, TOOL-dSafePassage-8's spec in this unit's `--dispatch --writes` when S3 edits it; and finding 20, `SPEC_DATE` as the date the join reads
 
 ## 4. Design
 
@@ -152,6 +155,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 29 (HIGH, item D-7).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-41`, `TOOL-dSafePassage-42`; no other section moved.
 
 ## 10. Reuse audit
 

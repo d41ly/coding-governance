@@ -76,3 +76,19 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T01:12:58Z rescope · item add TOOL-dSafePassage-35 · reason round-1 spec audit 2026-10-23-review-TOOL-dSafePassage-15-16-17-18-19-20-21-22-23-24-25-26-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 2 4 14 15 16 17 18 24 30 31 32 36 39 41 42 43 44 45 46 47 (MEDIUM) and 3 5 6 7 8 9 10 11 19 20 21 22 23 25 26 27 28 33 34 (LOW)
 
 2026-10-23T01:33:36Z review · item dSafePassage-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 39 · disposition promote
+
+2026-10-23T02:05:52Z rescope · item add TOOL-dSafePassage-36 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 8 at HIGH (item D-1)
+
+2026-10-23T02:05:52Z rescope · item add TOOL-dSafePassage-37 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 28 at HIGH (item D-2)
+
+2026-10-23T02:05:53Z rescope · item add TOOL-dSafePassage-38 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 30 at HIGH (item D-3)
+
+2026-10-23T02:05:53Z rescope · item add TOOL-dSafePassage-39 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 23 at HIGH (item D-4)
+
+2026-10-23T02:05:54Z rescope · item add TOOL-dSafePassage-40 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 29 at HIGH (item D-5)
+
+2026-10-23T02:05:55Z rescope · item add TOOL-dSafePassage-41 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: finding id 22 at HIGH (item D-6)
+
+2026-10-23T02:05:55Z rescope · item add TOOL-dSafePassage-42 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 1 10 31 2 9 27 21 24 11 18 12 25 (MEDIUM) and 3 13 19 14 33 4 15 5 6 7 16 17 20 26 32 (LOW)
+
+2026-10-23T02:22:05Z review · item dSafePassage-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 27 · disposition promote

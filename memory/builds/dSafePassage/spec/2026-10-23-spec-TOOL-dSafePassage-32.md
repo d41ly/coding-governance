@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-32 — the reuse estimate compares like clocks: a POSIX census row is judged on the kernel's boot clock, never the wall clock
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-32-deviation-78.md](../build/2026-10-23-build-TOOL-dSafePassage-32-deviation-78.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,7 @@ read on the kernel's boot clock, and a lock that does not carry that reading can
 
 - **consumes-from** `TOOL-dSafePassage-22` — the clock read before the census, `REUSE_MARGIN_S` and the lock fixture family; without them there is no estimate to put in one frame
 - **hands-off** `TOOL-dSafePassage-35` — the margin's per-backend bound and the timing of the two lock plants, which this unit's boot frame changes on POSIX
+- **hands-off** `TOOL-dSafePassage-42` — finding 17 of the spec audit of units 27 to 35, AC1's WSL probe spelled with the path inside the program text
 
 ## 4. Design
 
@@ -171,6 +173,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 37 (HIGH, item D-5).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-42`; no other section moved.
 
 ## 10. Reuse audit
 

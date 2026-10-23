@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-27 — the prepared landing's one untracked snapshot, taken before the walk, serves the regeneration's refusal too
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-27-deviation-73.md](../build/2026-10-23-build-TOOL-dSafePassage-27-deviation-73.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,7 @@ Id 35's promotion, `TOOL-dSafePassage-28`, gates every later refusal as a class.
 - **consumes-from** `TOOL-dSafePassage-25` — the gov-first snapshot and its refusal shape in `cmd_prepare`; without them there is no snapshot taken before the walk to keep alive
 - **hands-off** `TOOL-dSafePassage-28` — the class arm over every refusal of the prepared path after the walk, of which the regeneration refusal fixed here is the first
 - **hands-off** `TOOL-dSafePassage-35` — the snapshot helper and its write guard, which this unit's one snapshot site keeps as an inline line
+- **hands-off** `TOOL-dSafePassage-42` — findings 2, 14 and 33 of the spec audit of units 27 to 35, §1's fold premise, its `:918` cite and AC2's `git ls-tree` clause, read as the retry's dirty-tree refusal at `tools/push-main.sh:860-865`, and finding 26, the pricing of this unit's added landings
 
 ## 4. Design
 
@@ -167,6 +169,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 1 (HIGH, item D-1, shared with id 35).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-42`; no other section moved.
 
 ## 10. Reuse audit
 

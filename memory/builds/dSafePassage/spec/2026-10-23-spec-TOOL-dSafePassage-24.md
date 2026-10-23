@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-24 — a step is refused when the target's own git config declares an executor or a credential
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -68,6 +68,7 @@ a program or sends as a credential, the key named.
 - **hands-off** `TOOL-dSafePassage-29` — the refused keys as the class git's own config list derives, held to it by an arm, the repair of finding 12 of the round-1 audit of units 15 to 26
 - **hands-off** `TOOL-dSafePassage-30` — the config check over every repository git can enter from the target, submodules included, the repair of finding 38 of the round-1 audit of units 15 to 26
 - **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which adds the credential-bearing values and reads the inventory's refusal-join sentence
+- **hands-off** `TOOL-dSafePassage-38` — every key and file path of the refusal line passed through one redactor, so no refusal prints a credential, the repair of finding 30 of the spec audit of units 27 to 35
 
 ## 4. Design
 
@@ -175,6 +176,7 @@ none
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 53 (HIGH, item
   D-8).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-29`, `TOOL-dSafePassage-30`, `TOOL-dSafePassage-35`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-38`; no other section moved.
 
 ## 10. Reuse audit
 

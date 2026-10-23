@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0019@6e0cd313 whole
 
@@ -142,6 +142,7 @@ holder is dead, and the paths that run staged are read as gov's own staging.
 - **hands-off** `TOOL-dSafePassage-22` — the reclaim reading its clock before the census, the repair of finding 16
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 - **hands-off** `TOOL-dSafePassage-33` — recording a row the forward walk's first move applies by witness alone with the mark that says so, the repair of finding 40 of the round-1 audit of units 15 to 26
+- **hands-off** `TOOL-dSafePassage-40` — move 1's evidence read, the walk-start record and the row's before-image path, and the `kill-after-up` walk plant, the repair of finding 29 of the spec audit of units 27 to 35
 
 ## 4. Design
 
@@ -399,6 +400,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 
   consumes-from already declared, so the reciprocity join of hygiene check 12 holds; no other
   section moved.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-33`; no other section moved.
+- rev-5 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-40`; no other section moved.
 
 ## 10. Reuse audit
 

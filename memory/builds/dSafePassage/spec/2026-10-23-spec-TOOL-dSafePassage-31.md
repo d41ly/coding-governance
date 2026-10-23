@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-31 — the write lock records its holder's pid namespace, and a holder from another namespace reads unknown
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-31-deviation-77.md](../build/2026-10-23-build-TOOL-dSafePassage-31-deviation-77.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,7 @@ and a holder whose namespace differs reads `unknown`.
 
 - **consumes-from** `TOOL-dSafePassage-26` — the lock record's `platform` and `boot_id` and the namespace rows of `check_holder_dead`; without them there is no namespace test to make exact
 - **hands-off** `TOOL-dSafePassage-35` — the boot and absent-field rows of the namespace verdict, which run before this unit's row
+- **hands-off** `TOOL-dSafePassage-42` — finding 24 of the spec audit of units 27 to 35, the lock record keeping TOOL-dSafePassage-32's `started_boot` beside `pid_ns` in the one `take_write_lock` writer, and finding 17, AC1's WSL probe spelled with the path inside the program text
 
 ## 4. Design
 
@@ -154,6 +156,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 13 (HIGH, item D-4).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-42`; no other section moved.
 
 ## 10. Reuse audit
 

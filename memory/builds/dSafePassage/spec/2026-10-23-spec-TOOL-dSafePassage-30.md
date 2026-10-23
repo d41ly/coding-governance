@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-30 — the step contract's config check reads every repository git can enter from the target, its submodules included
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-30-deviation-76.md](../build/2026-10-23-build-TOOL-dSafePassage-30-deviation-76.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,8 @@ key table in each.
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-24` — `read_target_local_config`, `check_target_local_config` and the isolation plants; without them there is no read to widen
+- **hands-off** `TOOL-dSafePassage-36` — the `modules/` walk rooted at the target worktree's own git directory, never the common one, which corrects S1's second bullet and §4's reason, the repair of finding 8 of the spec audit of units 27 to 35
+- **hands-off** `TOOL-dSafePassage-42` — finding 27 of the spec audit of units 27 to 35, each repository's config graded before any index read and the gitlink read run with `core.fsmonitor=false`, and finding 6, `reached_by` for a `modules/` row mapped through `.gitmodules`
 
 ## 4. Design
 
@@ -171,6 +174,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 38 (HIGH, item D-3).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-36`, `TOOL-dSafePassage-42`; no other section moved.
 
 ## 10. Reuse audit
 

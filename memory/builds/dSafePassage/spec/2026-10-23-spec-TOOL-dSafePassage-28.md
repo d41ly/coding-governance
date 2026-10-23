@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-28 — every refusal of the prepared landing after the walk leaves a clean tree, gated as a class
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-28-deviation-74.md](../build/2026-10-23-build-TOOL-dSafePassage-28-deviation-74.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-33 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,7 @@ a refusal branch added to `cmd_prepare` later either joins it or reds it.
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-27` — the one snapshot the prepared path cleans against; without it the regeneration row of this arm is red over the shipped lander
+- **hands-off** `TOOL-dSafePassage-42` — findings 1, 10 and 31 of the spec audit of units 27 to 35, the compare-and-swap row's `moved` branch in `PREPARE_REFUSALS`' `expect` column; findings 18 and 32, the derived count read through `scan_shell_lines` and anchored on the `if ! run_gov_first` call; and finding 26, the pricing of the added landings
 
 ## 4. Design
 
@@ -153,6 +155,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 35 (HIGH, item D-1, shared with id 1).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-42`; no other section moved.
 
 ## 10. Reuse audit
 

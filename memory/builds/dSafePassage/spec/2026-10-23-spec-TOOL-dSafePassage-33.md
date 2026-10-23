@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-33 — a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-33-deviation-79.md](../build/2026-10-23-build-TOOL-dSafePassage-33-deviation-79.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,8 @@ records nothing for, take the no-image rule.
 - **consumes-from** `TOOL-dSafePassage-3` — `set_step_state`, `read_step_states` and the step row grammar, which gain the optional mark; without them the walk has nowhere to record how a row was applied
 - **consumes-from** `TOOL-dSafePassage-2` — `run_step_walk` and its move 1, the one place a row is applied by witness alone; without it no caller passes the mark
 - **hands-off** `TOOL-dSafePassage-35` — the re-run's second downs over the shipped row shapes, which take this unit's no-record branch
+- **hands-off** `TOOL-dSafePassage-39` — the mark carried by the one writer across every rewrite that keeps a row `applied`, and the reverse walk's move 3 marking an unrecorded row, the repair of finding 23 of the spec audit of units 27 to 35
+- **hands-off** `TOOL-dSafePassage-40` — move 1's mark set only when the walk-start receipt holds no record for the step and no before-image is on disk, the repair of finding 29 of the spec audit of units 27 to 35
 
 ## 4. Design
 
@@ -169,6 +172,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 40 (HIGH, item D-6).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-39`, `TOOL-dSafePassage-40`; no other section moved.
 
 ## 10. Reuse audit
 
