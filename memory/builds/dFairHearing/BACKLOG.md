@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · TOOL-dFairHearing-19 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dFairHearing-19 · until TOOL-dFairHearing-40 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dFairHearing-40 at order 26 today, closes it (README rule 1)
