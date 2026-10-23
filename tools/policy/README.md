@@ -82,9 +82,10 @@ owner-silence rule that declines a raise is a later build's reader.
   top level of the working directory by default. One line per arm,
   `policy-check: <arm> · <n> finding(s) · <population>`, then each finding. A population of zero is
   a finding. Exit 0 green, 1 red.
-- `python <prefix>/policy/check_policy.py --fixture` — one scratch repository per case under the
-  system temp directory (`pol-` prefix): each case plants its break, its arm must red naming the
-  planted key, and the unplanted copy must be green. It ends with an executed-assertion count.
+- `python <prefix>/policy/check_policy.py --fixture [<case>]` — one scratch repository per case under
+  the system temp directory (`pol-` prefix): each case plants its break, its arm must red naming the
+  planted key, and the unplanted copy must be green. It ends with an executed-assertion count. A
+  `<case>` runs that case alone; a name no case carries is exit 2.
 - `python <prefix>/policy/policy.py lists --check` — red on a row the catalogue owes and the list
   lacks, a row the list carries that the catalogue no longer owes (stale), and a row the list at the
   compare base did not carry. The base is the merge-base of HEAD and the remote default branch where
@@ -107,8 +108,25 @@ owner-silence rule that declines a raise is a later build's reader.
 The fixture's cases: one `schema-empty-<name>` per never-empty row, then `shape-no-empty`,
 `shape-unknown-field`, `usage-out-of-set`, `summary-new-key`, `usage-new-key`, `list-grew`,
 `direction-missing` (the first selected row loses its `direction`), `direction-new-bound` (a new
-`retry-count` row `zz.loop` with none) and `direction-wrong-value` (the first selected row declares
-`raise-tightens`).
+`retry-count` row `zz.loop` with none), `direction-wrong-value` (the first selected row declares
+`raise-tightens`) and `adopter-fresh-target`, an outcome case with no plant, below.
+
+## Each arm in an adopter
+
+The `policy check` leg ships, so every arm in `ARMS` runs in an adopter's tree as well as in gov's.
+The table says what each one grades there. `check_policy.py --fixture adopter-fresh-target` joins its
+first column to `ARMS` both ways, so an arm added with no row reds as unlisted and a row whose arm
+left reds as stale. The same case copies this kit, and each kit its `kit.toml` `requires`, into a
+fresh `git init` at the path each holds in its own repository, runs `adopt-policy.sh --scaffold`, then
+runs `--check` before the first commit and again after it. Both runs must exit 0, and every arm must
+print a graded line with no finding or an announce line, `policy-check: <arm> · not graded · <why>`.
+
+| Arm | In an adopter it grades | When its subject is absent |
+|---|---|---|
+| `arm_schema` | the target's `.governance/policy.toml`, each key against the installed catalogue | a finding: no policy file is a zero population, so `--scaffold` comes before the first `--check` |
+| `arm_shape` | the installed kit's catalogue, row by row | a finding: the catalogue ships in the kit, and one that does not read or parse reds |
+| `arm_summaries` | the installed shrink-only list against the installed catalogue, and against the list at the target's compare base | a finding per row an absent list owes; no remote or no fetched ref is no base, which its line says, and the catalogue alone is compared |
+| `arm_direction` | the installed catalogue's loop bound and deadline rows | a finding: the catalogue ships in the kit, and one that does not read or parse reds |
 
 ## The adopter
 

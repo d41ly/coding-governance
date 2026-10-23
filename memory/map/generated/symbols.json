@@ -3618,6 +3618,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "check_arm_lines",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_ask_mandate",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
@@ -8481,6 +8486,11 @@
       "id": "extract_acceptance",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
+    },
+    {
+      "id": "extract_arm_rows",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "extract_ask_vocabulary",
@@ -17010,6 +17020,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/roles/handoff.py"
     },
     {
@@ -17561,6 +17576,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -19316,6 +19336,11 @@
       "id": "run_fragment_merges",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "run_fresh_target",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_fts",

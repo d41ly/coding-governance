@@ -40,3 +40,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-23T20:12:23Z dispatch · item 81887798 TOOL-dGroundRules-11 · reason tools/policy/catalogue.toml tools/policy/policy.py tools/policy/check_policy.py tools/policy/README.md help/policy.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/map/features/policy.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-11.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-11-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
 
 2026-10-23T20:12:28Z brief · item TOOL-dGroundRules-11 · reason f7c18feb27f2 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-11-build-brief.md
+
+2026-10-23T20:23:29Z dispatch · item 0c430c81 TOOL-dGroundRules-16 · reason tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-16.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-16-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-23T20:23:34Z brief · item TOOL-dGroundRules-16 · reason b33cb6e219e8 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-16-build-brief.md

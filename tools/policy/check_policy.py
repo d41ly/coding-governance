@@ -2,7 +2,7 @@
 one can red (TOOL-dGroundRules-1).
 
     python <this kit>/check_policy.py [--repo <dir>]   # every arm in ARMS; exit 0 green, 1 red
-    python <this kit>/check_policy.py --fixture        # every case, RED as planted, green without
+    python <this kit>/check_policy.py --fixture [<case>]  # every case, or the one named
 
 `<dir>` defaults to the git top level of the working directory. Each arm prints
 `policy-check: <arm> · <n> finding(s) · <population>`, then one line per finding; a population of
@@ -20,6 +20,11 @@ that commit. Each case plants its break on the copy and runs its arm, which must
 planted key, then runs the arm again on the unplanted copy, which must be green. Each plant edits a
 real shipped row where one serves. WHAT IT DOES NOT CHECK: that the shipped catalogue's values are
 v2's, which is the build's acceptance probe, not an arm.
+
+`adopter-fresh-target` is an outcome case, no plant (TOOL-dGroundRules-16): this kit installed into a
+fresh `git init` by a copy, `--scaffold`, then `--check` before and after the first commit, where every
+arm must grade clean or announce; and the README's "Each arm in an adopter" table joined to ARMS both
+ways. Green on a correct build; its RED is an arm that finds a problem in an adopter's tree.
 
 Later units add arms to ARMS and cases to CASES.
 """
@@ -208,6 +213,159 @@ def seed_direction_wrong_value(repo, kit, rows):
     return name, "must be raise-loosens"
 
 
+# ---- the adopter's fresh target (TOOL-dGroundRules-16) ------------------------------------------
+
+FRESH_TARGET = "adopter-fresh-target"
+ADOPTER_SECTION = "Each arm in an adopter"
+
+
+# The kit-dir resolver, INLINED byte-identically from the canonical copy named on its marker line and
+# gated by the resolve-python self-test: a kit may not import a sibling.
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+
+
+def resolve_bash():
+    """The bash sharing this filesystem, by path, or None: on Windows the bare name reaches the
+    System32 WSL launcher before PATH (gotcha subprocess-resolves-a-different-shell). GOV_BASH
+    overrides; a candidate is taken only if it runs."""
+    override = os.environ.get("GOV_BASH")
+    cands = [override] if override else [
+        p for d in os.environ.get("PATH", "").split(os.pathsep) for p in (os.path.join(d, "bash.exe"), os.path.join(d, "bash"))
+        if os.path.isfile(p) and not any(s in p.replace("\\", "/").lower() for s in ("/system32/", "/windowsapps/"))]
+    for cand in cands:
+        try:
+            if subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0:
+                return cand
+        except OSError:
+            pass
+    return None
+
+
+def extract_arm_rows(text):
+    """The backticked first-column names of the README's "Each arm in an adopter" table, in order."""
+    parts = text.replace("\r", "").split(f"\n## {ADOPTER_SECTION}\n", 1)
+    section = parts[1].split("\n## ", 1)[0] if len(parts) == 2 else ""
+    return re.findall(r"^\| `([^`]+)` \|", section, flags=re.M)
+
+
+def check_arm_lines(out, names):
+    """-> one message per arm of `names` whose `--check` line in `out` is neither graded with no
+    finding nor an announce, carrying its finding lines."""
+    lines = out.replace("\r", "").split("\n")
+    bad = []
+    for arm in names:
+        head = f"policy-check: {arm} · "
+        at = next((i for i, ln in enumerate(lines) if ln.startswith(head)), None)
+        if at is None:
+            bad.append(f"{arm} printed neither its graded line nor an announce line")
+            continue
+        verdict = lines[at][len(head):]
+        if verdict.startswith(("0 finding(s) · ", "not graded · ")):
+            continue
+        found = []
+        for ln in lines[at + 1:]:
+            if not ln.startswith("  "):
+                break
+            found.append(ln.strip())
+        bad.append(f"{arm} {verdict.split(' · ')[0]}: " + "; ".join(found))
+    return bad
+
+
+def run_fresh_target(name):
+    """This kit and each kit its kit.toml `requires` copied into a fresh `git init` at their own paths,
+    as an install places them; `--scaffold`, then `--check` before the first commit and after it, each
+    exiting 0 with every arm graded clean or announced; and the README's table joined to ARMS both
+    ways. Prints its lines. -> (assertions, wrong)."""
+    names = [a.__name__ for a in ARMS]
+    listed = extract_arm_rows((KIT / "README.md").read_text(encoding="utf-8"))
+    wrong = [f"{n} is in ARMS with no row in README.md \"{ADOPTER_SECTION}\" (unlisted)" for n in names if n not in listed]
+    wrong += [f"README.md \"{ADOPTER_SECTION}\" lists {n}, which ARMS lacks (stale)" for n in listed if n not in names]
+    asserted = len(set(names) | set(listed)) + 1
+    bash = resolve_bash()
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        run_fixture_git(t, "init", "-q")
+        kits = [KIT]
+        # ponytail: `requires` names kit ids and is read as each kit's home, which they equal for every
+        # kit gov homes under its own id; a kit homed elsewhere is a WRONG naming it, never a skip.
+        for home in tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8")).get("requires", []):
+            try:
+                kits.append(resolve_kit_dir(home, "kit.toml", KIT))
+            except LookupError as exc:
+                wrong.append(f"kit.toml requires {home}, which this tree does not resolve: {exc}")
+        rels = {d: (policy.run_git(d, "rev-parse", "--show-prefix") or "").strip() for d in kits}  # derived, never spelled
+        for d, rel in rels.items():
+            shutil.copytree(d, t / rel, dirs_exist_ok=True, ignore=shutil.ignore_patterns("__pycache__"))
+        adopter = (t / rels[KIT] / "adopt-policy.sh").as_posix()
+        if bash is None:
+            wrong.append("no bash on PATH shares this filesystem: each was a System32 or WindowsApps launcher, "
+                         "or none ran; set GOV_BASH")
+        else:
+            def run_adopter(mode):
+                p = subprocess.run([bash, adopter, mode, "--target", t.as_posix()],
+                                   capture_output=True, text=True, encoding="utf-8", errors="replace")
+                return p.returncode, p.stdout + p.stderr
+            rc, out = run_adopter("--scaffold")
+            if rc:
+                wrong.append(f"--scaffold exited {rc}: {out.strip()}")
+            for phase in ("before the first commit", "after the first commit"):
+                if phase.startswith("after"):
+                    (t / "README.md").write_text("A fresh adopter of the policy kit.\n", encoding="utf-8", newline="\n")
+                    run_fixture_git(t, "add", "-A")
+                    run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
+                rc, out = run_adopter("--check")
+                bad = check_arm_lines(out, names)
+                asserted += len(names) + 1
+                wrong += [f"{phase}: {b}" for b in bad]
+                if rc:
+                    wrong.append(f"{phase}: --check exited {rc}" + ("" if bad else f": {out.strip()}"))
+    finally:
+        remove_repo(t)
+    for w in wrong:
+        print(f"policy-fixture: {name} · WRONG: {w}")
+    if not wrong:
+        print(f"policy-fixture: {name} · every arm graded clean or announced, before and after the first "
+              f"commit · the README table names exactly the {len(names)} arm(s) of ARMS")
+    return asserted, len(wrong)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -218,6 +376,7 @@ CASES = [
     ("direction-missing", arm_direction, seed_direction_missing),
     ("direction-new-bound", arm_direction, seed_direction_new_bound),
     ("direction-wrong-value", arm_direction, seed_direction_wrong_value),
+    (FRESH_TARGET, None, run_fresh_target),  # an outcome case: no plant and no one arm
 ]
 
 
@@ -258,12 +417,21 @@ def remove_repo(repo):
     shutil.rmtree(repo, **({"onexc": set_writable} if sys.version_info >= (3, 12) else {"onerror": set_writable}))
 
 
-def run_fixture():
+def run_fixture(only=None):
     for var in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GOV_REMOTE", "GOV_DEFAULT_BRANCH"):
         os.environ.pop(var, None)  # the fixture's own repository and remote, whatever the caller exported
     rows = policy.load_catalogue(KIT)
+    cases = [c for c in derive_cases(rows) if only in (None, c[0])]
+    if not cases:
+        print(f"policy-fixture: no case named {only}", file=sys.stderr)
+        return 2
     asserted, wrong = 0, 0
-    for name, arm, seed in derive_cases(rows):
+    for name, arm, seed in cases:
+        if arm is None:  # an outcome case runs itself
+            a, w = seed(name)
+            asserted += a
+            wrong += w
+            continue
         repo, kit = build_repo(rows)
         try:
             files = [kit / policy.CATALOGUE, kit / policy.LIST, Path(repo, *POLICY_FILE)]
@@ -297,12 +465,12 @@ def run_fixture():
     return 1 if wrong or not asserted else 0
 
 
-USAGE = "usage: python check_policy.py [--repo <dir>] | --fixture"
+USAGE = "usage: python check_policy.py [--repo <dir>] | --fixture [<case>]"
 
 
 def main(argv):
-    if argv == ["--fixture"]:
-        return run_fixture()
+    if argv[:1] == ["--fixture"] and len(argv) <= 2:
+        return run_fixture(*argv[1:])
     if argv and not (len(argv) == 2 and argv[0] == "--repo"):
         print(USAGE, file=sys.stderr)
         return 2
