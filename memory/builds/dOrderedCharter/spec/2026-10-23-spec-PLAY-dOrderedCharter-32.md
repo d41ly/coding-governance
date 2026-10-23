@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0062@fe903e93 whole
 

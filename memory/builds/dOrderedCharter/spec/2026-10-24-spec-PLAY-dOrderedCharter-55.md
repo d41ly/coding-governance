@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 

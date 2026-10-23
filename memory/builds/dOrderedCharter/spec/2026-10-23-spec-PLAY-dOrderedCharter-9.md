@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-9 — the instruction-unit registry: one row per unit in each kit's manifest, its one reader, and documents rendered from units
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 14 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 14 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0039@ee1a0e99 whole
 

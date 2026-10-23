@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 

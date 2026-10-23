@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0049@a87d159d whole
 **Carries:** node:system.tags

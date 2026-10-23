@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-46 — the overlay's landed revision defined, its unborn-HEAD outcome stated, and a write door rendering the rows it just wrote
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 

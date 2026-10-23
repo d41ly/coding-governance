@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 

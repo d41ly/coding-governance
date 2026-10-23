@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-8 — the build's card at level 1, through an ignored per-worktree card file the charter's entry file imports
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 26 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 26 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0038@1bd5b757 whole
 

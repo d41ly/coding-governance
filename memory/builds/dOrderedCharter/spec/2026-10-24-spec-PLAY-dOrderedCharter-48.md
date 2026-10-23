@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-48 — the sources that tell a writer to cite path and line are a query over the directive sources, every hit re-pointed or kept by name
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 

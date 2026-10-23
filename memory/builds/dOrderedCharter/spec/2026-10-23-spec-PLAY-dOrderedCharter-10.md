@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-10 — the namespaced tag system: this build's eight namespaces registered, joined both ways, shape-checked in the core, and their words handed to the lexicon
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 5 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 5 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0040@25b6d46b whole
 **Carries:** node:tag-namespace.reader

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-14 — memory instructing nothing: the auto-memory index measured at session start, its directives detected, a standing directive promoted into a unit
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0044@0104c89b whole
 

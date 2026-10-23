@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-16 — the layer register, the layer contract and the check that the core never depends on an expansion or an optional component
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 2 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 2 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0046@bd068162 whole
 

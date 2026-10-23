@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-33 — pins and drift: each gov change record marked `editorial` or `semantic`, a stale pin acting as `instructions.stale` says, successors re-pointing or orphaning an edge
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0063@a1361320 whole
 **Carries:** node:policy-key.instructions.stale

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 

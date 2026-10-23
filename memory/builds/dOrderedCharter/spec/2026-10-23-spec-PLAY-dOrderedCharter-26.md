@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0056@a91f3d50 whole
 

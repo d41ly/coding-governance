@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-24 — the edge-type registry and the edge grammar: one closed set of typed edges, inverses derived, selectors open
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 7 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 7 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0054@1e793db7 whole
 

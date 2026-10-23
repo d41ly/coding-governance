@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-21 — each practice's reach per step rendered as step-scoped units handed in work orders
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base ce13efbe · streams playbook · order 23 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0051@44bf9720 whole
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-25 — gov tag bundle, a tag's members, regions and instructions in one call, and the two edge checks
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0055@dc43d502 whole
 

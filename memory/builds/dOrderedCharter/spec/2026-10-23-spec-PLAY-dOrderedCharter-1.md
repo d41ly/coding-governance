@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0031@419dfa75 whole
 **Carries:** node:policy-key.charter.practices

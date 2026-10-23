@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-11 — load sets derived per reader and item, budgeted, and refused when a required unit is missing
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 21 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0041@29cae3c8 whole
 **Carries:** node:policy-key.instructions.checks

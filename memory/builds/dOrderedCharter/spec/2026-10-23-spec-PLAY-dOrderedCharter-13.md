@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-13 — the ladder renumbered: levels 0 to 7, the charter at level 0, the platform above it
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 12 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0043@536226d0 whole
 

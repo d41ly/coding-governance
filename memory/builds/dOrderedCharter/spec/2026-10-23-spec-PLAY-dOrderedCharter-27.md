@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-27 — each role's load set budgeting the `code` slot
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 22 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 22 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0057@ec297ae3 whole
 

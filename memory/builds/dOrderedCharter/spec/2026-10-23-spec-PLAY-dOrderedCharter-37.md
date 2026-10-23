@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-37 — the help pages: reference pages rendered from each registry's rows, concept, task and tutorial pages beside them, every shown command run, each page linked to its unit by tag
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 37 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0067@90e357b7 whole
 

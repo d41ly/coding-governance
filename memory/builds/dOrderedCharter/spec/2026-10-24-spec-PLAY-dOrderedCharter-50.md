@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-50 — the rows a new leg, key or retirement owes are written by the pass that creates them, through one owed-rows probe
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 

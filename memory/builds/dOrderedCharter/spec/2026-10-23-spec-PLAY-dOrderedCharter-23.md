@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-23 — a build run unattended by default from its request, said in the drive section, and the `[land]` rule read through the request's mandate
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 30 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 30 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0053@8f756a97 whole
 

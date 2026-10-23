@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0037@0b2c8bff whole
 

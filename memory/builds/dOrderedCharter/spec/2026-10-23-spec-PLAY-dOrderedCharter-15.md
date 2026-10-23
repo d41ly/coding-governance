@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0045@f345dc78 whole
 

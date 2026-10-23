@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0034@06f1afc5 whole
 

@@ -68,3 +68,111 @@ base: ce13efbe3d90cc8fcad100267e18ec2c9d03bdf8
 2026-10-23T22:17:27Z rescope · item add PLAY-dOrderedCharter-55 · reason closes spec-audit round 2 minors batch, MEDIUM findings 1 2 3 4 5 6 7 8 10 11 12 14 15 16 19 20 22 24 26 28 31 32 34 37 40 41 and LOW findings 9 17 18 29 35
 
 2026-10-23T22:33:35Z review · item dOrderedCharter-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 31 · disposition promote
+
+2026-10-23T22:53:29Z rescope · item defer PLAY-dOrderedCharter-1 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:29Z rescope · item defer PLAY-dOrderedCharter-10 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:30Z rescope · item defer PLAY-dOrderedCharter-11 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:31Z rescope · item defer PLAY-dOrderedCharter-12 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:32Z rescope · item defer PLAY-dOrderedCharter-13 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:32Z rescope · item defer PLAY-dOrderedCharter-14 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:33Z rescope · item defer PLAY-dOrderedCharter-15 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:34Z rescope · item defer PLAY-dOrderedCharter-16 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:35Z rescope · item defer PLAY-dOrderedCharter-17 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:35Z rescope · item defer PLAY-dOrderedCharter-18 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:36Z rescope · item defer PLAY-dOrderedCharter-19 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:37Z rescope · item defer PLAY-dOrderedCharter-2 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:38Z rescope · item defer PLAY-dOrderedCharter-20 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:38Z rescope · item defer PLAY-dOrderedCharter-21 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:39Z rescope · item defer PLAY-dOrderedCharter-22 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:40Z rescope · item defer PLAY-dOrderedCharter-23 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:40Z rescope · item defer PLAY-dOrderedCharter-24 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:41Z rescope · item defer PLAY-dOrderedCharter-25 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:42Z rescope · item defer PLAY-dOrderedCharter-26 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:43Z rescope · item defer PLAY-dOrderedCharter-27 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:43Z rescope · item defer PLAY-dOrderedCharter-28 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:44Z rescope · item defer PLAY-dOrderedCharter-29 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:45Z rescope · item defer PLAY-dOrderedCharter-3 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:46Z rescope · item defer PLAY-dOrderedCharter-30 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:46Z rescope · item defer PLAY-dOrderedCharter-31 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:47Z rescope · item defer PLAY-dOrderedCharter-32 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:48Z rescope · item defer PLAY-dOrderedCharter-33 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:48Z rescope · item defer PLAY-dOrderedCharter-34 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:49Z rescope · item defer PLAY-dOrderedCharter-35 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:50Z rescope · item defer PLAY-dOrderedCharter-36 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:51Z rescope · item defer PLAY-dOrderedCharter-37 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:51Z rescope · item defer PLAY-dOrderedCharter-4 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:52Z rescope · item defer PLAY-dOrderedCharter-5 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:53Z rescope · item defer PLAY-dOrderedCharter-6 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:53Z rescope · item defer PLAY-dOrderedCharter-7 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:54Z rescope · item defer PLAY-dOrderedCharter-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:55Z rescope · item defer PLAY-dOrderedCharter-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:56Z rescope · item defer PLAY-dOrderedCharter-39 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:56Z rescope · item defer PLAY-dOrderedCharter-40 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:57Z rescope · item defer PLAY-dOrderedCharter-41 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:58Z rescope · item defer PLAY-dOrderedCharter-42 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:59Z rescope · item defer PLAY-dOrderedCharter-43 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:53:59Z rescope · item defer PLAY-dOrderedCharter-44 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:00Z rescope · item defer PLAY-dOrderedCharter-45 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:01Z rescope · item defer PLAY-dOrderedCharter-46 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:02Z rescope · item defer PLAY-dOrderedCharter-47 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:02Z rescope · item defer PLAY-dOrderedCharter-48 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:03Z rescope · item defer PLAY-dOrderedCharter-49 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:04Z rescope · item defer PLAY-dOrderedCharter-50 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:05Z rescope · item defer PLAY-dOrderedCharter-51 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:05Z rescope · item defer PLAY-dOrderedCharter-52 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:06Z rescope · item defer PLAY-dOrderedCharter-53 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:07Z rescope · item defer PLAY-dOrderedCharter-54 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T22:54:07Z rescope · item defer PLAY-dOrderedCharter-55 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38

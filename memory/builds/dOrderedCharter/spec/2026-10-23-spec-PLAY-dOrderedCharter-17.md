@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-17 — every edge the layer check finds today made a declared optional slot with a named fallback, or moved into the core
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base ce13efbe · streams playbook · order 3 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base ce13efbe · streams playbook · order 3 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0047@9b2f4330 whole
 

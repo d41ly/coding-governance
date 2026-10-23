@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-28 — the shared edge grammar at every site the memory plan names: twelve new types, native-id classes and the two pinned forms
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 8 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0058@bc160feb whole
 

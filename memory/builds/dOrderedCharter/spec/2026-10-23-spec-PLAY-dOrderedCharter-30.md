@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-30 — the portable practice: a role per language, one rule set, each rule paired with its named leg, absorbing `[cross-os]` and `[bytes]`
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 28 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 28 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0060@83e8c234 whole
 

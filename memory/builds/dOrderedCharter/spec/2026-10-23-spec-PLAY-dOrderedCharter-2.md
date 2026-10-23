@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override

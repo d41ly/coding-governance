@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-22 — the namespace row's purpose-source and owner fields, and the chain registry's purpose field
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 6 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 6 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0052@e3506c61 whole
 

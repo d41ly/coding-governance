@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-18 — the moved grammar: every name the core imports from the recall kit moved into memory-tree, and every by-path reader re-pointed in the same unit
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 1 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 1 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0048@aab14736 whole
 
