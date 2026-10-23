@@ -73,8 +73,8 @@ seam: `policy.scan_keys` — reuse for any walk of a parsed policy document to i
 catalogue rows naming them; extend via the row matcher `read_catalogue_row`, never a joined-string compare.
 
 seam: `policy.resolve` — reuse for any read of a policy key's value, at the landed revision or a
-named one, parsed and never sourced; extend via a resolution step after `read_file_value`, never a
-second reader or a working-tree read.
+named one, parsed and never sourced; extend via a step named in `RESOLUTION_ORDER`, never a second
+order, a second reader or a working-tree read.
 
 ## Gaps
 

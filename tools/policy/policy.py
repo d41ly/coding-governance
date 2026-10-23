@@ -1,7 +1,7 @@
 """policy.py - the policy kit's module: its catalogue, the value check, the shape audit, the
 shrink-only list of keys that carry no summary or no usage (TOOL-dGroundRules-1), the direction
 check over the loop bound and deadline rows (TOOL-dGroundRules-11), and the reader
-(TOOL-dGroundRules-2).
+(TOOL-dGroundRules-2) with its one resolution order (TOOL-dGroundRules-3).
 
     python <this kit>/policy.py lists --check   # the list against the catalogue and against its base
     python <this kit>/policy.py lists --write   # drain the list; it never gains a name
@@ -16,7 +16,8 @@ final `*`, each matching exactly one segment, and fewer placeholders outrank mor
 THE READER reads `.governance/policy.toml` as committed at the landed revision, never from the
 working tree, and parses it with tomllib, never by sourcing it: `read_policy_key`'s contract in the
 unattended kit, carried to TOML. The landed revision is the remote tip the remote ladder names, or
-with no remote at all the local default branch, and every reason names its sha.
+with no remote at all the local default branch, and every reason names its sha. A key resolves in
+RESOLUTION_ORDER, spelled once: the file's value, then the catalogue default with its reason.
 
 Exit 0 green, 1 red, 2 usage or a refused read.
 """
@@ -432,26 +433,49 @@ def read_file_value(path, row, table, sha, how):
     return Resolution(table[path], "file", f"set in {POLICY_REL} at {sha[:8]}, {how}")
 
 
+def read_default_value(path, row, table, sha, how):
+    """Resolution(the row's default, "default", reason), the reason naming the sha8 and the case: the
+    file absent (`table` None) or present and not setting `path`, then any `preset` the file names,
+    which is not applied. A row with no `default` is a Refusal naming it, never an invented value."""
+    if "default" not in row:
+        raise Refusal((KIT / CATALOGUE).as_posix(), 0,
+                      f"the row {row.get('name')} carries no default, so {render_dotted(path)} has no value to read")
+    at = f"at {sha[:8]}, {how}; the catalogue default"
+    reason = f"{POLICY_REL} is absent {at}" if table is None else f"not set in {POLICY_REL} {at}"
+    if table is not None and ("preset",) in table:
+        p = table[("preset",)]
+        reason += (f"; the file names preset {p if isinstance(p, str) else render_json(p)}, "
+                   "not applied until dKeptSession adds presets to this reader")
+    return Resolution(row["default"], "default", reason)
+
+
+# The one order a key resolves in (TOOL-dGroundRules-3): `resolve` calls each step with (path, row,
+# table, sha, how) and the first Resolution answers. dKeptSession adds its preset step between the two.
+RESOLUTION_ORDER = (read_file_value, read_default_value)
+
+
 def resolve(key, repo=".", rev=None):
     """-> Resolution for `key`: its path and catalogue row, the revision (`rev` resolved to a full
-    sha, else the landed one), the policy text there, its parse, then `read_file_value`. Until
-    TOOL-dGroundRules-3 and -4 land, an absent file, an unset key and text that is not TOML refuse."""
+    sha, else the landed one), the policy text there and its parse (None for an absent file), then
+    the first answer of RESOLUTION_ORDER. Until TOOL-dGroundRules-4 lands, text that is not TOML refuses."""
     path = parse_key(key)
     row = read_catalogue_row(path, load_catalogue(KIT))
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
     text = read_policy_text(repo, sha)
-    if text is None:
-        raise Refusal(POLICY_REL, 0, f"absent at {sha[:8]}; no default is read until TOOL-dGroundRules-3")
-    try:
-        table = parse_policy(text)
-    except tomllib.TOMLDecodeError as exc:
-        at = re.search(r"at line (\d+)", str(exc))
-        line = getattr(exc, "lineno", None) or (int(at[1]) if at else 0)
-        raise Refusal(POLICY_REL, line, f"not TOML at {sha[:8]}: {exc}") from None
-    hit = read_file_value(path, row, table, sha, how)
-    if hit is None:
-        raise Refusal(POLICY_REL, 0, f"{key} is not set at {sha[:8]}; no default is read until TOOL-dGroundRules-3")
-    return hit
+    table = None
+    if text is not None:
+        try:
+            table = parse_policy(text)
+        except tomllib.TOMLDecodeError as exc:
+            at = re.search(r"at line (\d+)", str(exc))
+            line = getattr(exc, "lineno", None) or (int(at[1]) if at else 0)
+            raise Refusal(POLICY_REL, line, f"not TOML at {sha[:8]}: {exc}") from None
+    for step in RESOLUTION_ORDER:
+        hit = step(path, row, table, sha, how)
+        if hit is not None:
+            return hit
+    # Unreachable while the default step stands, which answers or refuses: deny, never a None value.
+    raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {key} at {sha[:8]}")
 
 
 def parse_list(text):

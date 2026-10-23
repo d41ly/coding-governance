@@ -119,9 +119,13 @@ for the legacy homes.
   `<key> = 0`, so `budgets."CLAUDE.md"` is two segments. `read_catalogue_row` finds its row by the
   name rule above; no row refuses, naming the catalogue.
 - **The value.** `parse_policy` maps each leaf's segment tuple to its value; a table is never a
-  value. `read_file_value` answers `Resolution(value, "file", reason)` where the file sets the key.
-- **Until TOOL-dGroundRules-3 and -4.** An absent file and a key the file does not set refuse, since
-  no default is read yet; text that is not TOML refuses naming the decoder's line.
+  value. `resolve` runs `RESOLUTION_ORDER`, the one order, and the first step to answer wins; each
+  step takes `(path, row, table, sha, how)`, `table` None for an absent file. `read_file_value`
+  answers `Resolution(value, "file", reason)` where the file sets the key; `read_default_value`
+  answers the row's `default` with source `default` and a reason naming the case, absent or not
+  set, and any `preset` the file names, which no step applies until dKeptSession adds its step
+  between the two. A row with no `default` refuses, naming it in the catalogue.
+- **Until TOOL-dGroundRules-4.** Text that is not TOML refuses naming the decoder's line.
 - **Git's environment.** Every git call drops the location variables git exports to a hook
   (`GIT_LOCATION_VARS`), so a reader started inside a hook or a fixture reads the repository it was
   pointed at.
@@ -147,6 +151,12 @@ which refuses with `GOV_REMOTE` unset and reads the second remote with it set, a
 repository, which reads its local `main`. `reader-parsed` commits a policy file whose first line is
 `touch <marker>`, which must refuse naming line 1, and one whose comments carry `$(touch <marker>)`
 and a backticked `touch`, which must read its value; the marker must not exist after both.
+`resolution-order` reads one repository per scenario at `--rev HEAD`: a file setting
+`budgets.enforce = "refuse"` must read `refuse` from `file` and `runtime.agents-in-flight` its
+default `6` as `not set in`; a commit with no file must read `warn` as `is absent at`; a file setting
+only `preset = "strict"` must read `warn` with the unapplied preset in its reason, and `refuse` once
+it sets the key too; and a copy of this kit whose `budgets.enforce` row carries no `default` must
+refuse, naming `catalogue.toml` and the row.
 
 ## Each arm in an adopter
 

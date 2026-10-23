@@ -32,10 +32,20 @@ allowed values and every check.
     `policy: budgets.enforce · file · set in .governance/policy.toml at 3708a705, <remote>/main, the landed revision`.
   - It refuses, exit 2 with one `policy: refused · <path>:<line> · <why>` line, a key no catalogue
     row names, a string that is not one TOML key, a revision that names no commit, a file that
-    is not TOML (naming its line), and, for now, an absent file or a key the file does not set: the
-    defaults are read once a later unit adds them.
+    is not TOML (naming its line), and a key whose catalogue row carries no default when the file
+    does not set it.
   - With several remotes and none chosen it refuses too: `export GOV_REMOTE=<remote>` names one.
   - The file is parsed as TOML and never run, so a line in it cannot execute anything.
+- **Where a value comes from:** every key resolves in one order, `RESOLUTION_ORDER` in
+  `tools/policy/policy.py`: the value the file sets, else the catalogue default. `--explain` says
+  which, after the sha and how the revision was found:
+  - the file sets the key: `file · set in .governance/policy.toml at <sha>, <how>`;
+  - the file does not set it: `default · not set in .governance/policy.toml at <sha>, <how>; the catalogue default`;
+  - there is no file at that revision: `default · .governance/policy.toml is absent at <sha>, <how>; the catalogue default`.
+
+  A file that names a `preset` reads the catalogue default too, for now: the reason adds
+  `; the file names preset <name>, not applied until dKeptSession adds presets to this reader`.
+  A value you set in the file always wins over the default.
 - **Check the file:** `python tools/policy/check_policy.py`. It refuses a value outside its key's
   allowed values, an empty set for a key that is never empty, and a key no catalogue row names. Each
   check prints one line with the number it read; a check that read nothing is red too.

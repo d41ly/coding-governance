@@ -32,6 +32,12 @@ reds a read of the working tree or of local HEAD without `--rev`, a fallback pas
 key or remote ladder; `reader-parsed` reds a policy file line that runs, or one that is not TOML
 read as a value.
 
+`resolution-order` is an outcome case (TOOL-dGroundRules-3), one repository per scenario read at
+`--rev HEAD`: it reds a default read over a key the file sets, an unset key or an absent file that
+refuses or reads anything but the catalogue default with its case's reason, a named preset missing
+from the reason, and a row with no default that prints a value; that row is planted in a copy of
+this kit, never in the tracked catalogue.
+
 Later units add arms to ARMS and cases to CASES.
 """
 import os
@@ -384,20 +390,22 @@ def write_policy(repo, text):
 
 
 def build_reader_repo(path, text):
-    """A git repository at `path` on `main`, its one commit holding `text` as the policy file."""
+    """A git repository at `path` on `main`, its one commit holding `text` as the policy file, or no
+    policy file where `text` is None."""
     path.mkdir()
     run_fixture_git(path, "init", "-q")
     run_fixture_git(path, "symbolic-ref", "HEAD", "refs/heads/main")
-    write_policy(path, text)
+    if text is not None:
+        write_policy(path, text)
     run_fixture_git(path, "add", "-A")
-    run_fixture_git(path, "commit", "-q", "-m", "policy")
+    run_fixture_git(path, "commit", "-q", "--allow-empty", "-m", "policy")
     return path
 
 
-def check_get(scenario, repo, args, want, env=None):
-    """`policy.py get <args>` run in `repo` -> (scenario, what, ok, what it observed), `want` judging
-    (exit code, stdout, stderr), CR stripped."""
-    p = subprocess.run([sys.executable, str(KIT / "policy.py"), "get", *args], cwd=repo, env=env,
+def check_get(scenario, repo, args, want, env=None, kit=KIT):
+    """`<kit>/policy.py get <args>` run in `repo` -> (scenario, what, ok, what it observed), `want`
+    judging (exit code, stdout, stderr), CR stripped."""
+    p = subprocess.run([sys.executable, str(kit / "policy.py"), "get", *args], cwd=repo, env=env,
                        capture_output=True, text=True, encoding="utf-8", errors="replace")
     out, err = p.stdout.replace("\r", ""), p.stderr.replace("\r", "")
     seen = f"exit {p.returncode} · stdout {out.strip() or '(none)'!r} · stderr {err.strip() or '(none)'!r}"
@@ -484,6 +492,47 @@ def run_reader_parsed(name):
     return print_checks(name, checks)
 
 
+# ---- the resolution order (TOOL-dGroundRules-3) -------------------------------------------------
+
+def run_resolution_order(name):
+    """One repository per case, each read at `--rev HEAD`: a key the file sets and one it does not, an
+    absent file, a file naming `strict` without and with an override, and a copy of this kit whose
+    `budgets.enforce` row carries no default, read where the file does not set the key."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        sets = build_reader_repo(t / "sets", '[budgets]\nenforce = "refuse"\n')
+        absent = build_reader_repo(t / "absent", None)
+        named = build_reader_repo(t / "named", 'preset = "strict"\n')
+        over = build_reader_repo(t / "over", 'preset = "strict"\n\n[budgets]\nenforce = "refuse"\n')
+        other = build_reader_repo(t / "other", "[runtime]\nagents-in-flight = 3\n")
+        kit = t / "kit"
+        kit.mkdir()
+        for f in ("policy.py", policy.CATALOGUE):
+            (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
+        write_edit(kit / policy.CATALOGUE, lambda text: set_row_block(
+            text, "budgets.enforce", lambda b: re.sub(r"^default = .*\n", "", b, flags=re.M)))
+        get = ["--rev", "HEAD", "--explain"]
+        checks = [
+            check_get("file-sets", sets, ["budgets.enforce", *get],
+                      lambda rc, o, e: rc == 0 and o == "refuse\n" and " · file · set in " in e),
+            check_get("file-silent", sets, ["runtime.agents-in-flight", *get],
+                      lambda rc, o, e: rc == 0 and o == "6\n" and " · default · not set in " in e),
+            check_get("file-absent", absent, ["budgets.enforce", *get],
+                      lambda rc, o, e: rc == 0 and o == "warn\n" and f" · default · {POLICY_REL} is absent at " in e),
+            check_get("preset-named", named, ["budgets.enforce", *get],
+                      lambda rc, o, e: rc == 0 and o == "warn\n" and " · default · " in e
+                      and "preset strict, not applied until dKeptSession" in e),
+            check_get("preset-overridden", over, ["budgets.enforce", *get],
+                      lambda rc, o, e: rc == 0 and o == "refuse\n" and " · file · " in e),
+            check_get("no-default", other, ["budgets.enforce", "--rev", "HEAD"],
+                      lambda rc, o, e: rc == 2 and not o and "catalogue.toml" in e
+                      and "the row budgets.enforce carries no default" in e, kit=kit),
+        ]
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -497,6 +546,7 @@ CASES = [
     (FRESH_TARGET, None, run_fresh_target),  # an outcome case: no plant and no one arm
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
     ("reader-parsed", None, run_reader_parsed),
+    ("resolution-order", None, run_resolution_order),
 ]
 
 

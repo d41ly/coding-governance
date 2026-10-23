@@ -13223,6 +13223,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "read_default_value",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_defs_at_sha",
       "kind": "function",
       "file": "tools/lexicon/lexicon.py"
@@ -19906,6 +19911,11 @@
       "id": "run_render_helper",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "run_resolution_order",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_rm",
