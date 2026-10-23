@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-11 — every agent the review harness spawns is typed from a declared stage, and an opted-in review step runs twin finder runs the synthesis merges
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0078@ed5e83ae whole
 **Carries:** node:policy-key.review.twin

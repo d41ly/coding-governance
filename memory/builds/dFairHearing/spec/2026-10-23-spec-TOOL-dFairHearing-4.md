@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-4 — skeptic batches sorted by cited address
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0071@8d3a19dc whole
 

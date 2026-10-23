@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-28 — the hook suite's census re-pinned to 59 and 14, measured by a script file whose pattern no shell can fold
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

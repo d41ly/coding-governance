@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-9 — portability, topology and adopter migration as anchored checklist classes, and lens notes derived per preset after a swap
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0076@8bf57ee9 whole
 

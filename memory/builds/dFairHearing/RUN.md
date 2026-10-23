@@ -80,3 +80,79 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T05:16:51Z rescope · item add TOOL-dFairHearing-40 · reason closes the round-5 spec-audit minors of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md, batched: MEDIUM ids 2 3 4 12 13 14 15 18 20 21 22 25 26 27 28 31 33 35 38 (items M1 to M13) and LOW ids 5 6 7 8 9 10 16 17 23 24 29 30 34 36 37 39 (items L1 to L15)
 
 2026-10-23T05:31:48Z review · item dFairHearing-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 35 · disposition promote
+
+2026-10-23T05:45:45Z rescope · item defer TOOL-dFairHearing-1 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:46Z rescope · item defer TOOL-dFairHearing-10 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:47Z rescope · item defer TOOL-dFairHearing-11 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:49Z rescope · item defer TOOL-dFairHearing-12 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:50Z rescope · item defer TOOL-dFairHearing-13 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:51Z rescope · item defer TOOL-dFairHearing-14 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:53Z rescope · item defer TOOL-dFairHearing-15 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:54Z rescope · item defer TOOL-dFairHearing-16 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:55Z rescope · item defer TOOL-dFairHearing-17 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:56Z rescope · item defer TOOL-dFairHearing-18 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:58Z rescope · item defer TOOL-dFairHearing-2 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:45:59Z rescope · item defer TOOL-dFairHearing-20 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:00Z rescope · item defer TOOL-dFairHearing-21 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:01Z rescope · item defer TOOL-dFairHearing-22 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:03Z rescope · item defer TOOL-dFairHearing-23 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:04Z rescope · item defer TOOL-dFairHearing-25 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:05Z rescope · item defer TOOL-dFairHearing-26 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:06Z rescope · item defer TOOL-dFairHearing-27 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:08Z rescope · item defer TOOL-dFairHearing-28 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:09Z rescope · item defer TOOL-dFairHearing-29 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:10Z rescope · item defer TOOL-dFairHearing-3 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:11Z rescope · item defer TOOL-dFairHearing-30 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:13Z rescope · item defer TOOL-dFairHearing-31 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:14Z rescope · item defer TOOL-dFairHearing-32 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:15Z rescope · item defer TOOL-dFairHearing-33 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:17Z rescope · item defer TOOL-dFairHearing-34 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:18Z rescope · item defer TOOL-dFairHearing-35 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:19Z rescope · item defer TOOL-dFairHearing-36 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:20Z rescope · item defer TOOL-dFairHearing-37 · reason spec run (README rule 1): added by a spec-audit round, audited, and carried once; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:21Z rescope · item defer TOOL-dFairHearing-38 · reason spec run (README rule 1): added by the round-5 spec audit and carried once, unaudited by the owner's stop of the audit chain; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:23Z rescope · item defer TOOL-dFairHearing-39 · reason spec run (README rule 1): added by the round-5 spec audit and carried once, unaudited by the owner's stop of the audit chain; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:24Z rescope · item defer TOOL-dFairHearing-4 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:25Z rescope · item defer TOOL-dFairHearing-40 · reason spec run (README rule 1): added by the round-5 spec audit and carried once, unaudited by the owner's stop of the audit chain; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:26Z rescope · item defer TOOL-dFairHearing-5 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:28Z rescope · item defer TOOL-dFairHearing-6 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:29Z rescope · item defer TOOL-dFairHearing-7 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:30Z rescope · item defer TOOL-dFairHearing-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T05:46:32Z rescope · item defer TOOL-dFairHearing-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19

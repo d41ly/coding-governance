@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it
 
-**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0083@bd47ee4e whole
 

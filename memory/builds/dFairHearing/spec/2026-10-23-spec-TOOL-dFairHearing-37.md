@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

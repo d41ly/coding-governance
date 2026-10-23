@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0084@b793fdd5 whole
 

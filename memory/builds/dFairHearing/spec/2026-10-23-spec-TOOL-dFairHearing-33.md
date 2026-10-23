@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-33 — the version check reads every declared kit version constant through govkit's own reader, so no carrier's form escapes a typed pattern
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

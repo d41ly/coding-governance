@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-12 — the scorer factory: one replay scorer, with aScoutedSeam's grader as its second instance
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0079@d8e61ab6 whole
 

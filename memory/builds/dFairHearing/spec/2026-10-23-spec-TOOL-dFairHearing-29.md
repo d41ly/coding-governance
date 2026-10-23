@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-29 — the five escaped-quote arms of the hook's suite checked by name, at their home and gone from the old one
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

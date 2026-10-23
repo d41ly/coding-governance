@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-14 — the experiment shape's method, enforced or recorded by the scorer factory
 
-**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0081@3ad56b8f whole
 

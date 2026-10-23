@@ -420,7 +420,7 @@ Cite ids, never line numbers.
 | [TOOL-dDerivedDocket-69](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-29 | A SUITE THAT CRASHES AFTER ITS FIRST FAIL LINE READS AS FAILING, NEVER… |
 | [TOOL-dDerivedDocket-75](../builds/dDerivedDocket/BACKLOG.md) | OPEN | LOW | — | 2026-09-30 | NODE d RUNS AN ABSOLUTE core.hooksPath FROM A WRITER NOBODY KNOWS. The… |
 | [TOOL-dDerivedDocket-76](../builds/dDerivedDocket/BACKLOG.md) | OPEN | MED | — | 2026-09-30 | THE UNATTENDED KIT'S COMPENSATING CHECK IS UNPAID FOR THIS LANDING.… |
-| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | SPECCED | MED | TOOL-dFairHearing-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dFairHearing-19](../builds/dFairHearing/BACKLOG.md) | DEFERRED | MED | TOOL-dFairHearing-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dFoldedVerdict-7](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-01 | THREE CARRIERS WERE FOUND SITTING EXACTLY ON THEIR DECLARED CEILING IN… |
 | [TOOL-dFoldedVerdict-9](../builds/dFoldedVerdict/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-09-02 | RETIRING ANOTHER BUILD'S UNIT LEFT TWO CONSEQUENCES ON THAT BUILD'S OWN… |
 | [TOOL-dFurnishedOrders-21](../builds/dFurnishedOrders/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |

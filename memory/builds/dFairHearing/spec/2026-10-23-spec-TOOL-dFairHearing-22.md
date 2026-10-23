@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

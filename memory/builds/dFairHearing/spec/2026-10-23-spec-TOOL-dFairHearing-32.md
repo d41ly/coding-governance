@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-32 — the round-3 spec audit's 32 minors: criteria that observe what their specs change, one source per procedure, and refusals that name their cause
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

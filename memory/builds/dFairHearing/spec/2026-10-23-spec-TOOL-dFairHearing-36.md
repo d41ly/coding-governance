@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-36 — the round-4 spec audit's 13 minors on units 28, 29 and 31: probes that read every node's bytes alike, misses seen red, and the bar's own base
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

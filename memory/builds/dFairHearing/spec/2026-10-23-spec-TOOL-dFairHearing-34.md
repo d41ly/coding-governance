@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-34 — the version check reads every gov:kit marker in every file the build changed, not four typed directories
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

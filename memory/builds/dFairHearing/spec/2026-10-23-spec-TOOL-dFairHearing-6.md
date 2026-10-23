@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-6 — items carrying a grade per id, ranked by the highest
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0073@242e109b whole
 

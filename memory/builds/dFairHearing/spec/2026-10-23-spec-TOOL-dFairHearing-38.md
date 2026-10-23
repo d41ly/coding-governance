@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-38 — a `selected` verdict observed by the parser `gotchas.py` has, so a correct build passes and a shipped flag reds
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

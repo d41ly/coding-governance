@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0068@d09495d0 whole
 

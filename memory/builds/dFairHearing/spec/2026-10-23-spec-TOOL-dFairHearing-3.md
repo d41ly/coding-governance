@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-3 — opt-in lenses swapped into a five-slot literal, and review.pin as the stand-in that maps them
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0070@00ce4e3c whole
 **Carries:** node:item.review.pin

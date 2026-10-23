@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-39 — a criterion quoting an error text its tool never emits, carried into the bug-class catalogue a spec commit selects
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 25 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 

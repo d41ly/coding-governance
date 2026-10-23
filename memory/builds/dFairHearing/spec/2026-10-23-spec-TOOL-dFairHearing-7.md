@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-7 — refuted claims and same-address twins handed to the synthesizer to flag
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dFairHearing-19
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0074@51869353 whole
 
