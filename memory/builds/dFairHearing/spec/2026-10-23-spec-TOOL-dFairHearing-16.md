@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0083@bd47ee4e whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -90,6 +91,8 @@ commit.
 - **consumes-from** `TOOL-dFairHearing-13` — the native slot arm in the `verifier fan-out` leg, beside which the moved rules land in the same gate; without it the gate's header and clean line this unit extends are today's
 - **hands-off** `TOOL-dFairHearing-10` — the review protocol's enforcement and predicate sections, rewritten to name where each moved rule now lives
 - **hands-off** external — dGroundRules retires rules 1 and 3 and the slot ledger; dBoundRoles retires agent-cap and moves the helpers this unit exports
+- **hands-off** `TOOL-dFairHearing-22` — finding id 40 (item H3) of the round-1 spec audit: the hook denies a spec-audit call while `spec-audit-optin.js` is not beside it, so a partial `govkit update` cannot fail open as §4 Rollout prices it
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 6, 10, 20, 29, 30, 31 and 33 of the round-1 spec audit: the version half of S7 and AC11 superseded by the lander's mint (its S12, S13, AC6), AC8's grep half replaced by counting the moved arms (its S16, AC9), `MAX_LENSES`'s home taken by `LENS_SLOTS` (its S42, AC33), the new leg's registry, budget and foreign-prefix rows (its S26, AC17), the fixtures copying `check-verifier-fanout.js` (its S27, AC18) and the kickoff manifest re-stamp after the gate-legs.json edit (its S28, AC19)
 
 ## 4. Design
 
@@ -309,6 +312,7 @@ New arm: tools/check-wiring.test.sh · covers AC9 · a settings file with the pa
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-22 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

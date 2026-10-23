@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-17 — each review round's state, computed by the harness and carried in its record
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0084@b793fdd5 whole
 
@@ -15,6 +15,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md) | research | TOOL-dFairHearing-1 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -77,6 +78,8 @@ chain or a follow-up round has no rule (`gap-review-21`).
   nothing to the rule
 - **hands-off** external — dDeclaredLoop's convergence routing passes `review.max-rounds` as
   `roundLimit` and routes on `roundState`, which is also where `RUNAWAY_CEILING` retires
+- **hands-off** `TOOL-dFairHearing-20` — finding id 37 (item H1) of the round-1 spec audit: on a gapped whole-design walk `roundCount` and `roundState` read null, never this unit's rule over a count of 0
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 4, 14, 15, 33 and 38 of the round-1 spec audit: AC9's render-diff clause replaced by a template-and-render count (its S7, S8, AC4), AC6's parity arm asserting the four in-domain tokens with `CEILING` held directly (its S19, S20, AC11), and the kickoff manifest re-stamp after the gate-legs.json edit (its S28, AC19)
 
 ## 4. Design
 
@@ -372,6 +375,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
 - rev-2 · 2026-10-23 · §8 F4 · the `**Carries:**` pin moves from `5c5896a3` to `b793fdd5`, following
   the `amends cl-dClosedLoop-0084@5c5896a3` row of this spec's own deviation record,
   `2026-10-23-build-TOOL-dFairHearing-17-deviation-171`; nothing else changed.
+- rev-3 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-20 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

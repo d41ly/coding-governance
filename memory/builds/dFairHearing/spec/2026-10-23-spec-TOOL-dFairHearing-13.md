@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-13 — the lens catalogue as data, rendered into the harness's five-slot literals, and a slot count in the fan-out leg
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0080@8c9e5de7 whole
 **Carries:** node:item.review.lens
@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -83,6 +84,7 @@ design-audit preset, the opt-in swap and the whole-design walk add rows to (shar
 - **hands-off** `TOOL-dFairHearing-16` — the native slot arm in the `verifier fan-out` leg, beside which the moved agent-cap rules land
 - **hands-off** `TOOL-dFairHearing-18` — the marker and rows of the whole-design literal
 - **hands-off** external — dBoundRoles retires agent-cap's array-literal allowance with the hook
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 7, 8, 20, 26, 27, 46 and 47 of the round-1 spec audit: the opt-in marker admitted beside rule 11 (its S14, AC7), the whole-design literal marked (its S15, AC8), the slot count on agent-cap's `topLevelArgs` with `LENS_SLOTS` its one home (its S34, S42, AC25, AC33), one marker predicate through `render_lenses.py --markers` (its S35, AC26), and the `mkfix` and `build_layout` fixtures S5 and S4 break (its S23, S24, AC14, AC15)
 
 ## 4. Design
 
@@ -353,6 +355,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC4 AC7 · the rende
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

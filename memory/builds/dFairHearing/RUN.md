@@ -30,3 +30,13 @@ anchor-ref: refs/heads/main
 base: 3708a705e834709f340a2d160f9acdf9c18b699f
 
 ## Parked
+
+2026-10-23T00:42:41Z rescope · item add TOOL-dFairHearing-20 · reason closes round-1 spec-audit finding id 37 (item H1), HIGH, of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md
+
+2026-10-23T00:42:42Z rescope · item add TOOL-dFairHearing-21 · reason closes round-1 spec-audit finding id 39 (item H2), HIGH, of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md
+
+2026-10-23T00:42:44Z rescope · item add TOOL-dFairHearing-22 · reason closes round-1 spec-audit finding id 40 (item H3), HIGH, of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md
+
+2026-10-23T00:42:52Z rescope · item add TOOL-dFairHearing-23 · reason closes the round-1 spec-audit minors of memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md, batched: MEDIUM ids 1 2 3 4 5 6 7 8 10 13 14 15 16 19 21 23 25 26 27 28 29 30 31 32 33 34 35 38 41 42 43 44 45 46 47 48 49 (items M1 to M28) and LOW ids 9 11 12 18 20 22 24 36 50 51 52 53 (items L1 to L12)
+
+2026-10-23T00:46:07Z review · item dFairHearing-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 49 · disposition promote

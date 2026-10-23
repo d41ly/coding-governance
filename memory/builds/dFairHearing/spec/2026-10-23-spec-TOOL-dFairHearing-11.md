@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-11 — every agent the review harness spawns is typed from a declared stage, and an opted-in review step runs twin finder runs the synthesis merges
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0078@ed5e83ae whole
 **Carries:** node:policy-key.review.twin
@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -96,6 +97,7 @@ one shape, verified together and merged into one report, with its check (gap-rev
 - **hands-off** `TOOL-dFairHearing-15` — the stage table every spawn takes its type from, which that unit's checklist agent joins as the resume probe did
 - **hands-off** `TOOL-dFairHearing-10` — the synthesizer role's input line names a twinned run's two finder runs
 - **hands-off** external — dDeclaredLoop's review trigger replaces the direct pin argument, and dBoundRoles' declared shapes name the twin kind and the probe's stage
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 5, 6, 31 and 49 of the round-1 spec audit: AC5 run with a `--subject` (its S11, AC5), the version half of S9 and AC12 superseded by the lander's mint (its S12, S13, AC6), and the `resume:checklist` agent typed by `probeOpts`, so S3's four-constant arm stands (its S37, AC28)
 
 ## 4. Design
 
@@ -337,6 +339,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

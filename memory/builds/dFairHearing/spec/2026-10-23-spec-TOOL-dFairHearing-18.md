@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-18 — the whole-design walk as a preset of the design audit, and its recall grade
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0085@796d40aa whole
 
@@ -14,6 +14,7 @@
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 |
 
 <!-- /gen:spec-records -->
 
@@ -101,6 +102,8 @@ audit measures its recall (`gap-review-22`).
   carries as every spec-audit round does
 - **hands-off** external — the sealed copy and its key, a failure-mode and trust-boundary slot in the
   walk table, and a read audit of the walkers, filed as one ask at this build's close
+- **hands-off** `TOOL-dFairHearing-20` — finding id 37 (item H1) of the round-1 spec audit: a gapped walk nulls `blockers`, `highs`, `roundCount` and `roundState` and notes BLOCKED, the red §4 The gaps states only in the synthesis prompt
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 1, 3, 8, 16, 18, 19, 21, 22, 32, 34 and 53 of the round-1 spec audit: the tag reader consumed from `TOOL-dFairHearing-12` with its integer section, AC7 included (its S1 to S3, AC1), review.pin's per-run route for runs and seed (its S5, S6, AC3), AC10's render-diff clause replaced (its S9, S10, AC4), the `WHOLE_DESIGN_LENSES` literal and receiver branch (its S15, AC8), AC7's drive-letter literal as a raw string (its S41, AC32), the design grade through `measure_recall` (its S43, AC34) and the walk grid's ceilings (its S49, AC40)
 
 ## 4. Design
 
@@ -477,6 +480,7 @@ New arm: tools/workflows/replay_scorer.py selftest · covers AC7 AC8 AC9 · a tw
 
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 18, the brief's S1, S3, S4, S10, S11, S12
   and S14, the whole-design audit's records, and the harness and replay scorer read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-20 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

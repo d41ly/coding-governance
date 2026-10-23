@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0068@d09495d0 whole
 
@@ -17,6 +17,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-repin-brief.md) | research | TOOL-dFairHearing-17 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -101,6 +102,7 @@ the replay's raw outputs.
 - **consumes-from** `TOOL-dFairHearing-3` — `review.pin`'s record-kind mapping, whose default replay 1's verdict sets
 - **hands-off** `TOOL-dFairHearing-15` — the bundle-and-clone procedure of §4, which its replays reuse
 - **hands-off** `TOOL-dFairHearing-18` — the known-set row shape and `parse_known_set`, which its seeded key reuses
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 2, 12, 13, 25 and 41 of the round-1 spec audit: the review-replay manifest's terms in place of AC5's parsed half (its S4, AC2), a bundle-and-fetch recipe in place of §4 The isolation's clone (its S17, S18, AC10), the replay's opt-in placement (its S22, AC13) and replay 1's flip in review.pin, never a template default (its S40, AC31)
 
 ## 4. Design
 
@@ -314,6 +316,7 @@ The record writes under `memory/builds/` owe the two recall-floor legs by the gu
 - rev-2 · 2026-10-23 · §8 F1 · the `**Carries:**` pin moves from `b4e6c04e` to `d09495d0`, following
   the `amends cl-dClosedLoop-0068@b4e6c04e` row of this spec's own deviation record,
   `2026-10-23-build-TOOL-dFairHearing-1-deviation-11`; nothing else changed.
+- rev-3 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

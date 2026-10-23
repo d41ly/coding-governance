@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-8 — fix verdicts judged by class behind a switch, and every confirmed finding given one disposition from the report's grammar
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0075@8c43970c whole
 **Carries:** node:item.review.report
@@ -11,6 +11,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -96,6 +97,7 @@ harness hands over and written to the review record.
 - **hands-off** `TOOL-dFairHearing-1` — the replay that re-judges aRoutedQuill #23's fix with the class judge switched on, and whose verdict sets the switch's default
 - **hands-off** `TOOL-dFairHearing-10` — the synthesizer role's input line names the leg names, the class slugs and the disposition grammar it is handed
 - **hands-off** external — dDeclaredLoop's dispose step routes each disposition; dPlacedRequest's claim ref makes a new slug unique across branches
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 5, 6, 9, 24, 31, 43 and 44 of the round-1 spec audit: AC4 run with a `--subject` (its S11, AC5), the version half of S9 and AC11 superseded by the lander's mint (its S12, S13, AC6), the `TOOL_ROOT` row kept this unit's (its S38, AC29), the argument named `gateManifest` (its S44, AC35), a leg count beside the probe's legs (its S31, AC22) and reason cells kept on one line (its S32, AC23)
 
 ## 4. Design
 
@@ -310,6 +312,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

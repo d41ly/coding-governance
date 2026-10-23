@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-9 — portability, topology and adopter migration as anchored checklist classes, and lens notes derived per preset after a swap
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0076@8bf57ee9 whole
 
@@ -11,6 +11,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-3-readers-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-3-readers-fix-brief.md) | research | TOOL-dFairHearing-3 |
 | [2026-10-23-prompt-TOOL-dFairHearing-9-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-9-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -71,6 +72,7 @@ unread instead of refusing the run at the `lensNotes` boundary check.
 - **consumes-from** `TOOL-dFairHearing-3` — the swap, `SLOT_DEFAULTS` and each swapped slot's `replaces` field the note derivation reads
 - **consumes-from** `TOOL-dFairHearing-2` — `PRESETS`, the preset names a per-preset note map is keyed by
 - **consumes-from** `TOOL-dFairHearing-13` — the catalogue rule that no lens key equals a literal name, which keeps the two note forms apart
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 11, 35 and 51 of the round-1 spec audit: AC3's three records observed by name (its S39, AC30), AC7's key arm re-derived (its S29, AC20) and the per-preset note entry shape-checked (its S47, AC38)
 
 ## 4. Design
 
@@ -249,6 +251,7 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC8 · an audit-stag
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-2 — the design-audit preset of the spec-audit kind, chosen by a preset argument
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0069@a762d009 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -71,6 +72,7 @@ ships dark (shared interface S9): the argument defaults to `unit-spec`, and noth
 - **hands-off** `TOOL-dFairHearing-11` — the `preset` argument its `design-records` twin setting reads
 - **hands-off** `TOOL-dFairHearing-1` — the replay verdict that keeps or flips the unit-spec preset for design records
 - **hands-off** `TOOL-dFairHearing-18` — the closed set of the `preset` argument and the marked receiver its `whole-design` literal joins
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 8 and 35 of the round-1 spec audit: the whole-design literal and receiver branch, with AC1's refusal arm rewritten to refuse another unknown preset (its S15, AC8), and AC4's key arm re-derived from the current `REVIEW_SHAPE` (its S29, AC20)
 
 ## 4. Design
 
@@ -243,6 +245,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC3 AC4 AC6 · the t
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 

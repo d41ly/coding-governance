@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-15 — the review's bug-class checklist, selected by the pinned range and handed by the harness itself
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0082@8ac81dad whole
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
 
@@ -87,6 +88,7 @@ NT-25). The cut of fully gated classes stays dLinkedLibrary's, once it derives e
 - **consumes-from** `TOOL-dFairHearing-14` — `check_experiment`, under which the two arms are declared one variable apart
 - **consumes-from** `TOOL-dFairHearing-1` — the bundle-and-clone procedure each blind replay reuses
 - **hands-off** external — dLinkedLibrary's derived gate status, which replaces S6's leg-name reading of "ungated" and cuts fully gated classes
+- **hands-off** `TOOL-dFairHearing-23` — finding ids 2, 9, 13, 23, 33, 36, 41, 48 and 49 of the round-1 spec audit: the manifest's terms for `dispatched 4` and `paired 4 of 4` (its S4, AC2), S2's kit.toml claim and AC6's kit.toml half superseded (its S38, AC29), the replay recipe (its S17, S18, AC10), the ungated arm read through one shared predicate (its S21, AC12), the kickoff manifest re-stamp (its S28, AC19), the three docs still naming the by-hand lookup (its S45, AC36), the tail-truncation refusal (its S36, AC27) and the checklist agent under `probeOpts` (its S37, AC28)
 
 ## 4. Design
 
@@ -297,6 +299,7 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
 
 ## 10. Reuse audit
 
