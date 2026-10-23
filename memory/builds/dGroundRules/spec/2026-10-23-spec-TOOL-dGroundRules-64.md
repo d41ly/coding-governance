@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-64 — the respelled literals no other repair covers, restored whole and observed: units 5, 21, 33 and 34
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

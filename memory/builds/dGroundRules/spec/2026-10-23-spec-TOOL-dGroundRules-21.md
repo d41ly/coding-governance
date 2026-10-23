@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-21 — the round-1 spec audit's minors: forty-one findings closed in the code units 1 to 10 leave, one scope item each
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7
+**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

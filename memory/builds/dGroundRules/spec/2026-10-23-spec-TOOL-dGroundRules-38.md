@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-38 — the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

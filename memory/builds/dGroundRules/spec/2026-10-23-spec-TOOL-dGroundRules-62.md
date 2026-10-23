@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-62 — an unset `budgets.<cap>` reads as no file value: the derived-default refusal is a type the caps module catches, and only that refusal
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

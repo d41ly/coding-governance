@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-42 — the criterion bug class gains the input respelled to pass a join, and is handed to every spec commit
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 13
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

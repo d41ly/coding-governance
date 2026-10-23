@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-55 — the criterion bug class gains the side read: a criterion observes its scope item by running the check, never by reading what the check reads
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

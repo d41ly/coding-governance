@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-50 — the help-page parity prints where it found the deferral line, so the install section is read by one rule
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

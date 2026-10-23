@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-13 — the mirror's bytes name no commit: each reason's revision phrase rendered as a placeholder the helper fills
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

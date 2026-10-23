@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-24 — the fresh target installed by the deployer, so the case grades an install govkit makes
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

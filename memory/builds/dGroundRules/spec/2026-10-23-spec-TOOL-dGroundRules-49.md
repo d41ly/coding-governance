@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-49 — the help page's guard line observed by the leg query with its path whole, and by the trace when it is taken out
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

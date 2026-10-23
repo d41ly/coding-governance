@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0011@8312590d whole
 

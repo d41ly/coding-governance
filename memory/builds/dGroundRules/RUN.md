@@ -167,3 +167,129 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T05:19:20Z rescope · item add TOOL-dGroundRules-63 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 minors batch: MEDIUM ids 6 15 21 22 and LOW ids 7 11 18 23
 
 2026-10-23T05:19:21Z rescope · item add TOOL-dGroundRules-64 · reason adopted discovery: the main loop's basename respelling stripped fixture literals from the acceptance criteria of units 5, 29, 34, 39, 40, 43 and 51 beyond those H1, H2 and M1 name; the unit restores each one in a form the spec-tokens paths join accepts
+
+2026-10-23T06:20:25Z rescope · item defer TOOL-dGroundRules-1 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:27Z rescope · item defer TOOL-dGroundRules-11 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:29Z rescope · item defer TOOL-dGroundRules-16 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:31Z rescope · item defer TOOL-dGroundRules-2 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:33Z rescope · item defer TOOL-dGroundRules-3 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:35Z rescope · item defer TOOL-dGroundRules-4 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:37Z rescope · item defer TOOL-dGroundRules-24 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:39Z rescope · item defer TOOL-dGroundRules-5 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:41Z rescope · item defer TOOL-dGroundRules-6 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:43Z rescope · item defer TOOL-dGroundRules-13 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:45Z rescope · item defer TOOL-dGroundRules-14 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:47Z rescope · item defer TOOL-dGroundRules-19 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:49Z rescope · item defer TOOL-dGroundRules-26 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:51Z rescope · item defer TOOL-dGroundRules-28 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:53Z rescope · item defer TOOL-dGroundRules-7 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:55Z rescope · item defer TOOL-dGroundRules-8 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:57Z rescope · item defer TOOL-dGroundRules-10 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:20:59Z rescope · item defer TOOL-dGroundRules-9 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:01Z rescope · item defer TOOL-dGroundRules-15 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:03Z rescope · item defer TOOL-dGroundRules-17 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:05Z rescope · item defer TOOL-dGroundRules-18 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:07Z rescope · item defer TOOL-dGroundRules-20 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:09Z rescope · item defer TOOL-dGroundRules-21 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:10Z rescope · item defer TOOL-dGroundRules-22 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:13Z rescope · item defer TOOL-dGroundRules-23 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:15Z rescope · item defer TOOL-dGroundRules-25 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:17Z rescope · item defer TOOL-dGroundRules-29 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:19Z rescope · item defer TOOL-dGroundRules-27 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:21Z rescope · item defer TOOL-dGroundRules-30 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:23Z rescope · item defer TOOL-dGroundRules-31 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:26Z rescope · item defer TOOL-dGroundRules-32 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:28Z rescope · item defer TOOL-dGroundRules-33 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:34Z rescope · item defer TOOL-dGroundRules-34 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:42Z rescope · item defer TOOL-dGroundRules-35 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:45Z rescope · item defer TOOL-dGroundRules-36 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:49Z rescope · item defer TOOL-dGroundRules-37 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:55Z rescope · item defer TOOL-dGroundRules-38 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:57Z rescope · item defer TOOL-dGroundRules-39 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:21:59Z rescope · item defer TOOL-dGroundRules-40 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:02Z rescope · item defer TOOL-dGroundRules-41 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:04Z rescope · item defer TOOL-dGroundRules-42 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:06Z rescope · item defer TOOL-dGroundRules-43 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:12Z rescope · item defer TOOL-dGroundRules-44 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:14Z rescope · item defer TOOL-dGroundRules-45 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:16Z rescope · item defer TOOL-dGroundRules-46 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:18Z rescope · item defer TOOL-dGroundRules-47 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:20Z rescope · item defer TOOL-dGroundRules-48 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:23Z rescope · item defer TOOL-dGroundRules-49 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:25Z rescope · item defer TOOL-dGroundRules-50 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:26Z rescope · item defer TOOL-dGroundRules-51 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:27Z rescope · item defer TOOL-dGroundRules-52 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:29Z rescope · item defer TOOL-dGroundRules-53 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:30Z rescope · item defer TOOL-dGroundRules-55 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:32Z rescope · item defer TOOL-dGroundRules-57 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:33Z rescope · item defer TOOL-dGroundRules-58 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:35Z rescope · item defer TOOL-dGroundRules-61 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:36Z rescope · item defer TOOL-dGroundRules-64 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:37Z rescope · item defer TOOL-dGroundRules-54 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:39Z rescope · item defer TOOL-dGroundRules-56 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:40Z rescope · item defer TOOL-dGroundRules-59 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:42Z rescope · item defer TOOL-dGroundRules-60 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:43Z rescope · item defer TOOL-dGroundRules-62 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:22:44Z rescope · item defer TOOL-dGroundRules-63 · reason specced; built by this build's build run (README rule 1)

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-28 — the historical-sha oracle class widened to HEAD, so a spec driving the deployer from gov's tree is handed it
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 4
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

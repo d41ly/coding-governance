@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-19 — the guard admits a regenerated mirror equal to its render, so an agent branch that edits the catalogue reaches a green bar
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

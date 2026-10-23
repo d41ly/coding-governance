@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-29 — a receipt-less target is gov's source tree only when it holds the registry, so the census arm never grades a scratch target as gov
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

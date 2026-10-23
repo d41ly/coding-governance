@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-11 — every loop bound and deadline key declares that raising it is a loosening
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0017@c5b54ae9 whole
 

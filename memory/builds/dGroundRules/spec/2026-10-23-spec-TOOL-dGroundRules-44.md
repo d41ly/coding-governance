@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-44 — the overlap arm's disjoint row is a real string-prefix trap, and the arm refuses a disjoint row that is not one
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

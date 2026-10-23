@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0013@8ae02ac2 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-39 — the census registry window held at both edges by a standing case, its fixture paths spelled whole
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

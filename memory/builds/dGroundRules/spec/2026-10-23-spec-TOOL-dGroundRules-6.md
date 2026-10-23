@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-6 — the minimal guard over the policy file and its three neighbours
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0012@937c308e whole
 

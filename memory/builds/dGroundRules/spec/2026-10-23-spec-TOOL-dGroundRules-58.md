@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-58 — the overlap probe sources the unattended library by its tracked path, so its shell column is a verdict and not a load failure
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

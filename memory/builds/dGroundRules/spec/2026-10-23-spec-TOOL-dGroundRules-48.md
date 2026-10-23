@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-48 — the help page's install-section count observed with its path whole, and paired with the break that empties it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

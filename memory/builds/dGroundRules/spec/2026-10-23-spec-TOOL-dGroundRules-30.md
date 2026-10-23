@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-30 — the writer-marker floor decided by the installed hook's own verdict, never by a kit version the lander has not minted
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

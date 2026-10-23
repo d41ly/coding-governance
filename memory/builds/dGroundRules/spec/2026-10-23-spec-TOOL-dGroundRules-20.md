@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-20 — the `policy fixtures` guard covers the sibling files its cases run, and a join keeps the census's enforcers inside it
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

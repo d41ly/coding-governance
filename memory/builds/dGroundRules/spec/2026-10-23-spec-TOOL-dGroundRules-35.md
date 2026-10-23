@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-35 — the guard trace records a bytecode-cache read as its source file, so a warm load still records `govkit.py`
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

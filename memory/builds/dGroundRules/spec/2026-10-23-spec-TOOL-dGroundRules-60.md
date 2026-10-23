@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-60 — unit 52's overlap observations taken through the whole probe, with the Python column shown graded on its own
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

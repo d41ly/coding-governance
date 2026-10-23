@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-2 — the policy reader, at the landed revision, parsed and never sourced
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0008@6598846f whole
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-56 — the row check observed refusing: the not-a-trap row run through the arm's own row function, never read off the table
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18
+**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

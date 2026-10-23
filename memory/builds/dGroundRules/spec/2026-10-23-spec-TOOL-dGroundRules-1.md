@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-1 — the policy file, the policy kit, its catalogue and the catalogue's shape audit
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0007@b0458b78 whole
 

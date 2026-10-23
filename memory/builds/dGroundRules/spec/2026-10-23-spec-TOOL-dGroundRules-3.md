@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0009@7d93fce9 whole
 

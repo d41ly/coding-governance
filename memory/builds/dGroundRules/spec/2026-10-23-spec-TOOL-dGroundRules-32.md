@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-32 — the round-1 audit of units 22 to 25, its minors: twenty findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

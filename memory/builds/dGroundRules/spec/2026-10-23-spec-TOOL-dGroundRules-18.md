@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-18 — a writer split bounded by the agent limit: rule 2 judges `gov:fixed-writers` against `runtime.agents-in-flight` and verifiers against `MAX_VERIFIERS`
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

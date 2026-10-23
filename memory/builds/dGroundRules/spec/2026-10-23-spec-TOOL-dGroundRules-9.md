@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5
+**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0015@8ce57bfb whole
 

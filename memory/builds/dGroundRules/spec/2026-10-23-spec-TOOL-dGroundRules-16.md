@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-16 — the adopter's fresh target as a standing case: every arm of the shipped `policy check` leg green on install day
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

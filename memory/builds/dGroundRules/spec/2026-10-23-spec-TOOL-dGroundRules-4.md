@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0010@cd629be7 whole
 **Carries:** node:policy-key.policy-file.on-invalid

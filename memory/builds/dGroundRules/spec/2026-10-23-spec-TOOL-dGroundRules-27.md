@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-27 — every policy case that drives the deployer runs it from the snapshot, and a call over the source's own root refuses
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

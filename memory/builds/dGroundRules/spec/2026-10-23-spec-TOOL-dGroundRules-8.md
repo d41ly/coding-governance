@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-8 — the reader-coverage arm: a key whose Owner build has landed has a reader
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0014@28a178b1 whole
 
