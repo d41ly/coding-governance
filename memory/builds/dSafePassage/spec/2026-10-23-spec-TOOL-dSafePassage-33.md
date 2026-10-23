@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dSafePassage-33-deviation-126.md](../build/2026-10-23-build-TOOL-dSafePassage-33-deviation-126.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-33-deviation-79.md](../build/2026-10-23-build-TOOL-dSafePassage-33-deviation-79.md) | deviation | — |
 | [2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-32 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-31 TOOL-dSafePassage-34 TOOL-dSafePassage-35 |
 

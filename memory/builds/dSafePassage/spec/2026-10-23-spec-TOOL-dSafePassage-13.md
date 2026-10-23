@@ -9,6 +9,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dSafePassage-13-deviation-113.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-113.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-51.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-51.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-7 TOOL-dSafePassage-11 |

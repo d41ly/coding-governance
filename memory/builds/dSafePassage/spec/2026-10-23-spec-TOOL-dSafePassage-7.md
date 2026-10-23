@@ -8,6 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dSafePassage-7-deviation-138.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-138.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-7-deviation-139.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-139.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-7-deviation-140.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-140.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-7-deviation-141.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-141.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-7-deviation-142.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-142.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-7-deviation-21.md](../build/2026-10-23-build-TOOL-dSafePassage-7-deviation-21.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |

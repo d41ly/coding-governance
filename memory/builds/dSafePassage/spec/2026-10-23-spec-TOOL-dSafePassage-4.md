@@ -8,6 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dSafePassage-4-deviation-130.md](../build/2026-10-23-build-TOOL-dSafePassage-4-deviation-130.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-4-deviation-131.md](../build/2026-10-23-build-TOOL-dSafePassage-4-deviation-131.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-4-deviation-132.md](../build/2026-10-23-build-TOOL-dSafePassage-4-deviation-132.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-4-deviation-133.md](../build/2026-10-23-build-TOOL-dSafePassage-4-deviation-133.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 

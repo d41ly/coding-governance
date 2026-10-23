@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dSafePassage-26-deviation-120.md](../build/2026-10-23-build-TOOL-dSafePassage-26-deviation-120.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-26-deviation-72.md](../build/2026-10-23-build-TOOL-dSafePassage-26-deviation-72.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-26-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-26-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-26-hygiene-fix.md) | research | TOOL-dSafePassage-24 TOOL-dSafePassage-25 |
