@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-25 — the owed replays run after the replay contract is corrected, and their verdicts set the dark switches
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-25-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-25-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md) | research | TOOL-dFairHearing-26 TOOL-dFairHearing-27 |
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-4 TOOL-dFairHearing-18 TOOL-dFairHearing-27 |
+| [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-26 TOOL-dFairHearing-27 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,8 @@ verdicts say.
 - **consumes-from** `TOOL-dFairHearing-23` — the corrected manifest terms (S4), the recipe (S17, S18), the placement (S22) and the flip site (S40); without them these runs repeat the defect
 - **consumes-from** `TOOL-dFairHearing-1` — the known set, `parse_known_set`, `--matched`, the calibration, replay 1's arguments and bar, and the R-1 ask rule
 - **consumes-from** `TOOL-dFairHearing-15` — the `resume:checklist` agent, the corpus, the two arms and their instrument, and the decision rule
+- **hands-off** `TOOL-dFairHearing-30` — finding id 28 (item H2) of the round-3 spec audit: unit 15's with-and-without replay, run with one fresh clone per record and arm, and its decision; this unit's S4, AC4, the unit-15 half of S5, AC6 and the unit-15 lines of S6 and AC7 are superseded by its S1 to S5 and AC1 to AC4
+- **hands-off** `TOOL-dFairHearing-32` — the same audit's minors on this spec, ids 4, 5, 9, 13, 21, 24, 29, 30 and 31: its S13 to S21, each naming what it supersedes
 
 ## 4. Design
 
@@ -226,6 +229,8 @@ each observed directly by §6.
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 1 (item H1) of the spec audit of units 20
   to 23.
+- rev-2 · 2026-10-23 · §3 · the round-3 spec audit's disposal: hands-off edges to TOOL-dFairHearing-30
+  (unit 15's replay in per-arm clones, finding id 28) and TOOL-dFairHearing-32 (nine minors).
 
 ## 10. Reuse audit
 

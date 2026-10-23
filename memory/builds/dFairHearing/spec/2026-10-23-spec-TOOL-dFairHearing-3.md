@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-3 — opt-in lenses swapped into a five-slot literal, and review.pin as the stand-in that maps them
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0070@00ce4e3c whole
 **Carries:** node:item.review.pin
@@ -103,6 +103,7 @@ C2-F6). It catalogues the six opt-in lenses as rows, each shipping on its losing
 - **hands-off** `TOOL-dFairHearing-18` — `review.design-audit.runs` and `review.design-audit.seed`, read as further `review.pin` arguments
 - **hands-off** external — the six losing tests, filed as one ask in dCalibratedLens, the build that draws its stage lenses from this catalogue
 - **hands-off** `TOOL-dFairHearing-23` — finding ids 3, 5, 7, 21, 35 and 50 of the round-1 spec audit: review_pin.py's per-run lines for whole-design (its S5, S6, AC3), keys printed only with their flags (its S11, AC5), the `gov:lens-optins` marker admitted by the renderer (its S14, AC7), AC5's key arm re-derived (its S29, AC20) and a backslashed subject refused (its S46, AC37)
+- **hands-off** `TOOL-dFairHearing-32` — finding id 24 of the round-3 spec audit: this unit's AC7 arm reads its expected no-flag preset from `DESIGN_RECORD_PRESET` rather than the literal, so a replay-1 hit does not red it (its S19)
 
 ## 4. Design
 
@@ -345,6 +346,8 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC9 · an audit-stag
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-10-23 · §3 · the round-3 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-32,
+  which re-pins this unit's AC7 arm to `DESIGN_RECORD_PRESET`.
 
 ## 10. Reuse audit
 

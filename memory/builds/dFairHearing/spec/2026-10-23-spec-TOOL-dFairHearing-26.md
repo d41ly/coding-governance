@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-26 — every rule 0 and rule 5 arm of the hook's suite found at its new home and gone from the old one, counted by label whatever helper writes it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-26-deviation-261.md](../build/2026-10-23-build-TOOL-dFairHearing-26-deviation-261.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-25-promoted-fix-brief.md) | research | TOOL-dFairHearing-25 TOOL-dFairHearing-27 |
 | [2026-10-23-prompt-TOOL-dFairHearing-26-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-26-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-25 TOOL-dFairHearing-27 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,8 @@ left behind, and is shown red on a planted miss before its count is trusted.
 
 - **consumes-from** `TOOL-dFairHearing-16` — the receiving suites and the rules' new homes the moved arms run against; without them there is nowhere to move an arm
 - **consumes-from** `TOOL-dFairHearing-23` — AC9, whose label half this unit's census replaces, and the arms that unit moves
+- **hands-off** `TOOL-dFairHearing-28` — finding id 11 (item B1, BLOCKER) of the round-3 spec audit: the census re-pinned to 71 labels and a population of 59 and 14, measured by a script file; this unit's AC1 totals, §4 Evidence's counts, §5's assertion of 54 and 14 and AC2 are superseded by its S2, AC1 and AC2
+- **hands-off** `TOOL-dFairHearing-29` — finding id 1 (item H1) of the round-3 spec audit: the five escaped-quote arms checked by name; this unit's AC1 member clause and S1's escaped-quote sentence are superseded by its S1 and AC1
 
 ## 4. Design
 
@@ -169,6 +172,9 @@ base to move.
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 10 (item H2) of the spec audit of units 20
   to 23.
+- rev-2 · 2026-10-23 · §3 · the round-3 spec audit's disposal: hands-off edges to TOOL-dFairHearing-28
+  (the census totals, finding id 11) and TOOL-dFairHearing-29 (the escaped-quote members, finding id 1),
+  each naming the criteria of this unit it supersedes.
 
 ## 10. Reuse audit
 

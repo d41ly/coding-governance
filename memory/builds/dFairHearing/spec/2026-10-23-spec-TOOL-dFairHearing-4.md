@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-4 — skeptic batches sorted by cited address
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0071@8d3a19dc whole
 
@@ -14,6 +14,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-4-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-18 TOOL-dFairHearing-27 TOOL-dFairHearing-25 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-14 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 |
 
 <!-- /gen:spec-records -->
 
@@ -70,6 +71,7 @@ argument, so `TOOL-dFairHearing-1`'s replay can run it against today's batches.
 ### Edges
 
 - **hands-off** `TOOL-dFairHearing-7` — the same-address pairs it hands the synthesis are judged by
+- **hands-off** `TOOL-dFairHearing-32` — the round-3 spec audit's minors on this spec, ids 2, 10, 14, 15, 19, 23, 32 and 33: the resume probe's spelling observed (its S1 to S4), the section class widened (its S5), the third difference named (its S6) and the scorer non-goal restated (its S7, S8); AC8's absence patterns, §4's section class and "two named places", and §3's "field for field" are superseded there
   `checkSameAddress` over `deriveAddressKey`, the one key, and it defines no address reading of its own
 - **hands-off** `TOOL-dFairHearing-1` — the replay runs the address-ordered verify stage through this
   unit's default-off argument and owns the verdict that would flip its default
@@ -339,6 +341,8 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
   consumes `deriveAddressKey`'s spec-kind reading from this unit, and this spec declared no hands-off
   back. Fixed here, by a hands-off edge to `TOOL-dFairHearing-12`: S1 already produces the key, and
   §3's non-goals already name that unit's reader as written to agree with it.
+- rev-4 · 2026-10-23 · §3 · the round-3 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-32,
+  naming the eight minors it closes on this spec and what it supersedes.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-27 — the spec audit of units 20 to 23, its 31 minors: criteria a correct build can pass, refusals that name their cause, and the readers a move leaves behind
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-27-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-27-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-27-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-27-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-4 TOOL-dFairHearing-18 TOOL-dFairHearing-25 |
+| [2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-4-14-25-27-spec-audit.md) | spec-audit | TOOL-dFairHearing-4 TOOL-dFairHearing-14 TOOL-dFairHearing-25 TOOL-dFairHearing-26 |
 
 <!-- /gen:spec-records -->
 
@@ -158,6 +159,8 @@ one's mechanism.
 - **consumes-from** `TOOL-dFairHearing-21` — `check_held_out_frozen`'s two new checks and its runner arms, which S7, S19 and S28 correct
 - **consumes-from** `TOOL-dFairHearing-22` — `checkOptinPackPresent` and its deny message, which S12, S13, S20 and S21 correct
 - **consumes-from** `TOOL-dFairHearing-23` — the marker predicate, the recipe, the tag reader, `check_ungated`, `LENS_SLOTS`, `gateManifest`, the version rule and the criteria S1 to S31 correct
+- **hands-off** `TOOL-dFairHearing-31` — finding id 34 (item H3) of the round-3 spec audit: the version-line check resolves the bar's base or refuses by name; S15's base sentence and AC10 are superseded by its S1 to S3 and AC1 to AC3, and S15's version rule stands
+- **hands-off** `TOOL-dFairHearing-32` — the same audit's minors on this spec, ids 3, 8, 12, 16, 17, 20, 26, 27, 35, 37 and 38: its S22 to S32, each naming what it supersedes
 
 ## 4. Design
 
@@ -419,6 +422,8 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC19 AC20 · a run-2 ban
 
 - rev-1 · 2026-10-23 · initial draft, promoting the 24 MEDIUM and 7 LOW findings of the spec audit of
   units 20 to 23 as one batch.
+- rev-2 · 2026-10-23 · §3 · the round-3 spec audit's disposal: hands-off edges to TOOL-dFairHearing-31
+  (the version check's base, finding id 34) and TOOL-dFairHearing-32 (eleven minors).
 
 ## 10. Reuse audit
 
