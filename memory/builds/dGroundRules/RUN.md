@@ -9,10 +9,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-refreshed-at: 3708a705e834709f340a2d160f9acdf9c18b699f · park · 0 touching
+asks-at-landing: TOOL-dGroundRules-12=OPEN
+units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52
+hold-run: 
+hold-streak: 1 · at d794a81b
+resume-owed: none · owner
+held-at: 2026-10-23T04:30:23Z
+hold-reason: The spec audit's promotion chain does not shrink: six rounds promoted 9, 4, 7, 2, 9 and 9 units (51 on the roster for 11 clauses) at precision 0.85-1.00, and M4 bounds the chain only by a round below the 0.5 floor, so whether to cap it, and where, is the parked decision; units 44-52 are specced and unaudited, units 1-43 audited
+hold-until: owner
+hold-code: owner-decision
+held-from: REVIEWING
+refreshed-at: 3708a705e834709f340a2d160f9acdf9c18b699f · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 429689679
-phase: REVIEWING
+witness: d794a81bc493f73af152ed3e0732de119cea0bb0
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -125,3 +135,7 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T04:14:04Z rescope · item add TOOL-dGroundRules-51 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 21 at HIGH, item H3
 
 2026-10-23T04:14:05Z rescope · item add TOOL-dGroundRules-52 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 minors batch: MEDIUM ids 3 4 5 6 12 13 14 15 19 25 26 30 31 33 35 36 and LOW ids 7 8 9 16 17 18 34 37 38
+
+2026-10-23T04:30:26Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dGroundRules && bash tools/push-main.sh --land --slug dGroundRules && bash tools/unattended/unattended.sh --settle dGroundRules
+
+2026-10-23T04:30:26Z hold · item owner-decision · reason until owner · reaped ccc970f5 · resume none(owner)
