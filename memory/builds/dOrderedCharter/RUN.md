@@ -9,12 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-179279769317056714048-1910 2cfd51d5
+asks-at-landing: PLAY-dOrderedCharter-38=DEFERRED
+units-at-landing: PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55
+gates-run: unattended-179279903129518517354-1951 32165a70
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 04cbc65b9fff5553a1f993396e4ab8fe5d7c0d90
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -179,3 +181,5 @@ base: ce13efbe3d90cc8fcad100267e18ec2c9d03bdf8
 2026-10-23T22:54:07Z rescope · item defer PLAY-dOrderedCharter-54 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
 
 2026-10-23T22:54:07Z rescope · item defer PLAY-dOrderedCharter-55 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing PLAY-dOrderedCharter-38
+
+2026-10-23T23:54:23Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: the owner capped spec review at two rounds ('no more than 2 rounds of spec reviews', memory/builds/dOrderedCharter/prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-owner-review-cap.md), and this run's diff is spec and record text only, already read by both rounds; the build run's closing diff review over its code meets it
