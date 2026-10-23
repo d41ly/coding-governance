@@ -9,11 +9,11 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
-gates-run: unattended-17927667520211603492-815 9dae11b2
+gates-run: unattended-179276878473773313263-1802 383f0b1e
 parked-surfaced: yes
 keepalive-reaped: yes
-asks-at-landing: TOOL-dGroundRules-12=DEFERRED
-units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-61 TOOL-dGroundRules-64 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-62 TOOL-dGroundRules-63
+asks-at-landing: TOOL-dGroundRules-12=DEFERRED TOOL-dGroundRules-13=DEFERRED TOOL-dGroundRules-100=OPEN TOOL-dGroundRules-101=OPEN TOOL-dGroundRules-102=OPEN TOOL-dGroundRules-103=OPEN TOOL-dGroundRules-104=OPEN TOOL-dGroundRules-105=OPEN TOOL-dGroundRules-106=OPEN TOOL-dGroundRules-107=OPEN
+units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-65 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-61 TOOL-dGroundRules-64 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-62 TOOL-dGroundRules-63
 hold-run: 
 hold-streak: 1 · at 69d0e822
 resume-owed: none · owner
@@ -25,7 +25,7 @@ held-from: VERIFYING
 refreshed-at: f3a36b5760ccf46f7e4c51643a9a122d32007b3c · handoff · 1 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 548976824bdfcd3a90ba7b5af4f4f5ddc8e41526
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -308,3 +308,5 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T14:08:42Z rescope · item add TOOL-dGroundRules-65 · reason the owner's renumbering of TOOL-dGroundRules-13, round-1 audit finding id 1 at BLOCKER (2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1), whose id a landed ask of dSafePassage holds; the add row of TOOL-dGroundRules-13 above stays as history
 
 2026-10-23T14:09:09Z rescope · item defer TOOL-dGroundRules-65 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T15:38:05Z override · item specs-audited · reason the owner capped the spec audit at round 6 (memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-1-owner-audit-cap.md): units TOOL-dGroundRules-44 to -52, which round 6 promoted, and TOOL-dGroundRules-53 to -64, which the closing review promoted, are specced as written and unaudited, all deferred to the build run
