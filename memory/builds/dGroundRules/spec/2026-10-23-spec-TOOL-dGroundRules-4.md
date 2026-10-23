@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0010@cd629be7 whole
 **Carries:** node:policy-key.policy-file.on-invalid
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-4-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-4-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-4-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-4-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-4-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-4-divergence-brief.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-4-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-4-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
@@ -264,10 +265,10 @@ reads with `--rev HEAD` at the case's newest commit, so no case rests on the lan
   `policy.py get budgets.enforce --explain` prints `refuse` with source `last-valid` and a reason
   naming C's line and V's sha8, and `policy.py check` exits 0 naming the fallback.
   Red when: the malformed file reads the catalogue default `warn`.
-- **AC4** — When a case plants one malformed revision and nothing before it, `policy.py get
-  budgets.enforce` and `policy.py check` each exit 2 printing a line that opens `policy: refused ·`
-  and names the malformed line, and `arm_on_invalid` over that repository reports one finding; over
-  the same repository with the file made valid it reports none.
+- **AC4** — When a case plants one malformed revision and nothing before it,
+  `policy.py get budgets.enforce` and `policy.py check` each exit 2 printing a line that opens
+  `policy: refused ·` and names the malformed line, and `arm_on_invalid` over that repository
+  reports one finding; over the same repository with the file made valid it reports none.
   Red when: either verb reads a default or exits 0, or the arm stays silent.
 - **AC5** — When a case plants a valid C that does not set `runtime.agents-in-flight`,
   `policy.py get runtime.agents-in-flight --explain` prints `6` with source `default`.
@@ -281,12 +282,12 @@ reads with `--rev HEAD` at the case's newest commit, so no case rests on the lan
   `policy.py get budgets.enforce` and `policy.py check` each exit 2 naming C's line and `refuse`.
   Red when: the read falls back to V or to the default, the FM2 case.
 - **AC8** — When a case plants V setting `policy-file.on-invalid = "refuse"` and C setting it to
-  `"never"`, every read exits 2; with V setting no value of the key and C the same, `get
-  budgets.enforce` reads V's value with source `last-valid`.
+  `"never"`, every read exits 2; with V setting no value of the key and C the same,
+  `get budgets.enforce` reads V's value with source `last-valid`.
   Red when: C's own value of `policy-file.on-invalid` is consulted, or C is read as valid.
-- **AC9** — When `check_policy.py --fixture --strict-from
-  memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` reaches the
-  `on-invalid-strict` case, it prints its population count and every excluded key with its reason,
+- **AC9** — When
+  `check_policy.py --fixture --strict-from memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md`
+  reaches the `on-invalid-strict` case, it prints its population count and every excluded key with its reason,
   then reads each kept key at the malformed revision and finds strict's value with source
   `last-valid`. Red when: any kept key reads its catalogue default or another value, or the
   population is empty.
@@ -367,6 +368,7 @@ New arm: tools/policy/check_policy.py (`arm_on_invalid` in `ARMS`) · covers AC4
 - rev-2 · 2026-10-23 · §3 · the reciprocal **hands-off** edges to TOOL-dGroundRules-5, TOOL-dGroundRules-9 added, each naming what that unit's own §3 **consumes-from** line takes from this one; hygiene check 12's edge join read them as missing. No scope, design or acceptance moved.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-4 · 2026-10-24 · S8 S9 S11 · §4 · AC11 · §7 · §8 F6 · the builder handed the unit back as a divergence. AC11, S9 and the first `New arm:` line planted `[budgets]` `enforse = "warn"` for a no-catalogue-key reason, but S1 and S2 find each leaf's row with `read_catalogue_row`, which matches `budgets.enforse` to the `budgets.*` row; and S11's pin arithmetic was one short, because `TOOL-dGroundRules-2`'s `Refusal.__str__` arrived unpinned. The run's ruling, the one `TOOL-dGroundRules-2` rev-4 took: the plant is `[runtime]` `agents-in-flite = 3`, which matches no row at `bade102d`, and F6 parks the wildcard near-miss with the `budgets.*` census question. S11 pins `1213` naming both arrivals, and S8 with §4's files adds the arm's row in `tools/policy/README.md` that `TOOL-dGroundRules-16`'s `adopter-fresh-target` case requires.
+- rev-5 · 2026-10-24 · §6 AC4 AC8 AC9 · a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
 
 ## 10. Reuse audit
 
