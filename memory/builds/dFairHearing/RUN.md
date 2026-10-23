@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dFairHearing-19=DEFERRED
+units-at-landing: TOOL-dFairHearing-13 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-9 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-11 TOOL-dFairHearing-8 TOOL-dFairHearing-16 TOOL-dFairHearing-10 TOOL-dFairHearing-22 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-1 TOOL-dFairHearing-21 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 TOOL-dFairHearing-20 TOOL-dFairHearing-23 TOOL-dFairHearing-25 TOOL-dFairHearing-26 TOOL-dFairHearing-27 TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 TOOL-dFairHearing-35 TOOL-dFairHearing-32 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 TOOL-dFairHearing-38 TOOL-dFairHearing-39 TOOL-dFairHearing-40
+gates-run: unattended-17927387951452257113-95 01b0db75
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 872189f39d86d8976a46c82b9fcde990cc3c622a
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -158,3 +161,7 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T05:46:30Z rescope · item defer TOOL-dFairHearing-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
 
 2026-10-23T05:46:32Z rescope · item defer TOOL-dFairHearing-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dFairHearing-19
+
+2026-10-23T07:15:32Z override · item closing-review-recorded · reason the owner stopped spec review: 'Stop reviewing the specs.' then 'let it run to completion, but stop after' (memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-owner-stop-reviews.md); this spec run's whole diff is specs and records, so a closing diff review would be a sixth spec review
+
+2026-10-23T07:15:32Z override · item specs-audited · reason the owner stopped the spec-audit chain after round 5 (memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-owner-stop-reviews.md), so round 5's promotions TOOL-dFairHearing-38 to -40 close with no audit naming them, as M4 provides when a chain ends
