@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-49 — the spec audit of units 43 to 46, the step module's 20 minors: one step-row predicate, TOOL-4 after TOOL-43, a second walk refusal, identity forms held by the arm, declared exits, and the readings that cite them
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-fork-resolution.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-49-hygiene-fix.md) | research | — |
+| [2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-50 |
 
 <!-- /gen:spec-records -->
 
@@ -228,6 +229,7 @@ Their items here add what the second finding found beyond the high's edit.
 - **consumes-from** `TOOL-dSafePassage-45` — S8's tested subsection, S9's redactor, S13's read, AC2, AC12, S11's pin and the PINNED figure, which S10, S14, S15, S17, S18 and S19 amend and read
 - **consumes-from** `TOOL-dSafePassage-47` — the candidate shape and the config-read refusal, beside which S7 adds the `rev-parse --git-dir` refusal
 - **consumes-from** `TOOL-dSafePassage-48` — the send-email rows in both forms and the `sendemail.sendmailCmd` row, which S8's arm holds to a derivation
+- **hands-off** `TOOL-dSafePassage-51` — F1(a)'s sweep ending on AC2's header probe, with no roster handed out while TOOL-dSafePassage-4's order is not above TOOL-dSafePassage-43's and TOOL-dSafePassage-7's, and amending the Rollouts of TOOL-dSafePassage-2, -7 and -43 to `TOOL-dSafePassage-4 builds at order 3`; S7's `rev-parse` run only after a config read that exited 0; no `UNLISTED_EXECUTOR_KEYS` in the module, the expected key a literal in `tools/govkit/selftest.py`; a staged move-3 copy for AC3; fixture code comparing through `test_step_row`; S18's `stat` before any open, with the `gitmodules-fifo` plant; S6's Readers reason; §4's section probe; and §10's lookups, findings 1, 10, 19, 2, 9, 14, 4, 3, 24, 13, 8 and 18 of the spec audit of units 47 to 50
 
 ## 4. Design
 
@@ -445,6 +447,7 @@ between units no `consumes-from` bullet joins.
   LOW findings of the step module, one scope item per raw id.
 - rev-2 · 2026-10-23 · §8 · F1 RESOLVED (agent, delegated) to (a) on rung 3: this build's build run
   applies S4's order move before it hands out the roster.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-51` of the spec audit of units 47 to 50, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-48 — the step contract refuses `sendemail.sendmailCmd` and every send-email executor key in its identity form
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-48-deviation-94.md](../build/2026-10-23-build-TOOL-dSafePassage-48-deviation-94.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-47 TOOL-dSafePassage-50 TOOL-dSafePassage-49 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,7 @@ listing is stated.
 - **consumes-from** `TOOL-dSafePassage-29` — `STEP_REFUSED_KEYS` and its `sendemail.ccCmd`, `toCmd` and `headerCmd` row, which S1 widens and S2 extends; without them there is no table to hold the rows
 - **consumes-from** `TOOL-dSafePassage-45` — S5's absolute-path rule and S6's identity form of `sendemail.smtpServer`, which S1 states as a class, and §7's uncovered sentence, which S4 reads
 - **hands-off** `TOOL-dSafePassage-49` — the class arm widening each kept `sendemail.<key>` to its identity form and keeping `sendemail.sendmailCmd`, so a row S1 or S2 adds cannot be dropped unseen, finding 27 of the spec audit of units 43 to 46
+- **hands-off** `TOOL-dSafePassage-51` — the smtpServer row's pin read as `:1782-1790`, AC3 read through that unit's one section probe, and the `sendemail.sendmailCmd` row the guard's selftest literal holds to, findings 12, 8 and 14 of the spec audit of units 47 to 50
 
 ## 4. Design
 
@@ -163,6 +165,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 43 to 46's id 10
   (HIGH, item D-2).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-51` of the spec audit of units 47 to 50, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 

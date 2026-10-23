@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-50 — the spec audit of units 43 to 46, its five minors on TOOL-46: the lander arm placed after the scan it reads, its locator cited by content, and one owner for the cutoff paragraph
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-50-deviation-96.md](../build/2026-10-23-build-TOOL-dSafePassage-50-deviation-96.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,7 @@ medium to low. D-15's fourth id, 25, cites TOOL-dSafePassage-43, -44 and -45 and
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-46` — S2's arm and its locator, S3's three files and AC3, which S1 places, S2 to S4 cite and S5 gives one owner; without them there is no arm to place
+- **hands-off** `TOOL-dSafePassage-52` — S1 read with the `set -u` abort a misplaced arm causes; the arm placed by content after the 28-32 block's `fi` and before the final line, with exactly one `_mt_rc=` scan; any template repair made in `tools/memory-tree/SPEC-TEMPLATE.template.md` and rendered; S4's `resolve_kit_dir` read as the shared primitive; and the Rollout read as disjoint from each of TOOL-dSafePassage-47 and -48, not all three, findings 7, 11, 16, 15, 17, 6 and 20 of the spec audit of units 47 to 50
 
 ## 4. Design
 
@@ -175,6 +177,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 43 to 46's 1 MEDIUM and 4
   LOW findings on TOOL-dSafePassage-46, one scope item per raw id.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-52` of the spec audit of units 47 to 50, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 

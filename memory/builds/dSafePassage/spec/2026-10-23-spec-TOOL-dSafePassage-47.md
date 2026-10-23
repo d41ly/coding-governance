@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-47 — the submodule walk lists a repository by git's own directory shape, and refuses one whose config git cannot read
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-47-deviation-93.md](../build/2026-10-23-build-TOOL-dSafePassage-47-deviation-93.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-47-48-49-50-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-48 TOOL-dSafePassage-50 TOOL-dSafePassage-49 |
 
 <!-- /gen:spec-records -->
 
@@ -77,6 +78,7 @@ repository by its shape alone. Each candidate's config read runs, and a read tha
 - **consumes-from** `TOOL-dSafePassage-45` — S12's walk, its plants `submodule-ref-named-config` and `submodule-config-malformed`, and AC9, whose repository test this unit replaces; without them there is no walk test to correct
 - **consumes-from** `TOOL-dSafePassage-36` — the `modules/` walk rooted at the target's own git directory, whose classification and descent this unit states
 - **hands-off** `TOOL-dSafePassage-49` — the candidate's `rev-parse --git-dir` exit added to S2's refusal, and the `submodule-format-unknown` plant, finding 26 of the spec audit of units 43 to 46
+- **hands-off** `TOOL-dSafePassage-51` — the walk never following a symlink or junction, a link or an unlistable directory under `modules/` refused naming its path, with the `submodule-modules-link-loop` plant; S2's refusal naming `<c>/config` "or a file it includes"; S2's read placed before `TOOL-dSafePassage-49`'s `rev-parse`; and AC4 read through that unit's one section probe, findings 22, 23, 2, 9 and 8 of the spec audit of units 47 to 50
 
 ## 4. Design
 
@@ -187,6 +189,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 43 to 46's id 9 (HIGH,
   item D-1), from the skeptic's corrected fix.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotion `TOOL-dSafePassage-51` of the spec audit of units 47 to 50, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 
