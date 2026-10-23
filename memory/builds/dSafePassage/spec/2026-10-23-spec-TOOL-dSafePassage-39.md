@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-39-deviation-85.md](../build/2026-10-23-build-TOOL-dSafePassage-39-deviation-85.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md) | research | TOOL-dSafePassage-38 TOOL-dSafePassage-42 |
+| [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-38 TOOL-dSafePassage-42 |
 
 <!-- /gen:spec-records -->
 
@@ -51,8 +52,8 @@ applied with no record and no image the same way.
 
 - When move 1 of the forward walk may set the mark: finding 29, `TOOL-dSafePassage-40`.
 - Whether an `applied` row may carry a `failure`. TOOL-dSafePassage-3's AC7 refuses one and
-  TOOL-dSafePassage-4 §4's table writes one at move 3; this unit keys the carry on the state alone and
-  leaves that disagreement to the units that own it.
+  TOOL-dSafePassage-4 §4's table writes one at move 3; this unit keys the carry on the state alone, and
+  `TOOL-dSafePassage-43` owns the answer.
 - A second record of the mark beside the receipt's row.
 
 ### Edges
@@ -60,6 +61,8 @@ applied with no record and no image the same way.
 - **consumes-from** `TOOL-dSafePassage-33` — the optional `via` mark, its writer rules and the down's verdict that reads it; without them there is no mark to carry
 - **consumes-from** `TOOL-dSafePassage-3` — `set_step_state`, the one writer that replaces a row whole; without it there is no rewrite to carry the mark across
 - **consumes-from** `TOOL-dSafePassage-4` — the reverse walk's move 1 and move 3 and the `rollback` fixture family; without them there is no rewrite before the down and no plant to kill it
+- **consumes-from** `TOOL-dSafePassage-43` — the answer to the second non-goal: an `applied` row may carry a `failure` that opens with an entry of `DOWN_STOP_PREFIXES`, so AC1 and AC3 write rows the writer admits
+- **hands-off** `TOOL-dSafePassage-45` — S2's caller table read as a recorded reading, its `pending` as "none, or `failed` / `rolled-back`", finding 5 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -154,6 +157,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 27 to 35's id 23
   (HIGH, item D-4).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-43`, `TOOL-dSafePassage-45`; the second non-goal names its owner, `TOOL-dSafePassage-43`; no other section moved.
 
 ## 10. Reuse audit
 

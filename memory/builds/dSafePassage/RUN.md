@@ -92,3 +92,13 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T02:05:55Z rescope · item add TOOL-dSafePassage-42 · reason round-2 spec audit 2026-10-23-review-TOOL-dSafePassage-27-28-29-30-31-32-33-34-35-spec-audit-round1.md: the MEDIUM and LOW batch, finding ids 1 10 31 2 9 27 21 24 11 18 12 25 (MEDIUM) and 3 13 19 14 33 4 15 5 6 7 16 17 20 26 32 (LOW)
 
 2026-10-23T02:22:05Z review · item dSafePassage-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 27 · disposition promote
+
+2026-10-23T02:58:00Z rescope · item add TOOL-dSafePassage-43 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: finding id 2 at HIGH (item D-1)
+
+2026-10-23T02:58:00Z rescope · item add TOOL-dSafePassage-44 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: finding id 13 at HIGH (item D-2)
+
+2026-10-23T02:58:01Z rescope · item add TOOL-dSafePassage-45 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: the MEDIUM and LOW batch of the step contract, finding ids 1 7 14 24 9 22 10 19 20 21 3 18 23 (MEDIUM) and 4 26 11 17 5 6 8 12 (LOW)
+
+2026-10-23T02:58:01Z rescope · item add TOOL-dSafePassage-46 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: the MEDIUM and LOW batch of the lander arm, the drift pin and the spec template, finding ids 25 15 (MEDIUM) and 16 (LOW)
+
+2026-10-23T03:06:58Z review · item dSafePassage-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 24 · disposition promote

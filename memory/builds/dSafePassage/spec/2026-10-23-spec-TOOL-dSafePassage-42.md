@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-42 — the spec audit of units 27 to 35: its 27 minors, per-row postconditions, discriminating criteria, one blanked population and the texts that cite them
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-42-deviation-88.md](../build/2026-10-23-build-TOOL-dSafePassage-42-deviation-88.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md) | research | TOOL-dSafePassage-38 TOOL-dSafePassage-39 |
+| [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-38 |
 
 <!-- /gen:spec-records -->
 
@@ -204,10 +205,12 @@ corrected fixes; id 28's corrected fix is the high `TOOL-dSafePassage-37`.
 - **consumes-from** `TOOL-dSafePassage-30` — `read_target_repositories` and `reached_by`, which S8 reorders and S22 spells
 - **consumes-from** `TOOL-dSafePassage-31` — the lock record and its WSL probe, which S10 and S25 read
 - **consumes-from** `TOOL-dSafePassage-32` — the boot reading and its WSL probe, which S10 and S25 read
-- **consumes-from** `TOOL-dSafePassage-34` — `SPEC_AC_ORDER_CUTOFF`, its write set and its S1, which S9, S23 and S26 price and read
+- **consumes-from** `TOOL-dSafePassage-34` — `SPEC_AC_ORDER_CUTOFF`, its write set and its S1, which S9, S23 and S26 price and read, S9's raise landing in that unit's pass as `TOOL-dSafePassage-46` reads it
 - **consumes-from** `TOOL-dSafePassage-35` — AC9, AC12, AC18, S1, S9, S10 and S24, which S11, S14 to S20 and S24 read, and `write_untracked_snapshot`, which S18 calls
 - **consumes-from** `TOOL-dSafePassage-37` — the predicate's `hook` suffix and §7 list, beside which S7 adds three names
 - **consumes-from** `TOOL-dSafePassage-41` — the `ac-order` join, whose date read S26 observes
+- **hands-off** `TOOL-dSafePassage-45` — S7's `sendemail.smtpServer` row read with git-send-email's absoluteness test and its identity form, S10 and AC7 read with an `ast` probe of the one writer and the fixture kept valid, S22 read with its exits and nested map, and AC3, AC14 and AC15 read as regression guards, findings 9, 22, 3, 11, 17, 23, 4 and 26 of the spec audit of units 36 to 42
+- **hands-off** `TOOL-dSafePassage-46` — S9's pin raise read as landing in TOOL-dSafePassage-34's pass, and S12's arm loading `check-arms.py` from the memory-tree kit found beside the lander, with a skip where it is absent, findings 25 and 15 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -390,6 +393,7 @@ New arm: tools/push-main.test.sh · covers AC1 AC9 · the compare-and-swap row u
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 27 to 35's 12 MEDIUM and 15
   LOW findings, one scope item per raw id.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`, `TOOL-dSafePassage-46`; the existing `TOOL-dSafePassage-34` bullet names the move; no other section moved.
 
 ## 10. Reuse audit
 

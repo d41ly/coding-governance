@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-36 — the config check walks the target worktree's own git directory for submodules, so a linked worktree's submodules are graded
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-36-deviation-82.md](../build/2026-10-23-build-TOOL-dSafePassage-36-deviation-82.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-37 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-38 TOOL-dSafePassage-42 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +65,7 @@ unit is id 8's promotion: the walk's root is the target's own git directory.
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-30` — `read_target_repositories`, its `modules/` walk and the submodule isolation plants; without them there is no walk whose root to correct
+- **hands-off** `TOOL-dSafePassage-45` — the `modules/` walk listing a directory as a repository by `git --git-dir=<d> rev-parse --git-dir`, never by a `config` file, and refusing a failed read by name, finding 18 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -154,6 +156,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 27 to 35's id 8
   (HIGH, item D-1).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`; no other section moved.
 
 ## 10. Reuse audit
 

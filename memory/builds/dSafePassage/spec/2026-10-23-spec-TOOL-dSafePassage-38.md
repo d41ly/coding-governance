@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-38 — a credential anywhere in a step target's config is refused by one predicate over keys and values, and no refusal line prints it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-38-deviation-84.md](../build/2026-10-23-build-TOOL-dSafePassage-38-deviation-84.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-42-hygiene-fix.md) | research | TOOL-dSafePassage-39 TOOL-dSafePassage-42 |
+| [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +64,8 @@ over keys and values, and every refusal line passes keys and paths through one r
 
 - **consumes-from** `TOOL-dSafePassage-35` — S8's credential rows and the `local-url-userinfo` plant, which this predicate supersedes and keeps green; without them there is no credential refusal to state as a class
 - **consumes-from** `TOOL-dSafePassage-24` — `check_target_local_config` and its refusal line naming each key and its file; without it there is no line to redact
+- **hands-off** `TOOL-dSafePassage-44` — the exemption of an ssh-scheme URL's bare user from `test_credential_bearing`, and §5 and §7 read with the ssh-scheme bare user kept, the repair of finding 13 of the spec audit of units 36 to 42
+- **hands-off** `TOOL-dSafePassage-45` — the scheme-optional proxy test, the whole subsection as the tested key text, the greedy redactor, `STEP_CREDENTIAL_KEYS` held to a derivation, the refused table holding no credential row, and §10 read with `derive_redacted`, findings 10, 19, 20, 21, 6 and 12 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -183,6 +186,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 27 to 35's id 30
   (HIGH, item D-3).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-44`, `TOOL-dSafePassage-45`; no other section moved.
 
 ## 10. Reuse audit
 

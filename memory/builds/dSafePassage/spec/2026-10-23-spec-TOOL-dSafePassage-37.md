@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-37 — the refused-key predicate keeps every key named as a hook, and the step environment closes the `ext::` transport by one command-scope pair
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-37-deviation-83.md](../build/2026-10-23-build-TOOL-dSafePassage-37-deviation-83.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-36 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-38 TOOL-dSafePassage-42 |
 
 <!-- /gen:spec-records -->
 
@@ -74,6 +75,7 @@ environment rather than by value rules on the keys that can reach it.
 - **consumes-from** `TOOL-dSafePassage-29` — `STEP_REFUSED_KEYS`, `STEP_UNREFUSED_KEYS`, the predicate and its class arm; without them there is no class to widen
 - **consumes-from** `TOOL-dSafePassage-7` — `build_step_env` and its command-scope pairs; without it there is no step environment to carry the transport refusal
 - **hands-off** `TOOL-dSafePassage-42` — the predicate's three further last-segment names and their rows, finding 9, which that batch adds to this unit's predicate
+- **hands-off** `TOOL-dSafePassage-45` — S3 and AC2 read with `GIT_CONFIG_COUNT` equal to the pairs present, `protocol.ext.allow` found at index 2 and TOOL-dSafePassage-26 S13's pairs after it, this unit's pass editing TOOL-dSafePassage-7's isolation arm and naming the pair in the help page; and AC1 read with `gc.recentobjectshook` as git prints it; findings 1, 7, 14, 24 and 8 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -190,6 +192,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 27 to 35's id 28
   (HIGH, item D-2), from the skeptic's corrected fix.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`; no other section moved.
 
 ## 10. Reuse audit
 

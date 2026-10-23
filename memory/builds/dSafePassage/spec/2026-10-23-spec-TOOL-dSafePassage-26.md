@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -373,6 +373,7 @@ here. Items whose fix the report records as REJECTED are built from the skeptic'
 - **hands-off** `TOOL-dSafePassage-34` — the ac-order join armed by a dated key over a measured population, the repair of finding 29 of the round-1 audit of units 15 to 26
 - **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which reads this unit's criteria and items against their sources and adds the boot rows of the namespace verdict
 - **hands-off** `TOOL-dSafePassage-41` — S45's `ac-order` join, AC43 and the `tools/check-spec-tokens.test.sh` arm covering it, which that unit builds in one pass with its key: this unit's pass adds no join, the repair of finding 22 of the spec audit of units 27 to 35
+- **hands-off** `TOOL-dSafePassage-45` — S13 read as "3 plus those pairs", and S33's lock record read with `started_boot` and `pid_ns` as TOOL-dSafePassage-42 S10 spells it, so this unit's pass keeps the key TOOL-dSafePassage-32 adds, findings 14 and 3 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -722,6 +723,7 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
   findings, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-31`, `TOOL-dSafePassage-34`, `TOOL-dSafePassage-35`; no other section moved.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-41`; no other section moved.
+- rev-4 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`; no other section moved.
 
 ## 10. Reuse audit
 

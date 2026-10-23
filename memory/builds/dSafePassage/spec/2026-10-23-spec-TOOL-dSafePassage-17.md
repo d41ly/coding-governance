@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-17 — a down is judged by its row's declared `reverted` rule, and a down with no before-image by its exit
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -74,6 +74,7 @@ rule for the downs TOOL-dSafePassage-1's helper runs.
 - **hands-off** `TOOL-dSafePassage-5` — the rollback of the release-0 tree past the floor step and the two legacy-home steps, back to release-0's digest
 - **hands-off** `TOOL-dSafePassage-33` — the no-image rule scoped to rows the forward walk applied by witness alone or recorded nowhere, the repair of finding 40 of the round-1 audit of units 15 to 26
 - **hands-off** `TOOL-dSafePassage-35` — the minors batch of the round-1 audit of units 15 to 26, which runs both legacy-home downs with no image and reads the floor-row block
+- **consumes-from** `TOOL-dSafePassage-43` — the writer rule admitting S2's `reverted check exits <rc>` on an `applied` row, its opening one entry of `DOWN_STOP_PREFIXES`; without it the not-reverted record is refused
 
 ## 4. Design
 
@@ -209,6 +210,7 @@ none
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit's id 51 (BLOCKER, item
   D-2).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-33`, `TOOL-dSafePassage-35`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-43`; no other section moved.
 
 ## 10. Reuse audit
 

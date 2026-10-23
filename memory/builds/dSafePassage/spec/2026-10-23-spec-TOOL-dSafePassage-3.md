@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0020@42c7d579 whole
 
@@ -94,6 +94,7 @@ receipt's schema is inventoried by value.
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 - **hands-off** `TOOL-dSafePassage-33` — the optional mark on an applied step row saying the forward walk applied it by witness alone, accepted and refused at the one writer and reader, the repair of finding 40 of the round-1 audit of units 15 to 26
 - **hands-off** `TOOL-dSafePassage-39` — `set_step_state` carrying `via` across a rewrite that keeps a row `applied`, the repair of finding 23 of the spec audit of units 27 to 35
+- **hands-off** `TOOL-dSafePassage-43` — the writer admitting a `failure` on an `applied` row only when it opens with an entry of `DOWN_STOP_PREFIXES`, so AC7 is read with that refusal narrowed, the repair of finding 2 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -343,6 +344,7 @@ persists the receipt after `set_step_state`, which is the walk's.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-16`, `TOOL-dSafePassage-20`, `TOOL-dSafePassage-26`; no other section moved.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-33`; no other section moved.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-39`; no other section moved.
+- rev-5 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-43`; no other section moved.
 
 ## 10. Reuse audit
 

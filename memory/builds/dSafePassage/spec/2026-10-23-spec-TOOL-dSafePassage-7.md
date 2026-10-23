@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0024@7817c7d0 whole
 
@@ -117,6 +117,7 @@ there and is marked attended. It closes no packet gap of its own; it is the exec
 - **hands-off** `TOOL-dSafePassage-24` — refusing a step whose target declares an executor or a credential in its own git config, the repair of finding 53
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 - **hands-off** `TOOL-dSafePassage-37` — a third command-scope pair, `protocol.ext.allow` = `never`, so `GIT_CONFIG_COUNT` reads 3, the repair of finding 28 of the spec audit of units 27 to 35
+- **hands-off** `TOOL-dSafePassage-45` — AC1 and its §4 table read with `GIT_CONFIG_COUNT` derived as the pairs present, the pass that adds a pair editing the isolation arm, findings 1, 7, 14 and 24 of the spec audit of units 36 to 42
 
 ## 4. Design
 
@@ -342,6 +343,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · the s
   consumes-from already declared, so the reciprocity join of hygiene check 12 holds; no other
   section moved.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-37`; no other section moved.
+- rev-5 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`; no other section moved.
 
 ## 10. Reuse audit
 
