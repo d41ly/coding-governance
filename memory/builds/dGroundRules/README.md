@@ -172,7 +172,7 @@ ids TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundR
 | [TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-52.md) | 16 | 2 | OPEN | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 48 bound to this build, across 4 record folder(s).
+Records: 49 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
