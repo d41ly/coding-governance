@@ -21,7 +21,7 @@ hold-reason: The spec audit's promotion chain does not shrink: six rounds promot
 hold-until: owner
 hold-code: owner-decision
 held-from: REVIEWING
-refreshed-at: 3708a705e834709f340a2d160f9acdf9c18b699f · handoff · 0 touching
+refreshed-at: f3a36b5760ccf46f7e4c51643a9a122d32007b3c · park · 1 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: d4eff943776e7ec212ebb4db93f6dd16da5e0321
 phase: VERIFYING
@@ -295,3 +295,5 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T06:22:43Z rescope · item defer TOOL-dGroundRules-62 · reason specced; built by this build's build run (README rule 1)
 
 2026-10-23T06:22:44Z rescope · item defer TOOL-dGroundRules-63 · reason specced; built by this build's build run (README rule 1)
+
+2026-10-23T06:52:52Z decision · item Id collision on TOOL-dGroundRules-13: dSafePassage's landing (f3a36b576) filed an ask in this build's BACKLOG.md as TOOL-dGroundRules-13 at 02:16, and this run promoted its round-1 unit (the mirror's bytes name no commit) as TOOL-dGroundRules-13 at 02:46, unlanded; the backlog fold reds V9 on the pair · reason Options: (1) renumber this run's unit 13 to the next free id across this build's specs, records, review bindings and a new rescope add row, the old add row left as history; (2) re-mint dSafePassage's landed ask under a new id in this build's BACKLOG.md and leave dSafePassage's records citing the old one to its next run; (3) give the ask the unit marker so one id names both. Refused because every option renumbers a landed id or rewrites append-only history across two builds, which no resolver the mandate delegates may decide
