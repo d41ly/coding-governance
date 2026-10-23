@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-15 — the review's bug-class checklist, selected by the pinned range and handed by the harness itself
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0082@8ac81dad whole
 
@@ -89,6 +89,7 @@ NT-25). The cut of fully gated classes stays dLinkedLibrary's, once it derives e
 - **consumes-from** `TOOL-dFairHearing-1` — the bundle-and-clone procedure each blind replay reuses
 - **hands-off** external — dLinkedLibrary's derived gate status, which replaces S6's leg-name reading of "ungated" and cuts fully gated classes
 - **hands-off** `TOOL-dFairHearing-23` — finding ids 2, 9, 13, 23, 33, 36, 41, 48 and 49 of the round-1 spec audit: the manifest's terms for `dispatched 4` and `paired 4 of 4` (its S4, AC2), S2's kit.toml claim and AC6's kit.toml half superseded (its S38, AC29), the replay recipe (its S17, S18, AC10), the ungated arm read through one shared predicate (its S21, AC12), the kickoff manifest re-stamp (its S28, AC19), the three docs still naming the by-hand lookup (its S45, AC36), the tail-truncation refusal (its S36, AC27) and the checklist agent under `probeOpts` (its S37, AC28)
+- **hands-off** `TOOL-dFairHearing-25` — finding id 1 (item H1) of the spec audit of units 20 to 23: the with-and-without replay and its decision, run on unit 23's corrected contract (its S4 to S6); this unit's AC8 and AC9 are superseded by its AC4, AC6 and AC7
 
 ## 4. Design
 
@@ -300,6 +301,7 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-25, which runs this unit's replay after unit 23's corrections and supersedes AC8 and AC9.
 
 ## 10. Reuse audit
 

@@ -16,7 +16,7 @@ Fix every hit below so `python tools/check-spec-tokens.py` reports none in these
 `TOOL-dFairHearing-23` is 51082 bytes against the 49152 spec ceiling (`tools/template-size-limits.txt`).
 
 - **First, bring it under by moving nothing out of scope.** Tighten prose and drop repetition, keeping every finding id, criterion and seen-red case.
-- **Only if that cannot reach the ceiling, split it in two.** Build method M4 admits a second batch unit ONLY when the minors split into two disjoint write sets. The new unit is `TOOL-dFairHearing-24`, at `memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-24.md`, in the same shape. Name in your report exactly which finding ids and which product paths each half holds, so the main loop records the `rescope add`.
+- **Only if that cannot reach the ceiling, split it in two.** Build method M4 admits a second batch unit ONLY when the minors split into two disjoint write sets. The new unit is a second batch unit under the next free id, at `memory/builds/dFairHearing/spec/2026-10-23-spec-a second batch unit under the next free id.md`, in the same shape. Name in your report exactly which finding ids and which product paths each half holds, so the main loop records the `rescope add`.
 
 ## 3. One departure record per added unit
 

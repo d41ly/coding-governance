@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-22 — agent-cap fails closed on a spec-audit call when the opt-in pack is not beside it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-22-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-22-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-21 TOOL-dFairHearing-20 TOOL-dFairHearing-23 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,7 @@ the spec-audit opt-in fails open.
 ### Edges
 
 - **consumes-from** `TOOL-dFairHearing-16` — rule 0's removal from the hook, `extractWorkflowArgs` exported, and the pack file `tools/workflows/spec-audit-optin.js` whose presence S1 tests; without them there is no moved rule to guard
+- **hands-off** `TOOL-dFairHearing-27` — finding ids 17, 18, 33 and 34 of the spec audit of units 20 to 23: the pack coupled to agent-cap's marker (its S12, AC7), the remedy by receipt state, superseding S2's fixed remedy and AC1's string (its S13, AC8), the pack resolved through the receipt first (its S20, AC15), and the self-test guard covering the pack (its S21, AC16)
 
 ## 4. Design
 
@@ -168,6 +170,7 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC2 AC3 · a copy of the ho
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 40 (item H3) of the round-1 spec audit.
+- rev-2 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-27, naming the four findings it closes on this spec and what it supersedes.
 
 ## 10. Reuse audit
 

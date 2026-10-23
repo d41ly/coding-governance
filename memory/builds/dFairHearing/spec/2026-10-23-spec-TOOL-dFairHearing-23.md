@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-23 — the round-1 spec audit's 49 minors: one contract per shared name, criteria a correct build can pass, and the fixtures and records the moved code needs
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -15,6 +15,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-23-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-23-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-23-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-23-3-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-23-readers-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-23-readers-fix-brief.md) | research | — |
+| [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-22 TOOL-dFairHearing-21 TOOL-dFairHearing-20 |
 
 <!-- /gen:spec-records -->
 
@@ -218,6 +219,9 @@ merges ids, each id is its own item and the later ones point at the first one's 
 - **consumes-from** `TOOL-dFairHearing-16` — the moved rules and suites, the new leg, the version move
 - **consumes-from** `TOOL-dFairHearing-17` — the parity arm, the leg-manifest edit
 - **consumes-from** `TOOL-dFairHearing-18` — the preset, `walk`, the design grade
+- **hands-off** `TOOL-dFairHearing-25` — finding id 1 (H1) of the audit of units 20 to 23: the replays of units 1 and 15 run on this unit's corrected contract
+- **hands-off** `TOOL-dFairHearing-26` — finding id 10 (H2): AC9's label half superseded by its census of every rule 0 and rule 5 label
+- **hands-off** `TOOL-dFairHearing-27` — the same audit's 22 minors on this spec: its S1 to S6, S9 to S11, S14 to S18, S22 to S24 and S27 to S31, each naming what it supersedes
 
 ## 4. Design
 
@@ -600,6 +604,7 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC12 · a class g
 
 - rev-1 · 2026-10-23 · initial draft, promoting the round-1 spec audit's 37 MEDIUM and 12 LOW findings
   as one batch.
+- rev-2 · 2026-10-23 · §3 · the audit of units 20 to 23 disposed: hands-off edges to TOOL-dFairHearing-25, -26 and -27.
 
 ## 10. Reuse audit
 

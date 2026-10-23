@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-4 — skeptic batches sorted by cited address
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0071@8d3a19dc whole
 
@@ -11,6 +11,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-prompt-TOOL-dFairHearing-4-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-1-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-4-edge-fix-brief.md) | research | TOOL-dFairHearing-18 TOOL-dFairHearing-27 TOOL-dFairHearing-25 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
@@ -71,6 +73,9 @@ argument, so `TOOL-dFairHearing-1`'s replay can run it against today's batches.
   `checkSameAddress` over `deriveAddressKey`, the one key, and it defines no address reading of its own
 - **hands-off** `TOOL-dFairHearing-1` — the replay runs the address-ordered verify stage through this
   unit's default-off argument and owns the verdict that would flip its default
+- **hands-off** `TOOL-dFairHearing-12` — `deriveAddressKey`'s spec-kind reading (the first `[tag]`,
+  else the leftmost section token), which its `extract_tag_ref` agrees with on the tag and the `§<n>`
+  forms rather than spelling a second address reading
 - **hands-off** `TOOL-dFairHearing-18` — the whole-design preset's address reading calls this unit's
   key rather than spelling a second one
 - **hands-off** `TOOL-dFairHearing-23` — finding id 52 of the round-1 spec audit: the address key folding a repo-absolute path and a drive letter's case (its S48, AC39)
@@ -330,6 +335,10 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 4, the brief's S4, S5 and S9, the
   review system record's batches by address, and the verify stage read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-10-23 · §3 · the hygiene check's edge parity (check 12): `TOOL-dFairHearing-12`'s §3
+  consumes `deriveAddressKey`'s spec-kind reading from this unit, and this spec declared no hands-off
+  back. Fixed here, by a hands-off edge to `TOOL-dFairHearing-12`: S1 already produces the key, and
+  §3's non-goals already name that unit's reader as written to agree with it.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-1 — the owed replays: the design-audit preset run blind at blob 767187aa, and the verdicts that flip the dark switches
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0068@d09495d0 whole
 
@@ -103,6 +103,7 @@ the replay's raw outputs.
 - **hands-off** `TOOL-dFairHearing-15` — the bundle-and-clone procedure of §4, which its replays reuse
 - **hands-off** `TOOL-dFairHearing-18` — the known-set row shape and `parse_known_set`, which its seeded key reuses
 - **hands-off** `TOOL-dFairHearing-23` — finding ids 2, 12, 13, 25 and 41 of the round-1 spec audit: the review-replay manifest's terms in place of AC5's parsed half (its S4, AC2), a bundle-and-fetch recipe in place of §4 The isolation's clone (its S17, S18, AC10), the replay's opt-in placement (its S22, AC13) and replay 1's flip in review.pin, never a template default (its S40, AC31)
+- **hands-off** `TOOL-dFairHearing-25` — finding id 1 (item H1) of the spec audit of units 20 to 23: replay 1's two design-audit runs, scored and verdicted on unit 23's corrected contract (its S1 to S6); this unit's AC4, AC5 and AC9's replay-1 half are superseded by its AC1 to AC5 and AC7
 
 ## 4. Design
 
@@ -317,6 +318,7 @@ The record writes under `memory/builds/` owe the two recall-floor legs by the gu
   the `amends cl-dClosedLoop-0068@b4e6c04e` row of this spec's own deviation record,
   `2026-10-23-build-TOOL-dFairHearing-1-deviation-11`; nothing else changed.
 - rev-3 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-4 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-25, which runs replay 1 after unit 23's corrections and supersedes AC4, AC5 and AC9's replay-1 half.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-21 — the held-out freeze check hashes the bytes it scores and refuses a shallow history
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 15 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-21-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-21-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-22 TOOL-dFairHearing-20 TOOL-dFairHearing-23 |
 
 <!-- /gen:spec-records -->
 
@@ -51,6 +52,7 @@ still prints `frozen at <sha>`.
 ### Edges
 
 - **consumes-from** `TOOL-dFairHearing-14` — `check_held_out_frozen`, its `heldOut` manifest key and its `frozen at <sha>` first line, which S1 and S2 tighten; without them there is no freeze check to tighten
+- **hands-off** `TOOL-dFairHearing-27` — finding ids 14, 16, 30 and 35 of the spec audit of units 20 to 23: the held-out path normalised before any `<rev>:<path>` read and a failed git call refused by name, superseding S2's verbatim path (its S7, S8, AC5); `ARMS_DECLARED` raised by this unit's arms, superseding the floor "none" (its S19, AC14); the clone-path reason marked UNVERIFIED (its S28, AC23)
 
 ## 4. Design
 
@@ -152,6 +154,7 @@ New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay sel
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 39 (item H2) of the round-1 spec audit.
+- rev-2 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-27, naming the four findings it closes on this spec and what it supersedes.
 
 ## 10. Reuse audit
 

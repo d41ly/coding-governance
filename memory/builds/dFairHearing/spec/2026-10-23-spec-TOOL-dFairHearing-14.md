@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-14 — the experiment shape's method, enforced or recorded by the scorer factory
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0081@3ad56b8f whole
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
+| [2026-10-23-prompt-TOOL-dFairHearing-14-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-14-1-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-14-edge-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-14-edge-fix-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
 <!-- /gen:spec-records -->
@@ -76,7 +78,6 @@ outputs, and the factory refuses one that breaks a rule it can check.
 - **consumes-from** `TOOL-dFairHearing-12` — `replay_scorer.py`, `read_raw_output`, `derive_paired_cases` and `INSTANCES`; without the factory there is no module to hold the rules
 - **hands-off** `TOOL-dFairHearing-1` — its replays declare a manifest and score through `check_experiment`
 - **hands-off** `TOOL-dFairHearing-15` — its with-and-without replay declares its two arms in a manifest, one variable apart
-- **hands-off** `TOOL-dFairHearing-18` — the whole-design walk's recall runs declare their manifest the same way
 - **hands-off** `TOOL-dFairHearing-21` — finding id 39 (item H2) of the round-1 spec audit: the freeze check hashes the working-tree bytes against the freeze's blob and refuses a shallow history, which S3 does not
 - **hands-off** `TOOL-dFairHearing-23` — finding id 2 of the round-1 spec audit: the review-replay manifest defined whole, its case, `dispatched`, `parsed` and `matched` (its S4, AC2)
 
@@ -246,6 +247,7 @@ New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay sel
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-21 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-10-23 · §3 · the hands-off edge to TOOL-dFairHearing-18 removed: spec 18's grade reads no experiment manifest (it takes `--key`, `--seed` and one review record per run, and TOOL-dFairHearing-23's S43 routes it through `measure_recall`), so spec 18 consumes nothing of this unit and declares no consumes-from back.
 
 ## 10. Reuse audit
 

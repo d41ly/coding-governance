@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-20 — a gapped whole-design walk reds the harness's returned counts, not only its prose
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 19 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dFairHearing-20-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md) | research | TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-21 TOOL-dFairHearing-22 TOOL-dFairHearing-23 |
+| [2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-20-23-spec-audit.md) | spec-audit | TOOL-dFairHearing-22 TOOL-dFairHearing-21 TOOL-dFairHearing-23 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,7 @@ non-empty `walkGaps`.
 
 - **consumes-from** `TOOL-dFairHearing-18` — `deriveWalkGaps`, `walkGaps` on the return and the synthesis prompt's BLOCKED sentence, which S1 gates on one condition; without them there is no gap to red on
 - **consumes-from** `TOOL-dFairHearing-17` — `roundCount`, `roundState` and `renderRoundLine`, which S2 and S3 null on a gapped walk; without them the round fields this unit nulls do not exist
+- **hands-off** `TOOL-dFairHearing-27` — finding ids 7 and 8 of the spec audit of units 20 to 23: AC2's absence half read as the walk-gap line (its S25, AC20) and S4's args-header half observed (its S26, AC21)
 
 ## 4. Design
 
@@ -185,6 +187,7 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 · a whole-d
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 37 (item H1) of the round-1 spec audit.
+- rev-2 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-27, naming the two findings it closes on this spec and the criterion it supersedes.
 
 ## 10. Reuse audit
 

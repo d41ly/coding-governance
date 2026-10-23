@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-16 — agent-cap's review rules moved to the review kit, each seen red at its new home before the hook stops carrying it
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dFairHearing-19
 
 **Carries:** cl-dClosedLoop-0083@bd47ee4e whole
 
@@ -93,6 +93,7 @@ commit.
 - **hands-off** external — dGroundRules retires rules 1 and 3 and the slot ledger; dBoundRoles retires agent-cap and moves the helpers this unit exports
 - **hands-off** `TOOL-dFairHearing-22` — finding id 40 (item H3) of the round-1 spec audit: the hook denies a spec-audit call while `spec-audit-optin.js` is not beside it, so a partial `govkit update` cannot fail open as §4 Rollout prices it
 - **hands-off** `TOOL-dFairHearing-23` — finding ids 6, 10, 20, 29, 30, 31 and 33 of the round-1 spec audit: the version half of S7 and AC11 superseded by the lander's mint (its S12, S13, AC6), AC8's grep half replaced by counting the moved arms (its S16, AC9), `MAX_LENSES`'s home taken by `LENS_SLOTS` (its S42, AC33), the new leg's registry, budget and foreign-prefix rows (its S26, AC17), the fixtures copying `check-verifier-fanout.js` (its S27, AC18) and the kickoff manifest re-stamp after the gate-legs.json edit (its S28, AC19)
+- **hands-off** `TOOL-dFairHearing-26` — finding id 10 (item H2) of the spec audit of units 20 to 23: every rule 0 and rule 5 arm counted by label at its new suite and gone from the hook's, any arm left behind moved (its S1 to S3, AC1 to AC3)
 
 ## 4. Design
 
@@ -313,6 +314,7 @@ New arm: tools/check-wiring.test.sh · covers AC9 · a settings file with the pa
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the round-1 spec audit's disposal: hands-off edges to TOOL-dFairHearing-22 and TOOL-dFairHearing-23, naming each finding the promoted unit closes on this spec and the criterion of its own it supersedes, if any.
+- rev-3 · 2026-10-23 · §3 · the disposal of the spec audit of units 20 to 23: a hands-off edge to TOOL-dFairHearing-26, the census of the moved rule 0 and rule 5 arms.
 
 ## 10. Reuse audit
 
