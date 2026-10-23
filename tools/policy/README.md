@@ -9,7 +9,8 @@ The kit lands dark: one reader reads `.governance/policy.toml`, `policy.py get` 
 in one resolution order (TOOL-dGroundRules-3), and an invalid file never reads defaults
 (TOOL-dGroundRules-4); no consumer calls the reader yet. The JSON mirror the hooks read,
 `.governance/policy.json`, is rendered at every landing and read by one helper (TOOL-dGroundRules-5);
-no hook reads it yet. The guard is a later unit of dGroundRules, and later units re-point consumers.
+no hook reads it yet. The minimal guard, `guard.py`, refuses an agent's commit to the policy file and
+its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-point consumers.
 
 ## Files
 
@@ -20,6 +21,8 @@ no hook reads it yet. The guard is a later unit of dGroundRules, and later units
 | `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, and the `lists`, `scaffold`, `get`, `check` and `mirror` verbs |
 | `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
+| `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
+| `guarded-paths.txt` | the one spelling of the guarded set, read at HEAD by `guard.py` and the pre-commit hook |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 
@@ -203,6 +206,37 @@ reason opens `mirror absent at <L8>` or `mirror stale at <L8>`. The working-tree
 opened. The shim carries the remote ladder and the python resolver inline, byte-identical to their
 canonicals. Python and shell consumers call the reader, never the mirror.
 
+## The guard
+
+The stand-in, until dDeclaredLoop's guard lands, for the defaults of `policy-file.guard` and
+`policy-file.proof`, owner-only and the TTY proof, enforced without reading either key: `guard.py`
+imports no reader. gov's `.githooks/pre-commit` carries its block, above the legs. When a path
+`guarded-paths.txt` lists at HEAD is staged, the block admits on the owner's terminal proof,
+`[ -t 2 ]`, since git leaves a hook's stderr as the committer's; otherwise it runs
+`guard.py --staged`, and any exit but 0 refuses, as does a tree whose tracked python resolver yields
+no launcher. A commit staging no listed path spawns no Python.
+
+`guard.py --staged`, from the top level: the list at HEAD (none, or no HEAD: exit 0); the touched
+set, `git diff --cached --no-renames` against it (empty: exit 0); while `MERGE_HEAD` resolves, a path
+whose staged blob is its blob at HEAD or at `MERGE_HEAD` leaves the set, since a merge taking a side
+writes nothing new. What remains must be exactly `.governance/policy.toml`, modified, where:
+
+- both sides parse as TOML, and exactly one leaf differs, present on both sides;
+- that leaf is under `budgets`, neither `budgets.enforce` nor `budgets.pinned`, and its last segment
+  is a file tracked at HEAD, so a class row such as `docs/*/` is no measured-file cap;
+- both values are integers, booleans excluded, and the new one is larger;
+- the text change is one old line replaced by comment lines and then one other line, one comment
+  carrying `RAISED <old> -> <new>`;
+- `memory/DECISIONS.md` is staged with at least one `- ` row added and no line removed.
+
+Exit 0 prints `policy-guard: admitted · budgets.<cap> <old> -> <new> · its change record attached`.
+Exit 1 prints every failed condition as `policy-guard: refused · <path> · <why>`, then one remedy
+line, which names `git restore --staged --worktree` for the mirror, since the landing renders it with
+no hook firing. Exit 2 is a git read that failed. It stops forgetting, not evasion: `--no-verify`, a
+pty wrapper, a list line removed one commit before the change, another clone, a cherry-pick or rebase,
+and a guard file deleted from the working tree all pass it, and the push-time bar does not re-judge
+authorship. The block is gov's own; the runbook's copy instructions do not carry it.
+
 ## The arms
 
 | Arm | Reads | Finds |
@@ -267,6 +301,18 @@ lands no mirror, refused under `refuse` and read as the reader reads it under `l
 other outcome case must leave `arm_mirror_landed` green. `mirror-landed-parity` runs the shim's
 `landed` beside `derive_landed_revision` with two remotes and `GOV_REMOTE`, two without, one, and
 none: the same sha, or both refusing, in each.
+
+The thirteen `guard-*` cases copy `guard.py` and `guarded-paths.txt` into the kit copy and commit a
+policy file whose `[budgets]` table caps a tracked `big.md` at 100, a tracked `small.md` at 50 and the
+class row `docs/*/` at 10, then stage one plant each from `GUARD_PLANTS` and judge `guard.py --staged`
+by its exit code and reasons. `guard-admits-raise`, `big.md` to 120 with its `RAISED` comment and one
+decision row, must exit 0. Exit 1, naming the reason: `guard-lowered`, `guard-two-raised`,
+`guard-class-row`, `guard-beside-change` (`budgets.enforce` set beside the raise),
+`guard-beside-path` (a line added to `.governance/deploy.toml` beside it), `guard-no-record`,
+`guard-no-argument`, `guard-no-row` (each naming only what is missing), `guard-other-paths` (the
+mirror, the instruction manifest and `.governance/deploy.toml`, each alone), `guard-new-row` and
+`guard-removed-row`. `guard-merge-side` concludes a conflicted merge with the branch's policy file,
+exit 0, then with a third text, exit 1. The hook block's arms are in gov's pre-commit suite.
 
 ## Each arm in an adopter
 

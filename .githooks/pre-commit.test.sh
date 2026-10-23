@@ -189,5 +189,39 @@ n_runs=$(printf '%s
 [ "$n_runs" = 1 ] && r=0 || r=1
 ck "AC2 an unrelated staged file does not run the adopter (one run, not $n_runs)" "$r" 0
 
+# ---- the policy guard, TOOL-dGroundRules-6 AC9 ----------------------------------------------------
+# A stand-in guard at the root install says it ran and exits as written; its list, committed, names
+# one path. Every commit below captures stderr, so none sits at a terminal and the owner's proof never
+# admits. Staging the listed path is refused when the guard exits 1, when it exits 2, and when the
+# index tracks no python resolver, so no launcher can judge it; staging none runs nothing and prints
+# no policy guard line. The REAL guard's verdicts are the policy kit's `guard-*` fixture cases.
+pk=policy; pl=.governance/policy.toml; d="$tmp/policy-guard"; rm -rf "$d"; mkdir -p "$d"
+cd "$d" || exit 2
+git init -q --template= -b main
+mkdir hk; cp "$HOOK" hk/pre-commit; chmod +x hk/pre-commit; git config core.hooksPath hk
+mkdir -p "$pk" vendor .governance; cp "$repo_src/$resolver" vendor/
+printf '# the guarded set\n%s\n' "$pl" > "$pk/guarded-paths.txt"
+printf 'print("GUARD RAN")\nraise SystemExit(1)\n' > "$pk/guard.py"
+echo base > "$pl"; git add -A; git commit -q --no-verify -m fixture
+for ex in 1 2; do
+  printf 'print("GUARD RAN")\nraise SystemExit(%s)\n' "$ex" > "$pk/guard.py"
+  echo "$ex" > "$pl"; git add "$pl"
+  out=$(git commit -q -m "g$ex" 2>&1); rc=$?
+  case "$out" in *"GUARD RAN"*) r=$rc ;; *) r=0 ;; esac
+  ck "AC9 a listed path staged and the guard exiting $ex: refused" "$r" 1
+done
+printf 'print("GUARD RAN")\n' > "$pk/guard.py"
+git rm -q --cached "vendor/${resolver##*/}"; echo 3 > "$pl"; git add "$pl"
+out=$(git commit -q -m g3 2>&1); rc=$?
+case "$out" in *"GUARD RAN"*) r=0 ;; *"no python launcher to judge them"*) r=$rc ;; *) r=0 ;; esac
+ck "AC9 a listed path staged and no launcher: refused, not skipped" "$r" 1
+git reset -q
+printf 'print("GUARD RAN")\nraise SystemExit(1)\n' > "$pk/guard.py"
+echo x > other.txt; git add other.txt
+out=$(git commit -q -m other 2>&1); rc=$?
+case "$out" in *"GUARD RAN"*|*"policy guard"*|*"policy-guard"*) r=1 ;; *) r=$rc ;; esac
+ck "AC9 a commit staging no listed path runs no guard and prints no policy guard line" "$r" 0
+cd "$tmp" || exit 2
+
 echo "---- $pass passed, $fail failed ----"
 [ "$fail" = 0 ]

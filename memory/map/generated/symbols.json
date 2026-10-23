@@ -2028,6 +2028,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "build_guard_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_gw",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
@@ -4033,6 +4038,11 @@
       "file": ".githooks/pre-push.runlog.test.sh"
     },
     {
+      "id": "check_decisions_row",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
       "id": "check_declaration",
       "kind": "function",
       "file": "tools/lexicon/lexicon_conf.py"
@@ -4768,6 +4778,11 @@
       "file": "tools/unattended/runlog-writer.test.sh"
     },
     {
+      "id": "check_parent_sides",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
       "id": "check_parity",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"
@@ -4941,6 +4956,11 @@
       "id": "check_quiet",
       "kind": "function",
       "file": "tools/run-gates/profile_bar.py"
+    },
+    {
+      "id": "check_raise_shape",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
     },
     {
       "id": "check_range_whole",
@@ -7341,6 +7361,11 @@
       "id": "derive_layer_verdict",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "derive_leaf_changes",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
     },
     {
       "id": "derive_leg_argv",
@@ -10380,6 +10405,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/policy/policy-mirror.js"
     },
     {
@@ -12998,6 +13028,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_blob_id",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
       "id": "read_blobs",
       "kind": "function",
       "file": "tools/memory-tree/deviation_join.py"
@@ -13706,6 +13741,11 @@
       "id": "read_guard_misses",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "read_guarded_paths",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
     },
     {
       "id": "read_gw_record",
@@ -15211,6 +15251,11 @@
       "id": "read_topo",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "read_touched_paths",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
     },
     {
       "id": "read_tracked",
@@ -19640,6 +19685,11 @@
     {
       "id": "run_git",
       "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
+      "id": "run_git",
+      "kind": "function",
       "file": "tools/policy/policy.py"
     },
     {
@@ -19666,6 +19716,11 @@
       "id": "run_grep",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
+    },
+    {
+      "id": "run_guard_case",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_gw",

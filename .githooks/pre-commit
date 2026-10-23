@@ -176,6 +176,35 @@ print_kit_miss() { # <leg> <kit dir, or ""> <file> [home] -> the announced skip,
   echo "pre-commit: $1 leg SKIPPED — no kit root: no install-receipt row for $rel, no ${4:+$4/$3 or }$rel at the root, and ${kitroot_declared:+no $rel under GOV_KITROOT=$kitroot_declared}${kitroot_declared:-no GOV_KITROOT declared in .githooks/gate-env.sh}."
 }
 
+# policy guard (TOOL-dGroundRules-6) — the minimal guard over the paths the policy kit's
+# guarded-paths.txt lists at HEAD: owner-only and the TTY proof, enforced without reading
+# policy-file.guard or policy-file.proof, until dDeclaredLoop's guard lands and retires this block.
+# Git sends a hook's stdout to stderr and leaves stderr as the committer's, so `[ -t 2 ]` reads
+# whether a person sits at a terminal, which an agent's shell does not. It stops forgetting, not
+# evasion: the guard's header names what passes it. The guard runs only when a listed path is
+# staged, so an ordinary commit spawns no Python; a kit that resolves nowhere has no list to guard,
+# and the block prints nothing. ABOVE THE LEGS, so a refused commit is told before paying for them.
+# A MISSING LAUNCHER REFUSES, unlike the legs' announced skip: this block is the enforcement, not
+# an early signal.
+if g=$(resolve_kit_gate policy guard.py); then
+  pg_list=$(git show "HEAD:${g%guard.py}guarded-paths.txt" 2>/dev/null | tr -d '\r' |
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
+  pg_hit=""
+  [ -z "$pg_list" ] || pg_hit=$(git diff --cached --name-only --no-renames | grep -xF -- "$pg_list" || true)
+  if [ -n "$pg_hit" ]; then
+    pg_names=$(printf '%s\n' "$pg_hit" | tr '\n' ' ')
+    pg_r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
+    if [ -t 2 ]; then
+      echo "pre-commit: policy guard — ${pg_names}staged, admitted on the owner's terminal proof."
+    elif [ -z "$pg_r" ] || ! . "./$pg_r" || ! py=$(resolve_python); then
+      echo "pre-commit: policy guard REFUSING — ${pg_names}staged and no python launcher to judge them."
+      rc=1
+    elif ! "$py" "$g" --staged; then
+      rc=1
+    fi
+  fi
+fi
+
 # memory-tree hygiene, staged leg — only when memory/ is touched
 if git diff --cached --name-only --diff-filter=ACMR -- 'memory/**' | grep -q .; then
   if g=$(resolve_kit_gate memory-tree check-memory-hygiene.sh); then

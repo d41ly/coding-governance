@@ -82,6 +82,52 @@ allowed values and every check.
   says nothing, and any row with another `direction`. Adding a new key of one of those kinds? Give
   its row `direction = "raise-loosens"`.
 
+## Who may change the policy file
+
+An agent that could commit any change to the policy file could loosen any rule, so this repository's
+pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
+
+- `.governance/policy.toml`, the policy file;
+- `.governance/policy.json`, its JSON mirror;
+- `.governance/instructions.toml`, the instruction manifest;
+- `.governance/deploy.toml`, the deployer's answers.
+
+- **The owner commits from a terminal.** A commit made at a terminal is the owner's proof, and the
+  hook admits it, printing `policy guard — <paths> staged, admitted on the owner's terminal proof.`
+  An agent's shell has no terminal, so the hook judges its commit instead.
+- **An agent may make one change: raise one measured-file cap.** One key under `[budgets]` whose
+  name is the path of a tracked file, set to a larger whole number, and nothing else in the four
+  files changed. The commit must carry its argument and its record:
+  - comment lines added directly above the cap, one of them `RAISED <old> -> <new>`;
+  - at least one row added to `memory/DECISIONS.md`, with no row removed.
+
+  Other files may ride in the same commit: a raise belongs in the commit of the unit whose change
+  needed it. Worked example, raising the cap on `AGENTS.md` from 20480 to 24576:
+
+  ```toml
+  [budgets]
+  # RAISED 20480 -> 24576, 2026-10-24, TOOL-x-1: the new role section measured 21900 bytes
+  "AGENTS.md" = 24576
+  ```
+
+  with a row such as `- TOOL-x-1 · AGENTS.md cap 20480->24576: the role section needs it` added to
+  `memory/DECISIONS.md`. The hook prints
+  `policy-guard: admitted · budgets."AGENTS.md" 20480 -> 24576 · its change record attached`.
+- **Everything else is refused**, each reason on its own `policy-guard: refused · <path> · <why>`
+  line: a lowered cap, two caps changed, a cap added or removed, a class row such as
+  `memory/builds/*/spec/` (it names no one file), `budgets.enforce` or `budgets.pinned`, any other
+  key, a raise missing its `RAISED` line or its decision row, another line of the file changed, and
+  any change to the other three paths. The mirror is never an agent's to commit: the landing renders
+  it, so unstage it with `git restore --staged --worktree .governance/policy.json`.
+- **A merge that takes one side's file** writes nothing new and is admitted; a merge that writes a
+  third text is judged like any other change.
+- **What the guard does not catch.** It stops forgetting, not evasion: `git commit --no-verify`, a
+  wrapper that gives an agent's commit a terminal, a line removed from the list in one commit and the
+  file changed in the next, a commit made in another clone, a cherry-pick or a rebase (no pre-commit
+  runs), and the guard file deleted from the working tree all pass it. The hook binds once it is on
+  `main` in the primary checkout, whose hooks every worktree runs. The push gate does not re-check
+  who made a change.
+
 ## The keys the file holds today
 
 | Key | Default | What it sets |

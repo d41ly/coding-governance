@@ -65,6 +65,13 @@ policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision 
 and asserts what the helper, a four-line fixture hook and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in four ladder states.
 
+The `guard-*` cases are outcome cases of the minimal guard (TOOL-dGroundRules-6): each copies
+`guard.py` and `guarded-paths.txt` into the kit copy, commits a policy file capping a tracked `big.md`
+and `small.md` and the class row `docs/*/`, stages its plant from `GUARD_PLANTS`, and judges
+`guard.py --staged` by its exit code and the reasons it prints. `guard-admits-raise` is the one plant
+that must exit 0; `guard-merge-side` concludes a conflicted merge with the branch's side, exit 0, then
+with a third text, exit 1.
+
 Later units add arms to ARMS and cases to CASES.
 """
 import json
@@ -1063,6 +1070,110 @@ def run_mirror_landed_parity(name):
     return print_checks(name, checks)
 
 
+# ---- the minimal guard (TOOL-dGroundRules-6) ----------------------------------------------------
+
+GUARD_FILES = ("guard.py", "guarded-paths.txt")
+DEPLOY_REL = ".governance/deploy.toml"
+DECISIONS_REL = "memory/DECISIONS.md"
+GUARD_POLICY = '[budgets]\n"big.md" = 100\n"small.md" = 50\n"docs/*/" = 10\n'
+BIG, SMALL, CLASS = '"big.md" = 100\n', '"small.md" = 50\n', '"docs/*/" = 10\n'
+RAISED = (POLICY_REL, lambda t: t.replace(BIG, '# RAISED 100 -> 120, 2026-10-23, TOOL-x-1, measured 118 bytes\n'
+                                                 '"big.md" = 120\n'))
+UNARGUED = (POLICY_REL, lambda t: t.replace(BIG, '"big.md" = 120\n'))
+ROW = (DECISIONS_REL, lambda t: t + "- TOOL-x-1 · big.md raised to 120\n")
+NO_RAISED, NO_ROW = "no RAISED", f"no {DECISIONS_REL} row"
+# case -> [(scenario, [(path, edit of its text, "" when absent)], the exit wanted, needles stdout
+# must carry, needles it must not)]; each scenario is staged alone over a fresh commit.
+GUARD_PLANTS = {
+    "guard-admits-raise": [("raise", [RAISED, ROW], 0, ["policy-guard: admitted · budgets.\"big.md\" 100 -> 120"], [])],
+    "guard-lowered": [("lowered", [(POLICY_REL, lambda t: t.replace(BIG, '# RAISED 100 -> 90\n"big.md" = 90\n')), ROW],
+                       1, ["a lowering"], [])],
+    "guard-two-raised": [("two raised", [RAISED, (POLICY_REL, lambda t: t.replace(SMALL, '# RAISED 50 -> 60\n'
+                                                                                   '"small.md" = 60\n')), ROW],
+                          1, ["2 keys changed"], [])],
+    "guard-class-row": [("class row", [(POLICY_REL, lambda t: t.replace(CLASS, '# RAISED 10 -> 20\n"docs/*/" = 20\n')),
+                                       ROW], 1, ["not a measured-file cap"], [])],
+    "guard-beside-change": [("beside a change", [RAISED, (POLICY_REL, lambda t: t.replace(
+        "[budgets]\n", '[budgets]\nenforce = "refuse"\n')), ROW], 1, ["2 keys changed"], [])],
+    "guard-beside-path": [("beside a path", [RAISED, ROW, (DEPLOY_REL, lambda t: t + 'planted = "a line"\n')],
+                           1, [f"refused · {DEPLOY_REL} · "], [])],
+    "guard-no-record": [("no record", [UNARGUED], 1, [NO_RAISED, NO_ROW], [])],
+    "guard-no-argument": [("no argument", [UNARGUED, ROW], 1, [NO_RAISED], [NO_ROW])],
+    "guard-no-row": [("no row", [RAISED], 1, [NO_ROW], [NO_RAISED])],
+    "guard-other-paths": [
+        ("mirror", [(policy.MIRROR_REL, lambda t: t + "\n")], 1,
+         [f"refused · {policy.MIRROR_REL} · ", f"git restore --staged --worktree {policy.MIRROR_REL}"], []),
+        ("instructions", [(".governance/instructions.toml", lambda t: 'planted = "a manifest"\n')], 1,
+         ["refused · .governance/instructions.toml · "], []),
+        ("deploy", [(DEPLOY_REL, lambda t: t.replace("fixture", "planted"))], 1, [f"refused · {DEPLOY_REL} · "], []),
+    ],
+    "guard-new-row": [("new row", [(POLICY_REL, lambda t: t + '# RAISED 0 -> 10\n"new.md" = 10\n'), ROW],
+                       1, ["a key was added"], [])],
+    "guard-removed-row": [("removed row", [(POLICY_REL, lambda t: t.replace(SMALL, "")), ROW],
+                           1, ["a key was removed"], [])],
+}
+
+
+def build_guard_repo():
+    """build_repo's fixture with guard.py and its list copied beside the catalogue, a tracked big.md and
+    small.md, a deploy.toml, a decision log holding one row, and a policy file whose [budgets] table
+    sets "big.md" = 100, "small.md" = 50 and "docs/*/" = 10, all committed. -> (repo, kit copy)."""
+    repo, kit = build_repo(policy.load_catalogue(KIT))
+    for f in GUARD_FILES:
+        (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
+    for rel, text in (("big.md", "big\n"), ("small.md", "small\n"), (DEPLOY_REL, 'deployer = "fixture"\n'),
+                      (DECISIONS_REL, "# decisions\n\n- TOOL-x-0 · the first row\n"), (POLICY_REL, GUARD_POLICY)):
+        Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
+        Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "-m", "the guard and its subjects")
+    return repo, kit
+
+
+def run_guard_case(name):
+    """`guard.py --staged` over build_guard_repo, judged by its exit code and stdout: each scenario of
+    GUARD_PLANTS staged alone, or for `guard-merge-side` a merge of a branch whose policy file differs,
+    conflicted, concluded with the branch's side (exit 0, a parent's blob) and then with a third text
+    (exit 1)."""
+    repo, kit = build_guard_repo()
+    guard = [sys.executable, str(kit / "guard.py"), "--staged"]
+    checks = []
+    try:
+        if name == "guard-merge-side":
+            for branch, n in (("side", 60), ("main", 55)):
+                run_fixture_git(repo, "checkout", "-q", *(["-b"] if branch == "side" else []), branch)
+                write_policy(repo, GUARD_POLICY.replace(SMALL, f'"small.md" = {n}\n'))
+                run_fixture_git(repo, "commit", "-q", "-am", branch)
+            try:
+                run_fixture_git(repo, "merge", "-q", "side")
+            except subprocess.CalledProcessError:
+                pass  # the conflict is the point; MERGE_HEAD says whether it happened
+            merging = bool((policy.run_git(repo, "rev-parse", "-q", "--verify", "MERGE_HEAD") or "").strip())
+            checks.append(("merge", "a conflicted merge of side is in progress", merging,
+                           "MERGE_HEAD " + ("resolves" if merging else "does not resolve")))
+            run_fixture_git(repo, "checkout", "--theirs", "--", POLICY_REL)
+            run_fixture_git(repo, "add", "--", POLICY_REL)
+            checks.append(check_run("merge, the branch's side", "guard.py --staged", guard,
+                                    lambda rc, o, e: rc == 0, cwd=repo))
+            write_policy(repo, GUARD_POLICY.replace(SMALL, '"small.md" = 70\n'))
+            run_fixture_git(repo, "add", "--", POLICY_REL)
+            checks.append(check_run("merge, a third text", "guard.py --staged", guard,
+                                    lambda rc, o, e: rc == 1 and "policy-guard: refused" in o, cwd=repo))
+        for scenario, edits, want, present, absent in GUARD_PLANTS.get(name, []):
+            for rel, edit in edits:
+                path = Path(repo, rel)
+                path.write_text(edit(path.read_text(encoding="utf-8") if path.exists() else ""),
+                                encoding="utf-8", newline="\n")
+                run_fixture_git(repo, "add", "--", rel)
+            checks.append(check_run(scenario, "guard.py --staged", guard, lambda rc, o, e, want=want, present=present,
+                                    absent=absent: rc == want and all(n in o for n in present)
+                                    and not any(n in o for n in absent), cwd=repo))
+            run_fixture_git(repo, "reset", "-q", "--hard")
+    finally:
+        remove_repo(repo)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -1087,6 +1198,7 @@ CASES = [
     ("mirror-stale-refuse", None, run_mirror_landed),
     ("mirror-absent-refuse", None, run_mirror_landed),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
+    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side"]),  # outcome cases: guard.py --staged
 ]
 
 
