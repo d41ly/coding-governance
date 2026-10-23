@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-33 — the version check reads every declared kit version constant through govkit's own reader, so no carrier's form escapes a typed pattern
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-33-deviation-331.md](../build/2026-10-23-build-TOOL-dFairHearing-33-deviation-331.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
+| [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,8 @@ and reports any value that moved. The marker half, the four-directory pathspec, 
 ### Edges
 
 - **consumes-from** `TOOL-dFairHearing-31` — the resolved base its probe prints, `base <sha> from <source>`; without it this check has no first end to read
+- **hands-off** `TOOL-dFairHearing-40` — the round-5 spec audit's minors on this spec, ids 2, 3, 10, 17, 20, 23, 26, 31 and 33: AC1's build-wide Red when half re-read at the build's last pass commit on `base.py`'s sha, this unit's ledger naming whether `GATE_BASE` was set when AC1 ran, `RuntimeError` caught, `new` refused unless the descriptor is absent at the base, the registry read at both ends, AC3's two unstaged refusals and the `absent` and `new` outcomes staged, and §4's `(none declared)` sentence corrected (its S1 to S4, S18, S19, S26, S28 and S29)
+
 
 ## 4. Design
 
@@ -193,6 +196,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 22 (item H1, HIGH, shared with id 31) of
   the round-4 spec audit of specs 28 to 32.
+- rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (nine minors).
 
 ## 10. Reuse audit
 

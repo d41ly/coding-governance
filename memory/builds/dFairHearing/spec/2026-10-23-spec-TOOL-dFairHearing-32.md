@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-32 — the round-3 spec audit's 32 minors: criteria that observe what their specs change, one source per procedure, and refusals that name their cause
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -186,6 +186,8 @@ one's mechanism.
 - **consumes-from** `TOOL-dFairHearing-3` — `DESIGN_RECORD_PRESET` and its AC7 arm, which S19 re-pins to the constant
 - **consumes-from** `TOOL-dFairHearing-16` — the opt-in pack, `spec-audit-optin.js`, whose home S25's resolver finds
 - **hands-off** `TOOL-dFairHearing-37` — the round-4 spec audit's minors on this spec, ids 2, 4, 6, 8, 10, 13, 17, 23, 25, 35, 36 and 37: S20, S21 and AC12 read unit 35's attempt rule for unit 15's replay, AC9 grades no derived value, S13 and AC8's selected half are observed by behaviour, and S6, S7, S18, S22, S25, S26, S31, S32, AC4, AC10, AC13, AC14, AC15, AC16, AC19 and AC20 are corrected there (its S2 to S5, S7, S9, S10 and S13 to S19)
+- **hands-off** `TOOL-dFairHearing-38` — finding id 1 (item H1, shared with id 11) of the round-5 spec audit: AC8's comparison and its `%TEMP%/fgc` fixture, re-run there with a staged break as the observation of a `selected` verdict
+- **hands-off** `TOOL-dFairHearing-40` — the round-5 spec audit's finding id 28: where `resolveKitDir`, this unit's S25 port, disagrees with `resolve_kit_dir.py` on unit 37's rows 8 and 9, the cure is that unit's (its S17)
 
 
 ## 4. Design
@@ -432,6 +434,8 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC20 · a gated s
 - rev-1 · 2026-10-23 · initial draft, promoting the 21 MEDIUM and 11 LOW findings of the round-3 spec
   audit of specs 4, 14, 25, 26 and 27 as one batch.
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-37 (twelve minors).
+- rev-3 · 2026-10-23 · §3 · the round-5 spec audit's disposal: hands-off edges to TOOL-dFairHearing-38 (AC8 re-run, item H1) and TOOL-dFairHearing-40
+  (the port's cure, id 28).
 
 ## 10. Reuse audit
 

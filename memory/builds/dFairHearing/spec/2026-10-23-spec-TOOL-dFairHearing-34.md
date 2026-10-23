@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-34 — the version check reads every gov:kit marker in every file the build changed, not four typed directories
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 23 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-34-deviation-341.md](../build/2026-10-23-build-TOOL-dFairHearing-34-deviation-341.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-35 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 | [2026-10-23-prompt-TOOL-dFairHearing-34-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-34-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,8 @@ whose marker number changed. The constant half, the typed pattern, is id 22's, i
 ### Edges
 
 - **consumes-from** `TOOL-dFairHearing-31` — the resolved base its probe prints, `base <sha> from <source>`; without it this check has no first end to read
+- **hands-off** `TOOL-dFairHearing-40` — the round-5 spec audit's minors on this spec, ids 2, 3, 20, 26 and 34: AC1's build-wide Red when half re-read at the build's last pass commit on `base.py`'s sha, this unit's ledger naming whether `GATE_BASE` was set when AC1 ran, and §3's attribution of an added file's marker corrected to `govkit selfcheck` check 5c (its S1 to S4 and S32)
+
 
 ## 4. Design
 
@@ -182,6 +185,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 31 (item H1, HIGH, shared with id 22) of
   the round-4 spec audit of specs 28 to 32.
+- rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (five minors).
 
 ## 10. Reuse audit
 

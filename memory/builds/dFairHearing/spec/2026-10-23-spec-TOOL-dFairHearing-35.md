@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-35 — unit 15's replay scored by one attempt rule fixed before the runs, so no figure rests on the attempt a runner prefers
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 22 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-35-deviation-351.md](../build/2026-10-23-build-TOOL-dFairHearing-35-deviation-351.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 | [2026-10-23-prompt-TOOL-dFairHearing-35-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-35-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 TOOL-dFairHearing-37 |
 
 <!-- /gen:spec-records -->
 
@@ -81,6 +82,9 @@ figure.
 - **consumes-from** `TOOL-dFairHearing-15` — the corpus, the two arms, the instrument, the decision rule and S6's product change, which this unit lands or leaves
 - **consumes-from** `TOOL-dFairHearing-14` — `check_experiment` and the manifest's `parsed` lines, which AC3 reads literally
 - **hands-off** `TOOL-dFairHearing-37` — finding ids 2 and 33 of the same audit: unit 32's S20, S21 and AC12 and unit 30's AC1 read this unit's scored attempt instead of a fixed attempt number or an after-the-fact cap
+- **hands-off** `TOOL-dFairHearing-38` — finding id 1 (item H1, shared with id 11) of the round-5 spec audit: the record's `selected` or `ungated` decision, which decides whether that unit's AC1 and AC2 apply
+- **hands-off** `TOOL-dFairHearing-40` — the round-5 spec audit's minors on this spec, ids 4, 6, 9, 13, 14, 21, 24, 25 and 35: the checker's `failed` outcome, its refusal of an unplaceable or empty row, the void column re-derived (the reports the manifest names stay on disk until that unit's pass), AC3 conditional on the checker's exit 3, S5's `**Serves:**` line observed, and the prose carriers checked on an `ungated` decision; the checker of §4 is superseded by its §4, re-run over unit 30's record there (its S6 to S10, S16, S21, S24 and S25)
+
 
 ## 4. Design
 
@@ -215,6 +219,8 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 32 (item H2, HIGH) of the round-4 spec
   audit of specs 28 to 32.
+- rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: hands-off edges to TOOL-dFairHearing-38 (the decision it reads, item H1) and
+  TOOL-dFairHearing-40 (nine minors).
 
 ## 10. Reuse audit
 

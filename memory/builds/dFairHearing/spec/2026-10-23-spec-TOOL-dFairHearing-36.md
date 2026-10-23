@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-36 — the round-4 spec audit's 13 minors on units 28, 29 and 31: probes that read every node's bytes alike, misses seen red, and the bar's own base
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-36-deviation-361.md](../build/2026-10-23-build-TOOL-dFairHearing-36-deviation-361.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-37 |
 | [2026-10-23-prompt-TOOL-dFairHearing-36-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-36-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-37 |
 
 <!-- /gen:spec-records -->
 
@@ -100,6 +101,8 @@ it. Where a report item merges ids, the later id points at the first one's mecha
 - **consumes-from** `TOOL-dFairHearing-29` — `members.py` and the five member labels, which S1, S4, S6, S7 and S9 correct
 - **consumes-from** `TOOL-dFairHearing-31` — the version check's base, which S11 to S13 correct
 - **consumes-from** `TOOL-dFairHearing-16` — the leg `spec-audit opt-in pack self-test`, which S10 names and AC7 reads
+- **hands-off** `TOOL-dFairHearing-40` — the round-5 spec audit's minors on this spec, ids 3, 7, 12, 16, 27, 30 and 39: `base.py`'s sha as the build-wide base, §4's sentence on units 33 and 34 superseded, AC3's suite read from `git show 3708a705:`, AC6 labelled precondition evidence in this unit's ledger, the pass's write set counting its ledger records, and the tip refusal naming both causes (its S3, S5, S11, S22, S27, S31 and S35)
+
 
 ## 4. Design
 
@@ -283,6 +286,7 @@ suite takes no `New arm:` line: it only loses an arm, as unit 26 §7 states.
 
 - rev-1 · 2026-10-23 · initial draft, promoting the 6 MEDIUM and 7 LOW findings of the round-4 spec
   audit of specs 28 to 32 that land on units 28, 29 and 31, as one of two batches.
+- rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (seven minors).
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-37 — the round-4 spec audit's 19 minors on units 30 and 32: one replay procedure that isolates each arm, criteria over the scored attempt, and checks that can go red
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 24 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-23-build-TOOL-dFairHearing-37-deviation-371.md](../build/2026-10-23-build-TOOL-dFairHearing-37-deviation-371.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-33-promoted-fix-brief.md) | research | TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-35 TOOL-dFairHearing-36 |
 | [2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-37-1-spec-writer.md) | journal | — |
+| [2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md) | spec-audit | TOOL-dFairHearing-35 TOOL-dFairHearing-33 TOOL-dFairHearing-34 TOOL-dFairHearing-36 |
 
 <!-- /gen:spec-records -->
 
@@ -129,6 +130,10 @@ it.
 - **consumes-from** `TOOL-dFairHearing-30` — the verdict record, its attempts and clones, and AC1, which S1, S6, S11 and S12 read or restate
 - **consumes-from** `TOOL-dFairHearing-32` — S6, S7, S13, S14, S18, S20 to S23, S25, S26, S31, S32 and their criteria, which S2 to S5, S7, S9, S10 and S13 to S19 correct
 - **consumes-from** `TOOL-dFairHearing-35` — the attempt rule and its checker, which S2 and S11 read for the scored attempt
+- **hands-off** `TOOL-dFairHearing-38` — finding id 1 (item H1, shared with id 11) of the round-5 spec audit: S4's argparse sentence, its claim to answer unit 32 S13 and AC8, and AC4's `selected` half are superseded by its S2, S3, AC1 and AC2; AC4's `ungated` half stands
+- **hands-off** `TOOL-dFairHearing-39` — finding id 11 (item H1, shared with id 1) of the same audit: AC4's argparse wording, cited in the bug-class catalogue as the form a criterion takes when it quotes an error text its tool never emits
+- **hands-off** `TOOL-dFairHearing-40` — the same audit's minors on this spec, ids 4, 5, 8, 15, 18, 22, 28, 29, 30, 36, 37 and 38: AC11 over each scored clone, AC17's and AC5's counts, AC15's anchor, the per-arm step's variables and its orchestrating-commit read and log arm, AC9's view through `renderLexedView`, AC12's Red when half and the port's cure, the `ungated` class set re-derived after S15, the pass's write set counting its ledger record, and every `git -C ${repo}` quoted (its S10, S12 to S15, S17, S20, S23, S30, S31, S33 and S34)
+
 
 ## 4. Design
 
@@ -317,6 +322,8 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC14 · a gated s
 
 - rev-1 · 2026-10-23 · initial draft, promoting the 14 MEDIUM and 5 LOW findings of the round-4 spec
   audit of specs 28 to 32 that land on units 30 and 32, as one of two batches.
+- rev-2 · 2026-10-23 · §3 · the round-5 spec audit's disposal: hands-off edges to TOOL-dFairHearing-38 and -39 (item H1, ids 1 and 11) and
+  TOOL-dFairHearing-40 (twelve minors).
 
 ## 10. Reuse audit
 

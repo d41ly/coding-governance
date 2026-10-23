@@ -1,6 +1,6 @@
 # TOOL-dFairHearing-30 — unit 15's with-and-without replay run with one fresh clone per record and arm, so no arm reviews a tree holding the other's report
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 21 · advances TOOL-dFairHearing-19
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -77,6 +77,7 @@ The decision then follows from these runs.
 - **hands-off** `TOOL-dFairHearing-32` — the minors that read this unit's verdict record: the behavioural `selected` check (id 4), the runs' orchestrating commit (ids 5, 13) and the one rule for a dead run (id 30)
 - **hands-off** `TOOL-dFairHearing-35` — finding id 32 (item H2) of the round-4 spec audit: the attempt rule that decides which completed attempt is scored, and with it the scoring and the decision; this unit's S4, the figure and decision half of S5 and AC3, AC4's ungated half, spec 15 S6's product files and the selftest arm on the flag are superseded by its S1 to S6 and AC1 to AC4
 - **hands-off** `TOOL-dFairHearing-37` — the same audit's minors on this spec, ids 1, 5, 12, 20, 26, 33 and 34: AC1 restated over the scored attempt, AC4's selected half observed by behaviour, and the per-arm clone, the forward-slash path and the checked status carried into the one replay procedure for every later replay (its S1, S4, S6, S8, S11, S12 and S18)
+- **hands-off** `TOOL-dFairHearing-40` — the round-5 spec audit's minors that read this unit's verdict record, ids 9, 13, 24 and 29: the void column re-derived from each attempt's report and quoted transcript line, so each report and transcript the record names stays on disk until that unit's pass, the record's `**Serves:**` line read for `TOOL-dFairHearing-35`, and the `ungated` class set re-derived (its S9, S24, S25 and S30)
 
 
 ## 4. Design
@@ -194,6 +195,7 @@ New arm: tools/memory-tree/gotchas.py (its selftest, only on an `ungated` win) �
   audit of specs 4, 14, 25, 26 and 27.
 - rev-2 · 2026-10-23 · §3 · the round-4 spec audit's disposal: hands-off edges to TOOL-dFairHearing-35 (the attempt rule,
   the scoring and the decision, finding id 32) and TOOL-dFairHearing-37 (seven minors).
+- rev-3 · 2026-10-23 · §3 · the round-5 spec audit's disposal: a hands-off edge to TOOL-dFairHearing-40 (four minors that read the verdict record).
 
 ## 10. Reuse audit
 
