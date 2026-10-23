@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-32 — the round-1 audit of units 22 to 25, its minors: twenty findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -163,6 +163,7 @@ corrected fix. Where the review offered options, §8 records the pick.
 - **hands-off** external — widening `SCRATCH_KITS` in `tools/govkit/matrix.py` to `policy`, which stays with the open ask `TOOL-aScouredKit-24`
 - **hands-off** `TOOL-dGroundRules-33` — `build_fresh_target`'s answer values from `DEPLOY_FULL` (S16) and the guard lines of S3 and S10, which that unit extends to `{prefix}/govkit/selftest.py` and a trace of every in-process source read (id 26 of the round-1 spec audit of units 26 to 32)
 - **hands-off** `TOOL-dGroundRules-34` — `build_fresh_target`, the receipt prefix rule, AC9's overlap pairs and their arm, AC6, the evidence citations and the kit README's census rows, which that unit amends, and the seven other build READMEs S13 re-renders, which that unit names as this unit's writes (ids 6, 15, 29, 37, 35, 18, 19, 9, 16, 27 and 36 of the round-1 spec audit of units 26 to 32)
+- **hands-off** `TOOL-dGroundRules-52` — `derive_parallel_step`, whose rendering of steps 12 to 14 of this build that unit observes (id 6 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -433,6 +434,8 @@ New arm: tools/memory-tree/gen_build_index.py (`--selftest`) · covers AC13 · a
   round-1 spec audit of units 22 to 25 in one batch, from the review's sound fixes and the skeptic's
   corrected fix for id 12, with each cited line read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-33, TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 

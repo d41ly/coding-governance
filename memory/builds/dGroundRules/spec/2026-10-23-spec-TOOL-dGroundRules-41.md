@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-41 — the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-41-deviation-29.md](../build/2026-10-23-build-TOOL-dGroundRules-41-deviation-29.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-42 TOOL-dGroundRules-43 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,10 @@ so an edit to either side reruns the check. It repairs `TOOL-dGroundRules-34`, w
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-34` — S36's `## Install` section of the help page, which S1 holds to the deferral line `adopter-fresh-target` captures and S3 observes whole
+- **hands-off** `TOOL-dGroundRules-48` — AC4, which that unit observes with the page path whole and pairs with `HELP_MOVED` (id 2 of the round-1 spec audit of units 35 to 43)
+- **hands-off** `TOOL-dGroundRules-49` — AC5 and S2's guard line, which that unit observes through the leg query with the page path whole and through the guard trace (id 11 of the round-1 spec audit of units 35 to 43)
+- **hands-off** `TOOL-dGroundRules-50` — `adopter-fresh-target`'s parity, which that unit makes print the page line it found (id 22 of the round-1 spec audit of units 35 to 43)
+- **hands-off** `TOOL-dGroundRules-52` — AC4 and AC5, which that unit observes through units 48 and 49's literals (id 31 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -155,6 +160,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 21 (HIGH, item H3) of the round-1 spec
   audit of units 33 and 34, from the skeptic's corrected AC36 path and a parity the restated line
   owes, with units 1, 31 and 34's help-page items read on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-48`, `TOOL-dGroundRules-49`, `TOOL-dGroundRules-50`, `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 

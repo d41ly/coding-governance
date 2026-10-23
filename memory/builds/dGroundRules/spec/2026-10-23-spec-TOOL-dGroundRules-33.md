@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-33 — the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -72,6 +72,8 @@ every source file it opens and reds each one whose path the `policy fixtures` gu
 - **hands-off** `TOOL-dGroundRules-37` — S4's additions to the `policy fixtures` row, which that unit holds to the files git tracks (id 1 of the round-1 spec audit of units 33 and 34)
 - **hands-off** `TOOL-dGroundRules-38` — `add_source_read`, which that unit keeps off the source's git directory and common directory (id 18 of the round-1 spec audit of units 33 and 34)
 - **hands-off** `TOOL-dGroundRules-43` — `add_source_read`'s event filter and `check_guard_trace`'s parse and working directory (ids 20, 27 and 12 of the round-1 spec audit of units 33 and 34)
+- **hands-off** `TOOL-dGroundRules-49` — the guard trace, which that unit stages to observe the help page's guard line (id 11 of the round-1 spec audit of units 35 to 43)
+- **hands-off** `TOOL-dGroundRules-52` — `add_source_read` and `check_guard_trace`, whose path decoding, unmapped-cache line and failure `WRONG` that unit amends or observes (ids 9, 34, 37 and 38 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -200,6 +202,8 @@ New arm: tools/policy/check_policy.py (`--fixture`, the `guard-trace` join) · c
   audit of units 26 to 32, from the review's sound fix and its left-shift, the class gate, with
   `DEPLOY_FULL`, the leg manifest and the audit hook's `open` event read on 2026-10-23.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-35, TOOL-dGroundRules-36, TOOL-dGroundRules-37, TOOL-dGroundRules-38 and TOOL-dGroundRules-43 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 33 and 34 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-49`, `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 

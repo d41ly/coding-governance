@@ -105,3 +105,23 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T03:36:44Z review · item dGroundRules-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 15 · disposition promote
 
 2026-10-23T03:38:33Z decision · item Cap the spec-audit promotion chain? Rounds 1-5 promoted 9, 4, 7, 2 and 9 units (the roster is 42), each round's precision 0.85-1.00, so M4's only bound, a round below the 0.5 floor, has not fired and the chain shows no shrink · reason Options: let the chain run until a round promotes nothing; cap it at a round, as the owner capped dTrueNorth's audit at round 2, the later promotions closing under a recorded specs-audited override; or lower the audit's intensity for promoted repair specs. Refused because a round cap is the owner's ruling (M4 states no cap, and dTrueNorth's cap was the owner's own words) and the run keeps auditing meanwhile
+
+2026-10-23T04:02:01Z review · item dGroundRules-spec-set-r6 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 7 · minors 25 · disposition promote
+
+2026-10-23T04:13:55Z rescope · item add TOOL-dGroundRules-44 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 29 at BLOCKER, item B1
+
+2026-10-23T04:13:56Z rescope · item add TOOL-dGroundRules-45 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 20 at HIGH, item H1
+
+2026-10-23T04:13:57Z rescope · item add TOOL-dGroundRules-46 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 10 at HIGH, item H1
+
+2026-10-23T04:13:58Z rescope · item add TOOL-dGroundRules-47 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 1 at HIGH, item H1
+
+2026-10-23T04:14:00Z rescope · item add TOOL-dGroundRules-48 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 2 at HIGH, item H2
+
+2026-10-23T04:14:01Z rescope · item add TOOL-dGroundRules-49 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 11 at HIGH, item H2
+
+2026-10-23T04:14:03Z rescope · item add TOOL-dGroundRules-50 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 22 at HIGH, item H2
+
+2026-10-23T04:14:04Z rescope · item add TOOL-dGroundRules-51 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 finding id 21 at HIGH, item H3
+
+2026-10-23T04:14:05Z rescope · item add TOOL-dGroundRules-52 · reason 2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1 minors batch: MEDIUM ids 3 4 5 6 12 13 14 15 19 25 26 30 31 33 35 36 and LOW ids 7 8 9 16 17 18 34 37 38

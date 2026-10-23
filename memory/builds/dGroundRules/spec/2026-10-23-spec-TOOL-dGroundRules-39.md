@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-39 — the census registry window held at both edges by a standing case, its fixture paths spelled whole
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-39-deviation-27.md](../build/2026-10-23-build-TOOL-dGroundRules-39-deviation-27.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,7 @@ repairs `TOOL-dGroundRules-34`, which sits at order 12, so it builds at order 13
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-34` — `census-ambiguous-registry` and the census-window scope of S11 and S12, which S1 extends to the window's two edges and S2 observes with its paths whole
+- **hands-off** `TOOL-dGroundRules-52` — AC2 and AC3, which that unit observes in a git clone, each requiring the `census-window-edge` `WRONG` (id 26 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -161,6 +163,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 2 (HIGH, item H3) of the round-1 spec
   audit of units 33 and 34, from the skeptic's corrected AC11 and AC12 inputs held in a standing
   case, with `derive_tool_root`'s search read on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 

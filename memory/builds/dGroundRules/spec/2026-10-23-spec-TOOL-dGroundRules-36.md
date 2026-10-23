@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-36 — a source read git ignores is set aside before the guard join, counted, and never offered to the guard
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-36-deviation-24.md](../build/2026-10-23-build-TOOL-dGroundRules-36-deviation-24.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ sits at order 11, so it builds at order 12.
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-33` — `check_guard_trace`, its pipe to `--legs-for` and the S4 sweep, whose population S1 narrows to the paths git does not ignore
+- **hands-off** `TOOL-dGroundRules-52` — `derive_guardable_reads`, whose `check-ignore` call that unit pins to `-z` and bytes (ids 13 and 33 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -169,6 +171,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 7 (HIGH, item H1) of the round-1 spec
   audit of units 33 and 34, from the review's fix narrowed to the paths git ignores, with
   `check-ignore` and `print_legs_for` read on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-42 — the criterion bug class gains the input respelled to pass a join, and is handed to every spec commit
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 13
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 13
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-42-deviation-30.md](../build/2026-10-23-build-TOOL-dGroundRules-42-deviation-30.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-43 |
 
 <!-- /gen:spec-records -->
 
@@ -61,7 +62,7 @@ every spec commit. It repairs `TOOL-dGroundRules-34`, which sits at order 12, so
 
 ### Edges
 
-none
+- **hands-off** `TOOL-dGroundRules-47` — the record's fix section, which that unit extends with the re-run of a read-only literal from the root (id 1 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -108,6 +109,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 25 (HIGH, item H3) of the round-1 spec
   audit of units 33 and 34 as the item's left-shift, with the record, `gotchas.py`'s anchor rule and
   a prefix-drop predicate over the live specs measured on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-47`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 9. Reuse audit
 

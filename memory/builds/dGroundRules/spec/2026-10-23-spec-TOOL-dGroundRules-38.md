@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-38 — the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-38-deviation-26.md](../build/2026-10-23-build-TOOL-dGroundRules-38-deviation-26.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,7 @@ which sits at order 11, so it builds at order 12.
 
 - **consumes-from** `TOOL-dGroundRules-33` — `add_source_read`, whose kept set S2 narrows, and the `--fixture` hook installation S1 extends
 - **consumes-from** `TOOL-dGroundRules-34` — S1's in-process copy of the source's exclude file, one of the two git-directory reads S2 keeps out of the trace
+- **hands-off** `TOOL-dGroundRules-52` — S3's claim, AC1 in a clone at the commit under test, and S1's deny branch, which that unit observes (ids 5, 15 and 8 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -164,6 +166,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 18 (HIGH, item H2) of the round-1 spec
   audit of units 33 and 34, from the review's sound fix, with `rev-parse` and `check-ignore` run in
   this worktree and the main checkout on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 

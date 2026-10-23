@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-37 — every `policy fixtures` guard entry names a file git tracks, so the trace's sweep cannot widen the guard with a path no diff carries
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-37-deviation-25.md](../build/2026-10-23-build-TOOL-dGroundRules-37-deviation-25.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ repairs `TOOL-dGroundRules-33`, which sits at order 11, so it builds at order 12
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-33` — `check_guard_trace` and the S4 sweep's additions to the `policy fixtures` row, which S1 holds to the files git tracks
+- **hands-off** `TOOL-dGroundRules-52` — `check_guard_lines`, which that unit takes out in favour of arm 1b of `tools/run-gates/run-gates.test.sh`, where this unit's arm line is then observed (ids 19, 9 and 37 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -166,6 +168,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 1 (HIGH, item H1) of the round-1 spec
   audit of units 33 and 34, closing the remedy its S4 names, with `read_tracked`, the ignore rules
   and govkit's own guard refusal read on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 

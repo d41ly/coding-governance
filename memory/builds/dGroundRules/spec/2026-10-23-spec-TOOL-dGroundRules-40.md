@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-40 — the overlap arm pins each pair's expected answer, so the render's rule and the dispatcher's are graded against the truth and not only against each other
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-40-deviation-28.md](../build/2026-10-23-build-TOOL-dGroundRules-40-deviation-28.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 |
 
 <!-- /gen:spec-records -->
 
@@ -53,6 +54,9 @@ both rules are graded against that column. Its own criteria spell the pairs whol
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-34` — the arm S17 narrows to two pairs and the parity S16 states, which S1 holds in one table and S2 grades against an expected column
+- **hands-off** `TOOL-dGroundRules-44` — the `OVERLAP_PAIRS` disjoint row, which that unit respells as a real string-prefix trap and guards with a row check (id 29 of the round-1 spec audit of units 35 to 43)
+- **hands-off** `TOOL-dGroundRules-45` — the arm's rows, which that unit makes call lines one probe lists, in place of `PAIRS_PY` and `PAIRS_SH` (id 20 of the round-1 spec audit of units 35 to 43)
+- **hands-off** `TOOL-dGroundRules-52` — AC2 and the §3 claim about `check_writes_intersect`, which that unit observes through `PAIRS_TABLE` (ids 30 and 17 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
 
@@ -155,6 +159,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 17 (HIGH, item H3) of the round-1 spec
   audit of units 33 and 34, from the skeptic's corrected AC15 and AC16 spellings held in one table
   with an expected column, with `overlaps` and the arm's home read on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-44`, `TOOL-dGroundRules-45`, `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
+  the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 
 ## 10. Reuse audit
 
