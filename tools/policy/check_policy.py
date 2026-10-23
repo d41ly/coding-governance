@@ -28,11 +28,13 @@ real shipped row where one serves. WHAT IT DOES NOT CHECK: that the shipped cata
 v2's, which is the build's acceptance probe, not an arm.
 
 `adopter-fresh-target` is an outcome case, no plant (TOOL-dGroundRules-16): this kit installed into a
-fresh `git init` by the deployer, `govkit.py apply` with the closure of its `requires`, the tool root
-compared with the receipt both ways (TOOL-dGroundRules-24), `--scaffold`, then `--check` with the
-install staged and again once it is committed, where every arm must grade clean or announce; and the
-README's "Each arm in an adopter" table joined to ARMS both ways. Green on a correct build; its RED is
-a refused `apply`, a stray or missing receipt path, or an arm that finds a problem in an adopter's tree.
+fresh `git init` by the deployer, `govkit.py apply` with the closure of its `requires`, run from a
+scratch clone whose HEAD commits the working tree under test, so an uncommitted edit is graded
+(TOOL-dGroundRules-26), the tool root compared with the receipt both ways (TOOL-dGroundRules-24),
+`--scaffold`, then `--check` with the install staged and again once it is committed, where every arm
+must grade clean or announce; and the README's "Each arm in an adopter" table joined to ARMS both
+ways. Green on a correct build; its RED is a failed snapshot step, a refused `apply`, a stray or
+missing receipt path, or an arm that finds a problem in an adopter's tree.
 
 `reader-landed` and `reader-parsed` are outcome cases too (TOOL-dGroundRules-2): each builds its own
 repositories, runs `policy.py get` in them and prints one line per observation. `reader-landed`
@@ -450,10 +452,60 @@ def check_arm_lines(out, names):
     return bad
 
 
+def build_source_snapshot(source_root):
+    """The root of a scratch clone whose HEAD commits `source_root`'s working tree over its HEAD
+    (TOOL-dGroundRules-26). The deployer installs its own checkout's HEAD, never a working tree, so a
+    case that installs through the clone's `govkit.py` grades the bytes under test, a file only the
+    working tree holds included. `--shared` reads the source's objects through alternates, and with
+    GIT_DIR set to the clone every new object lands in the clone's store, never the source's. `add -A`
+    runs over a copy of the source's index with the source as work tree, so the source's ignore rules
+    decide what counts and a file whose stat matches is not re-hashed. Every git call runs with the
+    memory-tree kit's GIT_ENV_LEAKS stripped, so an ambient GIT_DIR or GIT_INDEX_FILE cannot retarget
+    it. The caller removes the root. -> Path; RuntimeError naming the failed step and git's first
+    stderr line, the clone already removed."""
+    try:
+        lib = str(resolve_kit_dir("memory-tree", "tree_lib.py", KIT))
+    except LookupError as exc:
+        raise RuntimeError(f"no GIT_ENV_LEAKS to strip: {exc}") from None
+    if lib not in sys.path:
+        sys.path.insert(0, lib)
+    from tree_lib import GIT_ENV_LEAKS
+    base = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
+
+    def run(step, *args, cwd=None, **env):
+        p = subprocess.run(["git", "-c", "user.name=policy-fixture", "-c", "user.email=policy-fixture@invalid",
+                            "-c", "commit.gpgsign=false", *args], cwd=cwd, env={**base, **env},
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+        if p.returncode:
+            first = next((ln.strip() for ln in p.stderr.splitlines() if ln.strip()), "git printed nothing on stderr")
+            raise RuntimeError(f"the snapshot's {step} step exited {p.returncode}: {first}")
+        return p.stdout.strip()
+
+    source = Path(source_root)
+    s = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        run("clone", "clone", "--quiet", "--shared", "--no-checkout", source.as_posix(), s.as_posix())
+        index = s / ".git" / "snapshot-index"
+        held = source / run("index", "-C", source.as_posix(), "rev-parse", "--git-path", "index")
+        if held.is_file():  # a source with no index yet starts the snapshot from an empty one
+            shutil.copyfile(held, index)
+        env = {"GIT_DIR": (s / ".git").as_posix(), "GIT_WORK_TREE": source.as_posix(), "GIT_INDEX_FILE": index.as_posix()}
+        run("add", "add", "-A", cwd=source, **env)
+        tree = run("write-tree", "write-tree", **env)
+        commit = run("commit-tree", "commit-tree", tree, "-p", "HEAD", "-m", "the working tree under test", **env)
+        run("checkout", "-C", s.as_posix(), "checkout", "--quiet", "--detach", commit)
+    except BaseException:
+        remove_repo(s)
+        raise
+    return s
+
+
 def run_fresh_target(name):
     """This kit installed by the deployer into a fresh target: `git init` with a pinned autocrlf, a
     one-line README and a `.governance/deploy.toml`, committed once, then `govkit.py apply` with this
-    kit's id and the closure of its kit.toml `requires` (TOOL-dGroundRules-24). Every file under the
+    kit's id and the closure of its kit.toml `requires` (TOOL-dGroundRules-24), run from
+    `build_source_snapshot`'s clone of the tree under test, which the descriptor's `gov_source` names
+    and whose commit the case prints over the source's HEAD (TOOL-dGroundRules-26). Every file under the
     target's tool root must be a receipt row's `path`, and every engine or seed row's `path` must
     exist. Then the installed `adopt-policy.sh`, found through its receipt row: `--scaffold`, and
     `--check` with the install staged and again once it is committed, each exiting 0 with every arm
@@ -480,18 +532,30 @@ def run_fresh_target(name):
             wrong.append(f"kit.toml requires {home}, which this tree does not resolve: {exc}")
     root = KIT.parent  # this kit's own resolved tool root; the target's prefix is its name, never spelled
     govkit = root / "govkit" / "govkit.py"
-    rows = None
+    top = (policy.run_git(KIT, "rev-parse", "--show-toplevel", "--show-prefix") or "").split("\n")
+    rows, s = None, None
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     try:
         if not govkit.is_file():
             wrong.append(f"no deployer to install with: looked for govkit.py at {govkit.as_posix()}, under this kit's tool root")
+        elif len(top) < 2 or not top[0]:
+            wrong.append(f"no tree under test to snapshot: {KIT.as_posix()} is in no git repository")
         else:
+            try:
+                s = build_source_snapshot(top[0])
+            except (RuntimeError, OSError) as exc:
+                wrong.append(f"nothing was installed to grade: {exc}")
+        if s is not None:
+            snap, over = (policy.run_git(s, "rev-parse", "HEAD", "HEAD^") or "? ?").split()
+            print(f"{name}: installing from snapshot {snap[:8]} of the working tree over HEAD {over[:8]}")
+            govkit = s / Path(top[1]).parent / "govkit" / "govkit.py"  # the clone's own deployer installs its HEAD
             run_fixture_git(t, "init", "-q")
             run_fixture_git(t, "config", "core.autocrlf", "false")
             (t / "README.md").write_text("A fresh adopter of the policy kit.\n", encoding="utf-8", newline="\n")
             Path(t, POLICY_FILE[0]).mkdir()
             Path(t, POLICY_FILE[0], "deploy.toml").write_text(
-                f'gov_source = "local"\nprefix = {json.dumps(root.name)}\nkits = {json.dumps(ids)}\n', encoding="utf-8", newline="\n")
+                f'gov_source = {json.dumps(s.as_posix())}\nprefix = {json.dumps(root.name)}\nkits = {json.dumps(ids)}\n',
+                encoding="utf-8", newline="\n")
             run_fixture_git(t, "add", "-A")
             run_fixture_git(t, "commit", "-q", "-m", "a fresh target")
             p = subprocess.run([sys.executable, str(govkit), "apply", "--target", t.as_posix(), "--kits", ",".join(ids)],
@@ -543,6 +607,8 @@ def run_fresh_target(name):
                         wrong.append(f"{phase}: --check exited {rc}" + ("" if bad else f": {out.strip()}"))
     finally:
         remove_repo(t)
+        if s is not None:
+            remove_repo(s)
     for w in wrong:
         print(f"policy-fixture: {name} · WRONG: {w}")
     if not wrong:

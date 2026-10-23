@@ -2798,6 +2798,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_source_snapshot",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_source_state_copy",
       "kind": "function",
       "file": "tools/runlog/selftest.py"

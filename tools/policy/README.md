@@ -321,8 +321,11 @@ The table says what each one grades there. `check_policy.py --fixture adopter-fr
 first column to `ARMS` both ways, so an arm added with no row reds as unlisted and a row whose arm
 left reds as stale. The same case installs this kit the way an adopter gets it: a fresh `git init`
 with a `.governance/deploy.toml`, committed once, then `govkit.py apply` with this kit and the closure
-of its `kit.toml` `requires`. A refused `apply`, or a `govkit.py` absent from the tool root, reds the
-case. Every file under the target's tool root must be a path the receipt records, and every engine or
+of its `kit.toml` `requires`. The deployer installs its checkout's HEAD, so the case runs the
+`govkit.py` of a scratch clone whose HEAD commits the working tree under test, and prints
+`installing from snapshot <sha8> of the working tree over HEAD <sha8>`; an uncommitted edit is graded,
+and the source's object store gains nothing. A refused `apply`, a failed snapshot step, or a `govkit.py`
+absent from the tool root, reds the case. Every file under the target's tool root must be a path the receipt records, and every engine or
 seed row of the receipt must be present. The case then runs the installed adopter,
 `adopt-policy.sh --scaffold`, and `--check` with the install staged and again once it is committed.
 Both runs must exit 0, and every arm must print a graded line with no finding or an announce line,
