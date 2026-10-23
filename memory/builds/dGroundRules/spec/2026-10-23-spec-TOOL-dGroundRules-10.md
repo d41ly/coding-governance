@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0016@df63b6eb whole
 
@@ -12,6 +12,7 @@
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
@@ -305,18 +306,18 @@ landed limit until `policy.py settings --write` is run there.
   exits 2 naming the local file; and when `arm_mirror_landed` runs its case with the working-tree
   `policy.json` hand-edited to `8`, the real hook refuses settings at `3`.
   Red when: rule 7 reads only the project file, or reads the working-tree mirror.
-- **AC12** — When the four renders are regenerated in this repository, `grep -c "const MAX_VERIFIERS
-  = 5" tools/workflows/tier2-review.js` prints at least 1 and `grep -n "boundedParallel(thunks, cap
-  = " tools/workflows/tier2-review.js` shows the value `policy.py get runtime.agents-in-flight`
-  prints.
+- **AC12** — When the four renders are regenerated in this repository,
+  `grep -c "const MAX_VERIFIERS = 5" tools/workflows/tier2-review.js` prints at least 1 and
+  `grep -n "boundedParallel(thunks, cap = " tools/workflows/tier2-review.js` shows the value
+  `policy.py get runtime.agents-in-flight` prints.
   Red when: the token still renders the print mode's `5`, or `MAX_VERIFIERS` renders the limit.
   figure: the width is DERIVED from the reader at observation time.
 - **AC13** — When each of the four renders is piped as a `Workflow` script through
   `node tools/hooks/agent-cap.js --only=scripts`, each exits 0.
   Red when: a template still writes `const MAX_VERIFIERS = {{FANOUT_CAP}}` and rule 2 refuses a
   render above `MAX_VERIFIERS`.
-- **AC14** — When `git grep -n "AGENT_CAP\|print-cap\|FANOUT_CAP" -- README.md WIRE-INTO-PROJECT.md
-  tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md tools/hooks/README.md`
+- **AC14** — When
+  `git grep -n "AGENT_CAP\|print-cap\|FANOUT_CAP" -- README.md WIRE-INTO-PROJECT.md tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md tools/hooks/README.md`
   runs, no line it prints says a set `AGENT_CAP` is refused, names the print mode, or calls
   `FANOUT_CAP` a ceiling of five; and `agent-limit.md` names `runtime.agents-in-flight` and
   `policy.py settings --write`.
@@ -403,6 +404,7 @@ verdict. AC15 to AC17 are the main loop's live observation at the close, and no 
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-15, TOOL-dGroundRules-18, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-24 · §6 · AC12, AC14: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
 
 ## 10. Reuse audit
 

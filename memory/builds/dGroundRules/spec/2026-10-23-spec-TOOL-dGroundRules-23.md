@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-23 — the registry join holds each census row's destination and entry to what the deployer installs
 
-**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-23-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-23-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-23-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-23-build-brief.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-23-mark-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-23-mark-task.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-23-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-23-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-24 TOOL-dGroundRules-22 TOOL-dGroundRules-25 |
 
@@ -157,9 +158,9 @@ Every command runs from the repository root. The criteria spell the kit's files 
   `WRONG` naming `line-length` and `check-line-length`; with `installed` staged onto a
   `ships = false` row, it prints `WRONG` naming that row.
   Red when: a row names the wrong entry, or an unshipped row claims a destination.
-- **AC3** — When `python tools/check-spec-tokens.py --legs-for tools/govkit/govkit.py
-  tools/govkit/entries/check-line-length.kit.toml` runs on the built tree, it names
-  `policy fixtures` for each path.
+- **AC3** — When
+  `python tools/check-spec-tokens.py --legs-for tools/govkit/govkit.py tools/govkit/entries/check-line-length.kit.toml`
+  runs on the built tree, it names `policy fixtures` for each path.
   Red when: an edit to the resolver or a descriptor alone skips the leg the join runs in.
 
 ## 7. Gates
@@ -192,6 +193,7 @@ New arm: tools/policy/check_policy.py (`--fixture budgets-ships-join`) · covers
   `widens: none · relaxes: none`, because the departures report reads a mark per line. The mark's
   meaning is unchanged.
 - rev-5 · 2026-10-23 · §1 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
+- rev-6 · 2026-10-24 · §6 · AC3: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
 
 ## 10. Reuse audit
 

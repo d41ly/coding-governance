@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-20 — the `policy fixtures` guard covers the sibling files its cases run, and a join keeps the census's enforcers inside it
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-20-deviation-8.md](../build/2026-10-23-build-TOOL-dGroundRules-20-deviation-8.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-20-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-20-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-20-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-20-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-65-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-65-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-21 |
 
@@ -121,8 +122,9 @@ for each distinct enforcer e of the census:
 Every command runs from the repository root. The case spells the kit's file by bare name,
 `check_policy.py`, as `TOOL-dGroundRules-5` §6 does.
 
-- **AC1** — When `python tools/check-spec-tokens.py --legs-for tools/hooks/agent-cap.js
-  tools/memory-tree/tree_lib.py` runs on the built tree, it names `policy fixtures` for each path.
+- **AC1** — When
+  `python tools/check-spec-tokens.py --legs-for tools/hooks/agent-cap.js tools/memory-tree/tree_lib.py`
+  runs on the built tree, it names `policy fixtures` for each path.
   Red when: an edit to the hook or `tree_lib.py` alone skips the leg.
 - **AC2** — When `python tools/check-spec-tokens.py --legs-for` runs over every enforcer path the
   census names, it names `policy fixtures` for each.
@@ -152,6 +154,8 @@ none
   audit, from the review's sound fix and `tools/gate-legs.json` measured at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
   promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
+- rev-3 · 2026-10-24 · §6 · a criterion code span rejoined onto one line so hygiene check 23 reads
+  the criterion's tokens; no meaning change.
 
 ## 10. Reuse audit
 
