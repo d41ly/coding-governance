@@ -1,0 +1,15 @@
+# TOOL-dFairHearing-39 deviation 391 — the round-5 spec audit promoted a unit for the bug-class half of its high H1
+
+**Serves:** deviation TOOL-dFairHearing-39
+
+- **Departs from:** dFairHearing [roster]
+- **Hand-off:** design-to-spec
+- **Before:** dFairHearing's roster carries the specced units `TOOL-dFairHearing-1` to `TOOL-dFairHearing-18`, `TOOL-dFairHearing-20` to `TOOL-dFairHearing-23` and `TOOL-dFairHearing-25` to `TOOL-dFairHearing-37`, the round-4 spec audit's promotions `TOOL-dFairHearing-33` to `TOOL-dFairHearing-37` the last specced.
+- **After:** the roster also carries `TOOL-dFairHearing-39`, ordered at 25 after `TOOL-dFairHearing-36` and `TOOL-dFairHearing-37` at 24 and beside `TOOL-dFairHearing-38` at 25: the catalogue class `criterion-asserts-what-its-own-command-cannot-show` gains the form "the tool does not say that", its instance, its check and the `/spec/` anchor, so `gotchas.py --for-diff` selects the class for a commit touching a spec, with `memory/gotchas/INDEX.md` regenerated and no change to `gotchas.py`.
+- **Cause:** review finding
+- **Reason:** BUILD-METHOD M4 promotes every confirmed finding at a review's exit, a HIGH to a unit whose mechanism closes it. This unit closes the bug-class half of one confirmed high of the round-5 spec audit, item H1 (finding id 11, merged with id 1, whose criterion half is `TOOL-dFairHearing-38`'s). Id 11 is the grounding lens's reading of the defect: unit 37 AC4 quotes argparse's `unrecognized arguments` for a tool that reads its arguments by hand, `main`'s `--for-diff` branch at `tools/memory-tree/gotchas.py:1335-1339` never reading `argv[3:]`, so the quoted text has no emitting line. A finding fixed and not left-shifted returns (M8), and no gate can decide which tool emits a quoted text, so the form joins its catalogue class and that class gains the anchor a spec path reaches; today the class's row in `memory/gotchas/INDEX.md` counts 2 anchors and neither is a spec path. This is a spec run, so the unit is specced and carried forward once, and the build run after it builds it (`UNATTENDED-STOPS.md` §15, the carry-forward term's second condition). No audit names it: the owner stopped the spec-audit chain after round 5 (`memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-owner-stop-reviews.md`), so round 5's promotions close under a recorded override of `specs-audited` citing that record.
+- **Evidence:** the round-5 spec audit, `memory/builds/dFairHearing/reviews/2026-10-23-review-TOOL-dFairHearing-33-37-spec-audit.md`; the rescope add row for `TOOL-dFairHearing-39` in `memory/builds/dFairHearing/RUN.md`; the unit's spec, `memory/builds/dFairHearing/spec/2026-10-23-spec-TOOL-dFairHearing-39.md`; the owner's record, `memory/builds/dFairHearing/prompts/2026-10-23-prompt-TOOL-dFairHearing-1-owner-stop-reviews.md`.
+- **Risk:** additive
+- **Approver:** spec writer, the gov-spec-writer role of the harness's disposal stage, under the chain's `author-recorded` value (`PLAY-dClosedLoop-4`)
+- **Follow-through:** new unit TOOL-dFairHearing-39
+- **Caused-by:** PLAY-dClosedLoop-2
