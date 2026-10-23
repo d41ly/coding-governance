@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-11-deviation-111.md](../build/2026-10-23-build-TOOL-dSafePassage-11-deviation-111.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-11-deviation-147.md](../build/2026-10-23-build-TOOL-dSafePassage-11-deviation-147.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-11-deviation-31.md](../build/2026-10-23-build-TOOL-dSafePassage-11-deviation-31.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-7 TOOL-dSafePassage-13 |

@@ -188,7 +188,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 121 bound to this build, across 4 record folder(s).
+Records: 124 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
