@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-18 — a writer split bounded by the agent limit: rule 2 judges `gov:fixed-writers` against `runtime.agents-in-flight` and verifiers against `MAX_VERIFIERS`
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -64,6 +64,7 @@ while a verifier split stays bounded by `MAX_VERIFIERS`.
 
 - **consumes-from** `TOOL-dGroundRules-10` — rule 2 with `boundedK` against `MAX_VERIFIERS`, rule 7's `readPolicy` read beside the hooks kit, the `{{FANOUT_CAP}}` render through the policy reader, and the `limit-` case fixture
 - **hands-off** `TOOL-dGroundRules-25` — the writer receiver in the review protocol, the hooks README's bounds, the map card and the workflows render's version floor (findings 27, 8, 14, 35, 44)
+- **hands-off** `TOOL-dGroundRules-30` — `WRITER_MARK`, the writer bound and the template's `gov:fixed-writers` split, which that unit's render asks the installed hook to admit before it writes them (finding 18)
 
 ## 4. Design
 
@@ -184,6 +185,7 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 AC3 · a writer split above
   `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
   promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
+- rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-30 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

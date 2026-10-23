@@ -60,3 +60,19 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T00:49:36Z rescope · item add TOOL-dGroundRules-25 · reason 2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1 minors batch: MEDIUM ids 1 2 3 4 5 6 7 11 12 18 20 21 23 24 25 27 28 29 30 32 36 37 39 40 41 42 43 44 and LOW ids 8 9 14 15 16 19 22 26 33 34 35
 
 2026-10-23T01:09:09Z review · item dGroundRules-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 39 · disposition promote
+
+2026-10-23T01:43:52Z rescope · item add TOOL-dGroundRules-26 · reason 2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1 finding id 1 at HIGH, item H1
+
+2026-10-23T01:43:53Z rescope · item add TOOL-dGroundRules-27 · reason 2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1 finding id 7 at HIGH, item H1
+
+2026-10-23T01:43:55Z rescope · item add TOOL-dGroundRules-28 · reason 2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1 finding id 23 at HIGH, item H1
+
+2026-10-23T01:43:56Z rescope · item add TOOL-dGroundRules-29 · reason 2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1 finding id 17 at HIGH, item H2
+
+2026-10-23T01:43:57Z rescope · item add TOOL-dGroundRules-30 · reason 2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1 finding id 18 at HIGH, item H3
+
+2026-10-23T01:43:58Z rescope · item add TOOL-dGroundRules-31 · reason 2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1 finding id 24 at HIGH, item H4
+
+2026-10-23T01:43:59Z rescope · item add TOOL-dGroundRules-32 · reason 2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1 minors batch: MEDIUM ids 3 4 5 8 9 10 13 14 19 21 25 27 28 and LOW ids 6 11 12 15 16 22 29
+
+2026-10-23T02:03:16Z review · item dGroundRules-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 6 · minors 20 · disposition promote

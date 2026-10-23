@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-25-deviation-13.md](../build/2026-10-23-build-TOOL-dGroundRules-25-deviation-13.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-24 TOOL-dGroundRules-22 TOOL-dGroundRules-23 |
 
 <!-- /gen:spec-records -->
 
@@ -256,6 +257,10 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 - **consumes-from** `TOOL-dGroundRules-21` — `empty` on `ARMS`, `adopter-suite`, the decode path, `on-invalid-shallow`, the settings render, the parity re-point, the no-launcher branch and `adopt-policy.sh --scaffold`, which S7, S8 and S26 to S35 amend
 - **consumes-from** `TOOL-dGroundRules-22` — `derive_census_tree` and the adopter grading of the census, which S11, S12 and S36 read
 - **consumes-from** `TOOL-dGroundRules-24` — the deployer-installed fresh target, which S5 to S7, S9 and S12 assert against
+- **hands-off** `TOOL-dGroundRules-27` — the cases `legacy-homes-withheld-install` and `census-default-adopter`, which that unit moves onto the snapshot through `run_govkit` (finding 7)
+- **hands-off** `TOOL-dGroundRules-30` — the render's writer-marker floor (S18), whose version predicate that unit replaces with the installed hook's own verdict, and AC18, which that unit's AC1 and AC2 observe in its place (finding 18)
+- **hands-off** `TOOL-dGroundRules-31` — `--scaffold`'s `mirror --write` call (S7), whose `uncommitted changes` refusal that unit defers, and AC7's second clause, which that unit observes on the re-run after the first commit (finding 24)
+- **hands-off** `TOOL-dGroundRules-32` — the build-order rule, the census and plan cases, the BOM strip, the map regeneration, the card criterion, the edge read and the widened refusal, which that unit amends (findings 3, 9, 10, 19, 14, 25, 27, 28, 6, 11, 12, 15, 22)
 
 ## 4. Design
 
@@ -612,6 +617,7 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
   the round-1 spec audit of units 13 to 21 in one batch, from the review's sound fixes and the
   skeptics' corrected fixes for ids 2, 22, 23, 26 and 35, with each cited line read at base
   `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-27, TOOL-dGroundRules-30, TOOL-dGroundRules-31, TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

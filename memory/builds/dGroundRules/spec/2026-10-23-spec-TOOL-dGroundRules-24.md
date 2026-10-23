@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-24 — the fresh target installed by the deployer, so the case grades an install govkit makes
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-24-deviation-12.md](../build/2026-10-23-build-TOOL-dGroundRules-24-deviation-12.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,8 @@ own adopter there.
 
 - **consumes-from** `TOOL-dGroundRules-16` — `adopter-fresh-target`, its two `--check` runs and its per-arm reading, which this unit re-bases on the deployer
 - **hands-off** `TOOL-dGroundRules-25` — the installed target, which that unit's items for findings 36, 15 and 23 assert against
+- **hands-off** `TOOL-dGroundRules-26` — `adopter-fresh-target`'s `apply` from the source tree, which that unit points at a commit of the working tree made in a scratch clone (finding 1)
+- **hands-off** `TOOL-dGroundRules-32` — the fresh target's set-up, receipt compare and guard lines, which that unit moves into one builder with `[answers]`, a local identity and `govkit.py check` (findings 8, 12, 16, 21, 29)
 
 ## 4. Design
 
@@ -175,6 +178,7 @@ New arm: tools/policy/check_policy.py (`--fixture adopter-fresh-target`) · cove
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 17 (HIGH, item H2) of the round-1 spec
   audit of units 13 to 21, from the review's sound fix, corrected for `apply`'s refusal of an
   unselected `requires`, with govkit and its selftest read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-26, TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

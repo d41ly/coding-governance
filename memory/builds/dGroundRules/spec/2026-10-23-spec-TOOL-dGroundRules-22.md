@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-22 — each census row names where its kit installs the enforcer, and the census arm grades an adopter there
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-22-deviation-10.md](../build/2026-10-23-build-TOOL-dGroundRules-22-deviation-10.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-24 TOOL-dGroundRules-23 TOOL-dGroundRules-25 |
 
 <!-- /gen:spec-records -->
 
@@ -73,6 +74,8 @@ adopter at that destination, reading the target's install receipt and never the 
 - **consumes-from** `TOOL-dGroundRules-17` — `ships`, `arm_cap_census` graded by what ships, its `ships = false` announce line and the README table row, which this unit re-locates
 - **hands-off** `TOOL-dGroundRules-23` — the `installed` and `kit` fields, which that unit's registry join holds equal to each entry's resolved writes
 - **hands-off** `TOOL-dGroundRules-25` — `derive_census_tree` and the adopter grading, which that unit's legacy-home announce (finding 37) and real-install case (finding 4) read
+- **hands-off** `TOOL-dGroundRules-29` — `derive_census_tree`'s no-receipt answer, which that unit splits into `source` and `unadopted` by the registry only gov's tree holds (finding 17)
+- **hands-off** `TOOL-dGroundRules-32` — `derive_census_tree`'s receipt read, which that unit gives a required shape and an `invalid` answer (finding 25)
 
 ## 4. Design
 
@@ -194,6 +197,7 @@ New arm: tools/policy/check_policy.py (`--fixture census-adopter-receipt`) · co
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 10 (HIGH, item H1) of the round-1 spec
   audit of units 13 to 21, from the skeptics' corrected fix and the entry descriptors, the registry
   and `govkit.py`'s receipt writer read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-29, TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0011@8312590d whole
 
@@ -86,6 +86,7 @@ as `policy-file.on-invalid` says.
 - **hands-off** `TOOL-dGroundRules-15` — `resolve_read` as the one home of the `.agent-cap.conf` lowering, so the render sees it (finding 2)
 - **hands-off** `TOOL-dGroundRules-19` — `mirror --print`, the render at HEAD a staged mirror is compared with (finding 32)
 - **hands-off** `TOOL-dGroundRules-21` — bash resolution for the shim, the adopter's absent mirror, the helper's exit mapping, `legacy_blobs`, the read-shape scanner, the mirror's eol pin and the shared single-reader arm (findings 17, 47, 48, 49, 50, 11, 26)
+- **hands-off** `TOOL-dGroundRules-31` — `mirror --write`'s exit 2 and its `uncommitted changes` refusal line, which that unit's `--scaffold` defers on install day (finding 24)
 
 ## 4. Design
 
@@ -442,6 +443,7 @@ New arm: tools/policy/check_policy.py (`arm_mirror_readers`, live and `--fixture
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 5, the brief's S6, the owner's AF-2,
   and the lander, regen and ladder code read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-13, TOOL-dGroundRules-14, TOOL-dGroundRules-15, TOOL-dGroundRules-19, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-31 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

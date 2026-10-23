@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-23 — the registry join holds each census row's destination and entry to what the deployer installs
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 7
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-23-deviation-11.md](../build/2026-10-23-build-TOOL-dGroundRules-23-deviation-11.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-24 TOOL-dGroundRules-22 TOOL-dGroundRules-25 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,7 @@ equal what the deployer's own resolver says the entry writes.
 
 - **consumes-from** `TOOL-dGroundRules-17` — `budgets-ships-join`, its `[[exempt]]` half and the `{prefix}/govkit/registry.toml` guard line, which this unit extends
 - **consumes-from** `TOOL-dGroundRules-22` — the census fields `installed` and `kit`, which this join holds to the registry; without them it has nothing to compare
+- **hands-off** `TOOL-dGroundRules-32` — `budgets-ships-join` and its guard lines, which that unit routes through `read_shipped_descriptors` and extends to every census kit's descriptor (findings 13, 5)
 
 ## 4. Design
 
@@ -178,6 +180,7 @@ New arm: tools/policy/check_policy.py (`--fixture budgets-ships-join`) · covers
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 38 (HIGH, item H1) of the round-1 spec
   audit of units 13 to 21, from the skeptic's corrected fix and govkit's resolver and the two entry
   descriptors read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 
