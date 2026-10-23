@@ -10,7 +10,8 @@ zero is a finding, so an arm that read nothing cannot read green.
 
 THE ARMS read the repository's `.governance/policy.toml` and this kit's catalogue and shrink-only
 list: `arm_schema` grades each file key with the value check, `arm_shape` audits the catalogue's
-rows, and `arm_summaries` grades the list as `policy.py lists --check` does.
+rows, `arm_summaries` grades the list as `policy.py lists --check` does, and `arm_direction` reds a
+loop bound or deadline row that does not declare `direction = "raise-loosens"` (TOOL-dGroundRules-11).
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -93,7 +94,16 @@ def arm_summaries(repo, kit):
     return len(rows), f"{len(policy.derive_unsummarised(rows))} of {len(rows)} row(s) unsummarised · {note}", findings
 
 
-ARMS = [arm_schema, arm_shape, arm_summaries]
+def arm_direction(repo, kit):
+    """Each `check_direction` pair; the population is the rows `derive_bounds` selects."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    n = len(policy.derive_bounds(rows))
+    return n, f"{n} loop bound and deadline row(s)", policy.check_direction(rows)
+
+
+ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction]
 
 
 def run_arm(arm, repo, kit):
@@ -174,6 +184,30 @@ def seed_list_grew(repo, kit, rows):
     return PLANTED, "added to a shrink-only list"
 
 
+def derive_first_bound(rows):
+    return policy.derive_bounds(rows)[0]["name"]
+
+
+def seed_direction_missing(repo, kit, rows):
+    name = derive_first_bound(rows)
+    write_edit(kit / policy.CATALOGUE, lambda t: set_row_block(
+        t, name, lambda b: "".join(ln for ln in b.splitlines(keepends=True) if not ln.startswith("direction ="))))
+    return name, "declares no direction"
+
+
+def seed_direction_new_bound(repo, kit, rows):
+    write_edit(kit / policy.CATALOGUE, lambda t: t + '\n[[key]]\nname = "zz.loop"\n'
+               'allowed = { type = "retry-count", min = 1 }\ndefault = 3\nowner = "dGroundRules"\n')
+    return "zz.loop", "declares no direction"
+
+
+def seed_direction_wrong_value(repo, kit, rows):
+    name = derive_first_bound(rows)
+    write_edit(kit / policy.CATALOGUE, lambda t: set_row_block(
+        t, name, lambda b: re.sub(r"^direction = .*$", 'direction = "raise-tightens"', b, flags=re.M)))
+    return name, "must be raise-loosens"
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -181,6 +215,9 @@ CASES = [
     ("summary-new-key", arm_summaries, seed_summary_new_key),
     ("usage-new-key", arm_summaries, seed_usage_new_key),
     ("list-grew", arm_summaries, seed_list_grew),
+    ("direction-missing", arm_direction, seed_direction_missing),
+    ("direction-new-bound", arm_direction, seed_direction_new_bound),
+    ("direction-wrong-value", arm_direction, seed_direction_wrong_value),
 ]
 
 

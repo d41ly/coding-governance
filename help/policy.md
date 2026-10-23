@@ -30,6 +30,11 @@ allowed values and every check.
   `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the
   list. `python tools/policy/policy.py lists --check` reds a list that grew past the one the default
   branch carries.
+- **Know which keys are loop bounds or deadlines:** raising one loosens the policy, so its catalogue
+  row says so with `direction = "raise-loosens"`. A row is one when its allowed values are a retry,
+  round or route-back count, or a number of hours, days or seconds. The check reds such a row that
+  says nothing, and any row with another `direction`. Adding a new key of one of those kinds? Give
+  its row `direction = "raise-loosens"`.
 
 ## The keys the file holds today
 
@@ -47,6 +52,7 @@ python tools/policy/check_policy.py
 # policy-check: arm_schema · 0 finding(s) · 4 key(s) of .governance/policy.toml against 267 row(s)
 # policy-check: arm_shape · 0 finding(s) · 267 row(s), 19 set-valued, 10 never-empty
 # policy-check: arm_summaries · 0 finding(s) · 263 of 267 row(s) unsummarised · ...
+# policy-check: arm_direction · 0 finding(s) · 19 loop bound and deadline row(s)
 ```
 
 With `runtime.agents-in-flight = 0` in the file, the first line reads `1 finding(s)` and the next

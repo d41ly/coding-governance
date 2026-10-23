@@ -823,6 +823,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_direction",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "arm_evil_merge",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -4013,6 +4018,11 @@
       "file": "tools/check-spec-tokens.py"
     },
     {
+      "id": "check_direction",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_dispatch_pause",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -6663,6 +6673,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "derive_bounds",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "derive_budget_cut",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
@@ -6921,6 +6936,11 @@
       "id": "derive_families",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
+    },
+    {
+      "id": "derive_first_bound",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_first_seen",
@@ -21106,6 +21126,21 @@
       "id": "seed_corpus",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "seed_direction_missing",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_direction_new_bound",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "seed_direction_wrong_value",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "seed_driver_kit",

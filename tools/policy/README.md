@@ -15,7 +15,7 @@ re-points one consumer.
 |---|---|
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
-| `policy.py` | the module: `load_catalogue`, `check_value`, `check_shape`, `derive_unsummarised`, `resolve_compare_base`, and the `lists` and `scaffold` verbs |
+| `policy.py` | the module: `load_catalogue`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, and the `lists` and `scaffold` verbs |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 
@@ -32,7 +32,8 @@ owner = "dGroundRules"            # the design's Owner cell
 ```
 
 Required: `name`, `allowed`, `default`, `owner`. Optional: `empty`, `summary`, `usage`, `registry`,
-`direction`. Any other field is refused by the shape audit.
+`direction`. Any other field is refused by the shape audit. A loop bound or deadline row must carry
+`direction`, below.
 
 A `name` is dotted segments of `[A-Za-z0-9_-]+`; a segment may be a placeholder `<word>`, or `*` as
 the last segment. A placeholder or `*` matches exactly one segment of a file key, and an exact name
@@ -63,6 +64,18 @@ The value check denies by default: a member outside a closed list is refused eve
 names members a registry will add, because no registry exists yet. A cross-key rule the design states
 in prose, such as a round count held at or below `review.max-rounds`, is its owning build's to check.
 
+## Loop bounds and deadlines: `direction`
+
+Every loop ends and every wait expires, so raising a loop bound or a deadline loosens the policy.
+Each such row declares it: `direction = "raise-loosens"`, the field's one allowed value
+(TOOL-dGroundRules-11). The population is derived, never listed by name: `derive_bounds` selects
+each row whose `allowed` is a typed range of a noun in `LOOP_BOUND_TYPES` (`retry-count`,
+`round-count`, `route-back-count`) or `DEADLINE_TYPES` (`hours`, `days`, `seconds`). A duration that
+bounds no loop, such as a retention window, is in the population too, because over-inclusion fails
+safe. A row outside it may carry `direction`, and only `raise-loosens`. `check_direction` reds a
+member with no `direction` and any row with another value. Nothing reads the declaration yet: the
+owner-silence rule that declines a raise is a later build's reader.
+
 ## The CLIs
 
 - `python <prefix>/policy/check_policy.py [--repo <dir>]` — every arm over the repository, the git
@@ -89,9 +102,13 @@ in prose, such as a round count held at or below `review.max-rounds`, is its own
 | `arm_schema` | `.governance/policy.toml`, the catalogue | each key `check_value` refuses, each key no row matches |
 | `arm_shape` | the catalogue | a set-valued row with no `empty`, `empty` on any other row, a missing required field, an unknown field, a literal default or a `usage` its own row refuses, a `usage` that does not parse |
 | `arm_summaries` | the catalogue, the list, the list at the base | each `lists --check` finding |
+| `arm_direction` | the catalogue | each `check_direction` finding; its population is the loop bound and deadline rows |
 
 The fixture's cases: one `schema-empty-<name>` per never-empty row, then `shape-no-empty`,
-`shape-unknown-field`, `usage-out-of-set`, `summary-new-key`, `usage-new-key` and `list-grew`.
+`shape-unknown-field`, `usage-out-of-set`, `summary-new-key`, `usage-new-key`, `list-grew`,
+`direction-missing` (the first selected row loses its `direction`), `direction-new-bound` (a new
+`retry-count` row `zz.loop` with none) and `direction-wrong-value` (the first selected row declares
+`raise-tightens`).
 
 ## The adopter
 

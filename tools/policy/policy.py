@@ -1,5 +1,6 @@
-"""policy.py - the policy kit's module: its catalogue, the value check, the shape audit, and the
-shrink-only list of keys that carry no summary or no usage (TOOL-dGroundRules-1).
+"""policy.py - the policy kit's module: its catalogue, the value check, the shape audit, the
+shrink-only list of keys that carry no summary or no usage (TOOL-dGroundRules-1), and the direction
+check over the loop bound and deadline rows (TOOL-dGroundRules-11).
 
     python <this kit>/policy.py lists --check   # the list against the catalogue and against its base
     python <this kit>/policy.py lists --write   # drain the list; it never gains a name
@@ -39,6 +40,11 @@ OPTIONAL = ("empty", "summary", "usage", "registry", "direction")
 SET_TYPES = ("set", "list")
 COUNT_TYPES = ("count", "retry-count", "round-count", "route-back-count", "agent-count")
 DURATION_TYPES = ("hours", "days", "seconds")
+# The loop bound and deadline population, DERIVED from each row's typed-range noun and never typed as
+# names (TOOL-dGroundRules-11): each member declares `direction = "raise-loosens"`. Every duration is
+# a deadline, one that bounds no loop included, because over-inclusion fails safe.
+LOOP_BOUND_TYPES = ("retry-count", "round-count", "route-back-count")
+DEADLINE_TYPES = DURATION_TYPES
 BARE = re.compile(r"[A-Za-z0-9_-]+")
 
 
@@ -192,6 +198,28 @@ def check_shape(rows):
                 why = check_value(row, hits[0])
                 if why:
                     out.append((key, f"its usage is refused by its own row: {why}"))
+    return out
+
+
+def derive_bounds(rows):
+    """The loop bound and deadline rows in file order: each row whose `allowed` is a typed range of a
+    LOOP_BOUND_TYPES or DEADLINE_TYPES noun. No row is named; the noun is the rule."""
+    return [r for r in rows if isinstance(r.get("allowed"), dict)
+            and r["allowed"].get("type") in LOOP_BOUND_TYPES + DEADLINE_TYPES]
+
+
+def check_direction(rows):
+    """(key, why) for each loop bound or deadline row that declares no `direction`, and each row
+    whose `direction` is anything but raise-loosens, the one value a row may declare."""
+    bounds = derive_bounds(rows)
+    out = []
+    for i, row in enumerate(rows):
+        key = str(row.get("name") or f"row {i + 1}")
+        if "direction" in row:
+            if row["direction"] != "raise-loosens":
+                out.append((key, "direction must be raise-loosens"))
+        elif row in bounds:
+            out.append((key, "a loop bound or deadline declares no direction"))
     return out
 
 

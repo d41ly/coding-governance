@@ -130,6 +130,7 @@ name = "leases.expiry-hours"
 allowed = { type = "hours", min = 0 }
 default = 24
 owner = "dPlacedRequest"
+direction = "raise-loosens"
 
 [[key]]
 name = "leases.overlap"
@@ -148,12 +149,14 @@ name = "leases.queued-claim-days"
 allowed = { type = "days", min = 0 }
 default = 7
 owner = "dPlacedRequest"
+direction = "raise-loosens"
 
 [[key]]
 name = "leases.offer-seconds"
 allowed = { type = "seconds", min = 0 }
 default = 300
 owner = "dPlacedRequest"
+direction = "raise-loosens"
 
 [[key]]
 name = "deps.coordination"
@@ -257,6 +260,7 @@ name = "roles.retries"
 allowed = { type = "retry-count", min = 0 }
 default = 3
 owner = "dBoundRoles"
+direction = "raise-loosens"
 
 [[key]]
 name = "roles.no-spawn"
@@ -434,30 +438,35 @@ name = "runtime.act-ceiling"
 allowed = { type = "hours", min = 0 }
 default = 1.5
 owner = "dWellOiledMachine"
+direction = "raise-loosens"
 
 [[key]]
 name = "runtime.hold-ceiling"
 allowed = { type = "hours", min = 0 }
 default = 6
 owner = "dWellOiledMachine"
+direction = "raise-loosens"
 
 [[key]]
 name = "runtime.no-progress"
 allowed = { type = "retry-count", min = 0 }
 default = 3
 owner = "dWellOiledMachine"
+direction = "raise-loosens"
 
 [[key]]
 name = "runtime.refusal-repeats"
 allowed = { type = "retry-count", min = 1, max = 10 }
 default = 3
 owner = "dWellOiledMachine"
+direction = "raise-loosens"
 
 [[key]]
 name = "runtime.restarts"
 allowed = { type = "retry-count", min = 0 }
 default = 3
 owner = "dWellOiledMachine"
+direction = "raise-loosens"
 
 [[key]]
 name = "runtime.hook-failure"
@@ -504,6 +513,7 @@ name = "runtime.journal"
 allowed = { type = "days", min = 0, or = ["all"] }
 default = 60
 owner = "dWellOiledMachine"
+direction = "raise-loosens"
 
 [[key]]
 name = "runtime.secret-home"
@@ -552,6 +562,7 @@ name = "run.owner-deadline"
 allowed = { type = "hours", min = 0 }
 default = 24
 owner = "dWellOiledMachine"
+direction = "raise-loosens"
 
 [[key]]
 name = "run.on-owner-silence"
@@ -588,6 +599,7 @@ name = "mailbox.fetch-seconds"
 allowed = { type = "seconds", min = 10 }
 default = 60
 owner = "dKeptSession"
+direction = "raise-loosens"
 
 [[key]]
 name = "review.follow-up"
@@ -705,12 +717,14 @@ name = "review.design.round-count"
 allowed = { type = "round-count", min = 0 }
 default = 2
 owner = "dDeclaredLoop"
+direction = "raise-loosens"
 
 [[key]]
 name = "review.max-rounds"
 allowed = { type = "round-count", min = 0 }
 default = 3
 owner = "dDeclaredLoop"
+direction = "raise-loosens"
 
 [[key]]
 name = "review.design-audit.runs"
@@ -741,12 +755,14 @@ name = "flow.route-backs"
 allowed = { type = "route-back-count", min = 0 }
 default = 3
 owner = "dDeclaredLoop"
+direction = "raise-loosens"
 
 [[key]]
 name = "flow.rework-budget"
 allowed = { type = "route-back-count", min = 0, pattern = "[0-9]+\\+[0-9]+" }
 default = "4+2"
 owner = "dDeclaredLoop"
+direction = "raise-loosens"
 
 [[key]]
 name = "flow.on-exhausted"
@@ -759,6 +775,7 @@ name = "flow.wait-ceiling"
 allowed = { type = "hours", min = 0 }
 default = 72
 owner = "dDeclaredLoop"
+direction = "raise-loosens"
 
 [[key]]
 name = "flow.scenario-default"
@@ -1060,6 +1077,7 @@ name = "build.release-ceiling"
 allowed = { type = "hours", min = 0 }
 default = 72
 owner = "dShippedRelease"
+direction = "raise-loosens"
 
 [[key]]
 name = "kits.cadence"
@@ -1249,6 +1267,7 @@ name = "review.loop.window-days"
 allowed = { type = "days", min = 0 }
 default = 60
 owner = "dCalibratedLens"
+direction = "raise-loosens"
 
 [[key]]
 name = "review.loop.catch-source"
