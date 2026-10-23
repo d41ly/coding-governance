@@ -1,8 +1,8 @@
 # TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows
 
-**Status:** DEFERRED · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-6 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
 
-**Carries:** cl-dClosedLoop-0018@ed08a364 whole
+**Carries:** cl-dClosedLoop-0018@d4cade33 whole
 
 <!-- gen:spec-records -->
 
@@ -14,8 +14,11 @@
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-108.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-108.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-109.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-109.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md) | deviation | — |
+| [2026-10-23-build-TOOL-dSafePassage-1-deviation-145.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-145.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-4-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-4-spec-writer.md) | journal | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md) | research | TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-owner-audit-cap.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
@@ -540,6 +543,10 @@ branch has not landed.
 - rev-5 · 2026-10-23 · §8 F8's mark reads `widens: none · relaxes: none`, since the widening was
   the withdrawn deviation-12's and the guard's second write shape is `TOOL-dGroundRules-13`'s to
   grant; no other section moved.
+- rev-6 · 2026-10-23 · the header's binding line re-pins `cl-dClosedLoop-0018` from `ed08a364` to
+  `d4cade33`, its hash in the as-built view since
+  `2026-10-23-build-TOOL-dSafePassage-1-deviation-11` moved the clause's text; every token of that
+  text was already in the spec; §1 to §10 are unmoved.
 
 ## 10. Reuse audit
 

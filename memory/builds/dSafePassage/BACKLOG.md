@@ -10,3 +10,4 @@
 - SEV · TOOL-dSafePassage-14 · MED · the build's units stay unbuilt and its owned gaps open
 - SEV · TOOL-dSafePassage-60 · LOW · every spec-run round with promotions costs a main-loop spec-writer dispatch before its commit
 - DEFERRED · TOOL-dSafePassage-14 · until TOOL-dSafePassage-1 · filed 2026-10-21; the build run, which builds TOOL-dSafePassage-1 first; the spec run specced and deferred every roster unit, each header advancing this ask, and the build run builds them (README rule 1)
+- DEFERRED · TOOL-dSafePassage-60 · until TOOL-dSafePassage-1 · filed 2026-10-23; the change is to tools/workflows/unattended-build.js, outside this build's goal and its grant, so the build run, which builds TOOL-dSafePassage-1 first, re-reads it and either adopts it as a unit or files it with the kit's owner

@@ -1,8 +1,8 @@
 # TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
-**Carries:** cl-dClosedLoop-0028@032ca791 whole
+**Carries:** cl-dClosedLoop-0028@dae8abad whole
 **Carries:** node:policy-key.platforms.provision
 
 <!-- gen:spec-records -->
@@ -11,6 +11,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-11-deviation-111.md](../build/2026-10-23-build-TOOL-dSafePassage-11-deviation-111.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-11-deviation-31.md](../build/2026-10-23-build-TOOL-dSafePassage-11-deviation-31.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-7 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
@@ -210,9 +211,10 @@ statements only. `python tools/lib/python_floor.py down <prior> <target>` is the
 (`git -C <target> ls-files`). When `resolve_floor_interpreter(prior)` returns an interpreter, mode
 `interpreter <path>`, one child of that interpreter, run with `-I`, applies `compile()` to every
 `.py` and `tomllib.loads` to every `.toml`, and prints each failure. Otherwise, mode `static`,
-the running interpreter applies `ast.parse(src, feature_version=prior)` to each `.py` and also runs
-the PEP 701 check over its tokens. The check flags any string token inside a replacement field that
-reuses the enclosing f-string's quote. It also flags a backslash or a `#` in a replacement field,
+the running interpreter applies `ast.parse` at the prior floor's feature version,
+`ast.parse(src, feature_version=prior)`, to each `.py` and also runs the PEP 701 check over its
+tokens. The check flags any string token inside a replacement field that reuses the enclosing
+f-string's quote. It also flags a backslash or a `#` in a replacement field,
 and a line break in a single-quoted f-string's field. Each `.toml` is parsed by the running
 `tomllib`, and the static check then flags the four TOML 1.1 deltas: a line break or a trailing
 comma inside an inline table, a `\e` or `\xHH` escape, and a time without seconds. The mode is
@@ -507,6 +509,10 @@ static mode's eight shapes.
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-15`, `TOOL-dSafePassage-17`, `TOOL-dSafePassage-23`, `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-23 · the header's binding line re-pins `cl-dClosedLoop-0028` from `032ca791` to
+  `dae8abad`, its hash in the as-built view since
+  `2026-10-23-build-TOOL-dSafePassage-11-deviation-31` moved the clause's text; §4 "The floor
+  module" names the amended text's token `ast.parse` on its own; no other section moved.
 
 ## 10. Reuse audit
 

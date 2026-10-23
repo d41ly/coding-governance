@@ -1,8 +1,8 @@
 # TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
-**Carries:** cl-dClosedLoop-0030@274077d4 whole
+**Carries:** cl-dClosedLoop-0030@e7612082 whole
 **Carries:** node:policy-key.help.enforce
 
 <!-- gen:spec-records -->
@@ -12,6 +12,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-113.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-113.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-51.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-51.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-11 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-7 TOOL-dSafePassage-11 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-5 |
@@ -450,6 +451,11 @@ New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC8 · a new
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-23 · the header's binding line re-pins `cl-dClosedLoop-0030` from `274077d4` to
+  `e7612082`, its hash in the as-built view since
+  `2026-10-23-build-TOOL-dSafePassage-13-deviation-52` moved the clause's text, carrying the
+  population of `2026-10-23-build-TOOL-dSafePassage-13-deviation-51`, which it supersedes; every
+  token of that text was already in the spec; §1 to §10 are unmoved.
 
 ## 10. Reuse audit
 
