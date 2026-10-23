@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-29 — the step contract's refused keys are the class git's own config list derives, held to it by an arm
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -69,6 +69,8 @@ check.
 - **hands-off** `TOOL-dSafePassage-35` — the credential-bearing values and the sentence naming every key the check leaves unrefused, which this unit's exception table starts
 - **hands-off** `TOOL-dSafePassage-37` — the predicate's keys whose last segment ends in `hook`, `gc.recentObjectsHook` refused, and the `ext::` transport closed by a command-scope pair, the repair of finding 28 of the spec audit of units 27 to 35
 - **hands-off** `TOOL-dSafePassage-42` — finding 9 of the spec audit of units 27 to 35, the predicate's names `tunnel`, `httpd` and `smtpserver`, and finding 5, S5's rewrite keeping TOOL-dSafePassage-24 AC5's literals
+- **hands-off** `TOOL-dSafePassage-48` — the send-email executor rows in their `sendemail.<x>.` form and the `sendemail.sendmailCmd` row, finding 10 of the spec audit of units 43 to 46
+- **hands-off** `TOOL-dSafePassage-49` — the class arm widening each kept key to its identity form wherever `git help --config` lists a `<section>.<placeholder>.*` line, and keeping `UNLISTED_EXECUTOR_KEYS`, finding 27 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -208,6 +210,7 @@ none
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 12 (HIGH, item D-2).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-37`, `TOOL-dSafePassage-42`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-48`, `TOOL-dSafePassage-49`; no other section moved.
 
 ## 10. Reuse audit
 

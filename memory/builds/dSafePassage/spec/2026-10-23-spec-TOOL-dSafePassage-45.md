@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-45 — the spec audit of units 36 to 42, the step contract's 21 minors: a derived pair count, a credential class over keys and values, a walk by git's own test, declared exits, and the readings that cite them
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-45-deviation-91.md](../build/2026-10-23-build-TOOL-dSafePassage-45-deviation-91.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-46 |
 
 <!-- /gen:spec-records -->
 
@@ -185,6 +186,9 @@ S11, S16 and S17 are one edit.
 - **consumes-from** `TOOL-dSafePassage-39` — S2's caller table, which S18 reads
 - **consumes-from** `TOOL-dSafePassage-42` — S7, S10, S22, AC3, AC7, AC14 and AC15, which S5, S6, S11, S13 to S16 amend and read
 - **consumes-from** `TOOL-dSafePassage-44` — the ssh-scheme exemption and its plant, which S8's whole-subsection text keeps green
+- **hands-off** `TOOL-dSafePassage-47` — S12's walk test read as the directory shape git opens, a candidate's failed config read a refusal naming its config, and descent only through non-candidates and each candidate's `modules/`, so AC9 can go green, finding 9 of the spec audit of units 43 to 46
+- **hands-off** `TOOL-dSafePassage-48` — S6 read as a class, every send-email executor row in its `sendemail.<x>.` form, and `sendemail.sendmailCmd` refused though `git help --config` omits it, with §7 saying so, finding 10 of the spec audit of units 43 to 46
+- **hands-off** `TOOL-dSafePassage-49` — AC12 matched on the exact bytes git prints, AC2's help half scoped to its section, the `.gitmodules` read refusing a file that exists and does not read, the redactor covering a key's whole subsection to its last `@`, and S11's pin and the PINNED key count read by item and by filter, findings 4, 16, 31, 32, 25 and 12 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -388,6 +392,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 36 to 42's 13 MEDIUM and 8
   LOW findings of the step contract, one scope item per raw id.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-47`, `TOOL-dSafePassage-48`, `TOOL-dSafePassage-49`; no other section moved.
 
 ## 10. Reuse audit
 

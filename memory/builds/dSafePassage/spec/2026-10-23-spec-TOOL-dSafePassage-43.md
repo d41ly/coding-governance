@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-43 — the step row's one writer admits a stopped down's failure on an `applied` row, by one declared prefix set, and refuses every other
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-43-deviation-89.md](../build/2026-10-23-build-TOOL-dSafePassage-43-deviation-89.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,8 @@ and the one writer admits a `failure` on an `applied` row only when it begins wi
 - **hands-off** `TOOL-dSafePassage-4` — moves 3, 4 and 5 of the reverse walk, which build their failure texts from `DOWN_STOP_PREFIXES` and write them through the writer this unit's rule admits
 - **hands-off** `TOOL-dSafePassage-17` — the `reverted check exits <rc>` failure of S2, built from `DOWN_STOP_PREFIXES` and admitted on an `applied` row
 - **hands-off** `TOOL-dSafePassage-39` — the second non-goal's owner: an `applied` row may carry a down stop's failure, so AC1 and AC3 write and read the rows this unit admits
+- **hands-off** `TOOL-dSafePassage-33` — S3's `witness still holds after down; before-image <path> absent` built from `DOWN_STOP_PREFIXES` and admitted on an `applied` row, findings 7 and 20 of the spec audit of units 43 to 46
+- **hands-off** `TOOL-dSafePassage-49` — AC3 and the rollback-plant half of the arm observed at TOOL-dSafePassage-4's pass, so this unit's arm covers AC1; the row rule as one predicate `test_step_row` that the writer and the reader both call, admitting a `failure` only when absent, null or a non-empty string; move 3 recording a `rolled-back` row `applied`; no stop-text literal outside `DOWN_STOP_PREFIXES`; and a second staged break admitting any failure on an `applied` row, findings 1, 18, 29, 15, 2, 20 and 33 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -183,6 +186,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 36 to 42's id 2 (HIGH,
   item D-1).
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-33`, `TOOL-dSafePassage-49`; no other section moved.
 
 ## 10. Reuse audit
 

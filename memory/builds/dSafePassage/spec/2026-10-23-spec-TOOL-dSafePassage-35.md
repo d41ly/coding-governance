@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-35 — the round-1 audit of units 15 to 26: its 39 minors, one filtered population, one plan source, pinned plants and the texts that cite them
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -296,6 +296,7 @@ D-39's fix was REJECTED by its skeptic, so S39 is built from the skeptic's corre
 - **consumes-from** `TOOL-dSafePassage-33` — the no-record branch of the down's verdict, which S19 and S20 rest on
 - **hands-off** `TOOL-dSafePassage-38` — S8's credential rows restated as one predicate over keys and values, and every refusal line's keys redacted, the repair of finding 30 of the spec audit of units 27 to 35
 - **hands-off** `TOOL-dSafePassage-42` — findings 25, 3, 13 and 19 of the spec audit of units 27 to 35, AC9 counting code lines and `remove_new_untracked` calling `write_untracked_snapshot`; finding 11, AC12's population as the parity arm's own; finding 12, S24's moved set as its ast closure, `demand_safe_token` and eight constants included; findings 4 and 15, AC18 read as a regression guard; and finding 16, the `BRANCH_PIN` and filter cites
+- **hands-off** `TOOL-dSafePassage-44` — S8's `remote.<x>.url` and `remote.<x>.pushurl` rows, which that unit's pass removes in favour of `test_credential_bearing` and its ssh exemption, finding 3 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -546,6 +547,7 @@ New arm: tools/lib/resolve-python.test.sh · covers AC26 · every launcher faked
 - rev-1 · 2026-10-23 · initial draft, the batch of the round-1 spec audit of units 15 to 26's 20
   MEDIUM and 19 LOW findings, one scope item per raw id.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-38`, `TOOL-dSafePassage-42`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-44`; no other section moved.
 
 ## 10. Reuse audit
 

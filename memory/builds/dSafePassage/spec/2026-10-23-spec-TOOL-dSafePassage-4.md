@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal
 
-**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-5 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0021@ad0db541 whole
 
@@ -120,6 +120,7 @@ downgrade refusal for a rollback only and is never run on its own after a failur
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 - **hands-off** `TOOL-dSafePassage-39` — move 3 rewriting an `applied` row with its `via` kept, and recording an unrecorded row whose witness holds and whose image is absent with `via` `witness`, the repair of finding 23 of the spec audit of units 27 to 35
 - **consumes-from** `TOOL-dSafePassage-43` — `DOWN_STOP_PREFIXES`, from which moves 3, 4 and 5 build their failure texts, and the writer rule that admits them on an `applied` row; without it the writer refuses this unit's own stop rows
+- **hands-off** `TOOL-dSafePassage-49` — AC4 read with each stop text the `down-fails` and `witness-stays` plants leave opening with an entry of `DOWN_STOP_PREFIXES`, and TOOL-dSafePassage-43's AC3 observed at this unit's pass; move 3 on a `rolled-back` row whose witness holds recording it `applied`; and this unit's order moved to 3 by that unit's §8 F1, so it builds after TOOL-dSafePassage-43 and TOOL-dSafePassage-7, findings 11, 1, 2 and 19 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -314,6 +315,7 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · the s
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-17`, `TOOL-dSafePassage-18`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-26`; no other section moved.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-39`; no other section moved.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-43`; no other section moved.
+- rev-5 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-49`; no other section moved.
 
 ## 10. Reuse audit
 

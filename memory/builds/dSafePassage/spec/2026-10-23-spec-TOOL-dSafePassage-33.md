@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-33 — a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -71,6 +71,7 @@ records nothing for, take the no-image rule.
 - **hands-off** `TOOL-dSafePassage-35` — the re-run's second downs over the shipped row shapes, which take this unit's no-record branch
 - **hands-off** `TOOL-dSafePassage-39` — the mark carried by the one writer across every rewrite that keeps a row `applied`, and the reverse walk's move 3 marking an unrecorded row, the repair of finding 23 of the spec audit of units 27 to 35
 - **hands-off** `TOOL-dSafePassage-40` — move 1's mark set only when the walk-start receipt holds no record for the step and no before-image is on disk, the repair of finding 29 of the spec audit of units 27 to 35
+- **consumes-from** `TOOL-dSafePassage-43` — `DOWN_STOP_PREFIXES`, from which S3's `witness still holds after down; before-image <path> absent` is built, and the writer rule admitting it on an `applied` row; without it the writer refuses that stop
 
 ## 4. Design
 
@@ -173,6 +174,7 @@ none
 - rev-1 · 2026-10-23 · initial draft, the promotion of the round-1 spec audit of units 15 to 26's
   id 40 (HIGH, item D-6).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-39`, `TOOL-dSafePassage-40`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-43`; no other section moved.
 
 ## 10. Reuse audit
 

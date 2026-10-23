@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-44 — the credential predicate keeps an ssh-scheme URL's bare user, so an `ssh://git@host` remote is never refused, and holds itself to the repo's redaction negatives
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-44-deviation-90.md](../build/2026-10-23-build-TOOL-dSafePassage-44-deviation-90.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-43 TOOL-dSafePassage-45 TOOL-dSafePassage-46 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +65,8 @@ scheme's bare user still is, and the predicate is held to the repo's own redacti
 
 - **consumes-from** `TOOL-dSafePassage-38` — `test_credential_bearing`, its userinfo pattern and AC3, which this unit narrows by one exemption; without them there is no predicate to correct
 - **hands-off** `TOOL-dSafePassage-45` — the minors batch, which rewrites the predicate's tested text and redactor and keeps this unit's exemption and its `ssh-scheme-bare-user` plant green
+- **consumes-from** `TOOL-dSafePassage-35` — S8's `remote.<x>.url` and `remote.<x>.pushurl` rows of `STEP_REFUSED_KEYS`, which this unit's pass removes so the ssh-scheme plant is refused by nothing; without the removal AC1 is red at order 10
+- **hands-off** `TOOL-dSafePassage-49` — AC1 read with `STEP_REFUSED_KEYS` holding no `remote.<x>.url` or `remote.<x>.pushurl` row, AC2 with a floor naming `ssh://git@github.com/o/r.git`, and AC3 scoped to the "What a step can reach" section, findings 3, 6 and 16 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -173,6 +176,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 36 to 42's id 13 (HIGH,
   item D-2), from the skeptic's corrected fix.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-35`, `TOOL-dSafePassage-49`; no other section moved.
 
 ## 10. Reuse audit
 

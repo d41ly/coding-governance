@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-41 — the `ac-order` join lands in the pass that arms it, so no commit carries the join without its cutoff key
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -61,7 +61,7 @@ join also carries the key it reads.
 - **consumes-from** `TOOL-dSafePassage-34` — `AC_ORDER_KEY`, its declaration and read, and S3's move of TOOL-dSafePassage-8's AC8; without them the join would grade every live spec on its first commit
 - **consumes-from** `TOOL-dSafePassage-26` — S45's predicate and AC43, which this unit builds in place of that unit's pass; without them the join has no stated predicate
 - **hands-off** `TOOL-dSafePassage-42` — the reading of TOOL-dSafePassage-34's S1 and §10 with `SPEC_DATE`, finding 20, which that batch observes over this unit's join
-- **hands-off** `TOOL-dSafePassage-46` — the template paragraph and the blank example-conf row for `SPEC_AC_ORDER_CUTOFF`, this unit's §4 read with `tools/memory-tree/SPEC-TEMPLATE.template.md`, `memory/TEMPLATE-SPEC.md` and `tools/memory-tree/.memory-tree.conf.example`, finding 16 of the spec audit of units 36 to 42
+- **hands-off** `TOOL-dSafePassage-46` — the template paragraph and the blank example-conf row for `SPEC_AC_ORDER_CUTOFF`, written by that unit's pass alone, so this unit's pass writes none of `tools/memory-tree/SPEC-TEMPLATE.template.md`, `memory/TEMPLATE-SPEC.md` and `tools/memory-tree/.memory-tree.conf.example`, finding 16 of the spec audit of units 36 to 42 and finding 5 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -150,6 +150,7 @@ none
 - rev-1 · 2026-10-23 · initial draft, the promotion of the spec audit of units 27 to 35's id 22
   (HIGH, item D-6).
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-46`; no other section moved.
+- rev-3 · 2026-10-23 · §3 · an Edges bullet is amended for the promotions of the spec audit of units 43 to 46, written by the disposal stage: `TOOL-dSafePassage-46`; no other section moved.
 
 ## 10. Reuse audit
 

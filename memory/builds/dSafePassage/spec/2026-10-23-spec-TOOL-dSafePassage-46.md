@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-46 — the spec audit of units 36 to 42, its three minors off the step module: the drift pin raised in the pass that arms its key, a lander arm that finds its sibling kit, and the `ac-order` key documented
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-46-deviation-92.md](../build/2026-10-23-build-TOOL-dSafePassage-46-deviation-92.md) | deviation | — |
+| [2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 |
 
 <!-- /gen:spec-records -->
 
@@ -74,8 +75,9 @@ REJECTED its finder's fix, so S3 is built from the skeptic's corrected fix.
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-34` — the pass that arms `SPEC_AC_ORDER_CUTOFF`, into which S1 moves the pin raise and its decision row
-- **consumes-from** `TOOL-dSafePassage-41` — the `ac-order` join, whose key S3 documents in the template and the example conf
+- **consumes-from** `TOOL-dSafePassage-41` — the `ac-order` join, whose key S3 documents in the template and the example conf, this unit alone writing those three files, finding 5 of the spec audit of units 43 to 46
 - **consumes-from** `TOOL-dSafePassage-42` — S9's pin raise and S12's `tools/push-main.test.sh` arm, which S1 re-sequences and S2 locates
+- **hands-off** `TOOL-dSafePassage-50` — S2's arm placed after the `_mt_rc` scan with a criterion that it prints `ok` in gov's own tree, its locator cited by content, and S3's three files written by this unit alone, findings 30, 8, 13, 17 and 5 of the spec audit of units 43 to 46
 
 ## 4. Design
 
@@ -191,6 +193,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, the batch of the spec audit of units 36 to 42's 2 MEDIUM and 1
   LOW findings off the step module, one scope item per raw id.
+- rev-2 · 2026-10-23 · §3 · the Edges gain the end this unit owes the promotions of the spec audit of units 43 to 46, `TOOL-dSafePassage-50`, and the `TOOL-dSafePassage-41` bullet is amended for them, written by the disposal stage; no other section moved.
 
 ## 10. Reuse audit
 

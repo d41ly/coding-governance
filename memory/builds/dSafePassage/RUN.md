@@ -102,3 +102,13 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T02:58:01Z rescope · item add TOOL-dSafePassage-46 · reason round-4 spec audit 2026-10-23-review-TOOL-dSafePassage-36-37-38-39-40-41-42-spec-audit-round1.md: the MEDIUM and LOW batch of the lander arm, the drift pin and the spec template, finding ids 25 15 (MEDIUM) and 16 (LOW)
 
 2026-10-23T03:06:58Z review · item dSafePassage-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 24 · disposition promote
+
+2026-10-23T03:42:14Z rescope · item add TOOL-dSafePassage-47 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: finding id 9 at HIGH (item D-1)
+
+2026-10-23T03:42:15Z rescope · item add TOOL-dSafePassage-48 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: finding id 10 at HIGH (item D-2)
+
+2026-10-23T03:42:16Z rescope · item add TOOL-dSafePassage-49 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: the MEDIUM and LOW batch of the step module, finding ids 1 11 18 19 2 26 27 29 3 (MEDIUM) and 4 6 7 20 12 15 16 31 32 33 25 (LOW)
+
+2026-10-23T03:42:16Z rescope · item add TOOL-dSafePassage-50 · reason round-5 spec audit 2026-10-23-review-TOOL-dSafePassage-43-44-45-46-spec-audit-round1.md: the MEDIUM and LOW batch of the lander arm and the spec template, finding ids 30 (MEDIUM) and 5 8 13 17 (LOW)
+
+2026-10-23T03:53:53Z review · item dSafePassage-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 25 · disposition promote
