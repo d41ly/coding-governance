@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-8 — the reader-coverage arm: a key whose Owner build has landed has a reader
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
 
 **Carries:** cl-dClosedLoop-0014@28a178b1 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,8 @@ call site that consumes the key's value, never the policy reader's own default p
 - **consumes-from** `TOOL-dGroundRules-2` — the landed-revision resolution `resolve` uses for
   `rev=None`, and the CLI shape `policy.py get <key>` the reader scan matches; without the first the
   landed set would be read from the working tree
+- **hands-off** `TOOL-dGroundRules-20` — `tree_lib.py`, which its cases read, named in the `policy fixtures` guard (finding 35)
+- **hands-off** `TOOL-dGroundRules-21` — `tree_lib` reached through `resolve_kit_dir` and `requires`, the quoted pattern segment, the relocated-install case, the announced empty population and the regenerated codebase map (findings 6, 7, 16, 51, 40)
 
 ## 4. Design
 
@@ -240,6 +243,7 @@ New arm: tools/policy/check_policy.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the `
 - rev-1 · 2026-10-23 · initial draft. The spec brief asks for a `DRAFT` status token; the header carries
   `OPEN`, the template's drafting token, because hygiene check 12 parses only the seven-token vocabulary
   (`tools/memory-tree/check-memory-hygiene.sh:1930`).
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

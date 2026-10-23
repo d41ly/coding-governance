@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5
 
 **Carries:** cl-dClosedLoop-0016@df63b6eb whole
 
@@ -11,6 +11,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -136,6 +137,10 @@ do not exceed it.
 - **consumes-from** `TOOL-dGroundRules-5` — `readPolicy` in `tools/policy/policy-mirror.js` and its `PolicyRefusal`, which rule 7 calls, and `arm_mirror_landed`, whose fixture hook S8 replaces with `tools/hooks/agent-cap.js`
 - **hands-off** external — dWellOiledMachine: the in-flight ledger, the admission queue, the session total and the ultracode exemption (`gap-rt-35`)
 - **hands-off** external — dSafePassage: the step that moves `FANOUT_CAP` into the key and retires `.agent-cap.conf`
+- **hands-off** `TOOL-dGroundRules-15` — the conf lowering moved from the `resolve` wrapper into `resolve_read` (finding 2)
+- **hands-off** `TOOL-dGroundRules-18` — the writer marker `gov:fixed-writers`, whose split rule 2 judges against the limit while verifiers stay at `MAX_VERIFIERS` (finding 13)
+- **hands-off** `TOOL-dGroundRules-20` — `tools/hooks/agent-cap.js`, which the `limit-hook-` cases run, named in the `policy fixtures` guard (finding 35)
+- **hands-off** `TOOL-dGroundRules-21` — the map card, the D7 arm, the settings file's resolution, the playbook-parity rows, the stale markers, the adopter's first render, rule 7's catch-all, the suite's oracle, the atomic write and the regenerated codebase map (findings 9, 34, 21, 33, 38, 42, 45, 43, 54, 40)
 
 ## 4. Design
 
@@ -395,6 +400,7 @@ verdict. AC15 to AC17 are the main loop's live observation at the close, and no 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-15, TOOL-dGroundRules-18, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

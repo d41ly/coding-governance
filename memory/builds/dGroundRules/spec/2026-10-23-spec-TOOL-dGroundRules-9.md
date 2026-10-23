@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5
 
 **Carries:** cl-dClosedLoop-0015@8ce57bfb whole
 
@@ -15,6 +15,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 |
 
 <!-- /gen:spec-records -->
 
@@ -108,6 +109,9 @@ outside the switch.
 - **consumes-from** `TOOL-dGroundRules-6` — the spelling its admitted raise reads, a measured-file cap being a leaf under `budgets` named by the measured file's repo-relative path, which S1 adopts for every `limits` row
 - **hands-off** external — dSafePassage: the step that moves each legacy home's rows under `budgets.*` with their argued history and the four raise conditions
 - **hands-off** external — dWitnessedBar, dCalibratedLens and dOrderedCharter: a warning that reaches a reader, the pricing and re-derivation of values, and the load-set and composition refusals
+- **hands-off** `TOOL-dGroundRules-17` — the census's `ships` field and `arm_cap_census` graded by what ships (finding 37)
+- **hands-off** `TOOL-dGroundRules-20` — every census enforcer named in the `policy fixtures` guard, and the join that keeps them there (finding 35)
+- **hands-off** `TOOL-dGroundRules-21` — 0 as unchecked, the read-shape limits scanner, the refused-reader rule, `read_blob_at` and the regenerated codebase map (findings 8, 18, 36, 44, 10, 40)
 
 ## 4. Design
 
@@ -374,6 +378,7 @@ AC8 and AC12 are probes the close reads directly.
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-17, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-4 — an invalid policy file read as `policy-file.on-invalid` says, never as defaults
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
 
 **Carries:** cl-dClosedLoop-0010@cd629be7 whole
 **Carries:** node:policy-key.policy-file.on-invalid
@@ -10,6 +10,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -99,6 +100,7 @@ the last valid revision whenever the current file is invalid.
 - **consumes-from** `TOOL-dGroundRules-3` — `RESOLUTION_ORDER`, run over the last valid revision's table
 - **hands-off** `TOOL-dGroundRules-5` — `validate` and the invalid-file branch with its read of `policy-file.on-invalid`, which that unit's mirror render reaches once per revision
 - **hands-off** `TOOL-dGroundRules-9` — `validate` and its `Problem`, which that unit extends with one call
+- **hands-off** `TOOL-dGroundRules-21` — the shallow-history refusal, `arm_on_invalid` over an unresolved HEAD, the literal on-invalid read and the regenerated codebase map (findings 52, 47, 7, 40)
 
 ## 4. Design
 
@@ -344,6 +346,7 @@ New arm: tools/policy/check_policy.py (`arm_on_invalid` in `ARMS`) · covers AC4
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the reciprocal **hands-off** edges to TOOL-dGroundRules-5, TOOL-dGroundRules-9 added, each naming what that unit's own §3 **consumes-from** line takes from this one; hygiene check 12's edge join read them as missing. No scope, design or acceptance moved.
+- rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

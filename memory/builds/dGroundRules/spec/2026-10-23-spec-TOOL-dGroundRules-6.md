@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-6 — the minimal guard over the policy file and its three neighbours
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0012@937c308e whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -72,6 +73,8 @@ place beside the cap and a `memory/DECISIONS.md` row in the same commit.
 - **consumes-from** `TOOL-dGroundRules-1` — the kit `tools/policy/`, its `kit.toml` file rows, `check_policy.py` with `CASES`, its `--fixture` mode and the policy leg, and the help page `help/policy.md`
 - **hands-off** `TOOL-dGroundRules-9` — the spelling the admitted shape reads: a measured-file cap is a leaf under `budgets` whose last key segment is the measured file's repo-relative path and whose value is an integer
 - **hands-off** external — dDeclaredLoop's guard, which reads `policy-file.guard` and `policy-file.proof`, admits the same raise through its guarded policy command, and retires this block
+- **hands-off** `TOOL-dGroundRules-19` — the admission of a regenerated mirror equal to its render at HEAD, which replaces this unit's F6 pick once the render exists (finding 32)
+- **hands-off** `TOOL-dGroundRules-21` — the hook block's kit-miss refusal and the guard cases' slashed and class keys (findings 25, 56)
 
 ## 4. Design
 
@@ -398,6 +401,7 @@ New arm: .githooks/pre-commit.test.sh · covers AC9 · a throwaway repository wi
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 6, the brief's S7, the owner's FK-9-2,
   today's rule in `tools/template-size-limits.txt`, and the pre-commit hook and lander read at base
   `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-19, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

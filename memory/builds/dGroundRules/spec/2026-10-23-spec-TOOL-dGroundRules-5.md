@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3
 
 **Carries:** cl-dClosedLoop-0011@8312590d whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,11 @@ as `policy-file.on-invalid` says.
 - **consumes-from** `TOOL-dGroundRules-4` — `validate` and the invalid-file branch with its read of `policy-file.on-invalid`, which the render reaches once per revision
 - **hands-off** `TOOL-dGroundRules-10` — `readPolicy` for `runtime.agents-in-flight` in `tools/hooks/agent-cap.js`, and `arm_mirror_landed`'s fixture hook replaced there by the real hook
 - **hands-off** external — dDeclaredLoop's guarded policy command, which regenerates the mirror in the commit of each policy write it admits
+- **hands-off** `TOOL-dGroundRules-13` — each reason's revision phrase rendered as a placeholder, so the mirror names no commit and is fresh at the commit that carries it (finding 1)
+- **hands-off** `TOOL-dGroundRules-14` — the landing replay that observes the mirror fresh at a prepared merge (finding 31)
+- **hands-off** `TOOL-dGroundRules-15` — `resolve_read` as the one home of the `.agent-cap.conf` lowering, so the render sees it (finding 2)
+- **hands-off** `TOOL-dGroundRules-19` — `mirror --print`, the render at HEAD a staged mirror is compared with (finding 32)
+- **hands-off** `TOOL-dGroundRules-21` — bash resolution for the shim, the adopter's absent mirror, the helper's exit mapping, `legacy_blobs`, the read-shape scanner, the mirror's eol pin and the shared single-reader arm (findings 17, 47, 48, 49, 50, 11, 26)
 
 ## 4. Design
 
@@ -435,6 +441,7 @@ New arm: tools/policy/check_policy.py (`arm_mirror_readers`, live and `--fixture
 
 - rev-1 · 2026-10-23 · initial draft, from the packet's Items 5, the brief's S6, the owner's AF-2,
   and the lander, regen and ladder code read at base `3708a705`.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-13, TOOL-dGroundRules-14, TOOL-dGroundRules-15, TOOL-dGroundRules-19, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

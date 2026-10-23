@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-3 — one resolution order: the file's override, then the catalogue default with its reason
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 2
 
 **Carries:** cl-dClosedLoop-0009@7d93fce9 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +64,7 @@ why, and a later build adds its step to the tuple instead of a second order besi
 - **hands-off** `TOOL-dGroundRules-4` — `RESOLUTION_ORDER`, which that unit runs over the table of the last valid revision when the current file is invalid
 - **hands-off** `TOOL-dGroundRules-9` — a key the file does not set resolving with source `default`, which that unit reads as "no file value" for a `budgets.<cap>`
 - **hands-off** `TOOL-dGroundRules-10` — the resolution order, whose result that unit lowers for `runtime.agents-in-flight`
+- **hands-off** `TOOL-dGroundRules-21` — a derived default resolved to a refusal naming its row, and the regenerated codebase map (findings 3, 40)
 
 ## 4. Design
 
@@ -225,6 +227,7 @@ New arm: tools/policy/check_policy.py --fixture (the `resolution-order` cases) �
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the reciprocal **hands-off** edges to TOOL-dGroundRules-9, TOOL-dGroundRules-10 added, each naming what that unit's own §3 **consumes-from** line takes from this one; hygiene check 12's edge join read them as missing. No scope, design or acceptance moved.
+- rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

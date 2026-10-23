@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-1 — the policy file, the policy kit, its catalogue and the catalogue's shape audit
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 1
 
 **Carries:** cl-dClosedLoop-0007@b0458b78 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -86,6 +87,9 @@ resolution order, invalidity, the mirror and the guard are units 2 to 6; this un
 - **hands-off** `TOOL-dGroundRules-10` — the `runtime.agents-in-flight` row and its value in the policy file
 - **hands-off** `TOOL-dGroundRules-11` — the catalogue's typed ranges and the known optional field `direction`, whose rule it adds to the shape audit
 - **hands-off** external — the 24 pairs of catalogue names TOML cannot hold in one file, one a dotted prefix of the other (§8 F5), to the later builds that own them
+- **hands-off** `TOOL-dGroundRules-16` — the adopter's fresh target as a standing case every later arm of `policy check` passes through, and the README table of what each arm grades there (finding 4)
+- **hands-off** `TOOL-dGroundRules-20` — the sibling files the `policy fixtures` cases run, which this unit's `{prefix}/policy/` guard misses (finding 35)
+- **hands-off** `TOOL-dGroundRules-21` — the scaffold's LF bytes, the eol pins, the version marker, the adopter's armed refusal, the per-arm empty population, the four `read_policy_key` copies and the compare base's canonical block (findings 19, 27, 39, 41, 51, 20, 29)
 
 ## 4. Design
 
@@ -404,6 +408,7 @@ New arm: tools/policy/check_policy.py --fixture · covers AC3 AC4 AC5 AC6 AC10 �
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-16, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

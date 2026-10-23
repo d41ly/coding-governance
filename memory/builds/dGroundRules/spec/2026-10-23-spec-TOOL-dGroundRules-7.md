@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4
 
 **Carries:** cl-dClosedLoop-0013@8ae02ac2 whole
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
+| [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,8 @@ dConvergedCharter folds them (gap-spine-06, v2:1129-1132).
 - **consumes-from** `TOOL-dGroundRules-2` — the landed-revision resolution `resolve` uses for
   `rev=None`, which the shrink-only comparison reads the baseline list at; without it the baseline
   would be the working tree, which a branch edits
+- **hands-off** `TOOL-dGroundRules-17` — the legacy-home list withheld from installs, and its arm's announcement where the list is absent (finding 37)
+- **hands-off** `TOOL-dGroundRules-21` — one compare base for the shrink-only half, the main-dropped case, the house file through `resolve_kit_dir` and the regenerated codebase map (findings 5, 15, 16, 40)
 
 ## 4. Design
 
@@ -282,6 +285,7 @@ New arm: tools/policy/check_policy.py · covers AC2 AC6 AC7 AC8 AC9 AC10 · the 
 - rev-1 · 2026-10-23 · initial draft. The spec brief asks for a `DRAFT` status token; the header carries
   `OPEN`, the template's drafting token, because hygiene check 12 parses only the seven-token vocabulary
   (`tools/memory-tree/check-memory-hygiene.sh:1930`).
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-17, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 
