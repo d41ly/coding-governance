@@ -9,6 +9,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dFairHearing-11-deviation-118.md](../build/2026-10-23-build-TOOL-dFairHearing-11-deviation-118.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
@@ -318,8 +320,8 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 
   TOOL-dFairHearing-17 owns, marked by the `review-twin` line; the check is the tally over both runs
   plus this unit's arms. (a) mints nodes outside the packet's ten owned nodes, a departure the systems
   record's owner table does not ask for (it gives dFairHearing "the panel's internals and the twin
-  merge"). Recommendation (b). Rung 1. RESOLVED (agent, 2026-10-23, delegated): (b). widens: none ·
-  relaxes: none
+  merge"). Recommendation (b). Rung 1. RESOLVED (agent, 2026-10-23, delegated): (b).
+  widens: none · relaxes: none
 - **FACT-QUESTION · F5 — Is every diff review a landing review, for `design-and-landing`?** Probe:
   read BUILD-METHOD M8 and every tracked caller of the harness for a diff review that is not the
   closing review (`git grep -n "tier2-review" -- '*.js' '*.sh' '*.py' '*.toml'`). Observation: M8

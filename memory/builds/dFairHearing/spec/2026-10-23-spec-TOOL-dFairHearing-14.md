@@ -8,6 +8,9 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dFairHearing-14-deviation-149.md](../build/2026-10-23-build-TOOL-dFairHearing-14-deviation-149.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-30 TOOL-dFairHearing-32 |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-token-fix-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-12 TOOL-dFairHearing-15 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-14-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-14-1-spec-writer.md) | journal | — |
@@ -241,8 +244,8 @@ New arm: tools/workflows/replay_scorer.py (its runner, in the `review-replay sel
 - **F3 — With no committed label key, is the judge rule refused or recorded?** (a) Recorded, with
   its reason printed; checked whenever a key is named. (b) Refused. (b) refuses every past experiment,
   aScoutedSeam's included, since no key was ever committed (§4 Evidence), failing AC6 (veto 1).
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a).
+  widens: none · relaxes: none
 - **F4 — Where does an experiment declare its arms?** (a) A committed JSON manifest beside its raw
   outputs, read through `read_raw_output`. (b) CLI flags. §4 Alternatives says why (a). Both survive
   the vetoes; (a) serves every rule from one record. Recommendation (a). Rung 3. RESOLVED (agent,

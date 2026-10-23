@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dFairHearing-9-deviation-98.md](../build/2026-10-23-build-TOOL-dFairHearing-9-deviation-98.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-prompt-TOOL-dFairHearing-3-readers-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-3-readers-fix-brief.md) | research | TOOL-dFairHearing-3 |
 | [2026-10-23-prompt-TOOL-dFairHearing-9-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-9-1-spec-writer.md) | journal | — |
@@ -224,23 +226,23 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC8 · an audit-stag
   proposal. (c) fails the clause's "never universal" and check 19's budget of six: veto 1. (b) puts
   no domain on any checklist, only its instances, so the domain sweep the clause names exists
   nowhere. (a) adds three records and states each domain's sweep where its traps bit.
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a).
+  widens: none · relaxes: none
 - **F2 — What does each domain record anchor to?** (a) Directories its members touch, `tools/` and
   `.githooks/`, which select most of the catalogue on any tooling diff. (b) The files where its
   members bit, each anchor an anchor of a member. (a) is universal in all but name.
-  Recommendation (b). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (b). widens: none ·
-  relaxes: none
+  Recommendation (b). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (b).
+  widens: none · relaxes: none
 - **F3 — Where are a run's notes derived per preset?** (a) In the review harness, from a per-preset
   map, against the swapped literal it holds. (b) In each caller, which holds no literal's keys.
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a).
+  widens: none · relaxes: none
 - **F4 — Do lens notes need a declaration file?** The review-system record (`[lenses]`, lines 139-141) has
   the notes declared in the review kit's conf. (a) A new conf the callers read. (b) The callers'
   own arguments, which the clause names. (a) adds an install location and a root conf, a governance
   carrier `cl-dClosedLoop-0076` does not name, so veto 2 outside the grant. Recommendation (b).
-  Rung 1, v2's `cl-dClosedLoop-0076`. RESOLVED (agent, 2026-10-23, delegated): (b). widens: none ·
-  relaxes: none
+  Rung 1, v2's `cl-dClosedLoop-0076`. RESOLVED (agent, 2026-10-23, delegated): (b).
+  widens: none · relaxes: none
 - **F5 — Does the build's grant lift veto 2?** `tools/workflows/` is a governance carrier on
   `PLAY-dClosedLoop-10`'s list; `memory/gotchas/` is on none of its six selectors.
   `cl-dClosedLoop-0076` names the lens notes passed by the callers and derived per preset after a

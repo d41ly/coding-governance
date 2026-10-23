@@ -9,6 +9,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dFairHearing-13-deviation-138.md](../build/2026-10-23-build-TOOL-dFairHearing-13-deviation-138.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
@@ -341,8 +343,8 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC4 AC7 · the rende
 - **F3 — Does the slot count cap at five or require five?** (a) At most five, the hook's ceiling.
   (b) Exactly five. A literal of four is a default row lost from the catalogue, which runs a review
   narrower than the kit claims and reads as a full one; the swap keeps five after every swap (S2).
-  Recommendation (b). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (b). widens: none ·
-  relaxes: none
+  Recommendation (b). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (b).
+  widens: none · relaxes: none
 - **F4 — Does the build's grant lift veto 2 for these files?** Every path under `tools/` is a
   governance carrier on `PLAY-dClosedLoop-10`'s list (`open.py --carriers` at `3dca04036`: the
   routed product paths and every kit). `cl-dClosedLoop-0080` names the catalogue in the review kit,

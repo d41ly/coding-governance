@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dFairHearing-2-deviation-28.md](../build/2026-10-23-build-TOOL-dFairHearing-2-deviation-28.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
@@ -224,8 +226,8 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC3 AC4 AC6 · the t
   4 Design against section 7 Gates" in the prompts a design record is audited with, the measured
   cause of gap-review-04, and so fails the clause's "for design and architecture records". (b) costs
   five briefs and keeps the unit-spec preset unchanged, as the review-system record requires.
-  Recommendation (b). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (b). widens: none ·
-  relaxes: none
+  Recommendation (b). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (b).
+  widens: none · relaxes: none
 - **F2 — Who chooses the preset?** (a) The harness infers `design-audit` when every subject is a
   design subject. (b) The caller passes `preset`, and `review.pin` maps the pinned revisions' record
   kind to it behind its own default. The clause says a `preset` argument Design's breakpoint passes,
@@ -234,8 +236,8 @@ New arm: tools/workflows/tier2-review.test.sh · covers AC1 AC3 AC4 AC6 · the t
 - **F3 — Is `design-audit` refused over unit-spec subjects?** (a) Refused unless every subject is a
   design subject. (b) Legal for any spec audit. The review-system record says "A manual call may pass
   it for any spec audit" (`[lenses]`, line 131), and the replay may audit a mixed set.
-  Recommendation (b). Rung 1. RESOLVED (agent, 2026-10-23, delegated): (b). widens: none ·
-  relaxes: none
+  Recommendation (b). Rung 1. RESOLVED (agent, 2026-10-23, delegated): (b).
+  widens: none · relaxes: none
 - **F4 — Does the build's grant lift veto 2 for the harness edit?** `tools/workflows/` is a governance
   carrier on `PLAY-dClosedLoop-10`'s list. `cl-dClosedLoop-0069` names the design-audit preset, its
   `preset` argument and its five lenses. RESOLVED (agent, 2026-10-23, delegated): lifted by

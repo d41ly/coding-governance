@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-32-deviation-321.md](../build/2026-10-23-build-TOOL-dFairHearing-32-deviation-321.md) | deviation | — |
+| [2026-10-23-build-TOOL-dFairHearing-32-deviation-329.md](../build/2026-10-23-build-TOOL-dFairHearing-32-deviation-329.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-departures-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-3 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-30 |
 | [2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-28-promoted-fix-brief.md) | research | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 |
 | [2026-10-23-prompt-TOOL-dFairHearing-32-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-32-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-28-32-spec-audit.md) | spec-audit | TOOL-dFairHearing-28 TOOL-dFairHearing-29 TOOL-dFairHearing-30 TOOL-dFairHearing-31 |

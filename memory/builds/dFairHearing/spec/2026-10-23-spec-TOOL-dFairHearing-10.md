@@ -8,6 +8,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dFairHearing-10-deviation-108.md](../build/2026-10-23-build-TOOL-dFairHearing-10-deviation-108.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 TOOL-dFairHearing-23 |
 | [2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-spec-brief.md) | research | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 | [2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md](../reviews/2026-10-23-review-TOOL-dFairHearing-1-spec-audit.md) | spec-audit | TOOL-dFairHearing-1 TOOL-dFairHearing-2 TOOL-dFairHearing-3 TOOL-dFairHearing-4 TOOL-dFairHearing-5 TOOL-dFairHearing-6 TOOL-dFairHearing-7 TOOL-dFairHearing-8 TOOL-dFairHearing-9 TOOL-dFairHearing-11 TOOL-dFairHearing-12 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-15 TOOL-dFairHearing-16 TOOL-dFairHearing-17 TOOL-dFairHearing-18 |
 
@@ -220,8 +222,8 @@ grade, and AC1 to AC9 observe it.
   row (`memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-gap-register.md:437`).
   Observation: it reads "11 or 12 agents (9 when this row was written)", the measured count the review
   system's `[stale]` section asked for. Liveness: a row still reading "about 9 agents" would have kept
-  it in scope. RESOLVED (agent, 2026-10-23, delegated): already in line, nothing to edit. widens: none ·
-  relaxes: none
+  it in scope. RESOLVED (agent, 2026-10-23, delegated): already in line, nothing to edit.
+  widens: none · relaxes: none
 - **FACT-QUESTION · F4 — Does the restatement gate's own header state a moved rule's home?** Probe:
   `grep -n "join\|spec-audit\|fixed-verifiers\|sequential\|arity\|lens" tools/check-agent-cap-restatement.sh`.
   Observation: its header names historical carriers and the hook as the owner of the number, which

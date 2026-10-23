@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dFairHearing-23-deviation-231.md](../build/2026-10-23-build-TOOL-dFairHearing-23-deviation-231.md) | deviation | — |
+| [2026-10-23-build-TOOL-dFairHearing-23-deviation-238.md](../build/2026-10-23-build-TOOL-dFairHearing-23-deviation-238.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-1-mark-rewrap-brief.md) | research | TOOL-dFairHearing-2 TOOL-dFairHearing-9 TOOL-dFairHearing-10 TOOL-dFairHearing-11 TOOL-dFairHearing-13 TOOL-dFairHearing-14 TOOL-dFairHearing-16 |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief-2.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 |
 | [2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-20-promoted-fix-brief.md) | research | TOOL-dFairHearing-20 TOOL-dFairHearing-21 TOOL-dFairHearing-22 |
 | [2026-10-23-prompt-TOOL-dFairHearing-23-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dFairHearing-23-1-spec-writer.md) | journal | — |
@@ -597,8 +599,8 @@ New arm: tools/memory-tree/gotchas.py (its selftest) · covers AC12 · a class g
 - **F7 — How does an earlier unit's builder treat a criterion this unit supersedes?** Options: (a) the
   hands-off bullet in that unit's §3 names it, its acceptance ledger recording it superseded by this
   unit's named criterion; (b) fold the correction into the earlier spec, which BUILD-METHOD M4 refuses
-  for a spec-audit minor. RESOLVED (agent, 2026-10-23, delegated): (a), rung 3. widens: none ·
-  relaxes: none
+  for a spec-audit minor. RESOLVED (agent, 2026-10-23, delegated): (a), rung 3.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
