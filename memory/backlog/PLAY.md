@@ -31,4 +31,4 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-23](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE PROMPT-MODE BRIEF CHECK READS THE AUTHORED ROSTER ITS OWN WAY.… |
 | [PLAY-dClosedLoop-30](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | THE CARRIES INSTRUMENT AND THE PRODUCT CARRIES JOIN DISAGREE ON EVERY… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
-| [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | SPECCED | MED | PLAY-dOrderedCharter-1 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
