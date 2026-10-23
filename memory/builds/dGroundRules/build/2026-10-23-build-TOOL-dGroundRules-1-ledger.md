@@ -12,9 +12,9 @@ removed.
 **Evidences:** TOOL-dGroundRules-1
 - AC1 — `arm_schema` — `check_policy.main(['--repo', '.'])` exited 0 and printed one line per arm:
   `arm_schema · 0 finding(s) · 4 key(s) of .governance/policy.toml against 267 row(s)`,
-  `arm_shape · 0 finding(s) · 267 row(s), 19 set-valued, 10 never-empty` and `arm_summaries ·
-  0 finding(s) · 263 of 267 row(s) unsummarised`, its base note reading the list absent at
-  3c2b69be4652, which is no comparison. The leg's own run is the close's.
+  `arm_shape · 0 finding(s) · 267 row(s), 19 set-valued, 10 never-empty` and
+  `arm_summaries · 0 finding(s) · 263 of 267 row(s) unsummarised`, its base note reading the list
+  absent at 3c2b69be4652, which is no comparison. The leg's own run is the close's.
 - AC2 — `git show 9bf3b4c91952d54f01be759082f7ae3e52cde160` — a probe parsed the design's table
   between `## [policies]` and `## [presets]` into 267 rows and the catalogue into 267, and printed
   `names equal in order: True` and `owners equal: True`, with the four S1 defaults `last-valid`,
@@ -26,8 +26,9 @@ removed.
 - AC5 — `summary-new-key` — `summary-new-key` and `usage-new-key` each printed `RED as planted`,
   naming `zz.planted` as not listed, then `green unplanted`.
 - AC6 — `list-grew` — `list-grew` printed `RED as planted` naming `zz.planted` as added above the
-  base, then `green unplanted`; on the `summary-new-key` copy the run printed `lists --write left the
-  planted row out · lists --check still red`. The run ended `34 assertion(s) executed · 0 wrong`.
+  base, then `green unplanted`; on the `summary-new-key` copy the run printed
+  `lists --write left the planted row out · lists --check still red`. The run ended
+  `34 assertion(s) executed · 0 wrong`.
 - AC7 — `lists --write` — a copy of the kit under the run's scratch gave `autonomy` a `summary` and a
   `usage`: `policy.py lists --check` exited 1 naming `autonomy` stale, `lists --write` printed
   `drained 1: autonomy` and the list went from 263 rows to 262 with that row the only difference,
