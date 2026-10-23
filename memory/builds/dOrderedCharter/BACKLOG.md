@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · PLAY-dOrderedCharter-38 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · PLAY-dOrderedCharter-38 · until PLAY-dOrderedCharter-55 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, PLAY-dOrderedCharter-55 at order 41 today, closes it (README rule 1)
