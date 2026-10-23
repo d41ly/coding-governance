@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 3708a705e834709f340a2d160f9acdf9c18b699f · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 429689679
 phase: REVIEWING
@@ -82,3 +83,25 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T02:40:22Z rescope · item add TOOL-dGroundRules-34 · reason 2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1 minors batch: MEDIUM ids 1 2 3 4 5 6 10 14 15 18 19 22 23 24 25 28 29 31 32 33 34 35 37 and LOW ids 7 8 9 11 12 13 16 17 20 21 27 30 36 38
 
 2026-10-23T02:51:16Z review · item dGroundRules-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 37 · disposition promote
+
+2026-10-23T03:17:40Z rescope · item add TOOL-dGroundRules-35 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 22 at HIGH, item H1
+
+2026-10-23T03:17:42Z rescope · item add TOOL-dGroundRules-36 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 7 at HIGH, item H1
+
+2026-10-23T03:17:43Z rescope · item add TOOL-dGroundRules-37 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 1 at HIGH, item H1
+
+2026-10-23T03:17:44Z rescope · item add TOOL-dGroundRules-38 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 18 at HIGH, item H2
+
+2026-10-23T03:17:45Z rescope · item add TOOL-dGroundRules-39 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 2 at HIGH, item H3
+
+2026-10-23T03:17:47Z rescope · item add TOOL-dGroundRules-40 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 17 at HIGH, item H3
+
+2026-10-23T03:17:48Z rescope · item add TOOL-dGroundRules-41 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 21 at HIGH, item H3
+
+2026-10-23T03:17:49Z rescope · item add TOOL-dGroundRules-42 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 finding id 25 at HIGH, item H3
+
+2026-10-23T03:17:50Z rescope · item add TOOL-dGroundRules-43 · reason 2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1 minors batch: MEDIUM ids 3 4 5 6 8 9 10 11 20 26 27 and LOW ids 12 13 15 16
+
+2026-10-23T03:36:44Z review · item dGroundRules-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 15 · disposition promote
+
+2026-10-23T03:38:33Z decision · item Cap the spec-audit promotion chain? Rounds 1-5 promoted 9, 4, 7, 2 and 9 units (the roster is 42), each round's precision 0.85-1.00, so M4's only bound, a round below the 0.5 floor, has not fired and the chain shows no shrink · reason Options: let the chain run until a round promotes nothing; cap it at a round, as the owner capped dTrueNorth's audit at round 2, the later promotions closing under a recorded specs-audited override; or lower the audit's intensity for promoted repair specs. Refused because a round cap is the owner's ruling (M4 states no cap, and dTrueNorth's cap was the owner's own words) and the run keeps auditing meanwhile

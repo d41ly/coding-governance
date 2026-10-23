@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-34-deviation-22.md](../build/2026-10-23-build-TOOL-dGroundRules-34-deviation-22.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-33 |
 
 <!-- /gen:spec-records -->
 
@@ -266,6 +267,11 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
 - **consumes-from** `TOOL-dGroundRules-31` — `--scaffold`'s deferral and the help page's install text, which S20 and S36 amend
 - **consumes-from** `TOOL-dGroundRules-32` — `build_fresh_target`, the receipt shape rule, the overlap rule and its arm, the build-order criterion and the kit README's census rows, which S15 to S17, S21 to S23, S26, S32, S35 and S37 amend
 - **consumes-from** `TOOL-dGroundRules-33` — the `{prefix}/govkit/selftest.py` guard line and the guard trace, which hold S23's `ast` read inside the leg that runs it
+- **hands-off** `TOOL-dGroundRules-38` — S1's exclude-file read, kept out of the trace (id 18)
+- **hands-off** `TOOL-dGroundRules-39` — `census-ambiguous-registry` and S11-S12's window (id 2)
+- **hands-off** `TOOL-dGroundRules-40` — S16's parity and S17's arm, held in one table (id 17)
+- **hands-off** `TOOL-dGroundRules-41` — S36's `## Install` section, held to the deferral line (id 21)
+- **hands-off** `TOOL-dGroundRules-43` — the snapshot, govkit, receipt and `gov_source` amendments to this unit (ids 3-16, 26)
 
 ## 4. Design
 
@@ -648,6 +654,7 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
 - rev-1 · 2026-10-23 · initial draft, promoting the twenty-three MEDIUM and fourteen LOW findings of
   the round-1 spec audit of units 26 to 32 in one batch, from the review's sound fixes and the
   skeptic's corrected fixes for ids 24, 30 and 35, with each cited line read at `f4d31452a`.
+- rev-2 · 2026-10-23 · §3 · hands-off edges to units 38-41 and 43, reciprocals of their consumes-from lines; nothing else moved.
 
 ## 10. Reuse audit
 

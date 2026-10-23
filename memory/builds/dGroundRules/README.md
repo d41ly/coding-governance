@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34
+ids: TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43
 spec-audit: 2026-10-21
 parents: dTrueNorth
 may: PLAY-dClosedLoop-3
@@ -89,13 +89,23 @@ none
 | 32 | `TOOL-dGroundRules-32` | **Derived:** PLAY-dClosedLoop-2 | the round-1 audit of units 22 to 25, its minors: twenty findings closed in the code those units leave, one scope item each |
 | 33 | `TOOL-dGroundRules-33` | **Derived:** PLAY-dClosedLoop-2 | the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses |
 | 34 | `TOOL-dGroundRules-34` | **Derived:** PLAY-dClosedLoop-2 | the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each |
+| 35 | `TOOL-dGroundRules-35` | **Derived:** PLAY-dClosedLoop-2 | the guard trace records a bytecode-cache read as its source file, so a warm load still records `govkit.py` |
+| 36 | `TOOL-dGroundRules-36` | **Derived:** PLAY-dClosedLoop-2 | a source read git ignores is set aside before the guard join, counted, and never offered to the guard |
+| 37 | `TOOL-dGroundRules-37` | **Derived:** PLAY-dClosedLoop-2 | every `policy fixtures` guard entry names a file git tracks, so the trace's sweep cannot widen the guard with a path no diff carries |
+| 38 | `TOOL-dGroundRules-38` | **Derived:** PLAY-dClosedLoop-2 | the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits |
+| 39 | `TOOL-dGroundRules-39` | **Derived:** PLAY-dClosedLoop-2 | the census registry window held at both edges by a standing case, its fixture paths spelled whole |
+| 40 | `TOOL-dGroundRules-40` | **Derived:** PLAY-dClosedLoop-2 | the overlap arm pins each pair's expected answer, so the render's rule and the dispatcher's are graded against the truth and not only against each other |
+| 41 | `TOOL-dGroundRules-41` | **Derived:** PLAY-dClosedLoop-2 | the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it |
+| 42 | `TOOL-dGroundRules-42` | **Derived:** PLAY-dClosedLoop-2 | the criterion bug class gains the input respelled to pass a join, and is handed to every spec commit |
+| 43 | `TOOL-dGroundRules-43` | **Derived:** PLAY-dClosedLoop-2 | the round-1 audit of units 33 and 34, its minors: fifteen findings closed in the code those units leave, one scope item each |
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 33 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 42 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14
 ids TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28
-ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34
+ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42
+ids TOOL-dGroundRules-43
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -128,27 +138,37 @@ ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundR
 | [TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-25.md) | 8 | 2 | OPEN | rev-3 | 2026-10-23 |
 | [TOOL-dGroundRules-29 — a receipt-less target is gov's source tree only when it holds the registry, so the census arm never grades a scratch target as gov](spec/2026-10-23-spec-TOOL-dGroundRules-29.md) | 8 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dGroundRules-27 — every policy case that drives the deployer runs it from the snapshot, and a call over the source's own root refuses](spec/2026-10-23-spec-TOOL-dGroundRules-27.md) | 9 | 2 | OPEN | rev-2 | 2026-10-23 |
-| [TOOL-dGroundRules-30 — the writer-marker floor decided by the installed hook's own verdict, never by a kit version the lander has not minted](spec/2026-10-23-spec-TOOL-dGroundRules-30.md) | 9 | 2 | OPEN | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-30 — the writer-marker floor decided by the installed hook's own verdict, never by a kit version the lander has not minted](spec/2026-10-23-spec-TOOL-dGroundRules-30.md) | 9 | 2 | OPEN | rev-3 | 2026-10-23 |
 | [TOOL-dGroundRules-31 — the install-day scaffold defers the mirror over uncommitted inputs, so the first `--scaffold` in a repository with history exits 0](spec/2026-10-23-spec-TOOL-dGroundRules-31.md) | 9 | 2 | OPEN | rev-2 | 2026-10-23 |
 | [TOOL-dGroundRules-32 — the round-1 audit of units 22 to 25, its minors: twenty findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-32.md) | 10 | 2 | OPEN | rev-2 | 2026-10-23 |
-| [TOOL-dGroundRules-33 — the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses](spec/2026-10-23-spec-TOOL-dGroundRules-33.md) | 11 | 2 | OPEN | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-34.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-33 — the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses](spec/2026-10-23-spec-TOOL-dGroundRules-33.md) | 11 | 2 | OPEN | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-34.md) | 12 | 2 | OPEN | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-35 — the guard trace records a bytecode-cache read as its source file, so a warm load still records `govkit.py`](spec/2026-10-23-spec-TOOL-dGroundRules-35.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-36 — a source read git ignores is set aside before the guard join, counted, and never offered to the guard](spec/2026-10-23-spec-TOOL-dGroundRules-36.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-37 — every `policy fixtures` guard entry names a file git tracks, so the trace's sweep cannot widen the guard with a path no diff carries](spec/2026-10-23-spec-TOOL-dGroundRules-37.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-38 — the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits](spec/2026-10-23-spec-TOOL-dGroundRules-38.md) | 12 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-39 — the census registry window held at both edges by a standing case, its fixture paths spelled whole](spec/2026-10-23-spec-TOOL-dGroundRules-39.md) | 13 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-40 — the overlap arm pins each pair's expected answer, so the render's rule and the dispatcher's are graded against the truth and not only against each other](spec/2026-10-23-spec-TOOL-dGroundRules-40.md) | 13 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-41 — the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it](spec/2026-10-23-spec-TOOL-dGroundRules-41.md) | 13 | 2 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-42 — the criterion bug class gains the input respelled to pass a join, and is handed to every spec commit](spec/2026-10-23-spec-TOOL-dGroundRules-42.md) | 13 | 1 | OPEN | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-43 — the round-1 audit of units 33 and 34, its minors: fifteen findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-43.md) | 14 | 2 | OPEN | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 28 bound to this build, across 4 record folder(s).
+Records: 38 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dGroundRules-33 TOOL-dGroundRules-34.
+Ids no `spec-audit` record has ever named: TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43.
 
 Ids whose spec moved past its audited revision: TOOL-dGroundRules-1@rev-1 TOOL-dGroundRules-10@rev-1 TOOL-dGroundRules-13@rev-1 TOOL-dGroundRules-14@rev-1 TOOL-dGroundRules-15@rev-1 TOOL-dGroundRules-16@rev-1 TOOL-dGroundRules-17@rev-1 TOOL-dGroundRules-18@rev-1 TOOL-dGroundRules-19@rev-1
 TOOL-dGroundRules-2@rev-2 TOOL-dGroundRules-20@rev-1 TOOL-dGroundRules-21@rev-1 TOOL-dGroundRules-22@rev-1 TOOL-dGroundRules-23@rev-1 TOOL-dGroundRules-24@rev-1 TOOL-dGroundRules-25@rev-1 TOOL-dGroundRules-26@rev-1 TOOL-dGroundRules-27@rev-1 TOOL-dGroundRules-28@rev-1 TOOL-dGroundRules-29@rev-1
-TOOL-dGroundRules-3@rev-2 TOOL-dGroundRules-30@rev-1 TOOL-dGroundRules-31@rev-1 TOOL-dGroundRules-32@rev-1 TOOL-dGroundRules-4@rev-2 TOOL-dGroundRules-5@rev-1 TOOL-dGroundRules-6@rev-1 TOOL-dGroundRules-7@rev-1 TOOL-dGroundRules-8@rev-1 TOOL-dGroundRules-9@rev-1.
+TOOL-dGroundRules-3@rev-2 TOOL-dGroundRules-30@rev-1 TOOL-dGroundRules-31@rev-1 TOOL-dGroundRules-32@rev-1 TOOL-dGroundRules-33@rev-1 TOOL-dGroundRules-34@rev-1 TOOL-dGroundRules-4@rev-2 TOOL-dGroundRules-5@rev-1 TOOL-dGroundRules-6@rev-1 TOOL-dGroundRules-7@rev-1 TOOL-dGroundRules-8@rev-1
+TOOL-dGroundRules-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 33 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 42 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 11
 - carried in parts: 0 (none)
@@ -162,7 +182,9 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 33 spec(s) at 
   `spec/2026-10-23-spec-TOOL-dGroundRules-20.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-21.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-22.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-23.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dGroundRules-24.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-25.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-26.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-27.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dGroundRules-28.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-29.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-30.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-31.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-23-spec-TOOL-dGroundRules-32.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-33.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-34.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-23-spec-TOOL-dGroundRules-32.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-33.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-34.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-35.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-23-spec-TOOL-dGroundRules-36.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-37.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-39.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-23-spec-TOOL-dGroundRules-40.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-41.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-43.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0009, cl-dClosedLoop-0014, cl-dClosedLoop-0017
 <!-- /gen:build-coverage -->
 
@@ -181,7 +203,9 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 33 spec(s) at 
 | 9 | `TOOL-dGroundRules-27`, `TOOL-dGroundRules-30`, `TOOL-dGroundRules-31` | yes |
 | 10 | `TOOL-dGroundRules-32` | no |
 | 11 | `TOOL-dGroundRules-33` | no |
-| 12 | `TOOL-dGroundRules-34` | no |
+| 12 | `TOOL-dGroundRules-34`, `TOOL-dGroundRules-35`, `TOOL-dGroundRules-36`, `TOOL-dGroundRules-37`, `TOOL-dGroundRules-38` | yes |
+| 13 | `TOOL-dGroundRules-39`, `TOOL-dGroundRules-40`, `TOOL-dGroundRules-41`, `TOOL-dGroundRules-42` | yes |
+| 14 | `TOOL-dGroundRules-43` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

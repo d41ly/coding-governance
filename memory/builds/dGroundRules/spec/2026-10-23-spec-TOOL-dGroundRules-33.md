@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-33 — the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 11
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-33-deviation-21.md](../build/2026-10-23-build-TOOL-dGroundRules-33-deviation-21.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-34 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,11 @@ every source file it opens and reds each one whose path the `policy fixtures` gu
 - **consumes-from** `TOOL-dGroundRules-32` — `build_fresh_target`'s answer values from `DEPLOY_FULL` (S16) and the guard lines S3 and S10 add, which S1 extends to the file S16 reads
 - **consumes-from** `TOOL-dGroundRules-25` — `fixtures-guard-census`'s pipe to `check-spec-tokens.py --legs-for -` (S25), the one guard-match rule S3 reuses
 - **hands-off** `TOOL-dGroundRules-34` — the `{prefix}/govkit/selftest.py` guard line and the trace, under which that unit's `ast` read of `DEPLOY_FULL` (finding 19) is held by the leg that runs it
+- **hands-off** `TOOL-dGroundRules-35` — `add_source_read`, whose bytecode-cache reads that unit records as the source file each was compiled from (id 22 of the round-1 spec audit of units 33 and 34)
+- **hands-off** `TOOL-dGroundRules-36` — `check_guard_trace`, whose join that unit narrows to the reads git does not ignore, with a count of the rest (id 7 of the round-1 spec audit of units 33 and 34)
+- **hands-off** `TOOL-dGroundRules-37` — S4's additions to the `policy fixtures` row, which that unit holds to the files git tracks (id 1 of the round-1 spec audit of units 33 and 34)
+- **hands-off** `TOOL-dGroundRules-38` — `add_source_read`, which that unit keeps off the source's git directory and common directory (id 18 of the round-1 spec audit of units 33 and 34)
+- **hands-off** `TOOL-dGroundRules-43` — `add_source_read`'s event filter and `check_guard_trace`'s parse and working directory (ids 20, 27 and 12 of the round-1 spec audit of units 33 and 34)
 
 ## 4. Design
 
@@ -193,6 +199,7 @@ New arm: tools/policy/check_policy.py (`--fixture`, the `guard-trace` join) · c
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 26 (HIGH, item H1) of the round-1 spec
   audit of units 26 to 32, from the review's sound fix and its left-shift, the class gate, with
   `DEPLOY_FULL`, the leg manifest and the audit hook's `open` event read on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-35, TOOL-dGroundRules-36, TOOL-dGroundRules-37, TOOL-dGroundRules-38 and TOOL-dGroundRules-43 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 33 and 34 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 
