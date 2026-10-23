@@ -11,20 +11,20 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 ## Run facts
 parked-surfaced: yes
 keepalive-reaped: yes
-asks-at-landing: TOOL-dGroundRules-12=OPEN
-units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52
+asks-at-landing: TOOL-dGroundRules-12=DEFERRED
+units-at-landing: TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-16 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-24 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-25 TOOL-dGroundRules-29 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-55 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-61 TOOL-dGroundRules-64 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-62 TOOL-dGroundRules-63
 hold-run: 
-hold-streak: 1 · at d794a81b
+hold-streak: 1 · at 69d0e822
 resume-owed: none · owner
-held-at: 2026-10-23T04:30:23Z
-hold-reason: The spec audit's promotion chain does not shrink: six rounds promoted 9, 4, 7, 2, 9 and 9 units (51 on the roster for 11 clauses) at precision 0.85-1.00, and M4 bounds the chain only by a round below the 0.5 floor, so whether to cap it, and where, is the parked decision; units 44-52 are specced and unaudited, units 1-43 audited
+held-at: 2026-10-23T06:53:37Z
+hold-reason: TOOL-dGroundRules-13 names two things once main is merged: dSafePassage's landed ask (minted 02:16) and this run's round-1 unit (minted 02:46, unlanded), and the backlog fold reds V9; which side is renumbered is the parked decision. Everything else of the close is done: 63 units deferred, packet and departures report green on the prepared merge, the specs-audited override owed at --close
 hold-until: owner
 hold-code: owner-decision
-held-from: REVIEWING
-refreshed-at: f3a36b5760ccf46f7e4c51643a9a122d32007b3c · park · 1 touching
+held-from: VERIFYING
+refreshed-at: f3a36b5760ccf46f7e4c51643a9a122d32007b3c · handoff · 1 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: d4eff943776e7ec212ebb4db93f6dd16da5e0321
-phase: VERIFYING
+witness: 69d0e822af2922e992fee806f0fb243d1e52b03c
+phase: HELD
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -297,3 +297,7 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T06:22:44Z rescope · item defer TOOL-dGroundRules-63 · reason specced; built by this build's build run (README rule 1)
 
 2026-10-23T06:52:52Z decision · item Id collision on TOOL-dGroundRules-13: dSafePassage's landing (f3a36b576) filed an ask in this build's BACKLOG.md as TOOL-dGroundRules-13 at 02:16, and this run promoted its round-1 unit (the mirror's bytes name no commit) as TOOL-dGroundRules-13 at 02:46, unlanded; the backlog fold reds V9 on the pair · reason Options: (1) renumber this run's unit 13 to the next free id across this build's specs, records, review bindings and a new rescope add row, the old add row left as history; (2) re-mint dSafePassage's landed ask under a new id in this build's BACKLOG.md and leave dSafePassage's records citing the old one to its next run; (3) give the ask the unit marker so one id names both. Refused because every option renumbers a landed id or rewrites append-only history across two builds, which no resolver the mandate delegates may decide
+
+2026-10-23T06:53:41Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dGroundRules && bash tools/push-main.sh --land --slug dGroundRules && bash tools/unattended/unattended.sh --settle dGroundRules
+
+2026-10-23T06:53:41Z hold · item owner-decision · reason until owner · reaped 23f9fd54 · resume none(owner)
