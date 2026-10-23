@@ -30,5 +30,7 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-22](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE BINDING-LINE GRAMMAR HAS NO TEMPLATE HOME. TOOL-dTrueNorth-1 states… |
 | [PLAY-dClosedLoop-23](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE PROMPT-MODE BRIEF CHECK READS THE AUTHORED ROSTER ITS OWN WAY.… |
 | [PLAY-dClosedLoop-30](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | THE CARRIES INSTRUMENT AND THE PRODUCT CARRIES JOIN DISAGREE ON EVERY… |
+| [PLAY-dClosedLoop-31](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | THE CHAIN READMES ARE OPENED WITH A STATUS KEY THE INDEX REFUSES ONCE A… |
+| [PLAY-dClosedLoop-32](../builds/dClosedLoop/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | AN ASK FILED IN ANOTHER BUILD'S FAMILY CAN TAKE AN ID THAT BUILD HAS… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
