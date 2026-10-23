@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
+**Status:** OPEN · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 8
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-25-deviation-13.md](../build/2026-10-23-build-TOOL-dGroundRules-25-deviation-13.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-21 TOOL-dGroundRules-34 TOOL-dGroundRules-64 |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-24 TOOL-dGroundRules-22 TOOL-dGroundRules-23 |
 
 <!-- /gen:spec-records -->
@@ -18,13 +20,11 @@
 The round-1 spec audit of units 13 to 21
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-13-21-spec-audit-round1.md`)
 exited CONVERGED with 42 confirmed findings. Its three HIGHs are promoted one unit each,
-`TOOL-dGroundRules-22` to `TOOL-dGroundRules-24`. BUILD-METHOD M4 promotes the other thirty-nine,
-twenty-eight MEDIUM and eleven LOW, batched into one unit, and this is that unit. They land on units
-13 to 22 and 24, and nearly every half of them writes `tools/policy/check_policy.py`,
-`tools/policy/policy.py` or `tools/gate-legs.json`, so they do not split into two disjoint write
-sets by M6's clauses, and one unit carries them all. It repairs no unit in particular, so it builds
-at order 8, above every unit of this build. A finding the review merged with another into one item
-still takes its own scope item here, named by its own id.
+`TOOL-dGroundRules-22` to `TOOL-dGroundRules-24`; BUILD-METHOD M4 batches the other thirty-nine,
+twenty-eight MEDIUM and eleven LOW, into this unit. They land on units 13 to 22 and 24, and nearly
+every half of them writes `tools/policy/check_policy.py`, `tools/policy/policy.py` or
+`tools/gate-legs.json`, so M6's clauses yield no two disjoint write sets. It builds at order 8, above
+every unit of this build. A finding the review merged into another's item keeps its own scope item.
 
 | Finding id | Severity | Review item | Unit it lands on | Scope item | Criterion |
 |---|---|---|---|---|---|
@@ -232,9 +232,8 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 ## 3. Non-goals (OUT)
 
 - Every HIGH: `TOOL-dGroundRules-22` to `TOOL-dGroundRules-24`.
-- Rewriting any reviewed spec's text. Each defect a spec stated is closed here in the code and the
-  criteria it governs, and the repaired unit's §3 names this unit; nothing is folded (BUILD-METHOD
-  M4).
+- Rewriting any reviewed spec's text: each defect is closed here in code and in the criteria it
+  governs, and the repaired unit's §3 names this unit; nothing is folded (BUILD-METHOD M4).
 - Renumbering any unit's `order`. The render now says which steps are not parallel; the order verbs
   stay as their specs wrote them.
 - The other `resolve_bash` copies: `TOOL-dSettledRoster-6` stays their ask.
@@ -297,7 +296,6 @@ Every line below was read at base `3708a705` on 2026-10-23.
 - `tools/check-playbook-parity.sh:257` and `:270-272` hold the comment and the three README rows;
   `tools/check-playbook-parity.test.sh:159-161` writes the valid fixture's three sentences.
 - `tools/check-agent-cap-restatement.sh:90-91` declare `BOUND` and `NOUN`.
-- `tools/check-wiring.sh:102-108` refuses a declared `GOV_SETTINGS_JSON` that is not a file.
 - `tools/lib/resolve-python.test.sh:170-172` shows `PARITY_ROWS` as `stem|canonical|exclude`;
   `tools/run-gates/profile_bar.py:282` is the `resolve_bash` that runs each candidate;
   `memory/backlog/TOOL.md:494` lists `TOOL-dSettledRoster-6` as DEFERRED.
@@ -391,16 +389,14 @@ a generated region, written by `gen_build_index.py --write` in this commit.
 ### Alternatives rejected
 
 - **Two batch units split by kit.** The policy half and the tooling half both write
-  `tools/gate-legs.json`, and S36 and S37 move module-level functions the codebase map regenerates
-  from, a generated index shared with its generator, so M6's first and third clauses fail.
-- **Give the units that share a step distinct orders.** That rewrites the reviewed specs' headers,
-  a fold BUILD-METHOD M4 refuses at this exit (§8 F1).
+  `tools/gate-legs.json`, and S36 and S37 move functions the codebase map regenerates from, so M6's
+  first and third clauses fail.
+- **Give the units that share a step distinct orders.** §3 and §8 F1.
 
 ## 5. Production-readiness checklist
 
 - security — S19 to S21 close an agent path that staged a render input beside a mirror the guard
-  admitted; S32 names and bounds an environment-steered write, which refuses a declared path that is
-  not a file. No item widens a write surface beyond what `TOOL-dGroundRules-18` and
+  admitted; S32 names and bounds an environment-steered write. No item widens a write surface beyond what `TOOL-dGroundRules-18` and
   `TOOL-dGroundRules-21` priced.
 - perf / scale — S12 and S9 add two `apply` runs to `--fixture`; S37 reads each spec's two
   sub-sections once per render.
@@ -581,37 +577,27 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
 
 - **F1 — How are steps whose units share a write set or an edge closed (findings 1, 2, 26)?**
   (a) The build-order render reads each spec's Files touched and `consumes-from` edges and marks such
-  a step `no`. (b) Every unit writing `tools/policy/check_policy.py` takes a distinct order. (c) A
-  hygiene arm reds an edge inside one step. (b) rewrites reviewed spec headers, a fold BUILD-METHOD
-  M4 refuses and §3 excludes (veto 1). (c) reds twenty-one edges in landed specs, measured
-  on 2026-10-23, which a frozen record cannot clear. Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  a step `no`. Distinct orders rewrite reviewed spec headers, a fold BUILD-METHOD M4 refuses (veto 1),
+  and a hygiene arm reds twenty-one edges in landed specs, measured on 2026-10-23, which a frozen
+  record cannot clear (§3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F2 — What happens to the replay case once the real lander has an arm (finding 18)?** (a) It
-  stays, as the policy leg's fast check of the render, and the lander's own suite holds the real
-  observation. (b) It goes, the lander arm standing alone. Both meet every criterion; (a) keeps a
-  case of seconds in the leg every policy edit runs, where the lander arm needs a clone of the
-  repository, so it is the richer of the two. Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  stays as the policy leg's fast check of the render, a case of seconds in the leg every policy edit
+  runs, while the lander's own suite, which needs a clone, holds the real observation. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F3 — Where is the agent-cap floor of the writer marker enforced (finding 44)?** (a) In the
   workflows render, which reads the hook's version and keeps the verifier marker bounded at five
-  below it, as its playbook-render floor does. (b) In an adopter `--check` that refuses. The
-  workflows kit ships no adopter (`tools/workflows/kit.toml:93-96`), so (b) needs a new public verb
-  (veto 2). Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  below it, as its playbook-render floor does; an adopter `--check` needs a new public verb, the
+  workflows kit shipping no adopter (veto 2, §3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F4 — Is an adopter-authored legacy-home list graded (finding 37)?** (a) Never: in an adopter the
-  arm announces, a present list included. (b) Graded, with the reason stated. A list the adopter
-  writes from gov's `ORDER` row cannot hold gov's rows, so (b) reds every such adopter, which fails
-  `TOOL-dGroundRules-16` AC1 (veto 1). Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  arm announces, a present list included. A list written from gov's `ORDER` row cannot hold gov's
+  rows, so grading it reds every such adopter and fails `TOOL-dGroundRules-16` AC1 (veto 1).
+  Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F5 — How does the guard join learn which legs a path trips (finding 19)?** (a) It pipes its paths
-  to `check-spec-tokens.py --legs-for -`, gov's one trip rule. (b) It inlines the trip rule and
-  `resolve_prefix_token` as parity-held blocks. Both meet the criteria; (a) adds no copy, and the
-  case runs only in the gov-only `policy fixtures` leg, where the checker sits. Recommendation (a).
-  Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  to `check-spec-tokens.py --legs-for -`, gov's one trip rule, adding no inlined copy of it or of
+  `resolve_prefix_token`; the case runs only in the gov-only `policy fixtures` leg, where the checker
+  sits. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F6 — What does the reader do with a UTF-8 BOM (finding 43)?** (a) Strip one leading U+FEFF and
-  parse. (b) Refuse with a reason naming the BOM. (b) still sends an owner's valid values down the
-  invalid branch, which AC30 forbids. Recommendation (a), the rule unit 10's conf reader keeps.
-  Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  parse, the rule unit 10's conf reader keeps; refusing still sends an owner's valid values down the
+  invalid branch, which AC30 forbids. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -621,10 +607,13 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
   `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-27, TOOL-dGroundRules-30, TOOL-dGroundRules-31, TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-33, TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-4 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling after the closing
+  review's records row: repeats between sections dropped, each resolved fork cut to its decision and
+  reason; no meaning moved.
 
 ## 10. Reuse audit
 
-Each item extends a seam already named in its row: `build_regen_fixture` and arm 28 of
+Each item extends the seam its row names: `build_regen_fixture` and arm 28 of
 `tools/push-main.test.sh` (S2 to S4), `TOOL-dGroundRules-24`'s deployer-installed target (S5 to S7,
 S9, S12), `derive_census_tree` (S11, S12), the parity rows of `tools/lib/resolve-python.test.sh`
 (S28), `check-spec-tokens.py --legs-for` (S25), `check-protocol-parity.test.sh`'s version floor
@@ -634,11 +623,10 @@ moves into the kit's `design_lib.py` so the render and the checker share it (S37
 tools/codebase-map/reuse_lookup.py "locate an installed kit file in an adopter from its install
 receipt"` and `python tools/codebase-map/reuse_lookup.py "install a kit into a scratch target with
 the deployer and read its receipt"` ranked `resolve_kit_dir` and `kit_rel` among name-stem hits; the
-others were found by reading the files the review cites, each verified at base. One hit disagreed
-with the review rather than with source: the review's fix for id 1 asked for a build-index check
-over same-step edges, and the tree holds twenty-one such edges in landed specs, so §8 F1 renders the
-step instead. The recall probe returned the prior minors batch `TOOL-dGroundRules-21`, whose
-one-item-per-finding table this unit follows, and this audit's own items.
+other seams came from the files the review cites, each verified at base. One hit disagreed with the
+review, not with source: id 1's fix asked for a check over same-step edges, and twenty-one sit in
+landed specs, so §8 F1 renders the step instead. The recall probe returned the prior minors
+batch `TOOL-dGroundRules-21`, whose per-finding table this unit follows, and this audit's own items.
 
 Recall terms used: `python tools/memory-recall/query.py "how are review minors batched into one
 repair unit" --terms "minors batch promoted medium low disposed severity spec-audit repair unit write

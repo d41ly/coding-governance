@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-43 — the round-1 audit of units 33 and 34, its minors: fifteen findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-43-deviation-31.md](../build/2026-10-23-build-TOOL-dGroundRules-43-deviation-31.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 |
 
 <!-- /gen:spec-records -->
@@ -123,6 +124,7 @@ corrected fix.
 - **hands-off** `TOOL-dGroundRules-45` — AC1, which that unit observes through `PAIRS_TABLE` (id 20 of the round-1 spec audit of units 35 to 43)
 - **hands-off** `TOOL-dGroundRules-51` — S3 and AC3, which that unit observes with the build README's path whole (id 21 of the round-1 spec audit of units 35 to 43)
 - **hands-off** `TOOL-dGroundRules-52` — `build_source_snapshot`'s excludes forwarding, the S9 event filter, and AC1, AC3, AC6 and AC13, which that unit amends or observes (ids 3, 7, 12, 14, 16, 18, 25 and 36 of the round-1 spec audit of units 35 to 43)
+- **hands-off** `TOOL-dGroundRules-59` — AC1, which that unit observes through `PAIRS_TABLE_WHOLE` (id 13 of the closing diff review, round 1)
 
 ## 4. Design
 
@@ -320,6 +322,8 @@ none
   corrected fix for id 15, with each cited line read at `b9f7b5c4e`.
 - rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-45`, `TOOL-dGroundRules-51`, `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
   the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
+- rev-3 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-59`, the reciprocal end of the round-1 closing diff
+  review's promotions; no scope or criterion moved.
 
 ## 10. Reuse audit
 

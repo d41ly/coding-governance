@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each
 
-**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
+**Status:** OPEN · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-34-deviation-22.md](../build/2026-10-23-build-TOOL-dGroundRules-34-deviation-22.md) | deviation | — |
+| [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-21 TOOL-dGroundRules-25 TOOL-dGroundRules-64 |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-33 |
 
 <!-- /gen:spec-records -->
@@ -18,20 +20,15 @@
 The round-1 spec audit of units 26 to 32
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md`)
 exited CONVERGED with 38 confirmed findings. Its one HIGH, id 26, is promoted alone as
-`TOOL-dGroundRules-33`. BUILD-METHOD M4 promotes the other thirty-seven, twenty-three MEDIUM and
-fourteen LOW, batched into one unit, and this is that unit. They land on units 26 to 32. They do not
-split into two disjoint write sets by M6's clauses: the `check_policy.py` items and the
-`check-protocol-parity.test.sh` items both regenerate `memory/map/generated/symbols.json`, which
-carries that test file's functions, and the fresh-target case the policy items change runs the
-`adopt-policy.sh` the scaffold item changes, so one would read the other's write as an acceptance
-input. One unit carries them all. It repairs no unit in particular, so it builds at order 12, above
-every unit of this build, `TOOL-dGroundRules-33` at order 11 included.
+`TOOL-dGroundRules-33`; BUILD-METHOD M4 batches the other thirty-seven, twenty-three MEDIUM and
+fourteen LOW, into this unit. They land on units 26 to 32, and M6's clauses yield no two disjoint
+write sets (§4 "Alternatives rejected"). It builds at order 12, above every unit of this build,
+`TOOL-dGroundRules-33` at order 11 included.
 
-Several ids share a review item, and each still takes its own scope item, a distinct facet of the
-item's defect. Ids 2 and 1 are taken at MEDIUM and ids 11 and 36 at LOW, the grades the review gives
-them after its skeptic re-graded each. Id 37 names two corrupted criteria, `TOOL-dGroundRules-29`
-AC4 and `TOOL-dGroundRules-32` AC9; it sits in item M5 and takes one scope item, S14, observed
-by AC14 and AC15.
+Ids sharing a review item each take their own scope item, a distinct facet of its defect. Ids 2 and
+1 are taken at MEDIUM and ids 11 and 36 at LOW, the grades the review's skeptic re-graded them to.
+Id 37 names two corrupted criteria, `TOOL-dGroundRules-29` AC4 and `TOOL-dGroundRules-32` AC9, and
+takes one scope item, S14, observed by AC14 and AC15.
 
 | Finding id | Severity | Review item | Unit it lands on | Scope item | Criterion |
 |---|---|---|---|---|---|
@@ -242,9 +239,8 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
 ## 3. Non-goals (OUT)
 
 - The HIGH: `TOOL-dGroundRules-33`.
-- Rewriting any reviewed spec's text. Each defect a spec stated is closed here in the code and the
-  observation it governs, and each repaired unit's §3 names this unit; nothing is folded
-  (BUILD-METHOD M4).
+- Rewriting any reviewed spec's text: each defect is closed here in code and in the observation it
+  governs, and each repaired unit's §3 names this unit; nothing is folded (BUILD-METHOD M4).
 - Renumbering any unit's `order`.
 - The review's left-shift gates beyond what an item here builds: the spec-lint for a criterion that
   repeats a path or opens a list without `[`, the pre-unit-observation rule, and the checklist
@@ -298,9 +294,6 @@ names another revision.
   `DEPLOY_FULL` (`:703`), its constant parts joined and parsed by `tomllib`, printed the five
   answers `memory_root`, `playbook_path`, `playbook_dir`, `manifest_path` and `user_skills`, with
   no import (run 2026-10-23).
-- `tools/govkit/matrix.py:409` defines `run_in_gov`; `:929` clones `--local` from `ROOT`.
-- `tools/workflows/check-verifier-fanout.sh:213-214` echoes `verifier-fanout: FAILED — $f`, then the
-  hook's output through `sed 's/^/    /'`.
 - `overlaps tools/policy/ tools/policy/x.py` returned 0 and `overlaps tools/policy/a.py tools/policy/ab.py`
   returned 1 after sourcing `tools/unattended/lib-unattended.sh` (run 2026-10-23).
 - `render_order` (`tools/memory-tree/gen_build_index.py:1716`) prints one row per distinct `order`
@@ -356,9 +349,8 @@ build_fresh_target(snapshot_root, source_root, kits):
 | `tools/policy/README.md` | S37 |
 | the codebase map | S7, S23, by regeneration |
 
-S6, S14 to S16, S25, S26, S32 and S35 change no code of their own; each is the observation this
-unit owes for a defect in a criterion or a stated outcome, made against the code units 26 to 33
-build.
+S6, S14 to S16, S25, S26, S32 and S35 change no code; each is an observation owed for a defective
+criterion or stated outcome, made against the code units 26 to 33 build.
 
 ### Writes `TOOL-dGroundRules-32` declares
 
@@ -402,13 +394,11 @@ declares no cell for a Python constant, so `SNAPSHOT_ROOTS` is graded by none.
 ### Alternatives rejected
 
 - **Two batch units, the policy half and the render half.** Both regenerate
-  `memory/map/generated/symbols.json`, and the scaffold item writes the adopter the fresh-target
-  case runs, so M6's first and second clauses fail.
-- **`-c core.excludesFile=<source exclude>` for S1.** It overrides the user's own excludes file, so
-  a rule `git status` reads from there is lost and AC2 fails.
-- **A registry and every census enforcer copied into unit 1's base fixture repository (S18).**
-  Every case of units 1 to 33 plants on that repository, and each would then read `source` and need
-  every enforcer present (§8 F4).
+  `memory/map/generated/symbols.json`, which carries `check-protocol-parity.test.sh`'s functions,
+  and the fresh-target case the policy items change runs the `adopt-policy.sh` the scaffold item
+  changes, so one reads the other's write as an acceptance input: M6's first and second clauses fail.
+- **`-c core.excludesFile=<source exclude>` for S1**, and **a registry and every census enforcer
+  copied into unit 1's base fixture repository (S18)**: §8 F6 and F4.
 
 ## 5. Production-readiness checklist
 
@@ -421,9 +411,7 @@ declares no cell for a Python constant, so `SNAPSHOT_ROOTS` is graded by none.
 - observability — the snapshot line carries its file count and seconds; every new `WRONG` names its
   path, root, key or file.
 - risks — S5 removes another unit's arm by this unit's mandate; §7's arm line names its replacement.
-- testing — the cases under `--fixture`, the arms in `tools/check-spec-tokens.test.sh`,
-  `tools/policy/adopt-policy.test.sh` and `tools/workflows/check-protocol-parity.test.sh`, and AC1 to
-  AC37.
+- testing — the cases under `--fixture`, the suites on §7's arm lines, and AC1 to AC37.
 - migration — the codebase map and `memory/gotchas/INDEX.md` regenerated in this unit's commit.
 - user docs — `help/policy.md` (S36) and the kit README (S37).
 
@@ -606,48 +594,35 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
 
 - **F1 — How does `--scaffold` refuse an invalid policy file before it defers the mirror (finding
   32)?** (a) It runs the installed `check_policy.py --repo <t>` and reads `arm_schema`, which grades
-  the working-tree file through `validate`. (b) `mirror --write` validates the working-tree file
-  before its uncommitted comparison. (c) A working-tree flag on `policy.py check`. (b) opens the
-  working-tree file in `policy.py`, which `TOOL-dGroundRules-2` S2 states never happens, a
-  disagreement between specs that no fold here may settle (veto 1). (c) adds a public option to a
-  product verb (veto 2). (a) meets AC20 through the real control flow. Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F2 — How does `check_policy.py` read `DEPLOY_FULL`'s answers (finding 19)?** (a) A side-effect-free
-  module under `tools/govkit/` that `selftest.py` and `check_policy.py` both import. (b) A local copy
-  in `check_policy.py`, held equal to `selftest.py`'s by an `ast` arm. (c) An `ast` read of
-  `selftest.py`'s own assignment, no copy and no import. (a) edits another kit's held suite and adds
-  an import across kits, which `tools/codebase-map/map_lib.py:1505` states a kit may not do. (b) is
-  a second carrier of the fact with a gate to hold it, where (c) has one carrier and needs no gate.
-  (c) meets AC23 and was run on 2026-10-23 (§4). Recommendation (c). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (c). widens: none · relaxes: none
+  the working-tree file through `validate`, meeting AC20 through the real control flow. Validating in
+  `mirror --write` opens the working-tree file in `policy.py`, which `TOOL-dGroundRules-2` S2 states
+  never happens (veto 1); a working-tree flag on `policy.py check` adds a public option to a product
+  verb (veto 2). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F2 — How does `check_policy.py` read `DEPLOY_FULL`'s answers (finding 19)?** (c) An `ast` read
+  of `selftest.py`'s own assignment: one carrier, no copy, no import and no gate, run on 2026-10-23
+  (§4), meeting AC23. A shared module under `tools/govkit/` edits another kit's held suite and
+  imports across kits, which `tools/codebase-map/map_lib.py:1505` forbids; a local copy is a second
+  carrier needing an `ast` arm. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (c). widens: none · relaxes: none
 - **F3 — Where does the false-green HEAD shape live (finding 21)?** (a) In
-  `suite-invalidated-by-a-commit-under-it`, which names `_cmd_apply`'s HEAD stamp, with the
-  historical-sha record pointing to it and keeping its anchors. (b) In the historical-sha record
-  alone, with a stated reason. (c) The HEAD paragraph moved out of the historical-sha record
-  entirely. (c) makes `TOOL-dGroundRules-28` AC1 and AC2 red (veto 1). (b) keeps one record with two
-  opposite symptoms and leaves the other prescribing the defect. (a) meets AC34 and keeps
-  `TOOL-dGroundRules-28`'s criteria. Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  `suite-invalidated-by-a-commit-under-it`, which names `_cmd_apply`'s HEAD stamp, the historical-sha
+  record pointing to it and keeping its anchors, so AC34 and `TOOL-dGroundRules-28`'s criteria hold.
+  Moving the HEAD paragraph out reds `TOOL-dGroundRules-28` AC1 and AC2 (veto 1); keeping it there
+  alone leaves one record with two opposite symptoms and the other prescribing the defect.
+  Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F4 — How do the census cases keep their join in a receipt-less fixture repository (findings 24
-  and 33)?** (a) Under `unadopted` the arm withholds only enforcer presence and keeps the join. (b)
-  Unit 1's base fixture repository gains the registry and every census enforcer. (b) turns every
-  case's repository into gov's tree and needs every enforcer copied into it, changing the repository
-  every case of units 1 to 33 plants on. (a) meets AC18 and AC19 with one rule at the reader.
-  Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  and 33)?** (a) Under `unadopted` the arm withholds only enforcer presence and keeps the join, one
+  rule at the reader meeting AC18 and AC19. Copying the registry and every census enforcer into unit
+  1's base fixture repository turns the repository every case of units 1 to 33 plants on into gov's
+  tree. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F5 — How does `run_govkit` refuse every root no snapshot made (findings 4 and 34)?** (a)
-  `build_source_snapshot` records its roots and `run_govkit` refuses any other. (b) `run_govkit`
-  requires `git -C <root> rev-parse --show-toplevel` to equal the root and to sit outside the
-  source's top level. (b) admits a stale `--local` clone outside the source, which fails AC10
-  (veto 1). Recommendation (a). Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  `build_source_snapshot` records its roots and `run_govkit` refuses any other. Requiring
+  `rev-parse --show-toplevel` to equal the root outside the source admits a stale `--local` clone,
+  which fails AC10 (veto 1). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F6 — How does the snapshot read the source's exclude file (findings 2, 10, 22 and 31)?** (a)
-  Copy it into the snapshot's `info/exclude`. (b) `-c core.excludesFile=<it>`. (c) Build the file
-  list in the source with `ls-files -co --exclude-standard` and feed it to `update-index` under the
-  snapshot's `GIT_DIR`. (b) drops the user's own excludes file, which fails AC2 (veto 1). (a) and
-  (c) both meet every criterion; (a) keeps `TOOL-dGroundRules-26` S1's `add -A` and adds one copy.
-  Recommendation (a), by fewer open questions. Rung 3.
-  RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  Copy it into the snapshot's `info/exclude`, keeping `TOOL-dGroundRules-26` S1's `add -A` with one
+  copy added. `-c core.excludesFile=<it>` drops the user's own excludes file, which fails AC2
+  (veto 1); feeding `ls-files -co --exclude-standard` to `update-index` meets every criterion but
+  opens more questions. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -655,10 +630,13 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
   the round-1 spec audit of units 26 to 32 in one batch, from the review's sound fixes and the
   skeptic's corrected fixes for ids 24, 30 and 35, with each cited line read at `f4d31452a`.
 - rev-2 · 2026-10-23 · §3 · hands-off edges to units 38-41 and 43, reciprocals of their consumes-from lines; nothing else moved.
+- rev-3 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling after the closing
+  review's records row: repeats between sections dropped, each resolved fork cut to its decision and
+  reason; no meaning moved.
 
 ## 10. Reuse audit
 
-Each item extends a seam already named in its row: `TOOL-dGroundRules-26`'s `build_source_snapshot`
+Each item extends the seam its row names: `TOOL-dGroundRules-26`'s `build_source_snapshot`
 (S1 to S4, S24, S27 to S29), `TOOL-dGroundRules-27`'s `run_govkit` (S7 to S10, S33),
 `TOOL-dGroundRules-29`'s `derive_census_tree` and `arm_cap_census` (S11 to S14, S18, S19),
 `TOOL-dGroundRules-32`'s `check_writes_intersect` and the dispatcher's `overlaps` (S15 to S17),
@@ -668,10 +646,10 @@ Each item extends a seam already named in its row: `TOOL-dGroundRules-26`'s `bui
 file (S20), and the gotcha record `suite-invalidated-by-a-commit-under-it` (S34).
 `python tools/codebase-map/reuse_lookup.py "install a kit into a scratch target with the deployer and read its receipt"`
 ranked `read`, `read_text`, `scratch`, `kit_rel` and `resolve_kit_dir` among name-stem hits; the
-others were found by reading the files the review cites, each verified at `f4d31452a`.
+other seams came from the files the review cites, each verified at `f4d31452a`.
 `tools/govkit/matrix.py`'s `run_in_gov` was weighed for S9 and S10 and not reused (S33). The recall
 probe returned the prior minors batches `TOOL-dGroundRules-25` and `TOOL-dGroundRules-32`, whose
-one-item-per-finding table this unit follows, and this audit's own items.
+per-finding table this unit follows, and this audit's own items.
 
 Recall terms used: `python tools/memory-recall/query.py "how are review minors batched into one
 repair unit" --terms "minors batch promoted medium low disposed severity spec-audit repair unit write

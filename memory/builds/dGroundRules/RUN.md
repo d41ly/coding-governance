@@ -141,3 +141,29 @@ base: 3708a705e834709f340a2d160f9acdf9c18b699f
 2026-10-23T04:30:26Z hold · item owner-decision · reason until owner · reaped ccc970f5 · resume none(owner)
 
 2026-10-23T05:00:29Z resume · item dGroundRules · reason held · keepalive 23f9fd54 · manual
+
+2026-10-23T05:18:54Z review · item dGroundRules · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 10 · minors 8 · disposition promote
+
+2026-10-23T05:19:07Z rescope · item add TOOL-dGroundRules-53 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 5 at HIGH, item H1
+
+2026-10-23T05:19:08Z rescope · item add TOOL-dGroundRules-54 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 9 at HIGH, item H1
+
+2026-10-23T05:19:10Z rescope · item add TOOL-dGroundRules-55 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 12 at HIGH, item H1
+
+2026-10-23T05:19:11Z rescope · item add TOOL-dGroundRules-56 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 14 at HIGH, item H1
+
+2026-10-23T05:19:12Z rescope · item add TOOL-dGroundRules-57 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 19 at HIGH, item H1
+
+2026-10-23T05:19:13Z rescope · item add TOOL-dGroundRules-58 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 4 at HIGH, item H2
+
+2026-10-23T05:19:15Z rescope · item add TOOL-dGroundRules-59 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 13 at HIGH, item H2
+
+2026-10-23T05:19:16Z rescope · item add TOOL-dGroundRules-60 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 20 at HIGH, item H2
+
+2026-10-23T05:19:17Z rescope · item add TOOL-dGroundRules-61 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 1 at HIGH, item H3
+
+2026-10-23T05:19:19Z rescope · item add TOOL-dGroundRules-62 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 finding id 8 at HIGH, item H4
+
+2026-10-23T05:19:20Z rescope · item add TOOL-dGroundRules-63 · reason 2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1 minors batch: MEDIUM ids 6 15 21 22 and LOW ids 7 11 18 23
+
+2026-10-23T05:19:21Z rescope · item add TOOL-dGroundRules-64 · reason adopted discovery: the main loop's basename respelling stripped fixture literals from the acceptance criteria of units 5, 29, 34, 39, 40, 43 and 51 beyond those H1, H2 and M1 name; the unit restores each one in a form the spec-tokens paths join accepts

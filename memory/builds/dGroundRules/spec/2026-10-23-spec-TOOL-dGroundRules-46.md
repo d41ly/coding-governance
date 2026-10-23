@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-46 — the spec-tokens checker refuses a criterion literal that sources a shell file by bare name
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-46-deviation-34.md](../build/2026-10-23-build-TOOL-dGroundRules-46-deviation-34.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
 <!-- /gen:spec-records -->
 
@@ -58,7 +59,7 @@ order 13, so it builds at order 14.
 
 ### Edges
 
-none
+- **hands-off** `TOOL-dGroundRules-63` — the population the Goal, the Evidence and the Rollout state and AC3's fixture, which that unit re-measures at `7810198ad` with units 44 and 45 beside 34 and 40, and AC3 itself, which that unit observes at its own close (ids 6, 15 and 21 of the spec run's closing diff review)
 
 ## 4. Design
 
@@ -188,6 +189,10 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 10 (HIGH, item H1) of the round-1 spec
   audit of units 35 to 43 as the item's left-shift gate, with the bare-source predicate and a wider
   bare-name predicate measured over the spec corpus on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-63 added, the reciprocal of
+  that unit's **consumes-from** line: the promotion of the spec run's closing diff review's M1 (ids
+  6, 15 and 21), which re-measures this unit's population with units 44 and 45 and observes AC3. No
+  scope, design or acceptance moved here; the repair is the promoted unit's.
 
 ## 10. Reuse audit
 

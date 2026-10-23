@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-51 — the build-order evidence observed in the build README with its path whole, beside the root-README negative
 
-**Status:** OPEN · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 15
+**Status:** OPEN · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 15
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-51-deviation-39.md](../build/2026-10-23-build-TOOL-dGroundRules-51-deviation-39.md) | deviation | — |
+| [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-52 |
 
 <!-- /gen:spec-records -->
 
@@ -43,6 +44,7 @@ which sits at order 14, so it builds at order 15.
 
 - **consumes-from** `TOOL-dGroundRules-43` — S3's pinned citation of the build-order markers and AC3, which S1 observes with the path whole
 - **hands-off** `TOOL-dGroundRules-52` — `EVIDENCE_WHOLE`, through which that unit observes `TOOL-dGroundRules-43` AC3 (ids 3, 12 and 25)
+- **hands-off** `TOOL-dGroundRules-64` — `EVIDENCE_WHOLE`, through which that unit observes `TOOL-dGroundRules-34` AC32 (the adopted discovery of the closing diff review, round 1)
 
 ## 4. Design
 
@@ -83,6 +85,8 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 21 (HIGH, item H3) of the round-1 spec
   audit of units 35 to 43, from the review's sound fix, with both greps run on 2026-10-23.
+- rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-64`, the reciprocal end of the round-1 closing diff
+  review's promotions; no scope or criterion moved.
 
 ## 9. Reuse audit
 
