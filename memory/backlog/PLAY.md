@@ -29,6 +29,5 @@ Cite ids, never line numbers.
 | [PLAY-dClosedLoop-21](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE SPECS-AUDITED TERM IS NOT PIN-AWARE. TOOL-dTrueNorth-5 pins each… |
 | [PLAY-dClosedLoop-22](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE BINDING-LINE GRAMMAR HAS NO TEMPLATE HOME. TOOL-dTrueNorth-1 states… |
 | [PLAY-dClosedLoop-23](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-22 | THE PROMPT-MODE BRIEF CHECK READS THE AUTHORED ROSTER ITS OWN WAY.… |
-| [PLAY-dClosedLoop-30](../builds/dClosedLoop/BACKLOG.md) | OPEN | LOW | — | 2026-10-23 | THE SPEC AUDIT'S DISPOSAL STAGE HANDS BACK SPECS THE MEMORY HYGIENE… |
 | [PLAY-dConvergedCharter-24](../builds/dConvergedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [PLAY-dOrderedCharter-38](../builds/dOrderedCharter/BACKLOG.md) | OPEN | MED | — | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
