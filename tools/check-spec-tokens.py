@@ -156,15 +156,20 @@ status but WONTDO, with its history.
          spelling, so a `[path]` waiver row keyed on the same bare string neither swallows a
          claims refusal nor is kept from reading stale by one; waive a claim by that token.
   size   every LIVE spec's bytes, carriage returns stripped as check-template-size.sh strips them
-         -> the CLASS row `memory/builds/*/spec/` of `template-size-limits.txt` beside the leg
-         manifest (TOOL-aMendedFleet-25). The eighth population is the live specs themselves. A
+         -> the CLASS cap `memory/builds/*/spec/`, answered by the policy kit's budgets.py
+         (TOOL-dGroundRules-9): the class row of the template-size limits file, its ONE reader's
+         read at the landed revision, or the policy file's `budgets."memory/builds/*/spec/"`
+         (TOOL-aMendedFleet-25). The eighth population is the live specs themselves. A
          spec over the ceiling is a hit whose token is `size <- <path>`, unless a row keyed by its
          exact path in `template-size-highwater.txt` HOLDS it: held, it may shrink and may not grow,
-         and past its row it is a hit naming both figures. A high-water row under `memory/builds/`
-         naming anything but a live spec over the ceiling is STALE and reds, untracked, terminal or
-         back under. No class row turns the arm off, announced; a non-number class or high-water
-         row refuses. What it does NOT check: a line count, a terminal spec, and growth below the
-         ceiling.
+         and past its row it is a hit naming both figures. BOTH HITS OBEY THE SWITCH: under
+         `budgets.enforce = "warn"` with the cap unpinned, each is printed as a `BUDGET WARN` line
+         and not counted. A high-water row under `memory/builds/` naming anything but a live spec
+         over the ceiling is STALE and reds, untracked, terminal or back under. No class value, or
+         no policy kit beside this checker, turns the arm off, announced; a class row that is not a
+         number, any other refusal of the policy reader, and a non-number high-water row refuse,
+         under `warn` too. What it does NOT check: a line count, a terminal spec, and growth below
+         the ceiling.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -260,10 +265,11 @@ LEGS_NAME = "gate-legs.json"
 #: directory; `LEGS` is the repo-relative spelling `main` derives, for its messages.
 LEGS = LEGS_NAME
 HERE = pathlib.Path(__file__).resolve().parent
-# TOOL-aMendedFleet-25: the size join's two sidecars, read from the directory holding the leg
+# TOOL-aMendedFleet-25: the size join's high-water sidecar, read from the directory holding the leg
 # manifest, and the CLASS key its ceiling row carries. The key is a label no measured file's key
 # equals, so check-template-size.sh never reads it; class membership is this checker's LIVE test.
-SIZE_LIMITS_NAME = "template-size-limits.txt"
+# The ceiling itself is the policy kit's to read (TOOL-dGroundRules-9): budgets.py is the limits
+# file's one reader, so this checker never names that file.
 SIZE_HIGHWATER_NAME = "template-size-highwater.txt"
 SIZE_CLASS_KEY = "memory/builds/*/spec/"
 
@@ -1245,66 +1251,90 @@ def read_waivers(root):
     return rows
 
 
-def read_size_ceilings(tooldir):
-    """The size join's inputs from the two sidecars beside the leg manifest (TOOL-aMendedFleet-25):
-    `(ceiling, highwater)`, where `ceiling` is the CLASS row's bytes or None when the row is absent
-    (the arm is off) and `highwater` maps each recorded path to its bytes. Parsed the way
-    check-template-size.sh parses them: tab-separated, comment and blank lines skipped, the value
-    stripped of whitespace. A class row or a high-water row whose value is not a number REFUSES:
-    returns None after printing the refusal, never zero and never off."""
-    found = {}
-    for name in (SIZE_LIMITS_NAME, SIZE_HIGHWATER_NAME):
-        p = tooldir / name
-        rows = {}
-        if p.exists():
-            for line in p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines():
-                if not line.strip() or line.lstrip().startswith("#"):
-                    continue
-                key, _, val = line.partition("\t")
-                rows[key] = "".join(val.split())
-        found[name] = rows
-    limits, highwater = found[SIZE_LIMITS_NAME], found[SIZE_HIGHWATER_NAME]
-    bad = [(SIZE_LIMITS_NAME, SIZE_CLASS_KEY, limits[SIZE_CLASS_KEY])] \
-        if SIZE_CLASS_KEY in limits and not limits[SIZE_CLASS_KEY].isdigit() else []
-    bad += [(SIZE_HIGHWATER_NAME, k, v) for k, v in highwater.items() if not v.isdigit()]
+def read_size_ceilings(tooldir, root):
+    """The size join's inputs (TOOL-aMendedFleet-25, TOOL-dGroundRules-9): `(answer, highwater, judge,
+    off)`. `answer` is the policy kit's CapAnswer for the CLASS cap, read through `resolve_caps` in
+    `root` at its landed revision, or None when the arm is off, `off` then saying why: no class
+    value, or no policy kit beside this checker, found by `resolve_kit_dir`. `judge` is that kit's
+    `check_cap`. `highwater` maps each path the high-water sidecar beside the leg manifest records to
+    its bytes, parsed tab-separated with comment and blank lines skipped and the value stripped of
+    whitespace. A high-water row that is not a number, and every refusal the policy reader makes, a
+    class row that is not a number among them, REFUSE: None after printing the refusal, never zero
+    and never off."""
+    rows = {}
+    p = tooldir / SIZE_HIGHWATER_NAME
+    if p.exists():
+        for line in p.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n").splitlines():
+            if not line.strip() or line.lstrip().startswith("#"):
+                continue
+            key, _, val = line.partition("\t")
+            rows[key] = "".join(val.split())
+    bad = [(k, v) for k, v in rows.items() if not v.isdigit()]
     if bad:
-        name, key, val = bad[0]
-        print(f"spec-tokens: REFUSING — the size join's row for {key} in {name} is not a number: "
-              f"'{val}'; it would read as zero or as off")
+        print(f"spec-tokens: REFUSING — the size join's row for {bad[0][0]} in {SIZE_HIGHWATER_NAME} is not a "
+              f"number: '{bad[0][1]}'; it would read as zero or as off")
         return None
-    ceiling = int(limits[SIZE_CLASS_KEY]) if SIZE_CLASS_KEY in limits else None
-    return ceiling, {k: int(v) for k, v in highwater.items()}
+    highwater = {k: int(v) for k, v in rows.items()}
+    try:
+        kit = str(resolve_kit_dir("policy", "budgets.py", HERE))
+    except LookupError as exc:
+        return None, highwater, None, f"no policy kit beside this checker to read the ceiling through: {exc}"
+    if kit not in sys.path:
+        sys.path.insert(0, kit)
+    import budgets  # the policy kit's caps module, found above; never at import time, which gen_build_index shares
+    try:
+        answer = budgets.resolve_caps([SIZE_CLASS_KEY], str(root))[SIZE_CLASS_KEY]
+    except budgets.policy.Refusal as exc:
+        print(f"spec-tokens: REFUSING — the size join's ceiling for {SIZE_CLASS_KEY} did not read: {exc}")
+        return None
+    if not answer.value:
+        return None, highwater, None, f"no class value for {SIZE_CLASS_KEY}: {answer.reason}"
+    return answer, highwater, budgets.check_cap, ""
 
 
-def scan_spec_sizes(root, specs, files, ceiling, highwater, hw_rel):
+def scan_spec_sizes(root, specs, files, answer, highwater, hw_rel, judge):
     """The size join (TOOL-aMendedFleet-25) over the LIVE specs: each measured in bytes with carriage
-    returns stripped, as check-template-size.sh measures. Returns `(hits, stale, held, largest)`.
+    returns stripped, as check-template-size.sh measures. Returns `(hits, stale, held, largest,
+    warned)`.
 
-    A spec over `ceiling` with no high-water row is a hit; one with a row is HELD while it does not
-    exceed the row, and a hit naming both figures once it does. A row keyed under `memory/builds/`
-    that names anything but a live spec over the ceiling is STALE — untracked, terminal or back under
-    it — the rule a waiver row nothing produces already meets. `largest` is the largest unheld spec
-    as `(bytes, path)`, or None. It does not price growth under the ceiling, and it reads no line
-    count: the template gate prices bytes only, and so does this."""
-    hits, stale, held, largest, size = [], [], 0, None, {}
+    A spec over the ceiling, `answer.value`, with no high-water row is a hit; one with a row is HELD
+    while it does not exceed the row, and a hit naming both figures once it does. Each hit carries
+    the verdict `judge(answer, bytes, path)` returns (TOOL-dGroundRules-9): one that does not refuse
+    is printed as its `BUDGET WARN` line, counted in `warned` and never a hit. A row keyed under
+    `memory/builds/` that names anything but a live spec over the ceiling is STALE — untracked,
+    terminal or back under it — the rule a waiver row nothing produces already meets. `largest` is
+    the largest unheld spec as `(bytes, path)`, or None. It does not price growth under the ceiling,
+    and it reads no line count: the template gate prices bytes only, and so does this."""
+    ceiling = answer.value
+    hits, stale, held, largest, size, warned = [], [], 0, None, {}, 0
     for f in specs:
         n = len((root / f).read_bytes().replace(b"\r", b""))
         size[f] = n
         rec = highwater.get(f)
         if n > ceiling and rec is not None:
-            if n > rec:
+            if n <= rec:
+                held += 1
+                continue
+            verdict = judge(answer, n, f)
+            if verdict.refuse:
                 hits.append((f, "size", f"size <- {f}",
                              f"held at its recorded high-water {rec} in {hw_rel} and now {n} bytes "
-                             f"(+{n - rec}); a held spec may shrink and may not grow"))
+                             f"(+{n - rec}); a held spec may shrink and may not grow · {verdict.line}"))
             else:
-                held += 1
+                warned += 1
+                print(f"{verdict.line} · held at its recorded high-water {rec} in {hw_rel}, grown +{n - rec}")
             continue
         if largest is None or n > largest[0]:
             largest = (n, f)
         if n > ceiling:
-            hits.append((f, "size", f"size <- {f}",
-                         f"{n} bytes, {n - ceiling} over the spec ceiling {ceiling}; split the spec "
-                         "or move history out of it"))
+            verdict = judge(answer, n, f)
+            if verdict.refuse:
+                hits.append((f, "size", f"size <- {f}",
+                             f"{n} bytes, {n - ceiling} over the spec ceiling {ceiling}; split the spec "
+                             f"or move history out of it · {verdict.line}"))
+            else:
+                warned += 1
+                print(verdict.line)
     for key in sorted(highwater):
         if not key.startswith("memory/builds/"):
             continue
@@ -1316,7 +1346,7 @@ def scan_spec_sizes(root, specs, files, ceiling, highwater, hw_rel):
         elif size[key] <= ceiling:
             stale.append(("HIGH-WATER", key, f"in {hw_rel} — back under the ceiling "
                                              f"({size[key]} <= {ceiling})"))
-    return hits, stale, held, largest
+    return hits, stale, held, largest, warned
 
 
 def scan_arm_covers(f, text):
@@ -1418,11 +1448,10 @@ def main(argv):
         print(f"spec-tokens: REFUSING — {LEGS} declares no leg")
         return 1
 
-    sizes = read_size_ceilings(legs_path.parent)
+    sizes = read_size_ceilings(legs_path.parent, root)
     if sizes is None:
         return 1
     tool_rel = legs_path.parent.relative_to(root.resolve()).as_posix()
-    limits_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_LIMITS_NAME
     hw_rel = (f"{tool_rel}/" if tool_rel != "." else "") + SIZE_HIGHWATER_NAME
 
     waivers = read_waivers(root)
@@ -1621,11 +1650,11 @@ def main(argv):
 
     # The eighth join (TOOL-aMendedFleet-25): its hits take the waiver pass below like any other, and
     # its stale high-water rows join the stale list, so one exit decision covers both.
-    ceiling, highwater = sizes
-    sz_stale, sz_held, sz_largest = [], 0, None
-    if ceiling is not None:
-        sz_hits, sz_stale, sz_held, sz_largest = scan_spec_sizes(root, specs, files, ceiling,
-                                                                 highwater, hw_rel)
+    sz_answer, highwater, sz_judge, sz_off = sizes
+    sz_stale, sz_held, sz_largest, sz_warned = [], 0, None, 0
+    if sz_answer is not None:
+        sz_hits, sz_stale, sz_held, sz_largest, sz_warned = scan_spec_sizes(
+            root, specs, files, sz_answer, highwater, hw_rel, sz_judge)
         hits += sz_hits
 
     # The ninth join (TOOL-dTrueNorth-2), over a population of its own: the tracked chain-build specs
@@ -1727,12 +1756,13 @@ def main(argv):
           + (handoff_cut if handoff_cut else "blank (arm off)"))
     # The size join's line, on every run and carrying `live spec(s) ·` for the hands-off line's
     # reason: `--dispatch` filters its refusal diagnosis on that text.
-    if ceiling is None:
-        print(f"spec-tokens: size join · {len(specs)} live spec(s) · no class row in {limits_rel} (arm off)")
+    if sz_answer is None:
+        print(f"spec-tokens: size join · {len(specs)} live spec(s) · {sz_off} (arm off)")
     else:
         big = f"{sz_largest[0]} B {sz_largest[1]}" if sz_largest else "none"
-        print(f"spec-tokens: size join · {len(specs)} live spec(s) · ceiling {ceiling} from {limits_rel} · "
-              f"largest unheld {big} · {sz_held} held at a recorded high-water")
+        print(f"spec-tokens: size join · {len(specs)} live spec(s) · ceiling {sz_answer.value} "
+              f"({sz_answer.source}: {sz_answer.reason}) · mode {sz_answer.mode}, {sz_answer.rule} · "
+              f"largest unheld {big} · {sz_held} held at a recorded high-water · {sz_warned} warned")
     # The carries join's line, ONE shape on every run, off and armed alike, carrying `live spec(s) ·`
     # for the hands-off line's reason: `--dispatch` filters its refusal diagnosis on that text.
     ca_builds = cov.get("builds", {}).values()

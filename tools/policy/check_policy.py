@@ -107,12 +107,24 @@ with no remote, so local main is its landed revision. `limit-conf-lowers`, `limi
 cases copy the hooks kit's agent-cap.js and scratch-guard.js beside a copy of this kit, so rule 7 reads
 the fixture's own limit, and judge each call by its exit code and the text its criterion names.
 
+THE SIZE CAPS (TOOL-dGroundRules-9) add two arms and three kinds of case. `arm_limits_readers` reds a
+tracked code file outside this kit, the memory root, `help/` and the self-tests that spells the
+template-size limits file on a line that is not a comment or a docstring; `arm_cap_census` joins
+`caps.toml` to the tree both ways. `budgets-pinned-outside`, `budgets-pinned-exempt`,
+`budgets-pinned-unknown` and `budgets-family-value` are plant cases of `arm_schema`. The other named
+`budgets-` cases are outcome cases, one repository per observation. One `budgets-cap-<name>` case per
+census row, declared in CAP_CASES, builds a scratch repository on main with no remote, plants the
+cap's subject over its value, read from the source, and runs the row's enforcer under `warn` and under
+`refuse`: a `switch` row must warn and pass, then refuse naming `budgets.enforce`; an outside row must
+answer the same under both, and the reader must refuse to answer it.
+
 `--live` (S9) is no case: it drives headless `claude -p` sessions in a fixture repository under a
 rendered limit and under a control with none, reads each agent's start and end stamps, and prints
 each run's peak overlap. It costs real sessions, so no leg runs it.
 
 Later units add arms to ARMS and cases to CASES.
 """
+import ast
 import contextlib
 import hashlib
 import io
@@ -130,6 +142,7 @@ from pathlib import Path
 
 sys.dont_write_bytecode = True  # a gate leg leaves no bytecode cache in an adopter's kit dir
 import policy  # noqa: E402  (the module beside this file)
+import budgets  # noqa: E402  (the size caps' module beside this file, TOOL-dGroundRules-9)
 
 KIT = policy.KIT
 POLICY_FILE = (".governance", "policy.toml")
@@ -148,7 +161,9 @@ def load_rows(kit):
 
 def arm_schema(repo, kit):
     """Each problem `policy.validate` finds in the policy file: a key its catalogue row refuses, and a
-    key no row matches (TOOL-dGroundRules-4 re-points this arm through the one judge)."""
+    key no row matches (TOOL-dGroundRules-4 re-points this arm through the one judge), and the
+    `[budgets]` table's rule over the cap census `repo` holds at this kit's path (TOOL-dGroundRules-9).
+    A census that does not read is the one finding."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
@@ -156,7 +171,11 @@ def arm_schema(repo, kit):
     if not path.is_file():
         return 0, f"{POLICY_REL} is absent, so no key was graded", []
     text = path.read_text(encoding="utf-8")
-    problems = policy.validate(text, rows)
+    try:
+        census = budgets.read_cap_census(repo)
+    except policy.Refusal as exc:
+        return 0, "the cap census did not read", [(f"{exc.path}:{exc.line}", exc.why)]
+    problems = policy.validate(text, rows, census)
     if problems and not problems[0].key:
         return 0, f"{POLICY_REL} did not parse", [(POLICY_REL, f"does not parse: {problems[0].why}")]
     n = sum(1 for _ in policy.scan_keys(tomllib.loads(text), rows))
@@ -204,7 +223,10 @@ def arm_on_invalid(repo, kit):
 # ---- the JSON mirror (TOOL-dGroundRules-5) ------------------------------------------------------
 
 MIRROR_FILE = tuple(policy.MIRROR_REL.split("/"))
-MIRROR_KIT_FILES = ("policy.py", "policy-mirror.js", "policy-shim.sh")
+# The reader and what `validate` reads beside it: the caps module and its census (TOOL-dGroundRules-9).
+# Every kit copy that runs the reader carries all three.
+READER_FILES = ("policy.py", "budgets.py", budgets.CENSUS)
+MIRROR_KIT_FILES = (*READER_FILES, "policy-mirror.js", "policy-shim.sh")
 CODE_PATHSPECS = ("*.js", "*.mjs", "*.cjs", "*.py", "*.sh", ".githooks/*")
 MIRROR_REMEDY = "run: python <this kit>/policy.py mirror --write"
 
@@ -427,8 +449,140 @@ def arm_reader_coverage(repo, kit):
             [tuple(f.split(": ", 1)) for f in findings])
 
 
+# ---- the size caps (TOOL-dGroundRules-9) --------------------------------------------------------
+
+# A request of the size switch as an enforcer spells it: a verb of budgets.py's CLI, a
+# `resolve_caps` list, or the roles kit's `read_cap_answer`. `args` is the CLI's argument run, `list`
+# the Python list's body and `one` the single request; a `$`-led or braced cap is DYNAMIC, named by
+# the subject at run time.
+REQUEST_SHAPES = re.compile(
+    r"budgets\.py[\"']?[ \t]+(?P<verb>resolve|check)(?P<args>[^\n|;&)]*)"
+    r"|resolve_caps\(\s*\[(?P<list>[^\]]*)\]"
+    r"|read_cap_answer\(\s*(?P<one>[^,)]*)")
+# An enforcer that asks the switch at all: a shape above, the policy kit's resolver anchor, or a
+# call of budgets.py's own CLI entry from an embedded program.
+ASKS_SHAPE = re.compile(r"budgets\.py|resolve_caps\(|read_cap_answer\(|budgets\.main\(")
+LITERAL_SHAPE = re.compile(r"""[fFrRbB]{0,2}(["'])([^"'\n]*)\1""")
+COMMENT_LEADS = ("#", "//")
+
+
+def scan_cap_requests(text):
+    """-> one entry per request REQUEST_SHAPES finds on a line that is not a comment: the cap a
+    literal names, or None for a dynamic request. A request's cap is its text before `=`; a `check`
+    run's last argument is the measure, never a cap."""
+    out = []
+    for line in text.splitlines():
+        if line.lstrip().startswith(COMMENT_LEADS):
+            continue
+        for m in REQUEST_SHAPES.finditer(line):
+            if m["verb"]:
+                toks = [t.strip("\"'") for t in m["args"].split()]
+                toks = [t for t in toks if t and not t.startswith("-") and ">" not in t]
+                caps = toks[:-1] if m["verb"] == "check" else toks
+            else:
+                body = m["list"] if m["list"] is not None else m["one"]
+                caps = [s for _q, s in LITERAL_SHAPE.findall(body)] or [None]
+            out += [None if c is None or c.startswith("$") or "{" in c.split("=")[0] else c.split("=")[0]
+                    for c in caps]
+    return out
+
+
+def derive_docstring_lines(text):
+    """The 1-based lines inside a Python file's module, class and function docstrings, which read as
+    comments; an empty set for text that does not parse."""
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError):
+        return set()
+    out = set()
+    for node in ast.walk(tree):
+        body = getattr(node, "body", None)
+        if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef)) and body:
+            first = body[0]
+            if isinstance(first, ast.Expr) and isinstance(getattr(first, "value", None), ast.Constant) \
+                    and isinstance(first.value.value, str):
+                out.update(range(first.lineno, (first.end_lineno or first.lineno) + 1))
+    return out
+
+
+def derive_code_files(repo, kit):
+    """The tracked code files, CODE_PATHSPECS, outside this kit's directory, the memory root and
+    `help/`, and not a self-test by READER_SKIPPED: the population both size-cap arms read."""
+    skip = tuple(p for p in ((policy.run_git(kit, "rev-parse", "--show-prefix") or "").strip(),
+                             read_memory_root(repo) + "/", "help/") if p)
+    return [f for f in (policy.run_git(repo, "ls-files", "-z", "--", *CODE_PATHSPECS) or "").split("\0")
+            if f and not f.startswith(skip) and not READER_SKIPPED.search(f)]
+
+
+def arm_limits_readers(repo, kit):
+    """Each tracked code file of `derive_code_files` that spells the template-size limits file's name
+    on a line that is neither a comment nor inside a Python docstring: the policy kit's budgets.py is
+    that file's one reader (TOOL-dGroundRules-9), so any other spelling in code is a second parser."""
+    name = budgets.LIMITS_NAME
+    files = derive_code_files(repo, kit)
+    out = []
+    for f in files:
+        text = policy.read_text_or_none(Path(repo, f))
+        if text is None or name not in text:
+            continue
+        doc = derive_docstring_lines(text) if f.endswith(".py") else set()
+        hits = [str(n) for n, ln in enumerate(text.splitlines(), 1)
+                if name in ln and n not in doc and not ln.lstrip().startswith(COMMENT_LEADS)]
+        if hits:
+            out.append((f, f"spells {name} at line {', '.join(hits)}; budgets.py is its one reader, so ask "
+                           "it for the cap rather than parsing the file"))
+    return len(files), f"{len(files)} tracked code file(s) outside the kit, the memory root, help/ and the self-tests", out
+
+
+def arm_cap_census(repo, kit):
+    """The cap census joined to the tree both ways (TOOL-dGroundRules-9).
+
+    Census to tree: each row's enforcer, its `{prefix}` resolved against this kit's tool root, is a
+    file; a `switch` row's enforcer asks the policy kit and names the cap on a line that is not a
+    comment, a `limits:` row's naming it by the subject's key at run time; an outside row's enforcer
+    makes no request naming it; and each row has its case in CAP_CASES. Tree to census: a request in
+    a `derive_code_files` file naming a cap no row names, a CAP_CASES case for no row, and a row of
+    the limits file at HEAD no `limits:` row names. A census that does not read is the one finding."""
+    try:
+        census = budgets.read_cap_census(repo)
+    except policy.Refusal as exc:
+        return 0, "the cap census did not read", [(f"{exc.path}:{exc.line}", exc.why)]
+    troot = budgets.derive_tool_root()
+    out = []
+    for cap in census.values():
+        rel = budgets.resolve_prefix_token(cap.enforcer, troot)
+        text = policy.read_text_or_none(Path(repo, rel))
+        if text is None:
+            out.append((cap.name, f"its enforcer {rel} is not a file in this tree"))
+        else:
+            code = "\n".join(ln for ln in text.splitlines() if not ln.lstrip().startswith(COMMENT_LEADS))
+            if cap.cls == "switch" and not ASKS_SHAPE.search(code):
+                out.append((cap.name, f"its enforcer {rel} asks the policy kit nothing, so the switch never reaches it"))
+            elif cap.cls == "switch" and not cap.home.startswith("limits:") \
+                    and not re.search(rf"(?<![\w.-]){re.escape(cap.name)}(?![\w-])", code):
+                out.append((cap.name, f"its enforcer {rel} never names it outside a comment"))
+            elif cap.cls != "switch" and cap.name in scan_cap_requests(text):
+                out.append((cap.name, f"is {cap.cls}, outside the switch, and its enforcer {rel} requests a mode for it"))
+        if cap.name not in CAP_CASES:
+            out.append((cap.name, f"has no budgets-cap-{cap.name} case in CAP_CASES"))
+    out += [(name, "is a CAP_CASES case for no census row") for name in CAP_CASES if name not in census]
+    files, asked = derive_code_files(repo, kit), 0
+    for f in files:
+        for cap in scan_cap_requests(policy.read_text_or_none(Path(repo, f)) or ""):
+            asked += 1
+            if cap is not None and cap not in census:
+                out.append((cap, f"is requested by {f} and names no census row"))
+    lrel, lrows = budgets.read_limits_home(repo, "HEAD")
+    homes = {c.home.partition(":")[2] for c in census.values() if c.home.startswith("limits:")}
+    out += [(k, f"is a row of {lrel} at HEAD no limits: census row names, so nothing enforces it")
+            for k in sorted(set(lrows) - homes)]
+    return len(census), (f"{len(census)} census row(s) joined to their enforcers and cases · {asked} request(s) "
+                         f"in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel} at HEAD"), out
+
+
 ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm_mirror_parity,
-        arm_mirror_landed, arm_mirror_readers, arm_legacy_homes, arm_reader_coverage]
+        arm_mirror_landed, arm_mirror_readers, arm_legacy_homes, arm_reader_coverage,
+        arm_limits_readers, arm_cap_census]
 
 
 def run_arm(arm, repo, kit):
@@ -941,7 +1095,7 @@ def run_resolution_order(name):
         other = build_reader_repo(t / "other", "[runtime]\nagents-in-flight = 3\n")
         kit = t / "kit"
         kit.mkdir()
-        for f in ("policy.py", policy.CATALOGUE):
+        for f in (*READER_FILES, policy.CATALOGUE):
             (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
         write_edit(kit / policy.CATALOGUE, lambda text: set_row_block(
             text, "budgets.enforce", lambda b: re.sub(r"^default = .*\n", "", b, flags=re.M)))
@@ -1393,7 +1547,7 @@ def run_mirror_landed_parity(name):
 
 # ---- the minimal guard (TOOL-dGroundRules-6) ----------------------------------------------------
 
-GUARD_FILES = ("guard.py", "guarded-paths.txt", "policy.py")  # policy.py: the mirror shape's `mirror --print`
+GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: the mirror shape's `mirror --print`
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 DEPLOY_REL = ".governance/deploy.toml"
 DECISIONS_REL = "memory/DECISIONS.md"
@@ -1538,7 +1692,7 @@ def build_legacy_repo(t, gate, house):
     repo = t / "r"
     kit = repo / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit.mkdir(parents=True)
-    for f in ("policy.py", policy.CATALOGUE, policy.LIST):
+    for f in (*READER_FILES, policy.CATALOGUE, policy.LIST):
         (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
     homes = {repo / ".unattended.conf": LEGACY_CONF}
     if gate is not None:
@@ -1932,6 +2086,500 @@ LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed
                "limit-hook-settings-over", "limit-hook-local-over")
 
 
+# ---- the size caps' cases (TOOL-dGroundRules-9) --------------------------------------------------
+#
+# Every census enforcer runs from the SOURCE tree against a scratch repository on main with no remote,
+# so local main is the landed revision the policy reader reads: the plant's files and a policy file at
+# `warn` or `refuse`, committed. A copy-installed enforcer that finds the policy kit beside ITSELF runs
+# as a copy beside a copy of the policy kit, at their source paths. Each value the plant measures is
+# READ from the source, never typed: the limits file's row, the constant a shell or Python file sets.
+
+BUDGET_POLICY = '[budgets]\nenforce = "{mode}"\n'
+CAP_CASE_PREFIX = "budgets-cap-"
+CASE_SPEC = "memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md"
+CASE_SPEC_TEXT = ("# TOOL-tOne-1 — a unit\n\n**Status:** OPEN · rev-1 · 2026-09-02 · node t · Tier-1 · base 0123abcd · "
+                  "streams tooling\n\n## 6. Acceptance criteria\n\n- **AC1** — `{pre}gate-legs.json` exists.\n\n"
+                  "## 7. Gates\n\n`real leg`.\n\n")
+HYGIENE_CONF = 'MEMORY_ROOT=memory\nDISCIPLINES="arch"\nFAMILIES="arch:ARCH"\n'
+ROLES_CONF = "MEMORY_ROOT=memory\nCHARTER=AGENTS.md\n"
+MANIFEST_REL = "memory/guides/SESSION-KICKOFF.md"
+MANIFEST_TEXT = ("# Kickoff manifest — a case\n<!-- kickoff-manifest: v{fmt} · a case -->\n<!-- manifest-audit\n"
+                 "last-audit: 2026-07-12T12:00:01+00:00 @ {sha}\nwatch: Makefile\nverify-paths: docs/GOV.md\n"
+                 "last-body-change: {sha}\n-->\n## §A\n{skeleton}\n## §B\ngate fence:\n```bash\nmake all\n```\n{body}")
+SHA_SHAPE = re.compile(r"\b[0-9a-f]{7,40}\b")
+
+
+def derive_source_top():
+    """The checkout this kit sits in, as git spells it: the tree every census enforcer runs from."""
+    return Path((policy.run_git(KIT, "rev-parse", "--show-toplevel") or "").strip())
+
+
+def derive_enforcer_rel(cap):
+    """A census row's enforcer, its `{prefix}` resolved against this kit's tool root."""
+    return budgets.resolve_prefix_token(cap.enforcer, budgets.derive_tool_root())
+
+
+def derive_enforcer_path(cap):
+    """A census row's enforcer in the source tree, absolute: the file a plant runs from there."""
+    return (derive_source_top() / derive_enforcer_rel(cap)).as_posix()
+
+
+def read_source_number(rel, key):
+    """The integer the source file at `rel` assigns `key` where an assignment opens a line or follows a
+    `;`: `KEY=n`, `KEY = n`, `KEY=${KEY:-n}`, `KEY="n"`, `n` with `_` separators read as one number."""
+    text = (derive_source_top() / rel).read_text(encoding="utf-8")
+    m = re.search(rf"(?:^|;)[ \t]*{re.escape(key)}[ \t]*=[ \t]*(?:\$\{{{re.escape(key)}:-)?\"?([0-9_]+)", text, re.M)
+    if m is None:
+        raise LookupError(f"{rel} assigns no number to {key}")
+    return int(m[1].replace("_", ""))
+
+
+def read_source_limits():
+    """(the limits file's path, its text and its rows) at the source tree's HEAD, read through the
+    policy reader's own `read_limits_home`."""
+    top = derive_source_top()
+    lrel, rows = budgets.read_limits_home(top, "HEAD")
+    return lrel, policy.run_git(top, "show", f"HEAD:{lrel}") or "", rows
+
+
+def write_case_file(root, rel, text):
+    Path(root, rel).parent.mkdir(parents=True, exist_ok=True)
+    Path(root, rel).write_bytes(text if isinstance(text, bytes) else text.encode("utf-8"))
+
+
+def build_cap_repo(t, files, mode, extra="", copies=(), post=None):
+    """The case's repository at `t`, on main with no remote: each directory of `copies` copied from the
+    source tree to its own path, CRLF folded, then `files` ({path: text}), then a policy file setting
+    `budgets.enforce` to `mode` with `extra` below it, committed; `post(t)` then writes and commits."""
+    top = derive_source_top()
+    t.mkdir(parents=True, exist_ok=True)
+    for rel in copies:
+        shutil.copytree(top / rel, t / rel, ignore=shutil.ignore_patterns("__pycache__"), dirs_exist_ok=True)
+        for f in (t / rel).rglob("*"):
+            if f.is_file():
+                f.write_bytes(f.read_bytes().replace(b"\r\n", b"\n"))
+    for rel, text in files.items():
+        write_case_file(t, rel, text)
+    write_policy(t, BUDGET_POLICY.format(mode=mode) + extra)
+    run_fixture_git(t, "init", "-q")
+    run_fixture_git(t, "symbolic-ref", "HEAD", "refs/heads/main")
+    run_fixture_git(t, "add", "-A")
+    run_fixture_git(t, "commit", "-q", "-m", "the case's landed revision")
+    if post is not None:
+        post(t)
+        run_fixture_git(t, "add", "-A")
+        run_fixture_git(t, "commit", "-q", "--allow-empty", "-m", "the case's plant")
+    return t
+
+
+def render_said(out, mark):
+    """The one line of `out` carrying `mark`, else its last line, cut at 300: an observation's line."""
+    return next((ln for ln in out.splitlines() if mark and mark in ln), (out.strip().splitlines() or ["(no output)"])[-1])[:300]
+
+
+def run_case_argv(cwd, argv, env=None):
+    """-> (exit code, stdout and stderr with CR stripped); a `bash` argv[0] is `resolve_bash`'s."""
+    if argv[0] == "bash":
+        argv = [resolve_bash() or "bash", *argv[1:]]
+    try:
+        p = subprocess.run([str(a) for a in argv], cwd=cwd, capture_output=True, text=True, encoding="utf-8",
+                           errors="replace", env={**os.environ, **(env or {})})
+    except OSError as exc:
+        return None, f"{argv[0]} did not run: {exc}"
+    return p.returncode, (p.stdout + p.stderr).replace("\r", "")
+
+
+def derive_template_size_plant(cap):
+    """A subject at the row's key one byte over the row, the limits file at its source path."""
+    lrel, text, rows = read_source_limits()
+    v = int(rows[cap.name][0])
+    return {"files": {lrel: text, cap.name: "x" * (v + 1)}, "argv": ["bash", derive_enforcer_path(cap), cap.name],
+            "warn": f"BUDGET WARN — {cap.name} · {cap.name} · {v + 1} bytes over {v}",
+            "refuse": "budgets.enforce is refuse"}
+
+
+def derive_spec_class_plant(cap):
+    """One live spec one byte over the class row, in the smallest tree the spec-token lint grades."""
+    lrel, text, rows = read_source_limits()
+    v = int(rows[cap.name][0])
+    troot = budgets.derive_tool_root()
+    pre = f"{troot}/" if troot else ""
+    spec = CASE_SPEC_TEXT.format(pre=pre)
+    spec += ("0" * 99 + "\n") * ((v + 1 - len(spec.encode("utf-8"))) // 100 + 1)
+    return {"files": {f"{pre}gate-legs.json": '[{"name":"real leg"}]\n', f"{pre}gate.sh": "#!/bin/sh\n",
+                      "memory/project/spec-token-waivers.txt": "# waivers\n", lrel: text, CASE_SPEC: spec},
+            "argv": [sys.executable, derive_enforcer_path(cap)],
+            "warn": f"BUDGET WARN — {cap.name} · {CASE_SPEC} ·", "refuse": f"size <- {CASE_SPEC}"}
+
+
+def derive_line_length_plant(cap):
+    """A subject with one line a character past the gate's hard default, the family's value."""
+    rel = derive_enforcer_rel(cap)
+    v = read_source_number(rel, "HARD_DEFAULT")
+    return {"files": {"subject.md": "y" * (v + 1) + "\n"}, "argv": ["bash", derive_enforcer_path(cap), "subject.md"],
+            "warn": f"BUDGET WARN — line-length · subject.md · {v + 1} chars over {v}",
+            "refuse": "budgets.enforce is refuse"}
+
+
+def derive_hygiene_plant(cap):
+    """One memory file over one of check 6's or 7's caps, the value the engine declares for the
+    cap's conf key; a cap the engine leaves at 0, unchecked, takes 10 from the policy file."""
+    rel = derive_enforcer_rel(cap)
+    v, extra = read_source_number(rel, cap.home.rpartition(":")[2]), ""
+    if v == 0:
+        v, extra = 10, f'"{cap.name}" = 10\n'
+    kind, axis = cap.name.rsplit("-", 1)
+    files = {".memory-tree.conf": HYGIENE_CONF, "memory/backlog/ARCH.md": "# ARCH\n"}
+    path, head, width = {"guide": ("memory/guides/g.md", "", 199), "index": ("memory/backlog/ARCH.md", "# ARCH\n", 250),
+                         "entry": ("memory/backlog/ARCH.md", "# ARCH\n", 0), "dossier": ("memory/map/features/d.md", "", 120),
+                         "readme": ("memory/builds/bOne/README.md", "", 300),
+                         "readme-entry": ("memory/builds/bOne/README.md", "", 0)}[kind]
+    if kind == "dossier":
+        files[".codebase-map.conf"] = "MAP_ROOT=memory/map\n"
+    body = {"bytes": ("x" * width + "\n") * (v // (width + 1) + 1), "lines": "x\n" * (v + 1), "chars": "x" * (v + 1) + "\n"}
+    files[path] = head + body[axis]
+    return {"files": files, "extra": extra, "argv": ["bash", derive_enforcer_path(cap), "--only", "6,7"],
+            "warn": f"BUDGET WARN — {cap.name} ·", "refuse": "budgets.enforce is refuse"}
+
+
+def derive_readme_slot_plant(cap):
+    """A bound build README whose first canonical slot is one byte over its declared ceiling, the
+    canon and the ceilings read from the declaration the census names."""
+    rel = derive_enforcer_rel(cap)
+    decl = budgets.resolve_prefix_token(cap.home.split(":", 1)[1].rpartition(":")[0], budgets.derive_tool_root())
+    heads = [tuple(ln.split("\t", 1)) for ln in (derive_source_top() / decl).read_text(encoding="utf-8").splitlines()
+             if ln.startswith("## ") and "\t" in ln]
+    v = int(heads[0][1])
+    bodies = ["x" * (v + 1), "- one", "- one"] + [""] * len(heads)
+    slots = "".join(f"{h}\n\n{b}\n\n" if b else f"{h}\n\n" for (h, _v), b in zip(heads, bodies))
+    readme = ("---\nslug: tOne\nnode: t\nopened: 2026-01-01\nstreams: s\nroster: ARCH\nids: ARCH-tOne-1\n---\n\n# tOne\n\n"
+              f"{slots}<!-- roster:units -->\n| # | Unit |\n<!-- /roster:units -->\n\n<!-- gen:build-index -->\n"
+              "<!-- /gen:build-index -->\n")
+    readme_rel = "memory/builds/tOne/README.md"
+    return {"files": {".memory-tree.conf": "MEMORY_ROOT=memory\n", readme_rel: readme,
+                      "memory/project/readme-contract.txt": f"exempt-pin: 0\n{readme_rel}\n"},
+            "argv": [sys.executable, derive_enforcer_path(cap), "--check-format"],
+            "warn": f"BUDGET WARN — readme-slot · {readme_rel} `{heads[0][0]}` · {v + 1} bytes over {v}",
+            "refuse": "over its declared ceiling"}
+
+
+def derive_role_body_plant(cap):
+    """The roles kit and the policy kit copied in, and one role body 5000 bytes longer, past every
+    slot's ceiling."""
+    rel = derive_enforcer_rel(cap)
+    roles = posixpath.dirname(rel)
+    agent = sorted((derive_source_top() / roles / "agents").glob("*.agent.md"))[0]
+    text = agent.read_text(encoding="utf-8").replace("\r\n", "\n") + "\n" + "x" * 5000 + "\n"
+    return {"files": {".memory-tree.conf": ROLES_CONF, "AGENTS.md": (derive_source_top() / "AGENTS.md").read_bytes(),
+                      f"{roles}/agents/{agent.name}": text},
+            "copies": (roles, budgets.derive_kit_rel().rstrip("/")), "argv": [sys.executable, rel],
+            "warn": "BUDGET WARN — role-body ·", "refuse": "-byte ceiling (budgets.enforce is refuse)"}
+
+
+def derive_one_line_rule_plant(cap):
+    """A copy of the render engine beside a copy of the policy kit, a template whose one-line region
+    holds a rule one character past the engine's cap, and the smallest descriptor and registry."""
+    rel = derive_enforcer_rel(cap)
+    v = read_source_number(rel, "ONE_LINE_MAX")
+    eng = posixpath.dirname(rel)
+    return {"files": {rel: (derive_source_top() / rel).read_bytes(), f"{eng}/playbook.kit.toml": "",
+                      f"{eng}/registry.toml": '[[entry]]\nid = "lexicon"\n',
+                      ".governance/deploy.toml": 'kits = ["lexicon"]\n\n[answers]\nplaybook_path = "CHARTER.md"\n',
+                      "CHARTER.md": f"<!-- one-line -->\n- {'x' * v}\n<!-- /one-line -->\nend\n"},
+            "copies": (budgets.derive_kit_rel().rstrip("/"),), "argv": [sys.executable, rel, "--target", "{repo}"],
+            "warn": "BUDGET WARN — one-line-rule", "refuse": f"past the {v} a one-line rule may take"}
+
+
+def derive_roster_line_plant(cap):
+    """The roles kit and the policy kit copied in, and the first role's description lengthened past
+    the roster cap."""
+    rel = derive_enforcer_rel(cap)
+    v = read_source_number(rel, "ROSTER_LINE_MAX")
+    roles = posixpath.dirname(rel)
+    agent = sorted((derive_source_top() / roles / "agents").glob("*.agent.md"))[0]
+    text = re.sub(r"^(description: .*)\.$", lambda m: m[1] + "x" * v + ".",
+                  agent.read_text(encoding="utf-8").replace("\r\n", "\n"), count=1, flags=re.M)
+    return {"files": {".memory-tree.conf": ROLES_CONF, f"{roles}/agents/{agent.name}": text},
+            "copies": (roles, budgets.derive_kit_rel().rstrip("/")), "argv": [sys.executable, rel, "roster"],
+            "warn": f"BUDGET WARN — roster-line · {agent.name[:-len('.agent.md')]}",
+            "refuse": "(budgets.enforce is refuse)"}
+
+
+def derive_manifest_plant(cap, kit=True, body=None, env=None, argv_tail=()):
+    """A kickoff manifest over its cap, stamped at the base commit, in a repository whose policy kit is
+    TRACKED, as the checker's last rung finds it; `kit` False holds none. `body` replaces the plant."""
+    rel = derive_enforcer_rel(cap)
+    key = {"manifest-bytes": "MAX_MANIFEST_BYTES", "manifest-line": "MANIFEST_LINE_MAX",
+           "manifest-trap": "MANIFEST_TRAP_MAX"}.get(cap.name)
+    v = read_source_number(rel, key) if key else 0
+    plants = {"manifest-bytes": ("y" * 99 + "\n") * (v // 100 + 1), "manifest-line": "y" * (v + 1) + "\n",
+              "manifest-trap": ("\n### Environment traps worth front-loading\n\n- " + "y" * 98 + "\n"
+                                + ("  " + "y" * 98 + "\n") * (v // 100 + 1))}
+    fmt = re.search(r'^MANIFEST_FORMAT="([0-9.]+)"', (derive_source_top() / rel).read_text(encoding="utf-8"), re.M)[1]
+    skeleton = run_case_argv(derive_source_top(), ["bash", rel, "--task-skeleton"])[1].rstrip("\n")
+
+    def write_manifest(t):
+        sha = run_fixture_git(t, "rev-parse", "HEAD")
+        write_case_file(t, MANIFEST_REL, MANIFEST_TEXT.format(fmt=fmt, sha=sha, skeleton=skeleton,
+                                                               body=plants.get(cap.name, "") if body is None else body))
+    return {"files": {"Makefile": "all:\n\ttrue\n", "docs/GOV.md": "gov\n"}, "post": write_manifest, "env": env,
+            "copies": (budgets.derive_kit_rel().rstrip("/"),) if kit else (),
+            "argv": ["bash", derive_enforcer_path(cap), *argv_tail],
+            "warn": f"BUDGET WARN — {cap.name} ·", "refuse": "budgets.enforce is refuse"}
+
+
+def derive_universal_plant(cap):
+    """Two universal class records against the conf's UNIVERSAL_BUDGET of 1, the catalogue's index
+    written and committed."""
+    rel = derive_enforcer_rel(cap)
+    uni = "---\nname: {n}\ndescription: d\nuniversal: true\n---\n\nEverywhere. No machine gate.\n"
+    return {"files": {".memory-tree.conf": HYGIENE_CONF + 'UNIVERSAL_BUDGET="1"\n', "memory/HYGIENE.md": "sentinel\n",
+                      "memory/README.md": "# r\n", "memory/DECISIONS.md": "# d\n",
+                      "memory/gotchas/u1.md": uni.format(n="u1"), "memory/gotchas/u2.md": uni.format(n="u2")},
+            "post": lambda t: run_case_argv(t, [sys.executable, derive_source_top() / rel, "--write"]),
+            "argv": [sys.executable, derive_enforcer_path(cap), "--check"],
+            "warn": "BUDGET WARN — universal-gotchas", "refuse": "against a budget of 1"}
+
+
+def derive_recall_export_plant(cap):
+    """The recall kit and the policy kit copied in, so the kit's repository is the case's, and a query
+    log of one query a day, long enough that its export passes the cap."""
+    rel = derive_enforcer_rel(cap)
+    v = read_source_number(rel, "EXPORT_CAP")
+
+    def write_query_log(t):
+        log = Path(run_fixture_git(t, "rev-parse", "--path-format=absolute", "--git-common-dir"), "recall", "queries.jsonl")
+        log.parent.mkdir(parents=True, exist_ok=True)
+        log.write_text("".join(json.dumps({"qid": i + 1, "type": "query", "at": f"{2000 + i // 336:04d}-{i % 336 // 28 + 1:02d}-"
+                                           f"{i % 28 + 1:02d}T00:00:00Z", "n_hits": 1, "results": []}) + "\n"
+                               for i in range(v // 25)), encoding="utf-8", newline="\n")
+    return {"files": {".memory-tree.conf": HYGIENE_CONF, "memory/README.md": "# r\n"}, "post": write_query_log,
+            "copies": (posixpath.dirname(rel), budgets.derive_kit_rel().rstrip("/")),
+            "argv": [sys.executable, rel, "--export", "--tag", "z"],
+            "warn": "BUDGET WARN — recall-export", "refuse": "over the"}
+
+
+def derive_outside_probe_plant(cap):
+    """An outside row's enforcer run under each value. Where the cap is cheap to reach the run
+    breaches it: the orientation card at a 1-byte cap, Codex's canonical one byte over CODEX_MAX.
+    Elsewhere the run reads the constant the enforcer holds, from its own module."""
+    rel = derive_enforcer_rel(cap)
+    key = cap.home.rpartition(":")[2]
+    if cap.name == "orientation-card":
+        return derive_manifest_plant(cap, body="", env={key: "1"}, argv_tail=(
+            "--card", "--write", "--session", "00000000-0000-4000-8000-000000000000")) | {"warn": "over the 1-byte cap"}
+    src = derive_enforcer_path(cap)
+    if cap.name == "cited-file-cap":  # a waiver list, no number: the check runs over a small tree
+        return {"files": {".memory-tree.conf": "MEMORY_ROOT=memory\n", "memory/README.md": "# r\n"},
+                "argv": [sys.executable, src, "--check"], "warn": ""}
+    v = read_source_number(rel, f"const {key}" if rel.endswith(".js") else key)
+    if cap.name == "codex-instructions":
+        return {"files": {"AGENTS.md": "x" * v + "\n"}, "argv": ["bash", src], "warn": f"over {v}"}
+    if rel.endswith(".js"):
+        return {"files": {}, "argv": ["node", "-e", f"process.stdout.write(String(require({json.dumps(src)}).{key}))"],
+                "warn": str(v)}
+    mod = Path(rel).stem
+    return {"files": {}, "argv": [sys.executable, "-B", "-c", f"import sys; sys.path.insert(0, {posixpath.dirname(src)!r}); "
+                                  f"import {mod}; print({mod}.{key})"], "warn": str(v)}
+
+
+# The census row -> its plant. DECLARED, never derived from the census, so `arm_cap_census` reads a
+# census row with no case, and a case with no row, as the defects they are.
+CAP_CASES = {
+    "coding-governance-agents.template.md": derive_template_size_plant, "AGENTS.md": derive_template_size_plant,
+    "skills/session-kickoff/SKILL.md": derive_template_size_plant, "memory/guides/BUILD-METHOD.md": derive_template_size_plant,
+    "memory/guides/UNATTENDED-PROTOCOL.md": derive_template_size_plant, ".claude/skills/unattended/SKILL.md": derive_template_size_plant,
+    "memory/builds/*/spec/": derive_spec_class_plant, "line-length": derive_line_length_plant,
+    "guide-bytes": derive_hygiene_plant, "guide-lines": derive_hygiene_plant, "index-bytes": derive_hygiene_plant, "index-lines": derive_hygiene_plant,
+    "readme-bytes": derive_hygiene_plant, "readme-lines": derive_hygiene_plant, "dossier-bytes": derive_hygiene_plant,
+    "dossier-lines": derive_hygiene_plant, "entry-chars": derive_hygiene_plant, "readme-entry-chars": derive_hygiene_plant,
+    "readme-slot": derive_readme_slot_plant, "role-body": derive_role_body_plant, "one-line-rule": derive_one_line_rule_plant,
+    "roster-line": derive_roster_line_plant, "manifest-bytes": derive_manifest_plant, "manifest-line": derive_manifest_plant,
+    "manifest-trap": derive_manifest_plant, "universal-gotchas": derive_universal_plant, "recall-export": derive_recall_export_plant,
+    "orientation-card": derive_outside_probe_plant, "cited-file-cap": derive_outside_probe_plant,
+    "codex-instructions": derive_outside_probe_plant, "runlog-record": derive_outside_probe_plant,
+    "feature-card": derive_outside_probe_plant, "hook-context": derive_outside_probe_plant,
+}
+
+
+def run_cap_plant(t, cap, plant, mode, extra=""):
+    """One plant built at `t` under `mode` and its enforcer run there -> (exit code, output, plant)."""
+    p = plant(cap)
+    repo = build_cap_repo(t, p["files"], mode, p.get("extra", "") + extra, p.get("copies", ()), p.get("post"))
+    rc, out = run_case_argv(repo, [str(a).replace("{repo}", repo.as_posix()) for a in p["argv"]], p.get("env"))
+    return rc, out, p
+
+
+def run_cap_mode(t, cap, plant, mode):
+    """One mode of a census case at `t`: -> (exit code, output, plant) or the exception the plant
+    raised, the repository removed either way."""
+    try:
+        return run_cap_plant(t, cap, plant, mode)
+    except (subprocess.CalledProcessError, OSError, LookupError, KeyError, policy.Refusal) as exc:
+        return exc
+    finally:
+        if t.exists():
+            remove_repo(t)
+
+
+def run_cap_case(name):
+    """`budgets-cap-<name>` (AC5, AC6): the census row's plant built twice, at `warn` and at `refuse`,
+    in fresh repositories, and its enforcer run. A `switch` row must exit 0 printing its BUDGET WARN
+    line under `warn` and refuse naming `budgets.enforce` under `refuse`; its two modes run at once,
+    each at its own path. An outside row must print the same exit and output under both, its marker in
+    it, so its two modes run in turn at ONE path; and the policy reader must refuse to answer it."""
+    cap_name = name[len(CAP_CASE_PREFIX):]
+    checks, seen = [], {}
+    try:
+        cap = budgets.read_cap_census(derive_source_top()).get(cap_name)
+    except policy.Refusal as exc:
+        return print_checks(name, [(name, "the cap census", False, str(exc))])
+    plant = CAP_CASES.get(cap_name)
+    if cap is None or plant is None:
+        return print_checks(name, [(name, "a census row and its plant", False,
+                                    f"census row {'found' if cap else 'absent'} · plant {'found' if plant else 'absent'}")])
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        if cap.cls == "switch":
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
+                runs = dict(zip(("warn", "refuse"), pool.map(lambda m: run_cap_mode(t / m, cap, plant, m), ("warn", "refuse"))))
+        else:
+            runs = {m: run_cap_mode(t / "r", cap, plant, m) for m in ("warn", "refuse")}
+        for mode, got in runs.items():
+            if isinstance(got, Exception):
+                checks.append((mode, "the plant", False, f"{type(got).__name__}: {getattr(got, 'stderr', '') or got}"))
+                continue
+            rc, out, p = got
+            seen[mode] = (rc, SHA_SHAPE.sub("<sha>", out))
+            mark = p["refuse" if mode == "refuse" and cap.cls == "switch" else "warn"]
+            said = render_said(out, mark)
+            if cap.cls == "switch":
+                ok = (rc == 0) if mode == "warn" else (rc not in (0, None))
+                checks.append((mode, f"exit {'0' if mode == 'warn' else 'non-zero'} and {mark!r}", ok and mark in out,
+                               f"exit {rc} · {said}"))
+            else:
+                checks.append((mode, f"the outside enforcer ran, {mark!r} in its output", rc is not None and mark in out,
+                               f"exit {rc} · {said}"))
+        if cap.cls != "switch":
+            same = len(seen) == 2 and seen["warn"] == seen["refuse"]
+            checks.append(("warn and refuse", "the same exit and output", same,
+                           "identical" if same else f"warn {seen.get('warn')!r:.300} · refuse {seen.get('refuse')!r:.300}"))
+            try:
+                budgets.resolve_caps([cap.name], str(derive_source_top()))
+                checks.append(("reader", "budgets.resolve_caps refuses an outside cap", False, "it answered"))
+            except policy.Refusal as exc:
+                checks.append(("reader", "budgets.resolve_caps refuses an outside cap", "outside the switch" in exc.why, str(exc)))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+def seed_budget_pin(cap_name, needle, row=None):
+    """A plant of `budgets.pinned` naming `cap_name`, with `row` appended to the kit copy's census."""
+    def seed(repo, kit, rows):
+        if row:
+            write_edit(kit / budgets.CENSUS, lambda t: t + row)
+        write_edit(Path(repo, *POLICY_FILE), lambda t: t.replace("pinned = []", f'pinned = ["{cap_name}"]'))
+        return "budgets.pinned", needle
+    return seed
+
+
+def seed_family_value(repo, kit, rows):
+    write_edit(Path(repo, *POLICY_FILE), lambda t: t.replace("pinned = []", "pinned = []\nrole-body = 9000"))
+    return "budgets.role-body", "role-body is a family cap"
+
+
+EXEMPT_ROW = ('\n[[cap]]\nname = "zz-exempt"\nclass = "exempt"\nunit = "bytes"\nenforcer = "{prefix}/zz.sh"\n'
+              'home = "constant:{prefix}/zz.sh:ZZ"\nfamily = false\nresearch = 0\n')
+# AC1's four plants on the policy file, each graded by `arm_schema` through `validate`.
+BUDGET_SCHEMA_SEEDS = {
+    "budgets-pinned-outside": seed_budget_pin("codex-instructions", "codex-instructions is consumer, outside the switch"),
+    "budgets-pinned-exempt": seed_budget_pin("zz-exempt", "zz-exempt is exempt, outside the switch", EXEMPT_ROW),
+    "budgets-pinned-unknown": seed_budget_pin("no-such-cap", "no-such-cap names no row of the cap census"),
+    "budgets-family-value": seed_family_value,
+}
+
+
+def run_budget_case(name):
+    """The named outcome cases of the size switch (AC2, AC3, AC4, AC7, AC9, AC10, AC11), each over its
+    own repositories under one temp root, printing one line per observation."""
+    top, checks = derive_source_top(), []
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        census = budgets.read_cap_census(top)
+        lrel, ltext, lrows = read_source_limits()
+        no_agents = "".join(ln for ln in ltext.splitlines(True) if not ln.startswith("AGENTS.md\t"))
+        bud = [sys.executable, KIT / "budgets.py"]
+        if name == "budgets-pinned-warn":
+            rc, out, _p = run_cap_plant(t / "pin", census["AGENTS.md"], derive_template_size_plant, "warn", 'pinned = ["AGENTS.md"]\n')
+            checks.append(("pinned under warn", "exit 1 naming budgets.pinned", rc == 1 and "budgets.pinned" in out,
+                           f"exit {rc} · {render_said(out, 'budgets.pinned')}"))
+            rc, out, _p = run_cap_plant(t / "free", census["AGENTS.md"], derive_template_size_plant, "warn")
+            checks.append(("unpinned under warn", "exit 0 printing BUDGET WARN", rc == 0 and "BUDGET WARN" in out,
+                           f"exit {rc} · {render_said(out, 'BUDGET WARN')}"))
+        elif name == "budgets-two-homes":
+            line = lrows["AGENTS.md"][1]
+            r = build_cap_repo(t / "both", {lrel: ltext}, "warn", '"AGENTS.md" = 30000\n')
+            rc, out = run_case_argv(r, [*bud, "resolve", "AGENTS.md"])
+            want = f"policy: refused · {lrel}:{line} · budgets.AGENTS.md is held in both homes"
+            checks.append(("row and key", "exit 2 naming both homes", rc == 2 and out.strip() == want, f"exit {rc} · {out.strip()}"))
+            r = build_cap_repo(t / "key", {lrel: no_agents}, "warn", '"AGENTS.md" = 30000\n')
+            rc, out = run_case_argv(r, [*bud, "resolve", "AGENTS.md"])
+            checks.append(("key alone", "30000 with source file", rc == 0 and out.strip() == "AGENTS.md\t30000\twarn\tfile", f"exit {rc} · {out.strip()!r}"))
+        elif name == "budgets-limits-reader":
+            r = build_cap_repo(t / "r", {lrel: no_agents, "hooks/consumer.sh": "#!/bin/sh\necho reads no cap\n"},
+                               "warn", '"AGENTS.md" = 20480\n')
+            _n, _pop, found = arm_limits_readers(r, KIT)
+            checks.append(("unplanted", "arm_limits_readers green", not found, f"{found or 'no finding'}"))
+            write_case_file(r, "scripts/reader.sh", f"#!/bin/sh\ncat {lrel}\n")
+            run_fixture_git(r, "add", "scripts/reader.sh")
+            _n, _pop, found = arm_limits_readers(r, KIT)
+            checks.append(("a script reading the limits file", "red naming it", [k for k, _w in found] == ["scripts/reader.sh"], f"{found}"))
+        elif name == "budgets-census-join":
+            enforcers = {derive_enforcer_rel(c): (top / derive_enforcer_rel(c)).read_bytes() for c in census.values()}
+            r = build_cap_repo(t / "r", {**enforcers, lrel: ltext}, "warn", copies=(budgets.derive_kit_rel().rstrip("/"),))
+            _n, _pop, found = arm_cap_census(r, KIT)
+            checks.append(("the census's enforcers copied whole", "arm_cap_census green", not found, f"{found or 'no finding'}"))
+            ll = derive_enforcer_rel(census["line-length"])
+            write_case_file(r, ll, enforcers[ll] + b'\n"$PY_BIN" "$pk/budgets.py" resolve no-such-cap\n')
+            _n, _pop, found = arm_cap_census(r, KIT)
+            checks.append(("a request for no-such-cap", "red naming it", any(k == "no-such-cap" for k, _w in found), f"{found}"))
+            write_case_file(r, ll, enforcers[ll])
+            kit_census = Path(r, budgets.derive_kit_rel(), budgets.CENSUS)
+            write_edit(kit_census, lambda x: x + EXEMPT_ROW.replace("zz-exempt", "zz-planted"))
+            _n, _pop, found = arm_cap_census(r, KIT)
+            checks.append(("a census row with no case", "red naming it", any(k == "zz-planted" and "case" in w for k, w in found), f"{found}"))
+        elif name == "budgets-switch-refuse":
+            for mode, want in (("refuse", 1), ("warn", 0)):
+                r = build_cap_repo(t / mode, {lrel: ltext}, mode)
+                rc, out = run_case_argv(r, [*bud, "check", "AGENTS.md", "999999"])
+                checks.append((f"enforce = {mode}", f"exit {want} naming budgets.enforce", rc == want and "budgets.enforce" in out, f"exit {rc} · {out.strip()}"))
+        elif name == "budgets-no-kit":
+            rc, out, _p = run_cap_plant(t / "r", census["manifest-bytes"], lambda c: derive_manifest_plant(c, kit=False), "refuse")
+            told = out.count("no policy kit is installed")
+            checks.append(("no policy kit", "check 7 refuses and the absence is said once",
+                           rc == 1 and "MANIFEST check 7 FAILED" in out and told == 1,
+                           f"exit {rc} · said {told} time(s) · {render_said(out, 'check 7 FAILED')}"))
+        elif name == "budgets-correctness-kept":
+            bm = "memory/guides/BUILD-METHOD.md"
+            r = build_cap_repo(t / "r", {lrel: ltext, bm: "**Budget: <=1 bytes, <=1 lines**\nbody\n"}, "warn")
+            rc, out = run_case_argv(r, ["bash", derive_enforcer_path(census[bm]), bm])
+            checks.append(("a budget line disagreeing with its row, under warn", "exit 6", rc == 6,
+                           f"exit {rc} · {render_said(out, 'check 6 FAILED')}"))
+        else:
+            checks.append((name, "a known budgets case", False, "no such case"))
+    except (subprocess.CalledProcessError, OSError, LookupError, KeyError, policy.Refusal) as exc:
+        checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+BUDGET_CASES = ("budgets-pinned-warn", "budgets-two-homes", "budgets-limits-reader", "budgets-census-join",
+                "budgets-switch-refuse", "budgets-no-kit", "budgets-correctness-kept")
+
+
 # ---- the live observation (TOOL-dGroundRules-10 S9) ------------------------------------------------
 
 LIVE_LIMIT = 2
@@ -2096,6 +2744,9 @@ CASES = [
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("reader-coverage", None, run_reader_coverage),  # an outcome case: one planted repository per case
     *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each
+    *((c, arm_schema, s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
+    *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
+    *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
 ]
 
 
@@ -2119,7 +2770,7 @@ def build_repo(rows):
     prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit = repo / prefix if prefix else repo
     kit.mkdir(parents=True, exist_ok=True)
-    for name in (policy.CATALOGUE, policy.LIST):
+    for name in (policy.CATALOGUE, policy.LIST, budgets.CENSUS):
         (kit / name).write_bytes((KIT / name).read_bytes().replace(b"\r\n", b"\n"))
     Path(repo, POLICY_FILE[0]).mkdir()
     Path(repo, *POLICY_FILE).write_bytes(policy.render_scaffold(rows).encode("utf-8"))
@@ -2160,8 +2811,8 @@ def run_fixture(only=None):
             continue
         repo, kit = build_repo(rows)
         try:
-            files = [kit / policy.CATALOGUE, kit / policy.LIST, Path(repo, *POLICY_FILE), Path(repo, *MIRROR_FILE),
-                     Path(repo, *CONSUMER_FILE)]
+            files = [kit / policy.CATALOGUE, kit / policy.LIST, kit / budgets.CENSUS, Path(repo, *POLICY_FILE),
+                     Path(repo, *MIRROR_FILE), Path(repo, *CONSUMER_FILE)]
             saved = {p: p.read_bytes() for p in files}
             key, needle = seed(repo, kit, rows)
             _pop, findings = run_arm(arm, repo, kit)

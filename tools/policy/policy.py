@@ -4,6 +4,8 @@ check over the loop bound and deadline rows (TOOL-dGroundRules-11), and the read
 (TOOL-dGroundRules-2) with its one resolution order (TOOL-dGroundRules-3), its invalid-file
 branch (TOOL-dGroundRules-4), the JSON mirror the hooks read (TOOL-dGroundRules-5), and the
 shrink-only list of the legacy policy homes, derived from the files they guard (TOOL-dGroundRules-7).
+The size caps' half, the census, the switch and the `[budgets]` table's schema rule `validate`
+calls, is `budgets.py` beside this file (TOOL-dGroundRules-9).
 
     python <this kit>/policy.py lists --check   # both lists against their derivations and baselines
     python <this kit>/policy.py lists --write   # drain both lists; neither ever gains a row
@@ -476,11 +478,13 @@ def derive_key_line(text, path):
     return 0
 
 
-def validate(text, rows=None):
+def validate(text, rows=None, census=None):
     """[Problem] for a policy file's text, [] for a valid one. Text that is not TOML is one problem at
     the decoder's line, key "". Text that parses yields one per leaf its catalogue row refuses, by
-    `check_value`, and one per leaf no row matches, each at the line `derive_key_line` finds. `rows`
-    is `load_catalogue`'s, this kit's by default. The module's one judge of a policy file."""
+    `check_value`, and one per leaf no row matches, each at the line `derive_key_line` finds, then the
+    `[budgets]` table's own rule, `budgets.check_budgets` over the cap census `census`, the working
+    directory's by default (TOOL-dGroundRules-9). `rows` is `load_catalogue`'s, this kit's by default.
+    The module's one judge of a policy file."""
     try:
         doc = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:
@@ -491,7 +495,8 @@ def validate(text, rows=None):
         why = "no catalogue row matches this key" if row is None else check_value(row, value)
         if why:
             out.append(Problem(derive_key_line(text, segs), render_dotted(segs), why))
-    return out
+    import budgets  # the caps module beside this file; it imports this one, so never at the top
+    return out + budgets.check_budgets(doc, text, census)
 
 
 def read_last_valid(repo, sha):

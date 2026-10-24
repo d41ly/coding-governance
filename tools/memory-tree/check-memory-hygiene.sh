@@ -28,9 +28,10 @@
 # already false of 13-19 — one rule returning two verdicts, the
 # `amendment-leaves-its-other-half-standing` class this repo catalogues.
 #
-# Exit 0 = clean. Three channels print at exit 0 and are NOT regressions: the corpus classifier's
-# check-16 notices, any line opening `HYGIENE advisory `, and under `--only` the one liveness line
-# `HYGIENE --only <sel> ran checks <ids>`. Anything else printed is a regression. Under `--only`, a
+# Exit 0 = clean. Four channels print at exit 0 and are NOT regressions: the corpus classifier's
+# check-16 notices, any line opening `HYGIENE advisory `, under `--only` the one liveness line
+# `HYGIENE --only <sel> ran checks <ids>`, and a `BUDGET WARN ` line, a check-6 or check-7 breach the
+# policy kit's size switch warns on (TOOL-dGroundRules-9). Anything else printed is a regression. Under `--only`, a
 # requested id whose `check_selected` call never ran exits 2: its verdict would be silence.
 set -u
 # --only N[,M]: parsed BEFORE the `cd` below, because the selectable set is read from "$0" and a
@@ -489,6 +490,69 @@ resolve_python() {
 }
 # <<< resolve_python
 _PY=$(resolve_python) || { echo "HYGIENE — no usable python; checks 9 and 13-19 delegate to sibling modules"; exit 2; }
+
+# ---- THE SWITCH OVER CHECKS 6 AND 7 (TOOL-dGroundRules-9) ------------------------------------------
+# Each of the ten caps below is a row of the policy kit's cap census. ONE python start asks all ten,
+# handing in each value this engine holds: `legacy:` where .memory-tree.conf sets the key, `default:`
+# where the declaration above stands. The answers REPLACE the ten values, so a `budgets.<cap>` in
+# .governance/policy.toml takes the conf's place (one held in both refuses), and each cap's MODE
+# decides whether a breach is check 6 or 7 or a `BUDGET WARN` line. The kit is found through this
+# kit's own inlined resolver, backlog.py's. No kit, or any refusal, leaves every value as declared and
+# every mode `refuse`, as before, and the reason prints once, at the first breach. The curation-debt
+# partition is unchanged: it runs over both modes' findings before they are split.
+CAP_KEYS="guide-bytes:GUIDE_CAP_BYTES guide-lines:GUIDE_CAP_LINES index-bytes:INDEX_CAP_BYTES index-lines:INDEX_CAP_LINES readme-bytes:BUILD_README_CAP_BYTES readme-lines:BUILD_README_CAP_LINES dossier-bytes:DOSSIER_CAP_BYTES dossier-lines:DOSSIER_CAP_LINES entry-chars:ENTRY_CAP_CHARS readme-entry-chars:BUILD_README_ENTRY_CAP_CHARS"
+CAP_ANSWERS="" CAP_NOTE="" CAP_READ=0
+read_cap_modes() {
+  [ "$CAP_READ" = 1 ] && return 0
+  CAP_READ=1
+  local _reqs=() _p _how _out _v
+  for _p in $CAP_KEYS; do
+    _how=default
+    grep -qE "^[[:space:]]*(export[[:space:]]+)?${_p#*:}=" "$ROOT/.memory-tree.conf" 2>/dev/null && _how=legacy
+    eval "_reqs+=(\"\${_p%%:*}=\$_how:\${${_p#*:}}\")"
+  done
+  if _out=$("$_PY" -B -c '
+import sys
+sys.path.insert(0, sys.argv[1])
+import backlog
+try:
+    kit = backlog.resolve_kit_dir("policy", "budgets.py", sys.argv[1])
+except LookupError as e:
+    sys.exit(str(e))
+sys.path.insert(0, str(kit))
+import budgets
+sys.exit(budgets.main(["resolve", "--explain", *sys.argv[2:]]))' "$HERE" "${_reqs[@]}" 2>&1); then
+    CAP_ANSWERS=$_out
+    for _p in $CAP_KEYS; do
+      _v=$(printf '%s\n' "$_out" | awk -F'\t' -v c="${_p%%:*}" '$1 == c { print $2 }')
+      case "$_v" in ''|*[!0-9]*) ;; *) eval "${_p#*:}=\$_v" ;; esac
+    done
+  else
+    CAP_NOTE="HYGIENE — no policy kit answered the size caps, so a breach refuses as before: $(printf '%s\n' "$_out" | grep -v '^budgets: ' | head -n 1)"
+  fi
+}
+read_cap_mode() { local _m; _m=$(printf '%s\n' "$CAP_ANSWERS" | awk -F'\t' -v c="$1" '$1 == c { print $3 }'); printf '%s\n' "${_m:-refuse}"; }
+read_cap_rule() { printf '%s\n' "$CAP_ANSWERS" | awk -F' · ' -v c="budgets: $1" '$1 == c { print $2 }'; }
+# check_cap_findings <check> <findings> — each finding carries `\t<mode>\t<cap>\t<measured>\t<unit>\t<value>`
+# after its text: a `warn` one prints as its BUDGET WARN line, and _CAP_REFUSED keeps the rest, each
+# naming the rule that refused it where the policy kit answered.
+check_cap_findings() {
+  local _l _t _mode _cap _n _u _v _r
+  _CAP_REFUSED=""
+  [ -n "$2" ] || return 0
+  while IFS= read -r _l; do
+    [ -n "$_l" ] || continue
+    IFS=$'\t' read -r _t _mode _cap _n _u _v <<<"$_l"
+    _r=$(read_cap_rule "$_cap")
+    if [ "$_mode" = warn ]; then
+      printf 'BUDGET WARN — %s · %s · %s %s over %s · %s · check %s\n' "$_cap" "${_t%%[ :]*}" "$_n" "$_u" "$_v" "$_r" "$1"
+    else
+      _CAP_REFUSED="$_CAP_REFUSED$_t${_r:+ · $_r}"$'\n'
+    fi
+  done <<<"$2"
+  _CAP_REFUSED=${_CAP_REFUSED%$'\n'}
+  [ -z "$_CAP_REFUSED" ] || [ -z "$CAP_NOTE" ] || { echo "$CAP_NOTE"; CAP_NOTE=""; }
+}
 FAMILY_of() { local p; for p in $FAMILIES; do case "$p" in "$1:"*) echo "${p#*:}"; return;; esac; done; }
 DISC_ALT=""; for _da in $DISCIPLINES; do DISC_ALT+="${DISC_ALT:+|}$_da"; done                   # the streams enum, for check 12
 # THE recording-name tail, in ONE place. A multi-unit build names its sub-specs
@@ -1029,7 +1093,11 @@ if [ -n "$sel6" ]; then
     d>0 { s += length($0)+1 }
     x=="<!-- /gen:build-index -->" || x=="<!-- /gen:build-coverage -->" || x=="<!-- /gen:build-order -->" || x=="<!-- /gen:build-edges -->" { d--; if (d<0) bad=1 }
     END { flush() }')
-  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" '
+  # The switch's answers (TOOL-dGroundRules-9): the ten values, and one mode per class and axis.
+  read_cap_modes
+  bad6=$(awk -v gp="$M/guides/" -v bp="$M/builds/"           -v icb="$INDEX_CAP_BYTES" -v icl="$INDEX_CAP_LINES"           -v gcb="$GUIDE_CAP_BYTES" -v gcl="$GUIDE_CAP_LINES"           -v rcb="$BUILD_README_CAP_BYTES" -v rcl="$BUILD_README_CAP_LINES"           -v dcb="$DOSSIER_CAP_BYTES" -v dcl="$DOSSIER_CAP_LINES"           -v dp="${MAP_SUB:+$M/$MAP_SUB/features/}" \
+    -v modes="index-bytes=$(read_cap_mode index-bytes) index-lines=$(read_cap_mode index-lines) guide-bytes=$(read_cap_mode guide-bytes) guide-lines=$(read_cap_mode guide-lines) readme-bytes=$(read_cap_mode readme-bytes) readme-lines=$(read_cap_mode readme-lines) dossier-bytes=$(read_cap_mode dossier-bytes) dossier-lines=$(read_cap_mode dossier-lines)" '
+    BEGIN { nm = split(modes, mm, " "); for (j = 1; j <= nm; j++) { split(mm[j], kv, "="); mode[kv[1]] = kv[2] } }
     # THREE streams, told apart by a file counter: `FNR==NR` names only the first. Each is a printf
     # of a captured string, so none is ever zero lines and the counter cannot skip one.
     FNR==1 { fi++ }
@@ -1040,30 +1108,38 @@ if [ -n "$sel6" ]; then
     END { for(i=1;i<=n;i++){ f=ord[i]
             # +0 on every binding: awk compares an unset or non-numeric -v as a STRING, which reds
             # nothing at all. The validation at conf load is what makes these numbers; this is belt.
-            cb = icb+0; cl = icl+0; rd = 0
-            if (index(f, gp) == 1) { cb = gcb+0; cl = gcl+0 }
+            cb = icb+0; cl = icl+0; rd = 0; cls = "index"
+            if (index(f, gp) == 1) { cb = gcb+0; cl = gcl+0; cls = "guide" }
             # A build README: its own tier, and a 0 line cap means NO independent line cap. The line
             # count is whatever fits the byte budget at the per-line width, so there is no third
             # number to drift against the other two.
-            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0; rd = 1 }
+            if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cb = rcb+0; cl = rcl+0; rd = 1; cls = "readme" }
             # A codebase-map dossier, GUARDED on a non-empty prefix. `dp` is empty when no map is
             # adopted, and `index(f, "")` is 1 for EVERY string — an unguarded test would hand the
             # dossier bound to the whole tree and silently undo the index cap. The `ex7` selector in
             # check 7 adds its map alternatives under `[ -n "$MAP_SUB" ]` for the same reason.
-            if (dp != "" && index(f, dp) == 1) { cb = dcb+0; cl = dcl+0; rd = 0 }
+            if (dp != "" && index(f, dp) == 1) { cb = dcb+0; cl = dcl+0; rd = 0; cls = "dossier" }
             # rd 1: authored price; rd 2: a README whose region pairs do not balance, priced whole.
             sz = b[f]+0
             if (rd && (f in g)) { if (g[f]+0 < 0) rd = 2; else sz = b[f] - g[f] }
             else rd = 0
-            if (sz>cb || (cl>0 && l[f]+0>cl)) {
-              if (rd == 1 && cl>0) printf "%s (%dB authored %dL > %dB/%dL; generated regions not priced in bytes)\n", f, sz, l[f]+0, cb, cl
-              else if (rd == 1)    printf "%s (%dB authored > %dB; generated regions not priced; no line cap for this class)\n", f, sz, cb
-              else if (rd == 2)    printf "%s (%dB > %dB; generated region markers unbalanced, so priced whole; no line cap for this class)\n", f, sz, cb
-              else if (cl>0) printf "%s (%dB %dL > %dB/%dL)\n", f, sz, l[f]+0, cb, cl
-              else      printf "%s (%dB > %dB; no line cap for this class)\n", f, sz, cb } } }
+            ob = sz>cb; ol = cl>0 && l[f]+0>cl
+            if (ob || ol) {
+              if (rd == 1 && cl>0) msg = sprintf("%s (%dB authored %dL > %dB/%dL; generated regions not priced in bytes)", f, sz, l[f]+0, cb, cl)
+              else if (rd == 1)    msg = sprintf("%s (%dB authored > %dB; generated regions not priced; no line cap for this class)", f, sz, cb)
+              else if (rd == 2)    msg = sprintf("%s (%dB > %dB; generated region markers unbalanced, so priced whole; no line cap for this class)", f, sz, cb)
+              else if (cl>0) msg = sprintf("%s (%dB %dL > %dB/%dL)", f, sz, l[f]+0, cb, cl)
+              else      msg = sprintf("%s (%dB > %dB; no line cap for this class)", f, sz, cb)
+              # THE SWITCH: refused when a breached axis refuses, else warned; the cap it names is
+              # the refusing axis, or the first breached one.
+              if (ob && mode[cls "-bytes"] == "refuse") { m = "refuse"; c = cls "-bytes"; v = sz; u = "bytes"; cap = cb }
+              else if (ol && mode[cls "-lines"] == "refuse") { m = "refuse"; c = cls "-lines"; v = l[f]+0; u = "lines"; cap = cl }
+              else if (ob) { m = "warn"; c = cls "-bytes"; v = sz; u = "bytes"; cap = cb }
+              else { m = "warn"; c = cls "-lines"; v = l[f]+0; u = "lines"; cap = cl }
+              printf "%s\t%s\t%s\t%d\t%s\t%d\n", msg, m, c, v, u, cap } } }
   ' <(printf '%s\n' "$cbytes") <(printf '%s\n' "$clines") <(printf '%s\n' "$gen6"))
 fi
-derive_waived 6 "$bad6"; bad6="$_UNWAIVED"
+derive_waived 6 "$bad6"; check_cap_findings 6 "$_UNWAIVED"; bad6="$_CAP_REFUSED"
 # TWO BRANCHES, because the two classes have DIFFERENT remedies and a message is the only thing a
 # reader acts on. The remedy below is "rotate"; a per-build BACKLOG.md must never rotate, because an
 # ask is filed exactly once in its own build's folder and a rotation would move it somewhere the
@@ -1131,14 +1207,16 @@ if [ -n "$sel7" ]; then
     bytes) _c7env="LC_ALL=C" ;;
     chars) _c7env="LC_ALL=C.UTF-8" ;;
   esac
-  bad7=$(env $_c7env awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" '
+  read_cap_modes   # the switch's answers (TOOL-dGroundRules-9), once per run, as check 6 reads them
+  bad7=$(env $_c7env awk -v bp="$M/builds/" -v ecc="$ENTRY_CAP_CHARS" -v becc="$BUILD_README_ENTRY_CAP_CHARS" \
+    -v em="$(read_cap_mode entry-chars)" -v bem="$(read_cap_mode readme-entry-chars)" '
     { f = $0; if (f == "") next
       # PER-CLASS WIDTH, both declared. A build README is four rendered regions plus one authored
       # block, and its widest authored lines were MEASURED between 300 and 331 — that measurement is
       # why the class has its own tier, and it stays true whatever an adopter declares.
       # +0 on both: awk compares an unset or non-numeric -v as a STRING, which reds nothing at all.
-      cap = ecc+0
-      if (index(f, bp) == 1 && f ~ /\/README\.md$/) cap = becc+0
+      cap = ecc+0; c = "entry-chars"; m = em
+      if (index(f, bp) == 1 && f ~ /\/README\.md$/) { cap = becc+0; c = "readme-entry-chars"; m = bem }
       fence = ""; uln = 0; fm = 0; nl = 0
       while ((getline line < f) > 0) {
         sub(/\r$/, "", line)
@@ -1159,13 +1237,14 @@ if [ -n "$sel7" ]; then
         }
         if (fence != "") continue
         uln++
+        # The suffix of the switch (TOOL-dGroundRules-9): the mode of the class, its cap, the measure.
         if (length(line) > cap && line !~ /^#/ && line !~ /^[[:space:]]*\|[-: |]+\|[[:space:]]*$/)
-          print f ":" uln " (" length(line) " chars > " cap ")"
+          print f ":" uln " (" length(line) " chars > " cap ")\t" m "\t" c "\t" length(line) "\tchars\t" cap
       }
       close(f)
     }' <<<"$sel7")
 fi
-derive_waived 7 "$bad7"; bad7="$_UNWAIVED"
+derive_waived 7 "$bad7"; check_cap_findings 7 "$_UNWAIVED"; bad7="$_CAP_REFUSED"
 [ -n "$bad7" ] && fail 7 "index entry lines over their declared cap:
 $bad7"
 

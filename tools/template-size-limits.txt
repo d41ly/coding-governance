@@ -27,11 +27,14 @@
 # file records below: it "was perfectly resolvable on your own" (memory/DECISIONS.md,
 # TOOL-aOrientedCast-23).
 #
-# RESOLUTION: positional $2, then THIS declaration, then the MAX_BYTES environment variable, then the
-# gate's hard default. The declaration sits ABOVE the environment on purpose — see the kickoff-engine
-# row below, whose insulation from the environment is a property a landed unit built and verified.
+# RESOLUTION (TOOL-dGroundRules-9): this file's ONE reader is the policy kit's budgets.py, which reads
+# it at the landed revision, never the working tree, as the legacy home of each `budgets.<row key>` the
+# cap census names. A value for the same key in .governance/policy.toml takes the row's place, and a
+# key held in both homes refuses. Whether a breach refuses is `budgets.enforce` and `budgets.pinned`'s
+# (help/size-caps.md). No positional, environment variable or path override outranks a row any more:
+# the gate's positional limit and MAX_BYTES retired with its own parse of this file.
 #
-# A subject with no row here falls through to the environment and then the default, unchanged.
+# A subject with no row here keeps the gate's hard default, under the same switch.
 #
 # CLASS ROWS. A key that ends in `/` and carries a `*` is a CLASS label, not a measured file: no
 # subject's repo-relative key can equal it, so check-template-size.sh never reads one. Its reader is

@@ -142,7 +142,13 @@ CODEBASE_MAP="${CODEBASE_MAP_DIR##*/}"
 # Fixture identity and line endings for every git below, through the environment and not per repo
 # (TOOL-aSparedSpawn-9 S1): no spawn, and command scope outranks a node's global autocrlf=true.
 export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t.test GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t.test
-export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
+# The initial branch is PINNED too (TOOL-dGroundRules-9). Checks 6 and 7 obey the policy kit's size
+# switch, read at the landed revision, which in a repository with no remote is local main: a plain
+# `git init` here lands on master, so no fixture has a landed revision, every check-6/7 breach refuses
+# as before whatever the node's own init.defaultBranch says, and the switch's own warn and refuse
+# cases are the policy kit's `budgets-cap-` fixtures. A fixture that names main itself is unaffected.
+export GIT_CONFIG_COUNT=2 GIT_CONFIG_KEY_0=core.autocrlf GIT_CONFIG_VALUE_0=false
+export GIT_CONFIG_KEY_1=init.defaultBranch GIT_CONFIG_VALUE_1=master
 cd "$TMP" || exit 2
 git init -q --template= .
 # STREAMS_CUTOFF sits between the two fixture eras: the 2026-08-01 specs are grandfathered, the

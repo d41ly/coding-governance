@@ -1273,6 +1273,26 @@ def export_text(rows: list[dict], tag: str, cutoff: int | None = None,
     return "\n".join(out) + "\n"
 
 
+def read_export_cap(repo: pathlib.Path) -> tuple:
+    """`(value, mode, rule)` of the census cap `recall-export` (TOOL-dGroundRules-9): the policy kit's
+    `budgets.resolve_caps`, handed EXPORT_CAP as its default, so a `budgets.recall-export` in the
+    policy file takes its place; the kit found by the inlined resolver extract.py carries. No kit, or
+    any refusal of the reader, keeps EXPORT_CAP under `refuse`, as before, the rule saying why."""
+    try:
+        kit = str(E.resolve_kit_dir("policy", "budgets.py", pathlib.Path(__file__).resolve().parent))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import budgets  # the policy kit's caps module, found above
+        try:
+            a = budgets.resolve_caps([f"recall-export=default:{EXPORT_CAP}"], str(repo))["recall-export"]
+            return a.value or EXPORT_CAP, a.mode, a.rule
+        except budgets.policy.Refusal as exc:
+            why = f"the policy reader refused: {exc}"
+    except (LookupError, ImportError) as exc:
+        why = f"no policy kit answered: {exc}"
+    return EXPORT_CAP, "refuse", f"{why}; an export over the cap refuses as before"
+
+
 def export(repo: pathlib.Path, tag: str) -> int:
     rows = read_log(repo)
     if not rows:
@@ -1280,6 +1300,7 @@ def export(repo: pathlib.Path, tag: str) -> int:
         return 1
     text = export_text(rows, tag, export_dir=CONF.export_dir)
     size = len(text.encode())
+    cap, mode, rule = read_export_cap(repo)
     # FORKED: beside the log under the common git dir, not `<root>/memory/project/` inside the
     # worktree. That was the kit's ONE tracked write and the only path that could carry a
     # free-text question into version control; moving it keeps the reader and closes the path.
@@ -1287,11 +1308,15 @@ def export(repo: pathlib.Path, tag: str) -> int:
     # `recall_conf.resolve()` has already refused if it escapes the root (TOOL-aRepatriatedFork-12).
     dest = (repo / CONF.export_dir if CONF.export_dir else common_git_dir(repo) / "recall") \
         / f"recall-traffic-{tag}.md"
-    if size > EXPORT_CAP:
+    if size > cap and mode == "warn":
+        # THE SWITCH (TOOL-dGroundRules-9): under `warn` the export writes, and says it is over.
+        print(f"BUDGET WARN — recall-export · {dest.as_posix()} · {size} bytes over {cap} · {rule}",
+              file=sys.stderr)
+    elif size > cap:
         # A bound nobody can trip is not a bound. Refuse BEFORE writing, so the oversized file
         # never exists.
         print(
-            f"refused: the export is {size:,} B, over the {EXPORT_CAP:,} B cap.\n"
+            f"refused: the export is {size:,} B, over the {cap:,} B cap ({rule}).\n"
             f"  mv {dest.as_posix()} {dest.as_posix()}.<date>\n"
             "  then re-run --export to start a fresh file.",
             file=sys.stderr,
@@ -1299,7 +1324,7 @@ def export(repo: pathlib.Path, tag: str) -> int:
         return 1
     dest.parent.mkdir(parents=True, exist_ok=True)
     dest.write_text(text, encoding="utf-8", newline="\n")
-    print(f"wrote {dest.as_posix()} ({size:,} B of {EXPORT_CAP:,} B)")
+    print(f"wrote {dest.as_posix()} ({size:,} B of {cap:,} B)")
     return 0
 
 

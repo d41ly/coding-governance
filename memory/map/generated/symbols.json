@@ -803,6 +803,11 @@
       "file": "tools/workflows/check-verifier-fanout.test.sh"
     },
     {
+      "id": "arm_cap_census",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "arm_census",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -869,6 +874,11 @@
     },
     {
       "id": "arm_legacy_homes",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_limits_readers",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -1646,6 +1656,11 @@
       "id": "build_cache",
       "kind": "function",
       "file": "tools/memory-recall/query.py"
+    },
+    {
+      "id": "build_cap_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "build_capture_file",
@@ -2748,6 +2763,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "build_scratch_repo",
+      "kind": "function",
+      "file": "tools/check-template-size.test.sh"
+    },
+    {
       "id": "build_self_chain",
       "kind": "function",
       "file": "tools/process-monitor/scope.py"
@@ -3793,9 +3813,19 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "check_budget_breach",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "check_budgets",
       "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
+    },
+    {
+      "id": "check_budgets",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
     },
     {
       "id": "check_build_backlog",
@@ -3821,6 +3851,16 @@
       "id": "check_calls_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "check_cap",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
+      "id": "check_cap_findings",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
     },
     {
       "id": "check_cap_fit",
@@ -6903,6 +6943,11 @@
       "file": "tools/policy/policy.py"
     },
     {
+      "id": "derive_census_rel",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "derive_census_tokens",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -6946,6 +6991,11 @@
       "id": "derive_cli_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "derive_code_files",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_commit_range",
@@ -7023,6 +7073,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_docstring_lines",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_doctor_verdict",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -7036,6 +7091,16 @@
       "id": "derive_drift_line",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "derive_enforcer_path",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_enforcer_rel",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_entries",
@@ -7218,9 +7283,19 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "derive_home_line",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "derive_host_note",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "derive_hygiene_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_id_families",
@@ -7380,6 +7455,11 @@
     {
       "id": "derive_kit_rel",
       "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
+      "id": "derive_kit_rel",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -7458,6 +7538,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "derive_line_length_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_lineage",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -7481,6 +7566,11 @@
       "id": "derive_low_waters",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
+    },
+    {
+      "id": "derive_manifest_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_marker_basis",
@@ -7553,9 +7643,19 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_one_line_rule_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_opted_out",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_outside_probe_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_overlaps_line",
@@ -7643,6 +7743,11 @@
       "file": "tools/push-main.sh"
     },
     {
+      "id": "derive_readme_slot_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_ready",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -7651,6 +7756,11 @@
       "id": "derive_ready_point",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "derive_recall_export_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_receipt_miss",
@@ -7753,6 +7863,11 @@
       "file": "tools/branch-reconcile/branch_reconcile.py"
     },
     {
+      "id": "derive_role_body_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_role_roster",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
@@ -7761,6 +7876,11 @@
       "id": "derive_root_confs",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_roster_line_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_routed_candidate",
@@ -8108,6 +8228,16 @@
       "file": "tools/codebase-map/reuse_lookup.py"
     },
     {
+      "id": "derive_source_top",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "derive_spec_class_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_spec_unit",
       "kind": "function",
       "file": "tools/runlog/model.py"
@@ -8178,6 +8308,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "derive_template_size_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_tick_readings",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -8196,6 +8331,11 @@
       "id": "derive_tool_root",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "derive_tool_root",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
     },
     {
       "id": "derive_tool_root",
@@ -8231,6 +8371,11 @@
       "id": "derive_unit_key",
       "kind": "function",
       "file": "tools/runlog/record.py"
+    },
+    {
+      "id": "derive_universal_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_unsatisfied_requires",
@@ -10445,6 +10590,11 @@
     {
       "id": "main",
       "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
+      "id": "main",
+      "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
     {
@@ -11888,6 +12038,11 @@
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
+      "id": "parse_request",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "parse_row",
       "kind": "function",
       "file": "tools/memory-tree/row_grammar.py"
@@ -13138,6 +13293,16 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_budget_field",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
+      "id": "read_budget_rule",
+      "kind": "function",
+      "file": "skills/session-kickoff/manifest-check.sh"
+    },
+    {
       "id": "read_budgets",
       "kind": "function",
       "file": "tools/gate-lint/fork-count.sh"
@@ -13166,6 +13331,31 @@
       "id": "read_canon_refusal",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_cap_answer",
+      "kind": "function",
+      "file": "tools/roles/roles_lib.py"
+    },
+    {
+      "id": "read_cap_census",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
+      "id": "read_cap_mode",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "read_cap_modes",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
+    },
+    {
+      "id": "read_cap_rule",
+      "kind": "function",
+      "file": "tools/memory-tree/check-memory-hygiene.sh"
     },
     {
       "id": "read_carries_coverage",
@@ -13541,6 +13731,11 @@
       "id": "read_expand_rows",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "read_export_cap",
+      "kind": "function",
+      "file": "tools/memory-recall/query.py"
     },
     {
       "id": "read_fact_counts",
@@ -14153,6 +14348,11 @@
       "file": ".githooks/straggler-guard.test.sh"
     },
     {
+      "id": "read_limits_home",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "read_lin_header",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -14181,6 +14381,11 @@
       "id": "read_line",
       "kind": "function",
       "file": "tools/run-gates/run-gates.runlog.test.sh"
+    },
+    {
+      "id": "read_line_mode",
+      "kind": "function",
+      "file": "tools/check-line-length.sh"
     },
     {
       "id": "read_lines",
@@ -14381,6 +14586,11 @@
       "id": "read_offender_set",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "read_one_line_cap",
+      "kind": "function",
+      "file": "tools/playbook/render_playbook.py"
     },
     {
       "id": "read_one_signal",
@@ -15043,6 +15253,11 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "read_slot_mode",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "read_slot_table",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -15061,6 +15276,16 @@
       "id": "read_slug_home",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_source_limits",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "read_source_number",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "read_sp_key",
@@ -15431,6 +15656,11 @@
       "id": "read_units",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "read_universal_cap",
+      "kind": "function",
+      "file": "tools/memory-tree/gotchas.py"
     },
     {
       "id": "read_unnamed_holds",
@@ -16863,6 +17093,11 @@
       "file": "tools/run-gates/lib-attribute.sh"
     },
     {
+      "id": "render_said",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "render_same_holder",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -17403,6 +17638,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "resolve_caps",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "resolve_card_path",
       "kind": "function",
       "file": "tools/roles/handoff.py"
@@ -17775,6 +18015,11 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
+      "file": "tools/check-line-length.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
       "file": "tools/check-line-length.test.sh"
     },
     {
@@ -17796,6 +18041,11 @@
       "id": "resolve_kit_dir",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "resolve_kit_dir",
+      "kind": "function",
+      "file": "tools/check-template-size.sh"
     },
     {
       "id": "resolve_kit_dir",
@@ -18305,6 +18555,11 @@
     {
       "id": "resolve_prefix_token",
       "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
+      "id": "resolve_prefix_token",
+      "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
     },
     {
@@ -18391,6 +18646,11 @@
       "id": "resolve_python",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "resolve_python",
+      "kind": "function",
+      "file": "tools/check-template-size.sh"
     },
     {
       "id": "resolve_python",
@@ -19508,6 +19768,26 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_budget_case",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_cap_case",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_cap_mode",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_cap_plant",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_card",
       "kind": "function",
       "file": "skills/session-kickoff/manifest-check.test.sh"
@@ -19521,6 +19801,11 @@
       "id": "run_case",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
+    },
+    {
+      "id": "run_case_argv",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_census_worker",
@@ -19736,6 +20021,11 @@
       "id": "run_gate",
       "kind": "function",
       "file": "tools/check-remote-literals.test.sh"
+    },
+    {
+      "id": "run_gate_in",
+      "kind": "function",
+      "file": "tools/check-template-size.test.sh"
     },
     {
       "id": "run_gh33",
@@ -20928,6 +21218,11 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
+      "id": "scan_cap_requests",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "scan_carries",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
@@ -21583,6 +21878,11 @@
       "file": "tools/unattended/check-brief-recorded.test.sh"
     },
     {
+      "id": "seed_budget_pin",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "seed_c42",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -21671,6 +21971,11 @@
       "id": "seed_f4_tree",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
+    },
+    {
+      "id": "seed_family_value",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "seed_fixture_commit",
@@ -24876,6 +25181,11 @@
       "id": "write_carries_spec",
       "kind": "function",
       "file": "tools/check-spec-tokens.test.sh"
+    },
+    {
+      "id": "write_case_file",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "write_cf_backlog",

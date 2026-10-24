@@ -12,13 +12,19 @@
 # the gate's constant changed, because that is exactly when an unproven gate is most likely to be
 # silently wrong.
 #
+# THE DECLARATION IS READ THROUGH THE POLICY READER (TOOL-dGroundRules-9). The gate no longer parses
+# the limits file: the policy kit's budgets.py does, at the landed revision of the subject's
+# repository, and the switch `budgets.enforce` with its pins decides whether a breach refuses. So the
+# resolution arms run in a SCRATCH REPOSITORY with no remote, whose local main is its landed
+# revision: a limits file at this install's own prefix, a policy file, both committed. The retired
+# channels — the positional limit, MAX_BYTES and the limits-path positional — are each asserted to be
+# refused or ignored, never honoured.
+#
 # DISCIPLINES THIS FILE OBEYS:
 #  * Every arm asserts the SPECIFIC MESSAGE or the SPECIFIC BYTES, never the exit code alone. An arm
 #    that reads only `$?` reports success while exercising nothing.
-#  * A1, A2 and A4 run the gate with NO override and read the limit back out of its own OK line. A
-#    harness that exports its own MAX_BYTES tests the override path every time and never once
-#    observes the SHIPPED ceiling — the arms would stay green through any edit to the default.
-#    Only A5 sets the environment, because exercising the override is its whole purpose.
+#  * A0 runs the gate over the tracked template and reads the limit back out of its own OK line, so
+#    the SHIPPED ceiling is pinned once, against a literal.
 #  * A12 compares the record KEY against a hand-written literal, never against the gate's own
 #    derivation. `--bump` writes the key and the ratchet reads it back through the same code, so the
 #    round-trip is green whatever the key is: unit 1 shipped machine-ABSOLUTE keys through a fully
@@ -94,10 +100,8 @@ esac
 printf 'harness    shipped limit read from the gate: %s\n' "$LIMIT"
 
 # --- A0 · the SHIPPED ceiling, pinned to a literal ------------------------------------------
-# Deriving the limit (above) is right for the boundary arms — it keeps them honest about the
-# override paths — but it means NO arm pins the number itself. Mutating the default to 131072 or
-# to 47000 leaves every other arm green in both directions, on the one constant this whole build
-# was convened to change. This arm is the literal, and it is deliberately the only one.
+# The one arm that pins the number itself: mutating the template's declared row leaves every
+# scratch-repository arm below green, since none of them reads the tracked declaration.
 EXPECT_LIMIT=49152
 if [ "$LIMIT" = "$EXPECT_LIMIT" ]; then
   say_ok "A0 the shipped ceiling is $EXPECT_LIMIT"
@@ -108,111 +112,131 @@ fi
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 
-# --- A14-A18 · the four-layer resolution, each arm pinning WHICH layer won -----------------------
-# Against a SCRATCH limits file via the 4th positional, never the tracked one: `run-gates.sh` runs
-# its legs concurrently, so an arm that mutates a tracked file races every other leg.
-LIM="$TMP/limits"
-# The fixture limit is DERIVED from the subject's real size, never typed. It has rotted TWICE: it
-# read 40000, then 47000, and each time the charter grew past it the two precedence arms red on the
-# OVER-BUDGET branch instead of printing the resolved limit — so they stopped measuring precedence
-# and started measuring a stale constant, silently. A precedence fixture has two constraints, not
-# one: it must differ from the gate's hard default AND sit above the file. Both are now properties
-# of the derivation rather than of somebody's memory.
-_subj_bytes=$(tr -d '\r' < "$TEMPLATE" | wc -c | tr -d '[:space:]')
-LIM_VALUE=$((_subj_bytes + 1000))
-if [ "$LIM_VALUE" -eq 49152 ]; then LIM_VALUE=$((LIM_VALUE + 1)); fi   # never collide with the default
-printf '%s	%d\n' "coding-governance-agents.template.md" "$LIM_VALUE" > "$LIM"
-expect_out "A14 the DECLARED row supplies the limit"   "/ $LIM_VALUE bytes" 0 bash "$GATE" "$TEMPLATE" "" "" "$LIM"
-A15_POS=$((_subj_bytes + 2000))
-expect_out "A15 a positional beats the declaration"   "/ $A15_POS bytes" 0 bash "$GATE" "$TEMPLATE" "$A15_POS" "" "$LIM"
-# The declaration OUTRANKS the environment — the kickoff engine's insulation depends on it.
-out=$(MAX_BYTES=999999 bash "$GATE" "$TEMPLATE" "" "" "$LIM" 2>&1)
+# --- the scratch repository ----------------------------------------------------------------------
+# `build_scratch_repo <limits rows> <policy text>` rebuilds it: the limits file at this install's prefix, where
+# the policy reader reads it, and the policy file, committed on main with no remote. The subjects are
+# census names — `AGENTS.md`, the build method's path — so the reader answers them from this
+# repository's rows; `notes.md` is no census row and keeps the gate's own default.
+S="$TMP/repo"
+build_scratch_repo() {
+  rm -rf "$S"
+  mkdir -p "$S/${PFX}" "$S/.governance" "$S/memory/guides" || exit 2
+  printf '%b' "$1" > "$S/${PFX}template-size-limits.txt"
+  printf '%b' "$2" > "$S/.governance/policy.toml"
+  git -C "$S" init -q && git -C "$S" symbolic-ref HEAD refs/heads/main \
+    && git -C "$S" add -A && git -C "$S" -c user.name=t -c user.email=t@t.test -c commit.gpgsign=false commit -qm fixture \
+    || { printf 'harness FAILED — could not build the scratch repository\n'; exit 2; }
+}
+# The gate run inside the scratch repository, by its absolute path.
+run_gate_in() { (cd "$S" && bash "$ROOT/$GATE" "$@"); }
+WARN='[budgets]\nenforce = "warn"\n'
+REFUSE='[budgets]\nenforce = "refuse"\n'
+
+# --- A14-A19 · the declaration, read through the policy reader ----------------------------------
+build_scratch_repo 'AGENTS.md\t5000\n' "$WARN"
+mkfile 100 "$S/AGENTS.md"
+mkfile 100 "$S/notes.md"
+expect_out "A14 the DECLARED row supplies the limit" "/ 5000 bytes" 0 run_gate_in AGENTS.md
+expect_out "A15 a positional limit is refused as retired, never honoured" \
+  "a retired positional was given, and the limit and the limits path are read through the policy kit's budgets.py now; pass the subject, an empty second argument and the record (given" \
+  2 run_gate_in AGENTS.md 9999
+expect_out "A15b a limits-path positional is refused as retired" \
+  "a retired positional was given" 2 run_gate_in AGENTS.md "" "" "$TMP/limits"
+out=$(cd "$S" && MAX_BYTES=999999 bash "$ROOT/$GATE" AGENTS.md 2>&1)
 case "$out" in
-  *"/ $LIM_VALUE bytes"*) say_ok "A16 the declaration beats the environment" ;;
-  *) say_fail "A16 the declaration beats the environment" "expected $LIM_VALUE; got: $out" ;;
+  *"/ 5000 bytes"*) say_ok "A16 the environment no longer moves a declared limit" ;;
+  *) say_fail "A16 the environment no longer moves a declared limit" "expected 5000; got: $out" ;;
 esac
-# A subject with NO row falls through to the environment, then to the default.
-mkfile 100 "$TMP/undeclared"
-expect_out "A17 an undeclared subject still honours the environment"   "/ 4242 bytes" 0 env MAX_BYTES=4242 bash "$GATE" "$TMP/undeclared" "" "" "$LIM"
-expect_out "A18 an undeclared subject with no env falls to the hard default"   "/ 49152 bytes" 0 bash "$GATE" "$TMP/undeclared" "" "" "$LIM"
-# A19 · a non-numeric declared row is a NAMED failure, not a shell error.
-printf '%s	%s
-' "$TMP/undeclared" "not-a-number" > "$TMP/limits-bad"
-expect_out "A19 a non-numeric declared limit is a NAMED failure"   "the declared size limit for this subject is not a number: '" 5   bash "$GATE" "$TMP/undeclared" "" "" "$TMP/limits-bad"
+out=$(cd "$S" && MAX_BYTES=4242 bash "$ROOT/$GATE" notes.md 2>&1)
+case "$out" in
+  *"/ 49152 bytes"*) say_ok "A17 an undeclared subject ignores the retired environment" ;;
+  *) say_fail "A17 an undeclared subject ignores the retired environment" "expected 49152; got: $out" ;;
+esac
+expect_out "A18 an undeclared subject falls to the hard default" "/ 49152 bytes" 0 run_gate_in notes.md
+build_scratch_repo 'AGENTS.md\tnot-a-number\n' "$WARN"
+mkfile 100 "$S/AGENTS.md"
+expect_out "A19 a non-numeric declared limit is a NAMED failure" \
+  "the declared size limit for this subject could not be read, so nothing is compared: " 5 run_gate_in AGENTS.md
+expect_out "A19b ...naming the row the policy reader refused" "row is not a number: 'not-a-number'" 5 run_gate_in AGENTS.md
+build_scratch_repo 'AGENTS.md\t5000\n' '[budgets]\n"AGENTS.md" = 6000\n'
+mkfile 100 "$S/AGENTS.md"
+expect_out "A19c a cap held in both homes is check 5, naming both" "budgets.AGENTS.md is held in both homes" 5 run_gate_in AGENTS.md
+build_scratch_repo '# no rows\n' '[budgets]\n"AGENTS.md" = 6000\n'
+mkfile 100 "$S/AGENTS.md"
+expect_out "A19d the policy file's value takes the row's place" "/ 6000 bytes" 0 run_gate_in AGENTS.md
 
 # --- A20/A21 · THE PAIR TERM (TOOL-aHoistedPass-3) ----------------------------------------------
 # A subject may state its own budget in its own prose, and the ceiling is ALSO in a declaration.
-# Check 6 reds when the two disagree. THE KEY IS THE ABSOLUTE POSIX PATH for a subject outside the
-# repo, computed the way the gate computes it — writing the drive-letter form the shell was handed
-# makes every row MISS, the gate falls through to its 49152 default, and an arm written that way
-# passes while proving nothing. Measured: that is exactly what the first cut of these arms did.
-_pair_dir=$(cd "$TMP" && pwd)
-printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$TMP/pair-prose"
-printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$TMP/pair-kb"
-sed -i 's/<=27648 bytes/<=27 KB/' "$TMP/pair-kb"
-printf '%s\t%s\n' "$_pair_dir/pair-prose" 30000 >  "$TMP/limits-pair"
-printf '%s\t%s\n' "$_pair_dir/pair-kb"    27648 >> "$TMP/limits-pair"
-expect_out "A20 a budget line disagreeing with its declared row reds at check 6" \
+# Check 6 reds when the two disagree — under `warn` too, since it is correctness and not size.
+BM="memory/guides/BUILD-METHOD.md"
+build_scratch_repo "$BM\t30000\n" "$WARN"
+printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$S/$BM"
+expect_out "A20 a budget line disagreeing with its declared row reds at check 6, under warn" \
   "the subject states its own budget and disagrees with its declaration" 6 \
-  bash "$GATE" "$TMP/pair-prose" "" "$TMP/hw-pair" "$TMP/limits-pair"
+  run_gate_in "$BM" "" "$TMP/hw-pair"
 # A21 is the half that keeps the term from being disarmed by a rewrite: a prose figure this gate
 # cannot parse as BYTES is not equal to any declared row, so it reds through the same branch rather
 # than falling silently out of the comparison.
+build_scratch_repo "$BM\t27648\n" "$WARN"
+printf '**Budget: <=27 KB, <=350 lines**\nbody\n' > "$S/$BM"
 expect_out "A21 a budget line the gate cannot parse as bytes reds too, naming it" \
-  "'no bytes figure'" 6 \
-  bash "$GATE" "$TMP/pair-kb" "" "$TMP/hw-pair" "$TMP/limits-pair"
+  "'no bytes figure'" 6 run_gate_in "$BM" "" "$TMP/hw-pair"
 # THE CONTROL, and it is the arm that proves the two above are not vacuous. A subject whose prose
 # AGREES with its row passes, and a subject carrying no budget line at all is never compared — which
-# is the second guard, and the reason the three shipped subjects are untouched by this term.
-printf '%s\t%s\n' "$_pair_dir/pair-prose" 27648 > "$TMP/limits-pair-ok"
-expect_absent "A22 an agreeing pair is not a check 6" "check 6" 0 \
-  bash "$GATE" "$TMP/pair-prose" "" "$TMP/hw-pair" "$TMP/limits-pair-ok"
-printf '%s\t%s\n' "$_pair_dir/undeclared" 4096 > "$TMP/limits-nobudget"
+# is the second guard, and the reason the shipped subjects without one are untouched by this term.
+printf '**Budget: <=27648 bytes, <=350 lines**\nbody\n' > "$S/$BM"
+expect_absent "A22 an agreeing pair is not a check 6" "check 6" 0 run_gate_in "$BM" "" "$TMP/hw-pair"
+build_scratch_repo 'AGENTS.md\t4096\n' "$WARN"
+mkfile 100 "$S/AGENTS.md"
 expect_absent "A23 a declared subject with NO budget line is never compared" "check 6" 0 \
-  bash "$GATE" "$TMP/undeclared" "" "$TMP/hw-pair" "$TMP/limits-nobudget"
+  run_gate_in AGENTS.md "" "$TMP/hw-pair"
 
-# --- A1 · a file of exactly MAX_BYTES ----------------------------------------------------------
-mkfile "$LIMIT" "$TMP/at"
-expect_out "A1 at the limit exits 0" "template-size OK" 0 bash "$GATE" "$TMP/at"
-
-# --- A2 · a file of MAX_BYTES + 1, message names the overage -------------------------------------
-mkfile "$((LIMIT + 1))" "$TMP/over"
-expect_out "A2 one byte over reds, naming the overage" \
-  "the file is over its size budget" 1 bash "$GATE" "$TMP/over"
+# --- A1/A2 · the boundary, under each value of the switch ---------------------------------------
+build_scratch_repo 'AGENTS.md\t5000\n' "$REFUSE"
+mkfile 5000 "$S/AGENTS.md"
+expect_out "A1 at the limit exits 0" "template-size OK" 0 run_gate_in AGENTS.md
+mkfile 5001 "$S/AGENTS.md"
+expect_out "A2 one byte over under refuse reds, naming the overage" \
+  "the file is over its size budget" 1 run_gate_in AGENTS.md
+expect_out "A2b ...and the rule that set the mode" "budgets.enforce is refuse" 1 run_gate_in AGENTS.md
+build_scratch_repo 'AGENTS.md\t5000\n' "$WARN"
+mkfile 5001 "$S/AGENTS.md"
+expect_out "A2w one byte over under warn prints BUDGET WARN and exits 0" \
+  "BUDGET WARN — AGENTS.md · AGENTS.md · 5001 bytes over 5000" 0 run_gate_in AGENTS.md
+expect_absent "A2x ...and is not a check 2" "check 2" 0 run_gate_in AGENTS.md
+build_scratch_repo 'AGENTS.md\t5000\n' '[budgets]\nenforce = "warn"\npinned = ["AGENTS.md"]\n'
+mkfile 5001 "$S/AGENTS.md"
+expect_out "A2p a pinned subject refuses under warn, naming budgets.pinned" \
+  "budgets.pinned names it" 1 run_gate_in AGENTS.md
 
 # --- A3 · a missing path -------------------------------------------------------------------------
 expect_out "A3 a missing subject exits 2" \
   "the file to measure does not exist" 2 bash "$GATE" "$TMP/no-such-file"
 
-# --- A4 · CRLF at exactly MAX_BYTES normalized bytes ---------------------------------------------
+# --- A4 · CRLF at exactly the limit, normalized bytes --------------------------------------------
 # The gate strips CR before measuring so a Windows autocrlf smudge cannot inflate the count. On this
 # fleet that smudge is the normal state, so this arm guards what the gate was actually written for.
-{ head -c "$((LIMIT - 1))" /dev/zero | tr '\0' 'x'; printf '\n'; } > "$TMP/lf"
-sed 's/$/\r/' "$TMP/lf" > "$TMP/crlf"
-expect_out "A4 CRLF at the limit still exits 0" "template-size OK" 0 bash "$GATE" "$TMP/crlf"
-
-# --- A5 · the MAX_BYTES override, BOTH directions -------------------------------------------------
-mkfile 1000 "$TMP/mid"
-expect_out "A5a env override below the size reds" \
-  "the file is over its size budget" 1 env MAX_BYTES=999 bash "$GATE" "$TMP/mid"
-expect_out "A5b env override above the size passes" \
-  "template-size OK" 0 env MAX_BYTES=1001 bash "$GATE" "$TMP/mid"
+build_scratch_repo 'AGENTS.md\t5000\n' "$REFUSE"
+{ head -c 4999 /dev/zero | tr '\0' 'x'; printf '\n'; } > "$TMP/lf"
+sed 's/$/\r/' "$TMP/lf" > "$S/AGENTS.md"
+expect_out "A4 CRLF at the limit still exits 0" "template-size OK" 0 run_gate_in AGENTS.md
 
 # --- A6/A7 · the ratchet, keyed by measured file ---------------------------------------------------
+# Subjects outside any census row, so the hard default applies and the ratchet alone is observed.
 HW="$TMP/hw"
 mkfile 1000 "$TMP/subj"
-bash "$GATE" "$TMP/subj" 49152 "$HW" --bump >/dev/null 2>&1
+bash "$GATE" "$TMP/subj" "" "$HW" --bump >/dev/null 2>&1
 expect_absent "A7 at the recorded high-water: no warn" "TEMPLATE-SIZE WARN" 0 \
-  bash "$GATE" "$TMP/subj" 49152 "$HW"
+  bash "$GATE" "$TMP/subj" "" "$HW"
 mkfile 1001 "$TMP/subj"
 # S2's A6 row requires the line to NAME H, the size and the delta — not merely to carry the
 # marker. Matching the marker alone left the arm green when the numbers were removed.
 expect_out "A6 one byte past the high-water warns AND exits 0" \
-  "1000 -> 1001 (+1)" 0 bash "$GATE" "$TMP/subj" 49152 "$HW"
+  "1000 -> 1001 (+1)" 0 bash "$GATE" "$TMP/subj" "" "$HW"
 
 # --- A8 · --bump rewrites the subject's row and reports the delta -----------------------------------
 expect_out "A8 --bump re-records and names the delta" \
-  "high-water 1000 -> 1001 (1 bytes)" 0 bash "$GATE" "$TMP/subj" 49152 "$HW" --bump
+  "high-water 1000 -> 1001 (1 bytes)" 0 bash "$GATE" "$TMP/subj" "" "$HW" --bump
 bumped=$(awk -F'\t' -v k="$TMP/subj" '$1 == k { print $2 }' "$HW" | tr -d '[:space:]')
 if [ "$bumped" = "1001" ]; then
   say_ok "A8b the row now holds the measured size"
@@ -225,10 +249,10 @@ fi
 # only this one distinguishes them. Two consumers ride this gate ~14 KB apart, so a shared value can
 # never warn for the smaller and a --bump on it makes the larger warn on every run forever.
 mkfile 500 "$TMP/other"
-bash "$GATE" "$TMP/other" 49152 "$HW" --bump >/dev/null 2>&1
+bash "$GATE" "$TMP/other" "" "$HW" --bump >/dev/null 2>&1
 before=$(awk -F'\t' -v k="$TMP/subj" '$1 == k { print $2 }' "$HW" | tr -d '[:space:]')
 mkfile 900 "$TMP/other"
-bash "$GATE" "$TMP/other" 49152 "$HW" --bump >/dev/null 2>&1
+bash "$GATE" "$TMP/other" "" "$HW" --bump >/dev/null 2>&1
 after=$(awk -F'\t' -v k="$TMP/subj" '$1 == k { print $2 }' "$HW" | tr -d '[:space:]')
 if [ -n "$before" ] && [ "$before" = "$after" ]; then
   say_ok "A9 bumping one subject leaves the other row untouched"
@@ -242,28 +266,28 @@ fi
 # that alone does not distinguish the branch each arm names — deleting either branch left the
 # other arm green. Each now asserts the clause unique to its own branch.
 expect_out "A10 an absent RECORD says so and exits 0" \
-  "no high-water record at" 0 bash "$GATE" "$TMP/subj" 49152 "$TMP/definitely-absent"
+  "no high-water record at" 0 bash "$GATE" "$TMP/subj" "" "$TMP/definitely-absent"
 printf '%s\t%d\n' "some/other/subject.md" 123 > "$TMP/hw-norow"
 expect_out "A10b a record with no ROW for this subject says so and exits 0" \
-  "has no row in" 0 bash "$GATE" "$TMP/subj" 49152 "$TMP/hw-norow"
+  "has no row in" 0 bash "$GATE" "$TMP/subj" "" "$TMP/hw-norow"
 
 # --- A13 · --bump cannot write, and says so instead of reporting a bump it did not make -------
 expect_out "A13 an unwritable record is a named failure, not a false BUMP" \
   "the high-water record could not be written, so no bump was recorded" 4 \
-  bash "$GATE" "$TMP/subj" 49152 "$TMP/no-such-dir/hw" --bump
+  bash "$GATE" "$TMP/subj" "" "$TMP/no-such-dir/hw" --bump
 
 # --- A11 · the record exists but this subject's row is not a number --------------------------------------
 printf '%s\tnot-a-number\n' "$TMP/subj" > "$TMP/hw-bad"
 expect_out "A11 a non-numeric row is a NAMED failure, not a shell error" \
   "the high-water record holds a non-numeric value for" 3 \
-  bash "$GATE" "$TMP/subj" 49152 "$TMP/hw-bad"
+  bash "$GATE" "$TMP/subj" "" "$TMP/hw-bad"
 
 # --- A12 · the record key of a repo-internal subject is the literal repo-relative path ------------------
 # Compared against a hand-written string on purpose. Asking the gate what the key SHOULD be re-derives
 # the bug this arm exists for: unit 1's keys landed machine-absolute because `git rev-parse
 # --show-toplevel` and `pwd` answer different path forms, and the write/read round-trip agreed anyway.
 HWK="$TMP/hw-key"
-bash "$GATE" "$TEMPLATE" 49152 "$HWK" --bump >/dev/null 2>&1
+bash "$GATE" "$TEMPLATE" "" "$HWK" --bump >/dev/null 2>&1
 key=$(cut -f1 "$HWK" | head -1)
 if [ "$key" = "$TEMPLATE" ]; then
   say_ok "A12 the record key is the literal repo-relative path"

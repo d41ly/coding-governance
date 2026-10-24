@@ -5,12 +5,14 @@ cap's breach warns or refuses. The policy kit's catalogue, `tools/policy/catalog
 repository, is the file's schema. It has one row per key, giving the values the key admits, its
 default, and the build that owns it. A key the file does not set takes its default.
 
-One reader reads the file: `python tools/policy/policy.py get <key>`, below. One key has consumers
-so far: `runtime.agents-in-flight`, the agent limit, which `policy.py settings --write` renders into
-the harness's settings and the agent-cap hook holds them to ([the agent limit](agent-limit.md)).
-Later dGroundRules units re-point each other consumer, one at a time, so a value you set for any
-other key today is checked but changes no behaviour. The one exception is an invalid file, which
-the push gate refuses when it has nothing to fall back to, below.
+One reader reads the file: `python tools/policy/policy.py get <key>`, below. Two families of keys
+have consumers so far: `runtime.agents-in-flight`, the agent limit, which `policy.py settings
+--write` renders into the harness's settings and the agent-cap hook holds them to ([the agent
+limit](agent-limit.md)); and `budgets.enforce`, `budgets.pinned` and `budgets.<cap>`, which every
+gate that enforces a size cap reads ([the size caps](size-caps.md)). Later dGroundRules units
+re-point each other consumer, one at a time, so a value you set for any other key today is checked
+but changes no behaviour. The one exception is an invalid file, which the push gate refuses when it
+has nothing to fall back to, below.
 
 The kit README, `tools/policy/README.md`, is the full reference: the row fields, the grammar of
 allowed values and every check.

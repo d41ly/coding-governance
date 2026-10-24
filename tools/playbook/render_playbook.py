@@ -664,12 +664,51 @@ def build_substitution(text: str, key: str, val: str) -> str:
     return '\n'.join(out)
 
 
-def check_one_line_regions(text: str) -> None:
+# The `one-line-rule` cap's answer per target repository, asked of the policy kit once per target in a
+# process (TOOL-dGroundRules-9).
+_ONE_LINE_ANSWERS: dict = {}
+
+
+def read_one_line_cap(target: Path) -> tuple:
+    """`(value, mode, rule)` of the census cap `one-line-rule` for the repository at `target`: the
+    policy kit's `budgets.resolve_caps`, handed ONE_LINE_MAX as its default, the kit found by
+    `resolve_kit_dir` from this engine, so a `budgets."one-line-rule"` in the target's policy file
+    takes the constant's place. No kit, or any refusal of the reader, keeps ONE_LINE_MAX and refuses
+    as before, the rule saying why."""
+    key = str(Path(target).resolve())
+    if key not in _ONE_LINE_ANSWERS:
+        why = ''
+        try:
+            kit = str(resolve_kit_dir('policy', 'budgets.py', Path(__file__).resolve().parent))
+            if kit not in sys.path:
+                sys.path.insert(0, kit)
+            import budgets  # the policy kit's caps module, found above
+            try:
+                a = budgets.resolve_caps([f'one-line-rule=default:{ONE_LINE_MAX}'], key)['one-line-rule']
+                _ONE_LINE_ANSWERS[key] = (a.value or ONE_LINE_MAX, a.mode, a.rule)
+            except budgets.policy.Refusal as exc:
+                why = f'the policy reader refused: {exc}'
+        except (LookupError, ImportError) as exc:
+            why = f'no policy kit answered: {exc}'
+        if key not in _ONE_LINE_ANSWERS:
+            _ONE_LINE_ANSWERS[key] = (ONE_LINE_MAX, 'refuse', f'{why}; an over-length rule refuses as before')
+    return _ONE_LINE_ANSWERS[key]
+
+
+def check_one_line_regions(text: str, cap: tuple | None = None) -> list:
     """Refuse a one-line region holding anything but short single-line bullets.
 
     Line numbers are the RENDERED body's; the refusal quotes the line so an operator can find it in
     the source it came from — the template for section 1, `[charter] adopter_rules` for section 2.
-    What it does NOT grade: what a rule says, or any line outside a region."""
+    What it does NOT grade: what a rule says, or any line outside a region.
+
+    THE LENGTH OBEYS THE SWITCH (TOOL-dGroundRules-9): `cap` is `read_one_line_cap`'s `(value, mode,
+    rule)`, ONE_LINE_MAX refusing where none is given. Under `warn` a rule past the value is a
+    `BUDGET WARN` line in the returned list and the render goes on; under `refuse` it is refused as
+    before, naming the rule. The other refusals are shape, never size, and refuse under `warn` too.
+    -> the warned lines."""
+    limit, mode, rule = cap or (ONE_LINE_MAX, 'refuse', '')
+    warned = []
     inside = 0
     for n, line in enumerate(text.split('\n'), 1):
         bare = line.strip()
@@ -690,11 +729,17 @@ def check_one_line_regions(text: str) -> None:
         if not re.match(r'- \S', line):
             raise Refusal(f'line {n}: a one-line region holds a line that is not a `- ` bullet, '
                           f'so a rule spans two lines or is not a rule: {quoted!r}')
-        if len(line.rstrip()) > ONE_LINE_MAX:
+        if len(line.rstrip()) > limit:
+            if mode == 'warn':
+                warned.append(f'BUDGET WARN — one-line-rule · line {n} {quoted!r} · '
+                              f'{len(line.rstrip())} chars over {limit} · {rule}')
+                continue
             raise Refusal(f'line {n}: a rule in a one-line region is {len(line.rstrip())} '
-                          f'characters, past the {ONE_LINE_MAX} a one-line rule may take: {quoted!r}')
+                          f'characters, past the {limit} a one-line rule may take: {quoted!r}'
+                          + (f' ({rule})' if rule else ''))
     if inside:
         raise Refusal(f'line {inside}: a one-line region is never closed')
+    return warned
 
 
 # --------------------------------------------------------------------------- the region reader
@@ -1044,7 +1089,7 @@ def render(engine_dir: Path, gov_root: Path, target: Path,
         # A TOML multi-line string ends in a newline, and the template line holding the token ends in
         # one too; without the strip every multi-line answer adds a blank line after itself.
         text = build_substitution(text, key, str(val).rstrip('\n'))
-    check_one_line_regions(text)
+    notes += check_one_line_regions(text, read_one_line_cap(target) if ONE_LINE_OPEN in text else None)
     for ns, name in sorted(set(present)):
         if (ns, name) in drop:
             notes.append(f'dropped   {ns}:{name}')

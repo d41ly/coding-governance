@@ -8,17 +8,28 @@
 # is no longer doing it.
 #
 #   <prefix>/check-template-size.sh            # gate the tracked template
-#   MAX_BYTES=49152 <prefix>/check-template-size.sh <file>   # override target / limit
-#   <prefix>/check-template-size.sh --bump [<file> [<limit> [<record> [<limits>]]]]  # re-record
+#   <prefix>/check-template-size.sh <file>     # gate one subject
+#   <prefix>/check-template-size.sh --bump [<file> ["" [<record>]]]  # re-record the high-water
 #
 # The ceiling for each subject is DECLARED in <prefix>/template-size-limits.txt with its history
-# beside it; this script carries only a hard default for a subject that file does not name.
+# beside it, and read through the policy kit's budgets.py, that file's ONE reader, at the landed
+# revision (TOOL-dGroundRules-9): this script maps its subject's repo-relative key to that census row
+# and asks once. A value `budgets."<key>"` in .governance/policy.toml takes the row's place. A
+# subject with no row keeps this script's hard default, handed in as `default:`. Whether a breach
+# REFUSES is the switch's: `budgets.enforce` (warn by default) and `budgets.pinned`. Under `warn` a
+# breach prints a `BUDGET WARN` line and exits 0; under `refuse`, or for a pinned subject, it is
+# check 2, naming the rule. The positional limit, the MAX_BYTES environment variable and the
+# limits-path override retired with this script's own parse of the file, and a positional limit or
+# limits path is refused rather than ignored.
 #
-# Exit 0 = within budget (prints one line). Exit 1 = over budget. Exit 2 = file missing.
+# Exit 0 = within budget, or a warned breach (prints one line). Exit 1 = over budget, refused.
+# Exit 2 = file missing, or a retired positional given.
 # Exit 3 = the high-water record exists but this subject's row is not a number.
 # Exit 4 = --bump could not write the high-water record.
-# Exit 5 = the DECLARED limit for this subject is not a number.
+# Exit 5 = the DECLARED limit could not be read: a row that is not a number, a cap held in both
+#          homes, no policy kit beside this gate, or any other refusal of the policy reader.
 # Exit 6 = the subject states its own budget in prose and it disagrees with its declared row.
+# Checks 3, 5 and 6 are correctness, never size: they refuse under `warn` too.
 #
 # THAT LIST IS THE FULL SET OF DISTINCT FAIL_CODE VALUES this file assigns, and it is stated here
 # because a gate's own header is where a reader learns what its exit codes mean. It omitted 4 for as
@@ -57,51 +68,146 @@ fi
 
 FILE=${1:-"$ROOT/coding-governance-agents.template.md"}
 
-# The DECLARED limits file, resolved the same three ways every other path here is — positional,
-# then environment, then the tracked default — so the self-test can point the gate at a scratch copy
-# instead of mutating a tracked file while `run-gates.sh` runs its legs CONCURRENTLY.
-LIMITS=${4:-${LIMITS:-"$_self_dir/template-size-limits.txt"}}
+# THE RETIRED POSITIONALS (TOOL-dGroundRules-9). `$2` was a limit and `$4` a limits-file path; both
+# outranked the declaration, so a caller still passing one would believe it chose a ceiling. Refused,
+# never ignored. The record path keeps its slot, `$3`, so an empty `$2` stands before it.
+if [ -n "${2:-}" ] || [ -n "${4:-}" ]; then
+  FAIL_CODE=2
+  fail 7 "a retired positional was given, and the limit and the limits path are read through the policy kit's budgets.py now; pass the subject, an empty second argument and the record (given ${2:-} ${4:-})"
+fi
 
 # `key` is needed by BOTH the declared-limit lookup and the high-water lookup, so it is derived once
 # here rather than twice. Repo-RELATIVE, with both sides normalized through the same `cd && pwd`:
 # `git rev-parse --show-toplevel` answers a drive-letter form on this fleet while `pwd` answers the
 # POSIX one, so comparing them raw never matches and every key lands machine-absolute — which a
 # TRACKED record cannot survive. A subject outside the repo keeps its absolute path, correctly.
+# GIT answers both sides since TOOL-dGroundRules-9: `pwd` under a temp dir answers `/tmp/...`,
+# `/c/Users/<user>/...` or a short 8.3 name for one directory, so a `pwd` comparison missed whenever
+# the caller's spelling differed from git's, and a census subject read as no row at all. A subject
+# whose directory git places in THIS repository takes git's own prefix; any other keeps its path.
 _name=$(basename "$FILE")
 if [ -e "$FILE" ]; then
-  root_p=$(cd "$ROOT" 2>/dev/null && pwd) || root_p=$ROOT
-  key=$(cd "$(dirname "$FILE")" 2>/dev/null && pwd)/$_name
-  case "$key" in "$root_p"/*) key=${key#"$root_p"/} ;; esac
+  _dir=$(cd "$(dirname "$FILE")" 2>/dev/null && pwd) || _dir=$(dirname "$FILE")
+  key=$_dir/$_name
+  if [ "$(git -C "$_dir" rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ]; then
+    key=$(git -C "$_dir" rev-parse --show-prefix 2>/dev/null)$_name
+  fi
 else
   key=$FILE
 fi
 
-# The DECLARED ceiling for this subject, if the file names one.
-declared=""
-if [ -f "$LIMITS" ]; then
-  declared=$(awk -F'\t' -v k="$key" '$1 == k { print $2 }' "$LIMITS" | tr -d '[:space:]')
-  if [ -n "$declared" ] && ! printf '%s' "$declared" | grep -qE '^[0-9]+$'; then
-    FAIL_CODE=5
-    fail 5 "the declared size limit for this subject is not a number: '$declared' for $key in $LIMITS"
-  fi
+# The interpreter the policy reader runs under, and the sibling-kit resolver that finds it.
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
+# The sibling-kit resolver (TOOL-aRepatriatedFork-2 S3), INLINED byte-identically from the
+# canonical copy named on its marker line and gated by the resolve-python self-test's parity
+# table. `resolve_kit_dir <python> <home> <anchor> <here>` prints the kit directory ABSOLUTE, since
+# the subject's repository need not be the one this gate sits in, or the resolver's named refusal
+# on stderr and exits 1.
+resolve_kit_dir() {
+  local _rkd
+  IFS= read -r -d '' _rkd <<'RKD' || :
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
+RKD
+  "$1" -c "${_rkd%$'\n'}"'
+import sys
+try:
+    d = resolve_kit_dir(*sys.argv[1:4])
+except LookupError as e:
+    sys.exit(str(e))
+print(d.as_posix())' "$2" "$3" "$4"
+}
+
+# The DECLARED ceiling and the switch's mode for this subject, in ONE read of the policy reader:
+# `budgets.py resolve <key>=default:49152` prints `<key> <value> <mode> <source>`, the value the
+# census row's home holds (or the policy file's), and the 48 KiB hard default, source `constant`,
+# for a subject no census row names. The reader runs in the subject's repository, whose landed
+# revision it reads; every refusal it makes is check 5, and so is a missing policy kit, because
+# without it this gate has no declaration to read at all.
+budget="" _py="" _pk=""
+if _py=$(resolve_python "${TEMPLATE_SIZE_PY:-}" 2>&1) && _pk=$(resolve_kit_dir "$_py" policy budgets.py "$_self_dir" 2>&1); then
+  budget=$(cd "$ROOT" && "$_py" "$_pk/budgets.py" resolve "$key=default:49152" 2>&1) || _pk=""
+else
+  budget="no policy kit to read the declaration through: ${_pk:-$_py}"; _pk=""
 fi
+if [ -z "$_pk" ]; then
+  FAIL_CODE=5
+  fail 5 "the declared size limit for this subject could not be read, so nothing is compared: $budget"
+fi
+IFS=$'\t' read -r _cap MAX_BYTES MODE SOURCE <<<"$budget"
+# A row of the census, or the policy file's value, is a DECLARATION; the handed-in default is not.
+declared=""
+[ "$SOURCE" = constant ] || declared=$MAX_BYTES
 
-# The limit, in precedence order: positional $2, then THE DECLARATION, then the environment, then
-# the gate's hard default.
-# The POSITIONAL exists because a gate leg cannot set an environment variable: `run-gates.sh` execs
-# its argument vector directly with no shell, and the canary pins argv[0] to a known interpreter, so
-# neither `env MAX_BYTES=… bash …` nor a variable assignment is a legal leg.
-# THE DECLARATION OUTRANKS THE ENVIRONMENT, and that ordering is forced rather than tidy. The
-# kickoff engine's 18432 used to be a positional in the leg's argv, which beat the environment;
-# TOOL-aSiftedPlaybook-1 S1 built that insulation deliberately and verified it. Moving the number
-# into the declaration while leaving the declaration BELOW the environment would have made
-# `MAX_BYTES=999999` lift the engine to 48 KiB — silently undoing a landed property. A declared
-# per-subject pin is policy; the environment is a local override for a subject nobody declared.
-MAX_BYTES=${2:-${declared:-${MAX_BYTES:-49152}}}   # 48 KiB hard default, for a subject with no row.
-
-# The high-water record, resolved the same three ways MAX_BYTES is — positional $3, then the
-# environment, then the tracked default — because a gate leg cannot set an environment variable and
-# the self-test must point the gate at a scratch copy without writing the tracked one.
+# The high-water record, resolved three ways — positional $3, then the environment, then the
+# tracked default — because a gate leg cannot set an environment variable and the self-test must
+# point the gate at a scratch copy without writing the tracked one.
 HIGHWATER=${3:-${HIGHWATER:-"$_self_dir/template-size-highwater.txt"}}
 
 [ -f "$FILE" ] || { FAIL_CODE=2; fail 1 "the file to measure does not exist: $FILE"; }
@@ -133,20 +239,31 @@ if [ -n "$declared" ] && [ -n "$bline" ]; then
   if [ "$prose" != "$declared" ]; then
     FAIL_CODE=6
     fail 6 "the subject states its own budget and disagrees with its declaration: $name says
-  '${prose:-no bytes figure}', $LIMITS says $declared. Two spellings of one fact; change both or
+  '${prose:-no bytes figure}', its declaration (source $SOURCE) says $declared. Two spellings of one fact; change both or
   neither. A budget line this gate cannot parse as bytes reads the same as a wrong one, deliberately."
   fi
 fi
 
+# Check 2 obeys the switch. The verdict line is the policy reader's own, so it names the rule that
+# set the mode: `budgets.pinned` or `budgets.enforce`. A second read, and only on a breach.
+WARNED=0
 if [ "$bytes" -gt "$MAX_BYTES" ]; then
   over=$((bytes - MAX_BYTES))
-  FAIL_CODE=1
-  fail 2 "the file is over its size budget: $name is $bytes bytes, $over over $MAX_BYTES.
+  verdict=$(cd "$ROOT" && "$_py" "$_pk/budgets.py" check "$key=default:49152" "$bytes" 2>&1); _vrc=$?
+  if [ "$MODE" = warn ] && [ "$_vrc" = 0 ]; then
+    printf '%s\n' "$verdict"
+    WARNED=1
+  else
+    FAIL_CODE=1
+    fail 2 "the file is over its size budget: $name is $bytes bytes, $over over $MAX_BYTES.
+  $verdict
   Drop a conditional block, or trim non-instructional prose — the v3.0 charter is ONE file, so
   there is no companion to move a section into.
-  Raising the limit is the owner's decision, or a run's on the terms the header of $LIMITS
-  states; either way it is argued beside the row and recorded in memory/DECISIONS.md, never a fix
-  for the edit that hit it. This message is shared with the kickoff engine at its own limit."
+  Raising the limit is the owner's decision, or a run's on the terms the header of the declared
+  limits file beside this gate states; either way it is argued beside the row and recorded in
+  memory/DECISIONS.md, never a fix for the edit that hit it. This message is shared with the
+  kickoff engine at its own limit."
+  fi
 fi
 
 # --- the high-water ratchet -------------------------------------------------------------------
@@ -221,4 +338,6 @@ elif [ "$bytes" -gt "$recorded" ]; then
   echo "TEMPLATE-SIZE WARN — $name grew past its recorded high-water: $recorded -> $bytes (+$((bytes - recorded))). Advisory only; re-record with --bump when the growth is intended."
 fi
 
+# A warned breach has printed its BUDGET WARN line and exits 0 with no OK line: it is not within budget.
+[ "$WARNED" = 1 ] && exit 0
 printf 'template-size OK — %s: %d / %d bytes (%d under, %.1f%%)\n' "$name" "$bytes" "$MAX_BYTES" "$((MAX_BYTES - bytes))" "$(awk "BEGIN{print $bytes/$MAX_BYTES*100}")"

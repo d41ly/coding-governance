@@ -491,7 +491,12 @@ def print_stage_efforts(workflow):
 def print_roster(memory_root):
     """Print one charter line per role, `- `<slot>`: <description> <when>. Output: <output>.`, in the
     workflow table's order (TOOL-aOrientedCast-17); RolesError naming every role whose line is past
-    ROSTER_LINE_MAX or lacks a key, and on an empty catalogue, with nothing printed."""
+    its cap or lacks a key, and on an empty catalogue, with nothing printed.
+
+    THE CAP OBEYS THE SWITCH (TOOL-dGroundRules-9): the census cap `roster-line`, ROSTER_LINE_MAX
+    handed in as its default, answered once by `lib.read_cap_answer` in the working directory's
+    repository. Under `warn` a line past it renders, and its `BUDGET WARN` line goes to stderr, never
+    into the roster a render reads; under `refuse` it refuses as before, naming the rule."""
     from check_roles import NOT_MANDATORY_RE  # the checker's one reading of an optional role
     roles = lib.load_roles(KIT_DIR)
     if not roles:
@@ -508,7 +513,9 @@ def print_roster(memory_root):
         listed = hit[1]
         return (0, hit[0], listed.index(slot) if slot in listed else len(listed), slot)
 
-    lines, bad = [], []
+    lines, bad, warned = [], [], []
+    cap, mode, rule = lib.read_cap_answer("roster-line=default:%d" % ROSTER_LINE_MAX, ".", KIT_DIR)
+    cap = cap or ROSTER_LINE_MAX
     for slot in sorted(roles, key=derive_rank):
         keys = roles[slot]["keys"]
         missing = [k for k in ("description", "mandatory", "output") if not keys.get(k)]
@@ -525,12 +532,16 @@ def print_roster(memory_root):
             when = "Mandatory " + mandatory
         line = ("- `%s`: %s %s. Output: %s." % (slot, keys["description"], when, output)).replace(
             lib.MEMORY_ROOT_TOKEN, memory_root)
-        if len(line) > ROSTER_LINE_MAX:
+        if len(line) > cap and mode == "warn":
+            warned.append("BUDGET WARN — roster-line · %s · %d chars over %d · %s" % (slot, len(line), cap, rule))
+        elif len(line) > cap:
             bad.append("roster line for %s is %d characters, past the %d a one-line charter rule may "
-                       "take; shorten its description, mandatory or output" % (slot, len(line), ROSTER_LINE_MAX))
+                       "take; shorten its description, mandatory or output (%s)" % (slot, len(line), cap, rule))
         lines.append(line)
     if bad:
         raise lib.RolesError("\n".join(bad))
+    for w in warned:
+        print(w, file=sys.stderr)
     sys.stdout.buffer.write(("\n".join(lines) + "\n").encode("utf-8"))
 
 

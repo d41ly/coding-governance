@@ -2242,8 +2242,42 @@ def measure_slot_sizes(readme_text: str) -> list:
     return out
 
 
+# The `readme-slot` cap's mode, asked of the policy kit ONCE per run (TOOL-dGroundRules-9): None
+# until the first slot over its ceiling asks.
+_SLOT_MODE = None
+
+
+def read_slot_mode(root: str) -> tuple:
+    """`(mode, rule)` of the `readme-slot` cap, a family: its values stay the declared ceilings, and the
+    policy kit's `budgets.resolve_caps` answers only whether a breach warns or refuses, the kit found by
+    `backlog.resolve_kit_dir` from this kit. Asked once per run and kept. No kit, or any refusal of the
+    reader, is `refuse`, as before this unit, and the reason prints once."""
+    global _SLOT_MODE
+    if _SLOT_MODE is not None:
+        return _SLOT_MODE
+    why = ""
+    try:
+        kit = str(backlog.resolve_kit_dir("policy", "budgets.py", pathlib.Path(__file__).resolve().parent))
+        if kit not in sys.path:
+            sys.path.insert(0, kit)
+        import budgets  # the policy kit's caps module, found above
+        try:
+            answer = budgets.resolve_caps(["readme-slot"], root)["readme-slot"]
+            _SLOT_MODE = (answer.mode, answer.rule)
+        except budgets.policy.Refusal as exc:
+            why = f"the policy reader refused: {exc}"
+    except (LookupError, ImportError) as exc:
+        why = f"no policy kit answered: {exc}"
+    if _SLOT_MODE is None:
+        _SLOT_MODE = ("refuse", f"{why}; a slot over its ceiling refuses as before")
+        print(f"build-index: {_SLOT_MODE[1]}")
+    return _SLOT_MODE
+
+
 def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
-    """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does."""
+    """`(hard, advisory)` for one build README. Hard fails the bar; advisory never does. A slot over
+    its declared ceiling is hard under the `readme-slot` cap's `refuse` and a `BUDGET WARN` advisory
+    under `warn` (TOOL-dGroundRules-9), `read_slot_mode` deciding."""
     here = resolve_slot_data_dir()
     limits_p, hw_p = str(here / SLOT_LIMITS), str(here / SLOT_HIGHWATER)
     if not os.path.exists(limits_p):
@@ -2256,7 +2290,11 @@ def scan_slot_budget(root: str, conf: dict, rel: str) -> tuple:
     for head, size in measure_slot_sizes(read_text(os.path.join(root, rel))):
         cap, hw = limits.get(head), highs.get(head)
         if cap is not None and size > cap:
-            hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B")
+            mode, rule = read_slot_mode(root)
+            if mode == "warn":
+                adv.append(f"BUDGET WARN — readme-slot · {rel} `{head}` · {size} bytes over {cap} · {rule}")
+            else:
+                hard.append(f"    {rel} — slot `{head}` is {size} B over its declared ceiling of {cap} B · {rule}")
         elif hw is not None and size > hw:
             adv.append(f"    {rel} — slot `{head}` is {size} B, past its recorded high-water of "
                        f"{hw} B and under its {cap} B ceiling")
@@ -3013,7 +3051,8 @@ def cmd_check_format(root: str, conf: dict) -> int:
     # The advisory prints BEFORE the verdict and never changes it. It also reaches nobody through the
     # runner on a green leg, which is why `--report` exists and why the per-leg log is the other half.
     for line in adv:
-        print("build-index ADVISORY — a slot passed its recorded high-water:")
+        if not line.startswith("BUDGET WARN"):  # a warned breach prints alone (TOOL-dGroundRules-9)
+            print("build-index ADVISORY — a slot passed its recorded high-water:")
         print(line)
     if bad:
         print("build-index FORMAT — authored content outside the slot contract:")

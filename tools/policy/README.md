@@ -25,6 +25,8 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
 | `guarded-paths.txt` | the one spelling of the guarded set, read at HEAD by `guard.py` and the pre-commit hook |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
+| `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9) |
+| `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 
 ## A catalogue row
@@ -309,6 +311,24 @@ authorship. The block is gov's own; the runbook's copy instructions do not carry
 | `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root and `help/` | a file naming `policy.json` |
 | `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the landed revision | each `lists --check` report on the legacy homes; a refused landed revision |
 | `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision |
+| `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file spelling the template-size limits file's name on a line that is not a comment or a Python docstring: `budgets.py` is its one reader |
+| `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file at HEAD | a row whose enforcer is absent, asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
+
+## The size caps
+
+`budgets.py` (TOOL-dGroundRules-9) answers every size cap through one switch. `caps.toml` is the
+census: each cap's name under `budgets.*`, its class (`switch`, or outside it as `consumer`,
+`correctness` or `exempt`), its unit, its enforcer, its legacy home and whether it is a family. An
+enforcer asks once per run, `budgets.py resolve <cap>[=legacy:<n>|=default:<n>]` from a shell or
+`budgets.resolve_caps` from Python, handing in the value its own home holds; a `limits:` home, the
+template-size limits file, is read by `budgets.py` alone at the landed revision. The answer's value is
+the policy file's `budgets.<cap>` where it sets one, and a value held in both homes refuses. Its mode
+is `refuse` where `budgets.pinned` names the cap or `budgets.enforce` is `refuse`, else `warn`: a
+breach under `warn` prints `BUDGET WARN — <cap> · <subject> · <measured> <unit> over <value>` and
+passes. `validate` calls `check_budgets`, which refuses a pin outside the switch or naming no row, and
+a value naming no row, on a family cap, or not a positive integer. An enforcer with no policy kit
+beside it, or a reader that refuses, refuses as before and says so once. help/size-caps.md is the
+user's page.
 
 `arm_reader_coverage` (TOOL-dGroundRules-8) grades a key once its owner build has LANDED: at the
 landed revision `policy.py get` reads, the build folder `<memory root>/builds/<owner>/spec/` holds at
@@ -450,6 +470,8 @@ Both runs must exit 0, and every arm must print a graded line with no finding or
 | `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root and `help/` | a finding: a target with no tracked code is a zero population, until TOOL-dGroundRules-21 announces it |
 | `arm_legacy_homes` | the target's kit confs, gate file and house file against the installed `legacy-homes.txt` and the list at its landed revision | a finding: with the list absent, each derived row is a `stale list` finding, until TOOL-dGroundRules-17 withholds the list and announces the arm |
 | `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | no owner build landed, or no memory-tree kit beside this one, prints `graded 0` and no finding; a landed revision that does not resolve is a finding |
+| `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | a finding: a target with no tracked code is a zero population |
+| `arm_cap_census` | the installed cap census against the target: each row's enforcer, the requests its tracked code makes, and the limits file's rows at HEAD | a finding per census row whose enforcer the target does not hold, until TOOL-dGroundRules-17 grades each row by whether its enforcer ships |
 
 ## The adopter
 
