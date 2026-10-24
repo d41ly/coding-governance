@@ -383,3 +383,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T18:59:19Z dispatch · item 0a08a690 TOOL-dGroundRules-64 · reason memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-64.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-64-ledger.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
 
 2026-10-24T19:07:17Z dispatch · item 0a08a690 TOOL-dGroundRules-64 · reason memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-64.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-64-ledger.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T19:15:57Z brief · item TOOL-dGroundRules-56 · reason 884f27b09dc4 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-56-build-brief.md
+
+2026-10-24T19:17:52Z dispatch · item aef184ca TOOL-dGroundRules-56 · reason tools/check-spec-tokens.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-56.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-56-ledger.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T19:19:52Z dispatch · item aef184ca TOOL-dGroundRules-56 · reason tools/check-spec-tokens.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-56.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-56-ledger.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md

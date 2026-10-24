@@ -1704,6 +1704,26 @@ else
   echo "arm FAIL  the spec filename date's pattern is spelled in design_lib.py alone — checker $date_in_lint, design_lib $date_in_lib"; fail=$((fail+1))
 fi
 
+# TOOL-dGroundRules-46: the source join. One live spec whose acceptance fence sources a shell file by
+# bare name reds; the same by a path carrying `/` is no hit; a bullet whose code span opens on the
+# bare source reds too. $2 is the line planted after the AC1 bullet; a third word `fence` plants it
+# inside a fenced block. The backticks are octal escapes, so this file's shell scanner reads no quote.
+seed_source() {
+  local sp="$1/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" add="$2"
+  [ "${3:-}" = fence ] && add=$(printf '\n\140\140\140text\n%s\n\140\140\140' "$2")
+  ADD="$add" awk '{print} /^- \*\*AC1\*\*/{print ENVIRON["ADD"]}' "$sp" > "$sp.tmp" && mv "$sp.tmp" "$sp"
+  git -C "$1" add -A >/dev/null
+}
+d=$base/source-bare; scratch "$d"
+seed_source "$d" "PROBE = bash -c '. helper.sh; f'" fence
+arm "TOOL-dGroundRules-46 a bare-name source in a fenced acceptance literal REDS as [source]" 1 "$d" '[source] `helper.sh` — sources a shell file by bare name'
+d=$base/source-whole; scratch "$d"
+seed_source "$d" "PROBE = bash -c '. sub/helper.sh; f'" fence
+arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, and is counted" 0 "$d" "source join · 1 sourced file(s) examined in 1 live spec(s)" "[source]"
+d=$base/source-tick; scratch "$d"
+seed_source "$d" "$(printf -- '- When \140. helper.sh; f\140 runs, it prints \1400\140.')"
+arm "TOOL-dGroundRules-46 a bullet whose code span opens on a bare-name source REDS as [source]" 1 "$d" '[source] `helper.sh`'
+
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to
 # ${PFX} and the answer containment gives: design_lib's check_writes_intersect must print True, and
@@ -1716,6 +1736,8 @@ fi
 # no trailing comment, so grep '^check_overlap_pair ' lists exactly the rows the arm grades. The
 # function runs in this shell, so the count and the disagreements survive it; only the library is
 # sourced, in a subshell.
+# TOOL-dGroundRules-56: this arm stays the last before total=, so the row function, its call lines and
+# the one assertion run alone outside the suite; a new arm goes above this comment, never below it.
 UNATTENDED_DIR=$(resolve_kit_dir "$PY" unattended lib-unattended.sh "$HERE") || exit 2
 wi_lib="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$UNATTENDED_DIR/lib-unattended.sh"
 wi_rows=0; wi_bad=
@@ -1739,26 +1761,6 @@ if [ "$wi_rows" -ge 1 ] && [ -z "$wi_bad" ]; then
 else
   echo "arm FAIL  TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer — rows $wi_rows, ${wi_bad:-no row disagreed}"; fail=$((fail+1))
 fi
-
-# TOOL-dGroundRules-46: the source join. One live spec whose acceptance fence sources a shell file by
-# bare name reds; the same by a path carrying `/` is no hit; a bullet whose code span opens on the
-# bare source reds too. $2 is the line planted after the AC1 bullet; a third word `fence` plants it
-# inside a fenced block. The backticks are octal escapes, so this file's shell scanner reads no quote.
-seed_source() {
-  local sp="$1/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" add="$2"
-  [ "${3:-}" = fence ] && add=$(printf '\n\140\140\140text\n%s\n\140\140\140' "$2")
-  ADD="$add" awk '{print} /^- \*\*AC1\*\*/{print ENVIRON["ADD"]}' "$sp" > "$sp.tmp" && mv "$sp.tmp" "$sp"
-  git -C "$1" add -A >/dev/null
-}
-d=$base/source-bare; scratch "$d"
-seed_source "$d" "PROBE = bash -c '. helper.sh; f'" fence
-arm "TOOL-dGroundRules-46 a bare-name source in a fenced acceptance literal REDS as [source]" 1 "$d" '[source] `helper.sh` — sources a shell file by bare name'
-d=$base/source-whole; scratch "$d"
-seed_source "$d" "PROBE = bash -c '. sub/helper.sh; f'" fence
-arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, and is counted" 0 "$d" "source join · 1 sourced file(s) examined in 1 live spec(s)" "[source]"
-d=$base/source-tick; scratch "$d"
-seed_source "$d" "$(printf -- '- When \140. helper.sh; f\140 runs, it prints \1400\140.')"
-arm "TOOL-dGroundRules-46 a bullet whose code span opens on a bare-name source REDS as [source]" 1 "$d" '[source] `helper.sh`'
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then
