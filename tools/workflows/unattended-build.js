@@ -950,9 +950,11 @@ const slices = sliceKeys.map(function (k) {
     return (Number.isInteger(u.order) ? String(u.order) : 'unordered') === k
   })
 })
-// gov:fixed-verifiers — the bounded receiver. `chunk(x, Math.ceil(x.length / K))` with a resolvable
-// K is the sanctioned spelling; the group COUNT is what stands still while the batch grows.
-const specGroups = chunk(slices, Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers
+// gov:fixed-writers — the bounded receiver, judged against the agent limit and not the verify total:
+// writers are no verify stage, and this stage runs as wide as the limit the owner sets (TOOL-dGroundRules-18).
+// `chunk(x, Math.ceil(x.length / K))` with a resolvable K is the sanctioned spelling; the group COUNT is
+// what stands still while the batch grows.
+const specGroups = chunk(slices, Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-writers
 log('spec stage: ' + ordered.length + ' unit(s) in ' + slices.length + ' slice(s) -> ' +
     specGroups.length + ' writer(s), each holding only its own group')
 // S7 — a unit with no `specBriefPath` falls back to the shared prompt, and SAYS SO. A silent

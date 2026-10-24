@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-18 — a writer split bounded by the agent limit: rule 2 judges `gov:fixed-writers` against `runtime.agents-in-flight` and verifiers against `MAX_VERIFIERS`
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-18-deviation-55.md](../build/2026-10-23-build-TOOL-dGroundRules-18-deviation-55.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-18-deviation-6.md](../build/2026-10-23-build-TOOL-dGroundRules-18-deviation-6.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-18-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-18-ledger.md) | journal | — |
+| [2026-10-24-build-TOOL-dGroundRules-18-deviation-73.md](../build/2026-10-24-build-TOOL-dGroundRules-18-deviation-73.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-18-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-18-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-18-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-18-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-18-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-18-divergence-brief.md) | research | — |

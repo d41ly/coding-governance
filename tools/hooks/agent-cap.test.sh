@@ -1198,6 +1198,23 @@ else
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7/.claude/settings.json"
   run_limit_call "rule7: settings at the limit -> allow (control)" 0 "$R7_WF" "$R7/kits/hooks/agent-cap.js"
 fi
+# TOOL-dGroundRules-18 — rule 2 judges a `gov:fixed-writers` split against the agent limit and a
+# `gov:fixed-verifiers` split against MAX_VERIFIERS whatever the limit. The copy sits beside a STUB
+# policy-mirror.js answering the limit; "$TMP" lies in no checkout, so rules 6 and 7 add nothing.
+WS="$TMP/writer-split"; mkdir -p "$WS/hooks" "$WS/policy"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$WS/hooks/"
+write_limit_stub() { # limit
+  printf 'class PolicyRefusal extends Error {}\nmodule.exports = { PolicyRefusal, readPolicy: () => ({ value: %s, source: "stub", reason: "stub" }) }\n' "$1" > "$WS/policy/policy-mirror.js"
+}
+WS_WRITER='{"tool_name":"Workflow","tool_input":{"script":"const SPEC_WRITERS = 6\nconst g = chunk(s, Math.ceil(s.length / SPEC_WRITERS)) // gov:fixed-writers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), SPEC_WRITERS)"}}'
+WS_VERIFIER='{"tool_name":"Workflow","tool_input":{"script":"const K = 6\nconst g = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), 5)"}}'
+write_limit_stub 4
+run_limit_call "writer split: K 6 above a stub limit of 4 -> deny, naming the marker" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'gov:fixed-writers but its bounded split'
+run_limit_call "writer split: ...and the K it read against that limit" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'resolves to 6, above the bound 4: runtime.agents-in-flight'
+write_limit_stub 6
+run_limit_call "writer split: K 6 at a stub limit of 6 -> allow (control)" 0 "$WS_WRITER" "$WS/hooks/agent-cap.js"
+run_limit_call "verifier split: K 6 under a stub limit of 6 -> deny, against MAX_VERIFIERS" 2 "$WS_VERIFIER" "$WS/hooks/agent-cap.js" 'above the bound 5: MAX_VERIFIERS'
+rm -f "$WS/policy/policy-mirror.js"
+run_limit_call "writer split: no policy kit beside the hooks kit -> deny, against MAX_VERIFIERS" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'above the bound 5: MAX_VERIFIERS, as no policy kit'
 
 # ---- the two copies ------------------------------------------------------------------------------
 # `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing

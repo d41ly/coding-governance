@@ -13018,6 +13018,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readWriterBound",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "read_aborted_verdicts",
       "kind": "function",
       "file": "tools/drift-audit/drift_report.py"
@@ -25526,6 +25531,11 @@
       "id": "write_lg_record",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
+    },
+    {
+      "id": "write_limit_stub",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "write_lin_fix",

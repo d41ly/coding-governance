@@ -117,6 +117,14 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   is refused rather than assumed shrink-only.
 - Any marker `K` it cannot resolve to an integer ≤5, the hook's `MAX_VERIFIERS`: the `K` of a
   `gov:fixed-verifiers` split or of a `gov:sequential-agents` header. The burden is on the fan-out.
+- A `gov:fixed-writers` split whose `K` is above the agent limit (TOOL-dGroundRules-18). A WRITER
+  split, the spec stage's in the build harness, is no verify stage, so its bound is
+  `runtime.agents-in-flight`, read through the policy kit's `readPolicy` beside this hooks kit once
+  per call and only for a script carrying the marker. With no policy kit there the bound is
+  `MAX_VERIFIERS`, the stricter answer; a reader that refuses denies, naming its line. The shape
+  rules are the verifier marker's, a verifier split stays at `MAX_VERIFIERS` whatever the limit, and
+  a line carrying both markers is refused as ambiguous. The refusal names the marker, the `K` it read
+  and the bound with its key.
 
 - A REF-KEYED VERDICT JOIN. A review harness that joins each finding to its skeptic verdict on a
   `file:line` STRING loses findings to echo drift, and COLLAPSES two findings at one location so both

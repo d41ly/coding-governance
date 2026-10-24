@@ -444,8 +444,9 @@ function runBothViews(rule, script) {
 // ALLOWED receivers:
 //   (a) an identifier assigned on a line marked `gov:fixed-verifiers`, where that line spells
 //       chunk(x, Math.ceil(x.length / K)) or splitInto(x, K) and K is an integer literal <= 5 or an
-//       identifier bound in this file to one. The marker is the AUTHOR'S CLAIM; the shape check is
-//       what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
+//       identifier bound in this file to one — or marked `gov:fixed-writers`, the same shape with K at most
+//       the landed agent limit (MAX_VERIFIERS with no policy kit). The marker is the AUTHOR'S CLAIM; the
+//       shape check is what stops the claim being made falsely — `chunk(all, 1) // gov:fixed-verifiers` reds.
 //   (b) an identifier assigned from an ARRAY LITERAL with <= MAX_LENSES elements — the finder-lens
 //       case, where the agent count is a constant visible in the source. The count drops a trailing
 //       comma; counting it as an element is what made this allowance read as 6.
@@ -458,9 +459,16 @@ const MAX_VERIFIERS = 5
 // and no shipped harness has ever had six lenses — tier2-review has four, both drift-audit waves
 // have five. With the count fixed, 5 is what the charter says and what every harness already obeys.
 const MAX_LENSES = 5
-// TOOL-dGroundRules-10 F2 — rule 2's comparand is MAX_VERIFIERS itself, the review protocol's verify
-// total. The 1-to-5 clamp read from `.agent-cap.conf` retired with the agent limit's move to the
-// policy kit: the limit bounds how many run at once, and this bounds how many a verify stage spawns.
+// TOOL-dGroundRules-10 F2 — a VERIFIER split's comparand is MAX_VERIFIERS, the verify total. TOOL-dGroundRules-18 — a WRITER
+// split's is the agent limit (receiver (a)), read through rule 7's `readPolicy` once, only for a script carrying the marker.
+const WRITER_MARK = 'gov:fixed-writers'
+const POLICY_HELPER = require('path').join(require('path').dirname(__dirname), 'policy', 'policy-mirror.js')
+function readWriterBound(repo) {
+  if (!require('fs').existsSync(POLICY_HELPER)) return { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS, as no policy kit sits beside this hooks kit' }
+  let v
+  try { v = require(POLICY_HELPER).readPolicy('runtime.agents-in-flight', { repo }).value } catch (e) { return { why: `the agent limit could not be read: ${(e && e.message) || e}` } }
+  return Number.isInteger(v) && v > 0 ? { n: v, key: 'runtime.agents-in-flight' } : { why: `runtime.agents-in-flight reads ${JSON.stringify(v)}, not a positive integer` }
+}
 
 // THE THIRD MARKER, and the only one that admits a LOOP. Spelling ratified by the owner
 // 2026-09-01: `gov:sequential-agents`, carrying its bound — `gov:sequential-agents(5)`.
@@ -504,11 +512,11 @@ const LOOP_HEADER_G = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*\\(|\\bdo\\s*\
 const LOOP_KEYWORD_TAIL = new RegExp('\\b(?:' + LOOP_KEYWORDS + ')\\s*$')
 
 // `K` resolved against this file: an integer literal, or an identifier bound to one, judged against
-// MAX_VERIFIERS.
-function boundedK(tok, consts) {
+// `bound` — MAX_VERIFIERS, or readWriterBound's for a writer split.
+function boundedK(tok, consts, bound) {
   const t = String(tok).trim()
-  if (/^\d+$/.test(t)) return Number(t) <= MAX_VERIFIERS
-  if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t)) return consts.get(t) <= MAX_VERIFIERS
+  if (/^\d+$/.test(t)) return Number(t) <= bound
+  if (/^[A-Za-z_$][\w$]*$/.test(t) && consts.has(t)) return consts.get(t) <= bound
   return false
 }
 
@@ -576,13 +584,13 @@ function parseBranches(expr) {
 // array LITERAL whose top-level element count is at or under MAX_LENSES, counted with the shared
 // splitter so a trailing comma is not an element; or a bare identifier already proven bounded,
 // alone or followed by a chain of operations that cannot grow it.
-function boundedBranch(br, name, consts, ok) {
+function boundedBranch(br, name, consts, ok, bound) {
   if (br === null) return false
   const t = String(br).trim()
   if (!t) return false
   const c = /\bchunk\s*\(\s*[^,]+,\s*Math\.ceil\s*\(\s*[A-Za-z_$][\w$.]*\.length\s*\/\s*([^)]+)\)/.exec(t)
   const sp = /\bsplitInto\s*\(\s*[^,]+,\s*([^),]+)\)/.exec(t)
-  if ((c && boundedK(c[1], consts)) || (sp && boundedK(sp[1], consts))) return true
+  if ((c && boundedK(c[1], consts, bound)) || (sp && boundedK(sp[1], consts, bound))) return true
   if (t.startsWith('[') && t.endsWith(']')) return topLevelArgs(t.slice(1, -1)).length <= MAX_LENSES
   const m = /^([A-Za-z_$][\w$]*)([\s\S]*)$/.exec(t)
   if (!m || m[1] === name || !ok.has(m[1])) return false
@@ -737,7 +745,7 @@ function renderLexedView(script) {
   return { code: out, unterminated: stack.length > 0 || mode !== 'code' }
 }
 
-function fanoutFindings(script) {
+function fanoutFindings(script, writer) {
   const lines = script.split(/\r?\n/)
   // TOOL-aLexedStripper-5: an unterminated scan falls back to the per-line view, which returns
   // the verdict this hook reached before rule 2 moved. Not a fail-closed branch: that denied a
@@ -780,7 +788,7 @@ function fanoutFindings(script) {
     // stated refusal — the two rules are separate and the marker must satisfy both.
     if (!mm) return ` — ${SEQ_MARK} carries no bound token, and a bare marker claims concurrency one with an unbounded total`
     // C4: the number is CHECKED, never trusted, and by the one resolver every other consumer uses.
-    if (!boundedK(mm[1], consts)) return ` — ${SEQ_MARK}(${mm[1]}) names a bound this file does not resolve to an integer no greater than MAX_VERIFIERS (${MAX_VERIFIERS})`
+    if (!boundedK(mm[1], consts, MAX_VERIFIERS)) return ` — ${SEQ_MARK}(${mm[1]}) names a bound this file does not resolve to an integer no greater than MAX_VERIFIERS (${MAX_VERIFIERS})`
     const ch = code[h] || ''
     // C5: the SHAPE is read from the literal-blanked view, so a marker sitting inside a quoted
     // string on a line that is not really a loop header blesses nothing.
@@ -827,7 +835,9 @@ function fanoutFindings(script) {
     const asg = /\b(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/.exec(l)
     if (!asg) return
     const name = asg[1]
-    if (raw.includes(FIXED_MARK)) {
+    const mark = raw.includes(FIXED_MARK) ? FIXED_MARK : raw.includes(WRITER_MARK) ? WRITER_MARK : null
+    if (mark) {
+      const bound = mark === WRITER_MARK ? writer : raw.includes(WRITER_MARK) ? { why: `the line carries ${WRITER_MARK} too, so its bound is ambiguous` } : { n: MAX_VERIFIERS, key: 'MAX_VERIFIERS' }
       // TOOL-dTieredTribunal-13 S1 - EVERY top-level value branch is judged, not the first that
       // happens to match. This block used to be two sequential accepts, and either could return on a
       // SINGLE arm: a marked ternary whose other branch was caller-supplied passed, and an
@@ -840,8 +850,8 @@ function fanoutFindings(script) {
       // blessed `ALL_LENSES.concat(allFindings)` on the strength of the word appearing.
       const grows = /\b(concat|push|flat|flatMap|fill|repeat)\s*\(|\.\.\./.test(rhs)
       const branches = parseBranches(rhs)
-      const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok))
-      if (!grows && branches.length && bad0 === undefined) {
+      const bad0 = branches.find((b) => !boundedBranch(b, name, consts, ok, bound.n))
+      if (!grows && !bound.why && branches.length && bad0 === undefined) {
         // TOOL-aWeldedTribunal-2, closing-review fold. RECORD WHAT THIS BLESSING LEANED ON. A
         // derivation like `const groups = batches.filter(Boolean)` is bounded only because
         // `batches` was; when a later take-back removes `batches`, `groups` kept a bound nothing
@@ -867,20 +877,20 @@ function fanoutFindings(script) {
       // assignment two lines above. This is the convention `why()` already applies to every
       // unresolvable K: one explanation per refusal, naming the FORM, because an operator who
       // cannot tell which spelling was refused fixes it by guessing.
+      const kTok = (/([\w$]+)\s*\)+\s*$/.exec(String(bad0)) || [])[1], k = consts.has(kTok) ? consts.get(kTok) : Number(kTok)
       markedWhy.set(
         name,
-        grows
-          ? `\`${name}\` carries ${FIXED_MARK} but its right-hand side can GROW the receiver`
+        bound.why ? `\`${name}\` carries ${mark} but ${bound.why}` : grows
+          ? `\`${name}\` carries ${mark} but its right-hand side can GROW the receiver`
           : !branches.length || bad0 === null
-            ? `\`${name}\` carries ${FIXED_MARK} but this file cannot delimit its value branches`
+            ? `\`${name}\` carries ${mark} but this file cannot delimit its value branches`
             : /\b(chunk|splitInto)\s*\(/.test(String(bad0))
-              // A branch that IS a bounded split and still fails, failed on its K. Saying only that
-              // the branch is not a bounded form would send the author to rewrite a spelling that is
-              // already correct, so the cap is named instead — and the phrase the generic refusal
-              // uses is kept, because two self-test arms assert a marked K's refusal by that text and
-              // a message edit that strands an arm is a recorded class in this repo.
-              ? `\`${name}\` carries ${FIXED_MARK} but its bounded split names a cap which this file does not show to be bounded`
-              : `\`${name}\` carries ${FIXED_MARK} but the branch \`${String(bad0).trim()}\` is not one of the bounded forms`,
+              // A bounded split that still fails failed on its K, so the cap is named, with its value and
+              // bound where it resolves above one (TOOL-dGroundRules-18); the generic phrase is kept, as
+              // two self-test arms assert a marked K's refusal by it, and a stranded arm is a known class.
+              ? `\`${name}\` carries ${mark} but its bounded split names a cap which this file does not show to be bounded` +
+                (k > bound.n ? ` — its K ${kTok} resolves to ${k}, above the bound ${bound.n}: ${bound.key}` : '')
+              : `\`${name}\` carries ${mark} but the branch \`${String(bad0).trim()}\` is not one of the bounded forms`,
       )
       return
     }
@@ -1769,7 +1779,7 @@ const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORK
 function checkSettingsInForce(data) {
   const fs = require('fs')
   const path = require('path')
-  const helper = path.join(path.dirname(__dirname), 'policy', 'policy-mirror.js')
+  const helper = POLICY_HELPER
   if (!fs.existsSync(helper)) return null
   const root = resolveCheckoutRoot(data.cwd || process.cwd())
   if (!root) return null
@@ -1922,7 +1932,8 @@ function main() {
   }
   if (!script) process.exit(0) // a `name:` run: no source reaches this hook (see the protocol)
 
-  const fan = ONLY !== 'join' ? runBothViews(fanoutFindings, script) : []
+  const writer = ONLY !== 'join' && script.includes(WRITER_MARK) ? readWriterBound(ONLY === 'scripts' ? process.cwd() : data.cwd || process.cwd()) : null
+  const fan = ONLY !== 'join' ? runBothViews((s) => fanoutFindings(s, writer), script) : []
   if (fan.length) {
     process.stderr.write(
       `BLOCKED by agent-cap: a verify/fan-out stage spawns one agent per item. The review protocol ` +

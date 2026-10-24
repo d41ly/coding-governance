@@ -1774,7 +1774,8 @@
     "guard": [
       "{prefix}/policy/",
       "{prefix}/govkit/govkit.py",
-      "{prefix}/govkit/registry.toml"
+      "{prefix}/govkit/registry.toml",
+      "{prefix}/workflows/unattended-build.template.js"
     ],
     "chunk": "selftests",
     "subject": "kit",

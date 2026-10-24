@@ -108,9 +108,11 @@ last `policy.py mirror --print` too, which must refuse at the same line;
 `limit-conf-mirror` and `limit-conf-last-valid` (TOOL-dGroundRules-15) plant a lowering, the second
 over a malformed file whose last valid revision sets 6, render the mirror and red a `get` or a
 helper reading the fresh mirror that does not answer the lowered value;
-`limit-settings-render` commits two policy values and runs `policy.py settings`; the six `limit-hook-`
+`limit-settings-render` commits two policy values and runs `policy.py settings`; the seven `limit-hook-`
 cases copy the hooks kit's agent-cap.js and scratch-guard.js beside a copy of this kit, so rule 7 reads
-the fixture's own limit, and judge each call by its exit code and the text its criterion names.
+the fixture's own limit, and judge each call by its exit code and the text its criterion names;
+`limit-hook-writer-split` (TOOL-dGroundRules-18) pipes the workflows kit's build-harness template,
+rendered at 6, through `--only=scripts`, so rule 2 judges its `gov:fixed-writers` split by that limit.
 
 THE SIZE CAPS (TOOL-dGroundRules-9) add two arms and three kinds of case. `arm_limits_readers` reds a
 tracked code file outside this kit, the memory root, `help/` and the self-tests that spells the
@@ -1970,6 +1972,9 @@ HARNESS_FILE = "harness/h.js"
 HARNESS_TEXT = "export const meta = { name: 'h', description: 'one agent' }\nconst s = await agent('one')\n"
 LIMIT_ROLES = {"roles": {"gov-researcher": {"agent": True, "workflow": "research", "writes": "none"}},
                "harnesses": [HARNESS_FILE]}
+# A verifier split at 6 (TOOL-dGroundRules-18 AC3), which rule 2 judges against MAX_VERIFIERS whatever the limit.
+VERIFIER_SPLIT = ("const K = 6\nconst g = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers\n"
+                  "const r = await boundedParallel(g.map((x) => () => agent(x)), 5)\n")
 
 
 def write_settings(repo, env, rel=SETTINGS_FILE):
@@ -2015,13 +2020,14 @@ def build_limit_repo(path, policy_text, conf=None, mirror=True):
     return path, kit, hook_dir / "agent-cap.js"
 
 
-def check_hook_call(scenario, what, hook, payload, want, env=None):
-    """`node <hook>` with the JSON `payload` on stdin -> (scenario, what, ok, what it observed), `want`
-    judging (exit code, stderr). CLAUDE_PROJECT_DIR is dropped, so rule 6 reads the payload cwd alone."""
+def check_hook_call(scenario, what, hook, payload, want, env=None, args=(), cwd=None):
+    """`node <hook> <args>` in `cwd` with the JSON `payload` on stdin -> (scenario, what, ok, what it
+    observed), `want` judging (exit code, stderr). CLAUDE_PROJECT_DIR is dropped, so rule 6 reads the
+    payload cwd alone."""
     env = {k: v for k, v in (env or os.environ).items() if k != "CLAUDE_PROJECT_DIR"}
     try:
-        p = subprocess.run(["node", str(hook)], input=json.dumps(payload), capture_output=True, text=True,
-                           encoding="utf-8", errors="replace", env=env)
+        p = subprocess.run(["node", str(hook), *args], input=json.dumps(payload), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env, cwd=cwd)
         rc, err = p.returncode, p.stderr.replace("\r", "")
     except OSError as exc:
         rc, err = None, f"node did not run: {exc}"
@@ -2177,6 +2183,24 @@ def run_limit_case(name):
                 write_settings(repo, {var: "5"}, SETTINGS_LOCAL)
                 checks.append(check_hook_call(f"{local} sets {var} to 5", f"a {call['tool_name']} call", hook, call,
                                               has(local, var)))
+        elif name == "limit-hook-writer-split":
+            # TOOL-dGroundRules-18: the build harness's template rendered at 6, its spec-writer split judged by
+            # rule 2 against the landed limit; a verifier split at 6 against MAX_VERIFIERS whatever the limit;
+            # and the writer split against MAX_VERIFIERS once no policy-mirror.js sits beside the hooks kit.
+            wf = resolve_kit_dir("workflows", "unattended-build.template.js", KIT)
+            render = (wf / "unattended-build.template.js").read_text(encoding="utf-8").replace("{{FANOUT_CAP}}", "6")
+            scripts = ("--only=scripts",)
+            for i, (n, script, what, want) in enumerate((
+                    (6, render, "the render at 6 under a landed limit of 6", admits),
+                    (4, render, "the render at 6 under a landed limit of 4",
+                     has("gov:fixed-writers", "resolves to 6", f"above the bound 4: {AGENTS_KEY}")),
+                    (6, VERIFIER_SPLIT, "a verifier split at 6 under a landed limit of 6",
+                     has("gov:fixed-verifiers", "above the bound 5: MAX_VERIFIERS")))):
+                repo, kit, hook = build_limit_repo(t / f"r{i}", LIMIT_POLICY.format(n=n))
+                checks.append(check_hook_call(name, what, hook, render_workflow(repo, script), want, args=scripts, cwd=repo))
+            (kit / "policy-mirror.js").unlink()
+            checks.append(check_hook_call(name, "the render at 6, policy-mirror.js removed", hook, render_workflow(
+                repo, render), has("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit"), args=scripts, cwd=repo))
         else:
             checks.append((name, "a known limit case", False, "no such case"))
     except (subprocess.CalledProcessError, LookupError, policy.Refusal) as exc:
@@ -2189,7 +2213,7 @@ def run_limit_case(name):
 LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed", "limit-conf-mirror",
                "limit-conf-last-valid", "limit-settings-render",
                "limit-hook-admits-eight", "limit-hook-six-spawns", "limit-hook-rules-kept", "limit-hook-env-cap",
-               "limit-hook-settings-over", "limit-hook-local-over")
+               "limit-hook-settings-over", "limit-hook-local-over", "limit-hook-writer-split")
 
 
 # ---- the size caps' cases (TOOL-dGroundRules-9) --------------------------------------------------
