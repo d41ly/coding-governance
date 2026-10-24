@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-49 — the help page's guard line observed by the leg query with its path whole, and by the trace when it is taken out
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-49-deviation-37.md](../build/2026-10-23-build-TOOL-dGroundRules-49-deviation-37.md) | deviation | — |
+| [2026-10-24-build-TOOL-dGroundRules-49-ledger.md](../build/2026-10-24-build-TOOL-dGroundRules-49-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-49-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-49-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-47-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-47-staleness-probe-brief.md) | research | TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-50 |
 | [2026-10-24-prompt-TOOL-dGroundRules-49-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-49-2-spec-writer.md) | journal | — |
