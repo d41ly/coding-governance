@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-92 — the round-9 spec audit's 17 minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 46 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 46 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-92-deviation-921.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-92-deviation-921.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-91-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-91-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-91 |
 
 <!-- /gen:spec-records -->
 
@@ -123,6 +124,8 @@ its scope items: M1 (S1 to S4) and L1 (S10 and S11). The report's four refuted f
 - **consumes-from** `TOOL-dDeclaredLoop-88` — §3's consumes-from 87 bullet, S13, S24, the lifted-walk sketch and AC1, AC6, AC12, AC13 and AC16, which S5, S12, S13 and S17 restate (ids 1, 5, 6, 22)
 - **consumes-from** `TOOL-dDeclaredLoop-86` — §10, which S16 completes with `derive_conf_rebinds` (id 16)
 - **consumes-from** `TOOL-dDeclaredLoop-75` — S35's `GIT_ENV_LEAKS` route in `tools/loop/loop_witness.py`, which S8 moves onto the loader (id 14)
+- **hands-off** `TOOL-dDeclaredLoop-93` — AC16, whose exit code for the `push-merge-tree-fatal` plant that unit restates to 1, as 81 AC3 states (the round-10 spec audit's id 1)
+- **hands-off** `TOOL-dDeclaredLoop-94` — S3, S6, S7, S8, S9, S17, §4's sketches, §5, §10, AC5, AC6, AC8, AC9 and AC16, with `load_tree_lib`, `TREE_LIB_SYMBOLS` and `build_failure_detail`, which that unit restates and completes (the round-10 spec audit's ids 2, 3, 4, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 20, 21, 22, 23, 24, 25, 29)
 
 ## 4. Design
 
@@ -339,6 +342,8 @@ New arm: tools/loop/guard.py · covers AC16 · the OSError() and OSError(5, '') 
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-9 spec audit's 17 minors batched (9 MEDIUM, 8 LOW).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-93 and TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

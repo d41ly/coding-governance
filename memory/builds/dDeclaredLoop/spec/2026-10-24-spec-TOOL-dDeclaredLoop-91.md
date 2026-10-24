@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-91 — derive_conf_rebinds reads every position a module evaluates: class bodies, defaults, decorators and bases
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-91-deviation-911.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-91-deviation-911.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-91-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-91-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-92 |
 
 <!-- /gen:spec-records -->
 
@@ -89,6 +90,7 @@ bound with the names the walk answers. It builds immediately after 89 and repair
 - **consumes-from** `TOOL-dDeclaredLoop-89` — `derive_conf_rebinds` as S1 states it, the `conf-read-forms` rows of S3 and S5's priced list, which this unit extends to every position evaluated in module scope (the round-9 spec audit's id 20)
 - **consumes-from** `TOOL-dDeclaredLoop-87` — §3's binding-form bullet, which 89 S5 writes and S5 restates to the positions (the round-9 spec audit's id 20)
 - **hands-off** `TOOL-dDeclaredLoop-92` — 87 §3's binding-form bullet as S5 restates it, whose per-form tokens that unit's criterion reads
+- **hands-off** `TOOL-dDeclaredLoop-94` — S5, AC3 and AC4, which that unit restates: AC3's scratch copy gains `tools/memory-tree/` and AC4 the greps over 89 and 87 (the round-10 spec audit's ids 10, 19, 27)
 
 ## 4. Design
 
@@ -229,6 +231,8 @@ New arm: tools/loop/budget.py · covers AC1 AC3 · the module-scope group of con
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-9 spec audit's id 20 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

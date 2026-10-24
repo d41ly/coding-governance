@@ -294,3 +294,9 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T18:37:25Z rescope · item add TOOL-dDeclaredLoop-92 · reason spec-audit round 9 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md) the 17 confirmed minors batched into one unit: 9 MEDIUM, ids 1 2 3 4 9 14 15 17 21 (items M1 to M6), and 8 LOW, ids 5 6 7 8 11 12 16 22 (items L1 to L7); repairs no unit in particular
 
 2026-10-24T18:46:36Z review · item dDeclaredLoop-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 17 · disposition promote
+
+2026-10-24T19:09:28Z rescope · item add TOOL-dDeclaredLoop-93 · reason spec-audit round 10 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-91-spec-audit.md) id 1 HIGH, item H1: spec 92 AC16 says guard.py --fixture --plant push-merge-tree-fatal exits 0 while 81 AC3, 83 S2, 88 S18 and 88 AC18 say that plant exits 1, so no build satisfies both; repairs TOOL-dDeclaredLoop-92
+
+2026-10-24T19:09:29Z rescope · item add TOOL-dDeclaredLoop-94 · reason spec-audit round 10 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-91-spec-audit.md) the 24 confirmed minors batched into one unit: 14 MEDIUM, ids 2 3 4 10 11 12 15 17 19 21 22 23 24 27 (items M1 to M9), and 10 LOW, ids 6 7 8 9 13 14 16 20 25 29 (items L1 to L9); repairs no unit in particular
+
+2026-10-24T19:22:32Z review · item dDeclaredLoop-spec-set-r10 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 24 · disposition promote

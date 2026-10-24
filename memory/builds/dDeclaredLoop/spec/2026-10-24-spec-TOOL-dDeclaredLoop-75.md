@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched
 
-**Status:** OPEN · rev-7 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-8 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -217,6 +217,7 @@ are not in the disposal population.
 - **hands-off** `TOOL-dDeclaredLoop-88` — S27's parent rows, which that unit completes with an exit 1 whose conflicted paths hold the policy path (the round-7 spec audit's id 1)
 - **hands-off** `TOOL-dDeclaredLoop-90` — the edge to 78 that counts C's states, which that unit restates to five (the round-8 spec audit's id 26)
 - **hands-off** `TOOL-dDeclaredLoop-92` — S35's `GIT_ENV_LEAKS` route in `tools/loop/loop_witness.py`, which that unit moves onto the loop kit's `tree_lib` loader (the round-9 spec audit's id 14)
+- **hands-off** `TOOL-dDeclaredLoop-94` — S35 as 92 restates it onto the loader, whose range that unit greps for `load_tree_lib` (the round-10 spec audit's id 4)
 
 ## 4. Design
 
@@ -471,6 +472,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC31 · the directory-in
   TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 - rev-7 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
+- rev-8 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
