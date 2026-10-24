@@ -258,3 +258,11 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T15:05:24Z rescope · item add TOOL-dDeclaredLoop-79 · reason spec-audit round 4 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) the 28 confirmed minors batched into one unit: 21 MEDIUM, ids 2 3 4 5 9 10 11 13 14 16 17 20 21 22 23 24 30 32 34 35 36 (items M1 to M16), and 7 LOW, ids 6 7 12 15 18 26 28 (items L1 to L6); repairs no unit in particular
 
 2026-10-24T15:15:46Z review · item dDeclaredLoop-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 28 · disposition promote
+
+2026-10-24T15:57:05Z rescope · item add TOOL-dDeclaredLoop-80 · reason spec-audit round 5 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) id 20 HIGH, item H1: spec 76's no-own-conf-read rule counts the conf names its own fixture plants write in budget.py and breakpoints.py, so it reds on the code it must pass; repairs TOOL-dDeclaredLoop-76
+
+2026-10-24T15:57:13Z rescope · item add TOOL-dDeclaredLoop-81 · reason spec-audit round 5 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) id 28 HIGH, item H2: spec 78 reads every non-zero merge-tree exit as uncomputable, so a fatal exit such as unrelated histories takes the parent exemption and the guard fails open; repairs TOOL-dDeclaredLoop-78
+
+2026-10-24T15:57:14Z rescope · item add TOOL-dDeclaredLoop-82 · reason spec-audit round 5 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) the 23 confirmed minors batched into one unit: 10 MEDIUM, ids 1 3 4 5 6 11 13 17 29 30 (items M1 to M9), and 13 LOW, ids 2 7 8 9 10 12 15 16 18 19 22 24 27 (items L1 to L13); repairs no unit in particular
+
+2026-10-24T16:10:21Z review · item dDeclaredLoop-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 23 · disposition promote

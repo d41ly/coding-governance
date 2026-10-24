@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-78-deviation-781.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-78-deviation-781.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,8 @@ This unit gives C three named states and grades two of them on the C branch. It 
 - **consumes-from** `TOOL-dDeclaredLoop-69` — the C branch of the merge key grade in `check_push_range` of `tools/loop/guard.py`, whose reference this unit splits into three named states
 - **hands-off** `TOOL-dDeclaredLoop-75` — the three states, which S27 widens to a merge-tree exit 1 whose conflicts miss the policy path; its "its blob parses" reads as S3's refusal on a computable C that does not parse, never a fall to the parents
 - **hands-off** `TOOL-dDeclaredLoop-79` — the `absent` state, which that unit's pre-filter counts as a value when it compares M with every parent (ids 7, 12)
+- **hands-off** `TOOL-dDeclaredLoop-81` — the `uncomputable` state, which that unit narrows to an octopus merge or a probed absence of the feature, every other failed re-merge refusing by name and never taking the parent exemption (the round-5 spec audit's id 28)
+- **hands-off** `TOOL-dDeclaredLoop-82` — S4's plant list and AC2, which that unit completes with `push-merge-unparseable-c` and `push-merge-unparseable-parent` and restates to the break AC2 catches (the round-5 spec audit's ids 7, 8, 29)
 
 ## 4. Design
 
@@ -153,6 +156,8 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 AC4 · the resurrect, both-ab
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-4 spec audit's id 33 (HIGH, item H3).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-81 and TOOL-dDeclaredLoop-82, written by the round-5 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

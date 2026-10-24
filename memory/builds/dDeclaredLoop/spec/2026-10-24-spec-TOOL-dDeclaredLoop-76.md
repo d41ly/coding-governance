@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-76 — the loop readers' no-own-conf-read rule is graded on the syntax tree, and the root's source is a value
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-deviation-761.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-deviation-761.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,8 @@ It repairs `TOOL-dDeclaredLoop-72`.
 
 - **consumes-from** `TOOL-dDeclaredLoop-72` — `resolve_memory_root` in `tools/loop/loop_lib.py` and AC4's no-own-conf-read property, which this unit gives a source value and a syntax-tree grade
 - **hands-off** `TOOL-dDeclaredLoop-75` — `resolve_memory_root_source`, from whose `source` S7's `--explain` line and S8's held line print the conf, and S2's rule, inside which S5's and S30's docstrings name it; that pass re-runs the `no-own-conf-read` plant
+- **hands-off** `TOOL-dDeclaredLoop-80` — the `no-own-conf-read` plant's population, which that unit bounds at a function-name fixture boundary so the plants writing the confs sit outside it (the round-5 spec audit's id 20)
+- **hands-off** `TOOL-dDeclaredLoop-82` — `derive_conf_reads`, `resolve_memory_root_source`, the `root-source` plant and §4, which that unit widens to cross-module conf constants, mid-string names and aliased calls, gives a source for every branch, and amends (the round-5 spec audit's ids 1, 10, 11, 12, 17, 30)
 
 ## 4. Design
 
@@ -166,6 +169,8 @@ New arm: tools/loop/breakpoints.py · covers AC1 · the no-own-conf-read plant o
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-4 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-80 and TOOL-dDeclaredLoop-82, written by the round-5 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

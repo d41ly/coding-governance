@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-77 — a FETCH_HEAD URL is compared in the spelling git writes it, its user part stripped from both sides
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-76-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-77-deviation-771.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-77-deviation-771.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-76-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-79 |
 
 <!-- /gen:spec-records -->
 
@@ -64,6 +65,7 @@ This unit compares both URLs in the spelling git writes into `FETCH_HEAD`. It re
 
 - **consumes-from** `TOOL-dDeclaredLoop-74` — S1's `FETCH_HEAD` line match and its URL normalisation in `tools/loop/position.py`, which this unit spells as git writes the URL
 - **hands-off** `TOOL-dDeclaredLoop-79` — `normalise_fetch_url`, over which that unit plants the https remote carrying a user and a token (id 36)
+- **hands-off** `TOOL-dDeclaredLoop-82` — the `url-forms` plant, S2's shim and §4, §5, §7 and §10, which that unit takes past the mismatch skip line, gives a git-written oracle and scp regression pairs, spells through `Path.as_posix()`, and corrects (the round-5 spec audit's ids 3, 9, 15, 16, 18, 22, 27)
 
 ## 4. Design
 
@@ -169,6 +171,8 @@ New arm: tools/loop/position.py · covers AC1 AC2 AC3 AC4 · the scp-remote, ssh
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-4 spec audit's id 8 (HIGH, item H2).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-82, written by the round-5 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

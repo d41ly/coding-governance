@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79
+ids: TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82
 spec-audit: 2026-10-21
 parents: dOrderedCharter dFairHearing
 may: PLAY-dClosedLoop-3
@@ -98,14 +98,14 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 78 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 81 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
 ids TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52
 ids TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65
 ids TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78
-ids TOOL-dDeclaredLoop-79
+ids TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -144,9 +144,10 @@ ids TOOL-dDeclaredLoop-79
 | [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-69 — a merge whose clean re-merge is computable is graded against that re-merge alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md) | 18 | 2 | OPEN | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none](spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md) | 19 | 2 | OPEN | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none](spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md) | 19 | 2 | OPEN | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck](spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-81 — a clean re-merge that fails is its own state and never takes the parent exemption; only a probed absence of the feature does](spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md) | 20 | 2 | OPEN | rev-1 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge](spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-24 |
@@ -178,23 +179,25 @@ ids TOOL-dDeclaredLoop-79
 | [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md) | 36 | 2 | OPEN | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-71 — the breakpoints fixture runs under its own gate leg, so its plants are lasting coverage](spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md) | 36 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree](spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md) | 36 | 2 | OPEN | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree](spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md) | 36 | 2 | OPEN | rev-3 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-65 — the remote's freshness is the time of the last fetch, read from what a fetch and a clone write](spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md) | 37 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-68 — the witness normaliser has one owner, the run-gates program, before unit 67 reads it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md) | 37 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-76 — the loop readers' no-own-conf-read rule is graded on the syntax tree, and the root's source is a value](spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md) | 37 | 2 | OPEN | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-76 — the loop readers' no-own-conf-read rule is graded on the syntax tree, and the root's source is a value](spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md) | 37 | 2 | OPEN | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md) | 38 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md) | 38 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dDeclaredLoop-74 — a FETCH_HEAD counts as a fetch only when it holds the default branch of the resolved remote](spec/2026-10-24-spec-TOOL-dDeclaredLoop-74.md) | 38 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md) | 39 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-77 — a FETCH_HEAD URL is compared in the spelling git writes it, its user part stripped from both sides](spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md) | 39 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md) | 40 | 2 | OPEN | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-80 — the no-own-conf-read rule stops at a named fixture boundary, so the plants that write the confs are outside its population](spec/2026-10-24-spec-TOOL-dDeclaredLoop-80.md) | 38 | 2 | OPEN | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md) | 39 | 2 | OPEN | rev-3 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-77 — a FETCH_HEAD URL is compared in the spelling git writes it, its user part stripped from both sides](spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md) | 39 | 2 | OPEN | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md) | 40 | 2 | OPEN | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md) | 41 | 2 | OPEN | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 76 bound to this build, across 4 record folder(s).
+Records: 80 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79.
+Ids no `spec-audit` record has ever named: TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82.
 
 Ids whose spec moved past its audited revision: TOOL-dDeclaredLoop-1@rev-1 TOOL-dDeclaredLoop-11@rev-1 TOOL-dDeclaredLoop-12@rev-1 TOOL-dDeclaredLoop-13@rev-1 TOOL-dDeclaredLoop-14@rev-1 TOOL-dDeclaredLoop-15@rev-1 TOOL-dDeclaredLoop-16@rev-1 TOOL-dDeclaredLoop-17@rev-1 TOOL-dDeclaredLoop-19@rev-1
 TOOL-dDeclaredLoop-2@rev-1 TOOL-dDeclaredLoop-20@rev-1 TOOL-dDeclaredLoop-21@rev-1 TOOL-dDeclaredLoop-22@rev-1 TOOL-dDeclaredLoop-23@rev-1 TOOL-dDeclaredLoop-24@rev-1 TOOL-dDeclaredLoop-25@rev-1 TOOL-dDeclaredLoop-26@rev-1 TOOL-dDeclaredLoop-27@rev-1 TOOL-dDeclaredLoop-28@rev-1
@@ -202,12 +205,13 @@ TOOL-dDeclaredLoop-29@rev-1 TOOL-dDeclaredLoop-3@rev-1 TOOL-dDeclaredLoop-30@rev
 TOOL-dDeclaredLoop-40@rev-1 TOOL-dDeclaredLoop-41@rev-1 TOOL-dDeclaredLoop-42@rev-1 TOOL-dDeclaredLoop-43@rev-1 TOOL-dDeclaredLoop-44@rev-1 TOOL-dDeclaredLoop-45@rev-1 TOOL-dDeclaredLoop-46@rev-1 TOOL-dDeclaredLoop-47@rev-1 TOOL-dDeclaredLoop-48@rev-1 TOOL-dDeclaredLoop-49@rev-1
 TOOL-dDeclaredLoop-5@rev-1 TOOL-dDeclaredLoop-50@rev-1 TOOL-dDeclaredLoop-51@rev-1 TOOL-dDeclaredLoop-52@rev-1 TOOL-dDeclaredLoop-53@rev-1 TOOL-dDeclaredLoop-54@rev-1 TOOL-dDeclaredLoop-55@rev-1 TOOL-dDeclaredLoop-56@rev-1 TOOL-dDeclaredLoop-57@rev-1 TOOL-dDeclaredLoop-59@rev-1
 TOOL-dDeclaredLoop-6@rev-1 TOOL-dDeclaredLoop-60@rev-1 TOOL-dDeclaredLoop-61@rev-1 TOOL-dDeclaredLoop-62@rev-1 TOOL-dDeclaredLoop-63@rev-1 TOOL-dDeclaredLoop-64@rev-1 TOOL-dDeclaredLoop-65@rev-1 TOOL-dDeclaredLoop-66@rev-1 TOOL-dDeclaredLoop-67@rev-1 TOOL-dDeclaredLoop-68@rev-1
-TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-8@rev-1.
+TOOL-dDeclaredLoop-69@rev-1 TOOL-dDeclaredLoop-7@rev-1 TOOL-dDeclaredLoop-70@rev-1 TOOL-dDeclaredLoop-71@rev-1 TOOL-dDeclaredLoop-72@rev-1 TOOL-dDeclaredLoop-73@rev-1 TOOL-dDeclaredLoop-74@rev-1 TOOL-dDeclaredLoop-75@rev-1 TOOL-dDeclaredLoop-76@rev-1 TOOL-dDeclaredLoop-77@rev-1
+TOOL-dDeclaredLoop-78@rev-1 TOOL-dDeclaredLoop-79@rev-1 TOOL-dDeclaredLoop-8@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 78 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 81 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 34
 - carried in parts: 0 (none)
@@ -227,7 +231,7 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 78 spec(s) a
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-68.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-69.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-70.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-74.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-24-spec-TOOL-dDeclaredLoop-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-78.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-24-spec-TOOL-dDeclaredLoop-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dDeclaredLoop-82.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0086, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098, cl-dClosedLoop-0101,
   cl-dClosedLoop-0102, cl-dClosedLoop-0111
 <!-- /gen:build-coverage -->
@@ -255,7 +259,7 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 78 spec(s) a
 | 17 | `TOOL-dDeclaredLoop-59`, `TOOL-dDeclaredLoop-7` | yes |
 | 18 | `TOOL-dDeclaredLoop-14`, `TOOL-dDeclaredLoop-45`, `TOOL-dDeclaredLoop-69` | yes |
 | 19 | `TOOL-dDeclaredLoop-4`, `TOOL-dDeclaredLoop-78` | yes |
-| 20 | `TOOL-dDeclaredLoop-46`, `TOOL-dDeclaredLoop-6` | yes |
+| 20 | `TOOL-dDeclaredLoop-46`, `TOOL-dDeclaredLoop-6`, `TOOL-dDeclaredLoop-81` | yes |
 | 21 | `TOOL-dDeclaredLoop-25`, `TOOL-dDeclaredLoop-47` | yes |
 | 22 | `TOOL-dDeclaredLoop-29` | no |
 | 23 | `TOOL-dDeclaredLoop-26` | no |
@@ -273,9 +277,10 @@ Coverage of dDeclaredLoop's 34 clause(s) and 49 owned node(s), over 78 spec(s) a
 | 35 | `TOOL-dDeclaredLoop-54`, `TOOL-dDeclaredLoop-55`, `TOOL-dDeclaredLoop-63`, `TOOL-dDeclaredLoop-64` | yes |
 | 36 | `TOOL-dDeclaredLoop-56`, `TOOL-dDeclaredLoop-70`, `TOOL-dDeclaredLoop-71`, `TOOL-dDeclaredLoop-72` | yes |
 | 37 | `TOOL-dDeclaredLoop-65`, `TOOL-dDeclaredLoop-68`, `TOOL-dDeclaredLoop-76` | yes |
-| 38 | `TOOL-dDeclaredLoop-66`, `TOOL-dDeclaredLoop-67`, `TOOL-dDeclaredLoop-74` | yes |
+| 38 | `TOOL-dDeclaredLoop-66`, `TOOL-dDeclaredLoop-67`, `TOOL-dDeclaredLoop-74`, `TOOL-dDeclaredLoop-80` | yes |
 | 39 | `TOOL-dDeclaredLoop-75`, `TOOL-dDeclaredLoop-77` | yes |
 | 40 | `TOOL-dDeclaredLoop-79` | no |
+| 41 | `TOOL-dDeclaredLoop-82` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
