@@ -150,13 +150,6 @@
       "source": "default",
       "value": "explicit-override"
     },
-    "charter.practices": {
-      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
-      "source": "default",
-      "value": {
-        "derived": "the governance foundation set"
-      }
-    },
     "commits.edge-check": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
@@ -300,13 +293,6 @@
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
       "value": "state-reads-only"
-    },
-    "floor": {
-      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
-      "source": "default",
-      "value": {
-        "derived": "all on"
-      }
     },
     "flow.adapt": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -566,13 +552,6 @@
         "release-verify-failed",
         "session-start-breach"
       ]
-    },
-    "maintain.fixes": {
-      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
-      "source": "default",
-      "value": {
-        "derived": "reap, prune landed, regenerate stale, defer dormant, records-only fixes, close finished run records"
-      }
     },
     "maintain.host": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
@@ -1032,13 +1011,6 @@
       "source": "default",
       "value": "refuse"
     },
-    "roles.effort.default": {
-      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
-      "source": "default",
-      "value": {
-        "derived": "unset"
-      }
-    },
     "roles.no-spawn": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
@@ -1311,13 +1283,6 @@
       "source": "default",
       "value": "fix-pass-or-design"
     },
-    "verdict.remote.pin": {
-      "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
-      "source": "default",
-      "value": {
-        "derived": "none, until the owner pins"
-      }
-    },
     "verdict.remote.pin-scope": {
       "reason": "not set in .governance/policy.toml at {rev}; the catalogue default",
       "source": "default",
@@ -1333,6 +1298,9 @@
       "source": "default",
       "value": "prepared-merge"
     }
+  },
+  "legacy_blobs": {
+    ".agent-cap.conf": null
   },
   "policy_blob": "43fa1bb1dbe35b80a185cc5c1c452285b74086c0"
 }
