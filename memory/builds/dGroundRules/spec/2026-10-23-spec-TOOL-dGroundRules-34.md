@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -29,8 +29,6 @@ write sets (§4 "Alternatives rejected"). It builds at order 12, above every uni
 
 Ids sharing a review item each take their own scope item, a distinct facet of its defect. Ids 2 and
 1 are taken at MEDIUM and ids 11 and 36 at LOW, the grades the review's skeptic re-graded them to.
-Id 37 names two corrupted criteria, `TOOL-dGroundRules-29` AC4 and `TOOL-dGroundRules-32` AC9, and
-takes one scope item, S14, observed by AC14 and AC15.
 
 | Finding id | Severity | Review item | Unit it lands on | Scope item | Criterion |
 |---|---|---|---|---|---|
@@ -135,7 +133,8 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
   `tools/policy/check_policy.py` plants S11's two candidates in its temporary repository; the plant
   reads red as the one finding naming both, and the unplanted copy reads `unadopted` and green.
   Observed by AC13.
-- **S14** — Finding 37. Both corrupted criteria are re-spelled here as literal inputs, each checked
+- **S14** — Finding 37. Its corrupted criteria, `TOOL-dGroundRules-29` AC4 and
+  `TOOL-dGroundRules-32` AC9, are re-spelled here as literal inputs, each checked
   inside the rule it probes: S11's two candidates put `<d>` at depths 1 and 2, inside
   `TOOL-dGroundRules-29` S1's window of 0 to 2, and AC15's two pairs are the directory-over-file and
   string-prefix pairs `overlaps` decides (`tools/unattended/lib-unattended.sh:745-750`).
@@ -149,7 +148,7 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
 - **S17** — Finding 29. The arm `TOOL-dGroundRules-32` S9 adds to `tools/check-spec-tokens.test.sh`
   runs exactly S15's two pairs, its disjoint pair being the string-prefix pair, so it tells a raw
   prefix compare from the containment rule. Observed by AC17.
-- **S18** — Finding 24, the skeptic's corrected fix. Under `unadopted`, `arm_cap_census` withholds
+- **S18** — Finding 24. Under `unadopted`, `arm_cap_census` withholds
   only the per-row grading of enforcer presence. It keeps both directions of
   `TOOL-dGroundRules-9` S7's census-to-tree join: a requested cap with no row and a row with no case
   are findings in any tree. Observed by AC18.
@@ -165,7 +164,7 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
   finding count above zero makes `--scaffold` exit 2 printing the arm's finding lines and no
   deferral line. `TOOL-dGroundRules-31` AC4 is observed through this real control flow, not through
   a staged `policy.py`. Observed by AC20.
-- **S21** — Finding 35, the skeptic's corrected fix. `TOOL-dGroundRules-32` S11's prefix rule is
+- **S21** — Finding 35. `TOOL-dGroundRules-32` S11's prefix rule is
   stated inline in `check_policy.py`: each `\` in a receipt's `prefix` becomes `/`, and a value that
   is then absolute, matches `^[A-Za-z]:`, or holds a `..` segment after `posixpath.normpath` answers
   `invalid` naming `prefix`. Nothing is imported from the deployer, which adopters never install.
@@ -231,7 +230,7 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
   in §4 "Writes `TOOL-dGroundRules-32` declares", the seven the review's probe printed and this
   build's own, and the hands-off edge in `TOOL-dGroundRules-32` §3 hands them to that unit's
   `--dispatch` write set. Observed by AC35.
-- **S36** — Finding 30, the skeptic's corrected fix. `help/policy.md` carries a `## Install` section
+- **S36** — Finding 30. `help/policy.md` carries a `## Install` section
   holding `TOOL-dGroundRules-31` S6's deferral line and its order: commit the install and the policy
   file, then re-run `--scaffold`. Observed by AC36.
 - **S37** — Finding 36. The `arm_cap_census` and `legacy-homes` rows of `tools/policy/README.md`
@@ -461,8 +460,8 @@ holding `govkit.py` to its innermost enclosing function, and prints each line wh
   Red when: `TOOL-dGroundRules-25` AC18's outcome has no arm once its own arm is gone.
 - **AC7** — When `GOVKIT_LINES` runs on the built tree, it prints nothing.
   Red when: a line outside `resolve_govkit` spells the deployer's path.
-- **AC8** — When a scratch copy has its `govkit.py` renamed to another name, `--fixture
-  budgets-ships-join` and `--fixture adopter-fresh-target` each print `WRONG` naming the same
+- **AC8** — When a scratch copy has its `govkit.py` renamed to another name,
+  `--fixture budgets-ships-join` and `--fixture adopter-fresh-target` each print `WRONG` naming the same
   looked-in path.
   Red when: the in-process join and the deployer run locate the deployer two ways.
 - **AC9** — When `run_govkit("<repo>/tools", "<repo>", "plan")` is probed, it prints `WRONG` naming
@@ -595,36 +594,26 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
 ## 8. Open questions
 
 - **F1 — How does `--scaffold` refuse an invalid policy file before it defers the mirror (finding
-  32)?** (a) It runs the installed `check_policy.py --repo <t>` and reads `arm_schema`, which grades
-  the working-tree file through `validate`, meeting AC20 through the real control flow. Validating in
-  `mirror --write` opens the working-tree file in `policy.py`, which `TOOL-dGroundRules-2` S2 states
-  never happens (veto 1); a working-tree flag on `policy.py check` adds a public option to a product
-  verb (veto 2). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  32)?** (a) It runs the installed `check_policy.py --repo <t>` and reads `arm_schema`, meeting AC20
+  through the real control flow; validating in `policy.py` opens the working-tree file, which
+  `TOOL-dGroundRules-2` S2 rules out. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F2 — How does `check_policy.py` read `DEPLOY_FULL`'s answers (finding 19)?** (c) An `ast` read
-  of `selftest.py`'s own assignment: one carrier, no copy, no import and no gate, run on 2026-10-23
-  (§4), meeting AC23. A shared module under `tools/govkit/` edits another kit's held suite and
-  imports across kits, which `tools/codebase-map/map_lib.py:1505` forbids; a local copy is a second
-  carrier needing an `ast` arm. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (c). widens: none · relaxes: none
+  of `selftest.py`'s own assignment: one carrier, no copy and no import, meeting AC23; a shared
+  module imports across kits, which `tools/codebase-map/map_lib.py:1505` forbids. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (c). widens: none · relaxes: none
 - **F3 — Where does the false-green HEAD shape live (finding 21)?** (a) In
   `suite-invalidated-by-a-commit-under-it`, which names `_cmd_apply`'s HEAD stamp, the historical-sha
-  record pointing to it and keeping its anchors, so AC34 and `TOOL-dGroundRules-28`'s criteria hold.
-  Moving the HEAD paragraph out reds `TOOL-dGroundRules-28` AC1 and AC2 (veto 1); keeping it there
-  alone leaves one record with two opposite symptoms and the other prescribing the defect.
-  Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  record pointing to it and keeping its anchors; moving the HEAD paragraph out reds
+  `TOOL-dGroundRules-28` AC1 and AC2. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F4 — How do the census cases keep their join in a receipt-less fixture repository (findings 24
-  and 33)?** (a) Under `unadopted` the arm withholds only enforcer presence and keeps the join, one
-  rule at the reader meeting AC18 and AC19. Copying the registry and every census enforcer into unit
-  1's base fixture repository turns the repository every case of units 1 to 33 plants on into gov's
-  tree. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  and 33)?** (a) Under `unadopted` the arm withholds only enforcer presence and keeps the join, meeting
+  AC18 and AC19; copying the registry and its enforcers into unit 1's base fixture repository turns
+  every case's repository into gov's tree. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F5 — How does `run_govkit` refuse every root no snapshot made (findings 4 and 34)?** (a)
-  `build_source_snapshot` records its roots and `run_govkit` refuses any other. Requiring
-  `rev-parse --show-toplevel` to equal the root outside the source admits a stale `--local` clone,
-  which fails AC10 (veto 1). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  `build_source_snapshot` records its roots and `run_govkit` refuses any other; a
+  `--show-toplevel` check admits a stale `--local` clone, failing AC10. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F6 — How does the snapshot read the source's exclude file (findings 2, 10, 22 and 31)?** (a)
-  Copy it into the snapshot's `info/exclude`, keeping `TOOL-dGroundRules-26` S1's `add -A` with one
-  copy added. `-c core.excludesFile=<it>` drops the user's own excludes file, which fails AC2
-  (veto 1); feeding `ls-files -co --exclude-standard` to `update-index` meets every criterion but
-  opens more questions. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  Copy it into the snapshot's `info/exclude`, keeping `TOOL-dGroundRules-26` S1's `add -A`;
+  `-c core.excludesFile=<it>` drops the user's own excludes file, failing AC2. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -632,6 +621,7 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
 - rev-2 · 2026-10-23 · §3 · hands-off edges to units 38-41 and 43 added.
 - rev-3 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling; no meaning moved.
 - rev-4 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; older revision lines condensed under the spec ceiling; no design change.
+- rev-5 · 2026-10-24 · §1 §2 §6 §8 §9 · a criterion code span rejoined onto one line and prose shortened under the spec ceiling; no design change.
 
 ## 10. Reuse audit
 

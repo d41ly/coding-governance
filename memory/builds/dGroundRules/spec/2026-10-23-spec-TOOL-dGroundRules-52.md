@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -274,8 +274,8 @@ or a stated outcome, made against the code units 32 to 51 build.
 Every command runs from the repository root unless it says otherwise. `check_policy.py` names the
 policy kit's file under the kit, as `TOOL-dGroundRules-43` §6 does, and `ORDERS`, `ORDER_ROWS`,
 `EXCLUDES_REPO`, `UNEXCLUDE`, `DEPTH3_LIVE`, `TOPLEVEL` and `PYC_GUARD` are the expressions units 43,
-34, 38, 39 and 37 define. A fixture repository is a `git init` repository under `%TEMP%/<short
-name>`. Literal commands and stagings are spelled whole here, once, and the criteria name them:
+34, 38, 39 and 37 define. A fixture repository is a `git init` repository under
+`%TEMP%/<short name>`. Literal commands and stagings are spelled whole here, once, and the criteria name them:
 
 ```text
 CLONE_AT        = sha=$(git rev-parse HEAD); git clone -q <this repository> "$TEMP/gr52" &&
@@ -403,6 +403,7 @@ none
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-60`, the reciprocal end of the round-1 closing diff
   review's promotions; no scope or criterion moved.
 - rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
+- rev-4 · 2026-10-24 · §6 · a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
 
 ## 10. Reuse audit
 
