@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-99 — every `loop_lib.py` function that opens a conf is in `CONF_READERS`, checked both ways by a definition plant
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 50 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 50 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 

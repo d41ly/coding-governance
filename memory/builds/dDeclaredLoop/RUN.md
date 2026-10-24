@@ -316,3 +316,69 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T20:31:43Z rescope · item add TOOL-dDeclaredLoop-100 · reason spec-audit round 12 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) the 21 confirmed minors batched into one unit: 11 MEDIUM, ids 2 3 4 8 10 14 15 20 21 22 23 (items M1 to M10), and 10 LOW, ids 5 6 7 12 13 16 17 18 24 25 (items L1 to L8); lands on TOOL-dDeclaredLoop-95 and TOOL-dDeclaredLoop-96, so repairs no unit in particular
 
 2026-10-24T20:46:52Z review · item dDeclaredLoop-spec-set-r12 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 21 · disposition promote
+
+2026-10-24T20:51:35Z rescope · item defer TOOL-dDeclaredLoop-68 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:36Z rescope · item defer TOOL-dDeclaredLoop-69 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:37Z rescope · item defer TOOL-dDeclaredLoop-70 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:37Z rescope · item defer TOOL-dDeclaredLoop-71 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:38Z rescope · item defer TOOL-dDeclaredLoop-72 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:39Z rescope · item defer TOOL-dDeclaredLoop-73 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:39Z rescope · item defer TOOL-dDeclaredLoop-74 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:40Z rescope · item defer TOOL-dDeclaredLoop-75 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:41Z rescope · item defer TOOL-dDeclaredLoop-76 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:41Z rescope · item defer TOOL-dDeclaredLoop-77 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:42Z rescope · item defer TOOL-dDeclaredLoop-78 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:43Z rescope · item defer TOOL-dDeclaredLoop-79 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:43Z rescope · item defer TOOL-dDeclaredLoop-80 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:44Z rescope · item defer TOOL-dDeclaredLoop-81 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:45Z rescope · item defer TOOL-dDeclaredLoop-82 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:45Z rescope · item defer TOOL-dDeclaredLoop-83 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:46Z rescope · item defer TOOL-dDeclaredLoop-84 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:47Z rescope · item defer TOOL-dDeclaredLoop-85 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:47Z rescope · item defer TOOL-dDeclaredLoop-86 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:48Z rescope · item defer TOOL-dDeclaredLoop-87 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:49Z rescope · item defer TOOL-dDeclaredLoop-88 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:49Z rescope · item defer TOOL-dDeclaredLoop-89 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:50Z rescope · item defer TOOL-dDeclaredLoop-90 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:51Z rescope · item defer TOOL-dDeclaredLoop-91 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:52Z rescope · item defer TOOL-dDeclaredLoop-92 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:52Z rescope · item defer TOOL-dDeclaredLoop-93 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:53Z rescope · item defer TOOL-dDeclaredLoop-94 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:54Z rescope · item defer TOOL-dDeclaredLoop-95 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:54Z rescope · item defer TOOL-dDeclaredLoop-96 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:55Z rescope · item defer TOOL-dDeclaredLoop-97 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:56Z rescope · item defer TOOL-dDeclaredLoop-98 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:57Z rescope · item defer TOOL-dDeclaredLoop-99 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T20:51:57Z rescope · item defer TOOL-dDeclaredLoop-100 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35

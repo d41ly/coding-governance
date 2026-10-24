@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-86 — the round-6 spec audit's 22 minors, batched
 
-**Status:** OPEN · rev-7 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 42 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 42 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
