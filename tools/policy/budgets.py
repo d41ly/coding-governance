@@ -31,6 +31,8 @@ THE REFUSED READER, one rule for every switch enforcer (TOOL-dGroundRules-21 S31
 policy reader makes inside `resolve_caps`, of the landed revision, of the switch's own keys or of a
 cap's value, gives that cap `mode = refuse`, its rule naming the refusal, so a subject over its cap
 refuses as it did before the switch and is never read as `warn`; the CLI prints the refusal once.
+An unset cap's derived default, the reader's `DerivedDefault` refusal, is no such refusal: it is no file value,
+caught on the cap's value read alone (TOOL-dGroundRules-62).
 Where the landed revision's read itself refuses, a cap's value is the `legacy:` or `default:` value
 handed in, as the enforcer read it. The shell enforcers take the branch they take with no policy kit
 when no Python launcher resolves, and say so once.
@@ -221,13 +223,16 @@ def resolve_caps(requests, repo=".", rev=None, refused=None):
         refused.append(str(exc))
 
     # Each read spells its key as a string, the shape the reader-coverage arm reads as a reader. A
-    # refusal answers None, kept once in `refused`.
-    def read_key(key):
+    # refusal answers None, kept once in `refused`; a refusal of the `unset` type is no file value
+    # instead, a Resolution holding None, and `()` catches nothing (TOOL-dGroundRules-62).
+    def read_key(key, unset=()):
         if read is None:
             return None
         path = policy.parse_key(key)
         try:
             return policy.resolve_read(path, policy.read_catalogue_row(path, rows), read)
+        except unset:
+            return policy.Resolution(None, "default", "")
         except policy.Refusal as exc:
             if str(exc) not in refused:
                 refused.append(str(exc))
@@ -259,9 +264,10 @@ def resolve_caps(requests, repo=".", rev=None, refused=None):
                                   name, cap.unit, rule)
             continue
         seg = policy.render_json(name)  # one quoted segment, whatever `/`, `.` or `*` the name carries
-        hit = read_key(f"budgets.{seg}")
-        # The value's read refused: this cap refuses a breach too. An unset key's derived default is
-        # such a refusal (S12) until TOOL-dGroundRules-62 reads that one refusal as "no file value".
+        # An unset key reaches its derived default (TOOL-dGroundRules-21 S12): no file value, so the
+        # mode stays the pin's or the switch's (TOOL-dGroundRules-62). Any other refusal of the read
+        # refuses a breach too.
+        hit = read_key(f"budgets.{seg}", unset=policy.DerivedDefault)
         if hit is None and read is not None:
             mode, rule = "refuse", READER_REFUSED
         held = None if hit is None else hit.value

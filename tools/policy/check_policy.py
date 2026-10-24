@@ -165,7 +165,8 @@ and `mirror-absent-adopter` the mirror's; `legacy-homes-main-dropped` the lists'
 `reader-coverage-relocated` and `reader-quoted-pattern` reader coverage; `limit-settings-elsewhere`,
 `limit-hook-settings-malformed`, `limit-hook-reader-throws` and `limit-fresh-target-spawn` the agent
 limit's settings; `budgets-zero-cap`, `budgets-reader-refused` and `limits-reader-docstring` the
-size caps.
+size caps. `budgets-unset-derived` (TOOL-dGroundRules-62) reads an unset cap's derived default as no
+file value under the last valid revision, and an unparsed file with none before it as a refusal.
 
 Rule 7 bounds every settings layer it reads (TOOL-dGroundRules-61): `limit-settings-elsewhere-project-over`
 refuses a project file above the limit beside a declared file at it, `limit-settings-declared-absent`
@@ -3638,6 +3639,22 @@ def run_budget_case(name):
                 r = build_cap_repo(t / mode, {lrel: ltext}, mode)
                 rc, out = run_case_argv(r, [*bud, "check", "AGENTS.md", "999999"])
                 checks.append((f"enforce = {mode}", f"exit {want} naming budgets.enforce", rc == want and "budgets.enforce" in out, f"exit {rc} · {out.strip()}"))
+        elif name == "budgets-unset-derived":
+            # TOOL-dGroundRules-62 S4: the unset cap's derived default is no file value, under the last valid
+            # revision too, while a file that does not parse with none before it still refuses. (a) one
+            # unparsed commit; (b) V warn pinning the cap, then C unparsed; (c) V warn, no pin, then C.
+            v = lrows["AGENTS.md"][0]
+            unparsed = lambda r: write_policy(r, '[budgets]\nenforce = refuse\n')
+            for repo, extra, post, mode, rule, told in (
+                    ("a", "enforce = refuse\n", None, "refuse", budgets.READER_REFUSED, 1),
+                    ("b", 'pinned = ["AGENTS.md"]\n', unparsed, "refuse", "budgets.pinned names it", 0),
+                    ("c", "", unparsed, "warn", "budgets.enforce is warn", 0)):
+                r = build_cap_repo(t / repo, {lrel: ltext}, "warn", extra, post=post)
+                rc, out = run_case_argv(r, [*bud, "resolve", "--explain", "AGENTS.md"])
+                row, said = f"AGENTS.md\t{v}\t{mode}\tdefault", out.count("policy: refused")
+                checks.append((f"repository ({repo})", f"{row!r}, the rule {rule!r}, {told} refusal line(s)",
+                               rc == 0 and row in out.splitlines() and f" · {rule} · " in out and said == told,
+                               f"exit {rc} · said {said} time(s) · {render_said(out, 'budgets: AGENTS.md')}"))
         elif name == "budgets-no-kit":
             rc, out, _p = run_cap_plant(t / "r", census["manifest-bytes"], lambda c: derive_manifest_plant(c, kit=False), "refuse")
             told = out.count("no policy kit is installed")
@@ -3730,7 +3747,7 @@ def run_budget_case(name):
 
 BUDGET_CASES = ("budgets-pinned-warn", "budgets-two-homes", "budgets-limits-reader", "budgets-census-join",
                 "budgets-switch-refuse", "budgets-no-kit", "budgets-correctness-kept", "budgets-zero-cap",
-                "budgets-reader-refused", "limits-reader-docstring")
+                "budgets-reader-refused", "limits-reader-docstring", "budgets-unset-derived")
 
 
 def run_ships_join(name):

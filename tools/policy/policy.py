@@ -209,6 +209,12 @@ class Refusal(Exception):
         return f"policy: refused · {self.path}:{self.line} · {self.why}"
 
 
+class DerivedDefault(Refusal):
+    """A row whose default is { derived = ... }, which no reader computes yet (TOOL-dGroundRules-21
+    S12): `get` and the mirror refuse it as any Refusal, and the caps module alone reads it as no file
+    value (TOOL-dGroundRules-62)."""
+
+
 def read_catalogue_row(path, catalogue):
     """The row of `catalogue`, `load_catalogue`'s rows, that a key path (a tuple of segments) names.
     A catalogue `name` is split on `.`, since no name carries a quoted segment; an exact segment
@@ -671,7 +677,7 @@ def read_default_value(path, row, table, rev_phrase):
         raise Refusal((KIT / CATALOGUE).as_posix(), 0,
                       f"the row {row.get('name')} carries no default, so {render_dotted(path)} has no value to read")
     if check_derived(row["default"]):
-        raise Refusal((KIT / CATALOGUE).as_posix(), 0, f"the row {row.get('name')} carries {DERIVED_WHY}, "
+        raise DerivedDefault((KIT / CATALOGUE).as_posix(), 0, f"the row {row.get('name')} carries {DERIVED_WHY}, "
                       f"so {render_dotted(path)} has no value to read until the file sets it")
     at = f"at {rev_phrase}; the catalogue default"
     reason = f"{POLICY_REL} is absent {at}" if table is None else f"not set in {POLICY_REL} {at}"
@@ -837,10 +843,8 @@ def render_mirror(repo, rev="HEAD"):
     def add(p, row):
         try:
             hit = resolve_read(p, row, read)
-        except Refusal as exc:
-            if DERIVED_WHY in exc.why:  # ponytail: matched by its text until TOOL-dGroundRules-62 types it
-                return
-            raise
+        except DerivedDefault:  # its F4 omission; every other Refusal passes through
+            return
         key = render_dotted(p)
         keys[key] = {"reason": hit.reason, "source": hit.source, "value": check_json_value(key, hit.value)}
     for p in sorted(paths):

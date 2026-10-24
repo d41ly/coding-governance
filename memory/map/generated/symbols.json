@@ -78,6 +78,11 @@
       "file": "tools/memory-tree/transition_audit.py"
     },
     {
+      "id": "DerivedDefault",
+      "kind": "class",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "DesignRefusal",
       "kind": "class",
       "file": "tools/memory-tree/design_lib.py"
