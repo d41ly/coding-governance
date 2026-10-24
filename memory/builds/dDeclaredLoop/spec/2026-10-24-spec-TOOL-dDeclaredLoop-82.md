@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-82-deviation-821.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-82-deviation-821.md) | deviation | — |
+| [2026-10-24-build-TOOL-dDeclaredLoop-82-deviation-822.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-82-deviation-822.md) | deviation | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-80 |
 
 <!-- /gen:spec-records -->
