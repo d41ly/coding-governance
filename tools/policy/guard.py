@@ -142,7 +142,8 @@ def check_raise_shape(old_bytes, new_bytes):
     """The admitted shape over the policy file at HEAD and staged -> (each failed condition, the one
     changed leaf as (key, old, new), or None where not exactly one leaf changed on both sides)."""
     try:
-        old_text, new_text = old_bytes.decode("utf-8"), new_bytes.decode("utf-8")
+        # One leading U+FEFF off each side, as policy.py's derive_bomless_text strips it for every reader.
+        old_text, new_text = (b.decode("utf-8").removeprefix("﻿") for b in (old_bytes, new_bytes))
         changes = derive_leaf_changes(tomllib.loads(old_text), tomllib.loads(new_text))
     except (UnicodeDecodeError, tomllib.TOMLDecodeError):
         return ["the policy file does not parse"], None

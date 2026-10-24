@@ -292,8 +292,6 @@ SEC = r"^## %s\.[^\n]*\n(.*?)(?=\n## |\Z)"
 TICK = re.compile(r"`([^`\n]+)`")
 CITE = re.compile(r"`([^`\s]+\.[A-Za-z0-9]+):(\d+)(?:-\d+)?`")
 CITE_TAIL = re.compile(r":\d+(-\d+)?$")
-# A deploy-time token or an env assignment is never a path or a leg.
-NOT_A_TOKEN = re.compile(r"^(GATE_|\{\{|\$|~|'|\"|<)")
 # A section 7 list carries more than leg names: commands to run, conf keys, and the files a leg
 # grades. The pre-wiring run over 453 specs surfaced all three and they are not defects, so the leg
 # join excludes them by SHAPE rather than by waiver. A leg name is prose: no slash, no leading dot,
@@ -367,21 +365,11 @@ BAR = re.compile(
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "
            "run once, after the build is complete")
-# TOOL-dDerivedDocket-37: the hands-off join's key, grammar and refusal. The GRAMMAR IS CHECK 12'S,
-# copied rather than called: the hygiene engine is a copy-installed kit, so an arm there would reach
-# every memory-tree adopter's bar, a shipped surface this unit did not price. Check 12's own lines,
-# cited so a reader can compare them: the uid at
-# <prefix>/memory-tree/check-memory-hygiene.sh:1533-1534, Non-goals and Edges by heading text at :1547
-# and :1549, the marker at :1553, the verb at :1557 and the backticked-or-bare target at :1564-1565.
+# TOOL-dDerivedDocket-37: the hands-off join's key and refusal. Its GRAMMAR IS CHECK 12'S, read through
+# the memory-tree kit's `design_lib.read_spec_edges` (TOOL-dGroundRules-32 S17), which also reads a
+# bullet's two-space continuation lines: a payload wrapped past the house width is still the
+# bullet's promise, and reading only line one would leave every wrapped token ungraded and silent.
 HANDOFF_KEY = "SPEC_HANDOFF_CUTOFF"
-# ONE rule here is WIDER than check 12's, which reads a bullet's first line only: this reads the
-# two-space continuation lines too, the shape the acceptance-bullet loop below already uses. A
-# payload wrapped past the house width is still the bullet's promise, and reading only line one
-# would leave every wrapped token ungraded and silent.
-HANDOFF_BULLET = re.compile(r"^(?:-|\*)[ \t]+\*\*hands-off\*\*[ \t].*(?:\n  .*)*", re.M)
-# `## <n>. Non-goals` by HEADING TEXT and never by ordinal, the read GATES_HEAD and AC_HEAD already
-# have. No end anchor, because the house heading is `## 3. Non-goals (OUT)`.
-NONGOALS_HEAD = re.compile(r"^## [0-9]+[.] Non-goals[^\n]*$", re.M)
 # The uid a spec's H1 carries. BOTH halves of a handoff key are read from this and never from a
 # filename: a spec may legally be family-less, carry a record tail or sit in a sub-folder of
 # `spec/`, and its filename then says nothing about the unit it specs.
@@ -550,44 +538,11 @@ def extract_files_touched(text, files):
         return None
     paths, roots = [], []
     for word in words:
-        if len(derive_dir_segments(word)) == 1:
+        if len(load_design_lib().derive_dir_segments(word)) == 1:
             roots.append(word)
-        elif check_path_shaped(word, files) or check_dir_shaped(word):
+        elif check_path_shaped(word, files) or load_design_lib().check_dir_shaped(word):
             paths.append(word)
     return paths, roots
-
-
-def derive_dir_segments(tok):
-    """The REAL segments of a `/`-terminated token this join could read, or `[]` for anything else:
-    a token that is not `/`-terminated, opens like a deploy-time token, carries a glob or a space, or
-    has a segment that is empty, `.` or `..` — so `./`, `../` and `tools/./` are nothing, not a path
-    (round 2, R8). `src/` -> `['src']`; `src/app/` -> `['src', 'app']`."""
-    if NOT_A_TOKEN.match(tok) or " " in tok or "*" in tok or "?" in tok or not tok.endswith("/"):
-        return []
-    parts = tok.rstrip("/").split("/")
-    return [] if any(x in ("", ".", "..") for x in parts) else parts
-
-
-def check_dir_shaped(tok):
-    """A declared PREFIX: a directory token of TWO OR MORE real segments. A one-segment token is a
-    ROOT (`tools/`), which is how prose names a tree and declares nothing (round 2, R1); round 1's
-    fold kept it and owed every non-broad leg under it. The residual, both directions (round 3,
-    R4): a two-segment directory named in prose is still read as declared, and a one-segment
-    directory that is itself a joined guard (`.githooks/`) declared wholesale declares nothing -
-    its files, or a two-segment child, must be named."""
-    return len(derive_dir_segments(tok)) >= 2
-
-
-def check_guard_trips(path, guard):
-    """Git-pathspec semantics for a manifest guard: the exact path, or anything under it as a
-    directory. Never a bare prefix, so `src/x.sh` does not trip on `src/x.sh.bak`. A declared
-    DIRECTORY (its trailing `/` kept by `extract_files_touched`, two or more segments — a root never
-    reaches here) trips symmetrically: it also trips a guard that sits under it, an exact-file guard
-    included, because `tools/x/` declares `tools/x/y.sh` (R3)."""
-    p, g = path.rstrip("/"), guard.rstrip("/")
-    if p == g or p.startswith(g + "/"):
-        return True
-    return path.endswith("/") and g.startswith(p + "/")
 
 
 def derive_guarded_legs(rows):
@@ -628,7 +583,7 @@ def derive_tripped_legs(path, rows):
     out = []
     for r in rows:
         hit = next((g for g in r.get("guard") or []
-                    if not GLOB_MAGIC.search(g) and check_guard_trips(path, g)), None)
+                    if not GLOB_MAGIC.search(g) and load_design_lib().check_guard_trips(path, g)), None)
         if hit:
             out.append((r["name"], hit, r.get("chunk", "-"), r.get("subject", "-")))
     return out
@@ -803,30 +758,12 @@ def scan_handoffs(root, specs, uids, cutoff):
         if f not in cache:
             cache[f] = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         text = cache[f]
-        head = NONGOALS_HEAD.search(text)
-        if not head:
-            continue
-        rest = text[head.end():]
-        nxt = re.search(r"^## ", rest, re.M)
-        nongoals = rest[:nxt.start()] if nxt else rest
-        sub = re.search(r"^### Edges[ \t]*$", nongoals, re.M)
-        if not sub:
-            continue
-        rest = nongoals[sub.end():]
-        nxt = re.search(r"^### ", rest, re.M)
-        edges = rest[:nxt.start()] if nxt else rest
         uid = SPEC_UID.search(text)
         source = uid.group(1) if uid else ""
         build = f.split("/")[2]
-        for bullet in HANDOFF_BULLET.findall(edges):
-            # Check 12's target rule, on the payload past the marker and the verb: the first
-            # backticked token when the payload opens with one, else its leading word run. Stripping
-            # the MARKER here as well as the verb is what keeps a `*`-and-tab bullet readable.
-            payload = re.sub(r"^(?:-|\*)[ \t]*\*\*[^*]*\*\*[ \t]*", "", bullet.split("\n", 1)[0])
-            if payload.startswith("`"):
-                target = payload[1:].partition("`")[0]
-            else:
-                target = re.match(r"[A-Za-z0-9_-]*", payload).group(0)
+        # The bullets, their continuation lines and check 12's target rule are design_lib's one edge
+        # read (TOOL-dGroundRules-32 S17), the build-order render's consumes read too.
+        for target, bullet in load_design_lib().read_spec_edges(text, "hands-off"):
             if target == "external":
                 continue
             if not source or (build, target) not in uids:
@@ -894,6 +831,10 @@ def load_design_lib():
 # dated joins here and the carries population read one date. A checker copied without the kit binds
 # none, and `main` refuses by name before any join that reads a date.
 SPEC_DATE = load_design_lib().SPEC_FILE_DATE if DESIGN_LIB else None
+# A deploy-time token or an env assignment is never a path or a leg: design_lib's one pattern,
+# which its `derive_dir_segments` reads too (TOOL-dGroundRules-32 S9). Bound like SPEC_DATE, so a
+# checker copied without the kit binds none and `main` refuses before any join reads it.
+NOT_A_TOKEN = load_design_lib().NOT_A_TOKEN if DESIGN_LIB else None
 
 
 def read_carries_specs(root, design, cutoff, files=None, conf=None):
@@ -1581,7 +1522,7 @@ def main(argv):
         if declared and extract_gates(text) is None:
             g_nogates += 1
             near += [(f, "guards", p, "no Gates heading, not joined") for p in declared
-                     if any(check_guard_trips(p, g) for _, gs in guarded for g in gs)]
+                     if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs)]
         elif extract_gates(text) is not None:
             if g_armed:
                 g_specs += 1
@@ -1589,7 +1530,7 @@ def main(argv):
             for leg, gs in guarded:
                 if leg in named:
                     continue
-                path = next((p for p in declared if any(check_guard_trips(p, g) for g in gs)), None)
+                path = next((p for p in declared if any(load_design_lib().check_guard_trips(p, g) for g in gs)), None)
                 if path is not None:
                     missing.append((leg, path))
         if g_armed:
@@ -1602,9 +1543,9 @@ def main(argv):
             near += [(f, "guards", f"{leg} <- {path}", where) for leg, path in missing]
         # A path whose only guard matches are BROAD is EXCLUDED, and says so under --list, count and all.
         for p in declared:
-            if any(check_guard_trips(p, g) for _, gs in guarded for g in gs):
+            if any(load_design_lib().check_guard_trips(p, g) for _, gs in guarded for g in gs):
                 continue
-            hit = [g for g in broad if check_guard_trips(p, g)]
+            hit = [g for g in broad if load_design_lib().check_guard_trips(p, g)]
             if hit:
                 near.append((f, "guards", p, "matches only the broad guard(s) "
                              + " ".join(f"{g} ({broad[g]} legs)" for g in hit)

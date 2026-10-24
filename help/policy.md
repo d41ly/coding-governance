@@ -170,7 +170,8 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
   `memory/builds/*/spec/` (it names no one file), `budgets.enforce` or `budgets.pinned`, any other
   key, a raise missing its `RAISED` line or its decision row, another line of the file changed, and
   any change to the instruction manifest or the deployer's answers. A mirror staged beside a change
-  to any file it is rendered from, the policy file, the catalogue or `.agent-cap.conf`, is refused
+  to any file it is rendered from, the policy file, the catalogue or a key of the mirror's
+  `legacy_blobs` record (today `.agent-cap.conf` alone), is refused
   with `the mirror renders HEAD and its input <path> is staged changed: commit <path> first, then
   regenerate`; one that is
   not its render, a hand edit say, with `differs from its render at HEAD`. Unstage it with

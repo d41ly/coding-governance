@@ -43,7 +43,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # RAISED 189 -> 193 by TOOL-dGroundRules-9: the size line's home arm and the size join's three
 # switch arms, the padded spec and the grown held spec under warn and the pinned class cap, each
 # top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=193
+# RAISED 193 -> 194 by TOOL-dGroundRules-32: its overlap-parity arm, top-level. Counted by reading;
+# OWED: observed at the close.
+FLOOR_ASSERTIONS=194
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1698,6 +1700,23 @@ if [ "$date_in_lint:$date_in_lib" = "0:1" ]; then
   echo "arm ok    the spec filename date's pattern is spelled in design_lib.py alone"; pass=$((pass+1))
 else
   echo "arm FAIL  the spec filename date's pattern is spelled in design_lib.py alone — checker $date_in_lint, design_lib $date_in_lib"; fail=$((fail+1))
+fi
+
+# TOOL-dGroundRules-32 S9: the build-order render's overlap rule is the dispatcher's. design_lib's
+# check_writes_intersect answers what lib-unattended.sh's `overlaps` answers on a directory and a file
+# under it, and on the string-prefix pair, which a raw prefix compare calls overlapping. Staged red by
+# testing one direction only: the directory-and-file pair then reads False.
+UNATTENDED_DIR=$(resolve_kit_dir "$PY" unattended lib-unattended.sh "$HERE") || exit 2
+wi_py=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import design_lib as d; p = sys.argv[2] + "policy/"
+print(d.check_writes_intersect([p], [p + "x.py"]), d.check_writes_intersect([p + "a.py"], [p + "ab.py"]))' "$MEMORY_TREE" "$PFX" 2>&1 | tr -d '\r')
+wi_sh=$( . "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$UNATTENDED_DIR/lib-unattended.sh" >/dev/null 2>&1
+  for pr in "${PFX}policy/ ${PFX}policy/x.py" "${PFX}policy/a.py ${PFX}policy/ab.py"; do
+    set -- $pr; if overlaps "$1" "$2"; then printf 'True '; else printf 'False '; fi
+  done )
+if [ "$wi_py" = "True False" ] && [ "$wi_sh" = "True False " ]; then
+  echo "arm ok    TOOL-dGroundRules-32 AC9 check_writes_intersect answers what overlaps answers on both pairs"; pass=$((pass+1))
+else
+  echo "arm FAIL  TOOL-dGroundRules-32 AC9 check_writes_intersect answers what overlaps answers on both pairs — design_lib [$wi_py], overlaps [$wi_sh]"; fail=$((fail+1))
 fi
 
 total=$((pass+fail))

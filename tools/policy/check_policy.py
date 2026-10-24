@@ -229,7 +229,7 @@ def arm_schema(repo, kit):
     problems = policy.validate(text, rows, census)
     if problems and not problems[0].key:
         return 0, f"{POLICY_REL} did not parse", [(POLICY_REL, f"does not parse: {problems[0].why}")]
-    n = sum(1 for _ in policy.scan_keys(tomllib.loads(text), rows))
+    n = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.derive_bomless_text(text)), rows))
     return n, f"{n} key(s) of {POLICY_REL} against {len(rows)} row(s)", [(p.key, p.why) for p in problems]
 
 
@@ -378,14 +378,14 @@ def arm_legacy_homes(repo, kit):
     `kit` holds no list, the arm grades nothing and says so: the list is gov's own, withheld from
     installs by this kit's descriptor (TOOL-dGroundRules-17), and the `legacy-homes-present` case holds
     gov's own copy present. It says the same, and grades nothing, wherever `derive_census_tree` answers
-    `adopter`, a list at the installed kit's directory included: an adopter's list cannot hold gov's
+    `adopter` or `invalid` (TOOL-dGroundRules-32 S11), a list at the installed kit's directory included: an adopter's list cannot hold gov's
     rows, so grading one would red every adopter (TOOL-dGroundRules-25 S11). A receipt that does not
     read, or two registries, is the one finding."""
     try:
         tree, _receipt = derive_census_tree(repo)
     except policy.Refusal as exc:
         return 0, "the tree under test did not derive", [(exc.path, exc.why)]
-    if tree == "adopter" or not (Path(kit) / policy.LEGACY_LIST).is_file():
+    if tree in ("adopter", "invalid") or not (Path(kit) / policy.LEGACY_LIST).is_file():
         return None, policy.LEGACY_WITHHELD, []
     try:
         with policy.run_without_git_env():  # the base `lists --check` reads, by the one comparison
@@ -643,7 +643,8 @@ def derive_census_tree(repo):
     `<d>/govkit/registry.toml` sits with `<d>` 0 to 2 deep, the search govkit's `derive_tool_root`
     makes, since only gov's tree holds the registry; ("unadopted", None) where none does; and two or
     more is a Refusal naming each candidate. A receipt that is not a JSON object is a Refusal naming
-    it, never a `source` answer."""
+    it, never a `source` answer. One whose `kits` is not a list of strings, or whose `prefix` is not a
+    relative string free of `..` segments, is ("invalid", that field) (TOOL-dGroundRules-32 S11)."""
     try:
         text = Path(repo, RECEIPT_REL).read_text(encoding="utf-8")
     except FileNotFoundError:
@@ -663,6 +664,12 @@ def derive_census_tree(repo):
         raise policy.Refusal(RECEIPT_REL, 0, f"the install receipt does not parse: {exc}") from None
     if not isinstance(receipt, dict):
         raise policy.Refusal(RECEIPT_REL, 0, "the install receipt does not parse as a JSON object")
+    kits, prefix = receipt.get("kits"), receipt.get("prefix")
+    if not isinstance(kits, list) or not all(isinstance(k, str) for k in kits):
+        return "invalid", "kits"
+    if not isinstance(prefix, str) or prefix.startswith(("/", "\\")) or re.match(r"[A-Za-z]:", prefix) \
+            or ".." in re.split(r"[/\\]", prefix):
+        return "invalid", "prefix"
     return "adopter", receipt
 
 
@@ -690,6 +697,8 @@ def arm_cap_census(repo, kit):
         tree, held = derive_census_tree(repo)  # the receipt in an adopter, the tool root on the source
     except policy.Refusal as exc:
         return 0, "the tree under test did not derive", [(exc.path, exc.why)]
+    if tree == "invalid":  # TOOL-dGroundRules-32 S11: a receipt of the wrong shape is no adopter that installed nothing
+        return 0, "the install receipt did not read", [(RECEIPT_REL, f"its {held} is not of the shape the deployer writes")]
     out, told = [], []
     for cap in census.values():
         if tree == "source":
@@ -1042,13 +1051,16 @@ def derive_requires_closure(ids):
     return out, wrong
 
 
-def build_install_target(name, ids, answers=""):
+def build_install_target(name, ids):
     """A fresh target ready for the deployer (TOOL-dGroundRules-24, -26): `build_source_snapshot`'s
     clone of the tree under test, and beside it `git init` with a pinned autocrlf, a one-line README
     and a `.governance/deploy.toml` naming the snapshot as `gov_source`, this kit's tool root's name as
-    `prefix`, `ids` as `kits` and the TOML text `answers` after them, committed once. Prints the
+    `prefix`, `ids` as `kits`, and after them the `[answers]` table of `DEPLOY_FULL` in the snapshot's
+    `govkit/selftest.py`, read as text, so a case's answers are the deployer's own fixture's and never
+    typed here (TOOL-dGroundRules-32 S16); committed once, through `run_fixture_git`. Prints the
     snapshot line. -> (target, snapshot), which `run_govkit` installs from; the caller removes both
-    directories. RuntimeError naming what is missing or which step failed, nothing left behind."""
+    directories. RuntimeError naming what is missing, a copy holding no such table included, or which
+    step failed, nothing left behind."""
     root = KIT.parent  # this kit's own resolved tool root; the target's prefix is its name, never spelled
     top = (policy.run_git(KIT, "rev-parse", "--show-toplevel", "--show-prefix") or "").split("\n")
     if len(top) < 2 or not top[0]:
@@ -1059,6 +1071,12 @@ def build_install_target(name, ids, answers=""):
         raise RuntimeError(f"nothing was installed to grade: {exc}") from None
     t = Path(tempfile.mkdtemp(prefix="pol-"))
     try:
+        fixture = s / Path(top[1].strip()).parent / "govkit" / "selftest.py"  # under the tool root run_govkit resolves
+        body = re.search(r'^DEPLOY_FULL = f?"""(.*?)"""', policy.read_text_or_none(fixture) or "", re.S | re.M)
+        at = body[1].find("[answers]\n") if body else -1
+        if at < 0:
+            raise RuntimeError(f"no [answers] table of DEPLOY_FULL to install with in {fixture.as_posix()}")
+        answers = "\n" + body[1][at:]
         snap, over = (policy.run_git(s, "rev-parse", "HEAD", "HEAD^") or "? ?").split()
         print(f"{name}: installing from snapshot {snap[:8]} of the working tree over HEAD {over[:8]}")
         run_fixture_git(t, "init", "-q")
@@ -1107,8 +1125,8 @@ def run_fresh_target(name):
     """This kit installed by the deployer into a fresh target (TOOL-dGroundRules-24, -26): by
     `build_install_target`, then the deployer's `apply` through `run_govkit` with this kit's id and `run-gates`, and the closure
     of their `requires` read as registry ids (TOOL-dGroundRules-25 S6, S7). Every file under the
-    target's tool root must be a receipt row's `path`, every engine or seed row's `path` must exist,
-    and no `legacy-homes.txt` may be installed (S5). Then the installed `adopt-policy.sh`, found through
+    target's tool root must be a receipt row's `path`, the deployer's `check` must print no `is in the
+    receipt and not on disk` line (TOOL-dGroundRules-32 S18), and no `legacy-homes.txt` may be installed (S5). Then the installed `adopt-policy.sh`, found through
     its receipt row: `--scaffold`, exit 0 printing `mirror deferred` and writing no mirror, the
     install being staged (TOOL-dGroundRules-31); `--check` with the install staged; the install
     committed; `--scaffold` again, which renders the mirror once its inputs are committed, and the
@@ -1157,18 +1175,18 @@ def run_fresh_target(name):
         if rows is not None:
             paths = {r.get("path") for r in rows}
             held = sorted(f.relative_to(t).as_posix() for f in (t / root.name).rglob("*") if f.is_file())
-            owed = [r["path"] for r in rows if r.get("role") in ("engine", "seed")]
             stray = [f"{f} is under the tool root and is no receipt row's path (stray)" for f in held if f not in paths]
-            stray += [f"{f} is an engine or seed row of the receipt and is absent from the target (missing)"
-                      for f in owed if not Path(t, f).is_file()]
+            # TOOL-dGroundRules-32 S18: a receipt row missing from disk is the deployer's own check's to say.
+            _rc, said = run_govkit(s, derive_source_top(), "check", "--target", t.as_posix())
+            stray += [ln.strip() for ln in said.split("\n") if "is in the receipt and not on disk" in ln]
             stray += [f"{f} is installed, and the list is gov's own, withheld from every install (S5)"
                       for f in held if posixpath.basename(f) == policy.LEGACY_LIST]
-            asserted += len(held) + len(owed) + 1
+            asserted += len(held) + 2
             wrong += stray
             if not stray:
                 print(f"policy-fixture: {name} · apply --kits {','.join(ids)} exited 0 into its target · the "
-                      f"{len(held)} file(s) under {root.name}/ are each a receipt row's path, and its {len(owed)} "
-                      f"engine or seed row(s) are each present · no {policy.LEGACY_LIST} installed")
+                      f"{len(held)} file(s) under {root.name}/ are each a receipt row's path, and govkit check "
+                      f"finds every receipt row on disk · no {policy.LEGACY_LIST} installed")
             adopter = next((r["path"] for r in rows if r.get("kit") == desc["id"]
                             and str(r.get("path")).endswith("/adopt-policy.sh")), None)
             regen = next((r["path"] for r in rows if r.get("kit") == "run-gates"
@@ -1262,7 +1280,8 @@ def run_legacy_withheld_install(name):
     makes for this kit and its `requires` closure, the deployer's `plan` over it through `run_govkit`,
     then `apply`. The plan
     must hold the legacy-home list as one `ORDER [project-owned]` row and as no `write` or `SIDE`
-    row, and the applied target must hold no file of that name."""
+    row, and the applied target must hold no file of that name; a refused `apply` is a WRONG carrying
+    its output (TOOL-dGroundRules-32 S16)."""
     ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"]])
     checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
     t = s = None
@@ -1274,7 +1293,7 @@ def run_legacy_withheld_install(name):
         said = "; ".join(f"{k} [{r.strip()}] {d}" for k, r, d in rows) or "no row"
         checks.append(("plan", f"exit 0, one ORDER [project-owned] row for {policy.LEGACY_LIST} and no write or SIDE row",
                        rc == 0 and [(k, r.strip()) for k, r, _d in rows] == [("ORDER", "project-owned")], f"exit {rc} · {said}"))
-        rc, _out = run_govkit(s, derive_source_top(), "apply", *args)
+        rc, out = run_govkit(s, derive_source_top(), "apply", *args)
         # The install is read from its receipt, never from apply's exit alone: an adopter step that
         # refuses after the files land still leaves them, and an empty target would hold no list.
         installed = Path(t, RECEIPT_REL).is_file() and any(r.get("kit") == ids[0] for r in read_receipt_rows(t))
@@ -1282,6 +1301,7 @@ def run_legacy_withheld_install(name):
         checks.append(("apply", f"the receipt holds kit {ids[0]}'s rows and the target no {policy.LEGACY_LIST}",
                        installed and not held, f"apply exit {rc} · receipt {'holds' if installed else 'LACKS'} "
                        f"{ids[0]} · {held or 'none held'}"))
+        checks.append(("apply", "exit 0 with DEPLOY_FULL's answers", rc == 0, f"exit {rc} · {out.strip().replace(chr(10), ' · ') if rc else 'ok'}"))
     except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
         checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
     finally:
@@ -1291,14 +1311,11 @@ def run_legacy_withheld_install(name):
     return print_checks(name, checks)
 
 
-# The answers the kickoff-manifest entry asks for, as an adopter's descriptor carries them.
-KICKOFF_ANSWERS = '\n[answers]\nmanifest_path = "memory/guides/SESSION-KICKOFF.md"\nuser_skills = ".claude/skills"\n'
-
-
 def run_census_default_adopter(name):
     """`census-default-adopter` (TOOL-dGroundRules-25 S12): this kit, its `requires` closure and
     `kickoff-manifest` installed by `apply` into the target `build_install_target` makes, with the
-    answers that entry asks for and without `check-line-length`. `arm_cap_census` over it must
+    answers that entry asks for, `DEPLOY_FULL`'s (TOOL-dGroundRules-32 S16), and without
+    `check-line-length`; a refused `apply` carries its output. `arm_cap_census` over it must
     announce `line-length · kit check-line-length not installed`, grade the `manifest-bytes` row at the
     receipt's destination of `manifest-check.sh`, so no announce names it, and find nothing."""
     ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"],
@@ -1306,11 +1323,12 @@ def run_census_default_adopter(name):
     checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
     t = s = None
     try:
-        t, s = build_install_target(name, ids, KICKOFF_ANSWERS)
-        rc, _out = run_govkit(s, derive_source_top(), "apply", "--target", t.as_posix(), "--kits", ",".join(ids))
+        t, s = build_install_target(name, ids)
+        rc, out = run_govkit(s, derive_source_top(), "apply", "--target", t.as_posix(), "--kits", ",".join(ids))
         installed = Path(t, RECEIPT_REL).is_file()
         checks.append(("apply", f"--kits {','.join(ids)} wrote its receipt", installed, f"apply exit {rc} · receipt "
                        + ("written" if installed else "ABSENT")))
+        checks.append(("apply", "exit 0 with DEPLOY_FULL's answers", rc == 0, f"exit {rc} · {out.strip().replace(chr(10), ' · ') if rc else 'ok'}"))
         if installed:
             dest = next((r["path"] for r in read_receipt_rows(t) if str(r.get("path")).endswith("/manifest-check.sh")), None)
             with contextlib.redirect_stdout(io.StringIO()) as said:
@@ -1777,6 +1795,21 @@ def run_reader_refusals(name):
             run_fixture_git(r, "commit", "-q", "-m", "a valid file with a BOM")
             checks.append(check_get("a BOM", r, ["budgets.enforce", "--rev", "HEAD", "--explain"], lambda rc, o, e:
                                     rc == 0 and o == "refuse\n" and "policy: budgets.enforce · file · " in e))
+            # TOOL-dGroundRules-32 S12: the schema arm and the guard read the BOM-led file as the reader does.
+            _n, why, found = arm_schema(r, KIT)
+            checks.append(("arm_schema", "no parse failure over the BOM-led file", "did not parse" not in why,
+                           f"{why} · {found or 'no finding'}"))
+            g, gk = build_guard_repo()
+            try:
+                Path(g, *POLICY_FILE).write_bytes(b"\xef\xbb\xbf" + GUARD_POLICY.encode("utf-8"))
+                run_fixture_git(g, "commit", "-q", "-am", "the policy file written with a BOM")
+                for rel, edit in GUARD_PLANTS["guard-admits-raise"][0][1]:
+                    Path(g, rel).write_text(edit(Path(g, rel).read_text(encoding="utf-8")), encoding="utf-8", newline="\n")
+                    run_fixture_git(g, "add", "--", rel)
+                checks.append(check_run("the raise over a BOM", "guard.py --staged", [sys.executable, str(gk / "guard.py"),
+                                        "--staged"], lambda rc, o, e: rc == 0 and "policy-guard: admitted · " in o, cwd=g))
+            finally:
+                remove_repo(g)
         elif name == "on-invalid-shallow":
             src = build_reader_repo(t / "src", good, bad)
             for kind, depth in (("shallow", ["--depth", "1"]), ("full", [])):
@@ -3553,16 +3586,21 @@ def run_ships_join(name):
         spec = importlib.util.spec_from_file_location("govkit_ships_join", gk)
         govkit = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(govkit)
-        rep = govkit.Report()
-        descs = govkit.read_descriptors(top, govkit.load_registry(top), rep)
+    except Exception as exc:  # noqa: BLE001 (a deployer that does not import is this case's WRONG)
+        checks.append(("the deployer", "govkit.py loads", False, f"{gk.relative_to(top).as_posix()}: {type(exc).__name__}: {exc}"))
+        return print_checks(name, checks)
+    try:  # TOOL-dGroundRules-32 S8: the registry read `govkit.py shipped` makes, its refusal naming every problem
+        descs = govkit.read_shipped_descriptors(top)
+    except govkit.Refusal as exc:
+        checks.append(("the deployer", "every registry descriptor reads", False, str(exc).replace("\n", "; ")))
+        return print_checks(name, checks)
+    try:
         writes = {eid: govkit.resolve_entry(top, desc, govkit.canonical_ctx(eid))["writes"]
                   for eid, (desc, _p) in descs.items()}
-    except Exception as exc:  # noqa: BLE001 (a deployer that does not import or resolve is this case's WRONG)
-        checks.append(("the deployer", "govkit.py loads and resolves every entry", False,
+    except Exception as exc:  # noqa: BLE001 (a deployer that does not resolve is this case's WRONG)
+        checks.append(("the deployer", "govkit.py resolves every entry", False,
                        f"{gk.relative_to(top).as_posix()}: {type(exc).__name__}: {exc}"))
         return print_checks(name, checks)
-    if rep.problems:
-        checks.append(("the deployer", "every registry descriptor reads", False, "; ".join(rep.problems)))
     shipped = [cap for cap in census.values() if cap.ships]
     for cap in shipped:
         src = budgets.resolve_prefix_token(cap.enforcer, troot)
@@ -3647,20 +3685,48 @@ def run_fixtures_guard_census(name):
     top, troot = derive_source_top(), budgets.derive_tool_root()
     legs = top / troot / "gate-legs.json"
     checker = top / budgets.resolve_prefix_token("{prefix}/check-spec-tokens.py", troot)
+    reg = top / budgets.resolve_prefix_token("{prefix}/govkit/registry.toml", troot)
     try:
         census = budgets.read_cap_census(top)
         row = next((r for r in json.loads(legs.read_text(encoding="utf-8")) if r.get("name") == FIXTURES_LEG), None)
+        descs = {str(e.get("id")): budgets.resolve_prefix_token(str(e.get("descriptor")), troot)
+                 for e in tomllib.loads(reg.read_text(encoding="utf-8")).get("entry", []) if isinstance(e, dict)}
     except (OSError, ValueError, AttributeError, policy.Refusal) as exc:
-        return print_checks(name, [(name, "the census and the gate manifest", False, f"{type(exc).__name__}: {exc}")])
+        return print_checks(name, [(name, "the census, the gate manifest and the registry", False,
+                                    f"{type(exc).__name__}: {exc}")])
     runs = {legs.relative_to(top).as_posix(): ["this case, which reads it"]}
     for cap in census.values():
         e = budgets.resolve_prefix_token(cap.enforcer, troot)
         runs.setdefault(e, []).append(CAP_CASE_PREFIX + cap.name)
         for dep in derive_enforcer_imports(top, e):
             runs.setdefault(dep, []).append(f"{e}, which reaches it")
+    # TOOL-dGroundRules-32 S3, S10: each census kit's descriptor, from the registry's `descriptor` field;
+    # each kit of this kit's `requires` closure, its descriptor and its `[adopt]` script, which the
+    # fresh-target case installs and runs; and run-gates' descriptor and the `regen.py` beside it, which
+    # that case runs too. None is typed here: an id the registry lacks has no path to grade, so a WRONG.
+    closure, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"]])
+    owed = [(k, "a census kit's descriptor") for k in dict.fromkeys(c.kit for c in census.values() if c.kit)]
+    owed += [(k, "a requires-closure kit's descriptor") for k in closure] + [("run-gates", "the fresh-target case")]
+    for kid, why in owed:
+        if kid not in descs:
+            missed.append(f"{kid} is {why} and no entry of {reg.relative_to(top).as_posix()}")
+            continue
+        runs.setdefault(descs[kid], []).append(f"{why}, {kid}")
+    for kid in closure + ["run-gates"]:
+        d = descs.get(kid)
+        try:
+            desc = tomllib.loads((top / d).read_text(encoding="utf-8")) if d else {}
+        except (OSError, tomllib.TOMLDecodeError) as exc:
+            missed.append(f"the descriptor of {kid} does not read: {type(exc).__name__}: {exc}")
+            continue
+        home = posixpath.join(troot, desc["home"]) if desc.get("home") else posixpath.dirname(d or "")
+        steps = [a.replace("{kit}", home) for a in (desc.get("adopt") or {}).get("argv", []) if "{kit}/" in a]
+        for p in steps if kid != "run-gates" else [posixpath.join(home, "regen.py")]:
+            runs.setdefault(p, []).append(f"the fresh-target case, which runs {kid}'s {posixpath.basename(p)}")
     checks = [("the join", f"a census row and the {FIXTURES_LEG} leg", bool(census) and row is not None,
                f"{len(runs)} path(s) of {len(census)} row(s) · leg {'found' if row else 'absent'} in "
                f"{legs.relative_to(top).as_posix()}")]
+    checks += [("the registry", "every kit this case owes a path resolves", False, m) for m in missed]
     if not checker.is_file():
         return print_checks(name, checks + [("the judge", "the spec-token checker beside the manifest", False,
                                              f"{checker.relative_to(top).as_posix()} is absent, so no path was judged")])

@@ -76,6 +76,7 @@ import datetime
 import hashlib
 import importlib.util
 import io
+import itertools
 import json
 import os
 import pathlib
@@ -542,9 +543,10 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
         # unit row always has a value and only the ORDER cell can be empty.
         "tier": hdr.group("tier"),
         # The build-order render's two inputs (TOOL-dGroundRules-25 S37, S38): the Files touched
-        # words, none where the sub-head is absent, and the `consumes-from` targets.
-        "writes": design_lib.read_spec_writes(text) or [],
-        "consumes": design_lib.read_spec_consumes(text),
+        # words, None where the sub-head is absent, an unknown write set (TOOL-dGroundRules-32 S13), and
+        # the `consumes-from` targets, read through the one edge read (S17).
+        "writes": design_lib.read_spec_writes(text),
+        "consumes": [t for t, _b in design_lib.read_spec_edges(text, "consumes-from")],
     }
 
 
@@ -1721,25 +1723,25 @@ def _wrap_ids(roster: list) -> list:
 
 def derive_parallel_step(units: list) -> str:
     """`yes` where one step's units may run concurrently by M6's first two clauses, else `no`: a step
-    of one unit; two units one of which consumes from the other; or two whose write sets meet, a path
-    of two or more segments equal to, or under a directory token of, the other's (TOOL-dGroundRules-25
-    S37, S38). A spec with no Files touched sub-head contributes no writes, so `yes` says only that the
-    estimates are disjoint; `--dispatch` still decides."""
+    of one unit; two units one of which consumes from the other; or two whose write sets meet by
+    `design_lib.check_writes_intersect`, the dispatcher's containment rule, over the words of two or
+    more segments (TOOL-dGroundRules-25 S37, S38; TOOL-dGroundRules-32 S9). `unknown` for a step of two
+    or more units one of which has no Files touched sub-head, whose write set nobody declared
+    (TOOL-dGroundRules-32 S13). `yes` says only that the estimates are disjoint; `--dispatch` still
+    decides."""
     def pathlike(w):
         parts = w.rstrip("/").split("/")
         return len(parts) >= 2 and all(parts)
-
-    def meets(p, q):
-        a, b = p.rstrip("/"), q.rstrip("/")
-        return a == b or (q.endswith("/") and a.startswith(b + "/")) or (p.endswith("/") and b.startswith(a + "/"))
     if len(units) < 2:
         return "no"
-    for i, a in enumerate(units):
-        for b in units[i + 1:]:
-            if b["id"] in a.get("consumes", ()) or a["id"] in b.get("consumes", ()):
-                return "no"
-            if any(meets(p, q) for p in a.get("writes", ()) if pathlike(p) for q in b.get("writes", ()) if pathlike(q)):
-                return "no"
+    if any(u.get("writes", ()) is None for u in units):
+        return "unknown"
+    for a, b in itertools.combinations(units, 2):
+        if b["id"] in a.get("consumes", ()) or a["id"] in b.get("consumes", ()):
+            return "no"
+        if design_lib.check_writes_intersect([w for w in a.get("writes", ()) if pathlike(w)],
+                                             [w for w in b.get("writes", ()) if pathlike(w)]):
+            return "no"
     return "yes"
 
 
@@ -6780,8 +6782,9 @@ def cmd_selftest() -> int:
             def spec(uid, writes, edge):
                 return (f"# {uid} — a fixture unit\n\n**Status:** SPECCED · rev-1 · 2026-09-14 · node d · "
                         f"Tier-2 · base abc12345 · order 1\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n"
-                        f"{edge or 'none'}\n\n## 4. Design\n\n### Files touched (estimate)\n\n"
-                        + "".join(f"- `{w}`\n" for w in writes) + "\n## 5. Next\n")
+                        f"{edge or 'none'}\n\n## 4. Design\n\n"
+                        + ("" if writes is None else "### Files touched (estimate)\n\n"
+                           + "".join(f"- `{w}`\n" for w in writes)) + "\n## 5. Next\n")
             units = [parse_spec_text(spec("EXMP-aFoo-1", ["tools/x/a.py"], ""), "a.md", "EXMP"),
                      parse_spec_text(spec("EXMP-aFoo-2", writes_b, edge_b), "b.md", "EXMP")]
             return render_order({"units": units}).split("\n")[4]
@@ -6793,6 +6796,9 @@ def cmd_selftest() -> int:
             lambda: _render_step(["tools/y/b.py"]))
         arm("a unit consuming from its step's other unit renders `no`", "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | no |",
             lambda: _render_step(["tools/y/b.py"], "- **consumes-from** `EXMP-aFoo-1` — its output"))
+        # TOOL-dGroundRules-32 S13: a unit with no Files touched sub-head declared no write set.
+        arm("a unit with no Files touched sub-head renders its step `unknown`",
+            "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | unknown |", lambda: _render_step(None))
 
         # ------------------------------------------- TOOL-dDerivedDocket-7 — the family view
         # ONE fixture repo for every arm below. `_build_backlog_fixture` wipes and restages its memory

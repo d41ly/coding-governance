@@ -481,16 +481,22 @@ def read_policy_text(repo, rev):
     """The policy file's text in the commit `rev` names, decoded as UTF-8 by `read_blob_at`, or None
     where that commit holds no such path. A rev naming no commit is a Refusal; bytes that are not
     UTF-8 raise UnicodeDecodeError. One leading U+FEFF, the BOM an editor or a PowerShell write adds,
-    is stripped before any parse, as the `.agent-cap.conf` reader tolerates one (TOOL-dGroundRules-25
-    S30). The working-tree file is never opened."""
-    text = read_blob_at(repo, resolve_commit(repo, rev), POLICY_REL)
-    return text[1:] if text and text.startswith("﻿") else text
+    is stripped by every parse, by the one helper below, as the `.agent-cap.conf` reader tolerates
+    one (TOOL-dGroundRules-25 S30). The working-tree file is never opened."""
+    return read_blob_at(repo, resolve_commit(repo, rev), POLICY_REL)
+
+
+def derive_bomless_text(text):
+    """`text` less one leading U+FEFF, the BOM an editor or a PowerShell write adds and tomllib
+    rejects: the one strip every reader of the policy file calls before it parses
+    (TOOL-dGroundRules-32 S12). `guard.py` imports no reader, so it mirrors this inline."""
+    return text[1:] if text.startswith("\ufeff") else text
 
 
 def parse_policy(text):
     """{key path: value} for each leaf of a policy file's text, through tomllib alone: a table is
     descended into and is never a value. Text that is not TOML raises tomllib.TOMLDecodeError."""
-    out, todo = {}, [((), tomllib.loads(text))]
+    out, todo = {}, [((), tomllib.loads(derive_bomless_text(text)))]
     while todo:
         prefix, node = todo.pop()
         for k, v in node.items():
@@ -556,6 +562,7 @@ def validate(text, rows=None, census=None):
     `[budgets]` table's own rule, `budgets.check_budgets` over the cap census `census`, the working
     directory's by default (TOOL-dGroundRules-9). `rows` is `load_catalogue`'s, this kit's by default.
     The module's one judge of a policy file."""
+    text = derive_bomless_text(text)
     try:
         doc = tomllib.loads(text)
     except tomllib.TOMLDecodeError as exc:

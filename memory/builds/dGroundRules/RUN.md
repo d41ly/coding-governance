@@ -219,3 +219,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T11:38:47Z brief · item TOOL-dGroundRules-30 · reason 4a5eb7991f5f memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-30-build-brief.md
 
 2026-10-24T11:42:58Z dispatch · item a5bc3f94 TOOL-dGroundRules-30 · reason tools/workflows/check-protocol-parity.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-30.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-30-ledger.md
+
+2026-10-24T12:36:53Z brief · item TOOL-dGroundRules-32 · reason a21fca7251c2 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-32-build-brief.md
+
+2026-10-24T12:38:09Z dispatch · item 155501ab TOOL-dGroundRules-32 · reason tools/policy/check_policy.py tools/policy/policy.py tools/policy/guard.py tools/gate-legs.json tools/govkit/govkit.py tools/memory-tree/design_lib.py tools/memory-tree/gen_build_index.py tools/check-spec-tokens.py tools/check-spec-tokens.test.sh help/policy.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-32.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-32-ledger.md
+
+2026-10-24T12:56:04Z dispatch · item 155501ab TOOL-dGroundRules-32 · reason tools/policy/check_policy.py tools/policy/policy.py tools/policy/guard.py tools/gate-legs.json tools/govkit/govkit.py tools/memory-tree/design_lib.py tools/memory-tree/gen_build_index.py tools/check-spec-tokens.py tools/check-spec-tokens.test.sh help/policy.md memory/guides/SESSION-KICKOFF.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-32.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-32-ledger.md
