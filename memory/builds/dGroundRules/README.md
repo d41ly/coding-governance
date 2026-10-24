@@ -177,7 +177,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-41 — the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it](spec/2026-10-23-spec-TOOL-dGroundRules-41.md) | 13 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-42 — the criterion bug class gains the input respelled to pass a join, and is handed to every spec commit](spec/2026-10-23-spec-TOOL-dGroundRules-42.md) | 13 | 1 | CLOSED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-43 — the round-1 audit of units 33 and 34, its minors: fifteen findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-43.md) | 14 | 2 | CLOSED | rev-5 | 2026-10-24 |
-| [TOOL-dGroundRules-44 — the overlap arm's disjoint row is a real string-prefix trap, and the arm refuses a disjoint row that is not one](spec/2026-10-23-spec-TOOL-dGroundRules-44.md) | 14 | 2 | DEFERRED | rev-4 | 2026-10-24 |
+| [TOOL-dGroundRules-44 — the overlap arm's disjoint row is a real string-prefix trap, and the arm refuses a disjoint row that is not one](spec/2026-10-23-spec-TOOL-dGroundRules-44.md) | 14 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-45 — the overlap probes read their pairs from the arm's table, so no criterion spells a pair a second time](spec/2026-10-23-spec-TOOL-dGroundRules-45.md) | 14 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-46 — the spec-tokens checker refuses a criterion literal that sources a shell file by bare name](spec/2026-10-23-spec-TOOL-dGroundRules-46.md) | 14 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-47 — the criterion bug class's fix gains the re-run: a literal is run verbatim from the root before its spec commits, and a restated one is re-run, never copied](spec/2026-10-23-spec-TOOL-dGroundRules-47.md) | 14 | 1 | DEFERRED | rev-2 | 2026-10-24 |
@@ -185,22 +185,22 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-49 — the help page's guard line observed by the leg query with its path whole, and by the trace when it is taken out](spec/2026-10-23-spec-TOOL-dGroundRules-49.md) | 14 | 1 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-50 — the help-page parity prints where it found the deferral line, so the install section is read by one rule](spec/2026-10-23-spec-TOOL-dGroundRules-50.md) | 14 | 1 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-51 — the build-order evidence observed in the build README with its path whole, beside the root-README negative](spec/2026-10-23-spec-TOOL-dGroundRules-51.md) | 15 | 1 | WONTDO | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-52.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-24 |
+| [TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-52.md) | 16 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-53 — the trap row's shell verdict observed with the library sourced by its tracked path and the trap pair whole](spec/2026-10-23-spec-TOOL-dGroundRules-53.md) | 17 | 2 | WONTDO | rev-1 | 2026-10-24 |
-| [TOOL-dGroundRules-55 — the criterion bug class gains the side read: a criterion observes its scope item by running the check, never by reading what the check reads](spec/2026-10-23-spec-TOOL-dGroundRules-55.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-55 — the criterion bug class gains the side read: a criterion observes its scope item by running the check, never by reading what the check reads](spec/2026-10-23-spec-TOOL-dGroundRules-55.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-57 — the not-a-trap staging spelled whole, so the trap probe lists the row the row check refuses](spec/2026-10-23-spec-TOOL-dGroundRules-57.md) | 17 | 2 | WONTDO | rev-1 | 2026-10-24 |
 | [TOOL-dGroundRules-58 — the overlap probe sources the unattended library by its tracked path, so its shell column is a verdict and not a load failure](spec/2026-10-23-spec-TOOL-dGroundRules-58.md) | 17 | 2 | WONTDO | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-61 — rule 7 bounds every settings layer it can read, so a declared settings file never hides the project's](spec/2026-10-23-spec-TOOL-dGroundRules-61.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-64 — the respelled literals no other repair covers, restored whole and observed: units 5, 21, 33 and 34](spec/2026-10-23-spec-TOOL-dGroundRules-64.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-61 — rule 7 bounds every settings layer it can read, so a declared settings file never hides the project's](spec/2026-10-23-spec-TOOL-dGroundRules-61.md) | 17 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dGroundRules-64 — the respelled literals no other repair covers, restored whole and observed: units 5, 21, 33 and 34](spec/2026-10-23-spec-TOOL-dGroundRules-64.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-54 — the trap row's verdicts observed a second time through the whole overlap probe, which reads the pair from the suite and spells none](spec/2026-10-23-spec-TOOL-dGroundRules-54.md) | 18 | 2 | WONTDO | rev-1 | 2026-10-24 |
-| [TOOL-dGroundRules-56 — the row check observed refusing: the not-a-trap row run through the arm's own row function, never read off the table](spec/2026-10-23-spec-TOOL-dGroundRules-56.md) | 18 | 2 | DEFERRED | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-56 — the row check observed refusing: the not-a-trap row run through the arm's own row function, never read off the table](spec/2026-10-23-spec-TOOL-dGroundRules-56.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-59 — the overlap criteria of units 40 and 43 observed through the whole probe, the raw-compare staging included](spec/2026-10-23-spec-TOOL-dGroundRules-59.md) | 18 | 2 | WONTDO | rev-1 | 2026-10-24 |
-| [TOOL-dGroundRules-60 — unit 52's overlap observations taken through the whole probe, with the Python column shown graded on its own](spec/2026-10-23-spec-TOOL-dGroundRules-60.md) | 18 | 2 | DEFERRED | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-62 — an unset `budgets.<cap>` reads as no file value: the derived-default refusal is a type the caps module catches, and only that refusal](spec/2026-10-23-spec-TOOL-dGroundRules-62.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-60 — unit 52's overlap observations taken through the whole probe, with the Python column shown graded on its own](spec/2026-10-23-spec-TOOL-dGroundRules-60.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dGroundRules-62 — an unset `budgets.<cap>` reads as no file value: the derived-default refusal is a type the caps module catches, and only that refusal](spec/2026-10-23-spec-TOOL-dGroundRules-62.md) | 18 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 317 bound to this build, across 4 record folder(s).
+Records: 335 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
@@ -259,7 +259,7 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 58 spec(s) at 
 | 14 | `TOOL-dGroundRules-43`, `TOOL-dGroundRules-44`, `TOOL-dGroundRules-45`, `TOOL-dGroundRules-46`, `TOOL-dGroundRules-47`, `TOOL-dGroundRules-48`, `TOOL-dGroundRules-49`, `TOOL-dGroundRules-50` | no |
 | 15 | `TOOL-dGroundRules-51` | no |
 | 16 | `TOOL-dGroundRules-52` | no |
-| 17 | `TOOL-dGroundRules-53`, `TOOL-dGroundRules-55`, `TOOL-dGroundRules-57`, `TOOL-dGroundRules-58`, `TOOL-dGroundRules-61`, `TOOL-dGroundRules-64` | yes |
+| 17 | `TOOL-dGroundRules-53`, `TOOL-dGroundRules-55`, `TOOL-dGroundRules-57`, `TOOL-dGroundRules-58`, `TOOL-dGroundRules-61`, `TOOL-dGroundRules-64` | no |
 | 18 | `TOOL-dGroundRules-54`, `TOOL-dGroundRules-56`, `TOOL-dGroundRules-59`, `TOOL-dGroundRules-60`, `TOOL-dGroundRules-62` | yes |
 | 20 | `TOOL-dGroundRules-63` | no |
 <!-- /gen:build-order -->
