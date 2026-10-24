@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-36 — the row checks over every registered kind: the fixed set, the exclusion refusals and the widening classifier
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 34 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0066@dcfb4bb2 whole
 
@@ -12,8 +12,12 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-36-deviation-361.md](../build/2026-10-24-build-PLAY-dOrderedCharter-36-deviation-361.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-36-deviation-362.md](../build/2026-10-24-build-PLAY-dOrderedCharter-36-deviation-362.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-36-deviation-363.md](../build/2026-10-25-build-PLAY-dOrderedCharter-36-deviation-363.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -49,7 +53,8 @@ patch of any field would pass unclassified (flow-roles-adoption items 9 and 10, 
 - **S4** — The exclusion refusals. An `instructions.exclude` entry is refused, naming the requirer, when
   another active row of any registered kind holds the excluded tag in a field whose `ref` role is
   `needs`, `actor` or `grants`; and refused, naming the key, when a tag-valued policy key's value names
-  it. Observed by AC6.
+  it. The excluded set is `instructions.exclude`'s value as unit 35 reads it, a value its landed row's
+  `allowed` admits (TOOL-dGroundRules-1 §4). Observed by AC6.
 - **S5** — The widening classifier. Each open field declares the direction that widens it: `add` on a
   permission set, `remove` on a constraint set such as `needs`, or an ordered list on a scalar whose
   later values are wider. Every patch operation is classified `widens` or `narrows` from those
@@ -89,7 +94,8 @@ patch of any field would pass unclassified (flow-roles-adoption items 9 and 10, 
 - **consumes-from** `PLAY-dOrderedCharter-7` — the kinds register a kind's schema is found through, and the principle registry `principle=` sources resolve against
 - **consumes-from** `PLAY-dOrderedCharter-26` — the `path#symbol` form a `parser=` source is written in
 - **hands-off** `PLAY-dOrderedCharter-34` — printing the widening list `derive_widenings` returns in the update's delta report
-- **consumes-from** external — dGroundRules' reader and catalogue for tag-valued policy keys (`cl-dClosedLoop-0007`, `cl-dClosedLoop-0008`); until they land the check reads the catalogue defaults, and the fixture passes values with `--policy`
+- **consumes-from** external — dGroundRules, built before this build run: the catalogue's `allowed` grammar, read with `tomllib` (TOOL-dGroundRules-1 S3 and §4, `cl-dClosedLoop-0007`), `policy.py get` for tag-valued keys (TOOL-dGroundRules-2 S7, `cl-dClosedLoop-0008`) and `policy.py check --rev` for the first probe (TOOL-dGroundRules-4 S7); the fixture passes values with `--policy`
+- **consumes-from** `PLAY-dOrderedCharter-46` — the `--rev HEAD` every `policy.py get` of the composition passes (its S6)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 21 and 59, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC11's and AC12's pathspecs, which unit 49 S24 corrects, are observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
@@ -170,10 +176,21 @@ replacement cannot widen what a patch could not.
 
 **The exclusion walk.** For each tag `instructions.exclude` lists, every active row of every
 registered kind's composition is read for fields whose `ref` role is `needs`, `actor` or `grants`; a
-row holding the tag in one is the requirer, and the refusal names its tag and the field. Every
-catalogue key whose declared value type is a tag or a set of tags is read through the policy reader; a
-value naming the tag refuses, naming the key. An excluded row that is itself the only requirer of
+row holding the tag in one is the requirer, and the refusal names its tag and the field. A catalogue
+key is tag-valued when its landed row's `allowed` is a table whose `type` is `set`, `list` or `name`,
+the grammar having no tag type of its own (TOOL-dGroundRules-1 §4; §8 F4). The rows are read from the
+policy kit's `catalogue.toml` with `tomllib`, found through the inlined `resolve_kit_dir`, since the
+kit is not importable; each such key's value is read with `policy_reader(<key>)` at `--rev HEAD`
+(PLAY-dOrderedCharter-46 S6), `get` printing one member per line. A member equal to an excluded tag
+refuses, naming the key, and an exit 2 from `get` refuses the check, naming the key. An excluded row that is itself the only requirer of
 another excluded row does not refuse, because neither is active.
+
+The build run's first probe confirms that the value check admits a set of gov tags at all
+(the cross-check's row 49): in a scratch repository it commits, as the file's only revision,
+`.governance/policy.toml` holding `[instructions] exclude = ["<an open gov unit tag>"]`, and runs gov's
+`policy.py check --rev HEAD` (TOOL-dGroundRules-4 S7). Exit 0 naming the file valid confirms it; an
+exit 2 naming the key means the landed `allowed` refuses gov tags, and the build run files an ask to
+dGroundRules before S4's policy arm is built, the fixture's `--policy` values standing meanwhile.
 
 ### Inventory
 
@@ -208,7 +225,7 @@ another excluded row does not refuse, because neither is active.
   field with no direction refuses, and a fixed row cannot be patched, replaced or excluded, so a
   repository widens only what a kind opened.
 - perf / scale: one schema read per kind; the exclusion walk is linear in the composition's rows per
-  excluded tag.
+  excluded tag, plus one `policy.py get` per tag-valued key, each a few git calls.
 - error / empty / loading states: a kind with no schema refuses naming the kind; an empty exclusion
   list and a composition with no patch return no finding and say how many rows they read.
 - observability: every refusal names the row, the field, the source or the requirer; every widening is
@@ -297,10 +314,12 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
   namespace; (b) admitted unresolved. (b) lets a kind claim a fixed field nobody can check. RESOLVED
   (agent, 2026-10-23, delegated): (a), rung 3, deny by default. widens: none · relaxes: none
 - **F4 — Which policy keys count as tag-valued.** Options: (a) every catalogue key whose declared value
-  type is a tag or set of tags, read from the catalogue `cl-dClosedLoop-0007` defines; (b) a list in
-  this module. (b) is a second copy of the catalogue's types. RESOLVED (agent, 2026-10-23,
-  delegated): (a), rung 1, v2:1245's "one a policy value names", the catalogue being the one source of
-  a key's type; the build run re-grounds the catalogue's field for the type against the landed parent.
+  type holds tags, read from the catalogue `cl-dClosedLoop-0007` defines; (b) a list in this module.
+  (b) is a second copy of the catalogue's types. dGroundRules' landed `allowed` grammar has no tag
+  type: members are typed only by `set`, `list` and `name`, an `item` pattern and `registry` words
+  (TOOL-dGroundRules-1 §4), so (a) reads as every row whose `allowed` is one of those three, the walk
+  over-reading rather than missing a key. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1,
+  v2:1245's "one a policy value names", with the parent's grammar the one source of a key's type.
   widens: none · relaxes: none
 
 ## 9. Revision log
@@ -308,6 +327,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · §2 S4 · §3 Edges · §4 The exclusion walk, the first probe · §5 perf · §8 F4 (re-resolved) · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 49: the check reads `instructions.exclude`'s landed `allowed`, a tag-valued key is a row whose `allowed` type bears members, each read through `policy.py get` at `--rev HEAD`, and the build run's first probe confirms the value check admits gov tags.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-19 — the tag grammar, its namespace registry, the derived SQLite tag index and its one resolver, and the join factory moved to the core
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 4 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0049@a87d159d whole
 **Carries:** node:system.tags
@@ -18,8 +18,12 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-19-deviation-191.md](../build/2026-10-24-build-PLAY-dOrderedCharter-19-deviation-191.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-19-deviation-192.md](../build/2026-10-24-build-PLAY-dOrderedCharter-19-deviation-192.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-19-deviation-193.md](../build/2026-10-25-build-PLAY-dOrderedCharter-19-deviation-193.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -82,13 +86,28 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
   **Readers:** by name: READER NOT IN TREE — this item retires no name; it grades retirements that
   change records will carry, and its only reader, `gov_tag.py`, is new in this unit · by value: NO VALUE READERS —
   the retired set is empty until PLAY-dOrderedCharter-15's extractor writes it.
-- **S8** — The three keys, `tags.slice`, `tags.retired-cites` and `tags.bare-refs`, each a catalogue
-  row with its values, default, summary and usage from v2 `[policies]` (v2:1349, 1350, 1352), read
-  through dGroundRules' one reader once it lands and with the catalogue default until then. A
-  `--set <key>=<value>` flag is honoured under `--fixture` only. Observed by AC6 to AC8.
-  **Readers:** by name: READER NOT IN TREE — the three keys are new and retire nothing; their one
-  reader is dGroundRules' policy reader, which has not landed · by value: NO VALUE READERS — until
-  that reader lands each key reads its catalogue default.
+- **S8** — The three keys, `tags.slice`, `tags.retired-cites` and `tags.bare-refs`. dGroundRules
+  lands each catalogue row from v2 `[policies]` (v2:1349, 1350, 1352) with its `allowed`, default
+  and owner, no `summary` or `usage`, its name on the shrink-only `tools/policy/unsummarised-keys.txt`
+  (TOOL-dGroundRules-1 S3, S6). This unit adds no row: it fills each row's `summary` and a `usage`
+  line the row admits (`tags.slice = "subtree"`, `tags.retired-cites = "warn"`,
+  `tags.bare-refs = "unique"`), and drains the three names with
+  `python <prefix>/policy/policy.py lists --write` in the same commit; the mirror
+  `policy.py mirror --write` regenerates lands in a second commit, since a catalogue edit stales it.
+  This pass, the playbook kit's first to read a key, creates `tools/playbook/policy_value.py` with
+  `read_policy_value(key, root, rev=None)` and `PolicyRefused`, built to the contract unit 7's §4
+  "The policy reads" states: it carries its own inline `resolve_kit_dir` block, since a kit imports no
+  sibling kit, and runs `policy.py get <key> --explain [--rev <rev>]` as a subprocess in `root`, so the
+  value is `root`'s committed policy at its landed revision, an unset key its catalogue default with
+  its reason (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3 S2). Each key is read by
+  `read_policy_value("tags.slice", root)` and its two siblings, the key literal first, the `.py` shape
+  TOOL-dGroundRules-8's reader-coverage arm counts. A `PolicyRefused`, an exit 2 from `get` or no
+  policy kit found, refuses the verb with exit 2 naming the key and carrying the reader's line. Units
+  7, 25 and 26 call the module and never copy it. A `--set <key>=<value>` flag is honoured under
+  `--fixture` only. Observed by AC6 to AC8 and AC15.
+  **Readers:** by name: READER NOT IN TREE — the three rows land with dGroundRules and retire
+  nothing; their one reader is `read_policy_value` in `policy_value.py`, new in this unit · by value:
+  `show` for `tags.slice` and `check` for the other two, each through `read_policy_value`.
 - **S9** — The join factory (shared interface S2): `compute_coverage` with its `Coverage` class,
   `resolve_compare_base`, `derive_baseline_additions` and the pure `drop_touched_exemptions`, moved
   from `tools/codebase-map/map_lib.py` (`:1373`, `:1390-1404`, `:1502`, `:1530`) to the canonical `tools/lib/coverage_join.py`, and
@@ -97,7 +116,9 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
   `selftest.py`, `test_codebase_map.template.py` and its copy `test_codebase_map.py`, are rewritten to
   import the four names from memory-tree's module, which codebase-map already `requires`
   (`tools/codebase-map/kit.toml:7`); `map_lib` re-exports them for `install.deprecation-window`
-  releases; the template is re-copied into adopters through govkit's update. Observed by AC10.
+  releases, declared by PLAY-dOrderedCharter-31's `module-export` class row, the mechanism that counts
+  that hold being that unit's open §8 F6; the template is
+  re-copied into adopters through govkit's update. Observed by AC10.
 - **S10** — The common-dir resolver (shared interface S3): `common_git_dir` canonicalised from
   `tools/memory-recall/query.py:248-257` into `tools/lib/common_dir.py`, under a `common_git_dir`
   `PARITY_ROWS` row whose copies are `query.py`'s and `tag_index.py`'s. Observed by AC11.
@@ -142,21 +163,21 @@ point 3, the owner's NT-15; C1-F3, DA-M9, FM10).
 - **hands-off** `PLAY-dOrderedCharter-10` — the eight namespace rows, the shape check and the both-ways joins added to `check`
 - **hands-off** `PLAY-dOrderedCharter-15` — the change-record extractor that writes the index's retired rows, a rename, split or retirement each read from its change record
 - **hands-off** `PLAY-dOrderedCharter-22` — the `purpose-source` and `owner` fields' checks over `tools/playbook/namespaces.toml`
-- **hands-off** `PLAY-dOrderedCharter-25` — the `bundle` verb on `tools/playbook/gov_tag.py`
-- **hands-off** `PLAY-dOrderedCharter-26` — the `positional` check over `tools/playbook/positional-refs.txt`
+- **hands-off** `PLAY-dOrderedCharter-25` — the `bundle` verb on `tools/playbook/gov_tag.py`, and `read_policy_value` in `tools/playbook/policy_value.py` for its two keys
+- **hands-off** `PLAY-dOrderedCharter-26` — the `positional` check over `tools/playbook/positional-refs.txt`, and `read_policy_value` in `tools/playbook/policy_value.py` for its key
 - **hands-off** `PLAY-dOrderedCharter-31` — the `map_lib` re-export declared as a deprecation
 - **hands-off** `PLAY-dOrderedCharter-24` — `read_namespaces` and each row's `role`, which the edge registry's selector class reads
 - **hands-off** `PLAY-dOrderedCharter-28` — the resolver and the `tags` leg pack, which the edge checks join
 - **hands-off** `PLAY-dOrderedCharter-1` — the tag grammar's `seg` shape, which the catalogue's tags pass
 - **hands-off** `PLAY-dOrderedCharter-3` — the `doc` namespace, each registered document's tag
-- **hands-off** `PLAY-dOrderedCharter-7` — the join factory `compute_coverage` and its `PARITY_ROWS` row, the resolver and the `tags` pack
+- **hands-off** `PLAY-dOrderedCharter-7` — the join factory `compute_coverage` and its `PARITY_ROWS` row, the resolver and the `tags` pack, and `tools/playbook/policy_value.py`, built to that unit's §4 "The policy reads"
 - **hands-off** `PLAY-dOrderedCharter-9` — the `unit` namespace and `extract_unit`, which that unit points at its registry's reader
 - **hands-off** `PLAY-dOrderedCharter-12` — the resolver a pointer's target resolves through
 - **hands-off** `PLAY-dOrderedCharter-20` — the tag grammar and the namespace registry a unit row's `tag`, `scope` and `required-by` are graded against
 - **hands-off** `PLAY-dOrderedCharter-29` — the tag index, its `doc` sections, the `retired` check, the aliases file and the `tags` pack
 - **hands-off** `PLAY-dOrderedCharter-35` — the tag grammar, the namespace registry and the `owned` arm, which that unit widens to admit the adopter segment
 - **hands-off** `PLAY-dOrderedCharter-37` — the tag resolver each page's unit tag resolves through
-- **consumes-from** external — dGroundRules' catalogue (`cl-dClosedLoop-0007`) and reader (`cl-dClosedLoop-0008`), and dSafePassage's shim and update for the re-copied template
+- **consumes-from** external — dGroundRules, landed before this build run: the catalogue `tools/policy/catalogue.toml` holding the three rows and the shrink-only `tools/policy/unsummarised-keys.txt` (TOOL-dGroundRules-1 S3, S6, `cl-dClosedLoop-0007`), the reader `policy.py get` (TOOL-dGroundRules-2 S7, `cl-dClosedLoop-0008`) and the mirror's `mirror --write`; and dSafePassage's update for the re-copied template. The re-export rides no dSafePassage shim row: its hold is unit 31's open re-export fork
 - **hands-off** `PLAY-dOrderedCharter-40` — the doc extractor reading the reference registry's rows, so each page's registry tag is declared (finding 2)
 - **hands-off** `PLAY-dOrderedCharter-44` — S4's freshness keyed on the extractor and its version as well as the blob, with a parse ledger and a schema stamp (finding 76)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 11, 44, 55, 77 and 78, which that batch unit corrects after this unit lands, each by the item its report id names
@@ -228,7 +249,9 @@ codebase-map leg reds, which is the clause's planted case.
 
 Minted: `tools/playbook/tag_index.py`, `tools/playbook/gov_tag.py`, `tools/playbook/namespaces.toml`,
 `tools/playbook/aliases.toml`, `tools/playbook/positional-refs.txt`, `tools/lib/coverage_join.py`,
-`tools/memory-tree/coverage_join.py`, `tools/lib/common_dir.py`; the constants `TAG_RE`,
+`tools/memory-tree/coverage_join.py`, `tools/lib/common_dir.py`, and `tools/playbook/policy_value.py`
+with `read_policy_value` and `PolicyRefused` (unit 7's §4 contract, its `resolve_kit_dir` copy under
+the existing parity row); the constants `TAG_RE`,
 `TAG_MAX_BYTES`; the functions `parse_tag`, `read_namespaces`, `build_index`, `extract_doc`,
 `extract_unit`, `extract_citations`, `resolve_address`, `check_retired`, `check_resolves`,
 `build_tags_fixture`; the tables named in S4; the verbs `show`, `where`, `refs`, `check`; the flags
@@ -240,7 +263,8 @@ S12; the manifest key `pack`; the prefix `tags:`; the parity rows `coverage_join
 ### Migration
 
 Additive. `index.db` is derived and built on first use; deleting it costs one rebuild. An adopter's
-`test_codebase_map.py` keeps working through the re-export for the window.
+`test_codebase_map.py` keeps working through the re-export while it is held
+(PLAY-dOrderedCharter-31 §8 F6).
 
 ### Rollout
 
@@ -271,7 +295,10 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
 - `tools/govkit/subject-pins.tsv`
 - `tools/run-gates/ceiling-evidence.txt`
 - `memory/map/features/playbook.md`
-- the catalogue file of `cl-dClosedLoop-0007`, for the three keys' rows, at the path dGroundRules lands
+- `tools/playbook/policy_value.py` (new: `read_policy_value`, `PolicyRefused`, its inline `resolve_kit_dir`)
+- `tools/policy/catalogue.toml`, the three landed rows filled
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, regenerated, in its own commit
 
 ### Alternatives rejected
 
@@ -284,7 +311,7 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
 
 - security: the index is derived and local; the resolver reads only; `--set` is fixture-only, so the leg cannot be relaxed past the policy file; no network.
 - perf / scale: a cold build parses every blob once; a one-file commit re-parses one blob; both DERIVED at the pass by the fixture's `--rebuild` timing, and the leg's `ceiling` set from the measured run.
-- error / empty / loading states: an unreadable registry exits 2; an empty namespace prints `unarmed`; a locked database waits on SQLite's busy timeout and then exits 2 naming it.
+- error / empty / loading states: an unreadable registry exits 2; an empty namespace prints `unarmed`; a locked database waits on SQLite's busy timeout and then exits 2 naming it; an exit 2 from `policy.py get`, or no policy kit found, exits 2 naming the key, as TOOL-dSafePassage-9's mode read refuses.
 - observability: one summary line and one line per red.
 - risks: a tag-shaped token in prose that is not a citation; only registered namespaces are read, and `resolves` reds such a token, which the author answers by writing the full tag or quoting it otherwise.
 - testing: AC1 to AC14 and §7's arms.
@@ -351,10 +378,22 @@ Live at landing under the catalogue defaults; the leg runs over gov's tree.
   kit whose declaring source mints `layer.fixture-x` in the core `layer` namespace exits 1 naming the
   kit and the tag; the same tag minted by a core kit's source exits 0.
   Red when: an expansion mints in a core namespace.
+- **AC15** — When `python -c "import tomllib; k = ('tags.slice', 'tags.retired-cites', 'tags.bare-refs'); print([(r['name'], r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] in k])"`
+  runs after the pass, it prints exactly three tuples, each owned by `dOrderedCharter` with both flags
+  `True`; `python "tools/policy/policy.py" lists --check` exits 0;
+  `grep -c -e tags.slice -e tags.retired-cites -e tags.bare-refs "tools/policy/unsummarised-keys.txt"`
+  prints `0`; and `git grep -n -e 'read_policy_value("tags.slice"' -e 'read_policy_value("tags.retired-cites"' -e 'read_policy_value("tags.bare-refs"' -- tools/playbook`
+  prints three lines.
+  Red when: a key keeps no summary or usage, stays on the list, gains a second row, or is read in a
+  shape the reader-coverage arm does not count.
 
 ## 7. Gates
 
 `memory hygiene` · `python resolver (behaviour + inline parity + idiom ban)` · `codebase-map coverage + freshness` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `recall floor` · `memory-recall kit selftest` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `govkit selftest` · `govkit acceptance matrix` · `govkit refusal join` · `recall floor arms` · `playbook render selftest` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)`
+
+dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`, the mirror's
+parity and the reader-coverage arm over this unit's rows and calls; they are named here rather than
+on the leg line, because neither exists at this spec's base.
 
 New arm: tools/playbook/gov_tag.py · covers AC9 AC12 · the new `tags` leg over the tree, its failing case staged by citing `doc.no-such-doc` in a guide · none
 New arm: tools/playbook/adopt-playbook.sh · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC14 · the playbook-render selftest runs `gov_tag.py --fixture` under every plant of S13 and S14 · none
@@ -385,6 +424,15 @@ New arm: tools/codebase-map/selftest.py · covers AC10 · the selftest's coverag
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-44, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-51, PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · S8 S9 · §3 · §4 Migration, Inventory, Files touched · §5 · AC15 · §7 · §10 ·
+  re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`,
+  rows 11 and 46, U3 and U4: S8 fills and drains the three landed `tags.*` rows, never adds one, and
+  reads each through `read_policy_value`, a `policy.py get` subprocess in the shape the reader-coverage
+  arm counts, the mirror in a second commit; S9's re-export rides no shim, its hold being
+  PLAY-dOrderedCharter-31's open §8 F6. On the coordinator's follow-up the playbook kit has one policy
+  helper: this pass creates `tools/playbook/policy_value.py` to unit 7's §4 contract, its inline
+  `resolve_kit_dir` copy held by the existing parity row, in place of a second helper; and S9 again
+  names the `install.deprecation-window` hold `cl-dClosedLoop-0049` carries, its mechanism F6's.
 
 ## 10. Reuse audit
 
@@ -395,7 +443,12 @@ blob reads through `read_blobs_at` (`tools/memory-tree/tree_lib.py:328`); recall
 pattern (`tools/memory-recall/bench.py:88`, `query.py:381`). `reuse_lookup.py "build a blob-keyed
 SQLite cache of what each file defines and cites"` ranked `key`, `keys`, `build`, `build_commit`,
 `build_fixture` and `read_conf_key`, none an index of definitions; `bench.py`'s `build_index` is an FTS
-ranking index, not a definition index, so no tag index exists. Where the scout and source disagree:
+ranking index, not a definition index, so no tag index exists. The policy read reuses the playbook
+kit's `resolve_kit_dir` block, whose kit copy opens `tools/playbook/render_playbook.py:78-79`, as a
+new inline copy in `tools/playbook/policy_value.py` that the existing `resolve_kit_dir` row of
+`PARITY_ROWS` (`tools/lib/resolve-python.test.sh:172`) holds to its canonical, found by that row's
+marker grep (`:218`) with no new row; and it runs `policy.py get` as TOOL-dSafePassage-9 runs it for
+govkit, in the contract unit 7's §4 states, never importing the sibling kit. Where the scout and source disagree:
 the run-gates canary's known-key set (`run-gates.test.sh:244,580`) refuses a new leg key, which the
 scout's `pack` proposal did not name.
 

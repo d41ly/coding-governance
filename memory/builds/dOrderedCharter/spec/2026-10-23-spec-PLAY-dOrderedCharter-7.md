@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0037@0b2c8bff whole
 
@@ -21,9 +21,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-7-deviation-71.md](../build/2026-10-23-build-PLAY-dOrderedCharter-7-deviation-71.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-7-deviation-72.md](../build/2026-10-24-build-PLAY-dOrderedCharter-7-deviation-72.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-7-deviation-73.md](../build/2026-10-24-build-PLAY-dOrderedCharter-7-deviation-73.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-7-deviation-74.md](../build/2026-10-25-build-PLAY-dOrderedCharter-7-deviation-74.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -96,19 +100,30 @@ build owns.
 - **S9** — The exception register and `core.exceptions`, read by `core.py exceptions` and by every core
   gate: a red whose principle and part match an admitted record prints as `excepted`, naming the record.
   `any-session-recorded`, the default, admits every well-formed record; `owner-only-expiring` admits one
-  that carries `**Expires:**` in the future and was written through the door's owner path, the TTY proof
-  of dGroundRules' minimal guard (`cl-dClosedLoop-0012`), and reds an expired one or one without the
-  field; `none` admits none and reds every record. Observed by AC8 and AC9.
+  that carries `**Expires:**` in the future and was written through the door's owner path, under the
+  owner proof the owner-proof fork of PLAY-dOrderedCharter-15's §8 settles, never one of this unit's own,
+  and reds an expired one or one without the field; while no pass has landed that proof no record carries
+  it, so the value admits none. `none` admits none and reds every record. Observed by AC8 and AC9.
 - **S10** — `core.bypass`. `with-hooks-report`, the default, and `with-hooks-block` let a bypass skip the
   core legs with every other leg; `never` makes the meta-check red any leg whose `enforces` is non-empty and
-  which carries a `guard`, so no leg guard can skip a core check. Both keys are read through dGroundRules'
-  one reader (`cl-dClosedLoop-0008`) once it lands, and until then with v2's catalogue defaults,
-  `with-hooks-report` and `any-session-recorded` (v2:1144-1145). Observed by AC10.
+  which carries a `guard`, so no leg guard can skip a core check. Both keys are read with
+  `read_policy_value("core.bypass", root)` and `read_policy_value("core.exceptions", root)` (§4 "The
+  policy reads"), `root` the repository the gate grades; unset, each answers its catalogue default,
+  `with-hooks-report` and `any-session-recorded` (v2:1144-1145; TOOL-dGroundRules-3 S2). A refused read
+  reds the gate naming the key and the reader's line, so no core check runs on a guessed value.
+  Observed by AC10.
 - **S11** — The legs and plants. Legs `core meta-check`, `core kinds`, `core skills conformance` and `core
   practices conformance` in `tools/gate-legs.json`, each carrying `enforces`, and one `core selftest` leg;
   `python tools/playbook/core.py fixture --plant <case>` builds a throwaway repository in the system temp
-  directory with its own registry, legs, records and `.governance/policy.toml`, and runs the case. Observed
+  directory with its own registry, legs, records and `.governance/policy.toml`, committed, because the
+  reader reads a revision and never the working tree (TOOL-dGroundRules-2 S2), and runs the case. Observed
   by AC1 to AC10.
+- **S12** — The keys' rows. The `core.bypass` and `core.exceptions` rows of `tools/policy/catalogue.toml`
+  land with dGroundRules, owner dOrderedCharter (v2:1144-1145), with no `summary` or `usage` and both names
+  on the shrink-only `tools/policy/unsummarised-keys.txt` (TOOL-dGroundRules-1 S3, S6). This unit adds no
+  row: it fills each row's `summary` and its `usage`, a line the row admits (`core.bypass = "never"`,
+  `core.exceptions = "owner-only-expiring"`), and drains both names in the same commit with
+  `python <prefix>/policy/policy.py lists --write`. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -128,11 +143,11 @@ build owns.
 - **consumes-from** `PLAY-dOrderedCharter-19` — the join factory `compute_coverage` and its `PARITY_ROWS` row, the resolver and the `tags` pack
 - **consumes-from** `PLAY-dOrderedCharter-10` — the `principle`, `practice` and `kind` namespaces and the tag shape check S1 and S4 write under
 - **consumes-from** `PLAY-dOrderedCharter-16` — the layer kind's factory and gate leg, which S4 registers and S2 marks
-- **hands-off** `PLAY-dOrderedCharter-20` — the instruction-unit kind's factory and gate, registered here as pending
-- **hands-off** `PLAY-dOrderedCharter-1` — the practice catalogue's rows, which arm S6's practice gate and S3's practice population
+- **hands-off** `PLAY-dOrderedCharter-20` — the instruction-unit kind's factory and gate, registered here as pending; and `read_policy_value`, which that unit reads `instructions.legacy` through
+- **hands-off** `PLAY-dOrderedCharter-1` — the practice catalogue's rows, which arm S6's practice gate and S3's practice population; and `read_policy_value`, which that unit reads `charter.practices` through
 - **hands-off** `PLAY-dOrderedCharter-29` — the exception door, added to the one-door check's list, and the `enforces` key and the meta-check that grades its pairings both ways
 - **hands-off** `PLAY-dOrderedCharter-2` — the principle registry the charter's core block renders from, and S7's factory the override kind joins
-- **hands-off** `PLAY-dOrderedCharter-15` — S7's factory the change record kind joins
+- **hands-off** `PLAY-dOrderedCharter-15` — S7's factory the change record kind joins, and the owner proof S9's `owner-only-expiring` admits a record under, which that unit's §8 owner-proof fork settles
 - **hands-off** `PLAY-dOrderedCharter-35` — the kinds register a row kind's schema is found through
 - **hands-off** `PLAY-dOrderedCharter-36` — the kinds register's optional `schema` key, and the principle registry its `principle=` sources resolve against
 - **hands-off** `PLAY-dOrderedCharter-30` — the `enforces` key, the meta-check and the pending list its rule-to-leg pairs live in
@@ -140,7 +155,10 @@ build owns.
 - **hands-off** `PLAY-dOrderedCharter-37` — the kinds register's rows its reference pages render
 - **hands-off** `PLAY-dOrderedCharter-12` — the `enforces` key the grammar leg carries
 - **hands-off** `PLAY-dOrderedCharter-13` — the `enforces` key the ladder leg carries, and the meta-check that joins it
-- **consumes-from** external — dGroundRules' one policy reader (`cl-dClosedLoop-0008`) and its minimal guard's TTY proof (`cl-dClosedLoop-0012`), landed by the chain before this build run
+- **consumes-from** external — dGroundRules, landed before this build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) with an unset key's catalogue default (TOOL-dGroundRules-3 S2), the `core.bypass` and `core.exceptions` rows and the shrink-only list S12 drains (TOOL-dGroundRules-1 S3, S6), and the mirror's `mirror --write` (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1); the minimal guard's proof is `[ -t 2 ]` inline in `.githooks/pre-commit`, which no Python calls (TOOL-dGroundRules-6 S4, F3), so this edge takes no proof from it
+- **hands-off** `PLAY-dOrderedCharter-9` — `read_policy_value`, over which that unit's `policy_reader` renders a `policy:<key>` unit
+- **hands-off** `PLAY-dOrderedCharter-14` — `read_policy_value`, which that unit reads `memory.load-budget` through
+- **hands-off** `PLAY-dOrderedCharter-27` — `read_policy_value`, which that unit reads `memory.code-budget` through
 - **hands-off** external — dShippedRelease runs the core legs on the landed tree and acts on a bypassed red as `core.bypass` says; dTotalRecall's record door adopts the exception door
 - **hands-off** `PLAY-dOrderedCharter-42` — the three typed record kinds admitted by the bindings reader and joined to their file names, and the factory's kind list made the reader's (finding 31)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 4, 5, 40, 61, 66, 67 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
@@ -174,9 +192,27 @@ exception record     := - **Principle:** <tag> · - **Excuses:** <part> · - **R
                         [· - **Expires:** <YYYY-MM-DD>] · - **Caused-by:** <id>
 ```
 
+### The policy reads
+
+`read_policy_value(key, root, rev=None)` in `tools/playbook/policy_value.py` is the playbook kit's one
+caller of the policy reader, and this section is the contract it is built to. Whichever of this build's
+playbook-kit passes reads a key first defines the module; every later one calls it, as TOOL-dSafePassage-9
+rules for govkit's helper (`:154-158`). A kit may not import a sibling kit (TOOL-dGroundRules-1, §4
+Evidence), so the module carries the inline `resolve_kit_dir` block (the kit's copy opens
+`tools/playbook/render_playbook.py:78-79`), finds `policy.py` with it, and runs `<sys.executable>
+<kit>/policy.py get <key> --explain` with `root` as its working directory, adding `--rev <rev>` when `rev`
+is given. `get` reads `root`'s committed policy at its default revision, the landed one, and never the
+working tree (TOOL-dGroundRules-2 S1, S2, S7). The function returns the stdout lines, one per member for a
+list, and the `--explain` line. On exit 2, or with no policy kit found, it raises `PolicyRefused` carrying
+the key and the reader's stderr line, which each caller names in its own refusal. Every call passes its
+key as a string literal first, the shape the reader-coverage arm counts (TOOL-dGroundRules-8, Readers).
+It is a thin adapter over the one core `get`, as govkit's `read_policy_value` is for `tools/govkit/`
+modules (TOOL-dSafePassage-9 §4); neither kit can import the other's.
+
 ### Inventory
 
-Minted: the files `tools/playbook/principles.toml`, `tools/playbook/kinds.toml`,
+Minted: the module `tools/playbook/policy_value.py` with `read_policy_value` and `PolicyRefused`, unless an
+earlier pass defined it; the files `tools/playbook/principles.toml`, `tools/playbook/kinds.toml`,
 `tools/playbook/core-pending.txt`, `tools/playbook/core.py` (verbs `meta-check`, `kinds`, `new`,
 `exceptions`, `fixture`) and `tools/memory-tree/build_records.py` (verbs `new`, `read`); the leg key
 `enforces`; the record kind `exception`; the legs `core meta-check`, `core kinds`, `core skills
@@ -192,11 +228,15 @@ pending list is written once at the build pass and only shrinks after.
 ### Rollout
 
 Live at landing, at order 11: after units 10 (order 5), 16 (order 2) and 19 (order 4), and before units 20
-(order 15) and 1 (order 17), whose populations arm S3 and S6 when they land.
+(order 15) and 1 (order 17), whose populations arm S3 and S6 when they land. S12 lands as two commits: the
+row fills with the list drain, then `.governance/policy.json` alone as `policy.py mirror --write`
+regenerates it, since a catalogue edit stales the mirror (TOOL-dGroundRules-5 S1, S2) and the guard admits
+a mirror commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
 ### Files touched (estimate)
 
 - `tools/playbook/core.py`
+- `tools/playbook/policy_value.py` (new, unless an earlier pass created it)
 - `tools/playbook/principles.toml`
 - `tools/playbook/kinds.toml`
 - `tools/playbook/core-pending.txt`
@@ -204,6 +244,9 @@ Live at landing, at order 11: after units 10 (order 5), 16 (order 2) and 19 (ord
 - `tools/memory-tree/deviation_join.py`
 - `tools/memory-tree/check-verdict-epoch.sh`
 - `tools/gate-legs.json`
+- `tools/policy/catalogue.toml`, the two existing rows filled
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, the second commit
 
 ### Alternatives rejected
 
@@ -216,11 +259,13 @@ Live at landing, at order 11: after units 10 (order 5), 16 (order 2) and 19 (ord
 
 ## 5. Production-readiness checklist
 
-- security: principles are fixed and no key reads them; `core.exceptions: owner-only-expiring` reuses the
-  minimal guard's TTY proof; the door writes only under the session's own `build/` folder.
+- security: principles are fixed and no key reads them; `core.exceptions: owner-only-expiring` takes the
+  owner proof PLAY-dOrderedCharter-15's §8 settles and admits nothing before it lands; the door writes only
+  under the session's own `build/` folder.
 - perf / scale: one TOML read per registry and one JSON read of the legs; the join is set arithmetic.
-- error / empty / loading states: an absent registry or legs file is red; the practice population reads
-  `unarmed`, never green; each pending count prints on every run.
+- error / empty / loading states: an absent registry or legs file is red; a refused policy read is red
+  naming the key; the practice population reads `unarmed`, never green; each pending count prints on every
+  run.
 - observability: every red names the principle, kind or leg, the remedy and the build that arms a pending
   row.
 - risks: a hand-written exception record bypasses the door until unit 29's one-door check reads it; an
@@ -266,16 +311,27 @@ Live at landing, at order 11: after units 10 (order 5), 16 (order 2) and 19 (ord
   `excepted` naming it, and a record missing `Reason` is red.
   Red when: an exception excuses without its principle, part and reason.
 - **AC9** — When `python core.py fixture --plant exceptions-values` runs, a record with no
-  `Expires` reds under `owner-only-expiring`, an expired one reds, a record written without the TTY proof is
-  not admitted, and under `none` every record reds and excuses nothing.
+  `Expires` reds under `owner-only-expiring`, an expired one reds, a record written without the owner proof
+  is not admitted, and under `none` every record reds and excuses nothing.
   Red when: a value admits what it refuses.
 - **AC10** — When `python core.py fixture --plant bypass-never` runs, a core leg carrying a
-  `guard` reds `meta-check` under `core.bypass` `never`, and passes under `with-hooks-report`.
-  Red when: `never` lets a guard skip a core leg.
+  `guard` reds `meta-check` under `core.bypass` `never`, and passes under `with-hooks-report`; with the
+  fixture's only committed policy file setting `core.bypass = "sometimes"`, which no valid revision
+  precedes, so `policy.py get` exits 2 (TOOL-dGroundRules-4 S5), `meta-check` reds naming `core.bypass`.
+  Red when: `never` lets a guard skip a core leg, or a refused read runs the check on a default.
+- **AC11** — When `python -c "import tomllib; print([(r['name'], r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] in ('core.bypass', 'core.exceptions')])"`
+  runs after the pass, it prints two rows, each `dOrderedCharter`, `True`, `True`; `git grep -n -x -e
+  "core.bypass" -e "core.exceptions" -- "tools/policy/unsummarised-keys.txt"` finds no line;
+  `python "tools/policy/policy.py" lists --check` exits 0; and `git grep -n -F -e
+  'read_policy_value("core.bypass"' -e 'read_policy_value("core.exceptions"' -- tools/playbook/core.py`
+  finds a line for each.
+  Red when: a row is added, a row keeps no summary or usage, a name stays on the shrink-only list, or a
+  key is read in a shape the reader-coverage arm does not count.
+  fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds.
 
 ## 7. Gates
 
-`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `spec tokens (a spec's own names resolve)`
+`playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `python resolver (behaviour + inline parity + idiom ban)` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/playbook/core.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 AC10 · the `core selftest` leg runs every `fixture --plant` case, each failing case staged by its plant · none
 
@@ -305,6 +361,7 @@ New arm: tools/memory-tree/deviation_join.py · covers AC7 · its existing suite
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0037`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
+- rev-4 · 2026-10-24 · §2 S9, S10, S11, S12 · §3 Edges · §4 The policy reads, Inventory, Rollout, Files touched · §5 · AC9, AC10, AC11 · §7 · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 40, U3 and U4: both keys are read with `policy.py get` through `read_policy_value`, whose contract §4 now states, and a refused read reds; both landed rows are filled and drained, never added; `owner-only-expiring` takes the owner proof spec 15's §8 fork settles, since the guard's `[ -t 2 ]` is no callable.
 
 ## 10. Reuse audit
 
@@ -315,7 +372,9 @@ The seams extended are `tools/gate-legs.json`'s row grammar (a new `enforces` ke
 `tools/memory-tree/deviation_join.py` (`FIELD` at :145, `RECORD_NAME` at :160, `read_record` at :212,
 `read_records` at :268), which S7 extracts. `python tools/codebase-map/reuse_lookup.py "refuse a principle
 that no gate leg names as what it enforces"` ranked name-token matches (`legs`, `leg`, `CensusRefused`) and
-no registry or meta-check, so no existing seam fits those; scout B found the same by text search. The scout's
+no registry or meta-check, so no existing seam fits those; scout B found the same by text search. The
+policy keys are read through the policy kit's `get` verb (TOOL-dGroundRules-2 S7) as a subprocess, the one
+seam a sibling kit may reach, by one helper every playbook-kit read shares. The scout's
 note that govkit's `kind = "authoring"` means something else was confirmed at `tools/playbook/kit.toml`,
 whose `kind = "dir"` is an install shape, so the kinds register reuses neither.
 

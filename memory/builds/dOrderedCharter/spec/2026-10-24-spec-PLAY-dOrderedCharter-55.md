@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-55 — the round-2 spec audit's 31 minors: criteria observed where they can pass, one reader per fact, and seams that hold in any order
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 41 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,10 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-50-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-50-promoted-fix-return.md) | research | PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-54 |
 | [2026-10-24-build-PLAY-dOrderedCharter-55-deviation-551.md](../build/2026-10-24-build-PLAY-dOrderedCharter-55-deviation-551.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-55-deviation-552.md](../build/2026-10-24-build-PLAY-dOrderedCharter-55-deviation-552.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 |
+| [2026-10-25-build-PLAY-dOrderedCharter-55-deviation-553.md](../build/2026-10-25-build-PLAY-dOrderedCharter-55-deviation-553.md) | deviation | — |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-54 |
 
 <!-- /gen:spec-records -->
@@ -91,9 +95,11 @@ skeptic's corrected fix, as the report states it.
   `{"pending": "<unit id>"}`, for a kind whose fields a later unit owns; `new <kind>` on a pending kind
   exits 2 naming that unit, and unit 42 S2's key equality counts a pending entry. Unit 42's pass enters
   the override and change kinds as pending on units 2 and 15. Observed by AC8.
-- **S9** — id 8. Unit 49 S11's `census` verb re-renders with `--overlay-from` naming the overlay it has
+- **S9** — id 8. Unit 49 S11's census step re-renders with `--overlay-from` naming the overlay it has
   just written (`PLAY-dOrderedCharter-46` S3 and S4), so the charter carries the census units before
-  any commit. Observed by AC9.
+  any commit. Unit 49's pass builds it, since `step-rows-frozen` freezes that step's program at unit
+  49's landing (TOOL-dSafePassage-1 S9); this pass observes AC9 and changes no code for it.
+  Observed by AC9.
 - **S10** — id 10. Unit 39's retirement deletes `memory/map/baseline.toml`'s `agent-instructions
   self-test` line (`:14`); the `agent-instructions wiring` line (`:15`) stays with no dossier claim, or
   leaves in the commit where `memory/map/features/playbook.md` claims the key. `codebase-map coverage +
@@ -188,8 +194,9 @@ skeptic's corrected fix, as the report states it.
 
 ### This build's specs and legs
 
-- **S27** — id 24. `PLAY-dOrderedCharter-49`'s spec is brought under the live-spec ceiling, 49152
-  bytes CR-stripped (`tools/template-size-limits.txt`), by a revision that cuts the items units 50 and
+- **S27** — id 24. `PLAY-dOrderedCharter-49`'s spec is brought under the live-spec cap
+  `budgets."memory/builds/*/spec/"`, 49152 bytes CR-stripped, read through `budgets.py resolve`
+  (TOOL-dGroundRules-9 S2), by a revision that cuts the items units 50 and
   55 supersede to one-line pointers, every id, criterion and fork kept (§8 F2). Observed by AC27.
 - **S28** — id 26. The adopter population of the moved `agent-instructions wiring` leg is recorded:
   the `playbook-render` entry's leg set gains it for every adopter, and `govkit apply` over a fixture
@@ -243,7 +250,7 @@ skeptic's corrected fix, as the report states it.
 - **consumes-from** `PLAY-dOrderedCharter-46` — `read_overlay` and the candidate read (S9, S19)
 - **consumes-from** `PLAY-dOrderedCharter-47` — `L` and the grandfathered print (S24, S25, S26)
 - **consumes-from** `PLAY-dOrderedCharter-48` — the producers limb's plants (S26)
-- **consumes-from** `PLAY-dOrderedCharter-49` — the census verb, AC24, AC26, AC32, S50 and its own size (S2, S7, S9, S14, S20, S21, S27)
+- **consumes-from** `PLAY-dOrderedCharter-49` — the census step, AC24, AC26, AC32, S50 and its own size (S2, S7, S9, S14, S20, S21, S27)
 - **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe (S1, S7)
 - **consumes-from** `PLAY-dOrderedCharter-51` — the per-version tables and the read filter (S4, S13, S17)
 - **consumes-from** `PLAY-dOrderedCharter-52` — `TABLE_ENVELOPE` (S22, S23)
@@ -265,7 +272,7 @@ merge driver's `_dominant` (`:742`) and `main()` (`:1538-1552`), `.gitattributes
 ### Order
 
 Order 41, above every unit: the minors land on eleven units, the latest of them unit 49 at order 39,
-and unit 54 sits at 40. Items that change what an earlier pass does (S1, S2, S3, S8, S12) reach that
+and unit 54 sits at 40. Items that change what an earlier pass does (S1, S2, S3, S8, S9, S12) reach that
 pass through the repaired spec's §3 hand-off to this unit, which its builder reads; this unit's pass
 observes them.
 
@@ -289,7 +296,6 @@ Python names.
 - `tools/playbook/adopt-playbook.sh`
 - `tools/playbook/kit.toml`
 - `tools/playbook/edge_checks.py` (deleted)
-- `tools/govkit/steps/adopter_rules_to_overlay.py`
 - `tools/govkit/subject-pins.tsv`
 - `tools/govkit/registry.toml`
 - `tools/memory-tree/build_records.py`
@@ -354,7 +360,7 @@ alone, save S27, which §8 F2 places.
 - **AC8** — When `python build_records.py --fixture --plant pending-kind` runs, the module imports
   with a pending entry, and `new` on that kind exits 2 naming its unit.
   Red when: a field-less kind blocks the import, or invents fields.
-- **AC9** — When the `census` verb runs in a fixture and `render_playbook.py` reads the charter before
+- **AC9** — When unit 49 S11's step's up runs in a fixture and `render_playbook.py` reads the charter before
   any commit, the census unit's line is present.
   Red when: a render after the census write drops the moved lines.
 - **AC10** — When `git grep -n "agent-instructions" -- memory/map/baseline.toml` runs after unit 39's
@@ -402,7 +408,8 @@ alone, save S27, which §8 F2 places.
 - **AC26** — When `tags positional selftest`'s case list is read, it holds the plants of units 47, 48
   and 53, and a staged break of one reds that leg.
   Red when: a positional plant runs only under a suite whose population is elsewhere.
-- **AC27** — When `git cat-file -s` runs on spec 49's blob after S27, CR-stripped, it is under 49152.
+- **AC27** — When `git cat-file -s` runs on spec 49's blob after S27, CR-stripped, it is under the value
+  `budgets.py resolve "memory/builds/*/spec/"` prints.
   Red when: the spec stays over its ceiling.
 - **AC28** — When `govkit apply` runs over a fixture target selecting `playbook-render` alone, its
   manifest names `agent-instructions wiring`.
@@ -448,6 +455,7 @@ New arm: tools/memory-tree/merge-rows.test.sh · covers AC22 AC23 · the newline
 
 - rev-1 · 2026-10-24 · initial draft, the round-2 spec audit's 26 MEDIUM and 5 LOW findings batched by
   report id.
+- rev-2 · 2026-10-24 · §2 · §3 · §4 · §6 · re-grounded on the parents' landed specs by the cross-check record `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, U1 and U7: S27 and AC27 read the `budgets."memory/builds/*/spec/"` cap through `budgets.py resolve`, and S9 is built at unit 49's pass into its census step, which `step-rows-frozen` freezes at that landing.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-4 — the instruction map re-injected on compact and resume through the existing replay fragment
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 25 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0034@06f1afc5 whole
 
@@ -14,9 +14,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-4-deviation-41.md](../build/2026-10-24-build-PLAY-dOrderedCharter-4-deviation-41.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-4-deviation-42.md](../build/2026-10-24-build-PLAY-dOrderedCharter-4-deviation-42.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-4-deviation-43.md](../build/2026-10-25-build-PLAY-dOrderedCharter-4-deviation-43.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -41,7 +45,9 @@ that already fires on `resume|compact`, and adds no third SessionStart entry.
   hierarchy from it before acting`. Observed by AC1, AC3.
 - **S2** — The preset line. `render_instruction_map` gains one last line naming the active policy
   preset, foundations R2's third part of the map, so the charter's map section and the replay carry
-  it alike. Until presets exist it is a constant naming the hand-over. Observed by AC1.
+  it alike. Until presets exist it is a constant naming the hand-over and pointing at `policy.py get <key>
+  --explain`, which prints each key's source, rather than restating the resolution order. Observed by
+  AC1.
 - **S3** — The bound. The verb refuses past `MAP_CAP_BYTES = 1792` (exit 2, one `instruction-map:`
   line, no map), and each level line is cut at `MAP_LINE_BYTES = 160` with `… (+<k>)`. Observed by
   AC2.
@@ -66,7 +72,7 @@ that already fires on `resume|compact`, and adds no third SessionStart entry.
   registry.
 - No per-worktree card file and no import line: PLAY-dOrderedCharter-8.
 - No policy reader and no preset mechanism. Presets join the policy reader at dKeptSession
-  (`cl-dClosedLoop-0009`).
+  (`cl-dClosedLoop-0009`; TOOL-dGroundRules-3 S3).
 - The level-0 precedence sentence that directs a reset agent to rebuild from the map is the charter's
   text, PLAY-dOrderedCharter-2's.
 - Measuring the replay's injected bytes as a load point is PLAY-dOrderedCharter-11's.
@@ -87,7 +93,7 @@ that already fires on `resume|compact`, and adds no third SessionStart entry.
 ```
 [AGENTS.md · Level 0 · the instruction map: rebuild the hierarchy from it before acting]
 <render_instruction_map's lines, one per level 0 to 7>
-preset — none: presets join the policy reader at dKeptSession; each key reads its file value, else its catalogue default
+preset — none: presets join the policy reader at dKeptSession; a key's source: policy.py get <key> --explain
 [/AGENTS.md]
 ```
 
@@ -106,8 +112,12 @@ preset — none: presets join the policy reader at dKeptSession; each key reads 
 
 `render_instruction_map` appends `preset — <value>` as its last line. Until dKeptSession adds presets
 to dGroundRules' reader (`cl-dClosedLoop-0009`), the value is the constant above, held once as
-`PRESET_LINE_PENDING` with that hand-over in its comment. The charter's own map section, which calls
-the same function, carries the line too, so the two never differ.
+`PRESET_LINE_PENDING` with that hand-over in its comment. The line does not restate how a key resolves:
+dGroundRules' reader answers a file value, a last valid revision's value for an invalid file, a
+catalogue default with its reason, or a refusal for a derived default (TOOL-dGroundRules-3 S2,
+TOOL-dGroundRules-4 S5, TOOL-dGroundRules-21 S12), and `get --explain` prints which (TOOL-dGroundRules-2
+S7), so the line points there. The charter's own map section, which calls the same function, carries
+the line too, so the two never differ.
 
 ### The replay
 
@@ -186,9 +196,10 @@ read-only output and the fallback is today's replay plus one line.
   scratch tree holding a document registry with one row at level 0 and one at level 5, it prints the
   `[AGENTS.md · Level 0 · ` opener, `render_instruction_map`'s eight level lines in order 0 to 7, the
   `preset —` line last before the envelope's closer line (§4's form, naming `AGENTS.md`), and exits 0; the charter's map section
-  rendered from the same fixture carries the same `preset —` line.
-  Red when: a level line differs from the charter section's, or the preset line appears in one and
-  not the other.
+  rendered from the same fixture carries the same `preset —` line, which names `policy.py get <key>
+  --explain`.
+  Red when: a level line differs from the charter section's, the preset line appears in one and not
+  the other, or it restates a resolution order.
   fixture: a scratch tree under the run's scratch path; needs PLAY-dOrderedCharter-2, -3 and -13
   landed.
 - **AC2** — When the same verb runs with one level's rows planted to push its line past
@@ -239,14 +250,15 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 · `--selftest` arm
 - **F3 — The preset line before presets exist.** Foundations R2 puts the active preset in the map,
   and PLAY-dOrderedCharter-2's S3 names levels and documents only. Options: leave the preset out;
   read a preset key from `.governance/policy.toml`; print a constant naming the hand-over. No preset
-  key exists until dKeptSession (`cl-dClosedLoop-0009`) and dGroundRules' reader is unbuilt at this
-  build's base.
+  key exists until dKeptSession (`cl-dClosedLoop-0009`), and dGroundRules' reader applies no preset until
+  dKeptSession adds them (TOOL-dGroundRules-3 S3).
   RESOLVED (agent, 2026-10-23, delegated): the constant, added to the shared function so the charter and the replay agree, rung 1, v2's clause 0009 names when presets join. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §2 S2 · §3 Non-goals · §4 The verb, The preset line · AC1 · §8 F3's evidence · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 31: the preset line stops restating the resolution order, which dGroundRules' reader extends with a last-valid source and a derived-default refusal, and points at `policy.py get <key> --explain`; F3 keeps its resolution.
 
 ## 10. Reuse audit
 

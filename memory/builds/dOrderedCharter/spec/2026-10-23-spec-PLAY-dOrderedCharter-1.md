@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0031@419dfa75 whole
 **Carries:** node:policy-key.charter.practices
@@ -18,6 +18,10 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-1-departures-spec.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-departures-spec.md) | journal | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-1-deviation-11.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-deviation-11.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-1-deviation-12.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-deviation-12.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md) | research | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-deviation-13.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-deviation-13.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-3-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-3-reuse-scout.md) | journal | — |
@@ -27,6 +31,8 @@
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-owner-review-cap.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-owner-review-cap.md) | research | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-1-spec-writer.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -58,9 +64,14 @@ that the renderer reads to write the charter's practice lines (v2:1143, P14).
   whose step is not of the `seg` shape, and a `foundation` entry naming no row. Observed by AC2.
 - **S4** — The policy. `resolve_active_practices(catalogue, value)` returns the active rows in catalogue
   order. `value` is `charter.practices`, a non-empty set of practice tags (v2:1143). An empty set and a
-  tag in no row are refused by name. The key is read through dGroundRules' one reader
-  (`cl-dClosedLoop-0008`) once it lands, with the catalogue default v2 states, the `foundation` set,
-  until then. Observed by AC3.
+  tag in no row are refused by name. The key is read with `read_policy_value("charter.practices", root)`
+  (PLAY-dOrderedCharter-7 §4), `policy.py get` over `root`'s committed policy, `root` the render's target,
+  since the choice is the adopter's. Unset, the row's default is `{ derived = ... }`, v2's default being no
+  literal (TOOL-dGroundRules-1 §4), and `get` refuses it, exit 2, with "a derived default no reader
+  computes yet" (TOOL-dGroundRules-21 S12). On that refusal alone the render takes the catalogue's
+  `foundation` set and prints that it did; any other refusal refuses the render naming the key and the
+  reader's line. How a set of practice tags passes the row's value check is §8 F4. Observed by AC3 and
+  AC8.
 - **S5** — The render. The template's section-1 practice lines become one `{{PRACTICES}}` line inside
   the same one-line region, and `render()` (`tools/playbook/render_playbook.py:979`) expands it into
   `- [<name>] <line>` per active row BEFORE it collects placeholders, so the `{{DEFAULT_BRANCH}}`,
@@ -80,6 +91,13 @@ that the renderer reads to write the charter's practice lines (v2:1143, P14).
   optional, so a charter rendered without the line still joins.
 - **S7** — The page. `help/charter.md`, linked from `help/README.md`, says what the catalogue is, how
   an adopter reads its active set and how it chooses one. Observed by AC7.
+- **S8** — The key's row. The `charter.practices` row of `tools/policy/catalogue.toml` lands with
+  dGroundRules, owner dOrderedCharter (v2:1143), with no `summary` or `usage` and its name on the
+  shrink-only `tools/policy/unsummarised-keys.txt` (TOOL-dGroundRules-1 S3, S6). This unit adds no row: it
+  fills the row's `summary` and its `usage`, a line the row admits
+  (`charter.practices = ["practice.yagni", "practice.reuse"]`, once F4's probe finds tags admitted), and
+  drains the name in the same commit with `python <prefix>/policy/policy.py lists --write`. Observed by
+  AC9.
 
 ## 3. Non-goals (OUT)
 
@@ -95,15 +113,15 @@ that the renderer reads to write the charter's practice lines (v2:1143, P14).
 - The portable practice that absorbs `[cross-os]` and `[bytes]`: `PLAY-dOrderedCharter-30`.
 - The `step` namespace and its join: dDeclaredLoop registers it (`cl-dClosedLoop-0040`); this unit
   grades only the `seg` shape of a reach key.
-- The policy file, its reader and its presets: dGroundRules. No preset touches `charter.practices`
-  (foundations, settled design for step 1).
+- The policy file and its reader: dGroundRules; presets: dKeptSession (TOOL-dGroundRules-2, §3). No
+  preset touches `charter.practices` (foundations, settled design for step 1).
 
 ### Edges
 
 - **consumes-from** `PLAY-dOrderedCharter-9` — the reader module `tools/playbook/instruction_units.py` the catalogue reader joins
 - **consumes-from** `PLAY-dOrderedCharter-19` — the tag grammar's `seg` shape and the `practice.` namespace check
 - **consumes-from** `PLAY-dOrderedCharter-20` — the renderer of record the practice expansion lives in
-- **consumes-from** `PLAY-dOrderedCharter-7` — the `core practices conformance` gate and the meta-check's practice population, which this catalogue's rows arm
+- **consumes-from** `PLAY-dOrderedCharter-7` — the `core practices conformance` gate and the meta-check's practice population, which this catalogue's rows arm; and `read_policy_value`, which S4 reads `charter.practices` through
 - **consumes-from** `PLAY-dOrderedCharter-15` — `resolve_practices`, which turns a `charter.practices` value naming packs into the practice tags S4's reader takes
 - **hands-off** `PLAY-dOrderedCharter-21` — rendering each row's reach per step into work orders
 - **hands-off** `PLAY-dOrderedCharter-2` — the charter's re-founded layout around the rendered practice lines
@@ -111,7 +129,7 @@ that the renderer reads to write the charter's practice lines (v2:1143, P14).
 - **hands-off** `PLAY-dOrderedCharter-11` — the practice tags a role's `rules:` value cites, which the load set selects by
 - **hands-off** `PLAY-dOrderedCharter-23` — the catalogue row `practice.land`, whose line that unit rewrites
 - **hands-off** `PLAY-dOrderedCharter-30` — the catalogue, its reader and the `foundation` array the `practice.portable` row joins
-- **consumes-from** external — dGroundRules' one policy reader; until it lands the catalogue default is read
+- **consumes-from** external — dGroundRules, landed before this build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) and its derived-default refusal (TOOL-dGroundRules-21 S12), the `charter.practices` row and the shrink-only list S8 drains (TOOL-dGroundRules-1 S3, S6), and the mirror's `mirror --write` (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1)
 - **hands-off** `PLAY-dOrderedCharter-41` — S6's cross-os block state and the Migration sentence on older templates: that unit keeps the block live, not legacy, and states the major-only rule (finding 30)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 18, 21 and 53, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — this pass lands no `legacy` key on the `cross-os` row, so AC4 holds here (round-2 id 3); AC1 and AC7, which unit 49 S21 and S24 correct, are observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
@@ -165,7 +183,11 @@ render's `legacy` note asks for a reseed, the path `TEMPLATE_MARKER_RE` already 
 
 ### Rollout
 
-Live at landing; gov's `AGENTS.md` practice lines do not change.
+Live at landing; gov's `AGENTS.md` practice lines do not change. S8 lands as two commits: the row fill
+with the list drain, then `.governance/policy.json` alone as `policy.py mirror --write` regenerates it,
+since a catalogue edit stales the mirror (TOOL-dGroundRules-5 S1, S2), which omits this derived-default key
+(TOOL-dGroundRules-21 F4), and the guard admits a mirror commit only when the policy file and the
+catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
 ### Files touched (estimate)
 
@@ -177,6 +199,9 @@ Live at landing; gov's `AGENTS.md` practice lines do not change.
 - `AGENTS.md` (the render of the template, re-rendered, never edited)
 - `help/charter.md`
 - `help/README.md`
+- `tools/policy/catalogue.toml`, the existing row filled
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, the second commit
 
 ### Alternatives rejected
 
@@ -191,8 +216,11 @@ Live at landing; gov's `AGENTS.md` practice lines do not change.
 - security: no new write path; the catalogue is a shipped, read-only file.
 - perf / scale: one TOML read per render.
 - error / empty / loading states: an absent catalogue refuses the render naming the path; an empty
-  active set is refused (S4).
-- observability: the render prints `retired drop_blocks cross-os` when S6 maps it.
+  active set is refused (S4); a refused policy read other than the derived default refuses the render
+  naming `charter.practices`.
+- observability: the render prints `retired drop_blocks cross-os` when S6 maps it, and
+  `charter.practices — the foundation set: a derived default the policy reader leaves to the practice
+  catalogue` when S4 takes the default.
 - risks: a reach text the builder writes may be thin; the shape check grades presence, not quality.
 - testing: the fixture arms of §6 and the `New arm:` of §7.
 - migration: §4 Migration.
@@ -227,12 +255,26 @@ Live at landing; gov's `AGENTS.md` practice lines do not change.
 - **AC7** — When `grep -n "charter.practices" charter.md help/README.md` runs, the page names the
   key and the index links the page.
   Red when: either grep is empty.
+- **AC8** — When the render runs against a committed scratch target with no `.governance/policy.toml`,
+  it renders the 36 `foundation` lines and prints the one `charter.practices — the foundation set` line;
+  with the target's only committed policy file setting `charter.practices = []`, which the row's
+  `empty = "never"` refuses and no valid revision precedes (TOOL-dGroundRules-4 S5), it refuses naming
+  `charter.practices` and the reader's line, and writes nothing.
+  Red when: the derived-default refusal stops the render, or any other refusal renders a default.
+- **AC9** — When `python -c "import tomllib; print([(r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'charter.practices'])"`
+  runs after the pass, it prints one row, `dOrderedCharter`, `True`, `True`; `git grep -n -x -F
+  "charter.practices" -- "tools/policy/unsummarised-keys.txt"` finds no line; `python
+  "tools/policy/policy.py" lists --check` exits 0; and `git grep -n -F 'read_policy_value("charter.practices"'
+  -- tools/playbook/` finds one line.
+  Red when: a row is added, the row keeps no summary or usage, the name stays on the shrink-only list,
+  or the key is read in a shape the reader-coverage arm does not count.
+  fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds.
 
 ## 7. Gates
 
 `playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms`
 
-New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 · the selftest's fixture target plants each refused catalogue, a target with no roles kit and a `drop_blocks` naming `cross-os` · none
+New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 AC8 · the selftest's fixture target plants each refused catalogue, a target with no roles kit, a `drop_blocks` naming `cross-os`, and a committed `charter.practices = []` · none
 
 ## 8. Open questions
 
@@ -250,12 +292,26 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 · the selftest
   key of the `seg` shape, the join armed by dDeclaredLoop; (b) a list typed in the catalogue. RESOLVED
   (agent, 2026-10-23, delegated): (a), rung 1, `cl-dClosedLoop-0040` "each later namespace's join
   armed by the build that registers it, step … by dDeclaredLoop". widens: none · relaxes: none
+- **FACT-QUESTION · F4 — How a set of practice tags passes the `charter.practices` row's value check.**
+  v2's Allowed cell is "a non-empty set of catalogue or repo-declared practices" (v2:1143). dGroundRules'
+  value check refuses a member v2 admits only as registered or repo-declared, keeping v2's words in the
+  row's `registry` field (TOOL-dGroundRules-1 §3), and writes a set as `{ type = "set", of = [...] }` or
+  `{ type = "set", item = "<regex>" }` (its §4 `allowed` grammar); which the landed row holds is unknown
+  until dGroundRules builds. Options: (a) the build run's first probe reads the landed row's `allowed`,
+  then commits `charter.practices = ["practice.yagni"]` in a scratch target and runs `policy.py get
+  charter.practices --explain`: source `file` admits tags; `last-valid` or a refusal means the run files a
+  re-ground ask to dGroundRules for an `item` pattern of the `practice.<seg>` shape, and S8's `usage` waits
+  on its answer; (b) this unit edits the row's `allowed` itself, a schema change in the parent's kit beyond
+  the fill S8 is granted; (c) leave the value unsettable, every adopter rendering the `foundation` set.
+  Recommendation (a): the probe decides, (b) edits the parent's schema, and (c) drops S4's choice. Open:
+  the probe runs at the build run.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-41, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · §2 S4, S8 · §3 Non-goals, Edges · §4 Rollout, Files touched · §5 · AC8, AC9 · §7 New arm · §8 F4 · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` rows 29 and 30, U3 and U4: `charter.practices` is read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value`; its derived default refuses, so the render computes the `foundation` set itself and says so, and any other refusal refuses; the landed row is filled and drained, never added; F4 asks how practice tags pass the value check.
 
 ## 10. Reuse audit
 
@@ -266,6 +322,8 @@ reader joins S10's reader module rather than a new one. `python tools/codebase-m
 "select which charter practices render from a catalogue"` ranked `render` (fan-in 13, SEAM, which
 includes `render_playbook.py`) and `parse_charter` (`tools/roles/roles_lib.py:176`); the rest were
 `render_*` name-stem matches in other kits, which the source does not bear out as seams for this. Scout A's
-row for this unit agrees with the source at HEAD (`drop_blocks` at `render_playbook.py:986-1023`).
+row for this unit agrees with the source at HEAD (`drop_blocks` at `render_playbook.py:986-1023`). The key
+is read through the policy kit's `get` verb (TOOL-dGroundRules-2 S7) by the playbook kit's one helper,
+never a second reader.
 
 Recall terms used: `python tools/memory-recall/query.py "how did the charter's one-line practices get their tags and how does an adopter drop one" --terms "charter practice tag one-line rule drop_blocks when fence catalogue adopter section"`

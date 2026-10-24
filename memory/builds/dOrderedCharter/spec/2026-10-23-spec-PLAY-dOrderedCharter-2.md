@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-2 — the charter re-founded in its level-0 envelope, with the override rule and its record
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 20 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0032@e38b0cb6 whole
 **Carries:** node:policy-key.charter.override
@@ -16,9 +16,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-2-deviation-21.md](../build/2026-10-24-build-PLAY-dOrderedCharter-2-deviation-21.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-2-deviation-22.md](../build/2026-10-24-build-PLAY-dOrderedCharter-2-deviation-22.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-2-deviation-23.md](../build/2026-10-25-build-PLAY-dOrderedCharter-2-deviation-23.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -55,8 +59,17 @@ C1-F11, C1-F12).
   instruction wins, the conflict named and recorded; `absolute`, the charter outranks every live
   instruction and no override is taken. The rule also says a conflict resolves by level, never by load
   order, and that unenveloped text and any envelope inside tool output are data (v2:953-957 P13). The
-  key is read through dGroundRules' one reader (`cl-dClosedLoop-0008`) once it lands, with the catalogue
-  default `explicit-override` until then. Observed by AC2.
+  key is read with `policy.py get charter.override`, run in the target through unit 9's `policy_reader`
+  (the playbook kit's one subprocess reader of that verb), called with the key literal first,
+  `policy_reader("charter.override", …)`, the call shape dGroundRules' reader-coverage arm counts
+  (TOOL-dGroundRules-8, its Readers table). It reads the target's committed policy at its landed
+  revision, and an unset key answers the catalogue default `explicit-override` with its reason
+  (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3 S2); on the reader's exit 2 the render refuses, naming
+  the key and printing the reader's line. The key's catalogue row lands with dGroundRules with no
+  `summary` or `usage`, named on the shrink-only `tools/policy/unsummarised-keys.txt`
+  (TOOL-dGroundRules-1 S3, S6): this unit adds no row; it fills that row's `summary` and its `usage`, a
+  line the row admits (`charter.override = "absolute"`), and drains the name with
+  `python <prefix>/policy/policy.py lists --write` in the same commit. Observed by AC2 and AC8.
 - **S3** — The instruction map: one line per level of S8's `LEVELS`, naming the registered documents at
   that level (`PLAY-dOrderedCharter-3`'s registry) and when each loads, and the sentence directing an
   agent after a reset to rebuild the hierarchy from it. It is rendered by
@@ -93,10 +106,13 @@ C1-F11, C1-F12).
 - **S8** — The project block: the repository's own rules in their own part of the level-0 envelope,
   under a heading naming what the reader does, rendered from `[charter] adopter_rules` until the
   overlay's level-0 `repo.` units replace that source. Observed by AC1.
-- **S9** — Size. The re-founded `AGENTS.md` is measured against its row (20480); a crossing is raised in
-  this unit's commit under `tools/template-size-limits.txt`'s four conditions, argued in place and
-  recorded in `memory/DECISIONS.md`, and stays at or under 32768, which `PLAY-dOrderedCharter-6`'s check
-  holds. Observed by AC7.
+- **S9** — Size. The re-founded `AGENTS.md` is measured with `budgets.py resolve AGENTS.md`
+  (TOOL-dGroundRules-9 S2) against its cap `budgets."AGENTS.md"` (20480), which dSafePassage's step moved
+  into `.governance/policy.toml` from the former limits file (TOOL-dSafePassage-1 S7, S8). A crossing is
+  raised in this unit's commit in the minimal guard's one admitted shape (TOOL-dGroundRules-6 S3): that
+  one leaf grown, a `RAISED <old> -> <new>` comment directly above it, argued under the four raise
+  conditions the step carries above `[budgets]`, and a `memory/DECISIONS.md` row added; the cap stays at
+  or under 32768, which `PLAY-dOrderedCharter-6`'s check holds. Observed by AC7.
 - **S10** — The page. `help/charter.md` gains the override rule, its three values and where the record
   goes. Observed by AC7.
 
@@ -126,7 +142,8 @@ C1-F11, C1-F12).
 - **hands-off** `PLAY-dOrderedCharter-34` — the project block composed from the overlay's level-0 units
 - **hands-off** `PLAY-dOrderedCharter-5` — the re-founded charter, whose blocks the ranked agent file and handoff carry
 - **hands-off** `PLAY-dOrderedCharter-30` — the roles `rules:` join re-pointed to practice tags, through which the renamed `portable` value is read
-- **consumes-from** external — dGroundRules' one policy reader; until it lands `charter.override` reads its default
+- **consumes-from** external — dGroundRules, landed before the build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S7) with an unset key's default and reason (TOOL-dGroundRules-3 S2), the `charter.override` row and the shrink-only list this unit drains (TOOL-dGroundRules-1 S3, S6), `budgets.py resolve` (TOOL-dGroundRules-9 S2), the minimal guard's one admitted raise (TOOL-dGroundRules-6 S3), and the reader-coverage arm's call shapes (TOOL-dGroundRules-8)
+- **consumes-from** external — dSafePassage, landed before the build run: the step that moved the `AGENTS.md` row of the former limits file to `budgets."AGENTS.md"` in `.governance/policy.toml`, the four raise conditions above `[budgets]` (TOOL-dSafePassage-1 S7, S8)
 - **consumes-from** `PLAY-dOrderedCharter-42` — the override kind's token in the bindings reader, without which S4's record reads malformed (finding 31)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 21, 47, 75 and 85, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC7's page pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
@@ -186,7 +203,11 @@ reseed. `parse_charter` reads a `v4.x` charter through `SECTION_ONE_RE`, unchang
 ### Rollout
 
 Live at landing, in one commit with the role render (S7), so no tree holds the re-founded charter and
-an unparsed roles kit.
+an unparsed roles kit. That commit also carries the `charter.override` row's fill and the list's drain,
+and a raise of `budgets."AGENTS.md"` if S9 needs one. A second commit stages only
+`.governance/policy.json` as `policy.py mirror --write` regenerates it, because the mirror records the
+catalogue's and the policy file's blob ids (TOOL-dGroundRules-5 S1), and the guard admits a mirror
+commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
 ### Files touched (estimate)
 
@@ -208,8 +229,11 @@ an unparsed roles kit.
 - `tools/unattended/check-pass-order.sh`
 - `tools/check-microformats.sh`
 - `tools/check-microformats.test.sh`
-- `tools/template-size-limits.txt`
+- `.governance/policy.toml` (only on S9's raise of `budgets."AGENTS.md"`)
 - `memory/DECISIONS.md`
+- `tools/policy/catalogue.toml` (the `charter.override` row's `summary` and `usage`)
+- `tools/policy/unsummarised-keys.txt` (drained by `lists --write`)
+- `.governance/policy.json` (the second commit, regenerated by `mirror --write`)
 - `help/roles.md`
 - `help/charter.md`
 - `tools/memory-tree/build_records.py` (the override kind joins `PLAY-dOrderedCharter-7`'s factory)
@@ -230,8 +254,9 @@ an unparsed roles kit.
 - perf / scale: the map adds one registry read per render.
 - error / empty / loading states: an unreadable principle registry or document registry refuses the
   render naming the file.
-- observability: the render prints `charter.override` and its source, value or default.
-- risks: the charter grows past its row (S9); the role render is in the same commit (Rollout).
+- observability: the render prints `charter.override` and its source, as `policy.py get --explain`
+  names it.
+- risks: the charter grows past its cap (S9); the role render is in the same commit (Rollout).
 - testing: §6 and the `New arm:` lines of §7.
 - migration: §4 Migration.
 - user docs: `help/charter.md` and `help/roles.md` (S6, S10).
@@ -241,9 +266,10 @@ an unparsed roles kit.
 - **AC1** — When `grep -nE "^## " AGENTS.md` runs after the re-render, no heading starts with a digit,
   the headings appear in §4's order, and the line after `<!-- gov:playbook -->` is the level-0 envelope.
   Red when: a numbered heading or the provenance paragraph survives.
-- **AC2** — When the render runs against three scratch targets setting `charter.override` to each value
-  through the stand-in default's override argument, each charter carries its value's sentence and no
-  other; a fourth, setting `nope`, refuses naming the key.
+- **AC2** — When the render runs against three scratch targets whose committed `.governance/policy.toml`
+  sets `charter.override` to each value, each charter carries its value's sentence and no other; a
+  fourth, whose only committed policy file sets `nope`, refuses naming the key, the reader having no
+  valid revision to fall back to (TOOL-dGroundRules-4 S5).
   Red when: two values render the same sentence or an unknown value renders.
 - **AC3** — When `python build_records.py new override` runs in a scratch build under
   `explicit-override`, it writes `build/<date>-build-<unit id>-override-1.md` with every field; under `absolute` it exits 1 writing
@@ -260,11 +286,17 @@ an unparsed roles kit.
   over a scratch charter whose practices markers are removed and whose `## 1.` heading is gone exits 2
   naming R0.
   Red when: the role render fails on the re-founded charter, or a charter with neither shape parses.
-- **AC7** — When `bash tools/check-template-size.sh AGENTS.md` runs, it exits 0; a raised row carries a
-  `RAISED <old> -> <new>` comment naming this unit; and `grep -n "charter.override" charter.md`
-  names the key.
-  Red when: the charter lands over its row, or the page omits the rule.
-  figure: the charter's size is DERIVED by the gate at the landing commit.
+- **AC7** — When `git show HEAD:.governance/policy.toml` is read after the commit, its `"AGENTS.md"` key
+  under `[budgets]` holds a value at least the CR-stripped bytes of `AGENTS.md`, and a raised key
+  carries a `RAISED <old> -> <new>` comment naming this unit directly above it; and
+  `grep -n "charter.override" charter.md` names the key.
+  Red when: the charter lands over its cap, or the page omits the rule.
+  figure: the charter's size is DERIVED by `wc -c` at the landing commit.
+- **AC8** — When `python "tools/policy/policy.py" lists --check` runs after the first commit, it exits 0;
+  `git grep -n -x -F "charter.override" -- "tools/policy/unsummarised-keys.txt"` finds no line; and
+  `git grep -n -F '("charter.override"' -- tools/playbook/render_playbook.py` finds one line.
+  Red when: the row keeps no summary or usage, the name stays on the shrink-only list, or the key is
+  read in a shape the reader-coverage arm does not count.
 
 ## 7. Gates
 
@@ -306,6 +338,12 @@ New arm: tools/playbook/render_playbook.py · covers AC2 · the selftest renders
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · S2 S9 · §3 Edges · §4 Rollout, Files touched · §5 · AC2 AC7 AC8 · re-grounded on the
+  parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md` row 39, U1,
+  U3 and U4: `charter.override` is read with `policy.py get` in a shape the reader-coverage arm counts,
+  its landed row filled and drained, the mirror in a second commit; `AGENTS.md` is measured with
+  `budgets.py resolve` and a crossing raised on `budgets."AGENTS.md"` in the minimal guard's one
+  admitted shape, the former limits file being gone.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-14 — memory instructing nothing: the auto-memory index measured at session start, its directives detected, a standing directive promoted into a unit
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 27 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0044@0104c89b whole
 
@@ -13,9 +13,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-a.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-a.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-27 |
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-14-deviation-141.md](../build/2026-10-24-build-PLAY-dOrderedCharter-14-deviation-141.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-14-deviation-142.md](../build/2026-10-25-build-PLAY-dOrderedCharter-14-deviation-142.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -71,7 +75,9 @@ and instructs only by promotion (layer-instruction R-H).
 - **consumes-from** `PLAY-dOrderedCharter-15` — the guarded write command a promotion goes through, which refuses every write until dDeclaredLoop's guard lands
 - **consumes-from** `PLAY-dOrderedCharter-9` — the unit row grammar the promotion composes
 - **consumes-from** `PLAY-dOrderedCharter-8` — the card file at level 1, which carries the new cell after a session start
-- **hands-off** external — dTotalRecall registers the auto-memory witness and owns `memory.load-budget`; dDeclaredLoop's guard admits the promotion's write
+- **hands-off** external — dTotalRecall registers the auto-memory witness and owns `memory.load-budget`, its catalogue row's `summary` and `usage` its to fill; dDeclaredLoop's guard admits the promotion's write
+- **consumes-from** `PLAY-dOrderedCharter-7` — `read_policy_value`, which the measure reads `memory.load-budget` through
+- **consumes-from** external — dGroundRules, landed before this build run: the `memory.load-budget` catalogue row (TOOL-dGroundRules-1 S3) and `policy.py get` at the landed revision with an unset key's default and its source (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3 S2)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, finding 64, which that batch unit corrects after this unit lands, each by the item its report id names
 
 ## 4. Design
@@ -90,10 +96,13 @@ project audits.
 ### Measuring and detecting
 
 `measure_index(root)` reads `<dir>/MEMORY.md`. Bytes are its byte length; lines its line count. The
-budget is `memory.load-budget`, a key dTotalRecall owns (v2's `[policies]`, `memory.load-budget`,
-values `4k, 8k, 16k`, default `8k`), read through dGroundRules' one reader once both have landed and
-until then the catalogue default, held as `LOAD_BUDGET_DEFAULT = 8192` with that hand-over in its
-comment. `scan_directives(root)` walks the index's markdown links (a `[<title>]` label, then its `<file>.md` target in parentheses), opens each
+budget is `memory.load-budget`, a key dTotalRecall owns (v2's `[policies]`, values `4k, 8k, 16k`,
+default `8k`), whose catalogue row lands with dGroundRules (TOOL-dGroundRules-1 S3). It is read with
+`read_policy_value("memory.load-budget", root)` (PLAY-dOrderedCharter-7 §4), `root` the repository the card
+describes, its `--explain` source named in the line's parenthesis; a `k` is 1,000 bytes (§8 F1), so the
+default is 8000 bytes. A refused read, the reader's exit 2 or no policy kit found, prints `memory —
+skipped: memory.load-budget unread · <the reader's line>` and compares nothing, as the cell's other
+skipped forms do. `scan_directives(root)` walks the index's markdown links (a `[<title>]` label, then its `<file>.md` target in parentheses), opens each
 file under the memory directory only (a link resolving outside it is skipped and counted), and reads
 its front matter: `type: feedback`, at column 0 or indented under `metadata:`, marks a directive; a
 `promoted-to:` line marks it promoted. The detector states in its docstring what it does not read:
@@ -102,7 +111,7 @@ prose directives inside `project` or `reference` entries, and index lines with n
 `main measure` prints one line, never more than 200 bytes:
 
 ```
-memory — MEMORY.md 19830 B over its 8192 B budget (memory.load-budget default) · 110 lines · 54 standing directives unpromoted · list: memory_index.py directives
+memory — MEMORY.md 19830 B over its 8000 B budget (memory.load-budget default) · 110 lines · 54 standing directives unpromoted · list: memory_index.py directives
 ```
 
 Under budget it reads `within its <n> B budget`. No directory prints `memory — skipped: no
@@ -140,8 +149,8 @@ At this build every write through that command is refused until dDeclaredLoop's 
 
 ### Inventory
 
-New: the files `tools/lib/auto_memory.py` and `tools/playbook/memory_index.py`; the constants
-`AUTO_MEMORY_TEMPLATE` and `LOAD_BUDGET_DEFAULT`; the functions `measure_index`, `scan_directives`
+New: the files `tools/lib/auto_memory.py` and `tools/playbook/memory_index.py`; the constant
+`AUTO_MEMORY_TEMPLATE`; the functions `measure_index`, `scan_directives`
 and `derive_memory_line`; the verbs `measure`, `directives` and `promote` with the flags `--home`, `--level`
 and `--tag`; the knob `CARD_MEMORY_BOUND`; the card prefix `memory —`; the front-matter key
 `promoted-to:`; the parity row `auto_memory`. Naming cells: `lexicon naming predicates` grades the
@@ -181,8 +190,8 @@ The cell appears in every card after the release; it reads only.
   the guarded command succeeds.
 - perf / scale: one bounded Python spawn per session start; 110 index lines and 109 entry files
   today, each read once.
-- error / empty / loading states: no directory, no index, an unreadable file and a timeout each print
-  one `skipped:` line; the card still writes.
+- error / empty / loading states: no directory, no index, an unreadable file, a refused budget read and
+  a timeout each print one `skipped:` line; the card still writes.
 - observability: the cell is the observation, and `directives` lists what it counted.
 - risks: the harness may change its memory layout; the template is one constant in one canonical
   block.
@@ -201,10 +210,13 @@ The cell appears in every card after the release; it reads only.
   Red when: a copy drifts unseen, or the signal's output changes.
 - **AC2** — When `python memory_index.py measure --home <fixture>` runs over a fixture
   index of 9000 bytes linking three entries, two of them `type: feedback` and one of those carrying
-  `promoted-to:`, it prints one line naming `9000 B over its 8192 B budget` and `1 standing
-  directives unpromoted`; with the index cut to 4000 bytes it reads `within its 8192 B budget`.
-  Red when: a promoted entry is still counted, a non-feedback entry is counted, or the budget is
-  not compared.
+  `promoted-to:`, it prints one line naming `9000 B over its 8000 B budget` and `1 standing
+  directives unpromoted`; with the index cut to 4000 bytes it reads `within its 8000 B budget`; with
+  the fixture repository's only committed policy file setting `memory.load-budget = "9k"`, which the row
+  refuses and no valid revision precedes (TOOL-dGroundRules-4 S5), it prints one `memory — skipped:`
+  line naming `memory.load-budget`.
+  Red when: a promoted entry is still counted, a non-feedback entry is counted, the budget is not
+  compared, or a refused read compares against a typed default.
 - **AC3** — When `python memory_index.py directives --home <fixture>` runs over AC2's
   fixture, it prints exactly the one unpromoted feedback entry's name and description; a link
   planted to `outside.md` one directory above the memory directory is skipped and named in a count line.
@@ -240,11 +252,14 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC3 AC6 AC7 · `--selft
 ## 8. Open questions
 
 - **F1 — What `8k` means for the index's budget.** v2 states `memory.load-budget` values as `4k, 8k,
-  16k` with no unit. Options: 8,000 bytes; 8,192 bytes; 8,000 tokens. The catalogue's other size
-  caps (`template-size-limits.txt`, `CARD_CAP_BYTES`) are KiB-round bytes, and the harness's own
-  auto-memory limit is stated in bytes and lines. RESOLVED (agent, 2026-10-23, delegated): 8,192
-  bytes, rung 3, the reading every neighbouring cap uses; dTotalRecall's catalogue row, when it
-  lands, owns the value and this constant is re-pointed to its reader. widens: none · relaxes: none
+  16k` with no unit. Options: 8,000 bytes; 8,192 bytes; 8,000 tokens. The 2026-10-23 pass took 8,192
+  bytes, the KiB reading of the byte caps beside it, held as a constant until the key had a reader; the
+  catalogue row and `policy.py get` now answer the key (TOOL-dGroundRules-1 S3, TOOL-dGroundRules-3 S2),
+  so only the conversion of `k` is this unit's. RESOLVED (agent, 2026-10-24, delegated): 8,000 bytes,
+  rung 1: the systems record's memory-key table holds this key's row
+  (`2026-10-16-build-PLAY-dClosedLoop-1-systems.md:569`) beside the design's one definition of the unit,
+  "a KB being 1,000 bytes" (`:570`), the reading PLAY-dOrderedCharter-27's F1 takes for
+  `memory.code-budget`; 8,192 types a second definition. widens: none · relaxes: none
 - **F2 — How a promoted unit names the memory entry it came from.** The memory plan types this as a
   `promoted-from` edge written on `instructions.edit`'s change record, which PLAY-dOrderedCharter-15
   carries as its optional `Promoted-from` field, and the auto-memory's witness class, the target's
@@ -265,6 +280,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC3 AC6 AC7 · `--selft
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §3 Edges · §4 Measuring and detecting, Inventory · §5 · AC2 · §8 F1 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 48: `memory.load-budget` is read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value`, `LOAD_BUDGET_DEFAULT` is dropped, a refused read prints a `skipped:` line, and `k` converts as 1,000 bytes, so the default budget moves from 8192 to 8000 bytes.
 
 ## 10. Reuse audit
 

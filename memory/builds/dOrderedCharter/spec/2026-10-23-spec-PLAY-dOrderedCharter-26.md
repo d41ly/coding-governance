@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-26 — file:line citations held in the positional population, new text citing a symbol or a pinned line
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 9 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0056@a91f3d50 whole
 
@@ -15,8 +15,12 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-26-deviation-261.md](../build/2026-10-24-build-PLAY-dOrderedCharter-26-deviation-261.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-26-deviation-262.md](../build/2026-10-24-build-PLAY-dOrderedCharter-26-deviation-262.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-26-deviation-263.md](../build/2026-10-24-build-PLAY-dOrderedCharter-26-deviation-263.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-26-deviation-264.md](../build/2026-10-25-build-PLAY-dOrderedCharter-26-deviation-264.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -58,9 +62,12 @@ review producers that mandate a bare file:line today, so the ratchet does not re
     only ever shortens the list;
   - `refuse`: every positional reference is red, listed or not;
   - `report`: every finding is printed and the exit is 0.
-  The key is read through dGroundRules' one reader (`cl-dClosedLoop-0008`) once it lands, and until then
-  with v2's catalogue default, `shrink-only` (v2:1351); under `--fixture`, unit 19's `--set` plants a
-  value. Observed by AC2, AC3, AC4 and AC5.
+  The key is read by `read_policy_value("tags.positional", root)` from unit 19's
+  `tools/playbook/policy_value.py`, the key literal first, the
+  shape dGroundRules' reader-coverage arm counts: `root`'s committed policy at its landed revision,
+  unset its catalogue default, `shrink-only` (v2:1351). A `PolicyRefused`, an exit 2 from `policy.py
+  get`, refuses the check with exit 2 naming the key. Under `--fixture`, unit 19's `--set` plants a value. Observed by
+  AC2, AC3, AC4 and AC5.
 - **S4** — Resolution of the two stable forms, by the same arm:
   - a blob-pinned line resolves when its `<oid>` names one object and that blob holds line `<m>` (or `<n>`);
     an unknown, ambiguous or non-blob `<oid>`, or a line past the blob's end, is red wherever it is
@@ -88,6 +95,12 @@ review producers that mandate a bare file:line today, so the ratchet does not re
 - **S8** — The plants, through unit 19's fixture: `python tools/playbook/gov_tag.py --fixture --plant
   <case> [--set tags.positional=<value>]`, each case `positional-*`, in the scratch repository that
   fixture builds. Observed by AC1 to AC8.
+- **S9** — The key's row. dGroundRules lands the `tags.positional` catalogue row with its `allowed`,
+  default and owner and no `summary` or `usage`, the name on the shrink-only
+  `tools/policy/unsummarised-keys.txt` (TOOL-dGroundRules-1 S3, S6). This unit adds no row: it fills
+  the row's `summary` and a `usage` line the row admits (`tags.positional = "report"`), and drains the
+  name with `python <prefix>/policy/policy.py lists --write` in the same commit; the mirror
+  `policy.py mirror --write` regenerates lands in a second commit. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -104,8 +117,8 @@ review producers that mandate a bare file:line today, so the ratchet does not re
 
 ### Edges
 
-- **consumes-from** `PLAY-dOrderedCharter-19` — `tools/playbook/positional-refs.txt` and its row grammar, the `--list-positional` predicate, `gov_tag.py check` and its fixture, and the `tags` pack key (S21); without them there is no population to join
-- **consumes-from** external — dGroundRules' one policy reader (`cl-dClosedLoop-0008`), which the chain lands before this build run; until then the key reads its catalogue default
+- **consumes-from** `PLAY-dOrderedCharter-19` — `tools/playbook/positional-refs.txt` and its row grammar, the `--list-positional` predicate, `gov_tag.py check` and its fixture, the `tags` pack key (S21) and `read_policy_value` in `tools/playbook/policy_value.py`; without them there is no population to join
+- **consumes-from** external — dGroundRules, which the chain lands before this build run: the catalogue `tools/policy/catalogue.toml` holding the `tags.positional` row, the shrink-only `tools/policy/unsummarised-keys.txt` and the reader `policy.py get` (TOOL-dGroundRules-1 S3, S6, TOOL-dGroundRules-2 S7, `cl-dClosedLoop-0008`); without them S9 has no row to fill and the key no reader
 - **hands-off** `PLAY-dOrderedCharter-36` — the `path#symbol` form and S4's resolution, in which its `parser=` sources are written
 - **hands-off** `PLAY-dOrderedCharter-29` — the `positional` arm its address checks read
 - **hands-off** external — dWitnessedBar registers the list as a ledger population; dTotalRecall's code extractor replaces S4's def finder
@@ -167,6 +180,9 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
 - `tools/workflows/drift-audit-state.js`
 - `tools/roles/agents/gov-diff-reviewer.agent.md`
 - `.claude/agents/gov-diff-reviewer.md`
+- `tools/policy/catalogue.toml`, the landed row filled
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, regenerated, in its own commit
 
 ### Alternatives rejected
 
@@ -186,7 +202,8 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
 - perf / scale: one `git grep` over the tree and one `git cat-file --batch` for every pinned oid; the list
   grows by about 2.6 MB at seed and only shrinks after.
 - error / empty / loading states: an absent list is red, never an empty population read as green; an empty
-  file:line population after seed prints `unarmed`.
+  file:line population after seed prints `unarmed`; an exit 2 from `policy.py get` exits 2 naming
+  `tags.positional`.
 - observability: each red names the citing path, the reference and the remedy.
 - risks: a writer who cites `file:line` reds the bar; the message names `pin`. A frozen record's symbol
   that goes stale is only printed (S4).
@@ -237,13 +254,22 @@ Live at landing, at order 9, after unit 19 (order 4) ships the list, `--list-pos
   printed.
   figure: DERIVED at observation by the seed.
   Red when: the arm reds on the tree it was seeded from.
+- **AC11** — When `python -c "import tomllib; print([(r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'tags.positional'])"`
+  runs after the pass, it prints one tuple, `dOrderedCharter` with both flags `True`;
+  `python "tools/policy/policy.py" lists --check` exits 0;
+  `git grep -n -x -F "tags.positional" -- "tools/policy/unsummarised-keys.txt"` finds no line; and
+  `git grep -n -F 'read_policy_value("tags.positional"' -- tools/playbook/positional.py` finds one line.
+  Red when: the key keeps no summary or usage, stays on the list, gains a second row, or is read in a
+  shape the reader-coverage arm does not count.
 
 ## 7. Gates
 
 `playbook render selftest` · `govkit acceptance matrix` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `tier2-review self-test` · `verifier fan-out self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `check-wiring self-test` · `lexicon naming predicates` · `spec tokens (a spec's own names resolve)`
 
 Unit 19's `tags (the resolver's checks)` leg, which lands at order 4, runs the `positional` arm over the
-tree.
+tree. dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`, the
+mirror's parity and the reader-coverage arm over S9's row and S3's call; they are named here rather
+than on the leg line, because neither exists at this spec's base.
 
 New arm: tools/playbook/positional.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 · the `tags positional selftest` leg runs every `positional-*` fixture case, each failing case staged by its plant · none
 
@@ -273,6 +299,12 @@ New arm: tools/playbook/gov_tag.py · covers AC10 · the `positional` arm inside
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0056`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-47, PLAY-dOrderedCharter-48, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · S3 S9 · §3 · §4 Files touched · §5 · AC11 · §7 · §10 · re-grounded on the
+  parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, U3 and
+  U4: S3 reads `tags.positional` through `read_policy_value` in unit 19's `tools/playbook/policy_value.py` in the shape the reader-coverage
+  arm counts, an exit 2 refusing; new S9 fills and drains the landed row, the mirror in a second
+  commit. On the coordinator's follow-up the helper is `read_policy_value` in unit 19's
+  `tools/playbook/policy_value.py`, the playbook kit's one policy helper.
 
 ## 10. Reuse audit
 
@@ -285,5 +317,6 @@ keyed list of file line citations so new text cannot add one"` ranked name-token
 `key`, `scan_missing_citations`), none a def finder or a ratchet over citations, so no existing seam fits
 the resolver; codebase-map's symbol corpus and lexicon's `_python_defs` (`tools/lexicon/lexicon.py:425`)
 are optional kits the core may not import (scout B, PLAY-dOrderedCharter-26 row), confirmed at source.
+The key is read through `read_policy_value` in unit 19's `tools/playbook/policy_value.py`, called and never copied.
 
 Recall terms used: `python tools/memory-recall/query.py "how are positional references and stale file line citations held so new text cannot add them" --terms "positional ratchet shrink-only keyed list citation file:line path#symbol blob pinned waiver highwater stale"`

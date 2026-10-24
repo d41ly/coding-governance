@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-3 — envelopes rendered for every registered document, and the gate over them
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 18 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0033@756303be whole
 
@@ -14,9 +14,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-3-deviation-31.md](../build/2026-10-24-build-PLAY-dOrderedCharter-3-deviation-31.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-3-deviation-32.md](../build/2026-10-24-build-PLAY-dOrderedCharter-3-deviation-32.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-3-deviation-33.md](../build/2026-10-25-build-PLAY-dOrderedCharter-3-deviation-33.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -70,11 +74,18 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
   the charter's Protocols lines name, every `*.md` under `{memory_root}/guides/`, every
   `.claude/agents/*.md`, `.claude/rules/*.md`, `.claude/skills/*/SKILL.md` and `skills/*/SKILL.md`. The
   gate asserts that population is non-empty and prints its count. Observed by AC5 and AC6.
-- **S7** — Size. A document an envelope takes past its row in `tools/template-size-limits.txt` is
-  raised by the build run under that file's four conditions, argued in place above the row and
-  recorded in `memory/DECISIONS.md`, one row per raise. At base, `memory/guides/UNATTENDED-PROTOCOL.md`
-  (66859 of 66860) and `skills/session-kickoff/SKILL.md` (18310 of 18432) are the two rows an envelope
-  crosses. Observed by AC7.
+- **S7** — Size. A document's cap is its `budgets.*` key in `.governance/policy.toml`, where
+  dSafePassage's step moved every row of the former limits file (TOOL-dSafePassage-1 S7, S8), named as
+  the census `tools/policy/caps.toml` names it and read with `budgets.py resolve <cap>`
+  (TOOL-dGroundRules-9 S1, S2). A document an envelope takes past its cap is raised by the build run in
+  the minimal guard's one admitted shape (TOOL-dGroundRules-6 S3): exactly one `budgets` leaf grown per
+  commit, a `RAISED <old> -> <new>` comment directly above it, argued under the four raise conditions
+  the step carries above `[budgets]`, and a `memory/DECISIONS.md` row added. So each crossing
+  document's envelope lands in the commit that raises its cap, one commit per raise. At base,
+  `memory/guides/UNATTENDED-PROTOCOL.md` (66859 of 66860) and `skills/session-kickoff/SKILL.md` (18310
+  of 18432) are the two caps an envelope crosses, each a census row. A registered document with no
+  census row has no cap declared and is measured by none; this unit adds no census row, a new cap being
+  the owner's (TOOL-dGroundRules-9 §3). Observed by AC7.
 
 ## 3. Non-goals (OUT)
 
@@ -102,6 +113,8 @@ every load-bearing document to a registry row (foundations R2, v2:949-957 P13, l
 - **hands-off** `PLAY-dOrderedCharter-29` — the document registry the render-parity arm reads
 - **consumes-from** `PLAY-dOrderedCharter-20` — `INSTRUCTION_PATHSPECS`, the instruction-file population S6's load-bearing population reads in place of its own path list
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 5, 22, 38, 57, 65 and 67, which that batch unit corrects after this unit lands, each by the item its report id names
+- **consumes-from** external — dSafePassage, landed before the build run: the step that moved every row of the former limits file under `budgets.*` in `.governance/policy.toml`, the four raise conditions above `[budgets]` (TOOL-dSafePassage-1 S7, S8)
+- **consumes-from** external — dGroundRules, landed before the build run: the cap census and `budgets.py resolve` (TOOL-dGroundRules-9 S1, S2), and the minimal guard's one admitted raise (TOOL-dGroundRules-6 S3)
 - **consumes-from** `PLAY-dOrderedCharter-50` — the owed-rows probe: this pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit and writes every row it names in that commit (round-2 id 23), the rows of its envelope leg and the size rows its envelopes cross among them
 
 ## 4. Design
@@ -167,7 +180,7 @@ naming `P13`.
 - `tools/roles/roles_lib.py`
 - `tools/roles/render_agents.py`
 - `tools/gate-legs.json`
-- `tools/template-size-limits.txt`
+- `.governance/policy.toml` (S7's two raises, one commit each)
 - `memory/DECISIONS.md`
 - `coding-governance-agents.template.md`
 - `tools/memory-tree/BUILD-METHOD.template.md`
@@ -208,7 +221,7 @@ naming `P13`.
 - error / empty / loading states: an absent registry or an empty load-bearing population refuses with
   exit 2, never reads green.
 - observability: the gate prints the population count and one line per offender.
-- risks: two documents sit at their size rows (S7); a raise is a decision row, not a silent edit.
+- risks: two documents sit at their caps (S7); a raise is a decision row, not a silent edit.
 - testing: §6 and the `New arm:` lines of §7.
 - migration: §4 Migration.
 - user docs: `help/charter.md`, created by `PLAY-dOrderedCharter-1`, gains a paragraph on levels and
@@ -239,10 +252,11 @@ naming `P13`.
 - **AC6** — When the same fixture gains an unregistered guide, `NEW.md` in its guides folder, the gate exits 1
   naming it; with its row added and its envelope written, it exits 0.
   Red when: an unregistered load-bearing document passes.
-- **AC7** — When `bash tools/check-template-size.sh memory/guides/UNATTENDED-PROTOCOL.md` and
-  `bash tools/check-template-size.sh skills/session-kickoff/SKILL.md` run after the envelopes land, both
-  exit 0, and each raised row carries a `RAISED <old> -> <new>` comment naming this unit.
-  Red when: an envelope lands with its document over its row.
+- **AC7** — When `git show HEAD:.governance/policy.toml` is read after the envelopes' commits, the keys
+  `"memory/guides/UNATTENDED-PROTOCOL.md"` and `"skills/session-kickoff/SKILL.md"` under `[budgets]`
+  each hold a value at least the CR-stripped bytes of its document, each raised key under a
+  `RAISED <old> -> <new>` comment naming this unit directly above it.
+  Red when: an envelope lands with its document over its cap.
 
 ## 7. Gates
 
@@ -280,6 +294,11 @@ New arm: tools/playbook/instruction_units.py · covers AC5 AC6 · the `envelopes
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
+- rev-4 · 2026-10-24 · S7 · §3 Edges · §4 Files touched · §5 · AC7 · re-grounded on the parents' landed
+  specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md` U1: each document is
+  measured against its `budgets.*` cap through `budgets.py resolve`, the former limits file being gone;
+  a crossing is raised in the minimal guard's one admitted shape, one cap per commit; a document with
+  no census row has no cap; the external edges to dSafePassage's step and dGroundRules' census added.
 
 ## 10. Reuse audit
 

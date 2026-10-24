@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0062@fe903e93 whole
 
@@ -13,9 +13,14 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-c.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-c.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-32-deviation-321.md](../build/2026-10-24-build-PLAY-dOrderedCharter-32-deviation-321.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-32-deviation-322.md](../build/2026-10-25-build-PLAY-dOrderedCharter-32-deviation-322.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-32-1-spec-writer.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-32-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -68,12 +73,19 @@ and a fixed unit refuses all three; and where the repository declares its own po
   source that fixes it. Observed by AC7.
 - **S7** — The repository's own policy keys. A `[[policy]]` row declares `key` (`adopter.<seg>`),
   `values`, `default`, `summary` and `usage`; its value is set under `[adopter]` in
-  `.governance/policy.toml` and its tag is `policy.adopter.<seg>`. dGroundRules' one reader
-  (`cl-dClosedLoop-0008`) is extended to read the overlay's `[[policy]]` rows as a second catalogue
-  source: it validates an `adopter.` value against its row as it validates a catalogue key, refuses an
-  `adopter.` key no row declares, and leaves `adopter.` keys outside the presets' completeness check.
-  Only repository units read them: a gov unit whose `when` names a `policy.adopter.` tag is refused.
-  Observed by AC8, AC9.
+  `.governance/policy.toml` and its tag is `policy.adopter.<seg>`. This unit owns the row's grammar,
+  and the policy kit parses it: inside `tools/policy/policy.py`, `read_overlay_policies(repo, sha)`
+  reads the `[[policy]]` tables of `.governance/instructions.toml`'s blob at the revision the reader is
+  reading, through the kit's own `read_blob_at` (TOOL-dGroundRules-21 S11) and `tomllib`, never
+  importing `tools/playbook/` (TOOL-dGroundRules-1 §4), and returns each as a catalogue row whose
+  `owner` is the repository. Those rows join the catalogue's wherever the kit matches a key to a row:
+  `read_catalogue_row`, so `get` resolves an `adopter.` key (TOOL-dGroundRules-2 S4); `validate` and
+  `arm_schema`, so an `adopter.` value is judged against its row and an `adopter.` key no row declares
+  is the unknown-leaf problem (TOOL-dGroundRules-4 S1, S2); and the mirror, which renders each
+  `adopter.` key beside the catalogue's (TOOL-dGroundRules-5 S1). A `[[policy]]` key outside `adopter.`
+  is refused, so the overlay never redeclares a catalogue key, and `adopter.` keys stay outside the
+  presets' completeness check. Only repository units read them: a gov unit whose `when` names a
+  `policy.adopter.` tag is refused. Observed by AC8, AC9.
 - **S8** — The route for writing the overlay. `write_overlay_units(target, rows)` is the one function
   that writes rows into `.governance/instructions.toml`, keeping them ordered by level then tag,
   refusing a tag already present and leaving the file byte-identical on refusal. Its callers are the
@@ -81,8 +93,10 @@ and a fixed unit refuses all three; and where the repository declares its own po
   step that moves `[charter] adopter_rules` into the overlay, gov's own first (P38). Observed by AC10.
 - **S9** — The selection claim. The comment above `kits` in `.governance/deploy.toml` (`:11-13`), which
   says the list holds every kit this repository carries, is corrected to say what the list is and
-  that `kits` is the selection, written in the same prepared merge as PLAY-dOrderedCharter-31's step
-  on gov (§8 F4). Observed by AC11.
+  that `kits` is the selection. The edit is the owner's, made at the owner's terminal, the one writer
+  of a guarded file outside a step that the minimal guard admits (TOOL-dGroundRules-6 S1, S4; §8 F4):
+  this unit's pass leaves `.governance/deploy.toml` out of its commit, and its hand-back names the
+  edit with the comment's new text. Observed by AC11.
 
 ## 3. Non-goals (OUT)
 
@@ -90,8 +104,8 @@ and a fixed unit refuses all three; and where the repository declares its own po
   budgets and the delta report: PLAY-dOrderedCharter-34's.
 - The step that converts `[charter] adopter_rules` into level-0 `repo.` units and its down:
   PLAY-dOrderedCharter-31's; this unit lands the home it writes into and the function it writes with.
-- The row mechanism for every other kind, `instructions.exclude`'s catalogue row and its reader:
-  PLAY-dOrderedCharter-35's. The exclusion refusals beyond a fixed unit: PLAY-dOrderedCharter-36's.
+- The row mechanism for every other kind, the summary and usage of `instructions.exclude`'s landed
+  catalogue row, and its reader: PLAY-dOrderedCharter-35's. The exclusion refusals beyond a fixed unit: PLAY-dOrderedCharter-36's.
 - Stale pins, editorial and semantic marks, successors and orphans: PLAY-dOrderedCharter-33's.
 - The pinned address forms' own checks (a missing `@`, a malformed hash, a hash in no revision):
   PLAY-dOrderedCharter-28's edge checks.
@@ -111,8 +125,8 @@ and a fixed unit refuses all three; and where the repository declares its own po
 - **hands-off** `PLAY-dOrderedCharter-33` — stale pins and successors behind `amends` and `supersedes`
 - **hands-off** `PLAY-dOrderedCharter-34` — composing the level-0 units as the project block, through `read_overlay`
 - **hands-off** `PLAY-dOrderedCharter-35` — the same mechanism over every registered kind's rows, through `read_overlay`
-- **consumes-from** external — dGroundRules' one policy reader, extended by S7, and its minimal guard on the file
-- **hands-off** `PLAY-dOrderedCharter-46` — S1's landed revision defined as HEAD, its unborn-HEAD outcome and the candidate read for write doors (finding 80)
+- **consumes-from** external — dGroundRules, built before this build run: the policy kit's `read_blob_at`, key-to-row matcher, `validate`, `arm_schema` and mirror, which S7 extends inside `tools/policy/` (TOOL-dGroundRules-21 S11, -2 S4, -4 S1 and S2, -1 S4, -5 S1), `policy.py get` (TOOL-dGroundRules-2 S7), and its minimal guard on the file (TOOL-dGroundRules-6 S1)
+- **hands-off** `PLAY-dOrderedCharter-46` — S1's landed revision defined as HEAD, its unborn-HEAD outcome and the candidate read for write doors (finding 80), and the `--rev HEAD` every `policy.py get` of the composition passes
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 6, 7, 9, 45 and 59, which that batch unit corrects after this unit lands, each by the item its report id names
 
 ## 4. Design
@@ -173,26 +187,32 @@ tree, not only in an adopter's.
 
 ### The policy keys
 
-The extension to dGroundRules' reader is one call: after loading the catalogue, the reader loads
-`read_overlay(root).policies` and adds each as a row whose `owner` is the repository. A value under
-`[adopter]` is then validated by the reader's existing path; a key under `[adopter]` with no row is
-the reader's existing unknown-key refusal. The presets' completeness check, when dKeptSession adds
-presets, skips rows whose owner is the repository. A unit names a key it reads in its `when`, S10's
-`trigger`, as the tag `policy.adopter.<seg>.<value>`, a key's tag with one value segment added;
-`derive_unit_composition` includes it only when the reader returns that value.
+The extension lives in the policy kit (S7): its matcher, `validate`, `arm_schema` and the mirror take
+the catalogue's rows plus `read_overlay_policies` at the same sha, so one revision answers both a value
+and its row, and a key under `[adopter]` with no row is the kit's existing unknown-leaf problem. The
+policy kit parses only the `[[policy]]` tables, by S7's five fields; `read_overlay` (S1) parses the
+`[[unit]]` rows and reads each `[[policy]]` row's `key` alone, for its tag, leaving `values` and
+`default` to the kit. The presets' completeness check, when dKeptSession adds presets, skips rows
+whose owner is the repository. A unit names a key it reads in its `when`, S10's `trigger`, as the tag
+`policy.adopter.<seg>.<value>`, a key's tag with one value segment added; `derive_unit_composition`
+includes it only when `policy_reader("adopter.<seg>")`, PLAY-dOrderedCharter-9's `policy.py get`
+subprocess caller, prints that value at the revision PLAY-dOrderedCharter-46 fixes for the
+composition. An exit 2 from that read refuses the composition, naming the unit and the key.
 
 ### The selection claim
 
 `.governance/deploy.toml:11` says "EVERY kit this repo carries", above a `kits` array of 22 entries
 (PINNED, counted at base `ce13efbe`), while the registry lists more entries than that. The comment is
 rewritten to name the list as gov's selection and say why it is not `[selection] default`, the
-reason it already gives; no count is typed in it.
+reason it already gives; no count is typed in it. The pass writes that text into its hand-back, and
+the owner applies it.
 
 ### Inventory
 
 New: `.governance/instructions.toml`; `tools/playbook/overlay.py` with `read_overlay`,
 `derive_unit_composition`, `derive_unit_class` and `write_overlay_units`, its verb `check` and its
-`--fixture --plant`; the `[[policy]]` row and its five fields; the `[adopter]` table of
+`--fixture --plant`; `read_overlay_policies` in `tools/policy/policy.py`; the `[[policy]]` row and its
+five fields; the `[adopter]` table of
 `.governance/policy.toml`; the tag forms `repo.<seg>` and `policy.adopter.<seg>`; the unit field
 `fixed-by`; the states `unchanged`, `amended`, `replaced`, `excluded` (S22's, which
 PLAY-dOrderedCharter-34 reports). Naming cells: unit 10's tag shape check grades the tags, and
@@ -212,10 +232,13 @@ Live at landing. Nothing changes in a render until an overlay holds units.
 - `tools/playbook/overlay.py` (new)
 - `tools/playbook/render_playbook.py` (the unit list taken from `derive_unit_composition`; its self-test arm)
 - `tools/playbook/instruction_units.py` (`fixed-by` read on S10 rows)
-- dGroundRules' policy reader module, its path as `TOOL-dGroundRules-2` lands it (S7)
-- `.governance/deploy.toml` (the comment, S9)
+- `tools/policy/policy.py` (`read_overlay_policies`, its rows joined at the matcher, `validate` and the mirror, S7)
+- `tools/policy/check_policy.py` (`arm_schema` over the joined rows, S7)
 - `help/overlay.md` (new)
 - `help/README.md`
+
+Not in the pass's commit: `.governance/deploy.toml`, whose comment (S9) the owner edits at their
+terminal.
 
 ### Alternatives rejected
 
@@ -237,7 +260,9 @@ Live at landing. Nothing changes in a render until an overlay holds units.
   rule.
 - observability: `overlay.py check` prints each unit's state and class.
 - risks: an amendment to an unpinned target would ride gov's later changes unseen; the pin is
-  mandatory on both edge types.
+  mandatory on both edge types. A commit that drops a `[[policy]]` row while `[adopter]` still sets its
+  key makes the policy file invalid at that revision, so the whole file falls back to its last valid
+  revision (TOOL-dGroundRules-4 S5); `arm_schema` reds the pair on the `policy check` leg.
 - testing: the fixture's plants (AC1-AC10).
 - migration: none at this unit.
 - user docs: `help/overlay.md`, linked from `help/README.md`, says how a repository adds, amends,
@@ -271,12 +296,15 @@ Live at landing. Nothing changes in a render until an overlay holds units.
   a `principle.` unit, each exits 1 naming the target and `principle` as the source.
   Red when: any of the three operations is admitted on a fixed unit.
 - **AC8** — When `--plant adopter-key` declares `adopter.release-train` with values `weekly` and
-  `monthly` and sets `monthly` in the fixture's policy file, the reader returns `monthly`; set to
-  `daily`, the reader refuses naming the key and its values; an undeclared `[adopter] other` is
-  refused; and a `repo.release-train` unit beside `policy.adopter.release-train` both resolve through
-  `python gov_tag.py show`.
-  Red when: an out-of-set or undeclared repository key is read, or the two same-named tags collide.
-  fixture: needs dGroundRules' reader landed, which the chain lands before this build run.
+  `monthly` and commits `monthly` in the fixture's policy file, `policy.py get adopter.release-train
+  --rev HEAD` prints `monthly`; with `daily`, or an undeclared `[adopter] other`, committed as the
+  policy file's only revision, `get` exits 2 with the problem's line naming the key; a `[[policy]]` row
+  keyed `budgets.enforce` exits 2 naming the row; and a `repo.release-train` unit beside
+  `policy.adopter.release-train` both resolve through `python gov_tag.py show`.
+  Red when: an out-of-set or undeclared repository key is read, the overlay redeclares a catalogue key,
+  or the two same-named tags collide.
+  fixture: needs dGroundRules' reader landed, which the chain lands before this build run; each case
+  commits its files, since the reader reads revisions only.
 - **AC9** — When `--plant gov-reads-adopter` gives a fixture gov unit the `when` tag `policy.adopter.release-train.weekly`,
   `overlay.py check` exits 1 naming the unit; a repository unit with the same `when` composes only
   while the value is `weekly`.
@@ -284,9 +312,13 @@ Live at landing. Nothing changes in a render until an overlay holds units.
 - **AC10** — When `write_overlay_units` writes two rows into a fixture overlay, the file holds them by
   level then tag; writing a tag already present exits 2 and leaves the file byte-identical.
   Red when: a duplicate tag is written or a refused write changes bytes.
-- **AC11** — When `git grep -n "EVERY kit" -- .governance/deploy.toml` runs after the prepared merge,
-  it finds nothing, and the comment above `kits` names the list as the selection.
-  Red when: the false claim survives.
+- **AC11** — When `git show --name-only --format= HEAD -- .governance/deploy.toml` runs on the pass's
+  commit, it prints nothing, and the pass's hand-back names the comment edit with its new text; after
+  the owner's edit, `git grep -n "EVERY kit" -- .governance/deploy.toml` finds nothing, and the comment
+  above `kits` names the list as the selection.
+  Red when: the pass commits the guarded file, the hand-back omits the edit, or the false claim
+  survives the owner's edit.
+  permission: the second half observes the owner's edit, made at their terminal, not the pass.
 
 ## 7. Gates
 
@@ -318,20 +350,30 @@ New arm: tools/playbook/overlay.py · covers AC6 · `overlay.py check` over gov'
   writes to both files until dDeclaredLoop (`cl-dClosedLoop-0012`), and PLAY-dOrderedCharter-15's
   command refuses every write until then. Options: the unit's pass edits them; the upgrade step, run in
   the lander's prepared merge, as PLAY-dOrderedCharter-31's F4 settles for the same files; the owner by
-  hand. RESOLVED (agent, 2026-10-23, delegated): the step's prepared-merge write, rung 1, the memory
-  plan's `[doors]` naming the upgrade-step kind as the overlay's writer; the build run files the
-  admission ask where the landed guard reads it otherwise, as PLAY-dOrderedCharter-31 does. widens:
-  none · relaxes: none
-- **F5 — The parent's reader is unbuilt.** S7 extends dGroundRules' one reader, which is OPEN with no
-  unit built at this build's base. RESOLVED (agent, 2026-10-23, delegated): rung 1, v2's `[chain]`
-  puts dGroundRules before this build; the build run re-grounds S7 against the landed reader, spelling
-  its module path and its catalogue call as it ships them, and adds no fourth `read_policy_key` copy.
+  hand. For the overlay: RESOLVED (agent, 2026-10-23, delegated): the step's prepared-merge write,
+  rung 1, the memory plan's `[doors]` naming the upgrade-step kind as the overlay's writer, which
+  PLAY-dOrderedCharter-31's step writes the rows through; no admission ask is owed, since the lander
+  never fires pre-commit (TOOL-dGroundRules-6 §4, `:105-107`). For the `deploy.toml` comment, rev-2's
+  step route does not hold: no step writes a gov-only comment, and a step program runs on every
+  adopter. RESOLVED (agent, 2026-10-24, delegated): the owner by hand, rung 1, TOOL-dGroundRules-6 S4,
+  whose hook admits a guarded path staged at the owner's terminal, the one writer of a guarded file
+  outside a step; the pass leaves the file out of its commit and its hand-back names the edit (S9).
   widens: none · relaxes: none
+- **F5 — Where S7's read of the overlay's policy rows lives.** rev-2 extended dGroundRules' reader in
+  place with `read_overlay(root).policies`, the playbook kit's reader. dGroundRules' landed specs rule
+  that out: a kit may not import a sibling kit (TOOL-dGroundRules-1 §4), `load_catalogue(kit)` reads the
+  kit's own file with no revision, the reader reads one revision's blobs (TOOL-dGroundRules-2 S2), and
+  `validate` reports a leaf no row names, so the whole file would fall back (TOOL-dGroundRules-4 S1,
+  S5). Options: (a) the read inside `tools/policy/`, on the same revision's blob, seen by the matcher,
+  `validate`, `arm_schema` and the mirror; (b) the playbook kit handing its rows to the reader, which a
+  hook's `get` never sees. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1, the parent's kit rule
+  and one-revision read; S7 adds no fourth `read_policy_key` copy. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
+- rev-3 · 2026-10-24 · §2 S7 · §3 non-goals, Edges · §4 The policy keys, Inventory, Files touched · §5 risks · AC8 · §8 F4, F5 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 43 and U5: the `[[policy]]` read lives in `tools/policy/`, on the reader's revision, seen by its matcher, `validate`, `arm_schema` and the mirror; the composition reads a key through `policy.py get`; the guard owes no admission ask at a landing. Then §2 S9 · §4 The selection claim, Files touched · AC11 · §8 F4's `deploy.toml` half (re-resolved): the comment is the owner's edit at their terminal (TOOL-dGroundRules-6 S4), named in the pass's hand-back, never a step's write, so the pass commits no `.governance/deploy.toml`; F4's overlay half stands.
 
 ## 10. Reuse audit
 
@@ -341,7 +383,8 @@ The seams extended: the `.governance/` home and its reader shape (`load_deploy`,
 (`render_role`, `tools/roles/roles_lib.py:579-591`, appended under `## House rules`), both left for
 PLAY-dOrderedCharter-31 and -34 to re-point; `derive_pin_hash`, PLAY-dOrderedCharter-24's extraction of
 `derive_clause_hash` (`tools/memory-tree/design_lib.py:169-173`); PLAY-dOrderedCharter-36's `fixed-by`
-source grammar; dGroundRules' reader. The scout row (reuse scout C, unit -32) is verified: no
+source grammar; dGroundRules' policy kit, whose `read_blob_at` and key-to-row matcher S7 extends in
+place (TOOL-dGroundRules-21 S11, TOOL-dGroundRules-2 S4). The scout row (reuse scout C, unit -32) is verified: no
 `instructions.toml` exists anywhere at base, and the three shell copies of `read_policy_key`
 (`tools/push-main.sh:404`, `tools/run-gates/post-merge.sh:171`, `tools/unattended/unattended.sh:9517`)
 stand, of which this unit adds none. The file-level override precedent `[[own]]`

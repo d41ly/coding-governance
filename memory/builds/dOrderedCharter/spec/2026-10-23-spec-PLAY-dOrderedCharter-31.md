@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -15,9 +15,14 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-31-deviation-311.md](../build/2026-10-24-build-PLAY-dOrderedCharter-31-deviation-311.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-31-deviation-312.md](../build/2026-10-24-build-PLAY-dOrderedCharter-31-deviation-312.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-31-deviation-313.md](../build/2026-10-24-build-PLAY-dOrderedCharter-31-deviation-313.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-31-deviation-314.md](../build/2026-10-25-build-PLAY-dOrderedCharter-31-deviation-314.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-31-1-spec-writer.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-31-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -42,16 +47,22 @@ what an adopter can see ships its successor with an upgrade step that runs up an
   `tools/run-gates/ceiling-evidence.txt` and `tools/run-gates/selftest-budgets.txt`, and a
   `[[retired]]` row names it: `id = "agent-instructions"`, `successor = "playbook-render"`, `surfaces`
   the members `step_gate.py --list` prints for the entry at the base. `CODEX_MAX` moves into the module
-  unit 20 absorbed the wiring into, and unit 6's check and unit 34's render read it there.
+  unit 20 absorbed the wiring into, and unit 6's check and unit 34's render read it there. The same
+  commit re-points `tools/policy/caps.toml`'s `codex-instructions` row, its `enforcer` to that module
+  and its `home` to `constant:<that module>:CODEX_MAX`, and the census's
+  `budgets-cap-codex-instructions` case in `tools/policy/check_policy.py` to that enforcer, so
+  `arm_cap_census`'s join both ways holds (TOOL-dGroundRules-9 S1, S7, `:175`). At the build run's
+  base §4's first query also hits that row and its case, and the policy file, whose `AGENTS.md`
+  comment block names "the agent-instructions kit's CODEX_MAX" once TOOL-dSafePassage-1 S7 carries it
+  there: argued history in a guarded file, kept.
   **Readers:** by name: `tools/govkit/registry.toml`, `tools/gate-legs.json`,
   `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt`,
   `tools/run-gates/selftest-budgets.txt`, `tools/govkit/selftest.py`, `tools/govkit/govkit.py`,
-  `tools/template-size-limits.txt`, `README.md`, `WIRE-INTO-PROJECT.md`, `AGENTS.md`,
-  `.governance/deploy.toml`, `.claude/rules/product.md`, `.lexicon.conf`, `.memory-tree.conf`,
-  `memory/map/baseline.toml` and `memory/map/features/roles.md`, each a hit of §4's first query at
-  the base · by value: `tools/check-template-size.sh`'s 32 KiB hold through `CODEX_MAX` (unit 6's)
-  and `print_size_note`'s announce, which the render's harness-limit refusal replaces (unit 34).
-  Observed by AC1, AC2 and AC3.
+  `README.md`, `WIRE-INTO-PROJECT.md`, `AGENTS.md`, `.governance/deploy.toml`,
+  `.claude/rules/product.md`, `.lexicon.conf`, `.memory-tree.conf`, `memory/map/baseline.toml` and
+  `memory/map/features/roles.md`, each a hit of §4's first query at the base · by value: unit 6's
+  check, which holds the harness limit through `CODEX_MAX`, and `print_size_note`'s announce, which
+  the render's harness-limit refusal replaces (unit 34). Observed by AC1, AC2, AC3 and AC13.
 - **S2** — The by-value inventory, derived by §4's queries over the tree at the pass and never copied
   into a file; root `README.md`'s line 17 is among its hits. Each hit is re-pointed to the renderer,
   re-worded where it states where the wiring lives, or kept where it narrates history, and the pass
@@ -59,8 +70,12 @@ what an adopter can see ships its successor with an upgrade step that runs up an
 - **S3** — The `map_lib` re-export declared as a deprecation. A `[[class]]` row `module-export` joins
   dSafePassage's class registry `tools/govkit/surface-classes.toml`: its reader returns each name
   `tools/codebase-map/map_lib.py` re-exports from the join factory unit 19 moves to `tools/lib/`, and its
-  plant stages one re-export taken away, so the names leave only with a row naming them. How long they
-  stay is unit 19's hold under `install.deprecation-window`. Observed by AC4.
+  plant stages one re-export taken away, so the names leave only with a row naming them. What counts
+  their window is §8 F6, open for the owner: TOOL-dSafePassage-6 counts `install.deprecation-window`
+  per `[[shim]]` row only (its S5), and F2 found no shim kind that fits. The same commit writes the
+  class's `[[class]]` row in `tools/govkit/usage.toml`, usage shape `none` with a `why`, since a
+  docs leg finding is a registered class with no row there (TOOL-dSafePassage-13 S1, S8) and an
+  import name fits none of its S2 shapes. Observed by AC4 and AC14.
 - **S4** — The adopter rules into the overlay, by a step whose down restores them. An `[[upgrade]]` row
   `playbook/adopter-rules-to-overlay` in `tools/govkit/entries/playbook.kit.toml`, its program
   `tools/govkit/steps/adopter_rules_to_overlay.py`: its up turns each `- ` line of
@@ -69,20 +84,25 @@ what an adopter can see ships its successor with an upgrade step that runs up an
   byte-identical from the before-image; its witness holds when the key is absent and every line it held
   is a unit's text. The `ADOPTER_RULES` placeholder row (`tools/govkit/entries/playbook.kit.toml:273-277`)
   leaves the descriptor with it, and a `[[class]]` row `charter-key` (each `[[placeholder]]` key the
-  playbook descriptor declares) arms the step gate for it. **Readers:** by name:
+  playbook descriptor declares) arms the step gate for it, with its `tools/govkit/usage.toml`
+  `[[class]]` row, shape `none` with a `why`, in the same commit: each key's usage is its own
+  `[[placeholder]]` row's `default` and `why`, which no S2 source of TOOL-dSafePassage-13 reads, and
+  the class exists to arm the step gate. **Readers:** by name:
   `tools/govkit/entries/playbook.kit.toml`, `coding-governance-agents.template.md`,
   `tools/playbook/render_playbook.py` (its self-test fixtures), `tools/playbook/README.md`,
   `WIRE-INTO-PROJECT.md`, `.claude/rules/product.md` and `.governance/deploy.toml` · by value:
   `read_charter_table` (`tools/playbook/render_playbook.py:809`) reading `adopter_rules` into the
   rendered section, which unit 34's composition replaces with the overlay's level-0 units. Observed by
-  AC5, AC6 and AC7.
+  AC5, AC6, AC7 and AC14.
 - **S5** — The seeded charter template's succession row. A `[[retired]]` row in
   `tools/govkit/registry.toml`, `id = "playbook/seeded-template"`, `successor = "none"`, `surfaces` the
   members the step gate lists for the seed rule at the base, and the seed's `[[files]]` rule
   (`tools/govkit/entries/playbook.kit.toml:23-26`) and its hole leave the playbook descriptor. An
   adopter's seeded copy that it edited becomes `retired-edited`, kept and ordered as
   `install.retired-edits` says (TOOL-dSafePassage-9), never deleted; one it never edited reads
-  `withdrawn`. Its readers are inventoried by path and by value by §4's second query.
+  `withdrawn`. Those are the verdicts §8 F7 asks of the parent, open for the owner: its seed override
+  reads them `patched` and `current` today. Its readers are inventoried by path and by value by §4's
+  second query.
   **Readers:** by name: `tools/govkit/entries/playbook.kit.toml`, `tools/govkit/govkit.py`, `tools/govkit/matrix.py`,
   `tools/govkit/selftest.py`, `tools/check-placeholders.sh`,
   `tools/govkit/entries/check-microformats.kit.toml`, `tools/playbook/README.md` and
@@ -106,8 +126,9 @@ what an adopter can see ships its successor with an upgrade step that runs up an
   writes rows in their grammar and two class rows through their extension point.
 - Absorbing the wiring into the renderer and the render gate: unit 20's. Composing the project block
   and dropping the seeded template as the render's input: unit 34's. The census's rulings: unit 34's.
-- The `map_lib` re-export itself, its window and the shim for the moved module import: unit 19's.
-- Taking a re-export away when its window closes: dConvergedCharter.
+- The `map_lib` re-export itself: unit 19's. What counts its window: §8 F6.
+- Taking a re-export away when its window closes, and the `module-export` row with the last one:
+  dConvergedCharter.
 - A legacy block for an adopter's own instruction files: dLinkedLibrary.
 
 ### Edges
@@ -119,7 +140,7 @@ what an adopter can see ships its successor with an upgrade step that runs up an
 - **consumes-from** `PLAY-dOrderedCharter-33` — the step gate's gov unit-tag class, witnessed by the change record
 - **consumes-from** `PLAY-dOrderedCharter-19` — the join factory's move and `map_lib`'s re-export
 - **consumes-from** `PLAY-dOrderedCharter-6` — the check that reads `CODEX_MAX`, re-pointed with the constant
-- **consumes-from** external — dSafePassage's step kind, step gate, class registry and `retired-edited` (TOOL-dSafePassage-1, -9, -10), built before this build's build run; and dGroundRules' minimal guard (`cl-dClosedLoop-0012`)
+- **consumes-from** external — dSafePassage's step kind, step gate, class registry, `retired-edited` and the `upgrade-walk` leg (TOOL-dSafePassage-1, -5, -9, -10), built before this build's build run; dGroundRules' minimal guard (`cl-dClosedLoop-0012`), which the lander's prepared merge never fires (TOOL-dGroundRules-6, `:105-107`); and its cap census `tools/policy/caps.toml` with `arm_cap_census` (TOOL-dGroundRules-9)
 - **hands-off** `PLAY-dOrderedCharter-39` — S1's leg removal and moving list: the agent-instructions wiring leg keeps its name on the renderer, and the card import moves by name beside CODEX_MAX (finding 1)
 - **consumes-from** `PLAY-dOrderedCharter-46` — the candidate read, which S4's step re-renders through over the overlay it has just written (finding 80)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 10, 21 and 71, which that batch unit corrects after this unit lands, each by the item its report id names
@@ -154,8 +175,8 @@ needs-target = false
 # tools/govkit/surface-classes.toml
 [[class]]
 id = "charter-key"
-reader = "govkit/steps/adopter_rules_to_overlay.py:read_charter_keys"
-plant = "govkit/steps/adopter_rules_to_overlay.py:write_charter_key_plant"
+reader = "govkit/step_gate.py:read_charter_keys"
+plant = "govkit/step_gate.py:write_charter_key_plant"
 summary = "each [[placeholder]] key the playbook descriptor declares, which a target answers in deploy.toml"
 
 [[class]]
@@ -163,10 +184,30 @@ id = "module-export"
 reader = "codebase-map/map_lib.py:read_reexports"
 plant = "codebase-map/map_lib.py:write_reexport_plant"
 summary = "each name map_lib re-exports from the join factory, held for install.deprecation-window"
+
+# tools/govkit/usage.toml
+[[class]]
+class = "charter-key"
+usage = "none"
+rows = "none"
+why = "a placeholder's usage is its own [[placeholder]] row's default and why; the class arms the step gate"
+
+[[class]]
+class = "module-export"
+usage = "none"
+rows = "none"
+why = "an import name a module keeps for older callers has no verb, key, hook, leg or page"
 ```
 
+`rows` is spelled as TOOL-dSafePassage-13's own `none` rows (`file`, `installable`) spell it at its
+build.
+
 The `surfaces` lists are written from `python tools/govkit/step_gate.py --list` run at the base, so
-every member is spelled as the gate spells it and none is typed from memory.
+every member is spelled as the gate spells it and none is typed from memory. The `charter-key` reader
+and plant live in `tools/govkit/step_gate.py`, beside the parent's nine class readers
+(TOOL-dSafePassage-10, `:99-100`), never in the step program: `step-rows-frozen` freezes every byte of
+a program a landed argv names (TOOL-dSafePassage-1 S9), so a later edit to the reader there would red
+it, and no `[[upgrade]]` argv names `step_gate.py`.
 
 ### The adopter-rules step
 
@@ -191,9 +232,10 @@ before nor its after is named and left.
 
 **Who writes.** The step writes the overlay and `deploy.toml` as `update` runs it, which is the write
 the clause names ("by a step whose down restores it"), not an agent's edit through unit 15's command.
-The minimal guard refuses agent writes to both files (`cl-dClosedLoop-0012`); a step run by `update`
-in the lander's prepared merge is not one, and where the landed guard reads otherwise the build run
-files the admission ask, as TOOL-dGroundRules-13 did for dSafePassage's budgets step.
+The minimal guard refuses agent writes to both files (`cl-dClosedLoop-0012`, TOOL-dGroundRules-6
+S1); a step run by `update` in the lander's prepared merge is not one, and the lander never fires
+pre-commit (TOOL-dGroundRules-6, `:105-107`), so the step's write meets no guard and owes no
+admission ask.
 
 ### The inventory queries
 
@@ -219,7 +261,8 @@ edited. Both counts are DERIVED by the query at the pass.
 | the `[[retired]]` ids `agent-instructions` and `playbook/seeded-template` | `tools/govkit/registry.toml` | none |
 | the step id `playbook/adopter-rules-to-overlay` | `tools/govkit/entries/playbook.kit.toml` | none |
 | `tools/govkit/steps/adopter_rules_to_overlay.py` (step program) | govkit kit | the lexicon's naming predicates |
-| `read_charter_keys`, `write_charter_key_plant`, `read_reexports`, `write_reexport_plant` | their modules | the lexicon's naming predicates |
+| `read_charter_keys`, `write_charter_key_plant` | `tools/govkit/step_gate.py` | the lexicon's naming predicates |
+| `read_reexports`, `write_reexport_plant` | `tools/codebase-map/map_lib.py` | the lexicon's naming predicates |
 | the class ids `charter-key` and `module-export` | `tools/govkit/surface-classes.toml` | none |
 
 ### Files touched (estimate)
@@ -227,8 +270,11 @@ edited. Both counts are DERIVED by the query at the pass.
 - `tools/govkit/registry.toml`
 - `tools/govkit/entries/playbook.kit.toml`
 - `tools/govkit/surface-classes.toml`
+- `tools/govkit/usage.toml` (the two classes' `[[class]]` rows)
 - `tools/govkit/steps/adopter_rules_to_overlay.py` (new)
-- `tools/codebase-map/map_lib.py` (the class's reader and plant)
+- `tools/govkit/step_gate.py` (the `charter-key` class's reader and plant)
+- `tools/codebase-map/map_lib.py` (the `module-export` class's reader and plant)
+- `tools/policy/caps.toml`, `tools/policy/check_policy.py` (the `codex-instructions` row and its case)
 - `tools/gate-legs.json`
 - `tools/govkit/subject-pins.tsv`
 - `tools/run-gates/ceiling-evidence.txt`
@@ -262,7 +308,9 @@ edited. Both counts are DERIVED by the query at the pass.
   row that witnesses it.
 - risks: an adopter whose `CLAUDE.md` holds more than the import line keeps it, and the render's
   `--check` names it (unit 34, S4); the `playbook/seeded-template` id is a step-shaped id no step
-  declares, legal by the parent's grammar today (§8 F1).
+  declares, on which the parent's grammar states no rule (§8 F1); and a registered class whose
+  population is empty exits 2 (TOOL-dSafePassage-10 S5), so the commit that takes away the last
+  `map_lib` re-export also removes the `module-export` row and its `usage.toml` row.
 - testing: AC1 to AC11, each observing the step gate or the step program directly on a scratch clone.
 - migration: this unit is the migration; §4.
 - user docs: `help/upgrade-steps.md` (S8).
@@ -278,10 +326,11 @@ edited. Both counts are DERIVED by the query at the pass.
   kept hit the pass commit's `Decided:` trailer names, and `README.md`'s kit line names the renderer.
   Red when: a reader still names `tools/agent-instructions/` as where the wiring lives.
   figure: the count is DERIVED by the query at the pass.
-- **AC3** — When `python upgrade_steps.py list` runs, it prints the `agent-instructions`
-  succession row with `playbook-render`; and on a scratch adopter installed at `ce13efbe` with
-  `agent-instructions` claimed, `python tools/govkit/govkit.py update --target <scratch adopter>` carries
-  the claim to `playbook-render` and its `CLAUDE.md` import line is unchanged.
+- **AC3** — When `python tools/govkit/govkit.py check --target <scratch adopter>` runs on a scratch
+  adopter installed at `ce13efbe` with `agent-instructions` claimed, it prints
+  `agent-instructions: retired, successor playbook-render` and counts no problem for it, the line
+  TOOL-dSafePassage-1's AC9 states; and `python tools/govkit/govkit.py update --target <scratch adopter>`
+  carries the claim to `playbook-render` and its `CLAUDE.md` import line is unchanged.
   Red when: the update refuses the whole run on the retired kit, or rewrites a working import.
 - **AC4** — When `python step_gate.py --fixture --plant module-export` runs, it exits 1
   naming the re-exported name the plant took away; with `--with-row` it exits 0.
@@ -304,6 +353,7 @@ edited. Both counts are DERIVED by the query at the pass.
 - **AC9** — When `python tools/govkit/govkit.py update --target <scratch adopter>` runs on an adopter
   installed at `ce13efbe` whose seeded template it edited, the row reads `retired-edited`, one order is
   written and the file's bytes are unchanged; on one it never edited, the row reads `withdrawn`.
+  These are §8 F7 (a)'s verdicts, which wait on the owner's answer and the parent's arm.
   Red when: an edited seeded copy is deleted or graded `patched` with no order.
 - **AC10** — When `python step_gate.py --base ce13efbe` runs on a scratch clone with one
   census change record taken out, it exits 1 naming that unit's tag; with it, 0.
@@ -315,13 +365,23 @@ edited. Both counts are DERIVED by the query at the pass.
 - **AC12** — When `git grep -n -e "adopter-rules-to-overlay" -- upgrade-steps.md` runs, it finds
   the section.
   Red when: the steps ship with no page under `help/`.
+- **AC13** — When `python -c "import tomllib; print([(r['enforcer'], r['home']) for r in tomllib.load(open( 'tools/policy/caps.toml' , 'rb'))['cap'] if r['name'] == 'codex-instructions'])"`
+  runs after the pass, it prints the module `CODEX_MAX` moved into and `constant:<that module>:CODEX_MAX`,
+  and `python "tools/policy/check_policy.py"` reports `arm_cap_census` green.
+  Red when: the row still names `agent-instructions/adopt-agent-instructions.sh`, which the pass deletes.
+- **AC14** — When `git grep -n -A1 -e 'class = "charter-key"' -e 'class = "module-export"' -- tools/govkit/usage.toml`
+  runs after the pass, it prints both rows, each followed by `usage = "none"`.
+  Red when: a class registered in `tools/govkit/surface-classes.toml` has no `[[class]]` row in
+  `tools/govkit/usage.toml`, which the docs leg reports as a finding.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `recall floor` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map adopter e2e` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `agent-instructions self-test` · `lexicon naming predicates` · `straggler-guard arms` · `kit/dogfood doc parity` · `transition-audit arms` · `check-wiring self-test` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-The `step-gate`, `step-rows-frozen` and `upgrade walk` legs dSafePassage lands keep green over this
-unit's rows; they are named here in prose because the manifest at `ce13efbe` holds none of them.
+The `step-gate`, `step-rows-frozen`, `upgrade-walk` and `docs` legs dSafePassage lands keep green
+over this unit's rows, and dGroundRules' `policy check` and `policy fixtures` legs run `arm_cap_census` and the
+census case over the re-pointed row; they are named here in prose because the manifest at `ce13efbe`
+holds none of them.
 
 New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's own fixture runs each new class row's plant with and without `--with-row` · none
 
@@ -329,7 +389,8 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
 
 - **FACT-QUESTION · F1 — Whether a `[[retired]]` row can name the seeded template.** Scout C's
   interface 10: a `[[retired]]` row's `id` is an entry id or a step id, and the seed is a file inside
-  the `playbook` entry. Probe: TOOL-dSafePassage-1 §4 "### Data model", read at `ce13efbe`. Observation:
+  the `playbook` entry. Probe: TOOL-dSafePassage-1 §4 "### Data model", read at `ce13efbe` and again
+  at its rev-9 (`:201-204`), which still states no rule either way. Observation:
   the grammar refuses a retired id that is still a live entry or declared step and a successor that is
   not live, and states no rule that a retired step id was once declared; `surfaces` takes any
   `<class>:<name>`. Liveness: the same reader refuses `id = "playbook"`, a live entry, so the probe can
@@ -353,19 +414,52 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
   then. Options: (a) the step, run by `update` in the lander's prepared merge (`cl-dClosedLoop-0025`);
   (b) unit 15's command; (c) the owner by hand. (b) refuses by its own clause, and (c) is no step.
   RESOLVED (agent, 2026-10-23, delegated): (a), rung 1, the clause naming the step as the converter;
-  the build run re-grounds against the landed guard and files the admission ask if it reads the step's
-  write as an agent's. widens: none · relaxes: none
+  the lander never fires pre-commit (TOOL-dGroundRules-6, `:105-107`), so the step's write meets no
+  guard and owes no ask. widens: none · relaxes: none
 - **F5 — The agent-instructions kit's successor.** Options: (a) `playbook-render`, the renderer that
   absorbed the wiring; (b) `none`, the files withdrawn; (c) `playbook`. (b) leaves an adopter's alias
   files with no owner, and (c) is the seed entry whose template this build stops reading. RESOLVED
   (agent, 2026-10-23, delegated): (a), rung 1, v2's "agent-instructions' wiring moved to the one
   renderer". widens: none · relaxes: none
+- **F6 — What counts the `map_lib` re-export's window.** S3's `module-export` row reds a re-exported
+  name's leaving at the step gate, but TOOL-dSafePassage-6 counts `install.deprecation-window` per
+  `[[shim]]` row only (its S5, `:63-68`), while its §3 still names this re-export among the first
+  shim rows (`:89-91`), and F2 found no shim kind that fits. No mechanism counts the window, and unit
+  19's S9 names this fork as its hold. Options: (a) the `module-export` class row stays, and
+  dConvergedCharter, which takes a re-export away (§3), counts the window from that row's landing
+  commit on the default branch, with an ask to dSafePassage to drop its unit 6's mention of this
+  re-export as a first shim row (`:89-91`); (b) an ask to dSafePassage for a shim kind that forwards
+  named re-exports, counted per row. (b) adds a forwarder kind to the parent for one partial module
+  whose other names stay (F2), and (a) reuses the population the class row already declares, its
+  landing commit derived from history as the parent derives a shim row's. Recommendation (a). Open
+  for the owner.
+- **F7 — What an edited seeded copy reads once gov stops shipping the seed.** S5 and AC9 expect
+  `retired-edited` with one order. TOOL-dSafePassage-9 sends the grid cell (`differs`, `absent`) to
+  `retired-edited`, and its arm takes "both a first-time engine row and a row already carrying the
+  role" (`:127-128`), naming no seed row. At `cbf44887`, `tools/govkit/govkit.py:9988-10000` rewrites
+  every seed row's verdict after the grid (`UPDATE_ROLE` maps `seed` to `report-reseed`, `:8480`):
+  `reseed-available` where gov's side differs, else `current` or `patched` unless it reads `missing` or
+  `renamed`, and the parent leaves that override in place. So an edited copy reads `patched` with no
+  order, AC9's red, and an unedited one `current`, not `withdrawn`. Options: (a) an ask to dSafePassage
+  to route a retired seed row through its unit 9's `retired-edited` arm, so the edited copy reads
+  `retired-edited` and the unedited one `withdrawn`; (b) this unit extends that arm itself; (c) AC9
+  states the verdict the parent gives. (b) gives the parent's arm a second owner, and (c) states the
+  clause's own red as the expected result. Recommendation (a). Open for the owner.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-39, PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · S1 S3 S4 S5 S7 · §3 · §4 · §5 · AC3 AC9 AC13 AC14 · §7 · §8 F1 F4 F6 F7 · §10 ·
+  re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`,
+  rows 3, 6, 10, 12 and 16 and U1, U2, U7 and U9: S1's readers drop `tools/template-size-limits.txt`,
+  which leaves gov in TOOL-dSafePassage-1's commit, and re-point the `codex-instructions` census row
+  with `CODEX_MAX`; the `charter-key` reader and plant move to `step_gate.py`; AC3 reads succession
+  through `check`; the leg is `upgrade-walk`; F4 owes no admission ask; F6 and F7 open for the owner.
+  On the coordinator's follow-up, S3, S4, §4 and AC14 add each class's `tools/govkit/usage.toml`
+  `[[class]]` row (TOOL-dSafePassage-13 S1, S8), and the consumes-from edge to
+  `PLAY-dOrderedCharter-30` and S7's sentence on its comment leave, that comment being the owner's.
 
 ## 10. Reuse audit
 
@@ -384,7 +478,10 @@ query follows unit 18's stated-query form (its §4 "### The inventory query"), n
 a record and the source disagree: the scout cites the seed row at `entries/playbook.kit.toml:23-26`, which
 matches, and `README.md:17` as the kit's by-value reader, which spells its path and is a by-path hit
 too. The recall probe found the clause, TOOL-dSafePassage-1 and -5, and TOOL-dGroundRules-13
-(`memory/builds/dGroundRules/BACKLOG.md:6`), the guard-admission ask a step run on gov's own tree
-needed, which F4 follows.
+(`memory/builds/dGroundRules/BACKLOG.md:6`), the guard-admission ask a step run on gov's own tree was
+thought to need; F4 no longer follows it, since the lander never fires pre-commit
+(TOOL-dGroundRules-6, `:105-107`). The class readers' seam is the parent's own: its nine readers and
+plants sit in `tools/govkit/step_gate.py` (TOOL-dSafePassage-10, `:99-100`), which the `charter-key`
+pair joins; the census row re-pointed is TOOL-dGroundRules-9's (`:175`).
 
 Recall terms used: `python tools/memory-recall/query.py "how does gov ship its own upgrade step that retires the seeded charter template" --terms "upgrade step retired row seeded template adopter_rules overlay down restores successor change record"`

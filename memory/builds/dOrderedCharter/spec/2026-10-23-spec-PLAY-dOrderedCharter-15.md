@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0045@f345dc78 whole
 
@@ -18,9 +18,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-15-deviation-151.md](../build/2026-10-24-build-PLAY-dOrderedCharter-15-deviation-151.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-15-deviation-152.md](../build/2026-10-24-build-PLAY-dOrderedCharter-15-deviation-152.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-15-deviation-153.md](../build/2026-10-25-build-PLAY-dOrderedCharter-15-deviation-153.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -68,13 +72,20 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
   `point.instructions.guard`, the point dDeclaredLoop's guard declares; the refusal prints the row diff as
   `propose` would. dGroundRules' minimal guard (`cl-dClosedLoop-0012`) refuses agent writes to the
   overlay meanwhile. Observed by AC6.
-- **S5** — `instructions.proof`. `tty-cli`, the default, is the proof dGroundRules' minimal guard enforces
-  for `policy-file.proof`: an interactive terminal on the command's standard input, called through that
-  guard's one implementation and never re-derived. `signed` and `both` are refused at load as selecting an
-  absent component, the layered proof v2 places in `[planned]`, until a core row declares
-  `point.instructions.signed-proof`. Both keys are read through dGroundRules' one reader
-  (`cl-dClosedLoop-0008`) once it lands, and until then with v2's catalogue defaults,
-  `owner-command-agents-propose` and `tty-cli` (v2:1243-1244). Observed by AC3 and AC7.
+- **S5** — `instructions.proof`. `tty-cli`, the default, is the owner's presence shown as standard error
+  being an interactive terminal, the one stream dGroundRules' minimal guard tests for `policy-file.proof`
+  (`[ -t 2 ]`, written inline in `.githooks/pre-commit`, TOOL-dGroundRules-6 S4 and its §8 F3). That
+  test is shell with no callable, so how this command runs it is §8 F4, open for the owner; under its
+  recommendation (a) the command tests `sys.stderr.isatty()`, stated as a second implementation of the
+  guard's signal. `signed` and `both` are refused at load as selecting an absent component, the layered
+  proof v2 places in `[planned]`, until a core row declares `point.instructions.signed-proof`. Both keys
+  are read with `policy_reader("instructions.edit")` and `policy_reader("instructions.proof")`,
+  PLAY-dOrderedCharter-9's callable that runs `policy.py get <key>` as a subprocess through the inlined
+  `resolve_kit_dir` (`tools/playbook/render_playbook.py:78-79`), since a kit never imports a sibling
+  (TOOL-dGroundRules-1 §4): an unset key reads its catalogue default with its reason
+  (TOOL-dGroundRules-3 S2), and each call is a shape the reader-coverage arm counts (TOOL-dGroundRules-8,
+  the Readers table). An exit 2 from `get` refuses every verb at load, exit 2, naming the key and
+  carrying the reader's line. Observed by AC3, AC7 and AC12.
 - **S6** — The checks, run before every write and as a leg over the tree,
   `python tools/playbook/instructions_edit.py check`: unit 20's schema and one-fact checks, unit 12's
   grammar, unit 19's tag checks, and two of this unit's own: **conflicts at one level**, two active
@@ -107,8 +118,14 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
 - **S10** — The leg and plants. One leg `instruction edits (manifest checks)` in `tools/gate-legs.json`
   runs S6 over the tree and S8's check, carrying `"enforces": ["principle.p11", "principle.p13"]`;
   `python tools/playbook/instructions_edit.py fixture --plant <case>` builds a throwaway repository in the
-  system temp directory, with its own layer register and `.governance/policy.toml`, and runs the case.
-  Observed by AC1 to AC11.
+  system temp directory, with its own layer register and a committed `.governance/policy.toml`, since the
+  reader reads revisions only (TOOL-dGroundRules-2 S2), and runs the case. Observed by AC1 to AC11.
+- **S11** — The two catalogue rows. `instructions.edit` and `instructions.proof` land with dGroundRules as
+  `[[key]]` rows of `tools/policy/catalogue.toml`, owner dOrderedCharter (v2:1243-1244), with no
+  `summary` or `usage` and their names on the shrink-only `tools/policy/unsummarised-keys.txt`
+  (TOOL-dGroundRules-1 S3, S6). This unit adds no row: it fills each row's `summary` and `usage`, a line
+  its row admits (`instructions.edit = "command-for-all"`, `instructions.proof = "tty-cli"`), and drains
+  both names in the same commit with `python <prefix>/policy/policy.py lists --write`. Observed by AC12.
 
 ## 3. Non-goals (OUT)
 
@@ -129,7 +146,7 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
 - **consumes-from** `PLAY-dOrderedCharter-16` — the layer register whose declared points S3, S4 and S5 read
 - **consumes-from** `PLAY-dOrderedCharter-19` — the tag checks S6 runs, and the index whose `retired` rows S9's extractor writes
 - **consumes-from** `PLAY-dOrderedCharter-24` — S7's shared normaliser for `Before` and `After`
-- **consumes-from** external — dGroundRules' one policy reader (`cl-dClosedLoop-0008`) and its minimal guard's TTY proof (`cl-dClosedLoop-0012`)
+- **consumes-from** external — dGroundRules, built before this build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7), the two catalogue rows and the shrink-only list S11 fills and drains (TOOL-dGroundRules-1 S3, S6), the mirror's `mirror --write` (TOOL-dGroundRules-5 S2), and the stderr signal its minimal guard's hook tests (TOOL-dGroundRules-6 S4, `cl-dClosedLoop-0012`)
 - **hands-off** `PLAY-dOrderedCharter-1` — `resolve_practices`, which the `charter.practices` reader calls
 - **hands-off** `PLAY-dOrderedCharter-14` — the command a promotion goes through, and the `Promoted-from` field
 - **hands-off** `PLAY-dOrderedCharter-32` — the overlay as the command's `--manifest overlay` target
@@ -187,7 +204,10 @@ None: no manifest exists before unit 9's rows; the `.gitattributes` lines take e
 ### Rollout
 
 Live at landing, at order 16, refusing every write until dDeclaredLoop's guard declares its point; `list`,
-`render`, `check` and `propose` run from landing.
+`render`, `check` and `propose` run from landing. S11 lands as two commits: the first fills the two rows
+and drains the list; the second stages only `.governance/policy.json` as `policy.py mirror --write`
+regenerates it, because a catalogue edit stales the mirror and the guard admits a mirror commit only
+when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-dGroundRules-19 S1).
 
 ### Files touched (estimate)
 
@@ -198,6 +218,9 @@ Live at landing, at order 16, refusing every write until dDeclaredLoop's guard d
 - `tools/memory-tree/merge-rows.py`
 - `.gitattributes`
 - `tools/gate-legs.json`
+- `tools/policy/catalogue.toml`, the two existing rows filled
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, the second commit
 
 ### Alternatives rejected
 
@@ -210,8 +233,9 @@ Live at landing, at order 16, refusing every write until dDeclaredLoop's guard d
 
 ## 5. Production-readiness checklist
 
-- security: deny by default: every write refused until the guard declares its point; the proof is the
-  minimal guard's one implementation; `tty-cli` proves owner presence against a cooperative agent only, the
+- security: deny by default: every write refused until the guard declares its point, and a refused policy
+  read refuses every verb; the proof tests the one stream the minimal guard's hook tests, stderr (§8 F4);
+  `tty-cli` proves owner presence against a cooperative agent only, the
   threat the owner accepted (v2 `[witnesses]`, SA-1).
 - perf / scale: one read of every manifest per call; the merge class parses two TOML files per conflict.
 - error / empty / loading states: a refused write prints the proposal so the change is never lost; an
@@ -235,7 +259,7 @@ Live at landing, at order 16, refusing every write until dDeclaredLoop's guard d
   Red when: `propose` writes a file.
 - **AC3** — When `python instructions_edit.py fixture --plant owner-propose` runs with the
   guard's point declared, a write from a terminal writes the row and a change record whose `Proof` reads
-  `tty-cli`, and the same write with standard input not a terminal prints the proposal and writes nothing.
+  `tty-cli`, and the same write with standard error not a terminal prints the proposal and writes nothing.
   Red when: a non-terminal call writes a row.
 - **AC4** — When `python instructions_edit.py fixture --plant command-for-all` runs, a
   non-terminal write writes the row and a change record whose `Proof` reads `none — command-for-all`, and a
@@ -271,6 +295,15 @@ Live at landing, at order 16, refusing every write until dDeclaredLoop's guard d
   prints the redirect to `unit.new`, `unit.both` shows no single successor, and new text citing
   `unit.old` reds `gov_tag.py check` under `tags.retired-cites`' default.
   Red when: a retired tag resolves as live, or a split redirects to one successor.
+- **AC12** — When `python -c "import tomllib; k = ('instructions.edit', 'instructions.proof'); print([(r['name'], r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] in k])"`
+  runs after the pass, it prints exactly two tuples, each owned by `dOrderedCharter` with both flags
+  `True`; `python "tools/policy/policy.py" lists --check` exits 0; `grep -c -e instructions.edit -e instructions.proof "tools/policy/unsummarised-keys.txt"`
+  prints `0`; and `git grep -n -e 'policy_reader("instructions.edit"' -e 'policy_reader("instructions.proof"' -- tools/playbook/instructions_edit.py`
+  prints both lines.
+  Red when: a key keeps no summary or usage, stays on the list, gains a second row, or is read in a shape
+  the reader-coverage arm does not count.
+  fixture: the catalogue and the list are dGroundRules', untracked until it builds, so their paths are
+  quoted.
 
 ## 7. Gates
 
@@ -299,20 +332,35 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
   RESOLVED (agent, 2026-10-23, delegated): rung 1, memory-plan `[doors]` answers it: `instructions.edit`
   writes change records, and a stand-in door serves until the record door adopts it; the S12 factory's
   `new change` verb is that door (S7), and the command uses the same kind once it writes.
+- **F4 — How does the command prove `tty-cli`, when the guard's test is inline shell?** dGroundRules'
+  minimal guard tests `[ -t 2 ]` inside `.githooks/pre-commit` (TOOL-dGroundRules-6 S4, its §8 F3) and
+  lands no callable a Python command can run, so rev-3's "called through that guard's one
+  implementation" has nothing to call, and rev-3 named the other stream, standard input. Options:
+  (a) this unit's own proof, `sys.stderr.isatty()`, testing stderr as the hook does, stated in S5 and on
+  the command's page as the second implementation of one signal; (b) an ask to dGroundRules to move
+  the hook's test into a callable in `tools/policy/` that the hook and this command both run; (c) wait
+  for dDeclaredLoop's TTY CLI and refuse every write until then. (b) is the one-implementation shape,
+  but it moves a landed parent's hook seam for one consumer; (c) leaves `tty-cli` with no
+  implementation, so AC3's owner arm has nothing to observe even with the guard's point declared.
+  Recommendation (a): one stream, stderr, named once, and the second spelling is one call. Open for
+  the owner. PLAY-dOrderedCharter-7's `core.exceptions: owner-only-expiring` proof follows this fork.
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0045`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-45, PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
+- rev-4 · 2026-10-24 · §2 S5, S10, S11 (new) · §3 Edges · §4 Rollout, Files touched · §5 security · AC3, AC12 (new) · §8 F4 (new, open for the owner) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 40, U3 and U4: the proof tests stderr, the guard's stream, and how it is run is F4's; both keys are read through `policy_reader`, and a refused read refuses; the two landed rows are filled and drained, never added.
 
 ## 10. Reuse audit
 
 The seams extended are `tools/memory-tree/merge-rows.py`, the row-keyed driver R-I and the research's
 pick name for manifest merges (its `key` at line 271 anchors a markdown row; S1 adds a TOML-table class
 beside its three), the `.gitattributes` `merge=rows` lines (61-78), unit 7's record factory for the
-`change` kind, and dGroundRules' minimal guard for the TTY proof. No TTY proof exists in the tree today
-(scout A: no `isatty` under `tools`), so this unit calls dGroundRules' rather than writing a fourth.
+`change` kind, and the stream dGroundRules' minimal guard tests for the TTY proof. No TTY proof exists
+in the tree today (scout A: no `isatty` under `tools`), and the guard's lands as `[ -t 2 ]` inline in
+`.githooks/pre-commit` (TOOL-dGroundRules-6 S4), no callable, so §8 F4 holds whether this unit writes a
+second test of the same stream or asks the parent for a callable.
 `python tools/codebase-map/reuse_lookup.py "an owner-only command that adds edits and removes instruction rows
 and records each change"` ranked name-token matches (`rows`, `records`, `changed`), none a guarded write
 path, so no existing seam fits the command itself.
