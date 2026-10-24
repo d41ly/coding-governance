@@ -1708,6 +1708,8 @@ fi
 # lib-unattended.sh's `overlaps` exit 0, exactly on an `intersect` row. The `disjoint` row is the pair
 # a raw `startswith` calls overlapping, so staging both rules to a raw compare, in either direction,
 # reds the arm naming that row once per rule. A table that parses to no row reds it too.
+# TOOL-dGroundRules-44: a `disjoint` row neither of whose paths starts with the other as a string
+# is no trap, so a raw compare would pass it by accident; the arm reds naming it before either rule.
 OVERLAP_PAIRS='policy/ policy/x.py intersect
 policy policy-x.py disjoint'
 UNATTENDED_DIR=$(resolve_kit_dir "$PY" unattended lib-unattended.sh "$HERE") || exit 2
@@ -1716,6 +1718,9 @@ wi_out=$( . "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-topl
   while read -r a b want; do
     [ -n "${want:-}" ] || continue
     rows=$((rows+1))
+    if [ "$want" = disjoint ] && [[ "$a" != "$b"* && "$b" != "$a"* ]]; then
+      printf '[row %s %s %s: not a string-prefix trap] ' "$a" "$b" "$want"; continue
+    fi
     if [ "$want" = intersect ]; then wpy=True wsh=0; else wpy=False wsh=1; fi
     py=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import design_lib as d
 print(d.check_writes_intersect([sys.argv[2]], [sys.argv[3]]))' "$MEMORY_TREE" "$PFX$a" "$PFX$b" 2>&1 | tr -d '\r')

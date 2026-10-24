@@ -311,3 +311,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T16:09:54Z brief · item TOOL-dGroundRules-43 · reason 182cfbe81fb1 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-43-build-brief.md
 
 2026-10-24T16:20:11Z dispatch · item 8fa309e8 TOOL-dGroundRules-43 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-43.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-43-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T16:31:24Z brief · item TOOL-dGroundRules-44 · reason 9c03e2cd3fec memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-44-build-brief.md
+
+2026-10-24T16:33:13Z dispatch · item 97194a75 TOOL-dGroundRules-44 · reason tools/check-spec-tokens.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-44.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-44-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T16:35:52Z dispatch · item 97194a75 TOOL-dGroundRules-44 · reason tools/check-spec-tokens.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-44.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-44-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md

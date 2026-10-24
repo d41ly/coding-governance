@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-44 — the overlap arm's disjoint row is a real string-prefix trap, and the arm refuses a disjoint row that is not one
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-44-deviation-32.md](../build/2026-10-23-build-TOOL-dGroundRules-44-deviation-32.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-44-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-44-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-44-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-44-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-43-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-43-staleness-probe-brief.md) | research | TOOL-dGroundRules-43 TOOL-dGroundRules-45 TOOL-dGroundRules-46 |
 | [2026-10-24-prompt-TOOL-dGroundRules-44-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-44-2-spec-writer.md) | journal | — |
