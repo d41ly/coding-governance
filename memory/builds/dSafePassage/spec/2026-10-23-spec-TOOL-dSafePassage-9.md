@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0026@97d3c99b whole
 **Carries:** node:policy-key.install.retired-edits
@@ -11,9 +11,13 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-9-deviation-144.md](../build/2026-10-23-build-TOOL-dSafePassage-9-deviation-144.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-9-deviation-153.md](../build/2026-10-24-build-TOOL-dSafePassage-9-deviation-153.md) | deviation | — |
+| [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md](../build/2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-13 TOOL-dSafePassage-26 |
+| [2026-10-25-build-TOOL-dSafePassage-9-deviation-162.md](../build/2026-10-25-build-TOOL-dSafePassage-9-deviation-162.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-9-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-9-1-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-13 TOOL-dSafePassage-26 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -42,9 +46,15 @@ this build: "move hook unwiring, retired-edit orders and stale-lock reclaim into
   longer ships, (`differs`, `absent`), answers `retired-edited` in place of `patched`. Under
   `--write` that row's receipt role is set to `retired-edited`, its other fields kept, and no run
   writes or deletes its bytes, `--write-withdrawals` included. On every later run the row's own role
-  dispatches it. Observed by AC3 and AC4.
+  dispatches it. A `seed` row whose source gov no longer ships takes the same cell: the seed override
+  (`:9988-10000`), which rewrites a seed row's verdict after the grid, passes `retired-edited` and
+  `withdrawn` through, the two verdicts the grid gives only where gov holds no blob at the row's
+  `source`. An edited retired seed so reads `retired-edited` with one order under `order`; an unedited
+  one reads `withdrawn`, reported only and never deleted, as its role's `report-reseed` dispatch
+  (`:8480`) already reports it. A seed row gov still ships keeps the override. Observed by AC3, AC4
+  and AC12.
   **Readers:** by name: `VERDICT_GRID` in `tools/govkit/govkit.py`, read by `classify_row` and by
-  selfcheck's arms 7g and 7i. by value: the verdict tally and line `_cmd_update` prints, and the
+  selfcheck's arms 7g and 7i, and the seed override's kept-verdict tuple, read there alone. by value: the verdict tally and line `_cmd_update` prints, and the
   verdict arms of `tools/govkit/selftest.py`, which read each row's verdict word through `verdict_of`.
 - **S3** — The new state of S2 gains its own row in `UPDATE_ROLE`, the disposition `order`, and its
   own row in `UNLANDED_REASON`, so selfcheck arm 7g, whose known roles are built from
@@ -76,7 +86,7 @@ this build: "move hook unwiring, retired-edit orders and stale-lock reclaim into
   gov and an installed target, stages one case, runs `update --write`, and prints each verdict line,
   each order, each settings entry and each receipt role it observed beside what the case expects;
   `--stub <name>` runs the same case over a copy of govkit with one named mapping stubbed, which is
-  how each red the clause names is seen. Observed by AC1 to AC9.
+  how each red the clause names is seen. Observed by AC1 to AC9 and AC12.
 - **S8** — The docs: a page `help/update-edits.md` saying what `update` does with an edited file gov
   stopped shipping under each value of the key, with an edited render, and with a withdrawn hook,
   and its line in `help/README.md`. Observed by AC11.
@@ -98,7 +108,7 @@ this build: "move hook unwiring, retired-edit orders and stale-lock reclaim into
 
 - **consumes-from** external — dGroundRules, landed before the build run: the catalogue `tools/policy/catalogue.toml` holding the `install.retired-edits` row and the shrink-only `tools/policy/unsummarised-keys.txt` this unit drains (TOOL-dGroundRules-1 S3, S6, `cl-dClosedLoop-0007`), the reader `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) with an unset key's catalogue default and its reason (TOOL-dGroundRules-3 S2), and the mirror's `mirror --write` with the guard's mirror shape (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1); without them S6 has no row to fill and the mode has no reader
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
-- **hands-off** `TOOL-dSafePassage-13` — `read_policy_value(key, root)` in `govkit.py`, which this unit defines when it builds before TOOL-dSafePassage-6 and which that unit's docs leg calls for `help.enforce`
+- **hands-off** `TOOL-dSafePassage-13` — `read_policy_value(key, root, rev=None)` in `govkit.py`, which this unit defines when it builds before TOOL-dSafePassage-6 and which that unit's docs leg calls for `help.enforce`
 
 ## 4. Design
 
@@ -111,6 +121,7 @@ In `tools/govkit/govkit.py`:
 | `VERDICT_GRID[("differs", "absent")]` (`:8425`) | `"patched"` | `"retired-edited"` |
 | `UPDATE_ROLE` (`:8478-8503`) | no row for the state | `"retired-edited": "order"` |
 | `UNLANDED_REASON` (`:405-421`) | no row for the state | `"retired-edited"`: the target edited a file gov no longer ships, so gov keeps the target's bytes and orders it |
+| the seed override (`:9988-10000`) | keeps `missing` and `renamed` inline | `SEED_KEPT_VERDICTS = ("missing", "renamed", "retired-edited", "withdrawn")`, the tuple it keeps |
 | arm 7g (`:2729-2762`) | two inline loops | `derive_dispatch_gaps(update_role, unlanded_reason, landable_roles, grid)` returning the same messages, byte for byte |
 
 `retired-edited` is deliberately not in `ROLE_KINDS`: like `adopter-owned` (`:416-420`), it reaches a
@@ -124,8 +135,9 @@ the new cell structurally and the row's kit is not verified for a write it never
 ### The write loop
 
 One arm sits before the write loop's `a["how"] != "table"` guard (`:10518`), for the verdicts in a new
-`ORDERED_VERDICTS = ("retired-edited", "render-edited")`, so both a first-time engine row and a row
-already carrying the role reach it:
+`ORDERED_VERDICTS = ("retired-edited", "render-edited")`, so a first-time engine row, a retired seed
+row (S2), whose `report-reseed` dispatch the guard would otherwise only report, and a row already
+carrying the role all reach it:
 
 1. `read_retired_edits_mode(target)` reads `install.retired-edits` once per run with
    `read_policy_value("install.retired-edits", target)`, the key literal first, the `.py` call shape
@@ -147,12 +159,14 @@ already carrying the role reach it:
 3. `render_retired_edited_line(row, mode, order_path)` returns the row's report line, the order's
    path under `order` and `kept, no order (install.retired-edits = keep)` under `keep`, and the loop
    prints it. The tally counts the verdict word.
-4. A first-time engine row has its `role` set to `retired-edited`; its `path`, `source`, `commit`,
+4. A first-time engine or retired seed row has its `role` set to `retired-edited`; its `path`, `source`, `commit`,
    `gov_oid` and `kit` stay, so later runs classify it from the same fields. The role change moves no
    byte, so a rollback leaves it, as the existing `role-recorded` branch leaves its role (`:9771`).
 
-`read_policy_value(key, root)`, returning the value with the `--explain` line's source and reason,
-lives once, in `govkit.py`. The first of TOOL-dSafePassage-6 and this unit to build, both order 4,
+`read_policy_value(key, root, rev=None)`, returning the value with the `--explain` line's source and
+reason, lives once, in `govkit.py`. A `rev` that is set is passed to `get` as `--rev <rev>`, so a
+govkit reader can read at `--rev HEAD`; the default passes none and reads the landed revision, as
+step 1 does. Specs 6 and 13 call it without `rev`. The first of TOOL-dSafePassage-6 and this unit to build, both order 4,
 defines it there; the other, and TOOL-dSafePassage-13, calls it, a module in `tools/govkit/` reaching
 it by importing `govkit` as `tools/govkit/matrix.py:51-52` does.
 
@@ -190,11 +204,12 @@ A `retired-edited` row whose target later reverts its edit grids to `withdrawn` 
 keeping its role, until `apply` re-records it. A render whose receipt row carries no `oid`, as a
 receipt older than DEPL-dRemeasuredRender-1 does, is never called edited. A hook entry the adopter
 wired by hand, with no fragment row in the receipt, is never unwired. A target's policy edit not yet
-on its landed revision is not read: the mode is the committed one.
+on its landed revision is not read: the mode is the committed one. A retired seed copy the target
+deleted grids `converged`, which the seed override still rewrites as it does today.
 
 ### The fixture
 
-`tools/govkit/fixtures/retired_edits.py` builds a scratch gov holding one kit, an engine file, a
+`tools/govkit/fixtures/retired_edits.py` builds a scratch gov holding one kit, an engine file, a seed file, a
 rendered file with a `[[regenerate]]` argv, a hook fragment and a `settings-merge` entry, by copying
 `tools/govkit/govkit.py` into it as `check_update_safety` does (`tools/govkit/selftest.py:1728-1737`),
 and gov's `tools/policy/` kit beside it, where `resolve_kit_dir`'s probe finds it; installs a target from it, stages the case, and runs `update --write`. A `--stub` run loads the scratch
@@ -210,18 +225,21 @@ never in the tree.
 | `edited-gone` | the target edits the engine file, then gov stops shipping it | verdict `retired-edited`, the order written, the receipt role `retired-edited`, the bytes kept under `--write-withdrawals` |
 | `edited-row` | a receipt row already carrying the role | verdict `retired-edited` and the order, no `forked` line |
 | `keep` | `edited-row`, with `[install] retired-edits = "keep"` committed on the target's local `main`, the scratch target having no remote | the row's line naming `keep`, no order |
+| `seed-retired-edited` | the target edits its seeded copy, then gov stops shipping the seed | verdict `retired-edited`, one order written, the receipt role `retired-edited`, the copy's bytes kept |
+| `seed-retired-clean` | gov stops shipping a seed the target never edited, under `--write-withdrawals` | verdict `withdrawn`, the `reported only` line, no order, the copy kept |
 | `render-edited` | the target edits the rendered file | verdict `render-edited`, the kit held back, the order written, the edit's bytes kept |
 | `render-clean` | an unedited render, gov's template moved | `re-rendered`, as today |
 | `dispatch-gap` | `derive_dispatch_gaps` over a copy of `UPDATE_ROLE` lacking the row | one message naming the role |
 
 The stubs: `forked` sets the role's dispatch row to the `forked` row's disposition; `report-omits`
-makes `render_retired_edited_line` return nothing; `today` makes `check_render_edited` return false.
+makes `render_retired_edited_line` return nothing; `today` makes `check_render_edited` return false;
+`seed-override` sets `SEED_KEPT_VERDICTS` back to `("missing", "renamed")`.
 A plant exits 0 when every observation matches its case and 1 otherwise.
 
 ### Inventory
 
 Minted: the verdicts `retired-edited` and `render-edited`; the role `retired-edited` and its
-disposition `order`; the constant `ORDERED_VERDICTS`; the functions `derive_dispatch_gaps`,
+disposition `order`; the constants `ORDERED_VERDICTS` and `SEED_KEPT_VERDICTS`; the functions `derive_dispatch_gaps`,
 `read_retired_edits_mode`, `write_row_order`, `render_retired_edited_line` and
 `check_render_edited` in `govkit.py`, and `read_policy_value` there where this unit builds before TOOL-dSafePassage-6, and `run_fixture` and `main` in the fixture module; the
 `cause` parameter of `remove_wired_fragments`; the order names `update-retired-edited-<slug>.md` and
@@ -336,12 +354,18 @@ the guard admits a mirror commit only when the policy file and the catalogue equ
 - **AC11** — When `git grep -n -e "retired-edited" -- help/` runs, it finds the page and its line in
   the help index.
   Red when: the state ships with no page under `help/`.
+- **AC12** — When `python "tools/govkit/fixtures/retired_edits.py" --plant seed-retired-edited` runs,
+  it exits 0, its observations showing the verdict `retired-edited`, one `update-retired-edited-`
+  order, the receipt role `retired-edited` and the seeded copy's bytes unchanged; `--plant
+  seed-retired-clean` exits 0 with the verdict `withdrawn`, no order and the copy present; with
+  `--stub seed-override` the edited plant exits 1, the row graded `patched` with no order.
+  Red when: the seed override rewrites a retired seed's verdict, so an edited copy reads `patched`.
 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 · a new arm runs the fixture module over every plant of §4 and over the three stubs, asserting each exit · none
+New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 AC12 · a new arm runs the fixture module over every plant of §4 and over the four stubs, asserting each exit · none
 
 ## 8. Open questions
 
@@ -382,6 +406,11 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 · a
   `read_policy_value`, defined once in `govkit.py` by the first of TOOL-dSafePassage-6 and this unit
   to build, with §3's hands-off to TOOL-dSafePassage-13, which calls it; and the mirror is regenerated
   in a second commit.
+- rev-4 · 2026-10-25 · S2 · §3 Edges · §4 the grid table, the write loop, What it does not check, the
+  fixture, Inventory · AC12 · §7 · §10 · Items 5 and 6 of
+  `2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`: a retired seed row passes the seed override
+  into the `retired-edited` arm, by the owner's pick of dOrderedCharter spec 31's F7 (a), with two
+  plants, a stub and AC12; and `read_policy_value` takes `rev=None`, passed as `--rev`.
 
 ## 10. Reuse audit
 
@@ -394,7 +423,8 @@ extracted into `write_row_order` at its second caller; `remove_wired_fragments` 
 the edit test compares against; and dGroundRules' `policy.py get`, run as a subprocess from the policy
 kit `resolve_kit_dir` (`:196-233`) finds, the one reader of `install.retired-edits`. `reuse_lookup.py "unwire a hook fragment from the settings file"`
 ranked `run_fragment_merges` and the six wired hooks of the `harness-hooks` inventory, which is the
-seam taken; `reuse_lookup.py "write an outbox order for a file gov no longer ships"` ranked generic
+seam taken; the seed override (`:9988-10000`), whose kept-verdict tuple is named so a retired seed
+joins it; `reuse_lookup.py "write an outbox order for a file gov no longer ships"` ranked generic
 writers (`write`, `write_text`, `write_record`) and no order writer, because the `withdrawn` arm's is
 inline, which is why S4 extracts it. Where a record and the source disagree: the supersession
 research cites the edited-withdrawn cell at `govkit.py:8048` and `:8078` and the hook wiring at

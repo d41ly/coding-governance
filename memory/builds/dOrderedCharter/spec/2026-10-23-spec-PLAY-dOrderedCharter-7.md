@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-7 — the core: principle registry, meta-check, kinds register, exception register and the core policies
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 11 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0037@0b2c8bff whole
 
@@ -24,10 +24,12 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-7-deviation-74.md](../build/2026-10-25-build-PLAY-dOrderedCharter-7-deviation-74.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-7-deviation-75.md](../build/2026-10-25-build-PLAY-dOrderedCharter-7-deviation-75.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -100,10 +102,10 @@ build owns.
 - **S9** — The exception register and `core.exceptions`, read by `core.py exceptions` and by every core
   gate: a red whose principle and part match an admitted record prints as `excepted`, naming the record.
   `any-session-recorded`, the default, admits every well-formed record; `owner-only-expiring` admits one
-  that carries `**Expires:**` in the future and was written through the door's owner path, under the
-  owner proof the owner-proof fork of PLAY-dOrderedCharter-15's §8 settles, never one of this unit's own,
-  and reds an expired one or one without the field; while no pass has landed that proof no record carries
-  it, so the value admits none. `none` admits none and reds every record. Observed by AC8 and AC9.
+  that carries `**Expires:**` in the future and was written through the door's owner path, under
+  PLAY-dOrderedCharter-15's owner proof, stderr being a terminal, tested through that unit's check (its §8
+  F4, resolved by the owner) and never by one of this unit's own, and reds an expired one or one without
+  the field; while no pass has landed that check no record carries the proof, so the value admits none. `none` admits none and reds every record. Observed by AC8 and AC9.
 - **S10** — `core.bypass`. `with-hooks-report`, the default, and `with-hooks-block` let a bypass skip the
   core legs with every other leg; `never` makes the meta-check red any leg whose `enforces` is non-empty and
   which carries a `guard`, so no leg guard can skip a core check. Both keys are read with
@@ -147,7 +149,7 @@ build owns.
 - **hands-off** `PLAY-dOrderedCharter-1` — the practice catalogue's rows, which arm S6's practice gate and S3's practice population; and `read_policy_value`, which that unit reads `charter.practices` through
 - **hands-off** `PLAY-dOrderedCharter-29` — the exception door, added to the one-door check's list, and the `enforces` key and the meta-check that grades its pairings both ways
 - **hands-off** `PLAY-dOrderedCharter-2` — the principle registry the charter's core block renders from, and S7's factory the override kind joins
-- **hands-off** `PLAY-dOrderedCharter-15` — S7's factory the change record kind joins, and the owner proof S9's `owner-only-expiring` admits a record under, which that unit's §8 owner-proof fork settles
+- **hands-off** `PLAY-dOrderedCharter-15` — S7's factory the change record kind joins, and the owner proof S9's `owner-only-expiring` admits a record under, stderr being a terminal, through that unit's check
 - **hands-off** `PLAY-dOrderedCharter-35` — the kinds register a row kind's schema is found through
 - **hands-off** `PLAY-dOrderedCharter-36` — the kinds register's optional `schema` key, and the principle registry its `principle=` sources resolve against
 - **hands-off** `PLAY-dOrderedCharter-30` — the `enforces` key, the meta-check and the pending list its rule-to-leg pairs live in
@@ -259,9 +261,9 @@ a mirror commit only when the policy file and the catalogue equal HEAD (TOOL-dGr
 
 ## 5. Production-readiness checklist
 
-- security: principles are fixed and no key reads them; `core.exceptions: owner-only-expiring` takes the
-  owner proof PLAY-dOrderedCharter-15's §8 settles and admits nothing before it lands; the door writes only
-  under the session's own `build/` folder.
+- security: principles are fixed and no key reads them; `core.exceptions: owner-only-expiring` takes
+  PLAY-dOrderedCharter-15's owner proof, stderr being a terminal, through that unit's check, and admits
+  nothing before it lands; the door writes only under the session's own `build/` folder.
 - perf / scale: one TOML read per registry and one JSON read of the legs; the join is set arithmetic.
 - error / empty / loading states: an absent registry or legs file is red; a refused policy read is red
   naming the key; the practice population reads `unarmed`, never green; each pending count prints on every
@@ -362,6 +364,7 @@ New arm: tools/memory-tree/deviation_join.py · covers AC7 · its existing suite
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 - rev-4 · 2026-10-24 · §2 S9, S10, S11, S12 · §3 Edges · §4 The policy reads, Inventory, Rollout, Files touched · §5 · AC9, AC10, AC11 · §7 · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 40, U3 and U4: both keys are read with `policy.py get` through `read_policy_value`, whose contract §4 now states, and a refused read reds; both landed rows are filled and drained, never added; `owner-only-expiring` takes the owner proof spec 15's §8 fork settles, since the guard's `[ -t 2 ]` is no callable.
+- rev-5 · 2026-10-25 · §2 S9 · §3 Edges · §5 security · the owner's pick folded by `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks` item 2: `owner-only-expiring` states the settled proof, stderr being a terminal through PLAY-dOrderedCharter-15's check, in place of a pointer to that unit's open fork.
 
 ## 10. Reuse audit
 

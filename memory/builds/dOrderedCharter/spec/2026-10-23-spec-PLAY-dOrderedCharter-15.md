@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-15 — the instruction manifest and its guarded write command, each change recorded, and the pack catalogue
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 16 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0045@f345dc78 whole
 
@@ -21,10 +21,12 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-15-deviation-153.md](../build/2026-10-25-build-PLAY-dOrderedCharter-15-deviation-153.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-15-deviation-154.md](../build/2026-10-25-build-PLAY-dOrderedCharter-15-deviation-154.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -75,9 +77,8 @@ extending `charter.practices` into a pack catalogue, apart from the policy prese
 - **S5** — `instructions.proof`. `tty-cli`, the default, is the owner's presence shown as standard error
   being an interactive terminal, the one stream dGroundRules' minimal guard tests for `policy-file.proof`
   (`[ -t 2 ]`, written inline in `.githooks/pre-commit`, TOOL-dGroundRules-6 S4 and its §8 F3). That
-  test is shell with no callable, so how this command runs it is §8 F4, open for the owner; under its
-  recommendation (a) the command tests `sys.stderr.isatty()`, stated as a second implementation of the
-  guard's signal. `signed` and `both` are refused at load as selecting an absent component, the layered
+  test is shell with no callable, so the command tests `sys.stderr.isatty()` itself, stated as a second
+  implementation of the guard's signal (§8 F4, the owner's pick). `signed` and `both` are refused at load as selecting an absent component, the layered
   proof v2 places in `[planned]`, until a core row declares `point.instructions.signed-proof`. Both keys
   are read with `policy_reader("instructions.edit")` and `policy_reader("instructions.proof")`,
   PLAY-dOrderedCharter-9's callable that runs `policy.py get <key>` as a subprocess through the inlined
@@ -342,8 +343,9 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
   for dDeclaredLoop's TTY CLI and refuse every write until then. (b) is the one-implementation shape,
   but it moves a landed parent's hook seam for one consumer; (c) leaves `tty-cli` with no
   implementation, so AC3's owner arm has nothing to observe even with the guard's point declared.
-  Recommendation (a): one stream, stderr, named once, and the second spelling is one call. Open for
-  the owner. PLAY-dOrderedCharter-7's `core.exceptions: owner-only-expiring` proof follows this fork.
+  Recommendation (a): one stream, stderr, named once, and the second spelling is one call.
+  RESOLVED (owner, 2026-10-25): (a). PLAY-dOrderedCharter-7's `core.exceptions: owner-only-expiring`
+  proof is this check.
 
 ## 9. Revision log
 
@@ -351,6 +353,7 @@ New arm: tools/gate-legs.json · covers AC6 · the `instruction edits (manifest 
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-40, PLAY-dOrderedCharter-42, PLAY-dOrderedCharter-45, PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50.
 - rev-4 · 2026-10-24 · §2 S5, S10, S11 (new) · §3 Edges · §4 Rollout, Files touched · §5 security · AC3, AC12 (new) · §8 F4 (new, open for the owner) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 40, U3 and U4: the proof tests stderr, the guard's stream, and how it is run is F4's; both keys are read through `policy_reader`, and a refused read refuses; the two landed rows are filled and drained, never added.
+- rev-5 · 2026-10-25 · Status (ratified) · §2 S5 · §8 F4 · §10 · the owner's answer to F4, item 1 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`: (a), the command's own check that stderr is a terminal, stated directly where S5 and the reuse audit pointed at the open fork.
 
 ## 10. Reuse audit
 
@@ -359,8 +362,8 @@ pick name for manifest merges (its `key` at line 271 anchors a markdown row; S1 
 beside its three), the `.gitattributes` `merge=rows` lines (61-78), unit 7's record factory for the
 `change` kind, and the stream dGroundRules' minimal guard tests for the TTY proof. No TTY proof exists
 in the tree today (scout A: no `isatty` under `tools`), and the guard's lands as `[ -t 2 ]` inline in
-`.githooks/pre-commit` (TOOL-dGroundRules-6 S4), no callable, so §8 F4 holds whether this unit writes a
-second test of the same stream or asks the parent for a callable.
+`.githooks/pre-commit` (TOOL-dGroundRules-6 S4), no callable, so this unit writes a second test of the
+same stream (§8 F4, the owner's pick).
 `python tools/codebase-map/reuse_lookup.py "an owner-only command that adds edits and removes instruction rows
 and records each change"` ranked name-token matches (`rows`, `records`, `changed`), none a guarded write
 path, so no existing seam fits the command itself.

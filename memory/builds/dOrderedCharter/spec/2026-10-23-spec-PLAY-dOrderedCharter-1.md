@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-1 — the practice catalogue and `charter.practices`
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 17 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0031@419dfa75 whole
 **Carries:** node:policy-key.charter.practices
@@ -21,6 +21,8 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md) | research | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-deviation-13.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-deviation-13.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-deviation-14.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-deviation-14.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-parents-audit.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-parents-audit.md) | research | — |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md) | journal | — |
@@ -33,6 +35,7 @@
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-1-spec-writer.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -303,8 +306,15 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 AC8 · the self
   re-ground ask to dGroundRules for an `item` pattern of the `practice.<seg>` shape, and S8's `usage` waits
   on its answer; (b) this unit edits the row's `allowed` itself, a schema change in the parent's kit beyond
   the fill S8 is granted; (c) leave the value unsettable, every adopter rendering the `foundation` set.
-  Recommendation (a): the probe decides, (b) edits the parent's schema, and (c) drops S4's choice. Open:
-  the probe runs at the build run.
+  Recommendation (a): the probe decides, (b) edits the parent's schema, and (c) drops S4's choice.
+  Evidence, read without a checkout from the live dGroundRules run's built tree
+  (`origin/branch/unattended-dgroundrules-e47ae1` at `df4912bd`): its `tools/policy/catalogue.toml:22-26`
+  holds the row as `allowed = { type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "catalogue
+  or repo-declared practices" }`, `empty = "never"`, `default = { derived = "the governance foundation
+  set" }`, and its `check_value` (`tools/policy/policy.py:142`, the set branch at `:159-171`) admits a
+  member that `item` pattern matches, so `practice.yagni` passes and the probe is expected to read source
+  `file`. The probe still decides at the build run, against what dGroundRules lands.
+  RESOLVED (owner, 2026-10-25): (a).
 
 ## 9. Revision log
 
@@ -312,6 +322,7 @@ New arm: tools/playbook/render_playbook.py · covers AC2 AC5 AC6 AC8 · the self
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-41, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §2 S4, S8 · §3 Non-goals, Edges · §4 Rollout, Files touched · §5 · AC8, AC9 · §7 New arm · §8 F4 · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` rows 29 and 30, U3 and U4: `charter.practices` is read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value`; its derived default refuses, so the render computes the `foundation` set itself and says so, and any other refusal refuses; the landed row is filled and drained, never added; F4 asks how practice tags pass the value check.
+- rev-5 · 2026-10-25 · §8 F4 · Status line · the owner's pick folded by `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks` item 5: F4 resolved (a), the probe kept, with the built catalogue's `item` pattern and `check_value`'s set branch as the evidence that the probe should read source `file`; `ratified 2026-10-25` on the Status line.
 
 ## 10. Reuse audit
 

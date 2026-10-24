@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-35 — the overlay's row mechanism for every registered kind: adopter-segment tags, field patches, whole-row replacements, exclusions, row pins and stale rows
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 33 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0065@35e9932a whole
 **Carries:** node:policy-key.instructions.exclude
@@ -17,9 +17,11 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-35-deviation-354.md](../build/2026-10-25-build-PLAY-dOrderedCharter-35-deviation-354.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-35-deviation-355.md](../build/2026-10-25-build-PLAY-dOrderedCharter-35-deviation-355.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -56,16 +58,18 @@ lost at update (`gap-found-29`, closed with units 32 and 33).
   answers to gov's tag in the composition, so every dependent naming gov's tag resolves to it.
   Observed by AC5.
 - **S5** — Exclude, over every registered kind. `instructions.exclude`, this unit's policy key, takes
-  `none` or a set of gov tags of any registered kind the overlay holds; each listed gov row is absent
+  the empty set `[]`, v2's `none` and its default, or a set of gov tags of any registered kind the
+  overlay holds; each listed gov row is absent
   from the composition and its state reads `excluded`. A listed tag no registered kind holds is
   refused. The key is read with `policy_reader("instructions.exclude")`, PLAY-dOrderedCharter-9's
   callable that runs `policy.py get` as a subprocess (TOOL-dGroundRules-2 S7), passing `--rev HEAD` as
   PLAY-dOrderedCharter-46 S6 rules for every read the composition makes; `get` prints a set one member
-  per line and `none` as itself, and an exit 2 refuses the composition, naming the key and carrying the
+  per line and the empty default as no line, and an exit 2 refuses the composition, naming the key and carrying the
   reader's line. The key's row lands with dGroundRules, owner dOrderedCharter (v2:1245), with no
   `summary` or `usage` and its name on the shrink-only `tools/policy/unsummarised-keys.txt`
   (TOOL-dGroundRules-1 S3, S6). This unit adds no row: it fills the row's `summary` and `usage`, a line
-  the landed row's `allowed` admits, and drains the name in the same commit with
+  the landed row's `allowed` admits (`{ type = "set", item = ... }` with `empty = "allowed"` and
+  `default = []` in dGroundRules' built catalogue), and drains the name in the same commit with
   `python <prefix>/policy/policy.py lists --write`. Which exclusions are refused is unit 36's.
   Observed by AC6 and AC12.
 - **S6** — Pins over a row's canonical form. A pin's `<hash8>` is S7's shared normaliser (unit 24's
@@ -316,7 +320,7 @@ TOOL-dGroundRules-19 S1).
   changed behind the pin by `editorial` records only), it exits 0, the pin standing and no edge stale.
   Red when: an editorial change flags the edge.
 - **AC12** — When `python -c "import tomllib; print([(r['default'], r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'instructions.exclude'])"`
-  runs after the pass, it prints one row, `none`, `dOrderedCharter`, `True`, `True`;
+  runs after the pass, it prints one row, `[]` (v2's `none`), `dOrderedCharter`, `True`, `True`;
   `python "tools/policy/policy.py" lists --check` exits 0; and
   `git grep -n -F 'policy_reader("instructions.exclude"' -- tools/playbook/` finds the read.
   Red when: the row keeps no summary or usage, or its name stays on the shrink-only list, each of which
@@ -377,6 +381,7 @@ New arm: tools/playbook/render_playbook.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
 - rev-4 · 2026-10-24 · §2 S5 · §3 Edges · §4 The composer, Rollout, Files touched · AC12 · §8 F4 (re-resolved) · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` rows 18 and 45, U3 and U4: the landed `instructions.exclude` row is filled and drained, never added, and AC12's red is `policy.py lists --check`; the key is read through `policy.py get` at `--rev HEAD`; orders go through unit 33's handler, keyed on a `path`.
+- rev-5 · 2026-10-25 · §2 S5 · AC12 · item 8 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P11: `instructions.exclude`'s default is `[]`, v2's `none`, as dGroundRules' built catalogue holds it.
 
 ## 10. Reuse audit
 
