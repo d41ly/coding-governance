@@ -10,8 +10,8 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 
 ## Run facts
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 3e4c0ddde5097197f2ad73794679593ea44dd460
-phase: REVIEWING
+witness: 3e547fab3cc8fa20129b92daafb9f8893a973605
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
