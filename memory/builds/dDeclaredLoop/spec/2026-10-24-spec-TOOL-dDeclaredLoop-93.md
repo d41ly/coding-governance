@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-93 — 92 AC16 states the push-merge-tree-fatal plant's exit as 1, the code every sibling states
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 47 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 47 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-93-deviation-931.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-93-deviation-931.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-93-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-93-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-94 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ and repairs `TOOL-dDeclaredLoop-92`.
 
 - **consumes-from** `TOOL-dDeclaredLoop-92` — AC16 and the `OSError()` row of the `push-merge-tree-fatal` plant that S17 builds, which S1 restates to exit 1 (the round-10 spec audit's id 1)
 - **hands-off** `TOOL-dDeclaredLoop-94` — 92 AC16 as S1 restates it, whose `build_failure_detail` calls and range greps that unit completes (the round-10 spec audit's ids 4, 11, 13, 20, 29)
+- **hands-off** `TOOL-dDeclaredLoop-96` — §4's exit-claim probe, AC1 and AC3, which that unit restates (the round-11 spec audit's ids 3, 4, 12)
 
 ## 4. Design
 
@@ -160,6 +162,8 @@ moves no arm: the plant's exit 1 is 81's arm, and S2 only keeps it.
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-10 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-96, written by the round-11 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

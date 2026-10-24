@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-41 — the actor-witness list graded where its builds live, and an adopter's own agent items its own
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 6 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 6 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -61,6 +61,7 @@ state. This unit takes the report's fix. It repairs `TOOL-dDeclaredLoop-5`.
 
 - **consumes-from** `TOOL-dDeclaredLoop-5` — `check_actor_list`, `tools/loop/actor-witnesses.txt` and the unattended leg's `DOD_EXTRA` arm, which this unit grades by tree
 - **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minors ids 44 and 45: this pass keeps the loop definition leg green, and its arm runs under the loop definition fixtures leg that unit adds
+- **hands-off** `TOOL-dDeclaredLoop-95` — S1's and S2's `.memory-tree.conf` read and AC1's plants, which that unit moves onto `read_tree_conf` and whose no-kit clause in S2 it restates (the round-11 spec audit's id 1)
 
 ## 4. Design
 
@@ -148,6 +149,8 @@ a probe, never by that suite.
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's id 48 (HIGH, item H14).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-95, written by the round-11 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

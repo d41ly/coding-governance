@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-90 — the round-8 spec audit's 22 minors, batched
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -160,6 +160,8 @@ findings, ids 12, 14 and 23, are not in the disposal population.
 - **consumes-from** `TOOL-dDeclaredLoop-89` — `derive_conf_rebinds`' sentences in 87 S1 and 86 S13, which S1 and S10 keep, and its `tree_lib` call, which S4's refusal class covers
 - **hands-off** `TOOL-dDeclaredLoop-92` — S3, S4, S5, S11, S12, S21, §4's Write set, sketch, Evidence and Files touched, §7, §8 F4, §10, AC1, AC3, AC4, AC5, AC11, AC12 and AC21, with `load_tree_lib`, `TREE_LIB_SYMBOLS` and `build_failure_detail`, which that unit restates and completes (the round-9 spec audit's ids 1, 2, 3, 4, 5, 6, 7, 9, 11, 12, 14, 15, 17, 22)
 - **hands-off** `TOOL-dDeclaredLoop-94` — S4, S21 and the sketch "The tree_lib route, after this unit", whose tuple line that unit restates to hold `GIT_ENV_LEAKS` and whose ranges it greps (the round-10 spec audit's ids 4, 24)
+- **hands-off** `TOOL-dDeclaredLoop-95` — S4, AC4 and the sketch "The tree_lib route, after this unit", whose tuple that unit restates with `parse_conf` and whose attribute probe it re-runs (the round-11 spec audit's id 1)
+- **hands-off** `TOOL-dDeclaredLoop-96` — S4 and the sketch "The tree_lib route, after this unit", which that unit restates to 94's loader whole (the round-11 spec audit's ids 7, 9)
 
 ## 4. Design
 
@@ -395,6 +397,8 @@ New arm: tools/loop/guard.py · covers AC21 · the one-argument OSError row of p
   TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
+- rev-4 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-95 and TOOL-dDeclaredLoop-96, written by the round-11 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
