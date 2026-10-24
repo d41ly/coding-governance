@@ -347,3 +347,11 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T17:18:02Z dispatch · item fb47c2eb TOOL-dGroundRules-49 · reason memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-49-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-49.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
 
 2026-10-24T17:22:41Z dispatch · item fb47c2eb TOOL-dGroundRules-49 · reason memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-49-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-49.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T17:25:13Z brief · item TOOL-dGroundRules-50 · reason 5c6e48dab74b memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-50-build-brief.md
+
+2026-10-24T17:26:57Z dispatch · item a65cd823 TOOL-dGroundRules-50 · reason tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-50.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T17:30:12Z dispatch · item a65cd823 TOOL-dGroundRules-50 · reason tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-50.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T17:32:48Z dispatch · item a65cd823 TOOL-dGroundRules-50 · reason tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-50.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-50-ledger.md

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-50 — the help-page parity prints where it found the deferral line, so the install section is read by one rule
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-3 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-50-deviation-38.md](../build/2026-10-23-build-TOOL-dGroundRules-50-deviation-38.md) | deviation | — |
+| [2026-10-24-build-TOOL-dGroundRules-50-ledger.md](../build/2026-10-24-build-TOOL-dGroundRules-50-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-50-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-50-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-47-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-47-staleness-probe-brief.md) | research | TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 |
 | [2026-10-24-prompt-TOOL-dGroundRules-50-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-50-2-spec-writer.md) | journal | — |

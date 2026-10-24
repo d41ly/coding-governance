@@ -1349,17 +1349,20 @@ def run_fresh_target(name):
                         page = None
                     plines = (page or "").replace("\r", "").split("\n")
                     at = next((i for i, ln in enumerate(plines) if ln.startswith("## Install")), None)
-                    section = []
-                    for ln in plines[at + 1:] if at is not None else []:
+                    section = []  # (1-based page line number, line)
+                    for i, ln in enumerate(plines[at + 1:] if at is not None else [], (at or 0) + 2):
                         if ln.startswith("## "):
                             break
-                        section.append(ln)
-                    found = any(head in ln and tail in ln[ln.index(head) + len(head):] for ln in section)
-                    if page is None or at is None or not found:
+                        section.append((i, ln))
+                    # TOOL-dGroundRules-50 S1: the parity's own find yields the line it found, so the section is read once.
+                    found = next((i for i, ln in section if head in ln and tail in ln[ln.index(head) + len(head):]), None)
+                    if page is None or at is None or found is None:
                         why = ("is unreadable, so nothing restates" if page is None else "has no `## Install` section" if at is None
                                else "has no line under `## Install` holding")
                         wrong.append(f"help/policy.md {why} the deferral line the install-day --scaffold "
                                      f"printed: {printed}")
+                    else:
+                        print(f"policy-fixture: {name} · help/policy.md:{found} carries the deferral line")
                 grade_check("with the install staged")
                 run_fixture_git(t, "add", "-A")
                 run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
