@@ -170,6 +170,16 @@ status but WONTDO, with its history.
          number, any other refusal of the policy reader, and a non-number high-water row refuse,
          under `warn` too. What it does NOT check: a line count, a terminal spec, and growth below
          the ceiling.
+  source the source join: every shell source command, a `.` or `source` word at a command position,
+         a code span's opening word included, in a LIVE spec's acceptance section read WHOLE, fenced
+         blocks included -> a hit when its operand, ending in `.sh`, carries no `/`
+         (TOOL-dGroundRules-46). A bare name resolves against the working directory, not the kit, so
+         such a criterion run from the root cannot define the function it calls. Its line prints on
+         every run, so a join that examined nothing reads as zero examined and not as clean. What it
+         does NOT see: an operand built at runtime or held in a variable, a sourced file whose name
+         does not end in `.sh`, and a source command outside the acceptance section. A prose
+         sentence spelling a dot, a space and a bare `.sh` name at a command position reads as a
+         source; waive it by its operand.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -292,6 +302,11 @@ SEC = r"^## %s\.[^\n]*\n(.*?)(?=\n## |\Z)"
 TICK = re.compile(r"`([^`\n]+)`")
 CITE = re.compile(r"`([^`\s]+\.[A-Za-z0-9]+):(\d+)(?:-\d+)?`")
 CITE_TAIL = re.compile(r":\d+(-\d+)?$")
+# A shell source command, `.` or `source` at a command position — a line or code-span start, after a
+# separator or quote, or after a space — and its operand ending in `.sh`, stopped before a backtick.
+SOURCE_CMD = re.compile(r"(?:^|[;&|('\"`]|\s)(?:\.|source)\s+([^\s;&|'\"()`]+\.sh)\b")
+SOURCE_WHY = ("sources a shell file by bare name, which resolves against the working directory and "
+              "not the kit")
 # A section 7 list carries more than leg names: commands to run, conf keys, and the files a leg
 # grades. The pre-wiring run over 453 specs surfaced all three and they are not defects, so the leg
 # join excludes them by SHAPE rather than by waiver. A leg name is prose: no slash, no leading dot,
@@ -518,6 +533,16 @@ def extract_acceptance(text):
     rest = text[m.end():]
     nxt = re.search(r"^## ", rest, re.M)
     return rest[:nxt.start()] if nxt else rest
+
+
+def scan_bare_sources(text):
+    """Every operand a shell source command in the acceptance section names with no `/`.
+
+    TOOL-dGroundRules-46. The section is read WHOLE, fenced blocks included, unlike the bullet loop:
+    a criterion literal that sources the kit's library by its bare name cannot define what it calls
+    when run from the root, and that literal sits in a fence as often as in a bullet.
+    """
+    return [op for op in SOURCE_CMD.findall(extract_acceptance(text) or "") if "/" not in op]
 
 
 def extract_files_touched(text, files):
@@ -1425,6 +1450,7 @@ def main(argv):
     g_examined, g_specs, g_carriers, g_nosubhead, g_nogates = 0, 0, 0, 0, 0
     c_runs, c_specs, c_cleared = 0, 0, 0
     cv_lines, cv_specs, cv_carriers, cv_graded = 0, 0, 0, 0
+    so_examined, so_specs, so_bare = 0, 0, 0
     for f in specs:
         text = (root / f).read_bytes().decode("utf-8", "replace").replace("\r\n", "\n")
         m = SPEC_DATE.search("/" + f)
@@ -1575,6 +1601,13 @@ def main(argv):
         cv_specs += 1 if n else 0
         cv_carriers += c
         cv_graded += k
+        # THE SOURCE JOIN (TOOL-dGroundRules-46): the acceptance section whole, fences included.
+        n = len(SOURCE_CMD.findall(extract_acceptance(text) or ""))
+        so_examined += n
+        so_specs += 1 if n else 0
+        so_hits = scan_bare_sources(text)
+        so_bare += len(so_hits)
+        hits += [(f, "source", op, SOURCE_WHY) for op in so_hits]
 
     # The seventh join, over a population the six above never build: one uid map over the live specs,
     # then one read per graded target. It is folded into `hits` before the waiver pass, so a handoff
@@ -1671,6 +1704,10 @@ def main(argv):
     # normal state and only the arm-line count tells a join that read nothing from a clean one.
     print(f"spec-tokens: covers join · {cv_lines} New arm line(s) in {cv_specs} live spec(s) · "
           f"{cv_carriers} carry a covers field · {cv_graded} token(s) graded")
+    # The source join's line, on every run: a join that examined nothing reads as zero examined, not
+    # as clean. Its `live spec(s) ·` is the hands-off line's reason: `--dispatch` filters on it.
+    print(f"spec-tokens: source join · {so_examined} sourced file(s) examined in {so_specs} live spec(s) · "
+          f"{so_bare} by bare name")
     # THE UNGRADED POPULATION, which the report used to leave out entirely. A leg join that reads N
     # specs and grades a leg name in far fewer of them looks identical to one that graded them all
     # and found nothing wrong. These two numbers are what separate the cases, and they are kept

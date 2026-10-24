@@ -45,7 +45,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # top-level. Counted by reading; OWED: observed at the close.
 # RAISED 193 -> 194 by TOOL-dGroundRules-32: its overlap-parity arm, top-level. Counted by reading;
 # OWED: observed at the close.
-FLOOR_ASSERTIONS=194
+# RAISED 194 -> 197 by TOOL-dGroundRules-46: its three source-join arms, bare fence, whole fence and
+# bare code span, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=197
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1735,6 +1737,26 @@ if [ "$wi_rows" -ge 1 ] 2>/dev/null && [ -z "$wi_bad" ]; then
 else
   echo "arm FAIL  TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer — rows $wi_rows, ${wi_bad:-no row disagreed}"; fail=$((fail+1))
 fi
+
+# TOOL-dGroundRules-46: the source join. One live spec whose acceptance fence sources a shell file by
+# bare name reds; the same by a path carrying `/` is no hit; a bullet whose code span opens on the
+# bare source reds too. $2 is the line planted after the AC1 bullet; a third word `fence` plants it
+# inside a fenced block. The backticks are octal escapes, so this file's shell scanner reads no quote.
+seed_source() {
+  local sp="$1/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" add="$2"
+  [ "${3:-}" = fence ] && add=$(printf '\n\140\140\140text\n%s\n\140\140\140' "$2")
+  ADD="$add" awk '{print} /^- \*\*AC1\*\*/{print ENVIRON["ADD"]}' "$sp" > "$sp.tmp" && mv "$sp.tmp" "$sp"
+  git -C "$1" add -A >/dev/null
+}
+d=$base/source-bare; scratch "$d"
+seed_source "$d" "PROBE = bash -c '. helper.sh; f'" fence
+arm "TOOL-dGroundRules-46 a bare-name source in a fenced acceptance literal REDS as [source]" 1 "$d" '[source] `helper.sh` — sources a shell file by bare name'
+d=$base/source-whole; scratch "$d"
+seed_source "$d" "PROBE = bash -c '. sub/helper.sh; f'" fence
+arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, and is counted" 0 "$d" "source join · 1 sourced file(s) examined in 1 live spec(s)" "[source]"
+d=$base/source-tick; scratch "$d"
+seed_source "$d" "$(printf -- '- When \140. helper.sh; f\140 runs, it prints \1400\140.')"
+arm "TOOL-dGroundRules-46 a bullet whose code span opens on a bare-name source REDS as [source]" 1 "$d" '[source] `helper.sh`'
 
 total=$((pass+fail))
 if [ "$total" -lt "$FLOOR_ASSERTIONS" ]; then

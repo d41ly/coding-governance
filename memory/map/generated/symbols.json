@@ -21473,6 +21473,11 @@
       "file": "tools/memory-tree/row_grammar.py"
     },
     {
+      "id": "scan_bare_sources",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "scan_candidates",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -22366,6 +22371,11 @@
       "id": "seed_shards_base",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "seed_source",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.test.sh"
     },
     {
       "id": "seed_spc",
