@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 15 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 15 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0087@5eb8d36a whole
 

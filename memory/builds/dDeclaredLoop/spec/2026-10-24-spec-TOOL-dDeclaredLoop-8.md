@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-8 — claims keyed and trusted by key and source
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 16 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 16 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0093@a21f7ad5 whole
 

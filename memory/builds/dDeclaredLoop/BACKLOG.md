@@ -7,3 +7,4 @@
 ## Dispositions
 
 - SEV · TOOL-dDeclaredLoop-35 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dDeclaredLoop-35 · until TOOL-dDeclaredLoop-67 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dDeclaredLoop-67 at order 38 today, closes it (README rule 1)

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 13 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 13 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0088@b1722a1e whole
 **Carries:** node:record-kind.transition

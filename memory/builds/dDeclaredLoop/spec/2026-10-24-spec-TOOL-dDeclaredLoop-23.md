@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-23 — the commit node and its kind, and one trailer reader with both views
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 3 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 3 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0108@df656363 whole
 **Carries:** node:record-kind.commit

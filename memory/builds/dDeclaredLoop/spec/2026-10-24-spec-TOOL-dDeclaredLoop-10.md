@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 14 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 14 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0095@46379602 whole
 

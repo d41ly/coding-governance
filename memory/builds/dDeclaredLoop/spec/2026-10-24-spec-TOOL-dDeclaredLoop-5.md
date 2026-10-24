@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0090@e3f362f0 whole
 

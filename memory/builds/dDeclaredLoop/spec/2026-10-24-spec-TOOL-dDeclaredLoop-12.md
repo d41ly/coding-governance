@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 6 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 6 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0097@56655276 whole
 

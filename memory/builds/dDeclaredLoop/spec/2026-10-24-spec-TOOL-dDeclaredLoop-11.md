@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-11 — every checklist item named by a semantic tag, its number only display order
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 9 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 9 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0096@18103ca9 whole
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 25 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 25 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0113@11f77a79 whole
 **Carries:** node:policy-key.flow.adapt

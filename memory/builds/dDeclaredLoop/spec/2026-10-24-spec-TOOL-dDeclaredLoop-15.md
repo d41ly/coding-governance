@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-15 — the build table's terminal states, and `deps.on-parent-withdrawn` routing a withdrawn parent
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 12 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 12 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0100@4771709c whole
 **Carries:** node:policy-key.deps.on-parent-withdrawn

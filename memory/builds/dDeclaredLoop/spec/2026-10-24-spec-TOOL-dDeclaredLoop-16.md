@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-16 — one closed disposition set, and the owner's disposition record
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0101@6e645e0e whole
 **Carries:** node:record-kind.disposition

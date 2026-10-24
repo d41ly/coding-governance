@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-24 — the `item` kind in the kinds register, its factory, and the checks over the composed items
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 11 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 11 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0109@48e119fc whole
 

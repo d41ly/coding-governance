@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-13 — one transition table per level, the engine refusing a move it lacks
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 10 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 10 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0098@89542705 whole
 

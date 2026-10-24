@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 24 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 24 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0112@de8c6c54 whole
 **Carries:** node:tag-namespace.scenario

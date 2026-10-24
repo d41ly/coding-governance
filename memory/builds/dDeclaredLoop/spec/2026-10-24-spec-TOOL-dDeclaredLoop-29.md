@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 22 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 22 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0114@f3e34c2f whole
 

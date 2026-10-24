@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-34 — the deviation approval route read from deviation.approval: by its risk, the owner for all, or its author recorded
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 27 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 27 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0119@a9b53abc whole
 **Carries:** node:policy-key.deviation.approval

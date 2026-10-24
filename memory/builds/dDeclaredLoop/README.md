@@ -98,7 +98,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 66 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 66 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13
 ids TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26
 ids TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-35 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39
@@ -109,72 +109,72 @@ ids TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dDeclaredLoop-18 — the `step`, `item`, `policy` and `command` tag namespaces, with their extractors](spec/2026-10-24-spec-TOOL-dDeclaredLoop-18.md) | 1 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-1 — the loop kit and its definition keyed by the stage tags, the roles kit's stage table moved into it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-1.md) | 2 | 2 | OPEN | rev-3 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-23 — the commit node and its kind, and one trailer reader with both views](spec/2026-10-24-spec-TOOL-dDeclaredLoop-23.md) | 3 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-36 — the loop kit in govkit's default selection, so a default apply installs what roles requires](spec/2026-10-24-spec-TOOL-dDeclaredLoop-36.md) | 3 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-16 — one closed disposition set, and the owner's disposition record](spec/2026-10-24-spec-TOOL-dDeclaredLoop-16.md) | 4 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-37 — the trailer re-points observed at their call sites, red at base](spec/2026-10-24-spec-TOOL-dDeclaredLoop-37.md) | 4 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-38 — the trailer CLI writes LF only, so a shell loop never keeps a CR on its last token](spec/2026-10-24-spec-TOOL-dDeclaredLoop-38.md) | 4 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-39 — the one trailer reader carries the git pins of the readers it replaces](spec/2026-10-24-spec-TOOL-dDeclaredLoop-39.md) | 4 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-40 — the trailer reader finds the key table through the kit resolver, and reads a floor of keys where none is installed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md) | 4 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path](spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md) | 4 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused](spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md) | 5 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-58 — the LF-only criterion reads a counted, non-empty CLI output before it looks for a CR](spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md) | 5 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes](spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md) | 6 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-41 — the actor-witness list graded where its builds live, and an adopter's own agent items its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md) | 6 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-9 — each step's items declared with one actor, inputs, allowance, return schema and witness](spec/2026-10-24-spec-TOOL-dDeclaredLoop-9.md) | 7 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-17 — witnesses computed rather than typed by the acting agent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-17.md) | 8 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-11 — every checklist item named by a semantic tag, its number only display order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md) | 9 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-42 — the acceptance re-run bounded on the clock, its commands run by bash, never cmd.exe](spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md) | 9 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-13 — one transition table per level, the engine refusing a move it lacks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-13.md) | 10 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-24 — the `item` kind in the kinds register, its factory, and the checks over the composed items](spec/2026-10-24-spec-TOOL-dDeclaredLoop-24.md) | 11 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-15 — the build table's terminal states, and `deps.on-parent-withdrawn` routing a withdrawn parent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-15.md) | 12 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects](spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md) | 13 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones](spec/2026-10-24-spec-TOOL-dDeclaredLoop-10.md) | 14 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor](spec/2026-10-24-spec-TOOL-dDeclaredLoop-2.md) | 15 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-43 — the guarded write restores each path's prior bytes, and writes each through a sibling temp file](spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md) | 16 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-44 — the policy push arm grades a merge on its combined diff, and a new branch against the remote default tip](spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md) | 16 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-8 — claims keyed and trusted by key and source](spec/2026-10-24-spec-TOOL-dDeclaredLoop-8.md) | 16 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set](spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md) | 17 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-7 — the position engine: each unit's step, the build's step and the next item, from witnesses](spec/2026-10-24-spec-TOOL-dDeclaredLoop-7.md) | 17 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck](spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md) | 20 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge](spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md) | 22 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-26.md) | 23 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step](spec/2026-10-24-spec-TOOL-dDeclaredLoop-27.md) | 24 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition](spec/2026-10-24-spec-TOOL-dDeclaredLoop-28.md) | 25 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-34 — the deviation approval route read from deviation.approval: by its risk, the owner for all, or its author recorded](spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md) | 27 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-32 — the convergence routing: every until and while loop ends on a non-decrease of its blocker and high count, its findings promoted by budget](spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md) | 29 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-48 — the rework budget keeps a home under every channel set `transitions.record` admits](spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md) | 29 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-49 — the budget's `spent` counts every draw of the build, across every record, in commit order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md) | 29 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-31 — `flow.on-exhausted`: a build whose budget is spent ends by a transition row, and never laps again](spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md) | 30 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-60 — the budget reader counts draws in every run record, rotated archives included, under `MEMORY_ROOT`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-60.md) | 30 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-61 — every draw row carries a draw id, so two identical parallel draws stay two rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md) | 30 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-62 — the transition-record merge driver chosen against the recorded union measurement and the row driver's own refusal](spec/2026-10-24-spec-TOOL-dDeclaredLoop-62.md) | 30 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads](spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md) | 31 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-22 — the stage-exit recommendation: a command scores it, the producing role reasons it, one record carries both](spec/2026-10-24-spec-TOOL-dDeclaredLoop-22.md) | 32 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-50 — the review program's item rows pass the program and declaration checks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md) | 32 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-19 — breakpoints at any item boundary: reviews and owner gates one mechanism under `review.breakpoints`, `review.<stage>` and `autonomy`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-19.md) | 33 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-51 — the eight recommendation rows amended in place, their actors in the declaration grammar](spec/2026-10-24-spec-TOOL-dDeclaredLoop-51.md) | 33 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-33.md) | 34 | 2 | OPEN | rev-3 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-52 — the phase-to-state-and-step map shipped as rows with one reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-52.md) | 34 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-53 — an owner gate holds only builds opened after the gate was placed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-53.md) | 34 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-54 — a terminal set declared per level, and the termination rule run over each table with its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md) | 35 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-55 — the `loop termination` leg declares no guard, so no input it reads can skip it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md) | 35 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row](spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md) | 35 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md) | 35 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | OPEN | rev-2 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-65 — the remote's freshness is the time of the last fetch, read from what a fetch and a clone write](spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md) | 37 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md) | 38 | 2 | OPEN | rev-1 | 2026-10-24 |
-| [TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md) | 38 | 2 | OPEN | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-18 — the `step`, `item`, `policy` and `command` tag namespaces, with their extractors](spec/2026-10-24-spec-TOOL-dDeclaredLoop-18.md) | 1 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-1 — the loop kit and its definition keyed by the stage tags, the roles kit's stage table moved into it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-1.md) | 2 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-23 — the commit node and its kind, and one trailer reader with both views](spec/2026-10-24-spec-TOOL-dDeclaredLoop-23.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-36 — the loop kit in govkit's default selection, so a default apply installs what roles requires](spec/2026-10-24-spec-TOOL-dDeclaredLoop-36.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-16 — one closed disposition set, and the owner's disposition record](spec/2026-10-24-spec-TOOL-dDeclaredLoop-16.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-37 — the trailer re-points observed at their call sites, red at base](spec/2026-10-24-spec-TOOL-dDeclaredLoop-37.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-38 — the trailer CLI writes LF only, so a shell loop never keeps a CR on its last token](spec/2026-10-24-spec-TOOL-dDeclaredLoop-38.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-39 — the one trailer reader carries the git pins of the readers it replaces](spec/2026-10-24-spec-TOOL-dDeclaredLoop-39.md) | 4 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-40 — the trailer reader finds the key table through the kit resolver, and reads a floor of keys where none is installed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path](spec/2026-10-24-spec-TOOL-dDeclaredLoop-57.md) | 4 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-5 — the witness-class rule: every witness classed, the actor class refused](spec/2026-10-24-spec-TOOL-dDeclaredLoop-5.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-58 — the LF-only criterion reads a counted, non-empty CLI output before it looks for a CR](spec/2026-10-24-spec-TOOL-dDeclaredLoop-58.md) | 5 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes](spec/2026-10-24-spec-TOOL-dDeclaredLoop-12.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-41 — the actor-witness list graded where its builds live, and an adopter's own agent items its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-9 — each step's items declared with one actor, inputs, allowance, return schema and witness](spec/2026-10-24-spec-TOOL-dDeclaredLoop-9.md) | 7 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-17 — witnesses computed rather than typed by the acting agent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-17.md) | 8 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-11 — every checklist item named by a semantic tag, its number only display order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-11.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-42 — the acceptance re-run bounded on the clock, its commands run by bash, never cmd.exe](spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md) | 9 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-13 — one transition table per level, the engine refusing a move it lacks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-13.md) | 10 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-24 — the `item` kind in the kinds register, its factory, and the checks over the composed items](spec/2026-10-24-spec-TOOL-dDeclaredLoop-24.md) | 11 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-15 — the build table's terminal states, and `deps.on-parent-withdrawn` routing a withdrawn parent](spec/2026-10-24-spec-TOOL-dDeclaredLoop-15.md) | 12 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-3 — the transition record three ways, its channels the set `transitions.record` selects](spec/2026-10-24-spec-TOOL-dDeclaredLoop-3.md) | 13 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-10 — backward transitions recorded like forward ones](spec/2026-10-24-spec-TOOL-dDeclaredLoop-10.md) | 14 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor](spec/2026-10-24-spec-TOOL-dDeclaredLoop-2.md) | 15 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-43 — the guarded write restores each path's prior bytes, and writes each through a sibling temp file](spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-44 — the policy push arm grades a merge on its combined diff, and a new branch against the remote default tip](spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-8 — claims keyed and trusted by key and source](spec/2026-10-24-spec-TOOL-dDeclaredLoop-8.md) | 16 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set](spec/2026-10-24-spec-TOOL-dDeclaredLoop-59.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-7 — the position engine: each unit's step, the build's step and the next item, from witnesses](spec/2026-10-24-spec-TOOL-dDeclaredLoop-7.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-14 — the default failure route: the refusal recorded and the frontier returned](spec/2026-10-24-spec-TOOL-dDeclaredLoop-14.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-45 — a unit reads `built` from its pass commit while no acceptance writer is armed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-4 — stage claims and the coverage gate](spec/2026-10-24-spec-TOOL-dDeclaredLoop-4.md) | 19 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck](spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-6.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-25 — a repository's own stages, spliced between two adjacent gov stages](spec/2026-10-24-spec-TOOL-dDeclaredLoop-25.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-47 — the stage factory writes a whole conforming stage: its witness, exit item, state and table rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md) | 21 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-29 — an item's upstream field: commitment rows handed on, answered at the return, gating only a measured edge](spec/2026-10-24-spec-TOOL-dDeclaredLoop-29.md) | 22 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-26 — a build's composition pinned per step, its position read at the pin, and the move at the next step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-26.md) | 23 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-27 — the scenario kind and namespace: gov's five scenarios, admission, conflicts and the pin per step](spec/2026-10-24-spec-TOOL-dDeclaredLoop-27.md) | 24 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition](spec/2026-10-24-spec-TOOL-dDeclaredLoop-28.md) | 25 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-21 — the review round bounds as policy keys: review.max-rounds, the design rounds and follow-ups, REVIEW_ROUNDS and RUNAWAY_CEILING retired](spec/2026-10-24-spec-TOOL-dDeclaredLoop-21.md) | 26 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-34 — the deviation approval route read from deviation.approval: by its risk, the owner for all, or its author recorded](spec/2026-10-24-spec-TOOL-dDeclaredLoop-34.md) | 27 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-30 — the rework budget: one per build on its transition record, frozen at Design's exit, drawn by every repetition and never by contention](spec/2026-10-24-spec-TOOL-dDeclaredLoop-30.md) | 28 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-32 — the convergence routing: every until and while loop ends on a non-decrease of its blocker and high count, its findings promoted by budget](spec/2026-10-24-spec-TOOL-dDeclaredLoop-32.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-48 — the rework budget keeps a home under every channel set `transitions.record` admits](spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-49 — the budget's `spent` counts every draw of the build, across every record, in commit order](spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md) | 29 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-31 — `flow.on-exhausted`: a build whose budget is spent ends by a transition row, and never laps again](spec/2026-10-24-spec-TOOL-dDeclaredLoop-31.md) | 30 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-60 — the budget reader counts draws in every run record, rotated archives included, under `MEMORY_ROOT`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-60.md) | 30 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-61 — every draw row carries a draw id, so two identical parallel draws stay two rows](spec/2026-10-24-spec-TOOL-dDeclaredLoop-61.md) | 30 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-62 — the transition-record merge driver chosen against the recorded union measurement and the row driver's own refusal](spec/2026-10-24-spec-TOOL-dDeclaredLoop-62.md) | 30 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-20 — the breakpoint program's own items: trigger, dispose, fold and cost, and the four keys `review.dispose` reads](spec/2026-10-24-spec-TOOL-dDeclaredLoop-20.md) | 31 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-22 — the stage-exit recommendation: a command scores it, the producing role reasons it, one record carries both](spec/2026-10-24-spec-TOOL-dDeclaredLoop-22.md) | 32 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-50 — the review program's item rows pass the program and declaration checks](spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md) | 32 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-19 — breakpoints at any item boundary: reviews and owner gates one mechanism under `review.breakpoints`, `review.<stage>` and `autonomy`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-19.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-51 — the eight recommendation rows amended in place, their actors in the declaration grammar](spec/2026-10-24-spec-TOOL-dDeclaredLoop-51.md) | 33 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary](spec/2026-10-24-spec-TOOL-dDeclaredLoop-33.md) | 34 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-52 — the phase-to-state-and-step map shipped as rows with one reader](spec/2026-10-24-spec-TOOL-dDeclaredLoop-52.md) | 34 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-53 — an owner gate holds only builds opened after the gate was placed](spec/2026-10-24-spec-TOOL-dDeclaredLoop-53.md) | 34 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-54 — a terminal set declared per level, and the termination rule run over each table with its own](spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md) | 35 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-55 — the `loop termination` leg declares no guard, so no input it reads can skip it](spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md) | 35 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row](spec/2026-10-24-spec-TOOL-dDeclaredLoop-63.md) | 35 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`](spec/2026-10-24-spec-TOOL-dDeclaredLoop-64.md) | 35 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted](spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md) | 36 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-65 — the remote's freshness is the time of the last fetch, read from what a fetch and a clone write](spec/2026-10-24-spec-TOOL-dDeclaredLoop-65.md) | 37 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone](spec/2026-10-24-spec-TOOL-dDeclaredLoop-66.md) | 38 | 2 | DEFERRED | rev-1 | 2026-10-24 |
+| [TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md) | 38 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
 Records: 54 bound to this build, across 4 record folder(s).

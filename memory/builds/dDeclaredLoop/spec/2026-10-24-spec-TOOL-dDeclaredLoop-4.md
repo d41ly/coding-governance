@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-4 — stage claims and the coverage gate
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0089@66b8552a whole
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-9 — each step's items declared with one actor, inputs, allowance, return schema and witness
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 7 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 7 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0094@c69a5ae1 whole
 

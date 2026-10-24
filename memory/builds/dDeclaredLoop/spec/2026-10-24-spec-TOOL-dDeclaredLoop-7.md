@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-7 — the position engine: each unit's step, the build's step and the next item, from witnesses
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0092@0abbde28 whole
 
