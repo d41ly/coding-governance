@@ -10,7 +10,7 @@ universal: false
 ## Symptom
 
 An acceptance criterion looks rigorous — it names a real command, gives a real number, reads like an
-observation. It cannot fail, or cannot pass. Five ways, and a spec set usually has more than one:
+observation. It cannot fail, or cannot pass. Six ways, and a spec set usually has more than one:
 
 - **The command does not print that.** The criterion asserts on a per-subject set or a breakdown the
   named invocation never emits, so nobody can run it as written and the nearest printed total moves
@@ -27,6 +27,10 @@ observation. It cannot fail, or cannot pass. Five ways, and a spec set usually h
   Python literal, a sourced file — was shortened so a join over the spec would pass, and the
   shortened literal no longer probes what its scope item names: the path a bare basename stands for
   is not the path the command reads, so the criterion fails on a correct build or passes on nothing.
+- **It reads what the check reads, and never runs the check.** A criterion that names a scope item
+  observes it through a side probe of the table, fixture or file the check grades, so the item is
+  certified while the check's own code never runs. A side probe that misreads the input's spelling
+  prints nothing, and the criterion still reads as an observation.
 
 ## Where it bit
 
@@ -73,6 +77,15 @@ never pass. It landed one round after TOOL-dGroundRules-42 recorded the respelle
 TOOL-dGroundRules-43 AC1 inherited it by naming the same literal. Writing a literal whole does not
 repair one copied whole from a corrupted source.
 
+The side read bit dGroundRules at its closing diff review, round 1, as item H1.
+`TOOL-dGroundRules-44` AC3 read `OVERLAP_PAIRS` in Python, through `TRAP_PROBE`, to certify the row
+check of its S2, and never ran the check. On the built tree that read printed nothing because of a
+closing quote: the table was then one single-quoted shell string, so its last line ended in the word
+disjoint with the string's closing quote attached, and a probe that blanked no single quote matched
+no row. The respelled staging was not the cause. The revised `TRAP_PROBE` of `TOOL-dGroundRules-44`
+blanks the single quote and lists the row, and a probe that lists the row still never runs the
+check. `TOOL-dGroundRules-56`, which runs the row check itself, is the repair.
+
 ## The fix
 
 Make the criterion DERIVE rather than ASSERT. Name the invocation that enumerates the set and have
@@ -99,6 +112,11 @@ Then run it. Every literal a spec's acceptance section spells that only reads is
 verbatim from the repository root before the spec's commit, and its output is compared with what
 the criterion expects. A literal restated from another spec is re-run the same way and
 never copied on trust, because a copy carries its source's corruption.
+
+A criterion that names a scope item runs the shipped check on a staged break, whether the checker on
+a fixture, a suite function run alone or a `--selftest` flag, and names the suite on a `New arm:`
+line. A side read of the check's input never runs the check, so it may sit beside that observation
+and never stands in for it.
 
 ## Related
 
