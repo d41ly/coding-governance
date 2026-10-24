@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-67 — the close sweep: the policy fixtures guard holds every path the guard trace reports, the review protocol names no untracked settings file, the verb pin is re-measured, and the bar predicate reads the policy check's whole-suite form
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base df4912bd · streams tooling · order 21 · closes TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base df4912bd · streams tooling · order 21 · closes TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -255,6 +255,11 @@ matches the manifest argv above, a bare `--fixture` and `--fixture 2>&1 | grep`.
 Over every live spec's acceptance tokens and leg lines, no token is newly matched, so the bar join
 gains no hit.
 
+### Rollout
+
+The builder sets this spec's status from DEFERRED to INPROGRESS before its first write. Scratch-guard
+admits writes under `ROUTED_PATHS` for a Tier-1 unit only at INPROGRESS, or at SPECCED once graded.
+
 ### Files touched (estimate)
 
 - `tools/gate-legs.json`
@@ -291,6 +296,7 @@ for t in (" ".join(leg["argv"]), "python tools/policy/check_policy.py --fixture"
 WAIVER_GREPS:
 grep -c "^policy fixtures <- tools/workflows/kit.toml" memory/project/spec-token-waivers.txt
 grep "^- TOOL-dGroundRules-110 " memory/builds/dGroundRules/BACKLOG.md | grep -c "policy fixtures <- tools/workflows/kit.toml"
+grep -c "^policy fixtures <- tools/roles/roles_lib.py" memory/project/spec-token-waivers.txt
 ```
 
 The full `--fixture` run is not a criterion here. After S5 the bar join refuses its whole-suite form
@@ -322,8 +328,8 @@ it is present at base `3c2b69be` and at origin/main. It is out of this unit's sc
   figure: 1212 is PINNED, measured on 2026-10-25 at `df4912bda` by the lexicon's own `--check`.
 - **AC5** — When the `WAIVER_GREPS` block above runs, its first line prints `1` for
   `memory/project/spec-token-waivers.txt`, and its second prints `1` for ask `TOOL-dGroundRules-110` in
-  `memory/builds/dGroundRules/BACKLOG.md`. Also, `grep -c "roles_lib.py" memory/project/spec-token-waivers.txt`
-  prints `0`.
+  `memory/builds/dGroundRules/BACKLOG.md`. Its third line prints `0`, because no row is keyed on
+  `tools/roles/roles_lib.py` any more; the new row's reason still names that file, as deviation 76's did.
   Red when: the row stays keyed on `tools/roles/roles_lib.py`, which the guards join reports as a
   stale waiver once S1 lands, or the ask's accept clause names a key no row carries.
 - **AC6** — When the `BAR_PROBE` block above runs, it prints `True`, `True`, `False`, `False` and
@@ -358,6 +364,12 @@ none
   Folded in before commit, from the close's own run of the spec-token checker's suite: S5, the bar
   predicate, with AC6. AC1 observes the guard trace's join rather than the full `--fixture` run,
   because S5 makes that run a bar token.
+
+- rev-2 · 2026-10-25 · §4 · AC5 · the builder handed back a divergence: §4's waiver row names
+  `roles_lib.py` twice in its reason, so AC5's unanchored count of that name could never print `0`.
+  Ruling (main loop): AC5's third grep is anchored on the old row key at line start, inside the
+  `WAIVER_GREPS` block, and §4's row text and deviation 76's wording stay. §4 gains a Rollout note:
+  the status moves DEFERRED to INPROGRESS before the builder writes.
 
 ## 9. Reuse audit
 

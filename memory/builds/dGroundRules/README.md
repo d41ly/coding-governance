@@ -199,7 +199,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-60 — unit 52's overlap observations taken through the overlap arm run alone, with the Python rule shown failing on its own](spec/2026-10-23-spec-TOOL-dGroundRules-60.md) | 18 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-62 — an unset `budgets.<cap>` reads as no file value: the derived-default refusal is a type the caps module catches, and only that refusal](spec/2026-10-23-spec-TOOL-dGroundRules-62.md) | 18 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | CLOSED | rev-3 | 2026-10-24 |
-| [TOOL-dGroundRules-67 — the close sweep: the policy fixtures guard holds every path the guard trace reports, the review protocol names no untracked settings file, the verb pin is re-measured, and the bar predicate reads the policy check's whole-suite form](spec/2026-10-24-spec-TOOL-dGroundRules-67.md) | 21 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-67 — the close sweep: the policy fixtures guard holds every path the guard trace reports, the review protocol names no untracked settings file, the verb pin is re-measured, and the bar predicate reads the policy check's whole-suite form](spec/2026-10-24-spec-TOOL-dGroundRules-67.md) | 21 | 1 | DEFERRED | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
 Records: 358 bound to this build, across 4 record folder(s).
