@@ -139,9 +139,12 @@ so they hold on gov's tree alone. `legacy-homes-present` reds this kit's directo
 census row whose `ships = false` disagrees with the deployer registry's `[[exempt]]` paths either way,
 naming the row, and a registry that exempts no census enforcer.
 
-WHERE IT INSTALLS (TOOL-dGroundRules-22): `arm_cap_census` reads a tree with no
-`.governance/install.json` as the source and grades each row at its `enforcer`, and a tree with one
-as an adopter, grading each shipped row of an installed kit at its `installed` path.
+WHERE IT INSTALLS (TOOL-dGroundRules-22): `arm_cap_census` reads a tree with a
+`.governance/install.json` as an adopter, grading each shipped row of an installed kit at its
+`installed` path. With no receipt (TOOL-dGroundRules-29) a tree holding one `govkit/registry.toml`
+0 to 2 deep is the source, each row graded at its `enforcer`; a tree holding none is unadopted, every
+row announced and none graded; two are a finding naming both. `census-receiptless-target` reads a
+bare repository so, then again with the registry copied in, where every enforcer reds.
 `census-adopter-receipt` is an outcome case: a planted receipt naming no `check-line-length`, each
 named kit's enforcers at their `installed` paths, read green with the line-length row announced, red
 naming `manifest-bytes` once its planted enforcer is deleted, and green again restored.
@@ -376,11 +379,11 @@ def arm_legacy_homes(repo, kit):
     gov's own copy present. It says the same, and grades nothing, wherever `derive_census_tree` answers
     `adopter`, a list at the installed kit's directory included: an adopter's list cannot hold gov's
     rows, so grading one would red every adopter (TOOL-dGroundRules-25 S11). A receipt that does not
-    read is the one finding."""
+    read, or two registries, is the one finding."""
     try:
         tree, _receipt = derive_census_tree(repo)
     except policy.Refusal as exc:
-        return 0, "the install receipt did not read", [(exc.path, exc.why)]
+        return 0, "the tree under test did not derive", [(exc.path, exc.why)]
     if tree == "adopter" or not (Path(kit) / policy.LEGACY_LIST).is_file():
         return None, policy.LEGACY_WITHHELD, []
     try:
@@ -630,16 +633,27 @@ def arm_single_reader(repo, path, reader_dir, const=""):
 
 
 RECEIPT_REL = f"{POLICY_FILE[0]}/install.json"
+REGISTRY_REL = "govkit/registry.toml"  # the deployer's registry, under the tool root of gov's tree alone
 
 
 def derive_census_tree(repo):
-    """-> ("source", None) where the tree under test holds no install receipt, as gov's own tree holds
-    none, else ("adopter", the parsed receipt) (TOOL-dGroundRules-22). A receipt that is not a JSON
-    object is a Refusal naming it, never a `source` answer."""
+    """-> ("adopter", the parsed receipt) where the tree under test holds an install receipt
+    (TOOL-dGroundRules-22). With none (TOOL-dGroundRules-29): ("source", <d>) where exactly one
+    `<d>/govkit/registry.toml` sits with `<d>` 0 to 2 deep, the search govkit's `derive_tool_root`
+    makes, since only gov's tree holds the registry; ("unadopted", None) where none does; and two or
+    more is a Refusal naming each candidate. A receipt that is not a JSON object is a Refusal naming
+    it, never a `source` answer."""
     try:
         text = Path(repo, RECEIPT_REL).read_text(encoding="utf-8")
     except FileNotFoundError:
-        return "source", None
+        found = sorted({p.relative_to(repo).as_posix() for pat in ("", "*/", "*/*/")
+                        for p in Path(repo).glob(pat + REGISTRY_REL)})
+        if len(found) > 1:
+            raise policy.Refusal(", ".join(found), 0, f"{len(found)} {REGISTRY_REL} candidates, so the "
+                                 "tool root is not guessed and no row is graded") from None
+        if not found:
+            return "unadopted", None
+        return "source", posixpath.dirname(posixpath.dirname(found[0]))
     except OSError as exc:
         raise policy.Refusal(RECEIPT_REL, 0, f"the install receipt does not read: {exc}") from None
     try:
@@ -655,7 +669,9 @@ def arm_cap_census(repo, kit):
     """The cap census joined to the tree both ways (TOOL-dGroundRules-9).
 
     Census to tree, by the tree `derive_census_tree` answers (TOOL-dGroundRules-22): on the source
-    tree each row's enforcer is a file at its `enforcer` path, `ships` unread; in an adopter a
+    tree each row's enforcer is a file at its `enforcer` path, `{prefix}` read as the directory holding
+    the found `govkit/`, `ships` unread; on an `unadopted` tree, neither receipt nor registry, every
+    row is announced as an adopter with no kit installed reads it (TOOL-dGroundRules-29); in an adopter a
     `ships = false` row is announced, `<name> · enforcer not shipped`, a row whose `kit` the receipt's
     `kits` lacks is announced, `<name> · kit <kit> not installed`, and every other row's enforcer is
     a file at its `installed` path, `{prefix}` read as the receipt's `prefix`. Each announce is one
@@ -664,29 +680,28 @@ def arm_cap_census(repo, kit):
     outside row's enforcer makes no request naming it; and each row has its case in CAP_CASES. Tree
     to census: a request in a `derive_code_files` file naming a cap no row names, a CAP_CASES case for
     no row, and a row of the limits file in the tree, parsed by `budgets.parse_limits_rows`, no
-    `limits:` row names. A census or a receipt that does not read is the one finding."""
+    `limits:` row names. A census or a receipt that does not read, or two registries, is the one finding."""
     try:
         census = budgets.read_cap_census(repo)
     except policy.Refusal as exc:
         return 0, "the cap census did not read", [(f"{exc.path}:{exc.line}", exc.why)]
     try:
-        tree, receipt = derive_census_tree(repo)
+        tree, held = derive_census_tree(repo)  # the receipt in an adopter, the tool root on the source
     except policy.Refusal as exc:
-        return 0, "the install receipt did not read", [(exc.path, exc.why)]
-    troot = budgets.derive_tool_root()
+        return 0, "the tree under test did not derive", [(exc.path, exc.why)]
     out, told = [], []
     for cap in census.values():
         if tree == "source":
-            rel = budgets.resolve_prefix_token(cap.enforcer, troot)
+            rel = budgets.resolve_prefix_token(cap.enforcer, held)
             missing = f"its enforcer {rel} is not a file in this tree"
         elif not cap.ships:
             told.append(f"{cap.name} · enforcer not shipped")
             rel = None
-        elif cap.kit not in (receipt.get("kits") or []):
+        elif tree == "unadopted" or cap.kit not in (held.get("kits") or []):
             told.append(f"{cap.name} · kit {cap.kit} not installed")
             rel = None
         else:
-            rel = budgets.resolve_prefix_token(cap.installed, receipt.get("prefix"))
+            rel = budgets.resolve_prefix_token(cap.installed, held.get("prefix"))
             missing = f"its enforcer is not a file at {rel}, where kit {cap.kit} installs it"
         path = Path(repo, rel) if rel else None
         if path and not path.is_file():
@@ -3353,7 +3368,9 @@ def run_budget_case(name):
             checks.append(("a script reading the limits file", "red naming it", [k for k, _w in found] == ["scripts/reader.sh"], f"{found}"))
         elif name == "budgets-census-join":
             enforcers = {derive_enforcer_rel(c): (top / derive_enforcer_rel(c)).read_bytes() for c in census.values()}
-            r = build_cap_repo(t / "r", {**enforcers, lrel: ltext}, "warn", copies=(budgets.derive_kit_rel().rstrip("/"),))
+            reg = posixpath.join(budgets.derive_tool_root(), REGISTRY_REL)  # the repository stands for gov's tree
+            r = build_cap_repo(t / "r", {**enforcers, lrel: ltext, reg: (top / reg).read_bytes()}, "warn",
+                               copies=(budgets.derive_kit_rel().rstrip("/"),))
             _n, _pop, found = arm_cap_census(r, KIT)
             checks.append(("the census's enforcers copied whole", "arm_cap_census green", not found, f"{found or 'no finding'}"))
             ll = derive_enforcer_rel(census["line-length"])
@@ -3432,6 +3449,25 @@ def run_budget_case(name):
             rc, out = run_case_argv(r, ["bash", derive_enforcer_path(census[bm]), bm])
             checks.append(("a budget line disagreeing with its row, under warn", "exit 6", rc == 6,
                            f"exit {rc} · {render_said(out, 'check 6 FAILED')}"))
+        elif name == "census-receiptless-target":
+            # TOOL-dGroundRules-29: no receipt and no registry, every row announced and none graded; this
+            # kit's registry copied in under its tool root, the tree reads as gov's and every enforcer reds.
+            r = build_cap_repo(t / "r", {}, "warn")
+            reg = posixpath.join(budgets.derive_tool_root(), REGISTRY_REL)
+            for planted in (False, True):
+                if planted:
+                    write_case_file(r, reg, (top / reg).read_bytes())
+                with contextlib.redirect_stdout(io.StringIO()) as said:
+                    _n, _pop, found = arm_cap_census(r, KIT)
+                told = [ln for ln in said.getvalue().splitlines() if ln.startswith("cap census: ")]
+                red = {k for k, w in found if "is not a file" in w}
+                if planted:
+                    checks.append((f"{reg} copied in", "no announce and a finding naming every row",
+                                   not told and red == set(census), f"{len(told)} announced · {len(red)} of {len(census)} row(s) red"))
+                else:
+                    ok = len(told) == len(census) and all(ln.endswith((" not installed", " · enforcer not shipped")) for ln in told)
+                    checks.append(("no receipt and no registry", f"{len(census)} announce line(s) and no finding",
+                                   ok and not found, f"{len(told)} announced · {found or 'no finding'}"))
         else:
             checks.append((name, "a known budgets case", False, "no such case"))
     except (subprocess.CalledProcessError, OSError, LookupError, KeyError, policy.Refusal) as exc:
@@ -3829,6 +3865,7 @@ CASES = [
     ("budgets-ships-join", None, run_ships_join),  # the census's ships flags against the registry's exemptions
     ("fixtures-guard-census", None, run_fixtures_guard_census),  # the census's enforcers inside this leg's guard
     ("census-adopter-receipt", None, run_census_adopter_receipt),  # the census graded at each row's installed path
+    ("census-receiptless-target", None, run_budget_case),  # no receipt and no registry: every row announced
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
 ]
 
