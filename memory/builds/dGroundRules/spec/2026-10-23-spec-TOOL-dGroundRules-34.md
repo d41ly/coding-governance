@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-8 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-9 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -16,7 +16,9 @@
 | [2026-10-24-prompt-TOOL-dGroundRules-34-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-2-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-3-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-3-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-4-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-4-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-34-5-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-5-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-divergence-2-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-divergence-2-brief.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-34-divergence-3-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-divergence-3-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-divergence-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-fold-trim-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-fold-trim-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-rename-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-rename-brief.md) | research | — |
@@ -149,8 +151,7 @@ each pick among options.
 - **S16** — Finding 15. The parity half of `TOOL-dGroundRules-32` S9: `overlaps` gives the same two
   answers for the same two pairs. Observed by AC16.
 - **S17** — Finding 29. The arm `TOOL-dGroundRules-32` S9 adds to `tools/check-spec-tokens.test.sh`
-  runs exactly S15's two pairs, its disjoint pair being the string-prefix pair, so it tells a raw
-  prefix compare from the containment rule. Observed by AC17.
+  runs exactly S15's two pairs, its disjoint pair being the string-prefix pair. Observed by AC17.
 - **S18** — Finding 24. Under `unadopted`, `arm_cap_census` withholds
   only the per-row grading of enforcer presence. It keeps both directions of
   `TOOL-dGroundRules-9` S7's census-to-tree join: a requested cap with no row and a row with no case
@@ -273,7 +274,7 @@ each pick among options.
 - **consumes-from** `TOOL-dGroundRules-33` — the selftest.py guard line and trace, which hold S23's `ast` read in the leg
 - **hands-off** `TOOL-dGroundRules-38` — S1's exclude-file read, kept out of the trace (id 18)
 - **hands-off** `TOOL-dGroundRules-39` — `census-ambiguous-registry` and S11-S12's window (id 2)
-- **hands-off** `TOOL-dGroundRules-40` — S16's parity and S17's arm, held in one table (id 17)
+- **hands-off** `TOOL-dGroundRules-40` — S16's parity and S17's arm in one table (id 17); AC17, as its AC3 on a pair a raw `startswith` confuses, which `a.py`/`ab.py` is not
 - **hands-off** `TOOL-dGroundRules-41` — S36's `## Install` section, held to the deferral line (id 21)
 - **hands-off** `TOOL-dGroundRules-43` — the snapshot, govkit, receipt and `gov_source` amendments to this unit (ids 3-16, 26)
 
@@ -418,6 +419,8 @@ the nine READMEs that unit's commit may write.
 - observability — the snapshot line carries its file count and seconds; each `WRONG` names its cause.
 - risks — S22 hands the target's descriptor to `intake`, whose refusal is the case's `WRONG`.
 - testing — the `--fixture` cases, §7's arm lines, and AC1 to AC38.
+- hands-off — the arm comment at `tools/check-spec-tokens.test.sh:1705-1708`, saying a raw prefix
+  compare calls the prefix pair overlapping, is `TOOL-dGroundRules-40`'s to correct.
 - migration — the codebase map and `memory/gotchas/INDEX.md`, regenerated in this commit.
 - user docs — `help/policy.md` (S36) and the kit README (S37).
 
@@ -502,8 +505,8 @@ holding `govkit.py` to its innermost enclosing function, and prints each line wh
   `bash -c '. lib-unattended.sh; overlaps tools/policy/ x.py; echo $?; overlaps a.py ab.py; echo $?'`
   runs, it prints `0` then `1`, the answers AC15 gives.
   Red when: the render and the dispatcher disagree on either pair.
-- **AC17** — When `check_writes_intersect` is staged in a scratch copy to compare the raw strings
-  with `startswith` in either direction, the AC15 probe prints `True` for the second pair.
+- **AC17** — Observed by `TOOL-dGroundRules-40` AC3, its `RAW_BOTH` staging over a pair a raw
+  `startswith` confuses; this unit runs no command for it.
   Red when: the arm's disjoint pair cannot tell a raw prefix compare from containment.
 - **AC18** — When `--fixture budgets-census-join` runs, it prints `red naming it` on its
   `a request for no-such-cap` line and its `a census row with no case` line, and no `WRONG`.
@@ -593,7 +596,6 @@ holding `govkit.py` to its innermost enclosing function, and prints each line wh
 `review-protocol parity (kit vs dogfood)` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `spec-tokens self-test` · `harness arms (fail branches armed or pinned)` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 New arm: tools/policy/check_policy.py --fixture · covers AC8 AC13 AC18 AC19 AC22 AC29 · each case named in S8, S13, S18, S19, S22 and S29, its stated input staged in its temporary repository or scratch copy · none
-New arm: tools/check-spec-tokens.test.sh · covers AC17 · `check_writes_intersect` staged to a raw string-prefix compare, against `overlaps` on the prefix pair · that suite's assertion count, raised by the arm
 New arm: tools/policy/adopt-policy.test.sh · covers AC20 · an invalid policy file planted before the install-day `--scaffold`, replacing `TOOL-dGroundRules-31` AC4's staged `policy.py` · `ARMS_FLOORS`, as `check-arms.py --emit-floors` prints it
 New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dGroundRules-30`'s writer-marker arm, which replaces TOOL-dGroundRules-25's AC18 arm; the hook's writer marker staged to another string in a scratch clone · none
 
@@ -623,14 +625,15 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
 
 ## 9. Revision log
 
-- rev-1 · 2026-10-23 · initial draft from the units 26-32 spec audit.
-- rev-2 · 2026-10-23 · §3 · hands-off edges to units 38-41 and 43 added.
+- rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · hands-off edges added.
 - rev-3 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened.
-- rev-4 · 2026-10-24 · §7 §9 · the policy fixtures leg added.
-- rev-5 · 2026-10-24 · §1 §2 §6 §8 §9 · a code span rejoined; prose shortened.
-- rev-6 · 2026-10-24 · §1 §2 §3 §4 §5 §7 §9 §10 · the builder named `build_install_target(name, ids)`; §4 names unit 32's eight READMEs; S30 cites the hook.
-- rev-7 · 2026-10-24 · §1 §2 §3 §4 §5 §6 §7 §8 §9 §10 · the builder's divergence at `eb67e2cc8` ruled: S19's `budgets-census-join` reads `source`; S5, S21 and S30 restated as built; AC18, AC26, S20 and S22 corrected.
-- rev-8 · 2026-10-24 · §1 §2 §3 §4 §5 §6 §9 §10 · divergence: `intake`'s `[gate_runner]` reds `apply` in a fixture target; ruled (a), S22 strips it, AC38 observes; AC19 one case per `--fixture`.
+- rev-4 · 2026-10-24 · §7 §9 · policy fixtures leg.
+- rev-5 · 2026-10-24 · §1 §2 §6 §8 §9 · a code span rejoined.
+- rev-6 · 2026-10-24 · §1 §2 §3 §4 §5 §7 §9 §10 · builder named.
+- rev-7 · 2026-10-24 · §1 §2 §3 §4 §5 §6 §7 §8 §9 §10 · divergence at `eb67e2cc8` ruled.
+- rev-8 · 2026-10-24 · §1 §2 §3 §4 §5 §6 §9 §10 · divergence ruled (a).
+- rev-9 · 2026-10-24 · §2 §3 §5 §6 §7 §9 · disagreement: AC17 cannot red, a raw `startswith` calls the pair disjoint; ruled: AC17 and its arm go to unit 40.
 
 ## 10. Reuse audit
 
