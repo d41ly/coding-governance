@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-90 — the round-8 spec audit's 22 minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 45 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-90-deviation-901.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-90-deviation-901.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-89 |
 
 <!-- /gen:spec-records -->
 
@@ -157,6 +158,7 @@ findings, ids 12, 14 and 23, are not in the disposal population.
 - **consumes-from** `TOOL-dDeclaredLoop-87` — S1, S4, §3, §5, §10, AC2, AC3 and the conf-constant sketch, which S1, S8, S13, S17, S19 and S20 restate (ids 1, 4, 8, 13, 17, 18, 24)
 - **consumes-from** `TOOL-dDeclaredLoop-88` — S2, S13, S24, S33, the lifted-walk sketch, §4 Evidence and Write set, and AC1, AC2, AC6, AC9, AC12, AC13, AC16 and AC22, with `derive_constant_charges`, `build_failure_detail` and the `tree_lib` route they mint (ids 2, 3, 5, 6, 7, 11, 13, 15, 16, 21, 22, 25, 26)
 - **consumes-from** `TOOL-dDeclaredLoop-89` — `derive_conf_rebinds`' sentences in 87 S1 and 86 S13, which S1 and S10 keep, and its `tree_lib` call, which S4's refusal class covers
+- **hands-off** `TOOL-dDeclaredLoop-92` — S3, S4, S5, S11, S12, S21, §4's Write set, sketch, Evidence and Files touched, §7, §8 F4, §10, AC1, AC3, AC4, AC5, AC11, AC12 and AC21, with `load_tree_lib`, `TREE_LIB_SYMBOLS` and `build_failure_detail`, which that unit restates and completes (the round-9 spec audit's ids 1, 2, 3, 4, 5, 6, 7, 9, 11, 12, 14, 15, 17, 22)
 
 ## 4. Design
 
@@ -388,6 +390,8 @@ New arm: tools/loop/guard.py · covers AC21 · the one-argument OSError row of p
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-8 spec audit's 22 minors batched (13 MEDIUM, 9 LOW).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

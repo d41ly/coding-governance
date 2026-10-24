@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -221,6 +221,7 @@ M11 with L9 (S14, S34). The report refuted no finding.
 - **consumes-from** `TOOL-dDeclaredLoop-87` — `derive_conf_constants` as the class S1 states, which S13 re-implements as the module-level slice of the lifted walk, AC2's answer unchanged (id 17)
 - **consumes-from** `TOOL-dDeclaredLoop-89` — `derive_conf_rebinds`, which S13's `derive_conf_constants` unites with its rule-2 slice where this unit builds after 89 (the round-8 spec audit's id 19)
 - **hands-off** `TOOL-dDeclaredLoop-90` — S2, S13, S24, S33, the lifted-walk sketch, §4 Evidence and Write set, and AC1, AC2, AC6, AC9, AC12, AC13, AC16 and AC22, which that unit restates, with `derive_constant_charges`, `build_failure_detail` and the `tree_lib` route this unit mints (the round-8 spec audit's ids 2, 3, 5, 6, 7, 11, 13, 15, 16, 21, 22, 25, 26)
+- **hands-off** `TOOL-dDeclaredLoop-92` — §3's consumes-from 87 bullet, S13, S24, the lifted-walk sketch and AC1, AC6, AC12, AC13 and AC16, which that unit restates (the round-9 spec audit's ids 1, 5, 6, 22)
 
 ## 4. Design
 
@@ -533,6 +534,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC13 · the four charge-
 - rev-1 · 2026-10-24 · initial draft, the round-7 spec audit's 36 minors batched (19 MEDIUM, 17 LOW).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-89 and TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-89 — the conf-constant class covers a module name a global loader rebinds, and module-level walrus, for and with targets
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-89-deviation-891.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-89-deviation-891.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-90 |
 
 <!-- /gen:spec-records -->
 
@@ -102,6 +103,8 @@ after 87 and repairs `TOOL-dDeclaredLoop-87`.
 - **consumes-from** `TOOL-dDeclaredLoop-82` — S1's conf-constant kind, which S4 extends to the pass, and S8's `derive_docstring_ids`
 - **hands-off** `TOOL-dDeclaredLoop-88` — `derive_conf_rebinds`, which S13's `derive_conf_constants` unites with its rule-2 slice where 88 builds after this unit
 - **hands-off** `TOOL-dDeclaredLoop-90` — `derive_conf_rebinds`' sentences in 87 S1 and 86 S13, which that unit's restatements keep, and its `tree_lib` call, which that unit's refusal class covers
+- **hands-off** `TOOL-dDeclaredLoop-91` — `derive_conf_rebinds` as S1 states it, S3's `conf-read-forms` rows and S5's priced list, which that unit extends to every position evaluated in module scope (the round-9 spec audit's id 20)
+- **hands-off** `TOOL-dDeclaredLoop-92` — S3's `with`-held row, S4's restatement sites and AC3 and AC4, which that unit restates (the round-9 spec audit's ids 8, 16, 21)
 
 ## 4. Design
 
@@ -262,6 +265,8 @@ New arm: tools/loop/budget.py · covers AC1 · the global-loader, with-held load
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-8 spec audit's id 19 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-91 and TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

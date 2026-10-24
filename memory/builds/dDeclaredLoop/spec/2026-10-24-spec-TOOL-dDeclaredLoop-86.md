@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-86 — the round-6 spec audit's 22 minors, batched
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 42 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 42 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -165,6 +165,7 @@ The report's four refuted findings, ids 2, 8, 20 and 22, are not in the disposal
 - **hands-off** `TOOL-dDeclaredLoop-88` — S2, S8, S21, S22, the conf-constant sketch, Files touched, §10, AC9, AC10, AC12, AC16 and AC18, and the `failed` plants, which that unit restates, re-spells, gives commands and observes (the round-7 spec audit's ids 5, 7, 8, 9, 11, 13, 14, 16, 17, 22, 24, 28, 30, 34, 35, 36, 37)
 - **hands-off** `TOOL-dDeclaredLoop-89` — S13, S15, S21 and the conf-constant sketch, which that unit extends with `derive_conf_rebinds` and whose `tree_lib` route its pass takes (the round-8 spec audit's id 19)
 - **hands-off** `TOOL-dDeclaredLoop-90` — S2, S13, S21, §10, AC13 and the conf-constant sketch, which that unit restates and observes (the round-8 spec audit's ids 2, 4, 5, 10, 18, 20, 22)
+- **hands-off** `TOOL-dDeclaredLoop-92` — §10, which that unit completes with `derive_conf_rebinds` (the round-9 spec audit's id 16)
 
 ## 4. Design
 
@@ -401,6 +402,8 @@ New arm: tools/loop/position.py · covers AC9 · the url-forms fetch with the cr
   TOOL-dDeclaredLoop-87 and TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-89 and TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
+- rev-4 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

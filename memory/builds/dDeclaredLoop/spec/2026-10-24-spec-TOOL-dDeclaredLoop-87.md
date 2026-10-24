@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-87 — the conf-constant kind is stated as a class: any module-level binding whose value holds a conf name, and every import that binds it
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 43 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 43 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -79,6 +79,8 @@ aliased from-import a named, observed route. It builds immediately after 86 and 
 - **hands-off** `TOOL-dDeclaredLoop-88` — `derive_conf_constants` as S1 states it, which that unit re-implements as the module-level slice of the lifted charge walk, with AC2's answer unchanged (the round-7 spec audit's id 17)
 - **hands-off** `TOOL-dDeclaredLoop-89` — `derive_conf_constants` as S1 states it and S3's `conf-read-forms` rows, to which that unit adds the global-loader and module-level target pass (the round-8 spec audit's id 19)
 - **hands-off** `TOOL-dDeclaredLoop-90` — S1, S4, §3, §5, §10, AC2, AC3 and the conf-constant sketch, which that unit restates (the round-8 spec audit's ids 1, 4, 8, 13, 17, 18, 24)
+- **hands-off** `TOOL-dDeclaredLoop-91` — §3's binding-form bullet, which 89 S5 writes and that unit restates to the positions evaluated in module scope (the round-9 spec audit's id 20)
+- **hands-off** `TOOL-dDeclaredLoop-92` — §3's first non-goal, §3's hands-off 88 bullet and §10, which that unit restates (the round-9 spec audit's ids 1, 2, 16)
 
 ## 4. Design
 
@@ -200,6 +202,8 @@ New arm: tools/loop/budget.py · covers AC1 · the joined-path, os.path.join, mu
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-7 spec audit's id 29 (HIGH, item H1).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-89 and TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-91 and TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

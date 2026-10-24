@@ -288,3 +288,9 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T17:57:23Z rescope · item add TOOL-dDeclaredLoop-90 · reason spec-audit round 8 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md) the 22 confirmed minors batched into one unit: 13 MEDIUM, ids 1 2 3 5 9 10 15 16 17 18 20 21 22 (items M1 to M7), and 9 LOW, ids 4 6 7 8 11 13 24 25 26 (items L1 to L9); repairs no unit in particular
 
 2026-10-24T18:10:17Z review · item dDeclaredLoop-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 22 · disposition promote
+
+2026-10-24T18:37:19Z rescope · item add TOOL-dDeclaredLoop-91 · reason spec-audit round 9 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md) id 20 HIGH, item H1: spec 89's derive_conf_rebinds misses a class-body global and a walrus in a default argument, a lambda default, a decorator or a class base, all evaluated in module scope, so a module reading ll.CONF bound that way is certified as reading no conf of its own; repairs TOOL-dDeclaredLoop-89
+
+2026-10-24T18:37:25Z rescope · item add TOOL-dDeclaredLoop-92 · reason spec-audit round 9 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-89-spec-audit.md) the 17 confirmed minors batched into one unit: 9 MEDIUM, ids 1 2 3 4 9 14 15 17 21 (items M1 to M6), and 8 LOW, ids 5 6 7 8 11 12 16 22 (items L1 to L7); repairs no unit in particular
+
+2026-10-24T18:46:36Z review · item dDeclaredLoop-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 17 · disposition promote
