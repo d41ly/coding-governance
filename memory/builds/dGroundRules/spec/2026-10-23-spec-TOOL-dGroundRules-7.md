@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0013@8ae02ac2 whole
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-7-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-7-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-7-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-7-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-7-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-7-divergence-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
@@ -132,17 +134,36 @@ conversions. PINNED to that base; the list itself is the derived figure.
 
 ### The check and the write
 
-`lists --check`, for this list, reports each of:
+A row's identity is the pair (home, key); its mark is a value the pair carries, never part of what
+makes a row new or gone. Three lists are compared: the derived rows, the committed list (the working
+tree's file) and the list at the landed revision. `lists --check`, for this list, reports each of:
 
-1. A row in the committed list the derivation does not yield: `legacy homes: typed row <row>`. This is
-   the planted-row case, and it covers a hand-edited mark.
-2. A derived row the committed list lacks: `legacy homes: stale list, re-run lists --write`.
-3. A derived row the list at the landed revision lacks: `legacy homes: <home> <key> is a new legacy
-   home and the list is shrink-only; carry it as a key in tools/policy/catalogue.toml instead`. With no
-   list at the landed revision it prints `legacy homes: no landed list at <rev8>, so this one seeds the
-   baseline` and reports nothing under this item.
+1. A row in the committed list the derivation does not yield, full row compared. Its report turns on
+   its pair, and each such row reaches exactly one of:
+   - **1a** — no home yields its pair, and the list at the landed revision holds the pair: the key left
+     its home, so `legacy homes: stale list at <row>, re-run lists --write`, which drops the row. This
+     is the shrink case.
+   - **1b** — no home yields its pair, and the list at the landed revision lacks the pair, or there is
+     no list there: `legacy homes: typed row <row>`. This is the planted-row case.
+   - **1c** — the derivation still yields its pair under another mark: `legacy homes: typed row <row>`.
+     This is a hand-edited mark, and equally a committed mark that `GATE_ENV_MARKS` has since changed;
+     `lists --write` writes the derived mark in both.
+2. A derived row whose pair the committed list lacks:
+   `legacy homes: stale list at <row>, re-run lists --write`. A pair the committed list holds under
+   another mark is item 1c's alone, so a mark disagreement prints one report.
+3. A derived row whose pair the list at the landed revision lacks: `legacy homes: <home> <key> is a new
+   legacy home and the list is shrink-only; carry it as a key in tools/policy/catalogue.toml instead`.
+   The pair, not the full row, is compared, so a re-marked `GATE_ENV_MARKS` entry is a mark change
+   `--write` can write, never a new legacy home. With no list at the landed revision it prints
+   `legacy homes: no landed list at <rev8>, so this one seeds the baseline` and reports nothing under
+   this item.
 4. A row marked `unmarked`: `legacy homes: <key> in .githooks/gate-env.sh has no mark in
    GATE_ENV_MARKS`.
+
+Each plant of §6 reaches one report under items 1 to 3: AC2's planted row is item 1b alone (it is not
+derived, so items 2 and 3 see nothing), AC7's removed key is item 1a alone (its pair is in the landed
+list, and no derived row is missing), and AC6's grown key is item 3 alone (its row is in the committed
+list under the derived mark).
 
 Any report exits 1. `lists --write` writes the derived rows when item 3 reports nothing, and otherwise
 writes nothing and exits 1 naming each new home, so the list can shrink by `--write` and grow by no
@@ -162,7 +183,15 @@ runs each case of AC2, AC6, AC7, AC8 and AC9, printing one `case <name>: red|gre
 
 - `tools/policy/policy.py` (the derivation, the mark table, the list's half of `lists`)
 - `tools/policy/legacy-homes.txt` (generated)
-- `tools/policy/check_policy.py` (the `legacy-homes` arm and its fixture cases)
+- `tools/policy/check_policy.py` (the `legacy-homes` arm, the function `arm_legacy_homes` added to
+  `ARMS` beside `arm_mirror_readers` (`tools/policy/check_policy.py:264`), and its fixture cases)
+- `tools/policy/README.md` (one `arm_legacy_homes` row in the "Each arm in an adopter" table,
+  `tools/policy/README.md:364`: in an adopter it grades the target's kit confs, gate file and house
+  file against the installed list; with the list absent, each derived row is item 2's finding until
+  TOOL-dGroundRules-17 withholds the list and announces the arm. TOOL-dGroundRules-16's
+  `adopter-fresh-target` case joins that table's first column to `ARMS` both ways
+  (`tools/policy/check_policy.py:524-527`), so the arm landing without its row reds that case as
+  unlisted)
 - `tools/policy/kit.toml` (only where unit 1's file rules do not already cover the generated list; it
   takes the rule unit 1 gives `tools/policy/unsummarised-keys.txt`)
 - `help/policy.md` (this list's section; the page is unit 1's where unit 1 wrote it, else created here
@@ -197,9 +226,11 @@ runs each case of AC2, AC6, AC7, AC8 and AC9, printing one `case <name>: red|gre
   by any row, or a home the derivation reads moved since `--write`.
 - **AC2** — When `python check_policy.py --fixture legacy-homes` runs, case `planted-row`
   (the line `.unattended.conf PLANTED_KEY owner-policy` appended to the fixture's list, nothing else
-  changed) prints `red` with the typed-row report naming that line, and case `today` (the fixture
-  unplanted) prints `green`. Red when: the check compares row counts only, or skips a committed row
-  the derivation does not yield.
+  changed, so no home yields its pair and the fixture's landed list lacks it) prints `red` with
+  exactly one report, §4 item 1b's `legacy homes: typed row .unattended.conf PLANTED_KEY owner-policy`,
+  and case `today` (the fixture unplanted) prints `green`. Red when: the check compares row counts
+  only, skips a committed row the derivation does not yield, or prints the stale-list report for a
+  pair the landed list never held.
 - **AC3** — When `grep "^.githooks/gate-env.sh " legacy-homes.txt` runs on the built tree,
   it prints eleven rows, the keys and marks of §4's mark table and no other. Red when: the derivation
   reads only the assignments, so `GATE_POST_MERGE`, `GATE_SELFTESTS`, `GOV_PYTHON`, `GOV_GATE_CMD` and
@@ -217,9 +248,11 @@ runs each case of AC2, AC6, AC7, AC8 and AC9, printing one `case <name>: red|gre
   and its sub-step running `lists --write` exits 1 with the list unchanged. Red when: the shrink-only
   baseline is the working tree or HEAD rather than the landed revision.
 - **AC7** — When `python check_policy.py --fixture legacy-homes` runs, case `shrink` (a key
-  removed from the fixture's `.unattended.conf`) prints `red` with the stale-list report before
-  `lists --write` and `green` after it, the row gone. Red when: `--write` refuses a row leaving, or
-  `--check` passes a list holding a key no home holds.
+  removed from the fixture's `.unattended.conf`, its row still in the committed list and its pair in
+  the fixture's landed list) prints `red` with exactly one report before `lists --write`, §4 item
+  1a's `legacy homes: stale list at <row>, re-run lists --write` naming that row, and `green` after
+  it, the row gone. Red when: `--write` refuses a row leaving, `--check` passes a list holding a key
+  no home holds, or the case prints the typed-row report for the removed key's row.
 - **AC8** — When `python check_policy.py --fixture legacy-homes` runs, case `retrofit` (keys
   `PLANTED_CUTOFF="2026-11-01"` and `PLANTED_PIN="3"` added to a fixture conf) prints `green` and no row
   for either key appears. Red when: the predicate lists a cutoff or a pin.
@@ -288,6 +321,7 @@ New arm: tools/policy/check_policy.py · covers AC2 AC6 AC7 AC8 AC9 AC10 · the 
   `OPEN`, the template's drafting token, because hygiene check 12 parses only the seven-token vocabulary
   (`tools/memory-tree/check-memory-hygiene.sh:1930`).
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-17, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-24 · §4, §6 · the builder's DIVERGENCE: §4 item 1 gave every committed row no home yields the typed-row report, while AC7's `shrink` case, a key removed with its row still listed, required the stale-list report, which item 2 gave only to a derived row the list lacked; and item 3 left open whether it compared the full row or (home, key). The run's ruling (B), the option keeping both AC2's and AC7's observations: item 1 splits into 1a (pair in the landed list: the stale-list report), 1b (pair not in it: the typed-row report) and 1c (pair still derived under another mark: the typed-row report); items 2 and 3 compare the pair, so a re-marked `GATE_ENV_MARKS` entry is a mark change `--write` writes, and a mark disagreement prints one report; the stale-list report names its row, as §5's observability row asks of every report. AC2 and AC7 name the report their plant reaches, and AC7 reds on the typed-row report. Files touched adds `tools/policy/README.md`, whose "Each arm in an adopter" table TOOL-dGroundRules-16's `adopter-fresh-target` joins to `ARMS` both ways. Ruling (A), AC7 renamed to the typed-row report, was set aside as the narrower option (`memory/builds/dGroundRules/prompts/2026-10-24-prompt-TOOL-dGroundRules-7-divergence-brief.md`).
 
 ## 10. Reuse audit
 
