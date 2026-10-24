@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
 
 **Carries:** cl-dClosedLoop-0023@6e1e2e99 whole
 **Carries:** node:policy-key.install.deprecation-window
@@ -12,9 +12,12 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-6-deviation-137.md](../build/2026-10-23-build-TOOL-dSafePassage-6-deviation-137.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-6-deviation-151.md](../build/2026-10-24-build-TOOL-dSafePassage-6-deviation-151.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-6-deviation-159.md](../build/2026-10-24-build-TOOL-dSafePassage-6-deviation-159.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-owner-forks.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-owner-forks.md) | research | TOOL-dSafePassage-1 |
 | [2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -422,8 +425,9 @@ New arm: tools/govkit/govkit.py · covers AC8 · selfcheck arm 11, its failing c
   block, the `sh` template would resolve Python before its read, and JavaScript has no copy, the port
   TOOL-dGroundRules-5 F5 rejected, so `js` would be left a rule of its own to find. (a) is one rule
   for four languages, and its miss, a policy kit homed elsewhere, reads `warn`, the key's default.
-  Both meet every criterion. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3, tie-broken by
-  fewer open questions and by reuse of S3's own render rule. widens: none · relaxes: none
+  Both meet every criterion, and (a) is tie-broken by fewer open questions and by reuse of S3's own
+  render rule. Its miss reads `warn` and forwards, so the pick breaks no adopter's call.
+  RESOLVED (owner, 2026-10-24): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -436,6 +440,8 @@ New arm: tools/govkit/govkit.py · covers AC8 · selfcheck arm 11, its failing c
   its own second commit, `read_policy_value` lives once in `govkit.py` for specs 6, 9 and 13, with a §3 hands-off edge
   to TOOL-dSafePassage-13, F2
   re-resolved on rung 1, F7 added.
+- rev-4 · 2026-10-24 · §8 F7 · the owner resolves F7 to (a), replacing the delegated mark, by
+  `2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md`.
 
 ## 10. Reuse audit
 
