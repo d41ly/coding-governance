@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0016@df63b6eb whole
 
@@ -76,12 +76,13 @@ do not exceed it.
   Rules 0, 2, 5 and 6 and the `--only=` selector stay. Rule 2's bound is `MAX_VERIFIERS`, the
   review protocol's verify total (§8 F2). The header states only the kept rules. No version marker
   moves on the branch: `KIT_AGENT_CAP_VERSION` and the `gov:kit agent-cap@` markers in
-  `tools/hooks/format-guard.js` and `tools/hooks/scratch-guard.js` keep their value, and the major
-  bump the retirements owe is minted at landing (the build brief: the lander mints versions, a branch
-  owes none). The retirements take the file from 2427 lines to 1960, past three line citations in two
-  other builds' live specs; editing those specs is an outside write this build's README refuses, and
-  padding the file to its old length is dead bytes, so the unit waives the three and asks for their
-  re-citation, as §4 "The stranded citations" states (§8 F7). They also reach five readers §4
+  `tools/hooks/format-guard.js` and `tools/hooks/scratch-guard.js` keep their value. The landing
+  mints the next minor, 1.41: `cmd_mint` adds one to the last component and does not choose a bump
+  size (`tools/govkit/govkit.py:13491-13495`); a major bump for the retirements is the owner's call,
+  named in the wrap-up. The retirements take the file from 2427 lines to 1960, past line citations
+  in two other builds' specs; editing those is an outside write this build's README refuses, and
+  padding the file is dead bytes, so the unit waives the graded ones and asks for re-citation, as
+  §4 "The stranded citations" states (§8 F7). They also reach five readers §4
   "The other readers" names. Observed by AC6, AC7, AC8, AC9.
   **Readers:**
   by name: `tools/workflows/check-verifier-fanout.sh`, `tools/workflows/check-protocol-parity.test.sh`,
@@ -260,16 +261,18 @@ own directory (`agent-cap.js:1887`, `:2160`).
 ### The stranded citations
 
 The cites join (`tools/check-spec-tokens.py:1588-1596`) reds a backticked `<path>:<line>` past a
-tracked file's end. At 1960 lines three tokens pass it: TOOL-aOrientedCast-28's `:2092` and
-`:1972-1994`, and TOOL-dFairHearing-22's `:2269-2272`. By §8 F7, in the commit that shrinks the file:
+tracked file's end, in OPEN, SPECCED, INPROGRESS or BLOCKED specs only (`LIVE`, `:299`). At 1960
+lines TOOL-aOrientedCast-28 (OPEN) cites `:2092` and `:1972-1994` past it. TOOL-dFairHearing-22's
+`:2269-2272` gets no row: that spec is DEFERRED, ungraded, so a row would red as stale; it reds only
+when the spec leaves DEFERRED in its own build. By §8 F7, in the commit that shrinks the file:
 
 - `memory/project/spec-token-waivers.txt` gains one row per token, keyed
-  tools/hooks/agent-cap.js:2092, tools/hooks/agent-cap.js:1972 and tools/hooks/agent-cap.js:2269,
+  tools/hooks/agent-cap.js:2092 and tools/hooks/agent-cap.js:1972,
   each reason naming `[cite]`, the other build's live spec, that this unit's retirements moved the
-  lines, the ask below and the count, 26 rows to 29 (34 lines to 37), under ER:388 (dGroundRules);
+  lines, the ask below and the count, 26 rows to 28 (34 lines to 36), under ER:388 (dGroundRules);
 - `memory/builds/dGroundRules/BACKLOG.md` gains one ask row, the build's next unminted id, asking
-  both units to cite `agent-cap.js` by symbol, accepted when each spec's rows leave in the commit
-  that re-cites it, with a `SEV` row (LOW) and a `KEEP` row (the cure is outside this build's writes);
+  both units to cite `agent-cap.js` by symbol, accepted when both do and the two rows leave in
+  TOOL-aOrientedCast-28's re-citing commit, with a `SEV` row (LOW) and a `KEEP` row (the cure is outside this build's writes);
 - `memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md` (the next
   free number if 72 is taken), per `memory/HYGIENE.md` "Deviation records": Departs from
   `TOOL-dRetiredFork-20@rev-2`; Risk loosening; Follow-through `ask` that row;
@@ -449,7 +452,7 @@ AC5, AC13 and AC14 are probes the close reads directly, AC5 after the main loop'
 (S3); AC13 is also the `verifier fan-out` leg's
 verdict. AC15 to AC17 are the main loop's live observation at the close, and no suite runs them.
 `kit version markers` and `kit epoch (shipped bytes move, the version moves)` are graded at the close,
-after the lander mints the major bump (S4). The added legs are those §4's new files trip by
+after the landing mints the next minor (S4). The added legs are those §4's new files trip by
 `tools/gate-legs.json`'s guards (`python tools/check-spec-tokens.py --list`), and `roles adopter self-test`.
 
 ## 8. Open questions
@@ -525,7 +528,8 @@ after the lander mints the major bump (S4). The added legs are those §4's new f
 - rev-2 · 2026-10-23 · §3 · hands-off edges to TOOL-dGroundRules-15, -18, -20 and -21, reciprocals of the round-1 spec audit's promoted units; no scope, design or acceptance moved.
 - rev-3 · 2026-10-24 · §6 · AC12, AC14: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
 - rev-4 · 2026-10-24 · §2 S3, S5 · §4 · §6 AC5 · §7 · the builder's first DIVERGENCE (check 49): §7 adds `policy fixtures`; the main loop, not the builder, renders gov's settings at the close (S3, AC5); rule 7 adds no rule outside a checkout (S5); §4's suite section: hook copy for the rule-6 arms, slot-ledger checks deleted, `--only=scripts` asserts rule 2, retired-rule BASE denials excluded by name.
-- rev-5 · 2026-10-24 · §2 S4 · §3 · §4 · §7 · §8 F7, F8 · §10 · what disagreed: the builder's second DIVERGENCE: the retirements take `agent-cap.js` from 2427 lines to 1960, stranding line citations in TOOL-aOrientedCast-28 and TOOL-dFairHearing-22 (check 49 refused), and the build changed readers S4 and §4 never named. Rulings: (1) the citations are waived per token, with an ask row and a deviation record under ER:388 (F7); measured, the tokens are three, not two (`:1972-1994` also starts past 1960), so the registry goes 26 rows to 29 (34 lines to 37), not 34 to 36; (2) five readers named with their changes, the hook copies carrying `scratch-guard.js`; (3) no version marker moves on the branch; (4) §7 adds `spec tokens`, `roles adopter self-test`, `straggler-guard arms` (`.lexicon.conf` trips it) and `kit epoch`; (5) the one ask row takes `KEEP`, a `DEFERRED` row's `until` naming one unit; (6) F8, ruled (a): `widens: none` beside ER:388 reds `deviations.py --check`, so the trailer widens the registry and deviation-72 carries `**Surface:**`. Revision log condensed for the size ceiling.
+- rev-5 · 2026-10-24 · §2 S4 · §3 · §4 · §7 · §8 F7, F8 · §10 · the builder's second DIVERGENCE (check 49): stranded `agent-cap.js` citations waived per token under ER:388 with an ask row and deviation-72 (F7); five more readers named, hook copies carrying `scratch-guard.js`; no version marker moves on the branch; §7 adds `spec tokens`, `roles adopter self-test`, `straggler-guard arms`, `kit epoch`; the ask takes `KEEP`; F8 ruled (a), `widens:` the registry. Revision log condensed for the size ceiling.
+- rev-6 · 2026-10-24 · §2 S4 · §4 · §7 · §9 · the third builder's measurements: (1) `tools/check-spec-tokens.py` grades only `LIVE` specs (`:299`, `:153`), and TOOL-dFairHearing-22 is DEFERRED, so `:2269` yields no hit and a row for it reds as stale: two rows, 26 to 28 (34 lines to 36), the ask still naming both specs; (2) `cmd_mint` adds one to the last component (`tools/govkit/govkit.py:13491-13495`), so the landing mints agent-cap 1.41, and a major bump is the owner's call, named in the wrap-up.
 
 ## 10. Reuse audit
 

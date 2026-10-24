@@ -151,7 +151,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-65 — the mirror's bytes name no commit: each reason's revision phrase rendered as a placeholder the helper fills](spec/2026-10-23-spec-TOOL-dGroundRules-65.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard](spec/2026-10-23-spec-TOOL-dGroundRules-7.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-8 — the reader-coverage arm: a key whose Owner build has landed has a reader](spec/2026-10-23-spec-TOOL-dGroundRules-8.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired](spec/2026-10-23-spec-TOOL-dGroundRules-10.md) | 5 | 2 | DEFERRED | rev-5 | 2026-10-24 |
+| [TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired](spec/2026-10-23-spec-TOOL-dGroundRules-10.md) | 5 | 2 | DEFERRED | rev-6 | 2026-10-24 |
 | [TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader](spec/2026-10-23-spec-TOOL-dGroundRules-9.md) | 5 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-15 — the `.agent-cap.conf` lowering in one home: inside `resolve_read`, so every reader of the limit sees it](spec/2026-10-23-spec-TOOL-dGroundRules-15.md) | 6 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-17 — the legacy-home list withheld from installs and the cap census graded by what ships, so neither arm reds an adopter](spec/2026-10-23-spec-TOOL-dGroundRules-17.md) | 6 | 2 | DEFERRED | rev-3 | 2026-10-24 |
