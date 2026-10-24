@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-44 — the overlap arm's disjoint row is a real string-prefix trap, and the arm refuses a disjoint row that is not one
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -21,40 +21,47 @@ The round-1 spec audit of units 35 to 43
 exited BOUNDED with finding **id 29 at BLOCKER**, item **B1**, which no other id shares. The row
 `TOOL-dGroundRules-40` labels the string-prefix pair, `tools/policy/a.py` against
 `tools/policy/ab.py`, is not one: neither string starts with the other, so a raw `startswith`
-answers False for it, the right answer by accident. The arm then passes a `check_writes_intersect`
-or `covers` staged to a raw prefix compare, which is the regression unit 40 exists to catch, and its
-AC3 expects an answer under that staging that cannot occur. This unit is id 29's promotion: the
-disjoint row becomes a pair where a raw prefix compare and containment disagree, and the arm checks
-that every disjoint row is such a pair before it grades either rule, so a respelled row cannot pass
-as the trap again. It repairs `TOOL-dGroundRules-40`, which sits at order 13, so it builds at order 14.
+answers False for it, the right answer by accident. A `check_writes_intersect` or `covers` staged
+to a raw prefix compare therefore passes the arm unit 40 exists to grade.
+
+`TOOL-dGroundRules-40` rev-4 took the respelling itself: its S1 makes the disjoint row the
+string-prefix trap `policy` against `policy-x.py`, spelled relative to the suite's prefix `PFX`,
+and its AC3 observes the row under `RAW_BOTH`. What id 29 still asks for is a guard on the row: the
+arm checks that every disjoint row is a pair a raw prefix compare and containment answer apart
+before it grades either rule, so a respelled row cannot pass as the trap again. This unit is that
+check. It extends the arm `TOOL-dGroundRules-40` builds at order 13, so it builds at order 14.
 
 ## 2. Scope (IN)
 
-- **S1** — The trap row. The `disjoint` row of `OVERLAP_PAIRS`, the table `TOOL-dGroundRules-40` S1
-  places in `tools/check-spec-tokens.test.sh`, is `tools/policy/a` against `tools/policy/ab.py`.
-  The second path starts with the first as a string, and neither sits under the other at a path
-  component boundary. Observed by AC1, AC2.
-- **S2** — The row's own check. Before the arm grades either rule, it tests each `disjoint` row for a
-  raw string prefix in either direction. A row that has none fails the arm with a line naming the row
-  and the words `not a string-prefix trap`. Observed by AC3.
-- **S3** — `TOOL-dGroundRules-40` AC3 restated with the trap row. Under `RAW_BOTH`, both rules answer
-  the trap row as intersecting, `True` and exit `0`, which the expected column rejects. On the built
-  tree they answer `False` and exit `1`. Observed by AC2.
+- **S1** — The trap row, already `TOOL-dGroundRules-40` S1's, which this unit builds nothing for.
+  The `disjoint` row of `OVERLAP_PAIRS` in `tools/check-spec-tokens.test.sh` is `policy` against
+  `policy-x.py`, each joined to `PFX` at use. The second path starts with the first as a string,
+  and neither sits under the other at a path component boundary. Any row this unit names is spelled
+  that way, relative to `PFX`; the suite spells no literal prefix. Observed by AC1, AC2.
+- **S2** — The row's own check, the work this unit builds. Before the arm grades either rule, it
+  tests each `disjoint` row for a raw string prefix in either direction. A row that has none adds a
+  disagreement naming the row and the words `not a string-prefix trap` to the arm's one assertion,
+  which then fails. Observed by AC3.
+- **S3** — The trap row under `RAW_BOTH`, already `TOOL-dGroundRules-40` AC3, which this unit
+  builds nothing for. Under `RAW_BOTH` both rules answer the trap row as intersecting, `True` and
+  exit `0`, which the expected column rejects; on the built tree they answer `False` and exit `1`.
+  AC2 observes it again because S2 is graded only against a row that is a trap. Observed by AC2.
 
 ## 3. Non-goals (OUT)
 
 - Any change to `check_writes_intersect` or `overlaps`. Both answer the trap row correctly (§4
-  Evidence for `overlaps`; `check_writes_intersect` is first graded once `TOOL-dGroundRules-32` is
-  built).
+  Evidence). `TOOL-dGroundRules-32` is built (5412bbecd): the arm that grades both rules exists in
+  `tools/check-spec-tokens.test.sh`, and `TOOL-dGroundRules-40` adds its table.
+- The trap row's spelling and the `RAW_BOTH` observation: `TOOL-dGroundRules-40` S1 and AC3.
 - A third row. The directory-over-file row and the trap row cover the two rules the arm grades.
 - The probes' single spelling: `TOOL-dGroundRules-45`. The bare-name source join:
   `TOOL-dGroundRules-46`. The bug-class record: `TOOL-dGroundRules-47`.
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-40` — the `OVERLAP_PAIRS` table and its arm in `tools/check-spec-tokens.test.sh`, whose disjoint row S1 respells and whose loop S2 extends; without them there is no row to repair
+- **consumes-from** `TOOL-dGroundRules-40` — the `OVERLAP_PAIRS` table and its arm in `tools/check-spec-tokens.test.sh`, its trap disjoint row (its S1, this unit's S1) and its `RAW_BOTH` observation (its AC3, this unit's S3), whose row loop S2 extends; without them there is no row to check
 - **hands-off** `TOOL-dGroundRules-45` — the trap row as S1 spells it, which that unit's probe reads from the suite rather than restating
-- **hands-off** `TOOL-dGroundRules-53` — AC2's shell half, which that unit observes with `TRAP_SH_WHOLE` in place of the stripped `TRAP_SH` (ids 5 and 12 of the closing diff review round 1)
+- **hands-off** `TOOL-dGroundRules-53` — AC2's shell half, which that unit observes with `TRAP_SH_WHOLE` in place of `TRAP_SH` (ids 5 and 12 of the closing diff review round 1)
 - **hands-off** `TOOL-dGroundRules-54` — AC2, which that unit observes a second time through `PAIRS_TABLE_WHOLE`, reading the trap pair from the suite rather than from `TRAP_PY` and `TRAP_SH` (id 9 of the closing diff review round 1)
 - **hands-off** `TOOL-dGroundRules-55` — AC3's read of the table, which that unit records as the side-read form of `criterion-asserts-what-its-own-command-cannot-show.md` (id 12 of the closing diff review round 1)
 - **hands-off** `TOOL-dGroundRules-56` — S2's row check, which that unit observes refusing through `check_overlap_pair` run alone, in place of AC3's read of the table (id 14 of the closing diff review round 1)
@@ -64,33 +71,37 @@ as the trap again. It repairs `TOOL-dGroundRules-40`, which sits at order 13, so
 
 ### Evidence
 
-Every line below was read or run on 2026-10-23 at `0ced625e1`.
+Every line below was read or run on 2026-10-24 at 7a600abf5, from the repository root.
 
-- `tools/unattended/lib-unattended.sh:745-750` defines `covers` as "b is a, or sits under it" over
-  normalised paths, and `overlaps` as `covers` in either direction.
-- Sourcing `tools/unattended/lib-unattended.sh` from the repository root, `overlaps` returned 0 for
-  `tools/policy/` against `tools/policy/x.py` and 1 for `tools/policy/a` against `tools/policy/ab.py`.
-- In Python, `a.startswith(b) or b.startswith(a)` printed `True` for the trap row and `False` for
-  `tools/policy/a.py` against `tools/policy/ab.py`, the row unit 40 wrote (review id 29).
-- `tools/check-spec-tokens.py:581` `check_guard_trips`, which `TOOL-dGroundRules-32` S9 has
-  `check_writes_intersect` call in either direction, matches the exact path or a path under the
-  guard at a `/` boundary, so it answers False both ways for the trap row.
+- `covers` in `tools/unattended/lib-unattended.sh` is "b is a, or sits under it" over normalised
+  paths, and `overlaps` beside it is `covers` in either direction.
+- `check_guard_trips` in `tools/memory-tree/design_lib.py` matches the exact path or a path under
+  the guard at a `/` boundary, never a bare prefix; `check_writes_intersect` beside it holds that in
+  either direction (`TOOL-dGroundRules-32` S9). So it answers False both ways for the trap row.
+- Run at this repository's prefix, where `PFX` is `tools/`: `TRAP_PY` of §6 printed `False`,
+  `TRAP_SH` printed `1`, and a raw `startswith` in either direction printed `True` for the trap row.
+- The arm `TOOL-dGroundRules-32` built is the block headed by its S9 comment in
+  `tools/check-spec-tokens.test.sh`; at 7a600abf5 it still runs the unit 40 pair through two inline
+  lists. `TOOL-dGroundRules-40` rev-4 S1 gives it the `OVERLAP_PAIRS` table read below, and `TRAP_PROBE` of
+  §6 printed nothing on that tree and one line per disjoint row on a scratch file holding the table
+  as that S1 spells it.
 
-### The arm after S1 and S2
+### The arm after S2
 
 ```text
-OVERLAP_PAIRS (TOOL-dGroundRules-40 S1):
-    tools/policy/       tools/policy/x.py      intersect
-    tools/policy/a      tools/policy/ab.py     disjoint          # S1
+OVERLAP_PAIRS (TOOL-dGroundRules-40 S1, each path relative to ${PFX}):
+    policy/    policy/x.py    intersect
+    policy     policy-x.py    disjoint
 
-for each row (a, b, want):
+for each row (a, b, want), a and b joined to ${PFX}:
     if want == disjoint and not (a startswith b or b startswith a):       # S2
-        fail naming the row and "not a string-prefix trap"; next row
+        a disagreement naming the row and "not a string-prefix trap"; next row
     (TOOL-dGroundRules-40's two verdict checks, unchanged)
 ```
 
 The S2 test is plain string comparison in the suite and calls neither rule it guards, so a rule
-staged wrong cannot also silence the row check.
+staged wrong cannot also silence the row check. Joining `${PFX}` to both paths keeps their string
+relation, so the test reads the same before or after the join.
 
 ### Inventory
 
@@ -102,8 +113,8 @@ No identifier is minted. The check sits inside the arm's row loop.
 
 ### Alternatives rejected
 
-- **`tools/pol` against `tools/policy/x.py`.** It is also a trap, but it spans a segment boundary;
-  the sibling-file trap is the one a raw compare meets between two files of one directory.
+- **The row check asking either rule.** The staging it guards against would then reach the check
+  too; plain string comparison shares no state with the rules it guards.
 - **The trap stated only in a criterion.** A criterion is observed once and a respelling can shorten
   it; the row check runs on every run of the suite.
 
@@ -115,31 +126,38 @@ No identifier is minted. The check sits inside the arm's row loop.
 - observability — the failure line names the row and the reason.
 - risks — none beyond the suite.
 - testing — AC1 to AC3.
-- migration — the suite's assertion count, raised by the row check.
+- migration — none: the row check adds its disagreement to `TOOL-dGroundRules-40`'s list inside
+  the arm's one assertion, so the suite's assertion count and its floor do not move.
 - user docs — N/A: a gov-only suite.
 
 ## 6. Acceptance criteria
 
-Every command runs from the repository root unless it says otherwise. A scratch copy is a git clone
-of this repository under `%TEMP%/gr44`, checked out at the commit under test. The literal probes and
-stagings are spelled whole here, once, and the criteria name them:
+Every command runs from the repository root, or, in a scratch copy, from that copy's root. The
+literal probes and stagings are spelled whole here, once, and the criteria name them. `TRAP_PY` and
+`TRAP_SH` name the trap row read at this repository's prefix, `PFX` being `tools/`; `TRAP_PROBE`
+and `NOT_A_TRAP` name rows as the suite holds them, relative to `PFX`:
 
 ```text
+SCRATCH     = a git clone of this repository under %TEMP%/gr44, checked out at the commit under test
 TRAP_PROBE  = python -c "import re
-rows = [l.split() for l in open('tools/check-spec-tokens.test.sh', encoding='utf-8') if 'disjoint' in l and l.count('tools/policy/') == 2]
-for r in rows:
-    a, b = [t for t in r if t.startswith('tools/policy/')]
-    raw = a.startswith(b) or b.startswith(a)
-    inside = a.rstrip('/') == b.rstrip('/') or b.startswith(a.rstrip('/') + '/') or a.startswith(b.rstrip('/') + '/')
-    print(a, b, raw, inside)"
-TRAP_PY     = python -c "import sys; sys.path.insert(0, 'tools/memory-tree'); import design_lib as d; print(d.check_writes_intersect(['tools/policy/a'], ['tools/policy/ab.py']))"
-TRAP_SH     = bash -c '. lib-unattended.sh; overlaps tools/policy/a ab.py; echo $?'
-RAW_BOTH    = in the scratch copy, check_writes_intersect and covers both staged to a raw string
-              startswith in either direction
-NOT_A_TRAP  = in the scratch copy, the disjoint row respelled a.py tools/policy/ab.py
+for l in open('tools/check-spec-tokens.test.sh', encoding='utf-8'):
+    t = re.sub('[\"()]', ' ', l).split()
+    p = [w for w in t if w.startswith('policy')]
+    if t and t[0] != '#' and t[-1] == 'disjoint' and len(p) == 2:
+        a, b = p
+        print(a, b, a.startswith(b) or b.startswith(a), a.rstrip('/') == b.rstrip('/') or b.startswith(a.rstrip('/') + '/') or a.startswith(b.rstrip('/') + '/'))"
+TRAP_PY     = python -c "import sys; sys.path.insert(0, 'tools/memory-tree'); import design_lib as d; print(d.check_writes_intersect(['tools/policy'], ['tools/policy-x.py']))"
+TRAP_SH     = bash -c '. tools/unattended/lib-unattended.sh; overlaps tools/policy tools/policy-x.py; echo $?'
+RAW_BOTH    = in SCRATCH, the staging of that name in TOOL-dGroundRules-40 section 6:
+              check_writes_intersect and covers both staged to a raw string startswith in either direction
+NOT_A_TRAP  = in SCRATCH, the disjoint row of OVERLAP_PAIRS respelled  policy/a.py  policy/ab.py  disjoint
 ```
 
-- **AC1** — When `TRAP_PROBE` runs on the built tree, it prints one line ending `True False`.
+`TRAP_PROBE` lists each non-comment line of the suite whose last word is `disjoint` and which holds
+exactly two words starting `policy`, so it reads the table row whether it stands alone or as a call
+line; it prints the two paths, the raw prefix answer and the containment answer.
+
+- **AC1** — When `TRAP_PROBE` runs on the built tree, it prints one line, naming the trap row's two paths and ending `True False`.
   Red when: the disjoint row is a pair a raw prefix compare and containment answer alike.
 - **AC2** — When `TRAP_PY` and `TRAP_SH` run on the built tree, they print `False` and `1`; when
   `RAW_BOTH` runs and they run in that copy, they print `True` and `0`.
@@ -153,7 +171,7 @@ NOT_A_TRAP  = in the scratch copy, the disjoint row respelled a.py tools/policy/
 
 `spec-tokens self-test` · `memory hygiene`
 
-New arm: tools/check-spec-tokens.test.sh · covers AC2 AC3 · `RAW_BOTH` staged in a scratch copy, where the trap row's verdict check reds, and `NOT_A_TRAP` staged there, where the row check reds by name · that suite's assertion count, raised by the row check
+New arm: tools/check-spec-tokens.test.sh · covers AC2 AC3 · `NOT_A_TRAP` staged in a scratch copy, where the row check this unit adds reds by name; `RAW_BOTH` staged there reds the verdict check `TOOL-dGroundRules-40` builds in the same arm · none: the row check adds a disagreement to that arm's one assertion
 
 ## 8. Open questions
 
@@ -168,16 +186,32 @@ none
   the closing diff review round 1 wrote; no scope or criterion moved.
 - rev-3 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-54`, the reciprocal end of id 9's promotion, and
   the edge to `TOOL-dGroundRules-53` narrowed to ids 5 and 12; no scope or criterion moved.
+- rev-4 · 2026-10-24 · §1 S1 S3 §3 §4 §5 §6 AC1 AC2 AC3 §7 §10 · disagreements, from a read-only probe of
+  step 14 at 0860b8c1e: `TOOL-dGroundRules-40` rev-4 already respells the disjoint row as the trap
+  `policy` against `policy-x.py` and observes it under `RAW_BOTH`, so S1 and S3 duplicated it;
+  S1 and the §4 table spelled a literal `tools/` prefix the suite never spells; `TRAP_PROBE`
+  filtered rows holding two `tools/policy/` words and saw neither that row nor a planted one;
+  `TRAP_SH` sourced a bare file name and named a bare operand; §4 cited `check_guard_trips` in
+  the wrong file; §3 said `TOOL-dGroundRules-32` was unbuilt; citations into
+  `tools/unattended/lib-unattended.sh` were by line. Ruled: S1 and S3 restated as
+  `TOOL-dGroundRules-40`'s, S2 the work that remains; every row named relative to `PFX`;
+  `TRAP_PROBE` filters that row spelling; `TRAP_SH` sources the tracked path and names whole
+  paths; `check_guard_trips` cited in `tools/memory-tree/design_lib.py`; §3 states
+  `TOOL-dGroundRules-32` built; every citation by symbol; `RAW_BOTH` points at the staging
+  `TOOL-dGroundRules-40` spells; the scratch copy's path moved into the fenced block; §5 and the
+  arm line had the row check raise the assertion count against `TOOL-dGroundRules-40`'s one
+  assertion, ruled: its disagreement joins that list and no count or floor moves.
 
 ## 10. Reuse audit
 
-The seam extended is the arm `TOOL-dGroundRules-40` S1 places in `tools/check-spec-tokens.test.sh`,
-with `overlaps` (`tools/unattended/lib-unattended.sh:750`) and `check_writes_intersect` as its two
-subjects; nothing is built beside them. `python tools/codebase-map/reuse_lookup.py "read test table
-rows from a suite file to probe two overlap rules"` ranked name-stem hits only (`rows`, `row`,
-`read`), none of which tests a row's own shape, so the row check is three lines inside the loop that
-exists. The recall probe returned `TOOL-dGroundRules-42`, `TOOL-dGroundRules-40` and the open ask
-`TOOL-aKeyedAnnotation-9`; all agree with source.
+The seam extended is the arm `TOOL-dGroundRules-32` built and `TOOL-dGroundRules-40` S1 tables in
+`tools/check-spec-tokens.test.sh`, with `overlaps` of `tools/unattended/lib-unattended.sh` and
+`check_writes_intersect` of `tools/memory-tree/design_lib.py` as its two subjects; nothing is built
+beside them. `python tools/codebase-map/reuse_lookup.py "check a test table row is a string-prefix
+trap before grading two overlap rules"` ranked name-stem hits (`rows`, `row`, `check`, `before`)
+and the seam `overlaps`, the arm's own subject; none tests a row's own shape, so the row check is
+three lines inside the loop that exists. The recall probe returned `TOOL-dGroundRules-42`,
+`TOOL-dGroundRules-47`, `TOOL-dGroundRules-46` and this spec; all agree with source.
 
 Recall terms used: `python tools/memory-recall/query.py "how is a stripped criterion literal repaired
 and kept from being respelled" --terms "acceptance criterion literal stripped respelled fenced block

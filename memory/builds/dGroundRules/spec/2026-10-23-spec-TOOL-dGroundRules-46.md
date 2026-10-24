@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-46 — the spec-tokens checker refuses a criterion literal that sources a shell file by bare name
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -20,23 +20,27 @@ The round-1 spec audit of units 35 to 43
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md`)
 exited BOUNDED with finding **id 10 at HIGH**, which shares item **H1** with ids 1
 (`TOOL-dGroundRules-47`) and 20 (`TOOL-dGroundRules-45`). Id 10 is H1 seen from grounding: run from
-the repository root, `TOOL-dGroundRules-40`'s `PAIRS_SH` cannot even define `overlaps`, because it
-sources the unattended library by its bare file name, and `TOOL-dGroundRules-34` AC16 carries the
-same form. The same corruption has now crossed two audit rounds. This unit is id 10's promotion and
-the item's left-shift gate, which the review names: `tools/check-spec-tokens.py` gains a join that
-reds a live spec whose acceptance section sources a shell file by a name carrying no `/`. Measured
-over every spec in the tree, that predicate hits exactly the two corrupted literals and nothing else,
-so it is a class gate rather than a style rule. It repairs `TOOL-dGroundRules-40`, which sits at
-order 13, so it builds at order 14.
+the repository root, a criterion literal that sources the unattended library by its bare file name
+cannot even define `overlaps`. `TOOL-dGroundRules-34` AC16 carries that form, and
+`TOOL-dGroundRules-40`'s `PAIRS_SH`, `TOOL-dGroundRules-44`'s `TRAP_SH` and
+`TOOL-dGroundRules-45`'s `PAIRS_TABLE` carried it until their rev-4, rev-4 and rev-3. The same
+corruption has crossed two audit rounds. This unit is id 10's promotion and the item's left-shift
+gate, which the review names: `tools/check-spec-tokens.py` gains a join that reds a live spec whose
+acceptance section sources a shell file by a name carrying no `/`, a code span's opening word
+included. Measured over every spec in the tree (§4 Evidence), the source commands' bare operands
+are exactly two, unit 34's AC16 literal and this spec's own `BARE_LINE` fixture, the H1 corruption
+and its staged copy, and over acceptance sections the join's own pattern finds unit 34's alone, so
+it is a class gate rather than a style rule. It builds at order 14, after `TOOL-dGroundRules-40` at order 13.
 
 ## 2. Scope (IN)
 
 - **S1** — The join. For every live spec, `scan_bare_sources(text)` reads the acceptance section
   whole, fenced blocks included, and returns each operand of a shell source command, a `.` or
   `source` word at a command position followed by an operand ending in `.sh`, whose operand carries
-  no `/`. Each one is a hit,
+  no `/`. A command position includes the first word of a code span, directly after a backtick,
+  and the operand stops before a backtick. Each one is a hit,
   `[source] <spec> :: <operand> — sources a shell file by bare name, which resolves against the working directory and not the kit`.
-  Observed by AC1, AC3.
+  Observed by AC1, AC3, AC6.
 - **S2** — The whole spelling passes. An operand carrying a `/`, a tracked path such as
   `tools/unattended/lib-unattended.sh` included, is never a hit. Observed by AC2.
 - **S3** — The count line. Every run prints
@@ -53,39 +57,52 @@ order 13, so it builds at order 14.
 - Any other bare argument, such as a help page named by basename. The `TOOL-dGroundRules-42`
   measurement and this unit's own (§4 Evidence) show that predicate is the house basename style in
   most of its hits, so it cannot tell a stripped literal from a kit file named by convention.
-- A cutoff key. The two live hits sit in units that are terminal before this unit builds, and a
-  terminal spec is not graded (§4 Rollout).
+- A cutoff key. The one bare operand in an acceptance section sits in unit 34, which is CLOSED and
+  so not graded, and a spec live with one when this join lands is a true hit (§4 Rollout).
 - The arm's trap row and the probes' single spelling: `TOOL-dGroundRules-44` and
   `TOOL-dGroundRules-45`.
 
 ### Edges
 
-- **hands-off** `TOOL-dGroundRules-63` — the population the Goal, the Evidence and the Rollout state and AC3's fixture, which that unit re-measures at `7810198ad` with units 44 and 45 beside 34 and 40, and AC3 itself, which that unit observes at its own close (ids 6, 15 and 21 of the spec run's closing diff review)
+- **hands-off** `TOOL-dGroundRules-63` — AC3, which that unit observes at its own close with units 34, 40, 44 and 45 terminal, and its re-measure of the population at `7810198ad`, which this spec's rev-3 restates in §4 Evidence (ids 6, 15 and 21 of the spec run's closing diff review)
 
 ## 4. Design
 
 ### Evidence
 
-Every line below was read or run on 2026-10-23 at `0ced625e1`.
+Every line below was read or run on 2026-10-24 over the working tree on `7a600abf5`, which holds
+`TOOL-dGroundRules-44` rev-4 and `TOOL-dGroundRules-45` rev-3 as this pass revises them, except the
+one marked `0ced625e1`.
 
-- Over all 1415 spec files under `memory/builds/*/spec/`, the pattern
-  `(^|[ ;'"(])(\.|source) [A-Za-z0-9_./-]+\.sh` found nine source commands. Seven name the library
-  by a path carrying `/`; two name it bare, `TOOL-dGroundRules-34` :509 and `TOOL-dGroundRules-40`
-  :125, the two literals review ids 1, 10, 20 and 30 cite (PINNED).
+- Over all 1533 spec files under `memory/builds/*/spec/`, the pattern
+  `(^|[ ;'"(])(\.|source) [A-Za-z0-9_./-]+\.sh` found 17 source commands. Fifteen name the file by
+  a path carrying `/`, among them unit 40's `PAIRS_SH`, unit 44's `TRAP_SH` and unit 45's
+  `PAIRS_TABLE`; two name it bare: `TOOL-dGroundRules-34` AC16, the H1 literal review ids 1, 10, 20
+  and 30 cite, and this spec's own `BARE_LINE` (The join, below), its fixture (PINNED).
+- `SOURCE_CMD` (The join, below) over the acceptance section of each of those files matched 12
+  operands in 10 specs. One is bare, unit 34's, and none of the twelve sits in a live spec: unit 34
+  is CLOSED, and each of the other nine specs reads a status outside `LIVE` (PINNED, scratch
+  script). Over whole files the same pattern also matches eight bare operands outside any acceptance
+  section: `BARE_LINE` and `TICK_LINE`, four git pathspecs opening a code span, and two code spans
+  in prose quoting a bare source, in `TOOL-dDerivedDocket-24` and `TOOL-dGroundRules-53`; the join
+  does not read them.
 - A wider predicate, a bare file name in an acceptance section whose full path the same spec's
-  scope or design names outside `tools/`, gave 89 hits over 78 live specs, most of them the house
-  "`policy.md` under `help/`" form (PINNED, scratch script).
-- `tools/check-spec-tokens.py:1513` walks the acceptance bullets for the paths join and reads only
-  `- ` bullets, so a fenced literal is graded by no join today; `:1675` prints the run's summary
-  line, beside which the bar and guards joins print their own count lines.
-- The paths join's population is the live set, OPEN, SPECCED, INPROGRESS and BLOCKED, and
-  `tools/check-spec-tokens.test.sh:405-410` holds a terminal spec ungraded.
+  scope or design names outside `tools/`, gave 89 hits over 78 live specs at `0ced625e1`, most of
+  them the house "`policy.md` under `help/`" form (PINNED, scratch script).
+- In `main` of `tools/check-spec-tokens.py`, the paths join's bullet loop over `extract_acceptance`
+  reads only `- ` bullets and their continuation lines, so a fenced literal is graded by no join
+  today; `main` prints the run's summary line, live and terminal specs counted, and after it the
+  bar, guards, claims, covers, hands-off, size and carries joins print their own count lines.
+- The paths join's population is the checker's `LIVE` set, OPEN, SPECCED, INPROGRESS and BLOCKED,
+  so a DEFERRED spec is counted terminal and not graded, and the suite's arm "a CLOSED spec is
+  frozen, so it refuses rather than grading" in `tools/check-spec-tokens.test.sh` holds a terminal
+  spec ungraded.
 - `python tools/lexicon/lexicon.py --suggest scan_bare_sources --as py.function` answered OK.
 
 ### The join
 
 ```text
-SOURCE_CMD = (?:^|[;&|('"]|\s)(?:\.|source)\s+([^\s;&|'"()]+\.sh)\b
+SOURCE_CMD = (?:^|[;&|('"`]|\s)(?:\.|source)\s+([^\s;&|'"()`]+\.sh)\b
 
 scan_bare_sources(text):
     section = extract_acceptance(text), fenced blocks kept
@@ -105,13 +122,17 @@ not carry it:
 ```text
 BARE_LINE  = PROBE = bash -c '. helper.sh; f'
 WHOLE_LINE = PROBE = bash -c '. tools/unattended/lib-unattended.sh; f'
+TICK_LINE  = - When `. helper.sh; f` runs, it prints `0`.
 ```
 
 ### Rollout
 
-`TOOL-dGroundRules-34` and `TOOL-dGroundRules-40` sit at orders 12 and 13 and close before this unit
-builds, so the join meets no live hit at its own close. A spec still live then, through a park, is a
-true finding of this join, not a false one.
+The join's pattern meets one bare operand in an acceptance section, `TOOL-dGroundRules-34` AC16
+(Evidence), and that spec is CLOSED, so the join meets no live hit at its own close.
+`TOOL-dGroundRules-40`, `TOOL-dGroundRules-44` and `TOOL-dGroundRules-45` source the library by its
+tracked path. A spec live with a bare source when this join lands, at its build or through a park,
+is a true finding of this join, not a false one. `TOOL-dGroundRules-63` observes AC3 again at its
+own close (§3 Edges).
 
 ### Inventory
 
@@ -141,8 +162,10 @@ true finding of this join, not a false one.
 - error / empty / loading states — the count line makes an empty population visible.
 - observability — each hit names the spec and the operand.
 - risks — a prose sentence in a criterion that spells a dot, a space and a bare `.sh` name at a
-  command position reads as a source; none exists in the corpus measured.
-- testing — AC1 to AC5 and the arm.
+  command position reads as a source, and so does a code span that quotes the stripped form or
+  opens on a git pathspec such as `:!*.test.sh`; each is waivable, and none sits in an acceptance
+  section of the corpus measured (§4 Evidence).
+- testing — AC1 to AC6 and the arm.
 - migration — the codebase map regenerated in this unit's commit.
 - user docs — N/A: a gov-only checker; its docstring is its reference (S4).
 
@@ -153,33 +176,39 @@ of this repository under `%TEMP%/gr46`, checked out at the commit under test. Th
 spelled whole here, once, and the criteria name them:
 
 ```text
-PLANT_BARE  = in the scratch copy, BARE_LINE (section 4) appended inside the first fenced block of
-              the acceptance section of TOOL-dGroundRules-52's spec, which is live until order 16
+PLANT_BARE  = in the scratch copy, this unit's own spec with its status cell set to INPROGRESS, so
+              the checker grades it (a DEFERRED spec is counted terminal), and BARE_LINE (section 4)
+              appended inside the first fenced block of its acceptance section, this block
 PLANT_WHOLE = the same, with WHOLE_LINE in place of BARE_LINE
+PLANT_TICK  = the same spec at INPROGRESS, with TICK_LINE (section 4) appended as the last line of
+              its acceptance section, a bullet outside any fenced block, in place of BARE_LINE
 DOC_JOIN    = grep -c "source join" tools/check-spec-tokens.py
 ```
 
-- **AC1** — When `PLANT_BARE` runs and `python tools/check-spec-tokens.py --list` runs in that copy,
-  it prints a `[source]` hit naming that spec and `helper.sh`.
+- **AC1** — When `PLANT_BARE` runs and `python tools/check-spec-tokens.py --list` runs from that
+  copy's root, it prints a `[source]` hit naming that spec and `helper.sh`.
   Red when: a bare-name source in a fenced acceptance literal is graded by no join.
-- **AC2** — When `PLANT_WHOLE` runs and the same `--list` runs in that copy, it prints no `[source]`
-  hit.
+- **AC2** — When `PLANT_WHOLE` runs and the same `--list` runs from that copy's root, it prints no
+  `[source]` hit.
   Red when: the whole spelling the fix prescribes is refused with the stripped one.
 - **AC3** — When `python tools/check-spec-tokens.py --list` runs on the built tree, it prints no
   `[source]` hit.
   Red when: a live spec carries a criterion that cannot define the function it calls.
-  fixture: units 34 and 40 terminal, which their orders make them before this unit builds.
+  fixture: unit 34 CLOSED; units 40, 44 and 45 source the library by its tracked path.
 - **AC4** — When the AC3 command runs, it prints the `source join ·` count line.
   Red when: a join that examined nothing reads as clean.
   figure: both counts DERIVED at observation time.
 - **AC5** — When `DOC_JOIN` runs on the built tree, it prints `1` or more.
   Red when: the docstring omits the join and what it cannot see.
+- **AC6** — When `PLANT_TICK` runs and the same `--list` runs from that copy's root, it prints a
+  `[source]` hit naming that spec and `helper.sh`.
+  Red when: a bare-name source that opens a code span, directly after its backtick, is graded by no join.
 
 ## 7. Gates
 
-`spec-tokens self-test` · `memory-hygiene self-test` · `build-index selftest` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms`
+`spec-tokens self-test` · `memory-hygiene self-test` · `build-index selftest` · `spec tokens (a spec's own names resolve)` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
-New arm: tools/check-spec-tokens.test.sh · covers AC1 AC2 · a scratch repository whose one live spec's acceptance fence sources a shell file by bare name, then by its path · that suite's assertion count, raised by the arm
+New arm: tools/check-spec-tokens.test.sh · covers AC1 AC2 AC6 · a scratch repository whose one live spec's acceptance fence sources a shell file by bare name, then by its path, then whose acceptance bullet opens a code span on a bare-name source · that suite's assertion count, raised by the arm
 
 ## 8. Open questions
 
@@ -194,12 +223,28 @@ none
   that unit's **consumes-from** line: the promotion of the spec run's closing diff review's M1 (ids
   6, 15 and 21), which re-measures this unit's population with units 44 and 45 and observes AC3. No
   scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-24 · §1 §2 §3 §4 §5 §6 §7 §9 §10 · disagreements, from a read-only probe of step 14 at
+  0860b8c1e: `PLANT_BARE` planted into TOOL-dGroundRules-52's spec, DEFERRED and so never graded;
+  §7 lacked `policy fixtures`, whose guard holds the checker since TOOL-dGroundRules-20; the Goal's
+  "exactly two" and the Evidence and Rollout population predated units 44 and 45, and unit 40's
+  rev-4 had respelled its literal whole; the checker and suite citations had moved. Rulings:
+  `PLANT_BARE` plants into this unit's own spec read as INPROGRESS; `policy fixtures` added; the
+  population restated over the working tree on 7a600abf5, 1533 spec files and 17 source commands,
+  where unit 44 rev-4 and unit 45 rev-3 of this pass spell the library whole, so two bare operands
+  remain, unit 34's (CLOSED) and this spec's `BARE_LINE`, and the Goal's two is now those; the
+  cutoff-key non-goal, the hands-off edge and AC3's fixture made to match; every moved citation
+  named by symbol. This restates in the text what TOOL-dGroundRules-63 S1 and S2 re-measure, by the
+  run's ruling over that unit's non-goal of editing this spec; 63 still observes AC3 at its close.
+  Adopted in the same rev by the run's M3 ruling on a gap this pass found: `SOURCE_CMD` also reads a
+  command position directly after a backtick and stops its operand before one, so a criterion whose
+  code span opens on a bare-name source is caught; S1 says so, `TICK_LINE` and `PLANT_TICK` stage
+  it, AC6 observes it, the arm covers it, and §5 names the quoted-form and pathspec risk it adds.
 
 ## 10. Reuse audit
 
 The seam extended is `tools/check-spec-tokens.py`, whose spec walk, acceptance-section reader and
 waiver registry every join shares; the new join is one scan function and one count line inside them,
-and its arm uses the suite's `scratch` and `arm` helpers (`tools/check-spec-tokens.test.sh:199-243`).
+and its arm uses the `scratch` and `arm` helpers of `tools/check-spec-tokens.test.sh`.
 `python tools/codebase-map/reuse_lookup.py "flag a shell library sourced by a bare file name in a
 spec acceptance literal"` ranked `read_spec_revisions`, `parse_spec_h1` and `build_spec_path_re`,
 none of which reads a source command; no existing seam fits the scan itself. The recall probe
