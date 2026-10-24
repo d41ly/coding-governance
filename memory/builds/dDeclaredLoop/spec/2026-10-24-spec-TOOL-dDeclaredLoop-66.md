@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-66-deviation-661.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-66-deviation-661.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-67 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,7 @@ unit repairs none in particular and builds after every unit (order 38).
 ### Edges
 
 none
+- **hands-off** `TOOL-dDeclaredLoop-75` — the ask citation, the symmetric predicate and the re-render population (the round-3 spec audit's ids 18, 34)
 
 ## 4. Design
 
@@ -147,6 +149,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 · the shared-pa
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-57 — `update` refuses a claimed kit whose `requires` it leaves unmet, on every admission path
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 4 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-deviation-571.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-deviation-571.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,8 @@ report's fix. It repairs `TOOL-dDeclaredLoop-36`.
 ### Edges
 
 - **consumes-from** `TOOL-dDeclaredLoop-36` — `loop` in the registry's default set and the default-gained migration it relies on, whose uncovered paths this unit refuses
+- **hands-off** `TOOL-dDeclaredLoop-73` — the `requires` the refusal grades, which that unit reads at `to_commit` (the round-3 spec audit's id 39)
+- **hands-off** `TOOL-dDeclaredLoop-75` — the refusal's committed fixture, its write-path observation and its every-pair route (the round-3 spec audit's ids 11, 36, 40)
 
 ## 4. Design
 
@@ -146,6 +149,8 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · a receipt with no gov
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 52 (HIGH, item H6).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-73 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

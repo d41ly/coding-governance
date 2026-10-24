@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-59-deviation-591.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-59-deviation-591.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,8 @@ fix. It repairs `TOOL-dDeclaredLoop-44`.
 
 - **consumes-from** `TOOL-dDeclaredLoop-44` — the push-range merge rule in `check_push_range` of `tools/loop/guard.py`, whose merge grade this unit restates by key
 - **hands-off** `TOOL-dDeclaredLoop-67` — the merge key grade, which that unit's first-push walk applies to each merge it finds (the round-2 spec audit's id 61)
+- **hands-off** `TOOL-dDeclaredLoop-69` — the grade's computable branch, which that unit compares against the clean re-merge alone (the round-3 spec audit's id 2)
+- **hands-off** `TOOL-dDeclaredLoop-75` — the clean leg on a merge-tree exit 1 (the round-3 spec audit's id 41); this pass keeps the `loop guard fixtures` leg green (id 31)
 
 ## 4. Design
 
@@ -139,6 +142,8 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 AC4 · the four merge plants,
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 17 (HIGH, item H2).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-69 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

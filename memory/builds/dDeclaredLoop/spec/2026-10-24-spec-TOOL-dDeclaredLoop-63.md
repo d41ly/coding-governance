@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-63 — an adopter's extra phase reads as ungated through the driver's own phase set, never refused for lacking a row
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-63-deviation-631.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-63-deviation-631.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,8 @@ reading taken from the driver's resolved set. It repairs `TOOL-dDeclaredLoop-52`
 
 - **consumes-from** `TOOL-dDeclaredLoop-52` — `derive_phase_position`, the `loop_table.py phase` CLI and its `--phase` consumer, whose reading of an unmapped phase this unit defines
 - **hands-off** `TOOL-dDeclaredLoop-67` — the adopter-phase reading, whose population that unit's check of the phase rows matches (id 35)
+- **hands-off** `TOOL-dDeclaredLoop-70` — the default of `extra`, which that unit makes the driver's population for every caller (the round-3 spec audit's id 19)
+- **hands-off** `TOOL-dDeclaredLoop-75` — §5's protocol sentence in the template and its render (the round-3 spec audit's id 35); this pass keeps the `loop transition tables` leg green (id 31)
 
 ## 4. Design
 
@@ -129,6 +132,8 @@ The unattended kit's own suites are waived for this build's landing (README rule
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 56 (HIGH, item H8).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-70 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

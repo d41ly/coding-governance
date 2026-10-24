@@ -230,3 +230,21 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T13:14:24Z rescope · item defer TOOL-dDeclaredLoop-66 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
 
 2026-10-24T13:14:25Z rescope · item defer TOOL-dDeclaredLoop-67 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T13:56:35Z rescope · item add TOOL-dDeclaredLoop-68 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) id 1 HIGH, item H1: spec 67 forbids the normalise_output parity row and Python copy that spec 56 mints and its arm asserts; repairs TOOL-dDeclaredLoop-56
+
+2026-10-24T13:56:36Z rescope · item add TOOL-dDeclaredLoop-69 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) id 2 HIGH, item H2: the merge key grade exempts a resolution that reverts a key to the unchanged parent's value even where the clean re-merge is computable; repairs TOOL-dDeclaredLoop-59
+
+2026-10-24T13:56:37Z rescope · item add TOOL-dDeclaredLoop-70 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) id 19 HIGH, item H3: PHASES_EXTRA reaches derive_phase_position only from the --phase consumer, so its other callers still refuse an adopter phase; repairs TOOL-dDeclaredLoop-63
+
+2026-10-24T13:56:38Z rescope · item add TOOL-dDeclaredLoop-71 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) id 28 HIGH, item H4: the records-root plants live in breakpoints.py --fixture, which no gate leg runs; repairs TOOL-dDeclaredLoop-64
+
+2026-10-24T13:56:39Z rescope · item add TOOL-dDeclaredLoop-72 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) id 29 HIGH, item H5: the budget and breakpoint readers take MEMORY_ROOT from .memory-tree.conf while the driver takes it from .unattended.conf; repairs TOOL-dDeclaredLoop-64 and TOOL-dDeclaredLoop-60
+
+2026-10-24T13:56:40Z rescope · item add TOOL-dDeclaredLoop-73 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) id 39 HIGH, item H6: the claimed-requires refusal grades working-tree descriptors while update --to installs another vintage; repairs TOOL-dDeclaredLoop-57
+
+2026-10-24T13:56:41Z rescope · item add TOOL-dDeclaredLoop-74 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) id 45 HIGH, item H7: any FETCH_HEAD mtime reads as a fresh fetch, a failed fetch included; repairs TOOL-dDeclaredLoop-65
+
+2026-10-24T13:56:47Z rescope · item add TOOL-dDeclaredLoop-75 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) the 36 confirmed minors batched into one unit: 28 MEDIUM, ids 3 4 5 6 7 8 11 12 13 14 15 16 21 23 27 30 31 32 33 34 35 36 40 41 42 43 44 46, and 8 LOW, ids 10 17 18 20 24 25 26 38; repairs no unit in particular
+
+2026-10-24T14:18:15Z review · item dDeclaredLoop-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 36 · disposition promote

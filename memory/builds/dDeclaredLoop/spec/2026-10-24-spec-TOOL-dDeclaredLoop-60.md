@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-60 — the budget reader counts draws in every run record, rotated archives included, under `MEMORY_ROOT`
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-60-deviation-601.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-60-deviation-601.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,8 @@ draw is ever counted. This unit takes the report's fix. It repairs `TOOL-dDeclar
 
 - **consumes-from** `TOOL-dDeclaredLoop-48` — `budget_state`'s run-state home and the ` · budget <slug>` row, whose population this unit widens to rotated archives under the resolved root
 - **hands-off** `TOOL-dDeclaredLoop-67` — the resolved run-state population, which that unit's concurrent patch refusal and literal-root observation read (ids 8 and 63)
+- **hands-off** `TOOL-dDeclaredLoop-72` — the records-root read, which that unit points at the driver's root (the round-3 spec audit's id 29)
+- **hands-off** `TOOL-dDeclaredLoop-75` — the draw-id dedup, the owner rule, the root's docstring and its plants (the round-3 spec audit's ids 3, 4, 5, 12, 13, 23, 42, 43); this pass keeps the `loop budget fixtures` leg green (id 31)
 
 ## 4. Design
 
@@ -129,6 +132,8 @@ New arm: tools/loop/budget.py · covers AC1 AC2 AC3 · the rotation, non-default
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 19 (HIGH, item H3).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-72 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

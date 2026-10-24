@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-67-deviation-671.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-67-deviation-671.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 |
 
 <!-- /gen:spec-records -->
 
@@ -271,6 +272,10 @@ That is 38 MEDIUM and 16 LOW findings by raw id.
 - **consumes-from** `TOOL-dDeclaredLoop-62` — the transition-record driver and its weighing (ids 18, 62)
 - **consumes-from** `TOOL-dDeclaredLoop-63` — the adopter-phase reading the check's population matches (id 35)
 - **consumes-from** `TOOL-dDeclaredLoop-64` — the resolved root of the placement rule (ids 8, 28)
+- **consumes-from** `TOOL-dDeclaredLoop-68` — the program-route normaliser and the absent `normalise_output` row, which S24 and AC17 read as landed at order 37 (the round-3 spec audit's id 1)
+- **consumes-from** `TOOL-dDeclaredLoop-70` — the shared adopter-phase population, which S13's held-from lookup takes by passing no explicit `extra` (the round-3 spec audit's id 19)
+- **consumes-from** `TOOL-dDeclaredLoop-71` — the `loop breakpoints fixtures` leg that runs AC31's plant, and the arm-home ruling that supersedes S30's sentence on unit 53 (the round-3 spec audit's id 28)
+- **hands-off** `TOOL-dDeclaredLoop-75` — the guard, leg, claim, terminal-proof, conf-read, copy and citation items of the round-3 spec audit's minors (ids 6, 7, 10, 16, 20, 21, 26, 27, 30, 32, 38, 46)
 
 ## 4. Design
 
@@ -484,6 +489,8 @@ New arm: tools/loop/selftest.py · covers AC22 · the loop kit's self-test, reac
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-2 spec audit's 54 minors batched (38 MEDIUM, 16 LOW).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-68 and TOOL-dDeclaredLoop-70 and TOOL-dDeclaredLoop-71 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

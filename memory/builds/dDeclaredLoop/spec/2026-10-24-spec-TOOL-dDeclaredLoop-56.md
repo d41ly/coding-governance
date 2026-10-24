@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -264,6 +264,8 @@ That is 44 MEDIUM and 3 LOW findings by raw id.
 - **consumes-from** `TOOL-dDeclaredLoop-52` — `derive_phase_position` (id 17)
 - **hands-off** `TOOL-dDeclaredLoop-65` — the remote-freshness age source of S36, which that unit reads from what a fetch and a clone write (the round-2 spec audit's id 55)
 - **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minors ids 3, 4, 12, 22, 23, 24, 36, 50, 66 and 67, each a scope item of that unit
+- **hands-off** `TOOL-dDeclaredLoop-68` — S27's inline normaliser and its `normalise_output` parity row, which that unit replaces with the run-gates program at order 37 (the round-3 spec audit's id 1)
+- **consumes-from** `TOOL-dDeclaredLoop-70` — the shared adopter-phase population, which S18's `read_withdrawn_parents` call takes by passing no explicit `extra` (the round-3 spec audit's id 19)
 
 ## 4. Design
 
@@ -557,6 +559,8 @@ AC42 are observed by probes, never by those suites.
 - rev-1 · 2026-10-24 · initial draft, the batch of the round-1 spec audit's 44 MEDIUM and 3 LOW findings.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-65 and TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-68 and TOOL-dDeclaredLoop-70, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

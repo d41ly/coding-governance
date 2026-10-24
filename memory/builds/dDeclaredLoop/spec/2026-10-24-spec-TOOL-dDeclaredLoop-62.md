@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-62 — the transition-record merge driver chosen against the recorded union measurement and the row driver's own refusal
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 30 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-62-deviation-621.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-62-deviation-621.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ that keeps every draw exactly once. It repairs `TOOL-dDeclaredLoop-49`.
 - **consumes-from** `TOOL-dDeclaredLoop-49` — the `.gitattributes` line for transition records and the build-wide count it protects, whose evidence and driver this unit restates
 - **consumes-from** `TOOL-dDeclaredLoop-61` — the draw id, without which union takes two identical draws once
 - **hands-off** `TOOL-dDeclaredLoop-67` — the driver and its weighing, which that unit carries into the loop README and the adopter route (ids 18 and 62)
+- **hands-off** `TOOL-dDeclaredLoop-75` — the class-keyed census in the driver weighing (the round-3 spec audit's id 24); this pass keeps the `loop budget fixtures` leg green (id 31)
 
 ## 4. Design
 
@@ -141,6 +143,8 @@ New arm: tools/loop/budget.py · covers AC1 AC2 AC4 · the identical, distinct a
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 38 (HIGH, item H4, shared
   with id 53).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-57-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-64-deviation-641.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-64-deviation-641.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-57-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,9 @@ non-`memory` root as a real adopter shape. This unit takes the report's fix. It 
 
 - **consumes-from** `TOOL-dDeclaredLoop-53` — the opening-commit rule in `tools/loop/breakpoints.py`, whose README path this unit resolves through the memory root
 - **hands-off** `TOOL-dDeclaredLoop-67` — the resolved root of the opening-commit rule, beside which that unit fixes the oldest-add ordering and observes the literal root (ids 8 and 28)
+- **hands-off** `TOOL-dDeclaredLoop-71` — the fixture plants of this unit's `New arm:`, which that unit's leg runs (the round-3 spec audit's id 28)
+- **hands-off** `TOOL-dDeclaredLoop-72` — the records-root read, which that unit points at the driver's root (the round-3 spec audit's id 29)
+- **hands-off** `TOOL-dDeclaredLoop-75` — the held line's root source and the docstring rationale (the round-3 spec audit's ids 17, 44)
 
 ## 4. Design
 
@@ -125,6 +129,8 @@ New arm: tools/loop/breakpoints.py · covers AC1 AC2 AC3 · the records-root, no
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 57 (HIGH, item H9).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-71 and TOOL-dDeclaredLoop-72 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
