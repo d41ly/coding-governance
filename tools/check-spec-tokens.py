@@ -384,11 +384,14 @@ AC_LABEL = re.compile(r"^(?:[ \t]*[-*][ \t]*)?(?:\*\*)?(AC[0-9]+[a-z]?)(?:\*\*)?
 # `path:line` citation fails the trailing lookahead and stays the cites join's; a grep over a suite
 # FILE has grep at command position and is not a run; the empty assignment is the OFF spelling, and
 # so is the QUOTED empty one, `GATE_FULL=""` — the quote is not a value (closing review F9, where
-# `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF).
+# `\S` read it as one while the hook of TOOL-aDeferredBar-3 unquoted it to OFF). The policy kit's
+# `check_policy.py --fixture` with no case is a suite, because it runs every case, while naming one
+# case makes it the direct check a criterion may name.
 BAR = re.compile(
     r"(?:^|&&|[;|(])\s*(?:\w+=\S*\s+)*(?:timeout\s+(?:(?:-[ks]|--kill-after|--signal)\s+\S+\s+|-\S+\s+)*\S+\s+)?"
     r"(?:(?:bash|sh|python3?(?:\.\d+)?|py)\s+(?:(?!-[ncm]\s)(?:-X\S*(?:\s+\S+)?|-[A-Za-z]+|-\d+(?:\.\d+)?)\s+)?)?(?:\S*/)?"
-    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|[^\s/*?]*selftest\.py)(?=\s|$)"
+    r"(?:(?:run-gates|run-selftests|run-unattended-gates|[^\s/*?]+\.test)\.sh|[^\s/*?]*selftest\.py"
+    r"|check_policy\.py\s+--fixture(?:\s+--strict-from\s+\S+)?(?=\s*$|\s*[|;&)]|\s+\d*>))(?=\s|$)"
     r"|(?:^|\s)GATE_(?:FULL|SELFTESTS)=[\"']?[^\s\"']")
 BAR_WHY = ("a bar or suite is not an acceptance observation: observe the checker on a staged break, "
            "a --selftest flag or a fixture; name the suite under New arm:; the bar and the suites "

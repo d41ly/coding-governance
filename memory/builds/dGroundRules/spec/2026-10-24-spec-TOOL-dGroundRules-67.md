@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-67 — the close sweep: the policy fixtures guard holds every path the guard trace reports, the review protocol names no untracked settings file, the verb pin is re-measured, and the bar predicate reads the policy check's whole-suite form
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base df4912bd · streams tooling · order 21 · closes TOOL-dGroundRules-12
+**Status:** CLOSED · rev-2 · 2026-10-25 · node d · Tier-1 · base df4912bd · streams tooling · order 21 · closes TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,6 +8,7 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-25-build-TOOL-dGroundRules-67-deviation-79.md](../build/2026-10-25-build-TOOL-dGroundRules-67-deviation-79.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-67-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-67-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-67-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-67-spec-brief.md) | research | — |
 

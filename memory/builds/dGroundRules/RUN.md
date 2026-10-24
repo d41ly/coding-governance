@@ -415,3 +415,11 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T20:27:23Z dispatch · item d56a864b TOOL-dGroundRules-63 · reason tools/check-spec-tokens.py tools/check-spec-tokens.test.sh memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-1-owner-audit-cap.md memory/gotchas/observation-before-the-last-fold-of-the-same-commit.md memory/gotchas/two-answers-to-one-question.md memory/gotchas/INDEX.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-63.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-63-ledger.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/map/generated/symbols.json
 
 2026-10-24T20:57:18Z rescope · item add TOOL-dGroundRules-67 · reason close sweep owed by deviation-78 and found at the close: the policy fixtures guard gains the 12 guard-trace WRONG paths of the full --fixture run (one [guards] hit, aScoutedSeam-1 via tools/workflows/kit.toml, waived under ask TOOL-dGroundRules-110); hygiene check 15 on the review-protocol template's settings.local.json citation; the lexicon verb pin re-measured 1204->1212 naming 8 arrivals
+
+2026-10-24T22:06:49Z brief · item TOOL-dGroundRules-67 · reason b0fc94b112a3 memory/builds/dGroundRules/prompts/2026-10-24-prompt-TOOL-dGroundRules-67-spec-brief.md
+
+2026-10-24T22:09:55Z dispatch · item 7e80dee4 TOOL-dGroundRules-67 · reason tools/gate-legs.json tools/check-spec-tokens.py tools/workflows/REVIEW-PROTOCOL.template.md memory/guides/REVIEW-PROTOCOL.md .lexicon.conf memory/project/spec-token-waivers.txt memory/builds/dGroundRules/BACKLOG.md memory/builds/dGroundRules/build/2026-10-25-build-TOOL-dGroundRules-67-deviation-79.md memory/builds/dGroundRules/spec/2026-10-24-spec-TOOL-dGroundRules-67.md
+
+2026-10-24T22:18:10Z dispatch · item 7e80dee4 TOOL-dGroundRules-67 · reason memory/LIVE.md memory/backlog/TOOL.md memory/builds/dGroundRules/README.md memory/guides/SESSION-KICKOFF.md
+
+2026-10-24T22:21:33Z dispatch · item 7e80dee4 TOOL-dGroundRules-67 · reason memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

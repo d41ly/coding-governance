@@ -47,11 +47,13 @@ session spawns agents:
   (TOOL-dGroundRules-10). How many agents run at once is the agent limit, `runtime.agents-in-flight`,
   and the harness enforces it through the two concurrency settings the policy kit renders from it,
   because the harness counts agents in flight and knows when each one ends, which a `PreToolUse` hook
-  cannot. The hook refuses a call whose checkout's settings, `.claude/settings.json` or the
-  `.claude/settings.local.json` value that overrides it, are absent or above the landed limit, naming
-  the render command. The per-prompt slot ledger that counted direct spawns until TOOL-dGroundRules-10, with
-  its 45-minute expiry, retired with it: it counted claims, not agents in flight, so five idle claims
-  refused a sixth agent and five claims past the expiry admitted five more.
+  cannot. The hook refuses a call when the settings in force are absent or above the landed limit,
+  naming the render command. It reads three layers, highest precedence first (TOOL-dGroundRules-61):
+  the checkout's local settings file, the project's `.claude/settings.json`, and the file
+  `GOV_SETTINGS_JSON` declares, a relative path read against the checkout root. The per-prompt slot
+  ledger that counted direct spawns until TOOL-dGroundRules-10, with its 45-minute expiry, retired
+  with it: it counted claims, not agents in flight, so five idle claims refused a sixth agent and five
+  claims past the expiry admitted five more.
 - `tools/workflows/check-verifier-fanout.sh` — a merge-bar leg over the committed harnesses. It does
   not re-implement the static rule; it feeds each script to the hook. One predicate, two entry points.
 
