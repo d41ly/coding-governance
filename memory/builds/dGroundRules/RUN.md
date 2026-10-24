@@ -95,3 +95,5 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T00:24:01Z brief · item TOOL-dGroundRules-19 · reason 6ab400cff068 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-19-build-brief.md
 
 2026-10-24T00:31:00Z dispatch · item 729e5128 TOOL-dGroundRules-19 · reason tools/policy/guard.py help/policy.md
+
+2026-10-24T00:32:24Z dispatch · item d88f7ddd TOOL-dGroundRules-19 · reason .governance/policy.json
