@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-36 — a source read git ignores is set aside before the guard join, counted, and never offered to the guard
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-36-deviation-24.md](../build/2026-10-23-build-TOOL-dGroundRules-36-deviation-24.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-36-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-36-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-36-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-36-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-36-1-spec-reviewer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-36-1-spec-reviewer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-36-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-36-2-spec-writer.md) | journal | — |

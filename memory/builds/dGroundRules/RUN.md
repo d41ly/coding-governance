@@ -243,3 +243,11 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T13:26:12Z dispatch · item eb67e2cc TOOL-dGroundRules-35 · reason tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-35.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-35-ledger.md memory/backlog/TOOL.md memory/builds/dGroundRules/README.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/LIVE.md
 
 2026-10-24T13:28:18Z dispatch · item eb67e2cc TOOL-dGroundRules-35 · reason tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-35.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-35-ledger.md memory/backlog/TOOL.md memory/builds/dGroundRules/README.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md memory/LIVE.md
+
+2026-10-24T14:09:09Z dispatch · item 06109bfa TOOL-dGroundRules-36 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-36.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-36-ledger.md
+
+2026-10-24T14:09:14Z brief · item TOOL-dGroundRules-36 · reason 4cb8ee1b9a21 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-36-build-brief.md
+
+2026-10-24T14:18:09Z dispatch · item 06109bfa TOOL-dGroundRules-36 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-36.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-36-ledger.md
+
+2026-10-24T14:22:52Z dispatch · item 06109bfa TOOL-dGroundRules-36 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-36.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-36-ledger.md memory/builds/dGroundRules/README.md

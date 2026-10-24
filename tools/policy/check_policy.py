@@ -3775,17 +3775,25 @@ def add_source_read(event, args):
 
 
 def check_guard_trace():
-    """The guard trace's join (TOOL-dGroundRules-33 S3): every path `add_source_read` kept, piped to the
-    spec-token checker's `--legs-for -` through `read_legs_for`, gov's one trip rule, and a WRONG naming
-    each path that trips no `policy fixtures` guard: an edit to it alone would skip the leg whose cases
-    read it. The count line comes first, so an empty trace is seen, and is a WRONG of its own, as is a
-    checker that does not run: a join over nothing, or with no judge, proves nothing. -> (assertions, wrong)."""
+    """The guard trace's join (TOOL-dGroundRules-33 S3): every path `add_source_read` kept that git does
+    not ignore (`derive_guardable_reads`, TOOL-dGroundRules-36), piped to the spec-token checker's
+    `--legs-for -` through `read_legs_for`, gov's one trip rule, and a WRONG naming each path that trips
+    no `policy fixtures` guard: an edit to it alone would skip the leg whose cases read it. The count
+    line comes first, then the set-aside count on every run, so an empty trace is seen, and is a WRONG of
+    its own, as is an ignore query or a checker that does not run: a join over nothing, or with no
+    judge, proves nothing. -> (assertions, wrong)."""
     kept = sorted(SOURCE_READS)
     print(f"policy-fixture: guard-trace · {len(kept)} source read(s)")
+    top = derive_source_top()
+    try:
+        kept, n = derive_guardable_reads(kept, top)
+    except RuntimeError as exc:
+        print(f"policy-fixture: guard-trace · WRONG: {exc}, so no read was joined to the guard")
+        return 1, 1
+    print(f"policy-fixture: guard-trace · {n} ignored read(s) set aside")
     if not kept:
         print("policy-fixture: guard-trace · WRONG: no source read was traced, so nothing was joined to the guard")
         return 1, 1
-    top = derive_source_top()
     checker = top / budgets.resolve_prefix_token("{prefix}/check-spec-tokens.py", budgets.derive_tool_root())
     try:
         tripped = read_legs_for(top, checker, kept)
@@ -3796,6 +3804,26 @@ def check_guard_trace():
     for p in missed:
         print(f"policy-fixture: guard-trace · WRONG {p} · not under the {FIXTURES_LEG} guard")
     return 1 + len(kept), len(missed)
+
+
+def derive_guardable_reads(kept, top):
+    """The kept reads git does not ignore (TOOL-dGroundRules-36 S1), asked of `git check-ignore --stdin`
+    at `top`, so `.gitignore`, the exclude file and `core.excludesFile` decide and no pattern is spelled
+    here. A path git ignores never reaches the runner's diff, so no guard can trip on it. Exit 1 means
+    none is ignored; a git that does not start, or any other exit, is a RuntimeError naming
+    check-ignore, never "nothing ignored". -> (guardable, the count set aside)."""
+    env = {k: v for k, v in os.environ.items() if k not in policy.GIT_ENV_LEAKS}
+    try:
+        # bytes in: a text-mode pipe on Windows writes `\r\n`, and git reads `p\r` as a path no rule matches
+        p = subprocess.run(["git", "-C", str(top), "check-ignore", "--stdin"], input="\n".join(kept).encode("utf-8"),
+                           env=env, capture_output=True)
+    except OSError as exc:
+        raise RuntimeError(f"git check-ignore did not run: {exc}") from None
+    if p.returncode not in (0, 1):
+        said = render_said((p.stdout + p.stderr).decode("utf-8", "replace"), "fatal")
+        raise RuntimeError(f"git check-ignore exited {p.returncode}: {said}")
+    ignored = set(p.stdout.decode("utf-8", "replace").replace("\r", "").split("\n")) - {""}
+    return [k for k in kept if k not in ignored], len(ignored)
 
 
 ADOPTER_KITS =("policy", "memory-tree", "kickoff-manifest")  # the planted receipt's kits: no check-line-length

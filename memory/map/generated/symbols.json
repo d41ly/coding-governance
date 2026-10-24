@@ -7273,6 +7273,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "derive_guardable_reads",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_guarded_legs",
       "kind": "function",
       "file": "tools/check-spec-tokens.py"
