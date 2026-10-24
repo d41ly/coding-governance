@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0027@46290183 whole
 
@@ -9,7 +9,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-10-deviation-110.md](../build/2026-10-23-build-TOOL-dSafePassage-10-deviation-110.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-10-deviation-154.md](../build/2026-10-24-build-TOOL-dSafePassage-10-deviation-154.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-10-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-10-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -78,7 +81,7 @@ renames or retires such a surface with no step reds at dSafePassage's step gate 
 
 - **consumes-from** `TOOL-dSafePassage-1` — the `[[upgrade]]` and `[[retired]]` grammar (brief S1, S2) and its one reader in `tools/govkit/upgrade_steps.py` (brief S3); without it the gate has no `surfaces` to read and every vanished member is red
 - **consumes-from** `TOOL-dSafePassage-8` — gov's source-mode receipt `.governance/install.json` (brief S10), the population of the `file` class; without it that class is empty and the gate refuses
-- **consumes-from** external — dGroundRules' policy schema catalogue (`cl-dClosedLoop-0007`), the population of the `policy` class; without it that class is empty and the gate refuses
+- **consumes-from** external — dGroundRules' policy schema catalogue (`cl-dClosedLoop-0007`), `tools/policy/catalogue.toml` (TOOL-dGroundRules-1 S3), whose `[[key]]` names are the population of the `policy` class; without it that class is empty and the gate refuses
 - **hands-off** `TOOL-dSafePassage-13` — the one population reader of S2, which the docs leg imports over the same class registry rather than reading members a second way
 - **hands-off** external — each later build whose class joins the registry writes its own class row, its reader and its plant, as the clause's "each later class joining" sets
 - **hands-off** `TOOL-dSafePassage-21` — the file class reading gov's planned destinations when the tree carries no source receipt, the repair of finding 5
@@ -115,7 +118,7 @@ one spelling every `surfaces` value in this build uses (§8 F4):
 | `command` | each survivor destination shaped `.claude/skills/<name>/SKILL.md`, as `<name>` | the same survivors as `installable` |
 | `agent` | each `<name>` of a tracked `tools/roles/agents/<name>.agent.md` | `git ls-files` over the roles kit's agents |
 | `conf` | each key a descriptor's `[config]` declares in `required_keys_gate`, `required_keys_render` or `defaults`, as `<conf file>#<KEY>` | the descriptors, the lists `read_conf_key_gaps` reads (`govkit.py:5194-5200`) |
-| `policy` | each key the policy schema catalogue holds | the catalogue `cl-dClosedLoop-0007` defines, through its reader |
+| `policy` | each `[[key]]` row's `name` in the policy schema catalogue | `<root>/tools/policy/catalogue.toml` (TOOL-dGroundRules-1 S3) parsed with `tomllib`, so the base worktree and the tip each read their own catalogue (§8 F6) |
 | `verb` | each verb a declared usage source states, as `<cli>:<verb>` | `VERB_SOURCES`: `govkit.py`'s `USAGE` lines (`govkit.py:13588-13599`) and `unattended.sh`'s usage header (`unattended.sh:5-24`, which its own `usage()` reads at `:135-147`) |
 | `entry` | each registry `[[entry]]` row's `id` | `load_registry` (`govkit.py:247-268`) |
 
@@ -199,7 +202,8 @@ in a `finally`. The cases:
 
 The plants of the four classes the clause seeds red: `installable` renames one installed file (a
 `git mv` of its source and its rule's `to`); `agent` renames one agent file; `entry` deletes one
-registry `[[entry]]` row with its descriptor; `policy` deletes one catalogue row.
+registry `[[entry]]` row with its descriptor; `policy` deletes one `[[key]]` table from the clone's
+`tools/policy/catalogue.toml`.
 
 ### Inventory
 
@@ -291,8 +295,9 @@ so the three passes sequence by M6's disjointness rule rather than run concurren
   Red when: the witness union reads the `[[upgrade]]` rows and not the registry's `[[retired]]` rows.
 - **AC5** — When `python "tools/govkit/step_gate.py" --fixture --plant policy` runs, it exits 1 with a
   `RED policy:` line naming the deleted catalogue key; with `--with-row` it exits 0.
-  Red when: the policy class is absent from the registry, or reads the repository's set values in
-  place of the catalogue's keys.
+  Red when: the policy class is absent from the registry, reads the repository's set values in
+  place of the catalogue's keys, or reads one fixed `catalogue.toml` rather than the one under the
+  root it is given, so base and tip read one catalogue and nothing vanishes.
   fixture: needs dGroundRules' catalogue landed, which the build run lands first (§3 Edges).
 - **AC6** — When `python "tools/govkit/step_gate.py" --fixture --plant content-edit` runs, it exits 0
   and its summary line reports 0 vanished.
@@ -368,16 +373,22 @@ New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 · a
   `govkit selfcheck`; an arm of `kit epoch (shipped bytes move, the version moves)`. The clause says
   "a leg", and the brief's S7 fixes the name. RESOLVED (agent, 2026-10-23, delegated): the new leg,
   rung 1, with every row the meta-gates owe it (S8). widens: none · relaxes: none
-- **F6 — The parent is unbuilt.** The `policy` class reads the catalogue `cl-dClosedLoop-0007`
-  defines through the reader whose contract `cl-dClosedLoop-0008` extends (`read_policy_key`), and
-  neither has landed. RESOLVED (agent, 2026-10-23, delegated): rung 1, v2's `[chain]` puts
-  dGroundRules before this build; the build run re-grounds this spec against the landed parent first
-  and spells its catalogue reader as the parent ships it. widens: none · relaxes: none
+- **F6 — How the `policy` class reads the catalogue's keys.** Options:
+  (a) `read_policy_key`, the bash `KEY=value` parser of the legacy homes, which gains no TOML parse
+  (TOOL-dGroundRules-2 S8); (b) `load_catalogue(kit)` imported from the policy kit, which a sibling
+  kit may not import (TOOL-dGroundRules-1, `:105`); (c) a `git show <rev>:<path>` blob read, F1's
+  rejected option (b) for one class, with no revision to name for a tip that is a working tree;
+  (d) `tomllib` over `<root>/tools/policy/catalogue.toml`, taking each `[[key]]` row's `name`.
+  RESOLVED (agent, 2026-10-24, delegated): (d), rung 1, TOOL-dGroundRules-1's catalogue (S3, its
+  loader at `:171`) and its sibling-kit rule (`:105`); the root is the tip's tree or F1's base
+  worktree, so both revisions are read. TOOL-dGroundRules-11's AC5 reads the catalogue the same
+  way. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-21`, `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-24 · §3 · §4 · §6 · §8 · re-grounded on dGroundRules' landed specs by the cross-check record `../build/2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md`, rows 33 and 34: the `policy` class reads `tools/policy/catalogue.toml`'s `[[key]]` names with `tomllib` under each side's root, the Edge, the class row, the plant and AC5 name that file, and F6 is re-resolved on rung 1.
 
 ## 10. Reuse audit
 

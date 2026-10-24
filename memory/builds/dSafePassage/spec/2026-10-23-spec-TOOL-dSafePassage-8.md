@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 3 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0025@4e486ab9 whole
 
@@ -9,7 +9,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-8-deviation-143.md](../build/2026-10-23-build-TOOL-dSafePassage-8-deviation-143.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-8-deviation-152.md](../build/2026-10-24-build-TOOL-dSafePassage-8-deviation-152.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-8-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-8-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -111,7 +114,7 @@ closes `gap-deploy-20`.
 - **consumes-from** `TOOL-dSafePassage-11` — `lib/python-floor-3.15`, the second declared step, whose application to gov is the first the floor makes; without it AC5's receipt lists one step fewer than this landing declares
 - **hands-off** `TOOL-dSafePassage-12` — gov's receipt in the prepared merge, holding `lib/python-floor-3.15` as `applied`, which its AC7 reads
 - **hands-off** `TOOL-dSafePassage-10` — gov's source-mode receipt at `.governance/install.json`, whose `files` rows, one per planned destination, are the step gate's `file` class
-- **consumes-from** external — dGroundRules' minimal guard (`cl-dClosedLoop-0012`) admitting the writes TOOL-dSafePassage-1's two legacy-home steps make to gov's policy file when the lander runs them; if it refuses them, gov first refuses the landing and names the step
+- **consumes-from** external — dGroundRules' minimal guard (`cl-dClosedLoop-0012`) judging gov's policy-file write at TOOL-dSafePassage-1's unit-pass commit, where that unit's §8 F8 (a) runs its `template-size-limits` step's up on gov; the guard never fires at a landing (`memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-6.md:105-107`), so the landing's walk finds that step's witness holding and writes no guarded path; without that unit-pass write, TOOL-dSafePassage-1's AC15 stays red and this unit has no landed step to record
 - **consumes-from** `TOOL-dSafePassage-20` — the writer taking the reader's unlanded value as null; without it every step this landing introduces refuses at its record
 - **hands-off** `TOOL-dSafePassage-21` — the derivation of gov's planned destinations, shared by the source receipt's rows and the step gate's file class, the repair of finding 5
 - **hands-off** `TOOL-dSafePassage-25` — the refused landing removing the untracked files its walk made, the repair of finding 54
@@ -254,8 +257,10 @@ receipt that the landing's own walk would also write.
   are a named `SKIP` in `receipt sync`.
 - observability: the lander prints each step walked and its outcome. The attended path's commit
   subject names the landing, and the receipt names each step's state.
-- risks: TOOL-dSafePassage-1's legacy-home steps write gov's policy file at the landing. If
-  dGroundRules' minimal guard refuses that write, gov first refuses the landing (§3 Edges). A step
+- risks: the guard never sees a landing, since the lander commits through `commit-tree`
+  (`tools/push-main.sh:921`) and `--no-verify` (`:1092`). TOOL-dSafePassage-1's two steps write
+  nothing guarded there: its unit pass migrates gov's policy file under the guard (§3 Edges), and
+  gov tracks no `.agent-cap.conf`, whose absence is the fan-out step's witness. A step
   whose up writes outside the receipt writes those files into the merge, and they land with it.
   That is the point of gov first, and it is named in the lander's output.
 - testing: the probes of §6, and the arms in `tools/push-main.test.sh` and `tools/govkit/selftest.py`
@@ -326,8 +331,9 @@ New arm: tools/push-main.test.sh · covers AC5 AC6 · a fixture landing whose br
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC8 AC9 · gov's own deploy file planned in place, a planted metacharacter in an interpolated answer, and a planted step row with a failing witness on a source-mode clone · none
 New arm: tools/run-gates/check-receipt.py · covers AC7 · its in-file fixtures gain a source-mode receipt whose unhashed row's file is absent, and the same row with a `sha256` · none
 
-What these arms do not check: that the minimal guard admits a step's write to gov's policy file,
-which is dGroundRules' to show, and the attended landing's own commit, which AC5's prepared path
+What these arms do not check: that the minimal guard admits TOOL-dSafePassage-1's write of gov's
+policy file, which that unit's pass meets and dGroundRules shows; that no step writes a guarded path
+at a landing, where no guard fires; and the attended landing's own commit, which AC5's prepared path
 stands in for.
 
 ## 8. Open questions
@@ -369,6 +375,7 @@ stands in for.
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-20`, `TOOL-dSafePassage-21`, `TOOL-dSafePassage-25`, `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-24 · §3 Edges' external line, §5 risks and the note under §7 · the guard never fires at a landing, so it binds TOOL-dSafePassage-1's unit-pass commit and the landing's walk finds that step's witness holding, re-grounded by `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md` row 27; no other section moved.
 
 ## 10. Reuse audit
 
