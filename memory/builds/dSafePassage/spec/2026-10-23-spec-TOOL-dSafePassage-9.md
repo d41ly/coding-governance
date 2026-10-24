@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0026@97d3c99b whole
 **Carries:** node:policy-key.install.retired-edits
@@ -10,7 +10,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-9-deviation-144.md](../build/2026-10-23-build-TOOL-dSafePassage-9-deviation-144.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-9-deviation-153.md](../build/2026-10-24-build-TOOL-dSafePassage-9-deviation-153.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-9-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-9-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -59,10 +62,16 @@ this build: "move hook unwiring, retired-edit orders and stale-lock reclaim into
   run over the edit, and an outbox order written for it. It is never reported `re-rendered`. A row
   whose receipt recorded no render blob cannot prove an edit and is graded as today. Observed by AC8
   and AC9.
-- **S6** — The policy key: one catalogue row for `install.retired-edits`, values `order` and `keep`,
-  default `order`, with its summary and usage as the parent's catalogue clause requires, from v2's
-  `[policies]` row (v2:1406). The value is read from the target's policy, since the choice is the
-  adopter's. Observed by AC10.
+- **S6** — The policy key `install.retired-edits`, owned here. Its `[[key]]` row in the policy kit's
+  catalogue lands with dGroundRules, one row per v2 `[policies]` row in v2's order
+  (TOOL-dGroundRules-1 S3), with `allowed` `order` and `keep`, the default `order` and the owner
+  dSafePassage (v2:1406), no `summary` or `usage`, and its name on the kit's shrink-only list of
+  unsummarised keys (TOOL-dGroundRules-1 S6; both paths in §4 "### Files touched"). This unit adds no
+  row: it fills that row's `summary` and its `usage`, a line the row admits
+  (`install.retired-edits = "keep"`), and drains the name in the same commit with the policy kit's
+  `lists --write` verb. The value is read
+  from the target's committed policy, since the choice is the adopter's (§4 "### The write loop").
+  Observed by AC6 and AC10.
 - **S7** — The fixture, `tools/govkit/fixtures/retired_edits.py`: `--plant <case>` builds a scratch
   gov and an installed target, stages one case, runs `update --write`, and prints each verdict line,
   each order, each settings entry and each receipt role it observed beside what the case expects;
@@ -87,8 +96,9 @@ this build: "move hook unwiring, retired-edit orders and stale-lock reclaim into
 
 ### Edges
 
-- **consumes-from** external — dGroundRules' policy file, its catalogue (`cl-dClosedLoop-0007`) and its reader (`cl-dClosedLoop-0008`, `read_policy_key`); without them the key reads its default, `order`, and S6 has no catalogue to join
+- **consumes-from** external — dGroundRules, landed before the build run: the catalogue `tools/policy/catalogue.toml` holding the `install.retired-edits` row and the shrink-only `tools/policy/unsummarised-keys.txt` this unit drains (TOOL-dGroundRules-1 S3, S6, `cl-dClosedLoop-0007`), the reader `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) with an unset key's catalogue default and its reason (TOOL-dGroundRules-3 S2), and the mirror's `mirror --write` with the guard's mirror shape (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1); without them S6 has no row to fill and the mode has no reader
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
+- **hands-off** `TOOL-dSafePassage-13` — `read_policy_value(key, root)` in `govkit.py`, which this unit defines when it builds before TOOL-dSafePassage-6 and which that unit's docs leg calls for `help.enforce`
 
 ## 4. Design
 
@@ -117,10 +127,19 @@ One arm sits before the write loop's `a["how"] != "table"` guard (`:10518`), for
 `ORDERED_VERDICTS = ("retired-edited", "render-edited")`, so both a first-time engine row and a row
 already carrying the role reach it:
 
-1. `read_retired_edits_mode(target)` reads `install.retired-edits` once per run through the parent's
-   reader, `read_policy_key` (`cl-dClosedLoop-0008`), over the target's policy, default `order`. A
-   value outside `order` and `keep` is a refusal naming the key and both values, and holds the row's
-   kit. The render-edited verdict ignores the mode: it is always ordered.
+1. `read_retired_edits_mode(target)` reads `install.retired-edits` once per run with
+   `read_policy_value("install.retired-edits", target)`, the key literal first, the `.py` call shape
+   TOOL-dGroundRules-8's reader-coverage arm counts. The helper runs `[sys.executable, <policy
+   kit>/policy.py, "get", key, "--explain"]` with the target as its working directory, so gov's reader
+   reads the target's `.governance/policy.toml` as committed at the target's landed revision, `get`'s
+   default: the remote ladder's `<remote>/<branch>`, else local `main` (TOOL-dGroundRules-2 S1, S2,
+   S7). A target that sets no value, or holds no policy file, reads gov's catalogue default `order`
+   with its reason (TOOL-dGroundRules-3 S2), so the target needs no policy kit of its own. `<policy
+   kit>` is `resolve_kit_dir("policy", "policy.py", GOVKIT_DIR)`, the block `govkit.py:196-233`
+   inlines; a kit never imports a sibling kit (TOOL-dGroundRules-1 §4), so the reader is run, never
+   imported. A value outside `order` and `keep`, an exit 2 from `get`, or no policy kit found is a
+   refusal naming the key, carrying the reader's line where it printed one, and holds the row's kit.
+   The render-edited verdict ignores the mode: it is always ordered.
 2. Under `order`, `write_row_order(outbox, kind, row, to_commit, body)` writes
    `.governance/outbox/update-<kind>-<slug>.md`, `<slug>` from `render_order_slug`, with `kind`
    `retired-edited` or `render-edited`. It is the `withdrawn` arm's writer (`:10760-10768`), extracted
@@ -131,6 +150,11 @@ already carrying the role reach it:
 4. A first-time engine row has its `role` set to `retired-edited`; its `path`, `source`, `commit`,
    `gov_oid` and `kit` stay, so later runs classify it from the same fields. The role change moves no
    byte, so a rollback leaves it, as the existing `role-recorded` branch leaves its role (`:9771`).
+
+`read_policy_value(key, root)`, returning the value with the `--explain` line's source and reason,
+lives once, in `govkit.py`. The first of TOOL-dSafePassage-6 and this unit to build, both order 4,
+defines it there; the other, and TOOL-dSafePassage-13, calls it, a module in `tools/govkit/` reaching
+it by importing `govkit` as `tools/govkit/matrix.py:51-52` does.
 
 The order's body says gov no longer ships the file, that the copy carries the target's edit, that
 nothing was deleted, and that deleting the file once the edit has moved lets the next `update` close
@@ -165,14 +189,15 @@ so the entry comes back with the bytes.
 A `retired-edited` row whose target later reverts its edit grids to `withdrawn` and is reported only,
 keeping its role, until `apply` re-records it. A render whose receipt row carries no `oid`, as a
 receipt older than DEPL-dRemeasuredRender-1 does, is never called edited. A hook entry the adopter
-wired by hand, with no fragment row in the receipt, is never unwired.
+wired by hand, with no fragment row in the receipt, is never unwired. A target's policy edit not yet
+on its landed revision is not read: the mode is the committed one.
 
 ### The fixture
 
 `tools/govkit/fixtures/retired_edits.py` builds a scratch gov holding one kit, an engine file, a
 rendered file with a `[[regenerate]]` argv, a hook fragment and a `settings-merge` entry, by copying
 `tools/govkit/govkit.py` into it as `check_update_safety` does (`tools/govkit/selftest.py:1728-1737`),
-installs a target from it, stages the case, and runs `update --write`. A `--stub` run loads the scratch
+and gov's `tools/policy/` kit beside it, where `resolve_kit_dir`'s probe finds it; installs a target from it, stages the case, and runs `update --write`. A `--stub` run loads the scratch
 copy as a module, sets the stubbed name, and calls its `main`, so the break is staged in the copy and
 never in the tree.
 
@@ -184,7 +209,7 @@ never in the tree.
 | `fragment-rollback` | the same, and the kit's check made to red | the entry wired again after the rollback |
 | `edited-gone` | the target edits the engine file, then gov stops shipping it | verdict `retired-edited`, the order written, the receipt role `retired-edited`, the bytes kept under `--write-withdrawals` |
 | `edited-row` | a receipt row already carrying the role | verdict `retired-edited` and the order, no `forked` line |
-| `keep` | `edited-row` under `keep` | the row's line naming `keep`, no order |
+| `keep` | `edited-row`, with `[install] retired-edits = "keep"` committed on the target's local `main`, the scratch target having no remote | the row's line naming `keep`, no order |
 | `render-edited` | the target edits the rendered file | verdict `render-edited`, the kit held back, the order written, the edit's bytes kept |
 | `render-clean` | an unedited render, gov's template moved | `re-rendered`, as today |
 | `dispatch-gap` | `derive_dispatch_gaps` over a copy of `UPDATE_ROLE` lacking the row | one message naming the role |
@@ -198,12 +223,12 @@ A plant exits 0 when every observation matches its case and 1 otherwise.
 Minted: the verdicts `retired-edited` and `render-edited`; the role `retired-edited` and its
 disposition `order`; the constant `ORDERED_VERDICTS`; the functions `derive_dispatch_gaps`,
 `read_retired_edits_mode`, `write_row_order`, `render_retired_edited_line` and
-`check_render_edited` in `govkit.py`, and `run_fixture` and `main` in the fixture module; the
+`check_render_edited` in `govkit.py`, and `read_policy_value` there where this unit builds before TOOL-dSafePassage-6, and `run_fixture` and `main` in the fixture module; the
 `cause` parameter of `remove_wired_fragments`; the order names `update-retired-edited-<slug>.md` and
 `update-render-edited-<slug>.md`; the fixture flags `--plant`, `--stub`, `--write-withdrawals` and
 `--rerender-off`. Naming cells: each minted function passes `py.function`
-(`tools/lexicon/lexicon.py --suggest <name> --as py.function`, OK for all seven). Owned node:
-`policy-key.install.retired-edits`, the catalogue row of S6.
+(`tools/lexicon/lexicon.py --suggest <name> --as py.function`, OK for all seven, and for `read_policy_value` on 2026-10-24). Owned node:
+`policy-key.install.retired-edits`, the catalogue row S6 fills.
 
 ### Migration
 
@@ -218,6 +243,12 @@ Live at landing in gov's own deployer. The deployer never travels, so an adopter
 next `update`. `govkit.py` is also written by TOOL-dSafePassage-6 and TOOL-dSafePassage-10, so the
 three passes sequence rather than run concurrently (M6).
 
+S6 lands as two commits. The first fills the row and drains the list. The second stages only
+`.governance/policy.json` as `policy.py mirror --write` regenerates it, because the mirror records the
+catalogue's blob id and a catalogue edit stales it (TOOL-dGroundRules-5 S1, TOOL-dGroundRules-19), and
+the guard admits a mirror commit only when the policy file and the catalogue equal HEAD
+(TOOL-dGroundRules-19 S1).
+
 ### Files touched (estimate)
 
 - `tools/govkit/govkit.py`
@@ -225,9 +256,9 @@ three passes sequence rather than run concurrently (M6).
 - `tools/govkit/selftest.py`
 - `help/update-edits.md` (new)
 - `help/README.md`
-
-The catalogue row also goes into the catalogue file `cl-dClosedLoop-0007` defines, whose path the
-build run re-grounds against the landed parent (§8 F4) and adds to this unit's `--dispatch --writes`.
+- `tools/policy/catalogue.toml`, the existing row filled
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, the second commit
 
 ### Alternatives rejected
 
@@ -246,7 +277,7 @@ build run re-grounds against the landed parent (§8 F4) and adds to this unit's 
 ## 5. Production-readiness checklist
 
 - security: no new write path into the target beyond the outbox order writer `update` already uses; every path stays under `update`'s containment check (`:10501-10511`); an unwire runs the target's own `settings-merge.py` under the same switch that already gates target-side code.
-- perf / scale: one `git hash-object` per `rendered` row with a recorded `oid`, and one `settings-merge.py --unwire` per withdrawn fragment, each per run.
+- perf / scale: one `git hash-object` per `rendered` row with a recorded `oid`, one `settings-merge.py --unwire` per withdrawn fragment, and one `policy.py get` subprocess, each per run.
 - error / empty / loading states: an unknown key value refuses and holds the kit; a failed unwire keeps the entry and the file and says so; a render with no recorded `oid` is graded as today and the line does not claim an edit.
 - observability: every new verdict prints its row line with its order's path or the mode that kept it; the held kit prints the `HELD BACK` line it prints today.
 - risks: a `retired-edited` row stays in that role after a revert (§4 "### What it does not check"); a target whose renders carry no `oid` gets no edit detection until a render re-stamps them.
@@ -294,11 +325,14 @@ build run re-grounds against the landed parent (§8 F4) and adds to this unit's 
 - **AC9** — When `python "tools/govkit/fixtures/retired_edits.py" --plant render-clean` runs, it exits
   0 with the row `re-rendered` and no order.
   Red when: an unedited render whose output was left unstaged reads as edited.
-- **AC10** — When `git grep -n -e "install.retired-edits"` runs over the catalogue file the parent
-  lands, the key's row carries the values `order` and `keep`, the default `order`, a summary and a
-  usage.
-  Red when: the key lands with no summary or usage, which `cl-dClosedLoop-0007`'s schema refuses.
-  fixture: the catalogue's path is the parent's, re-grounded at the build run (§8 F4).
+- **AC10** — When `python -c "import tomllib; print([(r['allowed'], r['default'], r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'install.retired-edits'])"`
+  runs after the pass, it prints one row, `['order', 'keep']`, `order`, `dSafePassage`, `True`,
+  `True`; `git grep -n -x -F "install.retired-edits" -- "tools/policy/unsummarised-keys.txt"` finds no
+  line; and `git grep -n -F 'read_policy_value("install.retired-edits"' -- tools/govkit/govkit.py`
+  finds one line.
+  Red when: a second row for the key is added, the row keeps no summary or usage, the name stays on the
+  shrink-only list, or the mode is read in a shape the reader-coverage arm does not count.
+  fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds.
 - **AC11** — When `git grep -n -e "retired-edited" -- help/` runs, it finds the page and its line in
   the help index.
   Red when: the state ships with no page under `help/`.
@@ -340,6 +374,14 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC8 AC9 · a
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-24 · §2 S6 · §3 Edges · §4 the write loop, What it does not check, the fixture,
+  Inventory, Rollout, Files touched · §5 perf · AC10 · §10 · re-grounded on dGroundRules' landed specs by
+  `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck` rows 29 to 31, U5 and U6: the
+  `install.retired-edits` row is filled and drained, never added; the mode is read with gov's
+  `policy.py get` run in the target, in a shape the reader-coverage arm counts, through
+  `read_policy_value`, defined once in `govkit.py` by the first of TOOL-dSafePassage-6 and this unit
+  to build, with §3's hands-off to TOOL-dSafePassage-13, which calls it; and the mirror is regenerated
+  in a second commit.
 
 ## 10. Reuse audit
 
@@ -349,7 +391,8 @@ dispatch `UPDATE_ROLE` (`:8478-8503`) and `UNLANDED_REASON` (`:405-421`), whose 
 extracted into `write_row_order` at its second caller; `remove_wired_fragments` (`:6180-6193`) and
 `run_fragment_merges` (`:6109-6177`), reused for the unwire and its rollback; the hold region and
 `_add_held` (`:9659-9670`); and the render stamp `measure_rendered_rows` (`:9081-9122`), whose `oid`
-the edit test compares against. `reuse_lookup.py "unwire a hook fragment from the settings file"`
+the edit test compares against; and dGroundRules' `policy.py get`, run as a subprocess from the policy
+kit `resolve_kit_dir` (`:196-233`) finds, the one reader of `install.retired-edits`. `reuse_lookup.py "unwire a hook fragment from the settings file"`
 ranked `run_fragment_merges` and the six wired hooks of the `harness-hooks` inventory, which is the
 seam taken; `reuse_lookup.py "write an outbox order for a file gov no longer ships"` ranked generic
 writers (`write`, `write_text`, `write_record`) and no order writer, because the `withdrawn` arm's is

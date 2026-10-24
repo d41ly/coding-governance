@@ -128,7 +128,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | DEFERRED | rev-6 | 2026-10-23 |
+| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | DEFERRED | rev-7 | 2026-10-24 |
 | [TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it](spec/2026-10-23-spec-TOOL-dSafePassage-3.md) | 1 | 2 | DEFERRED | rev-5 | 2026-10-23 |
 | [TOOL-dSafePassage-16 — the step record's precondition, one predicate beside its one writer, and the schema-4 bootstrap it answers](spec/2026-10-23-spec-TOOL-dSafePassage-16.md) | 2 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left](spec/2026-10-23-spec-TOOL-dSafePassage-2.md) | 2 | 2 | DEFERRED | rev-5 | 2026-10-23 |
@@ -136,31 +136,31 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-4 — down steps in reverse, and the recorded rollback that lifts the downgrade refusal](spec/2026-10-23-spec-TOOL-dSafePassage-4.md) | 2 | 2 | DEFERRED | rev-5 | 2026-10-23 |
 | [TOOL-dSafePassage-43 — the step row's one writer admits a stopped down's failure on an `applied` row, by one declared prefix set, and refuses every other](spec/2026-10-23-spec-TOOL-dSafePassage-43.md) | 2 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-7 — the step kind's isolation contract, and the check of its needs-target field](spec/2026-10-23-spec-TOOL-dSafePassage-7.md) | 2 | 2 | DEFERRED | rev-5 | 2026-10-23 |
-| [TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step](spec/2026-10-23-spec-TOOL-dSafePassage-11.md) | 3 | 2 | DEFERRED | rev-3 | 2026-10-23 |
+| [TOOL-dSafePassage-11 — the interpreter floor at Python 3.15, declared once, refused below by the resolver, and raised as the second upgrade step](spec/2026-10-23-spec-TOOL-dSafePassage-11.md) | 3 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dSafePassage-12 — gov's remote CI at the interpreter floor, read from its one declaration, with the floor's preflight as the bar's first step](spec/2026-10-23-spec-TOOL-dSafePassage-12.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-15 — the walk persists no step row below schema 4, so a schema-3 receipt reaches the schema step](spec/2026-10-23-spec-TOOL-dSafePassage-15.md) | 3 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 | [TOOL-dSafePassage-18 — the reverse walk writes no row once a down leaves the receipt below schema 4](spec/2026-10-23-spec-TOOL-dSafePassage-18.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-19 — a rollback past the schema step stamps schema 3 with no `steps`, finishes its record, and converges after a kill](spec/2026-10-23-spec-TOOL-dSafePassage-19.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-22 — the lock reclaim reads its clock before the census, so a slow census errs toward live](spec/2026-10-23-spec-TOOL-dSafePassage-22.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-24 — a step is refused when the target's own git config declares an executor or a credential](spec/2026-10-23-spec-TOOL-dSafePassage-24.md) | 3 | 2 | DEFERRED | rev-3 | 2026-10-23 |
-| [TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt](spec/2026-10-23-spec-TOOL-dSafePassage-8.md) | 3 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip](spec/2026-10-23-spec-TOOL-dSafePassage-10.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dSafePassage-8 — gov first for every step: the lander walks each new step on gov's own tree, recorded in gov's source-mode receipt](spec/2026-10-23-spec-TOOL-dSafePassage-8.md) | 3 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dSafePassage-10 — the step gate: the adopter-visible surface population diffed between a landing's base and its tip](spec/2026-10-23-spec-TOOL-dSafePassage-10.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dSafePassage-17 — a down is judged by its row's declared `reverted` rule, and a down with no before-image by its exit](spec/2026-10-23-spec-TOOL-dSafePassage-17.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-23 — the resolver keeps an override's own name, and prefers the direct executable only for the launcher names](spec/2026-10-23-spec-TOOL-dSafePassage-23.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-25 — a refused gov-first landing removes the untracked files its walk made](spec/2026-10-23-spec-TOOL-dSafePassage-25.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-29 — the step contract's refused keys are the class git's own config list derives, held to it by an arm](spec/2026-10-23-spec-TOOL-dSafePassage-29.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-30 — the step contract's config check reads every repository git can enter from the target, its submodules included](spec/2026-10-23-spec-TOOL-dSafePassage-30.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-32 — the reuse estimate compares like clocks: a POSIX census row is judged on the kernel's boot clock, never the wall clock](spec/2026-10-23-spec-TOOL-dSafePassage-32.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window](spec/2026-10-23-spec-TOOL-dSafePassage-6.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered](spec/2026-10-23-spec-TOOL-dSafePassage-9.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce](spec/2026-10-23-spec-TOOL-dSafePassage-13.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-23 |
+| [TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window](spec/2026-10-23-spec-TOOL-dSafePassage-6.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered](spec/2026-10-23-spec-TOOL-dSafePassage-9.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce](spec/2026-10-23-spec-TOOL-dSafePassage-13.md) | 5 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dSafePassage-21 — the step gate's `file` class reads gov's planned destinations when no source receipt is on the tree](spec/2026-10-23-spec-TOOL-dSafePassage-21.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-27 — the prepared landing's one untracked snapshot, taken before the walk, serves the regeneration's refusal too](spec/2026-10-23-spec-TOOL-dSafePassage-27.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-28 — every refusal of the prepared landing after the walk leaves a clean tree, gated as a class](spec/2026-10-23-spec-TOOL-dSafePassage-28.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-33 — a missing before-image means "never ran" only for a row the forward walk applied by witness alone, recorded as such](spec/2026-10-23-spec-TOOL-dSafePassage-33.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-36 — the config check walks the target worktree's own git directory for submodules, so a linked worktree's submodules are graded](spec/2026-10-23-spec-TOOL-dSafePassage-36.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-37 — the refused-key predicate keeps every key named as a hook, and the step environment closes the `ext::` transport by one command-scope pair](spec/2026-10-23-spec-TOOL-dSafePassage-37.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install](spec/2026-10-23-spec-TOOL-dSafePassage-5.md) | 5 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them](spec/2026-10-23-spec-TOOL-dSafePassage-26.md) | 6 | 2 | DEFERRED | rev-4 | 2026-10-23 |
 | [TOOL-dSafePassage-39 — the step row's `via` mark survives every rewrite that keeps the row `applied`, so the reverse walk's own records cannot erase it](spec/2026-10-23-spec-TOOL-dSafePassage-39.md) | 6 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-40 — the forward walk marks a row `via: witness` only when nothing records that its up ever ran](spec/2026-10-23-spec-TOOL-dSafePassage-40.md) | 6 | 2 | DEFERRED | rev-1 | 2026-10-23 |
@@ -188,7 +188,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 124 bound to this build, across 4 record folder(s).
+Records: 142 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

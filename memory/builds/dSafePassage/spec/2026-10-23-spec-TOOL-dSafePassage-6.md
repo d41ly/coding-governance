@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0023@6e1e2e99 whole
 **Carries:** node:policy-key.install.deprecation-window
@@ -11,7 +11,10 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-6-deviation-137.md](../build/2026-10-23-build-TOOL-dSafePassage-6-deviation-137.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-6-deviation-151.md](../build/2026-10-24-build-TOOL-dSafePassage-6-deviation-151.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -47,10 +50,13 @@ then".
 - **S4** — The call, under `install.on-shim-call`. Under `warn`, the default, the forwarder prints
   one stderr line naming the old path, the new path and that the forwarder is held only until its
   window closes, and adds one journal line. Under `journal` it adds the journal line and prints
-  nothing. An unset key or an absent policy file reads `warn`; a value outside the two reads `warn`
-  and the stderr line says the value was not understood. The journal line carries the time, the shim
-  id, `from`, `to` and the mode, and never the call's arguments. Neither branch ever blocks the
-  forward. Observed by AC4 and AC5.
+  nothing. The value is the adopter's committed policy at its landed revision, as the parent's reader
+  answers it, so an unset key or an absent policy file reads the catalogue default `warn`. A value
+  outside the two never reaches the forwarder: the reader answers the last valid revision's value or
+  refuses (TOOL-dGroundRules-4 S5). A read that fails, a refusal or a missing policy kit included,
+  reads `warn`, and the stderr line adds that the policy could not be read. The journal line carries
+  the time, the shim id, `from`, `to` and the mode, and never the call's arguments. Neither branch
+  ever blocks the forward. Observed by AC4 and AC5.
 - **S5** — The window, under `install.deprecation-window`. A row may be set `closed = true` only when
   at least one release has been cut and at least the window's count of releases has been cut since
   the commit that landed the row on the default branch. With no release cut every row is held,
@@ -60,15 +66,20 @@ then".
 - **S6** — The check in the deployer's own selfcheck, a new arm 11: it runs S2's comparison and S5's
   window over the declared rows and prints how many rows it graded, a zero included, since gov ships
   no shim today. Observed by AC8.
-- **S7** — The two catalogue rows, each with its summary and usage as `cl-dClosedLoop-0007` requires:
-  `install.deprecation-window`, values 0, 1, 2 or 4, default 2; and `install.on-shim-call`, values
-  `warn` or `journal`, default `warn`, both from v2's `[policies]` rows (v2:1404-1405). Observed by AC9.
+- **S7** — The two keys. dGroundRules lands both catalogue rows from v2's `[policies]` rows
+  (v2:1404-1405) with their allowed values, default and owner, and with no `summary` or `usage`, on
+  its shrink-only list (TOOL-dGroundRules-1 S3, S6): `install.deprecation-window`, values 0, 1, 2 or
+  4, default 2; and `install.on-shim-call`, values `warn` or `journal`, default `warn`. This unit
+  fills each row's `summary` and `usage` as `cl-dClosedLoop-0007` requires and drains both names
+  with `policy.py lists --write` in the same commit. It adds no row. Each key keeps a reader in a
+  shape the parent's reader-coverage arm counts (TOOL-dGroundRules-8, its Readers table). Observed by
+  AC9.
 - **S8** — The fixture, on the generator's own CLI: `--fixture --plant <case>` builds a scratch git
   repository with a planted moved surface, its forwarder and its target, runs the forwarder, and
   prints what it observed beside what the case expects. Observed by AC3 to AC7.
 - **S9** — The docs: a page `help/shims.md` saying what an adopter sees when it calls a moved path,
-  the two modes, where the journal is, and how long a forwarder is held, and its line in
-  `help/README.md`. Observed by AC10.
+  the two modes and that a mode is read from the committed policy at its landed revision, where the
+  journal is, and how long a forwarder is held, and its line in `help/README.md`. Observed by AC10.
 
 ## 3. Non-goals (OUT)
 
@@ -93,8 +104,9 @@ then".
 
 ### Edges
 
-- **consumes-from** external — dGroundRules' policy file, its catalogue (`cl-dClosedLoop-0007`) and its reader (`cl-dClosedLoop-0008`, `read_policy_key`), and the JSON mirror the catalogue clause defines; without them both keys read their defaults and S7 has no catalogue to join
+- **consumes-from** external — dGroundRules, landed before the build run: the catalogue `tools/policy/catalogue.toml` with both rows and the list `tools/policy/unsummarised-keys.txt` (TOOL-dGroundRules-1 S3, S6), the reader `policy.py get` at the landed revision with the catalogue default and its reason (TOOL-dGroundRules-2 S7, TOOL-dGroundRules-3), its shell half `policy-shim.sh get` and the mirror's one reader `readPolicy` (TOOL-dGroundRules-5 S5, S6); without them S7 has no rows to fill, every forwarder's read fails and reads `warn`, and the window's read refuses and holds every closed row
 - **hands-off** external — dShippedRelease replaces the release stand-in with its release tags and reads the journal for the adopter view; dConvergedCharter closes each forwarder whose window has closed
+- **hands-off** `TOOL-dSafePassage-13` — `read_policy_value(key, root)` in `govkit.py`, which this unit defines when it builds before TOOL-dSafePassage-9 and which that unit's docs leg calls for `help.enforce`
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
@@ -130,19 +142,27 @@ work tree journals nothing and says so on stderr.
 
 ### The forwarders
 
-One template per language, rendered by `render_shim(row)`, each opening with its marker line and a
-prelude that reads `install.on-shim-call` and acts as S4 says:
+One template per language, a string constant in `tools/govkit/shims.py` rendered by
+`render_shim(row)`, each opening with its marker line and a prelude that reads
+`install.on-shim-call` through the parent's reader for its language and acts as S4 says:
 
 | Language | Reads the key through | Forwards by |
 |---|---|---|
-| `sh` | the bash reader whose contract `cl-dClosedLoop-0008` extends, `read_policy_key`, carried inline as a copy-installed kit carries `tools/lib` | `exec bash "$here/<to, relative>" "$@"` |
-| `js` | the JSON mirror `cl-dClosedLoop-0007` defines, parsed with `JSON.parse` | `spawnSync(process.execPath, [target, ...args], {stdio: "inherit"})`, then `process.exit` with its status |
-| `py`, `command` | the same JSON mirror, parsed with `json` | `runpy.run_path(target, run_name="__main__")` with `sys.argv[0]` set to the target |
-| `py`, `module` | the same JSON mirror, at import | `importlib.util.spec_from_file_location`, executed, then `sys.modules[__name__]` set to it |
+| `sh` | `bash "$policy/policy-shim.sh" get install.on-shim-call`, the policy kit's shell half, which resolves Python itself and prints `get --json` (TOOL-dGroundRules-5 S6, S7); the mode is `journal` only when that output ends `"value": "journal"}`, the last of its sorted keys | `exec bash "$here/<to, relative>" "$@"` |
+| `js` | `require(<policy>/policy-mirror.js).readPolicy("install.on-shim-call", { repo: process.cwd() })`, the mirror's one reader (TOOL-dGroundRules-5 S5) | `spawnSync(process.execPath, [target, ...args], {stdio: "inherit"})`, then `process.exit` with its status |
+| `py`, `command` | `subprocess.run([sys.executable, <policy>/policy.py, "get", "install.on-shim-call"])`, the reader's CLI (TOOL-dGroundRules-2 S7) | `runpy.run_path(target, run_name="__main__")` with `sys.argv[0]` set to the target |
+| `py`, `module` | the same call, at import | `importlib.util.spec_from_file_location`, executed, then `sys.modules[__name__]` set to it |
 
-Each reads the value of the repository it runs in, never gov's, since the mode is the adopter's.
-A prelude whose read fails for any reason takes `warn` and forwards anyway, so a broken policy file
-never breaks the adopter's call.
+`<policy>` is the policy kit's directory, written at render as the path from the forwarder's own
+directory to `{prefix}/policy/`, resolved as `to` is (§8 F7). Each read runs in the caller's working
+directory, so it answers the repository the call runs in, never gov's, since the mode is the
+adopter's. It reads that repository's committed policy at its landed revision, never its working
+tree (TOOL-dGroundRules-2 S2). No template spells the mirror's path, which `arm_mirror_readers` reds
+in tracked code outside the policy kit (TOOL-dGroundRules-5 S9). The `js` template writes its call on
+one line with unescaped double quotes, so the reader-coverage arm counts it in
+`tools/govkit/shims.py` as `install.on-shim-call`'s reader. A prelude whose read fails for any reason
+takes `warn` and forwards anyway, so a broken policy file or an absent policy kit never breaks the
+adopter's call.
 
 ### The window
 
@@ -160,9 +180,17 @@ never breaks the adopter's call.
 4. A `closed = true` row that is held is one refusal line naming the row, its landing, the release
    count and the window.
 
-The window value is gov's own, read from gov's policy file through `read_policy_key`
-(`cl-dClosedLoop-0008`), default 2: gov decides when it takes a forwarder away, and the adopter's
-currency budget is what the pair rule binds it to.
+The window value is gov's own: gov decides when it takes a forwarder away, and the adopter's
+currency budget is what the pair rule binds it to. `shims.py` imports govkit as
+`tools/govkit/matrix.py:51-52` does and calls `govkit.read_policy_value("install.deprecation-window",
+root)`. That function, `read_policy_value(key, root)`, lives once in `tools/govkit/govkit.py` beside
+its `resolve_kit_dir` block (`:196-233`), and specs 9 and 13 call the same one. It runs
+`<sys.executable> <policy kit>/policy.py get <key>` with `root` as its working directory, so it reads
+the committed policy at the landed revision, `get`'s default, and an unset key reads the catalogue
+default 2. govkit reaches the policy kit as a subprocess and never imports it, finding it with that
+`resolve_kit_dir`, called from the directory holding govkit itself. A refused read, or no policy kit
+found, holds every `closed = true` row, its refusal line carrying the reader's line. The call's first
+argument is the key as a literal, the `.py` shape the reader-coverage arm counts.
 
 ### The selfcheck arm
 
@@ -180,15 +208,19 @@ python tools/govkit/shims.py --fixture --plant window --window <0|1|2|4> --relea
 python tools/govkit/shims.py --fixture --plant parity-edit
 ```
 
-A forwarding plant builds a scratch repository under `tempfile.mkdtemp(prefix="shim-")` holding a
-target that prints its arguments and its stdin and exits 3, and the forwarder `render_shim` makes for
-a planted row whose `from` is the retired path; it sets the mode in the scratch policy file and its
-mirror, runs the forwarder with the arguments `a` and `b c` and the stdin `in`, and prints one line per
-observation: the exit, the arguments and stdin the target saw, the stderr line or none, and the
-journal line count. A window plant commits a landed row, then `<n>` commits it passes as the release
-list, sets the window in the scratch policy file and grades a `closed = true` row. Every plant exits 0
-when each observation matches its case and 1 otherwise, and 2 when it cannot observe (`node` not
-found for `js`).
+A forwarding plant builds a scratch repository under `tempfile.mkdtemp(prefix="shim-")`, on a `main`
+branch with no remote, holding a copy of gov's policy kit, a target that prints its arguments and its
+stdin and exits 3, and the forwarder `render_shim` makes for a planted row whose `from` is the retired
+path. It commits the mode in the scratch policy file, then renders the mirror with the copied kit's
+`policy.py mirror --write` and commits it, so the `js` plant reads a fresh mirror and `shims.py`
+never spells the mirror's path. `unset` commits no policy file. `bogus` commits a value the catalogue
+refuses as the file's only revision, so the reader refuses and `mirror --write` refuses with it,
+leaving no mirror. The plant runs the forwarder with the arguments `a` and `b c` and the stdin `in`,
+and prints one line per observation: the exit, the arguments and stdin the target saw, the stderr
+line or none, and the journal line count. A window plant commits the window in the scratch policy
+file, then a landed row, then `<n>` commits it passes as the release list, and grades a
+`closed = true` row. Every plant exits 0 when each observation matches its case and 1 otherwise, and
+2 when it cannot observe (`node` not found for `js`).
 
 ### Inventory
 
@@ -196,12 +228,15 @@ Minted: the module `tools/govkit/shims.py`; the file `tools/govkit/shims.toml` a
 keys `id`, `kind`, `from`, `to` and `closed`; the kinds `command`, `hook` and `module`; the marker
 `gov:shim`; the journal path `govkit/shim-calls.jsonl` under the git directory; the functions
 `read_shim_rows`, `render_shim`, `write_shims`, `check_shim_parity`, `read_releases`,
-`resolve_shim_landing`, `derive_shim_window`, `check_shim_windows`, `run_fixture` and `main`; the CLI
-flags `--write`, `--check`, `--fixture`, `--plant`, `--mode`, `--window`, `--releases` and
-`--unlanded`; selfcheck arm 11. Naming cells: each minted function passes `py.function`
-(`tools/lexicon/lexicon.py --suggest <name> --as py.function`, OK for all ten); the rest fall in no
-declared cell. Owned nodes: `policy-key.install.deprecation-window` and
-`policy-key.install.on-shim-call`, the two catalogue rows of S7.
+`resolve_shim_landing`, `derive_shim_window`, `check_shim_windows`, `run_fixture` and `main`; the
+CLI flags `--write`, `--check`, `--fixture`, `--plant`, `--mode`, `--window`, `--releases` and
+`--unlanded`; selfcheck arm 11. `read_policy_value` is defined in `tools/govkit/govkit.py` by
+whichever of this unit and TOOL-dSafePassage-9 builds first, both at order 4; the other calls it.
+Naming cells: each minted function passes `py.function` (`tools/lexicon/lexicon.py --suggest <name>
+--as py.function`, OK for all eleven, `read_policy_value` on 2026-10-24); the rest fall in no
+declared cell. Owned nodes:
+`policy-key.install.deprecation-window` and `policy-key.install.on-shim-call`, the two catalogue rows
+S7 fills.
 
 ### Migration
 
@@ -213,20 +248,29 @@ changes until a later build declares a row.
 Live at landing, dark in effect, since no row exists. The deployer never travels, so the generator
 and the arm are gov-side only; only rendered forwarders reach an adopter, through the ordinary engine
 rows of the kit whose surface moved. `govkit.py` is also written by TOOL-dSafePassage-9 and
-TOOL-dSafePassage-10, so the three passes sequence rather than run concurrently (M6).
+TOOL-dSafePassage-10, so the three passes sequence rather than run concurrently (M6). A kit carrying a
+forwarder declares no `requires` on the policy kit: without one, its forwarder reads `warn`.
+
+S7 lands as two commits. The first fills the two rows and drains the list. The second holds only
+`.governance/policy.json` as `policy.py mirror --write` regenerates it: the mirror records the
+catalogue's blob id (TOOL-dGroundRules-5 S1), so filling a row stales it, and the guard admits a
+mirror commit only when the policy file and the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
 ### Files touched (estimate)
 
 - `tools/govkit/shims.py` (new)
 - `tools/govkit/shims.toml` (new)
-- `tools/govkit/govkit.py`
+- `tools/govkit/govkit.py` (selfcheck arm 11, and `read_policy_value` where this unit builds before
+  TOOL-dSafePassage-9)
 - `tools/govkit/selftest.py`
 - `tools/gate-legs.json`
 - `help/shims.md` (new)
 - `help/README.md`
+- `tools/policy/catalogue.toml`
+- `tools/policy/unsummarised-keys.txt`
+- `.governance/policy.json`, regenerated, in its own commit
 
-The two catalogue rows also go into the catalogue file `cl-dClosedLoop-0007` defines, whose path the
-build run re-grounds against the landed parent (§8 F5) and adds to this unit's `--dispatch --writes`.
+The last three are dGroundRules' files, which the build run adds to this unit's `--dispatch --writes`.
 
 ### Alternatives rejected
 
@@ -244,11 +288,11 @@ build run re-grounds against the landed parent (§8 F5) and adds to this unit's 
 
 ## 5. Production-readiness checklist
 
-- security: a forwarder forwards to a path fixed at render and relative to itself, never one read from the environment or the call; the journal never records arguments, so a secret passed on a command line stays off disk; the prelude reads a policy value and nothing else.
-- perf / scale: one policy read and one appended line per forwarded call; a `py` or `js` forwarder adds one interpreter start, a `sh` one none beyond the `exec`.
-- error / empty / loading states: an unreadable policy file reads `warn`; no git work tree journals nothing and says so; `node` absent makes the `js` fixture exit 2, never a pass; an empty declaration grades zero rows and prints the zero.
+- security: a forwarder forwards to a path fixed at render and relative to itself, and reads through a policy kit at a path fixed the same way, never one read from the environment or the call; the journal never records arguments, so a secret passed on a command line stays off disk; the prelude reads one policy value, committed at the landed revision and never from the working tree, and nothing else.
+- perf / scale: one policy read and one appended line per forwarded call. The read spawns the parent's reader: the shim, a Python start and its git calls from `sh`; the mirror helper's shim and git calls from `js`, which the parent prices near 0.3 s (TOOL-dGroundRules-5 §5, UNVERIFIED); a Python start from `py`. A `py` or `js` forwarder adds one interpreter start of its own, a `sh` one none beyond the `exec`.
+- error / empty / loading states: a refused or failed policy read reads `warn` and says so; a refused window read holds every closed row; no git work tree journals nothing and says so; `node` absent makes the `js` fixture exit 2, never a pass; an empty declaration grades zero rows and prints the zero.
 - observability: the stderr line under `warn`, the journal line under both modes, and the selfcheck arm's row count.
-- risks: the policy reader's spelling in each language waits on the parent (§8 F2, F5); a forwarder whose target moved again forwards to nothing, which `--check` cannot see and the step gate does, as a vanished member.
+- risks: a policy kit homed away from `{prefix}/policy/` makes every forwarder read `warn` whatever the adopter set (§8 F7); a forwarder whose target moved again forwards to nothing, which `--check` cannot see and the step gate does, as a vanished member.
 - testing: the fixture plants, run by AC3 to AC7 and by the new selftest arm (§7).
 - migration: additive; §4 "### Migration".
 - user docs: `help/shims.md` and its `help/README.md` line (S9).
@@ -272,8 +316,9 @@ build run re-grounds against the landed parent (§8 F5) and adds to this unit's 
   Red when: a forwarder drops an argument, splits `b c`, loses stdin or exits 0 over the target's 3.
 - **AC4** — When `python "tools/govkit/shims.py" --fixture --plant <lang> --mode warn` runs for each
   language, it exits 0 with one stderr line naming both paths and one journal line; `--mode unset`
-  and `--mode bogus` observe the same, and `bogus` adds that the value was not understood.
-  Red when: an unset key reads as `journal` or as silence, or an unknown value blocks the call.
+  and `--mode bogus` observe the same, and `bogus`'s stderr line adds that the policy could not be
+  read.
+  Red when: an unset key reads as `journal` or as silence, or a refused read blocks the call.
 - **AC5** — When `python "tools/govkit/shims.py" --fixture --plant <lang> --mode journal` runs for each
   language, it exits 0 with no stderr line and one journal line, which carries the shim id, both
   paths and the mode and none of the arguments.
@@ -302,11 +347,15 @@ build run re-grounds against the landed parent (§8 F5) and adds to this unit's 
   does not hold.
   permission: the arm's own output is the `govkit selfcheck` leg's, which the main loop reads at the
   close; a build pass observes the wiring and the function directly.
-- **AC9** — When `git grep -n -e "install.deprecation-window" -e "install.on-shim-call"` runs over the
-  catalogue file the parent lands, each key's row carries its Allowed values, its default, a summary
-  and a usage.
-  Red when: a key lands with no summary or usage, which `cl-dClosedLoop-0007`'s schema refuses.
-  fixture: the catalogue's path is the parent's, re-grounded at the build run (§8 F5).
+- **AC9** — When `python -c "import tomllib; k = ('install.deprecation-window', 'install.on-shim-call'); print([(r['name'], r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] in k])"`
+  runs, it prints exactly two tuples, each owned by `dSafePassage` with both flags `True`;
+  `python "tools/policy/policy.py" lists --check` exits 0, and `grep -c -e install.deprecation-window -e install.on-shim-call "tools/policy/unsummarised-keys.txt"`
+  prints `0`; and `git grep -n -e 'readPolicy("install.on-shim-call"' -e 'read_policy_value("install.deprecation-window"' -- "tools/govkit/shims.py"`
+  prints both lines.
+  Red when: a key keeps no summary or usage, stays on the list, gains a second row, or loses the
+  reader the parent's reader-coverage arm counts.
+  fixture: the catalogue and the list are dGroundRules', untracked until it builds, so their paths
+  are quoted as its own criteria quote them (TOOL-dGroundRules-1 §6).
 - **AC10** — When `git grep -n -e "on-shim-call" -- help/` runs, it finds the page and its line in the
   help index.
   Red when: the forwarders ship with no page under `help/`.
@@ -314,6 +363,10 @@ build run re-grounds against the landed parent (§8 F5) and adds to this unit's 
 ## 7. Gates
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
+
+dGroundRules' policy legs, `policy check` and `policy fixtures`, run `arm_summaries`,
+`arm_mirror_parity`, `arm_mirror_readers` and the reader-coverage arm over this unit's files; they
+are named here rather than on the leg line, because neither exists at this spec's base.
 
 New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · a new arm runs the generator's fixture over every language and mode and every window pair of AC6, asserting each exit · none
 New arm: tools/govkit/govkit.py · covers AC8 · selfcheck arm 11, its failing case staged by a fixture declaration holding one `closed = true` row with no release cut · none
@@ -326,14 +379,16 @@ New arm: tools/govkit/govkit.py · covers AC8 · selfcheck arm 11, its failing c
   is §4's first rejected alternative. RESOLVED (agent, 2026-10-23, delegated): (a), rung 3, the
   most feature-rich survivor. widens: none · relaxes: none
 - **F2 — How a forwarder reads `install.on-shim-call` in each language.** Options: (a) each reads
-  the JSON mirror `cl-dClosedLoop-0007` defines, with the bash forwarder shelling to an interpreter
-  for it; (b) the `sh` forwarder carries the bash `read_policy_key` the parent extends, and the
-  `py` and `js` forwarders read the JSON mirror with their stdlib; (c) every forwarder reads the
-  TOML file directly. (c) misses a value a preset assigns, and (a) makes a bash forwarder depend on a
-  resolved interpreter. RESOLVED (agent, 2026-10-23, delegated): (b), rung 1: `cl-dClosedLoop-0008`
-  names `read_policy_key`'s contract as the reader, and its bash form is today's
-  (`tools/push-main.sh:404`). The build run re-grounds both spellings against the landed parent.
-  widens: none · relaxes: none
+  the JSON mirror directly, the bash forwarder shelling to an interpreter for it; (b) the `sh`
+  forwarder carries the bash `KEY=value` parser `read_policy_key`, and the
+  `py` and `js` forwarders parse the mirror with their stdlib; (c) every forwarder parses the TOML
+  file directly; (d) each calls the parent's reader for its language: `policy-shim.sh get` from
+  `sh`, `readPolicy` from `js`, `policy.py get` from `py`. (c) misses the resolution order and reads
+  the working tree. RESOLVED (agent, 2026-10-24, delegated): (d), rung 1, the parent's landed specs.
+  TOOL-dGroundRules-2 S8 keeps that parser `KEY=value` only, with no TOML parse, which rules out (b);
+  TOOL-dGroundRules-5 S5 and S9 make `readPolicy` the mirror's one reader and red any other tracked
+  code naming the mirror, which rules out (a) and (b); and its non-goals send Python and shell to the
+  reader. widens: none · relaxes: none
 - **F3 — Where a call is journaled.** Options: under the git directory; under `.governance/outbox/`;
   a user-level directory outside the repository. The outbox dirties the adopter's tree on every
   call, and a user-level path is a new install location, veto 2. RESOLVED (agent, 2026-10-23,
@@ -358,11 +413,29 @@ New arm: tools/govkit/govkit.py · covers AC8 · selfcheck arm 11, its failing c
   rung 1: a row landed before the first release counts that release as its first, which is SA-8's
   "windows start at the first cut release, every earlier shim held until then". widens: none ·
   relaxes: none
+- **F7 — How a forwarder finds the policy kit it reads through.** Options: (a) a path from the
+  forwarder's own directory to `{prefix}/policy/`, written at render as `to` is; (b) `resolve_kit_dir`'s
+  receipt and probe, the rule TOOL-dGroundRules-9 gives a copy-installed enforcer, with each kit that
+  carries a forwarder declaring `requires` on the policy kit; (c) a path read from the environment.
+  (c) lets the call's environment choose the code a forwarder runs, a wider surface than §5's
+  security line prices, veto 3. (b) exists as Python only: each `py` template would carry the gated
+  block, the `sh` template would resolve Python before its read, and JavaScript has no copy, the port
+  TOOL-dGroundRules-5 F5 rejected, so `js` would be left a rule of its own to find. (a) is one rule
+  for four languages, and its miss, a policy kit homed elsewhere, reads `warn`, the key's default.
+  Both meet every criterion. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3, tie-broken by
+  fewer open questions and by reuse of S3's own render rule. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-24 · S4 S7 S9 · §3 · §4 · §5 · AC4 AC9 · §7 · §8 F2 F7 · §10 · re-grounded on
+  dGroundRules' landed specs by `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md`,
+  rows 19 to 22 and U5 to U7: S7 fills the two landed rows and drains the list, each forwarder reads
+  through the parent's reader, the window through `policy.py get`, the regenerated mirror lands in
+  its own second commit, `read_policy_value` lives once in `govkit.py` for specs 6, 9 and 13, with a §3 hands-off edge
+  to TOOL-dSafePassage-13, F2
+  re-resolved on rung 1, F7 added.
 
 ## 10. Reuse audit
 
@@ -375,9 +448,12 @@ its new location and warn"` ranked path helpers only: `resolve_charter_path` and
 `resolve_harness_path` (`tools/roles/roles_lib.py`), `test_routed_path`
 (`tools/memory-tree/routed_commits.py`) and `alias_path` (`tools/agent-instructions/adopt-agent-instructions.sh`),
 none of which forwards a call; `alias_path` maps a file name to its agent alias and writes nothing at
-an old path. The map knows the bash `read_policy_key` copies (`tools/push-main.sh:404`,
-`tools/run-gates/post-merge.sh:171`, `tools/unattended/unattended.sh:9517`), which F2's `sh`
-forwarder follows. Where a record and the source disagree: the supersession research's candidate B
+an old path. The map knows the bash `KEY=value` parser `read_policy_key` and its copies
+(`tools/push-main.sh:404`, `tools/run-gates/post-merge.sh:171`, `tools/unattended/unattended.sh:9517`),
+which the parent keeps for the legacy homes only, so F2 reads through the parent's readers instead.
+`reuse_lookup.py "locate a sibling kit's script from a deployer module and run it as a subprocess"`
+ranked `resolve_kit_dir` a seam with 72 installs, inlined in `tools/govkit/govkit.py:196-233`, which
+the window's read reuses. Where a record and the source disagree: the supersession research's candidate B
 cites "a forwarder that warns" as gov practice in two places, `map_lib`'s re-export and `/unattended`
 as a client of `run`, and neither exists in the tree at `3708a705`; both are v2's plans. The recall
 probe found the clause, v2's three `[policies]` rows (v2:1404-1406), the away pass's closing review

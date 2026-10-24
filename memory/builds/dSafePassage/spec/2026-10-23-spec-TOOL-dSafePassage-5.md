@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-5 — the release-0 fixture tree and the upgrade-walk leg: every declared step walked up, down and up again over today's install
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0022@4bc8eba9 whole
 
@@ -9,9 +9,12 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dSafePassage-5-deviation-136.md](../build/2026-10-23-build-TOOL-dSafePassage-5-deviation-136.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-5-deviation-150.md](../build/2026-10-24-build-TOOL-dSafePassage-5-deviation-150.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-23-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-5-phantom-label-fix.md) | research | — |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-5-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-5-1-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 |
 
 <!-- /gen:spec-records -->
@@ -110,6 +113,7 @@ research's losing test for its candidate E (`research-supersession.md`, section 
 - **consumes-from** `TOOL-dSafePassage-7` — `run_step_isolated`, its result `{"verdict", "rc", "tail"}`, and `check_needs_target`, named at module level in `tools/govkit/upgrade_steps.py` so S5's child can rebind the runner
 - **consumes-from** `TOOL-dSafePassage-11` — the row `lib/python-floor-3.15` and its preflight, load-bearing under a planted below-floor interpreter
 - **consumes-from** `TOOL-dSafePassage-13` — the docs leg and `tools/govkit/usage.toml`, which S13's section answers to
+- **consumes-from** external — dGroundRules, landed before the build run: `policy.py get` with `--rev` (TOOL-dGroundRules-2 S7), the catalogue default of `runtime.agents-in-flight` (TOOL-dGroundRules-3) and the `.agent-cap.conf` lowering inside `resolve_read` (TOOL-dGroundRules-10 S1, TOOL-dGroundRules-15 S1); without them the `fanout-cap` plant has no observation and AC5 cannot be read
 - **hands-off** external — dShippedRelease's first release tag, after which the shims case gains a tagged history whose windows may close
 
 Two siblings are read and declare no edge to this unit, so they are named here rather than joined:
@@ -138,8 +142,14 @@ order, which the `edited-retired` plant expects.
 
 A `[[plant]]` row: `id`, `path`, `edit` (`append`, `replace` with `old` and `new`, or `create` with
 `text`), `expect` (`carried` or `ordered`), and for `carried` one observation: `contains` (a text the
-walked file holds), `unchanged` (the bytes as planted), or `policy` (a key and the value the reader
-`cl-dClosedLoop-0008` lands reads back in the target). `ordered` holds when an order under
+walked file holds), `unchanged` (the bytes as planted), or `policy` (a `key`, its `value`, and
+`absent`, the paths the walked commit must not hold). A `policy` observation runs gov's own reader,
+the clone's `tools/policy/policy.py get <key> --rev <the walked commit's sha>`, under
+`sys.executable` with the target as its working directory. The reader takes its catalogue from the
+clone's kit and reads the policy file and `.agent-cap.conf` only as committed at that sha
+(TOOL-dGroundRules-2 S2 and S6, TOOL-dGroundRules-15 S1), so the release-0 target needs no reader of
+its own. The observation holds when stdout is `value` and no `absent` path is in that commit. A
+`get` exit of 2 is a red that carries the reader's `policy: refused` line. `ordered` holds when an order under
 `.governance/outbox/` names the path. A `[[gov_plant]]` row: `id`, `what` and the edit, committed on
 the clone's tip. A `[[condition]]` row: `step`, and either `plant` (a `[[plant]]`-shaped edit) or
 `fakes` (launcher names and the version each prints, put first on the child's `PATH`).
@@ -150,7 +160,7 @@ The rows at this pass, each path re-read against the pin's tree when the row is 
 |---|---|---|---|
 | `engine-edit` | plant | one comment line appended to an `engine` row of the memory-tree kit | carried, `contains` |
 | `project-owned` | plant | one value changed in a `project-owned` row | carried, `unchanged` |
-| `fanout-cap` | plant | `.agent-cap.conf` created holding `FANOUT_CAP=2` | carried, `policy` `runtime.agents-in-flight` reads `2` |
+| `fanout-cap` | plant | `.agent-cap.conf` created holding `FANOUT_CAP=2` | carried, `policy` `runtime.agents-in-flight` reads `2`, `absent` `.agent-cap.conf`, since a conf of `FANOUT_CAP=2` lowers the key to 2 whether the step ran or not |
 | `wired-hook` | plant | an adopter's own hook entry in `.claude/settings.json` beside gov's | carried, `contains` |
 | `old-shape-record` | plant | a spec under `memory/builds/` dated before `SPEC10_CUTOFF`, nine sections | carried, `unchanged` |
 | `edited-render` | plant | one line edited in a `rendered` row's file | ordered |
@@ -310,9 +320,11 @@ Criteria AC2 to AC10 and AC12 build the release-0 tree first; the others read fi
   walk from the rolled-back tree equals the first walk's, and it exits 0.
   Red when: a step's second up writes differently from its first.
 - **AC5** — When `python "tools/govkit/upgrade_walk.py" --case plants` runs, each `[[plant]]` prints
-  `carried` or `ordered`, `fanout-cap` reading `2` for `runtime.agents-in-flight`, and it exits 0;
-  with `--inject drops-plant` it exits 1 naming `engine-edit`.
-  Red when: a plant is neither carried nor ordered and the case still passes.
+  `carried` or `ordered`, and `fanout-cap` prints `2` for `runtime.agents-in-flight` read by gov's
+  `policy.py get --rev` at the walked commit, with no `.agent-cap.conf` in that commit. It exits 0.
+  With `--inject drops-plant` it exits 1 naming `engine-edit`.
+  Red when: a plant is neither carried nor ordered and the case still passes, or `fanout-cap` counts
+  as carried while the walked commit still holds `.agent-cap.conf`.
 - **AC6** — When `python "tools/govkit/upgrade_walk.py" --case skip` runs, every step prints
   load-bearing, the floor step under `floor-below` stopping the walk unskipped and passing it
   skipped, and it exits 0; with `--inject no-op` it exits 1 naming `no-op` as not load-bearing.
@@ -426,6 +438,12 @@ New arm: tools/govkit/selftest.py · covers AC1 AC11 · a new arm runs `upgrade_
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 spec audit's findings, written by the disposal stage: `TOOL-dSafePassage-15`, `TOOL-dSafePassage-17`, `TOOL-dSafePassage-18`, `TOOL-dSafePassage-19`, `TOOL-dSafePassage-26`; no other section moved.
+- rev-3 · 2026-10-24 · §3 · §4 · AC5 · re-grounded against dGroundRules' landed specs by rows 17 and
+  18 of `memory/builds/dSafePassage/build/2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md`.
+  The `policy` observation now runs gov's `policy.py get --rev` at the walked commit with the target
+  as its working directory, so the target needs no reader of its own, and it gains `absent`. The
+  `fanout-cap` row and AC5 require `.agent-cap.conf` absent. The Edges gain dGroundRules as an
+  external consumes-from. §8 F8 is unchanged.
 
 ## 10. Reuse audit
 
