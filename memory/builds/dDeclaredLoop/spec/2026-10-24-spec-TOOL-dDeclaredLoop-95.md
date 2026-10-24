@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-95 — the loop kit reads `.memory-tree.conf` through `load_tree_lib`, so 94 AC1's route probe holds on the built tree
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 49 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 49 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-95-deviation-951.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-95-deviation-951.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-96 |
 
 <!-- /gen:spec-records -->
 
@@ -80,6 +81,8 @@ repairs `TOOL-dDeclaredLoop-94`.
 - **consumes-from** `TOOL-dDeclaredLoop-72` — `resolve_memory_root` and AC3's `confs-disagree` plant, which AC4 re-runs over the moved read (the round-11 spec audit's id 1)
 - **consumes-from** `TOOL-dDeclaredLoop-41` — S1's and S2's `.memory-tree.conf` read and AC1's plants, which S3 moves onto `read_tree_conf` and S4 restates for a conf no kit reads (the round-11 spec audit's id 1)
 - **hands-off** `TOOL-dDeclaredLoop-96` — the four-name `TREE_LIB_SYMBOLS`, `read_tree_conf` and 94's probe as this unit leaves it, which that unit's rewrites of 90's loader block and 94's probe keep (the round-11 spec audit's ids 1, 9, 13, 14)
+- **hands-off** `TOOL-dDeclaredLoop-97` — `read_tree_conf`, which that unit declares in `CONF_READERS` so the `no-own-conf-read` rule answers its calls (the round-12 spec audit's id 1)
+- **hands-off** `TOOL-dDeclaredLoop-100` — S2, S4, §4's Evidence and sketch "The conf read, after this unit", §5, §7, §10, AC4 and AC5, with `read_tree_conf`, which that unit restates and hardens (the round-12 spec audit's ids 6, 7, 8, 10, 12, 20)
 
 ## 4. Design
 
@@ -243,6 +246,8 @@ adds and moves no arm: AC1 to AC6 are probes and re-runs of plants that 41, 72 a
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-11 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-97 and TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

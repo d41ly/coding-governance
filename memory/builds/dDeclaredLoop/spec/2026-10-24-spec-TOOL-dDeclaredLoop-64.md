@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-64 — a build's opening commit is found under the resolved `MEMORY_ROOT`, never a literal `memory/`
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 35 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -58,6 +58,7 @@ non-`memory` root as a real adopter shape. This unit takes the report's fix. It 
 - **hands-off** `TOOL-dDeclaredLoop-71` — the fixture plants of this unit's `New arm:`, which that unit's leg runs (the round-3 spec audit's id 28)
 - **hands-off** `TOOL-dDeclaredLoop-72` — the records-root read, which that unit points at the driver's root (the round-3 spec audit's id 29)
 - **hands-off** `TOOL-dDeclaredLoop-75` — the held line's root source and the docstring rationale (the round-3 spec audit's ids 17, 44)
+- **hands-off** `TOOL-dDeclaredLoop-100` — S1's route clause, which that unit restates onto `read_tree_conf` (the round-12 spec audit's id 14)
 
 ## 4. Design
 
@@ -131,6 +132,8 @@ New arm: tools/loop/breakpoints.py · covers AC1 AC2 AC3 · the records-root, no
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 57 (HIGH, item H9).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-71 and TOOL-dDeclaredLoop-72 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -276,6 +276,7 @@ That is 38 MEDIUM and 16 LOW findings by raw id.
 - **consumes-from** `TOOL-dDeclaredLoop-70` — the shared adopter-phase population, which S13's held-from lookup takes by passing no explicit `extra` (the round-3 spec audit's id 19)
 - **consumes-from** `TOOL-dDeclaredLoop-71` — the `loop breakpoints fixtures` leg that runs AC31's plant, and the arm-home ruling that supersedes S30's sentence on unit 53 (the round-3 spec audit's id 28)
 - **hands-off** `TOOL-dDeclaredLoop-75` — the guard, leg, claim, terminal-proof, conf-read, copy and citation items of the round-3 spec audit's minors (ids 6, 7, 10, 16, 20, 21, 26, 27, 30, 32, 38, 46)
+- **hands-off** `TOOL-dDeclaredLoop-99` — S30's `loop definition fixtures` leg, which runs that unit's `conf-readers-declared` plant (the round-12 spec audit's id 19)
 
 ## 4. Design
 
@@ -491,6 +492,8 @@ New arm: tools/loop/selftest.py · covers AC22 · the loop kit's self-test, reac
 - rev-1 · 2026-10-24 · initial draft, the round-2 spec audit's 54 minors batched (38 MEDIUM, 16 LOW).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-68 and TOOL-dDeclaredLoop-70 and TOOL-dDeclaredLoop-71 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

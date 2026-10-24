@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-80 — the no-own-conf-read rule stops at a named fixture boundary, so the plants that write the confs are outside its population
 
-**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-5 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -64,6 +64,7 @@ immediately after 76 and repairs `TOOL-dDeclaredLoop-76`.
 - **hands-off** `TOOL-dDeclaredLoop-86` — S4's plant population, §4 Files touched and AC4, which that unit widens to every later plant, records 67's shared write in, and splits into one grep per plant (the round-6 spec audit's ids 4, 6, 25)
 - **hands-off** `TOOL-dDeclaredLoop-88` — S4's plant population, which that unit widens to the plants of 82, 86 and 87 (the round-7 spec audit's id 7)
 - **hands-off** `TOOL-dDeclaredLoop-90` — S4's plant population, which that unit widens to 87's `conf-read-forms` rows (the round-8 spec audit's id 6)
+- **hands-off** `TOOL-dDeclaredLoop-99` — S1's fixture boundary, outside which that unit derives the functions of `loop_lib.py` that open a conf (the round-12 spec audit's id 19)
 
 ## 4. Design
 
@@ -194,6 +195,8 @@ New arm: tools/loop/breakpoints.py · covers AC1 · the no-own-conf-read plant o
   TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
+- rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

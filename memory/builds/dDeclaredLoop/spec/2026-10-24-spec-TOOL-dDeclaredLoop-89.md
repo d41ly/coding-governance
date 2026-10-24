@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-89 — the conf-constant class covers a module name a global loader rebinds, and module-level walrus, for and with targets
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -106,6 +106,7 @@ after 87 and repairs `TOOL-dDeclaredLoop-87`.
 - **hands-off** `TOOL-dDeclaredLoop-91` — `derive_conf_rebinds` as S1 states it, S3's `conf-read-forms` rows and S5's priced list, which that unit extends to every position evaluated in module scope (the round-9 spec audit's id 20)
 - **hands-off** `TOOL-dDeclaredLoop-92` — S3's `with`-held row, S4's restatement sites and AC3 and AC4, which that unit restates (the round-9 spec audit's ids 8, 16, 21)
 - **hands-off** `TOOL-dDeclaredLoop-94` — the sketch "The conf-constant class, after this unit", §3's charging-by-scope bullet and §5 risks, which that unit restates to `load_tree_lib` and 91's class-body loader (the round-10 spec audit's ids 19, 24, 27)
+- **hands-off** `TOOL-dDeclaredLoop-99` — S5's sub-bullet on a `def` or `class` name read through a call, which that unit restates onto `CONF_READERS` (the round-12 spec audit's id 19)
 
 ## 4. Design
 
@@ -270,6 +271,8 @@ New arm: tools/loop/budget.py · covers AC1 · the global-loader, with-held load
   TOOL-dDeclaredLoop-91 and TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
+- rev-4 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

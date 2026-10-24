@@ -306,3 +306,13 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T19:54:13Z rescope · item add TOOL-dDeclaredLoop-96 · reason spec-audit round 11 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-93-spec-audit.md) the 13 confirmed minors batched into one unit: 7 MEDIUM, ids 2 4 9 10 12 13 14 (items M1 to M6), and 6 LOW, ids 3 5 7 15 16 17 (items L1 to L5); lands on TOOL-dDeclaredLoop-93 and TOOL-dDeclaredLoop-94, so repairs no unit in particular
 
 2026-10-24T20:03:27Z review · item dDeclaredLoop-spec-set-r11 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 13 · disposition promote
+
+2026-10-24T20:31:34Z rescope · item add TOOL-dDeclaredLoop-97 · reason spec-audit round 12 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) id 1 HIGH, item H1 shared with ids 11 and 19: read_tree_conf sits outside the no-own-conf-read rule's reader-call callee set, which 76 S2 and 82 S10 state as parse_conf and read_driver_conf alone; repairs TOOL-dDeclaredLoop-95
+
+2026-10-24T20:31:42Z rescope · item add TOOL-dDeclaredLoop-98 · reason spec-audit round 12 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) id 11 HIGH, item H1 shared with ids 1 and 19: the no-own-conf-read plant stays green on a reader that calls read_tree_conf, because no row of it observes the rule answering each declared conf reader; repairs TOOL-dDeclaredLoop-95
+
+2026-10-24T20:31:43Z rescope · item add TOOL-dDeclaredLoop-99 · reason spec-audit round 12 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) id 19 HIGH, item H1 shared with ids 1 and 11: a loop_lib function that opens a conf is kept inside the reader-call kind 87 and 89 defer function readers to by nothing, so the next one escapes the rule as read_tree_conf does; repairs TOOL-dDeclaredLoop-95
+
+2026-10-24T20:31:43Z rescope · item add TOOL-dDeclaredLoop-100 · reason spec-audit round 12 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) the 21 confirmed minors batched into one unit: 11 MEDIUM, ids 2 3 4 8 10 14 15 20 21 22 23 (items M1 to M10), and 10 LOW, ids 5 6 7 12 13 16 17 18 24 25 (items L1 to L8); lands on TOOL-dDeclaredLoop-95 and TOOL-dDeclaredLoop-96, so repairs no unit in particular
+
+2026-10-24T20:46:52Z review · item dDeclaredLoop-spec-set-r12 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 21 · disposition promote

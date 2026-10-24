@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched
 
-**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-5 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -175,6 +175,8 @@ and 26, are not in the disposal population.
 - **hands-off** `TOOL-dDeclaredLoop-88` — S6's pass-commit probe, S8's docstring set, AC4, AC5, §5 and §10, which that unit routes through `read_profile_legs`, reads from the lifted charge walk, gives a class-level half, floors and checks (the round-7 spec audit's ids 8, 9, 16, 17, 33)
 - **hands-off** `TOOL-dDeclaredLoop-89` — S1's conf-constant kind, which that unit extends to `derive_conf_rebinds`' names, and S8's `derive_docstring_ids`, which its pass reads (the round-8 spec audit's id 19)
 - **hands-off** `TOOL-dDeclaredLoop-90` — S1's conf-constant kind and the conf-read sketch, which that unit restates to the names `derive_conf_constants` answers, and §10, which it completes with `read_profile_legs` (the round-8 spec audit's ids 5, 17)
+- **hands-off** `TOOL-dDeclaredLoop-97` — S10's alias resolution and §4's sketch "The conf-read rule, after this unit", whose reader-call set that unit reads from `CONF_READERS` and restates (the round-12 spec audit's id 1)
+- **hands-off** `TOOL-dDeclaredLoop-98` — the `conf-read-forms` plant and AC10's reader-call row, which that unit extends to every declared conf reader (the round-12 spec audit's id 11)
 
 ## 4. Design
 
@@ -408,6 +410,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the glob-reader a
   TOOL-dDeclaredLoop-87 and TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-89 and TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
+- rev-5 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-97 and TOOL-dDeclaredLoop-98, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

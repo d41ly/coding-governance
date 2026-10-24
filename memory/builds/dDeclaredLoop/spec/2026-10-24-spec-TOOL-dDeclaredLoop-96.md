@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-96 — the round-11 spec audit's 13 minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 50 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 50 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-96-deviation-961.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-96-deviation-961.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-95-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-95 |
 
 <!-- /gen:spec-records -->
 
@@ -126,6 +127,7 @@ The report's three refuted findings, ids 6, 8 and 11, are not in the disposal po
 - **consumes-from** `TOOL-dDeclaredLoop-90` — S4 and the sketch "The tree_lib route, after this unit", which S4 and S11 restate (the round-11 spec audit's ids 7, 9)
 - **consumes-from** `TOOL-dDeclaredLoop-88` — S33, which S4 and S11 restate (the round-11 spec audit's ids 7, 9)
 - **consumes-from** `TOOL-dDeclaredLoop-86` — S21, which S4 restates (the round-11 spec audit's id 9)
+- **hands-off** `TOOL-dDeclaredLoop-100` — S4, S6, S9, S12, S13, §4's route-probe and skew-row sketches and §7, with the skew row of `budget.py`, which that unit restates and completes (the round-12 spec audit's ids 5, 13, 15, 21, 22, 23, 24)
 
 ## 4. Design
 
@@ -374,6 +376,8 @@ New arm: tools/loop/budget.py · covers AC12 · the no-own-conf-read skew row wi
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-11 spec audit's 13 minors batched (7 MEDIUM, 6 LOW).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

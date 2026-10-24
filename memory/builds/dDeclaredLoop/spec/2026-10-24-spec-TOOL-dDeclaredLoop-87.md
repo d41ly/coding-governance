@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-87 — the conf-constant kind is stated as a class: any module-level binding whose value holds a conf name, and every import that binds it
 
-**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 43 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-5 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 43 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -82,6 +82,7 @@ aliased from-import a named, observed route. It builds immediately after 86 and 
 - **hands-off** `TOOL-dDeclaredLoop-91` — §3's binding-form bullet, which 89 S5 writes and that unit restates to the positions evaluated in module scope (the round-9 spec audit's id 20)
 - **hands-off** `TOOL-dDeclaredLoop-92` — §3's first non-goal, §3's hands-off 88 bullet and §10, which that unit restates (the round-9 spec audit's ids 1, 2, 16)
 - **hands-off** `TOOL-dDeclaredLoop-94` — §3's first non-goal, which that unit's grep of 92 AC6 reads, and the §5 risks line 89 S5 writes, which that unit restates to a function or a class (the round-10 spec audit's ids 6, 19)
+- **hands-off** `TOOL-dDeclaredLoop-99` — `derive_conf_constants` as S1 states its class, which that unit reads as a conf path, and §3's bullet on a conf read through a call, which it restates onto `CONF_READERS` (the round-12 spec audit's id 19)
 
 ## 4. Design
 
@@ -207,6 +208,8 @@ New arm: tools/loop/budget.py · covers AC1 · the joined-path, os.path.join, mu
   TOOL-dDeclaredLoop-91 and TOOL-dDeclaredLoop-92, written by the round-9 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-94, written by the round-10 spec audit's disposal; nothing else moved.
+- rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-99, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

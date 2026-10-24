@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-72 — the loop kit reads the records root the driver reads, and refuses two confs that disagree
 
-**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-5 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -66,6 +66,7 @@ the two and repairs both; its placement names `TOOL-dDeclaredLoop-64`.
 - **hands-off** `TOOL-dDeclaredLoop-79` — `resolve_memory_root`'s refusal and its `.memory-tree.conf` read, which that unit restates to the pseudo-code's population over normalised paths and to `parse_conf`'s real signature (ids 15, 35)
 - **hands-off** `TOOL-dDeclaredLoop-82` — AC4, which that unit amends in place to observe through the `no-own-conf-read` plant (the round-5 spec audit's id 2)
 - **hands-off** `TOOL-dDeclaredLoop-95` — `resolve_memory_root` and AC3's `confs-disagree` plant, which that unit re-runs over the moved read (the round-11 spec audit's id 1)
+- **hands-off** `TOOL-dDeclaredLoop-100` — AC3's `confs-disagree` plant in `breakpoints.py`, which that unit re-runs over the read it changes (the round-12 spec audit's id 6)
 
 ## 4. Design
 
@@ -162,6 +163,8 @@ New arm: tools/loop/breakpoints.py · covers AC2 AC3 · the same two plants, sta
   TOOL-dDeclaredLoop-82, written by the round-5 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-95, written by the round-11 spec audit's disposal; nothing else moved.
+- rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

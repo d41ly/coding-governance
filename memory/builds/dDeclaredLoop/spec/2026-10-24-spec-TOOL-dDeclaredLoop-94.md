@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-94 — the round-10 spec audit's 24 minors, batched
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 48 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 48 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -160,6 +160,7 @@ four refuted findings, ids 5, 18, 26 and 28, are not in the disposal population.
 - **consumes-from** `TOOL-dDeclaredLoop-75` — S35 as 92 S8 restates it onto the loader, which S9's grep reads (the round-10 spec audit's id 4)
 - **hands-off** `TOOL-dDeclaredLoop-95` — AC1's tree_lib route probe, §4's sketch "The tree_lib route, after this unit" and §5, which that unit makes hold on the built tree (the round-11 spec audit's id 1)
 - **hands-off** `TOOL-dDeclaredLoop-96` — S2, S5, S8, S10, S21, S22, S24, §3's Edges, §4's sketch and probe, §5, AC2, AC3, AC6, AC10 and AC18, with the skew row of `budget.py` and `load_tree_lib`, which that unit restates and completes (the round-11 spec audit's ids 2, 3, 4, 5, 7, 9, 10, 12, 13, 14, 15, 16, 17)
+- **hands-off** `TOOL-dDeclaredLoop-100` — S5, S10, S24, §4's sketch and probe, §5, AC1, AC6 and AC18, which that unit restates (the round-12 spec audit's ids 3, 4, 5, 16, 23)
 
 ## 4. Design
 
@@ -423,6 +424,8 @@ New arm: tools/loop/guard.py · covers AC15 · the OSError("a\nb") row of push-m
 - rev-1 · 2026-10-24 · initial draft, the round-10 spec audit's 24 minors batched (14 MEDIUM, 10 LOW).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-95 and TOOL-dDeclaredLoop-96, written by the round-11 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-100, written by the round-12 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
