@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-48 — the help page's install-section count observed with its path whole, and paired with the break that empties it
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-48-deviation-36.md](../build/2026-10-23-build-TOOL-dGroundRules-48-deviation-36.md) | deviation | — |
+| [2026-10-24-build-TOOL-dGroundRules-48-ledger.md](../build/2026-10-24-build-TOOL-dGroundRules-48-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-48-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-48-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-47-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-47-staleness-probe-brief.md) | research | TOOL-dGroundRules-47 TOOL-dGroundRules-49 TOOL-dGroundRules-50 |
 | [2026-10-24-prompt-TOOL-dGroundRules-48-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-48-2-spec-writer.md) | journal | — |
