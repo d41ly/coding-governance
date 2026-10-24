@@ -62,7 +62,9 @@ map had no playbook dossier until now.
   positional was load-bearing: it beat the environment, so raising the template's default could not
   move the engine's cap. The declaration therefore OUTRANKS the environment — moving the number out
   of argv without that ordering would have let `MAX_BYTES=999999` lift the engine from 18 KiB to
-  48 KiB, silently undoing a property a landed unit built and verified.
+  48 KiB, silently undoing a property a landed unit built and verified. TOOL-dGroundRules-9 then
+  retired the positional and the environment both: the policy kit's `budgets.py` reads the
+  declaration, at the landed revision, and `budgets.enforce` decides whether a breach refuses.
 - **The high-water ratchet is ADVISORY and never changes the exit code.** It replaces the forcing
   function the old ceiling was providing: at 86 free every template edit was priced by the gate, and
   at 16470 free nothing prices one. No fixed threshold works — every conventional fraction is silent
@@ -110,7 +112,9 @@ map had no playbook dossier until now.
 seam: check-template-size.sh subject resolution — reuse for gating ANY file's byte size on the
 merge bar without writing a sibling script; extend via one `tools/gate-legs.json` entry naming the
 subject alone, one row in `tools/template-size-limits.txt` giving its ceiling and the reason for
-it, and one `--bump` to seed its high-water row. The limit is no longer passed positionally —
+it, one `[[cap]]` row in `tools/policy/caps.toml` naming the subject by the same key with a
+`limits:` home, and one `--bump` to seed its high-water row. A limits row with no census row is
+read by nothing, and `arm_cap_census` names it. The limit is no longer passed positionally —
 that spelling was this affordance's own text until the declaration replaced it.
 seam: the high-water record — reuse for pricing growth in any tracked artifact where a fixed
 threshold is either silent or permanently red; extend via a `<path>\t<bytes>` row, remembering that
