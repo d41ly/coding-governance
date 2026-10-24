@@ -9,11 +9,14 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dDeclaredLoop-35=DEFERRED
+units-at-landing: TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100
+gates-run: unattended-179287727213211527273-55802 652f8871
 parked-surfaced: yes
 keepalive-reaped: yes
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 3e547fab3cc8fa20129b92daafb9f8893a973605
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -384,3 +387,7 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T20:51:57Z rescope · item defer TOOL-dDeclaredLoop-99 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
 
 2026-10-24T20:51:57Z rescope · item defer TOOL-dDeclaredLoop-100 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dDeclaredLoop-35
+
+2026-10-24T21:39:06Z override · item specs-audited · reason the owner stopped the spec-audit chain at round 12 ('no more audit rounds after', memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-stop.md), so round 12's promotions TOOL-dDeclaredLoop-97 to -100 close with no audit naming them, as M4 provides when a chain ends
+
+2026-10-24T21:39:06Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: this run's whole diff is specs and records, already read by twelve spec-audit rounds, and the owner stopped spec review ('no more audit rounds after', memory/builds/dDeclaredLoop/prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-stop.md); the build run's closing diff review over its code meets it
