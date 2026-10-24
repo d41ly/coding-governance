@@ -39,9 +39,10 @@ real shipped row where one serves. WHAT IT DOES NOT CHECK: that the shipped cata
 v2's, which is the build's acceptance probe, not an arm.
 
 `adopter-fresh-target` is an outcome case, no plant (TOOL-dGroundRules-16): this kit installed into a
-fresh `git init` by the deployer, `govkit.py apply` with the closure of its `requires`, run from a
+fresh `git init` by the deployer, its `apply` with the closure of its `requires`, run from a
 scratch clone whose HEAD commits the working tree under test, so an uncommitted edit is graded
-(TOOL-dGroundRules-26), the tool root compared with the receipt both ways (TOOL-dGroundRules-24),
+(TOOL-dGroundRules-26), and only through `run_govkit`, which refuses the source's own root, the
+refusal `govkit-source-root-refused` observes (TOOL-dGroundRules-27), the tool root compared with the receipt both ways (TOOL-dGroundRules-24),
 `--scaffold`, then `--check` with the install staged and again once it is committed, where every arm
 must grade clean or announce; and the README's "Each arm in an adopter" table joined to ARMS both
 ways. Green on a correct build; its RED is a failed snapshot step, a refused `apply`, a stray or
@@ -149,7 +150,7 @@ bare repository so, then again with the registry copied in, where every enforcer
 named kit's enforcers at their `installed` paths, read green with the line-length row announced, red
 naming `manifest-bytes` once its planted enforcer is deleted, and green again restored.
 `budgets-ships-join` holds those two fields to the deployer on gov's tree (TOOL-dGroundRules-23): it
-loads `govkit.py` from the source repository and reds, naming the row, the entry and the destination,
+loads the deployer from the source repository and reds, naming the row, the entry and the destination,
 a shipped row whose `kit` does not write its enforcer at `installed`, or whose enforcer another entry
 writes.
 
@@ -973,7 +974,7 @@ def check_arm_lines(out, names):
 def build_source_snapshot(source_root):
     """The root of a scratch clone whose HEAD commits `source_root`'s working tree over its HEAD
     (TOOL-dGroundRules-26). The deployer installs its own checkout's HEAD, never a working tree, so a
-    case that installs through the clone's `govkit.py` grades the bytes under test, a file only the
+    case that installs through the clone's deployer grades the bytes under test, a file only the
     working tree holds included. `--shared` reads the source's objects through alternates, and with
     GIT_DIR set to the clone every new object lands in the clone's store, never the source's. `add -A`
     runs over a copy of the source's index with the source as work tree, so the source's ignore rules
@@ -1046,13 +1047,10 @@ def build_install_target(name, ids, answers=""):
     clone of the tree under test, and beside it `git init` with a pinned autocrlf, a one-line README
     and a `.governance/deploy.toml` naming the snapshot as `gov_source`, this kit's tool root's name as
     `prefix`, `ids` as `kits` and the TOML text `answers` after them, committed once. Prints the
-    snapshot line. -> (target, snapshot, the snapshot's govkit.py); the caller removes both
+    snapshot line. -> (target, snapshot), which `run_govkit` installs from; the caller removes both
     directories. RuntimeError naming what is missing or which step failed, nothing left behind."""
     root = KIT.parent  # this kit's own resolved tool root; the target's prefix is its name, never spelled
     top = (policy.run_git(KIT, "rev-parse", "--show-toplevel", "--show-prefix") or "").split("\n")
-    if not (root / "govkit" / "govkit.py").is_file():
-        raise RuntimeError(f"no deployer to install with: looked for govkit.py at {(root / 'govkit').as_posix()}, "
-                           "under this kit's tool root")
     if len(top) < 2 or not top[0]:
         raise RuntimeError(f"no tree under test to snapshot: {KIT.as_posix()} is in no git repository")
     try:
@@ -1076,14 +1074,26 @@ def build_install_target(name, ids, answers=""):
         remove_repo(t)
         remove_repo(s)
         raise
-    return t, s, s / Path(top[1]).parent / "govkit" / "govkit.py"  # the clone's own deployer installs its HEAD
+    return t, s
 
 
-def run_install_verb(govkit, verb, t, ids):
-    """`python <govkit> <verb> --target <t> --kits <ids>` with the remote probe off -> (exit, output)."""
-    p = subprocess.run([sys.executable, str(govkit), verb, "--target", t.as_posix(), "--kits", ",".join(ids)],
-                       capture_output=True, text=True, encoding="utf-8", errors="replace",
-                       env=dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1"))
+def run_govkit(snapshot_root, source_root, *argv):
+    """The one run of the deployer a case makes (TOOL-dGroundRules-27): `python <snapshot_root>/<tool
+    root>/govkit/govkit.py <argv>`, the tool root read from this kit's `--show-prefix`, with the remote
+    probe off and GIT_ENV_LEAKS stripped. The deployer installs its own checkout's HEAD, so a
+    `snapshot_root` that resolves to `source_root` would grade the tree under test's HEAD, never its
+    bytes: RuntimeError naming that root and `build_source_snapshot`, before any process starts.
+    RuntimeError naming the path it looked at when the snapshot holds no deployer. -> (exit, output)."""
+    if Path(snapshot_root).resolve() == Path(source_root).resolve():
+        raise RuntimeError(f"run_govkit: {Path(snapshot_root).as_posix()} is the tree under test; "
+                           "take build_source_snapshot first")
+    prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()
+    govkit = Path(snapshot_root) / Path(prefix).parent / "govkit" / "govkit.py"  # the clone's deployer installs its HEAD
+    if not govkit.is_file():
+        raise RuntimeError(f"no deployer to install with: looked at {govkit.as_posix()}")
+    env = {k: v for k, v in os.environ.items() if k not in policy.GIT_ENV_LEAKS}
+    p = subprocess.run([sys.executable, str(govkit), *argv], capture_output=True, text=True, encoding="utf-8",
+                       errors="replace", env=dict(env, GOVKIT_NO_REMOTE_PROBE="1"))
     return p.returncode, (p.stdout + p.stderr).replace("\r", "")
 
 
@@ -1095,7 +1105,7 @@ def read_receipt_rows(t):
 
 def run_fresh_target(name):
     """This kit installed by the deployer into a fresh target (TOOL-dGroundRules-24, -26): by
-    `build_install_target`, then `govkit.py apply` with this kit's id and `run-gates`, and the closure
+    `build_install_target`, then the deployer's `apply` through `run_govkit` with this kit's id and `run-gates`, and the closure
     of their `requires` read as registry ids (TOOL-dGroundRules-25 S6, S7). Every file under the
     target's tool root must be a receipt row's `path`, every engine or seed row's `path` must exist,
     and no `legacy-homes.txt` may be installed (S5). Then the installed `adopt-policy.sh`, found through
@@ -1109,7 +1119,7 @@ def run_fresh_target(name):
     installed kit's directory, `--check` must still announce it and find nothing (S11). The README's
     table is joined to ARMS both ways, and each row's last column opens with its arm's `empty` (S8); and
     an Arm planted with a population of 0 must print one finding under `finding` and none, `not graded`,
-    under `announce` (TOOL-dGroundRules-21 S5). A missing `govkit.py` or a refused `apply` is a WRONG,
+    under `announce` (TOOL-dGroundRules-21 S5). A missing deployer, a refused `run_govkit` or a refused `apply` is a WRONG,
     and nothing after it runs. Prints its lines. -> (assertions, wrong)."""
     names = [a.name for a in ARMS]
     listed = extract_arm_rows((KIT / "README.md").read_text(encoding="utf-8"))
@@ -1133,16 +1143,16 @@ def run_fresh_target(name):
     wrong += missed
     root, rows, t, s = KIT.parent, None, None, None
     try:
-        try:
-            t, s, govkit = build_install_target(name, ids)
-        except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
-            wrong.append(str(exc))
-        if t is not None:
-            rc, out = run_install_verb(govkit, "apply", t, ids)
+        try:  # a refused run_govkit is this case's WRONG, as a failed snapshot is (TOOL-dGroundRules-27)
+            t, s = build_install_target(name, ids)
+            rc, out = run_govkit(s, derive_source_top(), "apply", "--target", t.as_posix(), "--kits", ",".join(ids))
             if rc:
-                wrong.append(f"govkit.py apply --kits {','.join(ids)} exited {rc}, so nothing was installed to grade: {out.strip()}")
+                wrong.append(f"the deployer's apply --kits {','.join(ids)} exited {rc}, so nothing was installed to "
+                             f"grade: {out.strip()}")
             else:
                 rows = read_receipt_rows(t)
+        except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+            wrong.append(str(exc))
         if rows is not None:
             paths = {r.get("path") for r in rows}
             held = sorted(f.relative_to(t).as_posix() for f in (t / root.name).rglob("*") if f.is_file())
@@ -1239,20 +1249,22 @@ PLAN_LINE = re.compile(r"^\s*(\S+)\s+\[([^\]]*)\]\s+(\S+)")  # a `plan` row: its
 
 def run_legacy_withheld_install(name):
     """`legacy-homes-withheld-install` (TOOL-dGroundRules-25 S9): the target `build_install_target`
-    makes for this kit and its `requires` closure, `govkit.py plan` over it, then `apply`. The plan
+    makes for this kit and its `requires` closure, the deployer's `plan` over it through `run_govkit`,
+    then `apply`. The plan
     must hold the legacy-home list as one `ORDER [project-owned]` row and as no `write` or `SIDE`
     row, and the applied target must hold no file of that name."""
     ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"]])
     checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
     t = s = None
     try:
-        t, s, govkit = build_install_target(name, ids)
-        rc, out = run_install_verb(govkit, "plan", t, ids)
+        t, s = build_install_target(name, ids)
+        args = ("--target", t.as_posix(), "--kits", ",".join(ids))
+        rc, out = run_govkit(s, derive_source_top(), "plan", *args)
         rows = [m.groups() for m in map(PLAN_LINE.match, out.split("\n")) if m and m[3].endswith("/" + policy.LEGACY_LIST)]
         said = "; ".join(f"{k} [{r.strip()}] {d}" for k, r, d in rows) or "no row"
         checks.append(("plan", f"exit 0, one ORDER [project-owned] row for {policy.LEGACY_LIST} and no write or SIDE row",
                        rc == 0 and [(k, r.strip()) for k, r, _d in rows] == [("ORDER", "project-owned")], f"exit {rc} · {said}"))
-        rc, _out = run_install_verb(govkit, "apply", t, ids)
+        rc, _out = run_govkit(s, derive_source_top(), "apply", *args)
         # The install is read from its receipt, never from apply's exit alone: an adopter step that
         # refuses after the files land still leaves them, and an empty target would hold no list.
         installed = Path(t, RECEIPT_REL).is_file() and any(r.get("kit") == ids[0] for r in read_receipt_rows(t))
@@ -1284,8 +1296,8 @@ def run_census_default_adopter(name):
     checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
     t = s = None
     try:
-        t, s, govkit = build_install_target(name, ids, KICKOFF_ANSWERS)
-        rc, _out = run_install_verb(govkit, "apply", t, ids)
+        t, s = build_install_target(name, ids, KICKOFF_ANSWERS)
+        rc, _out = run_govkit(s, derive_source_top(), "apply", "--target", t.as_posix(), "--kits", ",".join(ids))
         installed = Path(t, RECEIPT_REL).is_file()
         checks.append(("apply", f"--kits {','.join(ids)} wrote its receipt", installed, f"apply exit {rc} · receipt "
                        + ("written" if installed else "ABSENT")))
@@ -1304,6 +1316,20 @@ def run_census_default_adopter(name):
         for d in (t, s):
             if d is not None:
                 remove_repo(d)
+    return print_checks(name, checks)
+
+
+def run_govkit_source_root_refused(name):
+    """`govkit-source-root-refused` (TOOL-dGroundRules-27 S5): `run_govkit` with the source's toplevel
+    as both roots and `--help`, which exits 0 if it runs, must raise a RuntimeError naming that root and
+    `build_source_snapshot`; a call that returns is a WRONG naming its exit and output."""
+    top = derive_source_top()
+    try:
+        rc, out = run_govkit(top, top, "--help")
+        checks = [(name, "the source's own root refused", False, f"the deployer ran: exit {rc} · {out.strip()}")]
+    except RuntimeError as exc:
+        checks = [(name, f"a RuntimeError naming {top.as_posix()} and build_source_snapshot",
+                   top.as_posix() in str(exc) and "build_source_snapshot" in str(exc), str(exc))]
     return print_checks(name, checks)
 
 
@@ -3831,6 +3857,7 @@ CASES = [
     ("adopter-suite", None, run_adopter_suite),  # the adopter's sibling suite, which arms its refusals
     ("legacy-homes-withheld-install", None, run_legacy_withheld_install),  # the plan's row and the applied target (TOOL-dGroundRules-25)
     ("census-default-adopter", None, run_census_default_adopter),  # the census over a real install without check-line-length
+    ("govkit-source-root-refused", None, run_govkit_source_root_refused),  # run_govkit refuses the tree under test's own root
     ("arms-empty-declared", None, run_arms_empty_declared),  # every ARMS row declares its empty and why
     ("arms-empty-target", None, run_arms_empty_target),  # the announcing arms over an empty target, arm_schema over its scaffold
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories

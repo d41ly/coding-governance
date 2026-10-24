@@ -20238,6 +20238,16 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "run_govkit",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_govkit_source_root_refused",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_grep",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
@@ -20356,11 +20366,6 @@
       "id": "run_inproc",
       "kind": "function",
       "file": "tools/unattended/unattended.test.sh"
-    },
-    {
-      "id": "run_install_verb",
-      "kind": "function",
-      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_ir_push",

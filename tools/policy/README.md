@@ -594,7 +594,10 @@ home, with `run-gates` selected too (TOOL-dGroundRules-25 S6, S7). The deployer 
 `govkit.py` of a scratch clone whose HEAD commits the working tree under test, and prints
 `installing from snapshot <sha8> of the working tree over HEAD <sha8>`; an uncommitted edit is graded,
 and the source's object store gains nothing. A refused `apply`, a failed snapshot step, or a `govkit.py`
-absent from the tool root, reds the case. Every file under the target's tool root must be a path the receipt records, and every engine or
+absent from the snapshot's tool root, reds the case. This case's, `legacy-homes-withheld-install`'s and
+`census-default-adopter`'s deployer runs all go through `run_govkit`, which refuses a snapshot root equal
+to the source's own, so no case can grade the tree under test's HEAD, and `govkit-source-root-refused`
+observes that refusal (TOOL-dGroundRules-27). Every file under the target's tool root must be a path the receipt records, and every engine or
 seed row of the receipt must be present, and no `legacy-homes.txt` installed (S5). The case then
 runs the installed adopter, `adopt-policy.sh --scaffold`, and `--check` with the install staged; it
 commits the install, re-runs the memory-tree adopter, which seeds its conf and stops on its first run,

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-27 — every policy case that drives the deployer runs it from the snapshot, and a call over the source's own root refuses
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-27-deviation-15.md](../build/2026-10-23-build-TOOL-dGroundRules-27-deviation-15.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-27-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-27-ledger.md) | journal | — |
+| [2026-10-24-build-TOOL-dGroundRules-27-deviation-77.md](../build/2026-10-24-build-TOOL-dGroundRules-27-deviation-77.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-27-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-27-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-27-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-27-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-27-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-27-divergence-brief.md) | research | — |
