@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-21 — the round-1 spec audit's minors: forty-one findings closed in the code units 1 to 10 leave, one scope item each
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,7 +14,9 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-21-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-build-brief.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-25 TOOL-dGroundRules-34 TOOL-dGroundRules-64 |
 | [2026-10-24-prompt-TOOL-dGroundRules-21-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-21-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-21-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-21-2-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-21-legline-fold-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-21-legline-fold-brief.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-21-size-trim-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-21-size-trim-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-65-21-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-65-21-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-16 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-19 TOOL-dGroundRules-15 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-20 |
 
@@ -26,10 +28,9 @@ The round-1 spec audit of this build
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md`)
 exited BOUNDED with 49 confirmed findings. Its two BLOCKERs and six HIGHs are promoted one unit each,
 `TOOL-dGroundRules-65` to `TOOL-dGroundRules-20`; BUILD-METHOD M4 batches the other forty-one,
-thirty-three MEDIUM and eight LOW, into this unit. They land on units 1 to 10 and share
-`tools/policy/policy.py`, `tools/policy/check_policy.py`, the codebase map and `tools/gate-legs.json`'s
-neighbours, so M6's clauses yield no two disjoint write sets. It builds at order 7, after every unit
-whose code it amends. A finding the review merged into another's item keeps its own scope item.
+thirty-three MEDIUM and eight LOW, into this one unit (§4 Alternatives rejected), built at order 7,
+after every unit whose code it amends. A finding the review merged into another's item keeps its own
+scope item.
 
 | Finding id | Severity | Review item | Unit it lands on | Scope item | Criterion |
 |---|---|---|---|---|---|
@@ -269,34 +270,26 @@ fix. Where the review offered options, §8 records the pick.
 
 ### Evidence
 
-Every line below was read at base `3708a705` on 2026-10-23.
+Every line cited here and in §2 was read at base `3708a705` on 2026-10-23; this list holds only what
+§2 does not state.
 
-- `.gitattributes:22` pins `tools/template-size-limits.txt` and `:100` pins `.governance/deploy.toml`;
-  `git check-attr eol` printed `unspecified` for the new policy paths, under a system
-  `core.autocrlf=true`.
-- `tools/roles/README.md:1` carries `<!-- gov:kit roles@1.8 -->`; govkit selfcheck 5 and 5c fail an
-  entry with no `version_from` or no marker (`tools/govkit/govkit.py:2119-2124`, `:2250-2291`).
-- `.memory-tree.conf:639` holds `ARMS_REFUSALS="graded"`, and `check-arms.py` reads arms from a gate's
-  sibling `<stem>.test.sh` and requires a per-gate floor in `ARMS_FLOORS` (`:39-55`).
-- `read_policy_key()` is defined at the four lines S6 names; v2's `## [presets]` heading is at line
-  1409, not 1408, as `TOOL-dGroundRules-1` §4 cites it.
+- `.gitattributes:100` pins `.governance/deploy.toml`; `git check-attr eol` printed `unspecified` for
+  the new policy paths, under a system `core.autocrlf=true`.
+- govkit selfcheck 5 and 5c fail an entry with no `version_from` or no marker
+  (`tools/govkit/govkit.py:2119-2124`, `:2250-2291`).
+- `check-arms.py` reads arms from a gate's sibling `<stem>.test.sh` and requires a per-gate floor in
+  `ARMS_FLOORS` (`:39-55`).
+- v2's `## [presets]` heading is at line 1409, not 1408, as `TOOL-dGroundRules-1` §4 cites it.
 - `def resolve_compare_base` exists once, `tools/codebase-map/map_lib.py:1502`, outside any marked
   block; `tools/lib/resolve-python.test.sh:170-185` declares `PARITY_ROWS` as `stem|canonical|exclude`
   and grades every copy `git grep` finds by its opening marker.
-- `tools/memory-tree/tree_lib.py:262` holds `GIT_ENV_LEAKS`; `memory/builds/dRetiredFork/BACKLOG.md:9`
-  files `TOOL-dRetiredFork-23`, the ask that the copies agree.
-- `tools/run-gates/profile_bar.py:282` is a `resolve_bash` that runs each candidate;
-  `memory/gotchas/subprocess-resolves-a-different-shell.md` records the class it closes.
-- `tools/workflows/check-review-join.test.sh:207` plants `env AGENT_CAP=7`;
-  `memory/map/features/agent-cap.md:84` teaches the `AGENT_CAP` refusal as live.
-- `tools/check-playbook-parity.sh:271-272` extract `boundedParallel(thunks, N)` and "cannot resolve to
-  an integer ≤N" from the hooks README and compare each with `MAX_VERIFIERS`.
-- S36's two carriers hold `gov:kit agent-cap@1.40`; `tools/check-kit-versions.sh` fails a carrier
-  that differs from the constant.
-- `tools/check-wiring.sh:94-117` resolves `GOV_SETTINGS_JSON` first; `tools/hooks/kit.toml:52-56`
-  records settings-merge as the hook wiring's owner.
-- `tools/memory-recall/extract.py:346` and `tools/check-spec-tokens.py:159` name
-  `template-size-limits.txt` in docstrings.
+- `memory/builds/dRetiredFork/BACKLOG.md:9` files `TOOL-dRetiredFork-23`, the ask that the copies of
+  `GIT_ENV_LEAKS` agree.
+- `memory/gotchas/subprocess-resolves-a-different-shell.md` records the class S14's `resolve_bash`
+  closes.
+- `tools/workflows/check-review-join.test.sh:207` plants `env AGENT_CAP=7`.
+- `tools/check-kit-versions.sh` fails a marker carrier, such as S36's two, that differs from its constant.
+- `tools/hooks/kit.toml:52-56` records settings-merge as the hook wiring's owner.
 - `.githooks/pre-commit:174` defines `print_kit_miss`, which each kit leg's `else` calls.
 
 ### Per-unit changes, by file
@@ -389,9 +382,9 @@ builder confirms each with `python tools/lexicon/lexicon.py --suggest <name> --a
 
 ### Alternatives rejected
 
-- **Two batch units split by kit.** Every half writes `tools/policy/policy.py` or
-  `tools/policy/check_policy.py`, and both move functions the codebase map regenerates from, so M6's
-  first and third clauses fail.
+- **Two batch units split by kit.** Every half writes `tools/policy/policy.py`,
+  `tools/policy/check_policy.py` or `tools/gate-legs.json`'s neighbours, and both move functions the
+  codebase map regenerates from, so M6's first and third clauses fail.
 - **A fix per spec text.** Nothing is folded at this exit (BUILD-METHOD M4; §3).
 
 ## 5. Production-readiness checklist
@@ -578,31 +571,29 @@ New arm: tools/workflows/check-review-join.test.sh · covers AC33 · the D7 arm 
 ## 8. Open questions
 
 - **F1 — Who writes the harness's `env` keys in `.claude/settings.json` (finding 21)?** (a) The policy
-  kit's render, as S34 states it: settings-merge owns hook entries, the policy kit owns
-  `env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and `env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`. Not an `env` mode in `tools/settings-merge.py`,
-  which changes a separately versioned copy-installed kit's fragment contract, a public surface the
-  grant's words for `cl-dClosedLoop-0016` do not name (veto 2). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F2 — How is the reader's git location-variable list held (finding 24)?** (a) A canonical block in
-  `tools/lib/` inlined in `policy.py` and graded by a parity row, over a set-equality check: it reuses
-  the inline-block seam and gives `TOOL-dRetiredFork-23` its canonical. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  kit's render owns `env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and
+  `env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`; settings-merge keeps hook entries. An `env` mode in
+  `tools/settings-merge.py` would change a separately versioned kit's fragment contract, a public
+  surface the grant for `cl-dClosedLoop-0016` does not name (veto 2). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F2 — How is the reader's git location-variable list held (finding 24)?** (a) S9's canonical block,
+  not a set-equality check: it reuses the inline-block seam and gives `TOOL-dRetiredFork-23` its
+  canonical. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F3 — How is the copied compare base held (finding 29)?** (a) A canonical `compare_base_py` block
   inlined in both copies; a deviation record would still owe the check this is. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F4 — Is a derived-default key in the mirror (finding 3)?** (a) Omitted, so the helper reads it
   through the reader and refuses; a refusal record would add a value shape every JS consumer must
   test for. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F5 — What does `budgets.<cap> = 0` mean (finding 8)?** (a) Unchecked, as each enforcer reads 0
-  today, so `check_budgets` admits non-negative integers; refusing it cannot carry
+  today; refusing it cannot carry
   `INDEX_CAP_LINES="0"` or `DOSSIER_CAP_LINES="0"`, which the census holds, and fails AC28 (veto 1).
   Rung 1: unit 9's data model says 0 "keeps meaning unchecked". RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F6 — How does the policy kit reach `tree_lib` (finding 6)?** (a) The inlined `resolve_kit_dir` and
-  a declared `requires`, a miss refusing, as `tools/memory-recall/extract.py:105-121` does, the seam M5
-  found; inlining the four names would copy `TERMINAL` and `HDR_RE` ungated. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F6 — How does the policy kit reach `tree_lib` (finding 6)?** (a) S26's resolver and declared
+  `requires`, the seam M5 found; inlining the four names would copy `TERMINAL` and `HDR_RE` ungated. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F7 — How is `adopt-policy.sh`'s refusal armed (finding 41)?** (a) A sibling suite run by the
   fixture mode, with its floor row; a pin in `memory/project/unarmed-branches.txt` observes nothing.
   Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F8 — How does reader coverage see units 4 and 9's reads (finding 7)?** (a) Unit 8's pattern
-  segment admits a quoted segment and unit 4 spells its read as a literal; reading `budgets.*` from
-  the census join would special-case one key family. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F8 — How does reader coverage see units 4 and 9's reads (finding 7)?** (a) S27's quoted segment and
+  literal read; reading `budgets.*` from the census join would special-case one key family. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F9 — Where does the refused-reader rule live (finding 44)?** (a) Once, in `budgets.py`, with the
   four shell enforcers' no-launcher branch, not ten spellings of one rule (`[core]`). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F10 — How do the stale agent-cap markers move (finding 38)?** (a) By hand, marker text only, in
@@ -610,8 +601,8 @@ New arm: tools/workflows/check-review-join.test.sh · covers AC33 · the D7 arm 
   before it. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F11 — Who owns the blob reader unit 9 consumes (finding 10)?** (a) `read_blob_at` in `policy.py`,
   which `read_policy_text` calls, not a second git blob read in one kit. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F12 — What happens to the playbook-parity rows (finding 33)?** (a) Retire the bounded-helper row
-  and re-point the resolved-K row to rule 2's sentence; keeping both sentences teaches retired rules
+- **F12 — What happens to the playbook-parity rows (finding 33)?** (a) S35's retire and re-point; keeping
+  both sentences teaches retired rules
   as live, which AC35 forbids. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
@@ -622,6 +613,7 @@ New arm: tools/workflows/check-review-join.test.sh · covers AC33 · the D7 arm 
 - rev-4 · 2026-10-23 · §1 §2 §4 §5 §8 §10 · prose shortened under the spec ceiling; no meaning moved.
 - rev-5 · 2026-10-23 · §1 §3 §4 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling.
 - rev-6 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; older revision lines condensed under the spec ceiling; no design change.
+- rev-7 · 2026-10-24 · §1 §4 §8 §9 · prose shortened under the spec ceiling; no design change.
 
 ## 10. Reuse audit
 
