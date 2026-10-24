@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-32 — the round-1 audit of units 22 to 25, its minors: twenty findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -404,7 +404,7 @@ and passes when it prints no `WRONG`. Let `ORDER_ROWS` stand for
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `govkit selfcheck` · `build-index selftest` · `memory-hygiene self-test` · `spec-tokens self-test` · `tier2-review self-test` · `agent-cap restatement` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `govkit selfcheck` · `build-index selftest` · `memory-hygiene self-test` · `spec-tokens self-test` · `tier2-review self-test` · `agent-cap restatement` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the cases;
 they are named by the arm lines, because neither exists at this spec's base.
@@ -441,6 +441,7 @@ New arm: tools/memory-tree/gen_build_index.py (`--selftest`) · covers AC13 · a
 - rev-3 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
   the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 - rev-4 · 2026-10-24 · §6 · AC11: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
+- rev-5 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

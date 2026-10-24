@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-50 — the help-page parity prints where it found the deferral line, so the install section is read by one rule
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -88,7 +88,7 @@ WITNESS_LINE = python tools/policy/check_policy.py --fixture adopter-fresh-targe
 
 ## 6. Gates
 
-`memory hygiene`
+`memory hygiene` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the case;
 they are named by the arm line, because neither exists at this spec's base.
@@ -103,6 +103,7 @@ none
 
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 22 (HIGH, item H2) of the round-1 spec
   audit of units 35 to 43, with unit 41's parity and its `awk` restatement read on 2026-10-23.
+- rev-2 · 2026-10-24 · §6 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 9. Reuse audit
 

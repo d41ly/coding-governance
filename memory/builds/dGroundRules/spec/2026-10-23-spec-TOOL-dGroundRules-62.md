@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-62 — an unset `budgets.<cap>` reads as no file value: the derived-default refusal is a type the caps module catches, and only that refusal
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -206,7 +206,7 @@ CATCH_PROBE = grep -c "except policy.DerivedDefault" tools/policy/budgets.py
 
 ## 7. Gates
 
-`codebase-map coverage + freshness` · `lexicon naming predicates` · `gotchas selftest` · `memory hygiene` · `recall floor` · `recall floor arms`
+`codebase-map coverage + freshness` · `lexicon naming predicates` · `gotchas selftest` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares run the cases; they are named on the arm line, because
 neither exists at this spec's base.
@@ -229,6 +229,7 @@ New arm: tools/policy/check_policy.py --fixture · covers AC1 AC2 AC3 AC4 · the
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 8 (HIGH, item H4) of the spec run's
   closing diff review, from the skeptic's corrected fix, with units 1, 2, 3, 9 and 21 read at
   `7810198ad` on 2026-10-23.
+- rev-2 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

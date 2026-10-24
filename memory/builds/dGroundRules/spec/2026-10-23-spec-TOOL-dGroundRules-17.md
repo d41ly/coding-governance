@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-17 — the legacy-home list withheld from installs and the cap census graded by what ships, so neither arm reds an adopter
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -172,7 +172,7 @@ Every command runs from the repository root. The criteria spell the kit's files 
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `govkit selfcheck` · `memory hygiene` · `recall floor` · `recall floor arms`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `codebase-map coverage + freshness` · `govkit selfcheck` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares run the cases; they are named by the arm line, because
 neither exists at this spec's base.
@@ -197,6 +197,7 @@ New arm: tools/policy/check_policy.py (`--fixture legacy-homes-present budgets-s
 - rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-22`, `TOOL-dGroundRules-23`,
   `TOOL-dGroundRules-25`, the reciprocal of each promotion of the round-1 spec audit of units 13 to
   21 that repairs this unit; no scope moved.
+- rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

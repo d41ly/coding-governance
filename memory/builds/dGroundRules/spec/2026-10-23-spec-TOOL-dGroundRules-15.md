@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-15 — the `.agent-cap.conf` lowering in one home: inside `resolve_read`, so every reader of the limit sees it
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -156,7 +156,7 @@ Every command runs from the repository root. The criteria spell the kit's files 
 
 ## 7. Gates
 
-`codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms`
+`codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares run the cases; they are named by the arm line, because
 neither exists at this spec's base.
@@ -178,6 +178,7 @@ New arm: tools/policy/check_policy.py (`--fixture limit-conf-mirror limit-conf-l
   audit, from the review's sound fix and specs 3, 5 and 10 read at their audited revisions.
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
   promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
+- rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

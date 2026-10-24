@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-61 — rule 7 bounds every settings layer it can read, so a declared settings file never hides the project's
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -223,7 +223,7 @@ DOC_LAYERS = grep -nE "GOV_SETTINGS_JSON|--settings|managed" help/agent-limit.md
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `gotchas selftest` · `memory hygiene` · `recall floor` · `recall floor arms`
+`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `gotchas selftest` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares run the cases; they are named on the arm line, because
 neither exists at this spec's base.
@@ -259,6 +259,7 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC1 AC3 · a scratch checkout w
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 1 (HIGH, item H3) of the spec run's
   closing diff review, from the skeptic's corrected fix widened by §8 F1 to every read layer, with
   the cited lines read and the harness binary probed on 2026-10-23.
+- rev-2 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-31 — the install-day scaffold defers the mirror over uncommitted inputs, so the first `--scaffold` in a repository with history exits 0
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -157,7 +157,7 @@ Every command runs from the repository root. The criteria spell the kit's files 
 
 ## 7. Gates
 
-`kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `recall floor` · `recall floor arms`
+`kit/dogfood doc parity` · `straggler-guard arms` · `transition-audit arms` · `harness arms (fail branches armed or pinned)` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares run the case and the suite; they are named by the arm
 lines, because neither exists at this spec's base.
@@ -181,6 +181,7 @@ New arm: tools/policy/adopt-policy.test.sh · covers AC4 · `policy.py` staged t
   audit of units 22 to 25, from the skeptic's corrected fix, with the refusal of `TOOL-dGroundRules-5`
   §4 and the install flow of `TOOL-dGroundRules-24` §4 read on 2026-10-23.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

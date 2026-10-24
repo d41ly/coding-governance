@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-38 — the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -152,7 +152,7 @@ DIRS_PROBE  = python -c "import sys; sys.path.insert(0, 'tools/policy'); import 
 
 ## 7. Gates
 
-`codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms`
+`codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the trace;
 they are named by the arm line, because neither exists at this spec's base.
@@ -170,6 +170,7 @@ none
   this worktree and the main checkout on 2026-10-23.
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
   the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
+- rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

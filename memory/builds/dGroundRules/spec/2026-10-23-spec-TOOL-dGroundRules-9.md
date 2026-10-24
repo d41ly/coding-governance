@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0015@8ce57bfb whole
 
@@ -319,7 +319,7 @@ reader as its reader. Each enforcer's own suite changes where it set a limit thr
 
 ## 7. Gates
 
-`line-length gate selftest` · `manifest-check self-test` · `scratch-guard self-test` · `memory-hygiene self-test` · `build-index selftest` · `tier2-review self-test` · `lexicon naming predicates` · `govkit acceptance matrix` · `playbook render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `unattended skill size` · `kickoff engine size <=18KiB` · `template size gate selftest` · `line length` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `memory hygiene` · `roles catalogue` · `kit version markers`
+`line-length gate selftest` · `manifest-check self-test` · `scratch-guard self-test` · `memory-hygiene self-test` · `build-index selftest` · `tier2-review self-test` · `lexicon naming predicates` · `govkit acceptance matrix` · `playbook render selftest` · `template size <=48KiB` · `charter size` · `build-method size` · `unattended protocol size` · `unattended skill size` · `kickoff engine size <=18KiB` · `template size gate selftest` · `line length` · `spec tokens (a spec's own names resolve)` · `spec-tokens self-test` · `memory hygiene` · `roles catalogue` · `kit version markers` · `policy fixtures`
 
 New arm: tools/policy/check_policy.py · covers AC4 AC7 · `arm_limits_readers` and `arm_cap_census` over the repository, in the `policy check` leg TOOL-dGroundRules-1 declares, staged by a planted reader of the limits file and a planted unknown cap request · none
 New arm: tools/policy/check_policy.py --fixture · covers AC1 AC2 AC3 AC5 AC6 AC9 AC10 AC11 · the `budgets-` cases in `CASES`, each planted in the temporary repository, the census cases run under both switch values, in the `policy fixtures` leg · none
@@ -386,6 +386,7 @@ AC8 and AC12 are probes the close reads directly.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-17, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-4 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-62 added, the reciprocal of that unit's **consumes-from** line: the promotion of the spec run's closing diff review's id 8 (item H4), which repairs this unit's S2 read of an unset cap. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-5 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

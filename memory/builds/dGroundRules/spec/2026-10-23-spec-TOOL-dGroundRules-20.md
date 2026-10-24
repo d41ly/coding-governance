@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-20 — the `policy fixtures` guard covers the sibling files its cases run, and a join keeps the census's enforcers inside it
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -137,7 +137,7 @@ Every command runs from the repository root. The case spells the kit's file by b
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `memory hygiene` · `recall floor` · `recall floor arms`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares run the case; they are named by the arm line, because
 neither exists at this spec's base.
@@ -156,6 +156,7 @@ none
   promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 - rev-3 · 2026-10-24 · §6 · a criterion code span rejoined onto one line so hygiene check 23 reads
   the criterion's tokens; no meaning change.
+- rev-4 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0016@df63b6eb whole
 
@@ -12,6 +12,8 @@
 |---|---|---|
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-divergence-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
@@ -56,8 +58,10 @@ do not exceed it.
 - **S3** — The landing regeneration. A `[[generated]]` row in `tools/policy/kit.toml`, `stage = 1`,
   whose `write` and `check` argv are the two S2 modes, so `tools/run-gates/regen.py --write` renders
   it at the merge commit of every landing (`tools/push-main.sh:749-772`) and `--check` grades it
-  before a bar's first leg. Gov's own `.claude/settings.json` is rendered in this unit. Observed by
-  AC5.
+  before a bar's first leg. The builder does not render gov's own `.claude/settings.json`: rewriting
+  it changes the configuration of the session running in this worktree. The main loop renders it at
+  the close, before the bar, through this row's regeneration,
+  `python tools/run-gates/regen.py --write`, and observes AC5 then. Observed by AC5.
 - **S4** — agent-cap's retirements, in `tools/hooks/agent-cap.js`:
   - rule 4, the direct-spawn slot ledger: `guardAgentSpawn`, `sweepTurns`, `gitCommonDir`,
     `SLOT_TTL_MS` and every helper only they call;
@@ -84,8 +88,9 @@ do not exceed it.
   beside the hooks kit, as `resolveHarnessName` probes the workflows kit (`agent-cap.js:109-117`); with
   none there it adds no rule. It reads the landed limit with `readPolicy("runtime.agents-in-flight",
   { repo })` (TOOL-dGroundRules-5), then `.claude/settings.json` and `.claude/settings.local.json` at
-  the payload `cwd`'s checkout root, and takes for each of the two harness variables the value the
-  harness applies, the local file's when set and else the project file's. It refuses, exit 2, when
+  the payload `cwd`'s checkout root; when that `cwd` lies in no checkout it adds no rule, a case
+  TOOL-dGroundRules-21 S38 later makes refuse. It takes for each of the two harness variables the
+  value the harness applies, the local file's when set and else the project file's. It refuses, exit 2, when
   either is absent, not a positive integer, or above the limit, naming the file, the variable, both
   numbers and `python tools/policy/policy.py settings --write`. A `PolicyRefusal` refuses with its
   line. After rule 7 an `Agent` call exits 0. Observed by AC10, AC11.
@@ -182,10 +187,43 @@ past the landed limit.
 `main()` keeps, in order: the `--only=` selector, the payload parse and tool filter, rule 6, rule 7,
 an `Agent` exit 0, rule 0, the script read, rule 2 with its deny message naming `MAX_VERIFIERS` where
 it named `EFFECTIVE_CAP` and `renderCapSource()`, and rule 5. `boundedK` compares against
-`MAX_VERIFIERS`. Rule 2's remedy keeps `boundedParallel(..., MAX_VERIFIERS)` as an example only. The
-suite drops the arms of the retired rules (`tools/hooks/agent-cap.test.sh:1214-1227`, `:1237-1322`,
-`:1917-2001` and the rule 1 and rule 3 corpora) and gains the arms §7 declares. A slot-ledger
-directory an earlier version left under the git common dir is read by nothing and left in place.
+`MAX_VERIFIERS`. Rule 2's remedy keeps `boundedParallel(..., MAX_VERIFIERS)` as an example only. A
+slot-ledger directory an earlier version left under the git common dir is read by nothing and left in
+place.
+
+### The suite after this unit
+
+The suite drops the arms of the retired rules (`tools/hooks/agent-cap.test.sh:1214-1227`, `:1237-1322`,
+`:1917-2001` and the rule 1 and rule 3 corpora) and gains the arms §7 declares. Its update also covers
+the two places where the retirements and rule 7 reach arms that stay:
+
+- **The rule-6 section** (`tools/hooks/agent-cap.test.sh:2355`) builds a checkout, `$HOREPO`, with a
+  bare `.git` and no settings files, so under rule 7 its admit arms would exit 2: AC1's rendered
+  handoff and CRLF variant, AC3's sixth call, AC4's two harness calls, AC5's no-index spawn and
+  inline script, OC27's unit-less handoff and OC14 AC4's index-less checkout. The section's arms run
+  on a copy of the hook in a scratch directory with no `policy` kit beside it, where rule 7 adds no
+  rule (S5). Its refusal arms do not move, since rule 6 decides before rule 7. The slot-ledger
+  checks in that section, `tools/hooks/agent-cap.test.sh:2456-2460`, `:2482-2486` and `:2502-2506`,
+  read the ledger rule 4 kept and are deleted with it, their spawn arms kept. The `--only=scripts`
+  arm at `tools/hooks/agent-cap.test.sh:2517`, which asserts rule 1's `raw parallel()/pipeline()`
+  text, takes a script that spawns one agent per item and asserts rule 2's
+  `spawns one agent per item`, so it still shows that selector runs the script rules.
+- **The no-denial-lost property** (`tools/hooks/agent-cap.test.sh:2046-2281`, against the BASE hook
+  `GOV_BASE_SHA`, `d65da7ab`). A BASE denial that came from a rule this unit retires is an expected
+  loss, excluded by name and never counted as a lost denial. The runner records the BASE run's
+  stderr, which its sink now discards (`:2147`), and names the rule by the denial's opening text:
+  rule 1's `raw parallel()/pipeline()`, rule 3's
+  `a bound is written here that this file cannot resolve`. BASE runs rule 2 before both, so their
+  text means rule 2 admitted the payload there; the exclusion also requires BASE under
+  `--only=join`, passed in the `argv` the runner hands the hook, to admit it, so a rule-5 denial is
+  never hidden behind a retired one. Each exclusion prints `RETIRED rule <n>: <path>`, the summary
+  line counts them, and every other admitted BASE denial still counts as lost or ratified, as now. The
+  property's own fixtures that hit those rules, run against `d65da7ab` on 2026-10-24, are
+  `backtick-in-regex.js` and `exposed-backtick.js` (rule 3, a width of 50) and
+  `template-borne-comment.js` (rule 1). `seq-marked-bounded.js`, `seq-unmarked-braceless.js` and
+  the six nesting-matrix files BASE denies are rule 2's and stay counted; BASE admits the other four,
+  so they never enter the comparison. The property's payloads carry a `cwd` in no checkout, so
+  rule 7 adds no rule to them.
 
 ### Migration
 
@@ -200,7 +238,8 @@ directory an earlier version left under the git common dir is read by nothing an
 
 ### Rollout
 
-Live at landing: the landing's regeneration renders gov's settings, every session started after it
+The builder leaves gov's `.claude/settings.json` alone; the main loop's render at the close, before
+the bar, writes it (S3). Live at landing: the landing's regeneration renders gov's settings, every session started after it
 runs under them, and rule 7 refuses spawns in a worktree whose settings are missing or above the
 landed limit until `policy.py settings --write` is run there.
 
@@ -273,9 +312,11 @@ landed limit until `policy.py settings --write` is run there.
   policy write of `6`, `policy.py settings --check` exits 1 naming both keys, and after `--write`
   both hold `"6"` and `--check` exits 0.
   Red when: either key is absent or keeps the earlier value after the second render.
-- **AC5** — When `python policy.py settings --check` runs over this repository at the
-  unit's commit, it exits 0, and `python tools/run-gates/regen.py --list` lists the S3 row.
+- **AC5** — When the main loop, at the close and before the bar, has rendered this repository's
+  settings through `python tools/run-gates/regen.py --write`, `python policy.py settings --check`
+  exits 0, and `python tools/run-gates/regen.py --list` lists the S3 row.
   Red when: a hand edit sets either `env` value in `.claude/settings.json` to `50`.
+  permission: rewrites the settings of the session in this worktree; the main loop's, at the close, never the builder's.
 - **AC6** — When the run reaches `limit-hook-admits-eight`, a fixture whose `.claude/roles.json`
   declares one `agent`-true role and one harness, under a landed limit of eight with settings
   rendered at eight and `FANOUT_CAP=8` planted in `.agent-cap.conf`, a handoff-valid `Agent` payload
@@ -341,14 +382,15 @@ landed limit until `policy.py settings --write` is run there.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `agent-cap restatement` · `kit version markers` · `memory hygiene`
+`agent-cap self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `agent-cap restatement` · `kit version markers` · `memory hygiene` · `policy fixtures`
 
 New arm: tools/policy/check_policy.py --fixture · covers AC1 AC2 AC3 AC4 AC6 AC7 AC8 AC9 AC10 AC11 · the `limit-` cases in `CASES`, each planting its input in the temporary repository and asserting its outcome, in the `policy fixtures` leg TOOL-dGroundRules-1 declares · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC6 AC7 AC8 AC9 AC10 · a conf at `FANOUT_CAP=8`, six spawns in one prompt, a raw `parallel` script, a width of 50 and a set `AGENT_CAP`, each admitted, and settings above a fixture limit refused, staged by running each arm against the base revision's hook, `git show 3708a705:tools/hooks/agent-cap.js` in the suite's scratch copy · none
 New arm: tools/govkit/selftest.py · covers AC12 · its fixture renderer arm, re-pointed from the print mode to the policy reader, staged by an absent `policy` kit · none
 New arm: tools/workflows/unattended-build.test.sh · covers AC12 · its renderer arm at line 1997, re-pointed to the policy reader, staged by a reader answering a non-integer · none
 
-AC5, AC13 and AC14 are probes the close reads directly; AC13 is also the `verifier fan-out` leg's
+AC5, AC13 and AC14 are probes the close reads directly, AC5 after the main loop's settings render
+(S3); AC13 is also the `verifier fan-out` leg's
 verdict. AC15 to AC17 are the main loop's live observation at the close, and no suite runs them.
 
 ## 8. Open questions
@@ -405,6 +447,7 @@ verdict. AC15 to AC17 are the main loop's live observation at the close, and no 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-15, TOOL-dGroundRules-18, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-3 · 2026-10-24 · §6 · AC12, AC14: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
+- rev-4 · 2026-10-24 · §2 S3, S5 · §4 · §6 AC5 · §7 · what disagreed: the builder's DIVERGENCE, `--dispatch` refusing at check 49 because `tools/check-spec-tokens.py` reds this spec at INPROGRESS: §4's write set names `tools/policy/policy.py`, which trips the `policy fixtures` leg's guard, and §7's leg line lacked that leg though §7's first `New arm:` line puts the `limit-` cases in it; plus four gaps the builder found. Rulings: (1) §7's leg line adds `policy fixtures`; (2) S3, AC5, §4 Rollout: the builder does not render gov's own `.claude/settings.json`, since rewriting it changes the configuration of the session running in the worktree; the main loop renders it at the close, before the bar, through the file's `[[generated]]` regeneration, and observes AC5 then; (3) S5: rule 7 adds no rule when the payload `cwd` lies in no checkout, which TOOL-dGroundRules-21 S38 later makes refuse; (4) §4's new suite section: the rule-6 arms run on a hook copy with no `policy` kit beside it, the three slot-ledger checks are deleted and the `--only=scripts` arm asserts rule 2 in place of rule 1, line numbers re-read against the tree; (5) the same section: the no-denial-lost property excludes by name a BASE denial from rule 1 or rule 3 as an expected loss, never counted as lost, and lists its three fixtures that hit those rules, each re-run against `d65da7ab`.
 
 ## 10. Reuse audit
 

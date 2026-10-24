@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -563,7 +563,7 @@ short-named.
 
 ## 7. Gates
 
-`push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `build-index selftest` · `memory-hygiene self-test` · `spec-tokens self-test` · `template size gate selftest` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `kit/dogfood doc parity` · `playbook parity` · `playbook parity selftest` · `agent-cap restatement` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `install-prefix (shipped surface)` · `foreign-prefix parity (every self-test at three prefixes)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `recall floor` · `recall floor arms`
+`push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `build-index selftest` · `memory-hygiene self-test` · `spec-tokens self-test` · `template size gate selftest` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `kit/dogfood doc parity` · `playbook parity` · `playbook parity selftest` · `agent-cap restatement` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `install-prefix (shipped surface)` · `foreign-prefix parity (every self-test at three prefixes)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the cases;
 they are named by the arm lines, because neither exists at this spec's base.
@@ -604,17 +604,13 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
 
 ## 9. Revision log
 
-- rev-1 · 2026-10-23 · initial draft, promoting the twenty-eight MEDIUM and eleven LOW findings of
-  the round-1 spec audit of units 13 to 21 in one batch, from the review's sound fixes and the
-  skeptics' corrected fixes for ids 2, 22, 23, 26 and 35, with each cited line read at base
-  `3708a705`.
-- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-27, TOOL-dGroundRules-30, TOOL-dGroundRules-31, TOOL-dGroundRules-32 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
-- rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-33, TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
-- rev-4 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling after the closing
-  review's records row: repeats between sections dropped, each resolved fork cut to its decision and
-  reason; no meaning moved.
-- rev-5 · 2026-10-23 · §1 §2 §3 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
-- rev-6 · 2026-10-24 · §6 · a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
+- rev-1 · 2026-10-23 · initial draft from the round-1 spec audit of units 13 to 21, twenty-eight MEDIUM and eleven LOW findings.
+- rev-2 · 2026-10-23 · §3 · hands-off edges to TOOL-dGroundRules-27, TOOL-dGroundRules-30, TOOL-dGroundRules-31 and TOOL-dGroundRules-32 added.
+- rev-3 · 2026-10-23 · §3 · hands-off edges to TOOL-dGroundRules-33 and TOOL-dGroundRules-34 added.
+- rev-4 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling; no meaning moved.
+- rev-5 · 2026-10-23 · §1 §2 §3 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling.
+- rev-6 · 2026-10-24 · §6 · a criterion code span rejoined onto one line for hygiene check 23.
+- rev-7 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; older revision lines condensed under the spec ceiling; no design change.
 
 ## 10. Reuse audit
 

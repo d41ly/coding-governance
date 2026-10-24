@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-18 — a writer split bounded by the agent limit: rule 2 judges `gov:fixed-writers` against `runtime.agents-in-flight` and verifiers against `MAX_VERIFIERS`
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -163,7 +163,7 @@ Every command runs from the repository root. The case spells the policy kit's fi
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out` · `workflow script syntax` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kit version markers` · `memory hygiene` · `recall floor` · `recall floor arms`
+`agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out` · `workflow script syntax` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `lexicon naming predicates` · `codebase-map coverage + freshness` · `kit version markers` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 New arm: tools/policy/check_policy.py (`--fixture limit-hook-writer-split`) · covers AC1 AC2 AC3 AC4 · the split's marker staged back to `gov:fixed-verifiers`, then `readWriterBound` staged to answer `MAX_VERIFIERS` always · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC2 AC3 · a writer split above a stub limit and a verifier split at 6, each refused, staged in the suite's own scratch copy by a stub `policy-mirror.js` answering the limit · that suite's assertion count, raised by the arms added
@@ -189,6 +189,7 @@ New arm: tools/hooks/agent-cap.test.sh · covers AC2 AC3 · a writer split above
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-25`, the reciprocal of each
   promotion of the round-1 spec audit of units 13 to 21 that repairs this unit; no scope moved.
 - rev-3 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-30 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 22 to 25 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-4 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

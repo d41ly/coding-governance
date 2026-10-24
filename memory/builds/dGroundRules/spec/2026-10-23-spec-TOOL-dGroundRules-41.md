@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-41 — the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -146,7 +146,7 @@ HELP_MOVED    = in a scratch copy's help/policy.md, the deferral line moved unde
 
 ## 7. Gates
 
-`run-gates gov canary` · `measure-legs selftest` · `memory hygiene` · `run-gates canary`
+`run-gates gov canary` · `measure-legs selftest` · `memory hygiene` · `run-gates canary` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the case;
 they are named by the arm line, because neither exists at this spec's base.
@@ -164,6 +164,7 @@ none
   owes, with units 1, 31 and 34's help-page items read on 2026-10-23.
 - rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-48`, `TOOL-dGroundRules-49`, `TOOL-dGroundRules-50`, `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
   the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
+- rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

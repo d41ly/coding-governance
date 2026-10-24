@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-23 — the registry join holds each census row's destination and entry to what the deployer installs
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -165,7 +165,7 @@ Every command runs from the repository root. The criteria spell the kit's files 
 
 ## 7. Gates
 
-`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `memory hygiene` · `recall floor` · `recall floor arms`
+`run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `govkit selfcheck` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares run the case; they are named by the arm line, because
 neither exists at this spec's base.
@@ -194,6 +194,7 @@ New arm: tools/policy/check_policy.py (`--fixture budgets-ships-join`) · covers
   meaning is unchanged.
 - rev-5 · 2026-10-23 · §1 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling, the id a landed dSafePassage ask holds; nothing else moved.
 - rev-6 · 2026-10-24 · §6 · AC3: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
+- rev-7 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 
 ## 10. Reuse audit
 

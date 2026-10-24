@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -582,7 +582,7 @@ holding `govkit.py` to its innermost enclosing function, and prints each line wh
 
 ## 7. Gates
 
-`review-protocol parity (kit vs dogfood)` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `spec-tokens self-test` · `harness arms (fail branches armed or pinned)` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms`
+`review-protocol parity (kit vs dogfood)` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `spec-tokens self-test` · `harness arms (fail branches armed or pinned)` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
 The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the cases;
 they are named by the arm lines, because neither exists at this spec's base.
@@ -628,13 +628,10 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
 
 ## 9. Revision log
 
-- rev-1 · 2026-10-23 · initial draft, promoting the twenty-three MEDIUM and fourteen LOW findings of
-  the round-1 spec audit of units 26 to 32 in one batch, from the review's sound fixes and the
-  skeptic's corrected fixes for ids 24, 30 and 35, with each cited line read at `f4d31452a`.
-- rev-2 · 2026-10-23 · §3 · hands-off edges to units 38-41 and 43, reciprocals of their consumes-from lines; nothing else moved.
-- rev-3 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling after the closing
-  review's records row: repeats between sections dropped, each resolved fork cut to its decision and
-  reason; no meaning moved.
+- rev-1 · 2026-10-23 · initial draft from the round-1 spec audit of units 26 to 32, twenty-three MEDIUM and fourteen LOW findings.
+- rev-2 · 2026-10-23 · §3 · hands-off edges to units 38-41 and 43 added.
+- rev-3 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling; no meaning moved.
+- rev-4 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; older revision lines condensed under the spec ceiling; no design change.
 
 ## 10. Reuse audit
 
