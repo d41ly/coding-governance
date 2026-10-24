@@ -81,3 +81,11 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-23T23:58:27Z dispatch · item 5f0e8922 TOOL-dGroundRules-28 · reason memory/gotchas/test-oracle-read-from-a-historical-sha.md memory/gotchas/INDEX.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-28.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-28-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/LIVE.md
 
 2026-10-23T23:58:33Z brief · item TOOL-dGroundRules-28 · reason 0684c7fc5d2c memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-28-build-brief.md
+
+2026-10-24T00:07:47Z dispatch · item 0cfed8ae TOOL-dGroundRules-65 · reason tools/policy/policy.py tools/policy/policy-mirror.js tools/policy/check_policy.py tools/policy/README.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-65.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-65-ledger.md
+
+2026-10-24T00:07:52Z brief · item TOOL-dGroundRules-65 · reason 8a7bf132fc74 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-65-build-brief.md
+
+2026-10-24T00:16:04Z dispatch · item 0cfed8ae TOOL-dGroundRules-65 · reason tools/policy/policy.py tools/policy/policy-mirror.js tools/policy/check_policy.py tools/policy/README.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-65.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-65-ledger.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-65-deviation-70.md
+
+2026-10-24T00:17:12Z dispatch · item 0cfed8ae TOOL-dGroundRules-65 · reason tools/policy/policy.py tools/policy/policy-mirror.js tools/policy/check_policy.py tools/policy/README.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-65.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-65-ledger.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-65-deviation-70.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

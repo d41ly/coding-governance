@@ -15,7 +15,8 @@
 //      `.governance/policy.toml` and `<kit>/catalogue.toml` at L, null where absent. A missing
 //      mirror, or text that does not parse as a JSON mirror, is ABSENT.
 //   4. Both recorded ids equal the ids at L: the mirror is FRESH, and a key it holds is returned
-//      with its recorded source and reason. A key it does not hold goes to step 6.
+//      with its recorded source and reason, each `{rev}` the render wrote in the reason filled with
+//      `<L8>, the landed revision` (TOOL-dGroundRules-65). A key it does not hold goes to step 6.
 //   5. Any id differing: the mirror is STALE.
 //   6. ABSENT, STALE or a missing key: `policy-shim.sh get policy-file.on-invalid`. Any value but
 //      `last-valid` throws `policy: refused · .governance/policy.json:0 · <absent|stale> at <L8>;
@@ -104,7 +105,9 @@ function readPolicy(key, { repo = process.cwd() } = {}) {
   else if (m.doc.policy_blob !== m.policyBlob || m.doc.catalogue_blob !== m.catalogueBlob) failed = "stale";
   else if (Object.prototype.hasOwnProperty.call(m.doc.keys, key)) {
     const hit = m.doc.keys[key];
-    return { value: hit.value, source: hit.source, reason: hit.reason };
+    const reason = typeof hit.reason === "string"
+      ? hit.reason.split("{rev}").join(`${landed.slice(0, 8)}, the landed revision`) : hit.reason;
+    return { value: hit.value, source: hit.source, reason };
   }
   const at = `${failed} at ${landed.slice(0, 8)}`;
   if (failed) {

@@ -146,7 +146,8 @@ for the legacy homes.
   name rule above; no row refuses, naming the catalogue.
 - **The value.** `parse_policy` maps each leaf's segment tuple to its value; a table is never a
   value. `resolve` runs `RESOLUTION_ORDER`, the one order, and the first step to answer wins; each
-  step takes `(path, row, table, sha, how)`, `table` None for an absent file. `read_file_value`
+  step takes `(path, row, table, rev_phrase)`, `table` None for an absent file, and names the
+  revision read only through `rev_phrase`, the read's `<sha8>, <how>`. `read_file_value`
   answers `Resolution(value, "file", reason)` where the file sets the key; `read_default_value`
   answers the row's `default` with source `default` and a reason naming the case, absent or not
   set, and any `preset` the file names, which no step applies until dKeptSession adds its step
@@ -168,7 +169,8 @@ for the legacy homes.
   (`GIT_LOCATION_VARS`), so a reader started inside a hook or a fixture reads the repository it was
   pointed at.
 - **One read per revision.** `read_revision(repo, rev)` reads the revision, its text, `validate`'s
-  problems and the parsed table once; `resolve_read(path, row, read)` is the one composition of
+  problems and the parsed table once, and spells the revision once as its `rev_phrase`, which
+  every reason names; `resolve_read(path, row, read)` is the one composition of
   `RESOLUTION_ORDER` and the invalid-file branch over it, the last valid revision walked to once per
   read. `resolve` calls the two in turn.
 
@@ -192,6 +194,13 @@ the reader refuses, an invalid file under `refuse` say, refuses the render, so a
 one stops naming the line. The blob ids pin the mirror to its policy, never a commit id: a commit
 cannot carry its own id, and the lander renders before the merge commit exists.
 
+**No commit in the bytes** (TOOL-dGroundRules-65). The render sets the read's `rev_phrase` to the
+placeholder `{rev}`, so every reason names the revision read as `{rev}`; a `last-valid` reason keeps
+the last valid revision's own sha8, history no rewrite changes. The invariant: two commits with the
+same policy blob, the same catalogue blob and the same first-parent history render byte-identical
+mirrors, so the mirror the lander renders into a merge stays fresh after its `git commit-tree`
+rewrite.
+
 **Regenerated at every landing.** `kit.toml`'s `[[generated]]` row, stage 2, names `mirror --write`
 and `mirror --check`, so the run-gates kit's `regen.py --write` renders it into each landing the
 lander makes, and the bar's preflight runs the check. A branch carrying a policy change carries a
@@ -199,7 +208,8 @@ stale mirror until it lands.
 
 **Read from the landed blob only.** `policy-mirror.js`'s `readPolicy(key, { repo })` finds the
 landed revision L through `policy-shim.sh landed`, reads the mirror's blob at L and the two blob ids
-there, and takes a key from the mirror only while both ids match. A stale or absent mirror, or a key
+there, and takes a key from the mirror only while both ids match, each `{rev}` in its reason filled
+with `<L8>, the landed revision`. A stale or absent mirror, or a key
 it does not hold, is read through the reader by `policy-shim.sh get <key>`; a mirror failure first
 reads `policy-file.on-invalid`, and any value but `last-valid` refuses naming the mirror. A fallback's
 reason opens `mirror absent at <L8>` or `mirror stale at <L8>`. The working-tree mirror is never
@@ -300,7 +310,10 @@ must refuse naming `.governance/policy.json:0` and red `arm_mirror_landed`; `mir
 lands no mirror, refused under `refuse` and read as the reader reads it under `last-valid`. Every
 other outcome case must leave `arm_mirror_landed` green. `mirror-landed-parity` runs the shim's
 `landed` beside `derive_landed_revision` with two remotes and `GOV_REMOTE`, two without, one, and
-none: the same sha, or both refusing, in each.
+none: the same sha, or both refusing, in each. `mirror-commit-rewrite` runs `mirror --write` at a
+commit, commits the mirror, and rewrites that commit with `git commit-tree` over its tree and
+parents: `mirror --check` must print `policy: mirror fresh` at both, and the helper, reading the
+rewrite pushed as L, must name L's sha8 as the landed revision with no `{rev}` left.
 
 The thirteen `guard-*` cases copy `guard.py` and `guarded-paths.txt` into the kit copy and commit a
 policy file whose `[budgets]` table caps a tracked `big.md` at 100, a tracked `small.md` at 50 and the

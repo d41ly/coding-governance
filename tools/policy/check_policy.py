@@ -66,6 +66,9 @@ and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies 
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
 and asserts what the helper, a four-line fixture hook and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in four ladder states.
+`mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
+that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
+at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
 
 The `guard-*` cases are outcome cases of the minimal guard (TOOL-dGroundRules-6): each copies
 `guard.py` and `guarded-paths.txt` into the kit copy, commits a policy file capping a tracked `big.md`
@@ -1050,7 +1053,10 @@ def run_mirror_landed(name):
     must refuse. `mirror-stale-last-valid`: L sets 3 and carries the mirror rendered at 2, read as 3
     with a reason opening `mirror stale at`. `mirror-stale-refuse`: the same under `refuse`, a refusal
     naming the mirror, which `arm_mirror_landed` reds. `mirror-absent-refuse`: L carries no mirror,
-    refused under `refuse`, then read as the reader reads it under `last-valid`."""
+    refused under `refuse`, then read as the reader reads it under `last-valid`.
+    `mirror-commit-rewrite` (TOOL-dGroundRules-65): `mirror --write` at A, committed as B, and B
+    rewritten by `git commit-tree` over its tree and parents into B', as `--prepare` folds a merge:
+    `mirror --check` fresh at B and at B', and the helper reading B' as L fills `{rev}` with L8."""
     rows = policy.load_catalogue(KIT)
     repo, kit, bare = build_landed_repo(rows)
     try:
@@ -1080,6 +1086,24 @@ def run_mirror_landed(name):
             at = set_landed(repo, "refuse", 3, True)
             checks.append(check_run(at_l, what, helper, lambda rc, o, e: rc == 2 and not o
                                     and e.startswith(f"{refused}stale at {at}; policy-file.on-invalid is refuse")))
+        elif name == "mirror-commit-rewrite":
+            cli = [sys.executable, str(kit / "policy.py"), "mirror"]
+            checks.append(check_run("A", "policy.py mirror --write", cli + ["--write"],
+                                    lambda rc, o, e: rc == 0 and o.startswith("policy: mirror written"), cwd=repo))
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "the mirror, rendered at its parent")
+            b = run_fixture_git(repo, "rev-parse", "HEAD")
+            parents = run_fixture_git(repo, "rev-parse", "HEAD^@").split()
+            rewrite = run_fixture_git(repo, "commit-tree", f"{b}^{{tree}}", *(a for p in parents for a in ("-p", p)),
+                                      "-m", "the mirror, rewritten by commit-tree")
+            checks.append(("B'", "a new commit over B's tree and parents", rewrite != b, f"B {b[:8]} · B' {rewrite[:8]}"))
+            for at, sha in (("B, the commit carrying the mirror", b), ("B', its commit-tree rewrite", rewrite)):
+                run_fixture_git(repo, "reset", "-q", "--hard", sha)
+                checks.append(check_run(at, "policy.py mirror --check", cli + ["--check"],
+                                        lambda rc, o, e: rc == 0 and o == "policy: mirror fresh\n", cwd=repo))
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            checks.append(check_run("B' landed as L", what + " --explain", helper + ["--explain"], lambda rc, o, e:
+                                    rc == 0 and f"at {rewrite[:8]}, the landed revision" in e and "{rev}" not in e))
         else:  # mirror-absent-refuse
             at = set_landed(repo, "refuse", 3, False)
             checks.append(check_run(at_l, what + " under refuse", helper, lambda rc, o, e: rc == 2 and not o
@@ -1263,6 +1287,7 @@ CASES = [
     ("mirror-stale-last-valid", None, run_mirror_landed),
     ("mirror-stale-refuse", None, run_mirror_landed),
     ("mirror-absent-refuse", None, run_mirror_landed),
+    ("mirror-commit-rewrite", None, run_mirror_landed),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side"]),  # outcome cases: guard.py --staged
 ]
@@ -1274,8 +1299,10 @@ def derive_cases(rows):
 
 
 def run_fixture_git(repo, *args):
-    subprocess.run(["git", "-C", str(repo), "-c", "user.name=policy-fixture", "-c", "user.email=policy-fixture@invalid",
-                    "-c", "commit.gpgsign=false", *args], check=True, capture_output=True)
+    """`git <args>` in a fixture repository, as the fixture's committer -> its stdout, stripped."""
+    return subprocess.run(["git", "-C", str(repo), "-c", "user.name=policy-fixture", "-c", "user.email=policy-fixture@invalid",
+                           "-c", "commit.gpgsign=false", *args], check=True, capture_output=True,
+                          text=True, encoding="utf-8", errors="replace").stdout.strip()
 
 
 def build_repo(rows):

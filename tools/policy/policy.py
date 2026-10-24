@@ -19,7 +19,8 @@ final `*`, each matching exactly one segment, and fewer placeholders outrank mor
 THE READER reads `.governance/policy.toml` as committed at the landed revision, never from the
 working tree, and parses it with tomllib, never by sourcing it: `read_policy_key`'s contract in the
 unattended kit, carried to TOML. The landed revision is the remote tip the remote ladder names, or
-with no remote at all the local default branch, and every reason names its sha. A key resolves in
+with no remote at all the local default branch, and every reason names its sha through the read's
+one `rev_phrase`, which the mirror's render spells `{rev}` (TOOL-dGroundRules-65). A key resolves in
 RESOLUTION_ORDER, spelled once: the file's value, then the catalogue default with its reason. A
 file `validate` refuses never reads a default: the whole file falls back to its last valid revision
 on the first-parent history, or refuses at a line, as that revision's `policy-file.on-invalid` says.
@@ -503,8 +504,9 @@ def read_last_valid_value(path, row, read):
     revision is walked to once per read and kept on it. `policy-file.on-invalid` is read from that
     revision by RESOLUTION_ORDER, never from the invalid file; with no valid revision, or with any
     value but `last-valid`, a Refusal at the first problem's line. Else RESOLUTION_ORDER over that
-    revision's table, its reason naming both shas, the line and the problem."""
-    sha, how, first = read["sha"], read["how"], read["problems"][0]
+    revision's table, its reason naming the line, the problem, the valid sha, and the revision read
+    through `read["rev_phrase"]` alone (TOOL-dGroundRules-65)."""
+    sha, first = read["sha"], read["problems"][0]
     what = (f"{first.key}: " if first.key else "") + first.why
     if "last_valid" not in read:
         read["last_valid"] = read_last_valid(read["repo"], sha)
@@ -512,15 +514,19 @@ def read_last_valid_value(path, row, read):
     if found is None:
         raise Refusal(POLICY_REL, first.line, f"{what}; no valid revision of the file precedes {sha[:8]}")
     valid, table = found
-    at = f"walked back from {sha[:8]}, {how}"
+    # The valid revision is history the lander's rewrite keeps, so it is named by its own sha8.
+    at = f"{valid[:8]}, walked back from {read['rev_phrase']}"
     if "on_invalid" not in read:
         on_path = parse_key("policy-file.on-invalid")
-        read["on_invalid"] = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, valid, at).value
+        read["on_invalid"] = read_ordered_value(on_path, read_catalogue_row(on_path, load_catalogue(KIT)), table, at).value
     on = read["on_invalid"]
     if on != "last-valid":  # deny by default: only the one fallback value falls back
         raise Refusal(POLICY_REL, first.line, f"{what}; policy-file.on-invalid is {on} at {valid[:8]}")
-    hit = read_ordered_value(path, row, table, valid, at)
-    return Resolution(hit.value, "last-valid", f"{POLICY_REL} at {sha[:8]} is invalid, line {first.line}: {what}; "
+    hit = read_ordered_value(path, row, table, at)
+    # ponytail: the opening names the revision read without its how-phrase, so it takes the phrase's
+    # head before ", ": a sha8 holds no comma and the render's `{rev}` none, so the head is one or the other.
+    named = read["rev_phrase"].split(", ", 1)[0]
+    return Resolution(hit.value, "last-valid", f"{POLICY_REL} at {named} is invalid, line {first.line}: {what}; "
                       f"read from the last valid revision {valid[:8]}: {hit.reason}")
 
 
@@ -538,22 +544,23 @@ def check_revision(repo, rev):
     return f"policy: check · every key falls back to the last valid revision · policy-file.on-invalid is {hit.value}: {hit.reason}"
 
 
-def read_file_value(path, row, table, sha, how):
+def read_file_value(path, row, table, rev_phrase):
     """Resolution(value, "file", reason) when the parsed `table` sets `path`, else None. `row` is
-    unread: every step of the resolution order shares this signature."""
+    unread: every step of the resolution order shares this signature, `rev_phrase` the read's."""
     if table is None or path not in table:
         return None
-    return Resolution(table[path], "file", f"set in {POLICY_REL} at {sha[:8]}, {how}")
+    return Resolution(table[path], "file", f"set in {POLICY_REL} at {rev_phrase}")
 
 
-def read_default_value(path, row, table, sha, how):
-    """Resolution(the row's default, "default", reason), the reason naming the sha8 and the case: the
-    file absent (`table` None) or present and not setting `path`, then any `preset` the file names,
-    which is not applied. A row with no `default` is a Refusal naming it, never an invented value."""
+def read_default_value(path, row, table, rev_phrase):
+    """Resolution(the row's default, "default", reason), the reason naming the revision by
+    `rev_phrase` and the case: the file absent (`table` None) or present and not setting `path`, then
+    any `preset` the file names, which is not applied. A row with no `default` is a Refusal naming
+    it, never an invented value."""
     if "default" not in row:
         raise Refusal((KIT / CATALOGUE).as_posix(), 0,
                       f"the row {row.get('name')} carries no default, so {render_dotted(path)} has no value to read")
-    at = f"at {sha[:8]}, {how}; the catalogue default"
+    at = f"at {rev_phrase}; the catalogue default"
     reason = f"{POLICY_REL} is absent {at}" if table is None else f"not set in {POLICY_REL} {at}"
     if table is not None and ("preset",) in table:
         p = table[("preset",)]
@@ -563,19 +570,19 @@ def read_default_value(path, row, table, sha, how):
 
 
 # The one order a key resolves in (TOOL-dGroundRules-3): `resolve` calls each step with (path, row,
-# table, sha, how) and the first Resolution answers. dKeptSession adds its preset step between the two.
+# table, rev_phrase) and the first Resolution answers. dKeptSession adds its preset step between the two.
 RESOLUTION_ORDER = (read_file_value, read_default_value)
 
 
-def read_ordered_value(path, row, table, sha, how):
+def read_ordered_value(path, row, table, rev_phrase):
     """The first Resolution RESOLUTION_ORDER answers for `path` over a parsed `table`, None for an
-    absent file."""
+    absent file, each reason naming the revision by `rev_phrase`."""
     for step in RESOLUTION_ORDER:
-        hit = step(path, row, table, sha, how)
+        hit = step(path, row, table, rev_phrase)
         if hit is not None:
             return hit
     # Unreachable while the default step stands, which answers or refuses: deny, never a None value.
-    raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {render_dotted(path)} at {sha[:8]}")
+    raise Refusal(POLICY_REL, 0, f"no step of the resolution order answers {render_dotted(path)} at {rev_phrase}")
 
 
 def read_revision(repo, rev=None, rows=None):
@@ -583,12 +590,14 @@ def read_revision(repo, rev=None, rows=None):
     resolved to a full sha, else the landed one, and how it was found; the policy text there;
     `validate`'s problems; and the parsed table, None for an absent or invalid file. The last valid
     revision and its `policy-file.on-invalid` join it on first need. A dict, so a render reads git
-    once for every key."""
+    once for every key. `rev_phrase`, `<sha8>, <how>`, is the one spelling of the revision read that
+    every reason names (TOOL-dGroundRules-65); `render_mirror` sets it to `{rev}`."""
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
     text = read_policy_text(repo, sha)
     problems = [] if text is None else validate(text, rows)
     table = None if text is None or problems else parse_policy(text)
-    return {"repo": repo, "sha": sha, "how": how, "text": text, "problems": problems, "table": table}
+    return {"repo": repo, "sha": sha, "how": how, "rev_phrase": f"{sha[:8]}, {how}", "text": text,
+            "problems": problems, "table": table}
 
 
 def resolve_read(path, row, read):
@@ -597,7 +606,7 @@ def resolve_read(path, row, read):
     None), are answered by RESOLUTION_ORDER. The one composition of the two."""
     if read["problems"]:
         return read_last_valid_value(path, row, read)
-    return read_ordered_value(path, row, read["table"], read["sha"], read["how"])
+    return read_ordered_value(path, row, read["table"], read["rev_phrase"])
 
 
 def resolve(key, repo=".", rev=None):
@@ -643,9 +652,15 @@ def render_mirror(repo, rev="HEAD"):
     kit's catalogue there, null where absent, and the Resolution of every catalogue name with no
     `*` or `<...>` segment and of every key the file there sets that a pattern row matches, each
     through `resolve_read` over ONE `read_revision` read. Sorted keys, two-space indent, ASCII, LF:
-    one revision renders one byte string. The resolution's Refusal passes through."""
+    one revision renders one byte string. The resolution's Refusal passes through.
+
+    THE INVARIANT (TOOL-dGroundRules-65): two commits with the same policy blob, the same catalogue
+    blob and the same first-parent history render byte-identical mirrors. The read's `rev_phrase` is
+    the placeholder `{rev}`, so no reason names the rendered commit, which the lander's commit-tree
+    rewrite replaces; `policy-mirror.js` fills it with the landed revision it read."""
     rows = load_catalogue(KIT)
     read = read_revision(repo, rev, rows)
+    read["rev_phrase"] = "{rev}"
     paths = {tuple(str(r["name"]).split(".")) for r in rows if r.get("name") and not check_pattern_name(r["name"])}
     keys = {}
 
