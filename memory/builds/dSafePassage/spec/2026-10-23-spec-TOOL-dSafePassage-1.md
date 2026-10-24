@@ -16,6 +16,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-11.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-145.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-145.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-146.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-146.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md](../build/2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-4-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-4-spec-writer.md) | journal | — |
