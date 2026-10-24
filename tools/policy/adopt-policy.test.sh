@@ -8,7 +8,8 @@
 #   bash <this kit>/adopt-policy.test.sh     # exit 0 every arm held, 1 one did not
 set -u
 export GIT_CONFIG_GLOBAL=/dev/null GIT_CONFIG_SYSTEM=/dev/null
-HERE="$(cd "$(dirname "$0")" && pwd)"
+case "$0" in */*) HERE=${0%/*} ;; *) HERE=. ;; esac
+HERE="$(cd "$HERE" && pwd)"
 TOOL="$HERE/adopt-policy.sh"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 pass=0; fail=0
@@ -24,7 +25,7 @@ mkrepo() { # name [commit] -> a scratch target at $TMP/<name>, on main, committe
 want() { # label · exit wanted · text the output must carry · adopter args...
   local label=$1 rc=$2 text=$3 out got; shift 3
   out=$(bash "$TOOL" "$@" 2>&1); got=$?
-  if [ "$got" = "$rc" ] && printf '%s' "$out" | grep -qF -- "$text"; then ok "$label (exit $got)"
+  if [ "$got" = "$rc" ] && [[ "$out" == *"$text"* ]]; then ok "$label (exit $got)"
   else bad "$label" "exit $got, want $rc carrying '$text': $out"; fi
 }
 

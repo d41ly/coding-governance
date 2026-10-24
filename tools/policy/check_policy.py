@@ -3059,6 +3059,11 @@ def run_budget_case(name):
             checks.append((f'"{cap.name}" = 0, an index over every other value, under refuse', "the enforcer exits 0",
                            rc == 0 and "check 6 FAILED" not in out and "check 7 FAILED" not in out,
                            f"exit {rc} · {render_said(out, 'FAILED')}"))
+            # The control: the same index under a value it is over refuses, so the 0 above is what passed it.
+            r = build_cap_repo(t / "control", p["files"], "refuse", f'"{cap.name}" = 10\n')
+            rc, out = run_case_argv(r, p["argv"])
+            checks.append((f'"{cap.name}" = 10, the same index, under refuse', "the enforcer refuses",
+                           rc not in (0, None), f"exit {rc} · {render_said(out, 'FAILED')}"))
         elif name == "budgets-reader-refused":
             # TOOL-dGroundRules-21 S31: a reader that refuses gives the cap `refuse`, never `warn`, and the
             # refusal prints once; with no launcher the enforcer takes its no-kit branch and says why.
