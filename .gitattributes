@@ -20,6 +20,12 @@ tools/template-size-highwater.txt text eol=lf
 # The DECLARED ceilings, same reason: the gate parses this file, and an unpinned path smudges to
 # CRLF on this fleet. A person edits it, so it never gets a rewrite to normalise it back.
 tools/template-size-limits.txt text eol=lf
+# The policy kit's parsed files (TOOL-dGroundRules-21 S2): the policy file, and the kit's catalogue,
+# cap census and lists, each read by tomllib or a line parser and byte-compared with a fresh render, so
+# a CRLF checkout under core.autocrlf=true would read a fresh file as changed.
+.governance/policy.toml text eol=lf
+tools/policy/*.toml text eol=lf
+tools/policy/*.txt text eol=lf
 # The runner's DECLARED hardware profile table: parsed at runtime with a TAB field separator, so a
 # stray CR lands inside the last field and turns `timeout=0` into a value the runner refuses.
 tools/run-gates/gate-profiles.txt text eol=lf

@@ -63,7 +63,10 @@ allowed values and every check.
   - `refuse`: every read refuses, naming the invalid file's line.
 
   A missing file is not invalid: every key reads its default. A key the file does not set reads its
-  default too.
+  default too, except a key whose catalogue default is prose, `{ derived = "..." }`: no reader
+  computes it yet, so `get` refuses it, naming the row, until the file sets the key. A file saved in
+  another encoding than UTF-8, as a PowerShell redirect writes it, is invalid, and a clone too
+  shallow to reach a valid commit refuses saying `history is shallow`; fetch more history.
 - **Check the committed file:** `python tools/policy/policy.py check` checks the file as committed at
   `HEAD`, the commit a push lands; `--rev <rev>` checks another commit. It exits 0 with one
   `policy: check · ...` line when the file is valid, missing, or invalid with a valid commit to fall
@@ -72,9 +75,13 @@ allowed values and every check.
   to fall back to blocks the push.
 - **Check the file:** `python tools/policy/check_policy.py`. It refuses a value outside its key's
   allowed values, an empty set for a key that is never empty, and a key no catalogue row names. Each
-  check prints one line with the number it read; a check that read nothing is red too.
+  check prints one line with the number it read; a check that read nothing is red too, unless reading
+  nothing is a legal state, no policy file yet, no tracked code, or no owner build landed, which it
+  prints as `not graded`.
 - **Start a file in another repository:** `bash tools/policy/adopt-policy.sh --scaffold --target <repo>`.
-  It writes the starter file only where none exists. `--check --target <repo>` checks that repository.
+  It writes the starter file only where none exists, then renders the harness settings from the agent
+  limit wherever the repository has a commit, so the first agent spawn passes. `--check --target
+  <repo>` checks that repository.
 - **See which keys are documented:** a catalogue row with no `summary` or no `usage` is named on
   `tools/policy/unsummarised-keys.txt`. That list may only shrink. To document a key, give its row a
   `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the
@@ -104,7 +111,8 @@ reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no
   Python or `mirror.get('budgets.enforce')` in JavaScript, or `policy.py get budgets.enforce` in a
   shell script or a git hook. A comment, a test file, a help page, the memory tree, the JSON mirror
   and the catalogue never count. For a key with a `*` or `<name>` part, such as `budgets.*`, a
-  variable in that part counts too: `policy.py get "budgets.$cap"`.
+  variable in that part counts too: `policy.py get "budgets.$cap"`, or a quoted part holding the
+  variable, `resolve(f'budgets."{cap}"')`.
 - **To clear it,** do one of two things: add the reader, a call of that shape where the code uses the
   value; or, if the key's build has not really landed, make the row's `owner` a build that has not
   landed yet.

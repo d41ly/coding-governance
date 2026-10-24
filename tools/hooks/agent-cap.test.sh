@@ -29,8 +29,14 @@ case "$KIT_REL" in */*) PFX="${KIT_REL%/*}/" ;; *) PFX="" ;; esac
 # ROOTPFX is a ROOT install's prefix, empty by definition: a fixture that models a root install,
 # or a key relative to the tool root, is spelled through it rather than bare (TOOL-aRepatriatedFork-28 S2).
 ROOTPFX=""
-HOOK="$HERE/agent-cap.js"
+KIT_HOOK="$HERE/agent-cap.js"
 TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+# THE ARMS RUN A COPY (TOOL-dGroundRules-21 S38): rule 7 refuses a payload cwd that lies in no checkout
+# wherever a policy kit sits beside the hook, and every arm below runs from "$TMP", which no checkout
+# holds. The copy sits beside scratch-guard.js and no policy kit, where rule 7 adds no rule, so each arm
+# judges the rule it names; the sections that arm rule 7 build their own copies beside a policy kit.
+mkdir -p "$TMP/arms-hooks/hooks"; cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$TMP/arms-hooks/hooks/"
+HOOK="$TMP/arms-hooks/hooks/agent-cap.js"
 pass=0; fail=0
 # The one resolver, not the retired `command -v python3 || python` idiom this repo banned — which the
 # ban could not see here, because it matches only `command -v`.
@@ -1187,7 +1193,7 @@ if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
 else
   R7="$TMP/r7"; mkdir -p "$R7/.governance" "$R7/kits/hooks" "$R7/kits/policy" "$R7/.claude"
   cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$R7/kits/hooks/"
-  for f in policy.py catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$R7/kits/policy/"; done
+  for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$R7/kits/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$R7/.governance/policy.toml"
   ( cd "$R7" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
       && git config user.name t && git add -A && git commit -qm limit --no-verify )
@@ -1672,7 +1678,7 @@ GOV_BASE_SHA=${GOV_BASE_SHA:-d65da7ab}
 # DERIVED, never spelled: a `<prefix>/hooks/` literal is gov's own install prefix and resolves to
 # nothing in a target that installed this kit elsewhere, which is what the shipped-surface ratchet
 # refuses. `git ls-files --full-name` answers where THIS hook actually lives in THIS tree.
-HOOKREL=$(git -C "$HERE" ls-files --full-name -- "$HOOK" 2>/dev/null | head -1)
+HOOKREL=$(git -C "$HERE" ls-files --full-name -- "$KIT_HOOK" 2>/dev/null | head -1)
 if [ -n "$HOOKREL" ] && git -C "$HERE" show "$GOV_BASE_SHA:$HOOKREL" > "$TMP/base-hook.js" 2>/dev/null; then
   cat > "$TMP/byte.py" <<'PYEOF'
 import sys, pathlib

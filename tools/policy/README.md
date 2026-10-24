@@ -1,3 +1,4 @@
+<!-- gov:kit policy@1.0 -->
 # policy — one file for a repository's policy, and the catalogue that is its schema
 
 A repository's policy lives in ONE file, `.governance/policy.toml`, TOML 1.0, read through `tomllib`
@@ -19,7 +20,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
 | `legacy-homes.txt` | GENERATED, shrink-only: one row per key a legacy policy home holds, with its mark (TOOL-dGroundRules-7); gov's own, withheld from installs by a `project-owned` rule in `kit.toml` (TOOL-dGroundRules-17) |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, and the `lists`, `scaffold`, `get`, `check` and `mirror` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, and the `lists` (`cmd_lists`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
 | `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
@@ -28,6 +29,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9), and `ships = false` where the deployer's registry exempts the enforcer (TOOL-dGroundRules-17), else the registry entry that installs it, `kit`, and its `{prefix}`-spelled destination, `installed` (TOOL-dGroundRules-22) |
 | `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
+| `adopt-policy.test.sh` | the adopter's sibling suite, arming each of its refusal branches; the case `adopter-suite` runs it (TOOL-dGroundRules-21 S4) |
 
 ## A catalogue row
 
@@ -90,8 +92,10 @@ owner-silence rule that declines a raise is a later build's reader.
 
 - `python <prefix>/policy/check_policy.py [--repo <dir>]` — every arm over the repository, the git
   top level of the working directory by default. One line per arm,
-  `policy-check: <arm> · <n> finding(s) · <population>`, then each finding. A population of zero is
-  a finding. Exit 0 green, 1 red.
+  `policy-check: <arm> · <n> finding(s) · <population>`, then each finding. What a population of
+  zero means each `ARMS` row declares as its `empty`: `finding`, one more finding, or `announce`,
+  `policy-check: <arm> · not graded · <why>` and no finding (TOOL-dGroundRules-21 S5); the table
+  "Each arm in an adopter" names each arm's choice. Exit 0 green, 1 red.
 - `python <prefix>/policy/check_policy.py --fixture [--strict-from <dir>] [<case>]` — one scratch
   repository per case under the system temp directory (`pol-` prefix): each case plants its break,
   its arm must red naming the planted key, and the unplanted copy must be green. It ends with an
@@ -108,28 +112,38 @@ owner-silence rule that declines a raise is a later build's reader.
   prints `NOT RUN`, exit 2.
 - `python <prefix>/policy/policy.py settings [--write|--check] [<settings-file>]` — the agent limit,
   `runtime.agents-in-flight` at HEAD, rendered into the harness's two concurrency settings,
-  `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`, in
-  `.claude/settings.json` under the repository root by default (TOOL-dGroundRules-10). `--check`, the
-  default, exits 1 printing one line per variable that is absent or differs; `--write` writes only
-  when one does, every other key kept in order, in `settings-merge.py`'s shape. `kit.toml`'s stage-1
-  `[[generated]]` row runs both at every landing and before a bar. The reader lowers the key, never
-  raises it, by a `FANOUT_CAP=<n>` line in `.agent-cap.conf` at the revision read, its legacy home.
+  `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`, in the
+  settings file in force (TOOL-dGroundRules-10): the file named, else `GOV_SETTINGS_JSON`, else
+  `.claude/settings.json` under the repository root, the order `check-wiring.sh` resolves it in, and
+  rule 7 of the hooks kit grades the same file (TOOL-dGroundRules-21 S34). `--check`, the default,
+  exits 1 printing one line per variable that is absent or differs; `--write` writes only when one
+  does, the two `env` keys alone, every other key kept in order, through a temporary file beside it
+  and `os.replace`, so no reader meets half a file (S40). `kit.toml`'s stage-1 `[[generated]]` row
+  runs both at every landing and before a bar. The reader lowers the key, never raises it, by a
+  `FANOUT_CAP=<n>` line in `.agent-cap.conf` at the revision read, its legacy home.
+  **Who owns the `env` keys** (§8 F1 of TOOL-dGroundRules-21): this render owns
+  `env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and `env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`;
+  `settings-merge.py` keeps the hook entries and writes no `env` key, so neither rewrites the other's.
 - `python <prefix>/policy/policy.py lists --check` — red on a row the catalogue owes and the list
   lacks, a row the list carries that the catalogue no longer owes (stale), and a row the list at the
   compare base did not carry. The base is the merge-base of HEAD and the remote default branch where
   that is a proper ancestor of HEAD, else the remote tip; no fetched ref is no base, and a list
-  absent at the base is no comparison, never an empty one. It grades `legacy-homes.txt` too, below.
+  absent at the base is no comparison, never an empty one. It grades `legacy-homes.txt` too, below,
+  against the SAME base: `cmd_lists` reads `resolve_compare_base` once for both lists, the block the
+  codebase map's baseline inlines too (TOOL-dGroundRules-21 S7, S23).
   Exit 0 green, 1 red, 2 usage or a refused read.
 - `python <prefix>/policy/policy.py lists --write` — drain the list: it keeps the rows the catalogue
   still owes and never adds one. An absent list is seeded with every owed row. It writes
   `legacy-homes.txt`'s derived rows too, and writes nothing, exit 1, while a derived row is new to the
-  list at the landed revision.
+  list at the compare base.
 
 ## The legacy policy homes
 
 Policy still lives outside `.governance/policy.toml` in three legacy homes: each tracked root file
 named `.*.conf`, the gate file `.githooks/gate-env.sh`, and the roles kit's house file, homed
-`<tool-root>/roles/house/policy.toml` and found from this kit's own location. `derive_legacy_homes`
+`<tool-root>/roles/house/policy.toml` and found through the inlined `resolve_kit_dir`, home `roles`
+and anchor `house/policy.toml`, never by joining a name to the tool root (TOOL-dGroundRules-21 S25).
+`derive_legacy_homes`
 parses each, never sources one, into rows `<home> <key> <mark>`: every key a kit conf assigns but a
 `_CUTOFF` or `_PIN` (the retrofit converts those), `owner-policy`; every key the gate file assigns,
 documents in its header, or is read from it by a `read_policy_key "<expr>" KEY` call in a tracked
@@ -138,11 +152,14 @@ in `policy.py`, else `unmarked`; and one `[<table>]` row per top-level table of 
 `owner-policy`. An absent home yields no rows and one `legacy homes: no <home> ...` line.
 
 `lists --check` compares the derived rows, the working tree's `legacy-homes.txt` and the list at the
-landed revision, identity the pair (home, key), and reports a committed row no home yields (`stale
-list at <row>` when the landed list holds its pair, else `typed row <row>`), a committed row under a
-mark the derivation does not give (`typed row`), a derived row the list lacks (`stale list`), a
-derived row the landed list lacks (`is a new legacy home and the list is shrink-only`), and an
-`unmarked` row. With no list at the landed revision it says the list seeds the baseline.
+compare base, the one `lists --check` reads for the summary list, identity the pair (home, key), and
+reports a committed row no home yields (`stale list at <row>` when the base's list holds its pair,
+else `typed row <row>`), a committed row under a mark the derivation does not give (`typed row`), a
+derived row the list lacks (`stale list`), a derived row the base's list lacks (`is a new legacy home
+and the list is shrink-only`), and an `unmarked` row. With no list at the base it says the list seeds
+the baseline, and with no base it compares the derivation alone and says why. A branch opened before
+the default branch dropped a key is graded at its merge-base, so the key it still carries is no new
+home (TOOL-dGroundRules-21 S23).
 
 The list is gov's own: its rows are gov's homes, so `kit.toml` withholds it from every install with
 a `project-owned` rule, the runlog descriptor's mechanism (TOOL-dGroundRules-17). Where this kit
@@ -151,7 +168,8 @@ gov's own and is withheld from installs` and finds nothing, and `lists --write` 
 list alone, printing `legacy-homes.txt · not written`: it updates the legacy list where one exists
 and never creates it. On gov's tree the case `legacy-homes-present` reds a deleted list.
 - `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
-  build owns that has a literal default, one table per first segment.
+  build owns that has a literal default, one table per first segment, written as UTF-8 bytes with LF
+  line ends on every platform, so it equals the blob git stores (TOOL-dGroundRules-21 S1).
 - `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain] [--json]` — run in the repository to
   read: the key's value on stdout, a string as itself, a number or a boolean in TOML's spelling, a
   list one member per line, LF-ended. `--json` prints one JSON object of `reason`, `source` and
@@ -180,7 +198,11 @@ and never creates it. On gov's tree the case `legacy-homes-present` reds a delet
 `read_policy_key`'s contract (the unattended kit, `THE POLICY IS READ AT R AND NEVER FROM THE TREE`)
 to TOML: the file as committed at a revision, read with `git show`, parsed with `tomllib`, never
 sourced and never opened from the working tree. The shell parser and its copies stay as they are
-for the legacy homes.
+for the legacy homes: `read_policy_key` keeps its `KEY=value` contract, the LAST `<key>=` line's
+value cleaned, in four byte-identical copies, each the function `read_policy_key()` and named here by
+symbol, never by line, so no later edit strands the citation (TOOL-dGroundRules-21 S6):
+`read_policy_key()` in `.githooks/pre-push`, in `<tool-root>/push-main.sh`, in
+`<tool-root>/run-gates/post-merge.sh` and in `<tool-root>/unattended/unattended.sh`.
 
 - **The revision.** `rev` given: the commit it names, else a refusal. `rev` absent, the landed
   revision: `refs/remotes/<remote>/<branch>`, the remote and branch the inlined remote ladder
@@ -212,9 +234,21 @@ for the legacy homes.
   `last-valid`, the default, the WHOLE file falls back, never one key: the key resolves over the
   valid revision's table, with source `last-valid` and a reason naming the invalid sha, the line,
   the problem and the valid sha. An absent file is not invalid and reads defaults.
-- **Git's environment.** Every git call drops the location variables git exports to a hook
-  (`GIT_LOCATION_VARS`), so a reader started inside a hook or a fixture reads the repository it was
-  pointed at.
+- **Git's environment.** Every git call drops `GIT_ENV_LEAKS`, the eight location variables git
+  exports to a hook and the four pathspec-mode variables, so a reader started inside a hook or a
+  fixture reads the repository it was pointed at. The tuple is the memory-tree kit's, inlined between
+  `git_env_leaks_py` markers and held to its canonical by the resolver self-test (TOOL-dGroundRules-21 S9).
+- **The blob read.** `read_blob_at(repo, rev, path)` is the kit's one blob reader, the policy file's
+  and the limits file's (S11), decoding strict UTF-8. A policy file that is not UTF-8, as a PowerShell
+  redirect writes it, is one problem keyed `""` whose why opens `not UTF-8:`, read as text that is not
+  TOML is (S10). A walk to the last valid revision that ends at a shallow clone's boundary refuses
+  `history is shallow at <sha8>; fetch more history`, never the false "no valid revision" (S13).
+- **A derived default.** A row whose `default` is `{ derived = "..." }` refuses where the file does
+  not set it, naming the row and `a derived default no reader computes yet`; the mirror omits such a
+  key, so the helper reads it through the reader and refuses alike (S12).
+- **A sibling kit.** This kit reaches a sibling through the inlined `resolve_kit_dir` and a declared
+  `requires`, and a miss refuses, naming where the resolver looked: reader coverage reads the
+  memory-tree kit's `tree_lib`, which `kit.toml` requires (S26).
 - **One read per revision.** `read_revision(repo, rev)` reads the revision, its text, `validate`'s
   problems and the parsed table once, and spells the revision once as its `rev_phrase`, which
   every reason names; `resolve_read(path, row, read)` is the one composition of
@@ -230,9 +264,17 @@ pinned LF in `.gitattributes`. `render_mirror(repo, rev)` renders it for one rev
 {
   "catalogue_blob": "<blob id of this kit's catalogue at the revision>",
   "keys": {"budgets.enforce": {"reason": "...", "source": "file", "value": "warn"}},
+  "legacy_blobs": {".agent-cap.conf": "<its blob id at the revision, or null when absent>"},
   "policy_blob": "<blob id of .governance/policy.toml at the revision, or null when absent>"
 }
 ```
+
+**Every input the resolution reads is pinned** (TOOL-dGroundRules-21 S17). `legacy_blobs` maps each
+legacy input `resolve_read` reads, `LEGACY_INPUTS` in `policy.py`, today `.agent-cap.conf`, whose
+`FANOUT_CAP` lowers the agent limit, to its blob id at the rendered revision or null, and the helper
+reads a mirror whose recorded id differs at L, or that carries no `legacy_blobs`, as STALE, so a
+landing that changes the conf alone is never read through a mirror holding the old limit. THE RULE: a
+unit adding a resolution input adds its path to `LEGACY_INPUTS`, so its blob joins this map.
 
 `keys` holds every catalogue name with no `*` or `<...>` segment, and every key the file sets that a
 pattern row matches, each with its `Resolution`. The bytes are sorted, two-space indented, ASCII and
@@ -244,9 +286,9 @@ cannot carry its own id, and the lander renders before the merge commit exists.
 **No commit in the bytes** (TOOL-dGroundRules-65). The render sets the read's `rev_phrase` to the
 placeholder `{rev}`, so every reason names the revision read as `{rev}`; a `last-valid` reason keeps
 the last valid revision's own sha8, history no rewrite changes. The invariant: two commits with the
-same policy blob, the same catalogue blob and the same first-parent history render byte-identical
-mirrors, so the mirror the lander renders into a merge stays fresh after its `git commit-tree`
-rewrite.
+same policy blob, the same catalogue blob, the same legacy blobs and the same first-parent history
+render byte-identical mirrors, so the mirror the lander renders into a merge stays fresh after its
+`git commit-tree` rewrite.
 
 **Regenerated at every landing.** `kit.toml`'s `[[generated]]` row, stage 2, names `mirror --write`
 and `mirror --check`, so the run-gates kit's `regen.py --write` renders it into each landing the
@@ -262,7 +304,11 @@ it does not hold, is read through the reader by `policy-shim.sh get <key>`; a mi
 reads `policy-file.on-invalid`, and any value but `last-valid` refuses naming the mirror. A fallback's
 reason opens `mirror absent at <L8>` or `mirror stale at <L8>`. The working-tree mirror is never
 opened. The shim carries the remote ladder and the python resolver inline, byte-identical to their
-canonicals. Python and shell consumers call the reader, never the mirror.
+canonicals, and runs under the bash `readPolicy` finds once per process by running each candidate,
+`GOV_BASH`, PATH's, then Git for Windows' two, kept only where it can see the shim; every shim outcome
+but exit 0 and its own exit-2 refusal, exit 1 or 127, a null status, a signal or a spawn error, is a
+`PolicyRefusal` naming the status, the signal and the shim's stderr (TOOL-dGroundRules-21 S16).
+Python and shell consumers call the reader, never the mirror.
 
 ## The guard
 
@@ -272,7 +318,9 @@ imports no reader. gov's `.githooks/pre-commit` carries its block, above the leg
 `guarded-paths.txt` lists at HEAD is staged, the block admits on the owner's terminal proof,
 `[ -t 2 ]`, since git leaves a hook's stderr as the committer's; otherwise it runs
 `guard.py --staged`, and any exit but 0 refuses, as does a tree whose tracked python resolver yields
-no launcher. A commit staging no listed path spawns no Python.
+no launcher, and a `guard.py` that resolves nowhere while `guarded-paths.txt` at HEAD, under the
+declared `GOV_KITROOT`, lists a staged path: that refusal names every rung the resolver missed
+(TOOL-dGroundRules-21 S21). A commit staging no listed path spawns no Python.
 
 `guard.py --staged`, from the top level: the list at HEAD (none, or no HEAD: exit 0); the touched
 set, `git diff --cached --no-renames` against it (empty: exit 0); while `MERGE_HEAD` resolves, a path
@@ -290,7 +338,7 @@ policy change is one commit and its regenerated mirror the next. What remains mu
 
 - both sides parse as TOML, and exactly one leaf differs, present on both sides;
 - that leaf is under `budgets`, neither `budgets.enforce` nor `budgets.pinned`, and its last segment
-  is a file tracked at HEAD, so a class row such as `docs/*/` is no measured-file cap;
+  is a file tracked at HEAD, so a class row such as `memory/builds/*/spec/` is no measured-file cap;
 - both values are integers, booleans excluded, and the new one is larger;
 - the text change is one old line replaced by comment lines and then one other line, one comment
   carrying `RAISED <old> -> <new>`;
@@ -312,13 +360,13 @@ authorship. The block is gov's own; the runbook's copy instructions do not carry
 | `arm_shape` | the catalogue | a set-valued row with no `empty`, `empty` on any other row, a missing required field, an unknown field, a literal default or a `usage` its own row refuses, a `usage` that does not parse |
 | `arm_summaries` | the catalogue, the list, the list at the base | each `lists --check` finding |
 | `arm_direction` | the catalogue | each `check_direction` finding; its population is the loop bound and deadline rows |
-| `arm_on_invalid` | `.governance/policy.toml` as committed at HEAD, its history | the refusal `policy.py check` prints: an invalid file with no valid revision before it, or one whose last valid revision sets `policy-file.on-invalid = "refuse"` |
-| `arm_mirror_parity` | the working-tree `.governance/policy.json` against `render_mirror` at HEAD | a mirror that differs, named by its first difference, or one that is absent |
+| `arm_on_invalid` | `.governance/policy.toml` as committed at HEAD, its history | the refusal `policy.py check` prints: an invalid file with no valid revision before it, or one whose last valid revision sets `policy-file.on-invalid = "refuse"`. A HEAD naming no commit, or holding no policy file, is announced (TOOL-dGroundRules-21 S15) |
+| `arm_mirror_parity` | the working-tree `.governance/policy.json` against `render_mirror` at HEAD | a mirror that differs, named by its first difference, or one that is absent where HEAD carries the policy file or a mirror; otherwise, a HEAD naming no commit included, it is announced (TOOL-dGroundRules-21 S15) |
 | `arm_mirror_landed` | `node policy-mirror.js get <key>` against the reader's `resolve`, for each key the policy file at the landed revision sets | a value the two answer differently, or one refusing where the other answers |
-| `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root and `help/` | a file naming `policy.json` |
-| `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the landed revision | each `lists --check` report on the legacy homes; a refused landed revision. With no list in this kit it is not graded and says so |
-| `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision |
-| `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file spelling the template-size limits file's name on a line that is not a comment or a Python docstring: `budgets.py` is its one reader |
+| `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root, `help/` and the self-tests | a file READING `policy.json`: a line, not a comment or a Python docstring, spelling `readFileSync`, `open(`, `cat` or `git show` followed on the line by the name, `arm_single_reader`'s row for the mirror (TOOL-dGroundRules-21 S18, S20) |
+| `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the compare base | each `lists --check` report on the legacy homes; a refused read. With no list in this kit it is not graded and says so |
+| `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, read with the memory-tree kit's `tree_lib`, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision, or a memory-tree kit that does not resolve, naming where the resolver looked (TOOL-dGroundRules-21 S26) |
+| `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file READING the template-size limits file by the same read shape, or naming `LIMITS_NAME`, `arm_single_reader`'s row for that file: `budgets.py` is its one reader (TOOL-dGroundRules-21 S20, S29) |
 | `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent where it is graded (its `enforcer` path on the source tree, its `installed` path in an adopter whose receipt names its `kit`), asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
 
 ## The size caps
@@ -334,9 +382,16 @@ the policy file's `budgets.<cap>` where it sets one, and a value held in both ho
 is `refuse` where `budgets.pinned` names the cap or `budgets.enforce` is `refuse`, else `warn`: a
 breach under `warn` prints `BUDGET WARN — <cap> · <subject> · <measured> <unit> over <value>` and
 passes. `validate` calls `check_budgets`, which refuses a pin outside the switch or naming no row, and
-a value naming no row, on a family cap, or not a positive integer. An enforcer with no policy kit
-beside it, or a reader that refuses, refuses as before and says so once. help/size-caps.md is the
-user's page.
+a value naming no row, on a family cap, or not a non-negative integer; 0 is unchecked, as every
+enforcer reads it and the census's homes hold it (TOOL-dGroundRules-21 S28). An enforcer with no
+policy kit beside it refuses as before and says so once. ONE RULE FOR A REFUSED READER, kept in
+`budgets.py` (S31): a refusal the reader makes inside `resolve_caps`, of the landed revision, of the
+switch's keys or of a cap's value, gives the cap `mode = refuse`, its rule `the policy reader refused,
+so a breach refuses as before`, and the CLI prints the refusal once, after its answers; a subject over
+its cap refuses and is never read as `warn`. Where the landed revision's own read refuses, the cap's
+value is the `legacy:` or `default:` value handed in, as the enforcer read it. The four shell
+enforcers take the branch they take with no policy kit when no Python launcher resolves, and say so
+once. help/size-caps.md is the user's page.
 
 `arm_reader_coverage` (TOOL-dGroundRules-8) grades a key once its owner build has LANDED: at the
 landed revision `policy.py get` reads, the build folder `<memory root>/builds/<owner>/spec/` holds at
@@ -344,14 +399,18 @@ least one spec and every spec's status header is terminal, read with the memory-
 `tree_lib` (`HDR_RE`, `TERMINAL`, `read_blobs_at`, `parse_conf`). A build whose spec run landed its
 units `DEFERRED` has not landed. A key is READ where a tracked file passes it to a reader in one of
 the two shapes of `READER_SHAPES`, one row each: a call whose first argument is the key as a string
-literal (`resolve("k")`, `mirror.get('k')`) in a `.py`, `.js`, `.mjs` or `.cjs` file, and
-`policy.py get k`, the key optionally quoted, in a `.sh` file or under `.githooks/`. A comment line
-never reads. A key with a `*` or `<name>` segment reads where that segment is spelled as one run with
-no quote, space, `.`, `(` or `)`, `"budgets.$cap"` say, unless the text spells another catalogue key
-exactly. It prints `reader coverage: graded <n> of <m> catalogue key(s); landed owners: <slugs or
+literal (`resolve("k")`, `mirror.get('k')`, the literal free to hold the other quotes) in a `.py`,
+`.js`, `.mjs` or `.cjs` file, a key joined around a name inside a quoted segment
+(`resolve('budgets."' + name + '"')`, read as `budgets."{name}"`), and `policy.py get k`, the key
+optionally quoted, in a `.sh` file or under `.githooks/`. A comment line never reads. A key with a `*`
+or `<name>` segment reads where that segment is spelled as one quoted segment, which may hold `.` and
+an interpolated name (`f'budgets."{cap}"'`), or as one run with no quote, space, `.`, `(` or `)`,
+`"budgets.$cap"` say, unless the text spells another catalogue key exactly (TOOL-dGroundRules-21
+S27). It prints `reader coverage: graded <n> of <m> catalogue key(s); landed owners: <slugs or
 none>` on every run, and with nothing graded `reader coverage: graded 0, so this arm checked nothing
-at <rev8>`, which is no finding; its population is the catalogue's keys. With no memory-tree kit
-beside this one, no build reads as landed, and it says so. It does not see a reader in another
+at <rev8>`; its population is the keys it graded, so before any Owner build lands the arm announces
+`not graded`, never a finding (S5). A memory-tree kit that does not resolve from this kit's own
+location is a refusal naming where the resolver looked, never "no build landed" (S26). It does not see a reader in another
 language, or a key built at run time from parts, which reds as unread; and a call that only names
 the key, in a message say, reads as a reader.
 
@@ -411,10 +470,11 @@ parents: `mirror --check` must print `policy: mirror fresh` at both, and the hel
 rewrite pushed as L, must name L's sha8 as the landed revision with no `{rev}` left.
 
 The sixteen `guard-*` cases copy `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy and commit a
-policy file whose `[budgets]` table caps a tracked `big.md` at 100, a tracked `small.md` at 50 and the
-class row `docs/*/` at 10, then stage one plant each from `GUARD_PLANTS` and judge `guard.py --staged`
-by its exit code and reasons. `guard-admits-raise`, `big.md` to 120 with its `RAISED` comment and one
-decision row, must exit 0. Exit 1, naming the reason: `guard-lowered`, `guard-two-raised`,
+policy file whose `[budgets]` table caps a tracked `.claude/skills/x/SKILL.md`, a key with slashes and
+a leading dot, at 100, a tracked `small.md` at 50 and the spec folder's class row
+`memory/builds/*/spec/` at 10 (TOOL-dGroundRules-21 S22), then stage one plant each from
+`GUARD_PLANTS` and judge `guard.py --staged` by its exit code and reasons. `guard-admits-raise`, that
+dotted, slashed key to 120 with its `RAISED` comment and one decision row, must exit 0. Exit 1, naming the reason: `guard-lowered`, `guard-two-raised`,
 `guard-class-row`, `guard-beside-change` (`budgets.enforce` set beside the raise),
 `guard-beside-path` (a line added to `.governance/deploy.toml` beside it), `guard-no-record`,
 `guard-no-argument`, `guard-no-row` (each naming only what is missing), `guard-other-paths` (the
@@ -465,6 +525,24 @@ only call names its sibling `fixture.exact`). Green: `unlanded` (`OPEN` landed),
 grading nothing and printing the announce line; `reader-python`, `reader-cli` and `reader-js`, one
 shape each; and `pattern-read` (`policy.py get "fixture.$name"` reads `fixture.*`).
 
+The minors batch's cases (TOOL-dGroundRules-21), each an outcome case: `adopter-suite` runs
+`adopt-policy.test.sh`; `on-invalid-utf16` reads V's value from `last-valid` at a C written as
+UTF-16LE, its reason holding `not UTF-8`; `on-invalid-shallow` refuses `history is shallow` in a
+`--depth 1` clone and falls back in a full one; `resolution-derived-default` refuses `get` on a row
+whose default is `{ derived = "x" }` and renders a mirror without it; `mirror-stale-legacy` reads a
+conf-only landing's mirror STALE; `mirror-shim-exit-one` refuses, naming the status, a shim exiting 1
+and one killed by a signal; `mirror-absent-adopter` announces the parity and on-invalid arms over a
+HEAD carrying neither file and over no commit; `legacy-homes-main-dropped` reports no new legacy home
+on a branch opened before main dropped a key; `reader-coverage-relocated` grades the landed owner at
+a tool root unlike gov's, then refuses naming where the resolver looked once `tree_lib.py` is gone;
+`reader-quoted-pattern` reads `budgets.*` through `resolve(f'budgets."{cap}"')` and through a joined
+quoted segment; `limit-settings-elsewhere` renders and grades the file `GOV_SETTINGS_JSON` names;
+`limit-hook-settings-malformed` and `limit-hook-reader-throws` deny with exit 2 naming the file or the
+step, and a cwd in no checkout too; `limit-fresh-target-spawn` admits an adopter's first spawn after
+`--scaffold`; `budgets-zero-cap` reads a cap of 0 as valid and unchecked; `budgets-reader-refused`
+refuses over a ladder refusal, saying it once, and with no launcher; `limits-reader-docstring` leaves
+a docstring and a comment unread and reds a line that opens the file.
+
 ## Each arm in an adopter
 
 The `policy check` leg ships, so every arm in `ARMS` runs in an adopter's tree as well as in gov's.
@@ -480,29 +558,39 @@ absent from the tool root, reds the case. Every file under the target's tool roo
 seed row of the receipt must be present. The case then runs the installed adopter,
 `adopt-policy.sh --scaffold`, and `--check` with the install staged and again once it is committed.
 Both runs must exit 0, and every arm must print a graded line with no finding or an announce line,
-`policy-check: <arm> · not graded · <why>`.
+`policy-check: <arm> · not graded · <why>`. Over the scaffolded target `arm_schema` must grade the
+scaffold's keys and `arm_mirror_readers` the memory-tree kit's staged code files, each with no
+finding, and `arm_reader_coverage` must print `not graded`; and an `Arm` planted with a population of
+0 must print one finding under `finding` and `not graded` under `announce` (TOOL-dGroundRules-21 S5).
+The last column opens with the arm's `empty`, the choice its `ARMS` row declares.
 
 | Arm | In an adopter it grades | When its subject is absent |
 |---|---|---|
-| `arm_schema` | the target's `.governance/policy.toml`, each key against the installed catalogue | a finding: no policy file is a zero population, so `--scaffold` comes before the first `--check` |
-| `arm_shape` | the installed kit's catalogue, row by row | a finding: the catalogue ships in the kit, and one that does not read or parse reds |
-| `arm_summaries` | the installed shrink-only list against the installed catalogue, and against the list at the target's compare base | a finding per row an absent list owes; no remote or no fetched ref is no base, which its line says, and the catalogue alone is compared |
-| `arm_direction` | the installed catalogue's loop bound and deadline rows | a finding: the catalogue ships in the kit, and one that does not read or parse reds |
-| `arm_on_invalid` | the target's `.governance/policy.toml` as committed at HEAD, against the installed catalogue | an absent file at HEAD grades clean, since it reads defaults; a HEAD that names no commit, before the first commit, is a finding until TOOL-dGroundRules-21 announces it |
-| `arm_mirror_parity` | the target's `.governance/policy.json` against its render at HEAD | a finding: an absent mirror reds until the first landing renders one, which TOOL-dGroundRules-21 grades only where HEAD carries a policy file or a mirror |
-| `arm_mirror_landed` | the installed helper against the reader, for each key the target's policy file sets at its landed revision | a finding: a landed revision with no policy file is a zero population, until TOOL-dGroundRules-25 announces it |
-| `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root and `help/` | a finding: a target with no tracked code is a zero population, until TOOL-dGroundRules-21 announces it |
-| `arm_legacy_homes` | nothing: `legacy-homes.txt` is gov's own list, which `kit.toml` withholds from every install (TOOL-dGroundRules-17) | announced, since no install holds the list: `policy-check: arm_legacy_homes · not graded · the list is gov's own and is withheld from installs`, and `lists --write` never creates it |
-| `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | no owner build landed, or no memory-tree kit beside this one, prints `graded 0` and no finding; a landed revision that does not resolve is a finding |
-| `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | a finding: a target with no tracked code is a zero population |
-| `arm_cap_census` | the installed cap census against the target: the target's `.governance/install.json` makes it an adopter, and each shipped row whose `kit` its `kits` names is graded at its `installed` path, `{prefix}` read as its `prefix`; the requests its tracked code makes, and the limits file's rows | graded by what ships (TOOL-dGroundRules-17, TOOL-dGroundRules-22): a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; a row whose `kit` the receipt's `kits` lacks is announced, `cap census: <name> · kit <kit> not installed`; an installed kit's enforcer absent at `installed` is a finding naming that path; a receipt that does not parse is a finding naming it |
+| `arm_schema` | the target's `.governance/policy.toml`, each key against the installed catalogue | announce: no policy file, or one setting no key, is a population of 0 and a legal state before `--scaffold`, so it prints `not graded` (TOOL-dGroundRules-21 S5); a file that does not parse or decode is a finding |
+| `arm_shape` | the installed kit's catalogue, row by row | finding: the catalogue ships in the kit, and one that does not read or parse reds |
+| `arm_summaries` | the installed shrink-only list against the installed catalogue, and against the list at the target's compare base | finding: a finding per row an absent list owes; no remote or no fetched ref is no base, which its line says, and the catalogue alone is compared |
+| `arm_direction` | the installed catalogue's loop bound and deadline rows | finding: the catalogue ships in the kit, and one that does not read or parse reds |
+| `arm_on_invalid` | the target's `.governance/policy.toml` as committed at HEAD, against the installed catalogue | finding: its population is HEAD, never 0; an absent file at HEAD, which reads defaults, and a HEAD that names no commit, before the first commit, are announced `not graded` (TOOL-dGroundRules-21 S15) |
+| `arm_mirror_parity` | the target's `.governance/policy.json` against its render at HEAD | finding: an absent mirror reds where HEAD carries a policy file or a mirror; where HEAD carries neither, before the first landing renders one, or names no commit, it is announced `not graded` (TOOL-dGroundRules-21 S15) |
+| `arm_mirror_landed` | the installed helper against the reader, for each key the target's policy file sets at its landed revision | finding: a landed revision with no policy file is a zero population, until TOOL-dGroundRules-25 announces it |
+| `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a read of the mirror | announce: a target with no tracked code is a population of 0, a legal state, so it prints `not graded` (TOOL-dGroundRules-21 S5) |
+| `arm_legacy_homes` | nothing: `legacy-homes.txt` is gov's own list, which `kit.toml` withholds from every install (TOOL-dGroundRules-17) | finding: a list that derives no row is a zero population; with no list, as in every install, it is announced: `policy-check: arm_legacy_homes · not graded · the list is gov's own and is withheld from installs`, and `lists --write` never creates it |
+| `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | announce: before any owner build lands it grades 0 keys and prints `not graded` (TOOL-dGroundRules-21 S5); a landed revision that does not resolve, or a memory-tree kit that does not, is a finding naming why |
+| `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | finding: a target with no tracked code is a zero population |
+| `arm_cap_census` | the installed cap census against the target: the target's `.governance/install.json` makes it an adopter, and each shipped row whose `kit` its `kits` names is graded at its `installed` path, `{prefix}` read as its `prefix`; the requests its tracked code makes, and the limits file's rows | finding: a census that reads no row is a zero population; the rows are graded by what ships (TOOL-dGroundRules-17, TOOL-dGroundRules-22): a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; a row whose `kit` the receipt's `kits` lacks is announced, `cap census: <name> · kit <kit> not installed`; an installed kit's enforcer absent at `installed` is a finding naming that path; a receipt that does not parse is a finding naming it |
 
 ## The adopter
 
 `bash <prefix>/policy/adopt-policy.sh --scaffold [--target <repo>]` writes `.governance/policy.toml`
 from the scaffold only where no file exists, and says "kept" otherwise: the file is the
-repository's own from its first write. `--check [--target <repo>]` runs `check_policy.py --repo`.
-The `policy check` leg ships to adopters; `policy fixtures` is gov's own.
+repository's own from its first write. Kept or written, it then renders the harness's settings,
+`policy.py settings --write`, wherever HEAD resolves, so an adopter's first spawn passes rule 7
+without a render by hand; with no commit yet it prints one line naming the re-run. `kit.toml`'s
+`[[regenerate]]` runs the same verb on every update (TOOL-dGroundRules-21 S37). `--check [--target
+<repo>]` runs `check_policy.py --repo`. Each refusal of the adopter, a `.governance` that cannot be
+made, a scaffold that cannot be written and a render that fails, is armed by `adopt-policy.test.sh`,
+which the case `adopter-suite` runs, and `ARMS_FLOORS` holds its census. The `policy check` leg ships
+to adopters; `policy fixtures` is gov's own.
 
 ## What this kit does not check
 

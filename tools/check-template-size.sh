@@ -189,12 +189,16 @@ print(d.as_posix())' "$2" "$3" "$4"
 # census row's home holds (or the policy file's), and the 48 KiB hard default, source `constant`,
 # for a subject no census row names. The reader runs in the subject's repository, whose landed
 # revision it reads; every refusal it makes is check 5, and so is a missing policy kit, because
-# without it this gate has no declaration to read at all.
+# without it this gate has no declaration to read at all. A reader that refuses ANSWERS, its mode
+# `refuse` and the refusal on its stderr (TOOL-dGroundRules-21 S31), so a subject over its cap refuses
+# below and is never read as `warn`. No python launcher takes the no-kit branch, and says so once.
 budget="" _py="" _pk=""
-if _py=$(resolve_python "${TEMPLATE_SIZE_PY:-}" 2>&1) && _pk=$(resolve_kit_dir "$_py" policy budgets.py "$_self_dir" 2>&1); then
+if ! _py=$(resolve_python "${TEMPLATE_SIZE_PY:-}" 2>&1); then
+  budget="no python launcher resolved, so no policy kit can read the declaration: ${_py%%$'\n'*}"; _pk=""
+elif _pk=$(resolve_kit_dir "$_py" policy budgets.py "$_self_dir" 2>&1); then
   budget=$(cd "$ROOT" && "$_py" "$_pk/budgets.py" resolve "$key=default:49152" 2>&1) || _pk=""
 else
-  budget="no policy kit to read the declaration through: ${_pk:-$_py}"; _pk=""
+  budget="no policy kit to read the declaration through: $_pk"; _pk=""
 fi
 if [ -z "$_pk" ]; then
   FAIL_CODE=5

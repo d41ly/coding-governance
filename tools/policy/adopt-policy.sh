@@ -8,12 +8,16 @@
 #
 # `--scaffold` writes the starter file `policy.py scaffold` prints, and ONLY when no file is there:
 # a policy file is the repository's own from its first write, so an existing one is kept byte for
-# byte and the script says "kept". `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
+# byte and the script says "kept". Then, kept or written, it renders the harness's two concurrency
+# settings from the agent limit at HEAD, `policy.py settings --write`, whenever HEAD resolves, so an
+# adopter spawns on install day without running the render by hand; with no commit yet it prints one
+# line naming the re-run. `[[regenerate]]` in kit.toml runs this same verb on every update
+# (TOOL-dGroundRules-21 S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
 #
 # The kit dir is this script's own directory, never spelled, so the adopter runs from wherever the
-# kit is installed.
+# kit is installed. Its refusals are armed by `adopt-policy.test.sh` beside it.
 #
-#   Exit 0 = written, kept or green · 1 = red, or the write failed · 2 = wrong invocation, no
+#   Exit 0 = written, kept or green · 1 = red, or a write failed · 2 = wrong invocation, no
 #   repository, or no python.
 set -u
 
@@ -83,13 +87,26 @@ fi
 FILE="$TARGET/.governance/policy.toml"
 if [ -e "$FILE" ]; then
   echo "kept     $FILE — a policy file is the repository's own, and the scaffold never overwrites it"
-  exit 0
-fi
-mkdir -p "$TARGET/.governance" || exit 1
-if "$PY" -B "$HERE/policy.py" scaffold > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"; then
+else
+  if ! mkdir -p "$TARGET/.governance" 2>/dev/null; then
+    echo "policy: the directory .governance could not be made in $TARGET"
+    exit 1
+  fi
+  if ! { "$PY" -B "$HERE/policy.py" scaffold > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"; } 2>/dev/null; then
+    rm -f "$FILE.tmp" 2>/dev/null
+    echo "policy: the scaffold could not be written to $FILE"
+    exit 1
+  fi
   echo "wrote    $FILE"
+fi
+
+# The harness's settings, rendered from the agent limit at HEAD wherever HEAD resolves.
+if ! git -C "$TARGET" rev-parse --verify -q HEAD >/dev/null 2>&1; then
+  echo "policy: $TARGET has no commit yet, so the harness settings are not rendered; re-run --scaffold after the first commit"
   exit 0
 fi
-rm -f "$FILE.tmp"
-echo "policy: the scaffold could not be written to $FILE"
-exit 1
+if ! (cd "$TARGET" && "$PY" -B "$HERE/policy.py" settings --write); then
+  echo "policy: the harness settings could not be rendered in $TARGET; the line above says why"
+  exit 1
+fi
+exit 0

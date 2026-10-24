@@ -185,7 +185,9 @@ print_kit_miss() { # <leg> <kit dir, or ""> <file> [home] -> the announced skip,
 # staged, so an ordinary commit spawns no Python; a kit that resolves nowhere has no list to guard,
 # and the block prints nothing. ABOVE THE LEGS, so a refused commit is told before paying for them.
 # A MISSING LAUNCHER REFUSES, unlike the legs' announced skip: this block is the enforcement, not
-# an early signal.
+# an early signal. SO DOES A MISSING GUARD (TOOL-dGroundRules-21 S21): a `guard.py` no rung resolves,
+# while the list at HEAD under the declared GOV_KITROOT names a staged path, prints the rungs that
+# missed and refuses, so a deleted guard never reads as a clean commit.
 if g=$(resolve_kit_gate policy guard.py); then
   pg_list=$(git show "HEAD:${g%guard.py}guarded-paths.txt" 2>/dev/null | tr -d '\r' |
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
@@ -202,6 +204,14 @@ if g=$(resolve_kit_gate policy guard.py); then
     elif ! "$py" "$g" --staged; then
       rc=1
     fi
+  fi
+else
+  pg_list=$(git show "HEAD:${kitroot_declared:+$kitroot_declared/}policy/guarded-paths.txt" 2>/dev/null | tr -d '\r' |
+            sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
+  if [ -n "$pg_list" ] && git diff --cached --name-only --no-renames | grep -qxF -- "$pg_list"; then
+    print_kit_miss "policy guard" policy guard.py
+    echo "pre-commit: policy guard REFUSING — a guarded path is staged and no guard.py resolves to judge it."
+    rc=1
   fi
 fi
 

@@ -157,7 +157,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-17 — the legacy-home list withheld from installs and the cap census graded by what ships, so neither arm reds an adopter](spec/2026-10-23-spec-TOOL-dGroundRules-17.md) | 6 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-18 — a writer split bounded by the agent limit: rule 2 judges `gov:fixed-writers` against `runtime.agents-in-flight` and verifiers against `MAX_VERIFIERS`](spec/2026-10-23-spec-TOOL-dGroundRules-18.md) | 6 | 2 | CLOSED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-20 — the `policy fixtures` guard covers the sibling files its cases run, and a join keeps the census's enforcers inside it](spec/2026-10-23-spec-TOOL-dGroundRules-20.md) | 6 | 2 | CLOSED | rev-5 | 2026-10-24 |
-| [TOOL-dGroundRules-21 — the round-1 spec audit's minors: forty-one findings closed in the code units 1 to 10 leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-21.md) | 7 | 2 | DEFERRED | rev-8 | 2026-10-24 |
+| [TOOL-dGroundRules-21 — the round-1 spec audit's minors: forty-one findings closed in the code units 1 to 10 leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-21.md) | 7 | 2 | CLOSED | rev-8 | 2026-10-24 |
 | [TOOL-dGroundRules-22 — each census row names where its kit installs the enforcer, and the census arm grades an adopter there](spec/2026-10-23-spec-TOOL-dGroundRules-22.md) | 7 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-23 — the registry join holds each census row's destination and entry to what the deployer installs](spec/2026-10-23-spec-TOOL-dGroundRules-23.md) | 7 | 2 | DEFERRED | rev-7 | 2026-10-24 |
 | [TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-25.md) | 8 | 2 | DEFERRED | rev-8 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 225 bound to this build, across 4 record folder(s).
+Records: 226 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

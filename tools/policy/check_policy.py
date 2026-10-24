@@ -6,8 +6,11 @@ one can red (TOOL-dGroundRules-1).
     python <this kit>/check_policy.py --live   # headless sessions under a rendered agent limit
 
 `<dir>` defaults to the git top level of the working directory. Each arm prints
-`policy-check: <arm> · <n> finding(s) · <population>`, then one line per finding; a population of
-zero is a finding, so an arm that read nothing cannot read green.
+`policy-check: <arm> · <n> finding(s) · <population>`, then one line per finding. What a population
+of zero means each `ARMS` entry declares as its `empty` (TOOL-dGroundRules-21 S5): `finding`, so an
+arm that read nothing cannot read green, or `announce`, where an empty population is a legal state,
+which prints `policy-check: <arm> · not graded · <why>` and no finding. An arm may also announce
+itself, answering None for its population, where its subject cannot exist yet.
 
 THE ARMS read the repository's `.governance/policy.toml` and this kit's catalogue and shrink-only
 list: `arm_schema` grades each file key with the value check, `arm_shape` audits the catalogue's
@@ -16,14 +19,16 @@ loop bound or deadline row that does not declare `direction = "raise-loosens"` (
 and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4).
 `arm_reader_coverage` reds a catalogue key whose owner build has landed, every spec in its build
 folder terminal at the landed revision, and that no call of READER_SHAPES in the tracked code reads
-(TOOL-dGroundRules-8); it grades nothing until an owner lands, and says so. The mirror's
+(TOOL-dGroundRules-8); it grades nothing until an owner lands, and announces so. The mirror's
 three (TOOL-dGroundRules-5): `arm_mirror_parity` reds a working-tree `.governance/policy.json` that
-is absent or differs from its render at HEAD; `arm_mirror_landed` reds a key the policy file at the
-landed revision sets that the helper `policy-mirror.js` and the reader answer differently, one
-`node` call per key; `arm_mirror_readers` reds a tracked code file outside this kit, the memory root
-and `help/` that names `policy.json`. `arm_legacy_homes` reds each report `policy.py lists --check`
-makes on the legacy-homes list (TOOL-dGroundRules-7); where this kit holds no list, as in every
-install, it prints `policy-check: arm_legacy_homes · not graded · <why>` (TOOL-dGroundRules-17).
+differs from its render at HEAD, or is absent where HEAD carries the policy file or a mirror, and
+announces otherwise (TOOL-dGroundRules-21 S15); `arm_mirror_landed` reds a key the policy file at
+the landed revision sets that the helper `policy-mirror.js` and the reader answer differently, one
+`node` call per key; `arm_mirror_readers` reds a tracked code file outside this kit, the memory root,
+`help/` and the self-tests that READS `policy.json`, by `arm_single_reader`. `arm_legacy_homes` reds
+each report `policy.py lists --check` makes on the legacy-homes list (TOOL-dGroundRules-7); where
+this kit holds no list, as in every install, it prints `policy-check: arm_legacy_homes · not graded
+· <why>` (TOOL-dGroundRules-17).
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -82,7 +87,8 @@ calls stale at that rewrite.
 
 The `guard-*` cases are outcome cases of the minimal guard (TOOL-dGroundRules-6): each copies
 `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy, commits a policy file capping a
-tracked `big.md` and `small.md` and the class row `docs/*/`, stages its plant from `GUARD_PLANTS`, and
+tracked `.claude/skills/x/SKILL.md`, whose key carries slashes and a leading dot, and `small.md`, and
+the spec folder's class row (TOOL-dGroundRules-21 S22), stages its plant from `GUARD_PLANTS`, and
 judges `guard.py --staged` by its exit code and the reasons it prints. `guard-admits-raise` is the one
 plant that must exit 0; `guard-merge-side` concludes a conflicted merge with the branch's side, exit
 0, then with a third text, exit 1. The mirror shape's three (TOOL-dGroundRules-19): `guard-mirror-render`
@@ -115,8 +121,9 @@ the fixture's own limit, and judge each call by its exit code and the text its c
 rendered at 6, through `--only=scripts`, so rule 2 judges its `gov:fixed-writers` split by that limit.
 
 THE SIZE CAPS (TOOL-dGroundRules-9) add two arms and three kinds of case. `arm_limits_readers` reds a
-tracked code file outside this kit, the memory root, `help/` and the self-tests that spells the
-template-size limits file on a line that is not a comment or a docstring; `arm_cap_census` joins
+tracked code file outside this kit, the memory root, `help/` and the self-tests that reads the
+template-size limits file on a line that is not a comment or a docstring, or names `LIMITS_NAME`,
+the second row of `arm_single_reader` (TOOL-dGroundRules-21 S20, S29); `arm_cap_census` joins
 `caps.toml` to the tree both ways, announcing a row whose enforcer does not ship or whose kit is not
 installed (TOOL-dGroundRules-17). `budgets-pinned-outside`, `budgets-pinned-exempt`,
 `budgets-pinned-unknown` and `budgets-family-value` are plant cases of `arm_schema`. The other named
@@ -139,6 +146,15 @@ as an adopter, grading each shipped row of an installed kit at its `installed` p
 named kit's enforcers at their `installed` paths, read green with the line-length row announced, red
 naming `manifest-bytes` once its planted enforcer is deleted, and green again restored.
 
+THE MINORS BATCH (TOOL-dGroundRules-21) adds outcome cases, each named in its function's docstring:
+`adopter-suite` runs the adopter's sibling suite; `on-invalid-utf16`, `on-invalid-shallow` and
+`resolution-derived-default` the reader's refusals; `mirror-stale-legacy`, `mirror-shim-exit-one`
+and `mirror-absent-adopter` the mirror's; `legacy-homes-main-dropped` the lists' one compare base;
+`reader-coverage-relocated` and `reader-quoted-pattern` reader coverage; `limit-settings-elsewhere`,
+`limit-hook-settings-malformed`, `limit-hook-reader-throws` and `limit-fresh-target-spawn` the agent
+limit's settings; `budgets-zero-cap`, `budgets-reader-refused` and `limits-reader-docstring` the
+size caps.
+
 `--live` (S9) is no case: it drives headless `claude -p` sessions in a fixture repository under a
 rendered limit and under a control with none, reads each agent's start and end stamps, and prints
 each run's peak overlap. It costs real sessions, so no leg runs it.
@@ -159,6 +175,7 @@ import subprocess
 import sys
 import tempfile
 import tomllib
+from collections import namedtuple
 from pathlib import Path
 
 sys.dont_write_bytecode = True  # a gate leg leaves no bytecode cache in an adopter's kit dir
@@ -184,14 +201,18 @@ def arm_schema(repo, kit):
     """Each problem `policy.validate` finds in the policy file: a key its catalogue row refuses, and a
     key no row matches (TOOL-dGroundRules-4 re-points this arm through the one judge), and the
     `[budgets]` table's rule over the cap census `repo` holds at this kit's path (TOOL-dGroundRules-9).
-    A census that does not read is the one finding."""
+    A census that does not read, or a file that is not UTF-8, is the one finding. No policy file, or
+    one setting no key, is a population of 0, which this arm announces (TOOL-dGroundRules-21 S5)."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
     path = Path(repo, *POLICY_FILE)
     if not path.is_file():
         return 0, f"{POLICY_REL} is absent, so no key was graded", []
-    text = path.read_text(encoding="utf-8")
+    try:
+        text = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError as exc:
+        return 0, f"{POLICY_REL} did not decode", [(POLICY_REL, f"not UTF-8: {exc}")]
     try:
         census = budgets.read_cap_census(repo)
     except policy.Refusal as exc:
@@ -218,7 +239,9 @@ def arm_summaries(repo, kit):
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
-    findings, note = policy.check_list(kit)
+    with policy.run_without_git_env():  # the base `lists --check` reads, by the one comparison
+        compare = policy.resolve_compare_base(kit)
+    findings, note = policy.check_list(kit, compare)
     return len(rows), f"{len(policy.derive_unsummarised(rows))} of {len(rows)} row(s) unsummarised · {note}", findings
 
 
@@ -231,14 +254,24 @@ def arm_direction(repo, kit):
     return n, f"{n} loop bound and deadline row(s)", policy.check_direction(rows)
 
 
+def check_head(repo):
+    """True where HEAD names a commit in `repo`: before the first commit there is no HEAD to grade."""
+    return bool((policy.run_git(repo, "rev-parse", "--verify", "-q", "HEAD^{commit}") or "").strip())
+
+
 def arm_on_invalid(repo, kit):
     """The `policy.py check` verdict over the repository's HEAD, the candidate a push lands: its
-    Refusal, an invalid policy file with no fallback, is the one finding (TOOL-dGroundRules-4)."""
+    Refusal, an invalid policy file with no fallback, is the one finding (TOOL-dGroundRules-4). A HEAD
+    that names no commit, or one holding no policy file, grades nothing and is announced
+    (TOOL-dGroundRules-21 S15)."""
+    if not check_head(repo):
+        return None, "HEAD names no commit, so no policy file is committed to check", []
     try:
         line = policy.check_revision(repo, "HEAD")
     except policy.Refusal as exc:
         return 1, f"{POLICY_REL} at HEAD", [(f"{exc.path}:{exc.line}", exc.why)]
-    return 1, line.removeprefix("policy: check · "), []
+    line = line.removeprefix("policy: check · ")
+    return (None if " is absent at " in line else 1), line, []
 
 
 # ---- the JSON mirror (TOOL-dGroundRules-5) ------------------------------------------------------
@@ -254,13 +287,21 @@ MIRROR_REMEDY = "run: python <this kit>/policy.py mirror --write"
 
 def arm_mirror_parity(repo, kit):
     """The working-tree mirror against `policy.render_mirror(repo, "HEAD")`: a mirror that differs,
-    named by its first difference, or one absent where this kit is present. A render the reader
-    refuses is the one finding."""
+    named by its first difference, or one absent where HEAD carries the policy file or a mirror. An
+    absent mirror where HEAD carries neither, which nothing in an adopter writes before its first
+    landing, or a HEAD that names no commit, is announced and grades nothing (TOOL-dGroundRules-21
+    S15). A render the reader refuses is the one finding."""
+    path = Path(repo, *MIRROR_FILE)
+    if not check_head(repo):
+        return None, "HEAD names no commit, so no mirror is rendered to compare", []
+    carried = [rel for rel in (POLICY_REL, policy.MIRROR_REL)
+               if (policy.run_git(repo, "cat-file", "-e", f"HEAD:{rel}") is not None)]
+    if not path.is_file() and not carried:
+        return None, f"HEAD carries neither {POLICY_REL} nor {policy.MIRROR_REL}, so no landing has rendered one", []
     try:
         want = policy.render_mirror(repo, "HEAD")
     except policy.Refusal as exc:
         return 1, f"{policy.MIRROR_REL} against its render at HEAD", [(f"{exc.path}:{exc.line}", exc.why)]
-    path = Path(repo, *MIRROR_FILE)
     drift = policy.check_mirror_text(want, path.read_bytes() if path.is_file() else None)
     n = len(json.loads(want)["keys"])
     population = f"{n} key(s) of {policy.MIRROR_REL} against its render at HEAD"
@@ -317,24 +358,6 @@ def read_memory_root(repo):
     return m[1].strip("/") if m else "memory"
 
 
-def arm_mirror_readers(repo, kit):
-    """Each tracked code file, `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*`, outside this
-    kit's directory, the memory root and `help/`, that names `policy.json`: every consumer reads the
-    mirror through the helper."""
-    skip = tuple(p for p in ((policy.run_git(kit, "rev-parse", "--show-prefix") or "").strip(),
-                             read_memory_root(repo) + "/", "help/") if p)
-    files = [f for f in (policy.run_git(repo, "ls-files", "-z", "--", *CODE_PATHSPECS) or "").split("\0")
-             if f and not f.startswith(skip)]
-    out = []
-    for f in files:
-        try:
-            if b"policy.json" in Path(repo, f).read_bytes():
-                out.append((f, "names policy.json; read the mirror through policy-mirror.js's readPolicy"))
-        except OSError:
-            continue
-    return len(files), f"{len(files)} tracked code file(s) outside the kit, the memory root and help/", out
-
-
 def arm_legacy_homes(repo, kit):
     """Each report `policy.py lists --check` makes on the legacy-homes list (TOOL-dGroundRules-7): the
     rows derived from the repository's legacy policy homes against this kit's list and the list at the
@@ -345,7 +368,9 @@ def arm_legacy_homes(repo, kit):
     if not (Path(kit) / policy.LEGACY_LIST).is_file():
         return None, policy.LEGACY_WITHHELD, []
     try:
-        reports, notes, rows, _new = policy.check_legacy_homes(repo, kit)
+        with policy.run_without_git_env():  # the base `lists --check` reads, by the one comparison
+            compare = policy.resolve_compare_base(kit)
+        reports, notes, rows, _new = policy.check_legacy_homes(repo, kit, compare)
     except policy.Refusal as exc:
         return 0, "the legacy homes were not graded", [(f"{exc.path}:{exc.line}", exc.why)]
     population = " · ".join([f"{len(rows)} row(s) derived from the legacy homes", *notes])
@@ -357,30 +382,39 @@ def arm_legacy_homes(repo, kit):
 # The reader shapes, one row per consumer shape: (the files the row reads, a suffix or a directory
 # ending `/`, and its pattern). Group 2 is the key text the call passes; a new shape is one row.
 READER_SHAPES = (
-    # a call whose first argument is the key as a string literal: resolve("k"), mirror.get('k')
+    # a call whose first argument is the key as a string literal: resolve("k"), mirror.get('k'), and
+    # a literal holding the other quotes inside it, resolve(f'budgets."{cap}"') (TOOL-dGroundRules-21 S27)
     ((".py", ".js", ".mjs", ".cjs"),
-     re.compile(r"[A-Za-z_$][\w$]*\([ \t]*(?:[fFrRbB]{1,2})?(['\"`])([^'\"`\n]*)\1")),
+     re.compile(r"[A-Za-z_$][\w$]*\([ \t]*(?:[fFrRbB]{1,2})?(['\"`])((?:(?!\1)[^\n\\])*)\1")),
+    # a key joined around a name inside a quoted segment: resolve('budgets."' + name + '"'), read as
+    # `budgets."{name}"` (S27)
+    ((".py", ".js", ".mjs", ".cjs"),
+     re.compile(r"[A-Za-z_$][\w$]*\([ \t]*(['\"])([^'\"\n]*\.\")\1[ \t]*\+[ \t]*([A-Za-z_$][\w$.]*)[ \t]*\+[ \t]*(['\"])\"\4")),
     # the reader CLI's get: policy.py get k, "$kit/policy.py" get "k" | ...
     ((".sh", ".githooks/"),
      re.compile(r"policy\.py[\"']?[ \t]+get[ \t]+([\"']?)([^\s'\"]+?)\1(?=[ \t;)|&]|$)")),
 )
 READER_SKIPPED = re.compile(r"(?:^|/)(?:[^/]*\.test\.(?:sh|js)|selftest[^/]*\.py|test_[^/]*\.py)$")
-PATTERN_SEGMENT = r"[^'\"`\s.()]+"  # a `*` or `<name>` segment: one run of no quote, space, `.`, `(` or `)`
+# a `*` or `<name>` segment: a quoted segment, which may hold `.` and an interpolated name, or one
+# run of no quote, space, `.`, `(` or `)` (TOOL-dGroundRules-21 S27)
+PATTERN_SEGMENT = r"(?:\"[^\"\n]*\"|[^'\"`\s.()]+)"
 
 
 def derive_landed_owners(repo, kit=KIT):
     """-> the catalogue owners whose build has landed: at the landed revision `policy.py get` reads,
     the build folder `<memory root>/builds/<owner>/spec/` holds at least one spec and every spec's
     status header carries a token in tree_lib's TERMINAL, the memory root read from that revision's
-    `.memory-tree.conf`. The landed revision's Refusal passes through; no memory-tree kit beside
-    this one reads no build as landed, saying so. A git read that fails is a Refusal naming it."""
+    `.memory-tree.conf`. The landed revision's Refusal passes through. `tree_lib` is reached as the
+    recall kit reaches it, through the inlined `resolve_kit_dir` from `kit`'s own location, the
+    memory-tree kit named in this kit's `requires`, so a miss is a Refusal naming where the resolver
+    looked, never "no build landed" (TOOL-dGroundRules-21 S26). A git read that fails is a Refusal
+    naming it."""
     rows = policy.load_catalogue(kit)
     sha, _how = policy.derive_landed_revision(repo)
     try:
-        tree_lib = load_tree_lib()
-    except (LookupError, ImportError):
-        print("reader coverage: no memory-tree kit beside the policy kit, so no build reads as landed")
-        return set()
+        tree_lib = load_tree_lib(kit)
+    except (LookupError, ImportError) as exc:
+        raise policy.Refusal("kit.toml", 0, f"requires memory-tree, which does not resolve: {exc}") from None
     owners = sorted({str(r["owner"]) for r in rows if r.get("owner")})
     if not owners:  # an ls-tree with no pathspec would list the whole revision
         return set()
@@ -422,7 +456,9 @@ def scan_reader_keys(repo, kit=KIT):
             continue
         for line in text.splitlines():
             if not line.lstrip().startswith(("#", "//")):
-                spelled.update(m[2] for rx in shapes for m in rx.finditer(line))
+                # a joined key's text is its literal with the name spliced in as `{name}"`
+                spelled.update(m[2] + ("{" + m[3] + "}\"" if m.re.groups == 4 else "")
+                               for rx in shapes for m in rx.finditer(line))
     return spelled
 
 
@@ -461,17 +497,18 @@ def check_reader_coverage(repo, landed=None, kit=KIT):
 
 
 def arm_reader_coverage(repo, kit):
-    """`check_reader_coverage` over the repository: its population the catalogue's keys joined to the
-    landed owners, so a graded count of 0 is the announce line it prints, never a finding. A Refusal,
-    a landed revision or landed build that does not read, is the one finding."""
+    """`check_reader_coverage` over the repository: its population the catalogue's keys whose owner
+    has landed, so before any Owner build lands it is 0, which this arm announces, never a finding
+    (TOOL-dGroundRules-21 S5). A Refusal, a landed revision, landed build or memory-tree kit that does
+    not read, is the one finding."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
     try:
         n, findings = check_reader_coverage(repo, kit=kit)
     except policy.Refusal as exc:
-        return len(rows), "no landed revision to join the owners to", [(f"{exc.path}:{exc.line}", exc.why)]
-    return (len(rows), f"{n} of {len(rows)} catalogue key(s) graded for a reader",
+        return len(rows), "no landed owners to grade", [(f"{exc.path}:{exc.line}", exc.why)]
+    return (n, f"{n} of {len(rows)} catalogue key(s) graded for a reader" + ("" if n else ", no owner build landed"),
             [tuple(f.split(": ", 1)) for f in findings])
 
 
@@ -540,24 +577,35 @@ def derive_code_files(repo, kit):
             if f and not f.startswith(skip) and not READER_SKIPPED.search(f)]
 
 
-def arm_limits_readers(repo, kit):
-    """Each tracked code file of `derive_code_files` that spells the template-size limits file's name
-    on a line that is neither a comment nor inside a Python docstring: the policy kit's budgets.py is
-    that file's one reader (TOOL-dGroundRules-9), so any other spelling in code is a second parser."""
-    name = budgets.LIMITS_NAME
-    files = derive_code_files(repo, kit)
+# A READ of a file, never a mention (TOOL-dGroundRules-21 S18): a call or command that opens it,
+# followed on its line by the file's name.
+READ_SHAPE = r"(?:readFileSync|\bopen\(|\bcat\b|git show)"
+
+
+def arm_single_reader(repo, path, reader_dir, const=""):
+    """Each tracked code file of `derive_code_files`, outside `reader_dir`, the directory holding the
+    file's one reader, the memory root, `help/` and the self-tests, that READS the file `path` names:
+    a line that is neither a comment nor inside a Python docstring and spells READ_SHAPE followed on
+    the line by the file's name, or names `const`, the constant its one reader defines for that name.
+    ONE scanner for every file with one reader (TOOL-dGroundRules-21 S20): the mirror's arm and the
+    limits file's are two rows of it in ARMS, so a mention in a comment, a docstring or a test's data
+    reds neither, and a direct read reds both alike."""
+    name = posixpath.basename(path)
+    rx = re.compile(READ_SHAPE + r".*" + re.escape(name) + (rf"|\b{re.escape(const)}\b" if const else ""))
+    prefix = (policy.run_git(reader_dir, "rev-parse", "--show-prefix") or "").strip()
+    files = derive_code_files(repo, reader_dir)
     out = []
     for f in files:
         text = policy.read_text_or_none(Path(repo, f))
-        if text is None or name not in text:
+        if text is None or (name not in text and not (const and const in text)):
             continue
         doc = derive_docstring_lines(text) if f.endswith(".py") else set()
         hits = [str(n) for n, ln in enumerate(text.splitlines(), 1)
-                if name in ln and n not in doc and not ln.lstrip().startswith(COMMENT_LEADS)]
+                if n not in doc and not ln.lstrip().startswith(COMMENT_LEADS) and rx.search(ln)]
         if hits:
-            out.append((f, f"spells {name} at line {', '.join(hits)}; budgets.py is its one reader, so ask "
-                           "it for the cap rather than parsing the file"))
-    return len(files), f"{len(files)} tracked code file(s) outside the kit, the memory root, help/ and the self-tests", out
+            out.append((f, f"reads {name} at line {', '.join(hits)}; its one reader is in {prefix or 'this kit'}, "
+                           "so ask that reader rather than reading the file"))
+    return len(files), f"{len(files)} tracked code file(s) outside {prefix or 'the kit'}, the memory root, help/ and the self-tests", out
 
 
 RECEIPT_REL = f"{POLICY_FILE[0]}/install.json"
@@ -652,17 +700,35 @@ def arm_cap_census(repo, kit):
                          f"· {asked} request(s) in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel}"), out
 
 
-ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm_mirror_parity,
-        arm_mirror_landed, arm_mirror_readers, arm_legacy_homes, arm_reader_coverage,
-        arm_limits_readers, arm_cap_census]
+# One row per arm: its name, its function (repo, kit) -> (population, why, findings), and what a
+# population of 0 means, `finding` or `announce` (TOOL-dGroundRules-21 S5), the choice the README's
+# "Each arm in an adopter" table names in its last column.
+Arm = namedtuple("Arm", "name run empty")
+ARMS = [
+    Arm("arm_schema", arm_schema, "announce"),  # no policy file, or one setting no key, is legal
+    Arm("arm_shape", arm_shape, "finding"),
+    Arm("arm_summaries", arm_summaries, "finding"),
+    Arm("arm_direction", arm_direction, "finding"),
+    Arm("arm_on_invalid", arm_on_invalid, "finding"),
+    Arm("arm_mirror_parity", arm_mirror_parity, "finding"),
+    Arm("arm_mirror_landed", arm_mirror_landed, "finding"),
+    Arm("arm_mirror_readers", lambda repo, kit: arm_single_reader(repo, policy.MIRROR_REL, kit), "announce"),  # no code is legal
+    Arm("arm_legacy_homes", arm_legacy_homes, "finding"),
+    Arm("arm_reader_coverage", arm_reader_coverage, "announce"),  # no Owner build landed yet
+    Arm("arm_limits_readers", lambda repo, kit: arm_single_reader(repo, budgets.LIMITS_NAME, kit, "LIMITS_NAME"), "finding"),
+    Arm("arm_cap_census", arm_cap_census, "finding"),
+]
+ARM = {a.name: a for a in ARMS}
 
 
 def run_arm(arm, repo, kit):
-    """-> (the verdict `main` prints after the arm's name, findings): `<k> finding(s) · <population>`,
-    a zero population being one more finding, or `not graded · <why>` where the arm answers None for
-    its population, an announce that grades nothing (TOOL-dGroundRules-17)."""
-    n, population, findings = arm(repo, kit)
-    if n is None:
+    """-> (the verdict `main` prints after the arm's name, findings) for an Arm row:
+    `<k> finding(s) · <population>`, or `not graded · <why>` where the arm answers None for its
+    population, an announce that grades nothing (TOOL-dGroundRules-17), or answers 0 with no finding
+    and declares `empty = "announce"` (TOOL-dGroundRules-21 S5); a 0 under `finding` is one more
+    finding, so an arm that read nothing cannot read green."""
+    n, population, findings = arm.run(repo, kit)
+    if n is None or (n == 0 and arm.empty == "announce" and not findings):
         return f"not graded · {population}", findings
     if n == 0:
         findings = findings + [("population", f"zero, so this arm graded nothing: {population}")]
@@ -769,73 +835,53 @@ FRESH_TARGET = "adopter-fresh-target"
 ADOPTER_SECTION = "Each arm in an adopter"
 
 
-# The kit-dir resolver, INLINED byte-identically from the canonical copy named on its marker line and
-# gated by the resolve-python self-test: a kit may not import a sibling.
-# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
-def resolve_kit_dir(home, anchor, here):
-    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
-
-    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
-       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
-       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
-       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
-    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
-    3. refuse — LookupError naming the three places looked; never a guessed prefix.
-    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
-    """
-    import json
-    import pathlib
-    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
-    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
-    receipt = root / ".governance" / "install.json"
-    try:
-        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
-    except (OSError, ValueError, AttributeError):
-        rows = []
-    for row in rows:
-        if not isinstance(row, dict) or not row.get("path"):
-            continue
-        src = str(row.get("source") or "").split("/")
-        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
-        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
-            continue
-        hit = (root / str(row["path"])).absolute()
-        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
-            return hit.parent
-    probes = (here / home, here.parent / home)
-    for cand in probes:
-        if (cand / anchor).is_file():
-            return cand
-    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
-        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
-# <<< resolve_kit_dir
+resolve_kit_dir = policy.resolve_kit_dir  # the kit's one inlined copy, in policy.py
 
 
-def load_tree_lib():
-    """The memory-tree kit's `tree_lib`, its directory found by `resolve_kit_dir` from this kit -> the
-    module; LookupError where no memory-tree kit is installed, ImportError where it does not import."""
-    lib = str(resolve_kit_dir("memory-tree", "tree_lib.py", KIT))
+def load_tree_lib(kit=KIT):
+    """The memory-tree kit's `tree_lib`, its directory found by `resolve_kit_dir` from `kit`, this
+    kit's own location unless a copy names its own (TOOL-dGroundRules-21 S25) -> the module;
+    LookupError where no memory-tree kit is installed, ImportError where it does not import."""
+    lib = str(resolve_kit_dir("memory-tree", "tree_lib.py", kit))
     if lib not in sys.path:
         sys.path.insert(0, lib)
     import tree_lib
     return tree_lib
 
 
-def resolve_bash():
-    """The bash sharing this filesystem, by path, or None: on Windows the bare name reaches the
-    System32 WSL launcher before PATH (gotcha subprocess-resolves-a-different-shell). GOV_BASH
-    overrides; a candidate is taken only if it runs."""
-    override = os.environ.get("GOV_BASH")
-    cands = [override] if override else [
-        p for d in os.environ.get("PATH", "").split(os.pathsep) for p in (os.path.join(d, "bash.exe"), os.path.join(d, "bash"))
-        if os.path.isfile(p) and not any(s in p.replace("\\", "/").lower() for s in ("/system32/", "/windowsapps/"))]
-    for cand in cands:
+def resolve_bash(script):
+    r"""The bash that can SEE `script`, by RUNNING each candidate, or None: a copy of the run-gates
+    kit's rule, profile_bar.py's `resolve_bash` (TOOL-dGroundRules-21 S14). GOV_BASH first, then the
+    bash PATH names, then Git for Windows' two paths, each kept only when `test -f` on the script
+    exits 0 under it. On Windows PATH order commonly puts the System32 WSL launcher first, which
+    cannot open a `C:/` path, and a stub that exits 127 can sit there too (gotcha
+    subprocess-resolves-a-different-shell); being on PATH is not evidence."""
+    cands = [os.environ.get("GOV_BASH", ""), shutil.which("bash") or "",
+             "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"]
+    tried = []
+    for c in cands:
+        if not c or c in tried:
+            continue
+        tried.append(c)
         try:
-            if subprocess.run([cand, "-c", ":"], capture_output=True).returncode == 0:
-                return cand
-        except OSError:
-            pass
+            r = subprocess.run([c, "-c", 'test -f "$1"', "_", str(script)], capture_output=True, timeout=20)
+        except (OSError, subprocess.SubprocessError):
+            continue
+        if r.returncode == 0:
+            return c
     return None
+
+
+def run_adopter_suite(name):
+    """`adopter-suite` (TOOL-dGroundRules-21 S4): `adopt-policy.test.sh`, the adopter's sibling suite,
+    which arms each of its refusal branches, run under the bash `resolve_bash` finds able to see it,
+    so a leg executes the arms `check-arms.py` reads. Its exit 0 is the case's pass."""
+    suite = KIT / "adopt-policy.test.sh"
+    bash = resolve_bash(suite.as_posix())
+    if bash is None:
+        return print_checks(name, [(name, "a bash that can see the suite", False, "none: set GOV_BASH")])
+    rc, out = run_case_argv(KIT, [bash, suite.as_posix()])
+    return print_checks(name, [(name, f"bash {suite.name} exits 0", rc == 0, f"exit {rc} · {render_said(out, 'passed')}")])
 
 
 def extract_arm_rows(text):
@@ -876,14 +922,10 @@ def build_source_snapshot(source_root):
     GIT_DIR set to the clone every new object lands in the clone's store, never the source's. `add -A`
     runs over a copy of the source's index with the source as work tree, so the source's ignore rules
     decide what counts and a file whose stat matches is not re-hashed. Every git call runs with the
-    memory-tree kit's GIT_ENV_LEAKS stripped, so an ambient GIT_DIR or GIT_INDEX_FILE cannot retarget
-    it. The caller removes the root. -> Path; RuntimeError naming the failed step and git's first
-    stderr line, the clone already removed."""
-    try:
-        leaks = load_tree_lib().GIT_ENV_LEAKS
-    except LookupError as exc:
-        raise RuntimeError(f"no GIT_ENV_LEAKS to strip: {exc}") from None
-    base = {k: v for k, v in os.environ.items() if k not in leaks}
+    memory-tree kit's GIT_ENV_LEAKS stripped, the copy the reader inlines (TOOL-dGroundRules-21 S9), so
+    an ambient GIT_DIR or GIT_INDEX_FILE cannot retarget it. The caller removes the root. -> Path;
+    RuntimeError naming the failed step and git's first stderr line, the clone already removed."""
+    base = {k: v for k, v in os.environ.items() if k not in policy.GIT_ENV_LEAKS}
 
     def run(step, *args, cwd=None, **env):
         p = subprocess.run(["git", "-c", "user.name=policy-fixture", "-c", "user.email=policy-fixture@invalid",
@@ -922,14 +964,27 @@ def run_fresh_target(name):
     target's tool root must be a receipt row's `path`, and every engine or seed row's `path` must
     exist. Then the installed `adopt-policy.sh`, found through its receipt row: `--scaffold`, and
     `--check` with the install staged and again once it is committed, each exiting 0 with every arm
-    graded clean or announced; and the README's table joined to ARMS both ways. A missing `govkit.py`
-    or a refused `apply` is a WRONG, and nothing after it runs. Prints its lines. -> (assertions, wrong)."""
-    names = [a.__name__ for a in ARMS]
+    graded clean or announced; and the README's table joined to ARMS both ways. Over the scaffolded
+    target, each `--check` must also print `arm_schema` grading the scaffold's keys with no finding,
+    `arm_mirror_readers` grading at least one staged code file of the memory-tree kit its `requires`
+    installs with no finding, and the reader-coverage arm `not graded`; and an Arm planted with a
+    population of 0 must print one finding under `finding` and none, `not graded`, under `announce`
+    (TOOL-dGroundRules-21 S5, AC5). A missing `govkit.py` or a refused `apply` is a WRONG, and nothing
+    after it runs. Prints its lines. -> (assertions, wrong)."""
+    names = [a.name for a in ARMS]
     listed = extract_arm_rows((KIT / "README.md").read_text(encoding="utf-8"))
     wrong = [f"{n} is in ARMS with no row in README.md \"{ADOPTER_SECTION}\" (unlisted)" for n in names if n not in listed]
     wrong += [f"README.md \"{ADOPTER_SECTION}\" lists {n}, which ARMS lacks (stale)" for n in listed if n not in names]
     asserted = len(set(names) | set(listed)) + 2
-    bash = resolve_bash()
+    for empty, want in (("finding", "1 finding(s) · "), ("announce", "not graded · ")):
+        verdict, _f = run_arm(Arm("planted", lambda _r, _k: (0, "a planted empty population", []), empty), None, KIT)
+        asserted += 1
+        if not verdict.startswith(want):
+            wrong.append(f"an Arm planted with population 0 under `{empty}` printed {verdict!r}, not {want!r}")
+    keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(policy.load_catalogue(KIT))), []))
+    lines = {"arm_schema": re.compile(rf"0 finding\(s\) · {keys} key\(s\) of "),
+             "arm_mirror_readers": re.compile(r"0 finding\(s\) · [1-9][0-9]* tracked code file\(s\)"),
+             "arm_reader_coverage": re.compile(r"not graded · ")}
     desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
     ids, todo = [desc["id"]], list(desc.get("requires", []))
     # ponytail: `requires` names kit ids and is read as each kit's home, which they equal for every
@@ -995,6 +1050,7 @@ def run_fresh_target(name):
                       f"engine or seed row(s) are each present · no stray or missing receipt path")
             adopter = next((r["path"] for r in rows if r.get("kit") == desc["id"]
                             and str(r.get("path")).endswith("/adopt-policy.sh")), None)
+            bash = resolve_bash((t / adopter).as_posix()) if adopter else None
             if adopter is None:
                 wrong.append(f"the receipt has no row of kit {desc['id']} whose path ends in adopt-policy.sh")
             elif bash is None:
@@ -1014,8 +1070,13 @@ def run_fresh_target(name):
                         run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
                     rc, out = run_adopter("--check")
                     bad = check_arm_lines(out, names)
-                    asserted += len(names) + 1
+                    asserted += len(names) + 1 + len(lines)
                     wrong += [f"{phase}: {b}" for b in bad]
+                    for arm, rx in lines.items():
+                        said = next((ln for ln in out.replace("\r", "").split("\n")
+                                     if ln.startswith(f"policy-check: {arm} · ")), "(no line)")
+                        if not rx.search(said):
+                            wrong.append(f"{phase}: {arm} printed {said!r}, not /{rx.pattern}/")
                     if rc:
                         wrong.append(f"{phase}: --check exited {rc}" + ("" if bad else f": {out.strip()}"))
     finally:
@@ -1394,11 +1455,76 @@ def run_on_invalid_strict(name):
     return len(kept) + 2, len(wrong)
 
 
+DERIVED_ROW = '\n[[key]]\nname = "zz.derived"\nallowed = ["a"]\ndefault = { derived = "x" }\nowner = "dGroundRules"\n'
+
+
+def run_reader_refusals(name):
+    """The reader's three refusals of TOOL-dGroundRules-21, one repository each. `on-invalid-utf16`
+    (S10): V valid, then C the same file written as UTF-16LE with its BOM, as a PowerShell redirect
+    writes it; `get` at C must read V's value from `last-valid`, its reason holding `not UTF-8`.
+    `on-invalid-shallow` (S13): V valid, then C malformed, cloned `--depth 1`; `get` at C must refuse
+    naming the shallow history, and a full clone fall back to V. `resolution-derived-default` (S12): a
+    kit copy at its own path in the repository whose catalogue carries DERIVED_ROW; `get` on it must
+    exit 2 naming the row and `a derived default`, and the mirror rendered there hold no such key."""
+    good, bad = '[budgets]\nenforce = "refuse"\n', '[budgets]\nenforce = refuse\n'
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        if name == "on-invalid-utf16":
+            r = build_reader_repo(t / "u", good)
+            Path(r, *POLICY_FILE).write_bytes(b"\xff\xfe" + good.encode("utf-16-le"))
+            run_fixture_git(r, "add", "-A")
+            run_fixture_git(r, "commit", "-q", "-m", "C, written by a PowerShell redirect")
+            checks.append(check_get("C in UTF-16LE", r, ["budgets.enforce", "--rev", "HEAD", "--explain"], lambda rc, o, e:
+                                    rc == 0 and o == "refuse\n" and " · last-valid · " in e and "not UTF-8" in e))
+        elif name == "on-invalid-shallow":
+            src = build_reader_repo(t / "src", good, bad)
+            for kind, depth in (("shallow", ["--depth", "1"]), ("full", [])):
+                run_fixture_git(t, "clone", "-q", *depth, src.as_uri(), kind)
+            checks += [check_get("--depth 1", t / "shallow", ["budgets.enforce", "--rev", "HEAD"], lambda rc, o, e:
+                                 rc == 2 and not o and "history is shallow at " in e and "fetch more history" in e),
+                       check_get("full history", t / "full", ["budgets.enforce", "--rev", "HEAD", "--explain"],
+                                 lambda rc, o, e: rc == 0 and o == "refuse\n" and " · last-valid · " in e)]
+        else:  # resolution-derived-default
+            r = t / "d"
+            prefix = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()
+            kit = r / prefix
+            kit.mkdir(parents=True)
+            for f in (*READER_FILES, policy.CATALOGUE):
+                (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
+            write_edit(kit / policy.CATALOGUE, lambda text: text + DERIVED_ROW)
+            write_policy(r, good)
+            run_fixture_git(r, "init", "-q")
+            run_fixture_git(r, "symbolic-ref", "HEAD", "refs/heads/main")
+            run_fixture_git(r, "add", "-A")
+            run_fixture_git(r, "commit", "-q", "-m", "a catalogue row with a derived default")
+            checks.append(check_get("the derived row", r, ["zz.derived", "--rev", "HEAD"], lambda rc, o, e:
+                                    rc == 2 and not o and "zz.derived" in e and "a derived default" in e, kit=kit))
+            p = subprocess.run([sys.executable, str(kit / "policy.py"), "mirror", "--print"], cwd=r,
+                               capture_output=True)
+            try:
+                held = json.loads(p.stdout.decode("utf-8")).get("keys", {})
+            except ValueError:
+                held = None
+            checks.append(("the mirror", "rendered with no zz.derived key, and budgets.enforce held",
+                           p.returncode == 0 and held is not None and "zz.derived" not in held and "budgets.enforce" in held,
+                           f"exit {p.returncode} · {len(held or {})} key(s) · {p.stderr.decode('utf-8', 'replace').strip() or 'no stderr'}"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+READER_REFUSAL_CASES = ("on-invalid-utf16", "on-invalid-shallow", "resolution-derived-default")
+
+
 # ---- the JSON mirror (TOOL-dGroundRules-5) ------------------------------------------------------
 
 AGENTS_KEY = "runtime.agents-in-flight"
 CONSUMER_FILE = ("hooks", "consumer.js")
-CONSUMER_TEXT = ("// A consumer outside the policy kit: it reads policy through the helper, never the file itself.\n"
+# Its comment names the mirror, which `arm_mirror_readers` must not read as a read (TOOL-dGroundRules-21 AC18).
+CONSUMER_TEXT = ("// A consumer outside the policy kit: it reads policy through the helper, never policy.json itself.\n"
                  "const { readPolicy } = require(@helper@);\n"
                  f"module.exports = () => readPolicy({json.dumps(AGENTS_KEY)}).value;\n")
 DIRECT_READER = 'module.exports = () => JSON.parse(require("fs").readFileSync(".governance/policy.json", "utf8"));\n'
@@ -1422,7 +1548,7 @@ def seed_mirror_absent(repo, kit, rows):
 def seed_mirror_direct_reader(repo, kit, rows):
     """The tracked consumer outside the kit made to read the mirror with readFileSync."""
     Path(repo, *CONSUMER_FILE).write_text(DIRECT_READER, encoding="utf-8", newline="\n")
-    return "/".join(CONSUMER_FILE), "names policy.json"
+    return "/".join(CONSUMER_FILE), "reads policy.json"
 
 
 def build_landed_repo(rows):
@@ -1562,6 +1688,30 @@ def run_mirror_landed(name):
                                         ["node", str(kit / "policy-mirror.js"), "get", "budgets.enforce", "--repo",
                                          str(repo), "--explain"], lambda rc, o, e: rc == 0 and o == "refuse\n"
                                         and " · file · mirror " not in e and f"at {rewrite[:8]}, the landed revision" in e))
+        elif name == "mirror-stale-legacy":
+            # TOOL-dGroundRules-21 S17: the mirror fresh on its policy and catalogue blobs, then a landing
+            # that changes `.agent-cap.conf` alone; the mirror's legacy blob no longer matches L.
+            set_landed(repo, "last-valid", 3, False)
+            Path(repo, *MIRROR_FILE).write_bytes(policy.render_mirror(repo, "HEAD"))
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            run_fixture_git(repo, "commit", "-q", "-m", "the mirror, fresh")
+            Path(repo, policy.LEGACY_FANOUT).write_text("FANOUT_CAP=2\n", encoding="utf-8", newline="\n")
+            run_fixture_git(repo, "add", "--", policy.LEGACY_FANOUT)
+            run_fixture_git(repo, "commit", "-q", "-m", "a conf-only landing")
+            run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+            at = run_fixture_git(repo, "rev-parse", "HEAD")[:8]
+            checks.append(check_run(at_l, what + " --explain", helper + ["--explain"], lambda rc, o, e: rc == 0
+                                    and o == "2\n" and f" · mirror stale at {at}; " in e))
+        elif name == "mirror-shim-exit-one":
+            # TOOL-dGroundRules-21 S16: every shim outcome but exit 0 and its own refusal is a PolicyRefusal
+            # naming the status, never an undefined value or another throw.
+            set_landed(repo, "last-valid", 3, False)
+            shim = kit / "policy-shim.sh"
+            enforce = ["node", str(kit / "policy-mirror.js"), "get", "budgets.enforce", "--repo", str(repo)]
+            for label, body in (("a shim exiting 1", "exit 1\n"), ("a shim killed by a signal", "kill -9 $$\n")):
+                shim.write_text("#!/usr/bin/env bash\necho planted >&2\n" + body, encoding="utf-8", newline="\n")
+                checks.append(check_run(label, "policy-mirror.js get budgets.enforce", enforce, lambda rc, o, e: rc == 2
+                                        and not o and e.startswith(refused) and "policy-shim.sh landed failed: status " in e))
         else:  # mirror-absent-refuse
             at = set_landed(repo, "refuse", 3, False)
             checks.append(check_run(at_l, what + " under refuse", helper, lambda rc, o, e: rc == 2 and not o
@@ -1572,7 +1722,7 @@ def run_mirror_landed(name):
                                     rc == 0 and o == want and f" · file · mirror absent at {at}; " in e))
         _n, population, findings = arm_mirror_landed(repo, kit)
         named = any(k == AGENTS_KEY for k, _w in findings)
-        ok = named if name == "mirror-stale-refuse" else not findings
+        ok = named if name in ("mirror-stale-refuse", "mirror-shim-exit-one") else not findings
         checks.append((at_l, "arm_mirror_landed", ok, f"{len(findings)} finding(s) · "
                        + ("; ".join(f"{k}: {w}" for k, w in findings) or population)))
     finally:
@@ -1584,17 +1734,45 @@ def run_mirror_landed(name):
     return asserted, wrong
 
 
+def run_mirror_absent_adopter(name):
+    """`mirror-absent-adopter` (TOOL-dGroundRules-21 S15): an adopter with no mirror, over a target
+    whose HEAD carries neither the policy file nor a mirror, the policy file scaffolded in its working
+    tree, and over a target with no commit at all. `arm_mirror_parity` and `arm_on_invalid` must each
+    print `not graded` and no finding over both."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        carried = t / "carried"
+        build_reader_repo(carried, None)
+        write_policy(carried, policy.render_scaffold(policy.load_catalogue(KIT)))
+        (t / "bare").mkdir()
+        run_fixture_git(t / "bare", "init", "-q")
+        for target, repo in (("HEAD carries neither", carried), ("no commit", t / "bare")):
+            for arm in ("arm_mirror_parity", "arm_on_invalid"):
+                verdict, findings = run_arm(ARM[arm], repo, KIT)
+                checks.append((target, arm, verdict.startswith("not graded · ") and not findings,
+                               f"{verdict} · {findings or 'no finding'}"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 def run_mirror_landed_parity(name):
     """The shim's `landed` against the reader's `derive_landed_revision` in four ladder states, each
     remote's main a different commit: two remotes with GOV_REMOTE naming the second; two without;
-    one remote; no remote. The same sha, or both refusing, in each."""
-    bash = resolve_bash()
-    if bash is None:
-        print(f"policy-fixture: {name} · WRONG: no bash on PATH shares this filesystem; set GOV_BASH")
-        return 1, 1
+    one remote; no remote. The same sha, or both refusing, in each. The shim runs under the bash
+    `resolve_bash` finds able to see it, whatever PATH puts first, and the case names it."""
     repo, kit, bare = build_landed_repo(policy.load_catalogue(KIT))
     checks = []
     try:
+        bash = resolve_bash((kit / "policy-shim.sh").as_posix())
+        if bash is None:
+            print(f"policy-fixture: {name} · WRONG: no bash can see the shim: GOV_BASH, PATH's bash and Git for "
+                  "Windows' two were each tried; set GOV_BASH")
+            return 1, 1
+        print(f"policy-fixture: {name} · the shim runs under {bash}")
         run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
         run_fixture_git(repo, "remote", "add", FIXTURE_SECOND, repo.as_posix())
         run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_SECOND}/main", "HEAD~1")
@@ -1627,24 +1805,28 @@ GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: th
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 DEPLOY_REL = ".governance/deploy.toml"
 DECISIONS_REL = "memory/DECISIONS.md"
-GUARD_POLICY = '[budgets]\n"big.md" = 100\n"small.md" = 50\n"docs/*/" = 10\n'
-BIG, SMALL, CLASS = '"big.md" = 100\n', '"small.md" = 50\n', '"docs/*/" = 10\n'
+# A measured-file cap whose key carries slashes and a leading dot, and the spec folder's class row, so
+# the guard's key handling is proved on the shapes the census holds, not on one-segment names
+# (TOOL-dGroundRules-21 S22).
+BIG_FILE = ".claude/skills/x/SKILL.md"
+GUARD_POLICY = f'[budgets]\n"{BIG_FILE}" = 100\n"small.md" = 50\n"memory/builds/*/spec/" = 10\n'
+BIG, SMALL, CLASS = f'"{BIG_FILE}" = 100\n', '"small.md" = 50\n', '"memory/builds/*/spec/" = 10\n'
 RAISED = (POLICY_REL, lambda t: t.replace(BIG, '# RAISED 100 -> 120, 2026-10-23, TOOL-x-1, measured 118 bytes\n'
-                                                 '"big.md" = 120\n'))
-UNARGUED = (POLICY_REL, lambda t: t.replace(BIG, '"big.md" = 120\n'))
-ROW = (DECISIONS_REL, lambda t: t + "- TOOL-x-1 · big.md raised to 120\n")
+                                                 f'"{BIG_FILE}" = 120\n'))
+UNARGUED = (POLICY_REL, lambda t: t.replace(BIG, f'"{BIG_FILE}" = 120\n'))
+ROW = (DECISIONS_REL, lambda t: t + f"- TOOL-x-1 · {BIG_FILE} raised to 120\n")
 NO_RAISED, NO_ROW = "no RAISED", f"no {DECISIONS_REL} row"
 # case -> [(scenario, [(path, edit of its text, "" when absent)], the exit wanted, needles stdout
 # must carry, needles it must not)]; each scenario is staged alone over a fresh commit.
 GUARD_PLANTS = {
-    "guard-admits-raise": [("raise", [RAISED, ROW], 0, ["policy-guard: admitted · budgets.\"big.md\" 100 -> 120"], [])],
-    "guard-lowered": [("lowered", [(POLICY_REL, lambda t: t.replace(BIG, '# RAISED 100 -> 90\n"big.md" = 90\n')), ROW],
+    "guard-admits-raise": [("raise", [RAISED, ROW], 0, [f"policy-guard: admitted · budgets.\"{BIG_FILE}\" 100 -> 120"], [])],
+    "guard-lowered": [("lowered", [(POLICY_REL, lambda t: t.replace(BIG, f'# RAISED 100 -> 90\n"{BIG_FILE}" = 90\n')), ROW],
                        1, ["a lowering"], [])],
     "guard-two-raised": [("two raised", [RAISED, (POLICY_REL, lambda t: t.replace(SMALL, '# RAISED 50 -> 60\n'
                                                                                    '"small.md" = 60\n')), ROW],
                           1, ["2 keys changed"], [])],
-    "guard-class-row": [("class row", [(POLICY_REL, lambda t: t.replace(CLASS, '# RAISED 10 -> 20\n"docs/*/" = 20\n')),
-                                       ROW], 1, ["not a measured-file cap"], [])],
+    "guard-class-row": [("class row", [(POLICY_REL, lambda t: t.replace(
+        CLASS, '# RAISED 10 -> 20\n"memory/builds/*/spec/" = 20\n')), ROW], 1, ["not a measured-file cap"], [])],
     "guard-beside-change": [("beside a change", [RAISED, (POLICY_REL, lambda t: t.replace(
         "[budgets]\n", '[budgets]\nenforce = "refuse"\n')), ROW], 1, ["2 keys changed"], [])],
     "guard-beside-path": [("beside a path", [RAISED, ROW, (DEPLOY_REL, lambda t: t + 'planted = "a line"\n')],
@@ -1668,13 +1850,14 @@ GUARD_PLANTS = {
 
 
 def build_guard_repo():
-    """build_repo's fixture with guard.py and its list copied beside the catalogue, a tracked big.md and
-    small.md, a deploy.toml, a decision log holding one row, and a policy file whose [budgets] table
-    sets "big.md" = 100, "small.md" = 50 and "docs/*/" = 10, all committed. -> (repo, kit copy)."""
+    """build_repo's fixture with guard.py and its list copied beside the catalogue, a tracked BIG_FILE
+    and small.md, a deploy.toml, a decision log holding one row, and a policy file whose [budgets]
+    table sets BIG_FILE to 100, "small.md" to 50 and the class row "memory/builds/*/spec/" to 10, all
+    committed. -> (repo, kit copy)."""
     repo, kit = build_repo(policy.load_catalogue(KIT))
     for f in GUARD_FILES:
         (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
-    for rel, text in (("big.md", "big\n"), ("small.md", "small\n"), (DEPLOY_REL, 'deployer = "fixture"\n'),
+    for rel, text in ((BIG_FILE, "big\n"), ("small.md", "small\n"), (DEPLOY_REL, 'deployer = "fixture"\n'),
                       (DECISIONS_REL, "# decisions\n\n- TOOL-x-0 · the first row\n"), (POLICY_REL, GUARD_POLICY)):
         Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
         Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
@@ -1774,7 +1957,7 @@ def build_legacy_repo(t, gate, house):
     if gate is not None:
         homes[Path(repo, policy.GATE_FILE)] = gate
     if house:
-        homes[policy.resolve_tool_home(policy.HOUSE_HOME, kit)] = LEGACY_HOUSE
+        homes[kit.parent / policy.HOUSE_HOME[len(policy.TOOL_ROOT):]] = LEGACY_HOUSE  # where resolve_kit_dir probes
     for path, text in homes.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8", newline="\n")
@@ -1870,6 +2053,36 @@ def run_legacy_homes(name):
     return print_checks(name, checks)
 
 
+def run_legacy_main_dropped(name):
+    """`legacy-homes-main-dropped` (TOOL-dGroundRules-21 S24): a branch opened from main and committed
+    once, then main drops the conf key KEPT_KEY with its row and lands; the branch's merge-base still
+    holds the row and the branch's derivation still carries the key. The branch's `lists --check` must
+    report no `new legacy home`, and exit 0: the base is the merge-base, never the landed tip."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        kit = build_legacy_repo(t, LEGACY_GATE, True)
+        repo, conf = t / "r", t / "r" / ".unattended.conf"
+        run_fixture_git(repo, "checkout", "-q", "-b", "b")
+        Path(repo, "branch-work.md").write_text("the branch's own change\n", encoding="utf-8", newline="\n")
+        run_fixture_git(repo, "add", "-A")
+        run_fixture_git(repo, "commit", "-q", "-m", "the branch, opened before main dropped a key")
+        run_fixture_git(repo, "checkout", "-q", "main")
+        write_edit(conf, lambda s: s.replace('KEPT_KEY="1"\n', ""))
+        run_legacy_lists(kit, "--write")
+        run_fixture_git(repo, "commit", "-q", "-am", "main drops KEPT_KEY and its row")
+        run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+        run_fixture_git(repo, "checkout", "-q", "b")
+        check, out = check_legacy_lists("main-dropped", kit, "--check", 0, [], label="the branch after main dropped KEPT_KEY")
+        grew = "is a new legacy home" in out
+        checks.append(check[:2] + (check[2] and not grew, check[3] + f" · {'a NEW LEGACY HOME reported' if grew else 'no new legacy home'}"))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 def run_legacy_present(name):
     """`legacy-homes-present` (TOOL-dGroundRules-17): this kit's own directory holds the legacy list,
     and its `kit.toml` withholds the list from installs by a `project-owned` rule naming it. Where the
@@ -1921,14 +2134,17 @@ RC_CASES = {
 }
 
 
-def build_reader_coverage_repo(t, name):
-    """The case's repository at `t`/r on main: the kit copy at this kit's own path holding a catalogue
-    of the case's rows, the planted spec with its landed token, and the planted files, committed and
-    pushed to one bare remote, so the landed revision is that commit; then the spec's working-tree
-    token written over it. -> the kit copy."""
-    rows, at_landing, in_tree, plants, _red, _n = RC_CASES[name]
+def build_reader_coverage_repo(t, name, spec=None, prefix=None, tree_lib=True):
+    """The case's repository at `t`/r on main: the kit copy at this kit's own path, or at `prefix`,
+    holding a catalogue of the case's rows (`spec`, else RC_CASES[name]), the planted spec with its
+    landed token, and the planted files, committed and pushed to one bare remote, so the landed
+    revision is that commit; then the spec's working-tree token written over it, and, where `tree_lib`,
+    the memory-tree kit's `tree_lib.py` untracked beside the kit copy, where `resolve_kit_dir` finds
+    it from there (TOOL-dGroundRules-21 S26). -> the kit copy."""
+    rows, at_landing, in_tree, plants, _red, _n = spec or RC_CASES[name]
     repo = t / "r"
-    kit = repo / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
+    own = (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
+    kit = repo / (prefix or own)
     files = {**plants, RC_SPEC: RC_HEADER.format(at_landing)}
     if name == "not-a-reader":  # this module names the key in reader shapes, as its fixtures do
         files[(kit / Path(__file__).name).relative_to(repo).as_posix()] = Path(__file__).read_text(encoding="utf-8")
@@ -1945,6 +2161,9 @@ def build_reader_coverage_repo(t, name):
     run_fixture_git(repo, "commit", "-q", "-m", "the landed state")
     run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
     Path(repo, RC_SPEC).write_text(RC_HEADER.format(in_tree), encoding="utf-8", newline="\n")
+    if tree_lib:
+        (kit.parent / "memory-tree").mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(load_tree_lib().__file__, kit.parent / "memory-tree" / "tree_lib.py")
     return kit
 
 
@@ -1970,6 +2189,58 @@ def run_reader_coverage(name):
                            f"git exited {exc.returncode}: {(exc.stderr or '').strip() or '(no stderr)'}"))
         except policy.Refusal as exc:
             checks.append((f"case {case}: refused", "check_reader_coverage", False, str(exc)))
+        finally:
+            remove_repo(t)
+    return print_checks(name, checks)
+
+
+RELOCATED_PREFIX = "vendor/gov/policy/"  # a tool root unlike gov's own, so no path can be guessed
+# The two read shapes a correct build of units 4 and 9 spells for a pattern key (TOOL-dGroundRules-21 S27).
+QUOTED_READS = {"an f-string's quoted segment": "value = resolve(f'budgets.\"{cap}\"')\n",
+                "a name joined into a quoted segment": "value = resolve('budgets.\"' + name + '\"')\n"}
+
+
+def run_reader_relocated(name):
+    """`reader-coverage-relocated` (TOOL-dGroundRules-21 S25, S26): `landed-no-reader`'s repository with
+    the kits at RELOCATED_PREFIX's tool root, the memory-tree kit's `tree_lib.py` beside the policy kit
+    there. The reader-coverage arm must grade the landed owner, 1 key, and red it; with `tree_lib.py`
+    absent it must refuse, one finding naming where the resolver looked. Never a population of 0."""
+    checks = []
+    for present in (True, False):
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        scenario = "memory-tree beside it" if present else "memory-tree absent"
+        try:
+            kit = build_reader_coverage_repo(t, "landed-no-reader", prefix=RELOCATED_PREFIX, tree_lib=present)
+            with contextlib.redirect_stdout(io.StringIO()):
+                verdict, findings = run_arm(ARM["arm_reader_coverage"], t / "r", kit)
+            said = "; ".join(f"{k}: {w}" for k, w in findings)
+            ok = (verdict.startswith("1 finding(s) · 1 of ") and f"{RC_KEY} (owner {RC_OWNER}" in said if present
+                  else verdict.startswith("1 finding(s)") and "looked in" in said and "memory-tree" in said)
+            checks.append((scenario, "arm_reader_coverage at " + RELOCATED_PREFIX, bool(ok) and "not graded" not in verdict,
+                           f"{verdict} · {said or 'no finding'}"))
+        except subprocess.CalledProcessError as exc:
+            checks.append((scenario, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+        finally:
+            remove_repo(t)
+    return print_checks(name, checks)
+
+
+def run_reader_quoted(name):
+    """`reader-quoted-pattern` (TOOL-dGroundRules-21 S27): a catalogue row `budgets.*` whose owner has
+    landed, read by each of QUOTED_READS in a tracked consumer, must grade 1 key and find no reader
+    missing; with neither planted it must red `budgets.*`."""
+    checks = []
+    for what, plant in (*QUOTED_READS.items(), ("no reader", None)):
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        spec = ([("budgets.*", RC_OWNER)], "CLOSED", "CLOSED", {"consumer.py": plant} if plant else {}, None, 1)
+        try:
+            kit = build_reader_coverage_repo(t, name, spec=spec)
+            with contextlib.redirect_stdout(io.StringIO()):
+                n, findings = check_reader_coverage(t / "r", kit=kit)
+            ok = n == 1 and (not findings if plant else len(findings) == 1 and ": budgets.* (owner " in findings[0])
+            checks.append((what, "check_reader_coverage", ok, f"graded {n} · {'; '.join(findings) or 'no finding'}"))
+        except (subprocess.CalledProcessError, policy.Refusal) as exc:
+            checks.append((what, "the fixture", False, str(exc)))
         finally:
             remove_repo(t)
     return print_checks(name, checks)
@@ -2220,6 +2491,53 @@ def run_limit_case(name):
             (kit / "policy-mirror.js").unlink()
             checks.append(check_hook_call(name, "the render at 6, policy-mirror.js removed", hook, render_workflow(
                 repo, render), has("gov:fixed-writers", "above the bound 5: MAX_VERIFIERS, as no policy kit"), args=scripts, cwd=repo))
+        elif name == "limit-settings-elsewhere":
+            # TOOL-dGroundRules-21 S34: GOV_SETTINGS_JSON names the settings in force, for the render and rule 7.
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            named = (t / "elsewhere" / "settings.json").as_posix()
+            env = {**os.environ, "GOV_SETTINGS_JSON": named}
+            read_env = lambda: json.loads(Path(named).read_text(encoding="utf-8")).get("env", {})  # noqa: E731
+            call = render_workflow(repo, "const r = await agent('one')\n")
+            checks.append(check_get("GOV_SETTINGS_JSON set", repo, ["--write"], lambda rc, o, e: rc == 0, env=env,
+                                    kit=kit, verb="settings"))
+            written = Path(named).is_file() and read_env() == render_limit_env(2)
+            checks.append(("GOV_SETTINGS_JSON set", "the named file holds both keys, .claude/settings.json unwritten",
+                           written and not Path(repo, *SETTINGS_FILE).exists(), f"named {'written' if written else 'NOT written'}"))
+            checks += [check_hook_call("GOV_SETTINGS_JSON at 2", "a Workflow call", hook, call, admits, env=env),
+                       check_hook_call("GOV_SETTINGS_JSON unset", "a Workflow call", hook, call,
+                                       has("/".join(SETTINGS_FILE), "is absent"))]
+            Path(named).write_text(json.dumps({"env": render_limit_env(3)}) + "\n", encoding="utf-8", newline="\n")
+            checks.append(check_hook_call("GOV_SETTINGS_JSON at 3", "a Workflow call", hook, call,
+                                          has(named, "above runtime.agents-in-flight 2"), env=env))
+        elif name == "limit-hook-settings-malformed":
+            # TOOL-dGroundRules-21 S38: a settings file that does not parse, and a cwd in no checkout, refuse.
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            Path(repo, SETTINGS_FILE[0]).mkdir(exist_ok=True)
+            Path(repo, *SETTINGS_FILE).write_text("{\n", encoding="utf-8", newline="\n")
+            checks.append(check_hook_call("settings.json is `{`", "an Agent call", hook, render_spawn(repo, "u-bad"),
+                                          has("/".join(SETTINGS_FILE), "does not parse as JSON")))
+            (t / "outside").mkdir()
+            checks.append(check_hook_call("a cwd in no checkout", "an Agent call", hook, render_spawn(t / "outside", "u-out"),
+                                          has("rule 7", "in no git checkout")))
+        elif name == "limit-hook-reader-throws":
+            # TOOL-dGroundRules-21 S38: a reader that throws anything but a PolicyRefusal denies, naming the step.
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            write_settings(repo, render_limit_env(2))
+            (kit / "policy-mirror.js").write_text(
+                "class PolicyRefusal extends Error {}\n"
+                "module.exports = { PolicyRefusal, readPolicy() { throw new TypeError('a planted throw') } }\n",
+                encoding="utf-8", newline="\n")
+            checks.append(check_hook_call(name, "an Agent call", hook, render_spawn(repo, "u-throw"),
+                                          has("rule 7", "reading the landed limit", "a planted throw")))
+        elif name == "limit-fresh-target-spawn":
+            # TOOL-dGroundRules-21 S37: --scaffold renders the settings wherever HEAD resolves, so an adopter
+            # spawns on install day without running the render by hand.
+            repo, kit, hook = build_limit_repo(t / "r", None, mirror=False)
+            (kit / "adopt-policy.sh").write_bytes((KIT / "adopt-policy.sh").read_bytes().replace(b"\r\n", b"\n"))
+            rc, out = run_case_argv(repo, ["bash", (kit / "adopt-policy.sh").as_posix(), "--scaffold", "--target", repo.as_posix()])
+            checks.append(("--scaffold over a committed target", "exit 0, the settings written", rc == 0
+                           and Path(repo, *SETTINGS_FILE).is_file(), f"exit {rc} · {render_said(out, 'settings')}"))
+            checks.append(check_hook_call(name, "the first Agent call", hook, render_spawn(repo, "u-first"), admits))
         else:
             checks.append((name, "a known limit case", False, "no such case"))
     except (subprocess.CalledProcessError, LookupError, policy.Refusal) as exc:
@@ -2232,7 +2550,9 @@ def run_limit_case(name):
 LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed", "limit-conf-mirror",
                "limit-conf-last-valid", "limit-settings-render",
                "limit-hook-admits-eight", "limit-hook-six-spawns", "limit-hook-rules-kept", "limit-hook-env-cap",
-               "limit-hook-settings-over", "limit-hook-local-over", "limit-hook-writer-split")
+               "limit-hook-settings-over", "limit-hook-local-over", "limit-hook-writer-split",
+               "limit-settings-elsewhere", "limit-hook-settings-malformed", "limit-hook-reader-throws",
+               "limit-fresh-target-spawn")
 
 
 # ---- the size caps' cases (TOOL-dGroundRules-9) --------------------------------------------------
@@ -2330,7 +2650,7 @@ def run_case_argv(cwd, argv, env=None, stdin=None):
     """-> (exit code, stdout and stderr with CR stripped); a `bash` argv[0] is `resolve_bash`'s, an
     `env` value of None drops that variable, and `stdin` is the text piped in."""
     if argv[0] == "bash":
-        argv = [resolve_bash() or "bash", *argv[1:]]
+        argv = [resolve_bash(Path(cwd, str(argv[1])).as_posix()) or "bash", *argv[1:]]
     merged = {**os.environ, **(env or {})}
     try:
         p = subprocess.run([str(a) for a in argv], cwd=cwd, capture_output=True, text=True, encoding="utf-8",
@@ -2696,11 +3016,11 @@ def run_budget_case(name):
         elif name == "budgets-limits-reader":
             r = build_cap_repo(t / "r", {lrel: no_agents, "hooks/consumer.sh": "#!/bin/sh\necho reads no cap\n"},
                                "warn", '"AGENTS.md" = 20480\n')
-            _n, _pop, found = arm_limits_readers(r, KIT)
+            _n, _pop, found = ARM["arm_limits_readers"].run(r, KIT)
             checks.append(("unplanted", "arm_limits_readers green", not found, f"{found or 'no finding'}"))
             write_case_file(r, "scripts/reader.sh", f"#!/bin/sh\ncat {lrel}\n")
             run_fixture_git(r, "add", "scripts/reader.sh")
-            _n, _pop, found = arm_limits_readers(r, KIT)
+            _n, _pop, found = ARM["arm_limits_readers"].run(r, KIT)
             checks.append(("a script reading the limits file", "red naming it", [k for k, _w in found] == ["scripts/reader.sh"], f"{found}"))
         elif name == "budgets-census-join":
             enforcers = {derive_enforcer_rel(c): (top / derive_enforcer_rel(c)).read_bytes() for c in census.values()}
@@ -2727,6 +3047,51 @@ def run_budget_case(name):
             checks.append(("no policy kit", "check 7 refuses and the absence is said once",
                            rc == 1 and "MANIFEST check 7 FAILED" in out and told == 1,
                            f"exit {rc} · said {told} time(s) · {render_said(out, 'check 7 FAILED')}"))
+        elif name == "budgets-zero-cap":
+            # TOOL-dGroundRules-21 S28: a cap of 0 is valid, and unchecked, as its census home holds 0 today.
+            cap = census["index-lines"]
+            p = derive_hygiene_plant(cap)
+            r = build_cap_repo(t / "r", p["files"], "refuse", f'"{cap.name}" = 0\n')
+            rc, out = run_case_argv(r, [sys.executable, KIT / "policy.py", "check"])
+            checks.append((f'"{cap.name}" = 0', "policy.py check exit 0, the file valid", rc == 0 and " is valid" in out,
+                           f"exit {rc} · {out.strip()}"))
+            rc, out = run_case_argv(r, p["argv"])
+            checks.append((f'"{cap.name}" = 0, an index over every other value, under refuse', "the enforcer exits 0",
+                           rc == 0 and "check 6 FAILED" not in out and "check 7 FAILED" not in out,
+                           f"exit {rc} · {render_said(out, 'FAILED')}"))
+        elif name == "budgets-reader-refused":
+            # TOOL-dGroundRules-21 S31: a reader that refuses gives the cap `refuse`, never `warn`, and the
+            # refusal prints once; with no launcher the enforcer takes its no-kit branch and says why.
+            cap = census["AGENTS.md"]
+            subject = "x" * 49153  # over the handed-in default, the value a refused landed read leaves
+            r = build_cap_repo(t / "two", {lrel: ltext, cap.name: subject}, "warn")
+            for remote in ("a", "b"):
+                run_fixture_git(r, "remote", "add", remote, r.as_posix())
+            rc, out = run_case_argv(r, ["bash", derive_enforcer_path(cap), cap.name])
+            told = out.count("Name it: export GOV_REMOTE=<remote>.")
+            checks.append(("two remotes, no GOV_REMOTE, under warn", "refused, the ladder's refusal said once",
+                           rc not in (0, None) and told == 1 and "BUDGET WARN" not in out,
+                           f"exit {rc} · said {told} time(s) · {render_said(out, 'FAILED')}"))
+            stubs = t / "stubs"
+            for launcher in ("python3", "python", "py"):
+                write_case_file(stubs, launcher, "#!/bin/sh\nexit 9009\n")
+                os.chmod(stubs / launcher, 0o755)
+            r = build_cap_repo(t / "bare", {lrel: ltext, cap.name: subject}, "warn")
+            rc, out = run_case_argv(r, ["bash", derive_enforcer_path(cap), cap.name],
+                                    env={"PATH": stubs.as_posix() + os.pathsep + os.environ.get("PATH", ""),
+                                         "GOV_PYTHON": None, "TEMPLATE_SIZE_PY": None})
+            checks.append(("no python launcher", "refused, saying no launcher resolved",
+                           rc not in (0, None) and "no python launcher" in out, f"exit {rc} · {render_said(out, 'launcher')}"))
+        elif name == "limits-reader-docstring":
+            # TOOL-dGroundRules-21 S29, S30: a docstring, and a comment, naming the limits file, each with a read
+            # shape on its line, are no readers; a line that reads it is.
+            doc = f'"""Never cat {budgets.LIMITS_NAME} here: open(...) it through budgets.py."""\n# cat {budgets.LIMITS_NAME}\n'
+            r = build_cap_repo(t / "r", {lrel: ltext, "scripts/notes.py": doc}, "warn")
+            _n, _pop, found = ARM["arm_limits_readers"].run(r, KIT)
+            checks.append(("a docstring and a comment", "arm_limits_readers green", not found, f"{found or 'no finding'}"))
+            write_case_file(r, "scripts/notes.py", doc + f'rows = open("{budgets.LIMITS_NAME}").read()\n')
+            _n, _pop, found = ARM["arm_limits_readers"].run(r, KIT)
+            checks.append(("a line that opens it", "red naming that file", [k for k, _w in found] == ["scripts/notes.py"], f"{found}"))
         elif name == "budgets-correctness-kept":
             bm = "memory/guides/BUILD-METHOD.md"
             r = build_cap_repo(t / "r", {lrel: ltext, bm: "**Budget: <=1 bytes, <=1 lines**\nbody\n"}, "warn")
@@ -2743,7 +3108,8 @@ def run_budget_case(name):
 
 
 BUDGET_CASES = ("budgets-pinned-warn", "budgets-two-homes", "budgets-limits-reader", "budgets-census-join",
-                "budgets-switch-refuse", "budgets-no-kit", "budgets-correctness-kept")
+                "budgets-switch-refuse", "budgets-no-kit", "budgets-correctness-kept", "budgets-zero-cap",
+                "budgets-reader-refused", "limits-reader-docstring")
 
 
 def run_ships_join(name):
@@ -2984,37 +3350,45 @@ def run_live():
 
 
 CASES = [
-    ("shape-no-empty", arm_shape, seed_no_empty),
-    ("shape-unknown-field", arm_shape, seed_unknown_field),
-    ("usage-out-of-set", arm_shape, seed_usage_out_of_set),
-    ("summary-new-key", arm_summaries, seed_summary_new_key),
-    ("usage-new-key", arm_summaries, seed_usage_new_key),
-    ("list-grew", arm_summaries, seed_list_grew),
-    ("direction-missing", arm_direction, seed_direction_missing),
-    ("direction-new-bound", arm_direction, seed_direction_new_bound),
-    ("direction-wrong-value", arm_direction, seed_direction_wrong_value),
+    ("shape-no-empty", ARM["arm_shape"], seed_no_empty),
+    ("shape-unknown-field", ARM["arm_shape"], seed_unknown_field),
+    ("usage-out-of-set", ARM["arm_shape"], seed_usage_out_of_set),
+    ("summary-new-key", ARM["arm_summaries"], seed_summary_new_key),
+    ("usage-new-key", ARM["arm_summaries"], seed_usage_new_key),
+    ("list-grew", ARM["arm_summaries"], seed_list_grew),
+    ("direction-missing", ARM["arm_direction"], seed_direction_missing),
+    ("direction-new-bound", ARM["arm_direction"], seed_direction_new_bound),
+    ("direction-wrong-value", ARM["arm_direction"], seed_direction_wrong_value),
     (FRESH_TARGET, None, run_fresh_target),  # an outcome case: no plant and no one arm
+    ("adopter-suite", None, run_adopter_suite),  # the adopter's sibling suite, which arms its refusals
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
     ("reader-parsed", None, run_reader_parsed),
     ("resolution-order", None, run_resolution_order),
     ("on-invalid-classes", None, run_on_invalid_classes),
     ("on-invalid-strict", None, run_on_invalid_strict),
-    ("mirror-hand-edited", arm_mirror_parity, seed_mirror_hand_edited),
-    ("mirror-absent", arm_mirror_parity, seed_mirror_absent),
-    ("mirror-direct-reader", arm_mirror_readers, seed_mirror_direct_reader),
+    *((c, None, run_reader_refusals) for c in READER_REFUSAL_CASES),  # the reader's refusals (TOOL-dGroundRules-21)
+    ("mirror-hand-edited", ARM["arm_mirror_parity"], seed_mirror_hand_edited),
+    ("mirror-absent", ARM["arm_mirror_parity"], seed_mirror_absent),
+    ("mirror-direct-reader", ARM["arm_mirror_readers"], seed_mirror_direct_reader),
     ("mirror-worktree-loosened", None, run_mirror_landed),  # outcome cases: the helper over a landed L
     ("mirror-stale-last-valid", None, run_mirror_landed),
     ("mirror-stale-refuse", None, run_mirror_landed),
     ("mirror-absent-refuse", None, run_mirror_landed),
     ("mirror-commit-rewrite", None, run_mirror_landed),
     ("mirror-landed-merge", None, run_mirror_landed),
+    ("mirror-stale-legacy", None, run_mirror_landed),
+    ("mirror-shim-exit-one", None, run_mirror_landed),
+    ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
+    ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
     ("legacy-homes-present", None, run_legacy_present),  # gov's own list held and withheld from installs
     ("reader-coverage", None, run_reader_coverage),  # an outcome case: one planted repository per case
+    ("reader-coverage-relocated", None, run_reader_relocated),  # the kits at a tool root unlike gov's
+    ("reader-quoted-pattern", None, run_reader_quoted),  # a pattern key read through a quoted segment
     *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each
-    *((c, arm_schema, s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
+    *((c, ARM["arm_schema"], s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
     ("budgets-ships-join", None, run_ships_join),  # the census's ships flags against the registry's exemptions
     ("fixtures-guard-census", None, run_fixtures_guard_census),  # the census's enforcers inside this leg's guard
@@ -3025,7 +3399,7 @@ CASES = [
 
 def derive_cases(rows):
     """One `schema-empty-<name>` case per never-empty row of the shipped catalogue, then CASES."""
-    return [(f"schema-empty-{r['name']}", arm_schema, seed_empty_value(r)) for r in rows if r.get("empty") == "never"] + CASES
+    return [(f"schema-empty-{r['name']}", ARM["arm_schema"], seed_empty_value(r)) for r in rows if r.get("empty") == "never"] + CASES
 
 
 def run_fixture_git(repo, *args):
@@ -3099,7 +3473,7 @@ def run_fixture(only=None):
                 # and `lists --check` stays red.
                 policy.write_list(kit)
                 kept = PLANTED in policy.parse_list((kit / policy.LIST).read_text(encoding="utf-8"))
-                still = any(k == PLANTED for k, _w in policy.check_list(kit)[0])
+                still = any(k == PLANTED for k, _w in policy.check_list(kit, policy.resolve_compare_base(kit))[0])
                 asserted += 2
                 wrong += kept + (not still)
                 print(f"policy-fixture: {name} · lists --write " + ("WRONG: it added the planted row" if kept else
@@ -3141,7 +3515,7 @@ def main(argv):
     red = 0
     for arm in ARMS:
         verdict, findings = run_arm(arm, repo, KIT)
-        print(f"policy-check: {arm.__name__} · {verdict}")
+        print(f"policy-check: {arm.name} · {verdict}")
         for key, why in findings:
             print(f"  {key}: {why}")
         red += len(findings)

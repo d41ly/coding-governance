@@ -1772,8 +1772,8 @@ function checkHarnessCall(data, index, root) {
 // the policy kit's `readPolicy`, located beside this hooks kit as `resolveHarnessName` probes the
 // workflows kit, and never the working-tree mirror; a hooks kit with no `policy` kit beside it adds no
 // rule. WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
-// and no hook can read, and a session that started before a lowering, which keeps its settings until
-// it restarts. null = allow · string = the deny message.
+// and no hook can read. UNVERIFIED: that a session started before a lowering keeps its settings until
+// it restarts. In force: GOV_SETTINGS_JSON, else .claude/settings.json (TOOL-dGroundRules-21 S34); a cwd in no checkout, or a throw at any step, refuses, naming it (S38). null = allow · string = deny.
 const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS']
 
 function checkSettingsInForce(data) {
@@ -1782,29 +1782,29 @@ function checkSettingsInForce(data) {
   const helper = POLICY_HELPER
   if (!fs.existsSync(helper)) return null
   const root = resolveCheckoutRoot(data.cwd || process.cwd())
-  if (!root) return null
-  // The render command, derived from where the policy kit sits in this checkout: a hook names no
-  // install prefix.
-  const rel = path.relative(root, path.dirname(helper)).split(path.sep).join('/')
+  if (!root) return `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the payload cwd ${String(data.cwd || process.cwd()).split(path.sep).join('/')} is in no git checkout, so the settings in force and the landed agent limit cannot be read, and a rule that cannot read does not admit.\n`
+  const rel = path.relative(root, path.dirname(helper)).split(path.sep).join('/')  // the render's kit path: a hook names no prefix
   const remedy = `python ${rel ? rel + '/' : ''}policy.py settings --write`
   const renderSettingsDeny = (why) =>
     `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) refused this ${data.tool_name} call — the ` +
     `settings this checkout's harness starts from do not hold the landed agent limit.\n${why}\n` +
     `Render them from the policy: ${remedy}, run at ${root.split(path.sep).join('/')}. A session started ` +
-    `before the render keeps the settings it started with until it restarts.\n`
+    `before the render keeps the settings it started with until it restarts (UNVERIFIED).\n`
+  checkSettingsInForce.step = `reading the landed limit through ${helper.split(path.sep).join('/')}` // main names the step a throw left
   const { readPolicy, PolicyRefusal } = require(helper)
   let limit
   try {
     limit = readPolicy('runtime.agents-in-flight', { repo: root }).value
   } catch (e) {
-    if (e instanceof PolicyRefusal) return renderSettingsDeny(`  ${e.message}`)
+    if (PolicyRefusal && e instanceof PolicyRefusal) return renderSettingsDeny(`  ${e.message}`)
     throw e
   }
   if (!Number.isInteger(limit) || limit < 1) return renderSettingsDeny(`  runtime.agents-in-flight reads ${JSON.stringify(limit)}, not a positive integer.`)
-  const files = ['.claude/settings.json', '.claude/settings.local.json']
+  const files = [process.env.GOV_SETTINGS_JSON || '.claude/settings.json', '.claude/settings.local.json']
   const envs = files.map((f) => {
+    checkSettingsInForce.step = `reading ${f}`
     let text
-    try { text = fs.readFileSync(path.join(root, f), 'utf8') } catch (e) {
+    try { text = fs.readFileSync(path.resolve(root, f), 'utf8') } catch (e) {
       if (e && e.code === 'ENOENT') return {}
       throw e
     }
@@ -1889,7 +1889,7 @@ function main() {
     try {
       deny = checkSettingsInForce(data)
     } catch (e) {
-      deny = `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) threw (${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
+      deny = `BLOCKED by agent-cap: rule 7 (TOOL-dGroundRules-10) threw (while ${checkSettingsInForce.step || 'resolving the payload cwd'}: ${(e && e.message) || e}), and a rule that cannot finish does not admit.\n`
     }
     if (deny) {
       process.stderr.write(deny)

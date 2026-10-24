@@ -221,6 +221,12 @@ echo x > other.txt; git add other.txt
 out=$(git commit -q -m other 2>&1); rc=$?
 case "$out" in *"GUARD RAN"*|*"policy guard"*|*"policy-guard"*) r=1 ;; *) r=$rc ;; esac
 ck "AC9 a commit staging no listed path runs no guard and prints no policy guard line" "$r" 0
+# TOOL-dGroundRules-21 S21: guard.py removed from the working tree while its list stays at HEAD, and a
+# listed path staged. No rung resolves the guard, so the block's `else` refuses, naming the rungs.
+rm -f "$pk/guard.py"; echo 4 > "$pl"; git add "$pl"
+out=$(git commit -q -m g4 2>&1); rc=$?
+case "$out" in *"policy guard"*) r=$rc ;; *) r=0 ;; esac
+ck "S21 guard.py removed with its list at HEAD and a listed path staged: refused naming the policy guard" "$r" 1
 cd "$tmp" || exit 2
 
 echo "---- $pass passed, $fail failed ----"

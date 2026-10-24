@@ -1324,7 +1324,9 @@ _mb_pk=$(resolve_kit_file policy budgets.py)
 # The last rung searches by NAME, so a repository's own `budgets.py` would answer it: the policy kit
 # is the one whose directory also holds its census and its catalogue, and anything else is no kit.
 case "$_mb_pk" in */budgets.py) [ -f "${_mb_pk%/*}/caps.toml" ] && [ -f "${_mb_pk%/*}/catalogue.toml" ] || _mb_pk="" ;; esac
-if [ -z "$_mb_py" ] || [ -z "$_mb_pk" ]; then
+if [ -z "$_mb_py" ] && [ -n "$_mb_pk" ]; then  # the no-kit branch, said as what it is (TOOL-dGroundRules-21 S31)
+  MB_NOTE="MANIFEST — no python launcher resolved to run the policy kit, so a size breach refuses as before"
+elif [ -z "$_mb_py" ] || [ -z "$_mb_pk" ]; then
   MB_NOTE="MANIFEST — no policy kit is installed beside this checker, so a size breach refuses as before"
 elif _mb_out=$("$_mb_py" "$_mb_pk" resolve --explain "manifest-bytes=default:$MAX_MANIFEST_BYTES" \
     "manifest-line=default:$MANIFEST_LINE_MAX" "manifest-trap=default:$MANIFEST_TRAP_MAX" 2>&1); then

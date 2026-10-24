@@ -204,16 +204,19 @@ past the landed limit. Rule 7 refuses that at the next call.
 
 On every `Agent` and `Workflow` call outside `--only=`, after rule 6, the hook locates
 `policy-mirror.js` in the `policy` kit beside its own kit, reads the landed limit through
-`readPolicy`, then `.claude/settings.json` and `.claude/settings.local.json` at the payload `cwd`'s
-checkout root. For each variable it takes the value the harness applies, the local file's where it
-sets one, else the project file's, and it refuses, exit 2, when either is absent, not a positive
-integer, or above the limit, naming the file, the variable, both numbers and the render command. A
-refused policy read refuses with its line. With no `policy` kit beside the hooks kit, or a `cwd` in
-no checkout, it adds no rule. After rule 7 an `Agent` call is admitted.
+`readPolicy`, then the settings file in force, `GOV_SETTINGS_JSON` else `.claude/settings.json`,
+resolved as `check-wiring.sh` resolves it, and `.claude/settings.local.json`, each at the payload
+`cwd`'s checkout root (TOOL-dGroundRules-21 S34). For each variable it takes the value the harness
+applies, the local file's where it sets one, else the project file's, and it refuses, exit 2, when
+either is absent, not a positive integer, or above the limit, naming the file, the variable, both
+numbers and the render command. A refused policy read refuses with its line. With no `policy` kit
+beside the hooks kit it adds no rule; beside one, a `cwd` in no checkout refuses, a settings file
+that does not parse refuses naming it, and a throw at any step refuses naming the step, since a rule
+that cannot finish does not admit (S38). After rule 7 an `Agent` call is admitted.
 
 **What it does not see**: an environment override of the two variables, which the harness applies
-and no hook can read; and a session started before a lowering, which keeps its settings until it
-restarts. A set `AGENT_CAP` is read by nothing since TOOL-dGroundRules-10. A ready-made harness that satisfies every
+and no hook can read. That a session started before a lowering keeps its settings until it restarts
+is UNVERIFIED (help/agent-limit.md). A set `AGENT_CAP` is read by nothing since TOOL-dGroundRules-10. A ready-made harness that satisfies every
 rule above ships at `<prefix>/workflows/tier2-review.js`.
 
 ## Rule 6 — every agent prompt is a rendered handoff

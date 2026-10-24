@@ -73,11 +73,17 @@ No value moved: every cap keeps the value its home holds.
 
 A cap can take a value from the policy file too, `budgets."AGENTS.md" = 21000` say, but a cap held
 both there and in its legacy home refuses rather than picking one, and a family cap (line lengths,
-README slots, role bodies, one value per subject) takes no value from the policy file at all.
+README slots, role bodies, one value per subject) takes no value from the policy file at all. A
+value of `0` means unchecked, as it does in every legacy home; a negative value or one that is not a
+whole number makes the file invalid.
 
 ## Without the policy kit
 
-A gate that finds no policy kit beside it refuses every breach as it did before, and says once why.
+A gate that finds no policy kit beside it, or no python launcher to run it with, refuses every breach
+as it did before, and says once why. When the policy reader itself refuses, two remotes and no
+`GOV_REMOTE` say, the gate still answers, and every cap refuses a breach, never warns: the refusal is
+printed once beside the verdict, and where the landed revision could not be read at all the cap's
+value is the one its gate holds.
 
 ## In a repository that installed the policy kit
 

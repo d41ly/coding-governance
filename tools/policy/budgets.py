@@ -25,7 +25,15 @@ template-size gate's subject with no declared row keeps that gate's default, und
 
 `check_budgets` is the schema rule `policy.validate` calls for the `[budgets]` table: a pinned name
 outside the switch or naming no census row, and a `budgets.<cap>` naming no row, set on a family cap
-or not a positive integer, each a Problem on its line.
+or not a non-negative integer, each a Problem on its line; 0 is unchecked.
+
+THE REFUSED READER, one rule for every switch enforcer (TOOL-dGroundRules-21 S31): a refusal the
+policy reader makes inside `resolve_caps`, of the landed revision, of the switch's own keys or of a
+cap's value, gives that cap `mode = refuse`, its rule naming the refusal, so a subject over its cap
+refuses as it did before the switch and is never read as `warn`; the CLI prints the refusal once.
+Where the landed revision's read itself refuses, a cap's value is the `legacy:` or `default:` value
+handed in, as the enforcer read it. The shell enforcers take the branch they take with no policy kit
+when no Python launcher resolves, and say so once.
 
 Exit 0 under or warned, 1 refused, 2 a refusal, printed as `policy: refused · <path>:<line> · <why>`.
 """
@@ -55,6 +63,8 @@ SHIPPED = ("kit", "installed")
 # The two exact rows under `budgets` a cap name may never shadow.
 RESERVED = ("enforce", "pinned")
 REQUEST = re.compile(r"(?P<cap>[^=]+)(?:=(?P<how>legacy|default):(?P<n>[0-9]+))?")
+# The rule a cap's mode carries when the policy reader refused (TOOL-dGroundRules-21 S31).
+READER_REFUSED = "the policy reader refused, so a breach refuses as before"
 SHELL_KEY = r"^\s*(?:export\s+)?{}\s*="
 
 Cap = namedtuple("Cap", "name cls unit enforcer home family research line ships kit installed")
@@ -168,9 +178,13 @@ def parse_limits_rows(text):
 
 def read_limits_home(repo, sha):
     """(the limits file's repo-relative path, its rows by `parse_limits_rows`) in the commit `sha`
-    names. An absent file has no rows."""
+    names, read through the policy reader's one blob reader, `policy.read_blob_at`
+    (TOOL-dGroundRules-21 S11). An absent file has no rows; one that is not UTF-8 is a Refusal."""
     rel = derive_limits_rel()
-    return rel, parse_limits_rows(policy.run_git(repo, "show", f"{sha}:{rel}"))
+    try:
+        return rel, parse_limits_rows(policy.read_blob_at(repo, sha, rel))
+    except UnicodeDecodeError as exc:
+        raise policy.Refusal(rel, 0, f"not UTF-8: {exc}") from None
 
 
 def derive_home_line(repo, home):
@@ -187,7 +201,7 @@ def derive_home_line(repo, home):
     return path, next((n for n, ln in enumerate(lines, 1) if not key.startswith("<") and rx.match(ln)), 0)
 
 
-def resolve_caps(requests, repo=".", rev=None):
+def resolve_caps(requests, repo=".", rev=None, refused=None):
     """{cap: CapAnswer} for each request in the CLI's grammar, over ONE read of the policy file at the
     revision `rev` names, else the landed one. The value is the file's `budgets.<cap>` when it sets
     one, else the legacy home's, else the `default:` handed in; the source is the reader's for a file
@@ -195,17 +209,31 @@ def resolve_caps(requests, repo=".", rev=None):
     `constant` for the enforcer's own handed-in default, which no declaration holds. A cap nothing
     gives a value answers None, source `none`: unchecked, as a 0 is. Refused: a request naming no
     census row with no `default:`, a cap outside the switch, a `legacy:` handed for a `limits:` home,
-    a limits row that is not a number, a cap held in both homes, and every refusal the reader makes."""
+    a limits row that is not a number, and a cap held in both homes. A refusal the reader makes is
+    no refusal here: it is THE REFUSED READER's rule above, `refused` collecting each one once."""
     census = read_cap_census(repo)
     rows = policy.load_catalogue(policy.KIT)
-    read = policy.read_revision(repo, rev, rows)
+    refused = [] if refused is None else refused
+    try:
+        read = policy.read_revision(repo, rev, rows)
+    except policy.Refusal as exc:
+        read = None
+        refused.append(str(exc))
 
-    # Each read spells its key as a string, the shape the reader-coverage arm reads as a reader.
+    # Each read spells its key as a string, the shape the reader-coverage arm reads as a reader. A
+    # refusal answers None, kept once in `refused`.
     def read_key(key):
+        if read is None:
+            return None
         path = policy.parse_key(key)
-        return policy.resolve_read(path, policy.read_catalogue_row(path, rows), read)
+        try:
+            return policy.resolve_read(path, policy.read_catalogue_row(path, rows), read)
+        except policy.Refusal as exc:
+            if str(exc) not in refused:
+                refused.append(str(exc))
+            return None
     enforce, pinned = read_key("budgets.enforce"), read_key("budgets.pinned")
-    pins = pinned.value if isinstance(pinned.value, list) else []
+    pins = pinned.value if pinned is not None and isinstance(pinned.value, list) else []
     limits = None
     out = {}
     for req in requests:
@@ -213,6 +241,8 @@ def resolve_caps(requests, repo=".", rev=None):
         cap = census.get(name)
         if name in pins:
             mode, rule = "refuse", "budgets.pinned names it"
+        elif enforce is None or pinned is None:
+            mode, rule = "refuse", READER_REFUSED
         else:
             mode, rule = ("refuse" if enforce.value == "refuse" else "warn"), f"budgets.enforce is {enforce.value}"
         if cap is None:
@@ -230,14 +260,17 @@ def resolve_caps(requests, repo=".", rev=None):
             continue
         seg = policy.render_json(name)  # one quoted segment, whatever `/`, `.` or `*` the name carries
         hit = read_key(f"budgets.{seg}")
-        # An unset key resolves to the row's derived default, a table: that is "no file value".
-        held = None if isinstance(hit.value, dict) else hit.value
+        # The value's read refused: this cap refuses a breach too. An unset key's derived default is
+        # such a refusal (S12) until TOOL-dGroundRules-62 reads that one refusal as "no file value".
+        if hit is None and read is not None:
+            mode, rule = "refuse", READER_REFUSED
+        held = None if hit is None else hit.value
         legacy = None
         if form == "limits":
             if how == "legacy":
                 raise policy.Refusal(derive_census_rel(), cap.line, f"{name}'s home is the limits file, which budgets.py reads alone")
-            if limits is None:
-                limits = read_limits_home(repo, read["sha"])
+            if limits is None:  # no landed revision to read the row at: the value handed in, if any
+                limits = (derive_limits_rel(), {}) if read is None else read_limits_home(repo, read["sha"])
             lrel, lrows = limits
             if key in lrows:
                 val, line = lrows[key]
@@ -279,9 +312,9 @@ def check_cap(answer, measured, subject=None):
 def check_budgets(doc, text="", census=None):
     """[Problem] for the `[budgets]` table of a parsed policy file, each at the line of `text` that
     `policy.derive_key_line` finds: a `budgets.pinned` name of a class outside the switch or naming no
-    census row, and a `budgets.<cap>` naming no census row, set on a family cap, or not a positive
-    integer. The census is `read_cap_census`'s for the working directory unless `census` names one,
-    and is read only when the table pins or sets something."""
+    census row, and a `budgets.<cap>` naming no census row, set on a family cap, or not a
+    non-negative integer, 0 being unchecked. The census is `read_cap_census`'s for the working
+    directory unless `census` names one, and is read only when the table pins or sets something."""
     table = doc.get("budgets")
     if not isinstance(table, dict):
         return []
@@ -307,8 +340,10 @@ def check_budgets(doc, text="", census=None):
         elif row.family:
             out.append(policy.Problem(line, key, f"{name} is a family cap: its enforcer asks only its mode, "
                                       "and the policy file may not set its value"))
-        elif isinstance(value, bool) or not isinstance(value, int) or value <= 0:
-            out.append(policy.Problem(line, key, f"{name} is {policy.render_json(value)}, not a positive integer"))
+        elif isinstance(value, bool) or not isinstance(value, int) or value < 0:
+            # 0 keeps meaning unchecked, as every enforcer reads it and the census's homes hold it
+            # today (TOOL-dGroundRules-21 S28, §8 F5).
+            out.append(policy.Problem(line, key, f"{name} is {policy.render_json(value)}, not a non-negative integer"))
     return out
 
 
@@ -333,19 +368,29 @@ def main(argv):
     else:
         print(USAGE, file=sys.stderr)
         return 2
+    refused = []
     try:
-        answers = resolve_caps(reqs, ".")
+        answers = resolve_caps(reqs, ".", refused=refused)
     except policy.Refusal as exc:
         print(exc, file=sys.stderr)
         return 2
+
+    def print_refused():
+        # Each refusal of the reader once, after the answers, which an enforcer reads first.
+        sys.stdout.flush()
+        for line in refused:
+            print(line, file=sys.stderr)
     if measured is None:
         for a in answers.values():
             print(f"{a.cap}\t{'-' if a.value is None else a.value}\t{a.mode}\t{a.source}")
             if explain:
+                sys.stdout.flush()
                 print(f"budgets: {a.cap} · {a.rule} · {a.reason}", file=sys.stderr)
+        print_refused()
         return 0
     verdict = check_cap(next(iter(answers.values())), measured)
     print(verdict.line)
+    print_refused()
     return 1 if verdict.refuse else 0
 
 

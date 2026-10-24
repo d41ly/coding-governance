@@ -878,11 +878,6 @@
       "file": "tools/policy/check_policy.py"
     },
     {
-      "id": "arm_limits_readers",
-      "kind": "function",
-      "file": "tools/policy/check_policy.py"
-    },
-    {
       "id": "arm_minor",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -894,11 +889,6 @@
     },
     {
       "id": "arm_mirror_parity",
-      "kind": "function",
-      "file": "tools/policy/check_policy.py"
-    },
-    {
-      "id": "arm_mirror_readers",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -964,6 +954,11 @@
     },
     {
       "id": "arm_shape",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "arm_single_reader",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -1251,6 +1246,11 @@
       "id": "bad",
       "kind": "function",
       "file": "tools/memory-tree/transition-audit.test.sh"
+    },
+    {
+      "id": "bad",
+      "kind": "function",
+      "file": "tools/policy/adopt-policy.test.sh"
     },
     {
       "id": "bad",
@@ -4383,6 +4383,11 @@
       "file": ".githooks/straggler-guard.sh"
     },
     {
+      "id": "check_head",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_head_reaches",
       "kind": "function",
       "file": "tools/unattended/check-unattended.sh"
@@ -5403,6 +5408,11 @@
       "file": "tools/process-monitor/reap.py"
     },
     {
+      "id": "check_shallow",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_shape",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -6176,6 +6186,11 @@
       "id": "cmd_land",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "cmd_lists",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "cmd_measure",
@@ -11443,6 +11458,11 @@
       "file": "tools/codebase-map/adopt-codebase-map.test.sh"
     },
     {
+      "id": "mkrepo",
+      "kind": "function",
+      "file": "tools/policy/adopt-policy.test.sh"
+    },
+    {
       "id": "mkscratch",
       "kind": "function",
       "file": "tools/memory-tree/merge-rows.test.sh"
@@ -11696,6 +11716,11 @@
       "id": "ok",
       "kind": "function",
       "file": "tools/memory-tree/transition-audit.test.sh"
+    },
+    {
+      "id": "ok",
+      "kind": "function",
+      "file": "tools/policy/adopt-policy.test.sh"
     },
     {
       "id": "ok",
@@ -13203,6 +13228,11 @@
       "file": "tools/unattended/check-unattended.sh"
     },
     {
+      "id": "read_base_pairs",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_base_version",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -13241,6 +13271,11 @@
       "id": "read_blob_at",
       "kind": "function",
       "file": ".githooks/straggler-guard.sh"
+    },
+    {
+      "id": "read_blob_at",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_blob_fact",
@@ -13416,6 +13451,11 @@
       "id": "read_charter_table",
       "kind": "function",
       "file": "tools/playbook/render_playbook.py"
+    },
+    {
+      "id": "read_checked_text",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_cited_ids",
@@ -14291,11 +14331,6 @@
       "id": "read_landed_observation",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "read_landed_pairs",
-      "kind": "function",
-      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_landed_unclosed",
@@ -17448,6 +17483,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "resolveBash",
+      "kind": "function",
+      "file": "tools/policy/policy-mirror.js"
+    },
+    {
       "id": "resolveCheckoutRoot",
       "kind": "function",
       "file": "tools/hooks/agent-cap.js"
@@ -17741,6 +17781,11 @@
       "id": "resolve_compare_base",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "resolve_compare_base",
+      "kind": "function",
+      "file": "tools/lib/compare_base.py"
     },
     {
       "id": "resolve_compare_base",
@@ -18205,7 +18250,7 @@
     {
       "id": "resolve_kit_dir",
       "kind": "function",
-      "file": "tools/policy/check_policy.py"
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "resolve_kit_dir",
@@ -19273,11 +19318,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "resolve_tool_home",
-      "kind": "function",
-      "file": "tools/policy/policy.py"
-    },
-    {
       "id": "resolve_tool_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -19681,6 +19721,11 @@
       "id": "run_adopter",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
+    },
+    {
+      "id": "run_adopter_suite",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_against",
@@ -20318,6 +20363,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_legacy_main_dropped",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_legacy_present",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -20396,6 +20446,11 @@
       "id": "run_minter",
       "kind": "function",
       "file": "tools/push-main.sh"
+    },
+    {
+      "id": "run_mirror_absent_adopter",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_mirror_landed",
@@ -20589,6 +20644,21 @@
     },
     {
       "id": "run_reader_parsed",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_reader_quoted",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_reader_refusals",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_reader_relocated",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -20991,6 +21061,11 @@
       "id": "run_wf",
       "kind": "function",
       "file": "tools/workflows/unattended-build.test.sh"
+    },
+    {
+      "id": "run_without_git_env",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "run_worktree_remove",
@@ -25051,6 +25126,11 @@
       "id": "walk_file_keys",
       "kind": "function",
       "file": "tools/codebase-map/map_lib.py"
+    },
+    {
+      "id": "want",
+      "kind": "function",
+      "file": "tools/policy/adopt-policy.test.sh"
     },
     {
       "id": "wcw",

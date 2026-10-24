@@ -40,15 +40,18 @@ THE AGENT LIMIT, `runtime.agents-in-flight` (TOOL-dGroundRules-10), is lowered b
 `FANOUT_CAP` line `.agent-cap.conf` holds at the revision read, its legacy home, and never raised by
 it, so `get`, the mirror and the settings render read one value (TOOL-dGroundRules-15).
 `settings --write` renders the resolved limit at HEAD into the harness's two concurrency settings
-in `.claude/settings.json`, which this kit's `[[generated]]` row regenerates at every landing.
+in the settings file in force, `GOV_SETTINGS_JSON` else `.claude/settings.json`, which this kit's
+`[[generated]]` row regenerates at every landing (TOOL-dGroundRules-21 S34).
 
 Exit 0 green, 1 red, 2 usage or a refused read.
 """
+import contextlib
 import json
 import os
 import re
 import subprocess
 import sys
+import tempfile
 import tomllib
 from collections import namedtuple
 from pathlib import Path
@@ -57,11 +60,29 @@ KIT_POLICY_VERSION = "1.0"
 KIT = Path(__file__).resolve().parent
 CATALOGUE = "catalogue.toml"
 POLICY_REL = ".governance/policy.toml"
-# The location variables git exports to a hook, the first eight of the memory-tree kit's
-# GIT_ENV_LEAKS, spelled here because a kit may not import a sibling: a reader started inside a hook
-# or a fixture reads the repository it was pointed at, never the one the hook's environment names.
-GIT_LOCATION_VARS = ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GIT_OBJECT_DIRECTORY",
-                     "GIT_ALTERNATE_OBJECT_DIRECTORIES", "GIT_COMMON_DIR", "GIT_NAMESPACE", "GIT_PREFIX")
+# The git variables every git call here drops, INLINED byte-identically from the canonical copy named
+# on its marker line and gated by the resolve-python self-test (TOOL-dGroundRules-21 S9): a reader
+# started inside a hook or a fixture reads the repository it was pointed at, never the one the
+# hook's environment names, and a pathspec it passes is never read as a literal.
+# >>> git_env_leaks_py -- canonical copy: git_env_leaks.py in the gov lib dir (byte-identical; gated)
+# The eight location variables git EXPORTS to a hook, which reach any subprocess the hook starts and
+# name another tree than the one a reader was pointed at; and the four pathspec-mode variables a
+# caller can carry, which turn a `:(glob)` pathspec into a literal name that matches nothing.
+GIT_ENV_LEAKS = (
+    "GIT_DIR",
+    "GIT_WORK_TREE",
+    "GIT_INDEX_FILE",
+    "GIT_OBJECT_DIRECTORY",
+    "GIT_ALTERNATE_OBJECT_DIRECTORIES",
+    "GIT_COMMON_DIR",
+    "GIT_NAMESPACE",
+    "GIT_PREFIX",
+    "GIT_LITERAL_PATHSPECS",
+    "GIT_GLOB_PATHSPECS",
+    "GIT_NOGLOB_PATHSPECS",
+    "GIT_ICASE_PATHSPECS",
+)
+# <<< git_env_leaks_py
 # One TOML key, dotted bare or quoted segments, and nothing after it: the shape `parse_key` admits
 # before tomllib decodes it, so `a = {b` or `a = 0 #` is refused rather than read as a key.
 KEY_SEGMENT = r"""(?:[A-Za-z0-9_-]+|"(?:[^"\\\x00-\x1f\x7f]|\\.)*"|'[^'\x00-\x08\x0a-\x1f\x7f]*')"""
@@ -109,6 +130,9 @@ def check_member(value, options):
 
 def check_derived(default):
     return isinstance(default, dict) and set(default) == {"derived"}
+
+
+DERIVED_WHY = "a derived default no reader computes yet"  # the refusal `read_default_value` makes of one
 
 
 def render_dotted(segs):
@@ -294,13 +318,39 @@ def derive_unsummarised(rows):
 
 
 def run_git(root, *args):
-    env = {k: v for k, v in os.environ.items() if k not in GIT_LOCATION_VARS}
+    env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
     try:
         r = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
                            encoding="utf-8", errors="replace", env=env)
     except OSError:
         return None
     return r.stdout if r.returncode == 0 else None
+
+
+def read_blob_at(repo, rev, path):
+    """The text of `path` in the commit `rev` names, decoded as strict UTF-8, or None where that
+    commit holds no such path. The module's one blob reader: the policy file's and the size caps'
+    limits file's reads both come through it (TOOL-dGroundRules-21 S11). Bytes that are not UTF-8
+    raise UnicodeDecodeError, which each caller turns into its own refusal (S10)."""
+    env = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
+    try:
+        r = subprocess.run(["git", "-C", str(repo), "show", f"{rev}:{path}"], capture_output=True, env=env)
+    except OSError:
+        return None
+    # The text layer's newline reading, which every reader here was written against.
+    return r.stdout.decode("utf-8").replace("\r\n", "\n").replace("\r", "\n") if r.returncode == 0 else None
+
+
+@contextlib.contextmanager
+def run_without_git_env():
+    """The process environment without GIT_ENV_LEAKS for the `with` body, restored after: the
+    inlined canonical blocks run git with the inherited environment, so a caller strips it here.
+    ponytail: not thread-safe, which no caller needs today."""
+    saved = {v: os.environ.pop(v) for v in GIT_ENV_LEAKS if v in os.environ}
+    try:
+        yield
+    finally:
+        os.environ.update(saved)
 
 
 # The remote ladder (TOOL-dLadderedRemote-1), INLINED byte-identically from the canonical copy
@@ -360,25 +410,45 @@ def resolve_remote(root):
 # <<< remote_ladder_py
 
 
-def resolve_compare_base(repo):
-    """-> (sha or None, reason): the revision the shrink-only list is compared against. The map
-    kit's function of this name, rule for rule: the remote the ladder resolves and the branch its
-    HEAD names (`main` when none is named), its merge-base with HEAD where that is a PROPER ancestor
-    of HEAD, else the remote tip. Fetches nothing: no remote-tracking ref, no answer."""
-    remote, _branch, observed, refusal = resolve_remote(repo)
+# The compare base both shrink-only lists read (TOOL-dGroundRules-21 S7, S23), INLINED byte-identically
+# from the canonical copy named on its marker line and gated by the resolve-python self-test; the
+# codebase map's baseline carries the same block, so the two kits grade a branch by one rule.
+# >>> compare_base_py -- canonical copy: compare_base.py in the gov lib dir (byte-identical; gated)
+def resolve_compare_base(root):
+    """-> (sha or None, why): the revision a shrink-only list at <root> is compared against.
+
+    The merge bar rule: the remote the inlined ladder resolves and the branch its HEAD names (`main`
+    when none is named), its merge-base with HEAD where that is a PROPER ancestor of HEAD, else the
+    remote tip. So a branch is graded on what IT changed, and a key the default branch deleted after
+    the branch opened is not misread as one the branch added. Fetches nothing: no remote-tracking
+    ref, no answer; a ladder refusal is no answer either, and says why. The OBSERVED branch, never
+    GOV_DEFAULT_BRANCH: an environment value must not move the base a shrink-only assert grades.
+    """
+    import subprocess
+
+    def read(*args):
+        try:
+            p = subprocess.run(["git", "-C", str(root), *args], capture_output=True, text=True,
+                               encoding="utf-8", errors="replace")
+        except OSError:
+            return ""
+        return p.stdout.strip() if p.returncode == 0 else ""
+
+    remote, _branch, observed, refusal = resolve_remote(root)
     if refusal:
         return None, refusal
     if not remote:
         return None, "no remote to compare against"
     branch = observed or "main"
-    tip = (run_git(repo, "rev-parse", "--verify", "-q", f"refs/remotes/{remote}/{branch}^{{commit}}") or "").strip()
+    tip = read("rev-parse", "--verify", "-q", "refs/remotes/" + remote + "/" + branch + "^{commit}")
     if not tip:
-        return None, f"no {remote}/{branch} ref to compare against (never fetched)"
-    head = (run_git(repo, "rev-parse", "--verify", "-q", "HEAD") or "").strip()
-    mb = (run_git(repo, "merge-base", "HEAD", tip) or "").strip()
+        return None, "no %s/%s ref to compare against (never fetched)" % (remote, branch)
+    head = read("rev-parse", "--verify", "-q", "HEAD")
+    mb = read("merge-base", "HEAD", tip)
     if mb and mb != head:
-        return mb, f"merge-base of HEAD and {remote}/{branch}"
-    return tip, f"{remote}/{branch} tip"
+        return mb, "merge-base of HEAD and %s/%s" % (remote, branch)
+    return tip, "%s/%s tip" % (remote, branch)
+# <<< compare_base_py
 
 
 # ---- the reader (TOOL-dGroundRules-2) ---------------------------------------------------------
@@ -397,13 +467,8 @@ def derive_landed_revision(repo):
     module's one `git remote` read: the landed ref is refs/remotes/<remote>/<branch>, the branch the
     ladder's else main, and with no remote at all the local refs/heads/<branch>. A ladder refusal, or
     a ref that names no commit, is a Refusal."""
-    # ponytail: the ladder's block is canonical and inherits this process's environment, so the
-    # location variables are swapped out around it; not thread-safe, which no caller needs today.
-    saved = {v: os.environ.pop(v) for v in GIT_LOCATION_VARS if v in os.environ}
-    try:
+    with run_without_git_env():  # the ladder's block is canonical and inherits this process's environment
         remote, branch, _observed, refusal = resolve_remote(repo)
-    finally:
-        os.environ.update(saved)
     if refusal:
         raise Refusal(POLICY_REL, 0, refusal)
     branch = branch or "main"
@@ -413,9 +478,10 @@ def derive_landed_revision(repo):
 
 
 def read_policy_text(repo, rev):
-    """The policy file's text in the commit `rev` names, decoded as UTF-8, or None where that commit
-    holds no such path. A rev naming no commit is a Refusal. The working-tree file is never opened."""
-    return run_git(repo, "show", f"{resolve_commit(repo, rev)}:{POLICY_REL}")
+    """The policy file's text in the commit `rev` names, decoded as UTF-8 by `read_blob_at`, or None
+    where that commit holds no such path. A rev naming no commit is a Refusal; bytes that are not
+    UTF-8 raise UnicodeDecodeError. The working-tree file is never opened."""
+    return read_blob_at(repo, resolve_commit(repo, rev), POLICY_REL)
 
 
 def parse_policy(text):
@@ -501,15 +567,32 @@ def validate(text, rows=None, census=None):
     return out + budgets.check_budgets(doc, text, census)
 
 
+def read_checked_text(repo, sha, rows=None):
+    """(the policy file's text in the commit `sha` names, `validate`'s problems over it): None and []
+    for an absent file. Text that is not UTF-8, as a PowerShell redirect writes it, is decoded inside
+    the handler and handed on as one problem keyed "" with why opening `not UTF-8:`, which the
+    invalid branch reads as it reads text that is not TOML (TOOL-dGroundRules-21 S10)."""
+    try:
+        text = read_policy_text(repo, sha)
+    except UnicodeDecodeError as exc:
+        return "", [Problem(0, "", f"not UTF-8: {exc}")]
+    return text, [] if text is None else validate(text, rows)
+
+
 def read_last_valid(repo, sha):
     """(sha, parsed table) of the newest revision on `sha`'s first-parent history whose policy file is
     present and `validate` admits, or None. Each commit of `git rev-list --first-parent <sha> --
-    <file>` is read through `read_policy_text`; a revision where the file is absent is not valid."""
+    <file>` is read through `read_checked_text`; a revision where the file is absent is not valid."""
     for c in (run_git(repo, "rev-list", "--first-parent", sha, "--", POLICY_REL) or "").split():
-        text = read_policy_text(repo, c)
-        if text is not None and not validate(text):
+        text, problems = read_checked_text(repo, c)
+        if text is not None and not problems:
             return c, parse_policy(text)
     return None
+
+
+def check_shallow(repo):
+    """True where `repo` is a shallow clone, so a first-parent walk can end at its boundary."""
+    return (run_git(repo, "rev-parse", "--is-shallow-repository") or "").strip() == "true"
 
 
 def read_last_valid_value(path, row, read):
@@ -525,6 +608,8 @@ def read_last_valid_value(path, row, read):
     if "last_valid" not in read:
         read["last_valid"] = read_last_valid(read["repo"], sha)
     found = read["last_valid"]
+    if found is None and check_shallow(read["repo"]):  # the walk ended at the boundary, not the root
+        raise Refusal(POLICY_REL, first.line, f"{what}; history is shallow at {sha[:8]}; fetch more history")
     if found is None:
         raise Refusal(POLICY_REL, first.line, f"{what}; no valid revision of the file precedes {sha[:8]}")
     valid, table = found
@@ -570,10 +655,14 @@ def read_default_value(path, row, table, rev_phrase):
     """Resolution(the row's default, "default", reason), the reason naming the revision by
     `rev_phrase` and the case: the file absent (`table` None) or present and not setting `path`, then
     any `preset` the file names, which is not applied. A row with no `default` is a Refusal naming
-    it, never an invented value."""
+    it, never an invented value, and so is a row whose default is `{ derived = "..." }`: its prose is
+    no value, and a table read as one would be (TOOL-dGroundRules-21 S12)."""
     if "default" not in row:
         raise Refusal((KIT / CATALOGUE).as_posix(), 0,
                       f"the row {row.get('name')} carries no default, so {render_dotted(path)} has no value to read")
+    if check_derived(row["default"]):
+        raise Refusal((KIT / CATALOGUE).as_posix(), 0, f"the row {row.get('name')} carries {DERIVED_WHY}, "
+                      f"so {render_dotted(path)} has no value to read until the file sets it")
     at = f"at {rev_phrase}; the catalogue default"
     reason = f"{POLICY_REL} is absent {at}" if table is None else f"not set in {POLICY_REL} {at}"
     if table is not None and ("preset",) in table:
@@ -608,8 +697,7 @@ def read_revision(repo, rev=None, rows=None):
     spelling of the revision read that every reason names (TOOL-dGroundRules-65); `render_mirror` sets
     it to `{rev}`."""
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
-    text = read_policy_text(repo, sha)
-    problems = [] if text is None else validate(text, rows)
+    text, problems = read_checked_text(repo, sha, rows)
     table = None if text is None or problems else parse_policy(text)
     return {"repo": repo, "sha": sha, "how": how, "rev_phrase": f"{sha[:8]}, {how}", "text": text,
             "problems": problems, "table": table}
@@ -686,6 +774,10 @@ def derive_lowered_limit(hit, read):
 # ---- the JSON mirror (TOOL-dGroundRules-5) -----------------------------------------------------
 
 MIRROR_REL = ".governance/policy.json"
+# Each legacy input the resolution reads, by its path at the revision read: the mirror records its
+# blob id under `legacy_blobs`, and the helper reads a mirror whose ids differ at L as STALE. A unit
+# adding a resolution input adds its path here (TOOL-dGroundRules-21 S17).
+LEGACY_INPUTS = (LEGACY_FANOUT,)
 
 
 def check_json_value(key, value):
@@ -713,16 +805,19 @@ def check_pattern_name(name):
 
 
 def render_mirror(repo, rev="HEAD"):
-    """The mirror's bytes for the commit `rev` names: the blob ids of the policy file and of this
-    kit's catalogue there, null where absent, and the Resolution of every catalogue name with no
-    `*` or `<...>` segment and of every key the file there sets that a pattern row matches, each
-    through `resolve_read` over ONE `read_revision` read. Sorted keys, two-space indent, ASCII, LF:
-    one revision renders one byte string. The resolution's Refusal passes through.
+    """The mirror's bytes for the commit `rev` names: the blob ids of the policy file, of this kit's
+    catalogue and of each LEGACY_INPUTS file there, null where absent, and the Resolution of every
+    catalogue name with no `*` or `<...>` segment and of every key the file there sets that a pattern
+    row matches, each through `resolve_read` over ONE `read_revision` read. A key whose resolution
+    reaches a derived default is omitted, so the helper reads it through the reader, which refuses
+    it (TOOL-dGroundRules-21 S12, §8 F4). Sorted keys, two-space indent, ASCII, LF: one revision
+    renders one byte string. Every other Refusal of the resolution passes through.
 
     THE INVARIANT (TOOL-dGroundRules-65): two commits with the same policy blob, the same catalogue
-    blob and the same first-parent history render byte-identical mirrors. The read's `rev_phrase` is
-    the placeholder `{rev}`, so no reason names the rendered commit, which the lander's commit-tree
-    rewrite replaces; `policy-mirror.js` fills it with the landed revision it read."""
+    blob, the same legacy blobs (TOOL-dGroundRules-21 S17) and the same first-parent history render
+    byte-identical mirrors. The read's `rev_phrase` is the placeholder `{rev}`, so no reason names the
+    rendered commit, which the lander's commit-tree rewrite replaces; `policy-mirror.js` fills it with
+    the landed revision it read."""
     rows = load_catalogue(KIT)
     read = read_revision(repo, rev, rows)
     read["rev_phrase"] = "{rev}"
@@ -730,7 +825,12 @@ def render_mirror(repo, rev="HEAD"):
     keys = {}
 
     def add(p, row):
-        hit = resolve_read(p, row, read)
+        try:
+            hit = resolve_read(p, row, read)
+        except Refusal as exc:
+            if DERIVED_WHY in exc.why:  # ponytail: matched by its text until TOOL-dGroundRules-62 types it
+                return
+            raise
         key = render_dotted(p)
         keys[key] = {"reason": hit.reason, "source": hit.source, "value": check_json_value(key, hit.value)}
     for p in sorted(paths):
@@ -747,7 +847,8 @@ def render_mirror(repo, rev="HEAD"):
 
     def read_blob(rel):
         return (run_git(repo, "rev-parse", "--verify", "-q", f"{read['sha']}:{rel}") or "").strip() or None
-    doc = {"catalogue_blob": read_blob(derive_catalogue_rel()), "keys": keys, "policy_blob": read_blob(POLICY_REL)}
+    doc = {"catalogue_blob": read_blob(derive_catalogue_rel()), "keys": keys,
+           "legacy_blobs": {rel: read_blob(rel) for rel in LEGACY_INPUTS}, "policy_blob": read_blob(POLICY_REL)}
     return (json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii")
 
 
@@ -766,7 +867,7 @@ def check_mirror_text(want, have):
     if not isinstance(doc, dict) or not isinstance(doc.get("keys"), dict):
         return "unparsable"
     w = json.loads(want)
-    for field in ("catalogue_blob", "policy_blob"):
+    for field in ("catalogue_blob", "legacy_blobs", "policy_blob"):
         if doc.get(field) != w[field]:
             return field
     return next((k for k in sorted(set(doc["keys"]) | set(w["keys"])) if doc["keys"].get(k) != w["keys"].get(k)), "bytes")
@@ -790,11 +891,13 @@ def render_settings(obj, n):
 
 def cmd_settings(argv):
     """`settings [--write|--check] [<settings-file>]`, run in the repository: both SETTINGS_VARS of
-    the file, `.claude/settings.json` under the repository root by default, against the limit
-    `resolve` gives for runtime.agents-in-flight at HEAD. `--check`, the default, exits 1 printing one
-    line per variable that is absent or differs, 0 when both match; `--write` writes the render, in
-    settings-merge.py's shape, only when they differ. A Refusal, or a file that is not a JSON object
-    holding an `env` object, exits 2 printing its line."""
+    the settings file in force, resolved as `check-wiring.sh` resolves it: the file named, else
+    `GOV_SETTINGS_JSON`, else `.claude/settings.json` under the repository root (TOOL-dGroundRules-21
+    S34), against the limit `resolve` gives for runtime.agents-in-flight at HEAD. `--check`, the
+    default, exits 1 printing one line per variable that is absent or differs, 0 when both match;
+    `--write` writes the render only when they differ, the two `env` keys alone and every other key
+    kept, through a temporary file beside it and `os.replace`, so no reader meets half a file (S40).
+    A Refusal, or a file that is not a JSON object holding an `env` object, exits 2 printing its line."""
     mode = next((a for a in argv if a in ("--write", "--check")), "--check")
     rest = [a for a in argv if a not in ("--write", "--check")]
     if len(rest) > 1 or any(a.startswith("-") for a in rest):
@@ -802,12 +905,13 @@ def cmd_settings(argv):
         return 2
     for stream in (sys.stdout, sys.stderr):
         stream.reconfigure(encoding="utf-8", newline="\n")
-    rel = rest[0] if rest else SETTINGS_REL
+    named = rest[0] if rest else os.environ.get("GOV_SETTINGS_JSON") or ""
+    rel = named or SETTINGS_REL
     top = (run_git(".", "rev-parse", "--show-toplevel") or "").strip()
     try:
         if not top:
             raise Refusal(rel, 0, "the working directory is in no git repository")
-        path = Path(top, rel) if not rest else Path(rel)
+        path = Path(named) if named else Path(top, rel)
         n = resolve(".".join(AGENTS_PATH), top, "HEAD").value
         try:
             obj = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
@@ -829,7 +933,14 @@ def cmd_settings(argv):
         return 1 if stale else 0
     if stale:
         path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes((json.dumps(render_settings(obj, n), indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+        fd, tmp = tempfile.mkstemp(prefix=".settings-", suffix=".tmp", dir=path.parent)
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write((json.dumps(render_settings(obj, n), indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+            os.replace(tmp, path)
+        except BaseException:
+            Path(tmp).unlink(missing_ok=True)
+            raise
         print(f"policy: settings written · {rel} · both variables at {n}")
     else:
         print(f"policy: settings fresh · {rel}")
@@ -841,8 +952,9 @@ def parse_list(text):
     return [ln.strip() for ln in text.replace("\r", "").split("\n") if ln.strip() and not ln.startswith("#")]
 
 
-def check_list(kit):
-    """-> ((name, why) findings, note) for the shrink-only list against the catalogue and its base."""
+def check_list(kit, compare):
+    """-> ((name, why) findings, note) for the shrink-only list against the catalogue and its base,
+    `compare` the (sha or None, why) `resolve_compare_base` answered for `kit`."""
     kit = Path(kit)
     d = set(derive_unsummarised(load_catalogue(kit)))
     path = kit / LIST
@@ -852,7 +964,7 @@ def check_list(kit):
     prefix = run_git(kit, "rev-parse", "--show-prefix")
     if prefix is None:
         return out, "no base: the kit is in no git repository, so only the catalogue is compared"
-    base, why = resolve_compare_base(kit)
+    base, why = compare
     if base is None:
         return out, f"no base: {why}; only the catalogue is compared"
     rel = prefix.strip() + LIST  # git's own spelling of the kit dir, so no two path forms are compared
@@ -888,12 +1000,13 @@ LEGACY_HEADER = (
     "# legacy-homes.txt - GENERATED by `python <this kit>/policy.py lists --write`, never edited.\n"
     "# One row per key a legacy policy home holds, `<home> <key> <mark>`, the mark owner-policy or\n"
     "# mechanic. SHRINK-ONLY: `lists --check` reds a row no home yields, a derived row this list lacks,\n"
-    "# and a derived row the list at the landed revision lacks. A new key goes in the catalogue instead.\n"
+    "# and a derived row the list at the compare base lacks. A new key goes in the catalogue instead.\n"
 )
 Row = namedtuple("Row", "home key mark")
 GATE_FILE = ".githooks/gate-env.sh"
 TOOL_ROOT = "<tool-root>/"
-HOUSE_HOME = TOOL_ROOT + "roles/house/policy.toml"   # the drained token is the row's home, verbatim
+HOUSE_ANCHOR = "house/policy.toml"  # the roles kit's house file, the anchor `resolve_kit_dir` finds it by
+HOUSE_HOME = TOOL_ROOT + "roles/" + HOUSE_ANCHOR   # the drained token is the row's home, verbatim
 # The gate file's keys as the clause classifies them: an owner policy dConvergedCharter folds, or a
 # mechanic that stays. A gate key this table does not name is `unmarked`, never given a default mark.
 GATE_ENV_MARKS = {
@@ -915,10 +1028,48 @@ POLICY_KEY_READ = re.compile(r'read_policy_key\s+".*?"\s+([A-Z][A-Z0-9_]*)\b')
 RETROFIT_KEY = re.compile(r"_(?:CUTOFF|PIN)$")   # a date cutoff or a scalar pin the retrofit converts
 
 
-def resolve_tool_home(home, kit=KIT):
-    """The file a `<tool-root>/...` home names: its lead replaced by the policy kit's parent directory,
-    so the one spelling is right at any install prefix."""
-    return Path(kit).parent / home[len(TOOL_ROOT):]
+# The kit-dir resolver, INLINED byte-identically from the canonical copy named on its marker line and
+# gated by the resolve-python self-test: a kit may not import a sibling, so this kit reaches the roles
+# kit's house file and the memory-tree kit's `tree_lib` through it, each named in `kit.toml`'s
+# `requires` or announced absent (TOOL-dGroundRules-21 S25, S26).
+# >>> resolve_kit_dir — canonical copy: resolve_kit_dir.py in gov's lib dir (byte-identical; gated)
+def resolve_kit_dir(home, anchor, here):
+    """The directory holding <anchor> of the kit gov homes at <tool root>/<home>, in THIS install.
+
+    1. receipt — a `.governance/install.json` row whose `path` exists inside this tree and whose
+       `source` ends in <home>/<anchor>, or a `rendered` row whose `source`, its template, sits
+       directly under <home>/ and whose `path` names a file <anchor>. The only record of a RENAMED
+       kit dir: no probe finds a memory-recall kit an adopter homed at `scripts/recall/`.
+    2. probe — <here>/<home>/<anchor>, then <here>/../<home>/<anchor>.
+    3. refuse — LookupError naming the three places looked; never a guessed prefix.
+    A receipt row whose path escapes the tree or does not exist is skipped, never followed.
+    """
+    import json
+    import pathlib
+    here = pathlib.Path(here).absolute()  # never resolve(): a junction must not move it
+    root = next((d for d in (here, *here.parents) if (d / ".git").exists()), here)
+    receipt = root / ".governance" / "install.json"
+    try:
+        rows = json.loads(receipt.read_text(encoding="utf-8")).get("files") or []
+    except (OSError, ValueError, AttributeError):
+        rows = []
+    for row in rows:
+        if not isinstance(row, dict) or not row.get("path"):
+            continue
+        src = str(row.get("source") or "").split("/")
+        made = row.get("role") == "rendered" and str(row["path"]).split("/")[-1] == anchor
+        if src[-2:] != [home, anchor] and not (made and src[-2:-1] == [home]):
+            continue
+        hit = (root / str(row["path"])).absolute()
+        if hit.is_file() and root in hit.parents and ".." not in hit.parts:
+            return hit.parent
+    probes = (here / home, here.parent / home)
+    for cand in probes:
+        if (cand / anchor).is_file():
+            return cand
+    raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
+        home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
+# <<< resolve_kit_dir
 
 
 def read_text_or_none(path):
@@ -952,8 +1103,10 @@ def derive_legacy_homes(repo, notes):
     naming it to `notes`. The kit confs, each tracked root file named `.*.conf`: every key assigned
     but a retrofit conversion, owner-policy. The gate file: the keys it assigns, the keys its header
     documents, and the keys a tracked shell file naming it reads, less those a kit conf row holds,
-    each marked from GATE_ENV_MARKS. The house file, found from this kit's own location: one row per
-    top-level table, `[<table>]`, owner-policy."""
+    each marked from GATE_ENV_MARKS. The house file, found through `resolve_kit_dir` with home `roles`
+    and anchor `house/policy.toml` from this kit's own location, never by joining a name to the tool
+    root, a miss being an absent home (TOOL-dGroundRules-21 S25): one row per top-level table,
+    `[<table>]`, owner-policy."""
     rows = []
     confs = [c for c in (run_git(repo, "ls-files", "-z", "--", ":(glob).*.conf") or "").split("\0") if c]
     if not confs:
@@ -971,7 +1124,10 @@ def derive_legacy_homes(repo, notes):
         keys = scan_shell_keys(lines) + [m[1] for m in map(DOCUMENTED_KEY.match, header) if m]
         keys += [k for k in scan_gate_readers(repo) if k not in held]
         rows += [Row(GATE_FILE, k, GATE_ENV_MARKS.get(k, "unmarked")) for k in dict.fromkeys(keys)]
-    text = read_text_or_none(resolve_tool_home(HOUSE_HOME))
+    try:
+        text = read_text_or_none(resolve_kit_dir("roles", HOUSE_ANCHOR, KIT) / HOUSE_ANCHOR)
+    except LookupError:
+        text = None
     if text is None:
         notes.append(f"no {HOUSE_HOME} in this install, so that home yields no rows")
     else:
@@ -983,47 +1139,51 @@ def derive_legacy_homes(repo, notes):
     return sorted(set(rows))
 
 
-def read_landed_pairs(repo, kit):
-    """-> (the (home, key) pairs of this kit's legacy list at the landed revision, or None where that
-    revision holds no list; the revision's sha). The landed revision is `derive_landed_revision`'s,
-    never the working tree or HEAD, and its Refusal passes through."""
-    sha, _how = derive_landed_revision(repo)
+def read_base_pairs(repo, kit, base):
+    """-> the (home, key) pairs of this kit's legacy list in the commit `base` names, or None where
+    that commit holds no list. `base` is the compare base `cmd_lists` resolved, the one comparison
+    the summary list reads too, never the working tree, HEAD or the landed tip (TOOL-dGroundRules-21
+    S23)."""
     prefix = run_git(kit, "rev-parse", "--show-prefix")
     if prefix is None:
-        raise Refusal((Path(kit) / LEGACY_LIST).as_posix(), 0, "the policy kit is in no git repository, so its list has no landed revision")
-    text = run_git(repo, "show", f"{sha}:{prefix.strip()}{LEGACY_LIST}")
-    return (None if text is None else {tuple(ln.split(" ")[:2]) for ln in parse_list(text)}), sha
+        raise Refusal((Path(kit) / LEGACY_LIST).as_posix(), 0, "the policy kit is in no git repository, so its list has no compare base")
+    text = run_git(repo, "show", f"{base}:{prefix.strip()}{LEGACY_LIST}")
+    return None if text is None else {tuple(ln.split(" ")[:2]) for ln in parse_list(text)}
 
 
-def check_legacy_homes(repo, kit=KIT):
+def check_legacy_homes(repo, kit, compare):
     """-> (reports, notes, rows, new): the derived rows of the tree at `repo` against the committed
-    list, `kit`'s working-tree file, and the list at the landed revision. A row's identity is its pair
-    (home, key). Reported: (1) a committed row the derivation does not yield, full row compared, as a
-    stale list where no home yields its pair and the landed list holds it, else as a typed row; (2) a
-    derived row whose pair the committed list lacks; (3) a derived row whose pair the landed list
-    lacks, `new` holding those, nothing where there is no landed list, which seeds the baseline; (4) a
+    list, `kit`'s working-tree file, and the list at the compare base `compare` names, the
+    (sha or None, why) `resolve_compare_base` answered. A row's identity is its pair (home, key).
+    Reported: (1) a committed row the derivation does not yield, full row compared, as a stale list
+    where no home yields its pair and the base's list holds it, else as a typed row; (2) a derived row
+    whose pair the committed list lacks; (3) a derived row whose pair the base's list lacks, `new`
+    holding those, nothing where there is no base or no list at it, which seeds the baseline; (4) a
     row `unmarked`. The catalogue's path in (3) is derived at runtime."""
     notes = []
     rows = derive_legacy_homes(repo, notes)
     derived = {(r.home, r.key): r.mark for r in rows}
     path = Path(kit) / LEGACY_LIST
     committed = parse_list(path.read_text(encoding="utf-8")) if path.is_file() else []
-    landed, sha = read_landed_pairs(repo, kit)
+    sha, why = compare
+    at_base = None if sha is None else read_base_pairs(repo, kit, sha)
     reports = []
     for ln in committed:
         f = ln.split(" ")
         pair = tuple(f[:2])
         if len(f) == 3 and derived.get(pair) == f[2]:
             continue
-        gone = len(f) == 3 and pair not in derived and landed is not None and pair in landed
+        gone = len(f) == 3 and pair not in derived and at_base is not None and pair in at_base
         reports.append(f"stale list at {ln}, re-run lists --write" if gone else f"typed row {ln}")
     held = {tuple(ln.split(" ")[:2]) for ln in committed}
     reports += [f"stale list at {' '.join(r)}, re-run lists --write" for r in rows if (r.home, r.key) not in held]
     new = []
-    if landed is None:
-        notes.append(f"no landed list at {sha[:8]}, so this one seeds the baseline")
+    if sha is None:
+        notes.append(f"no base: {why}; only the derivation is compared")
+    elif at_base is None:
+        notes.append(f"no list at the base {sha[:8]} ({why}), so this one seeds the baseline")
     else:
-        grown = [r for r in rows if (r.home, r.key) not in landed]
+        grown = [r for r in rows if (r.home, r.key) not in at_base]
         cat = derive_catalogue_rel() if grown else ""
         new = [f"{r.home} {r.key} is a new legacy home and the list is shrink-only; carry it as a key in {cat} instead"
                for r in grown]
@@ -1031,10 +1191,10 @@ def check_legacy_homes(repo, kit=KIT):
     return reports, notes, rows, new
 
 
-def write_legacy_homes(repo, kit=KIT):
-    """Write the derived rows under the header, sorted, unless a derived row is new to the landed list:
-    then write nothing. The list shrinks by this verb and grows by none. -> (new, notes, rows)."""
-    _reports, notes, rows, new = check_legacy_homes(repo, kit)
+def write_legacy_homes(repo, kit, compare):
+    """Write the derived rows under the header, sorted, unless a derived row is new to the list at the
+    compare base: then write nothing. The list shrinks by this verb and grows by none. -> (new, notes, rows)."""
+    _reports, notes, rows, new = check_legacy_homes(repo, kit, compare)
     if not new:
         with open(Path(kit) / LEGACY_LIST, "w", encoding="utf-8", newline="\n") as f:
             f.write(LEGACY_HEADER + "".join(" ".join(r) + "\n" for r in rows))
@@ -1168,36 +1328,29 @@ def cmd_mirror(argv):
     return 0
 
 
-def main(argv):
-    if argv[:1] == ["get"]:
-        return cmd_get(argv[1:])
-    if argv[:1] == ["check"]:
-        return cmd_check(argv[1:])
-    if argv[:1] == ["mirror"]:
-        return cmd_mirror(argv[1:])
-    if argv[:1] == ["settings"]:
-        return cmd_settings(argv[1:])
-    if argv == ["scaffold"]:
-        sys.stdout.write(render_scaffold(load_catalogue(KIT)))
-        return 0
-    if argv[:1] == ["lists"] and argv[1:] in (["--check"], ["--write"]):
-        for stream in (sys.stdout, sys.stderr):
-            stream.reconfigure(encoding="utf-8", newline="\n")
-        top = (run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
-        # The legacy list is gov's own and withheld from installs (TOOL-dGroundRules-17): `--write`
-        # updates it only where it exists and never creates it, so an adopter's run derives nothing.
-        held = argv[1] == "--check" or (KIT / LEGACY_LIST).is_file()
-        reports, notes, rows, new = [], [], [], []
-        try:
-            if not top:
-                raise Refusal(LEGACY_LIST, 0, "the policy kit is in no git repository, so no legacy home can be read")
-            if held:
-                reports, notes, rows, new = check_legacy_homes(top)
-        except Refusal as exc:
-            print(exc, file=sys.stderr)
-            return 2
-    if argv == ["lists", "--check"]:
-        findings, note = check_list(KIT)
+def cmd_lists(argv):
+    """`lists --check | --write`: both shrink-only lists, the summary list and the legacy-home list,
+    against ONE compare base, `resolve_compare_base` read once here for both (TOOL-dGroundRules-21
+    S23), so a branch opened before the default branch dropped a key is never read as adding it."""
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")
+    top = (run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
+    with run_without_git_env():  # the block is canonical and inherits this process's environment
+        compare = resolve_compare_base(KIT)
+    # The legacy list is gov's own and withheld from installs (TOOL-dGroundRules-17): `--write`
+    # updates it only where it exists and never creates it, so an adopter's run derives nothing.
+    held = argv == ["--check"] or (KIT / LEGACY_LIST).is_file()
+    reports, notes, rows, new = [], [], [], []
+    try:
+        if not top:
+            raise Refusal(LEGACY_LIST, 0, "the policy kit is in no git repository, so no legacy home can be read")
+        if held:
+            reports, notes, rows, new = check_legacy_homes(top, KIT, compare)
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    if argv == ["--check"]:
+        findings, note = check_list(KIT, compare)
         print(f"policy lists: {LIST} · {note}")
         for n, why in findings:
             print(f"  {n}: {why}")
@@ -1209,22 +1362,39 @@ def main(argv):
         n = len(findings) + len(reports)
         print(f"policy lists: {'RED' if n else 'green'} · {n} finding(s)")
         return 1 if n else 0
-    if argv == ["lists", "--write"]:
-        for ln in notes:
-            print(f"legacy homes: {ln}")
-        if new:
-            for r in new:
-                print(f"  legacy homes: {r}")
-            print(f"policy lists: wrote nothing · {len(new)} new legacy home(s), and {LEGACY_LIST} is shrink-only")
-            return 1
-        removed = write_list(KIT)
-        print(f"policy lists: wrote {LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
-        if held:
-            write_legacy_homes(top)
-            print(f"policy lists: wrote {LEGACY_LIST} · {len(rows)} row(s)")
-        else:
-            print(f"policy lists: {LEGACY_LIST} · not written · {LEGACY_WITHHELD}")
+    for ln in notes:
+        print(f"legacy homes: {ln}")
+    if new:
+        for r in new:
+            print(f"  legacy homes: {r}")
+        print(f"policy lists: wrote nothing · {len(new)} new legacy home(s), and {LEGACY_LIST} is shrink-only")
+        return 1
+    removed = write_list(KIT)
+    print(f"policy lists: wrote {LIST} · drained {len(removed)}: {', '.join(removed) or 'none'}")
+    if held:
+        write_legacy_homes(top, KIT, compare)
+        print(f"policy lists: wrote {LEGACY_LIST} · {len(rows)} row(s)")
+    else:
+        print(f"policy lists: {LEGACY_LIST} · not written · {LEGACY_WITHHELD}")
+    return 0
+
+
+def main(argv):
+    if argv[:1] == ["get"]:
+        return cmd_get(argv[1:])
+    if argv[:1] == ["check"]:
+        return cmd_check(argv[1:])
+    if argv[:1] == ["mirror"]:
+        return cmd_mirror(argv[1:])
+    if argv[:1] == ["settings"]:
+        return cmd_settings(argv[1:])
+    if argv == ["scaffold"]:
+        # The bytes, LF, never the text layer's newline translation: one output on every platform,
+        # equal to the blob git stores for a scaffolded file (TOOL-dGroundRules-21 S1).
+        sys.stdout.buffer.write(render_scaffold(load_catalogue(KIT)).encode("utf-8"))
         return 0
+    if argv[:1] == ["lists"] and argv[1:] in (["--check"], ["--write"]):
+        return cmd_lists(argv[1:])
     print(USAGE, file=sys.stderr)
     return 2
 
