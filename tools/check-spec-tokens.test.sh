@@ -1702,21 +1702,33 @@ else
   echo "arm FAIL  the spec filename date's pattern is spelled in design_lib.py alone — checker $date_in_lint, design_lib $date_in_lib"; fail=$((fail+1))
 fi
 
-# TOOL-dGroundRules-32 S9: the build-order render's overlap rule is the dispatcher's. design_lib's
-# check_writes_intersect answers what lib-unattended.sh's `overlaps` answers on a directory and a file
-# under it, and on the string-prefix pair, which a raw prefix compare calls overlapping. Staged red by
-# testing one direction only: the directory-and-file pair then reads False.
+# TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
+# dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to
+# ${PFX} and the answer containment gives: design_lib's check_writes_intersect must print True, and
+# lib-unattended.sh's `overlaps` exit 0, exactly on an `intersect` row. The `disjoint` row is the pair
+# a raw `startswith` calls overlapping, so staging both rules to a raw compare, in either direction,
+# reds the arm naming that row once per rule. A table that parses to no row reds it too.
+OVERLAP_PAIRS='policy/ policy/x.py intersect
+policy policy-x.py disjoint'
 UNATTENDED_DIR=$(resolve_kit_dir "$PY" unattended lib-unattended.sh "$HERE") || exit 2
-wi_py=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import design_lib as d; p = sys.argv[2] + "policy/"
-print(d.check_writes_intersect([p], [p + "x.py"]), d.check_writes_intersect([p + "a.py"], [p + "ab.py"]))' "$MEMORY_TREE" "$PFX" 2>&1 | tr -d '\r')
-wi_sh=$( . "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$UNATTENDED_DIR/lib-unattended.sh" >/dev/null 2>&1
-  for pr in "${PFX}policy/ ${PFX}policy/x.py" "${PFX}policy/a.py ${PFX}policy/ab.py"; do
-    set -- $pr; if overlaps "$1" "$2"; then printf 'True '; else printf 'False '; fi
-  done )
-if [ "$wi_py" = "True False" ] && [ "$wi_sh" = "True False " ]; then
-  echo "arm ok    TOOL-dGroundRules-32 AC9 check_writes_intersect answers what overlaps answers on both pairs"; pass=$((pass+1))
+wi_out=$( . "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$UNATTENDED_DIR/lib-unattended.sh" >/dev/null 2>&1
+  rows=0
+  while read -r a b want; do
+    [ -n "${want:-}" ] || continue
+    rows=$((rows+1))
+    if [ "$want" = intersect ]; then wpy=True wsh=0; else wpy=False wsh=1; fi
+    py=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import design_lib as d
+print(d.check_writes_intersect([sys.argv[2]], [sys.argv[3]]))' "$MEMORY_TREE" "$PFX$a" "$PFX$b" 2>&1 | tr -d '\r')
+    if overlaps "$PFX$a" "$PFX$b"; then sh=0; else sh=1; fi
+    [ "$py" = "$wpy" ] || printf '[row %s %s %s: check_writes_intersect %s] ' "$a" "$b" "$want" "$py"
+    [ "$sh" = "$wsh" ] || printf '[row %s %s %s: overlaps exit %s] ' "$a" "$b" "$want" "$sh"
+  done <<< "$OVERLAP_PAIRS"
+  printf 'rows=%s' "$rows" )
+wi_rows=${wi_out##*rows=}; wi_bad=${wi_out%rows=*}
+if [ "$wi_rows" -ge 1 ] 2>/dev/null && [ -z "$wi_bad" ]; then
+  echo "arm ok    TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer"; pass=$((pass+1))
 else
-  echo "arm FAIL  TOOL-dGroundRules-32 AC9 check_writes_intersect answers what overlaps answers on both pairs — design_lib [$wi_py], overlaps [$wi_sh]"; fail=$((fail+1))
+  echo "arm FAIL  TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer — rows $wi_rows, ${wi_bad:-no row disagreed}"; fail=$((fail+1))
 fi
 
 total=$((pass+fail))

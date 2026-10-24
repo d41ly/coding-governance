@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-40 — the overlap arm pins each pair's expected answer, so the render's rule and the dispatcher's are graded against the truth and not only against each other
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-40-deviation-28.md](../build/2026-10-23-build-TOOL-dGroundRules-40-deviation-28.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-40-deviation-64.md](../build/2026-10-23-build-TOOL-dGroundRules-40-deviation-64.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-40-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-40-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-40-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-40-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-39-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-39-staleness-probe-brief.md) | research | TOOL-dGroundRules-39 TOOL-dGroundRules-41 |
 | [2026-10-24-prompt-TOOL-dGroundRules-40-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-40-2-spec-writer.md) | journal | — |
