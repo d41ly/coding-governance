@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-8 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-23-build-TOOL-dGroundRules-25-deviation-59.md](../build/2026-10-23-build-TOOL-dGroundRules-25-deviation-59.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-21 TOOL-dGroundRules-34 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-25-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-25-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-25-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-25-size-trim-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-size-trim-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-25-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-22-25-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-24 TOOL-dGroundRules-22 TOOL-dGroundRules-23 |
@@ -25,9 +27,9 @@ The round-1 spec audit of units 13 to 21
 exited CONVERGED with 42 confirmed findings. Its three HIGHs are promoted one unit each,
 `TOOL-dGroundRules-22` to `TOOL-dGroundRules-24`; BUILD-METHOD M4 batches the other thirty-nine,
 twenty-eight MEDIUM and eleven LOW, into this unit. They land on units 13 to 22 and 24, and nearly
-every half of them writes `tools/policy/check_policy.py`, `tools/policy/policy.py` or
-`tools/gate-legs.json`, so M6's clauses yield no two disjoint write sets. It builds at order 8, above
-every unit of this build. A finding the review merged into another's item keeps its own scope item.
+all write the policy kit or `tools/gate-legs.json`, so M6 yields no two disjoint write sets (§4).
+It builds at order 8, above every unit of this build. A finding the review merged into another's
+item keeps its own scope item.
 
 | Finding id | Severity | Review item | Unit it lands on | Scope item | Criterion |
 |---|---|---|---|---|---|
@@ -317,16 +319,14 @@ def derive_parallel_step(units):          # units: one step's spec records
     return "yes"
 ```
 
-`writes` and `consumes` are filled by `read_spec_writes` and `read_spec_consumes` when the spec is
-read; a spec with no Files touched sub-head contributes no writes. A `yes` still means only that the
-specs' own estimates are disjoint; `--dispatch` with recorded write sets stays the act that decides.
+A spec with no Files touched sub-head contributes no writes. A `yes` means only that the specs'
+estimates are disjoint; `--dispatch` with recorded write sets still decides.
 
 ### The mirror's inputs after S19 to S21
 
-The guard, `mirror --write` and `mirror --check` each ask one question, "which paths does this mirror
-record", answered from the mirror's own fields: `.governance/policy.toml`, `<kit>/catalogue.toml`,
-and each key of `legacy_blobs` (`TOOL-dGroundRules-21` S17). A path added to `legacy_blobs` by a
-later unit is then compared everywhere with no edit to the guard.
+The guard, `mirror --write` and `mirror --check` read one input set, the mirror's own recorded
+fields (S19), so a path a later unit adds to `legacy_blobs` (`TOOL-dGroundRules-21` S17) is compared
+everywhere with no guard edit.
 
 ### Per-unit changes, by file
 
@@ -352,9 +352,7 @@ later unit is then compared everywhere with no edit to the guard.
 | `resolve_bash_py` | canonical block | `tools/lib/resolve_bash.py` |
 | `legacy-homes-withheld-install`, `census-default-adopter`, `guard-mirror-beside-conf`, `guard-mirror-inputs-join`, `arms-empty-declared`, `arms-empty-target`, `on-invalid-bom`, `limit-settings-env-stale` | `CASES` entries | `tools/policy/check_policy.py` |
 
-Each minted function leads with a verb `.lexicon.conf` declares: `lexicon.py --suggest` answered OK
-for `read_spec_writes`, `read_spec_consumes` and `derive_parallel_step` under `py.function` on
-2026-10-23.
+`lexicon.py --suggest` answered OK for the three minted functions under `py.function` on 2026-10-23.
 
 ### Files touched (estimate)
 
@@ -386,8 +384,7 @@ for `read_spec_writes`, `read_spec_consumes` and `derive_parallel_step` under `p
 - `memory/map/generated/inventories.json`
 - `memory/map/generated/MAP.md`
 
-S39 also re-renders the build-order region of every other build README the new rule moves; each is
-a generated region, written by `gen_build_index.py --write` in this commit.
+S39 also re-renders, by `gen_build_index.py --write`, each other build README's order region the rule moves.
 
 ### Alternatives rejected
 
@@ -579,28 +576,22 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
 ## 8. Open questions
 
 - **F1 — How are steps whose units share a write set or an edge closed (findings 1, 2, 26)?**
-  (a) The build-order render reads each spec's Files touched and `consumes-from` edges and marks such
-  a step `no`. Distinct orders rewrite reviewed spec headers, a fold BUILD-METHOD M4 refuses (veto 1),
-  and a hygiene arm reds twenty-one edges in landed specs, measured on 2026-10-23, which a frozen
-  record cannot clear (§3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  (a) The render marks such a step `no`: distinct orders rewrite reviewed headers, a fold M4 refuses
+  (veto 1), and a hygiene arm reds twenty-one landed edges (§3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F2 — What happens to the replay case once the real lander has an arm (finding 18)?** (a) It
-  stays as the policy leg's fast check of the render, a case of seconds in the leg every policy edit
-  runs, while the lander's own suite, which needs a clone, holds the real observation. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  stays as the policy leg's seconds-long check; the lander's suite, which needs a clone, holds the
+  real observation. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F3 — Where is the agent-cap floor of the writer marker enforced (finding 44)?** (a) In the
-  workflows render, which reads the hook's version and keeps the verifier marker bounded at five
-  below it, as its playbook-render floor does; an adopter `--check` needs a new public verb, the
-  workflows kit shipping no adopter (veto 2, §3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F4 — Is an adopter-authored legacy-home list graded (finding 37)?** (a) Never: in an adopter the
-  arm announces, a present list included. A list written from gov's `ORDER` row cannot hold gov's
-  rows, so grading it reds every such adopter and fails `TOOL-dGroundRules-16` AC1 (veto 1).
-  Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F5 — How does the guard join learn which legs a path trips (finding 19)?** (a) It pipes its paths
-  to `check-spec-tokens.py --legs-for -`, gov's one trip rule, adding no inlined copy of it or of
-  `resolve_prefix_token`; the case runs only in the gov-only `policy fixtures` leg, where the checker
-  sits. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F6 — What does the reader do with a UTF-8 BOM (finding 43)?** (a) Strip one leading U+FEFF and
-  parse, the rule unit 10's conf reader keeps; refusing still sends an owner's valid values down the
-  invalid branch, which AC30 forbids. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  workflows render (S18); an adopter `--check` needs a new verb, the kit shipping no adopter (veto 2,
+  §3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F4 — Is an adopter-authored legacy-home list graded (finding 37)?** (a) Never: an adopter's
+  list cannot hold gov's rows, so grading it reds every adopter and fails `TOOL-dGroundRules-16` AC1
+  (veto 1). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F5 — How does the guard join learn which legs a path trips (finding 19)?** (a) Through
+  `--legs-for -`, gov's one trip rule, never an inlined copy; the case runs only in the gov-only
+  `policy fixtures` leg, where the checker sits. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F6 — What does the reader do with a UTF-8 BOM (finding 43)?** (a) Strip one leading BOM
+  and parse, as unit 10's conf reader does; refusing sends valid values down the invalid branch (AC30). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -611,6 +602,7 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
 - rev-5 · 2026-10-23 · §1 §2 §3 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling.
 - rev-6 · 2026-10-24 · §6 · a criterion code span rejoined onto one line for hygiene check 23.
 - rev-7 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; older revision lines condensed under the spec ceiling; no design change.
+- rev-8 · 2026-10-24 · §1 §4 §8 §9 · prose shortened under the spec ceiling; no design change.
 
 ## 10. Reuse audit
 
