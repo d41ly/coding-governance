@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows
 
-**Status:** DEFERRED · rev-8 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-9 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 1 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
 
 **Carries:** cl-dClosedLoop-0018@d4cade33 whole
 
@@ -18,6 +18,7 @@
 | [2026-10-23-build-TOOL-dSafePassage-1-deviation-146.md](../build/2026-10-23-build-TOOL-dSafePassage-1-deviation-146.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-1-deviation-149.md](../build/2026-10-24-build-TOOL-dSafePassage-1-deviation-149.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-1-deviation-157.md](../build/2026-10-24-build-TOOL-dSafePassage-1-deviation-157.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-1-deviation-158.md](../build/2026-10-24-build-TOOL-dSafePassage-1-deviation-158.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md](../build/2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md) | research | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-2-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-3-spec-writer.md) | journal | — |
@@ -29,8 +30,10 @@
 | [2026-10-23-prompt-TOOL-dSafePassage-1-widens-marks.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-widens-marks.md) | research | TOOL-dSafePassage-7 |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-3-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-3-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-ac15-pathspec.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-ac15-pathspec.md) | research | — |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-owner-forks.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-owner-forks.md) | research | TOOL-dSafePassage-6 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -49,8 +52,7 @@ upgrade-step kind: a moved conf key is only reported).
 
 - **S1** — The step row. Every registry entry's descriptor may carry `[[upgrade]]` rows, and
   `tools/govkit/steps.toml` carries rows of the same grammar for surfaces no descriptor owns
-  (§4 Data model). Keys: `id`, `up`, `down`, `witness`, `surfaces`, `needs-target` and an optional
-  `resume`. The introducing commit is DERIVED by the reader and never typed in the row (§8 F2).
+  (§4 Data model). The introducing commit is DERIVED by the reader and never typed in the row (§8 F2).
   Observed by AC1, AC2 and AC3.
 - **S2** — The succession row. `tools/govkit/registry.toml` gains `[[retired]]` rows: `id` (an entry
   id or a step id), `successor` (a live id of the same kind, or `none`) and `surfaces`, the commit
@@ -64,8 +66,7 @@ upgrade-step kind: a moved conf key is only reported).
 - **S4** — `update` and `check` read succession through `resolve_claim`. A claimed kit that is no
   longer a registry entry and carries a `[[retired]]` row is carried to its successor, or released
   with its rows routed to the existing `withdrawn` arm when the successor is `none`, in place of the
-  whole-run refusal at `tools/govkit/govkit.py:9235-9239` and the problem `check` appends at
-  `tools/govkit/govkit.py:5677-5679`. A claimed id with no succession row still refuses.
+  whole-run refusal at `tools/govkit/govkit.py:9235-9239` and the problem `check` appends at :5677-5679. A claimed id with no succession row still refuses.
   Observed by AC6, AC7, AC8 and AC9. The replaced refusal's text, "which is no longer a registry
   entry", is spelled once in the tree, by `git grep -n -F 'no longer a registry entry' -- tools skills`.
   **Readers:** by name: `tools/govkit/govkit.py`, at :9237, and no test asserts the text · by value:
@@ -112,9 +113,10 @@ upgrade-step kind: a moved conf key is only reported).
   `[[exempt]]` row and its three `why` mentions in `tools/govkit/registry.toml`, the `.gitattributes`
   eol row and the `RECALL_EXTRA_SOURCES` member in `.memory-tree.conf` are removed or re-pointed to
   `.governance/policy.toml`; `budgets.py`'s `limits:` branch retires, `tools/policy/caps.toml`'s
-  seven `limits:` homes are re-pointed, and `arm_limits_readers` and the cases planting the file are
-  disposed (§8 F12), since gov's is the only tree that ever held the file (an `[[exempt]]` path,
-  shipped to no adopter); and each prose mention is re-worded to name `budgets.*`, the map dossiers'
+  seven `limits:` rows take the `policy` home form, a value held only under `budgets.<cap>`,
+  `arm_limits_readers`' row of `arm_single_reader` and the cases planting the file go, and
+  `budgets-two-homes` is re-planted on a `conf:` home, since gov's is the only tree that ever held
+  the file (an `[[exempt]]` path, shipped to no adopter); and each prose mention is re-worded to name `budgets.*`, the map dossiers'
   cards re-rendered by `python tools/codebase-map/gen_map.py --write`. The regenerated mirror,
   `policy.py mirror --write`, is a second commit: it refuses while the policy file differs from HEAD,
   and the guard admits a mirror only when the policy file and catalogue equal HEAD (dGroundRules
@@ -211,8 +213,7 @@ commit.
 
 The order is total: landed rows by their introducing commit's first-parent position, then unlanded
 rows; within one commit, `tools/govkit/steps.toml` first and then the descriptors in registry entry
-order; within one file, row order. The steps file comes first because its rows are the receipt and
-floor steps every later step's progress depends on (the brief's S5).
+order; within one file, row order. The steps file comes first (§8 F7).
 
 The two steps this unit ships:
 
@@ -302,12 +303,12 @@ second instance is `cmd_frozen`, so it is extracted rather than copied (charter 
 Additive for every adopter: a descriptor gaining a table no engine reads changes nothing until
 `update` reads it, and `read_descriptors` (`tools/govkit/govkit.py:13238-13253`) loads a descriptor
 whole, so the new table reaches no other reader. Gov's own tree is migrated in this unit's pass by S7's
-up (S8), after the build run re-grounds against the landed dGroundRules.
+up (S8), after §8 F9's re-ground.
 
 ### Rollout
 
-The leg is live in the landing that adds it. Its first base has no step rows, so its first run reads
-`0 landed row(s)` and says so; it grades a row from the landing after the one that introduces it.
+The leg is live in the landing that adds it. Its first base has no step rows, so its first run prints
+`0 landed row(s)`; it grades a row from the landing after the one that introduces it.
 
 ### Files touched (estimate)
 
@@ -350,11 +351,11 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
 
 ## 5. Production-readiness checklist
 
-- security — the reader is the write boundary for step rows: deny by default on any unknown key,
-  placeholder or interpreter, and on a program path that is not tracked. Steps run no target code
-  (`needs-target = false`), and a down never overwrites bytes edited since its up.
-- perf / scale — the introducing-commit derivation reads one blob per commit touching a declaring
-  file, oldest first, stopping at the first hit; measured at build on gov's history.
+- security — the reader is the write boundary for step rows, denying any unknown key, placeholder,
+  interpreter or untracked program path. Steps run no target code (`needs-target = false`), and a
+  down never overwrites bytes edited since its up.
+- perf / scale — the derivation's walk (§4 Data model) stops at its first hit; measured at build on
+  gov's history.
 - error / empty / loading states — an empty `[[retired]]` population and a base with no rows are
   announced with their counts, never read as coverage. A malformed row exits 2 naming file, row and key.
 - observability — `list` prints each row's order, id, introducing commit and file; `update` prints
@@ -454,8 +455,8 @@ The leg is live in the landing that adds it. Its first base has no step rows, so
 
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `recall floor arms` · `recall floor` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `memory-hygiene self-test` · `build-index selftest` · `govkit selfcheck` · `kit epoch (shipped bytes move, the version moves)` · `dead-path carriers (deleted files still named)` · `method carriers (every pointer declared)` · `template size <=48KiB` · `leg ceilings clear their evidenced maximum` · `every held leg is budgeted, every budget row resolves` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-The new leg `step-rows-frozen` is not on the line above, because the manifest does not hold it until
-this unit builds it. It is observed red by AC4 and green by AC5.
+The new leg `step-rows-frozen` is off the line above until this unit builds it; AC4 observes it red
+and AC5 green.
 
 New arm: tools/govkit/selftest.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10 AC11 AC12 AC13 AC14 AC16 · each case staged by its own scratch gov tree or target, one planted row, receipt or file per arm · `tools/govkit/refusal_join.py` `BRANCH_PIN`, by the measured count
 
@@ -560,29 +561,26 @@ branch has not landed.
   `budgets-two-homes` is re-planted on a `conf:` home. (b) The rows keep `limits:` naming an absent
   file, and the arm's reader directory moves to `tools/govkit/steps/`. (b) declares a home no tree
   holds and keeps an arm over a file no tree holds. Recommendation (a), charter `[yagni]`. Rung 3.
+  RESOLVED (owner, 2026-10-24): (a).
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft, from `2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md`
   and the packet's Items 1.
 - rev-2 · 2026-10-23 · §8 F8 cites the ask `TOOL-dGroundRules-13` for the withdrawn deviation-12,
-  whose clause is dGroundRules', and the build run re-grounds against the landed guard, from
-  `2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md`.
-- rev-3 · 2026-10-23 · §3 Edges gain the ends owed to the round-1 spec audit's promotions, by the
-  disposal stage: `TOOL-dSafePassage-17`, `-20`, `-26`; nothing else moved.
-- rev-4 · 2026-10-23 · §3 Edges gain the hands-off `TOOL-dSafePassage-4` its consumes-from
-  declared, so hygiene check 12's reciprocity join holds; nothing else moved.
-- rev-5 · 2026-10-23 · §8 F8's mark reads `widens: none · relaxes: none`: the widening was the
-  withdrawn deviation-12's, the second write shape `TOOL-dGroundRules-13`'s; nothing else moved.
-- rev-6 · 2026-10-23 · **Carries:** re-pins `cl-dClosedLoop-0018` from `ed08a364` to `d4cade33`,
-  its as-built hash since `2026-10-23-build-TOOL-dSafePassage-1-deviation-11` moved its text, whose
-  every token the spec held; §1 to §10 unmoved.
-- rev-7 · 2026-10-24 · §2 S5 to S8 · §3 Edges · §4 the steps' reads, ups and writer, Files touched ·
-  §6 AC10, AC13, AC15, AC16 · §8 F8, F9 and the new F12: re-grounded on dGroundRules' specs by
-  `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md`, rows 3, 4, 6, 8, 9, 11 and 13 and
-  U1 to U4.
+  from `2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md`.
+- rev-3 · 2026-10-23 · §3 Edges gain `TOOL-dSafePassage-17`, `-20`, `-26`, the round-1 audit's ends.
+- rev-4 · 2026-10-23 · §3 Edges gain the hands-off `TOOL-dSafePassage-4`, for check 12's reciprocity.
+- rev-5 · 2026-10-23 · §8 F8's mark reads `widens: none · relaxes: none`.
+- rev-6 · 2026-10-23 · re-pins `cl-dClosedLoop-0018` from `ed08a364` to `d4cade33`, after
+  deviation-11 moved its text; §1 to §10 unmoved.
+- rev-7 · 2026-10-24 · §2 S5 to S8, §3, §4, §6 AC10, AC13, AC15, AC16, §8 F8, F9 and new F12:
+  re-grounded by `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck.md`, rows 3, 4, 6, 8,
+  9, 11 and 13 and U1 to U4.
 - rev-8 · 2026-10-24 · §6 AC15's grep excludes the step's own files, from
   `2026-10-24-prompt-TOOL-dSafePassage-1-ac15-pathspec.md`.
+- rev-9 · 2026-10-24 · §2 S8 and §8 F12 read the owner's pick (a), from
+  `2026-10-24-prompt-TOOL-dSafePassage-1-owner-forks.md`; prose trimmed for the size cap.
 
 ## 10. Reuse audit
 
@@ -594,11 +592,9 @@ with no new loader; `load_registry` (`tools/govkit/govkit.py:247`) for the `[[re
 its second instance; `resolve_remote` (`tools/govkit/govkit.py:558`) for the default branch; the
 `withdrawn` arm (`tools/govkit/govkit.py:10741-10778`) for a successor of `none`; and govkit's
 `Refusal` with the refusal join's anchors. The lookup also ranked `read_blobs_at`
-(`tools/memory-tree/tree_lib.py`), which is another kit's, and govkit imports no other kit, so the
-blob read stays a small `git cat-file` reader in the new module. Where a hit
-disagreed with source: the research record's line numbers for `_cmd_update` are from an older
-`govkit.py` (the claim refusal it puts at :8855-8861 is :9235-9239 at the base, and `check`'s at
-:5677-5679), and its probe A text is `check`'s, not `update`'s. The recall probe added
+(`tools/memory-tree/tree_lib.py`), another kit's, which govkit may not import, so the blob read stays a small `git cat-file` reader in the new module. Where a record
+disagreed with source: its `_cmd_update` lines are an older `govkit.py`'s (its :8855-8861 claim
+refusal is :9235-9239 at the base, `check`'s :5677-5679), and its probe A text is `check`'s. The recall probe added
 `TOOL-aFlaggedScaffold-3` (update has no arm for a source gov started shipping), which bounds what a
 successor's new files get on the first update and is not widened here, and `TOOL-dRetiredFork-38`,
 named in §3.

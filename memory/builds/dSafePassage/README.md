@@ -128,7 +128,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | DEFERRED | rev-8 | 2026-10-24 |
+| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | DEFERRED | rev-9 | 2026-10-24 |
 | [TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it](spec/2026-10-23-spec-TOOL-dSafePassage-3.md) | 1 | 2 | DEFERRED | rev-5 | 2026-10-23 |
 | [TOOL-dSafePassage-16 — the step record's precondition, one predicate beside its one writer, and the schema-4 bootstrap it answers](spec/2026-10-23-spec-TOOL-dSafePassage-16.md) | 2 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left](spec/2026-10-23-spec-TOOL-dSafePassage-2.md) | 2 | 2 | DEFERRED | rev-5 | 2026-10-23 |
@@ -151,7 +151,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-29 — the step contract's refused keys are the class git's own config list derives, held to it by an arm](spec/2026-10-23-spec-TOOL-dSafePassage-29.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dSafePassage-30 — the step contract's config check reads every repository git can enter from the target, its submodules included](spec/2026-10-23-spec-TOOL-dSafePassage-30.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-32 — the reuse estimate compares like clocks: a POSIX census row is judged on the kernel's boot clock, never the wall clock](spec/2026-10-23-spec-TOOL-dSafePassage-32.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
-| [TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window](spec/2026-10-23-spec-TOOL-dSafePassage-6.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window](spec/2026-10-23-spec-TOOL-dSafePassage-6.md) | 4 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dSafePassage-9 — withdrawn hook fragments unwired, and an edited file gov stopped shipping kept as `retired-edited` and ordered](spec/2026-10-23-spec-TOOL-dSafePassage-9.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce](spec/2026-10-23-spec-TOOL-dSafePassage-13.md) | 5 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dSafePassage-21 — the step gate's `file` class reads gov's planned destinations when no source receipt is on the tree](spec/2026-10-23-spec-TOOL-dSafePassage-21.md) | 5 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -188,7 +188,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 145 bound to this build, across 4 record folder(s).
+Records: 150 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
