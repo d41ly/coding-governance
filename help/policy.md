@@ -95,9 +95,9 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
 - **The owner commits from a terminal.** A commit made at a terminal is the owner's proof, and the
   hook admits it, printing `policy guard — <paths> staged, admitted on the owner's terminal proof.`
   An agent's shell has no terminal, so the hook judges its commit instead.
-- **An agent may make one change: raise one measured-file cap.** One key under `[budgets]` whose
-  name is the path of a tracked file, set to a larger whole number, and nothing else in the four
-  files changed. The commit must carry its argument and its record:
+- **An agent may change the policy file one way: raise one measured-file cap.** One key under
+  `[budgets]` whose name is the path of a tracked file, set to a larger whole number, and nothing
+  else in the four files changed. The commit must carry its argument and its record:
   - comment lines added directly above the cap, one of them `RAISED <old> -> <new>`;
   - at least one row added to `memory/DECISIONS.md`, with no row removed.
 
