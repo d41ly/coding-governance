@@ -177,7 +177,7 @@ ids TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67
 | [TOOL-dDeclaredLoop-67 — the round-2 spec audit's 54 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-67.md) | 38 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 54 bound to this build, across 4 record folder(s).
+Records: 55 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
