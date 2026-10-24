@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-49 — the budget's `spent` counts every draw of the build, across every record, in commit order
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 29 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-49-deviation-491.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-49-deviation-491.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 
 <!-- /gen:spec-records -->
 
@@ -49,6 +50,9 @@ This unit takes the report's fix. It repairs `TOOL-dDeclaredLoop-30`.
 ### Edges
 
 - **consumes-from** `TOOL-dDeclaredLoop-30` — `budget_state` and `record_draw` in `tools/loop/budget.py`, whose count this unit defines over the whole build
+- **hands-off** `TOOL-dDeclaredLoop-61` — the draw rows, which that unit makes unique by a draw id (the round-2 spec audit's id 53)
+- **hands-off** `TOOL-dDeclaredLoop-62` — the transition-record merge driver and its evidence, which that unit restates against the recorded measurement (the round-2 spec audit's id 38)
+- **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minors ids 8, 18, 44 and 62: this pass keeps the loop budget fixtures leg green; the adopter route and the README weighing are scope items of that unit
 
 ## 4. Design
 
@@ -124,6 +128,8 @@ New arm: tools/loop/budget.py · covers AC1 AC2 · the `draws-across-records` an
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's id 52 (HIGH, item H18).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
+  consumes-from edges of TOOL-dDeclaredLoop-61 and TOOL-dDeclaredLoop-62 and TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

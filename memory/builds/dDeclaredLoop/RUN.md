@@ -74,3 +74,27 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T11:09:55Z rescope · item add TOOL-dDeclaredLoop-56 · reason spec-audit round 1 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) the 47 confirmed minors batched into one unit: 44 MEDIUM, ids 9 10 11 13 14 15 16 17 20 21 22 23 26 27 28 29 30 31 32 33 36 37 38 39 40 41 42 43 44 45 46 53 56 57 58 59 60 61 62 63 64 65 66 67 (items M1 to M37), and 3 LOW, ids 12 24 34 (items L1 to L3)
 
 2026-10-24T11:39:57Z review · item dDeclaredLoop-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 20 · minors 47 · disposition promote
+
+2026-10-24T12:32:48Z rescope · item add TOOL-dDeclaredLoop-57 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 52 HIGH, item H6: update's default-gained path can leave roles updated without the loop kit it requires; repairs TOOL-dDeclaredLoop-36
+
+2026-10-24T12:32:59Z rescope · item add TOOL-dDeclaredLoop-58 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 51 HIGH, item H5: AC1's tokens HEAD~3..HEAD over a three-commit fixture never observes the LF-only fix; repairs TOOL-dDeclaredLoop-38
+
+2026-10-24T12:33:00Z rescope · item add TOOL-dDeclaredLoop-59 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 17 HIGH, item H2: the diff-tree --cc --name-only grade lists a cleanly auto-merged policy file, so landing wedges; repairs TOOL-dDeclaredLoop-44
+
+2026-10-24T12:33:01Z rescope · item add TOOL-dDeclaredLoop-60 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 19 HIGH, item H3: the budget reader drops draws stored in rotated run records and globs a literal memory root; repairs TOOL-dDeclaredLoop-48
+
+2026-10-24T12:33:02Z rescope · item add TOOL-dDeclaredLoop-61 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 53 HIGH, item H4 (shared with id 38): a draw row carries no unique field, so two identical parallel draws merge into one and the budget under-counts; repairs TOOL-dDeclaredLoop-49
+
+2026-10-24T12:33:03Z rescope · item add TOOL-dDeclaredLoop-62 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 38 HIGH, item H4 (shared with id 53): merge=union collapses two identical draw rows and reintroduces a driver .gitattributes records as rejected; repairs TOOL-dDeclaredLoop-49
+
+2026-10-24T12:33:04Z rescope · item add TOOL-dDeclaredLoop-63 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 56 HIGH, item H8: the phase map covers PHASES_CORE only, so every --phase move into an adopter's extra phase is refused; repairs TOOL-dDeclaredLoop-52
+
+2026-10-24T12:33:05Z rescope · item add TOOL-dDeclaredLoop-64 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 57 HIGH, item H9: the pre-placement rule finds a build's opening commit at a literal memory path, so a non-default root holds every build; repairs TOOL-dDeclaredLoop-53
+
+2026-10-24T12:33:06Z rescope · item add TOOL-dDeclaredLoop-65 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 55 HIGH, item H7: the stale-remote reading uses the tracking ref's reflog, which a fresh clone and a no-op fetch never write; repairs TOOL-dDeclaredLoop-56
+
+2026-10-24T12:33:06Z rescope · item add TOOL-dDeclaredLoop-66 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) id 1 HIGH, item H1: build-order groups derive Parallel yes for units whose write sets intersect; repairs no unit in particular
+
+2026-10-24T12:33:12Z rescope · item add TOOL-dDeclaredLoop-67 · reason spec-audit round 2 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) the 54 confirmed minors batched into one unit: 38 MEDIUM, ids 2 3 4 5 6 7 8 9 10 11 18 20 21 22 23 24 25 26 27 33 35 36 39 40 41 42 43 44 45 46 47 54 61 62 63 64 65 66 (items M1 to M31), and 16 LOW, ids 12 13 14 15 16 28 29 30 31 37 48 49 50 60 67 68 (items L1 to L12)
+
+2026-10-24T13:03:10Z review · item dDeclaredLoop-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 10 · minors 54 · disposition promote

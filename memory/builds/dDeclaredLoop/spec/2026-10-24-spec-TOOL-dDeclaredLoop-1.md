@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-1 — the loop kit and its definition keyed by the stage tags, the roles kit's stage table moved into it
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 2 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 2 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0086@76547911 whole
 
@@ -18,6 +18,8 @@
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-3-reuse-scout.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-3-reuse-scout.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-4-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-4-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-5-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-5-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dDeclaredLoop-1-6-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-6-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md) | research | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
@@ -101,6 +103,7 @@ kit owns WHAT runs and in which step; the roles kit keeps WHO (walkthrough.md:11
 - **hands-off** `TOOL-dDeclaredLoop-13` — `loop_lib.py`, the one reader of the loop definition's steps
 - **hands-off** `TOOL-dDeclaredLoop-36` — the default selection's `loop` entry, which that unit adds so a default apply installs the kit roles requires (the round-1 spec audit's id 35)
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, ids 23, 26, 38, 39, 45, 57, each a scope item of that unit
+- **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minor id 40: this unit's roles requires reds govkit selftest arms OC8 AC2 and RQ5 AC1 until unit 36's registry line at order 3, so this pass records them owed to that unit, that unit's scope item
 
 ## 4. Design
 
@@ -338,6 +341,8 @@ New arm: tools/roles/adopt-roles.test.sh · covers AC3 AC4 · the roles adopter 
   I3, scout A's row 1 and the readers read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-36, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
+  consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

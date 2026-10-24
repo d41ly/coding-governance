@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-33 — the static termination check on every composition, at the push and at each step boundary
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 34 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0118@4c8ef789 whole
 
@@ -114,6 +114,7 @@ the push and at each step boundary a build moves. Today nothing checks that a fl
 - **hands-off** `TOOL-dDeclaredLoop-54` — the terminal set per level, which that unit declares and the termination rule reads (the round-1 spec audit's id 5)
 - **hands-off** `TOOL-dDeclaredLoop-55` — the termination leg's guard, which that unit removes (the round-1 spec audit's id 55)
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, ids 26, 39, 58, each a scope item of that unit
+- **hands-off** `TOOL-dDeclaredLoop-67` — the round-2 minors ids 2 and 46: AC10's guard clause is superseded by unit 55's guard-free row, and the no-guard property gets its lasting arm there
 
 ## 4. Design
 
@@ -309,6 +310,8 @@ New arm: tools/loop/selftest.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 ·
   the push wait read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-54, a hands-off TOOL-dDeclaredLoop-55, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
+  consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
