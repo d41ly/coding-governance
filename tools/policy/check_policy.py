@@ -3853,14 +3853,27 @@ def run_fixtures_guard_census(name):
 
 
 SOURCE_READS = set()  # what `add_source_read` kept: source files this process opened to read, top-relative
-TRACE_ROOTS = []  # [the source top, the case temporary root or None], set where `--fixture` installs the hook
+TRACE_ROOTS = []  # [the source top, the case temporary root or None, the source's git directories], set where `--fixture` installs the hook
+
+
+def read_source_git_dirs(top):
+    """The source's git directory and common directory, as git answers at `top` (TOOL-dGroundRules-38 S1),
+    absolute and resolved: in a primary checkout one `.git` under the top level, twice; in a linked
+    worktree two directories outside it. Asked of `top`, never of the caller's working directory.
+    -> (git dir, common dir); RuntimeError naming rev-parse where git does not answer both."""
+    out = policy.run_git(top, "rev-parse", "--path-format=absolute", "--git-dir", "--git-common-dir")
+    dirs = (out or "").splitlines()
+    if len(dirs) != 2 or not all(dirs):
+        raise RuntimeError(f"git rev-parse --git-dir --git-common-dir at {Path(top).as_posix()} did not answer both")
+    return tuple(os.path.realpath(d) for d in dirs)
 
 
 def add_source_read(event, args):
     """The audit hook `--fixture` installs before its first case (TOOL-dGroundRules-33 S2): an `open`
     event whose mode reads and writes nothing, on a path that resolves, against the working directory,
-    under the source repository's top level and under no case's temporary directory, is kept in
-    SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's.
+    under the source repository's top level, under no case's temporary directory and under neither of
+    the source's git directories (TOOL-dGroundRules-38 S2: the snapshot's index and exclude-file copies
+    are git's reads, never a source file's), is kept in SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's.
     A hook that raised would fail the very open it audits, so a path that does not resolve keeps nothing.
     A bytecode-cache read, or importlib's `.pyc.<digits>` atomic-write temporary, is kept as the source
     file it was compiled from (TOOL-dGroundRules-35 S1), so a warm load still records its `.py`; a cache
@@ -3877,8 +3890,10 @@ def add_source_read(event, args):
             with contextlib.suppress(ValueError):
                 p = importlib.util.source_from_cache(p)
         p = os.path.realpath(p)
-        top, tmp = TRACE_ROOTS
+        top, tmp, git_dirs = TRACE_ROOTS
         n = os.path.normcase(p)
+        if any(n.startswith(os.path.normcase(d) + os.sep) for d in git_dirs):
+            return
         if n.startswith(os.path.normcase(top) + os.sep) and not (tmp and n.startswith(os.path.normcase(tmp) + os.sep)):
             SOURCE_READS.add(os.path.relpath(p, top).replace(os.sep, "/"))
     except Exception:  # noqa: BLE001 - the hook must never fail an open
@@ -4250,9 +4265,14 @@ def run_fixture(only=None):
         return 2
     top = derive_source_top()
     if top.parts:  # outside a repository nothing is traced, and the empty trace is check_guard_trace's WRONG
+        try:
+            git_dirs = read_source_git_dirs(top)
+        except RuntimeError as exc:
+            print(f"policy-fixture: guard-trace · WRONG: {exc}, so no case ran")
+            return 1
         top, tmp = os.path.realpath(top), os.path.realpath(tempfile.gettempdir())
         # a case's directory sits under tempfile's root, so that root holding the source shelters no case
-        TRACE_ROOTS[:] = [top, None if os.path.normcase(top).startswith(os.path.normcase(tmp) + os.sep) else tmp]
+        TRACE_ROOTS[:] = [top, None if os.path.normcase(top).startswith(os.path.normcase(tmp) + os.sep) else tmp, git_dirs]
         sys.addaudithook(add_source_read)
     asserted, wrong = 0, 0
     for name, arm, seed in cases:

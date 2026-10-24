@@ -15408,6 +15408,11 @@
       "file": "tools/memory-tree/migrate_backlog.py"
     },
     {
+      "id": "read_source_git_dirs",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_source_limits",
       "kind": "function",
       "file": "tools/policy/check_policy.py"

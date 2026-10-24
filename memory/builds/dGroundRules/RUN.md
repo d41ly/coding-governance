@@ -265,3 +265,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T14:53:51Z dispatch · item 0860b8c1 TOOL-dGroundRules-37 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-37-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-37.md
 
 2026-10-24T14:55:52Z dispatch · item 0860b8c1 TOOL-dGroundRules-37 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-37-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-37.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T15:00:32Z brief · item TOOL-dGroundRules-38 · reason dee4c52619bd memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-38-build-brief.md
+
+2026-10-24T15:01:39Z dispatch · item 7a600abf TOOL-dGroundRules-38 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-38.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-38-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T15:06:36Z dispatch · item 7a600abf TOOL-dGroundRules-38 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-38.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-38-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
