@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-25 — the round-1 audit of units 13 to 21, its minors: thirty-nine findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-8 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-9 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,8 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-21 TOOL-dGroundRules-34 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-25-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-25-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-25-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-25-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-25-guards-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-guards-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-25-size-trim-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-size-trim-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-25-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-25-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
@@ -24,12 +26,11 @@
 
 The round-1 spec audit of units 13 to 21
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-65-21-spec-audit-round1.md`)
-exited CONVERGED with 42 confirmed findings. Its three HIGHs are promoted one unit each,
-`TOOL-dGroundRules-22` to `TOOL-dGroundRules-24`; BUILD-METHOD M4 batches the other thirty-nine,
-twenty-eight MEDIUM and eleven LOW, into this unit. They land on units 13 to 22 and 24, and nearly
-all write the policy kit or `tools/gate-legs.json`, so M6 yields no two disjoint write sets (§4).
-It builds at order 8, above every unit of this build. A finding the review merged into another's
-item keeps its own scope item.
+exited CONVERGED with 42 findings. Its three HIGHs are `TOOL-dGroundRules-22` to
+`TOOL-dGroundRules-24`; BUILD-METHOD M4 batches the other thirty-nine, twenty-eight MEDIUM and
+eleven LOW, here. They land on units 13 to 22 and 24, mostly in the policy kit or
+`tools/gate-legs.json`, so M6 yields no disjoint write sets (§4). It builds at order 8. A finding
+the review merged into another's item keeps its own scope item.
 
 | Finding id | Severity | Review item | Unit it lands on | Scope item | Criterion |
 |---|---|---|---|---|---|
@@ -73,8 +74,8 @@ item keeps its own scope item.
 | 1 | MEDIUM | M1 | 14, 19 | S38 | AC38 |
 | 2 | MEDIUM | M2 | 15, 17, 18, 20 | S39 | AC39 |
 
-Each item's fix is the one the review's skeptic judged sound; for ids 2, 22, 23, 26 and 35 it is
-the skeptic's corrected fix. Where the review offered options, §8 records the pick.
+Each fix is the one the review's skeptic judged sound, its corrected fix for ids 2, 22, 23, 26 and
+35; where the review offered options, §8 records the pick.
 
 ## 2. Scope (IN)
 
@@ -168,7 +169,8 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 - **S24** — Finding 41. The same guard gains each in-kit module a Python census enforcer imports and
   each in-kit file a shell enforcer sources, derived from the census at build, and
   `fixtures-guard-census` walks the same imports and sourced files and reds one the guard does not
-  cover. Observed by AC24.
+  cover. Its guards hit on another build's live spec is held by a waiver row and a deviation
+  record (§4 "The guard's reach into another build's live spec", §8 F7). Observed by AC24.
 - **S25** — Finding 19. `fixtures-guard-census` pipes every path it holds to
   `python <source tool root>/check-spec-tokens.py --legs-for -` and reds a path whose output does
   not name `policy fixtures`; it spells no guard-match rule of its own. An unreachable checker is a
@@ -237,36 +239,33 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 ## 3. Non-goals (OUT)
 
 - Every HIGH: `TOOL-dGroundRules-22` to `TOOL-dGroundRules-24`.
-- Rewriting any reviewed spec's text: each defect is closed here in code and in the criteria it
-  governs, and the repaired unit's §3 names this unit; nothing is folded (BUILD-METHOD M4).
-- Renumbering any unit's `order`. The render now says which steps are not parallel; the order verbs
-  stay as their specs wrote them.
+- Rewriting any reviewed spec: each defect closes here in code and criteria (BUILD-METHOD M4).
+- Renumbering any unit's `order`; the render says which steps are not parallel.
 - The other `resolve_bash` copies: `TOOL-dSettledRoster-6` stays their ask.
-- A hygiene arm that reds a `consumes-from` edge inside one order step. Measured on 2026-10-23,
-  twenty-one such edges sit in landed and live specs across nine builds, so a red would grade the
-  corpus retroactively; the render reports the step instead.
-- An adopter verb for the workflows kit. It ships no adopter (`tools/workflows/kit.toml:93-96`), so
-  the floor of S18 lives in its render.
+- A hygiene arm that reds a `consumes-from` edge inside one step: twenty-one sit in landed and live
+  specs across nine builds (2026-10-23), so the render reports the step instead.
+- An adopter verb for the workflows kit, which ships no adopter (`tools/workflows/kit.toml:93-96`);
+  S18's floor lives in its render.
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-65` — `mirror-commit-rewrite` and the reason builders' `rev_phrase`, which S1 runs per reason kind
-- **consumes-from** `TOOL-dGroundRules-14` — the lander observation and `mirror-landed-merge`, which S2 to S4 move into the lander's own suite
-- **consumes-from** `TOOL-dGroundRules-15` — `derive_lowered_limit`, which S36 maps
-- **consumes-from** `TOOL-dGroundRules-16` — `adopter-fresh-target`, its README table and the table join, which S5 to S8 extend
-- **consumes-from** `TOOL-dGroundRules-17` — the withheld legacy-home list, its announce line, `budgets-ships-join` and the census arm, which S9 to S13 extend
-- **consumes-from** `TOOL-dGroundRules-18` — `WRITER_MARK`, the writer bound and the hooks README's rule-2 paragraph, which S14 to S18 document and floor
-- **consumes-from** `TOOL-dGroundRules-19` — the guard's mirror shape, `mirror --print` and the `guard-mirror-` cases, which S19 to S22 extend
-- **consumes-from** `TOOL-dGroundRules-20` — the `policy fixtures` guard lines and `fixtures-guard-census`, which S23 to S25 extend
-- **consumes-from** `TOOL-dGroundRules-21` — `empty` on `ARMS`, `adopter-suite`, the decode path, `on-invalid-shallow`, the settings render, the parity re-point, the no-launcher branch and `adopt-policy.sh --scaffold`, which S7, S8 and S26 to S35 amend
-- **consumes-from** `TOOL-dGroundRules-22` — `derive_census_tree` and the adopter grading of the census, which S11, S12 and S36 read
-- **consumes-from** `TOOL-dGroundRules-24` — the deployer-installed fresh target, which S5 to S7, S9 and S12 assert against
-- **hands-off** `TOOL-dGroundRules-27` — the cases `legacy-homes-withheld-install` and `census-default-adopter`, which that unit moves onto the snapshot through `run_govkit` (finding 7)
-- **hands-off** `TOOL-dGroundRules-30` — the render's writer-marker floor (S18), whose version predicate that unit replaces with the installed hook's own verdict, and AC18, which that unit's AC1 and AC2 observe in its place (finding 18)
-- **hands-off** `TOOL-dGroundRules-31` — `--scaffold`'s `mirror --write` call (S7), whose `uncommitted changes` refusal that unit defers, and AC7's second clause, which that unit observes on the re-run after the first commit (finding 24)
-- **hands-off** `TOOL-dGroundRules-32` — the build-order rule, the census and plan cases, the BOM strip, the map regeneration, the card criterion, the edge read and the widened refusal, which that unit amends (findings 3, 9, 10, 19, 14, 25, 27, 28, 6, 11, 12, 15, 22)
-- **hands-off** `TOOL-dGroundRules-33` — `fixtures-guard-census`'s pipe to `check-spec-tokens.py --legs-for -` (S25), which that unit's guard trace reuses (id 26 of the round-1 spec audit of units 26 to 32)
-- **hands-off** `TOOL-dGroundRules-34` — AC18's version-staging arm, which that unit removes, `TOOL-dGroundRules-30` AC1 and AC2 observing AC18 in its place, and `census-default-adopter`, which that unit lists among the census cases (ids 1, 25 and 33 of the round-1 spec audit of units 26 to 32)
+- **consumes-from** `TOOL-dGroundRules-65` — `mirror-commit-rewrite` and `rev_phrase` (S1)
+- **consumes-from** `TOOL-dGroundRules-14` — `mirror-landed-merge` (S2 to S4)
+- **consumes-from** `TOOL-dGroundRules-15` — `derive_lowered_limit` (S36)
+- **consumes-from** `TOOL-dGroundRules-16` — `adopter-fresh-target`, its README table and join (S5 to S8)
+- **consumes-from** `TOOL-dGroundRules-17` — the withheld legacy-home list, `budgets-ships-join` and the census arm (S9 to S13)
+- **consumes-from** `TOOL-dGroundRules-18` — `WRITER_MARK`, the writer bound and the hooks README's rule 2 (S14 to S18)
+- **consumes-from** `TOOL-dGroundRules-19` — the guard's mirror shape, `mirror --print` and the `guard-mirror-` cases (S19 to S22)
+- **consumes-from** `TOOL-dGroundRules-20` — the `policy fixtures` guard and `fixtures-guard-census` (S23 to S25)
+- **consumes-from** `TOOL-dGroundRules-21` — `ARMS`, `adopter-suite`, the settings render and `--scaffold`, which S7, S8 and S26 to S35 amend
+- **consumes-from** `TOOL-dGroundRules-22` — `derive_census_tree` and the census's adopter grading (S11, S12, S36)
+- **consumes-from** `TOOL-dGroundRules-24` — the deployer-installed fresh target (S5 to S7, S9, S12)
+- **hands-off** `TOOL-dGroundRules-27` — `legacy-homes-withheld-install` and `census-default-adopter`, moved onto `run_govkit` (finding 7)
+- **hands-off** `TOOL-dGroundRules-30` — S18's writer-marker floor and AC18, which its AC1 and AC2 observe (finding 18)
+- **hands-off** `TOOL-dGroundRules-31` — S7's `mirror --write` call, whose `uncommitted changes` refusal it defers, and AC7's second clause (finding 24)
+- **hands-off** `TOOL-dGroundRules-32` — the build-order rule, census and plan cases, BOM strip, map regeneration, card criterion, edge read and widened refusal (findings 3, 9, 10, 19, 14, 25, 27, 28, 6, 11, 12, 15, 22)
+- **hands-off** `TOOL-dGroundRules-33` — S25's pipe to `--legs-for -`, which its guard trace reuses (id 26 of the round-1 audit of units 26 to 32)
+- **hands-off** `TOOL-dGroundRules-34` — AC18's version-staging arm, which it removes, and `census-default-adopter` (ids 1, 25 and 33 of the round-1 audit of units 26 to 32)
 
 ## 4. Design
 
@@ -274,36 +273,32 @@ the skeptic's corrected fix. Where the review offered options, §8 records the p
 
 Every line below was read at base `3708a705` on 2026-10-23.
 
-- `tools/push-main.test.sh:927-946` defines `build_regen_fixture` for arms 28 to 32, and arm 28 runs
-  `bash "$lander" --prepare --slug tRegen`; `:1046` prints the skip line where no `regen.py` sits
-  beside the lander. The `push-main self-test` leg's guard is `.githooks/`, `{prefix}/` and
-  `{prefix}/lib/` (`tools/gate-legs.json:661-669`).
-- `tools/push-main.sh:99-107` refuses `--prepare` without a letter-led `--slug`, `:845-852` refuses
-  a detached HEAD or the default branch, and `:947` prints `push-main: prepared <sha8> — first
-  parent ...`.
-- `tools/govkit/govkit.py:3803-3811` maps `project-owned` to the `ORDER` kind, and `plan` prints it as
+- `tools/push-main.test.sh:927-946` is `build_regen_fixture`; arm 28 runs
+  `bash "$lander" --prepare --slug tRegen`; `:1046` skips where no `regen.py` sits beside the lander.
+- `tools/push-main.sh:99-107` refuses `--prepare` without a letter-led `--slug`, `:845-852` a
+  detached HEAD or the default branch; `:947` prints `push-main: prepared`.
+- `tools/govkit/govkit.py:3803-3811` maps `project-owned` to `ORDER`, printed
   `ORDER [project-owned] <dest>`.
-- `tools/memory-tree/gen_build_index.py:1716-1739` is `render_order`; it marks any step of two or more
-  units `yes`. No tool reads the Parallel column (a `git grep` over `tools/` on 2026-10-23).
-- `tools/memory-tree/check-memory-hygiene.sh:2717-2720` reds a `consumes-from` target ordered AFTER
-  its consumer and is silent on a target in the same step.
-- `tools/check-spec-tokens.py:530-557` is `extract_files_touched`; it loads the memory-tree kit's
-  `design_lib.py` already (`:888`), and `{prefix}/check-spec-tokens.py` is a registry `[[exempt]]`
-  path, so the shipped `gen_build_index.py` cannot import it.
-- `tools/check-spec-tokens.py:637-641`: `--legs-for -` reads its paths from stdin.
-- `tools/memory-tree/gen_build_index.py:307` imports the sibling `backlog`, and `:186` imports
-  `tree_lib`; `memory/gotchas/held-suite-guard-misses-a-sibling-kit.md` prescribes guarding "the
-  module it imports, what that module imports".
-- `tools/workflows/check-protocol-parity.test.sh:95` renders `unattended-build.js` from its
-  template, and `:337` reads `KIT_PLAYBOOK_RENDER_VERSION` as a floor before it renders.
+- `render_order` (`tools/memory-tree/gen_build_index.py:1716-1739`) marks any step of two or more
+  units `yes`; no tool reads the Parallel column (`git grep` over `tools/`).
+- `tools/memory-tree/check-memory-hygiene.sh:2717-2720` reds a `consumes-from` target ordered after
+  its consumer and is silent within a step.
+- `extract_files_touched` (`tools/check-spec-tokens.py:530-557`) loads the kit's `design_lib.py`
+  (`:888`); `{prefix}/check-spec-tokens.py` is a registry `[[exempt]]` path, so the shipped
+  `gen_build_index.py` cannot import it; `--legs-for -` reads stdin (`:637-641`).
+- `tools/memory-tree/gen_build_index.py:307` imports `backlog` and `:186` `tree_lib`;
+  `memory/gotchas/held-suite-guard-misses-a-sibling-kit.md` prescribes guarding "the module it
+  imports, what that module imports".
+- `tools/workflows/check-protocol-parity.test.sh:95` renders `unattended-build.js`; `:337` reads
+  `KIT_PLAYBOOK_RENDER_VERSION` as a floor first.
 - `tools/workflows/REVIEW-PROTOCOL.template.md:118-133` and `memory/guides/REVIEW-PROTOCOL.md:118-133`
-  state "The predicate" with only the `gov:fixed-verifiers` receivers.
+  state "The predicate" with only `gov:fixed-verifiers` receivers.
 - `tools/check-playbook-parity.sh:257` and `:270-272` hold the comment and the three README rows;
-  `tools/check-playbook-parity.test.sh:159-161` writes the valid fixture's three sentences.
+  `tools/check-playbook-parity.test.sh:159-161` writes the valid fixture.
 - `tools/check-agent-cap-restatement.sh:90-91` declare `BOUND` and `NOUN`.
-- `tools/lib/resolve-python.test.sh:170-172` shows `PARITY_ROWS` as `stem|canonical|exclude`;
+- `tools/lib/resolve-python.test.sh:170-172`: `PARITY_ROWS` is `stem|canonical|exclude`;
   `tools/run-gates/profile_bar.py:282` is the `resolve_bash` that runs each candidate;
-  `memory/backlog/TOOL.md:494` lists `TOOL-dSettledRoster-6` as DEFERRED.
+  `memory/backlog/TOOL.md:494` lists `TOOL-dSettledRoster-6` DEFERRED.
 
 ### The build order after S37 and S38
 
@@ -319,29 +314,45 @@ def derive_parallel_step(units):          # units: one step's spec records
     return "yes"
 ```
 
-A spec with no Files touched sub-head contributes no writes. A `yes` means only that the specs'
-estimates are disjoint; `--dispatch` with recorded write sets still decides.
+A spec with no Files touched sub-head contributes no writes. A `yes` means only that the estimates
+are disjoint; `--dispatch` still decides.
 
 ### The mirror's inputs after S19 to S21
 
-The guard, `mirror --write` and `mirror --check` read one input set, the mirror's own recorded
-fields (S19), so a path a later unit adds to `legacy_blobs` (`TOOL-dGroundRules-21` S17) is compared
-everywhere with no guard edit.
+The guard, `mirror --write` and `mirror --check` read one input set, the mirror's recorded fields
+(S19), so a path added to `legacy_blobs` (`TOOL-dGroundRules-21` S17) needs no guard edit.
+
+### The guard's reach into another build's live spec
+
+S23 and S24 applied in a scratch clone at `8149b14ec` make one `[guards]` hit of
+`tools/check-spec-tokens.py`, `policy fixtures <- tools/roles/roles_lib.py` (census enforcers
+`check_roles.py` and `handoff.py` import it), on TOOL-aScoutedSeam-1 (SPECCED), whose files touched
+list it and whose §7 lacks the leg
+(`memory/builds/dGroundRules/prompts/2026-10-24-prompt-TOOL-dGroundRules-25-guards-brief.md`).
+By §8 F7, the commit that widens the guard writes:
+
+- `memory/project/spec-token-waivers.txt` gains one row keyed
+  `policy fixtures <- tools/roles/roles_lib.py`, its reason naming `[guards]`, TOOL-aScoutedSeam-1,
+  this unit's guard widening, ask TOOL-dGroundRules-110 and the count, one row more than the
+  registry holds at build;
+- `memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-25-deviation-76.md`,
+  deviation-74 its template, carries `**Bound:** spec-token-waivers shrink-only count`,
+  `**Tier:** middle`, `**Reason:**` naming F7's refused options and
+  `**Surface:** memory/project/spec-token-waivers.txt`; its follow-through is ask
+  TOOL-dGroundRules-110, which already asks that §7 for `policy fixtures`; no ask is filed;
+- the builder re-measures the `[guards]` set with S24's own derivation and waives each further hit
+  the same way, recording it in deviation-76;
+- `memory/guides/SESSION-KICKOFF.md`'s `last-audit:` is re-stamped, its `watch:` naming
+  `tools/gate-legs.json`.
+
+The commit's `Decided:` trailer cites F7 under rung 5 (ER:388) and carries
+`widens: memory/project/spec-token-waivers.txt` and `relaxes: spec-token-waivers shrink-only count`.
 
 ### Per-unit changes, by file
 
-| File | Items |
-|---|---|
-| `tools/policy/check_policy.py` | S1, S5 to S9, S11 to S13, S21, S24 to S27, S29 to S31, S33 |
-| `tools/policy/policy.py` | S20, S22, S30, S32 |
-| `tools/policy/guard.py` | S19, S22 |
-| `tools/policy/adopt-policy.sh` | S7 |
-| `tools/policy/kit.toml` | S32 |
-| `tools/policy/README.md` | S10, S32 |
-| `tools/gate-legs.json` | S23, S24 |
-| `tools/push-main.test.sh` | S2 to S4 |
-| `tools/memory-tree/design_lib.py`, `tools/memory-tree/gen_build_index.py`, `tools/check-spec-tokens.py` | S37, S38 |
-| the rest | as each item names |
+`check_policy.py` carries S1, S5 to S9, S11 to S13, S21, S24 to S27, S29 to S31 and S33;
+`policy.py` S20, S22, S30, S32; `guard.py` S19, S22; `tools/gate-legs.json` S23, S24; the rest as
+each item names.
 
 ### Inventory
 
@@ -383,35 +394,33 @@ everywhere with no guard edit.
 - `memory/map/generated/symbols.json`
 - `memory/map/generated/inventories.json`
 - `memory/map/generated/MAP.md`
+- `memory/project/spec-token-waivers.txt`
+- `memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-25-deviation-76.md`
+- `memory/guides/SESSION-KICKOFF.md`
 
-S39 also re-renders, by `gen_build_index.py --write`, each other build README's order region the rule moves.
+S39 also re-renders each other build README's order region the rule moves.
 
 ### Alternatives rejected
 
-- **Two batch units split by kit.** The policy half and the tooling half both write
-  `tools/gate-legs.json`, and S36 and S37 move functions the codebase map regenerates from, so M6's
-  first and third clauses fail.
+- **Two batch units split by kit.** Both halves write `tools/gate-legs.json`, and S36 and S37 move
+  functions the map regenerates from: M6's first and third clauses fail.
 - **Give the units that share a step distinct orders.** §3 and §8 F1.
 
 ## 5. Production-readiness checklist
 
-- security — S19 to S21 close an agent path that staged a render input beside a mirror the guard
-  admitted; S32 names and bounds an environment-steered write. No item widens a write surface beyond what `TOOL-dGroundRules-18` and
-  `TOOL-dGroundRules-21` priced.
+- security — S19 to S21 refuse a render input staged beside a mirror; S32 names and bounds an environment-steered write. Only §8 F7's waiver row widens a
+  surface.
 - perf / scale — S12 and S9 add two `apply` runs to `--fixture`; S37 reads each spec's two
   sub-sections once per render.
-- error / empty / loading states — S4, S25, S26, S29 and S30 each give a state that read as a pass
-  or a false invalid its own outcome.
+- error / empty / loading states — S4, S25, S26, S29 and S30 give a state read as a pass or a
+  false invalid its own outcome.
 - observability — each new refusal, announce line and `WRONG` names its file, input, kind or arm.
-- risks — S39 moves generated regions in other builds' READMEs; they are renders, and
-  `gen_build_index.py --check` holds them. S18's floor depends on the version `TOOL-dGroundRules-18`
-  ships, read at build.
-- testing — the cases in §4's inventory under `--fixture`, the suites on §7's arm lines, and AC1 to
-  AC39.
-- migration — the codebase map and every build-order region regenerated; `.memory-tree.conf`'s
-  floors moved where S35 adds exit sites.
-- user docs — the review protocol and its template (S14, S15), the hooks README (S16, S17), the
-  agent-cap map card (S17) and the policy kit README (S10, S32).
+- risks — S39 moves other builds' rendered order regions, held by `gen_build_index.py --check`;
+  S18's floor reads the version `TOOL-dGroundRules-18` ships.
+- testing — §4's inventory cases, §7's arm lines, AC1 to AC39.
+- migration — the map and build-order regions regenerated; S35's floors moved.
+- user docs — the review protocol and template (S14, S15), the hooks README and map card (S16,
+  S17), the policy kit README (S10, S32).
 
 ## 6. Acceptance criteria
 
@@ -560,10 +569,10 @@ short-named.
 
 ## 7. Gates
 
-`push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `build-index selftest` · `memory-hygiene self-test` · `spec-tokens self-test` · `template size gate selftest` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `kit/dogfood doc parity` · `playbook parity` · `playbook parity selftest` · `agent-cap restatement` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `install-prefix (shipped surface)` · `foreign-prefix parity (every self-test at three prefixes)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
+`push-main self-test` · `python resolver (behaviour + inline parity + idiom ban)` · `build-index selftest` · `memory-hygiene self-test` · `spec-tokens self-test` · `template size gate selftest` · `harness arms (fail branches armed or pinned)` · `review-protocol parity (kit vs dogfood)` · `kit/dogfood doc parity` · `playbook parity` · `playbook parity selftest` · `agent-cap restatement` · `agent-cap self-test` · `scratch-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `tier2-review self-test` · `unattended-build self-test` · `install-prefix (shipped surface)` · `foreign-prefix parity (every self-test at three prefixes)` · `run-gates canary` · `run-gates gov canary` · `measure-legs selftest` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `kit version markers` · `kit epoch (shipped bytes move, the version moves)` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures` · `spec tokens (a spec's own names resolve)`
 
-The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the cases;
-they are named by the arm lines, because neither exists at this spec's base.
+The policy legs `TOOL-dGroundRules-1` declares run the cases; the arm lines name them, neither
+existing at this spec's base.
 
 New arm: tools/policy/check_policy.py --fixture · covers AC1 AC5 AC6 AC7 AC8 AC9 AC11 AC12 AC19 AC21 AC24 AC25 AC26 AC27 AC29 AC30 AC31 AC32 AC33 · each case named in §4's inventory and each case S1 to S33 extends, planting its input in its temporary repository and asserting its stated outcome · none
 New arm: tools/push-main.test.sh · covers AC2 AC3 AC4 · a policy-file change on `feat` landed through the real `--prepare`, then the lander staged to a stub exiting 2 · that suite's assertion count, raised by the arm
@@ -576,50 +585,54 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC18 · the hoo
 ## 8. Open questions
 
 - **F1 — How are steps whose units share a write set or an edge closed (findings 1, 2, 26)?**
-  (a) The render marks such a step `no`: distinct orders rewrite reviewed headers, a fold M4 refuses
-  (veto 1), and a hygiene arm reds twenty-one landed edges (§3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  (a) The render marks such a step `no`: distinct orders rewrite reviewed headers (M4, veto 1), and
+  a hygiene arm reds twenty-one landed edges (§3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F2 — What happens to the replay case once the real lander has an arm (finding 18)?** (a) It
-  stays as the policy leg's seconds-long check; the lander's suite, which needs a clone, holds the
-  real observation. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  stays as the policy leg's fast check; the lander's suite holds the real observation. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F3 — Where is the agent-cap floor of the writer marker enforced (finding 44)?** (a) In the
-  workflows render (S18); an adopter `--check` needs a new verb, the kit shipping no adopter (veto 2,
-  §3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
-- **F4 — Is an adopter-authored legacy-home list graded (finding 37)?** (a) Never: an adopter's
-  list cannot hold gov's rows, so grading it reds every adopter and fails `TOOL-dGroundRules-16` AC1
-  (veto 1). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  workflows render (S18); the kit ships no adopter to carry a `--check` (veto 2, §3). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F4 — Is an adopter-authored legacy-home list graded (finding 37)?** (a) Never: it cannot
+  hold gov's rows, so grading it reds every adopter, failing `TOOL-dGroundRules-16` AC1 (veto 1). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F5 — How does the guard join learn which legs a path trips (finding 19)?** (a) Through
-  `--legs-for -`, gov's one trip rule, never an inlined copy; the case runs only in the gov-only
-  `policy fixtures` leg, where the checker sits. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  `--legs-for -`, gov's one trip rule; the case runs only in the gov-only `policy fixtures` leg. Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
 - **F6 — What does the reader do with a UTF-8 BOM (finding 43)?** (a) Strip one leading BOM
-  and parse, as unit 10's conf reader does; refusing sends valid values down the invalid branch (AC30). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+  and parse, as unit 10's conf reader does (AC30). Rung 3. RESOLVED (agent, 2026-10-23, delegated): (a). widens: none · relaxes: none
+- **F7 — How does S24's guard widening meet the hit it makes on another build's live spec?** The
+  guard gaining `{prefix}/roles/roles_lib.py` reds the guards join on TOOL-aScoutedSeam-1 (§4). (a) Keep every import and sourced file: waive the
+  hit under ask TOOL-dGroundRules-110 and record deviation-76, relaxing the shrink-only registry's
+  count. (b) Leave the module out: an edit to it skips the leg whose census case runs its importers,
+  the gap finding 41 names. (c) Revise TOOL-aScoutedSeam-1's §7: an outside write this build's
+  README refuses (`memory/builds/dGroundRules/README.md:48-49`). Recommendation (a). Rung 5:
+  RESOLVED (agent, 2026-10-24, delegated): (a), citing ER:388 (`PLAY-dClosedLoop-6`), the main
+  loop's ruling, and the precedent of TOOL-dGroundRules-20 §8 F1. The commit's `Decided:` trailer
+  carries the keys below.
+  widens: memory/project/spec-token-waivers.txt · relaxes: spec-token-waivers shrink-only count
 
 ## 9. Revision log
 
-- rev-1 · 2026-10-23 · initial draft from the round-1 spec audit of units 13 to 21, twenty-eight MEDIUM and eleven LOW findings.
-- rev-2 · 2026-10-23 · §3 · hands-off edges to TOOL-dGroundRules-27, TOOL-dGroundRules-30, TOOL-dGroundRules-31 and TOOL-dGroundRules-32 added.
-- rev-3 · 2026-10-23 · §3 · hands-off edges to TOOL-dGroundRules-33 and TOOL-dGroundRules-34 added.
-- rev-4 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling; no meaning moved.
-- rev-5 · 2026-10-23 · §1 §2 §3 · TOOL-dGroundRules-13 renamed TOOL-dGroundRules-65 by the owner's ruling.
-- rev-6 · 2026-10-24 · §6 · a criterion code span rejoined onto one line for hygiene check 23.
-- rev-7 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; older revision lines condensed under the spec ceiling; no design change.
-- rev-8 · 2026-10-24 · §1 §4 §8 §9 · prose shortened under the spec ceiling; no design change.
+- rev-1 · 2026-10-23 · initial draft.
+- rev-2 · 2026-10-23 · §3 · hands-off edges to units 27, 30, 31 and 32.
+- rev-3 · 2026-10-23 · §3 · hands-off edges to units 33 and 34.
+- rev-4 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened.
+- rev-5 · 2026-10-23 · §1 §2 §3 · unit 13 renamed TOOL-dGroundRules-65 (owner).
+- rev-6 · 2026-10-24 · §6 · a code span rejoined onto one line.
+- rev-7 · 2026-10-24 · §7 §9 · the policy fixtures leg added, owed by its guard.
+- rev-8 · 2026-10-24 · §1 §4 §8 §9 · prose shortened.
+- rev-9 · 2026-10-24 · §2 S24 · §4 · §5 · §7 · §8 F7 · §1 §3 §9 §10 trimmed · one `[guards]` hit measured before the build, `policy fixtures <- tools/roles/roles_lib.py` on TOOL-aScoutedSeam-1; ruled (a) under ER:388 (F7): every import stays, one waiver row under ask TOOL-dGroundRules-110 and deviation-76; §7 adds `spec tokens`.
 
 ## 10. Reuse audit
 
-Each item extends the seam its row names: `build_regen_fixture` and arm 28 of
-`tools/push-main.test.sh` (S2 to S4), `TOOL-dGroundRules-24`'s deployer-installed target (S5 to S7,
-S9, S12), `derive_census_tree` (S11, S12), the parity rows of `tools/lib/resolve-python.test.sh`
-(S28), `check-spec-tokens.py --legs-for` (S25), `check-protocol-parity.test.sh`'s version floor
-(S18), the `GOV_SETTINGS_JSON` rule of `tools/check-wiring.sh:102-108` (S32), `check-arms.py`'s
-sibling-suite rule (S35), `gen_map.py --write` (S36), and `extract_files_touched`, whose token read
-moves into the kit's `design_lib.py` so the render and the checker share it (S37). `python
-tools/codebase-map/reuse_lookup.py "locate an installed kit file in an adopter from its install
-receipt"` and `python tools/codebase-map/reuse_lookup.py "install a kit into a scratch target with
-the deployer and read its receipt"` ranked `resolve_kit_dir` and `kit_rel` among name-stem hits; the
-other seams came from the files the review cites, each verified at base. One hit disagreed with the
-review, not with source: id 1's fix asked for a check over same-step edges, and twenty-one sit in
-landed specs, so §8 F1 renders the step instead. The recall probe returned the prior minors
-batch `TOOL-dGroundRules-21`, whose per-finding table this unit follows, and this audit's own items.
+Each item extends the seam it names: `build_regen_fixture` and arm 28 of `tools/push-main.test.sh`
+(S2 to S4), `TOOL-dGroundRules-24`'s installed target (S5 to S7, S9, S12), `derive_census_tree`
+(S11, S12), the parity rows of `tools/lib/resolve-python.test.sh` (S28), `--legs-for` (S25),
+`check-protocol-parity.test.sh`'s version floor (S18), `tools/check-wiring.sh:102-108`'s
+`GOV_SETTINGS_JSON` rule (S32), `check-arms.py` (S35), `gen_map.py --write` (S36), and
+`extract_files_touched`, whose token read moves into `design_lib.py` (S37).
+`tools/codebase-map/reuse_lookup.py` over "locate an installed kit file in an adopter from its
+install receipt" and "install a kit into a scratch target with the deployer and read its receipt"
+ranked `resolve_kit_dir` and `kit_rel`; the rest came from the files the review cites. Recall
+returned `TOOL-dGroundRules-21`, whose table this unit follows. The waiver row and
+deviation-76 take TOOL-dGroundRules-20's rows and deviation-74 as their template.
 
 Recall terms used: `python tools/memory-recall/query.py "how are review minors batched into one
 repair unit" --terms "minors batch promoted medium low disposed severity spec-audit repair unit write
