@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31
-status: OPEN
+ids: TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
 spec-audit: 2026-10-21
 parents: dDeclaredLoop
 may: PLAY-dClosedLoop-3
@@ -96,47 +95,106 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 30 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
-ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31
+ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dWitnessedBar-26 — one bash resolver in `tools/lib` with its JavaScript twin](spec/2026-10-25-spec-TOOL-dWitnessedBar-26.md) | 1 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-27 — a wrong-shell refusal at every entry point](spec/2026-10-25-spec-TOOL-dWitnessedBar-27.md) | 2 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-13 — retrofit's baseline ledger factory in `tools/lib`](spec/2026-10-25-spec-TOOL-dWitnessedBar-13.md) | 3 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-15 — `test.seed` at every check's registration](spec/2026-10-25-spec-TOOL-dWitnessedBar-15.md) | 4 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-12 — the `leg`, `check` and `pack` tag namespaces, and a `tag` on every leg](spec/2026-10-25-spec-TOOL-dWitnessedBar-12.md) | 5 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-22 — the `tests=` and `enforces=` edge fields on legs](spec/2026-10-25-spec-TOOL-dWitnessedBar-22.md) | 6 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-19 — the leg's `purpose` field in `gate-legs.json`, every leg reviewed](spec/2026-10-25-spec-TOOL-dWitnessedBar-19.md) | 7 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-11 — the gate-leg factory and its conformance gate, every leg declaring the principles it enforces](spec/2026-10-25-spec-TOOL-dWitnessedBar-11.md) | 8 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-14 — the `ratchet` leg pack, and a population's growth admitted only as `retrofit.widen` says](spec/2026-10-25-spec-TOOL-dWitnessedBar-14.md) | 9 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes](spec/2026-10-25-spec-TOOL-dWitnessedBar-16.md) | 10 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-17 — the seven record and row pins as keyed populations, and the date cutoffs registered as cutoffs](spec/2026-10-25-spec-TOOL-dWitnessedBar-17.md) | 11 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-18 — the positional references, IW-1's legacy list and the unpinned facts registered from dOrderedCharter's keyed lists, and dSafePassage's landed step rows as an append-only population](spec/2026-10-25-spec-TOOL-dWitnessedBar-18.md) | 12 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-20 — the legacy-homes list converted into a ledger population keyed by conf and key](spec/2026-10-25-spec-TOOL-dWitnessedBar-20.md) | 13 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-24 — the portability leg pack: every P37 rule on a leg, each arm seen red on a planted case](spec/2026-10-25-spec-TOOL-dWitnessedBar-24.md) | 14 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-10 — the pre-commit list derived from the leg rows, and cost evidence from every node](spec/2026-10-25-spec-TOOL-dWitnessedBar-10.md) | 15 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-9 — the product-test contract: `level` on legs, the three `tests.*` keys, and runner adapters](spec/2026-10-25-spec-TOOL-dWitnessedBar-9.md) | 16 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-4 — the runner-written verdict per tree, the pre-push hook reading it, and the tree Test verifies](spec/2026-10-25-spec-TOOL-dWitnessedBar-4.md) | 17 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-25 — the verdict names its bar run and its cause, and a failing leg's output tail is kept by hash](spec/2026-10-25-spec-TOOL-dWitnessedBar-25.md) | 18 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-23 — a minimal tester agent in today's roles kit](spec/2026-10-25-spec-TOOL-dWitnessedBar-23.md) | 19 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-3 — attribution deciding what blocks](spec/2026-10-25-spec-TOOL-dWitnessedBar-3.md) | 20 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-5 — held legs by policy](spec/2026-10-25-spec-TOOL-dWitnessedBar-5.md) | 21 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-8 — flake quarantine](spec/2026-10-25-spec-TOOL-dWitnessedBar-8.md) | 22 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-1 — gate health measured and the reliability bar](spec/2026-10-25-spec-TOOL-dWitnessedBar-1.md) | 23 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-30 — a quarantined leg released after its streak, and a contended red re-run on a quiet host](spec/2026-10-25-spec-TOOL-dWitnessedBar-30.md) | 24 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-29 — every size warning a passing leg prints, shown in the runner's summary and verdict record and attributed to its unit](spec/2026-10-25-spec-TOOL-dWitnessedBar-29.md) | 25 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-7 — `test.seen-red` reading one seen-red record per gate a build adds or changes, the acceptance-ledger line standing in for `build.acceptance`](spec/2026-10-25-spec-TOOL-dWitnessedBar-7.md) | 26 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-21 — a fix pass that keeps its check: its allowance less the red leg's own files and the acceptance commands' own files](spec/2026-10-25-spec-TOOL-dWitnessedBar-21.md) | 27 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-6 — the verdict backends registered under `verdict`: the local hook, the peer-node verifier and the `remote-ci` slot with its witness rule and pin](spec/2026-10-25-spec-TOOL-dWitnessedBar-6.md) | 28 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-2 — each hook bypass recorded under `hooks.bypass`, and `refused` held by an off-node witness](spec/2026-10-25-spec-TOOL-dWitnessedBar-2.md) | 29 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-28 — a repository's legs from its overlay's leg rows through the leg factory, gov's legs changed only by pinned patches, every other leg landing](spec/2026-10-25-spec-TOOL-dWitnessedBar-28.md) | 30 | 2 | OPEN | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 2 record folder(s).
+Records: 18 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19
+TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-30
+TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 30 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 30 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 30
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 30 (cl-dClosedLoop-0339, cl-dClosedLoop-0340, cl-dClosedLoop-0341, cl-dClosedLoop-0342, cl-dClosedLoop-0343, cl-dClosedLoop-0344, cl-dClosedLoop-0345, cl-dClosedLoop-0346, cl-dClosedLoop-0347, cl-dClosedLoop-0348, cl-dClosedLoop-0349, cl-dClosedLoop-0350, cl-dClosedLoop-0351,
-  cl-dClosedLoop-0352, cl-dClosedLoop-0353, cl-dClosedLoop-0354, cl-dClosedLoop-0355, cl-dClosedLoop-0356, cl-dClosedLoop-0357, cl-dClosedLoop-0358, cl-dClosedLoop-0359, cl-dClosedLoop-0360, cl-dClosedLoop-0361, cl-dClosedLoop-0362, cl-dClosedLoop-0363, cl-dClosedLoop-0364, cl-dClosedLoop-0365,
-  cl-dClosedLoop-0366, cl-dClosedLoop-0367, cl-dClosedLoop-0368)
-- stale: 0 (none)
+- uncarried: 0 (none)
+- stale: 5 (cl-dClosedLoop-0341, cl-dClosedLoop-0345, cl-dClosedLoop-0354, cl-dClosedLoop-0359, cl-dClosedLoop-0366)
 - ambiguous: 0 (none)
-- owned nodes no spec names: item.test.attribute, item.test.exit, item.test.flakes, item.test.merge, item.test.route, item.test.seed, item.test.seen-red, item.test.select, item.test.verdict, policy-key.hooks.bypass, policy-key.retrofit.unseeded, policy-key.retrofit.widen,
-  policy-key.tests.landing-levels, policy-key.tests.product, policy-key.tests.without-cadence, policy-key.trace.leg-output, policy-key.verdict, policy-key.verdict.blocks, policy-key.verdict.flakes, policy-key.verdict.flakes.entry, policy-key.verdict.flakes.release, policy-key.verdict.held,
-  policy-key.verdict.red-route, policy-key.verdict.remote.pin, policy-key.verdict.remote.pin-scope, policy-key.verdict.remote.trust, policy-key.verdict.tree, record-kind.attribution, record-kind.flake, record-kind.routing, record-kind.seen-red, record-kind.selection, record-kind.verdict,
-  system.retrofit, tag-namespace.check, tag-namespace.leg, tag-namespace.pack
+- owned nodes no spec names: none
 - specs derived from no clause: none
-- clauses the token arm cannot see: cl-dClosedLoop-0340, cl-dClosedLoop-0341, cl-dClosedLoop-0342, cl-dClosedLoop-0343, cl-dClosedLoop-0348, cl-dClosedLoop-0349, cl-dClosedLoop-0354, cl-dClosedLoop-0355, cl-dClosedLoop-0356, cl-dClosedLoop-0358, cl-dClosedLoop-0359, cl-dClosedLoop-0367
+- clauses the token arm cannot see: cl-dClosedLoop-0340, cl-dClosedLoop-0342, cl-dClosedLoop-0343, cl-dClosedLoop-0348, cl-dClosedLoop-0349, cl-dClosedLoop-0355, cl-dClosedLoop-0356, cl-dClosedLoop-0358, cl-dClosedLoop-0367
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dWitnessedBar-26` | no |
+| 2 | `TOOL-dWitnessedBar-27` | no |
+| 3 | `TOOL-dWitnessedBar-13` | no |
+| 4 | `TOOL-dWitnessedBar-15` | no |
+| 5 | `TOOL-dWitnessedBar-12` | no |
+| 6 | `TOOL-dWitnessedBar-22` | no |
+| 7 | `TOOL-dWitnessedBar-19` | no |
+| 8 | `TOOL-dWitnessedBar-11` | no |
+| 9 | `TOOL-dWitnessedBar-14` | no |
+| 10 | `TOOL-dWitnessedBar-16` | no |
+| 11 | `TOOL-dWitnessedBar-17` | no |
+| 12 | `TOOL-dWitnessedBar-18` | no |
+| 13 | `TOOL-dWitnessedBar-20` | no |
+| 14 | `TOOL-dWitnessedBar-24` | no |
+| 15 | `TOOL-dWitnessedBar-10` | no |
+| 16 | `TOOL-dWitnessedBar-9` | no |
+| 17 | `TOOL-dWitnessedBar-4` | no |
+| 18 | `TOOL-dWitnessedBar-25` | no |
+| 19 | `TOOL-dWitnessedBar-23` | no |
+| 20 | `TOOL-dWitnessedBar-3` | no |
+| 21 | `TOOL-dWitnessedBar-5` | no |
+| 22 | `TOOL-dWitnessedBar-8` | no |
+| 23 | `TOOL-dWitnessedBar-1` | no |
+| 24 | `TOOL-dWitnessedBar-30` | no |
+| 25 | `TOOL-dWitnessedBar-29` | no |
+| 26 | `TOOL-dWitnessedBar-7` | no |
+| 27 | `TOOL-dWitnessedBar-21` | no |
+| 28 | `TOOL-dWitnessedBar-6` | no |
+| 29 | `TOOL-dWitnessedBar-2` | no |
+| 30 | `TOOL-dWitnessedBar-28` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
