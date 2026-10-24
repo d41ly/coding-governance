@@ -77,3 +77,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-23T23:40:19Z dispatch · item 4c1f59cc TOOL-dGroundRules-26 · reason tools/policy/check_policy.py tools/policy/README.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-26.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-26-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/LIVE.md
 
 2026-10-23T23:40:25Z brief · item TOOL-dGroundRules-26 · reason 5cc666a4228b memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-26-build-brief.md
+
+2026-10-23T23:58:27Z dispatch · item 5f0e8922 TOOL-dGroundRules-28 · reason memory/gotchas/test-oracle-read-from-a-historical-sha.md memory/gotchas/INDEX.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-28.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-28-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/LIVE.md
+
+2026-10-23T23:58:33Z brief · item TOOL-dGroundRules-28 · reason 0684c7fc5d2c memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-28-build-brief.md

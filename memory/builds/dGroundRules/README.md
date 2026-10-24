@@ -145,7 +145,7 @@ ids TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGrou
 | [TOOL-dGroundRules-14 — the landing replay: the mirror a prepared merge carries is fresh at that merge](spec/2026-10-23-spec-TOOL-dGroundRules-14.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dGroundRules-19 — the guard admits a regenerated mirror equal to its render, so an agent branch that edits the catalogue reaches a green bar](spec/2026-10-23-spec-TOOL-dGroundRules-19.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dGroundRules-26 — the fresh target installed from a commit of the tree under test, so the case grades the bytes the bar records](spec/2026-10-23-spec-TOOL-dGroundRules-26.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-28 — the historical-sha oracle class widened to HEAD, so a spec driving the deployer from gov's tree is handed it](spec/2026-10-23-spec-TOOL-dGroundRules-28.md) | 4 | 1 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-28 — the historical-sha oracle class widened to HEAD, so a spec driving the deployer from gov's tree is handed it](spec/2026-10-23-spec-TOOL-dGroundRules-28.md) | 4 | 1 | CLOSED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-65 — the mirror's bytes name no commit: each reason's revision phrase rendered as a placeholder the helper fills](spec/2026-10-23-spec-TOOL-dGroundRules-65.md) | 4 | 2 | DEFERRED | rev-3 | 2026-10-23 |
 | [TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard](spec/2026-10-23-spec-TOOL-dGroundRules-7.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dGroundRules-8 — the reader-coverage arm: a key whose Owner build has landed has a reader](spec/2026-10-23-spec-TOOL-dGroundRules-8.md) | 4 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -198,7 +198,7 @@ ids TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 181 bound to this build, across 4 record folder(s).
+Records: 182 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
