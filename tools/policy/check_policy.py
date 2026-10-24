@@ -148,6 +148,8 @@ row announced and none graded; two are a finding naming both. `census-receiptles
 bare repository so, then again with the registry copied in, where every enforcer reds.
 `census-ambiguous-registry` (TOOL-dGroundRules-34 S13) is a plant case of `arm_cap_census`: two
 registries, one and two deep, red as the one finding naming both, and green unplanted.
+`census-window-edge` (TOOL-dGroundRules-39) is an outcome case on the window's edges: a `<d>` three
+deep and a bare top-level `registry.toml` are never candidates, and a two-deep one always is.
 `census-adopter-receipt` is an outcome case: a planted receipt naming no `check-line-length`, each
 named kit's enforcers at their `installed` paths, read green with the line-length row announced, red
 naming `manifest-bytes` once its planted enforcer is deleted, and green again restored.
@@ -4022,6 +4024,49 @@ def run_census_adopter_receipt(name):
     return print_checks(name, checks)
 
 
+def derive_window_edge_paths():
+    """`census-window-edge`'s registries (TOOL-dGroundRules-39 S3) -> (written, planted). `written`:
+    REGISTRY_REL under this kit's tool root, one deep; under a `<d>` three deep, outside the window;
+    and a bare `registry.toml` at the top level, under no `govkit/`. `planted`: REGISTRY_REL under
+    RELOCATED_PREFIX's tool root, two deep, inside the window."""
+    written = (posixpath.join(budgets.derive_tool_root(), REGISTRY_REL), posixpath.join("a/b/c", REGISTRY_REL),
+               posixpath.basename(REGISTRY_REL))
+    return written, posixpath.join(posixpath.dirname(RELOCATED_PREFIX.rstrip("/")), REGISTRY_REL)
+
+
+def run_census_window_edge(name):
+    """`census-window-edge` (TOOL-dGroundRules-39 S1): the edges of the window `derive_census_tree`
+    searches with no receipt. Over `derive_window_edge_paths`' written registries, each a copy of the
+    source's, in a receipt-less repository it must answer ("source", this kit's tool root), the
+    depth-3 and top-level files uncounted; with the planted depth-2 one added it must refuse naming exactly that one and the
+    depth-1 one, its line reading `RED as planted`. An outcome case: an armed one's unplanted run
+    would grade every census enforcer and find each absent."""
+    written, planted = derive_window_edge_paths()
+    checks, t = [], Path(tempfile.mkdtemp(prefix="pol-"))
+
+    def ask():
+        try:
+            return derive_census_tree(t)
+        except policy.Refusal as exc:
+            return f"refused {exc.path}"
+    try:
+        registry = (derive_source_top() / written[0]).read_bytes()  # each plant a copy of the source's registry
+        run_fixture_git(t, "init", "-q")
+        for rel in written:
+            write_case_file(t, rel, registry)
+        want, got = ("source", budgets.derive_tool_root()), ask()
+        checks.append((", ".join(written), f"{want}, the depth-3 and top-level registries uncounted",
+                       got == want, f"{got}"))
+        write_case_file(t, planted, registry)
+        want, got = f"refused {', '.join(sorted((written[0], planted)))}", ask()
+        checks.append((f"{planted} planted", want, got == want, "RED as planted" if got == want else f"{got}"))
+    except (subprocess.CalledProcessError, OSError) as exc:
+        checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
 # ---- the live observation (TOOL-dGroundRules-10 S9) ------------------------------------------------
 
 LIVE_LIMIT = 2
@@ -4207,6 +4252,7 @@ CASES = [
     ("census-adopter-receipt", None, run_census_adopter_receipt),  # the census graded at each row's installed path
     ("census-receiptless-target", None, run_budget_case),  # no receipt and no registry: every row announced
     ("census-ambiguous-registry", ARM["arm_cap_census"], seed_ambiguous_registry),  # two registries: one finding naming both
+    ("census-window-edge", None, run_census_window_edge),  # the window's edges: depth 3 and a bare top-level file uncounted
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
 ]
 

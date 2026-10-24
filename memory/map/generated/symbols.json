@@ -8538,6 +8538,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "derive_window_edge_paths",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_winpid",
       "kind": "function",
       "file": "tools/unattended/resume-tick.test.sh"
@@ -19994,6 +19999,11 @@
     },
     {
       "id": "run_census_default_adopter",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_census_window_edge",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
