@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-32 — the repository's instruction overlay: `.governance/instructions.toml`, its `repo.` units, pinned edges into gov's units, derived classes and the repository's own policy keys
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 31 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0062@fe903e93 whole
 
@@ -16,11 +16,13 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-32-deviation-322.md](../build/2026-10-25-build-PLAY-dOrderedCharter-32-deviation-322.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-32-deviation-323.md](../build/2026-10-25-build-PLAY-dOrderedCharter-32-deviation-323.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-32-1-spec-writer.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-32-1-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -82,7 +84,10 @@ and a fixed unit refuses all three; and where the repository declares its own po
   `read_catalogue_row`, so `get` resolves an `adopter.` key (TOOL-dGroundRules-2 S4); `validate` and
   `arm_schema`, so an `adopter.` value is judged against its row and an `adopter.` key no row declares
   is the unknown-leaf problem (TOOL-dGroundRules-4 S1, S2); and the mirror, which renders each
-  `adopter.` key beside the catalogue's (TOOL-dGroundRules-5 S1). A `[[policy]]` key outside `adopter.`
+  `adopter.` key beside the catalogue's and records the overlay blob's id in its staleness key beside
+  the policy file's and the catalogue's (TOOL-dGroundRules-5 S1), while the guard's mirror shape also
+  requires `.governance/instructions.toml`'s staged blob to equal HEAD's (TOOL-dGroundRules-19 S1;
+  §8 F6). A `[[policy]]` key outside `adopter.`
   is refused, so the overlay never redeclares a catalogue key, and `adopter.` keys stay outside the
   presets' completeness check. Only repository units read them: a gov unit whose `when` names a
   `policy.adopter.` tag is refused. Observed by AC8, AC9.
@@ -234,6 +239,7 @@ Live at landing. Nothing changes in a render until an overlay holds units.
 - `tools/playbook/instruction_units.py` (`fixed-by` read on S10 rows)
 - `tools/policy/policy.py` (`read_overlay_policies`, its rows joined at the matcher, `validate` and the mirror, S7)
 - `tools/policy/check_policy.py` (`arm_schema` over the joined rows, S7)
+- `tools/policy/guard.py` (the mirror shape compares the overlay with HEAD, S7)
 - `help/overlay.md` (new)
 - `help/README.md`
 
@@ -262,7 +268,9 @@ terminal.
 - risks: an amendment to an unpinned target would ride gov's later changes unseen; the pin is
   mandatory on both edge types. A commit that drops a `[[policy]]` row while `[adopter]` still sets its
   key makes the policy file invalid at that revision, so the whole file falls back to its last valid
-  revision (TOOL-dGroundRules-4 S5); `arm_schema` reds the pair on the `policy check` leg.
+  revision (TOOL-dGroundRules-4 S5); `arm_schema` reds the pair on the `policy check` leg. Any overlay
+  edit, a `[[unit]]` row's included, stales the mirror, its key being the file's blob id; the landing
+  regenerates it (TOOL-dGroundRules-5).
 - testing: the fixture's plants (AC1-AC10).
 - migration: none at this unit.
 - user docs: `help/overlay.md`, linked from `help/README.md`, says how a repository adds, amends,
@@ -299,7 +307,9 @@ terminal.
   `monthly` and commits `monthly` in the fixture's policy file, `policy.py get adopter.release-train
   --rev HEAD` prints `monthly`; with `daily`, or an undeclared `[adopter] other`, committed as the
   policy file's only revision, `get` exits 2 with the problem's line naming the key; a `[[policy]]` row
-  keyed `budgets.enforce` exits 2 naming the row; and a `repo.release-train` unit beside
+  keyed `budgets.enforce` exits 2 naming the row; after a commit that changes only the overlay,
+  `policy.py mirror --check` exits 1 until `mirror --write`, and `python "tools/policy/guard.py" --staged`
+  refuses a staged mirror while `.governance/instructions.toml` differs from HEAD; and a `repo.release-train` unit beside
   `policy.adopter.release-train` both resolve through `python gov_tag.py show`.
   Red when: an out-of-set or undeclared repository key is read, the overlay redeclares a catalogue key,
   or the two same-named tags collide.
@@ -368,12 +378,22 @@ New arm: tools/playbook/overlay.py · covers AC6 · `overlay.py check` over gov'
   `validate`, `arm_schema` and the mirror; (b) the playbook kit handing its rows to the reader, which a
   hook's `get` never sees. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1, the parent's kit rule
   and one-revision read; S7 adds no fourth `read_policy_key` copy. widens: none · relaxes: none
+- **F6 — How the mirror and the guard see the overlay's policy rows.** dGroundRules' mirror keys its
+  staleness on the policy file's and the catalogue's blob ids (TOOL-dGroundRules-5 S1), and the guard's
+  mirror shape compares only those two with HEAD (TOOL-dGroundRules-19 S1), so an overlay row change
+  would leave the mirror current by its key and stale by its content. Options: (a) the mirror renders
+  `adopter.` keys and records the overlay blob's id, and the guard's mirror shape compares
+  `.governance/instructions.toml` with HEAD too; (b) the mirror omits `adopter.` keys, and a JS reader
+  cannot read them. (b) leaves a hook unable to read a key the policy file holds. Recommendation (a).
+  RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, v2's `[policies]` (v2:1127): every key in
+  `.governance/policy.toml` is mirrored to JSON for the hooks. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-46, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S7 · §3 non-goals, Edges · §4 The policy keys, Inventory, Files touched · §5 risks · AC8 · §8 F4, F5 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 43 and U5: the `[[policy]]` read lives in `tools/policy/`, on the reader's revision, seen by its matcher, `validate`, `arm_schema` and the mirror; the composition reads a key through `policy.py get`; the guard owes no admission ask at a landing. Then §2 S9 · §4 The selection claim, Files touched · AC11 · §8 F4's `deploy.toml` half (re-resolved): the comment is the owner's edit at their terminal (TOOL-dGroundRules-6 S4), named in the pass's hand-back, never a step's write, so the pass commits no `.governance/deploy.toml`; F4's overlay half stands.
+- rev-4 · 2026-10-25 · §2 S7 · §4 Files touched · §5 risks · AC8 · §8 F6 (new) · item 7 of `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P4: the mirror records the overlay blob's id and renders `adopter.` keys, and the guard's mirror shape compares `.governance/instructions.toml` with HEAD.
 
 ## 10. Reuse audit
 

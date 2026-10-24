@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-31 — this build's own upgrade steps: the agent-instructions wiring to the one renderer, adopter rules into the overlay, the seeded template's succession row, the census's change records and the `map_lib` deprecation
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 36 · advances PLAY-dOrderedCharter-38 · ratified 2026-10-25
 
 **Carries:** cl-dClosedLoop-0061@bf1a53b5 whole
 
@@ -18,11 +18,13 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-31-deviation-314.md](../build/2026-10-25-build-PLAY-dOrderedCharter-31-deviation-314.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-31-deviation-315.md](../build/2026-10-25-build-PLAY-dOrderedCharter-31-deviation-315.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-31-1-spec-writer.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-31-1-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -70,9 +72,9 @@ what an adopter can see ships its successor with an upgrade step that runs up an
 - **S3** — The `map_lib` re-export declared as a deprecation. A `[[class]]` row `module-export` joins
   dSafePassage's class registry `tools/govkit/surface-classes.toml`: its reader returns each name
   `tools/codebase-map/map_lib.py` re-exports from the join factory unit 19 moves to `tools/lib/`, and its
-  plant stages one re-export taken away, so the names leave only with a row naming them. What counts
-  their window is §8 F6, open for the owner: TOOL-dSafePassage-6 counts `install.deprecation-window`
-  per `[[shim]]` row only (its S5), and F2 found no shim kind that fits. The same commit writes the
+  plant stages one re-export taken away, so the names leave only with a row naming them. The names
+  are held for `install.deprecation-window` releases, which dConvergedCharter counts from this row's
+  landing commit on the default branch (§8 F6, the owner's pick); no `[[shim]]` row holds them. The same commit writes the
   class's `[[class]]` row in `tools/govkit/usage.toml`, usage shape `none` with a `why`, since a
   docs leg finding is a registered class with no row there (TOOL-dSafePassage-13 S1, S8) and an
   import name fits none of its S2 shapes. Observed by AC4 and AC14.
@@ -100,8 +102,8 @@ what an adopter can see ships its successor with an upgrade step that runs up an
   (`tools/govkit/entries/playbook.kit.toml:23-26`) and its hole leave the playbook descriptor. An
   adopter's seeded copy that it edited becomes `retired-edited`, kept and ordered as
   `install.retired-edits` says (TOOL-dSafePassage-9), never deleted; one it never edited reads
-  `withdrawn`. Those are the verdicts §8 F7 asks of the parent, open for the owner: its seed override
-  reads them `patched` and `current` today. Its readers are inventoried by path and by value by §4's
+  `withdrawn`: TOOL-dSafePassage-9's 2026-10-25 revision routes a retired seed row through its
+  `retired-edited` arm (§8 F7, the owner's pick). Its readers are inventoried by path and by value by §4's
   second query.
   **Readers:** by name: `tools/govkit/entries/playbook.kit.toml`, `tools/govkit/govkit.py`, `tools/govkit/matrix.py`,
   `tools/govkit/selftest.py`, `tools/check-placeholders.sh`,
@@ -126,13 +128,14 @@ what an adopter can see ships its successor with an upgrade step that runs up an
   writes rows in their grammar and two class rows through their extension point.
 - Absorbing the wiring into the renderer and the render gate: unit 20's. Composing the project block
   and dropping the seeded template as the render's input: unit 34's. The census's rulings: unit 34's.
-- The `map_lib` re-export itself: unit 19's. What counts its window: §8 F6.
+- The `map_lib` re-export itself: unit 19's. Counting its window: dConvergedCharter (§8 F6).
 - Taking a re-export away when its window closes, and the `module-export` row with the last one:
   dConvergedCharter.
 - A legacy block for an adopter's own instruction files: dLinkedLibrary.
 
 ### Edges
 
+- **consumes-from** external — TOOL-dSafePassage-9's 2026-10-25 revision (`2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`, Item 5): a retired seed row routed through its `retired-edited` arm, an edited copy reading `retired-edited` with one order and an unedited one `withdrawn`, which AC9 expects; without it the seed override grades the edited copy `patched`
 - **consumes-from** `PLAY-dOrderedCharter-20` — the renderer that absorbed the agent-instructions wiring, which the kit's successor ships
 - **consumes-from** `PLAY-dOrderedCharter-32` — the overlay file and the level-0 `repo.` unit grammar the adopter-rules step writes, through `write_overlay_units`
 - **consumes-from** `PLAY-dOrderedCharter-34` — the seeded template no longer read and the census's moved units
@@ -353,7 +356,7 @@ edited. Both counts are DERIVED by the query at the pass.
 - **AC9** — When `python tools/govkit/govkit.py update --target <scratch adopter>` runs on an adopter
   installed at `ce13efbe` whose seeded template it edited, the row reads `retired-edited`, one order is
   written and the file's bytes are unchanged; on one it never edited, the row reads `withdrawn`.
-  These are §8 F7 (a)'s verdicts, which wait on the owner's answer and the parent's arm.
+  These are TOOL-dSafePassage-9's verdicts for a retired seed row at its 2026-10-25 revision (§8 F7).
   Red when: an edited seeded copy is deleted or graded `patched` with no order.
 - **AC10** — When `python step_gate.py --base ce13efbe` runs on a scratch clone with one
   census change record taken out, it exits 1 naming that unit's tag; with it, 0.
@@ -423,28 +426,29 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
   renderer". widens: none · relaxes: none
 - **F6 — What counts the `map_lib` re-export's window.** S3's `module-export` row reds a re-exported
   name's leaving at the step gate, but TOOL-dSafePassage-6 counts `install.deprecation-window` per
-  `[[shim]]` row only (its S5, `:63-68`), while its §3 still names this re-export among the first
-  shim rows (`:89-91`), and F2 found no shim kind that fits. No mechanism counts the window, and unit
-  19's S9 names this fork as its hold. Options: (a) the `module-export` class row stays, and
+  `[[shim]]` row only (its S5, `:63-68`), its §3 named this re-export a first shim row (`:89-91`), and
+  F2 found no shim kind that fits. Options: (a) the `module-export` class row stays, and
   dConvergedCharter, which takes a re-export away (§3), counts the window from that row's landing
   commit on the default branch, with an ask to dSafePassage to drop its unit 6's mention of this
   re-export as a first shim row (`:89-91`); (b) an ask to dSafePassage for a shim kind that forwards
   named re-exports, counted per row. (b) adds a forwarder kind to the parent for one partial module
   whose other names stay (F2), and (a) reuses the population the class row already declares, its
-  landing commit derived from history as the parent derives a shim row's. Recommendation (a). Open
-  for the owner.
+  landing commit derived from history as the parent derives a shim row's. Recommendation (a).
+  RESOLVED (owner, 2026-10-25): (a). No ask is filed: TOOL-dSafePassage-6's 2026-10-25 revision
+  (`2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`, Item 4) drops its §3 naming of this re-export as a first shim row.
 - **F7 — What an edited seeded copy reads once gov stops shipping the seed.** S5 and AC9 expect
   `retired-edited` with one order. TOOL-dSafePassage-9 sends the grid cell (`differs`, `absent`) to
   `retired-edited`, and its arm takes "both a first-time engine row and a row already carrying the
-  role" (`:127-128`), naming no seed row. At `cbf44887`, `tools/govkit/govkit.py:9988-10000` rewrites
-  every seed row's verdict after the grid (`UPDATE_ROLE` maps `seed` to `report-reseed`, `:8480`):
-  `reseed-available` where gov's side differs, else `current` or `patched` unless it reads `missing` or
-  `renamed`, and the parent leaves that override in place. So an edited copy reads `patched` with no
-  order, AC9's red, and an unedited one `current`, not `withdrawn`. Options: (a) an ask to dSafePassage
+  role" (`:127-128`), naming no seed row, and at `cbf44887` the seed override
+  (`tools/govkit/govkit.py:9988-10000`) grades an edited copy `patched` with no order, AC9's red, and
+  an unedited one `current`. Options: (a) an ask to dSafePassage
   to route a retired seed row through its unit 9's `retired-edited` arm, so the edited copy reads
   `retired-edited` and the unedited one `withdrawn`; (b) this unit extends that arm itself; (c) AC9
   states the verdict the parent gives. (b) gives the parent's arm a second owner, and (c) states the
-  clause's own red as the expected result. Recommendation (a). Open for the owner.
+  clause's own red as the expected result. Recommendation (a).
+  RESOLVED (owner, 2026-10-25): (a). No ask is filed: TOOL-dSafePassage-9's 2026-10-25 revision
+  (`2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`, Item 5) routes a retired seed row through its `retired-edited` arm, an edited copy reading
+  `retired-edited` with one order and an unedited one `withdrawn`.
 
 ## 9. Revision log
 
@@ -460,6 +464,11 @@ New arm: tools/govkit/surface-classes.toml · covers AC4 AC7 · the step gate's 
   On the coordinator's follow-up, S3, S4, §4 and AC14 add each class's `tools/govkit/usage.toml`
   `[[class]]` row (TOOL-dSafePassage-13 S1, S8), and the consumes-from edge to
   `PLAY-dOrderedCharter-30` and S7's sentence on its comment leave, that comment being the owner's.
+- rev-5 · 2026-10-25 · S3 S5 · §3 · AC9 · §8 F6 F7 · the owner picks (a) on F6 and F7, from
+  `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md` Items 3 and 4: dConvergedCharter counts the
+  re-export's window from the `module-export` row's landing commit, and AC9 expects
+  TOOL-dSafePassage-9's retired-seed verdicts, with a consumes-from edge on that revision; no ask is
+  filed, since dSafePassage's units 6 and 9 are revised in the same commit.
 
 ## 10. Reuse audit
 

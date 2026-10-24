@@ -81,6 +81,43 @@ No rev bump, nothing staged in the real index, no commit.
 
 File: `C:/projects/coding-governance/.claude/worktrees/thermostat-power-issue-370c51/memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-6.md`
 
+### Return 4
+
+I put the `budgets.py home <cap>` verb in spec 6, not spec 11 as you and the brief said. Spec 6's check is the verb's first caller and lands at order 19, before spec 11 at order 21. The hygiene gate's edge arm reds a **consumes-from** edge whose target lands later, so spec 6 can't wait for spec 11. Specs 11 and 34 now call the verb, and neither spec 6 nor 34 parses `caps.toml`. If you'd rather spec 11 own it, the order has to change first. I recorded the choice as spec 6's §8 F5, `RESOLVED (agent, 2026-10-25, delegated)`.
+
+Hygiene, run over an index copy reset with `git read-tree HEAD` and only these three specs staged, has one finding: check 9, the build-index render for `memory/builds/dOrderedCharter/README.md`. Only `gen_build_index.py --write` cures it. The new pair of edges (spec 6 hands off to spec 11, spec 11 consumes from spec 6) runs in landing order. The gate holds edge joins under `--staged`, so the full join gets checked at the push run. I deleted the copy, staged nothing in the real index, and made no commit.
+
+The lexicon has no CLI-verb cell: `--as cli.verb` comes back MALFORMED. Asked as `py.function`, `home` gets "not in the declared table", which the lexicon calls a scoping question rather than a spelling one. The function behind the verb, `read_cap_home`, answers OK as `py.function`.
+
+**Spec 6 — rev-5, 2026-10-25, DEFERRED, 33136 bytes**
+- **S9 (new):**
+  - **Output:** the verb prints `<cap>\t<home>\t<value>`. For a `constant:` home, the value is the integer on the line that the built `derive_home_line` (and its `SHELL_KEY` pattern) finds; for any other home it prints `-`.
+  - **Refusals:** it exits 2 for a cap with no census row, or a home with no matching line.
+  - **Comes with it:** a `budgets-home` case in `CASES`, a line on `help/size-caps.md`, and the policy kit's version marker moves.
+- **S6:** reads `CODEX_MAX` with `budgets.py home codex-instructions`.
+- **Also moved:**
+  - §3: a hands-off edge to spec 11, and the dGroundRules external edge now names `budgets.py`, `derive_home_line`, `CASES` and the version marker.
+  - §4 Inventory and Files touched; §5 user docs.
+  - AC8, new: fixture plants and a probe that `codex-instructions` prints 32768.
+  - §7: `policy check`, `policy fixtures` and `kit version markers` added, plus a new `check_policy.py --fixture` arm.
+  - §8 F5 (new); §9.
+
+**Spec 11 — rev-4, 2026-10-25, DEFERRED, 30625 bytes**
+- **S3:** `CODEX_MAX` is read with `python <prefix>/policy/budgets.py home codex-instructions`.
+- **Also moved:** a §3 consumes-from edge to spec 6, and §9. It still reads load-point cap names from the census with `tomllib`; item 6 only covers the home.
+
+**Spec 34 — rev-5, 2026-10-25, DEFERRED, 37227 bytes**
+- **Moved:** S3, §4 Budgets and harness limits, §8 F6 (wording only, same resolution), §10 and §9. Each now reads `CODEX_MAX` with `budgets.py home codex-instructions`.
+
+Most of the growth in specs 11 and 34 is records rows the main loop rendered in between. All three are under 47000 bytes.
+
+`grep -n 'budgets.py home'` prints the verb in spec 6 and the calls in specs 6, 11 and 34. That differs from the brief's acceptance line, which expects the verb in spec 11.
+
+Files are in `C:/projects/coding-governance/.claude/worktrees/thermostat-power-issue-370c51/memory/builds/dOrderedCharter/spec/`:
+- `2026-10-23-spec-PLAY-dOrderedCharter-6.md`
+- `2026-10-23-spec-PLAY-dOrderedCharter-11.md`
+- `2026-10-23-spec-PLAY-dOrderedCharter-34.md`
+
 ## Group B, keys, led by unit 1
 
 ### Return 1
@@ -122,6 +159,26 @@ All seven Group B specs are revised: 1, 4, 7, 9, 14, 20 and 27. Each Status line
 4. **Minor.** The cross-check record's rows 47–48 call the `16k` and `8k` values "pattern strings". v2:1369 gives `memory.load-budget` a closed list of values (`4k, 8k, 16k`).
 
 The spec files are in `C:/projects/coding-governance/.claude/worktrees/thermostat-power-issue-370c51/memory/builds/dOrderedCharter/spec/`, named `2026-10-23-spec-PLAY-dOrderedCharter-<n>.md`. My edit scripts and the hygiene output are in `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-thermostat-power-issue-370c51/784b9d4d-3d6b-441c-87c6-b603e2cf2649/scratchpad/dB/`.
+
+### Return 2
+
+I applied the owner's picks to specs 1 and 7. Both stay `DEFERRED`, and each has a §9 line naming the brief `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`. Nothing is staged in the real index and nothing is committed.
+
+**Spec 1: rev-5, 2026-10-25, 35623 bytes**
+- **Status line:** the rev is bumped and `ratified 2026-10-25` is added at the end.
+- **§8 F4:** marked `RESOLVED (owner, 2026-10-25): (a).`, with the `FACT-QUESTION` label and the probe kept. I added the evidence, read with `git show` from `origin/branch/unattended-dgroundrules-e47ae1` at `df4912bd`, with no checkout:
+  - `tools/policy/catalogue.toml:22-26` holds the row as `{ type = "set", item = "[A-Za-z0-9][A-Za-z0-9_.-]*", registry = "catalogue or repo-declared practices" }`, with `empty = "never"` and a derived default.
+  - `check_value` (`tools/policy/policy.py:142`, set branch at `:159-171`) admits any member the `item` pattern matches. So `practice.yagni` passes and the probe should read source `file`. It still decides at the build run.
+- **§9:** the rev-5 line follows rev-4 (item 5).
+
+**Spec 7: rev-5, 2026-10-25, 39410 bytes**
+- **S9:** `owner-only-expiring` now names the settled proof, stderr being a terminal, tested through spec 15's check (its §8 F4, which the owner resolved), never one of spec 7's own. It still admits no record until that check lands, since spec 15 builds at order 16 and spec 7 at order 11.
+- **§3:** the hands-off edge to spec 15 and the §5 security line now say the same thing; neither points at an open fork any more.
+- **§9:** the rev-5 line follows rev-4 (item 2).
+
+**Hygiene:** I ran it over an index copy reset with `git read-tree HEAD`, with only these two specs staged, then deleted the copy. The only failure is check 9, the build-index render. It says spec 1 owes a render and that `memory/builds/dOrderedCharter/README.md` is stale. A `gen_build_index.py --write` render cures both, so I left them for you.
+
+The edit script and hygiene output are in `C:/Users/d41ly/AppData/Local/Temp/claude/C--projects-coding-governance--claude-worktrees-thermostat-power-issue-370c51/784b9d4d-3d6b-441c-87c6-b603e2cf2649/scratchpad/dB/` (`f17.py`, `hyg2.out`).
 
 ## Group C, overlay and update, led by unit 32
 
@@ -227,6 +284,77 @@ I added the `usage.toml` row for the `unit` class to spec 33. It stays at rev-3 
 
 The file is `C:/projects/coding-governance/.claude/worktrees/thermostat-power-issue-370c51/memory/builds/dOrderedCharter/spec/2026-10-23-spec-PLAY-dOrderedCharter-33.md`.
 
+### Return 4
+
+I applied the owner's picks and the audit fixes to specs 15, 32, 35 and 36. Each is still `DEFERRED`, one rev higher, dated 2026-10-25, with a §9 line naming the owner-forks brief and its item.
+
+**Checks:** the hygiene gate, run over an index copy reset with `git read-tree HEAD` and holding only these four specs, fails only check 9 (`memory/builds/dOrderedCharter/README.md` needs a fresh render, which is yours). The index copy is deleted. All four specs stay under 47000 bytes.
+
+| Spec | Rev | Bytes |
+|---|---|---|
+| PLAY-dOrderedCharter-15 | rev-5 | 37441 |
+| PLAY-dOrderedCharter-32 | rev-4 | 40621 |
+| PLAY-dOrderedCharter-35 | rev-5 | 37637 |
+| PLAY-dOrderedCharter-36 | rev-5 | 31792 |
+
+These are larger than my earlier figures because the render had already added generated records rows before I started.
+
+**Spec 15 (item 1).**
+- **Moved:** the Status line now ends `ratified 2026-10-25`. S5 says directly that the command checks `sys.stderr.isatty()` itself, a second test of the signal the guard's hook tests. §10 reads the same way instead of pointing at an open fork.
+- **Fork:** F4 now carries `RESOLVED (owner, 2026-10-25): (a).` and says that spec 7's `owner-only-expiring` proof is this check.
+
+**Spec 32 (item 7, audit P4).**
+- **Moved:** S7 now says the mirror renders `adopter.` keys and adds the overlay blob's id to its staleness key. It also says the guard's mirror shape requires `.governance/instructions.toml` to equal HEAD.
+  - §4 Files touched adds `tools/policy/guard.py`.
+  - §5 risks: any overlay edit, a `[[unit]]` row included, makes the mirror stale until the landing regenerates it.
+  - AC8 adds two observations: `mirror --check` exits 1 after an overlay-only commit, and `guard.py --staged` refuses a staged mirror while the overlay differs from HEAD.
+- **Fork:** a new F6, with option (a) (mirror and guard see the overlay) against (b) (the mirror omits `adopter.` keys). I resolved it as `RESOLVED (agent, 2026-10-25, delegated): (a)` on rung 1, because v2:1127 says every key in `.governance/policy.toml` is mirrored to JSON for the hooks.
+
+**Spec 35 (item 8, audit P11).**
+- **Moved:** S5 now says the key's values are the empty set `[]` (v2's `none`, and the default) or a set of gov tags. `get` prints the empty default as no line. S5 also cites the built row: `{ type = "set", item = ... }`, `empty = "allowed"`, `default = []`. AC12 now expects `[]` as the default.
+- **Fork:** none.
+
+**Spec 36 (items 5 and 8, audits P5 and P11).**
+- **Moved:**
+  - S4 gives the default as `[]`, which excludes nothing.
+  - The first probe is now expected to exit 0. The built row's `item` pattern `[A-Za-z0-9][A-Za-z0-9_.-]*` admits a gov tag, and the built `check_value` admits any set member the pattern fully matches. The probe still decides at the build run.
+  - I also fixed a gap in my rev-4 walk: `instructions.exclude` is itself a set-typed key, so the walk would have read it as a requirer of its own members and refused every exclusion. It is now never read as its own requirer.
+- **Fork:** none.
+
+**Two things you should know:**
+- The dGroundRules branch tip has moved from `df4912bd` to `7e80dee4`. I checked that `catalogue.toml` and `policy.py` are unchanged between the two, and spec 36's evidence names both commits.
+- Two of my Group C specs outside this round's list are now stale. I didn't edit them because you limited this round to four specs.
+  - Spec 46 S6 (line 68) still says `instructions.exclude`'s default is `none`.
+  - Spec 33's §5 risk line says the update reads `instructions.stale` at the landed ref, because `read_policy_value` took no revision. dSafePassage unit 9 now gives it `rev=None` (audit P3), so spec 33 could pass `rev="HEAD"` and drop that risk.
+
+The files are in `C:/projects/coding-governance/.claude/worktrees/thermostat-power-issue-370c51/memory/builds/dOrderedCharter/spec/`:
+- 2026-10-23-spec-PLAY-dOrderedCharter-15.md
+- 2026-10-23-spec-PLAY-dOrderedCharter-32.md
+- 2026-10-23-spec-PLAY-dOrderedCharter-35.md
+- 2026-10-23-spec-PLAY-dOrderedCharter-36.md
+
+### Return 5
+
+I fixed both. Each is still `DEFERRED` at rev-4, dated 2026-10-25, with a §9 line naming the owner-forks brief and the audit item.
+
+| Spec | Rev | Bytes |
+|---|---|---|
+| PLAY-dOrderedCharter-33 | rev-4 | 36510 |
+| PLAY-dOrderedCharter-46 | rev-4 | 20511 |
+
+- **Spec 33 (P3):**
+  - S3 now has `cmd_update` read the mode with `read_policy_value("instructions.stale", target, rev="HEAD")`. That is the target's `HEAD`, the revision spec 46 reads the overlay at; the `rev` reaches `policy.py get` as `--rev`.
+  - §4 Inventory names the same call.
+  - The §5 risk line about reading the mode at the landed ref is gone.
+  - AC10's grep, `read_policy_value("instructions.stale"`, still matches the new call, so it needs no change.
+- **Spec 46 (P11):** S6 now says that with no commit yet, `instructions.exclude` reads its catalogue default `[]` (v2's `none`), as dGroundRules' built row holds it. The spec's remaining "landed ref" mentions describe dGroundRules' own default revision, so they stay.
+
+The hygiene gate, run over an index copy reset with `git read-tree HEAD` and holding only these two specs, fails only check 9 (`memory/builds/dOrderedCharter/README.md` needs a fresh render, which is yours). The index copy is deleted.
+
+The files are in `C:/projects/coding-governance/.claude/worktrees/thermostat-power-issue-370c51/memory/builds/dOrderedCharter/spec/`:
+- 2026-10-23-spec-PLAY-dOrderedCharter-33.md
+- 2026-10-24-spec-PLAY-dOrderedCharter-46.md
+
 ## Group D, tags and steps, led by unit 31
 
 ### Return 1
@@ -316,6 +444,28 @@ The changed S9 line (line 116 and the start of 117) now reads:
 The rev-4 entry in §9 now ends: "…in place of a second helper; and S9 again names the `install.deprecation-window` hold `cl-dClosedLoop-0049` carries, its mechanism F6's." There was no rev bump.
 
 The real index now holds 63 staged files, which I take to be yours: every group's specs, the prompts, and deviation records dated 2026-10-25. I didn't stage or unstage anything there. Your staged copy of spec 19 was staged before this edit, so re-stage it or the S9 fix won't be in your commit.
+
+### Return 4
+
+The owner's (a) picks for F6 and F7 are now in specs 31 and 19, each bumped one rev to 2026-10-25 and still DEFERRED. On an index copy reset with `git read-tree HEAD` (now `c63aabbb4`) holding only these two specs, the memory hygiene gate reports only check 9, the build-index render that `gen_build_index.py --write` fixes, which is yours. I deleted the copy, `dD` is empty, and nothing was staged or committed.
+
+**Spec 31: rev-5, 46518 bytes**
+- **Status:** now ends `ratified 2026-10-25`.
+- **F6:** marked `RESOLVED (owner, 2026-10-25): (a).` Dropping the re-export from its first shim rows is credited to dSafePassage unit 6's 2026-10-25 revision (`2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`, Item 4).
+- **F7:** marked `RESOLVED (owner, 2026-10-25): (a).` Routing a retired seed row through the `retired-edited` arm is credited to dSafePassage unit 9's 2026-10-25 revision (same brief, Item 5): an edited copy reads `retired-edited` with one order, an unedited one `withdrawn`.
+- **S3 and §3:** the names are held for `install.deprecation-window` releases. dConvergedCharter counts the window from the `module-export` row's landing commit, and no `[[shim]]` row holds them.
+- **S5 and AC9:** both expect unit 9's new retired-seed verdicts.
+- **Edge:** a new consumes-from external edge on that unit 9 revision.
+- **§9:** a rev-5 line names `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md`, Items 3 and 4.
+- **Trims:** I shortened F6's and F7's evidence prose, because the brief says a spec over 47000 bytes must be trimmed to leave room for the records rows your render adds.
+- **Check:** `grep -n 'RESOLVED (owner, 2026-10-25): (a)'` prints F6 at line 435 and F7 at line 447.
+- **Unverified citation:** I cited the parent revisions as their "2026-10-25 revision" rather than by rev number. Their files in the working tree are still at rev-4 (unit 6) and rev-3 (unit 9) with the old text, because the other writer hasn't saved yet. Once those land, check the wording matches what they actually say.
+
+**Spec 19: rev-5, 42820 bytes**
+- **S9:** the `install.deprecation-window` hold is now spec 31's settled F6, counted by dConvergedCharter from that row's landing commit.
+- **§3:** the external edge now calls it unit 31's settled re-export fork.
+- **§9:** a rev-5 line names the owner-forks brief, Item 3.
+- **Size:** I reported spec 19 at 40260 bytes last time. My edit here adds only about 400, so the file seems to have been changed in between, probably by your render.
 
 ## Group E, help and batches, led by unit 37
 

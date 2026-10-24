@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-6 — forwarding shims for a moved command, hook path or module import, held for their deprecation window
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dSafePassage-14 · ratified 2026-10-24
 
 **Carries:** cl-dClosedLoop-0023@6e1e2e99 whole
 **Carries:** node:policy-key.install.deprecation-window
@@ -13,11 +13,15 @@
 | [2026-10-23-build-TOOL-dSafePassage-6-deviation-137.md](../build/2026-10-23-build-TOOL-dSafePassage-6-deviation-137.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-6-deviation-151.md](../build/2026-10-24-build-TOOL-dSafePassage-6-deviation-151.md) | deviation | — |
 | [2026-10-24-build-TOOL-dSafePassage-6-deviation-159.md](../build/2026-10-24-build-TOOL-dSafePassage-6-deviation-159.md) | deviation | — |
+| [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md](../build/2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-26 |
+| [2026-10-25-build-TOOL-dSafePassage-6-deviation-161.md](../build/2026-10-25-build-TOOL-dSafePassage-6-deviation-161.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-13 |
 | [2026-10-24-prompt-TOOL-dSafePassage-1-owner-forks.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-owner-forks.md) | research | TOOL-dSafePassage-1 |
 | [2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-6-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-9 TOOL-dSafePassage-13 TOOL-dSafePassage-26 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-13 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -87,8 +91,9 @@ then".
 ## 3. Non-goals (OUT)
 
 - Any first shim. Gov moves no command, hook path or module in this build, so the declaration ships
-  with no row. The first rows are the later builds' that move a surface, among them dOrderedCharter's
-  `map_lib` re-export and dWellOiledMachine's `/unattended` shim.
+  with no row. The first rows are the later builds' that move a surface, among them
+  dWellOiledMachine's `/unattended` shim. dOrderedCharter's module re-export is no `[[shim]]` row: its
+  spec 31 holds it under a `module-export` class row, and dConvergedCharter counts its window.
 - Taking a forwarder away when its window closes: dConvergedCharter's "shims removed at window
   close". This unit only refuses a close before the window allows it.
 - Release tags and how a release is cut: dShippedRelease's `kits.cut` and its release notes. This
@@ -442,6 +447,9 @@ New arm: tools/govkit/govkit.py · covers AC8 · selfcheck arm 11, its failing c
   re-resolved on rung 1, F7 added.
 - rev-4 · 2026-10-24 · §8 F7 · the owner resolves F7 to (a), replacing the delegated mark, by
   `2026-10-24-prompt-TOOL-dSafePassage-6-2-spec-writer.md`.
+- rev-5 · 2026-10-25 · §3 · the first shim rows drop dOrderedCharter's re-export, which its spec 31's
+  `module-export` class row holds by the owner's F6 pick, from Item 4 of
+  `2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`.
 
 ## 10. Reuse audit
 

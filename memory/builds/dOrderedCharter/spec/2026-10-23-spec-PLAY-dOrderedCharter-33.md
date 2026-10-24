@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-33 — pins and drift: each gov change record marked `editorial` or `semantic`, a stale pin acting as `instructions.stale` says, successors re-pointing or orphaning an edge
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ce13efbe · streams playbook · order 32 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0063@a1361320 whole
 **Carries:** node:policy-key.instructions.stale
@@ -18,10 +18,12 @@
 | [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-25-build-PLAY-dOrderedCharter-33-deviation-333.md](../build/2026-10-25-build-PLAY-dOrderedCharter-33-deviation-333.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-33-deviation-334.md](../build/2026-10-25-build-PLAY-dOrderedCharter-33-deviation-334.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md](../prompts/2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-46 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -56,8 +58,10 @@ beside the repository's own (IA-3; v2:1246).
   to it, the edge re-pointed and its pin kept; a successor list or `none` → `orphaned`. Observed by
   AC3, AC6.
 - **S3** — `instructions.stale`, this unit's policy key (values `order`, `refuse`, `warn`, default
-  `order`, v2:1246), read by `cmd_update` with `govkit.read_policy_value("instructions.stale", target)`
-  (TOOL-dSafePassage-9 §4), the target's committed policy, since the choice is the adopter's; an unset
+  `order`, v2:1246), read by `cmd_update` with `govkit.read_policy_value("instructions.stale", target,
+  rev="HEAD")` (TOOL-dSafePassage-9 §4, its `rev` passed to `policy.py get` as `--rev`), the target's
+  committed policy at the revision PLAY-dOrderedCharter-46 S1 reads the overlay at, since the choice
+  is the adopter's; an unset
   key reads `order` with its reason (TOOL-dGroundRules-3 S2). An exit 2 from the reader, or a value
   outside the three, is a refusal naming the key and carrying the reader's line, which holds the
   playbook kit, as TOOL-dSafePassage-9's mode read holds its row's kit. The mode reaches the drift
@@ -205,7 +209,7 @@ names no row source, a `none` class having no rows; where TOOL-dSafePassage-13's
 New: `tools/playbook/pins.py` with `derive_change_mark`, `derive_pin_state`, `run_unit_drift`,
 `read_unit_members`, `write_unit_plant` and `read_change_successors`, its `drift` verb with `--stale`
 and `--write`, and its `--fixture --plant`; `cmd_update`'s `read_policy_value("instructions.stale",
-target)` call;
+target, rev="HEAD")` call;
 `tools/playbook/spelling-map.toml` and its `[[spelling]]` row; the class id `unit`; the journal
 `.governance/journal/stale-edges.tsv`; the update line forms `stale`, `orphaned` and `new-beside`; the
 change record field `**Ruling:**`. The policy key `instructions.stale` is v2's. Naming cells:
@@ -255,10 +259,7 @@ file and the catalogue equal HEAD (TOOL-dGroundRules-5 S1, TOOL-dGroundRules-19 
   `0 row kinds registered`; a pin with no matching revision is PLAY-dOrderedCharter-28's red.
 - observability: every pinned edge prints one line, and `warn` journals.
 - risks: a punctuation change that alters meaning ("not," to "not") classifies `editorial`; the owner's
-  spelling map and ruling are the only widenings, and punctuation is the clause's own class. The mode
-  is read at the target's landed revision, `get`'s default, while the overlay is read at its HEAD
-  (PLAY-dOrderedCharter-46 S1), so a mode committed and not yet landed acts from the update after it
-  lands.
+  spelling map and ruling are the only widenings, and punctuation is the clause's own class.
 - testing: planted releases for every case (AC1-AC9).
 - migration: none.
 - user docs: `help/overlay.md` gains a section on pins, the three modes and orders.
@@ -358,6 +359,7 @@ New arm: tools/govkit/surface-classes.toml · covers AC7 · the step gate's arms
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §2 S3, S7, S8 (new) · §3 Edges · §4 The walk and the modes, Inventory, Rollout, Files touched · §5 risks · AC4, AC9, AC10 (new) · §8 F4 (re-resolved) · §10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` row 18, U3, U4 and U5: the drift is a `pins.py` verb `cmd_update` runs, whose orders it writes keyed on a `path`; the mode is read through `read_policy_value` from the target's committed policy; the landed row is filled and drained, never added. Then §2 S5 · §4 The step gate class, Files touched · AC11 (new): the `unit` class gains its `usage.toml` `[[class]]` row, shape `none` with a `why`, in the commit that registers it (TOOL-dSafePassage-13 S1, S8).
+- rev-4 · 2026-10-25 · §2 S3 · §4 Inventory · §5 risks · per `2026-10-25-prompt-PLAY-dOrderedCharter-1-owner-forks`, the parent audit's P3: dSafePassage unit 9's `read_policy_value` takes `rev`, so `cmd_update` reads `instructions.stale` at the target's `HEAD`, the overlay's revision, and the risk of a mode read at the landed ref goes.
 
 ## 10. Reuse audit
 
