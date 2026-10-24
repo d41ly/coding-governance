@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0016@df63b6eb whole
 
@@ -13,6 +13,8 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-10-divergence-2-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-divergence-2-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-10-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-divergence-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 |
@@ -72,15 +74,23 @@ do not exceed it.
     unused `CAP`, so no value outside 1 to 5 is refused and the hook reads no conf;
   - the refusal of a set `AGENT_CAP` (`:2241-2257`) and the `--print-cap` print mode (`:2191-2211`).
   Rules 0, 2, 5 and 6 and the `--only=` selector stay. Rule 2's bound is `MAX_VERIFIERS`, the
-  review protocol's verify total (§8 F2). `KIT_AGENT_CAP_VERSION` moves to `'2.0'` and the header
-  states only the kept rules. Observed by AC6, AC7, AC8, AC9.
+  review protocol's verify total (§8 F2). The header states only the kept rules. No version marker
+  moves on the branch: `KIT_AGENT_CAP_VERSION` and the `gov:kit agent-cap@` markers in
+  `tools/hooks/format-guard.js` and `tools/hooks/scratch-guard.js` keep their value, and the major
+  bump the retirements owe is minted at landing (the build brief: the lander mints versions, a branch
+  owes none). The retirements take the file from 2427 lines to 1960, past three line citations in two
+  other builds' live specs; editing those specs is an outside write this build's README refuses, and
+  padding the file to its old length is dead bytes, so the unit waives the three and asks for their
+  re-citation, as §4 "The stranded citations" states (§8 F7). They also reach five readers §4
+  "The other readers" names. Observed by AC6, AC7, AC8, AC9.
   **Readers:**
   by name: `tools/workflows/check-verifier-fanout.sh`, `tools/workflows/check-protocol-parity.test.sh`,
   `tools/workflows/check-verifier-fanout.test.sh`, `tools/hooks/agent-cap.test.sh`,
   `tools/govkit/selftest.py`, `tools/workflows/unattended-build.test.sh`, `tools/workflows/kit.toml`,
   `tools/workflows/REVIEW-PROTOCOL.template.md`, `memory/guides/REVIEW-PROTOCOL.md`, `README.md`,
   `WIRE-INTO-PROJECT.md`, `tools/hooks/README.md`, `tools/check-wiring.sh` (a comment naming the
-  `AGENT_CAP` class, kept as history).
+  `AGENT_CAP` class, kept as history), `tools/workflows/check-review-join.test.sh`,
+  `tools/roles/adopt-roles.test.sh`, `.lexicon.conf`, `help/policy.md`, `tools/policy/README.md`.
   by value: `tools/workflows/check-protocol-parity.test.sh` renders `{{FANOUT_CAP}}` from the
   print mode's answer, and `tools/workflows/check-verifier-fanout.sh` prints it on its clean line.
 - **S5** — Rule 7, the settings in force, in `tools/hooks/agent-cap.js`, run for every `Agent` and
@@ -144,6 +154,7 @@ do not exceed it.
 - **consumes-from** `TOOL-dGroundRules-3` — the resolution order whose result S1 lowers
 - **consumes-from** `TOOL-dGroundRules-5` — `readPolicy` in `tools/policy/policy-mirror.js` and its `PolicyRefusal`, which rule 7 calls, and `arm_mirror_landed`, whose fixture hook S8 replaces with `tools/hooks/agent-cap.js`
 - **hands-off** external — dWellOiledMachine: the in-flight ledger, the admission queue, the session total and the ultracode exemption (`gap-rt-35`)
+- **hands-off** external — aOrientedCast's TOOL-aOrientedCast-28 and dFairHearing's TOOL-dFairHearing-22: citing `agent-cap.js` by symbol where they cite lines this unit moves, which retires the waiver rows §4 "The stranded citations" adds
 - **hands-off** external — dSafePassage: the step that moves `FANOUT_CAP` into the key and retires `.agent-cap.conf`
 - **hands-off** `TOOL-dGroundRules-15` — the conf lowering moved from the `resolve` wrapper into `resolve_read` (finding 2)
 - **hands-off** `TOOL-dGroundRules-18` — the writer marker `gov:fixed-writers`, whose split rule 2 judges against the limit while verifiers stay at `MAX_VERIFIERS` (finding 13)
@@ -225,6 +236,47 @@ the two places where the retirements and rule 7 reach arms that stay:
   so they never enter the comparison. The property's payloads carry a `cwd` in no checkout, so
   rule 7 adds no rule to them.
 
+The rule-6 section's hook copy carries `scratch-guard.js` beside it, which the hook requires from its
+own directory (`agent-cap.js:1887`, `:2160`).
+
+### The other readers
+
+- `tools/workflows/check-review-join.test.sh:207` provokes the predicate's own refusal with
+  `env AGENT_CAP=7`, which S4 retires. The arm keeps its expected text and takes the refusal from a
+  stub `agent-cap.js` in a fixture checkout that, under `--only=join`, exits 2 printing no line
+  opening two spaces and `L`, placed as the `badstatus` fixture places its stub (`:213-225`).
+- `tools/roles/adopt-roles.test.sh` arms 6 (`:158`) and 11 (`:413`) run gov's hook in a fixture with
+  no settings, where rule 7 would refuse their admits. Each runs a copy of the hooks kit's
+  `agent-cap.js` and `scratch-guard.js` in a scratch directory with no `policy` kit beside it, as the
+  rule-6 section does (S5).
+- `.lexicon.conf:317`: `VERB_OFFENDER_PIN` 1213 to 1204, nine offenders leaving with the retired
+  code, under a `RE-MEASURED` comment naming them, as the comments above it do.
+- `help/policy.md:8-9`: "No gate or hook reads a value through it yet" goes stale; the page names
+  rule 7's read and the settings render, and points at `help/agent-limit.md`.
+- `tools/policy/README.md`: the CLI list gains the `settings` verb and `check_policy.py --live`, the
+  files table's `policy.py` row (`:22`) gains `read_legacy_fanout`, `render_settings` and `settings`,
+  and the lead's "no consumer calls the reader yet" and "no hook reads it yet" (`:8-13`) drop.
+
+### The stranded citations
+
+The cites join (`tools/check-spec-tokens.py:1588-1596`) reds a backticked `<path>:<line>` past a
+tracked file's end. At 1960 lines three tokens pass it: TOOL-aOrientedCast-28's `:2092` and
+`:1972-1994`, and TOOL-dFairHearing-22's `:2269-2272`. By §8 F7, in the commit that shrinks the file:
+
+- `memory/project/spec-token-waivers.txt` gains one row per token, keyed
+  tools/hooks/agent-cap.js:2092, tools/hooks/agent-cap.js:1972 and tools/hooks/agent-cap.js:2269,
+  each reason naming `[cite]`, the other build's live spec, that this unit's retirements moved the
+  lines, the ask below and the count, 26 rows to 29 (34 lines to 37), under ER:388 (dGroundRules);
+- `memory/builds/dGroundRules/BACKLOG.md` gains one ask row, the build's next unminted id, asking
+  both units to cite `agent-cap.js` by symbol, accepted when each spec's rows leave in the commit
+  that re-cites it, with a `SEV` row (LOW) and a `KEEP` row (the cure is outside this build's writes);
+- `memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md` (the next
+  free number if 72 is taken), per `memory/HYGIENE.md` "Deviation records": Departs from
+  `TOOL-dRetiredFork-20@rev-2`; Risk loosening; Follow-through `ask` that row;
+  `**Bound:** spec-token-waivers shrink-only count`; `**Tier:** middle` (the registry header's rule,
+  no clause's); `**Reason:**` naming F7's refused options;
+  `**Surface:** memory/project/spec-token-waivers.txt` (F8).
+
 ### Migration
 
 - An adopter with `.agent-cap.conf` keeps its lowering: the reader applies it and the render writes
@@ -255,7 +307,11 @@ landed limit until `policy.py settings --write` is run there.
 `tools/workflows/drift-audit-state.js` · `tools/workflows/unattended-build.js` ·
 `tools/workflows/kit.toml` · `tools/workflows/README.md` · `tools/workflows/REVIEW-PROTOCOL.template.md` ·
 `memory/guides/REVIEW-PROTOCOL.md` · `tools/govkit/selftest.py` · `README.md` ·
-`WIRE-INTO-PROJECT.md` · `help/agent-limit.md` · `help/README.md`
+`WIRE-INTO-PROJECT.md` · `help/agent-limit.md` · `help/README.md` ·
+`tools/workflows/check-review-join.test.sh` · `tools/roles/adopt-roles.test.sh` · `.lexicon.conf` ·
+`help/policy.md` · `tools/policy/README.md` · `memory/project/spec-token-waivers.txt` ·
+`memory/builds/dGroundRules/BACKLOG.md` ·
+`memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md`
 
 ### Alternatives rejected
 
@@ -382,7 +438,7 @@ landed limit until `policy.py settings --write` is run there.
 
 ## 7. Gates
 
-`agent-cap self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `agent-cap restatement` · `kit version markers` · `memory hygiene` · `policy fixtures`
+`agent-cap self-test` · `scratch-guard self-test` · `check-wiring self-test` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `recall floor` · `recall floor arms` · `hook destinations self-test` · `govkit selftest` · `lexicon naming predicates` · `govkit refusal join` · `govkit acceptance matrix` · `verifier fan-out` · `review-protocol parity (kit vs dogfood)` · `workflow script syntax` · `agent-cap restatement` · `kit version markers` · `memory hygiene` · `policy fixtures` · `spec tokens (a spec's own names resolve)` · `roles adopter self-test` · `straggler-guard arms` · `kit epoch (shipped bytes move, the version moves)`
 
 New arm: tools/policy/check_policy.py --fixture · covers AC1 AC2 AC3 AC4 AC6 AC7 AC8 AC9 AC10 AC11 · the `limit-` cases in `CASES`, each planting its input in the temporary repository and asserting its outcome, in the `policy fixtures` leg TOOL-dGroundRules-1 declares · none
 New arm: tools/hooks/agent-cap.test.sh · covers AC6 AC7 AC8 AC9 AC10 · a conf at `FANOUT_CAP=8`, six spawns in one prompt, a raw `parallel` script, a width of 50 and a set `AGENT_CAP`, each admitted, and settings above a fixture limit refused, staged by running each arm against the base revision's hook, `git show 3708a705:tools/hooks/agent-cap.js` in the suite's scratch copy · none
@@ -392,6 +448,9 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC12 · its renderer
 AC5, AC13 and AC14 are probes the close reads directly, AC5 after the main loop's settings render
 (S3); AC13 is also the `verifier fan-out` leg's
 verdict. AC15 to AC17 are the main loop's live observation at the close, and no suite runs them.
+`kit version markers` and `kit epoch (shipped bytes move, the version moves)` are graded at the close,
+after the lander mints the major bump (S4). The added legs are those §4's new files trip by
+`tools/gate-legs.json`'s guards (`python tools/check-spec-tokens.py --list`), and `roles adopter self-test`.
 
 ## 8. Open questions
 
@@ -441,13 +500,32 @@ verdict. AC15 to AC17 are the main loop's live observation at the close, and no 
   and leaves the mirror helper with no consumer. Rule 7 is a bound this spec adds beyond the clause,
   the weakest tier, and it satisfies every criterion the clause states. Recommendation (b); rung 3.
   RESOLVED (agent, 2026-10-23, delegated): (b). widens: none · relaxes: none
+- **F7 — How does the unit meet the citations its retirements strand in other builds' live specs?**
+  (a) Waive each token and ask both builds to cite by symbol, relaxing the shrink-only registry's
+  count (§4 "The stranded citations"). (b) Revise both specs: an outside write this build's README
+  refuses (`memory/builds/dGroundRules/README.md:48-49`), veto 2 outside the grant. (c) Pad
+  `agent-cap.js` to its old length: dead bytes. Rung 5: RESOLVED (agent, 2026-10-24, delegated): (a),
+  citing ER:388 (`PLAY-dClosedLoop-6`), the main loop's ruling, recorded as deviation-72. The commit's
+  `Decided:` trailer carries the keys F8 rules.
+  widens: memory/project/spec-token-waivers.txt · relaxes: spec-token-waivers shrink-only count
+- **F8 — Which `widens:` does F7's trailer carry?** The close's `deviations.py --check`
+  (`memory/builds/dGroundRules/README.md:39-42`) reds a trailer citing ER:388 with `widens: none`
+  (`memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py:860-861`).
+  (a) ER:388 with `widens: memory/project/spec-token-waivers.txt` beside F7's `relaxes:`, the record
+  gaining that `**Surface:**`, as dTrueNorth's waiver trailers do (`0c0d1bb0e`, `55c7df4a9`). (b)
+  ER:328 with `widens: none`, which the arm admits, respelling the ruling. (c) As F7 states: the
+  close reds. Recommendation (a): it keeps the ruling and its `relaxes:`. RESOLVED (agent,
+  2026-10-24, delegated): (a), citing ER:388 and the dTrueNorth precedent (`0c0d1bb0e`,
+  `55c7df4a9`): the trailer carries the keys below, and deviation-72 gains that `**Surface:**`.
+  widens: memory/project/spec-token-waivers.txt · relaxes: spec-token-waivers shrink-only count
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
-- rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-15, TOOL-dGroundRules-18, TOOL-dGroundRules-20, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
+- rev-2 · 2026-10-23 · §3 · hands-off edges to TOOL-dGroundRules-15, -18, -20 and -21, reciprocals of the round-1 spec audit's promoted units; no scope, design or acceptance moved.
 - rev-3 · 2026-10-24 · §6 · AC12, AC14: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
-- rev-4 · 2026-10-24 · §2 S3, S5 · §4 · §6 AC5 · §7 · what disagreed: the builder's DIVERGENCE, `--dispatch` refusing at check 49 because `tools/check-spec-tokens.py` reds this spec at INPROGRESS: §4's write set names `tools/policy/policy.py`, which trips the `policy fixtures` leg's guard, and §7's leg line lacked that leg though §7's first `New arm:` line puts the `limit-` cases in it; plus four gaps the builder found. Rulings: (1) §7's leg line adds `policy fixtures`; (2) S3, AC5, §4 Rollout: the builder does not render gov's own `.claude/settings.json`, since rewriting it changes the configuration of the session running in the worktree; the main loop renders it at the close, before the bar, through the file's `[[generated]]` regeneration, and observes AC5 then; (3) S5: rule 7 adds no rule when the payload `cwd` lies in no checkout, which TOOL-dGroundRules-21 S38 later makes refuse; (4) §4's new suite section: the rule-6 arms run on a hook copy with no `policy` kit beside it, the three slot-ledger checks are deleted and the `--only=scripts` arm asserts rule 2 in place of rule 1, line numbers re-read against the tree; (5) the same section: the no-denial-lost property excludes by name a BASE denial from rule 1 or rule 3 as an expected loss, never counted as lost, and lists its three fixtures that hit those rules, each re-run against `d65da7ab`.
+- rev-4 · 2026-10-24 · §2 S3, S5 · §4 · §6 AC5 · §7 · the builder's first DIVERGENCE (check 49): §7 adds `policy fixtures`; the main loop, not the builder, renders gov's settings at the close (S3, AC5); rule 7 adds no rule outside a checkout (S5); §4's suite section: hook copy for the rule-6 arms, slot-ledger checks deleted, `--only=scripts` asserts rule 2, retired-rule BASE denials excluded by name.
+- rev-5 · 2026-10-24 · §2 S4 · §3 · §4 · §7 · §8 F7, F8 · §10 · what disagreed: the builder's second DIVERGENCE: the retirements take `agent-cap.js` from 2427 lines to 1960, stranding line citations in TOOL-aOrientedCast-28 and TOOL-dFairHearing-22 (check 49 refused), and the build changed readers S4 and §4 never named. Rulings: (1) the citations are waived per token, with an ask row and a deviation record under ER:388 (F7); measured, the tokens are three, not two (`:1972-1994` also starts past 1960), so the registry goes 26 rows to 29 (34 lines to 37), not 34 to 36; (2) five readers named with their changes, the hook copies carrying `scratch-guard.js`; (3) no version marker moves on the branch; (4) §7 adds `spec tokens`, `roles adopter self-test`, `straggler-guard arms` (`.lexicon.conf` trips it) and `kit epoch`; (5) the one ask row takes `KEEP`, a `DEFERRED` row's `until` naming one unit; (6) F8, ruled (a): `widens: none` beside ER:388 reds `deviations.py --check`, so the trailer widens the registry and deviation-72 carries `**Surface:**`. Revision log condensed for the size ceiling.
 
 ## 10. Reuse audit
 
@@ -464,7 +542,9 @@ moved into the reader, so the conf keeps one parser. The kit locators are the in
 the hook. The mirror read is `readPolicy`, TOOL-dGroundRules-5's. Recall hit [6]
 (`2026-10-19-review-PLAY-dClosedLoop-1-night-pass-two-b.md:119`) says the clause retires only the
 ledger, the conf, the refusal and the print mode; the clause at `df63b6eb` also retires the raw
-primitive ban and the bound rule's concurrency half, and the clause governs.
+primitive ban and the bound rule's concurrency half, and the clause governs. The stranded citations
+reuse dTrueNorth's waiver rows (`memory/project/spec-token-waivers.txt:32-34`), each under ER:388
+with its ask in that build's own `BACKLOG.md`.
 
 Recall terms used: `python tools/memory-recall/query.py "how is the agent fan-out cap declared,
 lowered and read by the hook and the harness renderer" --terms "agent-cap FANOUT_CAP print-cap slot
