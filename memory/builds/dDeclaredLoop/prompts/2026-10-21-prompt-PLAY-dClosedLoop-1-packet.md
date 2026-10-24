@@ -23,7 +23,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 3. `cl-dClosedLoop-0088@b1722a1e` · now `b1722a1e`, as at the baseline · tokens: `transitions.record` — the transition record three ways, its channels the set `transitions.record` selects, seen on a planted subset and red on an empty set (the whole-design audit's C2-F9)
 4. `cl-dClosedLoop-0089@66b8552a` · now `66b8552a`, as at the baseline · tokens: none, so the token arm cannot see this clause — stage claims and the coverage gate
 5. `cl-dClosedLoop-0090@e3f362f0` · now `e3f362f0`, as at the baseline · tokens: none, so the token arm cannot see this clause — the witness-class rule
-6. `cl-dClosedLoop-0091@48218b99` · now `48218b99`, as at the baseline · tokens: none, so the token arm cannot see this clause — the factories and conformance gates for commands, policy keys, presets, stages, hooks, roles and workflows
+6. `cl-dClosedLoop-0091@48218b99` · now `b0158e81` by deviation `2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-61` · tokens: none, so the token arm cannot see this clause — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows, the preset kind held on the shrink-only pending list naming dKeptSession, which takes presets
 7. `cl-dClosedLoop-0092@0abbde28` · now `0abbde28`, as at the baseline · tokens: none, so the token arm cannot see this clause — the position engine: deriving each unit's step, the build's step, the next item and its interrupts from witnesses, items idempotent by witness and keyed by round or pass and input SHAs, answering from a closed set (act, awaiting, blocked, terminal, stuck, invalid-input, stale-remote), the read set and each claim's key and verdict printed
 8. `cl-dClosedLoop-0093@a21f7ad5` · now `a21f7ad5`, as at the baseline · tokens: none, so the token arm cannot see this clause — claims keyed and trusted by key and source
 9. `cl-dClosedLoop-0094@c69a5ae1` · now `c69a5ae1`, as at the baseline · tokens: none, so the token arm cannot see this clause — each step's items declared with actor, inputs, allowance, return schema and witness
@@ -77,7 +77,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `9e7be7289945c2b1ac7dee6dc17ef328c004adc5`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `4c1efd466535a05ccf8f64a215d3adc46180fdf4`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -85,7 +85,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `ed497191df0d973f903426cedc30f0ba6eb80d24`
+- rendered at: `96526383cd50d5e04e87a311971fc8776b764710`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -182,6 +182,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 ### Later builds named
 
+- `cl-dClosedLoop-0091` names dKeptSession: "…hooks, roles and workflows, the preset kind held on the shrink-only pending list naming dKeptSession, which takes presets"
 - `cl-dClosedLoop-0104` names dBoundRoles, a stand-in: "…until the owner's disposition record, which `run.on-owner-question` resolves only once dBoundRoles lands it and never for a ratification, and, until…"
 - `cl-dClosedLoop-0104` names dScopedBuild, a stand-in: "…resolves only once dBoundRoles lands it and never for a ratification, and, until dScopedBuild lands `build.ratify`, the gate standing in for it under…"
 - `cl-dClosedLoop-0104` names dScopedBuild, a stand-in: "…fallback holds `plan.exit`, seen red on a planted major fork under that value with dScopedBuild unlanded that reaches no gate (AF-1, DA-H1, the owner's…"
@@ -225,40 +226,40 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dDeclared
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dDeclaredLoop-1` · README:65 | 1 | `TOOL-dDeclaredLoop-1` | `cl-dClosedLoop-0086@76547911` | the loop kit and definition keyed by the stage tags |
-- unit id `TOOL-dDeclaredLoop-2` · README:66 | 2 | `TOOL-dDeclaredLoop-2` | `cl-dClosedLoop-0087@5eb8d36a` | the guard |
-- unit id `TOOL-dDeclaredLoop-3` · README:67 | 3 | `TOOL-dDeclaredLoop-3` | `cl-dClosedLoop-0088@b1722a1e` | the transition record three ways |
-- unit id `TOOL-dDeclaredLoop-4` · README:68 | 4 | `TOOL-dDeclaredLoop-4` | `cl-dClosedLoop-0089@66b8552a` | stage claims and the coverage gate |
-- unit id `TOOL-dDeclaredLoop-5` · README:69 | 5 | `TOOL-dDeclaredLoop-5` | `cl-dClosedLoop-0090@e3f362f0` | the witness-class rule |
-- unit id `TOOL-dDeclaredLoop-6` · README:70 | 6 | `TOOL-dDeclaredLoop-6` | `cl-dClosedLoop-0091@48218b99` | the factories and conformance gates for commands |
-- unit id `TOOL-dDeclaredLoop-7` · README:71 | 7 | `TOOL-dDeclaredLoop-7` | `cl-dClosedLoop-0092@0abbde28` | the position engine: deriving each unit's step |
-- unit id `TOOL-dDeclaredLoop-8` · README:72 | 8 | `TOOL-dDeclaredLoop-8` | `cl-dClosedLoop-0093@a21f7ad5` | claims keyed and trusted by key and source |
-- unit id `TOOL-dDeclaredLoop-9` · README:73 | 9 | `TOOL-dDeclaredLoop-9` | `cl-dClosedLoop-0094@c69a5ae1` | each step's items declared with actor |
-- unit id `TOOL-dDeclaredLoop-10` · README:74 | 10 | `TOOL-dDeclaredLoop-10` | `cl-dClosedLoop-0095@46379602` | backward transitions recorded like forward ones |
-- unit id `TOOL-dDeclaredLoop-11` · README:75 | 11 | `TOOL-dDeclaredLoop-11` | `cl-dClosedLoop-0096@18103ca9` | every checklist item named by a semantic tag |
-- unit id `TOOL-dDeclaredLoop-12` · README:76 | 12 | `TOOL-dDeclaredLoop-12` | `cl-dClosedLoop-0097@56655276` | each step a program of items with declared dependencies |
-- unit id `TOOL-dDeclaredLoop-13` · README:77 | 13 | `TOOL-dDeclaredLoop-13` | `cl-dClosedLoop-0098@89542705` | one transition table per level (build |
-- unit id `TOOL-dDeclaredLoop-14` · README:78 | 14 | `TOOL-dDeclaredLoop-14` | `cl-dClosedLoop-0099@60eee5d8` | a default failure route (the refusal recorded |
-- unit id `TOOL-dDeclaredLoop-15` · README:79 | 15 | `TOOL-dDeclaredLoop-15` | `cl-dClosedLoop-0100@4771709c` | the terminal states flow-steps' `[transitions]` declares |
-- unit id `TOOL-dDeclaredLoop-16` · README:80 | 16 | `TOOL-dDeclaredLoop-16` | `cl-dClosedLoop-0101@6e645e0e` | one closed disposition set |
-- unit id `TOOL-dDeclaredLoop-17` · README:81 | 17 | `TOOL-dDeclaredLoop-17` | `cl-dClosedLoop-0102@5579244a` | witnesses computed rather than typed by the acting agent (acceptance re-run by the executor |
-- unit id `TOOL-dDeclaredLoop-18` · README:82 | 18 | `TOOL-dDeclaredLoop-18` | `cl-dClosedLoop-0103@2d82c817` | the `step` |
-- unit id `TOOL-dDeclaredLoop-19` · README:83 | 19 | `TOOL-dDeclaredLoop-19` | `cl-dClosedLoop-0104@2c27f8f3` | breakpoints placeable at any item boundary (`review.breakpoints`) |
-- unit id `TOOL-dDeclaredLoop-20` · README:84 | 20 | `TOOL-dDeclaredLoop-20` | `cl-dClosedLoop-0105@cab8e16c` | the breakpoint program's own items |
-- unit id `TOOL-dDeclaredLoop-21` · README:85 | 21 | `TOOL-dDeclaredLoop-21` | `cl-dClosedLoop-0106@90aa01b6` | follow-up closing-review rounds by `review.follow-up` |
-- unit id `TOOL-dDeclaredLoop-22` · README:86 | 22 | `TOOL-dDeclaredLoop-22` | `cl-dClosedLoop-0107@a606d808` | the stage-exit recommendation: every step's recommend and reason items |
-- unit id `TOOL-dDeclaredLoop-23` · README:87 | 23 | `TOOL-dDeclaredLoop-23` | `cl-dClosedLoop-0108@df656363` | the commit node and its kind |
-- unit id `TOOL-dDeclaredLoop-24` · README:88 | 24 | `TOOL-dDeclaredLoop-24` | `cl-dClosedLoop-0109@48e119fc` | the `item` kind in the kinds register with its factory |
-- unit id `TOOL-dDeclaredLoop-25` · README:89 | 25 | `TOOL-dDeclaredLoop-25` | `cl-dClosedLoop-0110@c46e726a` | a repository's own stages |
-- unit id `TOOL-dDeclaredLoop-26` · README:90 | 26 | `TOOL-dDeclaredLoop-26` | `cl-dClosedLoop-0111@313dbc9c` | a build's composition pinned per step: the transition record into a step carrying the composition's revision |
-- unit id `TOOL-dDeclaredLoop-27` · README:91 | 27 | `TOOL-dDeclaredLoop-27` | `cl-dClosedLoop-0112@de8c6c54` | the `scenario` kind in the kinds register and its namespace: gov's shipped scenarios |
-- unit id `TOOL-dDeclaredLoop-28` · README:92 | 28 | `TOOL-dDeclaredLoop-28` | `cl-dClosedLoop-0113@11f77a79` | a build's recorded changes: rows a role proposes for its own build |
-- unit id `TOOL-dDeclaredLoop-29` · README:93 | 29 | `TOOL-dDeclaredLoop-29` | `cl-dClosedLoop-0114@f3e34c2f` | an item's `upstream` field naming the items whose commitments it must answer |
-- unit id `TOOL-dDeclaredLoop-30` · README:94 | 30 | `TOOL-dDeclaredLoop-30` | `cl-dClosedLoop-0115@cc7f99e5` | the rework budget: one per build in its transition record |
-- unit id `TOOL-dDeclaredLoop-31` · README:95 | 31 | `TOOL-dDeclaredLoop-31` | `cl-dClosedLoop-0116@d75a79f0` | `flow.on-exhausted`: a build whose budget is spent ends and never laps again |
-- unit id `TOOL-dDeclaredLoop-32` · README:96 | 32 | `TOOL-dDeclaredLoop-32` | `cl-dClosedLoop-0117@166df103` | the convergence routing: every `until-*` and `while-*` value |
-- unit id `TOOL-dDeclaredLoop-33` · README:97 | 33 | `TOOL-dDeclaredLoop-33` | `cl-dClosedLoop-0118@4c8ef789` | the static termination check on every composition |
-- unit id `TOOL-dDeclaredLoop-34` · README:98 | 34 | `TOOL-dDeclaredLoop-34` | `cl-dClosedLoop-0119@a9b53abc` | the deviation approval route under `deviation.approval`: by its risk |
+- unit id `TOOL-dDeclaredLoop-1` · README:64 | 1 | `TOOL-dDeclaredLoop-1` | `cl-dClosedLoop-0086@76547911` | the loop kit and definition keyed by the stage tags |
+- unit id `TOOL-dDeclaredLoop-2` · README:65 | 2 | `TOOL-dDeclaredLoop-2` | `cl-dClosedLoop-0087@5eb8d36a` | the guard |
+- unit id `TOOL-dDeclaredLoop-3` · README:66 | 3 | `TOOL-dDeclaredLoop-3` | `cl-dClosedLoop-0088@b1722a1e` | the transition record three ways |
+- unit id `TOOL-dDeclaredLoop-4` · README:67 | 4 | `TOOL-dDeclaredLoop-4` | `cl-dClosedLoop-0089@66b8552a` | stage claims and the coverage gate |
+- unit id `TOOL-dDeclaredLoop-5` · README:68 | 5 | `TOOL-dDeclaredLoop-5` | `cl-dClosedLoop-0090@e3f362f0` | the witness-class rule |
+- unit id `TOOL-dDeclaredLoop-6` · README:69 | 6 | `TOOL-dDeclaredLoop-6` | `cl-dClosedLoop-0091@48218b99` | the factories and conformance gates for commands |
+- unit id `TOOL-dDeclaredLoop-7` · README:70 | 7 | `TOOL-dDeclaredLoop-7` | `cl-dClosedLoop-0092@0abbde28` | the position engine: deriving each unit's step |
+- unit id `TOOL-dDeclaredLoop-8` · README:71 | 8 | `TOOL-dDeclaredLoop-8` | `cl-dClosedLoop-0093@a21f7ad5` | claims keyed and trusted by key and source |
+- unit id `TOOL-dDeclaredLoop-9` · README:72 | 9 | `TOOL-dDeclaredLoop-9` | `cl-dClosedLoop-0094@c69a5ae1` | each step's items declared with actor |
+- unit id `TOOL-dDeclaredLoop-10` · README:73 | 10 | `TOOL-dDeclaredLoop-10` | `cl-dClosedLoop-0095@46379602` | backward transitions recorded like forward ones |
+- unit id `TOOL-dDeclaredLoop-11` · README:74 | 11 | `TOOL-dDeclaredLoop-11` | `cl-dClosedLoop-0096@18103ca9` | every checklist item named by a semantic tag |
+- unit id `TOOL-dDeclaredLoop-12` · README:75 | 12 | `TOOL-dDeclaredLoop-12` | `cl-dClosedLoop-0097@56655276` | each step a program of items with declared dependencies |
+- unit id `TOOL-dDeclaredLoop-13` · README:76 | 13 | `TOOL-dDeclaredLoop-13` | `cl-dClosedLoop-0098@89542705` | one transition table per level (build |
+- unit id `TOOL-dDeclaredLoop-14` · README:77 | 14 | `TOOL-dDeclaredLoop-14` | `cl-dClosedLoop-0099@60eee5d8` | a default failure route (the refusal recorded |
+- unit id `TOOL-dDeclaredLoop-15` · README:78 | 15 | `TOOL-dDeclaredLoop-15` | `cl-dClosedLoop-0100@4771709c` | the terminal states flow-steps' `[transitions]` declares |
+- unit id `TOOL-dDeclaredLoop-16` · README:79 | 16 | `TOOL-dDeclaredLoop-16` | `cl-dClosedLoop-0101@6e645e0e` | one closed disposition set |
+- unit id `TOOL-dDeclaredLoop-17` · README:80 | 17 | `TOOL-dDeclaredLoop-17` | `cl-dClosedLoop-0102@5579244a` | witnesses computed rather than typed by the acting agent (acceptance re-run by the executor |
+- unit id `TOOL-dDeclaredLoop-18` · README:81 | 18 | `TOOL-dDeclaredLoop-18` | `cl-dClosedLoop-0103@2d82c817` | the `step` |
+- unit id `TOOL-dDeclaredLoop-19` · README:82 | 19 | `TOOL-dDeclaredLoop-19` | `cl-dClosedLoop-0104@2c27f8f3` | breakpoints placeable at any item boundary (`review.breakpoints`) |
+- unit id `TOOL-dDeclaredLoop-20` · README:83 | 20 | `TOOL-dDeclaredLoop-20` | `cl-dClosedLoop-0105@cab8e16c` | the breakpoint program's own items |
+- unit id `TOOL-dDeclaredLoop-21` · README:84 | 21 | `TOOL-dDeclaredLoop-21` | `cl-dClosedLoop-0106@90aa01b6` | follow-up closing-review rounds by `review.follow-up` |
+- unit id `TOOL-dDeclaredLoop-22` · README:85 | 22 | `TOOL-dDeclaredLoop-22` | `cl-dClosedLoop-0107@a606d808` | the stage-exit recommendation: every step's recommend and reason items |
+- unit id `TOOL-dDeclaredLoop-23` · README:86 | 23 | `TOOL-dDeclaredLoop-23` | `cl-dClosedLoop-0108@df656363` | the commit node and its kind |
+- unit id `TOOL-dDeclaredLoop-24` · README:87 | 24 | `TOOL-dDeclaredLoop-24` | `cl-dClosedLoop-0109@48e119fc` | the `item` kind in the kinds register with its factory |
+- unit id `TOOL-dDeclaredLoop-25` · README:88 | 25 | `TOOL-dDeclaredLoop-25` | `cl-dClosedLoop-0110@c46e726a` | a repository's own stages |
+- unit id `TOOL-dDeclaredLoop-26` · README:89 | 26 | `TOOL-dDeclaredLoop-26` | `cl-dClosedLoop-0111@313dbc9c` | a build's composition pinned per step: the transition record into a step carrying the composition's revision |
+- unit id `TOOL-dDeclaredLoop-27` · README:90 | 27 | `TOOL-dDeclaredLoop-27` | `cl-dClosedLoop-0112@de8c6c54` | the `scenario` kind in the kinds register and its namespace: gov's shipped scenarios |
+- unit id `TOOL-dDeclaredLoop-28` · README:91 | 28 | `TOOL-dDeclaredLoop-28` | `cl-dClosedLoop-0113@11f77a79` | a build's recorded changes: rows a role proposes for its own build |
+- unit id `TOOL-dDeclaredLoop-29` · README:92 | 29 | `TOOL-dDeclaredLoop-29` | `cl-dClosedLoop-0114@f3e34c2f` | an item's `upstream` field naming the items whose commitments it must answer |
+- unit id `TOOL-dDeclaredLoop-30` · README:93 | 30 | `TOOL-dDeclaredLoop-30` | `cl-dClosedLoop-0115@cc7f99e5` | the rework budget: one per build in its transition record |
+- unit id `TOOL-dDeclaredLoop-31` · README:94 | 31 | `TOOL-dDeclaredLoop-31` | `cl-dClosedLoop-0116@d75a79f0` | `flow.on-exhausted`: a build whose budget is spent ends and never laps again |
+- unit id `TOOL-dDeclaredLoop-32` · README:95 | 32 | `TOOL-dDeclaredLoop-32` | `cl-dClosedLoop-0117@166df103` | the convergence routing: every `until-*` and `while-*` value |
+- unit id `TOOL-dDeclaredLoop-33` · README:96 | 33 | `TOOL-dDeclaredLoop-33` | `cl-dClosedLoop-0118@4c8ef789` | the static termination check on every composition |
+- unit id `TOOL-dDeclaredLoop-34` · README:97 | 34 | `TOOL-dDeclaredLoop-34` | `cl-dClosedLoop-0119@a9b53abc` | the deviation approval route under `deviation.approval`: by its risk |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -282,11 +283,11 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dDeclaredLoop`:
 
-Coverage of dDeclaredLoop's 34 clauses and 49 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dDeclaredLoop's 34 clauses and 49 owned nodes, over 34 specs:
+- carried whole: 34; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0086, cl-dClosedLoop-0087, cl-dClosedLoop-0088, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098, cl-dClosedLoop-0099, cl-dClosedLoop-0100, cl-dClosedLoop-0101, cl-dClosedLoop-0102, cl-dClosedLoop-0103, cl-dClosedLoop-0104, cl-dClosedLoop-0105, cl-dClosedLoop-0106, cl-dClosedLoop-0107, cl-dClosedLoop-0108, cl-dClosedLoop-0109, cl-dClosedLoop-0110, cl-dClosedLoop-0111, cl-dClosedLoop-0112, cl-dClosedLoop-0113, cl-dClosedLoop-0114, cl-dClosedLoop-0115, cl-dClosedLoop-0116, cl-dClosedLoop-0117, cl-dClosedLoop-0118, cl-dClosedLoop-0119; stale: none; ambiguous: none
-- owned nodes no spec names: item.build.recommend, item.deploy.recommend, item.design.reason, item.design.recommend, item.plan.reason, item.plan.recommend, item.review.cost, item.review.dispose, item.review.fold, item.review.trigger, item.test.reason, item.test.recommend, policy-key.autonomy, policy-key.deps.on-parent-withdrawn, policy-key.deviation.approval, policy-key.floor, policy-key.flow.adapt, policy-key.flow.on-exhausted, policy-key.flow.rework-budget, policy-key.flow.route-backs, policy-key.flow.scenario-conflict, policy-key.flow.scenario-default, policy-key.flow.wait-ceiling, policy-key.policy-file.guard, policy-key.policy-file.on-missing-expansion, policy-key.policy-file.proof, policy-key.review.<stage>, policy-key.review.blocks, policy-key.review.breakpoints, policy-key.review.design.round-count, policy-key.review.design.rounds, policy-key.review.findings, policy-key.review.follow-up, policy-key.review.left-shift, policy-key.review.max-rounds, policy-key.review.recommendation, policy-key.review.recommendation.source, policy-key.review.unverified, policy-key.transitions.record, record-kind.acceptance, record-kind.commit, record-kind.disposition, record-kind.recommendation, record-kind.transition, tag-namespace.command, tag-namespace.item, tag-namespace.policy, tag-namespace.scenario, tag-namespace.step
+- uncarried: none; stale: cl-dClosedLoop-0091; ambiguous: none
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0086, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098, cl-dClosedLoop-0101, cl-dClosedLoop-0102, cl-dClosedLoop-0111
 
