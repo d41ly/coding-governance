@@ -20018,6 +20018,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "run_fixtures_guard_census",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_format",
       "kind": "function",
       "file": "tools/workflows/check_by_design_parity.py"

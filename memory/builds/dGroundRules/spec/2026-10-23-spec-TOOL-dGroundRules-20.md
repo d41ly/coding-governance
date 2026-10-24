@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-20 — the `policy fixtures` guard covers the sibling files its cases run, and a join keeps the census's enforcers inside it
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-20-deviation-8.md](../build/2026-10-23-build-TOOL-dGroundRules-20-deviation-8.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-20-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-20-ledger.md) | journal | — |
+| [2026-10-24-build-TOOL-dGroundRules-20-deviation-74.md](../build/2026-10-24-build-TOOL-dGroundRules-20-deviation-74.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-20-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-20-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-20-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-20-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-20-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-20-divergence-brief.md) | research | — |

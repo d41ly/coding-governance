@@ -2752,6 +2752,39 @@ def run_ships_join(name):
     return print_checks(name, checks)
 
 
+FIXTURES_LEG = "policy fixtures"
+
+
+def run_fixtures_guard_census(name):
+    """`fixtures-guard-census` (TOOL-dGroundRules-20): every distinct census enforcer sits inside the
+    guard of the `policy fixtures` row of `gate-legs.json` under this kit's tool root in the source
+    repository, a guard equal to it or a guard ending `/` that prefixes it, `{prefix}` resolved on
+    both sides. An edit to an enforcer outside it skips the leg its `budgets-cap-` cases run in. One
+    line per enforcer, and a WRONG where the census has no row or the manifest no such leg, since a
+    join over nothing proves nothing."""
+    top, troot = derive_source_top(), budgets.derive_tool_root()
+    legs = top / troot / "gate-legs.json"
+    try:
+        census = budgets.read_cap_census(top)
+        row = next((r for r in json.loads(legs.read_text(encoding="utf-8")) if r.get("name") == FIXTURES_LEG), None)
+    except (OSError, ValueError, AttributeError, policy.Refusal) as exc:
+        return print_checks(name, [(name, "the census and the gate manifest", False, f"{type(exc).__name__}: {exc}")])
+    guard = [budgets.resolve_prefix_token(g, troot) for g in (row or {}).get("guard") or []]
+    runs = {}
+    for cap in census.values():
+        runs.setdefault(cap.enforcer, []).append(CAP_CASE_PREFIX + cap.name)
+    checks = []
+    for e, cases in runs.items():
+        p = budgets.resolve_prefix_token(e, troot)
+        by = next((g for g in guard if g == p or (g.endswith("/") and p.startswith(g))), None)
+        checks.append((e, f"inside the {FIXTURES_LEG} guard", by is not None, f"covered by {by}" if by else
+                       f"{e} is run by {', '.join(cases)} and is outside the {FIXTURES_LEG} guard"))
+    checks.append(("the join", f"a census row and the {FIXTURES_LEG} leg", bool(runs) and row is not None,
+                   f"{len(runs)} enforcer(s) of {len(census)} row(s) · leg {'found' if row else 'absent'} in "
+                   f"{legs.relative_to(top).as_posix()}"))
+    return print_checks(name, checks)
+
+
 # ---- the live observation (TOOL-dGroundRules-10 S9) ------------------------------------------------
 
 LIVE_LIMIT = 2
@@ -2920,6 +2953,7 @@ CASES = [
     *((c, arm_schema, s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
     ("budgets-ships-join", None, run_ships_join),  # the census's ships flags against the registry's exemptions
+    ("fixtures-guard-census", None, run_fixtures_guard_census),  # the census's enforcers inside this leg's guard
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
 ]
 
