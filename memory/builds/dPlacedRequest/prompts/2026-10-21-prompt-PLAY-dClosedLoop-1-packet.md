@@ -72,7 +72,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `c63aabbb4a73d44315dd5dd1219ff1dac5055cf8`
+- rendered at: `5352805c87e4fd9d3b239a2f4aac68c77d89f73e`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -185,27 +185,27 @@ v2's `[owed]`, `[open]`, `[enforcement]` and `[policies]` lines naming dPlacedRe
 
 The opened README's roster, every unit with its row:
 
-- unit id `TOOL-dPlacedRequest-1` · README:64 | 1 | `TOOL-dPlacedRequest-1` | `cl-dClosedLoop-0120@5d655f07` | the coordination feature: one lease grammar for builds |
-- unit id `TOOL-dPlacedRequest-2` · README:65 | 2 | `TOOL-dPlacedRequest-2` | `cl-dClosedLoop-0121@2f58beed` | the build's orientation card at level 1 |
-- unit id `TOOL-dPlacedRequest-3` · README:66 | 3 | `TOOL-dPlacedRequest-3` | `cl-dClosedLoop-0122@938c9643` | the entry step's items: the card's orientation |
-- unit id `TOOL-dPlacedRequest-4` · README:67 | 4 | `TOOL-dPlacedRequest-4` | `cl-dClosedLoop-0123@626c316e` | the placement predicate and its check |
-- unit id `TOOL-dPlacedRequest-5` · README:68 | 5 | `TOOL-dPlacedRequest-5` | `cl-dClosedLoop-0503@65f19d46` | the `breakpoint` disposition in the placement set: an owner's request for a review on a live build |
-- unit id `TOOL-dPlacedRequest-6` · README:69 | 6 | `TOOL-dPlacedRequest-6` | `cl-dClosedLoop-0124@b8ada8e4` | the items' declarations of the `map` slot and their unfolds |
-- unit id `TOOL-dPlacedRequest-7` · README:70 | 7 | `TOOL-dPlacedRequest-7` | `cl-dClosedLoop-0125@4e0727e5` | the probe program (`probe.trigger` |
-- unit id `TOOL-dPlacedRequest-8` · README:71 | 8 | `TOOL-dPlacedRequest-8` | `cl-dClosedLoop-0126@b35ab44f` | each item's declared code seed: its write set |
-- unit id `TOOL-dPlacedRequest-9` · README:72 | 9 | `TOOL-dPlacedRequest-9` | `cl-dClosedLoop-0127@4f0c1452` | the kickoff manifest's facts as level-2 instruction units the card reads (the memory plan's `[pockets]`) |
-- unit id `TOOL-dPlacedRequest-10` · README:73 | 10 | `TOOL-dPlacedRequest-10` | `cl-dClosedLoop-0128@e0109d47` | a build's scenarios chosen at `entry.place`: the orientation scout's return naming each scenario whose admission predicate holds over the request's facts |
-- unit id `TOOL-dPlacedRequest-11` · README:74 | 11 | `TOOL-dPlacedRequest-11` | `cl-dClosedLoop-0129@30a0ceda` | each lease and claim written as a commit whose parent is its ref's previous tip |
-- unit id `TOOL-dPlacedRequest-12` · README:75 | 12 | `TOOL-dPlacedRequest-12` | `cl-dClosedLoop-0130@57d242df` | create-only registers on the remote |
-- unit id `TOOL-dPlacedRequest-13` · README:76 | 13 | `TOOL-dPlacedRequest-13` | `cl-dClosedLoop-0131@3532cbe6` | the change feed: an ordered |
-- unit id `TOOL-dPlacedRequest-14` · README:77 | 14 | `TOOL-dPlacedRequest-14` | `cl-dClosedLoop-0132@6096ecb9` | the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the request's content key |
-- unit id `TOOL-dPlacedRequest-15` · README:78 | 15 | `TOOL-dPlacedRequest-15` | `cl-dClosedLoop-0133@231564d8` | the fenced effect push: every effect push carrying the holder's new lease beat in one atomic push under a compare-and-swap on the lease tip it read |
-- unit id `TOOL-dPlacedRequest-16` · README:79 | 16 | `TOOL-dPlacedRequest-16` | `cl-dClosedLoop-0134@bacb3ef7` | a lease never deleted: each release a hand-over |
-- unit id `TOOL-dPlacedRequest-17` · README:80 | 17 | `TOOL-dPlacedRequest-17` | `cl-dClosedLoop-0135@55365bfa` | a lease's expiry |
-- unit id `TOOL-dPlacedRequest-18` · README:81 | 18 | `TOOL-dPlacedRequest-18` | `cl-dClosedLoop-0136@c9686488` | the cadence segment of the lease grammar taking any name the tag grammar admits |
-- unit id `TOOL-dPlacedRequest-19` · README:82 | 19 | `TOOL-dPlacedRequest-19` | `cl-dClosedLoop-0137@39b3ef9d` | a request that is not yet a build written as a project-level record any node may claim by lease |
-- unit id `TOOL-dPlacedRequest-20` · README:83 | 20 | `TOOL-dPlacedRequest-20` | `cl-dClosedLoop-0138@b6141505` | lease acquisition taking an optional offer |
-- unit id `TOOL-dPlacedRequest-21` · README:84 | 21 | `TOOL-dPlacedRequest-21` | `cl-dClosedLoop-0501@e1101a14` | `entry.claim` writing a patch or repeat build's derived plan record |
+- unit id `TOOL-dPlacedRequest-1` · README:63 | 1 | `TOOL-dPlacedRequest-1` | `cl-dClosedLoop-0120@5d655f07` | the coordination feature: one lease grammar for builds |
+- unit id `TOOL-dPlacedRequest-2` · README:64 | 2 | `TOOL-dPlacedRequest-2` | `cl-dClosedLoop-0121@2f58beed` | the build's orientation card at level 1 |
+- unit id `TOOL-dPlacedRequest-3` · README:65 | 3 | `TOOL-dPlacedRequest-3` | `cl-dClosedLoop-0122@938c9643` | the entry step's items: the card's orientation |
+- unit id `TOOL-dPlacedRequest-4` · README:66 | 4 | `TOOL-dPlacedRequest-4` | `cl-dClosedLoop-0123@626c316e` | the placement predicate and its check |
+- unit id `TOOL-dPlacedRequest-5` · README:67 | 5 | `TOOL-dPlacedRequest-5` | `cl-dClosedLoop-0503@65f19d46` | the `breakpoint` disposition in the placement set: an owner's request for a review on a live build |
+- unit id `TOOL-dPlacedRequest-6` · README:68 | 6 | `TOOL-dPlacedRequest-6` | `cl-dClosedLoop-0124@b8ada8e4` | the items' declarations of the `map` slot and their unfolds |
+- unit id `TOOL-dPlacedRequest-7` · README:69 | 7 | `TOOL-dPlacedRequest-7` | `cl-dClosedLoop-0125@4e0727e5` | the probe program (`probe.trigger` |
+- unit id `TOOL-dPlacedRequest-8` · README:70 | 8 | `TOOL-dPlacedRequest-8` | `cl-dClosedLoop-0126@b35ab44f` | each item's declared code seed: its write set |
+- unit id `TOOL-dPlacedRequest-9` · README:71 | 9 | `TOOL-dPlacedRequest-9` | `cl-dClosedLoop-0127@4f0c1452` | the kickoff manifest's facts as level-2 instruction units the card reads (the memory plan's `[pockets]`) |
+- unit id `TOOL-dPlacedRequest-10` · README:72 | 10 | `TOOL-dPlacedRequest-10` | `cl-dClosedLoop-0128@e0109d47` | a build's scenarios chosen at `entry.place`: the orientation scout's return naming each scenario whose admission predicate holds over the request's facts |
+- unit id `TOOL-dPlacedRequest-11` · README:73 | 11 | `TOOL-dPlacedRequest-11` | `cl-dClosedLoop-0129@30a0ceda` | each lease and claim written as a commit whose parent is its ref's previous tip |
+- unit id `TOOL-dPlacedRequest-12` · README:74 | 12 | `TOOL-dPlacedRequest-12` | `cl-dClosedLoop-0130@57d242df` | create-only registers on the remote |
+- unit id `TOOL-dPlacedRequest-13` · README:75 | 13 | `TOOL-dPlacedRequest-13` | `cl-dClosedLoop-0131@3532cbe6` | the change feed: an ordered |
+- unit id `TOOL-dPlacedRequest-14` · README:76 | 14 | `TOOL-dPlacedRequest-14` | `cl-dClosedLoop-0132@6096ecb9` | the pre-claim budget: placement loops before `entry.claim` drawing on a budget keyed to the request's content key |
+- unit id `TOOL-dPlacedRequest-15` · README:77 | 15 | `TOOL-dPlacedRequest-15` | `cl-dClosedLoop-0133@231564d8` | the fenced effect push: every effect push carrying the holder's new lease beat in one atomic push under a compare-and-swap on the lease tip it read |
+- unit id `TOOL-dPlacedRequest-16` · README:78 | 16 | `TOOL-dPlacedRequest-16` | `cl-dClosedLoop-0134@bacb3ef7` | a lease never deleted: each release a hand-over |
+- unit id `TOOL-dPlacedRequest-17` · README:79 | 17 | `TOOL-dPlacedRequest-17` | `cl-dClosedLoop-0135@55365bfa` | a lease's expiry |
+- unit id `TOOL-dPlacedRequest-18` · README:80 | 18 | `TOOL-dPlacedRequest-18` | `cl-dClosedLoop-0136@c9686488` | the cadence segment of the lease grammar taking any name the tag grammar admits |
+- unit id `TOOL-dPlacedRequest-19` · README:81 | 19 | `TOOL-dPlacedRequest-19` | `cl-dClosedLoop-0137@39b3ef9d` | a request that is not yet a build written as a project-level record any node may claim by lease |
+- unit id `TOOL-dPlacedRequest-20` · README:82 | 20 | `TOOL-dPlacedRequest-20` | `cl-dClosedLoop-0138@b6141505` | lease acquisition taking an optional offer |
+- unit id `TOOL-dPlacedRequest-21` · README:83 | 21 | `TOOL-dPlacedRequest-21` | `cl-dClosedLoop-0501@e1101a14` | `entry.claim` writing a patch or repeat build's derived plan record |
 
 Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
@@ -229,11 +229,11 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dPlacedRequest`:
 
-Coverage of dPlacedRequest's 21 clauses and 37 owned nodes, over 0 specs:
-- carried whole: 0; carried in parts: 0 (none)
+Coverage of dPlacedRequest's 21 clauses and 37 owned nodes, over 21 specs:
+- carried whole: 21; carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: cl-dClosedLoop-0120, cl-dClosedLoop-0121, cl-dClosedLoop-0122, cl-dClosedLoop-0123, cl-dClosedLoop-0503, cl-dClosedLoop-0124, cl-dClosedLoop-0125, cl-dClosedLoop-0126, cl-dClosedLoop-0127, cl-dClosedLoop-0128, cl-dClosedLoop-0129, cl-dClosedLoop-0130, cl-dClosedLoop-0131, cl-dClosedLoop-0132, cl-dClosedLoop-0133, cl-dClosedLoop-0134, cl-dClosedLoop-0135, cl-dClosedLoop-0136, cl-dClosedLoop-0137, cl-dClosedLoop-0138, cl-dClosedLoop-0501; stale: none; ambiguous: none
-- owned nodes no spec names: item.entry.claim, item.entry.orient, item.entry.place, item.entry.place-check, item.entry.place-owner, item.probe.design, item.probe.experiment, item.probe.judge, item.probe.judge-claimed, item.probe.pin, item.probe.return, item.probe.run, item.probe.trigger, policy-key.card.follows, policy-key.card.snapshot, policy-key.card.store, policy-key.leases, policy-key.leases.expiry-hours, policy-key.leases.granularity, policy-key.leases.offer-seconds, policy-key.leases.offline, policy-key.leases.overlap, policy-key.leases.queued-claim-days, policy-key.leases.renewal, policy-key.patch.ratify, policy-key.placement, policy-key.placement.check, policy-key.probe.experiment.authority, policy-key.probe.observations, policy-key.probe.points, policy-key.probe.raise, policy-key.resume.context, policy-key.resume.partial, record-kind.card, record-kind.lease, record-kind.probe, record-kind.probe-trigger
+- uncarried: none; stale: none; ambiguous: none
+- owned nodes no spec names: none
 - specs derived from no clause: none
 - clauses the token arm cannot see: cl-dClosedLoop-0122, cl-dClosedLoop-0126, cl-dClosedLoop-0129, cl-dClosedLoop-0133, cl-dClosedLoop-0136, cl-dClosedLoop-0137
 
