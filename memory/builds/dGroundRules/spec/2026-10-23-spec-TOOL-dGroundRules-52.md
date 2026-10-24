@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,8 @@
 | [2026-10-24-prompt-TOOL-dGroundRules-51-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-51-staleness-probe-brief.md) | research | TOOL-dGroundRules-51 |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-3-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-3-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md) | research | TOOL-dGroundRules-45 TOOL-dGroundRules-60 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-57 TOOL-dGroundRules-58 |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-probe-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-probe-fix-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 |
 
@@ -171,7 +173,7 @@ the relative value already resolving against the source (S16).
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-25` — `derive_parallel_step`, whose rendering of steps 12 to 14 S4 observes
+- **consumes-from** `TOOL-dGroundRules-32` — `check_writes_intersect`, which S21 observes graded by `TOOL-dGroundRules-40`'s arm, and `derive_parallel_step`, which calls it and whose rendering of steps 12 to 14 S4 observes
 - **consumes-from** `TOOL-dGroundRules-33` — `add_source_read`, `check_guard_trace` and its `--legs-for` failure `WRONG`, which S19, S23 to S25 amend or observe
 - **consumes-from** `TOOL-dGroundRules-35` — the cache mapping and its digit-tail cut, which S2, S15, S20, S23 and S25 observe or amend
 - **consumes-from** `TOOL-dGroundRules-36` — `derive_guardable_reads`, whose call S6 and S14 pin to `-z`, `os.fsencode` and a matched count
@@ -452,6 +454,9 @@ none
   green-before criterion names the staging or close run that can red it. Found by this pass: git
   reads a relative `core.excludesFile` against the work tree's top level, so S16 owes no code. The
   `TOOL-dGroundRules-60` hands-off narrows to S21 and AC5 through `PAIRS_TABLE`, per -60 rev-2.
+- rev-6 · 2026-10-24 · §3 · the consumes-from edge on `TOOL-dGroundRules-25`, CLOSED and declaring no hands-off back,
+  gives way to one on `TOOL-dGroundRules-32` naming `check_writes_intersect` and `derive_parallel_step`, the reciprocal
+  of that unit's hands-off line; S4 still names the rule in its prose. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-60 — unit 52's overlap observations taken through the whole probe, with the Python column shown graded on its own
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,7 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-58-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-task.md) | research | TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-60-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-60-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md) | research | TOOL-dGroundRules-52 TOOL-dGroundRules-45 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-57 TOOL-dGroundRules-58 |
 | [2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 |
 | [2026-10-24-prompt-TOOL-dGroundRules-60-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-60-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-60-probe-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-60-probe-fix-brief.md) | research | — |
@@ -52,7 +53,6 @@ S2 and AC2 keep their rev-1 ids; §9 rev-2 records why there is no S1 and no AC1
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-45` — `PAIRS_TABLE` and the `check_overlap_pair` call lines it reads, the probe S2 runs; without them the suite holds no call line and the probe prints nothing
-- **consumes-from** `TOOL-dGroundRules-40` — the disjoint row of `OVERLAP_PAIRS`, `policy` against `policy-x.py` relative to `PFX`, the string-prefix trap S2 needs; without it a raw `startswith` answers the row as the built rule does
 - **consumes-from** `TOOL-dGroundRules-52` — S21 and AC5, whose Python column S2 shows graded apart from the shell one
 
 ## 4. Design
@@ -143,6 +143,8 @@ none
   review of the spec run, as unit 52's observations taken through the whole probe, with the Python
   rule staged alone so its first grading is seen failing.
 - rev-2 · 2026-10-24 · §1 §2 §3 §4 §5 §6 §9 §10 · disagreements, from the read-only probe of steps 15 to 20 at e1c7051cb, restated at 8eab342e0 with units 1 to 41 built: S1 and AC1 ran `PAIRS_TABLE_WHOLE` on the built tree, the same observation as `TOOL-dGroundRules-52` AC5 and `TOOL-dGroundRules-45` rev-3 AC2; AC2 and the edges consumed `TOOL-dGroundRules-58`, now closed WONTDO with `TOOL-dGroundRules-51`, -53, -54, -57 and -59; §4 and §5 named the old disjoint row of `TOOL-dGroundRules-44` S1, a nested pair, where `TOOL-dGroundRules-40` S1 owns the trap `policy` against `policy-x.py` relative to `PFX`; the evidence cited moved lines by number. Ruled: S1 and AC1 leave the spec and S2 and AC2 keep their ids; AC2 runs `PAIRS_TABLE` of `TOOL-dGroundRules-45` and reads its disjoint line as `PY_RAW_WANT`; §4 and §5 restate the row as `TOOL-dGroundRules-40` S1 owns it; `TOOL-dGroundRules-52` is cited by S21 and AC5; every citation by symbol or AC id; AC2 is restated as green before this unit, with its staged break and the later change that reds it; no criterion consumes a literal of a WONTDO unit.
+- rev-3 · 2026-10-24 · §3 · the consumes-from edge on `TOOL-dGroundRules-40` leaves: that unit is CLOSED and declares no
+  hands-off back. The trap row stays named in §2 and §4. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 

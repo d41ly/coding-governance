@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-45 — the overlap probes read their pairs from the arm's table, so no criterion spells a pair a second time
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-24-prompt-TOOL-dGroundRules-43-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-43-staleness-probe-brief.md) | research | TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-46 |
 | [2026-10-24-prompt-TOOL-dGroundRules-45-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-45-2-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-45-probe-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-45-probe-fix-brief.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md) | research | TOOL-dGroundRules-52 TOOL-dGroundRules-60 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-57 TOOL-dGroundRules-58 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 
 <!-- /gen:spec-records -->
@@ -70,9 +71,7 @@ spelling them. It reshapes the arm `TOOL-dGroundRules-40` builds at order 13, so
 - **consumes-from** `TOOL-dGroundRules-40` — the `OVERLAP_PAIRS` arm in `tools/check-spec-tokens.test.sh`, its `PFX`-relative rows, its trap row and its one assertion naming every disagreement, whose rows S1 gives a listable form, and the criteria AC1 and AC2 S3 observes through `PAIRS_TABLE`
 - **consumes-from** `TOOL-dGroundRules-44` — the row check, which S1's row function carries unchanged
 - **consumes-from** `TOOL-dGroundRules-43` — AC1, which S3 observes a second time through `PAIRS_TABLE`, beside the whole `PAIRS_PY` and `PAIRS_SH` it runs
-- **hands-off** `TOOL-dGroundRules-52` — `PAIRS_TABLE`, through which that unit observes `TOOL-dGroundRules-40` AC2, `TOOL-dGroundRules-43` AC1 and the Python rule's first grading (ids 30, 12 and 17)
-- **hands-off** `TOOL-dGroundRules-58` — `PAIRS_TABLE`, which that unit spells whole as `PAIRS_TABLE_WHOLE`, the library sourced by its tracked path, and through which it observes AC2 and AC3 (id 4 of the closing diff review, round 1)
-- **hands-off** `TOOL-dGroundRules-59` — S3's routing of `TOOL-dGroundRules-40` AC1 to AC3 and `TOOL-dGroundRules-43` AC1, which that unit takes through `PAIRS_TABLE_WHOLE` (id 13 of the closing diff review, round 1)
+- **hands-off** `TOOL-dGroundRules-60` — `PAIRS_TABLE`, which that unit's S2 runs to show the Python column graded apart from the shell one (id 20 of the closing diff review, round 1)
 
 ## 4. Design
 
@@ -211,6 +210,10 @@ none
 - rev-2 · 2026-10-23 · §3 · the hands-off edges to `TOOL-dGroundRules-58`, `TOOL-dGroundRules-59`, the reciprocal ends of the round-1 closing diff
   review's promotions; no scope or criterion moved.
 - rev-3 · 2026-10-24 · §1 §2 §3 §4 §5 §6 §7 §9 · disagreements, from a read-only probe of step 14 at 0860b8c1e: §1, §4 and S3 still took `TOOL-dGroundRules-40`'s `PAIRS_SH` as stripped and `TOOL-dGroundRules-34` as open, where `TOOL-dGroundRules-40` rev-4 names whole pairs and sources the library whole and `TOOL-dGroundRules-34` is CLOSED; `PAIRS_TABLE` sourced a bare library name; the call lines spelled whole paths and the old string-prefix row, where `TOOL-dGroundRules-40` rev-4 spells its rows relative to `PFX` with a new trap pair; §4 had a row call reach `arm`, one assertion per row against that unit's one; the evidence cited line numbers that had moved. Ruled: §1, §4 and S3 restate the premise; `PAIRS_TABLE` sources `tools/unattended/lib-unattended.sh` and prints whole paths; the rows follow the `PFX`-relative spelling and the trap pair, and the probe joins the prefix as the arm does; the row function adds to `TOOL-dGroundRules-40`'s disagreements and §5 migration stays none; every moved line cited by symbol, read at 7a600abf5.
+- rev-4 · 2026-10-24 · §3 · the hands-off edges to `TOOL-dGroundRules-52`, whose rev-5 no longer consumes `PAIRS_TABLE`,
+  and to `TOOL-dGroundRules-58` and `TOOL-dGroundRules-59`, retired WONTDO with their edges withdrawn, leave; a hands-off edge to
+  `TOOL-dGroundRules-60` naming `PAIRS_TABLE` lands, the reciprocal of that unit's consumes-from line. No scope, design or
+  criterion moved.
 
 ## 10. Reuse audit
 

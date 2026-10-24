@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-53 — the trap row's shell verdict observed with the library sourced by its tracked path and the trap pair whole
 
-**Status:** WONTDO · rev-1 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
+**Status:** WONTDO · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-53-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-build-brief.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-task.md) | research | TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md) | research | TOOL-dGroundRules-52 TOOL-dGroundRules-45 TOOL-dGroundRules-60 TOOL-dGroundRules-54 TOOL-dGroundRules-57 TOOL-dGroundRules-58 |
 | [2026-10-24-prompt-TOOL-dGroundRules-53-1-spec-reviewer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-53-1-spec-reviewer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-53-staleness-probe-brief.md) | research | TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 |
 
@@ -59,7 +60,9 @@ repairs `TOOL-dGroundRules-44`, which sits at order 14, so it builds at order 17
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-44` — the trap row S1 spells, `TRAP_PY` and the `RAW_BOTH` staging, which S2 and S3 restate AC2 over; without them there is no row and no red case to observe
+none
+
+Retired WONTDO, superseded: every edge this unit declared is withdrawn.
 
 ## 4. Design
 
@@ -155,6 +158,8 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 5 (HIGH, item H1) of the closing diff
   review round 1, with id 12 carried on the same literal, from the review's sound fix, with
   `TRAP_SH`, `TRAP_SH_WHOLE` and a raw-prefix staging of `covers` run on 2026-10-23.
+- rev-2 · 2026-10-24 · §3 · retired WONTDO at `8eab342e0`, so every edge is withdrawn and the Edges block
+  reads `none`: consumes-from `TOOL-dGroundRules-44`. No scope, design or criterion moved.
 
 ## 10. Reuse audit
 
