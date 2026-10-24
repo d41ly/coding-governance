@@ -213,3 +213,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T11:25:47Z brief · item TOOL-dGroundRules-31 · reason 5404d1f74084 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-31-build-brief.md
 
 2026-10-24T11:30:06Z dispatch · item 20985745 TOOL-dGroundRules-31 · reason tools/policy/adopt-policy.sh tools/policy/adopt-policy.test.sh tools/policy/check_policy.py tools/policy/README.md .memory-tree.conf help/policy.md memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-31.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-31-ledger.md memory/builds/dGroundRules/README.md memory/builds/dGroundRules/BACKLOG.md memory/LIVE.md memory/backlog/TOOL.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-10-24T11:38:42Z dispatch · item a5bc3f94 TOOL-dGroundRules-30 · reason tools/workflows/check-protocol-parity.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-30.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-30-ledger.md
+
+2026-10-24T11:38:47Z brief · item TOOL-dGroundRules-30 · reason 4a5eb7991f5f memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-30-build-brief.md
+
+2026-10-24T11:42:58Z dispatch · item a5bc3f94 TOOL-dGroundRules-30 · reason tools/workflows/check-protocol-parity.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-30.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-30-ledger.md

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-30 — the writer-marker floor decided by the installed hook's own verdict, never by a kit version the lander has not minted
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 9 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-30-deviation-18.md](../build/2026-10-23-build-TOOL-dGroundRules-30-deviation-18.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-30-deviation-60.md](../build/2026-10-23-build-TOOL-dGroundRules-30-deviation-60.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-30-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-30-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-30-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-30-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-30-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-30-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-30-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-30-divergence-brief.md) | research | — |

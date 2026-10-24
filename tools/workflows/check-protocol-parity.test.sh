@@ -482,10 +482,19 @@ render() { # template -> stdout
   render_kit_cites
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
   out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MTD"}
-  out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
-  if [ "${WRITER_SPLIT:-1}" = 0 ]; then  # S18's floor, set above; a template without the line is unchanged
-    out=${out//"Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-writers"/"Math.ceil(slices.length / Math.min(SPEC_WRITERS, 5))) // gov:fixed-verifiers"}
+  # THE VERIFIER-BOUNDED FALLBACK (TOOL-dGroundRules-30 S3), when the hook's verdict below set
+  # WRITER_SPLIT=0: three spans of the build harness's template, before the cap token, so the fallback
+  # is this one template rendered and never a second copy. A span a template edit moved keeps the agent
+  # limit, and the hook's verdict on the fallback below denies it.
+  if [ "${WRITER_SPLIT:-1}" = 0 ]; then
+    case "$1" in
+      unattended-build.template.js|*/unattended-build.template.js)
+        out=${out//"async function boundedParallel(thunks, cap = {{FANOUT_CAP}})"/"async function boundedParallel(thunks, cap = $VERIFY_TOTAL)"}
+        out=${out//"const SPEC_WRITERS = {{FANOUT_CAP}}"/"const SPEC_WRITERS = $VERIFY_TOTAL"}
+        out=${out//"Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-writers"/"Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers"} ;;
+    esac
   fi
+  out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
   printf '%s' "$out"
 }
 read_lf() { sed 's/\r$//' "$1"; }
@@ -556,26 +565,38 @@ case "$FANOUT_CAP" in
   ''|0*|*[!0-9]*) echo "protocol-parity: the policy reader answered '$FANOUT_CAP' for runtime.agents-in-flight, not a positive integer. Nothing was rendered or graded."; exit 2 ;;
 esac
 
-# THE WRITER MARKER'S FLOOR (TOOL-dGroundRules-25 S18). `unattended-build.js` bounds its spec-writer
-# split under `// gov:fixed-writers`, which only an agent-cap hook at or above the version that
-# shipped the marker admits; an older hook's rule 2 denies every `unattended-build` call. So the
-# resolved hook's KIT_AGENT_CAP_VERSION is read first, and below the floor the split renders under
-# `// gov:fixed-verifiers` at `Math.min(SPEC_WRITERS, 5)`, the verify total the old hook resolves, with
-# one stderr line naming the update. The floor is the version the hook reads at build, 1.40; a
-# version is minted only at the landing. No hook resolved renders the writer split: nothing denies it.
-WRITER_FLOOR=1.40
-WRITER_SPLIT=1
-if _ac_dir=$(resolve_kit_dir "$_cite_py" hooks agent-cap.js "$HERE" 2>/dev/null); then
-  _ac_ver=$(sed -n "s/^const KIT_AGENT_CAP_VERSION = '\([0-9.]*\)'.*/\1/p" "$_ac_dir/agent-cap.js" | head -n 1)
-  if [ "$(awk -v v="$_ac_ver" -v f="$WRITER_FLOOR" 'BEGIN { split(v, a, "."); split(f, b, ".")
-         print (v == "" || a[1] + 0 < b[1] + 0 || (a[1] + 0 == b[1] + 0 && a[2] + 0 < b[2] + 0)) ? 1 : 0 }')" = 1 ]; then
-    WRITER_SPLIT=0
-    echo "protocol-parity: the agent-cap hook at $_ac_dir/agent-cap.js is ${_ac_ver:-unversioned}, below the $WRITER_FLOOR whose rule 2 admits a gov:fixed-writers split, so unattended-build.js renders its spec-writer split under gov:fixed-verifiers at Math.min(SPEC_WRITERS, 5). Update it: govkit update --kits agent-cap" >&2
-  fi
-fi
-
 TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT
+
+# THE WRITER SPLIT, DECIDED BY THE HOOK'S OWN VERDICT (TOOL-dGroundRules-30). `unattended-build.js`
+# bounds its spec-writer split under `// gov:fixed-writers`, which a hook that predates the writer
+# marker denies, and that hook's rule 2 then refuses every `unattended-build` call. No version tells
+# the two hooks apart, because a version is minted only at the landing, so the installed hook judges
+# the candidate render through this kit's own gate, `check-verifier-fanout.sh`, in both modes. A
+# denial renders the verifier-bounded fallback `render` holds, with one stderr line naming the hook's
+# first line and the update; a hook that denies the fallback too exits 2 and nothing is written. No
+# hook or no node denies both, and the kit requires `agent-cap`. VERIFY_TOTAL is the hook's
+# MAX_VERIFIERS as a literal it resolves, as the templates write that total; a hook whose total falls
+# below it denies the fallback. A pair the memory-tree skip leaves unrendered asks nothing.
+VERIFY_TOTAL=5
+WRITER_SPLIT=1
+_ub_tpl="$KITREL/unattended-build.template.js"
+if [ -f "$_ub_tpl" ] && [ -z "$MTD_SKIP" ]; then
+  render "$_ub_tpl" > "$TMPD/writer-split.js" || { echo "protocol-parity: the render of $_ub_tpl FAILED — the template could not be read"; exit 2; }
+  if ! _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-split.js" 2>&1); then
+    _ub_why=$(printf '%s\n' "$_ub_out" | awk 'f { sub(/^ +/, ""); print; exit } /^verifier-fanout: FAILED/ { f = 1 }')
+    [ -n "$_ub_why" ] || _ub_why=$(printf '%s\n' "$_ub_out" | head -n 1)
+    _ub_why=${_ub_why%.}
+    echo "protocol-parity: the agent-cap hook does not admit the writer split: $_ub_why. Update it: govkit update --kits agent-cap" >&2
+    WRITER_SPLIT=0
+    render "$_ub_tpl" > "$TMPD/writer-fallback.js" || { echo "protocol-parity: the render of $_ub_tpl FAILED — the template could not be read"; exit 2; }
+    if ! _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-fallback.js" 2>&1); then
+      echo "protocol-parity: the agent-cap hook denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded. Its answer:"
+      printf '%s\n' "$_ub_out" | sed 's/^/  /'
+      exit 2
+    fi
+  fi
+fi
 bad=0; i=0; skipped=" "; nskip=0; skipped_live=" "
 while IFS='|' read -r LIVE SHIP; do
   [ -n "$LIVE" ] || continue
