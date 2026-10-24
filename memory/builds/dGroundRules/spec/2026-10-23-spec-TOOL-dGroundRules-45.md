@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-45 — the overlap probes read their pairs from the arm's table, so no criterion spells a pair a second time
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-45-deviation-33.md](../build/2026-10-23-build-TOOL-dGroundRules-45-deviation-33.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-45-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-45-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-45-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-45-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-43-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-43-staleness-probe-brief.md) | research | TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-46 |
 | [2026-10-24-prompt-TOOL-dGroundRules-45-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-45-2-spec-writer.md) | journal | — |

@@ -1712,27 +1712,29 @@ fi
 # reds the arm naming that row once per rule. A table that parses to no row reds it too.
 # TOOL-dGroundRules-44: a `disjoint` row neither of whose paths starts with the other as a string
 # is no trap, so a raw compare would pass it by accident; the arm reds naming it before either rule.
-OVERLAP_PAIRS='policy/ policy/x.py intersect
-policy policy-x.py disjoint'
+# TOOL-dGroundRules-45: the OVERLAP_PAIRS table is the call lines below, one row each at column 0 with
+# no trailing comment, so grep '^check_overlap_pair ' lists exactly the rows the arm grades. The
+# function runs in this shell, so the count and the disagreements survive it; only the library is
+# sourced, in a subshell.
 UNATTENDED_DIR=$(resolve_kit_dir "$PY" unattended lib-unattended.sh "$HERE") || exit 2
-wi_out=$( . "$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$UNATTENDED_DIR/lib-unattended.sh" >/dev/null 2>&1
-  rows=0
-  while read -r a b want; do
-    [ -n "${want:-}" ] || continue
-    rows=$((rows+1))
-    if [ "$want" = disjoint ] && [[ "$a" != "$b"* && "$b" != "$a"* ]]; then
-      printf '[row %s %s %s: not a string-prefix trap] ' "$a" "$b" "$want"; continue
-    fi
-    if [ "$want" = intersect ]; then wpy=True wsh=0; else wpy=False wsh=1; fi
-    py=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import design_lib as d
-print(d.check_writes_intersect([sys.argv[2]], [sys.argv[3]]))' "$MEMORY_TREE" "$PFX$a" "$PFX$b" 2>&1 | tr -d '\r')
-    if overlaps "$PFX$a" "$PFX$b"; then sh=0; else sh=1; fi
-    [ "$py" = "$wpy" ] || printf '[row %s %s %s: check_writes_intersect %s] ' "$a" "$b" "$want" "$py"
-    [ "$sh" = "$wsh" ] || printf '[row %s %s %s: overlaps exit %s] ' "$a" "$b" "$want" "$sh"
-  done <<< "$OVERLAP_PAIRS"
-  printf 'rows=%s' "$rows" )
-wi_rows=${wi_out##*rows=}; wi_bad=${wi_out%rows=*}
-if [ "$wi_rows" -ge 1 ] 2>/dev/null && [ -z "$wi_bad" ]; then
+wi_lib="$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel)/$UNATTENDED_DIR/lib-unattended.sh"
+wi_rows=0; wi_bad=
+check_overlap_pair() {        # $1 a · $2 b · $3 intersect|disjoint · a and b relative to ${PFX}
+  local py sh wpy=False wsh=1
+  wi_rows=$((wi_rows+1))
+  if [ "$3" = disjoint ] && [[ "$1" != "$2"* && "$2" != "$1"* ]]; then
+    wi_bad+="[row $1 $2 $3: not a string-prefix trap] "; return 0
+  fi
+  if [ "$3" = intersect ]; then wpy=True wsh=0; fi
+  py=$("$PY" -B -c 'import sys; sys.path.insert(0, sys.argv[1]); import design_lib as d
+print(d.check_writes_intersect([sys.argv[2]], [sys.argv[3]]))' "$MEMORY_TREE" "$PFX$1" "$PFX$2" 2>&1 | tr -d '\r')
+  if ( . "$wi_lib" >/dev/null 2>&1; overlaps "$PFX$1" "$PFX$2" ); then sh=0; else sh=1; fi
+  [ "$py" = "$wpy" ] || wi_bad+="[row $1 $2 $3: check_writes_intersect $py] "
+  [ "$sh" = "$wsh" ] || wi_bad+="[row $1 $2 $3: overlaps exit $sh] "
+}
+check_overlap_pair policy/ policy/x.py intersect
+check_overlap_pair policy policy-x.py disjoint
+if [ "$wi_rows" -ge 1 ] && [ -z "$wi_bad" ]; then
   echo "arm ok    TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer"; pass=$((pass+1))
 else
   echo "arm FAIL  TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer — rows $wi_rows, ${wi_bad:-no row disagreed}"; fail=$((fail+1))
