@@ -81,9 +81,12 @@ allowed values and every check.
 - **Start a file in another repository:** `bash tools/policy/adopt-policy.sh --scaffold --target <repo>`.
   It writes the starter file only where none exists, then renders the harness settings from the agent
   limit and the policy mirror wherever the repository has a commit, so the first agent spawn passes
-  and the merge bar finds the mirror fresh. The mirror renders a commit, so run it again once the
-  policy file is committed. `--check --target
-  <repo>` checks that repository.
+  and the merge bar finds the mirror fresh. The mirror renders a commit, so on install day, while the
+  install and the policy file are not committed yet, it prints
+  `adopt-policy: mirror deferred · <file> has uncommitted changes · commit, then re-run --scaffold`
+  and still exits 0: commit the install and the policy file, then run `--scaffold` again, which
+  writes `.governance/policy.json`. Any other refusal of the mirror stops it, exit 1, with the
+  refusal's own line. `--check --target <repo>` checks that repository.
 - **See which keys are documented:** a catalogue row with no `summary` or no `usage` is named on
   `tools/policy/unsummarised-keys.txt`. That list may only shrink. To document a key, give its row a
   `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the

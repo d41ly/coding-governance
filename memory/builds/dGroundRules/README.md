@@ -164,7 +164,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-29 — a receipt-less target is gov's source tree only when it holds the registry, so the census arm never grades a scratch target as gov](spec/2026-10-23-spec-TOOL-dGroundRules-29.md) | 8 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-27 — every policy case that drives the deployer runs it from the snapshot, and a call over the source's own root refuses](spec/2026-10-23-spec-TOOL-dGroundRules-27.md) | 9 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-30 — the writer-marker floor decided by the installed hook's own verdict, never by a kit version the lander has not minted](spec/2026-10-23-spec-TOOL-dGroundRules-30.md) | 9 | 2 | DEFERRED | rev-3 | 2026-10-23 |
-| [TOOL-dGroundRules-31 — the install-day scaffold defers the mirror over uncommitted inputs, so the first `--scaffold` in a repository with history exits 0](spec/2026-10-23-spec-TOOL-dGroundRules-31.md) | 9 | 2 | DEFERRED | rev-3 | 2026-10-24 |
+| [TOOL-dGroundRules-31 — the install-day scaffold defers the mirror over uncommitted inputs, so the first `--scaffold` in a repository with history exits 0](spec/2026-10-23-spec-TOOL-dGroundRules-31.md) | 9 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-32 — the round-1 audit of units 22 to 25, its minors: twenty findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-32.md) | 10 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-33 — the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses](spec/2026-10-23-spec-TOOL-dGroundRules-33.md) | 11 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-34.md) | 12 | 2 | DEFERRED | rev-5 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 243 bound to this build, across 4 record folder(s).
+Records: 244 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

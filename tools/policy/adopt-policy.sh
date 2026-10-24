@@ -12,7 +12,8 @@
 # settings from the agent limit at HEAD, `policy.py settings --write`, whenever HEAD resolves, so an
 # adopter spawns on install day without running the render by hand, and then the JSON mirror,
 # `policy.py mirror --write` (TOOL-dGroundRules-25 S7); with no commit yet it prints one line naming
-# the re-run. `[[regenerate]]` in kit.toml runs this same verb on every update (TOOL-dGroundRules-21
+# the re-run, and while an input of the mirror is uncommitted, as on install day, one line deferring
+# the mirror to the re-run after the commit. `[[regenerate]]` in kit.toml runs this same verb on every update (TOOL-dGroundRules-21
 # S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
 #
 # The kit dir is this script's own directory, never spelled, so the adopter runs from wherever the
@@ -106,10 +107,25 @@ if ! git -C "$TARGET" rev-parse --verify -q HEAD >/dev/null 2>&1; then
   echo "policy: $TARGET has no commit yet, so the harness settings are not rendered; re-run --scaffold after the first commit"
   exit 0
 fi
-# Then the JSON mirror the hooks read, rendered at HEAD the same way (TOOL-dGroundRules-25 S7), so an
-# adopter's bar finds it fresh at its preflight; one refusal branch holds both renders.
-if ! (cd "$TARGET" && "$PY" -B "$HERE/policy.py" settings --write && "$PY" -B "$HERE/policy.py" mirror --write); then
-  echo "policy: the harness settings could not be rendered in $TARGET, or the policy mirror after them; the line above says which"
+if ! (cd "$TARGET" && "$PY" -B "$HERE/policy.py" settings --write); then
+  echo "policy: the harness settings could not be rendered in $TARGET; the line above says why"
   exit 1
+fi
+# Then the JSON mirror the hooks read, rendered at HEAD the same way (TOOL-dGroundRules-25 S7), so an
+# adopter's bar finds it fresh at its preflight. On install day every input it records differs from
+# HEAD, so its `uncommitted changes` refusal, and only that one, is deferred to the re-run after the
+# first commit, naming the input the refusal names (TOOL-dGroundRules-31); the scaffold compares no
+# input itself. Every other refusal stands.
+OUT=$(cd "$TARGET" && "$PY" -B "$HERE/policy.py" mirror --write 2>&1)
+RC=$?
+if [ "$RC" = 2 ] && [[ "$OUT" == *"uncommitted changes"* ]]; then
+  INPUT=${OUT#*refused · }
+  echo "adopt-policy: mirror deferred · ${INPUT%%:[0-9]* · uncommitted changes*} has uncommitted changes · commit, then re-run --scaffold"
+elif [ "$RC" != 0 ]; then
+  echo "policy: the policy mirror could not be rendered in $TARGET; the line below says why"
+  printf '%s\n' "$OUT"
+  exit 1
+else
+  printf '%s\n' "$OUT"
 fi
 exit 0

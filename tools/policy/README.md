@@ -599,9 +599,11 @@ absent from the snapshot's tool root, reds the case. This case's, `legacy-homes-
 to the source's own, so no case can grade the tree under test's HEAD, and `govkit-source-root-refused`
 observes that refusal (TOOL-dGroundRules-27). Every file under the target's tool root must be a path the receipt records, and every engine or
 seed row of the receipt must be present, and no `legacy-homes.txt` installed (S5). The case then
-runs the installed adopter, `adopt-policy.sh --scaffold`, and `--check` with the install staged; it
+runs the installed adopter, `adopt-policy.sh --scaffold`, which must exit 0 printing `mirror deferred`
+and write no mirror (TOOL-dGroundRules-31), and `--check` with the install staged; it
 commits the install, re-runs the memory-tree adopter, which seeds its conf and stops on its first run,
-and `--scaffold`, which renders the mirror once its inputs are committed, commits both, runs `--check`
+and `--scaffold`, which renders the mirror once its inputs are committed, and the installed
+`policy.py mirror --check`, exit 0, commits both, runs `--check`
 again and then the installed `regen.py --check`, the bar's preflight, which must exit 0 (S7); and a
 last `--check` with an adopter-written `legacy-homes.txt` at the installed kit's directory (S11).
 Every `--check` must exit 0, and every arm must print a graded line with no finding or an announce line,
@@ -636,10 +638,14 @@ repository's own from its first write. Kept or written, it then renders the harn
 `policy.py settings --write`, and then the JSON mirror, `policy.py mirror --write`
 (TOOL-dGroundRules-25 S7), wherever HEAD resolves, so an adopter's first spawn passes rule 7 without a
 render by hand and its bar's preflight finds the mirror; with no commit yet it prints one line naming
-the re-run. `kit.toml`'s
+the re-run. While an input the mirror records is uncommitted, as on install day, the mirror's
+`uncommitted changes` refusal is deferred, one line
+`adopt-policy: mirror deferred · <input> has uncommitted changes · commit, then re-run --scaffold`,
+and every other refusal of it stands (TOOL-dGroundRules-31). `kit.toml`'s
 `[[regenerate]]` runs the same verb on every update (TOOL-dGroundRules-21 S37). `--check [--target
 <repo>]` runs `check_policy.py --repo`. Each refusal of the adopter, a `.governance` that cannot be
-made, a scaffold that cannot be written and a render that fails, is armed by `adopt-policy.test.sh`,
+made, a scaffold that cannot be written, a settings render that fails and a mirror refusal that is
+no `uncommitted changes`, is armed by `adopt-policy.test.sh`,
 which the case `adopter-suite` runs, and `ARMS_FLOORS` holds its census. The `policy check` leg ships
 to adopters; `policy fixtures` is gov's own.
 

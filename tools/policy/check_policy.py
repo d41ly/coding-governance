@@ -1109,9 +1109,10 @@ def run_fresh_target(name):
     of their `requires` read as registry ids (TOOL-dGroundRules-25 S6, S7). Every file under the
     target's tool root must be a receipt row's `path`, every engine or seed row's `path` must exist,
     and no `legacy-homes.txt` may be installed (S5). Then the installed `adopt-policy.sh`, found through
-    its receipt row: `--scaffold`; `--check` with the install staged; the install committed;
-    `--scaffold` again, which renders the mirror once its inputs are committed, and the mirror
-    committed (S7); `--check` again; and the installed `regen.py --check`, exit 0, the adopter's bar's
+    its receipt row: `--scaffold`, exit 0 printing `mirror deferred` and writing no mirror, the
+    install being staged (TOOL-dGroundRules-31); `--check` with the install staged; the install
+    committed; `--scaffold` again, which renders the mirror once its inputs are committed, and the
+    installed `policy.py mirror --check`, exit 0; the mirror committed (S7); `--check` again; and the installed `regen.py --check`, exit 0, the adopter's bar's
     preflight. Each `--check` must exit 0 with every arm graded clean or announced (S26), print
     `arm_schema` grading the scaffold's keys with no finding, `arm_mirror_readers` grading at least one
     staged code file of the memory-tree kit with no finding, the reader-coverage arm `not graded`, and
@@ -1197,9 +1198,12 @@ def run_fresh_target(name):
                             wrong.append(f"{phase}: {arm} printed {said!r}, not /{rx.pattern}/")
                     if rc:
                         wrong.append(f"{phase}: --check exited {rc}" + ("" if bad else f": {out.strip()}"))
-                rc, out = run_adopter("--scaffold")
-                if rc:
-                    wrong.append(f"--scaffold exited {rc}: {out.strip()}")
+                rc, out = run_adopter("--scaffold")  # TOOL-dGroundRules-31: the install is staged, so the mirror defers
+                asserted += 1
+                deferred, mirrored = "mirror deferred" in out, Path(t, *MIRROR_FILE).is_file()
+                if rc or not deferred or mirrored:
+                    wrong.append(f"the install-day --scaffold exited {rc}, printed {'' if deferred else 'no '}`mirror "
+                                 f"deferred` and left {'a' if mirrored else 'no'} {policy.MIRROR_REL}: {out.strip()}")
                 grade_check("with the install staged")
                 run_fixture_git(t, "add", "-A")
                 run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
@@ -1216,6 +1220,12 @@ def run_fresh_target(name):
                 if rc or not Path(t, *MIRROR_FILE).is_file():
                     wrong.append(f"--scaffold after the first commit exited {rc} and wrote "
                                  f"{'a' if Path(t, *MIRROR_FILE).is_file() else 'no'} {policy.MIRROR_REL}: {out.strip()}")
+                else:
+                    asserted += 1
+                    rc, out = run_case_argv(t, [sys.executable, (t / adopter).with_name("policy.py").as_posix(),
+                                                "mirror", "--check"])
+                    if rc:
+                        wrong.append(f"the installed policy.py mirror --check after the re-run exited {rc}: {out.strip()}")
                 run_fixture_git(t, "add", "-A")
                 run_fixture_git(t, "commit", "-q", "--allow-empty", "-m", "the mirror")
                 grade_check("once the install and its mirror are committed")

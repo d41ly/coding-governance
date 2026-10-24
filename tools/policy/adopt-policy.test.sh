@@ -41,10 +41,22 @@ want "--scaffold where the scaffold cannot be written refuses" 1 'policy: the sc
 mkrepo bad-settings commit; mkdir -p "$R/.claude"; printf '{\n' > "$R/.claude/settings.json"
 want "--scaffold where the settings render fails refuses" 1 'policy: the harness settings could not be rendered in ' --scaffold --target "$R"
 
+# 3b — a mirror refusal that is no `uncommitted changes` stands (TOOL-dGroundRules-31 S2): a scratch
+# copy of the adopter beside a policy.py staged to exit 2 on `mirror`, over a committed policy file.
+mkdir -p "$TMP/kit"; cp "$TOOL" "$TMP/kit/adopt-policy.sh"
+printf 'import sys\nif sys.argv[1:2] == ["mirror"]:\n    print("policy: refused - a planted mirror refusal")\n    sys.exit(2)\n' > "$TMP/kit/policy.py"
+mkrepo mirror-refused commit; mkdir -p "$R/.governance"; printf '' > "$R/.governance/policy.toml"
+git -C "$R" add -A; git -C "$R" commit -qm policy
+TOOL="$TMP/kit/adopt-policy.sh"
+want "--scaffold where the mirror refuses otherwise refuses" 1 'policy: the policy mirror could not be rendered in ' --scaffold --target "$R"
+want "--scaffold prints the mirror's own refusal" 1 'policy: refused - a planted mirror refusal' --scaffold --target "$R"
+TOOL="$HERE/adopt-policy.sh"
+
 # 4 — the outcomes beside the branches: a committed target is scaffolded and its settings rendered;
 # a re-run keeps the file and renders again; a target with no commit names the re-run.
 mkrepo fresh commit
 want "--scaffold over a committed target writes the file" 0 'wrote    ' --scaffold --target "$R"
+want "--scaffold defers the mirror over the uncommitted file" 0 'adopt-policy: mirror deferred · .governance/policy.toml has uncommitted changes' --scaffold --target "$R"
 if [ -f "$R/.claude/settings.json" ] && grep -q CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS "$R/.claude/settings.json"; then
   ok "--scaffold rendered the harness settings"
 else bad "--scaffold rendered the harness settings" "no .claude/settings.json carrying the limit under $R"; fi
