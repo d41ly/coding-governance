@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-47 — the criterion bug class's fix gains the re-run: a literal is run verbatim from the root before its spec commits, and a restated one is re-run, never copied
 
-**Status:** DEFERRED · rev-1 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -26,12 +26,14 @@ exited BOUNDED with finding **id 1 at HIGH**, which shares item **H1** with ids 
 (`TOOL-dGroundRules-46`) and 20 (`TOOL-dGroundRules-45`). Id 1 is H1 seen from coherence:
 `TOOL-dGroundRules-40` promised its probes "restated whole" and copied the stripped `PAIRS_SH` of
 `TOOL-dGroundRules-34` AC16 instead, and `TOOL-dGroundRules-43` AC1 inherited it; the skeptic's
-corrected fix ends "re-run the literal from the repository root before committing the spec". The
-record `TOOL-dGroundRules-42` widens already says to spell a literal whole in a fenced block; it does
-not say to run it, and a whole-looking literal copied from a corrupted source is still corrupted.
-This unit is id 1's promotion and the item's checklist half: the record's fix gains the re-run rule
-and its "Where it bit" gains this round. It repairs `TOOL-dGroundRules-40`, which sits at order 13, so
-it builds at order 14.
+corrected fix ends "re-run the literal from the repository root before committing the spec".
+The rule to spell a literal whole in a fenced block is `TOOL-dGroundRules-42` S3, which widens the
+record `memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md` at order 13, before
+this unit. At HEAD the record does not hold it yet: its fix section names no fenced block. S3 does
+not say to run the literal, and a whole-looking literal copied from a corrupted source is still
+corrupted. This unit is id 1's promotion and the item's checklist half: the record's fix gains the
+re-run rule after the paragraph S3 writes, and its "Where it bit" gains this round. It repairs
+`TOOL-dGroundRules-40`, which sits at order 13, so it builds at order 14.
 
 ## 2. Scope (IN)
 
@@ -41,11 +43,14 @@ it builds at order 14.
   the spec's commit, and its output is compared with what the criterion expects; a literal restated
   from another spec is re-run in the same way and never copied on trust, because a copy carries its
   source's corruption. Observed by AC1.
-- **S2** — Where it bit. A paragraph names this audit's H1 (review ids 1, 10 and 20):
-  `TOOL-dGroundRules-40` restated `TOOL-dGroundRules-34` AC16's stripped literal while promising it
-  whole, one round after `TOOL-dGroundRules-42` recorded the respelled form. Observed by AC1.
-- **S3** — The index stays current. The record's front-matter `description` is unchanged, so
-  `memory/gotchas/INDEX.md` needs no new row text. Observed by AC2.
+- **S2** — Where it bit. A paragraph in "Where it bit" names this audit's H1 (review ids 1, 10 and
+  20): `TOOL-dGroundRules-40` restated `TOOL-dGroundRules-34` AC16's stripped literal while promising
+  it whole, one round after `TOOL-dGroundRules-42` recorded the respelled form. Observed by AC2.
+- **S3** — The index row holds. The record's front-matter `description` is unchanged, and neither
+  new paragraph backticks a path-like token, so the record's derived anchors and its row in
+  `memory/gotchas/INDEX.md` stay as `TOOL-dGroundRules-42` leaves them. NOT OBSERVED: a row this
+  unit leaves as it was reads the same before the unit as after it, so no criterion can red on it;
+  the `memory hygiene` leg in §6 runs `gotchas.py --check`, whose check 17 reds a stale index.
 
 ## 3. Non-goals (OUT)
 
@@ -56,15 +61,22 @@ it builds at order 14.
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-42` — the record's fifth form and its fenced-block fix, which S1 extends with the re-run and S2 with this round's instance
+- **consumes-from** `TOOL-dGroundRules-42` — the record's fifth form and its S3 fenced-block fix, which S1 extends with the re-run and S2 with this round's instance
 
 ## 4. Design
 
-`TOOL-dGroundRules-42` S1 to S3 add the respelled input to the record's Symptom list and its fix,
-and anchor the record so `gotchas.py --for-diff` hands it to every spec commit. This unit adds two
-paragraphs to the same record, one in "The fix" and one in "Where it bit", and changes no anchor, so
-the selection `TOOL-dGroundRules-42` AC1 observes is unchanged. The fix paragraph is the skeptic's
-own wording for id 1, generalised from `PAIRS_SH` to any read-only literal.
+`TOOL-dGroundRules-42` S1 to S3 add the respelled input to the record's Symptom list, its "Where it
+bit" and its fix, and its S4 backticks `memory/builds/` so `gotchas.py --for-diff` hands the record
+to every spec commit. This unit adds two paragraphs to the same record, one in "The fix" after the
+paragraph `TOOL-dGroundRules-42` S3 writes, and one in "Where it bit". The fix paragraph is the
+skeptic's own wording for id 1, generalised from `PAIRS_SH` to any read-only literal.
+
+Neither paragraph backticks a path-like token. In `tools/memory-tree/gotchas.py`, `ANCHOR_RE`
+harvests a record's anchors from backticked tokens carrying a `/` or a listed file extension,
+`build_record` keeps them, and `render` prints their count in the record's index row. A new anchor
+would move that count, leave the index stale for check 17 in `cmd_check`, and widen which diffs
+`selectable` hands the record to. The paragraphs name a unit id, a constant such as PAIRS_SH and
+the review in plain text, as the record's existing "Where it bit" paragraphs do.
 
 ### Files touched (estimate)
 
@@ -73,12 +85,16 @@ own wording for id 1, generalised from `PAIRS_SH` to any read-only literal.
 ## 5. Acceptance criteria
 
 - **AC1** — When
-  `grep -c "verbatim from the repository root" memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md`
-  runs, it prints `1` or more, and `grep -c "TOOL-dGroundRules-40"` over the same record prints `1`
-  or more.
-  Red when: the record names the stripped form without the re-run that would have caught the copy.
-- **AC2** — When `python tools/memory-tree/gotchas.py --check` runs, it exits 0.
-  Red when: the record's edit leaves the generated index stale.
+  `sed -n '/^## The fix/,/^## Related/p' memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md | grep -c "verbatim from the repository root"`
+  runs, it prints `1` or more, and the same command with `grep -c "never copied"` in place of the
+  last stage prints `1` or more. Both print `0` at commit 9bcca652 (measured 2026-10-24, PINNED).
+  Red when: "The fix" lacks the re-run of a literal from the root (the first count), or lacks the
+  rule that a restated literal is re-run rather than copied (the second count).
+- **AC2** — When
+  `sed -n '/^## Where it bit/,/^## The fix/p' memory/gotchas/criterion-asserts-what-its-own-command-cannot-show.md | grep -c "TOOL-dGroundRules-40"`
+  runs, it prints `1` or more. It prints `0` at commit 9bcca652 (measured 2026-10-24, PINNED).
+  Red when: "Where it bit" does not name this round's copied literal, including when the paragraph
+  lands in another section of the record.
 
 ## 6. Gates
 
@@ -93,6 +109,14 @@ none
 - rev-1 · 2026-10-23 · initial draft, promoting finding id 1 (HIGH, item H1) of the round-1 spec
   audit of units 35 to 43 as the item's checklist half, from the skeptic's corrected fix, with the
   record's fix section and unit 42's scope read on 2026-10-23.
+- rev-2 · 2026-10-24 · the staleness probe against HEAD found four disagreements, and the run ruled
+  on each. §1 said the record already holds the fenced-block fix; the ruling states it is
+  `TOOL-dGroundRules-42` S3, built at order 13 before this unit, and absent from the record at HEAD.
+  §4 credited S1 to S3 of that unit with the anchors; the ruling cites its S4. AC2 ran
+  `gotchas.py --check`, green before this unit; the ruling replaces it with a section-scoped count
+  that prints `0` at HEAD, AC1 is scoped to "The fix" the same way, and S3 is `NOT OBSERVED` with
+  its reason, after reading that `render` counts anchors in the index row. Code is cited by symbol,
+  never by line number.
 
 ## 9. Reuse audit
 
