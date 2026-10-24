@@ -7538,6 +7538,11 @@
       "file": "tools/govkit/fixtures/make_adopter_receipt.py"
     },
     {
+      "id": "derive_limits_rel",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
+    },
+    {
       "id": "derive_line_length_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -11966,6 +11971,11 @@
       "id": "parse_legacy_rows",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "parse_limits_rows",
+      "kind": "function",
+      "file": "tools/policy/budgets.py"
     },
     {
       "id": "parse_line",

@@ -312,7 +312,7 @@ authorship. The block is gov's own; the runbook's copy instructions do not carry
 | `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the landed revision | each `lists --check` report on the legacy homes; a refused landed revision |
 | `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision |
 | `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file spelling the template-size limits file's name on a line that is not a comment or a Python docstring: `budgets.py` is its one reader |
-| `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file at HEAD | a row whose enforcer is absent, asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
+| `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent, asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
 
 ## The size caps
 
@@ -471,7 +471,7 @@ Both runs must exit 0, and every arm must print a graded line with no finding or
 | `arm_legacy_homes` | the target's kit confs, gate file and house file against the installed `legacy-homes.txt` and the list at its landed revision | a finding: with the list absent, each derived row is a `stale list` finding, until TOOL-dGroundRules-17 withholds the list and announces the arm |
 | `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | no owner build landed, or no memory-tree kit beside this one, prints `graded 0` and no finding; a landed revision that does not resolve is a finding |
 | `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | a finding: a target with no tracked code is a zero population |
-| `arm_cap_census` | the installed cap census against the target: each row's enforcer, the requests its tracked code makes, and the limits file's rows at HEAD | a finding per census row whose enforcer the target does not hold, until TOOL-dGroundRules-17 grades each row by whether its enforcer ships |
+| `arm_cap_census` | the installed cap census against the target: each row's enforcer, the requests its tracked code makes, and the limits file's rows | a finding per census row whose enforcer the target does not hold, until TOOL-dGroundRules-17 grades each row by whether its enforcer ships |
 
 ## The adopter
 

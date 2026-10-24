@@ -132,20 +132,30 @@ def parse_request(req):
     return m["cap"], m["how"], int(m["n"]) if m["n"] else None
 
 
-def read_limits_home(repo, sha):
-    """(the limits file's repo-relative path, {row key: (value text, line)}) in the commit `sha`
-    names, at this kit's tool root: tab-separated rows, comment and blank lines skipped, the value
-    stripped of whitespace, as the template-size gate parsed it. An absent file has no rows."""
+def derive_limits_rel():
+    """The limits file's path from the top of the repository, at this kit's tool root."""
     root = derive_tool_root()
-    rel = f"{root}/{LIMITS_NAME}" if root else LIMITS_NAME
-    text = policy.run_git(repo, "show", f"{sha}:{rel}")
+    return f"{root}/{LIMITS_NAME}" if root else LIMITS_NAME
+
+
+def parse_limits_rows(text):
+    """{row key: (value text, line)} of the limits file's text: tab-separated rows, comment and blank
+    lines skipped, the value stripped of whitespace, as the template-size gate parsed it, the first
+    row of a key kept. The file's ONE parser: every reader of its rows comes through here."""
     rows = {}
     for n, line in enumerate((text or "").replace("\r", "").split("\n"), 1):
         if not line.strip() or line.lstrip().startswith("#"):
             continue
         key, _tab, val = line.partition("\t")
         rows.setdefault(key, ("".join(val.split()), n))
-    return rel, rows
+    return rows
+
+
+def read_limits_home(repo, sha):
+    """(the limits file's repo-relative path, its rows by `parse_limits_rows`) in the commit `sha`
+    names. An absent file has no rows."""
+    rel = derive_limits_rel()
+    return rel, parse_limits_rows(policy.run_git(repo, "show", f"{sha}:{rel}"))
 
 
 def derive_home_line(repo, home):
@@ -176,10 +186,10 @@ def resolve_caps(requests, repo=".", rev=None):
     read = policy.read_revision(repo, rev, rows)
 
     # Each read spells its key as a string, the shape the reader-coverage arm reads as a reader.
-    def ask(key):
+    def read_key(key):
         path = policy.parse_key(key)
         return policy.resolve_read(path, policy.read_catalogue_row(path, rows), read)
-    enforce, pinned = ask("budgets.enforce"), ask("budgets.pinned")
+    enforce, pinned = read_key("budgets.enforce"), read_key("budgets.pinned")
     pins = pinned.value if isinstance(pinned.value, list) else []
     limits = None
     out = {}
@@ -204,7 +214,7 @@ def resolve_caps(requests, repo=".", rev=None):
                                   name, cap.unit, rule)
             continue
         seg = policy.render_json(name)  # one quoted segment, whatever `/`, `.` or `*` the name carries
-        hit = ask(f"budgets.{seg}")
+        hit = read_key(f"budgets.{seg}")
         # An unset key resolves to the row's derived default, a table: that is "no file value".
         held = None if isinstance(hit.value, dict) else hit.value
         legacy = None

@@ -1321,6 +1321,9 @@ MANIFEST_TRAP_MAX=400   # check 11's per-bullet cap, which reuses check 8's figu
 MB_ANSWERS="" MB_NOTE=""
 _mb_py=$(resolve_python 2>/dev/null) || _mb_py=""
 _mb_pk=$(resolve_kit_file policy budgets.py)
+# The last rung searches by NAME, so a repository's own `budgets.py` would answer it: the policy kit
+# is the one whose directory also holds its census and its catalogue, and anything else is no kit.
+case "$_mb_pk" in */budgets.py) [ -f "${_mb_pk%/*}/caps.toml" ] && [ -f "${_mb_pk%/*}/catalogue.toml" ] || _mb_pk="" ;; esac
 if [ -z "$_mb_py" ] || [ -z "$_mb_pk" ]; then
   MB_NOTE="MANIFEST — no policy kit is installed beside this checker, so a size breach refuses as before"
 elif _mb_out=$("$_mb_py" "$_mb_pk" resolve --explain "manifest-bytes=default:$MAX_MANIFEST_BYTES" \

@@ -542,7 +542,8 @@ def arm_cap_census(repo, kit):
     comment, a `limits:` row's naming it by the subject's key at run time; an outside row's enforcer
     makes no request naming it; and each row has its case in CAP_CASES. Tree to census: a request in
     a `derive_code_files` file naming a cap no row names, a CAP_CASES case for no row, and a row of
-    the limits file at HEAD no `limits:` row names. A census that does not read is the one finding."""
+    the limits file in the tree, parsed by `budgets.parse_limits_rows`, no `limits:` row names. A census
+    that does not read is the one finding."""
     try:
         census = budgets.read_cap_census(repo)
     except policy.Refusal as exc:
@@ -572,12 +573,13 @@ def arm_cap_census(repo, kit):
             asked += 1
             if cap is not None and cap not in census:
                 out.append((cap, f"is requested by {f} and names no census row"))
-    lrel, lrows = budgets.read_limits_home(repo, "HEAD")
+    lrel = budgets.derive_limits_rel()
+    lrows = budgets.parse_limits_rows(policy.read_text_or_none(Path(repo, lrel)))
     homes = {c.home.partition(":")[2] for c in census.values() if c.home.startswith("limits:")}
-    out += [(k, f"is a row of {lrel} at HEAD no limits: census row names, so nothing enforces it")
+    out += [(k, f"is a row of {lrel} no limits: census row names, so nothing enforces it")
             for k in sorted(set(lrows) - homes)]
     return len(census), (f"{len(census)} census row(s) joined to their enforcers and cases · {asked} request(s) "
-                         f"in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel} at HEAD"), out
+                         f"in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel}"), out
 
 
 ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm_mirror_parity,
@@ -2135,11 +2137,11 @@ def read_source_number(rel, key):
 
 
 def read_source_limits():
-    """(the limits file's path, its text and its rows) at the source tree's HEAD, read through the
-    policy reader's own `read_limits_home`."""
-    top = derive_source_top()
-    lrel, rows = budgets.read_limits_home(top, "HEAD")
-    return lrel, policy.run_git(top, "show", f"HEAD:{lrel}") or "", rows
+    """(the limits file's path, its text and its rows) in the source tree under test, its rows by the
+    policy reader's own `parse_limits_rows`: a plant copies the text it measures against."""
+    lrel = budgets.derive_limits_rel()
+    text = policy.read_text_or_none(derive_source_top() / lrel) or ""
+    return lrel, text.replace("\r\n", "\n"), budgets.parse_limits_rows(text)
 
 
 def write_case_file(root, rel, text):
@@ -2177,13 +2179,15 @@ def render_said(out, mark):
     return next((ln for ln in out.splitlines() if mark and mark in ln), (out.strip().splitlines() or ["(no output)"])[-1])[:300]
 
 
-def run_case_argv(cwd, argv, env=None):
-    """-> (exit code, stdout and stderr with CR stripped); a `bash` argv[0] is `resolve_bash`'s."""
+def run_case_argv(cwd, argv, env=None, stdin=None):
+    """-> (exit code, stdout and stderr with CR stripped); a `bash` argv[0] is `resolve_bash`'s, an
+    `env` value of None drops that variable, and `stdin` is the text piped in."""
     if argv[0] == "bash":
         argv = [resolve_bash() or "bash", *argv[1:]]
+    merged = {**os.environ, **(env or {})}
     try:
         p = subprocess.run([str(a) for a in argv], cwd=cwd, capture_output=True, text=True, encoding="utf-8",
-                           errors="replace", env={**os.environ, **(env or {})})
+                           errors="replace", input=stdin, env={k: v for k, v in merged.items() if v is not None})
     except OSError as exc:
         return None, f"{argv[0]} did not run: {exc}"
     return p.returncode, (p.stdout + p.stderr).replace("\r", "")
@@ -2360,24 +2364,37 @@ def derive_recall_export_plant(cap):
 
 
 def derive_outside_probe_plant(cap):
-    """An outside row's enforcer run under each value. Where the cap is cheap to reach the run
-    breaches it: the orientation card at a 1-byte cap, Codex's canonical one byte over CODEX_MAX.
-    Elsewhere the run reads the constant the enforcer holds, from its own module."""
+    """An outside row's enforcer run under each value, breaching its cap where it has a CLI to reach
+    it: the orientation card at a 1-byte cap, Codex's canonical one byte over CODEX_MAX, a charter
+    citing a file under no cap, and a subagent route longer than the hook's context cap. A library
+    with no CLI, the runlog record's and the feature card's, is imported and its constant printed:
+    that run cannot breach, so the arm that holds it outside the switch is `arm_cap_census`'s join,
+    and the reader's refusal this case asserts beside it."""
     rel = derive_enforcer_rel(cap)
     key = cap.home.rpartition(":")[2]
     if cap.name == "orientation-card":
         return derive_manifest_plant(cap, body="", env={key: "1"}, argv_tail=(
             "--card", "--write", "--session", "00000000-0000-4000-8000-000000000000")) | {"warn": "over the 1-byte cap"}
     src = derive_enforcer_path(cap)
-    if cap.name == "cited-file-cap":  # a waiver list, no number: the check runs over a small tree
-        return {"files": {".memory-tree.conf": "MEMORY_ROOT=memory\n", "memory/README.md": "# r\n"},
-                "argv": [sys.executable, src, "--check"], "warn": ""}
+    if cap.name == "cited-file-cap":  # a waiver list, no number: a charter cites a file no cap covers
+        return {"files": {".memory-tree.conf": HYGIENE_CONF + "CHARTER=AGENTS.md\n", "memory/README.md": "# r\n",
+                          "AGENTS.md": "# Charter\n\nRead `memory/HYGIENE.md` first.\n", "memory/HYGIENE.md": "# Hygiene\n"},
+                "argv": [sys.executable, src, "--check"], "warn": "under no byte cap"}
     v = read_source_number(rel, f"const {key}" if rel.endswith(".js") else key)
     if cap.name == "codex-instructions":
         return {"files": {"AGENTS.md": "x" * v + "\n"}, "argv": ["bash", src], "warn": f"over {v}"}
-    if rel.endswith(".js"):
-        return {"files": {}, "argv": ["node", "-e", f"process.stdout.write(String(require({json.dumps(src)}).{key}))"],
-                "warn": str(v)}
+    if rel.endswith(".js"):  # the subagent context: a routed card of more route lines than the cap holds
+
+        def write_card(t):
+            card = Path(run_fixture_git(t, "rev-parse", "--path-format=absolute", "--git-common-dir"), "orientation", "case.md")
+            card.parent.mkdir(parents=True, exist_ok=True)
+            card.write_text("## route\n- build: bX\n" + "".join(
+                f"- unit: TOOL-bX-{i} · spec memory/builds/bX/spec/2026-01-01-spec-TOOL-bX-{i}.md\n"
+                for i in range(v // 50)), encoding="utf-8", newline="\n")
+        return {"files": {".memory-tree.conf": 'MEMORY_ROOT=memory\nROUTED_PATHS="tools/"\n'}, "post": write_card,
+                "argv": ["node", src], "env": {"CLAUDE_PROJECT_DIR": None},
+                "stdin": json.dumps({"hook_event_name": "SubagentStart", "session_id": "case", "cwd": "{repo}"}),
+                "warn": f"capped at {v} characters"}
     mod = Path(rel).stem
     return {"files": {}, "argv": [sys.executable, "-B", "-c", f"import sys; sys.path.insert(0, {posixpath.dirname(src)!r}); "
                                   f"import {mod}; print({mod}.{key})"], "warn": str(v)}
@@ -2406,7 +2423,8 @@ def run_cap_plant(t, cap, plant, mode, extra=""):
     """One plant built at `t` under `mode` and its enforcer run there -> (exit code, output, plant)."""
     p = plant(cap)
     repo = build_cap_repo(t, p["files"], mode, p.get("extra", "") + extra, p.get("copies", ()), p.get("post"))
-    rc, out = run_case_argv(repo, [str(a).replace("{repo}", repo.as_posix()) for a in p["argv"]], p.get("env"))
+    stdin = p["stdin"].replace("{repo}", repo.as_posix()) if p.get("stdin") else None
+    rc, out = run_case_argv(repo, [str(a).replace("{repo}", repo.as_posix()) for a in p["argv"]], p.get("env"), stdin)
     return rc, out, p
 
 
