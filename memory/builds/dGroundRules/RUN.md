@@ -105,3 +105,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T00:39:31Z brief · item TOOL-dGroundRules-14 · reason 8e6a14b351ee memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-14-build-brief.md
 
 2026-10-24T01:12:29Z rescope · item add TOOL-dGroundRules-66 · reason --dispatch's sibling loop grades every key of a terminal unit as a live pass; TOOL-dGroundRules-19 is CLOSED but keys 729e5128 and d88f7ddd can never close (the first Pass: TOOL-dGroundRules-19 commit after them wrote outside their sets), so check 49 refused TOOL-dGroundRules-7 twice and would refuse every unit declaring policy.py, guard.py, help/policy.md or the mirror; --audit already skips CLOSED/WONTDO units, and a terminal unit cannot write (scratch-guard), so --dispatch skips them too
+
+2026-10-24T01:43:44Z dispatch · item ef04a7f0 TOOL-dGroundRules-66 · reason tools/unattended/unattended.sh tools/unattended/unattended.test.sh tools/unattended/VERBS.template.md memory/guides/UNATTENDED-VERBS.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json memory/builds/dGroundRules/spec/2026-10-24-spec-TOOL-dGroundRules-66.md memory/builds/dGroundRules/build/2026-10-24-build-TOOL-dGroundRules-66-ledger.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/backlog/TOOL.md
+
+2026-10-24T01:43:49Z brief · item TOOL-dGroundRules-66 · reason f8dabbd5ddb8 memory/builds/dGroundRules/prompts/2026-10-24-prompt-TOOL-dGroundRules-66-spec-brief.md

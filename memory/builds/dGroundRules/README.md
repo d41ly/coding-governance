@@ -123,7 +123,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** SPECCED · 64 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 64 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14
 ids TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28
 ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42
@@ -143,7 +143,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-24 — the fresh target installed by the deployer, so the case grades an install govkit makes](spec/2026-10-23-spec-TOOL-dGroundRules-24.md) | 3 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-5 — the JSON mirror, regenerated at each landing and read from the landed blob](spec/2026-10-23-spec-TOOL-dGroundRules-5.md) | 3 | 2 | CLOSED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-6 — the minimal guard over the policy file and its three neighbours](spec/2026-10-23-spec-TOOL-dGroundRules-6.md) | 3 | 2 | CLOSED | rev-3 | 2026-10-24 |
-| [TOOL-dGroundRules-66 — `--dispatch`'s sibling set leaves out a terminal unit's keys, through the one open-pass reader `--audit` shares](spec/2026-10-24-spec-TOOL-dGroundRules-66.md) | 3 | 2 | SPECCED | rev-1 | 2026-10-24 |
+| [TOOL-dGroundRules-66 — `--dispatch`'s sibling set leaves out a terminal unit's keys, through the one open-pass reader `--audit` shares](spec/2026-10-24-spec-TOOL-dGroundRules-66.md) | 3 | 2 | CLOSED | rev-1 | 2026-10-24 |
 | [TOOL-dGroundRules-14 — the landing replay: the mirror a prepared merge carries is fresh at that merge](spec/2026-10-23-spec-TOOL-dGroundRules-14.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-19 — the guard admits a regenerated mirror equal to its render, so an agent branch that edits the catalogue reaches a green bar](spec/2026-10-23-spec-TOOL-dGroundRules-19.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-26 — the fresh target installed from a commit of the tree under test, so the case grades the bytes the bar records](spec/2026-10-23-spec-TOOL-dGroundRules-26.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 191 bound to this build, across 4 record folder(s).
+Records: 192 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

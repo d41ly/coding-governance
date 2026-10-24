@@ -8448,7 +8448,7 @@ read_tree_clocks() {
 # refusals exit 1. `refuse_if_terminal` is not reused for the terminal case: its sentence says the
 # verb "would rewrite" the record, and this verb rewrites nothing.
 print_audit() { # slug
-  local slug="$1" rel ph now lastc lastw dead="" rows u iso g decl disp el wtxt verdict open=0 sp st
+  local slug="$1" rel ph now lastc lastw dead="" rows u iso g decl disp el wtxt verdict open=0
   # THE TASK BOUND IS READ HERE AND NOT AT LOAD (TOOL-aRepatriatedFork-53 S6): this is the one verb
   # that grades it, so its NOTE and its exit-2 refusal belong to this verb, before any line prints.
   read_bound_key TASK_STALL_BOUND "$TASK_STALL_BOUND_DEFAULT" seconds "a registered task reads STALLED after the kit default of ${TASK_STALL_BOUND_DEFAULT}s with no heartbeat"
@@ -8474,24 +8474,28 @@ print_audit() { # slug
   # and this repo's own harness produced twelve one-path rows for one unit — so the last row alone
   # asked whether the pass wrote its LAST path, reported a CLOSED unit open for hours, and handed
   # the keepalive a kill order for it (closing review of aProbedUnit, cluster A).
-  rows=$(read_pass_declarations "$rel" current | awk -F' · ' '{
-       iso = $1; sub(/ dispatch$/, "", iso); it = substr($2, 6); g = it; sub(/ .*/, "", g); u = it; sub(/^[^ ]* /, "", u)
-       print u "\t" iso "\t" g "\t" substr($3, 8) }' | sort)
+  #
   # A UNIT WHOSE SPEC IS TERMINAL IS NOT OPEN, whatever its rows say. The openness test is a
   # disjointness proof and answers conservatively — a pass that legitimately declared a path it never
-  # wrote stays open under it forever — which is the right answer for `--dispatch` and the wrong one
-  # for a stall clock that a keepalive ACTS on. The status is resolved the way `--plan` resolves it,
-  # from the same tracked spec set, so the two verbs cannot grade one unit CLOSED and STALLED.
+  # wrote stays open under it forever. A terminal unit cannot be the writer that proof guards against:
+  # its spec goes CLOSED in its own pass commit, and from then the scratch guard refuses its writes
+  # under `ROUTED_PATHS` until the spec reads INPROGRESS again. So the skip is right for `--dispatch`
+  # too, and both verbs read it through `read_open_passes` (TOOL-dGroundRules-66). Outside
+  # `ROUTED_PATHS` the guard refuses nothing, so a follow-up pass dispatched for a unit already
+  # terminal reserves nothing until its spec is set back to INPROGRESS, and `--dispatch` says so.
+  # The status is resolved the way `--plan` resolves it, from the same tracked spec set, so the two
+  # verbs cannot grade one unit CLOSED and STALLED.
   # A PROBE, LIKE THE FOUR ABOVE IT, so its refusal reaches the dead-probe exit (closing review of
   # aProbedUnit, round 2, cluster H). Swallowed with `|| true`, a failed read left the maps empty,
   # the status skip never fired, and a CLOSED unit was graded STALLED with the kill-and-redispatch
   # remedy printed for the keepalive to act on — the round-1 defect again, with its cause discarded.
+  # It runs BEFORE the rows are read, because the reader takes its status from the maps it fills.
   [ -n "$dead" ] || load_spec_facts $(git ls-files "$M/builds/$slug/spec/*.md" 2>/dev/null | drop_working_specs) >/dev/null 2>&1 || dead="load_spec_facts over $M/builds/$slug/spec"
+  rows=$(read_open_passes "$rel" current | awk -F' · ' '{
+       iso = $1; sub(/ dispatch$/, "", iso); it = substr($2, 6); g = it; sub(/ .*/, "", g); u = it; sub(/^[^ ]* /, "", u)
+       print u "\t" iso "\t" g "\t" substr($3, 8) }' | sort)
   while IFS=$'\t' read -r u iso g decl; do
     [ -n "$u" ] || continue
-    st=""; sp="${SPEC_PATH[$u]:-}"; [ -z "$sp" ] || st="${SPEC_ST[$sp]:-}"
-    case "$st" in CLOSED|WONTDO) continue ;; esac
-    check_pass_open "$g" "$u" "$rel" "$decl" || continue
     [ -n "$dead" ] && break
     disp=$(date -u -d "$iso" +%s 2>/dev/null) || disp=""
     case "$disp" in ""|*[!0-9]*) dead="date -u -d on the dispatch row's timestamp $iso"; break ;; esac
@@ -13425,6 +13429,37 @@ RESCOPED
 # rendered from and a flat ban would refuse the ORDINARY declaration. Condition 2 is a judgement about
 # meaning and is NOT enforced; a verb that pretended to decide it would be a check that cannot fail.
 
+# THE OPEN PASSES, ONE READER FOR TWO VERBS (TOOL-dGroundRules-66): the rows the library's
+# `read_pass_declarations` prints for the same arguments, keeping a key only while `check_pass_open`
+# calls it open AND its unit's spec reads neither CLOSED nor WONTDO. `--dispatch` takes its sibling set
+# from it and `--audit` its open units, so the two cannot answer "which passes are open" two ways.
+# A TERMINAL UNIT RESERVES NOTHING: its spec goes terminal in its own pass commit, and from then the
+# scratch guard refuses its writes under `ROUTED_PATHS` until the spec reads INPROGRESS again, which
+# brings its keys back. Before this, a key whose first attributed commit wrote outside its set — which
+# `pass_commit` never closes — held its paths against every later pass for the rest of the run.
+# Openness is asked first, so each key the status skip RELEASES is named on stderr and none silently.
+# The maps are the CALLER's: each verb's load is a probe with its own failure handling, and a unit
+# with no status read is not terminal, so a failed read keeps every open key reserved.
+# WHAT IT DOES NOT SEE: a follow-up pass dispatched for a unit already terminal reserves nothing from
+# its declaration on (`--dispatch` says so), and a spec flipped before its pass commit releases the
+# pass early, because status is read from the working tree, as the order gate and the guard read it.
+read_open_passes() { # run-state file · [current] -> the open keys of units whose spec is not terminal
+  local _r _i _g _u _decl _sp _st
+  read_pass_declarations "$1" ${2:+"$2"} | while IFS= read -r _r; do
+      [ -n "$_r" ] || continue
+      _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
+      _g=${_i%% *}; _u=${_i#* }
+      _decl=${_r#* · reason }
+      check_pass_open "$_g" "$_u" "$1" "$_decl" || continue
+      _st=""; _sp="${SPEC_PATH[$_u]:-}"; [ -z "$_sp" ] || _st="${SPEC_ST[$_sp]:-}"
+      case "$_st" in CLOSED|WONTDO)
+        printf 'unattended: %s %s left out as terminal (%s), so its declared paths reserve nothing: %s\n' "$_g" "$_u" "$_st" "$_decl" >&2
+        continue ;;
+      esac
+      printf '%s\n' "$_r"
+    done
+}
+
 # IS THIS DISPATCHED PASS STILL OPEN. 0 = open, 1 = closed. The body of `verb_dispatch`'s sibling
 # loop, hoisted verbatim by TOOL-aProbedUnit-3 so `--dispatch` and `--audit` ask ONE function: two
 # definitions of "open" is the two-answers class, and the first version of this test was wrong once
@@ -13498,7 +13533,12 @@ check_commit_message() { # commit message file
   # row (the library's `current`), which is the window check 23 grades a commit made now in: a row at
   # a later anchor is a new pass, graded alone, and an earlier pass's paths do not carry into it
   # (TOOL-aGraftedHelix-39). Openness is the predicate `--dispatch` and `--audit` already share, asked
-  # over the key's union, so this verb cannot call a pass open that they call closed. A key it calls
+  # over the key's union, so this verb cannot call a pass open that they call closed. It asks
+  # check_pass_open alone, without the terminal-status skip `read_open_passes` adds for those two
+  # (TOOL-dGroundRules-66): a pass commit flips its own spec to CLOSED in the commit being made, so
+  # the skip would read that pass as closed, `pass_commit` does not name HEAD either, and every pass
+  # commit would be refused as having no open dispatched pass. This verb answers which declaration
+  # grades this commit, not which paths are reserved. A key it calls
   # closed BECAUSE ITS PASS COMMIT IS HEAD is kept apart (`O`): that is `git commit --amend` on the
   # pass commit, whose HEAD is the commit being replaced (closing review r1, M4). Only a trailer naming
   # the unit reopens it, so a records commit after a pass is never asked for a trailer it does not owe.
@@ -13688,6 +13728,12 @@ verb_dispatch() { # slug · unit · writes...
     fail 49 "--dispatch declares a build pass out of the build's own declared order: $unit is at order $_d_ord and an earlier step still holds a unit that is neither terminal nor dispatched:$_blockers"
     return 1
   fi
+  # A TERMINAL UNIT'S OWN DISPATCH RESERVES NOTHING (TOOL-dGroundRules-66 S3): `read_open_passes`
+  # leaves every key of a CLOSED or WONTDO unit out of a sibling set, the row this call parks included,
+  # so a follow-up pass for such a unit is declared with that said rather than left to look reserved.
+  case "${SPEC_ST[$_d_spec]:-}" in CLOSED|WONTDO)
+    echo "unattended: dispatch — $unit is ${SPEC_ST[$_d_spec]}, so this declaration reserves nothing against a sibling; set its spec back to INPROGRESS for it to" >&2 ;;
+  esac
   # --------------------------------------------------- TOOL-dTrueNorth-16 S2, THE EDGE REFUSAL
   # The order gate's blind spot: units sharing an order are one parallel group and never block each
   # other, so a consumer and its producer at one order dispatch in either sequence, and the consumer
@@ -13855,20 +13901,15 @@ verb_dispatch() { # slug · unit · writes...
   # it "the same way the leg reads it". It did not: it counted the run-state bookkeeping commit that
   # carries a pass's OWN declaration, so every pass closed the instant it was declared and this whole
   # proof ran over an empty set. A closing review reproduced that with two controls. The comment is
-  # now a function call, which cannot be wrong about what the leg does — `check_pass_open`, shared
-  # with `--audit`. ONE POPULATION, the library's keys (TOOL-aGraftedHelix-39): this loop asks about
-  # EVERY key and `--audit` about each unit's current one, and both ask over the key's union. So a
-  # pass's earlier same-anchor paths stay reserved against a sibling until it commits inside the
-  # union, and are released then. The per-ROW reading this replaced let a re-declaration naming only
-  # its added paths free the earlier ones while the pass was still open.
-  sibrows=$(read_pass_declarations "$rel" | while IFS= read -r _r; do
-      [ -n "$_r" ] || continue
-      _i=${_r#* dispatch · item }; _i=${_i%% · reason *}
-      _g=${_i%% *}; _u=${_i#* }
-      _decl=${_r#* · reason }
-      check_pass_open "$_g" "$_u" "$rel" "$_decl" || continue
-      printf '%s\n' "$_r"
-    done)
+  # now a function call, which cannot be wrong about what the leg does — `read_open_passes`, shared
+  # with `--audit`, over `check_pass_open`. ONE POPULATION, the library's keys (TOOL-aGraftedHelix-39):
+  # this verb asks about EVERY key and `--audit` about each unit's current one, and both ask over the
+  # key's union. So a pass's earlier same-anchor paths stay reserved against a sibling until it
+  # commits inside the union, and are released then. The per-ROW reading this replaced let a
+  # re-declaration naming only its added paths free the earlier ones while the pass was still open.
+  # A unit whose spec is CLOSED or WONTDO reserves nothing, each released key named on stderr
+  # (TOOL-dGroundRules-66): the reader's own comment says why.
+  sibrows=$(read_open_passes "$rel")
   sibpaths=$(printf '%s\n' "$sibrows" | sed 's/.* · reason //' | tr '\n' ' ')
   # A PROOF OVER NOBODY SAYS SO. The condition-1 loop below iterates the sibling rows and returns
   # success over zero of them, which is byte-indistinguishable from a proof over somebody — and an

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-66 — `--dispatch`'s sibling set leaves out a terminal unit's keys, through the one open-pass reader `--audit` shares
 
-**Status:** SPECCED · rev-1 · 2026-10-24 · node d · Tier-2 · base 3c2b69be · streams tooling · order 3
+**Status:** CLOSED · rev-1 · 2026-10-24 · node d · Tier-2 · base 3c2b69be · streams tooling · order 3
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dGroundRules-66-deviation-71.md](../build/2026-10-24-build-TOOL-dGroundRules-66-deviation-71.md) | deviation | — |
+| [2026-10-24-build-TOOL-dGroundRules-66-ledger.md](../build/2026-10-24-build-TOOL-dGroundRules-66-ledger.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-66-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-66-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-66-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-66-spec-brief.md) | research | — |
 

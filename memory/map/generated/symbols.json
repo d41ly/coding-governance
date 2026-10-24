@@ -14348,6 +14348,11 @@
       "file": "tools/drift-audit/selftest.py"
     },
     {
+      "id": "read_open_passes",
+      "kind": "function",
+      "file": "tools/unattended/unattended.sh"
+    },
+    {
       "id": "read_oracle_answer",
       "kind": "function",
       "file": "tools/lexicon/selftest.py"
