@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-51 — the build-order evidence observed in the build README with its path whole, beside the root-README negative
 
-**Status:** DEFERRED · rev-2 · 2026-10-23 · node d · Tier-1 · base 3708a705 · streams tooling · order 15 · advances TOOL-dGroundRules-12
+**Status:** WONTDO · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 15 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 

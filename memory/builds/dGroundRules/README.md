@@ -184,17 +184,17 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-48 — the help page's install-section count observed with its path whole, and paired with the break that empties it](spec/2026-10-23-spec-TOOL-dGroundRules-48.md) | 14 | 1 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-49 — the help page's guard line observed by the leg query with its path whole, and by the trace when it is taken out](spec/2026-10-23-spec-TOOL-dGroundRules-49.md) | 14 | 1 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-50 — the help-page parity prints where it found the deferral line, so the install section is read by one rule](spec/2026-10-23-spec-TOOL-dGroundRules-50.md) | 14 | 1 | DEFERRED | rev-3 | 2026-10-24 |
-| [TOOL-dGroundRules-51 — the build-order evidence observed in the build README with its path whole, beside the root-README negative](spec/2026-10-23-spec-TOOL-dGroundRules-51.md) | 15 | 1 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-51 — the build-order evidence observed in the build README with its path whole, beside the root-README negative](spec/2026-10-23-spec-TOOL-dGroundRules-51.md) | 15 | 1 | WONTDO | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-52.md) | 16 | 2 | DEFERRED | rev-4 | 2026-10-24 |
-| [TOOL-dGroundRules-53 — the trap row's shell verdict observed with the library sourced by its tracked path and the trap pair whole](spec/2026-10-23-spec-TOOL-dGroundRules-53.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-53 — the trap row's shell verdict observed with the library sourced by its tracked path and the trap pair whole](spec/2026-10-23-spec-TOOL-dGroundRules-53.md) | 17 | 2 | WONTDO | rev-1 | 2026-10-24 |
 | [TOOL-dGroundRules-55 — the criterion bug class gains the side read: a criterion observes its scope item by running the check, never by reading what the check reads](spec/2026-10-23-spec-TOOL-dGroundRules-55.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-57 — the not-a-trap staging spelled whole, so the trap probe lists the row the row check refuses](spec/2026-10-23-spec-TOOL-dGroundRules-57.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-58 — the overlap probe sources the unattended library by its tracked path, so its shell column is a verdict and not a load failure](spec/2026-10-23-spec-TOOL-dGroundRules-58.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-23 |
+| [TOOL-dGroundRules-57 — the not-a-trap staging spelled whole, so the trap probe lists the row the row check refuses](spec/2026-10-23-spec-TOOL-dGroundRules-57.md) | 17 | 2 | WONTDO | rev-1 | 2026-10-24 |
+| [TOOL-dGroundRules-58 — the overlap probe sources the unattended library by its tracked path, so its shell column is a verdict and not a load failure](spec/2026-10-23-spec-TOOL-dGroundRules-58.md) | 17 | 2 | WONTDO | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-61 — rule 7 bounds every settings layer it can read, so a declared settings file never hides the project's](spec/2026-10-23-spec-TOOL-dGroundRules-61.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-64 — the respelled literals no other repair covers, restored whole and observed: units 5, 21, 33 and 34](spec/2026-10-23-spec-TOOL-dGroundRules-64.md) | 17 | 2 | DEFERRED | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-54 — the trap row's verdicts observed a second time through the whole overlap probe, which reads the pair from the suite and spells none](spec/2026-10-23-spec-TOOL-dGroundRules-54.md) | 18 | 2 | DEFERRED | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-54 — the trap row's verdicts observed a second time through the whole overlap probe, which reads the pair from the suite and spells none](spec/2026-10-23-spec-TOOL-dGroundRules-54.md) | 18 | 2 | WONTDO | rev-1 | 2026-10-24 |
 | [TOOL-dGroundRules-56 — the row check observed refusing: the not-a-trap row run through the arm's own row function, never read off the table](spec/2026-10-23-spec-TOOL-dGroundRules-56.md) | 18 | 2 | DEFERRED | rev-1 | 2026-10-23 |
-| [TOOL-dGroundRules-59 — the overlap criteria of units 40 and 43 observed through the whole probe, the raw-compare staging included](spec/2026-10-23-spec-TOOL-dGroundRules-59.md) | 18 | 2 | DEFERRED | rev-1 | 2026-10-23 |
+| [TOOL-dGroundRules-59 — the overlap criteria of units 40 and 43 observed through the whole probe, the raw-compare staging included](spec/2026-10-23-spec-TOOL-dGroundRules-59.md) | 18 | 2 | WONTDO | rev-1 | 2026-10-24 |
 | [TOOL-dGroundRules-60 — unit 52's overlap observations taken through the whole probe, with the Python column shown graded on its own](spec/2026-10-23-spec-TOOL-dGroundRules-60.md) | 18 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 | [TOOL-dGroundRules-62 — an unset `budgets.<cap>` reads as no file value: the derived-default refusal is a type the caps module catches, and only that refusal](spec/2026-10-23-spec-TOOL-dGroundRules-62.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
@@ -215,7 +215,7 @@ TOOL-dGroundRules-40@rev-1 TOOL-dGroundRules-41@rev-1 TOOL-dGroundRules-42@rev-1
 
 <!-- gen:build-coverage -->
 
-Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 64 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 58 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 11
 - carried in parts: 0 (none)
@@ -233,11 +233,9 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 64 spec(s) at 
   `spec/2026-10-23-spec-TOOL-dGroundRules-37.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-38.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-39.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-40.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dGroundRules-41.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-42.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-43.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-44.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-23-spec-TOOL-dGroundRules-45.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-46.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-47.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-48.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-23-spec-TOOL-dGroundRules-49.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-51.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-52.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-23-spec-TOOL-dGroundRules-53.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-54.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-55.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-56.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-23-spec-TOOL-dGroundRules-57.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-58.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-59.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-60.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-23-spec-TOOL-dGroundRules-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-62.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-64.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-23-spec-TOOL-dGroundRules-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dGroundRules-66.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-23-spec-TOOL-dGroundRules-49.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-50.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-52.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-55.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-23-spec-TOOL-dGroundRules-56.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-60.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-61.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-62.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-23-spec-TOOL-dGroundRules-63.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-64.md` (PLAY-dClosedLoop-2), `spec/2026-10-23-spec-TOOL-dGroundRules-65.md` (PLAY-dClosedLoop-2), `spec/2026-10-24-spec-TOOL-dGroundRules-66.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0009, cl-dClosedLoop-0014, cl-dClosedLoop-0017
 <!-- /gen:build-coverage -->
 

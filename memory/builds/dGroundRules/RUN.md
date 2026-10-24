@@ -287,3 +287,15 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T15:44:13Z dispatch · item e1c7051c TOOL-dGroundRules-41 · reason tools/policy/check_policy.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-41.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-41-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
 
 2026-10-24T15:49:52Z dispatch · item e1c7051c TOOL-dGroundRules-41 · reason tools/policy/check_policy.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-41.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-41-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-10-24T15:54:47Z rescope · item retire TOOL-dGroundRules-51 · reason superseded: TOOL-dGroundRules-43 rev-5 (6e8863f43) already reads the build-order evidence from the build README with the command this unit would add; read-only probe 2026-10-24-prompt-TOOL-dGroundRules-51-1-spec-reviewer.md
+
+2026-10-24T15:54:48Z rescope · item retire TOOL-dGroundRules-53 · reason superseded: every criterion is observed by TOOL-dGroundRules-40 AC1 to AC3 (built 942581c64) or by TOOL-dGroundRules-44 rev-4 / -45 rev-3 as revised; read-only probe 2026-10-24-prompt-TOOL-dGroundRules-53-1-spec-reviewer.md
+
+2026-10-24T15:54:49Z rescope · item retire TOOL-dGroundRules-54 · reason superseded: every criterion is observed by TOOL-dGroundRules-40 AC1 to AC3 (built 942581c64) or by TOOL-dGroundRules-44 rev-4 / -45 rev-3 as revised; read-only probe 2026-10-24-prompt-TOOL-dGroundRules-53-1-spec-reviewer.md
+
+2026-10-24T15:54:51Z rescope · item retire TOOL-dGroundRules-57 · reason superseded: every criterion is observed by TOOL-dGroundRules-40 AC1 to AC3 (built 942581c64) or by TOOL-dGroundRules-44 rev-4 / -45 rev-3 as revised; read-only probe 2026-10-24-prompt-TOOL-dGroundRules-53-1-spec-reviewer.md
+
+2026-10-24T15:54:52Z rescope · item retire TOOL-dGroundRules-58 · reason superseded: every criterion is observed by TOOL-dGroundRules-40 AC1 to AC3 (built 942581c64) or by TOOL-dGroundRules-44 rev-4 / -45 rev-3 as revised; read-only probe 2026-10-24-prompt-TOOL-dGroundRules-53-1-spec-reviewer.md
+
+2026-10-24T15:54:54Z rescope · item retire TOOL-dGroundRules-59 · reason superseded: every criterion is observed by TOOL-dGroundRules-40 AC1 to AC3 (built 942581c64) or by TOOL-dGroundRules-44 rev-4 / -45 rev-3 as revised; read-only probe 2026-10-24-prompt-TOOL-dGroundRules-53-1-spec-reviewer.md
