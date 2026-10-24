@@ -16,6 +16,11 @@ NOT judge `1345b7f90`, whatever its message says: this worktree's `core.hooksPat
 checkout's `.githooks`, whose `pre-commit` carries no policy guard block until this build lands on
 `main`.
 
+The three follow-up commits after the pass (`d88f7ddda`, `1345b7f90`, `5d49772dd`) each ran under
+their own `--dispatch` row but carried `Pass: none`, which closes no row, so those rows stayed open
+and refused the next unit that declared `tools/policy/policy.py` beside the mirror (check 49). The
+main loop's commit adding this paragraph carries `Pass: TOOL-dGroundRules-19` and closes them.
+
 **Evidences:** TOOL-dGroundRules-19
 - AC1 — `python check_policy.py --fixture guard-mirror-render` — `run_fixture("guard-mirror-render")`, the case that command runs, committed a catalogue row, `mirror --write` printed "policy: mirror written · 263 keys", and with the mirror staged alone `guard.py --staged` exited 0 printing "policy-guard: admitted · .governance/policy.json · equals its render at HEAD". 2 assertions, 0 wrong.
 - AC2 — `--fixture guard-mirror-beside-catalogue` — `run_fixture("guard-mirror-beside-catalogue")` committed the row, ran `mirror --write`, moved the row back into the index with `git reset --soft HEAD~1` and staged the mirror beside it: `guard.py --staged` exited 1 printing "policy-guard: refused · .governance/policy.json · the mirror renders HEAD: commit the policy file or catalogue first, then regenerate", then the remedy line naming `git restore --staged --worktree .governance/policy.json`. 2 assertions, 0 wrong.
