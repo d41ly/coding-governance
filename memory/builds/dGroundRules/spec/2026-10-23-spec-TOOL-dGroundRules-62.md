@@ -16,6 +16,7 @@
 | [2026-10-24-prompt-TOOL-dGroundRules-55-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-55-staleness-probe-brief.md) | research | TOOL-dGroundRules-55 TOOL-dGroundRules-61 TOOL-dGroundRules-64 |
 | [2026-10-24-prompt-TOOL-dGroundRules-62-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-62-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-62-probe-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-62-probe-fix-brief.md) | research | — |
+| [2026-10-25-prompt-TOOL-dGroundRules-32-close-arms-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-32-close-arms-brief.md) | research | TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-41 TOOL-dGroundRules-43 TOOL-dGroundRules-50 TOOL-dGroundRules-52 TOOL-dGroundRules-61 TOOL-dGroundRules-65 |
 
 <!-- /gen:spec-records -->
 
