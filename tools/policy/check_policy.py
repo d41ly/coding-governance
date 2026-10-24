@@ -3750,14 +3750,22 @@ def add_source_read(event, args):
     event whose mode reads and writes nothing, on a path that resolves, against the working directory,
     under the source repository's top level and under no case's temporary directory, is kept in
     SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's.
-    A hook that raised would fail the very open it audits, so a path that does not resolve keeps nothing."""
+    A hook that raised would fail the very open it audits, so a path that does not resolve keeps nothing.
+    A bytecode-cache read, or importlib's `.pyc.<digits>` atomic-write temporary, is kept as the source
+    file it was compiled from (TOOL-dGroundRules-35 S1), so a warm load still records its `.py`; a cache
+    name `source_from_cache` refuses is kept as spelled, so the join names it."""
     if event != "open" or not TRACE_ROOTS:
         return
     try:
         path, mode = args[0], args[1] or "r"
         if isinstance(path, int) or any(c in mode for c in "wax+"):
             return
-        p = os.path.realpath(os.fsdecode(path))
+        p = os.fsdecode(path)
+        if os.path.basename(os.path.dirname(p)) == "__pycache__" and re.search(r"\.pyc(\.\d+)?$", p):
+            p = re.sub(r"(\.pyc)\.\d+$", r"\1", p)
+            with contextlib.suppress(ValueError):
+                p = importlib.util.source_from_cache(p)
+        p = os.path.realpath(p)
         top, tmp = TRACE_ROOTS
         n = os.path.normcase(p)
         if n.startswith(os.path.normcase(top) + os.sep) and not (tmp and n.startswith(os.path.normcase(tmp) + os.sep)):
