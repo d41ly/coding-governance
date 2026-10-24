@@ -84,5 +84,6 @@ A gate that finds no policy kit beside it refuses every breach as it did before,
 The policy check holds every census row to the gate that measures it, but a repository holds only
 the gates of the kits it installed. A row whose gate coding-governance never ships, marked
 `ships = false` in the census, prints `cap census: <name> · enforcer not shipped`; a row whose kit
-is not installed prints `cap census: <name> · kit <home> not installed`. Neither is a failure. A row
-whose kit is installed but whose gate file is missing is one.
+your install receipt, `.governance/install.json`, does not list prints
+`cap census: <name> · kit <kit> not installed`. Neither is a failure. A row whose kit is installed
+but whose gate file is missing from where that kit installs it, the row's `installed` path, is one.

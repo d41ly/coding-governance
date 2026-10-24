@@ -25,7 +25,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
 | `guarded-paths.txt` | the one spelling of the guarded set, read at HEAD by `guard.py` and the pre-commit hook |
 | `check_policy.py` | the arms' home: `ARMS` over a repository, and `--fixture`, which runs `CASES` |
-| `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9), and `ships = false` where the deployer's registry exempts the enforcer (TOOL-dGroundRules-17) |
+| `caps.toml` | the cap census: one `[[cap]]` row per size cap, its class, unit, enforcer, legacy home and family flag (TOOL-dGroundRules-9), and `ships = false` where the deployer's registry exempts the enforcer (TOOL-dGroundRules-17), else the registry entry that installs it, `kit`, and its `{prefix}`-spelled destination, `installed` (TOOL-dGroundRules-22) |
 | `budgets.py` | the size caps' half of the reader: `read_cap_census`, `resolve_caps` with the switch and the two-homes rule, `check_cap`, the `[budgets]` schema rule `check_budgets` that `validate` calls, and the `resolve` and `check` verbs |
 | `adopt-policy.sh` | the adopter: `--scaffold` and `--check` |
 
@@ -319,7 +319,7 @@ authorship. The block is gov's own; the runbook's copy instructions do not carry
 | `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the landed revision | each `lists --check` report on the legacy homes; a refused landed revision. With no list in this kit it is not graded and says so |
 | `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision |
 | `arm_limits_readers` | the same tracked code files outside this kit, the memory root, `help/` and the self-tests | a file spelling the template-size limits file's name on a line that is not a comment or a Python docstring: `budgets.py` is its one reader |
-| `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent while its kit resolves, asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
+| `arm_cap_census` | `caps.toml`, each row's enforcer, the requests the same tracked code makes, the limits file in the tree | a row whose enforcer is absent where it is graded (its `enforcer` path on the source tree, its `installed` path in an adopter whose receipt names its `kit`), asks the policy kit nothing, or never names it (a `limits:` row names it by subject), an outside row its enforcer requests a mode for, a row with no `budgets-cap-` case or a case with no row, a request naming no row, a limits row no census row names |
 
 ## The size caps
 
@@ -446,6 +446,13 @@ announcement in the arm, so this case is what reds a list deleted on gov's tree.
 `ships = false` disagrees either way with the registry's `[[exempt]]` paths, an exempt directory
 covering every enforcer under it, and a registry that exempts no census enforcer.
 
+`census-adopter-receipt` (TOOL-dGroundRules-22) is an outcome case over one scratch repository: a
+planted receipt whose `kits` names `policy`, `memory-tree` and `kickoff-manifest` and whose `prefix`
+is not gov's tool root, each of those kits' census enforcers at its `installed` path, and no
+deployer. `arm_cap_census` must print `line-length · kit check-line-length not installed` and no
+finding; it must red naming `manifest-bytes` and its installed path once the planted
+`manifest-check.sh` is deleted, and read green again once it is restored.
+
 `reader-coverage` is one outcome case over eleven repositories, each a kit copy whose catalogue holds
 the planted key `fixture.planted`, a spec under `memory/builds/bPlanted/spec/` and the case's planted
 files, pushed to a bare remote; it judges `check_reader_coverage` by the key it reds and the count it
@@ -488,7 +495,7 @@ Both runs must exit 0, and every arm must print a graded line with no finding or
 | `arm_legacy_homes` | nothing: `legacy-homes.txt` is gov's own list, which `kit.toml` withholds from every install (TOOL-dGroundRules-17) | announced, since no install holds the list: `policy-check: arm_legacy_homes · not graded · the list is gov's own and is withheld from installs`, and `lists --write` never creates it |
 | `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | no owner build landed, or no memory-tree kit beside this one, prints `graded 0` and no finding; a landed revision that does not resolve is a finding |
 | `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | a finding: a target with no tracked code is a zero population |
-| `arm_cap_census` | the installed cap census against the target: each row's enforcer, found through the target's install receipt before a probe, the requests its tracked code makes, and the limits file's rows | graded by what ships (TOOL-dGroundRules-17): an absent enforcer on a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; one whose kit's home, its first segment below `{prefix}`, resolves no `kit.toml` is announced, `cap census: <name> · kit <home> not installed`; one whose kit resolves is a finding |
+| `arm_cap_census` | the installed cap census against the target: the target's `.governance/install.json` makes it an adopter, and each shipped row whose `kit` its `kits` names is graded at its `installed` path, `{prefix}` read as its `prefix`; the requests its tracked code makes, and the limits file's rows | graded by what ships (TOOL-dGroundRules-17, TOOL-dGroundRules-22): a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; a row whose `kit` the receipt's `kits` lacks is announced, `cap census: <name> · kit <kit> not installed`; an installed kit's enforcer absent at `installed` is a finding naming that path; a receipt that does not parse is a finding naming it |
 
 ## The adopter
 

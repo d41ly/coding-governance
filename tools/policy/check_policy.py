@@ -132,6 +132,13 @@ so they hold on gov's tree alone. `legacy-homes-present` reds this kit's directo
 census row whose `ships = false` disagrees with the deployer registry's `[[exempt]]` paths either way,
 naming the row, and a registry that exempts no census enforcer.
 
+WHERE IT INSTALLS (TOOL-dGroundRules-22): `arm_cap_census` reads a tree with no
+`.governance/install.json` as the source and grades each row at its `enforcer`, and a tree with one
+as an adopter, grading each shipped row of an installed kit at its `installed` path.
+`census-adopter-receipt` is an outcome case: a planted receipt naming no `check-line-length`, each
+named kit's enforcers at their `installed` paths, read green with the line-length row announced, red
+naming `manifest-bytes` once its planted enforcer is deleted, and green again restored.
+
 `--live` (S9) is no case: it drives headless `claude -p` sessions in a fixture repository under a
 rendered limit and under a control with none, reads each agent's start and end stamps, and prints
 each run's peak overlap. It costs real sessions, so no leg runs it.
@@ -553,57 +560,69 @@ def arm_limits_readers(repo, kit):
     return len(files), f"{len(files)} tracked code file(s) outside the kit, the memory root, help/ and the self-tests", out
 
 
-def resolve_enforcer(cap, repo, troot):
-    """-> (the census row's enforcer file in `repo`, None where absent; its kit's home; the directory
-    that home resolves from) (TOOL-dGroundRules-17). A `{prefix}` enforcer resolves from the tool root
-    `troot` in `repo`, any other from the top of `repo`. Its home is its first segment below that
-    root: an enforcer below a home is found by `resolve_kit_dir`, the target's install receipt read
-    before any probe, and a root-level one is located at that root itself."""
-    lead = "{prefix}/"
-    spelled = str(cap.enforcer)
-    here = Path(repo, troot) if spelled.startswith(lead) else Path(repo)
-    home, _slash, anchor = spelled.removeprefix(lead).partition("/")
-    if not anchor:
-        return (here / home if (here / home).is_file() else None), home, here
+RECEIPT_REL = f"{POLICY_FILE[0]}/install.json"
+
+
+def derive_census_tree(repo):
+    """-> ("source", None) where the tree under test holds no install receipt, as gov's own tree holds
+    none, else ("adopter", the parsed receipt) (TOOL-dGroundRules-22). A receipt that is not a JSON
+    object is a Refusal naming it, never a `source` answer."""
     try:
-        return resolve_kit_dir(home, anchor, here) / anchor, home, here
-    except LookupError:
-        return None, home, here
+        text = Path(repo, RECEIPT_REL).read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return "source", None
+    except OSError as exc:
+        raise policy.Refusal(RECEIPT_REL, 0, f"the install receipt does not read: {exc}") from None
+    try:
+        receipt = json.loads(text)
+    except ValueError as exc:
+        raise policy.Refusal(RECEIPT_REL, 0, f"the install receipt does not parse: {exc}") from None
+    if not isinstance(receipt, dict):
+        raise policy.Refusal(RECEIPT_REL, 0, "the install receipt does not parse as a JSON object")
+    return "adopter", receipt
 
 
 def arm_cap_census(repo, kit):
     """The cap census joined to the tree both ways (TOOL-dGroundRules-9).
 
-    Census to tree: each row's enforcer, found by `resolve_enforcer`, is a file; a `switch` row's
-    enforcer asks the policy kit and names the cap on a line that is not a comment, a `limits:` row's
-    naming it by the subject's key at run time; an outside row's enforcer makes no request naming it;
-    and each row has its case in CAP_CASES. A row whose enforcer is absent is graded by what ships
-    (TOOL-dGroundRules-17): a `ships = false` row is announced, `<name> · enforcer not shipped`; a row
-    whose kit's home holds no `kit.toml` this install resolves is announced, `<name> · kit <home> not
-    installed`; a row whose kit resolves is a finding. Each announce is one `cap census:` line. Tree
+    Census to tree, by the tree `derive_census_tree` answers (TOOL-dGroundRules-22): on the source
+    tree each row's enforcer is a file at its `enforcer` path, `ships` unread; in an adopter a
+    `ships = false` row is announced, `<name> · enforcer not shipped`, a row whose `kit` the receipt's
+    `kits` lacks is announced, `<name> · kit <kit> not installed`, and every other row's enforcer is
+    a file at its `installed` path, `{prefix}` read as the receipt's `prefix`. Each announce is one
+    `cap census:` line. A graded `switch` row's enforcer asks the policy kit and names the cap on a
+    line that is not a comment, a `limits:` row's naming it by the subject's key at run time; an
+    outside row's enforcer makes no request naming it; and each row has its case in CAP_CASES. Tree
     to census: a request in a `derive_code_files` file naming a cap no row names, a CAP_CASES case for
     no row, and a row of the limits file in the tree, parsed by `budgets.parse_limits_rows`, no
-    `limits:` row names. A census that does not read is the one finding."""
+    `limits:` row names. A census or a receipt that does not read is the one finding."""
     try:
         census = budgets.read_cap_census(repo)
     except policy.Refusal as exc:
         return 0, "the cap census did not read", [(f"{exc.path}:{exc.line}", exc.why)]
+    try:
+        tree, receipt = derive_census_tree(repo)
+    except policy.Refusal as exc:
+        return 0, "the install receipt did not read", [(exc.path, exc.why)]
     troot = budgets.derive_tool_root()
     out, told = [], []
     for cap in census.values():
-        path, home, here = resolve_enforcer(cap, repo, troot)
-        if path is None:
+        if tree == "source":
             rel = budgets.resolve_prefix_token(cap.enforcer, troot)
-            try:
-                if cap.ships:
-                    resolve_kit_dir(home, "kit.toml", here)
-                    out.append((cap.name, f"its enforcer {rel} is not a file in this tree"))
-                else:
-                    told.append(f"{cap.name} · enforcer not shipped")
-            except LookupError:
-                told.append(f"{cap.name} · kit {home} not installed")
+            missing = f"its enforcer {rel} is not a file in this tree"
+        elif not cap.ships:
+            told.append(f"{cap.name} · enforcer not shipped")
+            rel = None
+        elif cap.kit not in (receipt.get("kits") or []):
+            told.append(f"{cap.name} · kit {cap.kit} not installed")
+            rel = None
         else:
-            rel = Path(os.path.relpath(path, repo)).as_posix()
+            rel = budgets.resolve_prefix_token(cap.installed, receipt.get("prefix"))
+            missing = f"its enforcer is not a file at {rel}, where kit {cap.kit} installs it"
+        path = Path(repo, rel) if rel else None
+        if path and not path.is_file():
+            out.append((cap.name, missing))
+        elif path:
             text = policy.read_text_or_none(path) or ""
             code = "\n".join(ln for ln in text.splitlines() if not ln.lstrip().startswith(COMMENT_LEADS))
             if cap.cls == "switch" and not ASKS_SHAPE.search(code):
@@ -2636,8 +2655,9 @@ def seed_family_value(repo, kit, rows):
     return "budgets.role-body", "role-body is a family cap"
 
 
+# A planted row whose enforcer no install holds, so `ships = false` and no `kit` or `installed`.
 EXEMPT_ROW = ('\n[[cap]]\nname = "zz-exempt"\nclass = "exempt"\nunit = "bytes"\nenforcer = "{prefix}/zz.sh"\n'
-              'home = "constant:{prefix}/zz.sh:ZZ"\nfamily = false\nresearch = 0\n')
+              'home = "constant:{prefix}/zz.sh:ZZ"\nfamily = false\nresearch = 0\nships = false\n')
 # AC1's four plants on the policy file, each graded by `arm_schema` through `validate`.
 BUDGET_SCHEMA_SEEDS = {
     "budgets-pinned-outside": seed_budget_pin("codex-instructions", "codex-instructions is consumer, outside the switch"),
@@ -2782,6 +2802,50 @@ def run_fixtures_guard_census(name):
     checks.append(("the join", f"a census row and the {FIXTURES_LEG} leg", bool(runs) and row is not None,
                    f"{len(runs)} enforcer(s) of {len(census)} row(s) · leg {'found' if row else 'absent'} in "
                    f"{legs.relative_to(top).as_posix()}"))
+    return print_checks(name, checks)
+
+
+ADOPTER_KITS = ("policy", "memory-tree", "kickoff-manifest")  # the planted receipt's kits: no check-line-length
+ADOPTER_PREFIX = "vendor/gov"  # the planted tool root, unlike gov's own, so `{prefix}` must be read from the receipt
+
+
+def run_census_adopter_receipt(name):
+    """`census-adopter-receipt` (TOOL-dGroundRules-22): a scratch repository on main holding an install
+    receipt whose `kits` is ADOPTER_KITS and whose `prefix` is ADOPTER_PREFIX, each census enforcer of
+    those kits copied from the source to its `installed` path there, and no deployer. `arm_cap_census`
+    must announce `line-length · kit check-line-length not installed`, announce no `manifest-bytes`
+    line and find nothing; with the planted `manifest-check.sh` deleted it must red naming
+    `manifest-bytes` and that path; restored, it must find nothing."""
+    top, checks = derive_source_top(), []
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        census = budgets.read_cap_census(top)
+        planted = {budgets.resolve_prefix_token(c.installed, ADOPTER_PREFIX): (top / derive_enforcer_rel(c)).read_bytes()
+                   for c in census.values() if c.kit in ADOPTER_KITS}
+        receipt = json.dumps({"prefix": ADOPTER_PREFIX, "kits": list(ADOPTER_KITS)})
+        r = build_cap_repo(t / "r", {**planted, RECEIPT_REL: receipt}, "warn")
+        mb = budgets.resolve_prefix_token(census["manifest-bytes"].installed, ADOPTER_PREFIX)
+
+        def run_census():
+            with contextlib.redirect_stdout(io.StringIO()) as said:
+                _n, _pop, found = arm_cap_census(r, KIT)
+            return said.getvalue(), found
+        said, found = run_census()
+        want = "cap census: line-length · kit check-line-length not installed"
+        checks.append(("the kits installed", f"{want!r}, no manifest-bytes announce and no finding",
+                       want in said.splitlines() and "cap census: manifest-bytes ·" not in said and not found,
+                       f"{render_said(said, 'line-length ·')} · {found or 'no finding'}"))
+        Path(r, mb).unlink()
+        _said, found = run_census()
+        checks.append((f"{mb} deleted", "red naming manifest-bytes and its installed path",
+                       any(k == "manifest-bytes" and mb in w for k, w in found), f"{found}"))
+        write_case_file(r, mb, planted[mb])
+        _said, found = run_census()
+        checks.append((f"{mb} restored", "no finding", not found, f"{found or 'no finding'}"))
+    except (subprocess.CalledProcessError, OSError, LookupError, KeyError, policy.Refusal) as exc:
+        checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
+    finally:
+        remove_repo(t)
     return print_checks(name, checks)
 
 
@@ -2954,6 +3018,7 @@ CASES = [
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
     ("budgets-ships-join", None, run_ships_join),  # the census's ships flags against the registry's exemptions
     ("fixtures-guard-census", None, run_fixtures_guard_census),  # the census's enforcers inside this leg's guard
+    ("census-adopter-receipt", None, run_census_adopter_receipt),  # the census graded at each row's installed path
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
 ]
 

@@ -6953,6 +6953,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "derive_census_tree",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_change_commit",
       "kind": "function",
       "file": "tools/memory-tree/transition_audit.py"
@@ -17813,11 +17818,6 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
-      "id": "resolve_enforcer",
-      "kind": "function",
-      "file": "tools/policy/check_policy.py"
-    },
-    {
       "id": "resolve_entry",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -19829,6 +19829,11 @@
     },
     {
       "id": "run_case_argv",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_census_adopter_receipt",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
