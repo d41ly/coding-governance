@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -13,7 +13,9 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-21 TOOL-dGroundRules-25 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-34-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-34-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-34-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-2-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-34-fold-trim-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-fold-trim-brief.md) | research | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-34-rename-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-34-rename-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-33 |
 
@@ -26,8 +28,7 @@ The round-1 spec audit of units 26 to 32
 exited CONVERGED with 38 confirmed findings. Its one HIGH, id 26, is promoted alone as
 `TOOL-dGroundRules-33`; BUILD-METHOD M4 batches the other thirty-seven, twenty-three MEDIUM and
 fourteen LOW, into this unit. They land on units 26 to 32, and M6's clauses yield no two disjoint
-write sets (§4 "Alternatives rejected"). It builds at order 12, above every unit of this build,
-`TOOL-dGroundRules-33` at order 11 included.
+write sets (§4 "Alternatives rejected"). It builds at order 12, above every unit of this build.
 
 Ids sharing a review item each take their own scope item, a distinct facet of its defect. Ids 2 and
 1 are taken at MEDIUM and ids 11 and 36 at LOW, the grades the review's skeptic re-graded them to.
@@ -171,16 +172,17 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
   is then absolute, matches `^[A-Za-z]:`, or holds a `..` segment after `posixpath.normpath` answers
   `invalid` naming `prefix`. Nothing is imported from the deployer, which adopters never install.
   Observed by AC21.
-- **S22** — Finding 18. `build_fresh_target` (`TOOL-dGroundRules-32` S16) runs
-  `run_govkit(snapshot_root, source_root, "intake", "--target", t, "--kits", <ids>, "--answer", "<key>=<value>", ...)`
-  over the `git init` target before its one commit, one `--answer` per key of S23's answers. `intake`
+- **S22** — Finding 18. `build_install_target(name, ids)` (`TOOL-dGroundRules-32` S16) runs
+  `run_govkit(s, source_root, "intake", "--target", t, "--kits", <ids>, "--answer", "<key>=<value>", ...)`,
+  `s` the snapshot it builds, over the `git init` target before its one commit, one `--answer` per
+  key of S23's answers. `intake`
   writes `.governance/deploy.toml`, its `gov_source`, the answers the closure needs and the
   `[gate_runner]` seed, and its refusal is the case's `WRONG`. The builder writes no descriptor of
   its own and derives no answer list of its own. Observed by AC22.
 - **S23** — Finding 19. `read_deploy_answers(source_root)` in `check_policy.py` reads `DEPLOY_FULL`'s
   `[answers]` from `<source tool root>/govkit/selftest.py` with `ast`, never by import: the module's
   `DEPLOY_FULL` assignment, its constant string parts joined and parsed with `tomllib`. A missing
-  assignment or an unparsable table is the case's `WRONG` naming the file. `build_fresh_target`
+  assignment or an unparsable table is the case's `WRONG` naming the file. `build_install_target`
   takes its `--answer` values from it. Observed by AC23.
 - **S24** — Finding 7. `TOOL-dGroundRules-26` AC4 is a guard, not acceptance. The acceptance of the
   snapshot's isolation is that the snapshot commit `TOOL-dGroundRules-26` S3 prints is absent from
@@ -206,7 +208,7 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
   asserts that the receipt's `gov_source` is the snapshot root. Observed by AC29.
 - **S30** — Finding 17. `TOOL-dGroundRules-30` S1's fallback notice quotes the hook's reason: the
   first line of the probe's output that opens with four spaces, the indent stripped, because
-  `tools/workflows/check-verifier-fanout.sh:213-214` prints `verifier-fanout: FAILED — <file>` first
+  `tools/workflows/check-verifier-fanout.sh:207-208` prints `verifier-fanout: FAILED — <file>` first
   and the hook's output after it, indented. Observed by AC30.
 - **S31** — Finding 38. When the probe's output holds no indented line, the notice reads
   `the agent-cap hook exited <rc> with no reason`, never the gate's header or the render's temporary
@@ -229,7 +231,7 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
   keeps its anchors and points to that record for the false-green shape, so its own symptom stays the
   false red. `memory/gotchas/INDEX.md` is regenerated with `gotchas.py --write`. Observed by AC34.
 - **S35** — Finding 27. The build READMEs `TOOL-dGroundRules-32` S13's `unknown` re-renders are named
-  in §4 "Writes `TOOL-dGroundRules-32` declares", the seven the review's probe printed and this
+  in §4 "Writes `TOOL-dGroundRules-32` declares", the eight that unit's S13 names and this
   build's own, and the hands-off edge in `TOOL-dGroundRules-32` §3 hands them to that unit's
   `--dispatch` write set. Observed by AC35.
 - **S36** — Finding 30. `help/policy.md` carries a `## Install` section
@@ -247,7 +249,7 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
 - Renumbering any unit's `order`.
 - The review's left-shift gates beyond what an item here builds: the spec-lint for a criterion that
   repeats a path or opens a list without `[`, the pre-unit-observation rule, and the checklist
-  entries. Each is a bug-class follow-up for the closing review's left-shift (BUILD-METHOD M8).
+  entries, each a follow-up for the closing review (BUILD-METHOD M8).
 - `tools/govkit/matrix.py`'s own HEAD exposure through `run_in_gov`. S33 records it; the policy
   cases are this build's.
 - A new `policy.py` or `govkit.py` flag (§8 F1).
@@ -264,7 +266,7 @@ skeptic's corrected fix. Where the review offered options, §8 records the pick.
 - **consumes-from** `TOOL-dGroundRules-29` — `derive_census_tree`'s three answers, the census arm under `unadopted` and `census-receiptless-target`, which S11 to S14, S18 and S19 amend
 - **consumes-from** `TOOL-dGroundRules-30` — the render's writer-marker probe and its fallback notice, which S5, S6, S25, S30 and S31 amend
 - **consumes-from** `TOOL-dGroundRules-31` — `--scaffold`'s deferral and the help page's install text, which S20 and S36 amend
-- **consumes-from** `TOOL-dGroundRules-32` — `build_fresh_target`, the receipt shape rule, the overlap rule and its arm, the build-order criterion and the kit README's census rows, which S15 to S17, S21 to S23, S26, S32, S35 and S37 amend
+- **consumes-from** `TOOL-dGroundRules-32` — `build_install_target`, the receipt shape rule, the overlap rule and its arm, the build-order criterion and the kit README's census rows, which S15 to S17, S21 to S23, S26, S32, S35 and S37 amend
 - **consumes-from** `TOOL-dGroundRules-33` — the `{prefix}/govkit/selftest.py` guard line and the guard trace, which hold S23's `ast` read inside the leg that runs it
 - **hands-off** `TOOL-dGroundRules-38` — S1's exclude-file read, kept out of the trace (id 18)
 - **hands-off** `TOOL-dGroundRules-39` — `census-ambiguous-registry` and S11-S12's window (id 2)
@@ -282,17 +284,16 @@ names another revision.
 - `git -C C:/projects/coding-governance rev-parse --git-path index` printed `.git/index`, and
   `--path-format=absolute --git-path info/exclude` printed `C:/projects/coding-governance/.git/info/exclude`,
   on git 2.54.0.
-- `git ls-files | wc -l` printed 5888; `git ls-files -s | grep -c "^160000"` printed 0, so gov's index
-  carries no gitlink and S4 refuses none of gov's own entries. `git ls-files .claude` prints only
+- `git ls-files | wc -l` printed 5888; `git ls-files -s | grep -c "^160000"` printed 0, so S4 refuses
+  none of gov's own entries. `git ls-files .claude` prints only
   `.claude/agents/` files, so AC3's pattern names untracked state only.
 - `tools/govkit/govkit.py:13089` `needed_answers` scans destinations, hole discharges, gate-leg argv
   and guards, adopt and check argv and `config.seeded_from`; `cmd_intake` (`:13122`) refuses an
   existing descriptor and a missing answer with `Refusing to invent one`, and writes
   `gov_source = root` (`:13125-13160`).
 - `tools/govkit/govkit.py:7981` and `:13030` write the receipt's `gov_source` as `str(root)`.
-- `tools/govkit/govkit.py:1301` declares `DRIVE_PREFIX_RE = ^[A-Za-z]:/` beside
-  `demand_contained_dest` (`:1304`); `tools/govkit/registry.toml` exempts `{prefix}/govkit` from
-  adopter installs, so `check_policy.py` in an adopter cannot import it.
+- `tools/govkit/govkit.py:1301` declares `DRIVE_PREFIX_RE = ^[A-Za-z]:/`; `tools/govkit/registry.toml`
+  exempts `{prefix}/govkit` from adopter installs, so `check_policy.py` in an adopter cannot import it.
 - `tools/govkit/selftest.py:195` runs `resolve_gov_pin` at import and `:197` prints; an `ast` read of
   `DEPLOY_FULL` (`:703`), its constant parts joined and parsed by `tomllib`, printed the five
   answers `memory_root`, `playbook_path`, `playbook_dir`, `manifest_path` and `user_skills`, with
@@ -327,15 +328,18 @@ build_source_snapshot(source):
 ### The fresh-target builder after S22 and S23
 
 ```text
-build_fresh_target(snapshot_root, source_root, kits):
+build_install_target(name, ids) -> (t, s):
+    s = build_source_snapshot(source_root)              # source_root: the tree under test
     answers = read_deploy_answers(source_root)          # ast, never import
     t = git init; core.autocrlf=false; local user.email, user.name; README.md
-    rc, out = run_govkit(snapshot_root, source_root, "intake", "--target", t, "--kits", kits,
+    rc, out = run_govkit(s, source_root, "intake", "--target", t, "--kits", ids,
                          *("--answer", f"{k}={v}") for k, v in answers)
     WRONG unless rc == 0                                # intake's own refusal names the answer
     commit once
-    apply and check through run_govkit, as TOOL-dGroundRules-32 S16 and S18 state
-    WRONG unless receipt gov_source == snapshot_root     # S29
+    return t, s
+
+adopter-fresh-target, after apply and check through run_govkit (TOOL-dGroundRules-32 S16, S18):
+    WRONG unless receipt gov_source == s                # S29
 ```
 
 ### Per-item changes, by file
@@ -352,19 +356,18 @@ build_fresh_target(snapshot_root, source_root, kits):
 | `tools/policy/README.md` | S37 |
 | the codebase map | S7, S23, by regeneration |
 
-S6, S14 to S16, S25, S26, S32 and S35 change no code; each is an observation owed for a defective
-criterion or stated outcome, made against the code units 26 to 33 build.
+S6, S14 to S16, S25, S26, S32 and S35 change no code; each is an observation owed against the code
+units 26 to 33 build.
 
 ### Writes `TOOL-dGroundRules-32` declares
 
-S13 of that unit re-renders the build-order region of each build README holding a step of two or
-more units with a spec that has no `### Files touched` sub-head. The review's probe printed seven
-(re-read 2026-10-23 at `f4d31452a`, PINNED): `memory/builds/aBlindedTrial/README.md`,
+That unit's S13 re-render moves a step to `unknown` in eight build READMEs, as its builder measured
+(PINNED, `TOOL-dGroundRules-32` S13): `memory/builds/aBlindedTrial/README.md`,
 `memory/builds/aBoundedCeiling/README.md`, `memory/builds/aBriskPreflight/README.md`,
 `memory/builds/aTunedCompass/README.md`, `memory/builds/dDerivedDocket/README.md`,
-`memory/builds/dGaugedVintage/README.md` and `memory/builds/dRetiredFork/README.md`, each of which
-holds a build-order region with a Parallel column. With `memory/builds/dGroundRules/README.md` they
-are the eight READMEs that unit's commit may write.
+`memory/builds/dGaugedVintage/README.md`, `memory/builds/dRetiredFork/README.md` and
+`memory/builds/dTieredTribunal/README.md`. With `memory/builds/dGroundRules/README.md` they are
+the nine READMEs that unit's commit may write.
 
 ### Inventory
 
@@ -376,8 +379,7 @@ are the eight READMEs that unit's commit may write.
 | `census-ambiguous-registry` | `CASES` entry | `tools/policy/check_policy.py` |
 
 `lexicon.py --suggest` answered OK for `resolve_govkit` and `read_deploy_answers` under
-`py.function` on 2026-10-23; it proposed `resolve_govkit` in place of `locate_govkit`. The lexicon
-declares no cell for a Python constant, so `SNAPSHOT_ROOTS` is graded by none.
+`py.function` on 2026-10-23. No lexicon cell grades a Python constant such as `SNAPSHOT_ROOTS`.
 
 ### Files touched (estimate)
 
@@ -397,22 +399,21 @@ declares no cell for a Python constant, so `SNAPSHOT_ROOTS` is graded by none.
 ### Alternatives rejected
 
 - **Two batch units, the policy half and the render half.** Both regenerate
-  `memory/map/generated/symbols.json`, which carries `check-protocol-parity.test.sh`'s functions,
-  and the fresh-target case the policy items change runs the `adopt-policy.sh` the scaffold item
-  changes, so one reads the other's write as an acceptance input: M6's first and second clauses fail.
+  `memory/map/generated/symbols.json`, and the fresh-target case runs the `adopt-policy.sh` the
+  scaffold item changes, so one reads the other's write: M6's first and second clauses fail.
 - **`-c core.excludesFile=<source exclude>` for S1**, and **a registry and every census enforcer
   copied into unit 1's base fixture repository (S18)**: §8 F6 and F4.
 
 ## 5. Production-readiness checklist
 
-- security — S21 refuses a receipt `prefix` that leaves the target by a drive letter or a backslash;
-  S9 and S10 keep the deployer off every root no snapshot made; no item widens a write surface.
-- perf / scale — S1 copies one file per snapshot; S4 lists the snapshot tree once; S22 adds one
-  `intake` run per installing case; S27 measures, never adds, the snapshot's cost.
-- error / empty / loading states — S4, S8, S20 and S23 each turn a silent or misattributed failure
-  into a named `WRONG` or refusal; S31 names an empty hook answer.
-- observability — the snapshot line carries its file count and seconds; every new `WRONG` names its
-  path, root, key or file.
+- security — S21 refuses a receipt `prefix` leaving the target; S9 and S10 keep the deployer off
+  every root no snapshot made; no item widens a write surface.
+- perf / scale — S1 copies one file per snapshot; S4 lists the tree once; S22 adds one `intake` run
+  per installing case; S27 measures the snapshot's cost.
+- error / empty / loading states — S4, S8, S20 and S23 turn a silent failure into a named `WRONG` or
+  refusal; S31 names an empty hook answer.
+- observability — the snapshot line carries its file count and seconds; each new `WRONG` names what
+  it refuses.
 - risks — S5 removes another unit's arm by this unit's mandate; §7's arm line names its replacement.
 - testing — the cases under `--fixture`, the suites on §7's arm lines, and AC1 to AC37.
 - migration — the codebase map and `memory/gotchas/INDEX.md` regenerated in this unit's commit.
@@ -585,8 +586,8 @@ holding `govkit.py` to its innermost enclosing function, and prints each line wh
 
 `review-protocol parity (kit vs dogfood)` · `verifier fan-out self-test` · `tier2-review self-test` · `unattended-build self-test` · `review-join self-test` · `spec-tokens self-test` · `harness arms (fail branches armed or pinned)` · `kit/dogfood doc parity` · `transition-audit arms` · `straggler-guard arms` · `codebase-map coverage + freshness` · `lexicon naming predicates` · `memory hygiene` · `recall floor` · `recall floor arms` · `policy fixtures`
 
-The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the cases;
-they are named by the arm lines, because neither exists at this spec's base.
+The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the cases,
+named by the arm lines because neither exists at this spec's base.
 
 New arm: tools/policy/check_policy.py --fixture · covers AC8 AC13 AC18 AC19 AC22 AC29 · each case named in S8, S13, S18, S19, S22 and S29, its stated input staged in its temporary repository or scratch copy · none
 New arm: tools/check-spec-tokens.test.sh · covers AC17 · `check_writes_intersect` staged to a raw string-prefix compare, against `overlaps` on the prefix pair · that suite's assertion count, raised by the arm
@@ -622,8 +623,9 @@ New arm: tools/workflows/check-protocol-parity.test.sh · covers AC6 · `TOOL-dG
 - rev-1 · 2026-10-23 · initial draft from the round-1 spec audit of units 26 to 32, twenty-three MEDIUM and fourteen LOW findings.
 - rev-2 · 2026-10-23 · §3 · hands-off edges to units 38-41 and 43 added.
 - rev-3 · 2026-10-23 · §1 §3 §4 §5 §8 §10 · prose shortened under the spec ceiling; no meaning moved.
-- rev-4 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; older revision lines condensed under the spec ceiling; no design change.
-- rev-5 · 2026-10-24 · §1 §2 §6 §8 §9 · a criterion code span rejoined onto one line and prose shortened under the spec ceiling; no design change.
+- rev-4 · 2026-10-24 · §7 §9 · the policy fixtures leg added to the leg line, owed by its guard; no design change.
+- rev-5 · 2026-10-24 · §1 §2 §6 §8 §9 · a criterion code span rejoined onto one line; prose shortened; no design change.
+- rev-6 · 2026-10-24 · §1 §2 §3 §4 §5 §7 §9 §10 · the builder named `build_install_target(name, ids)`, as `TOOL-dGroundRules-32` rev-6 extends it; §4 names the eight READMEs its S13 re-renders; S30 cites `check-verifier-fanout.sh` at :207-208; prose trimmed under the spec ceiling; no design change.
 
 ## 10. Reuse audit
 
@@ -636,11 +638,10 @@ Each item extends the seam its row names: `TOOL-dGroundRules-26`'s `build_source
 `check-verifier-fanout.sh` (S25, S30, S31), `arm_schema`, the one grader of a working-tree policy
 file (S20), and the gotcha record `suite-invalidated-by-a-commit-under-it` (S34).
 `python tools/codebase-map/reuse_lookup.py "install a kit into a scratch target with the deployer and read its receipt"`
-ranked `read`, `read_text`, `scratch`, `kit_rel` and `resolve_kit_dir` among name-stem hits; the
-other seams came from the files the review cites, each verified at `f4d31452a`.
-`tools/govkit/matrix.py`'s `run_in_gov` was weighed for S9 and S10 and not reused (S33). The recall
-probe returned the prior minors batches `TOOL-dGroundRules-25` and `TOOL-dGroundRules-32`, whose
-per-finding table this unit follows, and this audit's own items.
+ranked only name-stem hits; the other seams came from the files the review cites, verified at
+`f4d31452a`. `tools/govkit/matrix.py`'s `run_in_gov` was weighed for S9 and S10 and not reused
+(S33). The recall probe returned the minors batches `TOOL-dGroundRules-25` and
+`TOOL-dGroundRules-32`, whose per-finding table this unit follows.
 
 Recall terms used: `python tools/memory-recall/query.py "how are review minors batched into one
 repair unit" --terms "minors batch promoted medium low disposed severity spec-audit repair unit write

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-33 — the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,8 @@
 | [2026-10-23-build-TOOL-dGroundRules-33-deviation-21.md](../build/2026-10-23-build-TOOL-dGroundRules-33-deviation-21.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-33-deviation-62.md](../build/2026-10-23-build-TOOL-dGroundRules-33-deviation-62.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-33-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-33-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-33-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-33-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-33-rename-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-33-rename-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-34 |
 
@@ -24,7 +26,8 @@ exited CONVERGED with finding **id 26 at HIGH**, item **H1**, which no other id 
 id 26's promotion. It repairs `TOOL-dGroundRules-32`, which sits at order 10, so it builds at
 order 11.
 
-`TOOL-dGroundRules-32` S16 makes `build_fresh_target` take its answer values from `DEPLOY_FULL` in
+`TOOL-dGroundRules-32` S16 extends `build_install_target(name, ids)`, the one builder the three installing
+cases share, to take its answer values from `DEPLOY_FULL` in
 `tools/govkit/selftest.py`, and no unit adds that file to the `policy fixtures` guard. An edit to
 `DEPLOY_FULL` alone therefore skips the leg or reuses its stale green, while the three installing
 cases would red on the tree. This is the recorded class
@@ -59,7 +62,7 @@ every source file it opens and reds each one whose path the `policy fixtures` gu
   enforcers. The audit hook sees only this process. `TOOL-dGroundRules-25` S24's derived imports and
   sourced files and `TOOL-dGroundRules-32` S3 and S10's derived descriptors and adopters keep
   covering them, and `fixtures-guard-census` keeps holding them.
-- The route by which `build_fresh_target` reads `DEPLOY_FULL`: finding 19, an item of
+- The route by which `build_install_target` reads `DEPLOY_FULL`: finding 19, an item of
   `TOOL-dGroundRules-34`. Whatever the route, the read lands on `{prefix}/govkit/selftest.py`, which
   S1 guards.
 - Changing the leg's argv, subject or chunk, or any other leg's guard.
@@ -67,7 +70,7 @@ every source file it opens and reds each one whose path the `policy fixtures` gu
 
 ### Edges
 
-- **consumes-from** `TOOL-dGroundRules-32` — `build_fresh_target`'s answer values from `DEPLOY_FULL` (S16) and the guard lines S3 and S10 add, which S1 extends to the file S16 reads
+- **consumes-from** `TOOL-dGroundRules-32` — `build_install_target(name, ids)`'s answer values from `DEPLOY_FULL` (S16) and the guard lines S3 and S10 add, which S1 extends to the file S16 reads
 - **consumes-from** `TOOL-dGroundRules-25` — `fixtures-guard-census`'s pipe to `check-spec-tokens.py --legs-for -` (S25), the one guard-match rule S3 reuses
 - **hands-off** `TOOL-dGroundRules-34` — the `{prefix}/govkit/selftest.py` guard line and the trace, under which that unit's `ast` read of `DEPLOY_FULL` (finding 19) is held by the leg that runs it
 - **hands-off** `TOOL-dGroundRules-35` — `add_source_read`, whose bytecode-cache reads that unit records as the source file each was compiled from (id 22 of the round-1 spec audit of units 33 and 34)
@@ -164,7 +167,7 @@ Every command runs from the repository root. The criteria spell the policy kit's
   built tree, its output names `policy fixtures`.
   Red when: an edit to `DEPLOY_FULL` alone can skip the leg that runs the installing cases.
 - **AC2** — When a scratch copy of the built tree carries one `open()` of the repository's root
-  `README.md`, staged into the first line of `build_fresh_target`, and
+  `README.md`, staged into the first line of `build_install_target`, and
   `python check_policy.py --fixture adopter-fresh-target` runs there, it prints
   `guard-trace · WRONG README.md`.
   Red when: a case reads a source file outside the guard and the leg stays silent.
@@ -177,7 +180,7 @@ Every command runs from the repository root. The criteria spell the policy kit's
   `guard-trace · WRONG tools/govkit/selftest.py`.
   Red when: the guard can lose the file the answer values come from with nothing to say so.
   fixture: the in-process read is `TOOL-dGroundRules-34` S23's; before that unit, the staged copy
-  adds one `open()` of selftest.py to `build_fresh_target`, as AC2 does for `README.md`.
+  adds one `open()` of selftest.py to `build_install_target`, as AC2 does for `README.md`.
 
 ## 7. Gates
 
@@ -186,11 +189,11 @@ Every command runs from the repository root. The criteria spell the policy kit's
 The policy legs `TOOL-dGroundRules-1` declares, `policy check` and `policy fixtures`, run the trace;
 they are named by the arm line, because neither exists at this spec's base.
 
-New arm: tools/policy/check_policy.py (`--fixture`, the `guard-trace` join) · covers AC2 AC4 · one in-process read of a file outside the `policy fixtures` guard staged into `build_fresh_target`, then `selftest.py` staged out of the guard · none
+New arm: tools/policy/check_policy.py (`--fixture`, the `guard-trace` join) · covers AC2 AC4 · one in-process read of a file outside the `policy fixtures` guard staged into `build_install_target`, then `selftest.py` staged out of the guard · none
 
 ## 8. Open questions
 
-- **F1 — How is the file `build_fresh_target` reads kept inside the guard of the leg that runs it?**
+- **F1 — How is the file `build_install_target` reads kept inside the guard of the leg that runs it?**
   (a) The guard gains `{prefix}/govkit/selftest.py` and `fixtures-guard-census` holds it, the
   review's fix. (b) (a)'s guard line, and a trace of every source file the `--fixture` process opens,
   each joined to the guard through `--legs-for`. (c) A typed list of the files each case reads,
@@ -211,6 +214,7 @@ New arm: tools/policy/check_policy.py (`--fixture`, the `guard-trace` join) · c
 - rev-4 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-64`, the reciprocal end of the round-1 closing diff
   review's promotions; no scope or criterion moved.
 - rev-5 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
+- rev-6 · 2026-10-24 · §1 §3 §6 §7 §8 · the builder renamed `build_install_target(name, ids)`, the one builder the three installing cases share, after `TOOL-dGroundRules-32` rev-6 dropped the second builder its S16 had minted; no design change.
 
 ## 10. Reuse audit
 
