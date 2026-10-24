@@ -5,9 +5,16 @@
 No merge bar, gate leg or self-test suite ran in this pass. Each criterion was observed before the
 commit, with this unit's edits in the worktree, by the kit's own code over its scratch fixtures:
 `check_policy.run_fixture(<case>)` called in process for each case below, never the leg, every
-fixture repository under the system temp directory, short-named and removed by the case. The guard's
-admission of gov's own regenerated mirror is the commit after this one, made through the pre-commit
-hook.
+fixture repository under the system temp directory, short-named and removed by the case.
+
+On gov's own tree, after the pass commit `729e51286` and the help follow-up `d88f7ddda`,
+`policy.py mirror --check` named `actions.free` stale, `mirror --write` rendered 259 keys, and with
+`.governance/policy.json` staged alone `python tools/policy/guard.py --staged`, run directly, exited 0
+printing "policy-guard: admitted · .governance/policy.json · equals its render at HEAD"; that mirror
+is `1345b7f90`, fresh by `mirror --check`, 259 `{rev}` and no branch sha8. The pre-commit hook did
+NOT judge `1345b7f90`, whatever its message says: this worktree's `core.hooksPath` is the primary
+checkout's `.githooks`, whose `pre-commit` carries no policy guard block until this build lands on
+`main`.
 
 **Evidences:** TOOL-dGroundRules-19
 - AC1 — `python check_policy.py --fixture guard-mirror-render` — `run_fixture("guard-mirror-render")`, the case that command runs, committed a catalogue row, `mirror --write` printed "policy: mirror written · 263 keys", and with the mirror staged alone `guard.py --staged` exited 0 printing "policy-guard: admitted · .governance/policy.json · equals its render at HEAD". 2 assertions, 0 wrong.
