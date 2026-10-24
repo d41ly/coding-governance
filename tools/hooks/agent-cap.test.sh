@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# Runnable check for the portable agent-cap.js Workflow fan-out guard — BOTH rules:
-#   rule 1  raw parallel()/pipeline() outside a `gov:bounded-fanout` line   (concurrency)
-#   rule 2  a verify stage that spawns one agent per item                    (verifier arity)
+# Runnable check for the portable agent-cap.js guard on the Workflow and Agent tool calls, the rules it
+# keeps since TOOL-dGroundRules-10: rule 2, a verify stage that spawns one agent per item; rule 5,
+# the ref-keyed verdict join; rule 0, the spec-audit opt-in; rule 6, the rendered handoff; and rule 7,
+# the settings in force against the landed agent limit. The retired rules' arms went with them.
 # Run from the kit directory: bash ./agent-cap.test.sh   (exit 0 = all pass)
 set -u
 # A suite run from inside a session inherits the session's directory, which would arm rule 6 over a
@@ -124,9 +125,9 @@ print(d.relative_to(r).as_posix())' "$2" "$3" "$4"
 }
 TESTPY=$(resolve_python) || { echo "agent-cap.test: no usable python"; exit 2; }
 check() { # name expected_exit json
-  # FROM "$TMP", not from wherever the suite was launched (TOOL-aRepatriatedFork-7): a payload with no
-  # `cwd` makes the hook read `.agent-cap.conf` at the caller's checkout root, so an adopter that
-  # LOWERS its cap would otherwise move every ceiling arm below. The scratch dir has no checkout.
+  # FROM "$TMP", not from wherever the suite was launched: a payload with no `cwd` judges the
+  # caller's checkout, whose roles index arms rule 6 and whose settings rule 7 reads. The scratch dir
+  # has no checkout, so neither rule arms.
   printf '%s' "$3" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; local got=$?
   if [ "$got" = "$2" ]; then echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else echo "FAIL $1 (exit $got, want $2)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
@@ -144,16 +145,14 @@ js() { # name expected_exit  (script on stdin)
   check "$name" "$want" "$payload"
 }
 
-# ---- rule 1: concurrency ------------------------------------------------------------------------
-check "raw parallel(items.map) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const r = await parallel(D.map(d => () => agent(d.p)))"}}'
+# ---- the first arms ------------------------------------------------------------------------------
+# Rule 1, the ban on raw `parallel`/`pipeline`, retired in TOOL-dGroundRules-10 with its corpus:
+# the harness's own concurrency settings bound how many run at once. This first arm still DENIES, by
+# rule 2, because the raw primitive fans an agent over an unbounded receiver.
+check "a raw parallel fanning an agent over an unbounded map → deny (rule 2)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const r = await parallel(D.map(d => () => agent(d.p)))"}}'
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fail:-0}" = 0 ] && echo "PASS (${pass:-1} assertions)" || echo "FAIL (${pass:-1} assertions)"; [ "${fail:-0}" = 0 ] && exit 0; exit 1; fi
-check "raw pipeline(items,...) → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const r = await pipeline(files, s1, s2)"}}'
 check "non-Workflow tool → allow" 0 '{"tool_name":"Bash","tool_input":{"command":"parallel(x.map(y))"}}'
-check "member .parallel( → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"queue.parallel(2); log(1)"}}'
-check "comment mentioning parallel() → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"// use boundedParallel(), never raw parallel()\nconst r = await boundedParallel(t,5)"}}'
-check "parallel() only inside a string → allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const meta = { description: \"finders run, never raw parallel()\" }\nconst r = await boundedParallel(t, 5)"}}'
-check "string mentions parallel() + a real raw parallel( → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = \"we avoid parallel() normally\"\nconst r = await parallel(items.map(f))"}}'
 # The helper line itself is sanctioned, and its fan-out receiver is now BOUNDED — the old fixture
 # fanned `D.map(d=>()=>agent(d.p))`, which rule 2 correctly denies. A fixture that the gate must
 # reject cannot double as the fixture proving it accepts.
@@ -288,14 +287,8 @@ check "view axis: a spread nested in a removal-only splice → allow" 0 '{"tool_
 # That is also how one unterminated backtick blanked every line below it and the two rules reading
 # that view went blind under it. Both now fall back to a PER-LINE blanked render.
 #
-# ARMS PER RULE, not per view. Rule 3 and rule 5 read the same view through the same dispatcher, so
-# fixing one and pinning only that one certifies coverage that does not exist.
-#
-# THE RULE-3 FIXTURE IS ISOLATING BY CONSTRUCTION: a BOUNDED receiver with an OVER-CAP K, which only
-# rule 3 refuses. An unbounded receiver would be denied by rule 2 in both trees and prove nothing —
-# measured, and it is why the first draft of this arm was thrown away.
-check "rule3: over-cap K below an unterminated backtick → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst note = `an unterminated template\nawait boundedParallel(LENSES.map((L) => () => agent(L)), 50)"}}'
-check "rule3: the same with the backtick terminated → deny (control)" 2 '{"tool_name":"Workflow","tool_input":{"script":"const LENSES = [1,2,3]\nconst note = `a terminated template`\nawait boundedParallel(LENSES.map((L) => () => agent(L)), 50)"}}'
+# Rule 3 read the same view and retired in TOOL-dGroundRules-10 with its two arms here; rule 5's
+# remain.
 check "rule5: a ref-keyed join below an unterminated backtick → deny" 2 '{"tool_name":"Workflow","tool_input":{"script":"const note = `an unterminated template\nconst m = new Map()\nm.set(f.ref, v)"}}'
 # THE NARROWING SURVIVES THE FALLBACK. `TOOL-dTieredTribunal-14 S2` chose the blanked view for rule 5
 # so a banned pattern inside a STRING would not match; falling back to a view that keeps template
@@ -1089,11 +1082,11 @@ rm -f "$SACONF"
 rm -rf "$SAOTH"
 printf -- '---\nslug: tSA\n---\n' > "$SAREADME"
 
-# ---- rule 3: the hook READS THE BOUND ------------------------------------------------------------
-# EVERY ARM HERE ASSERTS ITS OWN MESSAGE, never the exit code. All three rules exit 2, so an arm
-# keyed on 2 passes when a completely different branch fires — which is how the retired `cap-5` arm
-# worked: it asserted that the REMEDIATION TEXT mentioned the number, on a fixture that tripped rule
-# 1, and read as proof the cap was enforced while `CAP` decided nothing at all.
+# ---- rule 2: the marked K and a reassigned receiver, each refusal asserting its own text ----------
+# Rule 3, which resolved every concurrency width, retired in TOOL-dGroundRules-10 with its arms.
+# These three were filed beside it and are rule 2's: the marker's K resolves through the one binder,
+# and an `<expr> || <int>` fallback or a reassignment takes the bound back. Each asserts its message,
+# because every rule exits 2.
 msg() { # name expected_exit needle   (script on stdin)
   local name=$1 want=$2 needle=$3 payload got
   payload=$("$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","tool_input":{"script":sys.stdin.read()}}))')
@@ -1106,64 +1099,14 @@ msg() { # name expected_exit needle   (script on stdin)
   else echo "FAIL $name (exit $got as wanted, but no branch named: $needle)"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 }
 
-# S1 — the CALL SITE argument.
-msg "rule3: call site cap 99 → deny naming the call site + 99" 2 \
-  'the cap argument at the boundedParallel() CALL SITE is 99' <<'EOF'
-const r = await boundedParallel(thunks, 99)
-EOF
-js "rule3: call site cap 5 → allow" 0 <<'EOF'
-const r = await boundedParallel(thunks, 5)
-EOF
-# The forward paren join, which is the whole mechanism: every shipped call site spans lines, so a
-# per-line read of argument 2 sees nothing at all.
-msg "rule3: cap 500 written across lines → deny naming 500" 2 \
-  'the cap argument at the boundedParallel() CALL SITE is 500' <<'EOF'
-const r = await boundedParallel(
-  thunks,
-  500
-)
-EOF
-# A TRAILING COMMA is not an argument. Measured: the prettier-formatted shape both shipped harnesses
-# use split into two, and the phantom second one read as a cap of nothing — the predicate denied this
-# repo's own review harness on its formatting.
-js "rule3: one argument + a trailing comma → allow (not a phantom cap)" 0 <<'EOF'
-async function boundedParallel(thunks, cap = 5) { return thunks }
-const r = await boundedParallel(
-  LENSES.map((L) => () => L),
-)
-EOF
-
-# S2 — the DEFAULT PARAMETER, which governs a call that passes no cap.
-js "rule3: no cap argument against a bounded default → allow" 0 <<'EOF'
-async function boundedParallel(thunks, cap = 5) { return thunks }
-const r = await boundedParallel(thunks)
-EOF
-msg "rule3: a wide default parameter → deny naming the DEFAULT PARAMETER + 99" 2 \
-  'the DEFAULT PARAMETER of boundedParallel() is 99' <<'EOF'
-async function boundedParallel(t, cap = 99) { return t }
-EOF
-msg "rule3: no cap argument and no helper defined → deny" 2 \
-  'there is no DEFAULT PARAMETER to resolve the bound from' <<'EOF'
-const r = await boundedParallel(thunks)
-EOF
-
-# S3 — the `||` fallback no longer binds, for ANY consumer. This is the defect that let two shipped
-# harnesses raise their own agent count from the caller while the guard read the literal.
-msg "rule3: cap bound by an || fallback → deny naming the fallback form" 2 \
-  'bound by an `<expr> || 5` FALLBACK form' <<'EOF'
-const CAP = (args && args.cap) || 5
-const r = await boundedParallel(thunks, CAP)
-EOF
-# ...and the same binder, refused for the MARKER's K — one narrowing, every consumer.
-msg "rule3: a marked K bound by an || fallback → deny" 2 \
+msg "rule2: a marked K bound by an || fallback → deny" 2 \
   'which this file does not show to be bounded' <<'EOF'
 const MAX_VERIFIERS = (args && args.maxVerifiers) || 5
 const b = chunk(all, Math.ceil(all.length / MAX_VERIFIERS)) // gov:fixed-verifiers
 const r = await boundedParallel(b.map((g) => () => agent(g)), 5)
 EOF
-# A BARE REASSIGNMENT invalidates the NUMBER, not just the receiver. The sweep existed for the
-# whitelist and was never mirrored onto the consts map, so `let K = 5; K = 500` published a 5.
-msg "rule3: a reassigned K → deny" 2 \
+# A BARE REASSIGNMENT invalidates the NUMBER, not just the receiver: `let K = 5; K = 500` published a 5.
+msg "rule2: a reassigned K → deny" 2 \
   'which this file does not show to be bounded' <<'EOF'
 let K = 5
 K = 500
@@ -1174,9 +1117,8 @@ EOF
 # D10 - a REASSIGNED receiver must SAY so. The reason map is written by both scan passes and was
 # never cleared on accept, so a name refused on pass 1 for declaration order and then accepted on
 # pass 2 kept the pass-1 text; the sweep below took the name back and the refusal printed an
-# explanation of a branch pass 2 had just blessed. The verdict was right and the reason was wrong,
-# which is precisely the "operator fixes it by guessing" failure the map was added to remove. This
-# arm asserts the TEXT, because an exit-code arm cannot tell a right reason from a wrong one.
+# explanation of a branch pass 2 had just blessed. This arm asserts the TEXT, because an exit-code
+# arm cannot tell a right reason from a wrong one.
 msg "rule2: a reassigned marked receiver -> deny NAMING the reassignment" 2   'was REASSIGNED after its bounded assignment' <<'EOF'
 let LENSES = ALL.filter((L) => L.on) // gov:fixed-verifiers
 const ALL = [1, 2, 3]
@@ -1184,169 +1126,78 @@ LENSES = args.custom
 const r = await boundedParallel(LENSES.map((L) => () => agent(L)), 5)
 EOF
 
-# S4 — `gov:bounded-fanout` is a CLAIM about a width, checked like its sibling. It used to exempt its
-# line outright, so a line slicing fifty wide returned before any shape check.
-msg "rule3: marked line slicing 50 wide → deny naming the width" 2 \
-  'the gov:bounded-fanout MARKED LINE slice width is 50' <<'EOF'
-async function boundedParallel(thunks, cap = 5) {
-  const out = []
-  for (let i = 0; i < thunks.length; i += 50)
-    out.push(...(await parallel(thunks.slice(i, i + 50)))) // gov:bounded-fanout
-  return out
-}
-EOF
-msg "rule3: a marker on a line with no slice at all → deny" 2 \
-  'does not slice a bare identifier by a visible width' <<'EOF'
-const r = await parallel(everything) // gov:bounded-fanout
-EOF
-# The canonical shipped helper body must stay green: its width token is the helper's own `cap`
-# PARAMETER, which S1 and S2 have already bounded. Without this case S4 denies all three harnesses.
-js "rule3: the canonical helper body → allow" 0 <<'EOF'
-async function boundedParallel(thunks, cap = 5) {
-  const out = []
-  for (let i = 0; i < thunks.length; i += cap)
-    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
-  return out
-}
-const r = await boundedParallel(thunks, 5)
-EOF
-
-# ---- the cap is a FILE CONSTANT: AGENT_CAP is refused, not ignored -------------------------------
-# The header advertised this override for two releases after it stopped deciding anything. A
-# silently-ignored knob that appears to work is how that survived, so it denies and says why.
-AGENT_CAP=50 printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await agent(1)"}}' \
-  > "$TMP/envpayload"
+# ---- a set AGENT_CAP is read by nothing (TOOL-dGroundRules-10) ------------------------------------
+# The refusal of a set `AGENT_CAP` retired in TOOL-dGroundRules-10 with the clamp it guarded: the agent limit is the
+# policy kit's `runtime.agents-in-flight`, and this hook reads no ceiling from the environment.
+printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await agent(1)"}}' > "$TMP/envpayload"
 (cd "$TMP" && AGENT_CAP=50 node "$HOOK") < "$TMP/envpayload" >/dev/null 2>"$TMP/env.err"; envrc=$?
-if [ "$envrc" = 2 ] && grep -qF 'AGENT_CAP is set (50) and this guard NO LONGER reads it' "$TMP/env.err"; then
-  echo "ok   a set AGENT_CAP is refused with a message"; pass=$((pass+1))
+if [ "$envrc" = 0 ] && [ ! -s "$TMP/env.err" ]; then
+  echo "ok   a set AGENT_CAP over a clean script is admitted, silently"; pass=$((pass+1))
 else
-  echo "FAIL a set AGENT_CAP was not refused (exit $envrc)"; sed 's/^/     /' "$TMP/env.err"; fail=$((fail+1))
+  echo "FAIL a set AGENT_CAP was not admitted (exit $envrc)"; sed 's/^/     /' "$TMP/env.err"; fail=$((fail+1))
 fi
-(cd "$TMP" && node "$HOOK") < "$TMP/envpayload" >/dev/null 2>&1
-if [ "$?" = 0 ]; then echo "ok   ...and an UNSET AGENT_CAP changes nothing"; pass=$((pass+1))
-else echo "FAIL an unset AGENT_CAP denied a clean script"; fail=$((fail+1)); fi
 
-# The rule-2 remediation text still names the number it enforces.
-if grep -qF 'verify-stage agents at 5 TOTAL' <(printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await boundedParallel(all.map((f) => () => agent(f.c)), 5)"}}' | (cd "$TMP" && node "$HOOK") 2>&1); then
+# The rule-2 remediation text names the number it enforces, and the constant it lives in.
+if grep -qF "verify-stage agents at 5 TOTAL, this hook's MAX_VERIFIERS" <(printf '%s' '{"tool_name":"Workflow","tool_input":{"script":"const r = await boundedParallel(all.map((f) => () => agent(f.c)), 5)"}}' | (cd "$TMP" && node "$HOOK") 2>&1); then
   echo "ok   rule-2 deny text names the 5-verifier cap"; pass=$((pass+1))
 else echo "FAIL rule-2 deny text does not name the cap"; fail=$((fail+1)); fi
 
-# ---- rule 4: a direct `Agent` spawn is COUNTED ---------------------------------------------------
-# THE SEAM WAS MEASURED BEFORE ANY OF THIS WAS WRITTEN, per the spec's own F4: a throwaway PreToolUse
-# hook on the `Agent` matcher captured a real spawn's payload on node a. `tool_name` arrives as
-# exactly `Agent`, and `session_id`, `prompt_id` and `tool_use_id` are all present. The fixtures below
-# are that payload shape, not a guess at it.
-#
-# THE TOKEN DIRECTORY IS ISOLATED WITHOUT A KNOB: the hook resolves it from the payload's own `cwd`,
-# so a scratch tree with a `.git` directory in it is all the isolation this needs. A test-only env
-# override would be one more caller-settable knob in the unit that exists to remove them.
-mkdir -p "$TMP/agentrepo/.git"
-AGJ="$NODEDIR/agentrepo"                       # node's spelling of the path, as the scriptPath arms use
-AGROOT="$TMP/agentrepo/.git/agent-cap"
-apay() { # session · prompt · tool_use_id
-  printf '{"tool_name":"Agent","cwd":"%s","session_id":"%s","prompt_id":"%s","tool_use_id":"%s"}' \
-    "$AGJ" "$1" "$2" "$3"
-}
-
-# AC23 — six SEQUENTIAL spawns in one turn: five allowed, the sixth denied. Asserted on a string
-# unique to this branch and never on the exit code, which all four rules in this file share.
-ok5=1
-for i in 1 2 3 4 5; do
-  printf '%s' "$(apay S1 P1 "u$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ag.err" || ok5=0
-done
-printf '%s' "$(apay S1 P1 u6)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ag6.err"; rc6=$?
-if [ "$ok5" = 1 ] && [ "$rc6" = 2 ] \
-   && grep -qF 'direct-Agent spawn budget for this prompt is exhausted' "$TMP/ag6.err"; then
-  echo "ok   rule4: six sequential spawns — five allowed, the sixth denied by name"; pass=$((pass+1))
-else
-  echo "FAIL rule4: sequential budget (first five ok=$ok5, sixth exit $rc6)"; sed 's/^/     /' "$TMP/ag6.err"; fail=$((fail+1))
-fi
-
-# ...and the SAME tool_use_id re-fed does not spend a second slot. A hook re-invoked for one call
-# would otherwise burn the turn's budget on a single spawn.
-printf '%s' "$(apay S1 P1 u3)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcdup=$?
-[ "$rcdup" = 0 ] && { echo "ok   rule4: a repeated tool_use_id is idempotent"; pass=$((pass+1)); } \
-                 || { echo "FAIL rule4: a repeated tool_use_id was charged again (exit $rcdup)"; fail=$((fail+1)); }
-
-# AC24 — THE ARM THE READ-THEN-DECIDE DESIGN FAILS. Six CONCURRENT payloads: exactly five slots
-# exist afterwards and exactly ONE deny is emitted. Run repeatedly, not once, because the miscount it
-# guards against is nondeterministic — measured on node a, a four-call burst overlapped its hook
-# processes and two of four read the same count. Create-a-token-THEN-count does not fix that either:
-# each of six processes sees between its own ordinal and six, so several deny. Only the atomic claim
-# of a NUMBERED slot decides it in the create, which is why the slots are numbered.
-conc=1; why=""
-for round in 1 2 3 4 5 6 7 8; do
-  P="Pc$round"
-  rm -f "$TMP"/ag.rc.*
-  for i in 1 2 3 4 5 6; do
-    ( printf '%s' "$(apay S1 "$P" "c$round-$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; echo $? > "$TMP/ag.rc.$i" ) &
-  done
-  wait
-  denies=$(cat "$TMP"/ag.rc.* 2>/dev/null | grep -c '^2$')
-  slots=$(ls "$AGROOT/S1__$P" 2>/dev/null | grep -c .)
-  if [ "$denies" != 1 ] || [ "$slots" != 5 ]; then conc=0; why="round $round: $denies deny(s), $slots slot(s)"; break; fi
-done
-[ "$conc" = 1 ] && { echo "ok   rule4: 8 concurrent bursts of six — exactly 5 slots, exactly 1 deny, every time"; pass=$((pass+1)); } \
-                || { echo "FAIL rule4: concurrent burst miscounted ($why)"; fail=$((fail+1)); }
-
-# AC25 — a FRESH prompt resets the budget, with no cleanup step run in between. The budget is keyed
-# per prompt precisely so nothing has to remember to clear it.
-printf '%s' "$(apay S1 Pfresh n1)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcf=$?
-[ "$rcf" = 0 ] && { echo "ok   rule4: a new prompt resets the budget with no cleanup"; pass=$((pass+1)); } \
-               || { echo "FAIL rule4: a new prompt did not reset the budget (exit $rcf)"; fail=$((fail+1)); }
-
-# AC26 — a slot IDLE past SLOT_TTL_MS is reclaimed, and one still inside it is NOT. Both directions,
-# because an expiry that always fires is a cap that does not exist, and one that never fires is the
-# permanent budget this arm was added to end. The clock is moved with `touch -d`, never by sleeping:
-# the constant is 45 minutes and a test that waits for it is a test nobody runs.
-#
-# THE STALE CASE IS THE REGRESSION ARM. Before the expiry landed, five sequential spawns exhausted a
-# turn's budget forever — measured, six sequential spawns with distinct tool_use_ids and the sixth
-# denied against five long-idle slots. Revert SLOT_TTL_MS to Infinity and this arm goes red.
-for i in 1 2 3 4 5; do
-  printf '%s' "$(apay Sttl Pttl "t$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
-done
-TURNTTL="$AGROOT/Sttl__Pttl"
-if [ ! -d "$TURNTTL" ]; then
-  echo "FAIL rule4: the TTL fixture claimed no slots — $TURNTTL absent"; fail=$((fail+1))
-else
-  # Age slot-1 only. The remaining four stay fresh, which is what makes the second half a control
-  # rather than a restatement of the first.
-  touch -d '46 minutes ago' "$TURNTTL/slot-1" 2>/dev/null || touch -A -004600 "$TURNTTL/slot-1" 2>/dev/null
-  printf '%s' "$(apay Sttl Pttl t6)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcstale=$?
-  printf '%s' "$(apay Sttl Pttl t7)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/ttl.err"; rcfresh=$?
-  if [ "$rcstale" = 0 ] && [ "$rcfresh" = 2 ] \
-     && grep -qF 'within the last' "$TMP/ttl.err"; then
-    echo "ok   rule4: an idle slot past the TTL is reclaimed; four fresh ones are not"; pass=$((pass+1))
+# ---- the agent limit (TOOL-dGroundRules-10) -------------------------------------------------------
+# Rule 4, the per-prompt slot ledger, and the 1-to-5 clamp read from `.agent-cap.conf` retired in TOOL-dGroundRules-10:
+# the harness counts agents in flight under the two settings the policy kit renders. The arms below
+# run a COPY of the hook beside a copy of scratch-guard.js and nothing else, so rule 7 finds no policy
+# kit and adds no rule, in a checkout that is a bare `.git` directory, which is all the root walk
+# looks for. The last arm puts a policy kit beside the copy, in a real repository, and rule 7 arms.
+LIMHK="$TMP/limit-hooks/hooks"; mkdir -p "$LIMHK"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$LIMHK/"
+LIMREPO="$TMP/limitrepo"; mkdir -p "$LIMREPO/.git" "$LIMREPO/sub"
+LIMJ="$NODEDIR/limitrepo/sub"
+run_limit_call() { # name expected_exit payload-json [hook] [text stderr must carry]
+  local got
+  printf '%s' "$3" | (cd "$TMP" && node "${4:-$LIMHK/agent-cap.js}") >/dev/null 2>"$TMP/err"; got=$?
+  if [ "$got" = "$2" ] && { [ -z "${5:-}" ] || grep -qF -- "$5" "$TMP/err"; }; then
+    echo "ok   $1 (exit $got)"; pass=$((pass+1))
   else
-    echo "FAIL rule4: slot TTL (stale-reclaim exit $rcstale want 0, fresh-deny exit $rcfresh want 2)"
-    sed 's/^/     /' "$TMP/ttl.err"; fail=$((fail+1))
+    echo "FAIL $1 (exit $got, want $2${5:+, stderr carrying '$5'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
   fi
-fi
-
-# ...and the DENY MESSAGE says which rule it is enforcing. It used to read "already spawned in this
-# turn", which described a permanent budget and named the concurrency rule in the same breath. A
-# message that misstates the rule sends the reader to consolidate work that did not need it.
-printf '%s' "$(apay Smsg Pmsg m1)" | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1
-for i in 2 3 4 5 6; do
-  printf '%s' "$(apay Smsg Pmsg "m$i")" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/msg.err"
+}
+LIM_WF='{"tool_name":"Workflow","cwd":"'"$LIMJ"'","tool_input":{"script":"const r = await agent(1)"}}'
+# A conf above the retired clamp's five is no refusal: the hook reads no conf.
+printf 'FANOUT_CAP=8\n' > "$LIMREPO/.agent-cap.conf"
+run_limit_call "limit: FANOUT_CAP=8 in .agent-cap.conf, a Workflow call -> allow" 0 "$LIM_WF"
+run_limit_call "limit: FANOUT_CAP=8 in .agent-cap.conf, an Agent call -> allow" 0 '{"tool_name":"Agent","cwd":"'"$LIMJ"'","session_id":"s8","prompt_id":"p8","tool_use_id":"u8"}'
+rm -f "$LIMREPO/.agent-cap.conf"
+# Six direct spawns in one prompt: the slot ledger that refused the sixth is gone, and so is its directory.
+for i in 1 2 3 4 5 6; do
+  run_limit_call "limit: direct spawn $i of one prompt -> allow" 0 '{"tool_name":"Agent","cwd":"'"$LIMJ"'","session_id":"s6","prompt_id":"p6","tool_use_id":"u'"$i"'"}'
 done
-grep -qF 'claimed in this turn within the last' "$TMP/msg.err" \
-  && grep -qF 'is reclaimed on the next spawn' "$TMP/msg.err" \
-  && { echo "ok   rule4: the deny message states the window, not a permanent budget"; pass=$((pass+1)); } \
-  || { echo "FAIL rule4: deny message does not state the reclaim window"; sed 's/^/     /' "$TMP/msg.err"; fail=$((fail+1)); }
-
-# FAIL OPEN when the budget cannot be KEYED — and prove it by the ABSENCE of a token, not by the exit
-# code alone, which a hook that allowed everything would also produce. A hook that denies every spawn
-# because a payload field is missing is worse than the burst it prevents; a token it could not
-# CREATE is a different fact and denies (the branch above it).
-before=$(ls "$AGROOT" 2>/dev/null | grep -c .)
-printf '{"tool_name":"Agent","cwd":"%s","session_id":"S9","tool_use_id":"x"}' "$AGJ" \
-  | (cd "$TMP" && node "$HOOK") >/dev/null 2>&1; rcn=$?
-after=$(ls "$AGROOT" 2>/dev/null | grep -c .)
-{ [ "$rcn" = 0 ] && [ "$before" = "$after" ]; } \
-  && { echo "ok   rule4: an unkeyable payload fails OPEN and writes no token"; pass=$((pass+1)); } \
-  || { echo "FAIL rule4: unkeyable payload (exit $rcn, dirs $before -> $after)"; fail=$((fail+1)); }
+if [ -e "$LIMREPO/.git/agent-cap" ]; then
+  echo "FAIL limit: a slot ledger directory appeared under $LIMREPO/.git"; fail=$((fail+1))
+else
+  echo "ok   limit: no slot ledger directory under the git dir"; pass=$((pass+1))
+fi
+# A raw primitive with no agent fan, and a width of 50: rules 1 and 3 retired, so each is admitted.
+check "limit: a raw parallel over items.map -> allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const items = [1, 2]\nconst r = await parallel(items.map((i) => () => i))"}}'
+check "limit: boundedParallel(thunks, 50) -> allow" 0 '{"tool_name":"Workflow","tool_input":{"script":"const r = await boundedParallel(thunks, 50)"}}'
+# RULE 7, armed: a real repository whose policy lands a limit of 2, the hook copy with a copy of the
+# policy kit beside it, and the settings the harness would start from first above the limit, then at it.
+LIMPK=$(resolve_kit_dir "$TESTPY" policy policy.py "$HERE") || LIMPK=""
+ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 2>/dev/null)
+if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
+  echo "FAIL limit: no policy kit beside this hooks kit, so rule 7 has nothing to arm with"; fail=$((fail+1))
+else
+  R7="$TMP/r7"; mkdir -p "$R7/.governance" "$R7/kits/hooks" "$R7/kits/policy" "$R7/.claude"
+  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$R7/kits/hooks/"
+  for f in policy.py catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$R7/kits/policy/"; done
+  printf '[runtime]\nagents-in-flight = 2\n' > "$R7/.governance/policy.toml"
+  ( cd "$R7" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
+      && git config user.name t && git add -A && git commit -qm limit --no-verify )
+  R7_WF='{"tool_name":"Workflow","cwd":"'"$NODEDIR/r7"'","tool_input":{"script":"const r = await agent(1)"}}'
+  printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7/.claude/settings.json"
+  run_limit_call "rule7: settings at 3 over a landed limit of 2 -> deny, naming the variable" 2 "$R7_WF" "$R7/kits/hooks/agent-cap.js" 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS'
+  run_limit_call "rule7: ...and naming the render" 2 "$R7_WF" "$R7/kits/hooks/agent-cap.js" 'policy.py settings --write'
+  printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7/.claude/settings.json"
+  run_limit_call "rule7: settings at the limit -> allow (control)" 0 "$R7_WF" "$R7/kits/hooks/agent-cap.js"
+fi
 
 # ---- the two copies ------------------------------------------------------------------------------
 # `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing
@@ -1694,12 +1545,6 @@ const all = args.everything
 if (x === 5") await Promise.all(all.map((f) => agent(f.prompt)))
 EOF
 
-# A block comment is NOT blanked by this view, deliberately, so a primitive named inside one still
-# trips rule 1 exactly as the dossier says it does. This arm pins that posture rather than the bug.
-js "renderCodeView: a raw primitive inside a block comment still denies (fail-closed posture)" 2 <<'EOF'
-/* the shape this bans is parallel(items.map(...)) */
-const r = await parallel(D.map((d) => () => agent(d.p)))
-EOF
 
 
 # ---- TOOL-dMispairedQuote-1: a quote pairs with the WRONG partner ---------------------------------
@@ -1711,51 +1556,14 @@ EOF
 # double-quoted string, a block comment and a template literal, and the shipped hook admitted all
 # four. The CONTROL beside each is the same line with the apostrophe removed.
 
-js "mispaired quote: regex literal shares the fan-out line -> deny" 2 <<'EOF'
-const re = /won't/
-const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
-js "mispaired quote: SAME LINE is the load-bearing part -> deny" 2 <<'EOF'
-const re = /won't/; const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
-js "mispaired quote: control, same line without the apostrophe -> deny" 2 <<'EOF'
-const re = /wont/; const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
-js "mispaired quote: apostrophe in a DOUBLE-quoted string -> deny" 2 <<'EOF'
-const s = "don't"; const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
-js "mispaired quote: apostrophe in a BLOCK COMMENT -> deny" 2 <<'EOF'
-/* don't */ const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
-js "mispaired quote: apostrophe in a TEMPLATE literal -> deny" 2 <<'EOF'
-const s = `don't`; const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
-js "mispaired quote: LOOSE apostrophe opening a word -> deny" 2 <<'EOF'
-/* run 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
+# Rule 1's seven arms here, a raw `parallel` beside a prose apostrophe, retired with that rule in TOOL-dGroundRules-10
+# (TOOL-dGroundRules-10); the defect they pinned is a view's, and rule 2's and rule 5's arms keep it.
 js "mispaired quote: rule 2 counter loses the agent( -> deny" 2 <<'EOF'
 const re = /won't/; const r = await boundedParallel(all.map((f) => () => agent('x')), 5)
 EOF
 
 js "mispaired quote: rule 2 control, no apostrophe -> deny" 2 <<'EOF'
 const re = /wont/; const r = await boundedParallel(all.map((f) => () => agent('x')), 5)
-EOF
-
-js "mispaired quote: rule 3 loses a declared cap of 50 -> deny" 2 <<'EOF'
-const B = ['a','b']
-const re = /won't/; const r = await boundedParallel(B.map((x) => () => agent('x')), 50)
-EOF
-
-js "mispaired quote: rule 3, an unpaired double quote swallows the bound -> deny" 2 <<'EOF'
-const B = ['a','b']
-const c = x === 5"; const r = await boundedParallel(B.map((x) => () => agent(x)), 50)
 EOF
 
 # Rule 5, the ref-keyed-join ban, is defeated by the same apostrophe and nobody had named it. Both
@@ -1776,49 +1584,11 @@ EOF
 # A fixture group that only ever asserts denials cannot catch a fail-closed that has become a
 # fail-open. Each of these passes at the tip and must keep passing.
 
-js "mispaired quote: a legal log() with a contraction in its trailing comment -> allow" 0 <<'EOF'
-log('parallel(') // we don't allow it
-EOF
-
-js "mispaired quote: return + a string naming a primitive -> allow" 0 <<'EOF'
-function f() { return 'parallel (nope)' }
-await boundedParallel([() => agent(1)], 5)
-EOF
-
-js "mispaired quote: case + a string naming a primitive -> allow" 0 <<'EOF'
-switch (x) { case 'parallel (nope)': break }
-await boundedParallel([() => agent(1)], 5)
-EOF
-
-js "mispaired quote: throw + a string naming a primitive -> allow" 0 <<'EOF'
-if (x) throw 'pipeline (nope)'
-await boundedParallel([() => agent(1)], 5)
-EOF
-
 js "mispaired quote: aLexedStripper-5's own fixture stays legal -> allow" 0 <<'EOF'
 const SEP = /[`]/
 const all = ['a','b']
 await boundedParallel(all.map((x) => () => agent(x)), 5)
 EOF
-
-# ---- the keyword clause, fixtured over its DECLARED SET rather than sampled ----------------------
-# `checkLiteralOpen` admits a quote as an opener after a JS keyword, because `return 'x'` is ordinary
-# code. Eleven keywords are declared and each is also an English word, so `/* <keyword> 'em */`
-# mispairs for every member: a STATED residual, one arm per member so the leak is recorded rather
-# than assumed away, and none of them a regression -- all eleven ADMIT at the tip too. The three
-# connectives dropped from the set are the CONTROL: they deny.
-for kw in return case throw typeof instanceof new delete void yield await else; do
-  js "keyword residual: /* $kw 'em */ above a raw parallel( -> allow (stated residual)" 0 <<EOF
-/* $kw 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-done
-
-for kw in in of do run one; do
-  js "keyword control: /* $kw 'em */ is not a declared opener -> deny" 2 <<EOF
-/* $kw 'em */ const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-done
-
 
 # ---- TOOL-dMispairedQuote-3: no denial may be LOST ------------------------------------------------
 # Correcting what counts as a string literal does not only un-hide fan-outs; it un-hides every other
@@ -1827,43 +1597,8 @@ done
 # here, and each was ALSO closed by the property arm below -- which is what makes the property worth
 # its bytes: the next repair to these views inherits it without knowing these three shapes.
 
-js "no-regress: a backtick inside a regex, above a multi-line cap-50 call -> deny" 2 <<'EOF'
-async function boundedParallel(thunks, cap = 5) {
-  const out = []
-  for (let i = 0; i < thunks.length; i += cap)
-    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
-  return out
-}
-const L = ['a','b']
-const re = /it's`don't/
-await boundedParallel(
-  L.map((s) => () => agent(s)),
-  50,
-)
-EOF
-
-js "no-regress: an exposed backtick leaks the template mode -> deny" 2 <<'EOF'
-async function boundedParallel(thunks, cap = 5) {
-  const out = []
-  for (let i = 0; i < thunks.length; i += cap)
-    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
-  return out
-}
-const L = ['a','b']
-const re = /a'b`c/
-await boundedParallel(
-  L.map((s) => () => agent(s)),
-  50,
-)
-EOF
-
-js "no-regress: a quoted URL inside a same-line template -> deny" 2 <<'EOF'
-const p = `see 'http://x' now`; await parallel(all.map(f))
-EOF
-
-js "no-regress: a DOUBLE-quoted URL in a template does it without an apostrophe -> deny" 2 <<'EOF'
-const p = `see "http://x" now`; await parallel(all.map(f))
-EOF
+# Its four fixtures here hit rule 3 (a width of 50) and rule 1 (a raw primitive), which retired in TOOL-dGroundRules-10
+# (TOOL-dGroundRules-10); three of them stay in the property's population below as expected losses.
 
 # ---- TOOL-aRepatriatedFork-7 S3: the NESTED-INTERPOLATION matrix ---------------------------------
 # A nested `${` zeroed the ONE depth counter the lexed view kept, so a brace open around an inner
@@ -1912,93 +1647,6 @@ if [ "$nest_n" = 10 ]; then
 else
   echo "FAIL nesting matrix: $nest_n fixture(s) judged, want 10 -- a matrix that judged fewer certifies shapes it never saw"; fail=$((fail+1))
 fi
-
-# ---- TOOL-aRepatriatedFork-7 S4/S5/S6: a DECLARED, lower-only cap ---------------------------------
-# `FANOUT_CAP` in `.agent-cap.conf` at the checkout root lowers the cap at every enforcement site and
-# for the direct-spawn slots; a value outside 1..ceiling denies every call naming the file. The
-# fixture checkout is a bare `.git` DIRECTORY, which is all the root walk looks for, and each call
-# stands in a subdirectory so the walk is exercised rather than assumed.
-CAPREPO="$TMP/caprepo"; mkdir -p "$CAPREPO/.git" "$CAPREPO/sub"
-render_cap_harness() { # K -> a harness whose default parameter AND call site both carry K
-  printf 'async function boundedParallel(thunks, cap = %s) {\n  const out = []\n  for (let i = 0; i < thunks.length; i += cap)\n    out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout\n  return out\n}\nconst LENSES = [1, 2, 3]\nawait boundedParallel(LENSES.map((L) => () => agent(L)), %s)\n' "$1" "$1"
-}
-check_cap() { # name expected_exit K [text stderr must carry]
-  local payload got
-  payload=$(render_cap_harness "$3" | "$TESTPY" -c 'import json,sys; print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":{"script":sys.stdin.read()}}))' "$CAPREPO/sub")
-  printf '%s' "$payload" | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
-  if [ "$got" = "$2" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
-    echo "ok   $1 (exit $got)"; pass=$((pass+1))
-  else
-    echo "FAIL $1 (exit $got, want $2${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
-  fi
-}
-check_spawn() { # name expected_exit prompt_id tool_use_id [text stderr must carry]
-  local got
-  printf '{"tool_name":"Agent","cwd":"%s","session_id":"s7","prompt_id":"%s","tool_use_id":"%s"}' \
-    "$("$TESTPY" -c 'import sys; print(sys.argv[1].replace(chr(92), "/"))' "$CAPREPO/sub")" "$3" "$4" \
-    | (cd "$TMP" && node "$HOOK") >/dev/null 2>"$TMP/err"; got=$?
-  if [ "$got" = "$2" ] && { [ -z "${5:-}" ] || grep -qF -- "$5" "$TMP/err"; }; then
-    echo "ok   $1 (exit $got)"; pass=$((pass+1))
-  else
-    echo "FAIL $1 (exit $got, want $2${5:+, stderr carrying '$5'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
-  fi
-}
-# No conf: the ceiling, unchanged.
-check_cap "declared cap: no conf, a cap-5 harness -> allow" 0 5
-check_cap "declared cap: no conf, a cap-4 harness -> allow" 0 4
-# AC4: a declared 4 is READ and ENFORCED at the call site and the default parameter.
-printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
-check_cap "declared cap: FANOUT_CAP=4, a cap-5 harness -> deny naming the effective cap" 2 5 'above the 4-agent cap'
-check_cap "declared cap: FANOUT_CAP=4, the denial names the file that lowered it" 2 5 '.agent-cap.conf'
-check_cap "declared cap: FANOUT_CAP=4, the same harness at 4 -> allow" 0 4
-printf '# the fleet cap\nFANOUT_CAP="4"\r\n' > "$CAPREPO/.agent-cap.conf"
-check_cap "declared cap: quoted value with a CRLF ending still lowers -> deny" 2 5 'above the 4-agent cap'
-printf 'FANOUT_CAP=5\n' > "$CAPREPO/.agent-cap.conf"
-check_cap "declared cap: FANOUT_CAP at the ceiling -> allow" 0 5
-# AC6: out of range or malformed DENIES, naming the file -- never a raise, never ignored.
-for bad in 6 0 four ''; do
-  printf 'FANOUT_CAP=%s\n' "$bad" > "$CAPREPO/.agent-cap.conf"
-  check_cap "declared cap: FANOUT_CAP=${bad:-<empty>} denies a bounded harness, naming the file" 2 4 '.agent-cap.conf declares FANOUT_CAP'
-done
-printf 'FANOUT_CAP=6\n' > "$CAPREPO/.agent-cap.conf"
-check_spawn "declared cap: FANOUT_CAP=6 denies a direct Agent spawn too" 2 p-bad u-bad '.agent-cap.conf declares FANOUT_CAP'
-# AC5: the direct-spawn slots count to the declared value, and to the ceiling without one.
-printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
-for k in 1 2 3 4; do check_spawn "declared cap: FANOUT_CAP=4, direct spawn $k -> allow" 0 p-four "u$k"; done
-check_spawn "declared cap: FANOUT_CAP=4, direct spawn 5 -> deny" 2 p-four u5 '4 of 4 claimed'
-rm -f "$CAPREPO/.agent-cap.conf"
-for k in 1 2 3 4 5; do check_spawn "declared cap: no conf, direct spawn $k -> allow" 0 p-five "u$k"; done
-check_spawn "declared cap: no conf, direct spawn 6 -> deny (control)" 2 p-five u6 '5 of 5 claimed'
-
-# ---- TOOL-aRepatriatedFork-7, closing review round 1 residual (b): the hook ANSWERS the cap ------
-# Two shell readers used to re-parse `.agent-cap.conf` with a sed of their own, and a conf saved with a
-# byte-order mark was the measured divergence: this hook read 4 (JavaScript's `\s` spans U+FEFF) while
-# both seds matched nothing and answered 5, so the parity renderer wrote cap-5 harnesses this hook
-# denies. `--print-cap` is the one answer they now ask for. Each arm pairs the ANSWER with the
-# ENFORCEMENT over the same bytes, so the two cannot be graded apart.
-check_print() { # name expected_exit expected_stdout [text stderr must carry]
-  local out got
-  out=$(cd "$CAPREPO/sub" && node "$HOOK" --print-cap </dev/null 2>"$TMP/err"); got=$?
-  if [ "$got" = "$2" ] && [ "$out" = "$3" ] && { [ -z "${4:-}" ] || grep -qF -- "$4" "$TMP/err"; }; then
-    echo "ok   $1 (exit $got, '$out')"; pass=$((pass+1))
-  else
-    echo "FAIL $1 (exit $got '$out', want $2 '$3'${4:+, stderr carrying '$4'})"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1))
-  fi
-}
-check_print "print-cap: no conf answers the ceiling" 0 5
-printf 'FANOUT_CAP=4\n' > "$CAPREPO/.agent-cap.conf"
-check_print "print-cap: a declared 4 answers 4" 0 4
-printf '\357\273\277FANOUT_CAP=4\r\n' > "$CAPREPO/.agent-cap.conf"
-check_cap "print-cap: a BOM-led conf still LOWERS the enforced cap" 2 5 'above the 4-agent cap'
-check_print "print-cap: ...and the answer is the enforced 4, not a re-parser's 5" 0 4
-printf 'FANOUT_CAP=4\nFANOUT_CAP=abc\n' > "$CAPREPO/.agent-cap.conf"
-check_print "print-cap: the LAST line wins and a malformed one refuses, naming the file" 2 '' '.agent-cap.conf declares FANOUT_CAP=abc'
-# Fail CLOSED if it is ever WIRED: a payload on stdin is a tool call being judged, and a query mode
-# that exits 0 on it would admit every call with no diff -- the `--only` hazard check-wiring polices.
-rm -f "$CAPREPO/.agent-cap.conf"
-printf '{"tool_name":"Workflow","tool_input":{"script":"x"}}' | (cd "$CAPREPO/sub" && node "$HOOK" --print-cap) >/dev/null 2>"$TMP/err"; got=$?
-if [ "$got" = 2 ] && grep -qF -- 'must not be wired' "$TMP/err"; then echo "ok   print-cap: a payload on stdin is denied, not admitted (exit $got)"; pass=$((pass+1))
-else echo "FAIL print-cap: a payload on stdin (exit $got, want 2 naming 'must not be wired')"; sed 's/^/     /' "$TMP/err"; fail=$((fail+1)); fi
 
 # ---- S10: `verbatim` is CHECKED, not asserted ----------------------------------------------------
 # The three renderShipped* bodies must equal their counterparts in the BASE blob. Only the name line
@@ -2049,6 +1697,9 @@ fi
 # whose population holds no instance of the class it guards can only ever pass.
 if [ -s "$TMP/base-hook.js" ]; then
   mkdir -p "$TMP/nrfix"
+  # TOOL-dGroundRules-10: `backtick-in-regex.js` and `exposed-backtick.js` (rule 3, a width of 50) and
+  # `template-borne-comment.js` (rule 1) are denied at BASE by rules TOOL-dGroundRules-10 retired, so each prints a
+  # `RETIRED rule <n>` line and is never counted as lost.
   # TOOL-dFoldedVerdict-4 S7. The FIRST is the ratified path: BASE denies it, this hook admits it, and
   # deleting the marker restores the denial — which is what makes the loss marker-attributed rather
   # than merely tolerated. The SECOND is the control: an unmarked braceless loop that BOTH hooks deny,
@@ -2122,6 +1773,8 @@ const cp = require('child_process')
 const [mode, baseHook, curHook, root, fixdir, strideArg] = process.argv.slice(2)
 const BOUND_MS = 120000
 const STOP = { stop: 'process.exit' }
+// The rules TOOL-dGroundRules-10 retired, by the opening text of their BASE denial.
+const RETIRED = [[1, 'raw parallel()/pipeline()'], [3, 'a bound is written here that this file cannot resolve']]
 
 function loadHook(file) {
   const abs = path.resolve(file)
@@ -2133,8 +1786,9 @@ function loadHook(file) {
   return { abs, script: new vm.Script(wrapped, { filename: abs }), req: Module.createRequire(abs) }
 }
 
-function runInProcess(hook, payload) {
+function runInProcess(hook, payload, flags = []) {
   let code = null
+  let err = ''
   // Both views proxy an EMPTY target and read the real object inside the trap, so no proxy invariant
   // ties a returned value to a non-configurable property of the real `fs` or `process`.
   const fsView = new Proxy({}, {
@@ -2145,11 +1799,14 @@ function runInProcess(hook, payload) {
   })
   const req = (id) => (id === 'fs' || id === 'node:fs' ? fsView : hook.req(id))
   const sink = { write: () => true }
+  // STDERR IS RECORDED (TOOL-dGroundRules-10): a BASE denial is named by its opening text.
+  const errSink = { write: (t) => { err += String(t); return true } }
   const proc = new Proxy({}, {
     get: (_t, k) => {
       if (k === 'exit') return (c) => { if (code === null) code = c === undefined ? 0 : c; throw STOP }
-      if (k === 'argv') return [process.execPath, hook.abs]
-      if (k === 'stdout' || k === 'stderr') return sink
+      if (k === 'argv') return [process.execPath, hook.abs, ...flags]
+      if (k === 'stdout') return sink
+      if (k === 'stderr') return errSink
       const v = process[k]
       return typeof v === 'function' ? v.bind(process) : v
     },
@@ -2166,7 +1823,7 @@ function runInProcess(hook, payload) {
       code = 1
     }
   }
-  return code === null ? 0 : code
+  return { code: code === null ? 0 : code, err }
 }
 
 function runSpawned(hook, payload) {
@@ -2185,7 +1842,8 @@ function readBody(p) {
 // THE PAYLOAD CWD IS THE FIXTURE DIR, which no checkout holds (TOOL-aSweptBar-1 S3). With no `cwd` the
 // hook falls back to this checkout, whose `.claude/roles.json` arms rule 6 against every inline script,
 // so every BASE denial read as a rule 6 denial and nothing was ratified. Under no checkout rule 6 stays
-// unarmed and the property compares rules 1 to 5 with BASE, which predates rule 6.
+// unarmed, and so does rule 7 (TOOL-dGroundRules-10), and the property compares the script rules with
+// BASE, which predates both.
 function buildPayload(body) {
   return JSON.stringify({ tool_name: 'Workflow', cwd: path.resolve(fixdir), tool_input: { script: body } })
 }
@@ -2200,6 +1858,7 @@ try {
   if (mode === 'property') {
     const lost = []
     const ratified = []
+    const retired = []
     let denied = 0
     let n = 0
     for (const p of tracked.concat(fixtures)) {
@@ -2208,22 +1867,32 @@ try {
       const payload = buildPayload(body)
       const a = runInProcess(base, payload)
       n += 1
-      if (a !== 2) continue
+      if (a.code !== 2) continue
       denied += 1
-      const b = runInProcess(cur, payload)
+      const b = runInProcess(cur, payload).code
       // ADMISSION IS `exit != 2`, not `exit == 0`: the hook BLOCKS only on 2, so a crash is an admission too.
       if (b !== 2) {
+        // AN EXPECTED LOSS (TOOL-dGroundRules-10): BASE denied it by a rule this unit retired, named by the
+        // denial's opening text. BASE runs rule 2 before both, so that text means rule 2 admitted it
+        // there, and BASE under `--only=join` must admit it too, so a rule-5 denial is never hidden
+        // behind a retired one. Never counted as lost.
+        const rule = RETIRED.find(([, text]) => a.err.startsWith('BLOCKED by agent-cap: ' + text))
+        if (rule && runInProcess(base, payload, ['--only=join']).code !== 2) {
+          retired.push('RETIRED rule ' + rule[0] + ': ' + p)
+          continue
+        }
         // CLASS-SCOPED RATIFICATION (TOOL-dFoldedVerdict-4): denial restored by stripping every marker
         // token means the marker bought the loss; anything else is a regression.
-        const r = runInProcess(cur, buildPayload(body.split('gov:sequential-agents').join('')))
+        const r = runInProcess(cur, buildPayload(body.split('gov:sequential-agents').join(''))).code
         if (r === 2) ratified.push(p + ' (exit ' + b + ', denial restored by removing the marker)')
         else lost.push(p + ' (exit ' + b + ')')
       }
     }
+    for (const f of retired) console.log(f)
     for (const f of lost) console.log('LOST a denial: ' + f)
     for (const f of ratified) console.log('RATIFIED a marker-attributed loss: ' + f)
     console.log('population ' + n + ' scanned, ' + denied + ' denied at BASE, ' + lost.length +
-      ' denial(s) lost, ' + ratified.length + ' ratified')
+      ' denial(s) lost, ' + ratified.length + ' ratified, ' + retired.length + ' retired-rule loss(es) excluded')
     process.exitCode = lost.length || denied === 0 || ratified.length === 0 ? 1 : 0
   } else if (mode === 'parity') {
     // ponytail: a fixed stride over the sorted tracked list keeps the sample a handful of spawns; a
@@ -2240,7 +1909,7 @@ try {
       if (body === null) continue
       const payload = buildPayload(body)
       for (const [name, hook] of [['BASE', base], ['current', cur]]) {
-        const inProc = runInProcess(hook, payload)
+        const inProc = runInProcess(hook, payload).code
         const real = runSpawned(hook, payload)
         compared += 1
         if (real === 2) denies += 1
@@ -2341,23 +2010,17 @@ else
 fi
 
 
-# Residual (c), from the closing review: an apostrophe after an OPERATOR is in a legal opener
-# position, so prose that writes one still mispairs. Not a regression — it admits at BASE too — and
-# it is fixtured here so the leak is recorded rather than assumed away, with its control beside it.
-js "opener residual: an apostrophe after an operator still mispairs -> allow (stated residual)" 0 <<'EOF'
-/* rock - 'n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
-js "opener residual: control, the same line without the apostrophe -> deny" 2 <<'EOF'
-/* rock - n roll */ const r = await parallel([() => agent('a'), () => agent('b')])
-EOF
-
 # ---- rule 6: every agent prompt is a rendered handoff (TOOL-aOrientedCast-7) ----------------------
 # Armed by `.claude/roles.json` at the checkout root of the payload `cwd`. Every arm above runs with
 # no index, which is the absent case; the arms below build their own checkout, whose index the
 # `write_roles` calls move between the absent, broken, unarmed and armed states. Each payload stands in
 # a subdirectory so the root walk is exercised. Every deny asserts its own reason, since every rule
 # exits 2; every allow asserts an empty stderr.
+# THE SECTION RUNS A COPY OF THE HOOK (TOOL-dGroundRules-10): its checkout is a bare `.git` directory
+# with no settings, which rule 7 would refuse, so the copy sits beside scratch-guard.js and no policy
+# kit, where rule 7 adds no rule. Its refusal arms are rule 6's, which decides before rule 7.
+HO6="$TMP/rule6-hooks/hooks"; mkdir -p "$HO6"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$HO6/"
+HOOK="$HO6/agent-cap.js"
 HOREPO="$TMP/horepo"
 HO_WF=workflows
 mkdir -p "$HOREPO/.git" "$HOREPO/.claude" "$HOREPO/sub" "$HOREPO/tools/$HO_WF" \
@@ -2451,13 +2114,8 @@ print(json.dumps({"tool_name":"Workflow","cwd":sys.argv[1],"tool_input":json.loa
 write_handoff
 write_roles "$HO_ROLES"
 HO_H="$HOJ/tools/$HO_WF/h.js"
-# AC1 — the rendered handoff is admitted and claims its slot; CRLF and blank ends do not move it.
+# AC1 — the rendered handoff is admitted; CRLF and blank ends do not move it.
 run_spawn "rule6 AC1: a rendered handoff is admitted" 0 gov-researcher ok "" ho-s ho-ac1 ho-ac1-u
-if grep -rqF ho-ac1-u "$HOREPO/.git/agent-cap" 2>/dev/null; then
-  echo "ok   rule6 AC1: the admitted spawn holds a slot"; pass=$((pass+1))
-else
-  echo "FAIL rule6 AC1: no slot under $HOREPO/.git/agent-cap holds ho-ac1-u"; fail=$((fail+1))
-fi
 run_spawn "rule6 AC1: CRLF endings and blank ends are admitted" 0 gov-researcher crlf ""
 # AC2 — every type that is not an agent-true role, and every malformed prompt, is refused by name.
 run_spawn "rule6 AC2: general-purpose refused" 2 general-purpose ok '"general-purpose" is not an agent-true role'
@@ -2476,14 +2134,9 @@ run_spawn "rule6 AC2: a section one character off refused" 2 gov-researcher off 
 run_spawn "rule6 AC2: a freeform line before the marker refused" 2 gov-researcher pre 'prompt line 1 is not the marker line'
 run_spawn "rule6 AC2: a freeform line after the section refused" 2 gov-researcher post 'differs from'
 run_spawn "rule6 AC2: a file edited after rendering refused" 2 gov-researcher stale 'edited after rendering'
-# AC3 — five refusals spend no slot: the sixth call, admitted, takes slot-1.
+# AC3 — five refusals, then the call that is admitted.
 for i in 1 2 3 4 5; do run_spawn "rule6 AC3: refused spawn $i" 2 general-purpose ok 'not an agent-true role' ho-s3 ho-p3 "ho-r$i"; done
 run_spawn "rule6 AC3: the spawn after five refusals is admitted" 0 gov-researcher ok "" ho-s3 ho-p3 ho-ac3-u
-if grep -qF ho-ac3-u "$HOREPO/.git/agent-cap/ho-s3__ho-p3/slot-1" 2>/dev/null; then
-  echo "ok   rule6 AC3: slot-1 of the turn holds the admitted call"; pass=$((pass+1))
-else
-  echo "FAIL rule6 AC3: slot-1 of ho-s3__ho-p3 does not hold ho-ac3-u"; ls -R "$HOREPO/.git/agent-cap" 2>&1 | sed 's/^/     /'; fail=$((fail+1))
-fi
 # AC4 — a declared harness with known roles passes, as an object and as a JSON string; nothing else.
 run_harness "rule6 AC4: the harness with roles as an object" 0 "{\"scriptPath\":\"$HO_H\",\"args\":{\"roles\":{\"builder\":\"gov-builder\"}}}" ""
 run_harness "rule6 AC4: the harness with roles in a JSON string" 0 "{\"scriptPath\":\"$HO_H\",\"args\":\"{\\\"roles\\\":{\\\"builder\\\":\\\"gov-builder\\\"}}\"}" ""
@@ -2499,11 +2152,6 @@ run_harness "rule6 AC4: an agent-false role refused" 2 "{\"scriptPath\":\"$HO_H\
 HO_INLINE='{"script":"const s = await agent(\"one\")\n"}'
 write_roles none
 run_spawn "rule6 AC5: no index, a general-purpose spawn admitted as at base" 0 general-purpose none "" ho-s5 ho-p5 ho-ac5-u
-if grep -rqF ho-ac5-u "$HOREPO/.git/agent-cap" 2>/dev/null; then
-  echo "ok   rule6 AC5: with no index the spawn still claims its slot"; pass=$((pass+1))
-else
-  echo "FAIL rule6 AC5: with no index no slot holds ho-ac5-u"; fail=$((fail+1))
-fi
 run_harness "rule6 AC5: no index, an inline script admitted as at base" 0 "$HO_INLINE" ""
 write_roles '{'
 run_spawn "rule6 AC5: a broken index refuses the spawn" 2 general-purpose none 'roles.json is not JSON'
@@ -2514,7 +2162,7 @@ run_harness "rule6 AC5: --only=join never meets rule 6 (Workflow)" 0 "$HO_INLINE
 # S11 — `scripts` is the fan-out gate's selector: the script rules run, the call rules do not.
 HO_FLAG=--only=scripts
 run_harness "rule6 AC5: --only=scripts never meets rule 6" 0 "$HO_INLINE" ""
-run_harness "rule6 AC5: --only=scripts still runs the fan-out rules" 2 '{"script":"const r = await parallel([() => agent(\"a\"), () => agent(\"b\")])\n"}' 'raw parallel()/pipeline()'
+run_harness "rule6 AC5: --only=scripts still runs the fan-out rules" 2 '{"script":"const r = await boundedParallel(all.map((f) => () => agent(f)), 5)\n"}' 'spawns one agent per item'
 HO_FLAG=""
 write_roles '{"roles":{"gov-session":{"agent":false,"workflow":"handoff","writes":"none"}},"harnesses":["tools/'"$HO_WF"'/h.js"]}'
 run_spawn "rule6 AC5: no agent-true role refuses the spawn as UNARMED" 2 gov-session ok 'UNARMED'

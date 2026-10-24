@@ -6,10 +6,13 @@ grammar is implementation detail of one hook and does not belong in a ruleset ev
 
 ## The two rules
 
-- **The verify-stage TOTAL is whatever `agent-cap.js` resolves.** Batching grows the batch, never
+- **The verify-stage TOTAL is `agent-cap.js`'s `MAX_VERIFIERS`.** Batching grows the batch, never
   the agent count.
-- **Concurrency is a SECOND bound, its own constant in the same file.** How many run at once is not
-  how many exist; they are two rules.
+- **Concurrency is a SECOND bound, and since TOOL-dGroundRules-10 it is not this file's.** How many agents
+  run at once is the policy key `runtime.agents-in-flight`, which the policy kit renders into the
+  harness's own two concurrency settings; the harness enforces them, and rule 7 below holds the
+  settings to the landed limit (TOOL-dGroundRules-10). How many run at once is not how many exist;
+  they are two rules.
 
 ## Wiring
 
@@ -67,9 +70,10 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
 
 ## What the hook DENIES, and how to satisfy it
 
-- A raw `parallel(` / `pipeline(` primitive. Route through a bounded helper instead —
-  `boundedParallel(thunks, 5)` or `boundedPipeline(items, 5, …)`, inlined, because workflow scripts
-  cannot import. The line carries a `gov:bounded-fanout` marker.
+- Not a raw `parallel(` / `pipeline(` primitive, any more. TOOL-dGroundRules-10 retired that ban, the
+  resolution of every concurrency width and the per-prompt slot ledger (TOOL-dGroundRules-10): the
+  harness's own settings bound how many run at once. The verify-stage remedy the hook prints still
+  fans through `boundedParallel(thunks, 5)`, its width the hook's `MAX_VERIFIERS`, as an example.
 - Any `agent(` fanned over a receiver the hook cannot PROVE bounded. The batching assignment carries
   a `gov:fixed-verifiers` marker, and EVERY top-level value branch of that assignment must qualify on
   its own — a marked line is admitted only when all of its branches do, never when the first one that
@@ -111,9 +115,8 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
   something inferred from a name. Every top-level branch of that right-hand side is judged on its own
   text, and the chain after a bounded root must CONSUME to a close: a tail this file cannot delimit
   is refused rather than assumed shrink-only.
-- Any `K` it cannot resolve to an integer ≤5. It RESOLVES a bound wherever it is written — the call
-  site, a helper's default parameter, or a `gov:bounded-fanout` slice width — and the burden is on
-  the fan-out.
+- Any marker `K` it cannot resolve to an integer ≤5, the hook's `MAX_VERIFIERS`: the `K` of a
+  `gov:fixed-verifiers` split or of a `gov:sequential-agents` header. The burden is on the fan-out.
 
 - A REF-KEYED VERDICT JOIN. A review harness that joins each finding to its skeptic verdict on a
   `file:line` STRING loses findings to echo drift, and COLLAPSES two findings at one location so both
@@ -167,8 +170,8 @@ hand narrowing passes green (the aReplayedCard closing review, F12).
 
 ## Running ONE rule
 
-`--only=<rule>` narrows the hook over a closed set: `join` is rule 5 alone, and `scripts` is rules 1,
-2, 3 and 5, the rules that read a script, without rules 0 and 6, which judge the call. Anything
+`--only=<rule>` narrows the hook over a closed set: `join` is rule 5 alone, and `scripts` is rules 2
+and 5, the rules that read a script, without rules 0, 6 and 7, which judge the call. Anything
 outside the set is REFUSED with the set named, rather than silently matching nothing. It exists so a
 file gate can share this predicate instead of re-implementing it: the review-join gate asks for
 `join`, and the verifier fan-out gate for `scripts`, because it feeds committed scripts as inline
@@ -178,18 +181,32 @@ file gate can share this predicate instead of re-implementing it: the review-joi
 rules off with no diff and a hook that still looks wired. `<prefix>/check-wiring.sh` asserts its absence.
 
 An array LITERAL of ≤5 elements — the finder-lens fan — is a RECEIVER the hook can size, which is
-one of the three ways a receiver branch qualifies above; it needs no helper. It is not a blanket
-exemption for the shape: a raw `parallel([...])` over five literal elements is still denied,
-because the allowance is a property of what an `agent(` fan runs OVER and not of the literal.
+one of the three ways a receiver branch qualifies above; it needs no helper. The allowance is a
+property of what an `agent(` fan runs OVER, not of the literal.
 
-## Direct spawns are COUNTED, not parsed
+## Rule 7 — the settings in force
 
-A direct `Agent` spawn carries no script for the hook to read, so it is counted instead: the
-effective cap's worth per user prompt, claimed as atomic slots. That count is the only enforcement
-reaching a fan-out made outside a workflow script, which is why the matcher must name both tools.
+`TOOL-dGroundRules-10`. The harness counts agents in flight and knows when each one ends, which a
+`PreToolUse` hook cannot, so the agent limit is enforced there: `policy.py settings --write`, from the
+policy kit, renders `runtime.agents-in-flight` into `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` (a direct
+spawn over it is refused) and `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS` (a Workflow agent over it
+queues) in `.claude/settings.json`, and every landing regenerates that render. The harness reads the
+settings from the working tree, so a hand-raised `env`, or a render left behind a lowering, would run
+past the landed limit. Rule 7 refuses that at the next call.
 
-`AGENT_CAP` in the environment is REFUSED, not honoured — the ceiling is a file constant. A ready-made
-harness that satisfies every rule above ships at `<prefix>/workflows/tier2-review.js`.
+On every `Agent` and `Workflow` call outside `--only=`, after rule 6, the hook locates
+`policy-mirror.js` in the `policy` kit beside its own kit, reads the landed limit through
+`readPolicy`, then `.claude/settings.json` and `.claude/settings.local.json` at the payload `cwd`'s
+checkout root. For each variable it takes the value the harness applies, the local file's where it
+sets one, else the project file's, and it refuses, exit 2, when either is absent, not a positive
+integer, or above the limit, naming the file, the variable, both numbers and the render command. A
+refused policy read refuses with its line. With no `policy` kit beside the hooks kit, or a `cwd` in
+no checkout, it adds no rule. After rule 7 an `Agent` call is admitted.
+
+**What it does not see**: an environment override of the two variables, which the harness applies
+and no hook can read; and a session started before a lowering, which keeps its settings until it
+restarts. A set `AGENT_CAP` is read by nothing since TOOL-dGroundRules-10. A ready-made harness that satisfies every
+rule above ships at `<prefix>/workflows/tier2-review.js`.
 
 ## Rule 6 — every agent prompt is a rendered handoff
 
@@ -221,8 +238,7 @@ A `Workflow` call passes only by a `scriptPath` listed in `harnesses` (never an 
 `name:` run), with `args.roles` a non-empty object whose every value is an `agent`-true role: pass
 what `handoff.py harness-args <harness>` prints.
 
-ORDER: after the `AGENT_CAP` refusal and the declared-cap read; before rule 4, so a refused spawn
-claims no slot; before rule 0. Skipped under any `--only=`. A throw inside the rule refuses.
+ORDER: first, before rule 7 and rule 0. Skipped under any `--only=`. A throw inside the rule refuses.
 
 **What it does not stop**, said rather than implied: a hook-less or `--bare` run; the agents a running
 harness spawns through its own `agent()`, which is a runtime call and not a tool call; a
@@ -231,48 +247,22 @@ index; a forged name, since any caller can copy the right one; and a harness age
 its script sets inside a runtime call no hook sees. It never compares `role-sha` with the role an
 agent type was rendered from.
 
-## Lowering the cap — `.agent-cap.conf`
+## `.agent-cap.conf` — a legacy home of the agent limit
 
-A repo that runs a LOWER fan-out cap than the hook's ceiling declares it once, in a tracked file at
-its checkout root:
+This hook reads no conf since TOOL-dGroundRules-10. A `FANOUT_CAP=<n>` line in a tracked
+`.agent-cap.conf` at the checkout root is read by the policy kit's reader instead, as a legacy home of
+`runtime.agents-in-flight`, and it can only LOWER that key: `policy.py get runtime.agents-in-flight
+--explain` names the line and whether it lowered anything. A value that is not an integer of at least
+1 refuses the reader, naming the line; there is no upper bound, and a value above the key reads as no
+lowering at all. The grammar is the one this hook used to read: `FANOUT_CAP=4` or `FANOUT_CAP="4"`, a
+byte-order mark and a trailing CR tolerated, the last such line winning.
 
-```sh
-# .agent-cap.conf
-FANOUT_CAP=4
-```
-
-The hook reads it on every `Workflow` and `Agent` call and enforces the smaller of that value and its
-file constant everywhere it resolves a bound: the helper call site, the helper's default parameter,
-the `gov:bounded-fanout` width, the verify-stage total and the direct-spawn slots. Every denial then
-prints the effective cap and names the file that lowered it. The lens allowance does not move with it.
-
-- **Lower only.** The value must be an integer from 1 up to the hook's `MAX_VERIFIERS`. Anything else,
-  including a word, zero or a value above the ceiling, DENIES every call and names the file. An absent
-  file or key means the ceiling. A value that can only lower the cap raises nothing, which is why a
-  tracked file is admissible where the `AGENT_CAP` environment knob is not.
-- **Grammar.** `FANOUT_CAP=4` or `FANOUT_CAP="4"`; the last such line wins, as a shell `.` reads it.
-  A linked worktree reads its own checkout's file.
-- **Ask the hook, never parse the file.** `node agent-cap.js --print-cap </dev/null`, run from inside
-  the checkout, prints the effective cap, or exits 2 with the deny message on a malformed
-  declaration. The shell readers that need the number ask it, because a second parser is a second
-  answer: a sed missed a BOM-led line the hook reads. A payload on stdin makes it DENY, so it must
-  never be wired.
-- **One key for both rules.** The charter's concurrency bound and its verify-stage total are two
-  rules, and this one number lowers both (TOOL-aRepatriatedFork-7 F1; a second key is additive later).
-- **The shipped harnesses follow it.** The review-harness kit renders `{{FANOUT_CAP}}` from this same
-  file into `tier2-review.js`, `unattended-build.js` and both drift-audit workflows, so a repo that
-  lowers the cap re-renders them rather than forking them: run
-  `bash <kit>/check-protocol-parity.test.sh --render` in the same commit as the conf line, or the
-  cap-ceiling renders are denied by the hook and the verifier fan-out leg reds.
-
-**The two mechanisms are mutually exclusive, and the slot ledger must not be extended to `Workflow`.**
-The script rules bound the fan-out inside one script; the slot ledger bounds the spawns made without
-one. Neither wants the other's population. A harness that dispatches one `Workflow` call per unit of
-a build issues a SEQUENCE of single-agent acts from one prompt, and a per-prompt slot budget written
-for a BURST of verifiers would deny it partway through its own roster — a refusal with nothing fanned
-out behind it. The slot budget is LIFETIME-PER-PROMPT, so it is the TOTAL and not the concurrency
-bound, and a total is the wrong instrument for a dispatch sequence whose count is a function of the
-roster size. Count what carries no script; parse what does.
+The verify total does not move with it: that is `MAX_VERIFIERS`, here. The review-harness kit renders
+the `{{FANOUT_CAP}}` width of `tier2-review.js`, `unattended-build.js` and both drift-audit workflows
+from the same reader, and the policy kit renders the harness's settings from it, so a repo that changes
+its limit re-renders both in the same commit: `bash <kit>/check-protocol-parity.test.sh --render` and
+`python <policy kit>/policy.py settings --write`. Moving `FANOUT_CAP` into the key itself, and
+retiring the file, is a later build's step.
 
 ## scratch-guard's second check: a `git commit` on an un-oriented card
 

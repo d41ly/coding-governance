@@ -32,6 +32,17 @@ write = ["python", "{kit}/policy.py", "mirror", "--write"]
 check = ["python", "{kit}/policy.py", "mirror", "--check"]
 stage = 2
 
+# The harness's two concurrency settings in `.claude/settings.json`, rendered from the agent limit
+# `runtime.agents-in-flight` resolves at HEAD (TOOL-dGroundRules-10), so a policy write and its render
+# land in one landing. Stage 1: it reads no other generated output.
+[[generated]]
+path = ".claude/settings.json"
+generator = "policy.py"
+why = "the harness's concurrency settings, rendered from runtime.agents-in-flight at each landing (TOOL-dGroundRules-10)"
+write = ["python", "{kit}/policy.py", "settings", "--write"]
+check = ["python", "{kit}/policy.py", "settings", "--check"]
+stage = 1
+
 [[outcome]]
 code = 0
 probe = { must_exist = ".governance/policy.toml" }

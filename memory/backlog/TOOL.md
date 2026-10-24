@@ -431,7 +431,7 @@ Cite ids, never line numbers.
 | [TOOL-dGatedProse-10](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | memory/map/features/memory-tree-hygiene.md line 54 names… |
 | [TOOL-dGatedProse-11](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | tools/check-spec-tokens.py grades a LIVE spec by a whitelist, OPEN,… |
 | [TOOL-dGatedProse-12](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | FIVE KIT SELF-TESTS ARE RED ON MAIN and no row records them: measured… |
-| [TOOL-dGroundRules-12](../builds/dGroundRules/BACKLOG.md) | DEFERRED | MED | TOOL-dGroundRules-10 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dGroundRules-12](../builds/dGroundRules/BACKLOG.md) | DEFERRED | MED | TOOL-dGroundRules-15 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dGroundRules-13](../builds/dGroundRules/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | let the minimal guard of cl-dClosedLoop-0012 admit the agent write a… |
 | [TOOL-dGroundRules-100](../builds/dGroundRules/BACKLOG.md) | OPEN | HIGH | — | 2026-10-23 | held red: suite recall floor arms red at ce13efbe on the daily held… |
 | [TOOL-dGroundRules-101](../builds/dGroundRules/BACKLOG.md) | OPEN | HIGH | — | 2026-10-23 | held red: suite run-gates turnstile red at ce13efbe on the daily held… |
@@ -441,6 +441,7 @@ Cite ids, never line numbers.
 | [TOOL-dGroundRules-105](../builds/dGroundRules/BACKLOG.md) | OPEN | HIGH | — | 2026-10-23 | held red: suite unattended gate selftest shard 5/8 red at ce13efbe on… |
 | [TOOL-dGroundRules-106](../builds/dGroundRules/BACKLOG.md) | OPEN | HIGH | — | 2026-10-23 | held red: suite unattended gate selftest shard 2/8 red at ce13efbe on… |
 | [TOOL-dGroundRules-107](../builds/dGroundRules/BACKLOG.md) | OPEN | HIGH | — | 2026-10-23 | held red: suite unattended gate selftest shard 4/8 red at ce13efbe on… |
+| [TOOL-dGroundRules-108](../builds/dGroundRules/BACKLOG.md) | OPEN | LOW | — | 2026-10-24 | TWO SPECS OF OTHER BUILDS CITE tools/hooks/agent-cap.js BY LINES THAT… |
 | [TOOL-dHomedResolver-6](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended gate selftest shard 6/8 red at d006cfc5 on… |
 | [TOOL-dHomedResolver-7](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended cross-component red at d006cfc5 on the daily… |
 | [TOOL-dHonouredPark-5](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | A bespoke review fan-out must assign finding ids in the ORCHESTRATOR,… |

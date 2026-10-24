@@ -4,18 +4,18 @@ export const meta = {
   // second is this entry's REGISTRY id, and without it a deployer grepping the id the
   // registry uses finds nothing. DEPL-dGaugedVintage-5. — engine identity (deployed verbatim; this field is the deployer's version marker)
   description:
-    'Consolidated, concurrency-capped (≤5) Tier-2 adversarial review, ≤5 verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
+    'Consolidated, concurrency-capped (≤6) Tier-2 adversarial review, at most the agent-cap hook\'s MAX_VERIFIERS verify agents TOTAL: find → batched-verify → synth, joined on an ORCHESTRATOR-ASSIGNED INTEGER id. Replaces the big-fan-out review that trips the server rate limiter. Project-agnostic — parameterize via `args`.',
   phases: [
     { title: 'Resume', detail: 'one probe reads the key directory; a lens or batch whose file carries the key is reused' },
-    { title: 'Find', detail: '5 finder lenses on either kind (3 on a light diff run), one wave, ≤5 concurrent' },
-    { title: 'Verify', detail: 'skeptics refute findings in ≤5 BATCHES — agent count fixed' },
+    { title: 'Find', detail: '5 finder lenses on either kind (3 on a light diff run), one wave, ≤6 concurrent' },
+    { title: 'Verify', detail: 'skeptics refute findings in at most MAX_VERIFIERS BATCHES — agent count fixed' },
     { title: 'Synthesize', detail: 'one pass → report file' },
   ],
 }
 
-// --- cap-5 fan-out (inlined; workflow scripts can't import) --------------
-// Passes agent-cap: the only raw primitive call is the marked helper line.
-async function boundedParallel(thunks, cap = 5) {
+// --- cap-6 fan-out (inlined; workflow scripts can't import) --------------
+// The only raw primitive call is the marked helper line; its width is the agent limit, rendered.
+async function boundedParallel(thunks, cap = 6) {
   const out = []
   for (let i = 0; i < thunks.length; i += cap)
     out.push(...(await parallel(thunks.slice(i, i + cap)))) // gov:bounded-fanout
@@ -1348,7 +1348,9 @@ phase('Verify')
 // bought 14 skeptics — still linear, which the protocol says is not enough. Bounding the group COUNT
 // makes the batch grow and the agent count stand still. `chunk` slices contiguously, so a batch
 // labelled `verify:ids-1-14` really does contain ids 1..14, and Math.ceil never yields an empty
-// group: at N < MAX_VERIFIERS it produces exactly N groups of one.
+// group: at N < MAX_VERIFIERS it produces exactly N groups of one. The total is the agent-cap hook's
+// own MAX_VERIFIERS, the review protocol's verify total, and never the agent limit the concurrency
+// width above renders, which bounds how many run at once (TOOL-dGroundRules-10 F3).
 const MAX_VERIFIERS = 5
 const batches = chunk(allFindings, Math.ceil(allFindings.length / MAX_VERIFIERS)) // gov:fixed-verifiers
 log(`${allFindings.length} finding(s) -> ${batches.length} verifier(s) (cap ${MAX_VERIFIERS})`)

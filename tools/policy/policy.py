@@ -11,6 +11,7 @@ shrink-only list of the legacy policy homes, derived from the files they guard (
     python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
     python <this kit>/policy.py mirror --write | --check | --print   # .governance/policy.json, rendered at HEAD
+    python <this kit>/policy.py settings [--write|--check] [<file>]  # the harness's two concurrency settings
 
 The catalogue, `catalogue.toml` beside this file, is the schema: one row per policy key. A file key
 is matched to a row as a tuple of SEGMENTS, never as a joined string, because a quoted TOML segment
@@ -31,6 +32,11 @@ THE MIRROR, `.governance/policy.json`, is the copy JavaScript reads, since a hoo
 catalogue there; `mirror --write` writes it at HEAD, which every landing runs through this kit's
 `[[generated]]` row; `policy-mirror.js` beside this file is its one reader, and takes a key from
 the landed revision's mirror only while both ids match the blobs there.
+
+THE AGENT LIMIT, `runtime.agents-in-flight` (TOOL-dGroundRules-10), is lowered by `resolve` to a
+`FANOUT_CAP` line `.agent-cap.conf` holds at the revision read, its legacy home, and never raised by
+it. `settings --write` renders the resolved limit at HEAD into the harness's two concurrency settings
+in `.claude/settings.json`, which this kit's `[[generated]]` row regenerates at every landing.
 
 Exit 0 green, 1 red, 2 usage or a refused read.
 """
@@ -612,11 +618,53 @@ def resolve_read(path, row, read):
 
 def resolve(key, repo=".", rev=None):
     """-> Resolution for `key`: its path and catalogue row, then `resolve_read` over the revision's
-    read, `rev` resolved to a full sha, else the landed revision."""
+    read, `rev` resolved to a full sha, else the landed revision. `runtime.agents-in-flight` is then
+    the smaller of that value and the `FANOUT_CAP` line `read_legacy_fanout` finds at the same
+    revision, the source kept and the line named in the reason (TOOL-dGroundRules-10)."""
     path = parse_key(key)
     rows = load_catalogue(KIT)
     row = read_catalogue_row(path, rows)
-    return resolve_read(path, row, read_revision(repo, rev, rows))
+    read = read_revision(repo, rev, rows)
+    hit = resolve_read(path, row, read)
+    if path != AGENTS_PATH:
+        return hit
+    found = read_legacy_fanout(repo, read["sha"])
+    if found is None:
+        return hit
+    n, line = found
+    at = f"{LEGACY_FANOUT}:{line}"
+    if n < hit.value:
+        return Resolution(n, hit.source, f"{hit.reason}; lowered to {n} by FANOUT_CAP at {at}")
+    return hit._replace(reason=f"{hit.reason}; FANOUT_CAP={n} at {at} does not lower it")
+
+
+# ---- the agent limit's legacy home (TOOL-dGroundRules-10) ----------------------------------------
+
+AGENTS_PATH = ("runtime", "agents-in-flight")
+LEGACY_FANOUT = ".agent-cap.conf"
+FANOUT_LINE = re.compile(r"^\s*FANOUT_CAP\s*=(.*)$")
+
+
+def read_legacy_fanout(repo, rev):
+    """-> (n, line) for the last `FANOUT_CAP=<n>` or `FANOUT_CAP="<n>"` line of `.agent-cap.conf` at
+    the checkout root in the commit `rev` names, or None where the file or the key is absent. The
+    grammar agent-cap's retired clamp read: a BOM and a trailing CR tolerated, the last line winning.
+    A value that is not an integer of at least 1 is a Refusal at its line; there is no upper bound."""
+    text = run_git(repo, "show", f"{resolve_commit(repo, rev)}:{LEGACY_FANOUT}")
+    if text is None:
+        return None
+    found = None
+    for n, ln in enumerate(text.removeprefix("﻿").split("\n"), 1):
+        m = FANOUT_LINE.match(ln)
+        if m:
+            found = (m[1].strip(), n)
+    if found is None:
+        return None
+    raw, line = found
+    value = raw[1:-1] if len(raw) >= 2 and raw[0] == raw[-1] == '"' else raw
+    if not re.fullmatch(r"[0-9]+", value) or int(value) < 1:
+        raise Refusal(LEGACY_FANOUT, line, "FANOUT_CAP must be an integer of at least 1")
+    return int(value), line
 
 
 # ---- the JSON mirror (TOOL-dGroundRules-5) -----------------------------------------------------
@@ -706,6 +754,70 @@ def check_mirror_text(want, have):
         if doc.get(field) != w[field]:
             return field
     return next((k for k in sorted(set(doc["keys"]) | set(w["keys"])) if doc["keys"].get(k) != w["keys"].get(k)), "bytes")
+
+
+# ---- the harness's settings (TOOL-dGroundRules-10) -----------------------------------------------
+
+SETTINGS_REL = ".claude/settings.json"
+# The harness's own two concurrency settings: a direct spawn over the first is refused, a Workflow
+# agent over the second queues. Both carry the one limit.
+SETTINGS_VARS = ("CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS", "CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS")
+
+
+def render_settings(obj, n):
+    """A copy of the parsed settings object `obj` whose `env` sets both SETTINGS_VARS to the limit
+    `n` as a decimal string, every other key and its order kept, `env` created when absent."""
+    out = dict(obj)
+    out["env"] = {**(out.get("env") or {}), **{v: str(n) for v in SETTINGS_VARS}}
+    return out
+
+
+def cmd_settings(argv):
+    """`settings [--write|--check] [<settings-file>]`, run in the repository: both SETTINGS_VARS of
+    the file, `.claude/settings.json` under the repository root by default, against the limit
+    `resolve` gives for runtime.agents-in-flight at HEAD. `--check`, the default, exits 1 printing one
+    line per variable that is absent or differs, 0 when both match; `--write` writes the render, in
+    settings-merge.py's shape, only when they differ. A Refusal, or a file that is not a JSON object
+    holding an `env` object, exits 2 printing its line."""
+    mode = next((a for a in argv if a in ("--write", "--check")), "--check")
+    rest = [a for a in argv if a not in ("--write", "--check")]
+    if len(rest) > 1 or any(a.startswith("-") for a in rest):
+        print(USAGE, file=sys.stderr)
+        return 2
+    for stream in (sys.stdout, sys.stderr):
+        stream.reconfigure(encoding="utf-8", newline="\n")
+    rel = rest[0] if rest else SETTINGS_REL
+    top = (run_git(".", "rev-parse", "--show-toplevel") or "").strip()
+    try:
+        if not top:
+            raise Refusal(rel, 0, "the working directory is in no git repository")
+        path = Path(top, rel) if not rest else Path(rel)
+        n = resolve(".".join(AGENTS_PATH), top, "HEAD").value
+        try:
+            obj = json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {}
+        except (OSError, ValueError) as exc:
+            raise Refusal(rel, 0, f"does not read as JSON: {exc}") from None
+        if not isinstance(obj, dict) or not isinstance(obj.get("env", {}), dict):
+            raise Refusal(rel, 0, "is not a JSON object whose env is an object")
+    except Refusal as exc:
+        print(exc, file=sys.stderr)
+        return 2
+    env = obj.get("env", {})
+    stale = [v for v in SETTINGS_VARS if env.get(v) != str(n)]
+    if mode == "--check":
+        for v in stale:
+            have = f'"{env[v]}"' if v in env else "absent"
+            print(f"policy: settings · {rel} · env.{v} is {have}, {'.'.join(AGENTS_PATH)} resolves {n}")
+        if not stale:
+            print(f"policy: settings fresh · {rel}")
+        return 1 if stale else 0
+    if stale:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes((json.dumps(render_settings(obj, n), indent=2, ensure_ascii=False) + "\n").encode("utf-8"))
+        print(f"policy: settings written · {rel} · both variables at {n}")
+    else:
+        print(f"policy: settings fresh · {rel}")
+    return 0
 
 
 def parse_list(text):
@@ -939,7 +1051,8 @@ def render_scaffold(rows):
 
 
 USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
-         " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print")
+         " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print"
+         " | settings [--write|--check] [<settings-file>]")
 
 
 def cmd_get(argv):
@@ -1045,6 +1158,8 @@ def main(argv):
         return cmd_check(argv[1:])
     if argv[:1] == ["mirror"]:
         return cmd_mirror(argv[1:])
+    if argv[:1] == ["settings"]:
+        return cmd_settings(argv[1:])
     if argv == ["scaffold"]:
         sys.stdout.write(render_scaffold(load_catalogue(KIT)))
         return 0

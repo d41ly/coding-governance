@@ -728,11 +728,6 @@
       "file": "tools/memory-tree/merge-rows.py"
     },
     {
-      "id": "apay",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
-    },
-    {
       "id": "append_only_re",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
@@ -2228,6 +2223,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "build_limit_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_lin_repo",
       "kind": "function",
       "file": "tools/run-gates/run-gates.evidence.test.sh"
@@ -3123,11 +3123,6 @@
       "file": "tools/govkit/govkit.py"
     },
     {
-      "id": "capFindings",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
       "id": "carry_matches",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -3371,6 +3366,11 @@
       "id": "checkSession",
       "kind": "function",
       "file": "tools/unattended/stop-guard.js"
+    },
+    {
+      "id": "checkSettingsInForce",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "checkSettles",
@@ -3821,11 +3821,6 @@
       "id": "check_calls_invariant",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
-    },
-    {
-      "id": "check_cap",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "check_cap_fit",
@@ -4418,6 +4413,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_hook_call",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_hook_modes",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -4916,11 +4916,6 @@
       "id": "check_prepared_merge",
       "kind": "function",
       "file": "tools/push-main.sh"
-    },
-    {
-      "id": "check_print",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "check_prior_close",
@@ -5436,11 +5431,6 @@
       "id": "check_sp_value",
       "kind": "function",
       "file": "tools/run-gates/run-gates.test.sh"
-    },
-    {
-      "id": "check_spawn",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "check_spawn_calibration",
@@ -6311,6 +6301,11 @@
       "id": "cmd_selftest",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "cmd_settings",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "cmd_shipped",
@@ -7591,6 +7586,11 @@
       "id": "derive_path_key",
       "kind": "function",
       "file": "tools/runlog/model.py"
+    },
+    {
+      "id": "derive_peak",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_phase",
@@ -9180,11 +9180,6 @@
     {
       "id": "gitCommonDir",
       "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
-      "id": "gitCommonDir",
-      "kind": "function",
       "file": "tools/memory-recall/recall-opened.js"
     },
     {
@@ -9261,11 +9256,6 @@
       "id": "grammar_for",
       "kind": "function",
       "file": "tools/memory-recall/extract.py"
-    },
-    {
-      "id": "guardAgentSpawn",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "gut_parser",
@@ -9381,11 +9371,6 @@
       "id": "hitl",
       "kind": "function",
       "file": "tools/memory-tree/check-memory-hygiene.test.sh"
-    },
-    {
-      "id": "holder",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "hook_probe",
@@ -9801,11 +9786,6 @@
       "id": "load",
       "kind": "function",
       "file": "tools/memory-recall/bench.py"
-    },
-    {
-      "id": "loadDeclaredCap",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "loadRoleIndex",
@@ -11506,11 +11486,6 @@
       "id": "observe_remote",
       "kind": "function",
       "file": "tools/unattended/unattended.sh"
-    },
-    {
-      "id": "offendingLines",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "ok",
@@ -14153,6 +14128,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "read_legacy_fanout",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_legacy_row",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
@@ -15313,6 +15293,11 @@
       "file": ".githooks/pre-push.test.sh"
     },
     {
+      "id": "read_tool_errors",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_tool_versions",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
@@ -16018,11 +16003,6 @@
       "file": "tools/workflows/tier2-review.template.js"
     },
     {
-      "id": "renderCapSource",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
       "id": "renderCell",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -16218,6 +16198,11 @@
       "file": "tools/hooks/scratch-guard.js"
     },
     {
+      "id": "renderSettingsDeny",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "renderShapeLine",
       "kind": "function",
       "file": "tools/workflows/tier2-review.js"
@@ -16366,11 +16351,6 @@
       "id": "render_by_design",
       "kind": "function",
       "file": "tools/memory-tree/gotchas.py"
-    },
-    {
-      "id": "render_cap_harness",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.test.sh"
     },
     {
       "id": "render_card",
@@ -16638,6 +16618,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "render_limit_env",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "render_line",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -16903,6 +16888,11 @@
       "file": "tools/runlog/record.py"
     },
     {
+      "id": "render_settings",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "render_settings_path",
       "kind": "function",
       "file": "tools/check-wiring.sh"
@@ -16953,9 +16943,19 @@
       "file": "tools/runlog/selftest.py"
     },
     {
+      "id": "render_spawn",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "render_spawn_name",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "render_spawn_prompt",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "render_spawn_summary",
@@ -17091,6 +17091,16 @@
       "id": "render_wall",
       "kind": "function",
       "file": "tools/roles/handoff.py"
+    },
+    {
+      "id": "render_workflow",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "render_workflow_prompt",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "render_worksheet",
@@ -19988,9 +19998,29 @@
       "file": "tools/unattended/check-unattended.test.sh"
     },
     {
+      "id": "run_limit_call",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "run_limit_case",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_lin_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_live",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_live_session",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_ln",
@@ -22093,11 +22123,6 @@
       "file": "tools/memory-tree/gen_build_index.py"
     },
     {
-      "id": "slug",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
       "id": "snippet_bytes",
       "kind": "function",
       "file": "tools/memory-recall/union.py"
@@ -22206,11 +22231,6 @@
       "id": "surface_paths",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
-    },
-    {
-      "id": "sweepTurns",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
     },
     {
       "id": "t1spec",
@@ -24688,11 +24708,6 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
-      "id": "why",
-      "kind": "function",
-      "file": "tools/hooks/agent-cap.js"
-    },
-    {
       "id": "winp",
       "kind": "function",
       "file": "tools/memory-recall/recall-opened.test.sh"
@@ -25056,6 +25071,11 @@
       "id": "write_handoff",
       "kind": "function",
       "file": "tools/hooks/agent-cap.test.sh"
+    },
+    {
+      "id": "write_handoff_fixture",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "write_handoff_spec",
@@ -25516,6 +25536,11 @@
       "id": "write_session",
       "kind": "function",
       "file": "tools/runlog/extract.py"
+    },
+    {
+      "id": "write_settings",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "write_settle_claim",

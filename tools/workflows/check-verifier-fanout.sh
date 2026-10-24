@@ -8,7 +8,6 @@
 #
 #   bash <prefix>/workflows/check-verifier-fanout.sh          # every workflow script git can see
 #   bash <prefix>/workflows/check-verifier-fanout.sh <file>…  # explicit files (the self-test's fixtures)
-#   ... --print-cap                                         # the hook's effective fan-out cap
 #
 # Exit 0 = clean · 1 = a rule the hook enforces is broken · 2 = misconfigured.
 #
@@ -147,11 +146,6 @@ fi
 [ -n "$HOOK" ] || { echo "verifier-fanout: no agent-cap.js through the install receipt, at $HERE/hooks/, $HERE/../hooks/ or $ROOT/.claude/hooks/ — this gate has no predicate to delegate to"; exit 2; }
 command -v node >/dev/null 2>&1 || { echo "verifier-fanout: node not found — the predicate is a node hook"; exit 2; }
 
-# `--print-cap` relays the hook's answer for this checkout's effective fan-out cap and judges nothing.
-# It exists so a sibling in this kit (check-protocol-parity.test.sh) asks the hook through the one
-# probe above, instead of locating the hook again or re-parsing `.agent-cap.conf` itself.
-[ "${1:-}" = --print-cap ] && exec node "$HOOK" --print-cap </dev/null
-
 # The gate and its fixtures are outside their own population: the test's RED fixtures spell the banned
 # shape on purpose, and a fixture that lands in the repo would otherwise make the merge bar
 # permanently red. (They live under `mktemp -d`, so this is belt-and-braces — the same shape
@@ -166,8 +160,8 @@ if [ "$#" -gt 0 ]; then
 else
   # tracked AND untracked-but-unignored, matching the other two JavaScript gates: a new harness is
   # judged the moment it exists, not the moment someone remembers to stage it.
-  # A `*.template.js` is a RENDER SOURCE, not a harness (TOOL-aRepatriatedFork-7 S7): its fan-out cap
-  # is the `{{FANOUT_CAP}}` token, which no hook can resolve and no runtime ever sees. What runs is
+  # A `*.template.js` is a RENDER SOURCE, not a harness (TOOL-aRepatriatedFork-7 S7): its concurrency
+  # width is the `{{FANOUT_CAP}}` token, which no hook can resolve and no runtime ever sees. What runs is
   # its render, which IS in this population, and check-protocol-parity.test.sh pins the render to it.
   FILES=$(git ls-files --cached --others --exclude-standard -- '*.js' \
     | grep -vE "$SELF_EXCLUDE" | grep -vE '\.template\.js$' | LC_ALL=C sort -u || true)
@@ -216,9 +210,8 @@ while IFS= read -r f; do
   fi
 done <<<"$SCAN"
 
-# THE CAP PRINTED IS THE EFFECTIVE ONE (TOOL-aRepatriatedFork-7 S6), and the HOOK answers it for the
-# root this script stands in (closing review round 1 residual b): the sed this replaced matched
-# nothing on a BOM-led conf and printed the ceiling over a hook enforcing 4. A refusal reds the run.
-CAPN=$(node "$HOOK" --print-cap </dev/null 2>&1) || { printf 'verifier-fanout: %s\n' "$CAPN"; st=1; }
-[ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the ≤$CAPN-verifier rule"
+# THE CLEAN LINE NAMES NO NUMBER (TOOL-dGroundRules-10). The verify total is the hook's MAX_VERIFIERS,
+# which the hook names in every denial, and the agent limit is the policy kit's: a number printed here
+# would be a third copy of either.
+[ "$st" = 0 ] && echo "verifier-fanout: clean — $n workflow script(s) obey the hook's verify-stage rule"
 exit "$st"

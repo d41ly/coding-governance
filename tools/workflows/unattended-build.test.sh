@@ -124,6 +124,8 @@ UNATTENDED_DIR=$(resolve_kit_dir "$_rkd_py" unattended unattended.sh "$HERE") ||
 UNATTENDED="${UNATTENDED_DIR##*/}"
 HOOKS_DIR=$(resolve_kit_dir "$_rkd_py" hooks agent-cap.js "$HERE") || exit 2
 HOOKS="${HOOKS_DIR##*/}"
+POLICY_KIT_DIR=$(resolve_kit_dir "$_rkd_py" policy policy.py "$HERE") || exit 2
+POLICY_KIT="${POLICY_KIT_DIR##*/}"
 MT_KIT_DIR=$(resolve_kit_dir "$_rkd_py" memory-tree gotchas.py "$HERE") || exit 2
 MT_KIT="${MT_KIT_DIR##*/}"
 # In this suite KIT_REL names the TOOL ROOT, not the kit dir: the prefix without its slash.
@@ -1994,21 +1996,23 @@ build_layout() { # dir · kit dir · unattended dir, or '-' for none · checklis
   # it reds every check-mode run with a missing shipped copy.
   cp "$HERE/unattended-build.template.js" "$HERE/check-protocol-parity.test.sh" "$HERE/check_by_design_parity.py" \
      "$HERE/REVIEW-PROTOCOL.template.md" "$HERE/tier2-review.js" "$HERE/unattended-unit.js" "$d/$kd/"
-  # THE RENDERER ASKS THE HOOK FOR FANOUT_CAP (TOOL-aRepatriatedFork-7 S11), through the fan-out
-  # gate's `--print-cap`, and refuses to render when nothing answers. `requires = ["agent-cap"]`, so a
-  # real install always has both: the gate beside the parity script, the hook where the gate's rung 2
-  # finds it, a directory up. A layout without them tests an install the kit forbids.
+  # THE RENDERER ASKS THE POLICY READER FOR FANOUT_CAP (TOOL-dGroundRules-10, which re-pointed it from
+  # the agent-cap hook): `policy.py get runtime.agents-in-flight --rev HEAD`, the policy kit a
+  # directory up where the inlined resolver's second probe finds it, and it refuses to render when
+  # nothing answers. `requires = ["agent-cap", "policy"]`, so a real install has the reader, the hook
+  # and the fan-out gate beside the parity script; the layout is committed so HEAD names a commit.
   cp "$HERE/check-verifier-fanout.sh" "$d/$kd/"
+  mkdir -p "$d/$kd/../${POLICY_KIT}"; cp "$ROOT/${POLICY_KIT_DIR}/policy.py" "$ROOT/${POLICY_KIT_DIR}/catalogue.toml" "$d/$kd/../${POLICY_KIT}/"
   # The three pairs S7 made rendered: the renderer refuses a set with a template missing, and
   # `--tracked-only` would SKIP an absent live copy, so an install carries both halves of each.
   cp "$HERE/tier2-review.template.js" "$HERE/drift-audit-code.template.js" "$HERE/drift-audit-code.js" \
      "$HERE/drift-audit-state.template.js" "$HERE/drift-audit-state.js" "$d/$kd/"
   mkdir -p "$d/$kd/../${HOOKS}"; cp "$ROOT/${HOOKS_DIR}/agent-cap.js" "$d/$kd/../${HOOKS}/"
   # `-` IS A REVIEW-HARNESS-ONLY INSTALL, which `requires` permits: this kit requires agent-cap and
-  # nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
+  # policy and nothing else, so neither the unattended kit nor the memory-tree kit has to be there.
   if [ "$ud" != - ]; then mkdir -p "$d/$ud"; printf '#!/usr/bin/env bash\n' > "$d/$ud/unattended.sh"; fi
   if [ -n "$gp" ]; then mkdir -p "$(dirname "$d/$gp")"; printf '# a stub checklist\n' > "$d/$gp"; fi
-  ( cd "$d" && git add -A )
+  ( cd "$d" && git add -A && git commit -q --no-verify -m layout )
 }
 run_layout() { # dir · kit dir · [--render] -> the parity script's output, then `rc=<exit>`
   ( cd "$1" && bash "$2/check-protocol-parity.test.sh" ${3:-} 2>&1; echo "rc=$?" )
@@ -2077,6 +2081,22 @@ o=$(run_layout "$FL" scripts/$WFK)
 has "PV-AC2 flat: the parity leg passes on its own render" "$o" "rc=0"
 has "PV-AC2 flat: ...and names the directory it probed" "$o" "MEMORY_TREE_DIR 'scripts'"
 
+# ---- TOOL-dGroundRules-10: the `{{FANOUT_CAP}}` width is the agent limit as the POLICY READER answers it,
+# ---- and the renderer refuses, naming why, when no policy kit answers or the answer is not a positive
+# ---- integer. Every layout above renders through a real reader; these two take it away and stub it.
+PK="$LAY/nopolicy"; build_layout "$PK" scripts/$WFK scripts/$UNK scripts/gotchas.py
+rm -rf "$PK/scripts/$POLICY_KIT"
+o=$(run_layout "$PK" scripts/$WFK --render)
+has "DGR10 no policy kit: --render refuses" "$o" "rc=2"
+has "DGR10 ...naming the reader it could not find" "$o" "no policy kit answers the agent limit"
+PN="$LAY/nonint"; build_layout "$PN" scripts/$WFK scripts/$UNK scripts/gotchas.py
+printf 'print("abc")\n' > "$PN/scripts/$POLICY_KIT/policy.py"
+o=$(run_layout "$PN" scripts/$WFK --render)
+has "DGR10 a reader answering a non-integer: --render refuses" "$o" "rc=2"
+has "DGR10 ...naming the answer" "$o" "answered 'abc' for runtime.agents-in-flight, not a positive integer"
+absent_harness=yes; [ -e "$PN/scripts/$WFK/unattended-build.js" ] && absent_harness=no
+same "DGR10 ...and writes no harness" "$absent_harness" "yes"
+
 # ---- AC3: the NESTED layout, and two ROOT installs, one of each memory-tree shape.
 NE="$LAY/nested"; build_layout "$NE" scripts/$WFK scripts/$UNK scripts/$MTK/gotchas.py
 run_layout "$NE" scripts/$WFK --render >/dev/null
@@ -2113,7 +2133,7 @@ has "PV-AC4 a tracked override holding a space is refused" "$o" "holds a charact
 has "PV-AC4 ...at exit 2" "$o" "rc=2"
 
 # ---- ROUND 1 F3: A REFUSAL THAT BELONGS TO ONE PAIR'S TOKEN NEVER BLOCKS A PAIR WITHOUT IT. This
-# ---- kit requires agent-cap and nothing else, so an install with no memory-tree kit and no
+# ---- kit requires agent-cap and policy and nothing else, so an install with no memory-tree kit and no
 # ---- unattended kit is legal, and in it nothing tracks a `gotchas.py`. The probe used to exit 2
 # ---- before any pair was graded, so that install lost `REVIEW-PROTOCOL.md` too: the document that
 # ---- states the concurrency cap could be neither rendered nor graded, over a harness it never runs.

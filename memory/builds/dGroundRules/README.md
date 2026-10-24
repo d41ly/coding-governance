@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-100 TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107
+ids: TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-100 TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107 TOOL-dGroundRules-108
 spec-audit: 2026-10-21
 parents: dTrueNorth
 may: PLAY-dClosedLoop-3
@@ -129,7 +129,7 @@ ids TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundR
 ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42
 ids TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56
 ids TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-100 TOOL-dGroundRules-101 TOOL-dGroundRules-102
-ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107
+ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107 TOOL-dGroundRules-108
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -151,7 +151,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-65 — the mirror's bytes name no commit: each reason's revision phrase rendered as a placeholder the helper fills](spec/2026-10-23-spec-TOOL-dGroundRules-65.md) | 4 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard](spec/2026-10-23-spec-TOOL-dGroundRules-7.md) | 4 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-8 — the reader-coverage arm: a key whose Owner build has landed has a reader](spec/2026-10-23-spec-TOOL-dGroundRules-8.md) | 4 | 2 | CLOSED | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired](spec/2026-10-23-spec-TOOL-dGroundRules-10.md) | 5 | 2 | DEFERRED | rev-6 | 2026-10-24 |
+| [TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired](spec/2026-10-23-spec-TOOL-dGroundRules-10.md) | 5 | 2 | CLOSED | rev-6 | 2026-10-24 |
 | [TOOL-dGroundRules-9 — one switch over every size cap, each cap's value through the policy reader](spec/2026-10-23-spec-TOOL-dGroundRules-9.md) | 5 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-15 — the `.agent-cap.conf` lowering in one home: inside `resolve_read`, so every reader of the limit sees it](spec/2026-10-23-spec-TOOL-dGroundRules-15.md) | 6 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-17 — the legacy-home list withheld from installs and the cap census graded by what ships, so neither arm reds an adopter](spec/2026-10-23-spec-TOOL-dGroundRules-17.md) | 6 | 2 | DEFERRED | rev-3 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 202 bound to this build, across 4 record folder(s).
+Records: 204 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

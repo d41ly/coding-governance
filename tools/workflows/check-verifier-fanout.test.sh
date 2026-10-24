@@ -155,26 +155,17 @@ arm 'the incident script is caught' 'verifier-fanout: FAILED' bash "$GATE" "$TMP
 # FOREIGN_PREFIX_PROBE (TOOL-aRepatriatedFork-52 S1): the arm above ran the subject, and a probe stops here.
 if [ "${FOREIGN_PREFIX_PROBE:-0}" = 1 ]; then echo "foreign-prefix-probe: stopped after 1 arm"; [ "${fails:-0}" = 0 ] && echo "PASS (${probe_n:-1} assertions)" || echo "FAIL (${probe_n:-1} assertions)"; [ "${fails:-0}" = 0 ] && exit 0; exit 1; fi
 arm '...and the report names the rule' 'verify-stage agents at 5 TOTAL' bash "$GATE" "$TMP/the-incident.js"
-arm 'a bounded harness is clean' 'obey the ≤5-verifier rule' bash "$GATE" "$TMP/bounded.js"
+arm 'a bounded harness is clean' 'verifier-fanout: clean' bash "$GATE" "$TMP/bounded.js"
 # Both states over the SAME two files: a gate that only ever reds is not discriminating, it is broken.
 arm 'a mixed set reports only the offender' 'the-incident.js' bash "$GATE" "$TMP/bounded.js" "$TMP/the-incident.js"
 
-# THE CAP IT PRINTS IS THE HOOK'S ANSWER (TOOL-aRepatriatedFork-7, closing review round 1 residual b).
-# This gate used to re-parse `.agent-cap.conf` with its own sed, which matched nothing on a BOM-led
-# line and printed the ceiling over a hook enforcing 4. The fixture is a checkout of its own, because
-# the gate reads the conf at the root it stands in.
-CR="$TMP/caprepo"; mkdir -p "$CR" && git -C "$CR" init -q
-sed 's/= 5$/= 4/; s/), 5)$/), 4)/' "$TMP/bounded.js" > "$CR/bounded4.js"
-printf '\357\273\277FANOUT_CAP=4\r\n' > "$CR/.agent-cap.conf"
-arm 'a BOM-led conf prints the enforced cap' 'obey the ≤4-verifier rule' bash -c 'cd "$1" && bash "$2" bounded4.js' _ "$CR" "$GATE"
-printf 'FANOUT_CAP=4\nFANOUT_CAP=abc\n' > "$CR/.agent-cap.conf"
-arm '--print-cap relays the hook refusal, naming the file' '.agent-cap.conf declares FANOUT_CAP=abc' bash -c 'cd "$1" && bash "$2" --print-cap' _ "$CR" "$GATE"
 # Closing review round 2 L1 (TOOL-aRepatriatedFork-46 S8): an exported `GIT_DIR` turned the gate's
 # second question to git into its own directory, so the hook path named nothing and node threw.
+# TOOL-dGroundRules-10 retired the print verb this arm asked, so it judges a file instead.
 GR="$TMP/gitdirrepo"; mkdir -p "$GR" && git -C "$GR" init -q
-out=$(cd "$GR" && GIT_DIR="$GR/.git" bash "$GATE" --print-cap 2>&1)
-if [ "$out" = 5 ]; then printf 'arm ok    L1: --print-cap with GIT_DIR exported prints the cap\n'
-else fails=$((fails+1)); printf 'arm FAIL  L1: --print-cap with GIT_DIR exported printed:\n%s\n' "$out" | head -5; fi
+out=$(cd "$GR" && GIT_DIR="$GR/.git" bash "$GATE" "$TMP/bounded.js" 2>&1)
+case "$out" in *'verifier-fanout: clean'*) printf 'arm ok    L1: with GIT_DIR exported the gate still reaches its predicate\n' ;;
+  *) fails=$((fails+1)); printf 'arm FAIL  L1: with GIT_DIR exported the gate printed:\n%s\n' "$out" | head -5 ;; esac
 
 # The DISCOVERY path — the shipped tree. Every arm above hands the gate explicit files, and the
 # explicit path never touches git, so none of them exercises the population.

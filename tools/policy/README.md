@@ -98,6 +98,20 @@ owner-silence rule that declines a raise is a later build's reader.
   `on-invalid-strict` reads: the one file directly in it whose name ends `-architecture-v2.md`, red
   naming the count when there is none or more than one. Without it that case prints `NOT RUN`, never
   a pass. Gov's `policy fixtures` leg always passes it.
+- `python <prefix>/policy/check_policy.py --live` — TOOL-dGroundRules-10's live observation: a
+  fixture repository whose policy sets `runtime.agents-in-flight` to 2, its settings rendered, and
+  headless `claude -p` sessions whose agents each stamp a start and an end around a 20-second sleep,
+  under the render and under a control with none. It prints each run's peak overlap and the session
+  total, never asserted. It drives real sessions, so no leg runs it; with no `claude` on PATH it
+  prints `NOT RUN`, exit 2.
+- `python <prefix>/policy/policy.py settings [--write|--check] [<settings-file>]` — the agent limit,
+  `runtime.agents-in-flight` at HEAD, rendered into the harness's two concurrency settings,
+  `CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`, in
+  `.claude/settings.json` under the repository root by default (TOOL-dGroundRules-10). `--check`, the
+  default, exits 1 printing one line per variable that is absent or differs; `--write` writes only
+  when one does, every other key kept in order, in `settings-merge.py`'s shape. `kit.toml`'s stage-1
+  `[[generated]]` row runs both at every landing and before a bar. The reader lowers the key, never
+  raises it, by a `FANOUT_CAP=<n>` line in `.agent-cap.conf` at the revision read, its legacy home.
 - `python <prefix>/policy/policy.py lists --check` — red on a row the catalogue owes and the list
   lacks, a row the list carries that the catalogue no longer owes (stale), and a row the list at the
   compare base did not carry. The base is the merge-base of HEAD and the remote default branch where

@@ -3,6 +3,7 @@ one can red (TOOL-dGroundRules-1).
 
     python <this kit>/check_policy.py [--repo <dir>]   # every arm in ARMS; exit 0 green, 1 red
     python <this kit>/check_policy.py --fixture [--strict-from <dir>] [<case>]  # every case, or the one named
+    python <this kit>/check_policy.py --live   # headless sessions under a rendered agent limit
 
 `<dir>` defaults to the git top level of the working directory. Each arm prints
 `policy-check: <arm> · <n> finding(s) · <population>`, then one line per finding; a population of
@@ -68,7 +69,7 @@ reads policy through the helper, and the mirror rendered at its commit in the wo
 parity and readers arms. `mirror-worktree-loosened`, `mirror-stale-last-valid`, `mirror-stale-refuse`
 and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies policy.py,
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
-and asserts what the helper, a four-line fixture hook and `arm_mirror_landed` answer there.
+and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
 `mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in four ladder states.
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
@@ -99,12 +100,25 @@ a kit copy whose catalogue carries the planted key, a planted spec under `bPlant
 the planted consumers, pushed to one bare remote, then the spec's working-tree token; it judges
 `check_reader_coverage` by the key it reds and the count it grades, printing `case <name>: red|green`.
 
+The `limit-` cases are outcome cases of the agent limit (TOOL-dGroundRules-10), one repository each
+with no remote, so local main is its landed revision. `limit-conf-lowers`, `limit-conf-no-raise` and
+`limit-conf-malformed` plant `.agent-cap.conf` and read `policy.py get runtime.agents-in-flight`;
+`limit-settings-render` commits two policy values and runs `policy.py settings`; the six `limit-hook-`
+cases copy the hooks kit's agent-cap.js and scratch-guard.js beside a copy of this kit, so rule 7 reads
+the fixture's own limit, and judge each call by its exit code and the text its criterion names.
+
+`--live` (S9) is no case: it drives headless `claude -p` sessions in a fixture repository under a
+rendered limit and under a control with none, reads each agent's start and end stamps, and prints
+each run's peak overlap. It costs real sessions, so no leg runs it.
+
 Later units add arms to ARMS and cases to CASES.
 """
 import contextlib
+import hashlib
 import io
 import json
 import os
+import posixpath
 import re
 import shutil
 import stat
@@ -1158,11 +1172,6 @@ CONSUMER_TEXT = ("// A consumer outside the policy kit: it reads policy through 
                  "const { readPolicy } = require(@helper@);\n"
                  f"module.exports = () => readPolicy({json.dumps(AGENTS_KEY)}).value;\n")
 DIRECT_READER = 'module.exports = () => JSON.parse(require("fs").readFileSync(".governance/policy.json", "utf8"));\n'
-# The fixture hook: four lines of Node that require the helper, read the limit, and refuse a request above it.
-FIXTURE_HOOK = ("const { readPolicy } = require(@helper@);\n"
-                f"const limit = readPolicy({json.dumps(AGENTS_KEY)}, {{ repo: __dirname }}).value;\n"
-                "const asked = 3;\n"
-                "process.exit(asked > limit ? 2 : 0);\n")
 LANDED_POLICY = '[policy-file]\non-invalid = "{on}"\n\n[runtime]\nagents-in-flight = {n}\n'
 
 
@@ -1242,10 +1251,16 @@ def run_mirror_landed(name):
             doc = json.loads(mirror.read_bytes())
             doc["keys"][AGENTS_KEY]["value"] = 8
             mirror.write_bytes((json.dumps(doc, indent=2, sort_keys=True, ensure_ascii=True) + "\n").encode("ascii"))
-            Path(repo, "hook.js").write_text(FIXTURE_HOOK.replace("@helper@", json.dumps(str(kit / "policy-mirror.js"))),
-                                             encoding="utf-8", newline="\n")
-            checks += [check_run(at_l, "the fixture hook asked for 3", ["node", str(repo / "hook.js")],
-                                 lambda rc, o, e: rc == 2, cwd=repo),
+            # The hooks kit's agent-cap.js beside the kit copy, its settings at 3 (TOOL-dGroundRules-10):
+            # rule 7 must read L's limit of 2, never the working-tree mirror's 8.
+            hooks = resolve_kit_dir("hooks", "agent-cap.js", KIT)
+            hook = repo / (policy.run_git(hooks, "rev-parse", "--show-prefix") or "").strip() / "agent-cap.js"
+            hook.parent.mkdir(parents=True, exist_ok=True)
+            for f in HOOK_FILES:
+                (hook.parent / f).write_bytes((hooks / f).read_bytes().replace(b"\r\n", b"\n"))
+            write_settings(repo, render_limit_env(3))
+            checks += [check_hook_call(at_l, "agent-cap.js rule 7 with settings at 3", hook, render_spawn(repo, "u3"),
+                                       lambda rc, err: rc == 2 and "above runtime.agents-in-flight 2" in err),
                        check_run(at_l, what, helper, lambda rc, o, e: rc == 0 and o == "2\n")]
         elif name == "mirror-stale-last-valid":
             set_landed(repo, "last-valid", 2, False)
@@ -1709,6 +1724,348 @@ def run_reader_coverage(name):
     return print_checks(name, checks)
 
 
+# ---- the agent limit (TOOL-dGroundRules-10) ------------------------------------------------------
+
+LIMIT_POLICY = "[runtime]\nagents-in-flight = {n}\n"
+HOOK_FILES = ("agent-cap.js", "scratch-guard.js")
+SETTINGS_FILE = (".claude", "settings.json")
+SETTINGS_LOCAL = (".claude", "settings.local.json")
+# The retired print mode's flag in two halves, so the grep `limit-hook-env-cap` runs over the tool root
+# finds no carrier of it here either.
+RETIRED_FLAG = "--print" + "-cap"
+HANDOFF_ROLE = "## Role\n\nYou research.\n\n"
+HANDOFF_TASK = "## Task\n\nThis handoff is for build `bx`, unit `T-1`.\n"
+HANDOFF_FILE = "memory/builds/bx/prompts/2026-10-24-prompt-T-1-researcher.md"
+HARNESS_FILE = "harness/h.js"
+HARNESS_TEXT = "export const meta = { name: 'h', description: 'one agent' }\nconst s = await agent('one')\n"
+LIMIT_ROLES = {"roles": {"gov-researcher": {"agent": True, "workflow": "research", "writes": "none"}},
+               "harnesses": [HARNESS_FILE]}
+
+
+def write_settings(repo, env, rel=SETTINGS_FILE):
+    """`.claude/settings.json`, or the file `rel` names, holding `env` as its env, or `{}` for None."""
+    Path(repo, rel[0]).mkdir(exist_ok=True)
+    Path(repo, *rel).write_text(json.dumps({} if env is None else {"env": env}, indent=2) + "\n",
+                                encoding="utf-8", newline="\n")
+
+
+def render_limit_env(n):
+    return {v: str(n) for v in policy.SETTINGS_VARS}
+
+
+def build_limit_repo(path, policy_text, conf=None):
+    """A git repository at `path` on `main`, no remote, so local main is its landed revision: this
+    kit's reader, mirror helper and shim beside its catalogue at the kit's own path, the hooks kit's
+    agent-cap.js and scratch-guard.js at theirs, `policy_text` as the policy file (None: none) and
+    `conf` as `.agent-cap.conf`, committed; then the mirror rendered at that commit, committed over it.
+    -> (repo, kit copy, hook copy)."""
+    hooks = resolve_kit_dir("hooks", "agent-cap.js", KIT)
+    path.mkdir()
+    kit = path / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()
+    hook_dir = path / (policy.run_git(hooks, "rev-parse", "--show-prefix") or "").strip()
+    for src, dst, names in ((KIT, kit, (policy.CATALOGUE, *MIRROR_KIT_FILES)), (hooks, hook_dir, HOOK_FILES)):
+        dst.mkdir(parents=True, exist_ok=True)
+        for f in names:
+            (dst / f).write_bytes((Path(src) / f).read_bytes().replace(b"\r\n", b"\n"))
+    if policy_text is not None:
+        write_policy(path, policy_text)
+    if conf is not None:
+        Path(path, policy.LEGACY_FANOUT).write_bytes(conf.encode("utf-8"))
+    run_fixture_git(path, "init", "-q")
+    run_fixture_git(path, "symbolic-ref", "HEAD", "refs/heads/main")
+    run_fixture_git(path, "add", "-A")
+    run_fixture_git(path, "commit", "-q", "-m", "the agent limit's fixture")
+    Path(path, *MIRROR_FILE).parent.mkdir(exist_ok=True)
+    Path(path, *MIRROR_FILE).write_bytes(policy.render_mirror(path, "HEAD"))
+    run_fixture_git(path, "add", "-A")
+    run_fixture_git(path, "commit", "-q", "-m", "its mirror")
+    return path, kit, hook_dir / "agent-cap.js"
+
+
+def check_hook_call(scenario, what, hook, payload, want, env=None):
+    """`node <hook>` with the JSON `payload` on stdin -> (scenario, what, ok, what it observed), `want`
+    judging (exit code, stderr). CLAUDE_PROJECT_DIR is dropped, so rule 6 reads the payload cwd alone."""
+    env = {k: v for k, v in (env or os.environ).items() if k != "CLAUDE_PROJECT_DIR"}
+    try:
+        p = subprocess.run(["node", str(hook)], input=json.dumps(payload), capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=env)
+        rc, err = p.returncode, p.stderr.replace("\r", "")
+    except OSError as exc:
+        rc, err = None, f"node did not run: {exc}"
+    return scenario, what, want(rc, err), f"exit {rc} · stderr {err.strip()[:400] or '(none)'!r}"
+
+
+def render_workflow(repo, script):
+    return {"tool_name": "Workflow", "cwd": str(repo), "tool_input": {"script": script}}
+
+
+def render_spawn(repo, uid, prompt="x", **extra):
+    return {"tool_name": "Agent", "cwd": str(repo), "session_id": "limit-s", "prompt_id": "limit-p",
+            "tool_use_id": uid, "tool_input": {"prompt": prompt, **extra}}
+
+
+def write_handoff_fixture(repo):
+    """The roles index, one handoff prompt file and one harness of `limit-hook-admits-eight`, the marker
+    and digest computed as the renderer defines them. -> the Agent call's `tool_input`."""
+    digest = lambda s: hashlib.sha256(s.encode("utf-8")).hexdigest()[:12]  # noqa: E731
+    marker = (f"<!-- gov:handoff role=gov-researcher build=bx unit=T-1 path={HANDOFF_FILE} "
+              f"role-sha={digest(HANDOFF_ROLE)} task-sha={digest(HANDOFF_TASK)} -->")
+    for rel, text in ((HANDOFF_FILE, f"**Serves:** journal T-1\n\n# a handoff\n\n{marker}\n\n{HANDOFF_ROLE}{HANDOFF_TASK}"),
+                      (HARNESS_FILE, HARNESS_TEXT), (".claude/roles.json", json.dumps(LIMIT_ROLES))):
+        Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
+        Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
+    return {"subagent_type": "gov-researcher", "description": "bx · T-1 · research", "prompt": f"{marker}\n\n{HANDOFF_TASK}"}
+
+
+def run_limit_case(name):
+    """One planted repository per `limit-` case (TOOL-dGroundRules-10), judged by exit code and the
+    text each criterion names. The conf cases read `policy.py get` at the landed revision; the render
+    case commits two policy values; the hook cases run the hooks kit's agent-cap.js beside a copy of
+    this kit, so rule 7 reads the fixture's own landed limit, with each payload's cwd the fixture."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    default = next(r["default"] for r in policy.load_catalogue(KIT) if r.get("name") == AGENTS_KEY)
+    has = lambda *needles: lambda rc, err: rc == 2 and all(n in err for n in needles)  # noqa: E731
+    admits = lambda rc, err: rc == 0  # noqa: E731
+    try:
+        if name == "limit-conf-lowers":
+            repo, kit, _hook = build_limit_repo(t / "r", None, "FANOUT_CAP=2\n")
+            checks += [check_get(name, repo, [AGENTS_KEY], lambda rc, o, e: rc == 0 and o == "2\n", kit=kit),
+                       check_get(name, repo, [AGENTS_KEY, "--explain"], lambda rc, o, e: rc == 0
+                                 and f"lowered to 2 by FANOUT_CAP at {policy.LEGACY_FANOUT}:1" in e, kit=kit)]
+        elif name == "limit-conf-no-raise":
+            repo, kit, _hook = build_limit_repo(t / "r", None, "# a lower-only home\nFANOUT_CAP=8\n")
+            checks.append(check_get(name, repo, [AGENTS_KEY, "--explain"], lambda rc, o, e: rc == 0
+                                    and o == f"{default}\n" and f"FANOUT_CAP=8 at {policy.LEGACY_FANOUT}:2 does not lower it" in e,
+                                    kit=kit))
+        elif name == "limit-conf-malformed":
+            repo, kit, _hook = build_limit_repo(t / "r", None, "FANOUT_CAP=abc\n")
+            checks.append(check_get(name, repo, [AGENTS_KEY], lambda rc, o, e: rc == 2 and not o and e.strip()
+                                    == f"policy: refused · {policy.LEGACY_FANOUT}:1 · FANOUT_CAP must be an integer of at least 1",
+                                    kit=kit))
+        elif name == "limit-settings-render":
+            repo, kit, _hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=8))
+            settings = Path(repo, *SETTINGS_FILE)
+            read_env = lambda: json.loads(settings.read_text(encoding="utf-8")).get("env", {})  # noqa: E731
+            checks.append(check_get("at 8", repo, ["--write"], lambda rc, o, e: rc == 0, kit=kit, verb="settings"))
+            checks.append(("at 8", "both env keys", read_env() == render_limit_env(8), f"env {read_env()}"))
+            write_policy(repo, LIMIT_POLICY.format(n=6))
+            run_fixture_git(repo, "commit", "-q", "-am", "a policy write of 6")
+            checks.append(check_get("after 6", repo, ["--check"], lambda rc, o, e: rc == 1 and all(
+                f"env.{v} is \"8\", {AGENTS_KEY} resolves 6" in o for v in policy.SETTINGS_VARS), kit=kit, verb="settings"))
+            checks.append(check_get("after 6", repo, ["--write"], lambda rc, o, e: rc == 0, kit=kit, verb="settings"))
+            checks.append(("after 6", "both env keys", read_env() == render_limit_env(6), f"env {read_env()}"))
+            checks.append(check_get("after 6", repo, ["--check"], lambda rc, o, e: rc == 0, kit=kit, verb="settings"))
+        elif name == "limit-hook-admits-eight":
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=8), "FANOUT_CAP=8\n")
+            checks.append(check_get("at 8", repo, ["--write"], lambda rc, o, e: rc == 0, kit=kit, verb="settings"))
+            spawn = write_handoff_fixture(repo)
+            checks += [check_hook_call(name, "a handoff-valid Agent call", hook,
+                                       {**render_spawn(repo, "u8"), "tool_input": spawn}, admits),
+                       check_hook_call(name, "the registered harness", hook, {
+                           "tool_name": "Workflow", "cwd": str(repo), "tool_input": {
+                               "scriptPath": str(Path(repo, HARNESS_FILE)), "args": {"roles": {"r": "gov-researcher"}}}}, admits)]
+        elif name == "limit-hook-six-spawns":
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            write_settings(repo, render_limit_env(2))
+            checks += [check_hook_call(name, f"spawn {i} of one prompt", hook, render_spawn(repo, f"u{i}"), admits)
+                       for i in range(1, 7)]
+            ledger = Path(run_fixture_git(repo, "rev-parse", "--path-format=absolute", "--git-common-dir"), "agent-cap")
+            checks.append((name, "no slot ledger under the git common dir", not ledger.exists(),
+                           f"{ledger.as_posix()} {'exists' if ledger.exists() else 'is absent'}"))
+        elif name == "limit-hook-rules-kept":
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            write_settings(repo, render_limit_env(2))
+            checks += [
+                check_hook_call(name, "a raw parallel over items.map", hook, render_workflow(
+                    repo, "const items = [1, 2]\nconst r = await parallel(items.map((i) => () => i))\n"), admits),
+                check_hook_call(name, "boundedParallel(thunks, 50)", hook, render_workflow(
+                    repo, "const r = await boundedParallel(thunks, 50)\n"), admits),
+                check_hook_call(name, "a verifier per finding", hook, render_workflow(
+                    repo, "const v = await boundedParallel(all.map((f) => () => agent(f.claim)), 5)\n"),
+                    has("MAX_VERIFIERS")),
+                check_hook_call(name, "a ref-keyed verdict join", hook, render_workflow(
+                    repo, "const m = new Map()\nm.set(f.ref, v)\n"), has("ref-keyed verdict join"))]
+        elif name == "limit-hook-env-cap":
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            write_settings(repo, render_limit_env(2))
+            checks.append(check_hook_call(name, "AGENT_CAP=50 over a clean script", hook, render_workflow(
+                repo, "const r = await agent('one')\n"), admits, env={**os.environ, "AGENT_CAP": "50"}))
+            top = (policy.run_git(KIT, "rev-parse", "--show-toplevel") or "").strip()
+            tool_root = posixpath.dirname((policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip().rstrip("/")) or "."
+            g = subprocess.run(["git", "-C", top, "grep", "-n", "-e", RETIRED_FLAG, "--", tool_root],
+                               capture_output=True, text=True, encoding="utf-8", errors="replace")
+            checks.append((name, "no file under the tool root asks the retired print mode",
+                           g.returncode == 1 and not g.stdout.strip(),
+                           f"git grep exit {g.returncode} · {g.stdout.strip()[:400] or '(nothing printed)'}"))
+        elif name == "limit-hook-settings-over":
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            call = render_workflow(repo, "const r = await agent('one')\n")
+            refused = has("CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS", "policy.py settings --write")
+            for label, env, want in (("settings at 3", render_limit_env(3), refused), ("no env", None, refused),
+                                     ("settings at 2", render_limit_env(2), admits)):
+                write_settings(repo, env)
+                checks.append(check_hook_call(label, "a Workflow call", hook, call, want))
+            write_settings(repo, render_limit_env(3))
+            remove_repo(kit)
+            checks.append(check_hook_call("settings at 3, the policy kit absent", "a Workflow call", hook, call, admits))
+        elif name == "limit-hook-local-over":
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            write_settings(repo, render_limit_env(2))
+            local = "/".join(SETTINGS_LOCAL)
+            for var, call in ((policy.SETTINGS_VARS[0], render_spawn(repo, "u-local")),
+                              (policy.SETTINGS_VARS[1], render_workflow(repo, "const r = await agent('one')\n"))):
+                write_settings(repo, {var: "5"}, SETTINGS_LOCAL)
+                checks.append(check_hook_call(f"{local} sets {var} to 5", f"a {call['tool_name']} call", hook, call,
+                                              has(local, var)))
+        else:
+            checks.append((name, "a known limit case", False, "no such case"))
+    except (subprocess.CalledProcessError, LookupError, policy.Refusal) as exc:
+        checks.append((name, "the fixture", False, f"{type(exc).__name__}: {getattr(exc, 'stderr', '') or exc}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
+
+
+LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed", "limit-settings-render",
+               "limit-hook-admits-eight", "limit-hook-six-spawns", "limit-hook-rules-kept", "limit-hook-env-cap",
+               "limit-hook-settings-over", "limit-hook-local-over")
+
+
+# ---- the live observation (TOOL-dGroundRules-10 S9) ------------------------------------------------
+
+LIVE_LIMIT = 2
+LIVE_BOUND = 900
+STAMP = ("import sys, time\n"
+         "name, log = sys.argv[1], sys.argv[2]\n"
+         "with open(log, 'a', encoding='utf-8') as f:\n"
+         "    f.write('start %s %d\\n' % (name, time.time_ns()))\n"
+         "time.sleep(20)\n"
+         "with open(log, 'a', encoding='utf-8') as f:\n"
+         "    f.write('end %s %d\\n' % (name, time.time_ns()))\n")
+
+
+def render_workflow_prompt(runs, log):
+    """A prompt asking for `runs` Workflow calls in ONE message, each a script of four agents that each
+    run the stamp script under a name `r<run>-<agent>`."""
+    blocks = []
+    for r in range(1, runs + 1):
+        blocks.append(
+            "```js\nexport const meta = { name: 'live-limit-%d', description: 'four stamps' }\n"
+            "await parallel([1, 2, 3, 4].map((i) => () => agent(`Run exactly this command with the Bash tool "
+            "and nothing else, then reply done: python stamp.py r%d-${i} %s`)))\n```" % (r, r, log))
+    return (f"Call the Workflow tool {'once' if runs == 1 else f'{runs} times in ONE message'}, "
+            f"passing {'this script' if runs == 1 else 'these scripts, one per call'} as `script`, and do "
+            "nothing else:\n\n" + "\n\n".join(blocks))
+
+
+def render_spawn_prompt(log):
+    return ("In ONE message, call the Agent tool three times with run_in_background true, each with the "
+            "general-purpose type and this prompt, its name a1, a2 and a3 in turn: `Run exactly this command "
+            f"with the Bash tool and nothing else, then reply done: python stamp.py <name> {log}`. Then wait "
+            "for every agent that started and reply done.")
+
+
+def derive_peak(lines, prefix=""):
+    """-> (peak overlap, names that stamped) of the `start <name> <ns>` / `end <name> <ns>` lines whose
+    name opens `prefix`; an end sorts before a start at the same instant."""
+    events, names = [], set()
+    for ln in lines:
+        f = ln.split()
+        if len(f) == 3 and f[0] in ("start", "end") and f[1].startswith(prefix) and f[2].isdigit():
+            events.append((int(f[2]), 0 if f[0] == "end" else 1))
+            names.add(f[1])
+    peak = cur = 0
+    for _ns, kind in sorted(events):
+        cur += 1 if kind else -1
+        peak = max(peak, cur)
+    return peak, names
+
+
+def read_tool_errors(stream):
+    """-> the count of tool results the session's stream-json output marks as errors."""
+    n = 0
+    for ln in stream.splitlines():
+        try:
+            ev = json.loads(ln)
+        except ValueError:
+            continue
+        content = (ev.get("message") or {}).get("content") if isinstance(ev, dict) else None
+        n += sum(1 for c in content or [] if isinstance(c, dict) and c.get("type") == "tool_result" and c.get("is_error"))
+    return n
+
+
+def run_live_session(claude, repo, prompt, log):
+    """One headless session in `repo` -> (stamp lines, stream-json text, a failure or "")."""
+    env = {k: v for k, v in os.environ.items() if k not in (*policy.SETTINGS_VARS, "CLAUDE_PROJECT_DIR")}
+    try:
+        p = subprocess.run([claude, "-p", prompt, "--output-format", "stream-json", "--verbose",
+                            "--permission-mode", "bypassPermissions"], cwd=repo, env=env, capture_output=True,
+                           text=True, encoding="utf-8", errors="replace", timeout=LIVE_BOUND)
+        why = "" if p.returncode == 0 else f"claude exited {p.returncode}: {(p.stderr or '').strip()[:300]}"
+        stream = p.stdout
+    except (OSError, subprocess.TimeoutExpired) as exc:
+        why, stream = f"claude did not finish: {exc}", ""
+    lines = Path(log).read_text(encoding="utf-8").splitlines() if Path(log).is_file() else []
+    return lines, stream, why
+
+
+def run_live():
+    """`--live`: a fixture repository whose policy sets the limit to LIVE_LIMIT, its settings rendered by
+    `policy.py settings --write`, and headless `claude -p` sessions whose agents each run the stamp
+    script, a start and an end line around a 20-second sleep. Each scenario runs under the render and
+    under the control, `{}` as the settings. AC15: a Workflow of four agents peaks at most at the limit,
+    and the control at 3 or more. AC16: three background Agents in one message stamp at most the limit
+    at once, the third's tool result an error with no stamp of its own; the control stamps all three,
+    overlapping. AC17: two Workflow runs of four in one message, each run's peak at most the limit; the
+    session's total peak is printed, never asserted. Exit 0 every check held, 1 one did not, 2 no
+    `claude` on PATH."""
+    claude = shutil.which("claude")
+    if claude is None:
+        print("policy-live: NOT RUN — no claude on PATH, and a run that observed nothing is never a pass")
+        return 2
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        repo = build_reader_repo(t / "r", LIMIT_POLICY.format(n=LIVE_LIMIT))
+        Path(repo, "stamp.py").write_text(STAMP, encoding="utf-8", newline="\n")
+        for control in (False, True):
+            arm = "control, no env" if control else f"settings at {LIVE_LIMIT}"
+            if control:
+                write_settings(repo, None)
+            else:
+                p = subprocess.run([sys.executable, str(KIT / "policy.py"), "settings", "--write"], cwd=repo,
+                                   capture_output=True, text=True, encoding="utf-8", errors="replace")
+                checks.append((arm, "policy.py settings --write", p.returncode == 0, p.stdout.strip() or p.stderr.strip()))
+            for scenario in ("AC15", "AC16", "AC17"):
+                log = (t / f"{scenario}-{int(control)}.log").as_posix()
+                prompt = render_spawn_prompt(log) if scenario == "AC16" else render_workflow_prompt(
+                    2 if scenario == "AC17" else 1, log)
+                lines, stream, why = run_live_session(claude, repo, prompt, log)
+                if why:
+                    checks.append((scenario, arm, False, why))
+                    continue
+                if scenario == "AC15":
+                    peak, names = derive_peak(lines)
+                    ok = peak >= 3 if control else peak <= LIVE_LIMIT and len(names) == 4
+                    checks.append((scenario, arm, ok, f"peak {peak} over {len(names)} stamp(s)"))
+                elif scenario == "AC16":
+                    peak, names = derive_peak(lines)
+                    errors = read_tool_errors(stream)
+                    ok = (len(names) == 3 and peak >= 3) if control else (peak <= LIVE_LIMIT and len(names) == 2 and errors >= 1)
+                    checks.append((scenario, arm, ok, f"peak {peak} · {len(names)} stamped · {errors} tool error(s)"))
+                else:
+                    peaks = [derive_peak(lines, f"r{r}-")[0] for r in (1, 2)]
+                    total = derive_peak(lines)[0]
+                    ok = True if control else all(pk <= LIVE_LIMIT for pk in peaks)
+                    checks.append((scenario, arm, ok, f"run peaks {peaks} · the session's total peak {total}, printed and not asserted"))
+    finally:
+        remove_repo(t)
+    asserted, wrong = print_checks("live", checks)
+    print(f"policy-live: {asserted} check(s) · {wrong} wrong")
+    return 1 if wrong or not asserted else 0
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -1738,6 +2095,7 @@ CASES = [
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("reader-coverage", None, run_reader_coverage),  # an outcome case: one planted repository per case
+    *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each
 ]
 
 
@@ -1834,11 +2192,13 @@ def run_fixture(only=None):
     return 1 if wrong or not asserted else 0
 
 
-USAGE = "usage: python check_policy.py [--repo <dir>] | --fixture [--strict-from <dir>] [<case>]"
+USAGE = "usage: python check_policy.py [--repo <dir>] | --fixture [--strict-from <dir>] [<case>] | --live"
 
 
 def main(argv):
     global STRICT_FROM
+    if argv == ["--live"]:
+        return run_live()
     if argv[:1] == ["--fixture"]:
         rest = argv[1:]
         if rest[:1] == ["--strict-from"] and len(rest) >= 2:

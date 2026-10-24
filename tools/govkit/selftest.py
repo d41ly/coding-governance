@@ -112,7 +112,7 @@ def resolve_kit_dir(home, anchor, here):
     raise LookupError("no %s kit holding %s in this install: looked in %s, %s and %s" % (
         home, anchor, receipt.as_posix(), probes[0].as_posix(), probes[1].as_posix()))
 # <<< resolve_kit_dir
-KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "agent-cap.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("roles", "roles_lib.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
+KIT_DIRS = {home: resolve_kit_dir(home, anchor, HERE) for home, anchor in (("codebase-map", "map_lib.py"), ("drift-audit", "drift_report.py"), ("hooks", "agent-cap.js"), ("lexicon", "lexicon.py"), ("memory-recall", "extract.py"), ("memory-tree", "gotchas.py"), ("playbook", "render_playbook.py"), ("policy", "policy.py"), ("process-monitor", "procmon-hook.js"), ("pytest-parallel-guardrails", "crashprobe.py"), ("roles", "roles_lib.py"), ("run-gates", "run-gates.sh"), ("runlog", "runlog.py"), ("unattended", "unattended.sh"), ("workflows", "tier2-review.js"))}
 KIT_DIRS["govkit"] = HERE
 KIT_NAMES = {home: d.name for home, d in KIT_DIRS.items()}
 
@@ -14633,10 +14633,9 @@ user_skills = "/tmp/gk-fake-skills"
                     (g / PFX / _kd / _name).write_text(_body, encoding="utf-8", newline="\n")
             shutil.copy2(_pvREAL / "check-protocol-parity.test.sh",
                          g / PFX / KIT_NAMES["workflows"] / "check-protocol-parity.test.sh")
-            # TOOL-aRepatriatedFork-7 residual b: the renderer asks its sibling gate's `--print-cap`
-            # for FANOUT_CAP, and that gate asks the agent-cap hook, so the real kit's renderer
-            # cannot run without both. The sibling ships in the kit as it does in the real one; the
-            # hook is the target's own, see `seed_pv_hook`.
+            # The verifier fan-out gate ships in the kit as it does in the real one. The renderer read
+            # FANOUT_CAP through it until TOOL-dGroundRules-10 re-pointed the token to the policy
+            # reader, which is the target's own, see `seed_pv_policy`.
             shutil.copy2(_pvREAL / "check-verifier-fanout.sh",
                          g / PFX / KIT_NAMES["workflows"] / "check-verifier-fanout.sh")
             # TOOL-aGraftedHelix-28 made the real parity script require this sibling wherever the
@@ -14676,12 +14675,15 @@ user_skills = "/tmp/gk-fake-skills"
         _pvSEED = "memory/project/seedy-loops.txt"
         _pvSV = "scripts/seedy/seedy.sh"
 
-        def seed_pv_hook(t):
-            """The agent-cap hook where inCMS core keeps its only copy, `.claude/hooks/`, which the
-            renderer's sibling gate probes third. Both measured consumers hold one; a fixture without
-            it could not render at all since the renderer began asking the hook for FANOUT_CAP."""
-            (t / ".claude" / "hooks").mkdir(parents=True, exist_ok=True)
-            shutil.copy2(KIT_DIRS["hooks"] / "agent-cap.js", t / ".claude" / "hooks" / "agent-cap.js")
+        def seed_pv_policy(t):
+            """The policy kit's reader and catalogue beside the target's workflows kit, where the
+            renderer's inlined resolver probes second, since the renderer reads FANOUT_CAP from
+            `policy.py get runtime.agents-in-flight --rev HEAD` (TOOL-dGroundRules-10); the review
+            harness requires the policy kit. With no policy file the reader answers the catalogue's
+            default. A fixture without it could not render at all."""
+            (t / "scripts" / "policy").mkdir(parents=True, exist_ok=True)
+            for _pf in ("policy.py", "catalogue.toml"):
+                shutil.copy2(KIT_DIRS["policy"] / _pf, t / "scripts" / "policy" / _pf)
 
         def build_pv_target(g, name, harness_edit=None):
             """An install `apply` wrote at vintage A, with one local delta, which both measured
@@ -14690,7 +14692,7 @@ user_skills = "/tmp/gk-fake-skills"
             t = make_target(tmp / name, _pvDEPLOY.format(kits='["review-harness"]'))
             (t / "scripts").mkdir(exist_ok=True)
             (t / "scripts" / "gotchas.py").write_text("# a stub checklist\n", encoding="utf-8", newline="\n")
-            seed_pv_hook(t)
+            seed_pv_policy(t)
             settle(t, "the memory-tree kit's checklist, installed flat")
             _ap = run_pv_govkit(g, "apply", "--target", str(t), "--kits", "review-harness")
             check(f"[-PV] the {name} fixture applies GREEN at vintage A, or every arm over it grades a "
@@ -14723,7 +14725,7 @@ user_skills = "/tmp/gk-fake-skills"
                     (t / _dst).mkdir(parents=True, exist_ok=True)
                     shutil.copy2(g / _rel, t / _dst / _name)
             (t / "scripts" / "gotchas.py").write_text("# a stub checklist\n", encoding="utf-8", newline="\n")
-            seed_pv_hook(t)
+            seed_pv_policy(t)
             with (t / _pvD).open("a", encoding="utf-8", newline="\n") as _fh:
                 _fh.write("// a consumer's own line\n")
             (t / _pvJ).write_text("echo a join this tree wrote for itself\n", encoding="utf-8", newline="\n")

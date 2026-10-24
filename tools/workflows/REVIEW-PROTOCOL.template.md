@@ -6,8 +6,8 @@ every number below is either measured on THIS tree or marked as inherited with t
 
 ## The hard cap — the verify-stage total `agent-cap.js` resolves
 
-**A review's verify stage spawns at most the cap `{{TOOL_ROOT}}hooks/agent-cap.js` resolves,
-whatever the finding count.** The batch size grows
+**A review's verify stage spawns at most the total `{{TOOL_ROOT}}hooks/agent-cap.js` holds as
+`MAX_VERIFIERS`, whatever the finding count.** The batch size grows
 with the finding count; the agent count never does.
 
 The NUMBER is a FILE CONSTANT in `{{TOOL_ROOT}}hooks/agent-cap.js`, and that file is what a run actually
@@ -17,8 +17,8 @@ when the two disagree, the hook is right and the sentence you are reading is the
 revision of this line claimed the number was "declared per repository"; that was written for a
 mechanism that was specced and then parked, and it described a channel this tree does not have.
 
-This is not the concurrency cap wearing a different hat. `boundedParallel(thunks, 5)` bounds how many
-run AT ONCE; N findings still spawn N agents, five at a time. **Concurrency is not a budget.**
+This is not the agent limit wearing a different hat. `runtime.agents-in-flight` bounds how many run
+AT ONCE; N findings still spawn N agents, a limit's worth at a time. **Concurrency is not a budget.**
 
 Measured here, on one review of one spec in one session:
 
@@ -43,52 +43,15 @@ session spawns agents:
   a review, because the ad-hoc review script written in a session is never a file, so no file-scoped
   gate can see it. Measured: of the `Workflow` calls in the session that motivated this document,
   every one passed `script` and none passed `scriptPath`.
-- The same hook on the **`Agent`** tool call — the RUNTIME half, and the modality that was unguarded
-  entirely until `agent-cap` 1.3. A direct spawn carries no script, so it is COUNTED: each spawn
-  claims a numbered slot with `O_EXCL` under a `session_id` + `prompt_id`-keyed directory in the git
-  common dir, and the spawn that finds every slot taken is denied. The budget resets on the next user
-  prompt, so nothing has to remember to clear it. Measured before it was built: `PreToolUse` does
-  fire for a direct `Agent` spawn, `tool_name` arrives as exactly `Agent`, and `session_id`,
-  `prompt_id` and `tool_use_id` are all present.
-
-  The count does **not** distinguish a verifier from any other agent, and that is deliberate: keying
-  on "is this a verify agent" would need a session-to-build binding no payload field provides, while
-  the concurrency rule below already binds every fan-out to the same number. The residual is a wide
-  fan-out that is legitimately not a review — accepted, for that reason.
-
-  **A slot also EXPIRES, from 1.5, and what that buys is stated exactly.** `PreToolUse` fires BEFORE
-  the work and there is no matching after-event this hook is wired for, so a slot had no release path
-  and the raw count was LIFETIME-PER-PROMPT, not concurrency: five agents that ran one after another,
-  each finished before the next began, refused the sixth for the rest of the turn. Measured at
-  agent-cap 1.4 — six sequential spawns, distinct `tool_use_id`s, the sixth denied against five
-  long-idle slots. A slot idle past `SLOT_TTL_MS` (45 min, set above the longest subagent measured on
-  this fleet, 34 min) is now reclaimed by the next spawn, so the budget is a rolling window rather
-  than a permanent one.
-
-  **The expiry stands in for a completion signal; it does not turn the counter into a concurrency
-  meter, and the direction it fails in is chosen.** A burst — the case this rule exists for — claims
-  its five slots within a second, so no realistic TTL lets one through. What the TTL does admit is
-  the rarer shape: five agents genuinely running concurrently for longer than 45 minutes, then a
-  sixth. The precise fix is a release keyed on `tool_use_id`, which the harness guarantees identifies
-  ONE tool execution across `PreToolUse` and `PostToolUse`. It is not built, and the reason is a
-  single unmeasured fact: whether the `Agent` tool fires `PostToolUse` at all. Settle it with a
-  `PostToolUse[Agent]` probe plus a `PostToolUse[Bash]` CONTROL, wired IN PLACE. This document used to
-  send that probe to a FRESH session because settings are not hot-reloaded; that reason is wrong. The
-  public hooks reference says direct edits to hooks in settings files are normally picked up by the
-  file watcher, and OBSERVED on node `d` in session `a6d954d0` the wired agent-cap command CHANGED
-  mid-session after commit `206af3de` retargeted `.claude/settings.json` — two denials in one
-  transcript naming two different commands. A fresh session is still the tidier control, because it
-  removes the question of WHEN the watcher caught the edit; it is no longer a precondition. That same
-  reference says Agent skips both tool events in favour of `SubagentStart`/`SubagentStop`, and
-  `SubagentStop` carries no `tool_use_id` to correlate on — while the measurement in the bullet above
-  says `PreToolUse` DOES fire for Agent, re-confirmed by watching a real spawn claim a slot. Both
-  cannot be right, and wiring a release for an event that never
-  arrives would ship exactly the mechanism-that-cannot-fire this repo gates.
-
-  Why slots and not a running count: read-then-decide loses updates (measured — a four-call burst
-  overlapped its hook processes and two of four read the same count), and create-a-token-then-count
-  does not fix it either, since each of six concurrent processes sees between its own ordinal and
-  six. Only the atomic claim of a numbered slot decides the question in the create.
+- The same hook on the **`Agent`** and **`Workflow`** calls — the SETTINGS half, its rule 7
+  (TOOL-dGroundRules-10). How many agents run at once is the agent limit, `runtime.agents-in-flight`,
+  and the harness enforces it through the two concurrency settings the policy kit renders from it,
+  because the harness counts agents in flight and knows when each one ends, which a `PreToolUse` hook
+  cannot. The hook refuses a call whose checkout's settings, `.claude/settings.json` or the
+  `.claude/settings.local.json` value that overrides it, are absent or above the landed limit, naming
+  the render command. The per-prompt slot ledger that counted direct spawns until TOOL-dGroundRules-10, with
+  its 45-minute expiry, retired with it: it counted claims, not agents in flight, so five idle claims
+  refused a sixth agent and five claims past the expiry admitted five more.
 - `{{TOOL_ROOT}}workflows/check-verifier-fanout.sh` — a merge-bar leg over the committed harnesses. It does
   not re-implement the static rule; it feeds each script to the hook. One predicate, two entry points.
 
@@ -110,10 +73,9 @@ alone still contains the string `agent-cap.js` and used to report the tree corre
   inside a `Workflow` sidechain — the matcher-on-a-tool-it-does-hold experiment this bullet asked
   for. So the spawns above are missed because the matcher covers `Workflow|Agent` and a sidechain
   holds neither, NOT because hooks stop at the sidechain boundary.
-- A session whose token directory cannot be resolved at all — no git dir, or a payload missing
-  `session_id` / `prompt_id` / `tool_use_id`. That fails OPEN and silently, because a hook that
-  denies every spawn on a filesystem hiccup is worse than the burst it prevents. A token that could
-  not be CREATED is a different fact and denies.
+- An environment override of the two harness variables, which the harness applies and no hook can
+  read, and a session started before a lowering, which keeps the settings it started with until it
+  restarts.
 
 ### The predicate
 
@@ -151,35 +113,29 @@ explaining the ban.)
 
 The marker is a claim; the gate checks the claim's SHAPE. `chunk(all, 1) // gov:fixed-verifiers`
 reds, and so does `splitInto(all, all.length)` — blessing a helper by NAME would bless `chunk`
-wearing a different name. `gov:bounded-fanout` is a claim on the same terms: the marked line must
-slice a bare identifier by a width that is either the enclosing helper's own `cap` parameter, which
-the two rules above have already bounded, or a `<K>` that resolves. It used to exempt its line
-outright, so a line slicing fifty wide passed unread.
+wearing a different name. `gov:bounded-fanout` marks a helper's own slice line, and since
+TOOL-dGroundRules-10 no concurrency width is resolved: the agent limit bounds that, in the harness.
 
-## Concurrency — the at-once bound `agent-cap.js` resolves, always
+## Concurrency — the at-once bound is `runtime.agents-in-flight`, always
 
-Route ALL fan-out through `boundedParallel(thunks, 5)` / `boundedPipeline(items, 5, …stages)` —
-the literal `5` STAYS in these two forms on purpose: they are code an agent inlines into a script,
-and a script that spells a pointer instead of an integer does not run. `{{TOOL_ROOT}}hooks/agent-cap.js` re-resolves
-that width at the call site and denies it if it is wrong, so the digit here is checked, not trusted. The
-same hook DENIES a script calling raw `parallel(` / `pipeline(` outside a line marked
-`gov:bounded-fanout`; scripts cannot `import`, so inline the helper.
+How many agents run AT ONCE is the policy key `runtime.agents-in-flight` (TOOL-dGroundRules-10). The
+policy kit renders it into the harness's own two settings in `.claude/settings.json`,
+`CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS` and `CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS`, with
+`policy.py settings --write`, and every landing regenerates that render. The harness counts agents in
+flight and enforces them: a direct spawn over the first is refused, and a Workflow agent over the
+second queues. `{{TOOL_ROOT}}hooks/agent-cap.js` holds the settings a session starts from to the landed
+limit, its rule 7, and resolves no width itself. Read the limit with `policy.py get
+runtime.agents-in-flight --explain`, which names a `FANOUT_CAP` lowering in `.agent-cap.conf` too.
+
+Route fan-out through `boundedParallel(thunks, cap)` / `boundedPipeline(items, cap, …stages)`, inlined
+because scripts cannot `import`; the shipped harnesses render that width from the same key. Until the
+in-flight ledger arms, the limit binds direct spawns and each Workflow run separately, so two runs in
+one message may together hold twice it.
 
 Inherited with its reason: a ~40-agent burst tripped the server rate limiter twice, ~3 M tokens
-wasted. That is a property of the shared service, not of the tree that measured it, so the number
-travels. It moved 6 → 5 here on that basis.
-
-**The hook reads the number, in all three places a bound is written** (`agent-cap` 1.2). It resolves
-the cap argument at each `boundedParallel(` / `boundedPipeline(` CALL SITE, the helper's own DEFAULT
-PARAMETER when a call passes none, and the slice width a `gov:bounded-fanout` line claims — joining
-lines forward until the parens balance, because every shipped call site spans lines. A K it cannot
-resolve to an integer within the cap `{{TOOL_ROOT}}hooks/agent-cap.js` holds is denied; the burden is on
-the fan-out.
-
-The cap is a FILE CONSTANT in `{{TOOL_ROOT}}hooks/agent-cap.js` — the one place it is written and the
-one place to change it. There is no environment override, and a set `AGENT_CAP` is refused with a
-message rather than ignored — a ceiling that can be raised from the environment leaves no diff behind,
-which is the defeatable class this rule exists to stay out of.
+wasted. That is a property of the shared service, not of the tree that measured it, which is why the
+limit carries a default in the policy catalogue and a repository moves it by a policy write, never by
+editing a harness.
 
 ## Tiers and security boundaries
 

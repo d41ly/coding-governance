@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-10 — the agent limit as runtime.agents-in-flight, rendered into the harness's settings, agent-cap's counting retired
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0016@df63b6eb whole
 
@@ -10,6 +10,8 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
+| [2026-10-23-build-TOOL-dGroundRules-10-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-10-ledger.md) | journal | — |
+| [2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md](../build/2026-10-24-build-TOOL-dGroundRules-10-deviation-72.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-10-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-10-1-spec-writer.md) | journal | — |

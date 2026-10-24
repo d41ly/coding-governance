@@ -190,6 +190,11 @@ for out, desc in ((sys.argv[5], name), (sys.argv[6], "bx · TOOL-bx-1 · researc
                    "prompt": open(sys.argv[2], newline="", encoding="utf-8").read()}}, fh)
 sys.stdout.buffer.write(json.dumps(name, ensure_ascii=False).encode("utf-8"))' \
     "$FXN" "$TMP_ROOT/a6.task" "$$" "$TMP_ROOT/a6.err" "$TMP_ROOT/a6.json" "$TMP_ROOT/a6s.json" > "$TMP_ROOT/a6.name"
+  # TOOL-dGroundRules-10: the hook's rule 7 refuses a spawn in a checkout whose settings do not hold
+  # the landed agent limit, and this fixture carries no policy. The agreement this arm holds is rule
+  # 6's, so it runs a copy of the hook with no policy kit beside it, where rule 7 adds no rule.
+  HKC="$TMP_ROOT/hooks-copy/hooks"; mkdir -p "$HKC" && cp "$HK/agent-cap.js" "$HK/scratch-guard.js" "$HKC/"
+  HK=$HKC
   (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HK/agent-cap.js" < "$TMP_ROOT/a6.json" >/dev/null 2>"$TMP_ROOT/a6.hook"); hrc=$?
   check_arm "arm 6 the renderer's task part, named as it printed, is admitted by the spawn guard" \
      "$([ "$rc" = 0 ] && [ "$hrc" = 0 ] && [ ! -s "$TMP_ROOT/a6.hook" ] && echo 1 || echo 0)"
@@ -461,6 +466,9 @@ for name, text in variants.items():
     hit = roles_lib.extract_prompt_marker(text)
     with open(out / (name + ".py"), "w", encoding="utf-8", newline="") as fh:
         fh.write("admit" if hit and hit.group(0) == m else "refuse")' "$HERE" "$TMP_ROOT/a11" "$FXN" "$$"
+  # A copy of the hook with no policy kit beside it, as arm 6 runs, so rule 7 adds no rule here.
+  HKAC="$TMP_ROOT/a11/hooks-copy/hooks"; mkdir -p "$HKAC" && cp "$HKA/agent-cap.js" "$HKA/scratch-guard.js" "$HKAC/"
+  HKA=$HKAC
   _seen=""
   for _v in v1 v2 v3 v4 v5; do
     (cd "$TMP_ROOT" && env -u CLAUDE_PROJECT_DIR node "$HKA/agent-cap.js" < "$TMP_ROOT/a11/$_v.json" >/dev/null 2>"$TMP_ROOT/a11/$_v.hook"); hrc=$?

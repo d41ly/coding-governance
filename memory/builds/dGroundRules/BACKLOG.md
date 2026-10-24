@@ -12,6 +12,7 @@
 - TOOL-dGroundRules-105 · filed 2026-10-23 · held red: suite unattended gate selftest shard 5/8 red at ce13efbe on the daily held job, run 39931745897 · seen `.github/workflows/remote-ci.yml`@ce13efbe · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-dGroundRules-106 · filed 2026-10-23 · held red: suite unattended gate selftest shard 2/8 red at ce13efbe on the daily held job, run 39931745897 · seen `.github/workflows/remote-ci.yml`@ce13efbe · accept the suite is green on the daily held job at the default branch's tip
 - TOOL-dGroundRules-107 · filed 2026-10-23 · held red: suite unattended gate selftest shard 4/8 red at ce13efbe on the daily held job, run 39931745897 · seen `.github/workflows/remote-ci.yml`@ce13efbe · accept the suite is green on the daily held job at the default branch's tip
+- TOOL-dGroundRules-108 · filed 2026-10-24 · TWO SPECS OF OTHER BUILDS CITE `tools/hooks/agent-cap.js` BY LINES THAT NO LONGER EXIST. TOOL-dGroundRules-10's retirements took the file from 2427 lines to 1960, so `TOOL-aOrientedCast-28`'s `:2092` and `:1972-1994` and `TOOL-dFairHearing-22`'s `:2269-2272` point past its end. Two rows in `memory/project/spec-token-waivers.txt` hold the two `[cite]` hits on `TOOL-aOrientedCast-28`, a live spec, meanwhile (deviation 72); `TOOL-dFairHearing-22` is DEFERRED, which the cites join does not grade, so it takes no row and reds when it leaves DEFERRED in its own build. Each of the two units is asked to cite `agent-cap.js` by symbol instead of by line. · accept both specs cite `agent-cap.js` by symbol where they cited those lines, and the two waiver rows leave in the commit that re-cites `TOOL-aOrientedCast-28`
 
 ## Dispositions
 
@@ -35,3 +36,5 @@
 - KEEP · TOOL-dGroundRules-106 · filed by an unattended run for the owning build; outside this build's goal
 - SEV · TOOL-dGroundRules-107 · HIGH · a held self-test is red on the default branch's daily job
 - KEEP · TOOL-dGroundRules-107 · filed by an unattended run for the owning build; outside this build's goal
+- SEV · TOOL-dGroundRules-108 · LOW · two waiver rows hold two [cite] hits on another build's live spec; no verdict moves
+- KEEP · TOOL-dGroundRules-108 · filed by TOOL-dGroundRules-10's build pass; the cure is a revision of two other builds' specs, outside this build's writes (README, Build-level rules)
