@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-38 — the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,9 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-38-deviation-26.md](../build/2026-10-23-build-TOOL-dGroundRules-38-deviation-26.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-38-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-38-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-36-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-36-staleness-probe-brief.md) | research | TOOL-dGroundRules-36 TOOL-dGroundRules-37 |
+| [2026-10-24-prompt-TOOL-dGroundRules-38-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-38-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-38-probe-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-38-probe-fix-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-35-43-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 |
 
@@ -20,12 +23,17 @@
 The round-1 spec audit of units 33 and 34
 (`memory/builds/dGroundRules/reviews/2026-10-23-review-TOOL-dGroundRules-33-34-spec-audit-round1.md`)
 exited CONVERGED with finding **id 18 at HIGH**, item **H2**, which no other id shares.
-`TOOL-dGroundRules-26` S1 copies the source's index in process, and `TOOL-dGroundRules-34` S1 copies
-its exclude file in process. In a primary checkout, which remote CI's `actions/checkout` and the main
-checkout both are, those files are `.git/index` and `.git/info/exclude`, under the top level, so
-`TOOL-dGroundRules-33` S2 keeps them and the leg prints `guard-trace · WRONG` for each. In a linked
-worktree, where a build pass runs and S4's sweep looks, they sit outside the top level and the leg is
-green. This unit is id 18's promotion: `add_source_read` keeps no path under the source's git
+`TOOL-dGroundRules-26` S1 copies the source's index in process, and `TOOL-dGroundRules-34` S1 adds an
+in-process copy of its exclude file. At this revision `build_source_snapshot` copies only the index,
+through a relative `--git-path` (`tools/policy/check_policy.py:1010`); `TOOL-dGroundRules-34`, which
+builds before this unit in order 12, adds the exclude-file copy (its S1) and the
+`--path-format=absolute` flag on every `--git-path` call (its S28). This unit is written against the
+branch that holds both, and depends on that unit for them. In a primary checkout, which remote CI's
+`actions/checkout` and the main checkout both are, those files are `.git/index` and
+`.git/info/exclude`, under the top level, so `TOOL-dGroundRules-33` S2 keeps them and the leg prints
+`guard-trace · WRONG` for each. In a linked worktree they sit outside the top level and the leg is
+green; that is where the close runs the first `policy fixtures` leg, which `TOOL-dGroundRules-33`
+deviation 78 made the run that sweeps S4's paths into the guard, in place of that unit's build pass. This unit is id 18's promotion: `add_source_read` keeps no path under the source's git
 directory or its common directory, both resolved once by git. It repairs `TOOL-dGroundRules-33`,
 which sits at order 11, so it builds at order 12.
 
@@ -39,8 +47,9 @@ which sits at order 11, so it builds at order 12.
   a primary checkout, where they are one directory under the top level, and in a linked worktree,
   where they differ and sit outside it. Observed by AC1, AC2.
 - **S3** — The readers named. The in-process copy of the index (`TOOL-dGroundRules-26` S1) and of
-  the exclude file (`TOOL-dGroundRules-34` S1) are the two reads S2 keeps out today; the
-  hands-off edge in `TOOL-dGroundRules-34` §3 names the trace as a reader of that unit's copy.
+  the exclude file (`TOOL-dGroundRules-34` S1) are the two reads S2 keeps out, on the branch after
+  `TOOL-dGroundRules-34` builds, which it does before this unit; at this revision only the index copy
+  exists. The hands-off edge in `TOOL-dGroundRules-34` §3 names the trace as a reader of that unit's copy.
   Observed by AC1, AC2.
 
 ## 3. Non-goals (OUT)
@@ -55,7 +64,7 @@ which sits at order 11, so it builds at order 12.
 ### Edges
 
 - **consumes-from** `TOOL-dGroundRules-33` — `add_source_read`, whose kept set S2 narrows, and the `--fixture` hook installation S1 extends
-- **consumes-from** `TOOL-dGroundRules-34` — S1's in-process copy of the source's exclude file, one of the two git-directory reads S2 keeps out of the trace
+- **consumes-from** `TOOL-dGroundRules-34` — S1's in-process copy of the source's exclude file, one of the two git-directory reads S2 keeps out of the trace, and S28's absolute `--git-path`; that unit builds first
 - **hands-off** `TOOL-dGroundRules-52` — S3's claim, AC1 in a clone at the commit under test, and S1's deny branch, which that unit observes (ids 5, 15 and 8 of the round-1 spec audit of units 35 to 43)
 
 ## 4. Design
@@ -171,12 +180,21 @@ none
 - rev-2 · 2026-10-23 · §3 · the hands-off edge to `TOOL-dGroundRules-52`, the reciprocal ends the disposal of
   the round-1 spec audit of units 35 to 43 wrote; no scope or criterion moved.
 - rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
+- rev-4 · 2026-10-24 · §1, §2 S3, §3, §10 · a read-only review against HEAD `7106e5abc` disagreed on
+  three points: §1 and S3 counted an exclude-file read the snapshot does not yet make, §10 called
+  S28's absolute flag present while the index call is relative, and §1 placed the sweep in a build
+  pass. Rulings: both are what the branch holds after `TOOL-dGroundRules-34`, which builds before
+  this unit, and that dependency is named; the sweep is the close's first `policy fixtures` run
+  (`TOOL-dGroundRules-33` deviation 78). No scope or criterion moved.
 
 ## 10. Reuse audit
 
 The seams extended are `add_source_read` (`TOOL-dGroundRules-33` S2) and git's own answer for where
 a repository's directories sit, `rev-parse --path-format=absolute --git-dir --git-common-dir`, the
-flag `TOOL-dGroundRules-34` S28 already requires of every `--git-path` call in the snapshot.
+flag `TOOL-dGroundRules-34` S28 adds to every `--git-path` call in the snapshot. At this revision
+the snapshot's index call is still relative (`tools/policy/check_policy.py:1010`) and the fixtures'
+own `--git-common-dir` reads already carry the flag (`tools/policy/check_policy.py:2805`); S28 is on
+the branch before this unit builds, since `TOOL-dGroundRules-34` builds first in order 12.
 `python tools/codebase-map/reuse_lookup.py "drop paths git ignores from a list of file paths"`
 ranked `git`, `run_git`, `read_git_output` and `build_git_env`, which run git and resolve no git
 directory for a caller: no existing seam fits. The recall probe returned `TOOL-aGraftedHelix-45`,
