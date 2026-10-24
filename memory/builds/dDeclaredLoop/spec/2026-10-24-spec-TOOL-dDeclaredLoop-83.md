@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-83-deviation-831.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-83-deviation-831.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 |
 
 <!-- /gen:spec-records -->
 
@@ -58,6 +59,7 @@ left S27's fallback standing.
 
 - **consumes-from** `TOOL-dDeclaredLoop-81` — the exit table of S2 and S3, every exit other than 0 and 1 the `failed` state, which S1 writes into 75 S27
 - **hands-off** `TOOL-dDeclaredLoop-75` — S27's fallback clause restated to 81's exit table and AC27 re-observing `push-merge-tree-fatal`, which that unit builds at order 39
+- **hands-off** `TOOL-dDeclaredLoop-88` — S1's parent rows, §4's S27 table, its Evidence pins and Files touched, which that unit completes, re-anchors and widens (the round-7 spec audit's ids 1, 15, 27)
 
 ## 4. Design
 
@@ -149,6 +151,8 @@ This pass writes one spec and no code. 75's own pass keeps the sibling-minted `l
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-6 spec audit's id 1 (HIGH, item H1, shared
   with id 7).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

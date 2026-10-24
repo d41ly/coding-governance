@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-81 — a clean re-merge that fails is its own state and never takes the parent exemption; only a probed absence of the feature does
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -76,6 +76,7 @@ feature by a probe instead of an exit code. It repairs `TOOL-dDeclaredLoop-78`.
 - **hands-off** `TOOL-dDeclaredLoop-84` — S2's exit table, which that unit writes into 78's states and grade and into 82 S4 and AC4 (the round-6 spec audit's id 7)
 - **hands-off** `TOOL-dDeclaredLoop-85` — `resolve_write_tree_support`, `check_write_tree_usage` and S4's plant hook, which that unit gives a third answer, `probe failed`, routed to the `failed` state, and restates in S1, S2, S5, §4, AC4 and AC5 (the round-6 spec audit's id 24)
 - **hands-off** `TOOL-dDeclaredLoop-86` — S3's state names and parent-side parse refusal, the `failed` refusal text for a start failure, a signal and an empty stderr, and §4 Evidence's quotation of 75 S27, which that unit amends (the round-6 spec audit's ids 3, 18, 29)
+- **hands-off** `TOOL-dDeclaredLoop-88` — S1's probe signature and rule, S3's state names, §4's grade and AC5, which that unit restates to the three-answer probe (the round-7 spec audit's ids 3, 6, 9, 12, 19, 21)
 
 ## 4. Design
 
@@ -194,6 +195,8 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 AC4 · the unrelated-historie
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-5 spec audit's id 28 (HIGH, item H2).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-83 and TOOL-dDeclaredLoop-84 and TOOL-dDeclaredLoop-85 and TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

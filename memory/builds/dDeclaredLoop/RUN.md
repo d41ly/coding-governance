@@ -276,3 +276,9 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T16:36:13Z rescope · item add TOOL-dDeclaredLoop-86 · reason spec-audit round 6 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) the 22 confirmed minors batched into one unit: 13 MEDIUM, ids 3 4 9 11 14 15 17 18 23 25 26 27 28 (items M1 to M12), and 9 LOW, ids 5 6 10 12 13 16 19 21 29 (items L1 to L9); repairs no unit in particular
 
 2026-10-24T16:48:18Z review · item dDeclaredLoop-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 22 · disposition promote
+
+2026-10-24T17:12:39Z rescope · item add TOOL-dDeclaredLoop-87 · reason spec-audit round 7 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md) id 29 HIGH, item H1: spec 86's derive_conf_constants lists value shapes instead of the class, so a conf path bound as ROOT / ".unattended.conf", through os.path.join or by an aliased from-import reads as no conf read; repairs TOOL-dDeclaredLoop-86
+
+2026-10-24T17:12:47Z rescope · item add TOOL-dDeclaredLoop-88 · reason spec-audit round 7 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md) the 36 confirmed minors batched into one unit: 19 MEDIUM, ids 1 2 3 4 5 7 8 11 16 17 20 21 23 25 30 31 32 33 34 (items M1 to M16), and 17 LOW, ids 6 9 10 12 13 14 15 18 19 22 24 26 27 28 35 36 37 (items L1 to L11); repairs no unit in particular
+
+2026-10-24T17:28:15Z review · item dDeclaredLoop-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 36 · disposition promote
