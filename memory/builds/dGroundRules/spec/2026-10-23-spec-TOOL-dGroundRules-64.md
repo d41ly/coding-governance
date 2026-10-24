@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-64 — the respelled literals no other repair covers, restored whole and observed: units 5, 21, 33 and 34
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-2 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-64-deviation-52.md](../build/2026-10-23-build-TOOL-dGroundRules-64-deviation-52.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-64-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-64-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-21-trim-task.md) | research | TOOL-dGroundRules-21 TOOL-dGroundRules-25 TOOL-dGroundRules-34 |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 |
 | [2026-10-23-prompt-TOOL-dGroundRules-58-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-task.md) | research | TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 |

@@ -191,7 +191,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-57 — the not-a-trap staging spelled whole, so the trap probe lists the row the row check refuses](spec/2026-10-23-spec-TOOL-dGroundRules-57.md) | 17 | 2 | WONTDO | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-58 — the overlap probe sources the unattended library by its tracked path, so its shell column is a verdict and not a load failure](spec/2026-10-23-spec-TOOL-dGroundRules-58.md) | 17 | 2 | WONTDO | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-61 — rule 7 bounds every settings layer it can read, so a declared settings file never hides the project's](spec/2026-10-23-spec-TOOL-dGroundRules-61.md) | 17 | 2 | CLOSED | rev-3 | 2026-10-24 |
-| [TOOL-dGroundRules-64 — the respelled literals no other repair covers, restored whole and observed: units 5, 21, 33 and 34](spec/2026-10-23-spec-TOOL-dGroundRules-64.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
+| [TOOL-dGroundRules-64 — the respelled literals no other repair covers, restored whole and observed: units 5, 21, 33 and 34](spec/2026-10-23-spec-TOOL-dGroundRules-64.md) | 17 | 2 | CLOSED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-54 — the trap row's verdicts observed a second time through the whole overlap probe, which reads the pair from the suite and spells none](spec/2026-10-23-spec-TOOL-dGroundRules-54.md) | 18 | 2 | WONTDO | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-56 — the row check observed refusing: the not-a-trap row run through the arm's own row function, never read off the table](spec/2026-10-23-spec-TOOL-dGroundRules-56.md) | 18 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-59 — the overlap criteria of units 40 and 43 observed through the whole probe, the raw-compare staging included](spec/2026-10-23-spec-TOOL-dGroundRules-59.md) | 18 | 2 | WONTDO | rev-2 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 349 bound to this build, across 4 record folder(s).
+Records: 350 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
