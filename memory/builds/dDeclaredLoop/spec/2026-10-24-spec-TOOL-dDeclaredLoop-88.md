@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-88 — the round-7 spec audit's 36 minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 44 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-88-deviation-881.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-88-deviation-881.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-87 |
 
 <!-- /gen:spec-records -->
 
@@ -218,6 +219,8 @@ M11 with L9 (S14, S34). The report refuted no finding.
 - **consumes-from** `TOOL-dDeclaredLoop-85` — `run_merge_tree_usage`, the memoised resolver, the probe detail, S2's predicate, the probe plants, AC2, AC5 and Files touched (ids 4, 10, 18, 19, 23, 25, 26, 27, 30, 31, 32)
 - **consumes-from** `TOOL-dDeclaredLoop-86` — S2's narrowing, S8, S21, S22, the conf-constant sketch, §4 Files touched, §10, AC9, AC10, AC12, AC16 and AC18, and the `failed` plants of S6 and S22 (ids 5, 7, 8, 9, 11, 13, 14, 16, 17, 22, 24, 28, 30, 34, 35, 36, 37)
 - **consumes-from** `TOOL-dDeclaredLoop-87` — `derive_conf_constants` as the class S1 states, which S13 re-implements as the module-level slice of the lifted walk, AC2's answer unchanged (id 17)
+- **consumes-from** `TOOL-dDeclaredLoop-89` — `derive_conf_rebinds`, which S13's `derive_conf_constants` unites with its rule-2 slice where this unit builds after 89 (the round-8 spec audit's id 19)
+- **hands-off** `TOOL-dDeclaredLoop-90` — S2, S13, S24, S33, the lifted-walk sketch, §4 Evidence and Write set, and AC1, AC2, AC6, AC9, AC12, AC13, AC16 and AC22, which that unit restates, with `derive_constant_charges`, `build_failure_detail` and the `tree_lib` route this unit mints (the round-8 spec audit's ids 2, 3, 5, 6, 7, 11, 13, 15, 16, 21, 22, 25, 26)
 
 ## 4. Design
 
@@ -528,6 +531,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC13 · the four charge-
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-7 spec audit's 36 minors batched (19 MEDIUM, 17 LOW).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-89 and TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

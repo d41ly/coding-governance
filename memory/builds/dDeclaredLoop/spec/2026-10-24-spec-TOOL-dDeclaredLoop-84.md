@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-84 — the specs that restate the clean re-merge's non-zero exits read 81's exit table: 78's states and 82's S27 restatement
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -66,6 +66,7 @@ definitions and 82's criterion standing.
 - **consumes-from** `TOOL-dDeclaredLoop-78` — S1's three states, S2's parent-branch sentence and §4's grade block, built at order 19, which this unit restates to 81's table
 - **hands-off** `TOOL-dDeclaredLoop-82` — S4 and AC4, amended to keep S27's exit table and to grep 75 for the retired fallback, which that unit builds at order 41
 - **hands-off** `TOOL-dDeclaredLoop-88` — the restatement of 78's grade, whose dispatch that unit completes, and Files touched (the round-7 spec audit's ids 2, 20, 27)
+- **hands-off** `TOOL-dDeclaredLoop-90` — the edge to 78 that counts C's states, which that unit restates to five (the round-8 spec audit's id 26)
 
 ## 4. Design
 
@@ -154,6 +155,8 @@ This pass writes two specs and no code, so no loop leg is tripped.
   with id 1).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

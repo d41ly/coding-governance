@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-78 — the clean re-merge has three states, and a re-merge that lacks the policy file is graded, never treated as none
 
-**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-5 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 19 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -68,6 +68,7 @@ This unit gives C three named states and grades two of them on the C branch. It 
 - **hands-off** `TOOL-dDeclaredLoop-84` — S1's `uncomputable`, S2's parent-branch sentence and §4's grade block, which that unit restates to 81's exit table (the round-6 spec audit's id 7)
 - **hands-off** `TOOL-dDeclaredLoop-86` — S3's parse refusal at a parent, which that unit widens to every branch that reads the parents (the round-6 spec audit's id 3)
 - **hands-off** `TOOL-dDeclaredLoop-88` — S1's state count and §4's grade block, which that unit restates to five states, a five-way dispatch and a failed-probe line (the round-7 spec audit's ids 2, 5, 20)
+- **hands-off** `TOOL-dDeclaredLoop-90` — the H1, S1 and hands-off edge that count C's states, which that unit restates to five (the round-8 spec audit's id 26)
 
 ## 4. Design
 
@@ -165,6 +166,8 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 AC4 · the resurrect, both-ab
   TOOL-dDeclaredLoop-84 and TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 - rev-4 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
+- rev-5 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

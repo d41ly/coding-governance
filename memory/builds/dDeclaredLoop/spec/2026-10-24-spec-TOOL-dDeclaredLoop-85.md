@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-85 — the write-tree capability probe has three answers, and only a probed absence takes the parent exemption
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -74,6 +74,7 @@ corrected fix. It builds immediately after 81 and repairs `TOOL-dDeclaredLoop-81
 - **consumes-from** `TOOL-dDeclaredLoop-81` — `resolve_write_tree_support`, `check_write_tree_usage`, S4's in-process plant hook and S2's `failed` state, in `tools/loop/guard.py`, which this unit gives a third answer and a route to `failed`
 - **hands-off** `TOOL-dDeclaredLoop-86` — S2's predicate, whose `supported` and `unsupported` that unit narrows to exit 0 or 129 with a usage line (id 9)
 - **hands-off** `TOOL-dDeclaredLoop-88` — `run_merge_tree_usage`, the memoised resolver, the probe detail, S2's predicate, the probe plants, AC2, AC5 and Files touched, which that unit keys, pins, unifies, narrows, extends and widens (the round-7 spec audit's ids 4, 10, 18, 19, 23, 25, 26, 27, 30, 31, 32)
+- **hands-off** `TOOL-dDeclaredLoop-90` — S1 and S3, which that unit completes with `LC_ALL=C` and the probe-keyed memo (the round-8 spec audit's id 5)
 
 ## 4. Design
 
@@ -184,6 +185,8 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 · the probe-failed, probe-si
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-6 spec audit's id 24 (HIGH, item H2).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -282,3 +282,9 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T17:12:47Z rescope · item add TOOL-dDeclaredLoop-88 · reason spec-audit round 7 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-83-spec-audit.md) the 36 confirmed minors batched into one unit: 19 MEDIUM, ids 1 2 3 4 5 7 8 11 16 17 20 21 23 25 30 31 32 33 34 (items M1 to M16), and 17 LOW, ids 6 9 10 12 13 14 15 18 19 22 24 26 27 28 35 36 37 (items L1 to L11); repairs no unit in particular
 
 2026-10-24T17:28:15Z review · item dDeclaredLoop-spec-set-r7 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 36 · disposition promote
+
+2026-10-24T17:57:23Z rescope · item add TOOL-dDeclaredLoop-89 · reason spec-audit round 8 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md) id 19 HIGH, item H1: spec 87's conf-constant class leaves out a module name a function binds under global and module-level walrus, for and with targets, so a module reading ll.CONF set by a global loader is certified as reading no conf of its own; repairs TOOL-dDeclaredLoop-87
+
+2026-10-24T17:57:23Z rescope · item add TOOL-dDeclaredLoop-90 · reason spec-audit round 8 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-87-spec-audit.md) the 22 confirmed minors batched into one unit: 13 MEDIUM, ids 1 2 3 5 9 10 15 16 17 18 20 21 22 (items M1 to M7), and 9 LOW, ids 4 6 7 8 11 13 24 25 26 (items L1 to L9); repairs no unit in particular
+
+2026-10-24T18:10:17Z review · item dDeclaredLoop-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 22 · disposition promote

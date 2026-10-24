@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-83 — 75 S27 states 81's exit table, so no merge-tree exit but 0 and 1 falls to the parents
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 21 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -60,6 +60,7 @@ left S27's fallback standing.
 - **consumes-from** `TOOL-dDeclaredLoop-81` — the exit table of S2 and S3, every exit other than 0 and 1 the `failed` state, which S1 writes into 75 S27
 - **hands-off** `TOOL-dDeclaredLoop-75` — S27's fallback clause restated to 81's exit table and AC27 re-observing `push-merge-tree-fatal`, which that unit builds at order 39
 - **hands-off** `TOOL-dDeclaredLoop-88` — S1's parent rows, §4's S27 table, its Evidence pins and Files touched, which that unit completes, re-anchors and widens (the round-7 spec audit's ids 1, 15, 27)
+- **hands-off** `TOOL-dDeclaredLoop-90` — S1, which that unit reads for the policy path, and §3's state count, which it restates to five (the round-8 spec audit's ids 5, 26)
 
 ## 4. Design
 
@@ -153,6 +154,8 @@ This pass writes one spec and no code. 75's own pass keeps the sibling-minted `l
   with id 7).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
   TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullet mirroring the edge of
+  TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

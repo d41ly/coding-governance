@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -173,6 +173,8 @@ and 26, are not in the disposal population.
 - **hands-off** `TOOL-dDeclaredLoop-86` — S1's conf-constant kind, S6's pass-commit probe, S8, S14, AC1, AC5, AC6, AC21, AC22, §4, §5, §7 and §10, and the `conf-read-forms` and `url-forms` plants, which that unit restates, keys, floors, re-pins and hardens (the round-6 spec audit's ids 5, 10, 13, 14, 16, 19, 21, 23, 25, 26, 27, 28)
 - **hands-off** `TOOL-dDeclaredLoop-87` — S1's conf-constant kind, which that unit restates from a string constant to any value whose syntax subtree holds a conf name, an aliased from-import reaching it through S10's `derive_import_aliases` (the round-7 spec audit's id 29)
 - **hands-off** `TOOL-dDeclaredLoop-88` — S6's pass-commit probe, S8's docstring set, AC4, AC5, §5 and §10, which that unit routes through `read_profile_legs`, reads from the lifted charge walk, gives a class-level half, floors and checks (the round-7 spec audit's ids 8, 9, 16, 17, 33)
+- **hands-off** `TOOL-dDeclaredLoop-89` — S1's conf-constant kind, which that unit extends to `derive_conf_rebinds`' names, and S8's `derive_docstring_ids`, which its pass reads (the round-8 spec audit's id 19)
+- **hands-off** `TOOL-dDeclaredLoop-90` — S1's conf-constant kind and the conf-read sketch, which that unit restates to the names `derive_conf_constants` answers, and §10, which it completes with `read_profile_legs` (the round-8 spec audit's ids 5, 17)
 
 ## 4. Design
 
@@ -404,6 +406,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the glob-reader a
   TOOL-dDeclaredLoop-84 and TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-87 and TOOL-dDeclaredLoop-88, written by the round-7 spec audit's disposal; nothing else moved.
+- rev-4 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-89 and TOOL-dDeclaredLoop-90, written by the round-8 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
