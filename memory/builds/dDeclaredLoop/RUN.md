@@ -266,3 +266,13 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T15:57:14Z rescope · item add TOOL-dDeclaredLoop-82 · reason spec-audit round 5 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-76-spec-audit.md) the 23 confirmed minors batched into one unit: 10 MEDIUM, ids 1 3 4 5 6 11 13 17 29 30 (items M1 to M9), and 13 LOW, ids 2 7 8 9 10 12 15 16 18 19 22 24 27 (items L1 to L13); repairs no unit in particular
 
 2026-10-24T16:10:21Z review · item dDeclaredLoop-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 23 · disposition promote
+
+2026-10-24T16:36:04Z rescope · item add TOOL-dDeclaredLoop-83 · reason spec-audit round 6 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) id 1 HIGH, item H1 shared with id 7: spec 75 S27 still sends every merge-tree exit other than 0 and 1 to the parents alone, contradicting the exit table of spec 81; repairs TOOL-dDeclaredLoop-81
+
+2026-10-24T16:36:12Z rescope · item add TOOL-dDeclaredLoop-84 · reason spec-audit round 6 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) id 7 HIGH, item H1 shared with id 1: no unit removes the parents-alone fallback from the specs that restate it, spec 78 S1 and its grade and spec 82 S4 and AC4; repairs TOOL-dDeclaredLoop-81
+
+2026-10-24T16:36:13Z rescope · item add TOOL-dDeclaredLoop-85 · reason spec-audit round 6 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) id 24 HIGH, item H2: the write-tree capability probe of spec 81 has no failed answer, so a probe that cannot run reads as the feature absent and takes the parent exemption; repairs TOOL-dDeclaredLoop-81
+
+2026-10-24T16:36:13Z rescope · item add TOOL-dDeclaredLoop-86 · reason spec-audit round 6 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) the 22 confirmed minors batched into one unit: 13 MEDIUM, ids 3 4 9 11 14 15 17 18 23 25 26 27 28 (items M1 to M12), and 9 LOW, ids 5 6 10 12 13 16 19 21 29 (items L1 to L9); repairs no unit in particular
+
+2026-10-24T16:48:18Z review · item dDeclaredLoop-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 22 · disposition promote

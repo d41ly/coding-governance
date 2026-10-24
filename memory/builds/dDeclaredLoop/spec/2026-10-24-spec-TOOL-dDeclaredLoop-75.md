@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched
 
-**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-4 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -211,6 +211,7 @@ are not in the disposal population.
 - **consumes-from** `TOOL-dDeclaredLoop-78` — the clean re-merge's three states, which S27 widens to a merge-tree exit 1 whose conflicts miss the policy path, a computable C that does not parse refusing by name (the round-4 spec audit's id 33)
 - **consumes-from** `TOOL-dDeclaredLoop-80` — the fixture boundary, inside which S6's `unset-driver-root` plant writes both confs, so this pass's re-run of the `no-own-conf-read` plant exits 0 (the round-5 spec audit's id 20)
 - **consumes-from** `TOOL-dDeclaredLoop-81` — the clean re-merge's exit table: S27 grades exit 1, and every other exit is the failed state, refused untrailered and never a fall to the parents (the round-5 spec audit's id 28)
+- **consumes-from** `TOOL-dDeclaredLoop-83` — S27's fallback clause, restated to 81's exit table, and AC27's re-observation of `push-merge-tree-fatal`, which that unit writes before this pass (the round-6 spec audit's id 1)
 - **hands-off** `TOOL-dDeclaredLoop-79` — the pass-commit probe, S21's guards, S23's copies, S24's ask row, S25's protocol sentence and S29's key list, which that unit extends, mirrors in the descriptor, refreshes, re-observes, funds and pins (ids 3, 5, 9, 13, 18, 20, 21, 26, 28)
 - **hands-off** `TOOL-dDeclaredLoop-82` — S27's exit-1 body, which that unit restates as present, absent or refused with its deleted-policy plant, and the share of `tools/loop/position.py` at step 39 (the round-5 spec audit's ids 4, 9)
 
@@ -459,6 +460,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC31 · the directory-in
   TOOL-dDeclaredLoop-76 and TOOL-dDeclaredLoop-78 and TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-80 and TOOL-dDeclaredLoop-81 and TOOL-dDeclaredLoop-82, written by the round-5 spec audit's disposal; nothing else moved.
+- rev-4 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-83, written by the round-6 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

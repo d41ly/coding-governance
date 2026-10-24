@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-66 — the build-order region derives `Parallel` from the group's write sets and edges, never from a shared order alone
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -63,6 +63,7 @@ unit repairs none in particular and builds after every unit (order 38).
 
 none
 - **hands-off** `TOOL-dDeclaredLoop-75` — the ask citation, the symmetric predicate and the re-render population (the round-3 spec audit's ids 18, 34)
+- **hands-off** `TOOL-dDeclaredLoop-86` — `render_order`'s Parallel cell, which that unit observes at step 38 (the round-6 spec audit's id 10)
 
 ## 4. Design
 
@@ -151,6 +152,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC1 AC2 · the shared-pa
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 1 (HIGH, item H1).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

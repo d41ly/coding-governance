@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-80 — the no-own-conf-read rule stops at a named fixture boundary, so the plants that write the confs are outside its population
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-80-deviation-801.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-80-deviation-801.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,7 @@ immediately after 76 and repairs `TOOL-dDeclaredLoop-76`.
 - **hands-off** `TOOL-dDeclaredLoop-75` — the fixture boundary, inside which S6's `unset-driver-root` plant writes both confs, so that pass's re-run of the `no-own-conf-read` plant exits 0
 - **hands-off** `TOOL-dDeclaredLoop-79` — the fixture boundary, inside which the `trailing-slash-agree` and `no-confs` plants write their confs
 - **hands-off** `TOOL-dDeclaredLoop-82` — the fixture boundary, outside which that unit counts a conf-name constant read through a name or an attribute (ids 1, 11)
+- **hands-off** `TOOL-dDeclaredLoop-86` — S4's plant population, §4 Files touched and AC4, which that unit widens to every later plant, records 67's shared write in, and splits into one grep per plant (the round-6 spec audit's ids 4, 6, 25)
 
 ## 4. Design
 
@@ -184,6 +186,8 @@ New arm: tools/loop/breakpoints.py · covers AC1 · the no-own-conf-read plant o
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-5 spec audit's id 20 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

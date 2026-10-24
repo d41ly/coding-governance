@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-82 — the round-5 spec audit's 23 minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 41 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-24-build-TOOL-dDeclaredLoop-82-deviation-821.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-82-deviation-821.md) | deviation | — |
+| [2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-80-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-80 |
 
 <!-- /gen:spec-records -->
 
@@ -168,6 +169,8 @@ and 26, are not in the disposal population.
 - **consumes-from** `TOOL-dDeclaredLoop-79` — S10's probe, S17's trim, S18's population, the `sed-fails` plant and AC11 (ids 5, 6, 13, 19, 22, 24)
 - **consumes-from** `TOOL-dDeclaredLoop-80` — the fixture boundary, outside which S1 counts a conf constant read by name (ids 1, 11)
 - **consumes-from** `TOOL-dDeclaredLoop-81` — the clean re-merge's exit table, beside which S4 restates S27's exit-1 body (id 4)
+- **consumes-from** `TOOL-dDeclaredLoop-84` — S4 and AC4, amended before this pass to keep 75 S27's exit table and to grep 75 for the retired fallback (the round-6 spec audit's id 7)
+- **hands-off** `TOOL-dDeclaredLoop-86` — S1's conf-constant kind, S6's pass-commit probe, S8, S14, AC1, AC5, AC6, AC21, AC22, §4, §5, §7 and §10, and the `conf-read-forms` and `url-forms` plants, which that unit restates, keys, floors, re-pins and hardens (the round-6 spec audit's ids 5, 10, 13, 14, 16, 19, 21, 23, 25, 26, 27, 28)
 
 ## 4. Design
 
@@ -395,6 +398,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC8 · the glob-reader a
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-5 spec audit's 23 minors batched (10 MEDIUM, 13 LOW).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-84 and TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

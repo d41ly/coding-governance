@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-59 — a merge owes a policy trailer only for a key its result sets that no parent and no clean re-merge set
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 17 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -62,6 +62,7 @@ fix. It repairs `TOOL-dDeclaredLoop-44`.
 - **hands-off** `TOOL-dDeclaredLoop-67` — the merge key grade, which that unit's first-push walk applies to each merge it finds (the round-2 spec audit's id 61)
 - **hands-off** `TOOL-dDeclaredLoop-69` — the grade's computable branch, which that unit compares against the clean re-merge alone (the round-3 spec audit's id 2)
 - **hands-off** `TOOL-dDeclaredLoop-75` — the clean leg on a merge-tree exit 1 (the round-3 spec audit's id 41); this pass keeps the `loop guard fixtures` leg green (id 31)
+- **hands-off** `TOOL-dDeclaredLoop-86` — S3's missing-feature sentence, which that unit restates to 81 S1's usage probe (the round-6 spec audit's id 15)
 
 ## 4. Design
 
@@ -144,6 +145,8 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 AC4 · the four merge plants,
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's id 17 (HIGH, item H2).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-69 and TOOL-dDeclaredLoop-75, written by the round-3 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

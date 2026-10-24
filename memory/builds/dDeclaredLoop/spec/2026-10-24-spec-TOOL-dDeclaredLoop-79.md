@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-79 — the round-4 spec audit's 28 minors, batched
 
-**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 40 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 40 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -178,6 +178,7 @@ and 31, are not in the disposal population.
 - **consumes-from** `TOOL-dDeclaredLoop-78` — the `absent` state, which the pre-filter counts as a value (ids 7, 12)
 - **consumes-from** `TOOL-dDeclaredLoop-80` — the fixture boundary, inside which the `trailing-slash-agree`, `unset-driver-root` and `no-confs` plants write their confs (the round-5 spec audit's id 20)
 - **hands-off** `TOOL-dDeclaredLoop-82` — S10's probe, S17's trim, S18's population, the `sed-fails` plant and AC11, which that unit re-observes with an absent-leg line, bounds by the parsed anchors, widens to `loop selftest`, sets inside the bash and observes through the checker (the round-5 spec audit's ids 5, 6, 13, 19, 22, 24)
+- **hands-off** `TOOL-dDeclaredLoop-86` — S10's probe and AC10, which that unit re-observes at 80's pass commit for the `no-own-conf-read` plant (the round-6 spec audit's id 17)
 
 ## 4. Design
 
@@ -411,6 +412,8 @@ New arm: tools/govkit/selftest.py · covers AC15 AC19 · the reverse-vintage and
 - rev-1 · 2026-10-24 · initial draft, the round-4 spec audit's 28 minors batched (21 MEDIUM, 7 LOW).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-80 and TOOL-dDeclaredLoop-82, written by the round-5 spec audit's disposal; nothing else moved.
+- rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-86, written by the round-6 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
