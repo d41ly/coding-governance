@@ -13,6 +13,7 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-61-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-61-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-61-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-61-build-brief.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-61-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-61-task.md) | research | TOOL-dGroundRules-62 TOOL-dGroundRules-63 |
+| [2026-10-24-prompt-TOOL-dGroundRules-55-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-55-staleness-probe-brief.md) | research | TOOL-dGroundRules-55 TOOL-dGroundRules-62 TOOL-dGroundRules-64 |
 
 <!-- /gen:spec-records -->
 

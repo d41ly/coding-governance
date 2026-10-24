@@ -12,6 +12,8 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-task.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-56 TOOL-dGroundRules-57 |
 | [2026-10-23-prompt-TOOL-dGroundRules-55-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-55-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-55-1-spec-reviewer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-55-1-spec-reviewer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-55-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-55-staleness-probe-brief.md) | research | TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-64 |
 
 <!-- /gen:spec-records -->
 

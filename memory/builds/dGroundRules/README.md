@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 308 bound to this build, across 4 record folder(s).
+Records: 316 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
