@@ -5103,6 +5103,11 @@
       "file": "tools/check-wiring.sh"
     },
     {
+      "id": "check_receipt_prefix",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_receipt_vintage",
       "kind": "function",
       "file": "tools/memory-tree/check-verdict-epoch.sh"

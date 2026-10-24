@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-43 — the round-1 audit of units 33 and 34, its minors: fifteen findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-5 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-43-deviation-31.md](../build/2026-10-23-build-TOOL-dGroundRules-43-deviation-31.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-43-deviation-65.md](../build/2026-10-23-build-TOOL-dGroundRules-43-deviation-65.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-43-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-43-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-43-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-43-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-43-1-spec-reviewer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-43-1-spec-reviewer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-43-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-43-2-spec-writer.md) | journal | — |

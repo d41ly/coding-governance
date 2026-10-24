@@ -672,10 +672,18 @@ def derive_census_tree(repo):
     kits, prefix = receipt.get("kits"), receipt.get("prefix")
     if not isinstance(kits, list) or not all(isinstance(k, str) for k in kits):
         return "invalid", "kits"
-    if not isinstance(prefix, str) or prefix.startswith(("/", "\\")) or re.match(r"[A-Za-z]:", prefix) \
-            or ".." in re.split(r"[/\\]", prefix):
+    if not check_receipt_prefix(prefix):
         return "invalid", "prefix"
     return "adopter", receipt
+
+
+def check_receipt_prefix(value):
+    """True where a receipt's `prefix` is a relative string: it opens with neither `/` nor a backslash,
+    carries no drive letter and holds no `..` segment split on either separator (TOOL-dGroundRules-43
+    S14). Stricter than the deployer's `demand_contained_dest` on purpose (TOOL-dGroundRules-34 S21):
+    that one normalises first and admits `a/..`, this one refuses every `..` segment."""
+    return (isinstance(value, str) and not value.startswith(("/", "\\")) and not re.match(r"[A-Za-z]:", value)
+            and ".." not in re.split(r"[/\\]", value))
 
 
 def arm_cap_census(repo, kit):
@@ -996,7 +1004,8 @@ def build_source_snapshot(source_root):
     GIT_DIR set to the clone every new object lands in the clone's store, never the source's. `add -A`
     runs over a copy of the source's index with the source as work tree, and with the source's
     exclude file copied into the clone's (TOOL-dGroundRules-34 S1, S3), so the `.gitignore` files, that
-    exclude file and the user's `core.excludesFile` decide what counts, the rules `git status` in the
+    exclude file and the `core.excludesFile` the source reads, passed as `-c` (TOOL-dGroundRules-43
+    S10), decide what counts, the rules `git status` in the
     source reads, and a file whose stat matches is not re-hashed. Every `--git-path` is absolute (S28),
     never resolved against the caller's working directory. A gitlink the source's index does not
     carry, a nested repository no ignore rule covers, is refused naming it and the exclude file (S4).
@@ -1029,7 +1038,10 @@ def build_source_snapshot(source_root):
             (s / ".git" / "info").mkdir(exist_ok=True)
             shutil.copyfile(ex, s / ".git" / "info" / "exclude")
         env = {"GIT_DIR": (s / ".git").as_posix(), "GIT_WORK_TREE": source.as_posix(), "GIT_INDEX_FILE": index.as_posix()}
-        run("add", "add", "-A", cwd=source, **env)
+        # TOOL-dGroundRules-43 S10: the source's effective core.excludesFile, every scope it sees, its
+        # worktree configuration included; the clone's GIT_DIR alone would read the global one only
+        xf = (policy.run_git(source, "config", "--type=path", "--get", "core.excludesFile") or "").strip()
+        run("add", *(("-c", f"core.excludesFile={xf}") if xf else ()), "add", "-A", cwd=source, **env)
         tree = run("write-tree", "write-tree", **env)
         commit = run("commit-tree", "commit-tree", tree, "-p", "HEAD", "-m", "the working tree under test", **env)
         run("checkout", "-C", s.as_posix(), "checkout", "--quiet", "--detach", commit)
@@ -1078,15 +1090,17 @@ def derive_requires_closure(ids):
 
 
 def resolve_govkit(root):
-    """The deployer under `root` (TOOL-dGroundRules-34 S7, S8): `<root>/<tool root>/govkit/govkit.py`,
-    the tool root this kit's own, as `budgets.derive_tool_root` resolves it (TOOL-dGroundRules-24 S4).
+    """The deployer under `root` (TOOL-dGroundRules-34 S7, S8), located by `resolve_kit_dir`, home
+    `govkit`, anchor `govkit.py`, from `<root>/<tool root>/policy`, the tool root this kit's own, as
+    `budgets.derive_tool_root` resolves it (TOOL-dGroundRules-24 S4, TOOL-dGroundRules-43 S15).
     The one line of this file spelling the deployer's file name: every deployer run and the in-process
-    load of `budgets-ships-join` take the path from here. -> Path; RuntimeError naming where it looked
-    when no file is there, so a missing deployer is one named WRONG wherever it is asked for."""
-    path = Path(root) / budgets.derive_tool_root() / "govkit" / "govkit.py"
-    if not path.is_file():
-        raise RuntimeError(f"no deployer to install with: looked at {path.as_posix()}")
-    return path
+    load of `budgets-ships-join` take the path from here. -> Path; RuntimeError carrying the locator's
+    LookupError text whole, the three places looked, so a missing deployer is one named WRONG wherever
+    it is asked for."""
+    try:  # TOOL-dGroundRules-43 S15: the kit's one locator, its refusal raised as the RuntimeError callers catch
+        return resolve_kit_dir("govkit", "govkit.py", Path(root) / budgets.derive_tool_root() / "policy") / "govkit.py"
+    except LookupError as exc:
+        raise RuntimeError(str(exc)) from None
 
 
 def read_deploy_answers(source_root):
@@ -3898,7 +3912,8 @@ def read_source_git_dirs(top):
 
 def add_source_read(event, args):
     """The audit hook `--fixture` installs before its first case (TOOL-dGroundRules-33 S2): an `open`
-    event whose mode reads and writes nothing, on a path that resolves, against the working directory,
+    event whose mode reads and writes nothing, a None mode read by its flags, which carry none of
+    `O_WRONLY`, `O_RDWR` or `O_CREAT` (TOOL-dGroundRules-43 S9), on a path that resolves, against the working directory,
     under the source repository's top level, under no case's temporary directory and under neither of
     the source's git directories (TOOL-dGroundRules-38 S2: the snapshot's index and exclude-file copies
     are git's reads, never a source file's), is kept in SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's.
@@ -3909,8 +3924,13 @@ def add_source_read(event, args):
     if event != "open" or not TRACE_ROOTS:
         return
     try:
-        path, mode = args[0], args[1] or "r"
-        if isinstance(path, int) or any(c in mode for c in "wax+"):
+        path, mode, flags = args[0], args[1], args[2]
+        if isinstance(path, int):
+            return
+        if mode is None:  # TOOL-dGroundRules-43 S9: `os.open` carries its intent in the flags alone
+            if flags & (os.O_WRONLY | os.O_RDWR | os.O_CREAT):
+                return
+        elif not isinstance(mode, str) or any(c in mode for c in "wax+"):
             return
         p = os.fsdecode(path)
         if os.path.basename(os.path.dirname(p)) == "__pycache__" and re.search(r"\.pyc(\.\d+)?$", p):
@@ -3929,7 +3949,8 @@ def add_source_read(event, args):
 
 
 def check_guard_trace():
-    """The guard trace's join (TOOL-dGroundRules-33 S3): every path `add_source_read` kept that git does
+    """The guard trace's join (TOOL-dGroundRules-33 S3): every path `add_source_read` kept that exists
+    under the source top when this runs (TOOL-dGroundRules-43 S9, the rest counted as absent) and git does
     not ignore (`derive_guardable_reads`, TOOL-dGroundRules-36), piped to the spec-token checker's
     `--legs-for -` through `read_legs_for`, gov's one trip rule, and a WRONG naming each path that trips
     no `policy fixtures` guard: an edit to it alone would skip the leg whose cases read it. The count
@@ -3939,6 +3960,11 @@ def check_guard_trace():
     kept = sorted(SOURCE_READS)
     print(f"policy-fixture: guard-trace · {len(kept)} source read(s)")
     top = derive_source_top()
+    # TOOL-dGroundRules-43 S9: a read of a path absent now, a failed probe or a file since removed,
+    # is no source file a guard could cover, so it is counted and set aside, never joined
+    present = [p for p in kept if (top / p).exists()]
+    print(f"policy-fixture: guard-trace · {len(kept) - len(present)} absent read(s) set aside")
+    kept = present
     try:
         kept, n = derive_guardable_reads(kept, top)
     except RuntimeError as exc:
