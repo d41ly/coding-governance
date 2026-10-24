@@ -18,6 +18,7 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-1-departures-spec.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-departures-spec.md) | journal | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-1-deviation-11.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-deviation-11.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-1-deviation-12.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-deviation-12.md) | deviation | — |
+| [2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md](../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md) | research | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-1-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-2-reuse-scout.md) | journal | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-3-reuse-scout.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-3-reuse-scout.md) | journal | — |
