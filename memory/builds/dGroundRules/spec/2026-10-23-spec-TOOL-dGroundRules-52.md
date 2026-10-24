@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each
 
-**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-52-deviation-40.md](../build/2026-10-23-build-TOOL-dGroundRules-52-deviation-40.md) | deviation | — |
+| [2026-10-24-build-TOOL-dGroundRules-52-ledger.md](../build/2026-10-24-build-TOOL-dGroundRules-52-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-52-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-52-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-51-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-51-staleness-probe-brief.md) | research | TOOL-dGroundRules-51 |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-1-spec-writer.md) | journal | — |

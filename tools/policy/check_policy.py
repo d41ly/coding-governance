@@ -3898,6 +3898,7 @@ def run_fixtures_guard_census(name):
 
 
 SOURCE_READS = set()  # what `add_source_read` kept: source files this process opened to read, top-relative
+UNMAPPED_READS = set()  # the SOURCE_READS kept as spelled because `source_from_cache` refused their cache name
 TRACE_ROOTS = []  # [the source top, the case temporary root or None, the source's git directories], set where `--fixture` installs the hook
 
 
@@ -3921,9 +3922,9 @@ def add_source_read(event, args):
     the source's git directories (TOOL-dGroundRules-38 S2: the snapshot's index and exclude-file copies
     are git's reads, never a source file's), is kept in SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's.
     A hook that raised would fail the very open it audits, so a path that does not resolve keeps nothing.
-    A bytecode-cache read, or importlib's `.pyc.<digits>` atomic-write temporary, is kept as the source
-    file it was compiled from (TOOL-dGroundRules-35 S1), so a warm load still records its `.py`; a cache
-    name `source_from_cache` refuses is kept as spelled, so the join names it."""
+    A bytecode-cache read is kept as the source file it was compiled from (TOOL-dGroundRules-35 S1), so
+    a warm load still records its `.py`; a cache name `source_from_cache` refuses is kept as spelled,
+    and in UNMAPPED_READS too, so the trace names it (TOOL-dGroundRules-52 S25)."""
     if event != "open" or not TRACE_ROOTS:
         return
     try:
@@ -3936,17 +3937,23 @@ def add_source_read(event, args):
         elif not isinstance(mode, str) or any(c in mode for c in "wax+"):
             return
         p = os.fsdecode(path)
-        if os.path.basename(os.path.dirname(p)) == "__pycache__" and re.search(r"\.pyc(\.\d+)?$", p):
-            p = re.sub(r"(\.pyc)\.\d+$", r"\1", p)
-            with contextlib.suppress(ValueError):
+        refused = False
+        # TOOL-dGroundRules-52 S20: no `.pyc.<digits>` cut, since S9's flag filter above drops importlib's temporary write
+        if os.path.basename(os.path.dirname(p)) == "__pycache__" and p.endswith(".pyc"):
+            try:
                 p = importlib.util.source_from_cache(p)
+            except ValueError:
+                refused = True
         p = os.path.realpath(p)
         top, tmp, git_dirs = TRACE_ROOTS
         n = os.path.normcase(p)
         if any(n.startswith(os.path.normcase(d) + os.sep) for d in git_dirs):
             return
         if n.startswith(os.path.normcase(top) + os.sep) and not (tmp and n.startswith(os.path.normcase(tmp) + os.sep)):
-            SOURCE_READS.add(os.path.relpath(p, top).replace(os.sep, "/"))
+            rel = os.path.relpath(p, top).replace(os.sep, "/")
+            SOURCE_READS.add(rel)
+            if refused:  # TOOL-dGroundRules-52 S25: named by the trace, never only counted by a set-aside
+                UNMAPPED_READS.add(rel)
     except Exception:  # noqa: BLE001 - the hook must never fail an open
         return
 
@@ -3962,6 +3969,8 @@ def check_guard_trace():
     judge, proves nothing. -> (assertions, wrong)."""
     kept = sorted(SOURCE_READS)
     print(f"policy-fixture: guard-trace · {len(kept)} source read(s)")
+    for p in sorted(UNMAPPED_READS):  # TOOL-dGroundRules-52 S25, before any set-aside can hide it
+        print(f"policy-fixture: guard-trace · unmapped cache read {p}")
     top = derive_source_top()
     # TOOL-dGroundRules-43 S9: a read of a path absent now, a failed probe or a file since removed,
     # is no source file a guard could cover, so it is counted and set aside, never joined
@@ -3994,19 +4003,21 @@ def derive_guardable_reads(kept, top):
     at `top`, so `.gitignore`, the exclude file and `core.excludesFile` decide and no pattern is spelled
     here. A path git ignores never reaches the runner's diff, so no guard can trip on it. Exit 1 means
     none is ignored; a git that does not start, or any other exit, is a RuntimeError naming
-    check-ignore, never "nothing ignored". -> (guardable, the count set aside)."""
+    check-ignore, never "nothing ignored". Paths go in and come out NUL-terminated under `-z`, through
+    `os.fsencode` and `os.fsdecode`, so git never C-quotes one and no path is refused by a narrower
+    encoding (TOOL-dGroundRules-52 S6, S14). -> (guardable, the count of kept paths set aside)."""
     env = {k: v for k, v in os.environ.items() if k not in policy.GIT_ENV_LEAKS}
     try:
         # bytes in: a text-mode pipe on Windows writes `\r\n`, and git reads `p\r` as a path no rule matches
-        p = subprocess.run(["git", "-C", str(top), "check-ignore", "--stdin"], input="\n".join(kept).encode("utf-8"),
-                           env=env, capture_output=True)
+        p = subprocess.run(["git", "-C", str(top), "check-ignore", "--stdin", "-z"],
+                           input=b"".join(os.fsencode(k) + b"\0" for k in kept), env=env, capture_output=True)
     except OSError as exc:
         raise RuntimeError(f"git check-ignore did not run: {exc}") from None
     if p.returncode not in (0, 1):
         said = render_said((p.stdout + p.stderr).decode("utf-8", "replace"), "fatal")
         raise RuntimeError(f"git check-ignore exited {p.returncode}: {said}")
-    ignored = set(p.stdout.decode("utf-8", "replace").replace("\r", "").split("\n")) - {""}
-    return [k for k in kept if k not in ignored], len(ignored)
+    ignored = {os.fsdecode(b) for b in p.stdout.split(b"\0") if b}
+    return [k for k in kept if k not in ignored], sum(k in ignored for k in kept)
 
 
 def check_guard_lines():
@@ -4359,6 +4370,9 @@ def remove_repo(repo):
 def run_fixture(only=None):
     for var in ("GIT_DIR", "GIT_WORK_TREE", "GIT_INDEX_FILE", "GOV_REMOTE", "GOV_DEFAULT_BRANCH"):
         os.environ.pop(var, None)  # the fixture's own repository and remote, whatever the caller exported
+    if sys.pycache_prefix is not None:  # TOOL-dGroundRules-52 S15: a prefixed cache read has no `__pycache__` parent to map
+        print("policy-fixture: guard-trace · WRONG sys.pycache_prefix is set")
+        return 1
     rows = policy.load_catalogue(KIT)
     cases = [c for c in derive_cases(rows) if only in (None, c[0])]
     if not cases:
