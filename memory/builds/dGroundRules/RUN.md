@@ -281,3 +281,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T15:30:45Z brief · item TOOL-dGroundRules-40 · reason 5682fff7bef6 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-40-build-brief.md
 
 2026-10-24T15:32:07Z dispatch · item 9bcca652 TOOL-dGroundRules-40 · reason tools/check-spec-tokens.test.sh memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-40.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-40-ledger.md
+
+2026-10-24T15:42:28Z brief · item TOOL-dGroundRules-41 · reason 04d3211a6363 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-41-build-brief.md
+
+2026-10-24T15:44:13Z dispatch · item e1c7051c TOOL-dGroundRules-41 · reason tools/policy/check_policy.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-41.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-41-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md
+
+2026-10-24T15:49:52Z dispatch · item e1c7051c TOOL-dGroundRules-41 · reason tools/policy/check_policy.py tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-41.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-41-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md

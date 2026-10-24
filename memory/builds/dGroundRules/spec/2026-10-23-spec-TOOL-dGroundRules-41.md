@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-41 — the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 13 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-41-deviation-29.md](../build/2026-10-23-build-TOOL-dGroundRules-41-deviation-29.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-41-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-41-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-41-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-41-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-39-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-39-staleness-probe-brief.md) | research | TOOL-dGroundRules-39 TOOL-dGroundRules-40 |
 | [2026-10-24-prompt-TOOL-dGroundRules-41-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-41-2-spec-writer.md) | journal | — |

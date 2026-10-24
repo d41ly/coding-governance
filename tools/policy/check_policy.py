@@ -1320,6 +1320,32 @@ def run_fresh_target(name):
                 if rc or not deferred or mirrored:
                     wrong.append(f"the install-day --scaffold exited {rc}, printed {'' if deferred else 'no '}`mirror "
                                  f"deferred` and left {'a' if mirrored else 'no'} {policy.MIRROR_REL}: {out.strip()}")
+                # TOOL-dGroundRules-41 S1: the help page's `## Install` section restates the printed deferral
+                # line; one of its lines must hold the line's halves either side of the input name, in order.
+                printed = next((ln.strip() for ln in out.replace("\r", "").split("\n")
+                                if ln.strip().startswith("adopt-policy: mirror deferred")), None)
+                if printed is not None:
+                    asserted += 1
+                    head, _sep, rest = printed.partition(" · ")
+                    head += _sep
+                    tail = rest[len(rest.split(" ", 1)[0]):]  # ponytail: an input name holds no space
+                    try:
+                        page = (derive_source_top() / "help" / "policy.md").read_text(encoding="utf-8")
+                    except OSError:
+                        page = None
+                    plines = (page or "").replace("\r", "").split("\n")
+                    at = next((i for i, ln in enumerate(plines) if ln.startswith("## Install")), None)
+                    section = []
+                    for ln in plines[at + 1:] if at is not None else []:
+                        if ln.startswith("## "):
+                            break
+                        section.append(ln)
+                    found = any(head in ln and tail in ln[ln.index(head) + len(head):] for ln in section)
+                    if page is None or at is None or not found:
+                        why = ("is unreadable, so nothing restates" if page is None else "has no `## Install` section" if at is None
+                               else "has no line under `## Install` holding")
+                        wrong.append(f"help/policy.md {why} the deferral line the install-day --scaffold "
+                                     f"printed: {printed}")
                 grade_check("with the install staged")
                 run_fixture_git(t, "add", "-A")
                 run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")

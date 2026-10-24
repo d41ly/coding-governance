@@ -174,7 +174,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-38 — the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits](spec/2026-10-23-spec-TOOL-dGroundRules-38.md) | 12 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-39 — the census registry window held at both edges by a standing case, its fixture paths spelled whole](spec/2026-10-23-spec-TOOL-dGroundRules-39.md) | 13 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-40 — the overlap arm pins each pair's expected answer, so the render's rule and the dispatcher's are graded against the truth and not only against each other](spec/2026-10-23-spec-TOOL-dGroundRules-40.md) | 13 | 2 | CLOSED | rev-4 | 2026-10-24 |
-| [TOOL-dGroundRules-41 — the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it](spec/2026-10-23-spec-TOOL-dGroundRules-41.md) | 13 | 2 | DEFERRED | rev-4 | 2026-10-24 |
+| [TOOL-dGroundRules-41 — the help page's install section held to the deferral line `--scaffold` prints, by the case that prints it](spec/2026-10-23-spec-TOOL-dGroundRules-41.md) | 13 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-42 — the criterion bug class gains the input respelled to pass a join, and is handed to every spec commit](spec/2026-10-23-spec-TOOL-dGroundRules-42.md) | 13 | 1 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dGroundRules-43 — the round-1 audit of units 33 and 34, its minors: fifteen findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-43.md) | 14 | 2 | DEFERRED | rev-5 | 2026-10-24 |
 | [TOOL-dGroundRules-44 — the overlap arm's disjoint row is a real string-prefix trap, and the arm refuses a disjoint row that is not one](spec/2026-10-23-spec-TOOL-dGroundRules-44.md) | 14 | 2 | DEFERRED | rev-4 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 307 bound to this build, across 4 record folder(s).
+Records: 308 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -1822,7 +1822,8 @@
       "{prefix}/memory-recall/recall_conf.py",
       "{prefix}/runlog/extract.py",
       "{prefix}/runlog/model.py",
-      "{prefix}/runlog/runlog_lib.py"
+      "{prefix}/runlog/runlog_lib.py",
+      "help/policy.md"
     ],
     "chunk": "selftests",
     "subject": "kit",
