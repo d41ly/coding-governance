@@ -252,7 +252,8 @@ symbol, never by line, so no later edit strands the citation (TOOL-dGroundRules-
   `history is shallow at <sha8>; fetch more history`, never the false "no valid revision" (S13).
 - **A derived default.** A row whose `default` is `{ derived = "..." }` refuses where the file does
   not set it, naming the row and `a derived default no reader computes yet`; the mirror omits such a
-  key, so the helper reads it through the reader and refuses alike (S12).
+  key, so the helper reads it through the reader and refuses alike (S12). The refusal is the type
+  `DerivedDefault`, which `resolve_caps` alone reads as no file value (TOOL-dGroundRules-62).
 - **A sibling kit.** This kit reaches a sibling through the inlined `resolve_kit_dir` and a declared
   `requires`, and a miss refuses, naming where the resolver looked: reader coverage reads the
   memory-tree kit's `tree_lib`, which `kit.toml` requires (S26).
@@ -397,7 +398,9 @@ policy kit beside it refuses as before and says so once. ONE RULE FOR A REFUSED 
 `budgets.py` (S31): a refusal the reader makes inside `resolve_caps`, of the landed revision, of the
 switch's keys or of a cap's value, gives the cap `mode = refuse`, its rule `the policy reader refused,
 so a breach refuses as before`, and the CLI prints the refusal once, after its answers; a subject over
-its cap refuses and is never read as `warn`. Where the landed revision's own read refuses, the cap's
+its cap refuses and is never read as `warn`. An unset cap's derived default is no such refusal: its
+`DerivedDefault`, caught on the cap's value read alone, is no file value, so the cap keeps its home's
+value and the pin's or the switch's mode (TOOL-dGroundRules-62). Where the landed revision's own read refuses, the cap's
 value is the `legacy:` or `default:` value handed in, as the enforcer read it. The four shell
 enforcers take the branch they take with no policy kit when no Python launcher resolves, and say so
 once. help/size-caps.md is the user's page.
