@@ -6,8 +6,11 @@ The verdict over the staged change of an agent's commit. It refuses a change to 
 `guarded-paths.txt` lists at HEAD, and admits one agent shape: a single measured-file cap under
 `budgets` raised, nothing else among those paths changed, a comment line carrying
 `RAISED <old> -> <new>` added directly above the cap, and a `memory/DECISIONS.md` row added in the
-same commit. A merge concluded with a parent's blob writes nothing new and is admitted. Exit 0
-admitted, 1 refused naming every failed condition, 2 when git cannot say what is staged.
+same commit. A merge concluded with a parent's blob writes nothing new and is admitted. The mirror
+`.governance/policy.json` leaves the judged set when its staged bytes are its render at HEAD and the
+render's inputs are staged as HEAD holds them (TOOL-dGroundRules-19), so a catalogue or policy change
+is one commit and its regenerated mirror the next. Exit 0 admitted, 1 refused naming every failed
+condition, 2 when git cannot say what is staged.
 
 It enforces the defaults of `policy-file.guard` and `policy-file.proof`, owner-only and the TTY proof,
 WITHOUT READING EITHER KEY: it imports no policy reader. The owner's proof is the pre-commit hook's,
@@ -93,6 +96,26 @@ def check_parent_sides(touched):
             if read_blob_id("", p) not in (read_blob_id("HEAD", p), read_blob_id("MERGE_HEAD", p))}
 
 
+def check_mirror_render():
+    """The mirror shape (TOOL-dGroundRules-19) -> None where the staged mirror leaves the touched set,
+    else why it stays. It leaves when the staged policy file and this kit's catalogue are their blobs
+    at HEAD, each absent on both sides counting as equal, and its staged bytes are the stdout of
+    `policy.py mirror --print`, the render at HEAD, run under this interpreter: a subprocess, so the
+    guard imports no reader. A render that refuses keeps the mirror in the set, naming its line."""
+    kit = Path(__file__).absolute().parent
+    catalogue = run_git("-C", str(kit), "rev-parse", "--show-prefix").decode("utf-8").strip() + "catalogue.toml"
+    if any(read_blob_id("", p) != read_blob_id("HEAD", p) for p in (POLICY, catalogue)):
+        return "the mirror renders HEAD: commit the policy file or catalogue first, then regenerate"
+    p = subprocess.run([sys.executable, str(kit / "policy.py"), "mirror", "--print"], capture_output=True)
+    if p.returncode != 0:
+        err = p.stderr.decode("utf-8", errors="replace").strip() or f"exit {p.returncode}"
+        return f"its render at HEAD refused: {err}"
+    staged = read_blob_id("", MIRROR)
+    if staged is None or run_git("cat-file", "blob", staged) != p.stdout:
+        return "differs from its render at HEAD"
+    return None
+
+
 def derive_leaf_changes(old, new):
     """Two parsed TOML tables -> {leaf key tuple: (old value, new value)} for each leaf that differs,
     None standing for absent, since TOML has no null. A table is walked; any other value, an array
@@ -162,9 +185,13 @@ def main(argv):
         return 2
     guarded = read_guarded_paths()
     touched = check_parent_sides(read_touched_paths(guarded)) if guarded else {}
+    mirror_why = check_mirror_render() if MIRROR in touched else None
+    if MIRROR in touched and mirror_why is None:
+        del touched[MIRROR]
+        print(f"policy-guard: admitted · {MIRROR} · equals its render at HEAD")
     if not touched:
         return 0
-    refused = [(p, f"an agent's commit may change {POLICY} alone among the guarded paths")
+    refused = [(p, mirror_why if p == MIRROR else f"an agent's commit may change {POLICY} alone among the guarded paths")
                for p in sorted(touched) if p != POLICY]
     cap = None
     if touched.get(POLICY, "M") != "M":

@@ -118,7 +118,8 @@ owner-silence rule that declines a raise is a later build's reader.
   `.governance/policy.json` only when its bytes differ and prints `policy: mirror written · <n> keys
   · policy <blob8> · catalogue <blob8>` or `policy: mirror fresh`. `--check` exits 0 with
   `policy: mirror fresh`, or 1 with `policy: mirror stale · .governance/policy.json · <what> · run: ...`,
-  `<what>` being `absent`, `unparsable`, a blob field, or the first key that differs.
+  `<what>` being `absent`, `unparsable`, a blob field, or the first key that differs. `--print`
+  writes the render's bytes to stdout and no file, the form `guard.py` compares a staged mirror with.
 - `node <prefix>/policy/policy-mirror.js get <key> [--repo <dir>] [--explain]` — the helper's CLI:
   the value as `get` prints it, `--explain` adding the same stderr line. Exit 0, or 2 with the
   refusal line.
@@ -204,7 +205,8 @@ rewrite.
 **Regenerated at every landing.** `kit.toml`'s `[[generated]]` row, stage 2, names `mirror --write`
 and `mirror --check`, so the run-gates kit's `regen.py --write` renders it into each landing the
 lander makes, and the bar's preflight runs the check. A branch carrying a policy change carries a
-stale mirror until it lands.
+stale mirror until it lands or until a commit of its own carries the regenerated one, which the
+guard admits (below).
 
 **Read from the landed blob only.** `policy-mirror.js`'s `readPolicy(key, { repo })` finds the
 landed revision L through `policy-shim.sh landed`, reads the mirror's blob at L and the two blob ids
@@ -229,7 +231,16 @@ no launcher. A commit staging no listed path spawns no Python.
 `guard.py --staged`, from the top level: the list at HEAD (none, or no HEAD: exit 0); the touched
 set, `git diff --cached --no-renames` against it (empty: exit 0); while `MERGE_HEAD` resolves, a path
 whose staged blob is its blob at HEAD or at `MERGE_HEAD` leaves the set, since a merge taking a side
-writes nothing new. What remains must be exactly `.governance/policy.toml`, modified, where:
+writes nothing new. Then the mirror shape (TOOL-dGroundRules-19): `.governance/policy.json` leaves
+the set when the staged policy file and this kit's catalogue are their blobs at HEAD, each absent on
+both sides counting as equal, and its staged bytes are the stdout of `policy.py mirror --print` run
+under the guard's own interpreter, a subprocess, so no reader is imported. It prints
+`policy-guard: admitted · .governance/policy.json · equals its render at HEAD`, and an emptied set
+exits 0. Otherwise the mirror stays, refused with
+`the mirror renders HEAD: commit the policy file or catalogue first, then regenerate`, with
+`differs from its render at HEAD`, or with the render's own refusal line. So an agent's catalogue or
+policy change is one commit and its regenerated mirror the next. What remains must be exactly
+`.governance/policy.toml`, modified, where:
 
 - both sides parse as TOML, and exactly one leaf differs, present on both sides;
 - that leaf is under `budgets`, neither `budgets.enforce` nor `budgets.pinned`, and its last segment
@@ -315,7 +326,7 @@ commit, commits the mirror, and rewrites that commit with `git commit-tree` over
 parents: `mirror --check` must print `policy: mirror fresh` at both, and the helper, reading the
 rewrite pushed as L, must name L's sha8 as the landed revision with no `{rev}` left.
 
-The thirteen `guard-*` cases copy `guard.py` and `guarded-paths.txt` into the kit copy and commit a
+The sixteen `guard-*` cases copy `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy and commit a
 policy file whose `[budgets]` table caps a tracked `big.md` at 100, a tracked `small.md` at 50 and the
 class row `docs/*/` at 10, then stage one plant each from `GUARD_PLANTS` and judge `guard.py --staged`
 by its exit code and reasons. `guard-admits-raise`, `big.md` to 120 with its `RAISED` comment and one
@@ -324,8 +335,14 @@ decision row, must exit 0. Exit 1, naming the reason: `guard-lowered`, `guard-tw
 `guard-beside-path` (a line added to `.governance/deploy.toml` beside it), `guard-no-record`,
 `guard-no-argument`, `guard-no-row` (each naming only what is missing), `guard-other-paths` (the
 mirror, the instruction manifest and `.governance/deploy.toml`, each alone), `guard-new-row` and
-`guard-removed-row`. `guard-merge-side` concludes a conflicted merge with the branch's policy file,
-exit 0, then with a third text, exit 1. The hook block's arms are in gov's pre-commit suite.
+`guard-removed-row`; the mirror plant of `guard-other-paths`, a hand edit, must print
+`differs from its render at HEAD`. `guard-merge-side` concludes a conflicted merge with the branch's
+policy file, exit 0, then with a third text, exit 1. The mirror shape's three commit a catalogue row
+and run `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0 printing
+`equals its render at HEAD`; `guard-mirror-beside-catalogue` moves the row back into the index with
+`git reset --soft HEAD~1` and stages the mirror beside it, exit 1 printing
+`commit the policy file or catalogue first`; `guard-mirror-branch-green` does it on a branch, commits
+the admitted mirror, and `mirror --check` at the new HEAD must print `policy: mirror fresh`. The hook block's arms are in gov's pre-commit suite.
 
 ## Each arm in an adopter
 

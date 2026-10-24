@@ -4653,6 +4653,11 @@
       "file": "tools/govkit/selftest.py"
     },
     {
+      "id": "check_mirror_render",
+      "kind": "function",
+      "file": "tools/policy/guard.py"
+    },
+    {
       "id": "check_mirror_text",
       "kind": "function",
       "file": "tools/policy/policy.py"

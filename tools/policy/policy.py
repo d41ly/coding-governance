@@ -9,7 +9,7 @@ branch (TOOL-dGroundRules-4), and the JSON mirror the hooks read (TOOL-dGroundRu
     python <this kit>/policy.py scaffold        # print the starter .governance/policy.toml
     python <this kit>/policy.py get <key> [--rev <rev>] [--explain] [--json]   # one key's value
     python <this kit>/policy.py check [--rev <rev>]   # the file at a revision, HEAD by default
-    python <this kit>/policy.py mirror --write | --check   # .governance/policy.json, rendered at HEAD
+    python <this kit>/policy.py mirror --write | --check | --print   # .governance/policy.json, rendered at HEAD
 
 The catalogue, `catalogue.toml` beside this file, is the schema: one row per policy key. A file key
 is matched to a row as a tuple of SEGMENTS, never as a joined string, because a quoted TOML segment
@@ -778,7 +778,7 @@ def render_scaffold(rows):
 
 
 USAGE = ("usage: python policy.py lists --check | lists --write | scaffold | get <key> [--rev <rev>] [--explain] [--json]"
-         " | check [--rev <rev>] | mirror --write | mirror --check")
+         " | check [--rev <rev>] | mirror --write | mirror --check | mirror --print")
 
 
 def cmd_get(argv):
@@ -832,11 +832,13 @@ def cmd_check(argv):
 
 
 def cmd_mirror(argv):
-    """`mirror --write | --check`, run in the repository: both refuse, exit 2, while the policy file
-    or this kit's catalogue in the working tree differs from its blob at HEAD, each absent on both
-    sides being equal, and then render at HEAD. `--write` writes `.governance/policy.json` only when
-    its bytes differ; `--check` compares them, exit 1 naming the first difference."""
-    if argv not in (["--write"], ["--check"]):
+    """`mirror --write | --check | --print`, run in the repository: each refuses, exit 2, while the
+    policy file or this kit's catalogue in the working tree differs from its blob at HEAD, each absent
+    on both sides being equal, and then renders at HEAD. `--write` writes `.governance/policy.json`
+    only when its bytes differ; `--check` compares them, exit 1 naming the first difference; `--print`
+    writes the render's bytes to stdout and no file, the form the policy guard compares a staged
+    mirror with (TOOL-dGroundRules-19)."""
+    if argv not in (["--write"], ["--check"], ["--print"]):
         print(USAGE, file=sys.stderr)
         return 2
     for stream in (sys.stdout, sys.stderr):
@@ -854,6 +856,9 @@ def cmd_mirror(argv):
     except Refusal as exc:
         print(exc, file=sys.stderr)
         return 2
+    if argv == ["--print"]:
+        sys.stdout.buffer.write(want)  # the bytes, never the text layer's newline translation
+        return 0
     path = Path(top, MIRROR_REL)
     have = path.read_bytes() if path.is_file() else None
     if argv == ["--check"]:

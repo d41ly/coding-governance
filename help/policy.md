@@ -113,12 +113,21 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
   with a row such as `- TOOL-x-1 · AGENTS.md cap 20480->24576: the role section needs it` added to
   `memory/DECISIONS.md`. The hook prints
   `policy-guard: admitted · budgets."AGENTS.md" 20480 -> 24576 · its change record attached`.
+- **An agent may also commit the mirror it regenerated, in a commit of its own.** A change to the
+  policy file or to `tools/policy/catalogue.toml` leaves the mirror stale, so it takes two commits:
+  first the policy or catalogue change, then `python tools/policy/policy.py mirror --write` and a
+  commit of `.governance/policy.json` with neither of those two files staged beside it. The hook
+  renders the mirror at `HEAD` itself and admits the staged one only when its bytes are that render,
+  printing `policy-guard: admitted · .governance/policy.json · equals its render at HEAD`.
 - **Everything else is refused**, each reason on its own `policy-guard: refused · <path> · <why>`
   line: a lowered cap, two caps changed, a cap added or removed, a class row such as
   `memory/builds/*/spec/` (it names no one file), `budgets.enforce` or `budgets.pinned`, any other
   key, a raise missing its `RAISED` line or its decision row, another line of the file changed, and
-  any change to the other three paths. The mirror is never an agent's to commit: the landing renders
-  it, so unstage it with `git restore --staged --worktree .governance/policy.json`.
+  any change to the instruction manifest or the deployer's answers. A mirror staged beside a change
+  to the policy file or the catalogue is refused with
+  `the mirror renders HEAD: commit the policy file or catalogue first, then regenerate`; one that is
+  not its render, a hand edit say, with `differs from its render at HEAD`. Unstage it with
+  `git restore --staged --worktree .governance/policy.json`; the landing renders it too.
 - **A merge that takes one side's file** writes nothing new and is admitted; a merge that writes a
   third text is judged like any other change.
 - **What the guard does not catch.** It stops forgetting, not evasion: `git commit --no-verify`, a

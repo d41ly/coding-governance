@@ -71,11 +71,14 @@ that commit with `git commit-tree` as the lander does, and reds a `mirror --chec
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
 
 The `guard-*` cases are outcome cases of the minimal guard (TOOL-dGroundRules-6): each copies
-`guard.py` and `guarded-paths.txt` into the kit copy, commits a policy file capping a tracked `big.md`
-and `small.md` and the class row `docs/*/`, stages its plant from `GUARD_PLANTS`, and judges
-`guard.py --staged` by its exit code and the reasons it prints. `guard-admits-raise` is the one plant
-that must exit 0; `guard-merge-side` concludes a conflicted merge with the branch's side, exit 0, then
-with a third text, exit 1.
+`guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy, commits a policy file capping a
+tracked `big.md` and `small.md` and the class row `docs/*/`, stages its plant from `GUARD_PLANTS`, and
+judges `guard.py --staged` by its exit code and the reasons it prints. `guard-admits-raise` is the one
+plant that must exit 0; `guard-merge-side` concludes a conflicted merge with the branch's side, exit
+0, then with a third text, exit 1. The mirror shape's three (TOOL-dGroundRules-19): `guard-mirror-render`
+commits a catalogue row and stages the regenerated mirror alone, exit 0; `guard-mirror-beside-catalogue`
+stages it beside the row, exit 1; `guard-mirror-branch-green` commits the admitted mirror on a branch
+and reads `mirror --check` fresh at the new HEAD.
 
 Later units add arms to ARMS and cases to CASES.
 """
@@ -1162,7 +1165,8 @@ def run_mirror_landed_parity(name):
 
 # ---- the minimal guard (TOOL-dGroundRules-6) ----------------------------------------------------
 
-GUARD_FILES = ("guard.py", "guarded-paths.txt")
+GUARD_FILES = ("guard.py", "guarded-paths.txt", "policy.py")  # policy.py: the mirror shape's `mirror --print`
+GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
 DEPLOY_REL = ".governance/deploy.toml"
 DECISIONS_REL = "memory/DECISIONS.md"
 GUARD_POLICY = '[budgets]\n"big.md" = 100\n"small.md" = 50\n"docs/*/" = 10\n'
@@ -1192,7 +1196,8 @@ GUARD_PLANTS = {
     "guard-no-row": [("no row", [RAISED], 1, [NO_ROW], [NO_RAISED])],
     "guard-other-paths": [
         ("mirror", [(policy.MIRROR_REL, lambda t: t + "\n")], 1,
-         [f"refused · {policy.MIRROR_REL} · ", f"git restore --staged --worktree {policy.MIRROR_REL}"], []),
+         [f"refused · {policy.MIRROR_REL} · differs from its render at HEAD",
+          f"git restore --staged --worktree {policy.MIRROR_REL}"], []),
         ("instructions", [(".governance/instructions.toml", lambda t: 'planted = "a manifest"\n')], 1,
          ["refused · .governance/instructions.toml · "], []),
         ("deploy", [(DEPLOY_REL, lambda t: t.replace("fixture", "planted"))], 1, [f"refused · {DEPLOY_REL} · "], []),
@@ -1224,7 +1229,11 @@ def run_guard_case(name):
     """`guard.py --staged` over build_guard_repo, judged by its exit code and stdout: each scenario of
     GUARD_PLANTS staged alone, or for `guard-merge-side` a merge of a branch whose policy file differs,
     conflicted, concluded with the branch's side (exit 0, a parent's blob) and then with a third text
-    (exit 1)."""
+    (exit 1). The GUARD_MIRROR cases (TOOL-dGroundRules-19) commit a catalogue row and run
+    `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0;
+    `guard-mirror-beside-catalogue` first moves the row back into the index, exit 1;
+    `guard-mirror-branch-green` does it on a branch, commits the admitted mirror, and runs
+    `mirror --check` at the new HEAD, which must be fresh."""
     repo, kit = build_guard_repo()
     guard = [sys.executable, str(kit / "guard.py"), "--staged"]
     checks = []
@@ -1249,6 +1258,25 @@ def run_guard_case(name):
             run_fixture_git(repo, "add", "--", POLICY_REL)
             checks.append(check_run("merge, a third text", "guard.py --staged", guard,
                                     lambda rc, o, e: rc == 1 and "policy-guard: refused" in o, cwd=repo))
+        if name in GUARD_MIRROR:
+            beside = name == "guard-mirror-beside-catalogue"
+            if name == "guard-mirror-branch-green":
+                run_fixture_git(repo, "checkout", "-q", "-b", "side")
+            write_edit(kit / policy.CATALOGUE, lambda t: t + render_planted_row("a catalogue row an agent adds"))
+            run_fixture_git(repo, "add", "--", str(kit / policy.CATALOGUE))
+            run_fixture_git(repo, "commit", "-q", "-m", "a catalogue row")
+            checks.append(check_get("the row committed", repo, ["--write"], lambda rc, o, e: rc == 0
+                                    and o.startswith("policy: mirror written"), kit=kit, verb="mirror"))
+            if beside:  # the row back in the index beside the mirror rendered over it
+                run_fixture_git(repo, "reset", "-q", "--soft", "HEAD~1")
+            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+            want, needle = (1, "commit the policy file or catalogue first") if beside else (0, "equals its render at HEAD")
+            checks.append(check_run("the mirror staged" + (" beside the row" if beside else " alone"), "guard.py --staged",
+                                    guard, lambda rc, o, e: rc == want and needle in o, cwd=repo))
+            if name == "guard-mirror-branch-green":
+                run_fixture_git(repo, "commit", "-q", "-m", "the mirror, regenerated")
+                checks.append(check_get("the mirror committed", repo, ["--check"], lambda rc, o, e: rc == 0
+                                        and o == "policy: mirror fresh\n", kit=kit, verb="mirror"))
         for scenario, edits, want, present, absent in GUARD_PLANTS.get(name, []):
             for rel, edit in edits:
                 path = Path(repo, rel)
@@ -1289,7 +1317,7 @@ CASES = [
     ("mirror-absent-refuse", None, run_mirror_landed),
     ("mirror-commit-rewrite", None, run_mirror_landed),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
-    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side"]),  # outcome cases: guard.py --staged
+    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
 ]
 
 
