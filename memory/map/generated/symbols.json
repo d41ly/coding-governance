@@ -13723,6 +13723,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "read_deploy_answers",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_derivation",
       "kind": "function",
       "file": "tools/run-gates/run-gates.gov.test.sh"
@@ -16113,6 +16118,11 @@
       "file": "tools/playbook/render_playbook.py"
     },
     {
+      "id": "remove_gate_runner",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "remove_group_residue",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
@@ -17996,6 +18006,11 @@
       "id": "resolve_gov_pin",
       "kind": "function",
       "file": "tools/govkit/selftest.py"
+    },
+    {
+      "id": "resolve_govkit",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "resolve_harness_path",
@@ -22096,6 +22111,11 @@
       "id": "seed_affordances",
       "kind": "function",
       "file": "tools/codebase-map/reuse_lookup.py"
+    },
+    {
+      "id": "seed_ambiguous_registry",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "seed_brange_fixture",

@@ -13,14 +13,15 @@
 # adopter spawns on install day without running the render by hand, and then the JSON mirror,
 # `policy.py mirror --write` (TOOL-dGroundRules-25 S7); with no commit yet it prints one line naming
 # the re-run, and while an input of the mirror is uncommitted, as on install day, one line deferring
-# the mirror to the re-run after the commit. `[[regenerate]]` in kit.toml runs this same verb on every update (TOOL-dGroundRules-21
+# the mirror to the re-run after the commit, unless `check_policy.py`'s `arm_schema` finds the policy
+# file invalid, which exits 2 printing its findings (TOOL-dGroundRules-34 S20). `[[regenerate]]` in kit.toml runs this same verb on every update (TOOL-dGroundRules-21
 # S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
 #
 # The kit dir is this script's own directory, never spelled, so the adopter runs from wherever the
 # kit is installed. Its refusals are armed by `adopt-policy.test.sh` beside it.
 #
 #   Exit 0 = written, kept or green · 1 = red, or a write failed · 2 = wrong invocation, no
-#   repository, or no python.
+#   repository, no python, or an invalid policy file on install day.
 set -u
 
 HERE="$(cd "$(dirname "$0")" && pwd)" || exit 2
@@ -119,6 +120,16 @@ fi
 OUT=$(cd "$TARGET" && "$PY" -B "$HERE/policy.py" mirror --write 2>&1)
 RC=$?
 if [ "$RC" = 2 ] && [[ "$OUT" == *"uncommitted changes"* ]]; then
+  # An invalid policy file is never deferred (TOOL-dGroundRules-34 S20): `check_policy.py`'s
+  # `arm_schema` grades the working-tree file first, and a finding stops the scaffold, exit 2.
+  SCHEMA=$("$PY" -B "$HERE/check_policy.py" --repo "$TARGET" 2>&1 |
+    awk '/^policy-check: arm_schema · /{f=1; print; next} f && /^  /{print; next} {f=0}')
+  case "$SCHEMA" in
+    "policy-check: arm_schema · "[1-9]*)
+      echo "policy: $TARGET/.governance/policy.toml is invalid, so the mirror is not deferred; fix it, then re-run --scaffold"
+      printf '%s\n' "$SCHEMA"
+      exit 2 ;;
+  esac
   INPUT=${OUT#*refused · }
   echo "adopt-policy: mirror deferred · ${INPUT%%:[0-9]* · uncommitted changes*} has uncommitted changes · commit, then re-run --scaffold"
 elif [ "$RC" != 0 ]; then

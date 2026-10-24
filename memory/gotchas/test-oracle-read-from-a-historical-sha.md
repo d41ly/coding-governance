@@ -39,7 +39,9 @@ with a frozen copy measures the distance from that copy, which grows by design.
 
 For the HEAD shape, install from a commit of the working tree made in a scratch clone
 (`build_source_snapshot`), or refuse naming the dirty paths; never grade HEAD silently while the
-verdict is recorded against the working tree.
+verdict is recorded against the working tree. The false green that shape gives, and why a frozen
+`--local` clone does not cure it, is [[suite-invalidated-by-a-commit-under-it]]'s; this record's
+symptom stays the false red of a frozen oracle.
 
 No machine gate: a literal sha or a HEAD read in a test is sometimes the subject itself (a fixture
 commit, a pinned base under test). The documented check, in a Tier-2 review of any `.test.sh` diff,

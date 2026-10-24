@@ -78,15 +78,7 @@ allowed values and every check.
   check prints one line with the number it read; a check that read nothing is red too, unless reading
   nothing is a legal state, no policy file yet, no tracked code, no owner build landed, or no landed
   revision yet, which it prints as `not graded`.
-- **Start a file in another repository:** `bash tools/policy/adopt-policy.sh --scaffold --target <repo>`.
-  It writes the starter file only where none exists, then renders the harness settings from the agent
-  limit and the policy mirror wherever the repository has a commit, so the first agent spawn passes
-  and the merge bar finds the mirror fresh. The mirror renders a commit, so on install day, while the
-  install and the policy file are not committed yet, it prints
-  `adopt-policy: mirror deferred · <file> has uncommitted changes · commit, then re-run --scaffold`
-  and still exits 0: commit the install and the policy file, then run `--scaffold` again, which
-  writes `.governance/policy.json`. Any other refusal of the mirror stops it, exit 1, with the
-  refusal's own line. `--check --target <repo>` checks that repository.
+- **Start a file in another repository:** see [Install](#install), below.
 - **See which keys are documented:** a catalogue row with no `summary` or no `usage` is named on
   `tools/policy/unsummarised-keys.txt`. That list may only shrink. To document a key, give its row a
   `summary` and a `usage`, then run `python tools/policy/policy.py lists --write` to drain it from the
@@ -97,6 +89,27 @@ allowed values and every check.
   round or route-back count, or a number of hours, days or seconds. The check reds such a row that
   says nothing, and any row with another `direction`. Adding a new key of one of those kinds? Give
   its row `direction = "raise-loosens"`.
+
+## Install
+
+`bash tools/policy/adopt-policy.sh --scaffold --target <repo>` starts the policy file in another
+repository. It writes the starter file only where none exists, then renders the harness settings
+from the agent limit and the policy mirror wherever the repository has a commit, so the first agent
+spawn passes and the merge bar finds the mirror fresh. `--check --target <repo>` checks that
+repository.
+
+The mirror renders a commit, so on install day, while the install and the policy file are not
+committed yet, `--scaffold` prints
+`adopt-policy: mirror deferred · <file> has uncommitted changes · commit, then re-run --scaffold`
+and still exits 0. In that order:
+
+1. commit the install and the policy file;
+2. run `--scaffold` again, which writes `.governance/policy.json`.
+
+A policy file that is invalid on install day is never deferred: `--scaffold` runs `check_policy.py`,
+and when its `arm_schema` check finds a problem, a value outside its key's allowed values say, it
+exits 2 printing that check's findings and no deferral line. Fix the file, then re-run `--scaffold`.
+Any other refusal of the mirror stops it, exit 1, with the refusal's own line.
 
 ## Every key whose build has landed has a reader
 

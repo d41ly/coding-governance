@@ -52,6 +52,15 @@ want "--scaffold where the mirror refuses otherwise refuses" 1 'policy: the poli
 want "--scaffold prints the mirror's own refusal" 1 'policy: refused - a planted mirror refusal' --scaffold --target "$R"
 TOOL="$HERE/adopt-policy.sh"
 
+# 3c — an invalid policy file written before the install-day --scaffold is refused through
+# check_policy.py's arm_schema, never deferred (TOOL-dGroundRules-34 S20): the real control flow.
+mkrepo invalid commit; mkdir -p "$R/.governance"
+printf '[policy-file]\non-invalid = "refuse"\n\n[budgets]\nenforce = "bogus"\n' > "$R/.governance/policy.toml"
+out=$(bash "$TOOL" --scaffold --target "$R" 2>&1); got=$?
+if [ "$got" = 2 ] && [[ "$out" == *"budgets.enforce"* ]] && [[ "$out" != *"mirror deferred"* ]]; then
+  ok "--scaffold over an invalid policy file on install day refuses (exit $got)"
+else bad "--scaffold over an invalid policy file on install day refuses" "exit $got, want 2 naming budgets.enforce and no 'mirror deferred': $out"; fi
+
 # 4 — the outcomes beside the branches: a committed target is scaffolded and its settings rendered;
 # a re-run keeps the file and renders again; a target with no commit names the re-run.
 mkrepo fresh commit

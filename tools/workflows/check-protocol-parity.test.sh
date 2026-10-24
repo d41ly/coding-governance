@@ -583,9 +583,11 @@ WRITER_SPLIT=1
 _ub_tpl="$KITREL/unattended-build.template.js"
 if [ -f "$_ub_tpl" ] && [ -z "$MTD_SKIP" ]; then
   render "$_ub_tpl" > "$TMPD/writer-split.js" || { echo "protocol-parity: the render of $_ub_tpl FAILED — the template could not be read"; exit 2; }
-  if ! _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-split.js" 2>&1); then
+  _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-split.js" 2>&1); _ub_rc=$?
+  if [ "$_ub_rc" != 0 ]; then
     _ub_why=$(printf '%s\n' "$_ub_out" | awk 'f { sub(/^ +/, ""); print; exit } /^verifier-fanout: FAILED/ { f = 1 }')
-    [ -n "$_ub_why" ] || _ub_why=$(printf '%s\n' "$_ub_out" | head -n 1)
+    # An empty hook answer is said as one, never as the gate's header or the render's path (TOOL-dGroundRules-34 S31).
+    [ -n "$_ub_why" ] || _ub_why="the agent-cap hook exited $_ub_rc with no reason"
     _ub_why=${_ub_why%.}
     echo "protocol-parity: the agent-cap hook does not admit the writer split: $_ub_why. Update it: govkit update --kits agent-cap" >&2
     WRITER_SPLIT=0
