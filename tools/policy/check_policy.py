@@ -12,7 +12,10 @@ THE ARMS read the repository's `.governance/policy.toml` and this kit's catalogu
 list: `arm_schema` grades each file key with the value check, `arm_shape` audits the catalogue's
 rows, `arm_summaries` grades the list as `policy.py lists --check` does, `arm_direction` reds a
 loop bound or deadline row that does not declare `direction = "raise-loosens"` (TOOL-dGroundRules-11),
-and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4). The mirror's
+and `arm_on_invalid` reds what `policy.py check` refuses at HEAD (TOOL-dGroundRules-4).
+`arm_reader_coverage` reds a catalogue key whose owner build has landed, every spec in its build
+folder terminal at the landed revision, and that no call of READER_SHAPES in the tracked code reads
+(TOOL-dGroundRules-8); it grades nothing until an owner lands, and says so. The mirror's
 three (TOOL-dGroundRules-5): `arm_mirror_parity` reds a working-tree `.governance/policy.json` that
 is absent or differs from its render at HEAD; `arm_mirror_landed` reds a key the policy file at the
 landed revision sets that the helper `policy-mirror.js` and the reader answer differently, one
@@ -91,8 +94,15 @@ pushed to one bare remote with the legacy list seeded, so the landed revision re
 plants its break and judges the copy's `lists --check` and `lists --write` by exit code and exact
 reports, printing `case <name>: red|green`.
 
+`reader-coverage` is an outcome case (TOOL-dGroundRules-8): per case of RC_CASES, a repository holding
+a kit copy whose catalogue carries the planted key, a planted spec under `bPlanted`'s build folder and
+the planted consumers, pushed to one bare remote, then the spec's working-tree token; it judges
+`check_reader_coverage` by the key it reds and the count it grades, printing `case <name>: red|green`.
+
 Later units add arms to ARMS and cases to CASES.
 """
+import contextlib
+import io
 import json
 import os
 import re
@@ -280,8 +290,131 @@ def arm_legacy_homes(repo, kit):
     return len(rows), population, [("legacy homes", r) for r in reports]
 
 
+# ---- reader coverage (TOOL-dGroundRules-8) -----------------------------------------------------
+
+# The reader shapes, one row per consumer shape: (the files the row reads, a suffix or a directory
+# ending `/`, and its pattern). Group 2 is the key text the call passes; a new shape is one row.
+READER_SHAPES = (
+    # a call whose first argument is the key as a string literal: resolve("k"), mirror.get('k')
+    ((".py", ".js", ".mjs", ".cjs"),
+     re.compile(r"[A-Za-z_$][\w$]*\([ \t]*(?:[fFrRbB]{1,2})?(['\"`])([^'\"`\n]*)\1")),
+    # the reader CLI's get: policy.py get k, "$kit/policy.py" get "k" | ...
+    ((".sh", ".githooks/"),
+     re.compile(r"policy\.py[\"']?[ \t]+get[ \t]+([\"']?)([^\s'\"]+?)\1(?=[ \t;)|&]|$)")),
+)
+READER_SKIPPED = re.compile(r"(?:^|/)(?:[^/]*\.test\.(?:sh|js)|selftest[^/]*\.py|test_[^/]*\.py)$")
+PATTERN_SEGMENT = r"[^'\"`\s.()]+"  # a `*` or `<name>` segment: one run of no quote, space, `.`, `(` or `)`
+
+
+def derive_landed_owners(repo, kit=KIT):
+    """-> the catalogue owners whose build has landed: at the landed revision `policy.py get` reads,
+    the build folder `<memory root>/builds/<owner>/spec/` holds at least one spec and every spec's
+    status header carries a token in tree_lib's TERMINAL, the memory root read from that revision's
+    `.memory-tree.conf`. The landed revision's Refusal passes through; no memory-tree kit beside
+    this one reads no build as landed, saying so. A git read that fails is a Refusal naming it."""
+    rows = policy.load_catalogue(kit)
+    sha, _how = policy.derive_landed_revision(repo)
+    try:
+        tree_lib = load_tree_lib()
+    except (LookupError, ImportError):
+        print("reader coverage: no memory-tree kit beside the policy kit, so no build reads as landed")
+        return set()
+    owners = sorted({str(r["owner"]) for r in rows if r.get("owner")})
+    if not owners:  # an ls-tree with no pathspec would list the whole revision
+        return set()
+    try:
+        conf = tree_lib.read_blobs_at(repo, [(sha, ".memory-tree.conf")])[(sha, ".memory-tree.conf")]
+        root = tree_lib.parse_conf(conf or "", {"MEMORY_ROOT": "memory"})["MEMORY_ROOT"].strip("/")
+        listed = tree_lib.read_git_output(repo, ("ls-tree", "-r", "--name-only", sha, "--",
+                                                 *(f"{root}/builds/{o}/spec/" for o in owners)))
+        specs = [p for p in listed.decode("utf-8", "replace").split("\n") if p.endswith(".md")]
+        texts = tree_lib.read_blobs_at(repo, [(sha, p) for p in specs])
+    except OSError as exc:
+        raise policy.Refusal(".memory-tree.conf", 0, f"the landed builds at {sha[:8]} do not read: {exc}") from None
+    landed = set()
+    for owner in owners:
+        mine = [p for p in specs if p.startswith(f"{root}/builds/{owner}/spec/")]
+        tokens = [next((m["token"] for m in map(tree_lib.HDR_RE.match, (texts[(sha, p)] or "").split("\n")) if m), None)
+                  for p in mine]
+        if tokens and all(t in tree_lib.TERMINAL for t in tokens):
+            landed.add(owner)
+    return landed
+
+
+def scan_reader_keys(repo, kit=KIT):
+    """-> every key text a call of READER_SHAPES passes in the tracked code of `repo`, read from disk:
+    `git ls-files` with a row's suffix or under its directory, outside the memory root and `help/`,
+    never a `*.test.sh`, `*.test.js`, `selftest*.py` or `test_*.py`, nor this module at `kit`'s path,
+    whose fixtures name keys without consuming them. A line opening `#` or `//` is a comment."""
+    own = (policy.run_git(kit, "rev-parse", "--show-prefix") or "").strip() + Path(__file__).name
+    skip = (read_memory_root(repo) + "/", "help/")
+    spelled = set()
+    for f in (policy.run_git(repo, "ls-files", "-z", "--", *CODE_PATHSPECS) or "").split("\0"):
+        if not f or f.startswith(skip) or f == own or READER_SKIPPED.search(f):
+            continue
+        shapes = [rx for files, rx in READER_SHAPES
+                  if any(f.startswith(p) if p.endswith("/") else f.endswith(p) for p in files)]
+        try:
+            text = Path(repo, f).read_text(encoding="utf-8", errors="replace") if shapes else ""
+        except OSError:
+            continue
+        for line in text.splitlines():
+            if not line.lstrip().startswith(("#", "//")):
+                spelled.update(m[2] for rx in shapes for m in rx.finditer(line))
+    return spelled
+
+
+def check_key_read(key, spelled, names):
+    """True when a spelled key text reads catalogue key `key`: the key itself, or, for a key holding
+    a `*` or `<name>` segment, a text that spells it with each such segment one PATTERN_SEGMENT run
+    and that is no other catalogue key of `names`."""
+    if key in spelled:
+        return True
+    segs = key.split(".")
+    if not any(s == "*" or (s.startswith("<") and s.endswith(">")) for s in segs):
+        return False
+    rx = re.compile(r"\.".join(PATTERN_SEGMENT if s == "*" or (s.startswith("<") and s.endswith(">"))
+                               else re.escape(s) for s in segs))
+    return any(s not in names and rx.fullmatch(s) for s in spelled)
+
+
+def check_reader_coverage(repo, landed=None, kit=KIT):
+    """-> (the count of keys graded, one finding per graded key with no reader): a key is graded when
+    its catalogue owner has landed, `derive_landed_owners` unless `landed` names the set, and read
+    when `scan_reader_keys` finds a call passing it. Prints the summary line on every run, and the
+    announce line when it graded nothing. A Refusal reading the landed revision passes through."""
+    rows = policy.load_catalogue(kit)
+    sha, _how = policy.derive_landed_revision(repo)
+    owners = derive_landed_owners(repo, kit) if landed is None else set(landed)
+    graded = [r for r in rows if r.get("owner") in owners]
+    spelled = scan_reader_keys(repo, kit) if graded else set()
+    names = {str(r.get("name")) for r in rows}
+    findings = [f"reader coverage: {r['name']} (owner {r['owner']}, landed at {sha[:8]}) has no reader"
+                for r in graded if not check_key_read(str(r["name"]), spelled, names)]
+    print(f"reader coverage: graded {len(graded)} of {len(rows)} catalogue key(s); "
+          f"landed owners: {', '.join(sorted(owners)) or 'none'}")
+    if not graded:
+        print(f"reader coverage: graded 0, so this arm checked nothing at {sha[:8]}")
+    return len(graded), findings
+
+
+def arm_reader_coverage(repo, kit):
+    """`check_reader_coverage` over the repository: its population the catalogue's keys joined to the
+    landed owners, so a graded count of 0 is the announce line it prints, never a finding. A Refusal,
+    a landed revision or landed build that does not read, is the one finding."""
+    rows, bad = load_rows(kit)
+    if bad:
+        return 0, "the catalogue did not parse", [bad]
+    try:
+        n, findings = check_reader_coverage(repo, kit=kit)
+    except policy.Refusal as exc:
+        return len(rows), "no landed revision to join the owners to", [(f"{exc.path}:{exc.line}", exc.why)]
+    return (len(rows), f"{n} of {len(rows)} catalogue key(s) graded for a reader",
+            [tuple(f.split(": ", 1)) for f in findings])
+
+
 ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm_mirror_parity,
-        arm_mirror_landed, arm_mirror_readers, arm_legacy_homes]
+        arm_mirror_landed, arm_mirror_readers, arm_legacy_homes, arm_reader_coverage]
 
 
 def run_arm(arm, repo, kit):
@@ -434,6 +567,16 @@ def resolve_kit_dir(home, anchor, here):
 # <<< resolve_kit_dir
 
 
+def load_tree_lib():
+    """The memory-tree kit's `tree_lib`, its directory found by `resolve_kit_dir` from this kit -> the
+    module; LookupError where no memory-tree kit is installed, ImportError where it does not import."""
+    lib = str(resolve_kit_dir("memory-tree", "tree_lib.py", KIT))
+    if lib not in sys.path:
+        sys.path.insert(0, lib)
+    import tree_lib
+    return tree_lib
+
+
 def resolve_bash():
     """The bash sharing this filesystem, by path, or None: on Windows the bare name reaches the
     System32 WSL launcher before PATH (gotcha subprocess-resolves-a-different-shell). GOV_BASH
@@ -493,13 +636,10 @@ def build_source_snapshot(source_root):
     it. The caller removes the root. -> Path; RuntimeError naming the failed step and git's first
     stderr line, the clone already removed."""
     try:
-        lib = str(resolve_kit_dir("memory-tree", "tree_lib.py", KIT))
+        leaks = load_tree_lib().GIT_ENV_LEAKS
     except LookupError as exc:
         raise RuntimeError(f"no GIT_ENV_LEAKS to strip: {exc}") from None
-    if lib not in sys.path:
-        sys.path.insert(0, lib)
-    from tree_lib import GIT_ENV_LEAKS
-    base = {k: v for k, v in os.environ.items() if k not in GIT_ENV_LEAKS}
+    base = {k: v for k, v in os.environ.items() if k not in leaks}
 
     def run(step, *args, cwd=None, **env):
         p = subprocess.run(["git", "-c", "user.name=policy-fixture", "-c", "user.email=policy-fixture@invalid",
@@ -1484,6 +1624,91 @@ def run_legacy_homes(name):
     return print_checks(name, checks)
 
 
+# ---- reader coverage (TOOL-dGroundRules-8) -----------------------------------------------------
+
+RC_KEY, RC_OWNER = "fixture.planted", "bPlanted"
+RC_SPEC = "memory/builds/bPlanted/spec/2026-10-23-spec-TOOL-bPlanted-1.md"
+RC_HEADER = "# TOOL-bPlanted-1 — a planted spec\n\n**Status:** {} · rev-1 · 2026-10-23 · node d · Tier-1 · base 0123abcd\n"
+RC_CALL = 'value = resolve("fixture.planted")\n'
+RC_CLI = "python policy.py get fixture.planted\n"
+# case -> (catalogue rows (key, owner), the planted spec's token at the landed revision, its token in
+# the working tree, the tracked files planted {path: text}, the key that must red or None, the count
+# of keys graded). `not-a-reader` also carries this module, copied to the kit copy's path.
+RC_CASES = {
+    "landed-no-reader": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED", {}, RC_KEY, 1),
+    "unlanded": ([(RC_KEY, RC_OWNER)], "OPEN", "OPEN", {}, None, 0),
+    "no-build": ([(RC_KEY, "bAbsent")], "CLOSED", "CLOSED", {}, None, 0),
+    "reader-python": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED", {"consumer.py": RC_CALL}, None, 1),
+    "reader-cli": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED", {"consumer.sh": RC_CLI}, None, 1),
+    "reader-js": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                  {"consumer.js": "const value = mirror.get('fixture.planted');\n"}, None, 1),
+    "not-a-reader": ([(RC_KEY, RC_OWNER)], "CLOSED", "CLOSED",
+                     {"notes.md": RC_CALL, "consumer.test.sh": RC_CLI, "consumer.py": "# " + RC_CALL,
+                      policy.MIRROR_REL: json.dumps({"keys": {RC_KEY: {"value": "a"}}}) + "\n"},
+                     RC_KEY, 1),
+    "history-not-tree": ([(RC_KEY, RC_OWNER)], "CLOSED", "OPEN", {}, RC_KEY, 1),
+    "tree-not-history": ([(RC_KEY, RC_OWNER)], "OPEN", "CLOSED", {}, None, 0),
+    "pattern-read": ([("fixture.*", RC_OWNER)], "CLOSED", "CLOSED",
+                     {"consumer.sh": 'python policy.py get "fixture.$name"\n'}, None, 1),
+    "pattern-only-sibling": ([("fixture.*", RC_OWNER), ("fixture.exact", RC_OWNER)], "CLOSED", "CLOSED",
+                             {"consumer.sh": "python policy.py get fixture.exact\n"}, "fixture.*", 2),
+}
+
+
+def build_reader_coverage_repo(t, name):
+    """The case's repository at `t`/r on main: the kit copy at this kit's own path holding a catalogue
+    of the case's rows, the planted spec with its landed token, and the planted files, committed and
+    pushed to one bare remote, so the landed revision is that commit; then the spec's working-tree
+    token written over it. -> the kit copy."""
+    rows, at_landing, in_tree, plants, _red, _n = RC_CASES[name]
+    repo = t / "r"
+    kit = repo / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
+    files = {**plants, RC_SPEC: RC_HEADER.format(at_landing)}
+    if name == "not-a-reader":  # this module names the key in reader shapes, as its fixtures do
+        files[(kit / Path(__file__).name).relative_to(repo).as_posix()] = Path(__file__).read_text(encoding="utf-8")
+    files[(kit / policy.CATALOGUE).relative_to(repo).as_posix()] = "".join(
+        f'[[key]]\nname = "{k}"\nallowed = ["a"]\ndefault = "a"\nowner = "{o}"\n\n' for k, o in rows)
+    for rel, text in files.items():
+        Path(repo, rel).parent.mkdir(parents=True, exist_ok=True)
+        Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
+    run_fixture_git(t, "init", "-q", "--bare", "b.git")
+    run_fixture_git(repo, "init", "-q")
+    run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
+    run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, (t / "b.git").as_posix())
+    run_fixture_git(repo, "add", "-A")
+    run_fixture_git(repo, "commit", "-q", "-m", "the landed state")
+    run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+    Path(repo, RC_SPEC).write_text(RC_HEADER.format(in_tree), encoding="utf-8", newline="\n")
+    return kit
+
+
+def run_reader_coverage(name):
+    """`check_reader_coverage` over one repository per RC_CASES case, printing `case <name>: red|green`:
+    a red case must find exactly one key with no reader, its key and owner named; a green case none;
+    each must grade its count of keys, and a case grading none must print the announce line."""
+    checks = []
+    for case, (_rows, _at, _in, _plants, red, want_n) in RC_CASES.items():
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        try:
+            kit = build_reader_coverage_repo(t, case)
+            out = io.StringIO()
+            with contextlib.redirect_stdout(out):
+                n, findings = check_reader_coverage(t / "r", kit=kit)
+            told = "so this arm checked nothing at" in out.getvalue()
+            ok = n == want_n and (told or n) and (
+                len(findings) == 1 and f": {red} (owner {RC_OWNER}, landed at " in findings[0] if red else not findings)
+            checks.append((f"case {case}: {'red' if findings else 'green'}", "check_reader_coverage", bool(ok),
+                           f"graded {n} · " + ("; ".join(findings) or out.getvalue().strip().replace("\n", " · "))))
+        except subprocess.CalledProcessError as exc:
+            checks.append((f"case {case}: not built", "the fixture's git", False,
+                           f"git exited {exc.returncode}: {(exc.stderr or '').strip() or '(no stderr)'}"))
+        except policy.Refusal as exc:
+            checks.append((f"case {case}: refused", "check_reader_coverage", False, str(exc)))
+        finally:
+            remove_repo(t)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -1512,6 +1737,7 @@ CASES = [
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
+    ("reader-coverage", None, run_reader_coverage),  # an outcome case: one planted repository per case
 ]
 
 

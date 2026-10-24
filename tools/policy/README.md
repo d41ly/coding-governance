@@ -294,6 +294,24 @@ authorship. The block is gov's own; the runbook's copy instructions do not carry
 | `arm_mirror_landed` | `node policy-mirror.js get <key>` against the reader's `resolve`, for each key the policy file at the landed revision sets | a value the two answer differently, or one refusing where the other answers |
 | `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root and `help/` | a file naming `policy.json` |
 | `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the landed revision | each `lists --check` report on the legacy homes; a refused landed revision |
+| `arm_reader_coverage` | the catalogue's `owner` fields, each owner's build folder at the landed revision, the tracked `*.py`, `*.js`, `*.mjs`, `*.cjs`, `*.sh` and `.githooks/*` outside the memory root, `help/`, tests and this checker | each key whose owner build has landed that no call reads; a refused landed revision |
+
+`arm_reader_coverage` (TOOL-dGroundRules-8) grades a key once its owner build has LANDED: at the
+landed revision `policy.py get` reads, the build folder `<memory root>/builds/<owner>/spec/` holds at
+least one spec and every spec's status header is terminal, read with the memory-tree kit's
+`tree_lib` (`HDR_RE`, `TERMINAL`, `read_blobs_at`, `parse_conf`). A build whose spec run landed its
+units `DEFERRED` has not landed. A key is READ where a tracked file passes it to a reader in one of
+the two shapes of `READER_SHAPES`, one row each: a call whose first argument is the key as a string
+literal (`resolve("k")`, `mirror.get('k')`) in a `.py`, `.js`, `.mjs` or `.cjs` file, and
+`policy.py get k`, the key optionally quoted, in a `.sh` file or under `.githooks/`. A comment line
+never reads. A key with a `*` or `<name>` segment reads where that segment is spelled as one run with
+no quote, space, `.`, `(` or `)`, `"budgets.$cap"` say, unless the text spells another catalogue key
+exactly. It prints `reader coverage: graded <n> of <m> catalogue key(s); landed owners: <slugs or
+none>` on every run, and with nothing graded `reader coverage: graded 0, so this arm checked nothing
+at <rev8>`, which is no finding; its population is the catalogue's keys. With no memory-tree kit
+beside this one, no build reads as landed, and it says so. It does not see a reader in another
+language, or a key built at run time from parts, which reds as unread; and a call that only names
+the key, in a message say, reads as a reader.
 
 `arm_on_invalid` is how an invalid file with no fallback reaches the push and landing gates: the
 `policy check` leg carries no guard, so the pre-push bar and every landing run it on a push that
@@ -377,6 +395,18 @@ stale-list report, then green after `lists --write`; `retrofit` a `_CUTOFF` and 
 and unlisted; `unmarked` a gate key `GATE_ENV_MARKS` lacks; `absent-homes` no gate or house file,
 green with one announce line for each.
 
+`reader-coverage` is one outcome case over eleven repositories, each a kit copy whose catalogue holds
+the planted key `fixture.planted`, a spec under `memory/builds/bPlanted/spec/` and the case's planted
+files, pushed to a bare remote; it judges `check_reader_coverage` by the key it reds and the count it
+grades, printing `case <name>: red|green`. Red: `landed-no-reader` (the spec `CLOSED` at the landed
+revision, no consumer), `not-a-reader` (the key named only in a `.md` file, a `*.test.sh`, a `.py`
+comment line, a copy of `check_policy.py`, the JSON mirror and the catalogue), `history-not-tree`
+(`CLOSED` landed, `OPEN` in the working tree) and `pattern-only-sibling` (`fixture.*` red while the
+only call names its sibling `fixture.exact`). Green: `unlanded` (`OPEN` landed), `no-build` (owner
+`bAbsent`, no build folder) and `tree-not-history` (`OPEN` landed, `CLOSED` in the working tree), each
+grading nothing and printing the announce line; `reader-python`, `reader-cli` and `reader-js`, one
+shape each; and `pattern-read` (`policy.py get "fixture.$name"` reads `fixture.*`).
+
 ## Each arm in an adopter
 
 The `policy check` leg ships, so every arm in `ARMS` runs in an adopter's tree as well as in gov's.
@@ -405,6 +435,7 @@ Both runs must exit 0, and every arm must print a graded line with no finding or
 | `arm_mirror_landed` | the installed helper against the reader, for each key the target's policy file sets at its landed revision | a finding: a landed revision with no policy file is a zero population, until TOOL-dGroundRules-25 announces it |
 | `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root and `help/` | a finding: a target with no tracked code is a zero population, until TOOL-dGroundRules-21 announces it |
 | `arm_legacy_homes` | the target's kit confs, gate file and house file against the installed `legacy-homes.txt` and the list at its landed revision | a finding: with the list absent, each derived row is a `stale list` finding, until TOOL-dGroundRules-17 withholds the list and announces the arm |
+| `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | no owner build landed, or no memory-tree kit beside this one, prints `graded 0` and no finding; a landed revision that does not resolve is a finding |
 
 ## The adopter
 

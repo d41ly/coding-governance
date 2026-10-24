@@ -82,6 +82,35 @@ allowed values and every check.
   says nothing, and any row with another `direction`. Adding a new key of one of those kinds? Give
   its row `direction = "raise-loosens"`.
 
+## Every key whose build has landed has a reader
+
+Each catalogue row names the build that owns the key. Once that build has landed, a key no code
+reads is a setting you can change to no effect, so `python tools/policy/check_policy.py` reds it:
+
+```
+reader coverage: budgets.enforce (owner dGroundRules, landed at 3708a705) has no reader
+```
+
+- **Landed** means: on the default branch as `policy.py get` reads it, the build's folder
+  `memory/builds/<owner>/spec/` holds at least one spec and every spec there is `CLOSED` or
+  `WONTDO`. A build whose specs are still `DEFERRED` or open has not landed, and your working tree
+  never counts: only what is committed on the default branch does.
+- **A reader** is a line of tracked code that passes the key to the policy reader, in one of two
+  shapes: a call whose first argument is the key in quotes, such as `resolve("budgets.enforce")` in
+  Python or `mirror.get('budgets.enforce')` in JavaScript, or `policy.py get budgets.enforce` in a
+  shell script or a git hook. A comment, a test file, a help page, the memory tree, the JSON mirror
+  and the catalogue never count. For a key with a `*` or `<name>` part, such as `budgets.*`, a
+  variable in that part counts too: `policy.py get "budgets.$cap"`.
+- **To clear it,** do one of two things: add the reader, a call of that shape where the code uses the
+  value; or, if the key's build has not really landed, make the row's `owner` a build that has not
+  landed yet.
+- **Every run says what it graded:** `reader coverage: graded <n> of <m> catalogue key(s); landed
+  owners: <builds>`, and while no owner build has landed,
+  `reader coverage: graded 0, so this arm checked nothing at <commit>`, which passes.
+- **What it does not see:** a reader in another language, or one that builds the key's name at run
+  time from pieces, reds as unread; a call that only mentions the key, in a message say, counts as a
+  reader.
+
 ## Who may change the policy file
 
 An agent that could commit any change to the policy file could loosen any rule, so this repository's

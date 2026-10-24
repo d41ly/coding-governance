@@ -113,3 +113,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T02:16:02Z dispatch · item 43dc142e TOOL-dGroundRules-7 · reason tools/policy/policy.py tools/policy/check_policy.py tools/policy/legacy-homes.txt tools/policy/README.md help/policy.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-7.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-7-ledger.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/backlog/TOOL.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
 
 2026-10-24T02:16:07Z brief · item TOOL-dGroundRules-7 · reason 59101ef41183 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-7-build-brief.md
+
+2026-10-24T02:34:45Z dispatch · item 463959d2 TOOL-dGroundRules-8 · reason tools/policy/check_policy.py tools/policy/README.md help/policy.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-8.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-8-ledger.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/backlog/TOOL.md memory/map/generated/symbols.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/map/generated/inventories.json
+
+2026-10-24T02:34:50Z brief · item TOOL-dGroundRules-8 · reason 6a12cfa582d5 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-8-build-brief.md
