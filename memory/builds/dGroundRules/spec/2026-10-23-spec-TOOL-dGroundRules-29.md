@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-29 — a receipt-less target is gov's source tree only when it holds the registry, so the census arm never grades a scratch target as gov
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 8 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-29-deviation-17.md](../build/2026-10-23-build-TOOL-dGroundRules-29-deviation-17.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-29-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-29-build-brief.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-29-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-29-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-29-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-29-divergence-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
 | [2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-26-32-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-26 TOOL-dGroundRules-28 TOOL-dGroundRules-27 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 |
 
@@ -71,11 +73,12 @@ every row is announced and none is graded.
 
 Every line below was read at base `3708a705` on 2026-10-23.
 
-- `derive_tool_root` finds a fixture's tool root as the parent of the one directory holding
-  `govkit/registry.toml`, searched at depths 0 to 2, and refuses none or more than one
+- `derive_tool_root` finds a fixture's tool root as the one `<d>` at depths 0 to 2 below the top
+  level where `<d>/govkit/registry.toml` exists, and refuses none or more than one
   (`tools/govkit/govkit.py:153-173`).
-- `tools/govkit/registry.toml:294-296` exempts `{prefix}/govkit`, so no adopter install holds the
-  registry.
+- The `[[exempt]]` row of `tools/govkit/registry.toml` whose path is `{prefix}/govkit` names it "the
+  deployer itself", "never installed into a target", so no adopter install holds the registry (row
+  re-read by content at `454674a73` on 2026-10-24).
 - `tools/run-gates/check-receipt.py:38-41`: a tree with no receipt "never adopted anything", and gov's
   own tree holds none.
 - The receipt-less callers `TOOL-dGroundRules-22` names none of: `TOOL-dGroundRules-1` AC9 runs
@@ -135,20 +138,27 @@ Every command runs from the repository root. The criteria spell the kit's files 
 `check_policy.py`, `adopt-policy.sh` and `README.md` under the kit, as `TOOL-dGroundRules-5` §6 does.
 
 - **AC1** — When `bash adopt-policy.sh --scaffold --target <t>` and then `--check --target <t>` run
-  over a fresh `git init` target, as `TOOL-dGroundRules-1` AC9 builds one, `--check` exits 0 and
-  `arm_cap_census` prints only `not installed` and `not shipped` lines.
+  over a fresh `git init` target, as `TOOL-dGroundRules-1` AC9 builds one, `--check` prints a line
+  beginning `policy-check: arm_cap_census · 0 finding(s)` and `arm_cap_census` prints only
+  `not installed` and `not shipped` lines. This criterion grades that arm alone: `--check` still
+  exits 1 over that target on `arm_mirror_landed` and `arm_limits_readers`, which
+  `TOOL-dGroundRules-25` S26 owns, on `arm_reader_coverage`, which `TOOL-dGroundRules-8` owns, and on
+  `arm_legacy_homes`, which `TOOL-dGroundRules-7` and `TOOL-dGroundRules-17` own, so its pass is not
+  a pass of that target.
   Red when: a receipt-less scratch target is graded as gov's source tree.
-- **AC2** — When `python check_policy.py --repo <t>` runs over a `git init` target holding only a
-  copy of the registry at `tools/govkit/registry.toml`, `arm_cap_census` prints a finding for each
-  census enforcer the target lacks; and over this repository it prints no `not installed` line.
+- **AC2** — When `python check_policy.py --repo <t>` runs over a `git init` target holding a copy of
+  the registry at `<t>/tools/govkit/registry.toml` and nothing else, `arm_cap_census` prints a
+  finding for each census enforcer the target lacks; and over this repository it prints no
+  `not installed` line.
   Red when: gov's own tree, or a fixture standing for it, stops grading its enforcers.
 - **AC3** — When `python check_policy.py --fixture census-receiptless-target` runs, it prints no
   `WRONG`; with `derive_census_tree` staged in a scratch copy to answer `source` for every
   receipt-less tree, it prints `WRONG`.
   Red when: the standing case passes while the arm grades a bare target as gov.
-- **AC4** — When a receipt-less `git init` target holds `registry.toml` and
-  `registry.toml` and `python check_policy.py --repo <t>` runs, `arm_cap_census` prints a
-  finding naming both paths.
+- **AC4** — When a fixture plants two registries in a receipt-less `git init` target, one at
+  `<t>/govkit/registry.toml` at its top level and one at `<t>/vendor/kits/govkit/registry.toml` two
+  levels down, and `python check_policy.py --repo <t>` runs, `arm_cap_census` prints a finding
+  naming both paths.
   Red when: an ambiguous tree is guessed to be gov's at one of the two roots.
 - **AC5** — When `grep -n "registry.toml" README.md` runs under the kit, it prints the
   `arm_cap_census` row of the "Each arm in an adopter" table.
@@ -180,6 +190,7 @@ New arm: tools/policy/check_policy.py (`--fixture census-receiptless-target`) ·
   `derive_tool_root`, the registry's exemption and the receipt check read at base `3708a705`.
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edge to TOOL-dGroundRules-34 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit of units 26 to 32 that build on this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-3 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
+- rev-4 · 2026-10-24 · §4, §6 · the builder's divergence at `4298cfcc7`: AC1 asked `--check` to exit 0 over the scaffolded fresh target, but four arms this unit does not touch red there. Ruling: AC1 grades `arm_cap_census` alone, by its `0 finding(s)` line and its announce lines, and names the other arms' owners. AC4 names its two planted roots whole again; §4 cites the registry's `{prefix}/govkit` exempt row by content, not line. No design change.
 
 ## 10. Reuse audit
 
