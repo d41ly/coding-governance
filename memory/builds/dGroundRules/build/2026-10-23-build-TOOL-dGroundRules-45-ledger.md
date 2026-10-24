@@ -8,8 +8,8 @@ The staged criterion ran on a `git clone` of the branch under `%TEMP%/gr45` carr
 The arm was run alone: a scratch driver lifted the lines from `UNATTENDED_DIR=` to the arm's closing
 `fi` out of the suite and evaluated them with `PFX` at `tools/`. Unstaged it printed `arm ok` with 2
 rows; with `ROW_ADDED` it printed `arm ok` with 3 rows; with the trap row's expected answer staged to
-`intersect` it printed `arm FAIL ... [row policy policy-x.py intersect: check_writes_intersect False]
-[row policy policy-x.py intersect: overlaps exit 1]`, one disagreement per rule; with the disjoint
+`intersect` it printed `arm FAIL` naming that row once with `check_writes_intersect False` and
+once with `overlaps exit 1`, one disagreement per rule; with the disjoint
 row respelled `policy/a.py policy/ab.py disjoint` it printed `arm FAIL ... not a string-prefix trap`.
 `TOOL-dGroundRules-44`'s `TRAP_PROBE` printed `policy policy-x.py True False` from the call line, and
 `TOOL-dGroundRules-40`'s `ARM_ROWS` and `ARM_NOTE` printed `1` and `0`. Owed at the close: the
