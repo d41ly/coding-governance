@@ -69,6 +69,10 @@ and asserts what the helper, a four-line fixture hook and `arm_mirror_landed` an
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
+`mirror-landed-merge` (TOOL-dGroundRules-14) replays the lander's landing: a branch's policy change
+merged `--no-ff` onto main, the mirror rendered over the merge, the merge rewritten by `commit-tree`
+over its parents and pushed as main; it reds a mirror the check, `arm_mirror_parity` or the helper
+calls stale at that rewrite.
 
 The `guard-*` cases are outcome cases of the minimal guard (TOOL-dGroundRules-6): each copies
 `guard.py`, `guarded-paths.txt` and `policy.py` into the kit copy, commits a policy file capping a
@@ -1059,7 +1063,12 @@ def run_mirror_landed(name):
     refused under `refuse`, then read as the reader reads it under `last-valid`.
     `mirror-commit-rewrite` (TOOL-dGroundRules-65): `mirror --write` at A, committed as B, and B
     rewritten by `git commit-tree` over its tree and parents into B', as `--prepare` folds a merge:
-    `mirror --check` fresh at B and at B', and the helper reading B' as L fills `{rev}` with L8."""
+    `mirror --check` fresh at B and at B', and the helper reading B' as L fills `{rev}` with L8.
+    `mirror-landed-merge` (TOOL-dGroundRules-14): main with its fresh mirror pushed as L, a branch b
+    setting budgets.enforce, b merged --no-ff onto main detached, `mirror --write` over the merge, and
+    `commit-tree` over the written tree with parents main and b, pushed as main: at that rewrite
+    `mirror --check` is fresh, `arm_mirror_parity` finds nothing, and the helper reads the key from
+    the mirror with no `mirror stale at`. A failed git step is a WRONG naming the step."""
     rows = policy.load_catalogue(KIT)
     repo, kit, bare = build_landed_repo(rows)
     try:
@@ -1107,6 +1116,48 @@ def run_mirror_landed(name):
             run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
             checks.append(check_run("B' landed as L", what + " --explain", helper + ["--explain"], lambda rc, o, e:
                                     rc == 0 and f"at {rewrite[:8]}, the landed revision" in e and "{rev}" not in e))
+        elif name == "mirror-landed-merge":
+            # The landing's order (TOOL-dGroundRules-14), as push-main.sh --prepare runs it: b merged
+            # --no-ff onto main detached, the mirror regenerated over the merge, the merge rewritten by
+            # commit-tree over its own parents, and the rewrite pushed as main.
+            cli = [sys.executable, str(kit / "policy.py"), "mirror"]
+            msg, rewrite, step = "merge: land b onto main", None, "main committed with its mirror, pushed as L"
+            try:
+                Path(repo, *MIRROR_FILE).write_bytes(policy.render_mirror(repo, "HEAD"))
+                run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+                run_fixture_git(repo, "commit", "-q", "-m", "main, its mirror fresh")
+                run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+                step = "1, budgets.enforce committed on branch b"
+                run_fixture_git(repo, "checkout", "-q", "-b", "b")
+                write_edit(Path(repo, *POLICY_FILE), lambda t: t.replace('enforce = "warn"\n', 'enforce = "refuse"\n'))
+                run_fixture_git(repo, "commit", "-q", "-am", "the branch being landed")
+                step = "2, b merged --no-ff onto main, detached"
+                run_fixture_git(repo, "checkout", "-q", "--detach", "main")
+                run_fixture_git(repo, "merge", "-q", "--no-ff", "b", "-m", msg)
+                checks.append(check_run("the merge", "policy.py mirror --write", cli + ["--write"],
+                                        lambda rc, o, e: rc == 0 and o.startswith("policy: mirror written"), cwd=repo))
+                step = "4, the merge rewritten by commit-tree over its parents"
+                run_fixture_git(repo, "add", "-A")
+                rewrite = run_fixture_git(repo, "commit-tree", run_fixture_git(repo, "write-tree"),
+                                          "-p", "main", "-p", "b", "-m", msg)
+                run_fixture_git(repo, "update-ref", "--no-deref", "HEAD", rewrite)
+                step = "5, the rewrite pushed as main"
+                run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "HEAD:refs/heads/main")
+            except subprocess.CalledProcessError as exc:
+                checks.append((f"step {step}", "the replay", False,
+                               f"git exited {exc.returncode}: {(exc.stderr or '').strip() or '(no stderr)'}"))
+                rewrite = None
+            if rewrite:
+                at = "the rewrite"
+                checks.append(check_run(at, "policy.py mirror --check", cli + ["--check"],
+                                        lambda rc, o, e: rc == 0 and o == "policy: mirror fresh\n", cwd=repo))
+                _n, population, findings = arm_mirror_parity(repo, kit)
+                checks.append((at, "arm_mirror_parity", not findings, f"{len(findings)} finding(s) · "
+                               + ("; ".join(f"{k}: {w}" for k, w in findings) or population)))
+                checks.append(check_run(at + " landed as L", "policy-mirror.js get budgets.enforce --explain",
+                                        ["node", str(kit / "policy-mirror.js"), "get", "budgets.enforce", "--repo",
+                                         str(repo), "--explain"], lambda rc, o, e: rc == 0 and o == "refuse\n"
+                                        and " · file · mirror " not in e and f"at {rewrite[:8]}, the landed revision" in e))
         else:  # mirror-absent-refuse
             at = set_landed(repo, "refuse", 3, False)
             checks.append(check_run(at_l, what + " under refuse", helper, lambda rc, o, e: rc == 2 and not o
@@ -1123,7 +1174,10 @@ def run_mirror_landed(name):
     finally:
         remove_repo(repo)
         remove_repo(bare)
-    return print_checks(name, checks)
+    asserted, wrong = print_checks(name, checks)
+    if name == "mirror-landed-merge" and not wrong:
+        print(f"policy-fixture: {name} · fresh at the rewrite")
+    return asserted, wrong
 
 
 def run_mirror_landed_parity(name):
@@ -1316,6 +1370,7 @@ CASES = [
     ("mirror-stale-refuse", None, run_mirror_landed),
     ("mirror-absent-refuse", None, run_mirror_landed),
     ("mirror-commit-rewrite", None, run_mirror_landed),
+    ("mirror-landed-merge", None, run_mirror_landed),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
 ]
