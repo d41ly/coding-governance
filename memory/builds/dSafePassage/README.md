@@ -128,7 +128,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
 |---|---|---|---|---|---|
-| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | DEFERRED | rev-7 | 2026-10-24 |
+| [TOOL-dSafePassage-1 — the upgrade-step kind: the step row, succession rows, their one reader, and frozen landed rows](spec/2026-10-23-spec-TOOL-dSafePassage-1.md) | 1 | 2 | DEFERRED | rev-8 | 2026-10-24 |
 | [TOOL-dSafePassage-3 — the receipt's schema 4: the `steps` field, its one writer, and the step that ships it](spec/2026-10-23-spec-TOOL-dSafePassage-3.md) | 1 | 2 | DEFERRED | rev-5 | 2026-10-23 |
 | [TOOL-dSafePassage-16 — the step record's precondition, one predicate beside its one writer, and the schema-4 bootstrap it answers](spec/2026-10-23-spec-TOOL-dSafePassage-16.md) | 2 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 | [TOOL-dSafePassage-2 — `update` walks the upgrade steps oldest first, and recovers what a killed run left](spec/2026-10-23-spec-TOOL-dSafePassage-2.md) | 2 | 2 | DEFERRED | rev-5 | 2026-10-23 |
@@ -188,7 +188,7 @@ ids TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 TOOL-dSafePas
 | [TOOL-dSafePassage-59 — the spec audit of units 51 and 52, its 12 minors on TOOL-51: the link test's population and form, the `.gitmodules` link refusal, the sweep's own criteria, and the readings that cite them](spec/2026-10-23-spec-TOOL-dSafePassage-59.md) | 15 | 2 | DEFERRED | rev-1 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 142 bound to this build, across 4 record folder(s).
+Records: 145 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
