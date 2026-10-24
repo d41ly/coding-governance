@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-7 — the legacy policy homes on a shrink-only list derived from the files they guard
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 4 · advances TOOL-dGroundRules-12
 
 **Carries:** cl-dClosedLoop-0013@8ae02ac2 whole
 
@@ -11,6 +11,8 @@
 | [2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-1-spec-brief.md) | research | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 |
 | [2026-10-23-prompt-TOOL-dGroundRules-7-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-7-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-7-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-7-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-7-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-7-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-7-divergence-2-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-7-divergence-2-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-7-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-7-divergence-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-11-spec-audit-round1.md) | spec-audit | TOOL-dGroundRules-1 TOOL-dGroundRules-11 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-10 TOOL-dGroundRules-9 |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
@@ -80,7 +82,7 @@ parses it too. Three homes, each read by query, none typed:
 |---|---|---|
 | Each kit conf: a tracked file at the repository root whose name starts with `.` and ends with `.conf` (§8 F1) | every `KEY=` assignment, `export` allowed, regex `^\s*(?:export\s+)?([A-Z][A-Z0-9_]*)=`, minus a key ending `_CUTOFF` or `_PIN` (§8 F2) | `owner-policy`: dConvergedCharter folds every kit conf key the retrofit does not convert (v2:1130-1131) |
 | `.githooks/gate-env.sh` | the union of: every key it assigns (same regex); every key its header documents, the header being the comment lines before its first non-comment line and a documented key a `^#\s+([A-Z][A-Z0-9_]*)=` line; every key a reader parses from it, being the `KEY` of a `read_policy_key "<expr>" KEY` call in a tracked shell file, outside `memory/` and `help/` and not a `*.test.sh`, that spells the path `.githooks/gate-env.sh`, minus every key a kit conf row already holds | from the gate-env mark table below; a key it does not name is `unmarked` |
-| `tools/roles/house/policy.toml`, located as `<tool root>/roles/house/policy.toml`, the tool root being the policy kit's parent directory | one row per top-level table, its key spelled `[<table>]`: today `[effort]` and `[gates]` (lines 5 and 25) | `owner-policy`: dConvergedCharter folds both into `roles.effort.*` and the role gate grants (v2:1132) |
+| The roles' house file, its home spelled `<tool-root>/roles/house/policy.toml` in every row: one constant in `tools/policy/policy.py` holds that drained token, the row's home field is the constant verbatim, and the reader resolves it by replacing its `<tool-root>/` lead with the policy kit's parent directory (`KIT.parent`, `KIT` being `Path(__file__).resolve().parent`, `tools/policy/policy.py:46`), so the row is right in an adopter installed at another prefix | one row per top-level table, its key spelled `[<table>]`: today `[effort]` and `[gates]` (`tools/roles/house/policy.toml:5`, `tools/roles/house/policy.toml:25`) | `owner-policy`: dConvergedCharter folds both into `roles.effort.*` and the role gate grants (v2:1132) |
 
 The reader-parse arm's exclusion is measured, not assumed: over the tree at base 3708a705 the calls in
 files naming `.githooks/gate-env.sh` read nine keys, and two of them, `GATE_POLICY_FILE`
@@ -123,9 +125,18 @@ that base; AC3 re-derives it.
 ### Data model
 
 `tools/policy/legacy-homes.txt`: a header of `#` lines saying it is generated by
-`python tools/policy/policy.py lists --write` and is never edited by hand, then one row per line, sorted
-by home then key, three fields separated by one space: `<home> <key> <mark>`, for example
-`.unattended.conf REVIEW_ROUNDS owner-policy`. No field holds a space.
+`python <this kit>/policy.py lists --write` and is never edited by hand, the spelling the header of
+`tools/policy/unsummarised-keys.txt` already uses (`LIST_HEADER`, `tools/policy/policy.py:60`), then
+one row per line, sorted by home then key, three fields separated by one space: `<home> <key> <mark>`,
+for example `.unattended.conf REVIEW_ROUNDS owner-policy`, and for the house file
+`<tool-root>/roles/house/policy.toml [effort] owner-policy`. No field holds a space.
+
+The list, the header and every string this unit types into a file under the tool root spell a kit
+path only as a drained token (`<this kit>/`, `<tool-root>/`) or through a path derived at runtime from
+the kit's own location, never as a literal: the merge bar's `install-prefix (shipped surface)` leg
+reads every tracked file under the tool root, `.txt` included, and bans a kit path spelled any other
+way with no waiver (`tools/check-install-prefix.sh:44-53`). The fixture of "The arm" places its house
+file at the path it resolves the same constant to, so it spells no kit either.
 
 Measured at base 3708a705: 102 kit conf rows (`.codebase-map.conf` 6, `.lexicon.conf` 2,
 `.memory-tree.conf` 35, `.process-monitor.conf` 6, `.unattended.conf` 53; `MEMORY_ROOT` is a row in two
@@ -152,7 +163,9 @@ tree's file) and the list at the landed revision. `lists --check`, for this list
    `legacy homes: stale list at <row>, re-run lists --write`. A pair the committed list holds under
    another mark is item 1c's alone, so a mark disagreement prints one report.
 3. A derived row whose pair the list at the landed revision lacks: `legacy homes: <home> <key> is a new
-   legacy home and the list is shrink-only; carry it as a key in tools/policy/catalogue.toml instead`.
+   legacy home and the list is shrink-only; carry it as a key in <catalogue> instead`, `<catalogue>`
+   being the value of `derive_catalogue_rel()` (`tools/policy/policy.py:636`) at runtime, the
+   catalogue's path derived from the kit's own location; `policy.py` types no literal path to it.
    The pair, not the full row, is compared, so a re-marked `GATE_ENV_MARKS` entry is a mark change
    `--write` can write, never a new legacy home. With no list at the landed revision it prints
    `legacy homes: no landed list at <rev8>, so this one seeds the baseline` and reports nothing under
@@ -239,9 +252,10 @@ runs each case of AC2, AC6, AC7, AC8 and AC9, printing one `case <name>: red|gre
 - **AC4** — When `grep -c " REVIEW_ROUNDS owner-policy" legacy-homes.txt` runs on the built
   tree it prints 1, and `grep -cE "_(CUTOFF|PIN) " legacy-homes.txt` prints 0. Red when:
   the retrofit predicate also excludes `REVIEW_ROUNDS`, or lets a cutoff or pin through.
-- **AC5** — When `grep "^tools/roles/house/policy.toml " legacy-homes.txt` runs on the built
+- **AC5** — When `grep "^<tool-root>/roles/house/policy.toml " legacy-homes.txt` runs on the built
   tree, it prints exactly the two rows for `[effort]` and `[gates]`, each `owner-policy`. Red when: the
-  house file is read per key instead of per table, or not found from the tool root.
+  house file is read per key instead of per table, not found from the tool root, or its home spelled
+  with a literal kit path rather than the drained token.
 - **AC6** — When `python check_policy.py --fixture legacy-homes` runs, case `growth` (a key
   `PLANTED_NEW` assigned in the fixture's `.unattended.conf` and its row written into the working list
   by hand, so the committed list equals the derivation) prints `red` with the new-legacy-home report,
@@ -266,7 +280,7 @@ runs each case of AC2, AC6, AC7, AC8 and AC9, printing one `case <name>: red|gre
 
 ## 7. Gates
 
-`govkit selfcheck` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)`
+`govkit selfcheck` · `lexicon naming predicates` · `encoding posture (text IO names its encoding)` · `kit epoch (shipped bytes move, the version moves)` · `install-prefix (shipped surface)`
 
 The leg that runs `tools/policy/check_policy.py` on the bar is unit 1's and is not in the manifest at
 this spec's base, so it is named here in prose only; this unit's arm joins it.
@@ -322,6 +336,7 @@ New arm: tools/policy/check_policy.py · covers AC2 AC6 AC7 AC8 AC9 AC10 · the 
   (`tools/memory-tree/check-memory-hygiene.sh:1930`).
 - rev-2 · 2026-10-23 · §3 · the **hands-off** edges to TOOL-dGroundRules-17, TOOL-dGroundRules-21 added, each the reciprocal of that unit's **consumes-from** line: the promotions of the round-1 spec audit's findings that repair this unit. No scope, design or acceptance moved here; the repair is the promoted unit's.
 - rev-3 · 2026-10-24 · §4, §6 · the builder's DIVERGENCE: §4 item 1 gave every committed row no home yields the typed-row report, while AC7's `shrink` case, a key removed with its row still listed, required the stale-list report, which item 2 gave only to a derived row the list lacked; and item 3 left open whether it compared the full row or (home, key). The run's ruling (B), the option keeping both AC2's and AC7's observations: item 1 splits into 1a (pair in the landed list: the stale-list report), 1b (pair not in it: the typed-row report) and 1c (pair still derived under another mark: the typed-row report); items 2 and 3 compare the pair, so a re-marked `GATE_ENV_MARKS` entry is a mark change `--write` writes, and a mark disagreement prints one report; the stale-list report names its row, as §5's observability row asks of every report. AC2 and AC7 name the report their plant reaches, and AC7 reds on the typed-row report. Files touched adds `tools/policy/README.md`, whose "Each arm in an adopter" table TOOL-dGroundRules-16's `adopter-fresh-target` joins to `ARMS` both ways. Ruling (A), AC7 renamed to the typed-row report, was set aside as the narrower option (`memory/builds/dGroundRules/prompts/2026-10-24-prompt-TOOL-dGroundRules-7-divergence-brief.md`).
+- rev-4 · 2026-10-24 · §4, §6, §7 · the builder's second DIVERGENCE: the merge bar's `install-prefix (shipped surface)` leg bans every literal kit path in a tracked file under the tool root, `.txt` included, with no waiver, while §4 and AC5 required `legacy-homes.txt` to hold house rows homed `tools/roles/house/policy.toml`, its header to name `python tools/policy/policy.py lists --write`, and item 3's report to type the catalogue's path as a literal in `policy.py`. The run's ruling: the house home is spelled with the drained token `<tool-root>/roles/house/policy.toml`, which the reader resolves from the kit's own location and which is right at any install prefix; the header names `python <this kit>/policy.py lists --write`, as `unsummarised-keys.txt` does; item 3 names the catalogue through `derive_catalogue_rel()` at runtime; AC5 greps the token; §7 names the `install-prefix (shipped surface)` leg. The list stays in the tool root, which TOOL-dGroundRules-17 consumes, and the measured figures stand (`memory/builds/dGroundRules/prompts/2026-10-24-prompt-TOOL-dGroundRules-7-divergence-2-brief.md`).
 
 ## 10. Reuse audit
 
