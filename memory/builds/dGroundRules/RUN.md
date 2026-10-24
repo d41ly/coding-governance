@@ -103,3 +103,5 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T00:39:25Z dispatch · item 5d49772d TOOL-dGroundRules-14 · reason tools/policy/check_policy.py memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-14.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-14-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md memory/LIVE.md
 
 2026-10-24T00:39:31Z brief · item TOOL-dGroundRules-14 · reason 8e6a14b351ee memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-14-build-brief.md
+
+2026-10-24T01:12:29Z rescope · item add TOOL-dGroundRules-66 · reason --dispatch's sibling loop grades every key of a terminal unit as a live pass; TOOL-dGroundRules-19 is CLOSED but keys 729e5128 and d88f7ddd can never close (the first Pass: TOOL-dGroundRules-19 commit after them wrote outside their sets), so check 49 refused TOOL-dGroundRules-7 twice and would refuse every unit declaring policy.py, guard.py, help/policy.md or the mirror; --audit already skips CLOSED/WONTDO units, and a terminal unit cannot write (scratch-guard), so --dispatch skips them too
