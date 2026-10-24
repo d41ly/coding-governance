@@ -212,7 +212,7 @@ ids TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDecl
 | [TOOL-dDeclaredLoop-100 — the round-12 spec audit's 21 minors, batched](spec/2026-10-24-spec-TOOL-dDeclaredLoop-100.md) | 51 | 2 | DEFERRED | rev-1 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 139 bound to this build, across 4 record folder(s).
+Records: 140 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
