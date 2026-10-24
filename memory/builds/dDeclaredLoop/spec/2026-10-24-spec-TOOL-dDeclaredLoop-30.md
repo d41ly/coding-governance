@@ -259,7 +259,8 @@ New arm: tools/loop/budget.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10
   `building` transition, the units counted at that commit; (b) a row at every entry into `building`;
   (c) no row, the total derived from the roster at the Design exit's commit on every read. (b) lets a
   route back re-size the budget; (c) needs that commit found on every read and no row says the figure.
-  RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3. widens: none. relaxes: none.
+  RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3.
+  widens: none · relaxes: none
 - **F3 — What does the draw row's `<item>` hold before items carry tags in the driver?** Options: (a)
   the item tag, or the unit id or subject the driver act names until an item tag reaches it; (b) only
   item tags, the driver sites waiting for TOOL-dDeclaredLoop-20's items. (b) leaves today's review and
@@ -273,7 +274,8 @@ New arm: tools/loop/budget.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 AC8 AC9 AC10
   record, the run-state file, copied into the first record by the next draw, and a channel set without
   `log` refused; (b) refuse every draw before a spec exists; (c) a second trailer key for draws. (b)
   leaves a planning loop undrawn, the cascade the clause exists to stop; (c) adds a key outside I7's
-  list. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3. widens: none. relaxes: none.
+  list. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 

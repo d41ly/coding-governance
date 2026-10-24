@@ -247,8 +247,8 @@ New arm: tools/codebase-map/selftest.py · covers AC7 · a fence with a list `st
 - **F2 — What is a stage's witness?** (a) Its exit item, witnessed or stood in for; (b) any leg or
   hook claiming the stage. (b) reds Plan, Design and Deploy until later builds land their checks,
   since every leg claims Test. (a) reads what unit 13's stand-ins already declare (C2-F8).
-  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-24, delegated): (a). widens: none ·
-  relaxes: none
+  Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-24, delegated): (a).
+  widens: none · relaxes: none
 - **F3 — May a part claim no stage?** A tool such as the drift audit serves the Loop Review, a cadence
   program, and no build stage. (a) The word `none`, declared and counted as claimed; (b) every part
   forced onto a step. (b) types false claims. Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-24,

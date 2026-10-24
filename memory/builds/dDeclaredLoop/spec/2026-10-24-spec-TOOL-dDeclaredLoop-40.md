@@ -144,8 +144,8 @@ New arm: tools/memory-tree/routed_commits.py · covers AC2 AC3 · the absent-tab
 - **F2 — Which keys form the floor?** Options: (a) `Pass` and `Decided`, the keys read before this build;
   (b) those and the two keys this build's shipped readers pass, `Gov-Transition` and `Gov-Policy`. (a)
   leaves `TOOL-dDeclaredLoop-3`'s transition reader refusing in every adopter without playbook, the
-  same defect one kit over. RESOLVED (agent, 2026-10-24, delegated): (b), rung 3. widens: none ·
-  relaxes: none
+  same defect one kit over. RESOLVED (agent, 2026-10-24, delegated): (b), rung 3.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 

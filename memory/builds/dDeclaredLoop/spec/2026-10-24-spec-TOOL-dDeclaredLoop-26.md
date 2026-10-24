@@ -235,13 +235,13 @@ New arm: tools/loop/composition.py · covers AC1 AC2 AC3 AC4 AC5 AC6 · the `loo
 - **F2 — What is a composition revision?** Options: (a) the landed commit the composition is read
   from; (b) a digest over the composed rows; (c) the overlay's blob alone. I17 names the overlay's
   landed revision plus gov's pack revisions, which one commit holds both of; (b) cannot be read back
-  and (c) misses gov's packs. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3. widens: none.
-  relaxes: none.
+  and (c) misses gov's packs. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3.
+  widens: none · relaxes: none
 - **F3 — How is a policy value naming a renamed boundary re-pointed?** Options: (a) a read-side
   redirect plus an order to the owner; (b) a write of the new value into the policy file; (c) the
   redirect alone. (b) is an agent write to a guarded file, discarded by veto 3; (c) leaves the file
-  naming a dead tag for ever. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3. widens: none.
-  relaxes: none.
+  naming a dead tag for ever. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 

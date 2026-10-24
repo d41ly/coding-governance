@@ -282,7 +282,8 @@ New arm: tools/unattended/unattended.test.sh and tools/unattended/check-unattend
   (a) the loop kit's `review_bounds.py`, called by the driver and run as an arm of the loop kit's
   check; (b) `check-unattended.sh`, reading the policy file; (c) a new catalogue field in dGroundRules'
   schema. (b) cannot run without the driver it reads fifteen sets from; (c) re-specs a parent's
-  contract. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3. widens: none. relaxes: none.
+  contract. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3.
+  widens: none · relaxes: none
 - **F3 — What does an `until-*` or `while-*` value bound here?** Options: (a) `review.max-rounds`, its
   stopping rule TOOL-dDeclaredLoop-32's; (b) refuse those values until that unit lands. Both units build
   in one run, and v2:1255 bounds every loop by the key. RESOLVED (agent, 2026-10-24, delegated): (a),

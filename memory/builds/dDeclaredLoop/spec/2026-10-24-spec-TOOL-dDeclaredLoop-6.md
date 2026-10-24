@@ -273,8 +273,8 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC10 · each 
   relaxes: the clause's factory and conformance gate for presets at this build
 - **F2 — What does the command factory write?** (a) Unit 18's `[[command]]` row in the kit descriptor;
   (b) a command adapter with its witness contract. (b) is dWellOiledMachine's extension point. Rung 1,
-  unit 18's declaring source. RESOLVED (agent, 2026-10-24, delegated): (a). widens: none ·
-  relaxes: none
+  unit 18's declaring source. RESOLVED (agent, 2026-10-24, delegated): (a).
+  widens: none · relaxes: none
 - **F3 — One factory module or one per kit?** (a) `tools/loop/factories.py`, one contract and one
   restore; (b) one per owning kit. Recommendation (a). Rung 3. RESOLVED (agent, 2026-10-24,
   delegated): (a). grants: PLAY-dClosedLoop-3 the five wrapped legs' `enforces` lists and the
