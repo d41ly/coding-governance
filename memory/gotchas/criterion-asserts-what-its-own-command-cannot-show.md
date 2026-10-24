@@ -65,6 +65,14 @@ Python literal that no longer parsed, a candidate list missing the depth it name
 round-5 audit of units 33 and 34 confirmed as its H3. The join itself is the open ask
 `TOOL-aKeyedAnnotation-9`.
 
+The next round copied it. The round-6 spec audit, of units 35 to 43, confirmed as its H1 (review
+ids 1, 10 and 20) that TOOL-dGroundRules-40, promoted to repair TOOL-dGroundRules-34, promised its
+probes restated whole and copied AC16's stripped PAIRS_SH literal instead: a library sourced by
+bare name and two pairs cut to basenames, so the copy printed 127 twice from the root and could
+never pass. It landed one round after TOOL-dGroundRules-42 recorded the respelled form, and
+TOOL-dGroundRules-43 AC1 inherited it by naming the same literal. Writing a literal whole does not
+repair one copied whole from a corrupted source.
+
 ## The fix
 
 Make the criterion DERIVE rather than ASSERT. Name the invocation that enumerates the set and have
@@ -86,6 +94,11 @@ A literal is never shortened to satisfy a join. A criterion's argument the paths
 Python literal — is spelled whole in a fenced block of the acceptance section of the spec under
 `memory/builds/`, outside every criterion bullet, and the criterion names that block. The house rule
 of citing a kit file by its basename covers prose only, never a command's argument.
+
+Then run it. Every literal a spec's acceptance section spells that only reads is run
+verbatim from the repository root before the spec's commit, and its output is compared with what
+the criterion expects. A literal restated from another spec is re-run the same way and
+never copied on trust, because a copy carries its source's corruption.
 
 ## Related
 

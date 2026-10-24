@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-47 — the criterion bug class's fix gains the re-run: a literal is run verbatim from the root before its spec commits, and a restated one is re-run, never copied
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-2 · 2026-10-24 · node d · Tier-1 · base 3708a705 · streams tooling · order 14 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-47-deviation-35.md](../build/2026-10-23-build-TOOL-dGroundRules-47-deviation-35.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-47-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-47-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-47-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-47-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-47-1-spec-reviewer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-47-1-spec-reviewer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-47-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-47-2-spec-writer.md) | journal | — |
