@@ -3741,7 +3741,56 @@ def run_fixtures_guard_census(name):
     return print_checks(name, checks)
 
 
-ADOPTER_KITS = ("policy", "memory-tree", "kickoff-manifest")  # the planted receipt's kits: no check-line-length
+SOURCE_READS = set()  # what `add_source_read` kept: source files this process opened to read, top-relative
+TRACE_ROOTS = []  # [the source top, the case temporary root or None], set where `--fixture` installs the hook
+
+
+def add_source_read(event, args):
+    """The audit hook `--fixture` installs before its first case (TOOL-dGroundRules-33 S2): an `open`
+    event whose mode reads and writes nothing, on a path that resolves, against the working directory,
+    under the source repository's top level and under no case's temporary directory, is kept in
+    SOURCE_READS, top-relative in `/` form. Only this process's reads are seen, never a subprocess's.
+    A hook that raised would fail the very open it audits, so a path that does not resolve keeps nothing."""
+    if event != "open" or not TRACE_ROOTS:
+        return
+    try:
+        path, mode = args[0], args[1] or "r"
+        if isinstance(path, int) or any(c in mode for c in "wax+"):
+            return
+        p = os.path.realpath(os.fsdecode(path))
+        top, tmp = TRACE_ROOTS
+        n = os.path.normcase(p)
+        if n.startswith(os.path.normcase(top) + os.sep) and not (tmp and n.startswith(os.path.normcase(tmp) + os.sep)):
+            SOURCE_READS.add(os.path.relpath(p, top).replace(os.sep, "/"))
+    except Exception:  # noqa: BLE001 - the hook must never fail an open
+        return
+
+
+def check_guard_trace():
+    """The guard trace's join (TOOL-dGroundRules-33 S3): every path `add_source_read` kept, piped to the
+    spec-token checker's `--legs-for -` through `read_legs_for`, gov's one trip rule, and a WRONG naming
+    each path that trips no `policy fixtures` guard: an edit to it alone would skip the leg whose cases
+    read it. The count line comes first, so an empty trace is seen, and is a WRONG of its own, as is a
+    checker that does not run: a join over nothing, or with no judge, proves nothing. -> (assertions, wrong)."""
+    kept = sorted(SOURCE_READS)
+    print(f"policy-fixture: guard-trace · {len(kept)} source read(s)")
+    if not kept:
+        print("policy-fixture: guard-trace · WRONG: no source read was traced, so nothing was joined to the guard")
+        return 1, 1
+    top = derive_source_top()
+    checker = top / budgets.resolve_prefix_token("{prefix}/check-spec-tokens.py", budgets.derive_tool_root())
+    try:
+        tripped = read_legs_for(top, checker, kept)
+    except RuntimeError as exc:
+        print(f"policy-fixture: guard-trace · WRONG: {exc}, so no read was joined to the guard")
+        return 1, 1
+    missed = [p for p in kept if FIXTURES_LEG not in tripped.get(p, ())]
+    for p in missed:
+        print(f"policy-fixture: guard-trace · WRONG {p} · not under the {FIXTURES_LEG} guard")
+    return 1 + len(kept), len(missed)
+
+
+ADOPTER_KITS =("policy", "memory-tree", "kickoff-manifest")  # the planted receipt's kits: no check-line-length
 ADOPTER_PREFIX = "vendor/gov"  # the planted tool root, unlike gov's own, so `{prefix}` must be read from the receipt
 
 
@@ -4025,6 +4074,12 @@ def run_fixture(only=None):
     if not cases:
         print(f"policy-fixture: no case named {only}", file=sys.stderr)
         return 2
+    top = derive_source_top()
+    if top.parts:  # outside a repository nothing is traced, and the empty trace is check_guard_trace's WRONG
+        top, tmp = os.path.realpath(top), os.path.realpath(tempfile.gettempdir())
+        # a case's directory sits under tempfile's root, so that root holding the source shelters no case
+        TRACE_ROOTS[:] = [top, None if os.path.normcase(top).startswith(os.path.normcase(tmp) + os.sep) else tmp]
+        sys.addaudithook(add_source_read)
     asserted, wrong = 0, 0
     for name, arm, seed in cases:
         if arm is None:  # an outcome case runs itself
@@ -4062,6 +4117,9 @@ def run_fixture(only=None):
             print(f"policy-fixture: {name} · " + (f"WRONG: unplanted reds {findings}" if findings else "green unplanted"))
         finally:
             remove_repo(repo)
+    a, w = check_guard_trace()
+    asserted += a
+    wrong += w
     print(f"policy-fixture: {asserted} assertion(s) executed · {wrong} wrong")
     return 1 if wrong or not asserted else 0
 

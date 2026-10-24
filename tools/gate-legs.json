@@ -1775,6 +1775,7 @@
       "{prefix}/policy/",
       "{prefix}/govkit/govkit.py",
       "{prefix}/govkit/registry.toml",
+      "{prefix}/govkit/selftest.py",
       "{prefix}/workflows/unattended-build.template.js",
       "{prefix}/lib/",
       "{prefix}/hooks/agent-cap.js",

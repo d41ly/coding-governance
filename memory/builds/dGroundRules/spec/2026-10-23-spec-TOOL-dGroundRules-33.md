@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-33 — the `policy fixtures` guard holds `selftest.py`, and a trace of every source file a case reads reds one the guard misses
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 11 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-33-deviation-21.md](../build/2026-10-23-build-TOOL-dGroundRules-33-deviation-21.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-33-deviation-62.md](../build/2026-10-23-build-TOOL-dGroundRules-33-deviation-62.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-33-deviation-78.md](../build/2026-10-23-build-TOOL-dGroundRules-33-deviation-78.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-33-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-33-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-33-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-33-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-33-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-33-2-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-33-rename-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-33-rename-brief.md) | research | — |

@@ -638,6 +638,11 @@
       "file": "tools/unattended/resume-tick.test.sh"
     },
     {
+      "id": "add_source_read",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "add_spec_records_region",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -4331,6 +4336,11 @@
       "id": "check_grant",
       "kind": "function",
       "file": "tools/memory-tree/backlog.py"
+    },
+    {
+      "id": "check_guard_trace",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "check_guard_trips",
