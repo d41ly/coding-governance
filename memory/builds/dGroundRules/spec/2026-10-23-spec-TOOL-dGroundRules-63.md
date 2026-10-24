@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 20 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-63-deviation-51.md](../build/2026-10-23-build-TOOL-dGroundRules-63-deviation-51.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-63-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-63-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-61-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-61-task.md) | research | TOOL-dGroundRules-61 TOOL-dGroundRules-62 |
 | [2026-10-23-prompt-TOOL-dGroundRules-63-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-63-build-brief.md) | journal | — |

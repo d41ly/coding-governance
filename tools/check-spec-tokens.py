@@ -35,7 +35,8 @@ reads none of them either and mints a fifth population of its own, the backticke
 spec's hands-off bullets, joined to the text of the sibling each one names. The eighth, `size`,
 reads the live specs' own bytes and the two size sidecars, and no token at all. The ninth,
 `carries`, reads none of the live populations: its own is every tracked chain-build spec, at any
-status but WONTDO, with its history.
+status but WONTDO, with its history. The tenth, `packet`, reads no spec: its own is the chain
+builds whose run is live in the tree, each graded by the packet instrument it already ships.
 
   legs   backticked tokens on a `## 7. Gates` LINE THAT IS THE LIST -> a `name` in the manifest.
          A section 7 line carrying prose is not graded: measured, that predicate produced 270
@@ -180,6 +181,18 @@ status but WONTDO, with its history.
          does not end in `.sh`, and a source command outside the acceptance section. A prose
          sentence spelling a dot, a space and a bare `.sh` name at a command position reads as a
          source; waive it by its operand.
+  packet the packet join: every chain build whose run is LIVE in this tree, one holding a tracked
+         packet `memory/builds/<slug>/prompts/*-prompt-<id>-packet.md` and a `RUN.md` whose last
+         `phase:` line is not LANDED, ABORTED or LANDING -> the packet instrument's own
+         `--check <slug>`, run from the root; any exit but 0 is a hit whose token is the slug and
+         whose reason carries the instrument's summary line, its first line of output
+         (TOOL-dGroundRules-63). The instrument is the one tracked `*-build-<id>-packet.py` under the
+         dClosedLoop build's `build/` folder and `<id>` is read from its name, so no spec id is
+         spelled here. None tracked, the join prints that it is off and grades nothing; more than
+         one refuses. Its line prints on every run. What it does NOT see: a LANDING record's packet,
+         because deriving LANDED asks the remote and a join on an unguarded leg reads no network; a
+         run whose `RUN.md` this tree does not hold, or whose `RUN.md` carries no phase line; and
+         anything the instrument itself does not check, which its own docstring lists.
 
 REFUSALS, not passes. An empty spec population refuses: a lint that graded nothing reports the same
 zero as a clean tree. An unreadable manifest refuses. A waiver row naming a path no spec cites, or
@@ -1354,6 +1367,47 @@ def scan_arm_covers(f, text):
     return hits, len(arms), carriers, graded
 
 
+# THE PACKET JOIN (TOOL-dGroundRules-63). The instrument is DERIVED from the one tracked file this
+# shape matches, and the packet's id from its name: spelling the id would cite a live spec from
+# product source.
+PACKET_INSTRUMENT = re.compile(r"memory/builds/dClosedLoop/build/[^/]*-build-([^/]+)-packet\.py")
+LIVE_EXCLUDED = ("LANDED", "ABORTED", "LANDING")
+RUN_PHASE = re.compile(r"^phase: (\S+)", re.M)
+
+
+def scan_live_packets(root, files):
+    """(hits, live, checked) over every chain build whose run is live, or None with no instrument
+    tracked. More than one instrument tracked is a ValueError: picking one would grade by accident."""
+    inst = sorted(f for f in files if PACKET_INSTRUMENT.fullmatch(f))
+    if not inst:
+        return None
+    if len(inst) > 1:
+        raise ValueError(f"{len(inst)} tracked files match the packet instrument's shape: {', '.join(inst)}")
+    serves = PACKET_INSTRUMENT.fullmatch(inst[0]).group(1)
+    shape = re.compile(rf"memory/builds/([^/]+)/prompts/[^/]*-prompt-{re.escape(serves)}-packet\.md")
+    packets = {}
+    for f in sorted(files):
+        m = shape.fullmatch(f)
+        if m:
+            packets.setdefault(m.group(1), f)
+    hits, live, checked = [], 0, 0
+    for slug, packet in packets.items():
+        run_md = root / "memory" / "builds" / slug / "RUN.md"
+        if not run_md.is_file():
+            continue
+        phases = RUN_PHASE.findall(run_md.read_bytes().decode("utf-8", "replace").replace("\r\n", "\n"))
+        if not phases or phases[-1] in LIVE_EXCLUDED:
+            continue
+        live += 1
+        p = subprocess.run([sys.executable, inst[0], "--check", slug], cwd=root, capture_output=True)
+        checked += 1
+        if p.returncode:
+            out = p.stdout.decode("utf-8", "replace").replace("\r\n", "\n").splitlines()
+            summary = out[0] if out else "(no output)"
+            hits.append((packet, "packet", slug, f"packet.py --check exited {p.returncode}: {summary}"))
+    return hits, live, checked
+
+
 def main(argv):
     listing = "--list" in argv
     root = pathlib.Path(run("git", "rev-parse", "--show-toplevel").strip())
@@ -1650,6 +1704,15 @@ def main(argv):
         else:
             hits.append((where, "carries", f"carries <- {arm}:{ref}", why))
 
+    # The tenth join (TOOL-dGroundRules-63): each live chain run's packet, by its own instrument.
+    try:
+        pk = scan_live_packets(root, files)
+    except ValueError as exc:
+        print(f"spec-tokens: REFUSING — the packet join cannot name its instrument: {exc}")
+        return 1
+    if pk is not None:
+        hits += pk[0]
+
     live = [h for h in hits if h[2] not in waivers]
     for h in hits:
         if h[2] in waivers:
@@ -1744,6 +1807,11 @@ def main(argv):
           f"{sum(len(e['nodes']) for e in ca_builds)} owned node(s) · {len(ca_found)} finding(s), "
           f"{sum(1 for f in ca_found if f[1] in CARRIES_EXIT_ARMS)} at the Design exit only · {CARRIES_KEY} "
           + (cov["cutoff"] if cov["state"] == "armed" else "blank (arm off)"))
+    # The packet join's line, on every run, so zero live runs reads as zero and not as clean.
+    if pk is None:
+        print("spec-tokens: packet join · off · no packet instrument")
+    else:
+        print(f"spec-tokens: packet join · {pk[1]} live chain run(s) · {pk[2]} packet(s) checked")
 
     if listing:
         return 0

@@ -47,7 +47,9 @@ PFX="${KIT_REL:+$KIT_REL/}"
 # OWED: observed at the close.
 # RAISED 194 -> 197 by TOOL-dGroundRules-46: its three source-join arms, bare fence, whole fence and
 # bare code span, each top-level. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=197
+# RAISED 197 -> 199 by TOOL-dGroundRules-63: its two packet-join arms, the live run's hit and the
+# landed run's silence, each top-level. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=199
 # RAISED 132 -> 168 at TOOL-dTrueNorth-2, by its 36 carries-join `arm` calls: the clean line, each
 # plant's red arm and its green-once-restored arm, the composite waiver, its --list row, the
 # bare-path row, the blank key, the non-ISO key, the blank design key, the WONTDO pair and the moved pair.
@@ -1723,6 +1725,21 @@ arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, 
 d=$base/source-tick; scratch "$d"
 seed_source "$d" "$(printf -- '- When \140. helper.sh; f\140 runs, it prints \1400\140.')"
 arm "TOOL-dGroundRules-46 a bullet whose code span opens on a bare-name source REDS as [source]" 1 "$d" '[source] `helper.sh`'
+
+# TOOL-dGroundRules-63: the packet join. A stub at the packet instrument's path exits 1 printing a
+# finding, and one chain build holds a packet and a RUN.md; its last phase BUILDING reds the join
+# naming the build and the stub's summary line, and a later LANDED line takes the run out of it.
+d=$base/packet; scratch "$d"
+mkdir -p "$d/memory/builds/dClosedLoop/build" "$d/memory/builds/tChain/prompts"
+printf 'import sys\nprint("packet: tChain - stub - byte compare red")\nsys.exit(1)\n' \
+  > "$d/memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py"
+printf '# packet\n' > "$d/memory/builds/tChain/prompts/2026-10-21-prompt-PLAY-dClosedLoop-1-packet.md"
+printf '# tChain - run state\n\nphase: BUILDING\n' > "$d/memory/builds/tChain/RUN.md"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm packet --no-verify
+arm "TOOL-dGroundRules-63 a live chain run whose packet check exits 1 REDS as [packet] naming the build" 1 "$d" '[packet] `tChain` — packet.py --check exited 1: packet: tChain - stub - byte compare red'
+printf 'phase: LANDED\n' >> "$d/memory/builds/tChain/RUN.md"
+git -C "$d" add -A >/dev/null; git -C "$d" commit -qm landed --no-verify
+arm "TOOL-dGroundRules-63 the same run once LANDED is not graded, and the join says so" 0 "$d" "packet join · 0 live chain run(s) · 0 packet(s) checked" "[packet]"
 
 # TOOL-dGroundRules-32 S9, TOOL-dGroundRules-40: the build-order render's overlap rule is the
 # dispatcher's, and both are graded against the truth. Each OVERLAP_PAIRS row is two paths relative to

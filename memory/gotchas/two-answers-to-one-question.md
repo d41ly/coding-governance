@@ -227,3 +227,15 @@ status, and a column beside it is a second answer that is right only on the day 
 **Why it is not gated** (`TOOL-aLevelledCopy-9` §8 F3): refusing the column in the index generator
 would red 31 landed READMEs or need a new cutoff key, which is a memory-tree kit change and its
 version bump, outside the unit that found it. This record is the left-shift until a unit owns that.
+
+## The count form — a spelled-out count in an authority record
+
+dGroundRules' owner-cap record deferred "the eleven the README opened with and the forty-one the
+audit promoted" while its own opener listed rounds summing to forty, and a reconciliation reading
+the two counts expected fifty-two units the roster did not hold (closing diff review, L1, finding
+ids 7, 11, 18 and 23; repaired by `TOOL-dGroundRules-63`). The roster is derived; the count beside
+it was typed once and re-derived by nobody.
+
+**The check:** an authority record that states a population names it by id and id range, never
+by a spelled-out count, so each id it names can be joined to the derived roster and a count can
+never disagree with it.

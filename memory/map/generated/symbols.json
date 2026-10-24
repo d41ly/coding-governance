@@ -21738,6 +21738,11 @@
       "file": "tools/run-gates/measure_legs.py"
     },
     {
+      "id": "scan_live_packets",
+      "kind": "function",
+      "file": "tools/check-spec-tokens.py"
+    },
+    {
       "id": "scan_message_lines",
       "kind": "function",
       "file": "tools/runlog/prose.py"
