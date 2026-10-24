@@ -18,7 +18,8 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 |---|---|
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, and the `lists`, `scaffold`, `get`, `check` and `mirror` verbs |
+| `legacy-homes.txt` | GENERATED, shrink-only: one row per key a legacy policy home holds, with its mark (TOOL-dGroundRules-7) |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, `resolve_compare_base`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, and the `lists`, `scaffold`, `get`, `check` and `mirror` verbs |
 | `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
@@ -101,9 +102,31 @@ owner-silence rule that declines a raise is a later build's reader.
   lacks, a row the list carries that the catalogue no longer owes (stale), and a row the list at the
   compare base did not carry. The base is the merge-base of HEAD and the remote default branch where
   that is a proper ancestor of HEAD, else the remote tip; no fetched ref is no base, and a list
-  absent at the base is no comparison, never an empty one. Exit 0 green, 1 red, 2 usage.
+  absent at the base is no comparison, never an empty one. It grades `legacy-homes.txt` too, below.
+  Exit 0 green, 1 red, 2 usage or a refused read.
 - `python <prefix>/policy/policy.py lists --write` — drain the list: it keeps the rows the catalogue
-  still owes and never adds one. An absent list is seeded with every owed row.
+  still owes and never adds one. An absent list is seeded with every owed row. It writes
+  `legacy-homes.txt`'s derived rows too, and writes nothing, exit 1, while a derived row is new to the
+  list at the landed revision.
+
+## The legacy policy homes
+
+Policy still lives outside `.governance/policy.toml` in three legacy homes: each tracked root file
+named `.*.conf`, the gate file `.githooks/gate-env.sh`, and the roles kit's house file, homed
+`<tool-root>/roles/house/policy.toml` and found from this kit's own location. `derive_legacy_homes`
+parses each, never sources one, into rows `<home> <key> <mark>`: every key a kit conf assigns but a
+`_CUTOFF` or `_PIN` (the retrofit converts those), `owner-policy`; every key the gate file assigns,
+documents in its header, or is read from it by a `read_policy_key "<expr>" KEY` call in a tracked
+shell file outside `memory/` and `help/`, less a key a kit conf holds, marked from `GATE_ENV_MARKS`
+in `policy.py`, else `unmarked`; and one `[<table>]` row per top-level table of the house file,
+`owner-policy`. An absent home yields no rows and one `legacy homes: no <home> ...` line.
+
+`lists --check` compares the derived rows, the working tree's `legacy-homes.txt` and the list at the
+landed revision, identity the pair (home, key), and reports a committed row no home yields (`stale
+list at <row>` when the landed list holds its pair, else `typed row <row>`), a committed row under a
+mark the derivation does not give (`typed row`), a derived row the list lacks (`stale list`), a
+derived row the landed list lacks (`is a new legacy home and the list is shrink-only`), and an
+`unmarked` row. With no list at the landed revision it says the list seeds the baseline.
 - `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
   build owns that has a literal default, one table per first segment.
 - `python <prefix>/policy/policy.py get <key> [--rev <rev>] [--explain] [--json]` — run in the repository to
@@ -270,6 +293,7 @@ authorship. The block is gov's own; the runbook's copy instructions do not carry
 | `arm_mirror_parity` | the working-tree `.governance/policy.json` against `render_mirror` at HEAD | a mirror that differs, named by its first difference, or one that is absent |
 | `arm_mirror_landed` | `node policy-mirror.js get <key>` against the reader's `resolve`, for each key the policy file at the landed revision sets | a value the two answer differently, or one refusing where the other answers |
 | `arm_mirror_readers` | the tracked `*.js`, `*.mjs`, `*.cjs`, `*.py`, `*.sh` and `.githooks/*` outside this kit, the memory root and `help/` | a file naming `policy.json` |
+| `arm_legacy_homes` | the kit confs, the gate file and the house file, `legacy-homes.txt`, the list at the landed revision | each `lists --check` report on the legacy homes; a refused landed revision |
 
 `arm_on_invalid` is how an invalid file with no fallback reaches the push and landing gates: the
 `policy check` leg carries no guard, so the pre-push bar and every landing run it on a push that
@@ -344,6 +368,15 @@ and run `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0 
 `commit the policy file or catalogue first`; `guard-mirror-branch-green` does it on a branch, commits
 the admitted mirror, and `mirror --check` at the new HEAD must print `policy: mirror fresh`. The hook block's arms are in gov's pre-commit suite.
 
+`legacy-homes` is one outcome case over seven repositories, each a copy of `policy.py` with a
+`.unattended.conf`, a gate file and a house file, pushed to a bare remote with the list seeded; it
+prints `case <name>: red|green` and judges the copy's `lists` verbs by exit code and exact reports:
+`today` green; `planted-row` a typed row; `growth` a conf key and its row typed in, the new-home
+report, and `lists --write` exiting 1 with the list unchanged; `shrink` a conf key removed, the
+stale-list report, then green after `lists --write`; `retrofit` a `_CUTOFF` and a `_PIN` key, green
+and unlisted; `unmarked` a gate key `GATE_ENV_MARKS` lacks; `absent-homes` no gate or house file,
+green with one announce line for each.
+
 ## Each arm in an adopter
 
 The `policy check` leg ships, so every arm in `ARMS` runs in an adopter's tree as well as in gov's.
@@ -371,6 +404,7 @@ Both runs must exit 0, and every arm must print a graded line with no finding or
 | `arm_mirror_parity` | the target's `.governance/policy.json` against its render at HEAD | a finding: an absent mirror reds until the first landing renders one, which TOOL-dGroundRules-21 grades only where HEAD carries a policy file or a mirror |
 | `arm_mirror_landed` | the installed helper against the reader, for each key the target's policy file sets at its landed revision | a finding: a landed revision with no policy file is a zero population, until TOOL-dGroundRules-25 announces it |
 | `arm_mirror_readers` | the target's tracked code outside the installed kit, its memory root and `help/` | a finding: a target with no tracked code is a zero population, until TOOL-dGroundRules-21 announces it |
+| `arm_legacy_homes` | the target's kit confs, gate file and house file against the installed `legacy-homes.txt` and the list at its landed revision | a finding: with the list absent, each derived row is a `stale list` finding, until TOOL-dGroundRules-17 withholds the list and announces the arm |
 
 ## The adopter
 

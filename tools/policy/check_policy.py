@@ -17,7 +17,8 @@ three (TOOL-dGroundRules-5): `arm_mirror_parity` reds a working-tree `.governanc
 is absent or differs from its render at HEAD; `arm_mirror_landed` reds a key the policy file at the
 landed revision sets that the helper `policy-mirror.js` and the reader answer differently, one
 `node` call per key; `arm_mirror_readers` reds a tracked code file outside this kit, the memory root
-and `help/` that names `policy.json`.
+and `help/` that names `policy.json`. `arm_legacy_homes` reds each report `policy.py lists --check`
+makes on the legacy-homes list (TOOL-dGroundRules-7).
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -83,6 +84,12 @@ plant that must exit 0; `guard-merge-side` concludes a conflicted merge with the
 commits a catalogue row and stages the regenerated mirror alone, exit 0; `guard-mirror-beside-catalogue`
 stages it beside the row, exit 1; `guard-mirror-branch-green` commits the admitted mirror on a branch
 and reads `mirror --check` fresh at the new HEAD.
+
+`legacy-homes` is an outcome case (TOOL-dGroundRules-7): per case, a repository holding a copy of
+policy.py, a `.unattended.conf`, a gate file and a house file where the copy resolves HOUSE_HOME,
+pushed to one bare remote with the legacy list seeded, so the landed revision resolves. Each case
+plants its break and judges the copy's `lists --check` and `lists --write` by exit code and exact
+reports, printing `case <name>: red|green`.
 
 Later units add arms to ARMS and cases to CASES.
 """
@@ -261,8 +268,20 @@ def arm_mirror_readers(repo, kit):
     return len(files), f"{len(files)} tracked code file(s) outside the kit, the memory root and help/", out
 
 
+def arm_legacy_homes(repo, kit):
+    """Each report `policy.py lists --check` makes on the legacy-homes list (TOOL-dGroundRules-7): the
+    rows derived from the repository's legacy policy homes against this kit's list and the list at the
+    landed revision. A Refusal, an unreadable landed revision or house file, is the one finding."""
+    try:
+        reports, notes, rows, _new = policy.check_legacy_homes(repo, kit)
+    except policy.Refusal as exc:
+        return 0, "the legacy homes were not graded", [(f"{exc.path}:{exc.line}", exc.why)]
+    population = " · ".join([f"{len(rows)} row(s) derived from the legacy homes", *notes])
+    return len(rows), population, [("legacy homes", r) for r in reports]
+
+
 ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm_mirror_parity,
-        arm_mirror_landed, arm_mirror_readers]
+        arm_mirror_landed, arm_mirror_readers, arm_legacy_homes]
 
 
 def run_arm(arm, repo, kit):
@@ -1346,6 +1365,125 @@ def run_guard_case(name):
     return print_checks(name, checks)
 
 
+# ---- the legacy policy homes (TOOL-dGroundRules-7) ----------------------------------------------
+
+LEGACY_CONF = 'REVIEW_ROUNDS="3"\nKEPT_KEY="1"\n'
+LEGACY_GATE = "#!/usr/bin/env sh\n# The fixture's gate file.\n#   GOV_PYTHON=<launcher>  a documented key\nINHERITED_RED=land\n"
+LEGACY_HOUSE = '[effort]\ndefault = "medium"\n\n[gates]\n'
+LEGACY_REPORT = "  legacy homes: "
+LEGACY_CASES = ("today", "planted-row", "growth", "shrink", "retrofit", "unmarked", "absent-homes")
+
+
+def build_legacy_repo(t, gate, house):
+    """A repository at `t`/r holding a copy of this kit's policy.py, catalogue and summary list at the
+    kit's own path, a `.unattended.conf`, the gate file's text `gate` (none where None) and, where
+    `house`, a house file where the copy resolves HOUSE_HOME; committed on main and pushed to one bare
+    remote, then the copy's `lists --write` seeding the legacy list, committed and pushed, so the
+    landed list is that seed. -> the kit copy."""
+    repo = t / "r"
+    kit = repo / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
+    kit.mkdir(parents=True)
+    for f in ("policy.py", policy.CATALOGUE, policy.LIST):
+        (kit / f).write_bytes((KIT / f).read_bytes().replace(b"\r\n", b"\n"))
+    homes = {repo / ".unattended.conf": LEGACY_CONF}
+    if gate is not None:
+        homes[Path(repo, policy.GATE_FILE)] = gate
+    if house:
+        homes[policy.resolve_tool_home(policy.HOUSE_HOME, kit)] = LEGACY_HOUSE
+    for path, text in homes.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8", newline="\n")
+    run_fixture_git(t, "init", "-q", "--bare", "b.git")
+    run_fixture_git(repo, "init", "-q")
+    run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
+    run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, (t / "b.git").as_posix())
+    for msg in ("the legacy homes", "the legacy list, seeded"):
+        if msg.endswith("seeded"):
+            run_legacy_lists(kit, "--write")
+        run_fixture_git(repo, "add", "-A")
+        run_fixture_git(repo, "commit", "-q", "-m", msg)
+        run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
+    return kit
+
+
+def run_legacy_lists(kit, verb):
+    """The kit copy's `policy.py lists <verb>`, run in its repository -> (exit code, stdout and stderr)."""
+    p = subprocess.run([sys.executable, str(kit / "policy.py"), "lists", verb], cwd=kit, capture_output=True,
+                       text=True, encoding="utf-8", errors="replace")
+    return p.returncode, (p.stdout + p.stderr).replace("\r", "")
+
+
+def check_legacy_lists(case, kit, verb, want_rc, want_reports, label=None):
+    """The kit copy's `lists <verb>` judged by its exit code and its exact `legacy homes` reports ->
+    ((scenario, what, ok, what it observed), its output)."""
+    rc, out = run_legacy_lists(kit, verb)
+    reports = [ln[len(LEGACY_REPORT):] for ln in out.split("\n") if ln.startswith(LEGACY_REPORT)]
+    ok = rc == want_rc and reports == want_reports
+    seen = f"exit {rc} · {len(reports)} report(s)" + "".join(f" · {r}" for r in reports)
+    return (label or f"case {case}: {'green' if rc == 0 else 'red' if rc == 1 else 'refused'}", f"lists {verb}", ok,
+            seen + ("" if ok else f" · output {out.strip()!r}")), out
+
+
+def run_legacy_homes(name):
+    """The legacy-homes list over a planted repository per case, each judged by the copy's `lists`
+    verbs: `today` green unplanted; `planted-row` a typed row appended, red with the typed-row report
+    alone; `growth` a conf key added and its row typed into the list, red with the new-home report
+    alone, and `lists --write` exiting 1 with the list unchanged; `shrink` a conf key removed, red
+    with the stale-list report alone, then green after `lists --write` with the row gone; `retrofit`
+    a cutoff and a pin added, green with no row for either; `unmarked` a gate key GATE_ENV_MARKS
+    lacks in the landed list, red with the no-mark report; `absent-homes` no gate file and no house
+    file, green with one announce line for each."""
+    checks = []
+    for case in LEGACY_CASES:
+        t = Path(tempfile.mkdtemp(prefix="pol-"))
+        try:
+            gate = None if case == "absent-homes" else LEGACY_GATE + ("GATE_PLANTED=1\n" if case == "unmarked" else "")
+            kit = build_legacy_repo(t, gate, case != "absent-homes")
+            conf, listed = t / "r" / ".unattended.conf", kit / policy.LEGACY_LIST
+            if case == "planted-row":
+                write_edit(listed, lambda s: s + ".unattended.conf PLANTED_KEY owner-policy\n")
+                checks.append(check_legacy_lists(case, kit, "--check", 1, ["typed row .unattended.conf PLANTED_KEY owner-policy"])[0])
+            elif case == "growth":
+                write_edit(conf, lambda s: s + 'PLANTED_NEW="1"\n')
+                write_edit(listed, lambda s: s + ".unattended.conf PLANTED_NEW owner-policy\n")
+                held = listed.read_bytes()
+                new = [f".unattended.conf PLANTED_NEW is a new legacy home and the list is shrink-only; carry it as a key "
+                       f"in {policy.derive_catalogue_rel()} instead"]
+                checks.append(check_legacy_lists(case, kit, "--check", 1, new)[0])
+                check = check_legacy_lists(case, kit, "--write", 1, new, label=f"case {case}: lists --write")[0]
+                same = listed.read_bytes() == held
+                checks.append(check[:2] + (check[2] and same, check[3] + f" · the list {'unchanged' if same else 'CHANGED'}"))
+            elif case == "shrink":
+                write_edit(conf, lambda s: s.replace('KEPT_KEY="1"\n', ""))
+                checks.append(check_legacy_lists(case, kit, "--check", 1, [
+                    "stale list at .unattended.conf KEPT_KEY owner-policy, re-run lists --write"])[0])
+                checks.append(check_legacy_lists(case, kit, "--write", 0, [], label=f"case {case}: lists --write")[0])
+                gone = " KEPT_KEY " not in listed.read_text(encoding="utf-8")
+                check = check_legacy_lists(case, kit, "--check", 0, [], label=f"case {case}, after lists --write: green")[0]
+                checks.append(check[:2] + (check[2] and gone, check[3] + f" · the row {'gone' if gone else 'STILL LISTED'}"))
+            elif case == "retrofit":
+                write_edit(conf, lambda s: s + 'PLANTED_CUTOFF="2026-11-01"\nPLANTED_PIN="3"\n')
+                checks.append(check_legacy_lists(case, kit, "--check", 0, [])[0])
+                check = check_legacy_lists(case, kit, "--write", 0, [], label=f"case {case}: lists --write")[0]
+                rows = [r for r in policy.parse_list(listed.read_text(encoding="utf-8")) if " PLANTED_" in r]
+                checks.append(check[:2] + (check[2] and not rows, check[3] + f" · {len(rows)} PLANTED_ row(s) listed"))
+            else:
+                check, out = check_legacy_lists(case, kit, "--check", 1 if case == "unmarked" else 0,
+                                                [f"GATE_PLANTED in {policy.GATE_FILE} has no mark in GATE_ENV_MARKS"]
+                                                if case == "unmarked" else [])
+                if case == "absent-homes":
+                    told = [h for h in (policy.GATE_FILE, policy.HOUSE_HOME)
+                            if sum(ln.startswith(f"legacy homes: no {h} ") for ln in out.split("\n")) == 1]
+                    check = check[:2] + (check[2] and len(told) == 2, check[3] + f" · announced: {', '.join(told) or 'none'}")
+                checks.append(check)
+        except subprocess.CalledProcessError as exc:
+            checks.append((f"case {case}: not built", "the fixture's git", False,
+                           f"git exited {exc.returncode}: {(exc.stderr or '').strip() or '(no stderr)'}"))
+        finally:
+            remove_repo(t)
+    return print_checks(name, checks)
+
+
 CASES = [
     ("shape-no-empty", arm_shape, seed_no_empty),
     ("shape-unknown-field", arm_shape, seed_unknown_field),
@@ -1373,6 +1511,7 @@ CASES = [
     ("mirror-landed-merge", None, run_mirror_landed),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
+    ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
 ]
 
 

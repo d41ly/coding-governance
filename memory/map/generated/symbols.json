@@ -873,6 +873,11 @@
       "file": "tools/branch-reconcile/selftest.py"
     },
     {
+      "id": "arm_legacy_homes",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "arm_minor",
       "kind": "function",
       "file": "tools/branch-reconcile/selftest.py"
@@ -2206,6 +2211,11 @@
       "id": "build_leg_yield",
       "kind": "function",
       "file": "tools/runlog/runlog.py"
+    },
+    {
+      "id": "build_legacy_repo",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "build_lexicon_marginal_offense_rate",
@@ -4561,6 +4571,16 @@
       "id": "check_leg_claimable",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
+    },
+    {
+      "id": "check_legacy_homes",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
+      "id": "check_legacy_lists",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "check_lin_control",
@@ -7391,6 +7411,11 @@
       "id": "derive_leg_turnstile",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "derive_legacy_homes",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "derive_legs_path",
@@ -14043,6 +14068,11 @@
       "file": "tools/unattended/unattended.sh"
     },
     {
+      "id": "read_landed_pairs",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "read_landed_unclosed",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -15216,6 +15246,11 @@
       "id": "read_text_or_none",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
+      "id": "read_text_or_none",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "read_tick_registration",
@@ -18913,6 +18948,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "resolve_tool_home",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "resolve_tool_path",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -19901,6 +19941,16 @@
       "id": "run_leg_retry",
       "kind": "function",
       "file": "tools/run-gates/run-gates.sh"
+    },
+    {
+      "id": "run_legacy_homes",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_legacy_lists",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_lg_leg",
@@ -20968,6 +21018,11 @@
       "file": "tools/lexicon/lexicon.py"
     },
     {
+      "id": "scan_gate_readers",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "scan_glob_readers",
       "kind": "function",
       "file": "tools/memory-tree/gen_build_index.py"
@@ -21191,6 +21246,11 @@
       "id": "scan_shared_index_overlaps",
       "kind": "function",
       "file": "tools/unattended/lib-unattended.sh"
+    },
+    {
+      "id": "scan_shell_keys",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "scan_shell_layer",
@@ -25036,6 +25096,11 @@
       "id": "write_leg_record",
       "kind": "function",
       "file": "tools/run-gates/measure_legs.py"
+    },
+    {
+      "id": "write_legacy_homes",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "write_legs",
