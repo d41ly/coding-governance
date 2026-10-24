@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-50 — the rows a new leg, key or retirement owes are written by the pass that creates them, through one owed-rows probe
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 10 · advances PLAY-dOrderedCharter-38
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,10 @@
 |---|---|---|
 | [2026-10-24-build-PLAY-dOrderedCharter-50-deviation-501.md](../build/2026-10-24-build-PLAY-dOrderedCharter-50-deviation-501.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-50-promoted-fix-return.md](../build/2026-10-24-build-PLAY-dOrderedCharter-50-promoted-fix-return.md) | research | PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-50-deviation-502.md](../build/2026-10-25-build-PLAY-dOrderedCharter-50-deviation-502.md) | deviation | — |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-55 |
 | [2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-50-promoted-fix-brief.md) | research | PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
 
 <!-- /gen:spec-records -->
@@ -46,7 +50,7 @@ lands; writes unit 26's rows; and hands the rule to every later leg-adding or re
   | leg removed | names at `<rev>` absent now | no row of `subject-pins.tsv`, `memory/map/baseline.toml` or `tools/run-gates/selftest-budgets.txt` naming it |
   | key | every key of every row of `tools/gate-legs.json` | membership in each `KNOWN` copy of `run-gates.test.sh` |
   | path deleted | `git diff --name-only --diff-filter=D <rev>` | no row of `memory/project/spawn-idiom-sites.txt`, `memory/project/testsuite-count-waivers.txt` or `memory/project/unarmed-branches.txt` naming it |
-  | size | each path changed since `<rev>` holding a `tools/template-size-limits.txt` row | its CR-stripped bytes within the row, else the row's raise on that file's own terms or a trim |
+  | size | each path changed since `<rev>` that a path-named `budgets.<cap>` of the cap census names or matches | its CR-stripped bytes within the value `budgets.py resolve <cap>` prints, else a trim, or a raise in the minimal guard's one admitted shape where the cap names a tracked file (TOOL-dGroundRules-6 S3) |
 
   A leg added also owes a `tools/run-gates/ceiling-evidence.txt` row, which only a measured bar run
   writes (`derive-ceilings.py --write`, that file's header). The probe prints it as a `deferred —` line
@@ -58,12 +62,13 @@ lands; writes unit 26's rows; and hands the rule to every later leg-adding or re
   `selfcheck` reads it (`tools/govkit/govkit.py:3005-3014`); claimed legs through `read_descriptors`
   (`:13238`) and the registry's `[[exempt_leg]]` rows; dossier claims through the codebase-map kit's
   claim reader (`claimant_index`, `tools/codebase-map/map_lib.py:1613`), reached through
-  `resolve_kit_dir`; size rows by the two-sidecar grammar `read_size_ceilings` documents
-  (`tools/check-spec-tokens.py:1248`). The probe mints no predicate a leg already owns: it reports
+  `resolve_kit_dir`; caps by the census `tools/policy/caps.toml`, parsed with `tomllib`, and each
+  cap's value by `budgets.py resolve <cap>`, its one reader (TOOL-dGroundRules-9 S1, S2, S5), run as a
+  subprocess through the same `resolve_kit_dir`, since a kit may not import a sibling kit. The probe mints no predicate a leg already owns: it reports
   presence, and each leg still grades its own row. Observed by AC2.
 - **S4** — `--selftest`: a scratch repository plants each population's failing case, a leg added with
   no pin row, a leg removed whose budget row stays, a key outside `KNOWN`, a deleted script named by
-  `unarmed-branches.txt`, a file grown past its size row, and a tree owing nothing, and asserts the
+  `unarmed-branches.txt`, a file grown past its cap, and a tree owing nothing, and asserts the
   exit and the named row of each. Observed by AC3.
   **Readers:** by name: none — this item retires nothing; the removed leg and the deleted script are
   failing cases planted in a scratch repository. by value: NO VALUE READERS — the plants live and end
@@ -92,6 +97,7 @@ lands; writes unit 26's rows; and hands the rule to every later leg-adding or re
 ### Edges
 
 - **consumes-from** `PLAY-dOrderedCharter-26` — the `tags positional selftest` leg, whose pin, descriptor and dossier rows S5 writes; without it S5 has no leg to keep
+- **consumes-from** external — TOOL-dSafePassage-1's move of every size row under `budgets.*` (S7, S8), and TOOL-dGroundRules-9's cap census and `budgets.py resolve`, built before this build's build run; without them the size population has no cap to read
 - **hands-off** `PLAY-dOrderedCharter-25` — its pass runs the probe and writes the rows of `tags bundle selftest` (S6)
 - **hands-off** `PLAY-dOrderedCharter-7` — its pass finds `enforces` already in both key sets and writes its new legs' rows (S1, S6)
 - **hands-off** `PLAY-dOrderedCharter-13` — its pass writes the rows of its ladder leg (S6)
@@ -112,7 +118,9 @@ Read at `ce13efbe`. The canary's arm holds `KNOWN` as a closed literal at
 repeats it at `:580`. `selfcheck` reds "a NEW leg" with no pin row (`tools/govkit/govkit.py:3019-3022`)
 and a leg "claimed by no descriptor and carried by no [[exempt_leg]]" (`:2944-2946`, check 7h).
 `tools/run-gates/ceiling-evidence.txt`'s header says it is generated from run records and never typed.
-`.claude/skills/unattended/SKILL.md` has its 10240-byte row at `tools/template-size-limits.txt:151`.
+`.claude/skills/unattended/SKILL.md` had its 10240-byte row at `tools/template-size-limits.txt:151`,
+which dSafePassage unit 1 removes, moving the row to `budgets.".claude/skills/unattended/SKILL.md"`
+(its S7, S8), the census's sixth row (TOOL-dGroundRules-9 §4 "### Inventory").
 The map's baseline is shrink-only (`tools/codebase-map/test_codebase_map.py:155`), so a new leg is
 claimed by a dossier, never baselined. Of the leg-adding specs, 16, 19, 28, 29, 31 and 39 list
 `subject-pins.tsv` under Files touched; 26, 25, 7, 13, 12, 20, 15 and 3 do not.
@@ -213,13 +221,14 @@ New arm: tools/run-gates/run-gates.test.sh · covers AC1 AC3 · the `enforces` c
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-2 spec audit's finding 23 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §2 · §3 · §4 · §10 · re-grounded on the parents' landed specs by the cross-check record `../build/2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`, U1: the size population reads `budgets.*` caps through the census and `budgets.py resolve`, since dSafePassage unit 1 removes `tools/template-size-limits.txt`, and the external edge is added.
 
 ## 10. Reuse audit
 
 The seams extended are the canary's key-set arm (`tools/run-gates/run-gates.test.sh:244`, `:580`),
 `selfcheck`'s pin read and writer (`tools/govkit/govkit.py:3005-3022`), `read_descriptors` (`:13238`),
-the map's `claimant_index` (`tools/codebase-map/map_lib.py:1613`) and the size sidecars' grammar
-(`tools/check-spec-tokens.py:1248`); the probe composes their reads and mints no rule. `python
+the map's `claimant_index` (`tools/codebase-map/map_lib.py:1613`) and the policy kit's cap reader
+`budgets.py resolve` (TOOL-dGroundRules-9 S2); the probe composes their reads and mints no rule. `python
 tools/codebase-map/reuse_lookup.py "list the registry rows a newly added gate leg still owes"` ranked
 `rows`, `row`, `legs` and `leg` by name stem, test-suite helpers with no owed-row logic, so no
 existing seam fits the derivation itself and it is new code over the readers above. The recall query

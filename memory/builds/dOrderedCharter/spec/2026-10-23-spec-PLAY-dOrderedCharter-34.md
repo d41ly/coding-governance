@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-34 — composition and its report: the project block and marked parts from the overlay, budgets and harness limits at render, one composition for every harness, the delta report, and the practice census
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 35 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0064@42692e4c whole
 
@@ -14,8 +14,12 @@
 | [2026-10-24-build-PLAY-dOrderedCharter-34-deviation-342.md](../build/2026-10-24-build-PLAY-dOrderedCharter-34-deviation-342.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-34-deviation-343.md](../build/2026-10-24-build-PLAY-dOrderedCharter-34-deviation-343.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-34-deviation-344.md](../build/2026-10-24-build-PLAY-dOrderedCharter-34-deviation-344.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-34-deviation-345.md](../build/2026-10-25-build-PLAY-dOrderedCharter-34-deviation-345.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -46,10 +50,12 @@ units 31 and 32.
   unit at level 1, 6 or 7 is refused naming it, since a repository cannot write the card, the task or
   memory (adopter-instructions item 3). Observed by AC2 and AC3.
 - **S3** — Budgets at render. Each composed document is measured per load point against its cap under
-  `budgets.*` (S18, read through unit 11's budget reader); over its cap it warns or refuses as
-  `budgets.enforce` says, and over a harness's own limit it is refused whatever `budgets.enforce`
-  says, `warn` included. The harness limit is read where unit 6's check reads it, `CODEX_MAX`, and
-  never typed here. Every overflow line names the largest contributors by origin, each with its bytes,
+  `budgets.*` (S18, read through unit 11's budget reader, which calls `budgets.py resolve` with the cap
+  named as the census `tools/policy/caps.toml` names it, `AGENTS.md` for the charter; TOOL-dGroundRules-9
+  S1, S2); over its cap it warns or refuses as the mode `budgets.py` answers says, and over a harness's
+  own limit it is refused whatever `budgets.enforce` says, `warn` included. The harness limit is
+  `CODEX_MAX`, read through its census row `codex-instructions` as unit 6's check and unit 11 read it,
+  and never typed here. Every overflow line names the largest contributors by origin, each with its bytes,
   and the render writes no file it would have to truncate. Observed by AC4 and AC5.
 - **S4** — One composition for every harness. Each harness file the wiring names is an import line, a
   symlink, or the composition's own bytes; a harness file holding anything else is refused at
@@ -114,7 +120,7 @@ units 31 and 32.
 - **consumes-from** `PLAY-dOrderedCharter-35` — each gov row's state from the composer
 - **consumes-from** `PLAY-dOrderedCharter-36` — the widening list
 - **hands-off** `PLAY-dOrderedCharter-31` — the seeded template's `[[retired]]` row and the readers of `playbook_path`, the change records of the census's moved units, and `CODEX_MAX`'s new home when the agent-instructions kit leaves
-- **consumes-from** external — dGroundRules' `budgets.*` and `budgets.enforce` (v2:1346-1347); until its reader lands unit 11's reader reads the legacy carrier
+- **consumes-from** external — dGroundRules, landed before the build run: `budgets.*` and `budgets.enforce` (v2:1346-1347), read with `budgets.py resolve`, and the cap census whose `codex-instructions` row names `CODEX_MAX`'s home (TOOL-dGroundRules-9 S1, S2)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, findings 6, 10, 21 and 29, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC11's pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
@@ -141,14 +147,16 @@ The marked pair reuses the region-marker shape `REGION_OPEN` and `REGION_CLOSE` 
 ### Budgets and harness limits
 
 ```text
-budget   AGENTS.md            21311 > 20480 (budgets.agents-md) · warn · largest: gov:playbook 17920 · repository 2391 · gov:roles 1000
+budget   AGENTS.md            21311 > 20480 (budgets."AGENTS.md") · warn · largest: gov:playbook 17920 · repository 2391 · gov:roles 1000
 REFUSED  AGENTS.md            33210 > 32768 (CODEX_MAX, codex) · refused under any budgets.enforce · largest: gov:playbook 17920 · repository 14290 · gov:roles 1000
 ```
 
-The cap's key is the load point's key under `budgets.*` as unit 11 names it; the harness limit is the
-value unit 6's check reads from `CODEX_MAX`, so the gate and the render read one fact. Under `refuse`
-a budget breach exits 1 and writes nothing; a harness-limit breach exits 1 and writes nothing under
-either value.
+The cap is the load point's key under `budgets.*`, its repo-relative path as the census names it and
+quoted in the policy file, `budgets."AGENTS.md"` (TOOL-dGroundRules-9, its data model), read through
+unit 11's `budgets.py resolve` call; the harness limit is `CODEX_MAX`, read through the census row
+`codex-instructions` as unit 6's check reads it, so the gate and the render read one fact. Under
+`refuse` a budget breach exits 1 and writes nothing; a harness-limit breach exits 1 and writes nothing
+under either value.
 
 ### The harness files
 
@@ -343,14 +351,23 @@ New arm: tools/govkit/selftest.py · covers AC8 · a scratch adopter whose playb
   which the minimal guard refuses to an agent until dDeclaredLoop (`cl-dClosedLoop-0012`).
   RESOLVED (agent, 2026-10-23, delegated): (a), rung 3, and the clause's "gov's own overlay". widens: none · relaxes: none
 - **F6 — The parent is unbuilt.** `budgets.*` and `budgets.enforce` are dGroundRules' and unread until
-  its reader lands.
-  RESOLVED (agent, 2026-10-23, delegated): rung 1, v2's `[chain]` puts dGroundRules and dSafePassage before this build; this unit reads caps through unit 11's reader, which reads the legacy carrier until then, and the build run re-grounds against the landed parent. widens: none · relaxes: none
+  its reader lands. The first pick read caps through unit 11's reader, which read the legacy carrier
+  until then; the parents' landed specs rule that carrier out, since dSafePassage's step moves every
+  row of the former limits file under `budgets.*` and deletes the file (TOOL-dSafePassage-1 S7, S8).
+  RESOLVED (agent, 2026-10-24, delegated): rung 1, v2's `[chain]` puts dGroundRules and dSafePassage
+  before this build, so this unit reads caps through unit 11's reader, which calls `budgets.py resolve`
+  with each cap named as the census `tools/policy/caps.toml` names it (TOOL-dGroundRules-9 S1, S2), and
+  reads `CODEX_MAX` through that census's `codex-instructions` row. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · S3 · §3 Edges · §4 Budgets and harness limits · §8 F6 · §10 · re-grounded on the
+  parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md` row 36 and
+  U2: the cap is `budgets."AGENTS.md"`, read through `budgets.py resolve`, and the harness limit
+  `CODEX_MAX` through its census row; F6 re-resolved on rung 1, the legacy carrier being gone.
 
 ## 10. Reuse audit
 
@@ -358,11 +375,11 @@ The seams extended: `render()` (`tools/playbook/render_playbook.py:979-1051`, ve
 shape (`:121-123`) and `check_one_line_regions` (`:667`) for the marked part; `resolve_template_path`
 (`:768-782`) for the template input; `cmd_update`'s verdict line (`tools/govkit/govkit.py:10010`) and
 tally (`:10033`) for the report's shape; the regenerate spawn through `run_target_argv` (`:11363`) for
-the relay; `CODEX_MAX` (`tools/agent-instructions/adopt-agent-instructions.sh:31`) through unit 6's
-reader. `reuse_lookup.py "measure the byte size of a rendered document against a declared budget"`
+the relay; `CODEX_MAX` (`tools/agent-instructions/adopt-agent-instructions.sh:31` at the base) through
+its census row `codex-instructions` (TOOL-dGroundRules-9 S1), as unit 6's check reads it. `reuse_lookup.py "measure the byte size of a rendered document against a declared budget"`
 ranked `measure_typed_counts` and `derive_budget_cut` in the codebase map and recall kits; read at
-source, neither measures a document against a cap, and `tools/check-template-size.sh` is the cap
-checker, whose rows unit 11 reads. `reuse_lookup.py "print a per-row state line at update"` ranked
+source, neither measures a document against a cap, and `budgets.py resolve` is the one cap reader
+(TOOL-dGroundRules-9 S2, S5), which unit 11 calls. `reuse_lookup.py "print a per-row state line at update"` ranked
 name-token hits only, so the report reuses `cmd_update`'s widths rather than a helper. No practice
 census exists: `tools/govkit/census.py` is the fork census (its docstring, `:2`), as the scout's row
 (`memory/builds/dOrderedCharter/build/2026-10-23-build-PLAY-dOrderedCharter-1-reuse-scout-c.md:17`)

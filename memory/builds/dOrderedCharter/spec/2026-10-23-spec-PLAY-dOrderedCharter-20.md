@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-20 — the unit schema, the one renderer of record and its templates, the render gate with its legacy list, and one fact in one unit
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 15 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0050@13d9192b whole
 
@@ -18,9 +18,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-20-deviation-201.md](../build/2026-10-24-build-PLAY-dOrderedCharter-20-deviation-201.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-20-deviation-202.md](../build/2026-10-24-build-PLAY-dOrderedCharter-20-deviation-202.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-20-deviation-203.md](../build/2026-10-25-build-PLAY-dOrderedCharter-20-deviation-203.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-6 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -88,8 +92,14 @@ instruction-unit kind's factory.
   one path per instruction file not yet rendered from units, a file whose lock row (unit 12) lists units
   being rendered from units. Under `instructions.legacy`: `shrink-only`, the default, reds an instruction
   file neither rendered from units nor listed, and a listed file now rendered from units as stale;
-  `refuse` reds every listed file. Read through dGroundRules' one reader (`cl-dClosedLoop-0008`) once it
-  lands, and until then with v2's default, `shrink-only` (v2:1359). Observed by AC8.
+  `refuse` reds every listed file. Read with `read_policy_value("instructions.legacy", root)`
+  (PLAY-dOrderedCharter-7 §4), `root` the tree under check; unset, it answers the catalogue default,
+  `shrink-only` (v2:1359; TOOL-dGroundRules-3 S2), and a refused read, the reader's exit 2, reds the gate
+  naming the key and the reader's line. The key's row in `tools/policy/catalogue.toml` lands with
+  dGroundRules, owner dOrderedCharter, with no `summary` or `usage` and its name on the shrink-only
+  `tools/policy/unsummarised-keys.txt` (TOOL-dGroundRules-1 S3, S6). This unit adds no row: it fills the
+  row's `summary` and its `usage`, a line the row admits (`instructions.legacy = "refuse"`), and drains the
+  name in the same commit with `python <prefix>/policy/policy.py lists --write`. Observed by AC8 and AC10.
 - **S9** — The instruction-unit kind's factory and gate (deviation 71):
   `python tools/playbook/core.py new unit <name> --kit <kit> --type <t> --level <n> --text <line>` composes a
   row S1 passes and prints it with the unit-15 command that writes it, never writing a manifest itself;
@@ -119,7 +129,8 @@ instruction-unit kind's factory.
 
 - **consumes-from** `PLAY-dOrderedCharter-9` — `read_units`, `derive_unit_selection` and `render_units`, which every check and slot reads
 - **consumes-from** `PLAY-dOrderedCharter-12` — `STATEMENT_TYPES` and the lock rows S8 reads and S5 writes
-- **consumes-from** `PLAY-dOrderedCharter-7` — the record factory S3 reads change records through, the kinds register S9 updates, and the `enforces` key
+- **consumes-from** `PLAY-dOrderedCharter-7` — the record factory S3 reads change records through, the kinds register S9 updates, the `enforces` key, and `read_policy_value`, which S8 reads `instructions.legacy` through
+- **consumes-from** external — dGroundRules, landed before this build run: `policy.py get` at the landed revision (TOOL-dGroundRules-2 S1, S7, `cl-dClosedLoop-0008`) with an unset key's catalogue default (TOOL-dGroundRules-3 S2), the `instructions.legacy` row and the shrink-only list S8 drains (TOOL-dGroundRules-1 S3, S6), and the mirror's `mirror --write` (TOOL-dGroundRules-5 S2, TOOL-dGroundRules-19 S1)
 - **consumes-from** `PLAY-dOrderedCharter-24` — S7's shared normaliser, the one-fact key's hash
 - **consumes-from** `PLAY-dOrderedCharter-19` — the tag grammar and namespace registry S1 grades `tag`, `scope` and `required-by` against
 - **hands-off** `PLAY-dOrderedCharter-15` — the write command S9 prints, and the change records S3 derives status from
@@ -189,7 +200,10 @@ the renderer, the script calling it. Rendered bytes do not change: the scopes re
 ### Rollout
 
 Live at landing, at order 15, after unit 9 (order 14); units 15 (order 16), 2 (order 20) and 3 (order 18)
-build on it.
+build on it. S8's row fill lands as two commits: the fill with the list drain, then
+`.governance/policy.json` alone as `policy.py mirror --write` regenerates it, since a catalogue edit stales
+the mirror (TOOL-dGroundRules-5 S1, S2) and the guard admits a mirror commit only when the policy file and
+the catalogue equal HEAD (TOOL-dGroundRules-19 S1).
 
 ### Files touched (estimate)
 
@@ -206,6 +220,9 @@ build on it.
 - `tools/roles/adopt-roles.sh`
 - `tools/agent-instructions/adopt-agent-instructions.sh`
 - `tools/gate-legs.json`
+- `tools/policy/catalogue.toml`, the existing row filled
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, the second commit
 
 ### Alternatives rejected
 
@@ -222,8 +239,9 @@ build on it.
 - security: the renderer writes only the targets `renderers.toml` assigns it and their lock rows; the
   factory never writes a manifest, which stays unit 15's guarded command.
 - perf / scale: one render per scope; the checks read the rows once.
-- error / empty / loading states: an instruction file with no renderer row is red; an empty unit
-  population prints `unarmed`, never green.
+- error / empty / loading states: an instruction file with no renderer row is red; a refused
+  `instructions.legacy` read is red naming the key; an empty unit population prints `unarmed`, never
+  green.
 - observability: each red names the path or tag, the arm and the remedy.
 - risks: the roles kit's render now reaches the playbook kit, a core-to-core edge unit 16's check admits;
   an adopter whose roles kit updates before its playbook kit renders with the old renderer until unit 31's
@@ -268,12 +286,24 @@ build on it.
   Red when: the template changes a handoff's bytes, or a slot renders prose of its own.
 - **AC8** — When `python instruction_units.py fixture --plant legacy` plants an instruction file neither
   rendered from units nor on `instructions-legacy.txt`, and a listed file whose lock row lists units, the
-  gate reds both under `shrink-only`, and under `refuse` reds every listed file.
-  Red when: an unlisted hand-written document passes, or the list grows unseen.
+  gate reds both under `shrink-only`, and under `refuse`, set in the fixture's committed policy file,
+  reds every listed file; with that file, the only commit, setting `instructions.legacy = "loose"`,
+  which the row refuses and no valid revision precedes (TOOL-dGroundRules-4 S5), the gate reds naming
+  `instructions.legacy`.
+  Red when: an unlisted hand-written document passes, the list grows unseen, or a refused read grades
+  under a default.
 - **AC9** — When `python tools/playbook/core.py new unit demo --kit playbook --type directive --level 3
   --text "MUST demo."` runs, it prints one row `schema` passes and the unit-15 command that writes it, the
   manifest is unchanged, and `core.py kinds` reads the instruction-unit kind with its factory and gate.
   Red when: the factory writes a manifest, or its row fails the schema.
+- **AC10** — When `python -c "import tomllib; print([(r['owner'], bool(r.get('summary')), bool(r.get('usage'))) for r in tomllib.load(open( 'tools/policy/catalogue.toml' , 'rb'))['key'] if r['name'] == 'instructions.legacy'])"`
+  runs after the pass, it prints one row, `dOrderedCharter`, `True`, `True`; `git grep -n -x -F
+  "instructions.legacy" -- "tools/policy/unsummarised-keys.txt"` finds no line; `python
+  "tools/policy/policy.py" lists --check` exits 0; and `git grep -n -F
+  'read_policy_value("instructions.legacy"' -- tools/playbook/render_playbook.py` finds one line.
+  Red when: a row is added, the row keeps no summary or usage, the name stays on the shrink-only list,
+  or the key is read in a shape the reader-coverage arm does not count.
+  fixture: the policy kit's paths are quoted because none is tracked until dGroundRules builds.
 
 ## 7. Gates
 
@@ -308,6 +338,7 @@ New arm: tools/playbook/render_playbook.py · covers AC5 · the render selftest 
 - rev-1 · 2026-10-23 · initial draft, the spec run's carrier of `cl-dClosedLoop-0050`.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-43, PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-50, PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · §2 S8 · §3 Edges · §4 Rollout, Files touched · §5 · AC8, AC10 · re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck` U3 and U4: `instructions.legacy` is read with `policy.py get` through PLAY-dOrderedCharter-7's `read_policy_value`, a refused read reds the gate, and the landed row is filled and drained, never added.
 
 ## 10. Reuse audit
 

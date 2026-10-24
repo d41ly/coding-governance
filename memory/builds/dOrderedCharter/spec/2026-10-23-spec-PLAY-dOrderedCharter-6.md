@@ -1,6 +1,6 @@
 # PLAY-dOrderedCharter-6 — the drive section composed from each adopted kit's drive table, and the charter held inside 32 KiB
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
+**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base ce13efbe · streams playbook · order 19 · advances PLAY-dOrderedCharter-38
 
 **Carries:** cl-dClosedLoop-0036@3667f2f3 whole
 
@@ -14,9 +14,13 @@
 | [2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md](../build/2026-10-23-build-PLAY-dOrderedCharter-1-token-fix-return.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-24-build-PLAY-dOrderedCharter-6-deviation-61.md](../build/2026-10-24-build-PLAY-dOrderedCharter-6-deviation-61.md) | deviation | — |
 | [2026-10-24-build-PLAY-dOrderedCharter-6-deviation-62.md](../build/2026-10-24-build-PLAY-dOrderedCharter-6-deviation-62.md) | deviation | — |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-agent-ledger.md) | journal | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-39 PLAY-dOrderedCharter-40 PLAY-dOrderedCharter-41 PLAY-dOrderedCharter-42 PLAY-dOrderedCharter-43 PLAY-dOrderedCharter-44 PLAY-dOrderedCharter-45 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-47 PLAY-dOrderedCharter-48 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-51 PLAY-dOrderedCharter-52 PLAY-dOrderedCharter-53 PLAY-dOrderedCharter-54 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md](../build/2026-10-25-build-PLAY-dOrderedCharter-1-reground-returns.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
+| [2026-10-25-build-PLAY-dOrderedCharter-6-deviation-63.md](../build/2026-10-25-build-PLAY-dOrderedCharter-6-deviation-63.md) | deviation | — |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-edge-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-33 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-spec-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
 | [2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md](../prompts/2026-10-23-prompt-PLAY-dOrderedCharter-1-token-fix-brief.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 |
+| [2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md](../prompts/2026-10-24-prompt-PLAY-dOrderedCharter-1-parents-reground.md) | research | PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-37 PLAY-dOrderedCharter-46 PLAY-dOrderedCharter-49 PLAY-dOrderedCharter-50 PLAY-dOrderedCharter-55 |
 | [2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md](../reviews/2026-10-23-review-PLAY-dOrderedCharter-1-spec-audit.md) | spec-audit | PLAY-dOrderedCharter-18 PLAY-dOrderedCharter-16 PLAY-dOrderedCharter-17 PLAY-dOrderedCharter-19 PLAY-dOrderedCharter-10 PLAY-dOrderedCharter-22 PLAY-dOrderedCharter-24 PLAY-dOrderedCharter-28 PLAY-dOrderedCharter-26 PLAY-dOrderedCharter-25 PLAY-dOrderedCharter-7 PLAY-dOrderedCharter-13 PLAY-dOrderedCharter-12 PLAY-dOrderedCharter-9 PLAY-dOrderedCharter-20 PLAY-dOrderedCharter-15 PLAY-dOrderedCharter-1 PLAY-dOrderedCharter-3 PLAY-dOrderedCharter-2 PLAY-dOrderedCharter-11 PLAY-dOrderedCharter-27 PLAY-dOrderedCharter-21 PLAY-dOrderedCharter-5 PLAY-dOrderedCharter-4 PLAY-dOrderedCharter-8 PLAY-dOrderedCharter-14 PLAY-dOrderedCharter-30 PLAY-dOrderedCharter-29 PLAY-dOrderedCharter-23 PLAY-dOrderedCharter-32 PLAY-dOrderedCharter-33 PLAY-dOrderedCharter-35 PLAY-dOrderedCharter-36 PLAY-dOrderedCharter-34 PLAY-dOrderedCharter-31 PLAY-dOrderedCharter-37 |
 
 <!-- /gen:spec-records -->
@@ -62,15 +66,26 @@ F1-6, F1-7; v2:961-965 P15).
   role's drive lines under a `### Drive` heading at the end of the `## Role` section, from the same
   rows, so a subagent holds its role's line as the main session does. Observed by AC5.
 - **S6** — The charter inside 32 KiB. `tools/check-template-size.sh` gains a check: when its subject
-  is the rendered charter, `AGENTS.md`, a declared row above the smallest harness's limit is refused,
-  the limit read from `CODEX_MAX` in `tools/agent-instructions/adopt-agent-instructions.sh:31` and never
-  typed in the gate. The rendered charter is measured at this unit against its two caps in
-  `template-size-limits.txt`, the `AGENTS.md` row (20480) and the template row (49152), the carriers of
-  `budgets.*` until dGroundRules moves them, and both rows are held. Observed by AC6.
-- **S7** — The raise rule, as the clause states it. The header of `tools/template-size-limits.txt`
-  gains one sentence: once a row moves under `budgets.*`, a run's raise goes through the one write
-  shape dGroundRules' minimal guard admits until dDeclaredLoop's guard lands, argued in that write's
-  change record as `cl-dClosedLoop-0012` defines it, and the four conditions stand. Observed by AC7.
+  is the rendered charter, `AGENTS.md`, a cap `budgets.py resolve AGENTS.md` answers above the smallest
+  harness's limit is refused under either `budgets.enforce` value, a correctness check as the script's
+  checks 3, 5 and 6 stay (TOOL-dGroundRules-9 S6). The limit is `CODEX_MAX`, read through the census
+  row `codex-instructions` of `tools/policy/caps.toml` (TOOL-dGroundRules-9 S1): its `home`,
+  `constant:<path>:CODEX_MAX`, names the file whose `CODEX_MAX` assignment line, `^CODEX_MAX *= *[0-9]+`
+  in the shell and the Python spelling alike, the check reads, so the move `PLAY-dOrderedCharter-31`
+  makes re-points the row and the check follows it, never typed in the gate; a missing row or a home
+  holding no such line refuses, exit 2. The charter is measured at this unit against its two caps
+  through `budgets.py resolve AGENTS.md coding-governance-agents.template.md` (TOOL-dGroundRules-9 S2),
+  `budgets."AGENTS.md"` (20480) and the template's (49152), the `AGENTS.md` and template rows
+  `tools/template-size-limits.txt` held until dSafePassage's step moved them under `budgets.*` in
+  `.governance/policy.toml` (TOOL-dSafePassage-1 S7, S8), and both caps are
+  held. Observed by AC6.
+- **S7** — The raise rule, as the clause states it. `help/charter.md`, S8's page, gains one sentence:
+  once a cap is under `budgets.*`, a run's raise goes through the one write shape dGroundRules' minimal
+  guard admits until dDeclaredLoop's guard lands, argued in that write's change record as
+  `cl-dClosedLoop-0012` defines it, and the four conditions dSafePassage's step carries above
+  `[budgets]` stand; the sentence links `help/policy.md`'s section on who may change the policy file
+  (TOOL-dGroundRules-6 S6) for the shape, and the policy file stays as the step writes it (§8 F4).
+  Observed by AC7.
 - **S8** — The page. `help/charter.md` gains a section on the drive section: where a kit declares its
   rows and how an adopter reads its own. Observed by AC7.
 
@@ -96,7 +111,8 @@ F1-6, F1-7; v2:961-965 P15).
 - **hands-off** `PLAY-dOrderedCharter-34` — the render-time refusal over a harness's own limit
 - **hands-off** `PLAY-dOrderedCharter-31` — S6's check that reads `CODEX_MAX`, re-pointed when the constant moves
 - **hands-off** `PLAY-dOrderedCharter-37` — the drive table's `[[drive]]` rows its reference page renders
-- **consumes-from** external — dGroundRules' `budgets.*` keys and minimal guard, which the raise route names
+- **consumes-from** external — dGroundRules, landed before the build run: `budgets.py resolve` and the cap census whose `codex-instructions` row S6 reads (TOOL-dGroundRules-9 S1, S2), and the minimal guard, its one admitted raise and its help section, which the raise route names (TOOL-dGroundRules-6 S3, S6)
+- **consumes-from** external — dSafePassage, landed before the build run: the step that moved every row of the former limits file under `budgets.*` in `.governance/policy.toml`, the four raise conditions above `[budgets]` (TOOL-dSafePassage-1 S7, S8)
 - **hands-off** `PLAY-dOrderedCharter-49` — the round-1 spec audit's minors on this spec, finding 21, which that batch unit corrects after this unit lands, each by the item its report id names
 - **hands-off** `PLAY-dOrderedCharter-55` — AC7's page pathspec, which unit 49 S24 corrects, is observed at `PLAY-dOrderedCharter-49`'s pass and recorded from that observation; this pass changes no code to satisfy it (round-2 id 2)
 
@@ -135,8 +151,9 @@ template's vintage as it does today. A kit without rows contributes nothing.
 
 ### Rollout
 
-Live at landing. Gov's `AGENTS.md` grows by the drive section; it is measured in the build against its
-20480 row, and a row the section would cross is raised only under the file's four conditions.
+Live at landing. Gov's `AGENTS.md` grows by the drive section; it is measured in the build against
+`budgets."AGENTS.md"` (20480), and a cap the section would cross is raised only in the minimal guard's
+one admitted shape (TOOL-dGroundRules-6 S3), under the four conditions above `[budgets]`.
 
 ### Files touched (estimate)
 
@@ -156,7 +173,6 @@ Live at landing. Gov's `AGENTS.md` grows by the drive section; it is measured in
 - `tools/roles/handoff.py`
 - `tools/check-template-size.sh`
 - `tools/check-template-size.test.sh`
-- `tools/template-size-limits.txt`
 - `coding-governance-agents.template.md`
 - `AGENTS.md` (the render of the template, re-rendered, never edited)
 - `help/charter.md`
@@ -201,19 +217,20 @@ Live at landing. Gov's `AGENTS.md` grows by the drive section; it is measured in
 - **AC5** — When `python tools/roles/handoff.py render --role builder --build <fixture> --stdout` renders a fixture handoff, its
   `## Role` section ends with a `### Drive` block holding the `gov-builder` rows' lines.
   Red when: the handoff carries no drive line.
-- **AC6** — When `LIMITS=<scratch-limits> bash tools/check-template-size.sh AGENTS.md` runs with a
-  scratch limits file declaring `AGENTS.md` at 40960, it exits non-zero naming `CODEX_MAX`; with
-  20480 it exits 0, and the measured bytes it prints are at most 20480.
-  Red when: a row above 32768 passes.
-- **AC7** — When `grep -n "cl-dClosedLoop-0012\|budgets\." tools/template-size-limits.txt` and
-  `grep -n "Drive" charter.md` run, each names the new text.
+- **AC6** — When `bash tools/check-template-size.sh AGENTS.md` runs in a scratch repository holding the
+  policy kit, whose committed `.governance/policy.toml` sets `"AGENTS.md" = 40960` under `[budgets]`, it
+  exits non-zero naming `CODEX_MAX` under `budgets.enforce = "warn"`; at 20480 it exits 0, and the
+  measured bytes it prints are at most 20480.
+  Red when: a cap above 32768 passes.
+- **AC7** — When `grep -n "cl-dClosedLoop-0012" charter.md` and `grep -n "Drive" charter.md` run, each
+  names the new text.
   Red when: either grep is empty.
 
 ## 7. Gates
 
 `playbook render selftest` · `playbook render wiring` · `playbook parity` · `charter size` · `template size <=48KiB` · `template size gate selftest` · `roles render wiring` · `roles render selftest` · `govkit acceptance matrix` · `govkit refusal join` · `govkit selftest` · `recall floor arms` · `codebase-map adopter e2e` · `codebase-map gate coverage` · `codebase-map kit selftest` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test`
 
-New arm: tools/check-template-size.test.sh · covers AC6 · a scratch limits file declaring the charter's row above the harness limit · none
+New arm: tools/check-template-size.test.sh · covers AC6 · a scratch repository whose committed policy file sets the charter's cap above the harness limit · none
 New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive` verb's selftest plants each defect of AC3 and the two charter edits of AC4 in a scratch tree · none
 
 ## 8. Open questions
@@ -235,12 +252,30 @@ New arm: tools/playbook/instruction_units.py · covers AC3 AC4 · the `drive` ve
   RESOLVED (agent, 2026-10-23, delegated): (a), rung 3; (c) holds today's value and not the limit,
   so a later raise to 40960 would pass, and (b) is `PLAY-dOrderedCharter-34`'s composition refusal.
   widens: none · relaxes: none
+- **F4 — Where S7's sentence goes, the file it was written for being gone.** dSafePassage's step
+  deletes the former limits file in its own commit and carries its header, the four raise conditions,
+  above `[budgets]` in `.governance/policy.toml` (TOOL-dSafePassage-1 S7, S8), a path the minimal guard
+  refuses to an agent's commit unless the change is one cap raised (TOOL-dGroundRules-6 S1, S3).
+  Options: (a) the sentence on `help/charter.md`, S8's page, linking `help/policy.md`'s section on who
+  may change the policy file (TOOL-dGroundRules-6 S6), the policy file left as the step writes it; (b)
+  the sentence above `[budgets]`, written by the owner at a terminal; (c) the sentence on
+  `help/size-caps.md` (TOOL-dGroundRules-9 S8). (b) hangs an agent's unit on an owner turn the build
+  cannot schedule, and (c) edits a page another build owns. RESOLVED (agent, 2026-10-24, delegated):
+  (a), rung 1, the parents' landed specs rule out the file and the agent's write; (a) is the page this
+  unit already edits, and the link keeps the shape stated once. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-23 · initial draft.
 - rev-2 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-1 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-49.
 - rev-3 · 2026-10-24 · §3 · Edges gain the mirror of each edge the round-2 spec audit's promoted units declare against this unit: PLAY-dOrderedCharter-55.
+- rev-4 · 2026-10-24 · S6 S7 · §3 Edges · §4 Rollout, Files touched · AC6 AC7 · §7 · §8 F4 · §10 ·
+  re-grounded on the parents' landed specs by `2026-10-24-build-PLAY-dOrderedCharter-1-parents-crosscheck.md`
+  row 37, U1 and U2: S6 reads both caps through `budgets.py resolve`, the rows moved by dSafePassage's
+  step, and `CODEX_MAX` through its census row; S7's sentence moves to `help/charter.md` (F4 added),
+  the former limits file being gone and the policy file guarded; AC6's scratch cap sits in a committed
+  policy file; S6 names `tools/template-size-limits.txt` as the rows' former home, keeping
+  `cl-dClosedLoop-0036`'s token in its carrier.
 
 ## 10. Reuse audit
 
@@ -249,8 +284,9 @@ The seams extended: `render()` (`tools/playbook/render_playbook.py:979`) compose
 itself in an adopter, and the `root_relative` `[[files]]` rules of `tools/playbook/kit.toml` are how
 its declarations already travel; `tools/roles/workflows.toml` already orders the loop's workflows by
 `stage`; `render_handoff` (`tools/roles/handoff.py:312`) assembles the role section the drive lines
-join; `check-template-size.sh` (`tools/check-template-size.sh:79-100`) is the one reader of the size
-rows. `python tools/codebase-map/reuse_lookup.py "compose a charter section from each kit descriptor"`
+join; `budgets.py resolve` is the one reader of the caps (TOOL-dGroundRules-9 S2, S5), and
+`check-template-size.sh` (`tools/check-template-size.sh:79-100`) the enforcer the hold joins.
+`python tools/codebase-map/reuse_lookup.py "compose a charter section from each kit descriptor"`
 ranked `kit_rel`, `resolve_kit_dir` (fan-in 12, installs 72), `read_descriptors`
 (`tools/govkit/govkit.py:13238`, `tools/run-gates/regen.py`) and `render_charter_blocks`;
 `read_descriptors` reads every registry descriptor but lives in the deployer, which an adopter's
