@@ -20,6 +20,39 @@ KIT_REL=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-prefix 2>
 [ -f "$HERE/push-main.sh" ] || { echo "push-main.sh missing beside this suite"; exit 1; }
 [ -f "$SRC/.githooks/pre-push" ] || { echo ".githooks/pre-push missing"; exit 1; }
 lander="${KIT_REL}push-main.sh"   # the lander's path inside every fixture, the same prefix as here
+# The launcher resolver, INLINE: arm 33 runs the prepared merge's own checks, which are Python, and
+# this suite ships beside its lander where `<prefix>/lib/` does not travel (TOOL-dGroundRules-25 S2).
+# >>> resolve_python — canonical copy: resolve-python.sh in gov's lib dir (byte-identical; gated)
+resolve_python() {
+  # Candidates in order: the caller's own published override, then $GOV_PYTHON, then the three
+  # launcher names. Every candidate is ONE WORD — `py -3` cannot work here, because the probe quotes
+  # the candidate and every consumer uses "$PY" as a single word (measured: exit 127).
+  _rp_tried=""
+  for _rp_c in "${1:-}" "${GOV_PYTHON:-}" python3 python py; do
+    [ -n "$_rp_c" ] || continue
+    _rp_tried="$_rp_tried $_rp_c"
+    if "$_rp_c" -c "import sys" >/dev/null 2>&1; then
+      printf '%s\n' "$_rp_c"
+      return 0
+    fi
+  done
+  {
+    echo "resolve_python: no usable python launcher. Each candidate was RUN with -c 'import sys' and"
+    echo "resolve_python: none exited 0 — being on PATH is not evidence (the Microsoft Store python3"
+    echo "resolve_python: stub answers \`command -v\` and exits 9009 without running anything)."
+    echo "resolve_python: tried:$_rp_tried"
+    if [ -n "${1:-}" ]; then
+      echo "resolve_python: the caller's override '$1' was tried FIRST and did not run."
+    fi
+    if [ -n "${GOV_PYTHON:-}" ]; then
+      echo "resolve_python: GOV_PYTHON is set to '$GOV_PYTHON' and did not run. An override that is"
+      echo "resolve_python: set and unusable is THIS failure, never a silent fall-through — the"
+      echo "resolve_python: operator believes they chose, and would not have."
+    fi
+  } >&2
+  return 1
+}
+# <<< resolve_python
 
 tmp=$(mktemp -d) || exit 2
 trap 'rm -rf "$tmp"' EXIT
@@ -1042,6 +1075,43 @@ if [ -n "$_rg_k" ]; then
       ok "32 a failing regeneration refuses the attended landing with its own line, and nothing is pushed" ;;
     *) bad "32 a failing regeneration did not refuse the attended landing, or something was pushed: $out32" ;;
   esac
+
+  # 33 (TOOL-dGroundRules-25 S2-S4) — a policy-file change on `feat`, landed through the real
+  #      --prepare, which stales the mirror (it records the policy file's blob): the prepared merge's
+  #      own checks, the installed regen.py --check and the policy kit's mirror --check, must each
+  #      exit 0 at the prepared HEAD. The lander is asserted to have prepared FIRST, by its exit, its
+  #      `push-main: prepared` line and a second parent: a refused --prepare is graded by its exit
+  #      status, never by checks over the unmerged branch. Needs the policy kit beside the lander; an
+  #      install without one says so, as 28-32 do without regen.py.
+  _pk_k=$(cd "$HERE" && for d in */; do [ -f "$d/policy.py" ] && [ -f "$d/catalogue.toml" ] && { printf '%s' "${d%/}"; break; }; done)
+  if [ -z "$_pk_k" ]; then
+    echo "  skip — 33 no policy kit beside this lander, so the policy-landing arm did not run"
+  elif ! _py33=$(resolve_python); then
+    bad "33 no python launcher runs, so the prepared merge's checks cannot be read"
+  else
+    out33=$(
+      build_regen_fixture "$tmp/remote13.git" "$tmp/work13" || exit 1
+      git checkout -q -b feat
+      printf '# a policy change landed through --prepare (TOOL-dGroundRules-25 S2)\n' >> .governance/policy.toml
+      git commit -q --no-verify -am "TOOL-tFix-33: a policy change"
+      unset GATE_PUSH_BASE; o33=$(bash "$lander" --prepare --slug tPolicy 2>&1); rc33=$?
+      printf '%s\n' "$o33"; echo "prepare-rc=$rc33"
+      [ "$rc33" = 0 ] || exit 0
+      git rev-parse -q --verify 'HEAD^2' >/dev/null && echo merge=1
+      "$_py33" "${KIT_REL}$_rg_k/regen.py" --check >/dev/null 2>&1; echo "regen-rc=$?"
+      "$_py33" "${KIT_REL}$_pk_k/policy.py" mirror --check >/dev/null 2>&1; echo "mirror-rc=$?"
+    )
+    _rc33=$(printf '%s\n' "$out33" | sed -n 's/^prepare-rc=//p')
+    if [ "$_rc33" != 0 ]; then
+      bad "33 --prepare over a policy-file change exited ${_rc33:-(it never ran)}, so neither check was read: $out33"
+    elif ! printf '%s\n' "$out33" | grep -q '^push-main: prepared ' || ! printf '%s\n' "$out33" | grep -qx 'merge=1'; then
+      bad "33 --prepare exited 0 without printing push-main: prepared and leaving a second parent: $out33"
+    elif printf '%s\n' "$out33" | grep -qx 'regen-rc=0' && printf '%s\n' "$out33" | grep -qx 'mirror-rc=0'; then
+      ok "33 a policy-file change landed through --prepare carries generated outputs regen.py --check and mirror --check both call fresh"
+    else
+      bad "33 the prepared merge carries a generated output its own checks call stale: $(printf '%s\n' "$out33" | grep -E '^(regen|mirror)-rc=' | tr '\n' ' ')"
+    fi
+  fi
 else
   echo "  skip — 28-32 no run-gates kit holding regen.py beside this lander, so the regeneration arms did not run"
 fi

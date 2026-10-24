@@ -107,8 +107,8 @@ Ids whose spec moved past its audited revision: none — 0 of 8 unit id(s) carry
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `KICK-aBlindedTrial-1`, `TOOL-aBlindedTrial-1`, `TOOL-aBlindedTrial-2`, `TOOL-aBlindedTrial-7`, `TOOL-aBlindedTrial-8` | yes |
-| 2 | `TOOL-aBlindedTrial-3`, `TOOL-aBlindedTrial-4`, `TOOL-aBlindedTrial-5` | yes |
+| 1 | `KICK-aBlindedTrial-1`, `TOOL-aBlindedTrial-1`, `TOOL-aBlindedTrial-2`, `TOOL-aBlindedTrial-7`, `TOOL-aBlindedTrial-8` | no |
+| 2 | `TOOL-aBlindedTrial-3`, `TOOL-aBlindedTrial-4`, `TOOL-aBlindedTrial-5` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

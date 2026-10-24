@@ -105,9 +105,9 @@ Ids whose spec moved past its audited revision: none — 0 of 7 unit id(s) carry
 | Step | Units | Parallel |
 |---|---|---|
 | 0 | `TOOL-aHonedRuleset-1` | no |
-| 1 | `TOOL-aHonedRuleset-2`, `TOOL-aHonedRuleset-6` | yes |
+| 1 | `TOOL-aHonedRuleset-2`, `TOOL-aHonedRuleset-6` | no |
 | 2 | `TOOL-aHonedRuleset-3` | no |
-| 3 | `TOOL-aHonedRuleset-4`, `TOOL-aHonedRuleset-5` | yes |
+| 3 | `TOOL-aHonedRuleset-4`, `TOOL-aHonedRuleset-5` | no |
 | 4 | `TOOL-aHonedRuleset-8` | no |
 <!-- /gen:build-order -->
 

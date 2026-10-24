@@ -483,6 +483,9 @@ render() { # template -> stdout
   out=${out//\{\{TOOL_ROOT\}\}/"$TOOLROOT"}
   out=${out//\{\{MEMORY_TREE_DIR\}\}/"$MTD"}
   out=${out//\{\{FANOUT_CAP\}\}/"$FANOUT_CAP"}
+  if [ "${WRITER_SPLIT:-1}" = 0 ]; then  # S18's floor, set above; a template without the line is unchanged
+    out=${out//"Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-writers"/"Math.ceil(slices.length / Math.min(SPEC_WRITERS, 5))) // gov:fixed-verifiers"}
+  fi
   printf '%s' "$out"
 }
 read_lf() { sed 's/\r$//' "$1"; }
@@ -552,6 +555,24 @@ FANOUT_CAP=${FANOUT_CAP%$'\r'}
 case "$FANOUT_CAP" in
   ''|0*|*[!0-9]*) echo "protocol-parity: the policy reader answered '$FANOUT_CAP' for runtime.agents-in-flight, not a positive integer. Nothing was rendered or graded."; exit 2 ;;
 esac
+
+# THE WRITER MARKER'S FLOOR (TOOL-dGroundRules-25 S18). `unattended-build.js` bounds its spec-writer
+# split under `// gov:fixed-writers`, which only an agent-cap hook at or above the version that
+# shipped the marker admits; an older hook's rule 2 denies every `unattended-build` call. So the
+# resolved hook's KIT_AGENT_CAP_VERSION is read first, and below the floor the split renders under
+# `// gov:fixed-verifiers` at `Math.min(SPEC_WRITERS, 5)`, the verify total the old hook resolves, with
+# one stderr line naming the update. The floor is the version the hook reads at build, 1.40; a
+# version is minted only at the landing. No hook resolved renders the writer split: nothing denies it.
+WRITER_FLOOR=1.40
+WRITER_SPLIT=1
+if _ac_dir=$(resolve_kit_dir "$_cite_py" hooks agent-cap.js "$HERE" 2>/dev/null); then
+  _ac_ver=$(sed -n "s/^const KIT_AGENT_CAP_VERSION = '\([0-9.]*\)'.*/\1/p" "$_ac_dir/agent-cap.js" | head -n 1)
+  if [ "$(awk -v v="$_ac_ver" -v f="$WRITER_FLOOR" 'BEGIN { split(v, a, "."); split(f, b, ".")
+         print (v == "" || a[1] + 0 < b[1] + 0 || (a[1] + 0 == b[1] + 0 && a[2] + 0 < b[2] + 0)) ? 1 : 0 }')" = 1 ]; then
+    WRITER_SPLIT=0
+    echo "protocol-parity: the agent-cap hook at $_ac_dir/agent-cap.js is ${_ac_ver:-unversioned}, below the $WRITER_FLOOR whose rule 2 admits a gov:fixed-writers split, so unattended-build.js renders its spec-writer split under gov:fixed-verifiers at Math.min(SPEC_WRITERS, 5). Update it: govkit update --kits agent-cap" >&2
+  fi
+fi
 
 TMPD=$(mktemp -d) || exit 2
 trap 'rm -rf "$TMPD"' EXIT

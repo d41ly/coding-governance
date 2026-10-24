@@ -10,9 +10,10 @@
 # a policy file is the repository's own from its first write, so an existing one is kept byte for
 # byte and the script says "kept". Then, kept or written, it renders the harness's two concurrency
 # settings from the agent limit at HEAD, `policy.py settings --write`, whenever HEAD resolves, so an
-# adopter spawns on install day without running the render by hand; with no commit yet it prints one
-# line naming the re-run. `[[regenerate]]` in kit.toml runs this same verb on every update
-# (TOOL-dGroundRules-21 S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
+# adopter spawns on install day without running the render by hand, and then the JSON mirror,
+# `policy.py mirror --write` (TOOL-dGroundRules-25 S7); with no commit yet it prints one line naming
+# the re-run. `[[regenerate]]` in kit.toml runs this same verb on every update (TOOL-dGroundRules-21
+# S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
 #
 # The kit dir is this script's own directory, never spelled, so the adopter runs from wherever the
 # kit is installed. Its refusals are armed by `adopt-policy.test.sh` beside it.
@@ -105,8 +106,10 @@ if ! git -C "$TARGET" rev-parse --verify -q HEAD >/dev/null 2>&1; then
   echo "policy: $TARGET has no commit yet, so the harness settings are not rendered; re-run --scaffold after the first commit"
   exit 0
 fi
-if ! (cd "$TARGET" && "$PY" -B "$HERE/policy.py" settings --write); then
-  echo "policy: the harness settings could not be rendered in $TARGET; the line above says why"
+# Then the JSON mirror the hooks read, rendered at HEAD the same way (TOOL-dGroundRules-25 S7), so an
+# adopter's bar finds it fresh at its preflight; one refusal branch holds both renders.
+if ! (cd "$TARGET" && "$PY" -B "$HERE/policy.py" settings --write && "$PY" -B "$HERE/policy.py" mirror --write); then
+  echo "policy: the harness settings could not be rendered in $TARGET, or the policy mirror after them; the line above says which"
   exit 1
 fi
 exit 0

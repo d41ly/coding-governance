@@ -55,13 +55,14 @@ stage = 2
 
 # The harness's two concurrency settings in `.claude/settings.json`, rendered from the agent limit
 # `runtime.agents-in-flight` resolves at HEAD (TOOL-dGroundRules-10), so a policy write and its render
-# land in one landing. Stage 1: it reads no other generated output.
+# land in one landing. Both argvs name the tracked file, so an exported GOV_SETTINGS_JSON cannot steer
+# the landing's render away from it (TOOL-dGroundRules-25 S32). Stage 1: it reads no other generated output.
 [[generated]]
 path = ".claude/settings.json"
 generator = "policy.py"
 why = "the harness's concurrency settings, rendered from runtime.agents-in-flight at each landing (TOOL-dGroundRules-10)"
-write = ["python", "{kit}/policy.py", "settings", "--write"]
-check = ["python", "{kit}/policy.py", "settings", "--check"]
+write = ["python", "{kit}/policy.py", "settings", "--write", ".claude/settings.json"]
+check = ["python", "{kit}/policy.py", "settings", "--check", ".claude/settings.json"]
 stage = 1
 
 [[outcome]]

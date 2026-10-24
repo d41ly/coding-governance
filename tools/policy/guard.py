@@ -98,20 +98,31 @@ def check_parent_sides(touched):
 
 def check_mirror_render():
     """The mirror shape (TOOL-dGroundRules-19) -> None where the staged mirror leaves the touched set,
-    else why it stays. It leaves when the staged policy file and this kit's catalogue are their blobs
-    at HEAD, each absent on both sides counting as equal, and its staged bytes are the stdout of
-    `policy.py mirror --print`, the render at HEAD, run under this interpreter: a subprocess, so the
-    guard imports no reader. A render that refuses keeps the mirror in the set, naming its line."""
+    else why it stays. It leaves when every input the staged mirror records is staged as HEAD holds
+    it, each absent on both sides counting as equal: the policy file, this kit's catalogue and each
+    key of its `legacy_blobs`, read from the mirror's own record so an input the render adds needs no
+    edit here (TOOL-dGroundRules-25 S19, S21); and when its staged bytes are the stdout of
+    `policy.py mirror --print`, the render at HEAD, run under this interpreter and compared as bytes:
+    a subprocess, so the guard imports no reader. A render that refuses keeps the mirror in the set,
+    naming its line."""
     kit = Path(__file__).absolute().parent
     catalogue = run_git("-C", str(kit), "rev-parse", "--show-prefix").decode("utf-8").strip() + "catalogue.toml"
-    if any(read_blob_id("", p) != read_blob_id("HEAD", p) for p in (POLICY, catalogue)):
-        return "the mirror renders HEAD: commit the policy file or catalogue first, then regenerate"
+    staged = read_blob_id("", MIRROR)
+    blob = None if staged is None else run_git("cat-file", "blob", staged)
+    try:
+        legacy = json.loads(blob.decode("utf-8")).get("legacy_blobs") if blob is not None else {}
+    except (ValueError, AttributeError):
+        legacy = None
+    if not isinstance(legacy, dict) or not all(isinstance(k, str) for k in legacy):
+        return "records no legacy_blobs object, so its inputs cannot be read; regenerate it"
+    for p in (POLICY, catalogue, *sorted(legacy)):
+        if read_blob_id("", p) != read_blob_id("HEAD", p):
+            return f"the mirror renders HEAD and its input {p} is staged changed: commit {p} first, then regenerate"
     p = subprocess.run([sys.executable, str(kit / "policy.py"), "mirror", "--print"], capture_output=True)
     if p.returncode != 0:
         err = p.stderr.decode("utf-8", errors="replace").strip() or f"exit {p.returncode}"
         return f"its render at HEAD refused: {err}"
-    staged = read_blob_id("", MIRROR)
-    if staged is None or run_git("cat-file", "blob", staged) != p.stdout:
+    if blob is None or blob != p.stdout:
         return "differs from its render at HEAD"
     return None
 

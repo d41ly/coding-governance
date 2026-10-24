@@ -83,6 +83,10 @@ An `agent(` call reached through an iteration construct is allowed only when its
 
 - an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers`, where that line
   spells `chunk(<x>, Math.ceil(<x>.length / <K>))` or `splitInto(<x>, <K>)` and `<K>` resolves; or
+- an identifier assigned exactly once on a line carrying `// gov:fixed-writers`, the same split
+  shape, whose `<K>` resolves to at most `runtime.agents-in-flight` — a WRITER split, the build
+  harness's spec stage, is no verify stage, so its bound is the agent limit and not `MAX_VERIFIERS`
+  (TOOL-dGroundRules-18); or
 - an identifier assigned exactly once from an array LITERAL with ≤ 5 elements — the finder-lens case,
   where the agent count is visible in the source. A trailing comma is not an element; or
 - an identifier assigned exactly once on a line carrying `// gov:fixed-verifiers` whose right-hand

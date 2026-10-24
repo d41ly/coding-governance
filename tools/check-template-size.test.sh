@@ -209,6 +209,17 @@ mkfile 5001 "$S/AGENTS.md"
 expect_out "A2p a pinned subject refuses under warn, naming budgets.pinned" \
   "budgets.pinned names it" 1 run_gate_in AGENTS.md
 
+# --- A24 · no python launcher: an over-cap subject refuses at check 5 (TOOL-dGroundRules-25 S35) --
+# Every launcher name on PATH answers as the Microsoft Store stub does, exit 9009, and no override is
+# set, so no policy kit can read the declaration: the gate's `fail 5`, never a pass unmeasured.
+mkdir -p "$TMP/nopy"
+for _np in python3 python py; do printf '#!/usr/bin/env bash\nexit 9009\n' > "$TMP/nopy/$_np"; chmod +x "$TMP/nopy/$_np"; done
+build_scratch_repo 'AGENTS.md\t5000\n' "$REFUSE"
+mkfile 5001 "$S/AGENTS.md"
+expect_out "A24 with no python launcher an over-cap subject refuses at check 5" \
+  "TEMPLATE-SIZE check 5 FAILED — the declared size limit for this subject could not be read, so nothing is compared: no python launcher resolved" \
+  5 env -u GOV_PYTHON -u TEMPLATE_SIZE_PY PATH="$TMP/nopy:$PATH" bash -c 'cd "$1" && bash "$2" AGENTS.md' _ "$S" "$ROOT/$GATE"
+
 # --- A3 · a missing path -------------------------------------------------------------------------
 expect_out "A3 a missing subject exits 2" \
   "the file to measure does not exist" 2 bash "$GATE" "$TMP/no-such-file"

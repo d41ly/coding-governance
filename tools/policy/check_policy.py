@@ -327,9 +327,13 @@ def arm_mirror_landed(repo, kit):
     """For each key the policy file at the landed revision L sets, the helper's CLI, `node
     policy-mirror.js get <key> --repo <repo>`, one call per key, against the reader's `resolve` at L
     as `get` prints it: a value the two answer differently, or one refusing where the other answers,
-    is a finding."""
+    is a finding. A landed revision that does not resolve is announced, and one whose policy file
+    sets no key is a population of 0, announced by its `empty` (TOOL-dGroundRules-25 S26)."""
     try:
         sha, _how = policy.derive_landed_revision(repo)
+    except policy.Refusal as exc:  # announced: no landing yet is legal (TOOL-dGroundRules-25 S26)
+        return None, f"no landed revision: {exc.why}", []
+    try:
         text = policy.read_policy_text(repo, sha)
         keys = sorted(policy.render_dotted(p) for p in policy.parse_policy(text)) if text is not None else []
     except policy.Refusal as exc:
@@ -369,8 +373,15 @@ def arm_legacy_homes(repo, kit):
     landed revision. A Refusal, an unreadable landed revision or house file, is the one finding. Where
     `kit` holds no list, the arm grades nothing and says so: the list is gov's own, withheld from
     installs by this kit's descriptor (TOOL-dGroundRules-17), and the `legacy-homes-present` case holds
-    gov's own copy present."""
-    if not (Path(kit) / policy.LEGACY_LIST).is_file():
+    gov's own copy present. It says the same, and grades nothing, wherever `derive_census_tree` answers
+    `adopter`, a list at the installed kit's directory included: an adopter's list cannot hold gov's
+    rows, so grading one would red every adopter (TOOL-dGroundRules-25 S11). A receipt that does not
+    read is the one finding."""
+    try:
+        tree, _receipt = derive_census_tree(repo)
+    except policy.Refusal as exc:
+        return 0, "the install receipt did not read", [(exc.path, exc.why)]
+    if tree == "adopter" or not (Path(kit) / policy.LEGACY_LIST).is_file():
         return None, policy.LEGACY_WITHHELD, []
     try:
         with policy.run_without_git_env():  # the base `lists --check` reads, by the one comparison
@@ -504,11 +515,16 @@ def check_reader_coverage(repo, landed=None, kit=KIT):
 def arm_reader_coverage(repo, kit):
     """`check_reader_coverage` over the repository: its population the catalogue's keys whose owner
     has landed, so before any Owner build lands it is 0, which this arm announces, never a finding
-    (TOOL-dGroundRules-21 S5). A Refusal, a landed revision, landed build or memory-tree kit that does
-    not read, is the one finding."""
+    (TOOL-dGroundRules-21 S5), and so is a landed revision that does not resolve, before any landing
+    (TOOL-dGroundRules-25 S26). A Refusal, a landed build or memory-tree kit that does not read, is the
+    one finding."""
     rows, bad = load_rows(kit)
     if bad:
         return 0, "the catalogue did not parse", [bad]
+    try:
+        policy.derive_landed_revision(repo)
+    except policy.Refusal as exc:  # announced: no landing yet is legal (TOOL-dGroundRules-25 S26)
+        return None, f"no landed revision: {exc.why}", []
     try:
         n, findings = check_reader_coverage(repo, kit=kit)
     except policy.Refusal as exc:
@@ -705,23 +721,33 @@ def arm_cap_census(repo, kit):
                          f"· {asked} request(s) in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel}"), out
 
 
-# One row per arm: its name, its function (repo, kit) -> (population, why, findings), and what a
+# One row per arm: its name, its function (repo, kit) -> (population, why, findings), what a
 # population of 0 means, `finding` or `announce` (TOOL-dGroundRules-21 S5), the choice the README's
-# "Each arm in an adopter" table names in its last column.
-Arm = namedtuple("Arm", "name run empty")
+# "Each arm in an adopter" table opens its last column with, and the reason for that choice. Every row
+# declares both, and `arms-empty-declared` reds one that does not (TOOL-dGroundRules-25 S26): an
+# undeclared `empty` reads a 0 as a finding, so it can only red, never pass silently.
+Arm = namedtuple("Arm", "name run empty why", defaults=(None, None))
 ARMS = [
-    Arm("arm_schema", arm_schema, "announce"),  # no policy file, or one setting no key, is legal
-    Arm("arm_shape", arm_shape, "finding"),
-    Arm("arm_summaries", arm_summaries, "finding"),
-    Arm("arm_direction", arm_direction, "finding"),
-    Arm("arm_on_invalid", arm_on_invalid, "finding"),
-    Arm("arm_mirror_parity", arm_mirror_parity, "finding"),
-    Arm("arm_mirror_landed", arm_mirror_landed, "finding"),
-    Arm("arm_mirror_readers", lambda repo, kit: arm_single_reader(repo, policy.MIRROR_REL, kit), "announce"),  # no code is legal
-    Arm("arm_legacy_homes", arm_legacy_homes, "finding"),
-    Arm("arm_reader_coverage", arm_reader_coverage, "announce"),  # no Owner build landed yet
-    Arm("arm_limits_readers", lambda repo, kit: arm_single_reader(repo, budgets.LIMITS_NAME, kit, "LIMITS_NAME"), "finding"),
-    Arm("arm_cap_census", arm_cap_census, "finding"),
+    Arm("arm_schema", arm_schema, empty="announce",
+        why="no policy file, or one setting no key, is legal before --scaffold"),
+    Arm("arm_shape", arm_shape, empty="finding", why="the catalogue ships in the kit, so it always has rows"),
+    Arm("arm_summaries", arm_summaries, empty="finding", why="the catalogue the list is graded against ships in the kit"),
+    Arm("arm_direction", arm_direction, empty="finding", why="the catalogue's bound rows ship in the kit"),
+    Arm("arm_on_invalid", arm_on_invalid, empty="finding",
+        why="its population is HEAD, never 0; a HEAD that names no commit or holds no file is announced"),
+    Arm("arm_mirror_parity", arm_mirror_parity, empty="finding",
+        why="HEAD's mirror always holds keys; a HEAD naming no commit, or carrying neither file, is announced"),
+    Arm("arm_mirror_landed", arm_mirror_landed, empty="announce",
+        why="a landed revision that does not resolve, or sets no key, is legal before the first landing"),
+    Arm("arm_mirror_readers", lambda repo, kit: arm_single_reader(repo, policy.MIRROR_REL, kit), empty="announce",
+        why="a tree with no tracked code is legal"),
+    Arm("arm_legacy_homes", arm_legacy_homes, empty="finding",
+        why="gov's own list derives rows; with no list, or in an adopter's tree, it is announced"),
+    Arm("arm_reader_coverage", arm_reader_coverage, empty="announce",
+        why="no owner build landed, or no landed revision, is legal"),
+    Arm("arm_limits_readers", lambda repo, kit: arm_single_reader(repo, budgets.LIMITS_NAME, kit, "LIMITS_NAME"),
+        empty="announce", why="a tree with no tracked code is legal"),
+    Arm("arm_cap_census", arm_cap_census, empty="finding", why="the census ships in the kit, so it always has rows"),
 ]
 ARM = {a.name: a for a in ARMS}
 
@@ -854,9 +880,11 @@ def load_tree_lib(kit=KIT):
     return tree_lib
 
 
+# The run-gates kit's rule, profile_bar.py's `resolve_bash` (TOOL-dGroundRules-21 S14), inlined from
+# its canonical block (TOOL-dGroundRules-25 S28).
+# >>> resolve_bash_py -- canonical copy: resolve_bash.py in the gov lib dir (byte-identical; gated)
 def resolve_bash(script):
-    r"""The bash that can SEE `script`, by RUNNING each candidate, or None: a copy of the run-gates
-    kit's rule, profile_bar.py's `resolve_bash` (TOOL-dGroundRules-21 S14). GOV_BASH first, then the
+    r"""The bash that can SEE `script`, by RUNNING each candidate, or None. GOV_BASH first, then the
     bash PATH names, then Git for Windows' two paths, each kept only when `test -f` on the script
     exits 0 under it. On Windows PATH order commonly puts the System32 WSL launcher first, which
     cannot open a `C:/` path, and a stub that exits 127 can sit there too (gotcha
@@ -875,25 +903,33 @@ def resolve_bash(script):
         if r.returncode == 0:
             return c
     return None
+# <<< resolve_bash_py
 
 
 def run_adopter_suite(name):
     """`adopter-suite` (TOOL-dGroundRules-21 S4): `adopt-policy.test.sh`, the adopter's sibling suite,
     which arms each of its refusal branches, run under the bash `resolve_bash` finds able to see it,
-    so a leg executes the arms `check-arms.py` reads. Its exit 0 is the case's pass."""
+    so a leg executes the arms `check-arms.py` reads. The pass is its exit 0 AND its closing count line
+    naming at least one arm passed and none failed (TOOL-dGroundRules-25 S29): a suite that is absent,
+    that no bash can see, or that never reached its count is a WRONG, never a skip."""
     suite = KIT / "adopt-policy.test.sh"
+    if not suite.is_file():
+        return print_checks(name, [(name, f"{suite.name} beside the adopter", False, "absent, so no arm ran")])
     bash = resolve_bash(suite.as_posix())
     if bash is None:
         return print_checks(name, [(name, "a bash that can see the suite", False, "none: set GOV_BASH")])
     rc, out = run_case_argv(KIT, [bash, suite.as_posix()])
-    return print_checks(name, [(name, f"bash {suite.name} exits 0", rc == 0, f"exit {rc} · {render_said(out, 'passed')}")])
+    count = re.search(r"^==== ([1-9][0-9]*) passed, 0 failed ====$", out, flags=re.M)
+    return print_checks(name, [(name, f"bash {suite.name} exits 0 naming its arm count", rc == 0 and bool(count),
+                                f"exit {rc} · {render_said(out, 'passed')}")])
 
 
 def extract_arm_rows(text):
-    """The backticked first-column names of the README's "Each arm in an adopter" table, in order."""
+    """The README's "Each arm in an adopter" table -> {backticked first-column name: the leading word
+    of its last column, `announce` or `finding` as written}, in order (TOOL-dGroundRules-25 S8)."""
     parts = text.replace("\r", "").split(f"\n## {ADOPTER_SECTION}\n", 1)
     section = parts[1].split("\n## ", 1)[0] if len(parts) == 2 else ""
-    return re.findall(r"^\| `([^`]+)` \|", section, flags=re.M)
+    return {m[1]: m[2] for m in re.finditer(r"^\| `([^`]+)` \|.*\| ([A-Za-z-]*)[^|]*\|[ \t]*$", section, flags=re.M)}
 
 
 def check_arm_lines(out, names):
@@ -960,27 +996,113 @@ def build_source_snapshot(source_root):
     return s
 
 
+def derive_requires_closure(ids):
+    """-> (the registry ids `ids` and the closure of each entry's descriptor `requires`, in order; one
+    message per id the deployer's registry does not resolve). Each id is read as a REGISTRY id, its
+    descriptor the `descriptor` field of the registry under this kit's tool root, `{prefix}` resolved,
+    never as a kit home: `agent-cap` is homed in `hooks` (TOOL-dGroundRules-25 S6)."""
+    troot = budgets.derive_tool_root()
+    top = Path((policy.run_git(KIT, "rev-parse", "--show-toplevel") or "").strip() or KIT.parent)
+    reg = top / budgets.resolve_prefix_token("{prefix}/govkit/registry.toml", troot)
+    try:
+        entries = {str(e.get("id")): str(e.get("descriptor")) for e in
+                   tomllib.loads(reg.read_text(encoding="utf-8")).get("entry", []) if isinstance(e, dict)}
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        return list(ids), [f"the deployer's registry does not read: {type(exc).__name__}: {exc}"]
+    out, todo, wrong = [], list(ids), []
+    while todo:
+        eid = todo.pop(0)
+        if eid in out:
+            continue
+        out.append(eid)
+        if eid not in entries:
+            wrong.append(f"{eid} is selected or required and is no entry of {reg.relative_to(top).as_posix()}")
+            continue
+        try:
+            desc = top / budgets.resolve_prefix_token(entries[eid], troot)
+            todo += tomllib.loads(desc.read_text(encoding="utf-8")).get("requires", [])
+        except (OSError, tomllib.TOMLDecodeError) as exc:
+            wrong.append(f"the descriptor of {eid} does not read: {type(exc).__name__}: {exc}")
+    return out, wrong
+
+
+def build_install_target(name, ids, answers=""):
+    """A fresh target ready for the deployer (TOOL-dGroundRules-24, -26): `build_source_snapshot`'s
+    clone of the tree under test, and beside it `git init` with a pinned autocrlf, a one-line README
+    and a `.governance/deploy.toml` naming the snapshot as `gov_source`, this kit's tool root's name as
+    `prefix`, `ids` as `kits` and the TOML text `answers` after them, committed once. Prints the
+    snapshot line. -> (target, snapshot, the snapshot's govkit.py); the caller removes both
+    directories. RuntimeError naming what is missing or which step failed, nothing left behind."""
+    root = KIT.parent  # this kit's own resolved tool root; the target's prefix is its name, never spelled
+    top = (policy.run_git(KIT, "rev-parse", "--show-toplevel", "--show-prefix") or "").split("\n")
+    if not (root / "govkit" / "govkit.py").is_file():
+        raise RuntimeError(f"no deployer to install with: looked for govkit.py at {(root / 'govkit').as_posix()}, "
+                           "under this kit's tool root")
+    if len(top) < 2 or not top[0]:
+        raise RuntimeError(f"no tree under test to snapshot: {KIT.as_posix()} is in no git repository")
+    try:
+        s = build_source_snapshot(top[0])
+    except (RuntimeError, OSError) as exc:
+        raise RuntimeError(f"nothing was installed to grade: {exc}") from None
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    try:
+        snap, over = (policy.run_git(s, "rev-parse", "HEAD", "HEAD^") or "? ?").split()
+        print(f"{name}: installing from snapshot {snap[:8]} of the working tree over HEAD {over[:8]}")
+        run_fixture_git(t, "init", "-q")
+        run_fixture_git(t, "config", "core.autocrlf", "false")
+        (t / "README.md").write_text("A fresh adopter of the policy kit.\n", encoding="utf-8", newline="\n")
+        Path(t, POLICY_FILE[0]).mkdir()
+        Path(t, DEPLOY_REL).write_text(
+            f'gov_source = {json.dumps(s.as_posix())}\nprefix = {json.dumps(root.name)}\nkits = {json.dumps(ids)}\n{answers}',
+            encoding="utf-8", newline="\n")
+        run_fixture_git(t, "add", "-A")
+        run_fixture_git(t, "commit", "-q", "-m", "a fresh target")
+    except BaseException:
+        remove_repo(t)
+        remove_repo(s)
+        raise
+    return t, s, s / Path(top[1]).parent / "govkit" / "govkit.py"  # the clone's own deployer installs its HEAD
+
+
+def run_install_verb(govkit, verb, t, ids):
+    """`python <govkit> <verb> --target <t> --kits <ids>` with the remote probe off -> (exit, output)."""
+    p = subprocess.run([sys.executable, str(govkit), verb, "--target", t.as_posix(), "--kits", ",".join(ids)],
+                       capture_output=True, text=True, encoding="utf-8", errors="replace",
+                       env=dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1"))
+    return p.returncode, (p.stdout + p.stderr).replace("\r", "")
+
+
+def read_receipt_rows(t):
+    """The install receipt's `files` rows of target `t`, each a dict."""
+    return [r for r in json.loads(Path(t, RECEIPT_REL).read_text(encoding="utf-8")).get("files") or []
+            if isinstance(r, dict)]
+
+
 def run_fresh_target(name):
-    """This kit installed by the deployer into a fresh target: `git init` with a pinned autocrlf, a
-    one-line README and a `.governance/deploy.toml`, committed once, then `govkit.py apply` with this
-    kit's id and the closure of its kit.toml `requires` (TOOL-dGroundRules-24), run from
-    `build_source_snapshot`'s clone of the tree under test, which the descriptor's `gov_source` names
-    and whose commit the case prints over the source's HEAD (TOOL-dGroundRules-26). Every file under the
-    target's tool root must be a receipt row's `path`, and every engine or seed row's `path` must
-    exist. Then the installed `adopt-policy.sh`, found through its receipt row: `--scaffold`, and
-    `--check` with the install staged and again once it is committed, each exiting 0 with every arm
-    graded clean or announced; and the README's table joined to ARMS both ways. Over the scaffolded
-    target, each `--check` must also print `arm_schema` grading the scaffold's keys with no finding,
-    `arm_mirror_readers` grading at least one staged code file of the memory-tree kit its `requires`
-    installs with no finding, and the reader-coverage arm `not graded`; and an Arm planted with a
-    population of 0 must print one finding under `finding` and none, `not graded`, under `announce`
-    (TOOL-dGroundRules-21 S5, AC5). A missing `govkit.py` or a refused `apply` is a WRONG, and nothing
-    after it runs. Prints its lines. -> (assertions, wrong)."""
+    """This kit installed by the deployer into a fresh target (TOOL-dGroundRules-24, -26): by
+    `build_install_target`, then `govkit.py apply` with this kit's id and `run-gates`, and the closure
+    of their `requires` read as registry ids (TOOL-dGroundRules-25 S6, S7). Every file under the
+    target's tool root must be a receipt row's `path`, every engine or seed row's `path` must exist,
+    and no `legacy-homes.txt` may be installed (S5). Then the installed `adopt-policy.sh`, found through
+    its receipt row: `--scaffold`; `--check` with the install staged; the install committed;
+    `--scaffold` again, which renders the mirror once its inputs are committed, and the mirror
+    committed (S7); `--check` again; and the installed `regen.py --check`, exit 0, the adopter's bar's
+    preflight. Each `--check` must exit 0 with every arm graded clean or announced (S26), print
+    `arm_schema` grading the scaffold's keys with no finding, `arm_mirror_readers` grading at least one
+    staged code file of the memory-tree kit with no finding, the reader-coverage arm `not graded`, and
+    `arm_legacy_homes` `not graded · the list is gov's own` (S5); with an adopter-written list at the
+    installed kit's directory, `--check` must still announce it and find nothing (S11). The README's
+    table is joined to ARMS both ways, and each row's last column opens with its arm's `empty` (S8); and
+    an Arm planted with a population of 0 must print one finding under `finding` and none, `not graded`,
+    under `announce` (TOOL-dGroundRules-21 S5). A missing `govkit.py` or a refused `apply` is a WRONG,
+    and nothing after it runs. Prints its lines. -> (assertions, wrong)."""
     names = [a.name for a in ARMS]
     listed = extract_arm_rows((KIT / "README.md").read_text(encoding="utf-8"))
     wrong = [f"{n} is in ARMS with no row in README.md \"{ADOPTER_SECTION}\" (unlisted)" for n in names if n not in listed]
     wrong += [f"README.md \"{ADOPTER_SECTION}\" lists {n}, which ARMS lacks (stale)" for n in listed if n not in names]
-    asserted = len(set(names) | set(listed)) + 2
+    wrong += [f"{a.name} declares empty = {a.empty!r} and its README.md \"{ADOPTER_SECTION}\" row opens its last "
+              f"column with {listed[a.name]!r}" for a in ARMS if a.name in listed and listed[a.name] != a.empty]
+    asserted = 2 * len(set(names) | set(listed)) + 2
     for empty, want in (("finding", "1 finding(s) · "), ("announce", "not graded · ")):
         verdict, _f = run_arm(Arm("planted", lambda _r, _k: (0, "a planted empty population", []), empty), None, KIT)
         asserted += 1
@@ -989,57 +1111,23 @@ def run_fresh_target(name):
     keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(policy.load_catalogue(KIT))), []))
     lines = {"arm_schema": re.compile(rf"0 finding\(s\) · {keys} key\(s\) of "),
              "arm_mirror_readers": re.compile(r"0 finding\(s\) · [1-9][0-9]* tracked code file\(s\)"),
-             "arm_reader_coverage": re.compile(r"not graded · ")}
+             "arm_reader_coverage": re.compile(r"not graded · "),
+             "arm_legacy_homes": re.compile(r"not graded · the list is gov's own")}
     desc = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))
-    ids, todo = [desc["id"]], list(desc.get("requires", []))
-    # ponytail: `requires` names kit ids and is read as each kit's home, which they equal for every
-    # kit gov homes under its own id; a kit homed elsewhere is a WRONG naming it, never a skip.
-    while todo:
-        home = todo.pop(0)
-        if home in ids:
-            continue
-        ids.append(home)
-        try:
-            todo += tomllib.loads((resolve_kit_dir(home, "kit.toml", KIT) / "kit.toml").read_text(encoding="utf-8")).get("requires", [])
-        except LookupError as exc:
-            wrong.append(f"kit.toml requires {home}, which this tree does not resolve: {exc}")
-    root = KIT.parent  # this kit's own resolved tool root; the target's prefix is its name, never spelled
-    govkit = root / "govkit" / "govkit.py"
-    top = (policy.run_git(KIT, "rev-parse", "--show-toplevel", "--show-prefix") or "").split("\n")
-    rows, s = None, None
-    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    ids, missed = derive_requires_closure([desc["id"], "run-gates"])
+    wrong += missed
+    root, rows, t, s = KIT.parent, None, None, None
     try:
-        if not govkit.is_file():
-            wrong.append(f"no deployer to install with: looked for govkit.py at {govkit.as_posix()}, under this kit's tool root")
-        elif len(top) < 2 or not top[0]:
-            wrong.append(f"no tree under test to snapshot: {KIT.as_posix()} is in no git repository")
-        else:
-            try:
-                s = build_source_snapshot(top[0])
-            except (RuntimeError, OSError) as exc:
-                wrong.append(f"nothing was installed to grade: {exc}")
-        if s is not None:
-            snap, over = (policy.run_git(s, "rev-parse", "HEAD", "HEAD^") or "? ?").split()
-            print(f"{name}: installing from snapshot {snap[:8]} of the working tree over HEAD {over[:8]}")
-            govkit = s / Path(top[1]).parent / "govkit" / "govkit.py"  # the clone's own deployer installs its HEAD
-            run_fixture_git(t, "init", "-q")
-            run_fixture_git(t, "config", "core.autocrlf", "false")
-            (t / "README.md").write_text("A fresh adopter of the policy kit.\n", encoding="utf-8", newline="\n")
-            Path(t, POLICY_FILE[0]).mkdir()
-            Path(t, POLICY_FILE[0], "deploy.toml").write_text(
-                f'gov_source = {json.dumps(s.as_posix())}\nprefix = {json.dumps(root.name)}\nkits = {json.dumps(ids)}\n',
-                encoding="utf-8", newline="\n")
-            run_fixture_git(t, "add", "-A")
-            run_fixture_git(t, "commit", "-q", "-m", "a fresh target")
-            p = subprocess.run([sys.executable, str(govkit), "apply", "--target", t.as_posix(), "--kits", ",".join(ids)],
-                               capture_output=True, text=True, encoding="utf-8", errors="replace",
-                               env=dict(os.environ, GOVKIT_NO_REMOTE_PROBE="1"))
-            if p.returncode:
-                wrong.append(f"govkit.py apply --kits {','.join(ids)} exited {p.returncode}, so nothing was installed "
-                             f"to grade: {(p.stdout + p.stderr).strip()}")
+        try:
+            t, s, govkit = build_install_target(name, ids)
+        except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+            wrong.append(str(exc))
+        if t is not None:
+            rc, out = run_install_verb(govkit, "apply", t, ids)
+            if rc:
+                wrong.append(f"govkit.py apply --kits {','.join(ids)} exited {rc}, so nothing was installed to grade: {out.strip()}")
             else:
-                rows = [r for r in json.loads(Path(t, POLICY_FILE[0], "install.json").read_text(encoding="utf-8")).get("files") or []
-                        if isinstance(r, dict)]
+                rows = read_receipt_rows(t)
         if rows is not None:
             paths = {r.get("path") for r in rows}
             held = sorted(f.relative_to(t).as_posix() for f in (t / root.name).rglob("*") if f.is_file())
@@ -1047,14 +1135,18 @@ def run_fresh_target(name):
             stray = [f"{f} is under the tool root and is no receipt row's path (stray)" for f in held if f not in paths]
             stray += [f"{f} is an engine or seed row of the receipt and is absent from the target (missing)"
                       for f in owed if not Path(t, f).is_file()]
-            asserted += len(held) + len(owed)
+            stray += [f"{f} is installed, and the list is gov's own, withheld from every install (S5)"
+                      for f in held if posixpath.basename(f) == policy.LEGACY_LIST]
+            asserted += len(held) + len(owed) + 1
             wrong += stray
             if not stray:
                 print(f"policy-fixture: {name} · apply --kits {','.join(ids)} exited 0 into its target · the "
                       f"{len(held)} file(s) under {root.name}/ are each a receipt row's path, and its {len(owed)} "
-                      f"engine or seed row(s) are each present · no stray or missing receipt path")
+                      f"engine or seed row(s) are each present · no {policy.LEGACY_LIST} installed")
             adopter = next((r["path"] for r in rows if r.get("kit") == desc["id"]
                             and str(r.get("path")).endswith("/adopt-policy.sh")), None)
+            regen = next((r["path"] for r in rows if r.get("kit") == "run-gates"
+                          and str(r.get("path")).endswith("/regen.py")), None)
             bash = resolve_bash((t / adopter).as_posix()) if adopter else None
             if adopter is None:
                 wrong.append(f"the receipt has no row of kit {desc['id']} whose path ends in adopt-policy.sh")
@@ -1066,17 +1158,13 @@ def run_fresh_target(name):
                     p = subprocess.run([bash, (t / adopter).as_posix(), mode, "--target", t.as_posix()],
                                        capture_output=True, text=True, encoding="utf-8", errors="replace")
                     return p.returncode, p.stdout + p.stderr
-                rc, out = run_adopter("--scaffold")
-                if rc:
-                    wrong.append(f"--scaffold exited {rc}: {out.strip()}")
-                for phase in ("with the install staged", "once the install is committed"):
-                    if phase.startswith("once"):
-                        run_fixture_git(t, "add", "-A")
-                        run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
+
+                def grade_check(phase):
+                    nonlocal asserted
                     rc, out = run_adopter("--check")
                     bad = check_arm_lines(out, names)
                     asserted += len(names) + 1 + len(lines)
-                    wrong += [f"{phase}: {b}" for b in bad]
+                    wrong.extend(f"{phase}: {b}" for b in bad)
                     for arm, rx in lines.items():
                         said = next((ln for ln in out.replace("\r", "").split("\n")
                                      if ln.startswith(f"policy-check: {arm} · ")), "(no line)")
@@ -1084,16 +1172,161 @@ def run_fresh_target(name):
                             wrong.append(f"{phase}: {arm} printed {said!r}, not /{rx.pattern}/")
                     if rc:
                         wrong.append(f"{phase}: --check exited {rc}" + ("" if bad else f": {out.strip()}"))
+                rc, out = run_adopter("--scaffold")
+                if rc:
+                    wrong.append(f"--scaffold exited {rc}: {out.strip()}")
+                grade_check("with the install staged")
+                run_fixture_git(t, "add", "-A")
+                run_fixture_git(t, "commit", "-q", "-m", "install the policy kit")
+                # ponytail: the memory-tree kit, which `requires` brings in, seeds its conf and stops on its
+                # first run, and an adopter re-runs it to finish; the bar's preflight grades that tree. A
+                # second kit that seeds and stops would be a second line here, or a loop over the receipt.
+                mt = next((r["path"] for r in rows if str(r.get("path")).endswith("/adopt-memory-tree.sh")), None)
+                if mt:
+                    rc, out = run_case_argv(t, ["bash", mt, "--scaffold"])
+                    if rc:
+                        wrong.append(f"the memory-tree adopter's re-run exited {rc}: {render_said(out, 'memory-tree')}")
+                rc, out = run_adopter("--scaffold")  # S7: the mirror renders once its inputs are committed
+                asserted += 1
+                if rc or not Path(t, *MIRROR_FILE).is_file():
+                    wrong.append(f"--scaffold after the first commit exited {rc} and wrote "
+                                 f"{'a' if Path(t, *MIRROR_FILE).is_file() else 'no'} {policy.MIRROR_REL}: {out.strip()}")
+                run_fixture_git(t, "add", "-A")
+                run_fixture_git(t, "commit", "-q", "--allow-empty", "-m", "the mirror")
+                grade_check("once the install and its mirror are committed")
+                asserted += 1
+                if regen is None:
+                    wrong.append("the receipt has no row of kit run-gates whose path ends in regen.py")
+                else:
+                    rc, out = run_case_argv(t, [sys.executable, (t / regen).as_posix(), "--check"])
+                    if rc:
+                        wrong.append(f"the installed {regen} --check exited {rc}, so the bar's preflight refuses: "
+                                     f"{render_said(out, 'STALE')}")
+                # S11: an adopter-authored list at the installed kit's directory is never graded.
+                (t / adopter).with_name(policy.LEGACY_LIST).write_text("# an adopter's own list\nzz.home\tzz\n",
+                                                                       encoding="utf-8", newline="\n")
+                grade_check(f"with an adopter-written {policy.LEGACY_LIST} beside the installed kit")
     finally:
-        remove_repo(t)
-        if s is not None:
-            remove_repo(s)
+        for d in (t, s):
+            if d is not None:
+                remove_repo(d)
     for w in wrong:
         print(f"policy-fixture: {name} · WRONG: {w}")
     if not wrong:
-        print(f"policy-fixture: {name} · every arm graded clean or announced, with the install staged and "
-              f"once it is committed · the README table names exactly the {len(names)} arm(s) of ARMS")
+        print(f"policy-fixture: {name} · every arm graded clean or announced, with the install staged, once it "
+              f"and its mirror are committed, and beside an adopter's list · the installed regen.py --check "
+              f"exits 0 · the README table names exactly the {len(names)} arm(s) of ARMS, each with its empty")
     return asserted, len(wrong)
+
+
+PLAN_LINE = re.compile(r"^\s*(\S+)\s+\[([^\]]*)\]\s+(\S+)")  # a `plan` row: its mark, role and destination
+
+
+def run_legacy_withheld_install(name):
+    """`legacy-homes-withheld-install` (TOOL-dGroundRules-25 S9): the target `build_install_target`
+    makes for this kit and its `requires` closure, `govkit.py plan` over it, then `apply`. The plan
+    must hold the legacy-home list as one `ORDER [project-owned]` row and as no `write` or `SIDE`
+    row, and the applied target must hold no file of that name."""
+    ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"]])
+    checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
+    t = s = None
+    try:
+        t, s, govkit = build_install_target(name, ids)
+        rc, out = run_install_verb(govkit, "plan", t, ids)
+        rows = [m.groups() for m in map(PLAN_LINE.match, out.split("\n")) if m and m[3].endswith("/" + policy.LEGACY_LIST)]
+        said = "; ".join(f"{k} [{r.strip()}] {d}" for k, r, d in rows) or "no row"
+        checks.append(("plan", f"exit 0, one ORDER [project-owned] row for {policy.LEGACY_LIST} and no write or SIDE row",
+                       rc == 0 and [(k, r.strip()) for k, r, _d in rows] == [("ORDER", "project-owned")], f"exit {rc} · {said}"))
+        rc, _out = run_install_verb(govkit, "apply", t, ids)
+        # The install is read from its receipt, never from apply's exit alone: an adopter step that
+        # refuses after the files land still leaves them, and an empty target would hold no list.
+        installed = Path(t, RECEIPT_REL).is_file() and any(r.get("kit") == ids[0] for r in read_receipt_rows(t))
+        held = sorted(f.relative_to(t).as_posix() for f in t.rglob(policy.LEGACY_LIST))
+        checks.append(("apply", f"the receipt holds kit {ids[0]}'s rows and the target no {policy.LEGACY_LIST}",
+                       installed and not held, f"apply exit {rc} · receipt {'holds' if installed else 'LACKS'} "
+                       f"{ids[0]} · {held or 'none held'}"))
+    except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+        checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
+    finally:
+        for d in (t, s):
+            if d is not None:
+                remove_repo(d)
+    return print_checks(name, checks)
+
+
+# The answers the kickoff-manifest entry asks for, as an adopter's descriptor carries them.
+KICKOFF_ANSWERS = '\n[answers]\nmanifest_path = "memory/guides/SESSION-KICKOFF.md"\nuser_skills = ".claude/skills"\n'
+
+
+def run_census_default_adopter(name):
+    """`census-default-adopter` (TOOL-dGroundRules-25 S12): this kit, its `requires` closure and
+    `kickoff-manifest` installed by `apply` into the target `build_install_target` makes, with the
+    answers that entry asks for and without `check-line-length`. `arm_cap_census` over it must
+    announce `line-length · kit check-line-length not installed`, grade the `manifest-bytes` row at the
+    receipt's destination of `manifest-check.sh`, so no announce names it, and find nothing."""
+    ids, missed = derive_requires_closure([tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8"))["id"],
+                                           "kickoff-manifest"])
+    checks = [("the selection", "every id resolves in the registry", False, m) for m in missed]
+    t = s = None
+    try:
+        t, s, govkit = build_install_target(name, ids, KICKOFF_ANSWERS)
+        rc, _out = run_install_verb(govkit, "apply", t, ids)
+        installed = Path(t, RECEIPT_REL).is_file()
+        checks.append(("apply", f"--kits {','.join(ids)} wrote its receipt", installed, f"apply exit {rc} · receipt "
+                       + ("written" if installed else "ABSENT")))
+        if installed:
+            dest = next((r["path"] for r in read_receipt_rows(t) if str(r.get("path")).endswith("/manifest-check.sh")), None)
+            with contextlib.redirect_stdout(io.StringIO()) as said:
+                _n, _pop, found = arm_cap_census(t, KIT)
+            want = "cap census: line-length · kit check-line-length not installed"
+            checks.append(("the census", f"{want!r}, manifest-bytes graded at {dest}, and no finding",
+                           bool(dest) and want in said.getvalue().splitlines()
+                           and "cap census: manifest-bytes ·" not in said.getvalue() and not found,
+                           f"{render_said(said.getvalue(), 'line-length ·')} · {found or 'no finding'}"))
+    except (RuntimeError, OSError, subprocess.CalledProcessError) as exc:
+        checks.append((name, "the target", False, f"{type(exc).__name__}: {exc}"))
+    finally:
+        for d in (t, s):
+            if d is not None:
+                remove_repo(d)
+    return print_checks(name, checks)
+
+
+def run_arms_empty_declared(name):
+    """`arms-empty-declared` (TOOL-dGroundRules-25 S26): every ARMS row declares `empty`, `finding` or
+    `announce`, and the reason for it; one that does not is a WRONG naming it."""
+    return print_checks(name, [(a.name, "declares empty and why", a.empty in ("finding", "announce") and bool(a.why),
+                                f"empty = {a.empty!r} · why = {a.why!r}") for a in ARMS])
+
+
+def run_arms_empty_target(name):
+    """`arms-empty-target` (TOOL-dGroundRules-25 S27): `check_policy.py --repo` over a target holding
+    one committed README, no policy file and no tracked code: `arm_schema`, `arm_reader_coverage` and
+    `arm_mirror_readers` must each print `not graded`. Then the scaffold written as its policy file:
+    `arm_schema` must grade the scaffold's keys, a count derived from it, with no finding."""
+    t = Path(tempfile.mkdtemp(prefix="pol-"))
+    checks = []
+    try:
+        run_fixture_git(t, "init", "-q")
+        (t / "README.md").write_text("An empty target.\n", encoding="utf-8", newline="\n")
+        run_fixture_git(t, "add", "-A")
+        run_fixture_git(t, "commit", "-q", "-m", "an empty target")
+        _rc, out = run_case_argv(t, [sys.executable, str(KIT / "check_policy.py"), "--repo", t.as_posix()])
+        for arm in ("arm_schema", "arm_reader_coverage", "arm_mirror_readers"):
+            said = render_said(out, f"policy-check: {arm} · ")
+            checks.append(("the empty target", arm, said.startswith(f"policy-check: {arm} · not graded · "), said))
+        rows = policy.load_catalogue(KIT)
+        keys = sum(1 for _ in policy.scan_keys(tomllib.loads(policy.render_scaffold(rows)), []))
+        write_policy(t, policy.render_scaffold(rows))
+        _rc, out = run_case_argv(t, [sys.executable, str(KIT / "check_policy.py"), "--repo", t.as_posix()])
+        said = render_said(out, "policy-check: arm_schema · ")
+        checks.append(("the scaffolded target", f"arm_schema grades the scaffold's {keys} key(s) with no finding",
+                       said.startswith(f"policy-check: arm_schema · 0 finding(s) · {keys} key(s) of "), said))
+    except subprocess.CalledProcessError as exc:
+        checks.append((name, "the fixture's git", False, f"git exited {exc.returncode}: {(exc.stderr or '').strip()}"))
+    finally:
+        remove_repo(t)
+    return print_checks(name, checks)
 
 
 # ---- the reader (TOOL-dGroundRules-2) ----------------------------------------------------------
@@ -1482,10 +1715,25 @@ def run_reader_refusals(name):
             run_fixture_git(r, "commit", "-q", "-m", "C, written by a PowerShell redirect")
             checks.append(check_get("C in UTF-16LE", r, ["budgets.enforce", "--rev", "HEAD", "--explain"], lambda rc, o, e:
                                     rc == 0 and o == "refuse\n" and " · last-valid · " in e and "not UTF-8" in e))
+        elif name == "on-invalid-bom":
+            # TOOL-dGroundRules-25 S30: one valid revision written with a UTF-8 BOM, as an editor or a
+            # PowerShell write leaves it. With no earlier revision, a BOM read as invalid would fall
+            # to the catalogue default; the file's own value with source `file` is the pass.
+            r = build_reader_repo(t / "b", None)
+            Path(r, POLICY_FILE[0]).mkdir()
+            Path(r, *POLICY_FILE).write_bytes(b"\xef\xbb\xbf" + good.encode("utf-8"))
+            run_fixture_git(r, "add", "-A")
+            run_fixture_git(r, "commit", "-q", "-m", "a valid file with a BOM")
+            checks.append(check_get("a BOM", r, ["budgets.enforce", "--rev", "HEAD", "--explain"], lambda rc, o, e:
+                                    rc == 0 and o == "refuse\n" and "policy: budgets.enforce · file · " in e))
         elif name == "on-invalid-shallow":
             src = build_reader_repo(t / "src", good, bad)
             for kind, depth in (("shallow", ["--depth", "1"]), ("full", [])):
                 run_fixture_git(t, "clone", "-q", *depth, src.as_uri(), kind)
+            # TOOL-dGroundRules-25 S31: the clone is shallow before its read is graded, so the branch is exercised.
+            shallow = run_fixture_git(t / "shallow", "rev-parse", "--is-shallow-repository")
+            checks.append(("--depth 1", "git rev-parse --is-shallow-repository", shallow == "true",
+                           f"is-shallow-repository {shallow}"))
             checks += [check_get("--depth 1", t / "shallow", ["budgets.enforce", "--rev", "HEAD"], lambda rc, o, e:
                                  rc == 2 and not o and "history is shallow at " in e and "fetch more history" in e),
                        check_get("full history", t / "full", ["budgets.enforce", "--rev", "HEAD", "--explain"],
@@ -1521,7 +1769,7 @@ def run_reader_refusals(name):
     return print_checks(name, checks)
 
 
-READER_REFUSAL_CASES = ("on-invalid-utf16", "on-invalid-shallow", "resolution-derived-default")
+READER_REFUSAL_CASES = ("on-invalid-utf16", "on-invalid-bom", "on-invalid-shallow", "resolution-derived-default")
 
 
 # ---- the JSON mirror (TOOL-dGroundRules-5) ------------------------------------------------------
@@ -1634,20 +1882,38 @@ def run_mirror_landed(name):
             checks.append(check_run(at_l, what, helper, lambda rc, o, e: rc == 2 and not o
                                     and e.startswith(f"{refused}stale at {at}; policy-file.on-invalid is refuse")))
         elif name == "mirror-commit-rewrite":
+            # Once per reason kind (TOOL-dGroundRules-25 S1), each builder's reason rendered at A: a
+            # file setting the key, a file present without it, the file absent, and an invalid file
+            # over a valid ancestor, the `last-valid` kind, so a builder naming the rendered commit
+            # reds the kind that exercises it.
             cli = [sys.executable, str(kit / "policy.py"), "mirror"]
-            checks.append(check_run("A", "policy.py mirror --write", cli + ["--write"],
-                                    lambda rc, o, e: rc == 0 and o.startswith("policy: mirror written"), cwd=repo))
-            run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
-            run_fixture_git(repo, "commit", "-q", "-m", "the mirror, rendered at its parent")
-            b = run_fixture_git(repo, "rev-parse", "HEAD")
-            parents = run_fixture_git(repo, "rev-parse", "HEAD^@").split()
-            rewrite = run_fixture_git(repo, "commit-tree", f"{b}^{{tree}}", *(a for p in parents for a in ("-p", p)),
-                                      "-m", "the mirror, rewritten by commit-tree")
-            checks.append(("B'", "a new commit over B's tree and parents", rewrite != b, f"B {b[:8]} · B' {rewrite[:8]}"))
-            for at, sha in (("B, the commit carrying the mirror", b), ("B', its commit-tree rewrite", rewrite)):
-                run_fixture_git(repo, "reset", "-q", "--hard", sha)
-                checks.append(check_run(at, "policy.py mirror --check", cli + ["--check"],
-                                        lambda rc, o, e: rc == 0 and o == "policy: mirror fresh\n", cwd=repo))
+            kinds = (("file", LANDED_POLICY.format(on="last-valid", n=3)),
+                     ("default, the file present without the key", '[budgets]\nenforce = "warn"\n'),
+                     ("default, the file absent", None),
+                     ("last-valid", LANDED_POLICY.format(on="last-valid", n=3)), ("last-valid", MALFORMED))
+            for kind, text in kinds:
+                if text is None:
+                    Path(repo, *POLICY_FILE).unlink()
+                else:
+                    write_policy(repo, text)
+                run_fixture_git(repo, "add", "-A")
+                run_fixture_git(repo, "commit", "-q", "--allow-empty", "-m", f"A, the policy file of kind {kind}")
+                if text == LANDED_POLICY.format(on="last-valid", n=3) and kind == "last-valid":
+                    continue  # the valid ancestor the invalid file falls back to
+                checks.append(check_run(f"{kind} · A", "policy.py mirror --write", cli + ["--write"],
+                                        lambda rc, o, e: rc == 0 and o.startswith("policy: mirror written"), cwd=repo))
+                run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
+                run_fixture_git(repo, "commit", "-q", "-m", "the mirror, rendered at its parent")
+                b = run_fixture_git(repo, "rev-parse", "HEAD")
+                parents = run_fixture_git(repo, "rev-parse", "HEAD^@").split()
+                rewrite = run_fixture_git(repo, "commit-tree", f"{b}^{{tree}}", *(a for p in parents for a in ("-p", p)),
+                                          "-m", "the mirror, rewritten by commit-tree")
+                checks.append((f"{kind} · B'", "a new commit over B's tree and parents", rewrite != b,
+                               f"B {b[:8]} · B' {rewrite[:8]}"))
+                for at, sha in (("B, the commit carrying the mirror", b), ("B', its commit-tree rewrite", rewrite)):
+                    run_fixture_git(repo, "reset", "-q", "--hard", sha)
+                    checks.append(check_run(f"{kind} · {at}", "policy.py mirror --check", cli + ["--check"],
+                                            lambda rc, o, e: rc == 0 and o == "policy: mirror fresh\n", cwd=repo))
             run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
             checks.append(check_run("B' landed as L", what + " --explain", helper + ["--explain"], lambda rc, o, e:
                                     rc == 0 and f"at {rewrite[:8]}, the landed revision" in e and "{rev}" not in e))
@@ -1808,6 +2074,7 @@ def run_mirror_landed_parity(name):
 
 GUARD_FILES = ("guard.py", "guarded-paths.txt", *READER_FILES)  # the reader: the mirror shape's `mirror --print`
 GUARD_MIRROR = ("guard-mirror-render", "guard-mirror-beside-catalogue", "guard-mirror-branch-green")
+GUARD_INPUTS = ("guard-mirror-beside-conf", "guard-mirror-inputs-join")  # TOOL-dGroundRules-25 S19, S21
 DEPLOY_REL = ".governance/deploy.toml"
 DECISIONS_REL = "memory/DECISIONS.md"
 # A measured-file cap whose key carries slashes and a leading dot, and the spec folder's class row, so
@@ -1916,13 +2183,34 @@ def run_guard_case(name):
             if beside:  # the row back in the index beside the mirror rendered over it
                 run_fixture_git(repo, "reset", "-q", "--soft", "HEAD~1")
             run_fixture_git(repo, "add", "--", policy.MIRROR_REL)
-            want, needle = (1, "commit the policy file or catalogue first") if beside else (0, "equals its render at HEAD")
+            want, needle = (1, f"its input {budgets.derive_kit_rel()}{policy.CATALOGUE} is staged changed") if beside \
+                else (0, "equals its render at HEAD")
             checks.append(check_run("the mirror staged" + (" beside the row" if beside else " alone"), "guard.py --staged",
                                     guard, lambda rc, o, e: rc == want and needle in o, cwd=repo))
             if name == "guard-mirror-branch-green":
                 run_fixture_git(repo, "commit", "-q", "-m", "the mirror, regenerated")
                 checks.append(check_get("the mirror committed", repo, ["--check"], lambda rc, o, e: rc == 0
                                         and o == "policy: mirror fresh\n", kit=kit, verb="mirror"))
+        if name in GUARD_INPUTS:
+            # TOOL-dGroundRules-25 S19, S21: an input the mirror records, staged changed beside a mirror
+            # rendered at HEAD. `-beside-conf` stages `.agent-cap.conf`, an input no guarded path names;
+            # `-inputs-join` first commits a render recording one input more than today's, so the guard
+            # reads its inputs from the mirror's own record, never from a list of its own.
+            extra = policy.LEGACY_FANOUT
+            if name == "guard-mirror-inputs-join":
+                extra = ".zz-recorded.conf"
+                write_edit(kit / "policy.py", lambda t: t.replace("LEGACY_INPUTS = (LEGACY_FANOUT,)",
+                                                                  f"LEGACY_INPUTS = (LEGACY_FANOUT, {extra!r})"))
+                run_fixture_git(repo, "add", "-A")
+                run_fixture_git(repo, "commit", "-q", "-m", "a render recording one more input")
+            checks.append(check_get("HEAD", repo, ["--write"], lambda rc, o, e: rc == 0
+                                    and o.startswith("policy: mirror written"), kit=kit, verb="mirror"))
+            recorded = json.loads(Path(repo, *MIRROR_FILE).read_bytes()).get("legacy_blobs", {})
+            checks.append(("the render", f"records {extra} under legacy_blobs", extra in recorded, f"legacy_blobs {sorted(recorded)}"))
+            Path(repo, extra).write_text("FANOUT_CAP=2\n", encoding="utf-8", newline="\n")
+            run_fixture_git(repo, "add", "--", extra, policy.MIRROR_REL)
+            checks.append(check_run(f"the mirror staged beside {extra}", "guard.py --staged", guard, lambda rc, o, e:
+                                    rc == 1 and f"its input {extra} is staged changed" in o, cwd=repo))
         for scenario, edits, want, present, absent in GUARD_PLANTS.get(name, []):
             for rel, edit in edits:
                 path = Path(repo, rel)
@@ -2503,17 +2791,53 @@ def run_limit_case(name):
             env = {**os.environ, "GOV_SETTINGS_JSON": named}
             read_env = lambda: json.loads(Path(named).read_text(encoding="utf-8")).get("env", {})  # noqa: E731
             call = render_workflow(repo, "const r = await agent('one')\n")
+            # The named file exists, as a declared file must (TOOL-dGroundRules-25 S32), holding the old
+            # value 3; a hard link to it is the reader that must never meet half a file (S33).
+            Path(named).parent.mkdir()
+            Path(named).write_text(json.dumps({"env": render_limit_env(3)}) + "\n", encoding="utf-8", newline="\n")
+            link, old = t / "elsewhere-link.json", Path(named).read_bytes()
+            os.link(named, link)
             checks.append(check_get("GOV_SETTINGS_JSON set", repo, ["--write"], lambda rc, o, e: rc == 0, env=env,
                                     kit=kit, verb="settings"))
             written = Path(named).is_file() and read_env() == render_limit_env(2)
             checks.append(("GOV_SETTINGS_JSON set", "the named file holds both keys, .claude/settings.json unwritten",
                            written and not Path(repo, *SETTINGS_FILE).exists(), f"named {'written' if written else 'NOT written'}"))
+            # S33: the write is atomic by its effect, a new inode in place, never the old one rewritten.
+            kept, moved = link.read_bytes() == old, os.stat(named).st_ino != os.stat(link).st_ino
+            left = sorted(p.name for p in Path(named).parent.iterdir() if p.name != "settings.json")
+            checks.append(("--write over a hard-linked file", "the link keeps the old bytes, the target is a new "
+                           "inode, and no temporary file is left beside it", kept and moved and not left,
+                           f"link {'kept' if kept else 'REWRITTEN'} · inode {'new' if moved else 'SAME'} · "
+                           f"left beside it: {left or 'nothing'}"))
             checks += [check_hook_call("GOV_SETTINGS_JSON at 2", "a Workflow call", hook, call, admits, env=env),
                        check_hook_call("GOV_SETTINGS_JSON unset", "a Workflow call", hook, call,
                                        has("/".join(SETTINGS_FILE), "is absent"))]
             Path(named).write_text(json.dumps({"env": render_limit_env(3)}) + "\n", encoding="utf-8", newline="\n")
             checks.append(check_hook_call("GOV_SETTINGS_JSON at 3", "a Workflow call", hook, call,
                                           has(named, "above runtime.agents-in-flight 2"), env=env))
+        elif name == "limit-settings-env-stale":
+            # TOOL-dGroundRules-25 S32: the landing's render names the tracked file, so an exported
+            # GOV_SETTINGS_JSON naming a fresh scratch file cannot hide a stale tracked one from
+            # `regen.py --check`; and a declared variable that is not a file refuses.
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            regen = resolve_kit_dir("run-gates", "regen.py", KIT) / "regen.py"
+            dst = repo / (policy.run_git(regen.parent, "rev-parse", "--show-prefix") or "").strip() / "regen.py"
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            for src, to in ((regen, dst), (KIT / "kit.toml", kit / "kit.toml")):
+                to.write_bytes(src.read_bytes().replace(b"\r\n", b"\n"))
+            write_settings(repo, render_limit_env(3))
+            run_fixture_git(repo, "add", "-A")
+            run_fixture_git(repo, "commit", "-q", "-m", "the regenerator, the descriptor and a stale settings file")
+            scratch = t / "scratch-settings.json"
+            scratch.write_text(json.dumps({"env": render_limit_env(2)}) + "\n", encoding="utf-8", newline="\n")
+            rc, out = run_case_argv(repo, [sys.executable, dst.as_posix(), "--check"],
+                                    env={"GOV_SETTINGS_JSON": scratch.as_posix()})
+            checks.append(("GOV_SETTINGS_JSON at a fresh scratch file", "regen.py --check exits non-zero naming "
+                           + "/".join(SETTINGS_FILE), rc != 0 and "/".join(SETTINGS_FILE) in out,
+                           f"exit {rc} · {render_said(out, 'settings')}"))
+            checks.append(check_get("GOV_SETTINGS_JSON names a directory", repo, ["--write"], lambda rc, o, e: rc == 2
+                                    and "not a file" in e, env={**os.environ, "GOV_SETTINGS_JSON": t.as_posix()},
+                                    kit=kit, verb="settings"))
         elif name == "limit-hook-settings-malformed":
             # TOOL-dGroundRules-21 S38: a settings file that does not parse, and a cwd in no checkout, refuse.
             repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
@@ -2557,7 +2881,7 @@ LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed
                "limit-hook-admits-eight", "limit-hook-six-spawns", "limit-hook-rules-kept", "limit-hook-env-cap",
                "limit-hook-settings-over", "limit-hook-local-over", "limit-hook-writer-split",
                "limit-settings-elsewhere", "limit-hook-settings-malformed", "limit-hook-reader-throws",
-               "limit-fresh-target-spawn")
+               "limit-fresh-target-spawn", "limit-settings-env-stale")
 
 
 # ---- the size caps' cases (TOOL-dGroundRules-9) --------------------------------------------------
@@ -3182,35 +3506,100 @@ def run_ships_join(name):
 
 
 FIXTURES_LEG = "policy fixtures"
+# A shell enforcer's `.` or `source` line, its operand the file it sources.
+SOURCED = re.compile(r"""^\s*(?:\.|source)\s+["']?([^"'\s;)]+)""", re.M)
+
+
+def derive_enforcer_imports(top, rel):
+    """The files in the enforcer's own directory that the repo-relative enforcer `rel` reaches, read
+    transitively, sorted: each module a Python file imports, at any depth of its body, that sits beside
+    it, and each file a shell file sources that sits beside it, its operand read by basename
+    (TOOL-dGroundRules-25 S24). An edit to one of them changes what the enforcer runs, so the leg whose
+    cases run the enforcer must run on it too (gotcha held-suite-guard-misses-a-sibling-kit). A file
+    that does not read or parse reaches nothing."""
+    out, todo = set(), [rel]
+    while todo:
+        cur = todo.pop()
+        here = posixpath.dirname(cur)
+        text = policy.read_text_or_none(Path(top, cur)) or ""
+        found = []
+        if cur.endswith(".py"):
+            try:
+                tree = ast.parse(text)
+            except SyntaxError:
+                tree = ast.Module(body=[], type_ignores=[])
+            for n in ast.walk(tree):
+                if isinstance(n, ast.Import):
+                    found += [a.name.split(".")[0] + ".py" for a in n.names]
+                elif isinstance(n, ast.ImportFrom) and n.module and not n.level:
+                    found.append(n.module.split(".")[0] + ".py")
+        elif cur.endswith(".sh"):
+            found = [posixpath.basename(m[1]) for m in SOURCED.finditer(text)]
+        for f in found:
+            dep = posixpath.join(here, f)
+            if dep != rel and dep not in out and Path(top, dep).is_file():
+                out.add(dep)
+                todo.append(dep)
+    return sorted(out)
+
+
+def read_legs_for(top, checker, paths):
+    """`python <checker> --legs-for -` run at `top` with `paths` on stdin -> {path: the legs whose guard
+    it trips}: gov's one trip rule, never a second one spelled here (TOOL-dGroundRules-25 S25). A
+    checker that does not run or exits non-zero is a RuntimeError naming it."""
+    try:
+        p = subprocess.run([sys.executable, str(checker), "--legs-for", "-"], cwd=top, input="\n".join(paths),
+                           capture_output=True, text=True, encoding="utf-8", errors="replace")
+    except OSError as exc:
+        raise RuntimeError(f"{checker.name} did not run: {exc}") from None
+    if p.returncode:
+        raise RuntimeError(f"{checker.name} --legs-for exited {p.returncode}: {render_said(p.stdout + p.stderr, 'REFUSING')}")
+    legs, cur = {}, None
+    for ln in p.stdout.replace("\r", "").split("\n"):
+        if ln.startswith("  ") and cur is not None and " <- " in ln and not ln.strip().startswith("UNEVALUATED "):
+            legs[cur].add(ln.strip().split(" <- ", 1)[0])
+        elif ln and not ln.startswith((" ", "legs-for:")):
+            cur = ln.removesuffix(" (not tracked at HEAD)")
+            legs.setdefault(cur, set())
+    return legs
 
 
 def run_fixtures_guard_census(name):
-    """`fixtures-guard-census` (TOOL-dGroundRules-20): every distinct census enforcer sits inside the
-    guard of the `policy fixtures` row of `gate-legs.json` under this kit's tool root in the source
-    repository, a guard equal to it or a guard ending `/` that prefixes it, `{prefix}` resolved on
-    both sides. An edit to an enforcer outside it skips the leg its `budgets-cap-` cases run in. One
-    line per enforcer, and a WRONG where the census has no row or the manifest no such leg, since a
-    join over nothing proves nothing."""
+    """`fixtures-guard-census` (TOOL-dGroundRules-20): every path a `budgets-cap-` case runs must trip
+    the `policy fixtures` leg, by the spec-token checker's `--legs-for -` under this kit's tool root in
+    the source repository, gov's one trip rule (TOOL-dGroundRules-25 S25): each distinct census
+    enforcer, each file `derive_enforcer_imports` finds it reaching (S24), and `gate-legs.json`, which
+    this case reads (S23). An edit to one outside the guard skips the leg that runs it. One line per
+    path, and a WRONG where the census has no row, the manifest no such leg, or the checker is absent
+    or refuses, since a join over nothing, or with no judge, proves nothing."""
     top, troot = derive_source_top(), budgets.derive_tool_root()
     legs = top / troot / "gate-legs.json"
+    checker = top / budgets.resolve_prefix_token("{prefix}/check-spec-tokens.py", troot)
     try:
         census = budgets.read_cap_census(top)
         row = next((r for r in json.loads(legs.read_text(encoding="utf-8")) if r.get("name") == FIXTURES_LEG), None)
     except (OSError, ValueError, AttributeError, policy.Refusal) as exc:
         return print_checks(name, [(name, "the census and the gate manifest", False, f"{type(exc).__name__}: {exc}")])
-    guard = [budgets.resolve_prefix_token(g, troot) for g in (row or {}).get("guard") or []]
-    runs = {}
+    runs = {legs.relative_to(top).as_posix(): ["this case, which reads it"]}
     for cap in census.values():
-        runs.setdefault(cap.enforcer, []).append(CAP_CASE_PREFIX + cap.name)
-    checks = []
-    for e, cases in runs.items():
-        p = budgets.resolve_prefix_token(e, troot)
-        by = next((g for g in guard if g == p or (g.endswith("/") and p.startswith(g))), None)
-        checks.append((e, f"inside the {FIXTURES_LEG} guard", by is not None, f"covered by {by}" if by else
-                       f"{e} is run by {', '.join(cases)} and is outside the {FIXTURES_LEG} guard"))
-    checks.append(("the join", f"a census row and the {FIXTURES_LEG} leg", bool(runs) and row is not None,
-                   f"{len(runs)} enforcer(s) of {len(census)} row(s) · leg {'found' if row else 'absent'} in "
-                   f"{legs.relative_to(top).as_posix()}"))
+        e = budgets.resolve_prefix_token(cap.enforcer, troot)
+        runs.setdefault(e, []).append(CAP_CASE_PREFIX + cap.name)
+        for dep in derive_enforcer_imports(top, e):
+            runs.setdefault(dep, []).append(f"{e}, which reaches it")
+    checks = [("the join", f"a census row and the {FIXTURES_LEG} leg", bool(census) and row is not None,
+               f"{len(runs)} path(s) of {len(census)} row(s) · leg {'found' if row else 'absent'} in "
+               f"{legs.relative_to(top).as_posix()}")]
+    if not checker.is_file():
+        return print_checks(name, checks + [("the judge", "the spec-token checker beside the manifest", False,
+                                             f"{checker.relative_to(top).as_posix()} is absent, so no path was judged")])
+    try:
+        tripped = read_legs_for(top, checker, list(runs))
+    except RuntimeError as exc:
+        return print_checks(name, checks + [("the judge", "the spec-token checker's --legs-for", False, str(exc))])
+    for p, why in runs.items():
+        ok = FIXTURES_LEG in tripped.get(p, ())
+        checks.append((p, f"trips the {FIXTURES_LEG} leg", ok, f"run by {', '.join(why[:3])}" if ok else
+                       f"{p} is run by {', '.join(why[:3])} and trips no {FIXTURES_LEG} guard"))
     return print_checks(name, checks)
 
 
@@ -3404,6 +3793,10 @@ CASES = [
     ("direction-wrong-value", ARM["arm_direction"], seed_direction_wrong_value),
     (FRESH_TARGET, None, run_fresh_target),  # an outcome case: no plant and no one arm
     ("adopter-suite", None, run_adopter_suite),  # the adopter's sibling suite, which arms its refusals
+    ("legacy-homes-withheld-install", None, run_legacy_withheld_install),  # the plan's row and the applied target (TOOL-dGroundRules-25)
+    ("census-default-adopter", None, run_census_default_adopter),  # the census over a real install without check-line-length
+    ("arms-empty-declared", None, run_arms_empty_declared),  # every ARMS row declares its empty and why
+    ("arms-empty-target", None, run_arms_empty_target),  # the announcing arms over an empty target, arm_schema over its scaffold
     ("reader-landed", None, run_reader_landed),  # outcome cases: the reader over its own repositories
     ("reader-parsed", None, run_reader_parsed),
     ("resolution-order", None, run_resolution_order),
@@ -3423,7 +3816,7 @@ CASES = [
     ("mirror-shim-exit-one", None, run_mirror_landed),
     ("mirror-absent-adopter", None, run_mirror_absent_adopter),
     ("mirror-landed-parity", None, run_mirror_landed_parity),
-    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
+    *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR, *GUARD_INPUTS]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
     ("legacy-homes-main-dropped", None, run_legacy_main_dropped),  # the base is the merge-base, not the tip
     ("legacy-homes-present", None, run_legacy_present),  # gov's own list held and withheld from installs

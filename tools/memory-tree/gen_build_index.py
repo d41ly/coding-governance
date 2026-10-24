@@ -305,6 +305,8 @@ def write_text(path: str, text: str) -> None:
 # an index. The verbs it reads are PERMITTED and never required, so a header carrying neither parses
 # byte-identically to how it parsed before this import existed.
 import backlog  # noqa: E402  a sibling of this file, reached by the path insert above
+# A spec's declared write set and consumed siblings, read by the build-order render (TOOL-dGroundRules-25).
+import design_lib  # noqa: E402  a sibling of this file, reached by the path insert above
 
 
 def load_conf(root: str) -> dict:
@@ -539,6 +541,10 @@ def parse_spec_text(text: str, path: str, alt: str = "(?!)") -> dict | None:
         # renders it, which costs this key and one cell. It is MANDATORY in the header regex, so a
         # unit row always has a value and only the ORDER cell can be empty.
         "tier": hdr.group("tier"),
+        # The build-order render's two inputs (TOOL-dGroundRules-25 S37, S38): the Files touched
+        # words, none where the sub-head is absent, and the `consumes-from` targets.
+        "writes": design_lib.read_spec_writes(text) or [],
+        "consumes": design_lib.read_spec_consumes(text),
     }
 
 
@@ -1713,8 +1719,33 @@ def _wrap_ids(roster: list) -> list:
     return lines
 
 
+def derive_parallel_step(units: list) -> str:
+    """`yes` where one step's units may run concurrently by M6's first two clauses, else `no`: a step
+    of one unit; two units one of which consumes from the other; or two whose write sets meet, a path
+    of two or more segments equal to, or under a directory token of, the other's (TOOL-dGroundRules-25
+    S37, S38). A spec with no Files touched sub-head contributes no writes, so `yes` says only that the
+    estimates are disjoint; `--dispatch` still decides."""
+    def pathlike(w):
+        parts = w.rstrip("/").split("/")
+        return len(parts) >= 2 and all(parts)
+
+    def meets(p, q):
+        a, b = p.rstrip("/"), q.rstrip("/")
+        return a == b or (q.endswith("/") and a.startswith(b + "/")) or (p.endswith("/") and b.startswith(a + "/"))
+    if len(units) < 2:
+        return "no"
+    for i, a in enumerate(units):
+        for b in units[i + 1:]:
+            if b["id"] in a.get("consumes", ()) or a["id"] in b.get("consumes", ()):
+                return "no"
+            if any(meets(p, q) for p in a.get("writes", ()) if pathlike(p) for q in b.get("writes", ()) if pathlike(q)):
+                return "no"
+    return "yes"
+
+
 def render_order(build: dict) -> str:
-    """The BUILD ORDER region. Units sharing an `order` value are the parallel group."""
+    """The BUILD ORDER region. Units sharing an `order` value are a step, and `derive_parallel_step`
+    says whether its units may run concurrently."""
     mo, mc = next((o, c) for n, o, c in GEN_REGIONS if n == "build-order")
     out = [mo, ""]
     steps = {}
@@ -1729,7 +1760,7 @@ def render_order(build: dict) -> str:
         for n in sorted(steps):
             us = sorted(steps[n], key=lambda x: x["id"])
             ids = ", ".join(f"`{u['id']}`" for u in us)
-            out.append(f"| {n} | {ids} | {'yes' if len(us) > 1 else 'no'} |")
+            out.append(f"| {n} | {ids} | {derive_parallel_step(us)} |")
         # RESIDUAL, stated rather than silently dropped: a unit with no verb is not ordered, and a
         # region that omitted it would read as a complete order while hiding a unit.
         rest = sorted((u["id"] for u in build["units"] if u.get("order") is None))
@@ -6742,6 +6773,26 @@ def cmd_selftest() -> int:
             lambda: _read_verbs(" · closes EXMP-aFoo-2 · advances EXMP-aFoo-2"))
         arm("a `closes` with no value REFUSES", "carries `closes` with no value",
             lambda: _read_verbs(" · closes · streams tooling"))
+
+        # TOOL-dGroundRules-25 S37, S38 — a step's Parallel column, from two parsed fixture specs at
+        # one order: `yes` only where their Files touched are disjoint and neither consumes the other.
+        def _render_step(writes_b, edge_b=""):
+            def spec(uid, writes, edge):
+                return (f"# {uid} — a fixture unit\n\n**Status:** SPECCED · rev-1 · 2026-09-14 · node d · "
+                        f"Tier-2 · base abc12345 · order 1\n\n## 3. Non-goals (OUT)\n\n- none\n\n### Edges\n\n"
+                        f"{edge or 'none'}\n\n## 4. Design\n\n### Files touched (estimate)\n\n"
+                        + "".join(f"- `{w}`\n" for w in writes) + "\n## 5. Next\n")
+            units = [parse_spec_text(spec("EXMP-aFoo-1", ["tools/x/a.py"], ""), "a.md", "EXMP"),
+                     parse_spec_text(spec("EXMP-aFoo-2", writes_b, edge_b), "b.md", "EXMP")]
+            return render_order({"units": units}).split("\n")[4]
+        arm("two units whose Files touched name one path render `no`", "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | no |",
+            lambda: _render_step(["tools/x/a.py"]))
+        arm("two units, one declaring a directory over the other's path, render `no`", "| no |",
+            lambda: _render_step(["tools/x/"]))
+        arm("two units with disjoint Files touched render `yes`", "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | yes |",
+            lambda: _render_step(["tools/y/b.py"]))
+        arm("a unit consuming from its step's other unit renders `no`", "| 1 | `EXMP-aFoo-1`, `EXMP-aFoo-2` | no |",
+            lambda: _render_step(["tools/y/b.py"], "- **consumes-from** `EXMP-aFoo-1` — its output"))
 
         # ------------------------------------------- TOOL-dDerivedDocket-7 — the family view
         # ONE fixture repo for every arm below. `_build_backlog_fixture` wipes and restages its memory

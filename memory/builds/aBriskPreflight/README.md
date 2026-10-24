@@ -108,10 +108,10 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aBriskPreflight-1`, `TOOL-aBriskPreflight-10`, `TOOL-aBriskPreflight-5`, `TOOL-aBriskPreflight-6` | yes |
-| 2 | `TOOL-aBriskPreflight-2`, `TOOL-aBriskPreflight-4` | yes |
+| 2 | `TOOL-aBriskPreflight-2`, `TOOL-aBriskPreflight-4` | no |
 | 3 | `TOOL-aBriskPreflight-3` | no |
 | 4 | `TOOL-aBriskPreflight-7` | no |
-| 6 | `TOOL-aBriskPreflight-11`, `TOOL-aBriskPreflight-12` | yes |
+| 6 | `TOOL-aBriskPreflight-11`, `TOOL-aBriskPreflight-12` | no |
 | 7 | `TOOL-aBriskPreflight-19` | no |
 <!-- /gen:build-order -->
 

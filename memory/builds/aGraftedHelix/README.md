@@ -181,17 +181,17 @@ Ids whose spec moved past its audited revision: none — 0 of 44 unit id(s) carr
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aGraftedHelix-1` | no |
-| 2 | `TOOL-aGraftedHelix-10`, `TOOL-aGraftedHelix-11`, `TOOL-aGraftedHelix-12`, `TOOL-aGraftedHelix-2` | yes |
-| 3 | `TOOL-aGraftedHelix-18`, `TOOL-aGraftedHelix-19`, `TOOL-aGraftedHelix-3` | yes |
-| 4 | `TOOL-aGraftedHelix-20`, `TOOL-aGraftedHelix-22`, `TOOL-aGraftedHelix-27`, `TOOL-aGraftedHelix-4` | yes |
+| 2 | `TOOL-aGraftedHelix-10`, `TOOL-aGraftedHelix-11`, `TOOL-aGraftedHelix-12`, `TOOL-aGraftedHelix-2` | no |
+| 3 | `TOOL-aGraftedHelix-18`, `TOOL-aGraftedHelix-19`, `TOOL-aGraftedHelix-3` | no |
+| 4 | `TOOL-aGraftedHelix-20`, `TOOL-aGraftedHelix-22`, `TOOL-aGraftedHelix-27`, `TOOL-aGraftedHelix-4` | no |
 | 5 | `TOOL-aGraftedHelix-23`, `TOOL-aGraftedHelix-9` | yes |
-| 6 | `TOOL-aGraftedHelix-14`, `TOOL-aGraftedHelix-24`, `TOOL-aGraftedHelix-6` | yes |
-| 7 | `TOOL-aGraftedHelix-13`, `TOOL-aGraftedHelix-17`, `TOOL-aGraftedHelix-25`, `TOOL-aGraftedHelix-5` | yes |
+| 6 | `TOOL-aGraftedHelix-14`, `TOOL-aGraftedHelix-24`, `TOOL-aGraftedHelix-6` | no |
+| 7 | `TOOL-aGraftedHelix-13`, `TOOL-aGraftedHelix-17`, `TOOL-aGraftedHelix-25`, `TOOL-aGraftedHelix-5` | no |
 | 8 | `TOOL-aGraftedHelix-26`, `TOOL-aGraftedHelix-7` | yes |
 | 9 | `TOOL-aGraftedHelix-8` | no |
 | 10 | `TOOL-aGraftedHelix-15` | no |
 | 11 | `TOOL-aGraftedHelix-16` | no |
-| 12 | `TOOL-aGraftedHelix-21`, `TOOL-aGraftedHelix-28` | yes |
+| 12 | `TOOL-aGraftedHelix-21`, `TOOL-aGraftedHelix-28` | no |
 | 13 | `TOOL-aGraftedHelix-29` | no |
 | 14 | `TOOL-aGraftedHelix-30` | no |
 | 15 | `TOOL-aGraftedHelix-31` | no |

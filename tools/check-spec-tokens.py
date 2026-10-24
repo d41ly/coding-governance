@@ -324,11 +324,10 @@ LEGLINE_KEY = "SPEC_LEGLINE_CUTOFF"
 # pattern, `design_lib.SPEC_FILE_DATE` (TOOL-dTrueNorth-16 S32), so this file spells no second copy.
 # TOOL-aDeferredBar-2: the bar join's key, heading pattern and predicate. Blank or absent is OFF.
 DIRECT_KEY = "SPEC_DIRECT_CUTOFF"
-# TOOL-aBlindedTrial-8: the guards join's key and the sub-head it reads. The corpus spells the
-# sub-head both ways (437 with the parenthetical, 21 without at 987c5bec), so the suffix is optional.
-# The section body ends at the NEXT heading of any depth, because the sub-head has siblings.
+# TOOL-aBlindedTrial-8: the guards join's key. The sub-head it reads, spelled both ways in the corpus
+# (437 with the parenthetical, 21 without at 987c5bec), is read by `design_lib.read_spec_writes`
+# (TOOL-dGroundRules-25 S37), its body ending at the NEXT heading of any depth.
 GUARDS_KEY = "SPEC_GUARD_LEGS_CUTOFF"
-FILES_HEAD = re.compile(r"^### Files touched( \(estimate\))?[ \t]*$", re.M)
 # A guard carried by MORE than this many legs is BROAD and leaves the guards join (closing review
 # round 1, R1). Measured on the manifest at 144cd1fb: 5 keeps `<prefix>/hooks/` (5 legs, the motivating
 # case) and `.githooks/` (5) joined and drops `<prefix>/lib/` (30), `<prefix>/` (11), `<prefix>/memory-tree/`
@@ -546,20 +545,15 @@ def extract_files_touched(text, files):
     sub-head declaring nothing (TOOL-aBlindedTrial-8). The body closes at the next heading of ANY
     depth, unlike the section readers above, because the sub-head has siblings inside section 4.
     """
-    m = FILES_HEAD.search(text)
-    if not m:
+    words = load_design_lib().read_spec_writes(text)  # the one token read (TOOL-dGroundRules-25 S37)
+    if words is None:
         return None
-    rest = text[m.end():]
-    nxt = re.search(r"^##+ ", rest, re.M)
-    body = rest[:nxt.start()] if nxt else rest
     paths, roots = [], []
-    for tok in TICK.findall(body):
-        for word in tok.split():
-            if len(derive_dir_segments(word)) == 1:
-                if word not in roots:
-                    roots.append(word)
-            elif (check_path_shaped(word, files) or check_dir_shaped(word)) and word not in paths:
-                paths.append(word)
+    for word in words:
+        if len(derive_dir_segments(word)) == 1:
+            roots.append(word)
+        elif check_path_shaped(word, files) or check_dir_shaped(word):
+            paths.append(word)
     return paths, roots
 
 

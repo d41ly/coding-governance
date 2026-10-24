@@ -1060,6 +1060,16 @@ lineno()  { grep -nF "$1" <<<"$out" | head -1 | cut -d: -f1; }
 before()  { local a b; n=$((n+1)); a=$(lineno "$1"); b=$(lineno "$2")
             { [ -n "$a" ] && [ -n "$b" ] && [ "$a" -lt "$b" ]; } \
               || { echo "FAIL expected [$1] before [$2] (got '$a' vs '$b')"; st=1; }; }
+# NO PYTHON LAUNCHER (TOOL-dGroundRules-25 S35): the checker stops at its resolver with exit 2 and its
+# own line, never a pass over nothing. Every launcher name on PATH answers as the Microsoft Store stub
+# does, exit 9009, and no override is set. The line is asserted by its TEXT: an exit 2 is no `fail`
+# call, so `check-arms.py --report` lists no branch for it and this arm is its one witness.
+mkdir -p "$TMP/nopy"
+for _np in python3 python py; do printf '#!/usr/bin/env bash\nexit 9009\n' > "$TMP/nopy/$_np"; chmod +x "$TMP/nopy/$_np"; done
+_npout=$(env -u GOV_PYTHON PATH="$TMP/nopy:$PATH" bash "$SCRIPT" 2>&1); _nprc=$?
+n=$((n+1)); [ "$_nprc" = 2 ] || { echo "FAIL no python launcher: the checker exited $_nprc, not 2"; st=1; }
+n=$((n+1)); grep -qF "HYGIENE — no usable python" <<<"$_npout" \
+  || { echo "FAIL no python launcher: the checker never printed 'HYGIENE — no usable python': $_npout"; st=1; }
 # ONE SCOPED RUN, its liveness asserted (TOOL-aSparedSpawn-7 S8). Leaves the output in `sout` and the
 # exit in `src`, never in `out`, which the main block's arms read. Counts one assertion per requested
 # id named among what RAN, plus one for the unreached-guard refusal being absent: a scoped arm reading
@@ -4373,7 +4383,9 @@ fi
 # spec-token checker sits in the kit directory's parent. Counted by reading; OWED: observed at the close.
 # RAISED 666 -> 668 by TOOL-dTrueNorth-27: its two full-run check-29-and-30 assertions, each top-level and
 # skipped aloud with that block's others. Counted by reading; OWED: observed at the close.
-FLOOR_ASSERTIONS=668
+# RAISED 668 -> 670 by TOOL-dGroundRules-25 S35: its two no-launcher assertions, exit 2 and the line,
+# each top-level and never skipped. Counted by reading; OWED: observed at the close.
+FLOOR_ASSERTIONS=670
 [ "$((n + ${n_skip:-0}))" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent; look for a block stranded past an exit or a return"; st=1; }
 
 [ "$st" = 0 ] && echo "PASS ($n assertions)"

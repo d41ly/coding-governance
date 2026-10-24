@@ -101,8 +101,8 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 |---|---|---|
 | 1 | `TOOL-aPrimedIndex-1` | no |
 | 2 | `TOOL-aPrimedIndex-2` | no |
-| 3 | `TOOL-aPrimedIndex-3`, `TOOL-aPrimedIndex-4` | yes |
-| 4 | `DEPL-aPrimedIndex-1`, `TOOL-aPrimedIndex-6`, `TOOL-aPrimedIndex-7`, `TOOL-aPrimedIndex-8` | yes |
+| 3 | `TOOL-aPrimedIndex-3`, `TOOL-aPrimedIndex-4` | no |
+| 4 | `DEPL-aPrimedIndex-1`, `TOOL-aPrimedIndex-6`, `TOOL-aPrimedIndex-7`, `TOOL-aPrimedIndex-8` | no |
 | 5 | `TOOL-aPrimedIndex-9` | no |
 | 6 | `TOOL-aPrimedIndex-10` | no |
 | 7 | `TOOL-aPrimedIndex-16` | no |

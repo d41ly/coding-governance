@@ -76,11 +76,13 @@ allowed values and every check.
 - **Check the file:** `python tools/policy/check_policy.py`. It refuses a value outside its key's
   allowed values, an empty set for a key that is never empty, and a key no catalogue row names. Each
   check prints one line with the number it read; a check that read nothing is red too, unless reading
-  nothing is a legal state, no policy file yet, no tracked code, or no owner build landed, which it
-  prints as `not graded`.
+  nothing is a legal state, no policy file yet, no tracked code, no owner build landed, or no landed
+  revision yet, which it prints as `not graded`.
 - **Start a file in another repository:** `bash tools/policy/adopt-policy.sh --scaffold --target <repo>`.
   It writes the starter file only where none exists, then renders the harness settings from the agent
-  limit wherever the repository has a commit, so the first agent spawn passes. `--check --target
+  limit and the policy mirror wherever the repository has a commit, so the first agent spawn passes
+  and the merge bar finds the mirror fresh. The mirror renders a commit, so run it again once the
+  policy file is committed. `--check --target
   <repo>` checks that repository.
 - **See which keys are documented:** a catalogue row with no `summary` or no `usage` is named on
   `tools/policy/unsummarised-keys.txt`. That list may only shrink. To document a key, give its row a
@@ -165,8 +167,9 @@ pre-commit hook guards four paths, listed in `tools/policy/guarded-paths.txt`:
   `memory/builds/*/spec/` (it names no one file), `budgets.enforce` or `budgets.pinned`, any other
   key, a raise missing its `RAISED` line or its decision row, another line of the file changed, and
   any change to the instruction manifest or the deployer's answers. A mirror staged beside a change
-  to the policy file or the catalogue is refused with
-  `the mirror renders HEAD: commit the policy file or catalogue first, then regenerate`; one that is
+  to any file it is rendered from, the policy file, the catalogue or `.agent-cap.conf`, is refused
+  with `the mirror renders HEAD and its input <path> is staged changed: commit <path> first, then
+  regenerate`; one that is
   not its render, a hand edit say, with `differs from its render at HEAD`. Unstage it with
   `git restore --staged --worktree .governance/policy.json`; the landing renders it too.
 - **A merge that takes one side's file** writes nothing new and is admitted; a merge that writes a
@@ -196,8 +199,10 @@ kit settings files at the repository root (`.unattended.conf`, `.memory-tree.con
 generated, never typed: `python tools/policy/policy.py lists --write` writes it.
 
 The list is coding-governance's own and is never installed into another repository. There the policy
-check prints `arm_legacy_homes · not graded · the list is gov's own and is withheld from installs`,
-and `lists --write` does not create the file.
+check prints `arm_legacy_homes · not graded · the list is gov's own and is withheld from installs; …`,
+even if that repository writes a list of its own, and `lists --write` does not create the file. The
+deployer's `plan` shows the list as an `ORDER [project-owned]` row: that row is for information, and
+the list is not yours to write.
 
 - **A row** is `<place> <key> <mark>`, for example `.unattended.conf REVIEW_ROUNDS owner-policy`. The
   roles file's place is written `<tool-root>/roles/house/policy.toml`, which means the roles kit

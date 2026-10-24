@@ -2143,6 +2143,11 @@
       "file": "tools/run-gates/run-gates.sh"
     },
     {
+      "id": "build_install_target",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "build_invocations",
       "kind": "function",
       "file": "tools/runlog/runlog_lib.py"
@@ -7113,6 +7118,11 @@
       "file": "skills/session-kickoff/manifest-check.sh"
     },
     {
+      "id": "derive_enforcer_imports",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "derive_enforcer_path",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
@@ -7698,6 +7708,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "derive_parallel_step",
+      "kind": "function",
+      "file": "tools/memory-tree/gen_build_index.py"
+    },
+    {
       "id": "derive_parity_lines",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -7871,6 +7886,11 @@
       "id": "derive_repo_root",
       "kind": "function",
       "file": "tools/run-gates/regen.py"
+    },
+    {
+      "id": "derive_requires_closure",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "derive_rev_prefix",
@@ -14398,6 +14418,11 @@
       "file": "tools/run-gates/derive-ceilings.py"
     },
     {
+      "id": "read_legs_for",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_lf",
       "kind": "function",
       "file": "tools/workflows/check-protocol-parity.test.sh"
@@ -14923,6 +14948,11 @@
       "file": "tools/run-gates/check-receipt.py"
     },
     {
+      "id": "read_receipt_rows",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "read_recipe",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
@@ -15378,6 +15408,11 @@
       "file": "tools/run-gates/run-selftests.sh"
     },
     {
+      "id": "read_spec_consumes",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
+    },
+    {
       "id": "read_spec_marks",
       "kind": "function",
       "file": "tools/runlog/selftest.py"
@@ -15406,6 +15441,11 @@
       "id": "read_spec_words",
       "kind": "function",
       "file": "tools/memory-tree/migrate_backlog.py"
+    },
+    {
+      "id": "read_spec_writes",
+      "kind": "function",
+      "file": "tools/memory-tree/design_lib.py"
     },
     {
       "id": "read_sr_close",
@@ -17660,6 +17700,11 @@
     {
       "id": "resolve_bash",
       "kind": "function",
+      "file": "tools/lib/resolve_bash.py"
+    },
+    {
+      "id": "resolve_bash",
+      "kind": "function",
       "file": "tools/memory-tree/corpus_ids.py"
     },
     {
@@ -19758,6 +19803,16 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "run_arms_empty_declared",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_arms_empty_target",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_ask",
       "kind": "function",
       "file": "tools/unattended/gate-guard.test.sh"
@@ -19879,6 +19934,11 @@
     },
     {
       "id": "run_census_adopter_receipt",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_census_default_adopter",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },
@@ -20298,6 +20358,11 @@
       "file": "tools/unattended/unattended.test.sh"
     },
     {
+      "id": "run_install_verb",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_ir_push",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
@@ -20369,6 +20434,11 @@
     },
     {
       "id": "run_legacy_present",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
+      "id": "run_legacy_withheld_install",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
     },

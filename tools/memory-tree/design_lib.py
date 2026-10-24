@@ -515,6 +515,46 @@ def read_design_keys(root, conf):
     return values
 
 
+# A spec's declared write set and its consumed siblings (TOOL-dGroundRules-25 S37, S38): the one read
+# the spec-token checker's guards join and the build-order render share.
+FILES_TOUCHED_HEAD = re.compile(r"^### Files touched( \(estimate\))?[ \t]*$", re.M)
+TICKED = re.compile(r"`([^`\n]+)`")
+CONSUMES_BULLET = re.compile(r"^(?:-|\*)[ \t]*\*\*consumes-from\*\*[ \t]+(.*)$")
+
+
+def read_spec_writes(text):
+    """Every word inside backticks under a spec's `### Files touched` sub-head, in order and without
+    repeats, or None when the spec has no such sub-head. The body closes at the next heading of any
+    depth, because the sub-head has siblings inside section 4. No shape filter: each caller keeps its own."""
+    m = FILES_TOUCHED_HEAD.search(text)
+    if not m:
+        return None
+    rest = text[m.end():]
+    nxt = re.search(r"^##+ ", rest, re.M)
+    out = []
+    for tok in TICKED.findall(rest[:nxt.start()] if nxt else rest):
+        out += [w for w in tok.split() if w not in out]
+    return out
+
+
+def read_spec_consumes(text):
+    """The targets of a spec's `**consumes-from**` bullets under `### Edges` in its Non-goals section,
+    in order, by check 12's bullet grammar in `check-memory-hygiene.sh`: the first backticked token
+    after the verb, else its leading run of `[A-Za-z0-9_-]`."""
+    out, in3, edges = [], False, False
+    for line in text.replace("\r", "").split("\n"):
+        if line.startswith("## "):
+            in3, edges = bool(re.match(r"## [0-9]+[.] Non-goals", line)), False
+        elif line.startswith("### "):
+            edges = in3 and bool(re.match(r"### Edges[ \t]*$", line))
+        elif edges and (m := CONSUMES_BULLET.match(line)):
+            t = re.match(r"`([^`]*)`|([A-Za-z0-9_-]*)", m[1])
+            target = t[1] if t[1] is not None else t[2]
+            if target and target not in out:
+                out.append(target)
+    return out
+
+
 def read_spec_revisions(root, paths, memory_root="memory"):
     """`{path: [(sha, before, after)]}`, oldest first, for every path of `paths` (S10, S12): one entry per
     non-merge commit that changed it, `before` its text at that commit's first parent, None at its

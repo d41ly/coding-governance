@@ -137,7 +137,7 @@ Ids whose spec moved past its audited revision: none — 0 of 28 unit id(s) carr
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dRedressedBar-1`, `TOOL-dRedressedBar-2`, `TOOL-dRedressedBar-8`, `TOOL-dRedressedBar-9` | yes |
+| 1 | `TOOL-dRedressedBar-1`, `TOOL-dRedressedBar-2`, `TOOL-dRedressedBar-8`, `TOOL-dRedressedBar-9` | no |
 | 2 | `TOOL-dRedressedBar-3`, `TOOL-dRedressedBar-4` | yes |
 | 3 | `TOOL-dRedressedBar-5` | no |
 | 4 | `TOOL-dRedressedBar-20`, `TOOL-dRedressedBar-6` | yes |
@@ -145,7 +145,7 @@ Ids whose spec moved past its audited revision: none — 0 of 28 unit id(s) carr
 | 6 | `TOOL-dRedressedBar-10` | no |
 | 7 | `TOOL-dRedressedBar-11` | no |
 | 8 | `TOOL-dRedressedBar-12` | no |
-| 9 | `TOOL-dRedressedBar-13`, `TOOL-dRedressedBar-16` | yes |
+| 9 | `TOOL-dRedressedBar-13`, `TOOL-dRedressedBar-16` | no |
 | 10 | `TOOL-dRedressedBar-14` | no |
 | 11 | `TOOL-dRedressedBar-15` | no |
 | 12 | `TOOL-dRedressedBar-17` | no |

@@ -183,6 +183,7 @@ remote_ladder_py|$ROOT/$KIT_REL/resolve_remote.py|$KIT_REL/resolve_remote
 remote_ladder_sh|$ROOT/$KIT_REL/resolve-remote.sh|$KIT_REL/resolve-remote
 compare_base_py|$ROOT/$KIT_REL/compare_base.py|$KIT_REL/compare_base
 git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
+resolve_bash_py|$ROOT/$KIT_REL/resolve_bash.py|$KIT_REL/resolve_bash
 "
 # CRs are dropped before the compare: a Python copy may sit CRLF in a Windows working copy while git
 # stores it LF, and the parity asked is of the block, not of a checkout's line endings.
@@ -211,6 +212,8 @@ git_env_leaks_py|$ROOT/$KIT_REL/git_env_leaks.py|$KIT_REL/git_env_leaks
 # compare_base_py (TOOL-dGroundRules-21 S7) is the shrink-only compare base the codebase map and the
 # policy kit both read, and git_env_leaks_py (S9) the git variables the policy reader drops, the
 # memory-tree kit's GIT_ENV_LEAKS member for member; each had a copy with no canonical to drift from.
+# resolve_bash_py (TOOL-dGroundRules-25 S28) is the run-gates kit's bash rule the policy kit's checker
+# carries; the other copies return another shape and are TOOL-dSettledRoster-6's ask.
 #
 # EVERY BLOCK IN A FILE IS GRADED, not the first (TOOL-aRepatriatedFork-47 S5). `blk` takes the
 # block's ordinal: the extractor used to stop at the first closing marker, so a second copy in one

@@ -245,20 +245,20 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 64 spec(s) at 
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-dGroundRules-1`, `TOOL-dGroundRules-11` | yes |
-| 2 | `TOOL-dGroundRules-16`, `TOOL-dGroundRules-2`, `TOOL-dGroundRules-3`, `TOOL-dGroundRules-4` | yes |
-| 3 | `TOOL-dGroundRules-24`, `TOOL-dGroundRules-5`, `TOOL-dGroundRules-6`, `TOOL-dGroundRules-66` | yes |
-| 4 | `TOOL-dGroundRules-14`, `TOOL-dGroundRules-19`, `TOOL-dGroundRules-26`, `TOOL-dGroundRules-28`, `TOOL-dGroundRules-65`, `TOOL-dGroundRules-7`, `TOOL-dGroundRules-8` | yes |
-| 5 | `TOOL-dGroundRules-10`, `TOOL-dGroundRules-9` | yes |
-| 6 | `TOOL-dGroundRules-15`, `TOOL-dGroundRules-17`, `TOOL-dGroundRules-18`, `TOOL-dGroundRules-20` | yes |
-| 7 | `TOOL-dGroundRules-21`, `TOOL-dGroundRules-22`, `TOOL-dGroundRules-23` | yes |
-| 8 | `TOOL-dGroundRules-25`, `TOOL-dGroundRules-29` | yes |
-| 9 | `TOOL-dGroundRules-27`, `TOOL-dGroundRules-30`, `TOOL-dGroundRules-31` | yes |
+| 1 | `TOOL-dGroundRules-1`, `TOOL-dGroundRules-11` | no |
+| 2 | `TOOL-dGroundRules-16`, `TOOL-dGroundRules-2`, `TOOL-dGroundRules-3`, `TOOL-dGroundRules-4` | no |
+| 3 | `TOOL-dGroundRules-24`, `TOOL-dGroundRules-5`, `TOOL-dGroundRules-6`, `TOOL-dGroundRules-66` | no |
+| 4 | `TOOL-dGroundRules-14`, `TOOL-dGroundRules-19`, `TOOL-dGroundRules-26`, `TOOL-dGroundRules-28`, `TOOL-dGroundRules-65`, `TOOL-dGroundRules-7`, `TOOL-dGroundRules-8` | no |
+| 5 | `TOOL-dGroundRules-10`, `TOOL-dGroundRules-9` | no |
+| 6 | `TOOL-dGroundRules-15`, `TOOL-dGroundRules-17`, `TOOL-dGroundRules-18`, `TOOL-dGroundRules-20` | no |
+| 7 | `TOOL-dGroundRules-21`, `TOOL-dGroundRules-22`, `TOOL-dGroundRules-23` | no |
+| 8 | `TOOL-dGroundRules-25`, `TOOL-dGroundRules-29` | no |
+| 9 | `TOOL-dGroundRules-27`, `TOOL-dGroundRules-30`, `TOOL-dGroundRules-31` | no |
 | 10 | `TOOL-dGroundRules-32` | no |
 | 11 | `TOOL-dGroundRules-33` | no |
-| 12 | `TOOL-dGroundRules-34`, `TOOL-dGroundRules-35`, `TOOL-dGroundRules-36`, `TOOL-dGroundRules-37`, `TOOL-dGroundRules-38` | yes |
-| 13 | `TOOL-dGroundRules-39`, `TOOL-dGroundRules-40`, `TOOL-dGroundRules-41`, `TOOL-dGroundRules-42` | yes |
-| 14 | `TOOL-dGroundRules-43`, `TOOL-dGroundRules-44`, `TOOL-dGroundRules-45`, `TOOL-dGroundRules-46`, `TOOL-dGroundRules-47`, `TOOL-dGroundRules-48`, `TOOL-dGroundRules-49`, `TOOL-dGroundRules-50` | yes |
+| 12 | `TOOL-dGroundRules-34`, `TOOL-dGroundRules-35`, `TOOL-dGroundRules-36`, `TOOL-dGroundRules-37`, `TOOL-dGroundRules-38` | no |
+| 13 | `TOOL-dGroundRules-39`, `TOOL-dGroundRules-40`, `TOOL-dGroundRules-41`, `TOOL-dGroundRules-42` | no |
+| 14 | `TOOL-dGroundRules-43`, `TOOL-dGroundRules-44`, `TOOL-dGroundRules-45`, `TOOL-dGroundRules-46`, `TOOL-dGroundRules-47`, `TOOL-dGroundRules-48`, `TOOL-dGroundRules-49`, `TOOL-dGroundRules-50` | no |
 | 15 | `TOOL-dGroundRules-51` | no |
 | 16 | `TOOL-dGroundRules-52` | no |
 | 17 | `TOOL-dGroundRules-53`, `TOOL-dGroundRules-55`, `TOOL-dGroundRules-57`, `TOOL-dGroundRules-58`, `TOOL-dGroundRules-61`, `TOOL-dGroundRules-64` | yes |

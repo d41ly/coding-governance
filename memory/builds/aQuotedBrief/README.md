@@ -94,7 +94,7 @@ Ids whose spec moved past its audited revision: none — 0 of 6 unit id(s) carry
 
 | Step | Units | Parallel |
 |---|---|---|
-| 1 | `TOOL-aQuotedBrief-1`, `TOOL-aQuotedBrief-2` | yes |
+| 1 | `TOOL-aQuotedBrief-1`, `TOOL-aQuotedBrief-2` | no |
 | 2 | `TOOL-aQuotedBrief-3` | no |
 | 3 | `TOOL-aQuotedBrief-4` | no |
 | 4 | `TOOL-aQuotedBrief-5` | no |
