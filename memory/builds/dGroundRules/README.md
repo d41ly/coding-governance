@@ -185,7 +185,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-49 — the help page's guard line observed by the leg query with its path whole, and by the trace when it is taken out](spec/2026-10-23-spec-TOOL-dGroundRules-49.md) | 14 | 1 | CLOSED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-50 — the help-page parity prints where it found the deferral line, so the install section is read by one rule](spec/2026-10-23-spec-TOOL-dGroundRules-50.md) | 14 | 1 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-51 — the build-order evidence observed in the build README with its path whole, beside the root-README negative](spec/2026-10-23-spec-TOOL-dGroundRules-51.md) | 15 | 1 | WONTDO | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-52.md) | 16 | 2 | DEFERRED | rev-6 | 2026-10-24 |
+| [TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-52.md) | 16 | 2 | DEFERRED | rev-7 | 2026-10-24 |
 | [TOOL-dGroundRules-53 — the trap row's shell verdict observed with the library sourced by its tracked path and the trap pair whole](spec/2026-10-23-spec-TOOL-dGroundRules-53.md) | 17 | 2 | WONTDO | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-55 — the criterion bug class gains the side read: a criterion observes its scope item by running the check, never by reading what the check reads](spec/2026-10-23-spec-TOOL-dGroundRules-55.md) | 17 | 2 | DEFERRED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-57 — the not-a-trap staging spelled whole, so the trap probe lists the row the row check refuses](spec/2026-10-23-spec-TOOL-dGroundRules-57.md) | 17 | 2 | WONTDO | rev-2 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 344 bound to this build, across 4 record folder(s).
+Records: 346 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

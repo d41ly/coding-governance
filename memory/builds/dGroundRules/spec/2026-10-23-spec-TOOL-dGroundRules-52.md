@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-52 — the round-1 audit of units 35 to 43, its minors: twenty-five findings closed in the code and the observations those units leave, one scope item each
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 16 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -14,6 +14,8 @@
 | [2026-10-24-prompt-TOOL-dGroundRules-52-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-1-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-2-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-3-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-3-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-4-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-4-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-52-ac17-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-ac17-fix-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-edge-repair-brief.md) | research | TOOL-dGroundRules-45 TOOL-dGroundRules-60 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-57 TOOL-dGroundRules-58 |
 | [2026-10-24-prompt-TOOL-dGroundRules-52-probe-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-52-probe-fix-brief.md) | research | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 |
@@ -138,8 +140,10 @@ the relative value already resolving against the source (S16).
   prints as a `WRONG`. Both are built, so S19 owes no code. Observed by AC16.
 - **S20** — Finding 16. The `.pyc` digit-tail cut of `TOOL-dGroundRules-35` S1 is taken out of
   `add_source_read`, because `TOOL-dGroundRules-43` S9 skips importlib's temporary write, a mode-None
-  `open` carrying `O_CREAT`, before the path steps, so the cut sees no input. The cold case is
-  observed with bytecode writing on. Observed by AC17.
+  `open` carrying `O_CREAT`, before the path steps, so the cut sees no input. The policy check sets
+  `sys.dont_write_bytecode` at import (`tools/policy/check_policy.py:195`), so no traced run writes a
+  cache temporary; the cut's absence is observed by handing `add_source_read` a temporary's name
+  directly, which, `.pyc` not ending it, is kept as spelled. Observed by AC17.
 - **S21** — Finding 17. Closed by `TOOL-dGroundRules-40`'s arm in `tools/check-spec-tokens.test.sh`,
   which grades `check_writes_intersect` and `overlaps` over `OVERLAP_PAIRS`; `TOOL-dGroundRules-40`
   §3's "both answer correctly today" is now graded for both rules. S21 owes no code. Observed by AC5.
@@ -218,6 +222,9 @@ Every line below was read or run on 2026-10-24 at `8eab342e0`.
   directory outside it, staged excl.txt and kept.txt and not secret.local.
 - `git check-ignore --stdin` answered exit 1 for the paths .git/info/exclude and .git/index.
 - `RENDERED_STEPS` printed steps 12, 13 and 14, of five, four and eight units, each ending `| no |`.
+- On 2026-10-24, in a clone at `0618d7a6e` carrying the builder's S6, S14, S15, S20 and S25 patch,
+  `PYC_TEMP_PROBE` printed `[]` and a list holding the temporary's name alone; after `CUT_BACK` it
+  printed `[]` and a list holding `tools/govkit/govkit.py` alone.
 
 ### The trace after this unit
 
@@ -334,8 +341,10 @@ NO_GIT          = in the copy, the policy.run_git call inside read_source_git_di
                   None, git's no-answer, every other policy.run_git caller left whole
 DENY_OFF        = in the copy, read_source_git_dirs's raise staged to return ()
 BAD_JSON        = in the copy, one comma inserted before the closing bracket of tools/gate-legs.json
-COLD_WRITING    = env -u PYTHONDONTWRITEBYTECODE python -c "import shutil; shutil.rmtree('tools/govkit/__pycache__', ignore_errors=True)" &&
-                  env -u PYTHONDONTWRITEBYTECODE python tools/policy/check_policy.py --fixture budgets-ships-join
+PYC_TEMP_PROBE  = python -c "import os, sys; sys.path.insert(0, 'tools/policy'); import check_policy as c; top = os.path.realpath(c.derive_source_top()); c.TRACE_ROOTS[:] = [top, None, c.read_source_git_dirs(top)]; c.add_source_read('open', ('tools/govkit/__pycache__/govkit.cpython-314.pyc.123', 'rb', 0)); print(sorted(c.UNMAPPED_READS)); print(sorted(c.SOURCE_READS))"
+CUT_BACK        = in the copy, add_source_read's .pyc.<digits> cut restored: its __pycache__ test widened back to
+                  re.search(r"\.pyc(\.\d+)?$", p) and p = re.sub(r"(\.pyc)\.\d+$", r"\1", p) put back before
+                  the source_from_cache call
 LOCAL_COUNT     = git ls-files .claude | grep -cE '^\.claude/(worktrees/|scheduled_tasks\.lock|mailbox/)'
 TRACK_LOCAL     = in the copy, .claude/mailbox/x created and added with git add -f
 PLANT_BYTES     = in the copy, open(b'README.md') staged into run_fresh_target's first line
@@ -400,10 +409,10 @@ PLANT_REFUSED   = in the copy, tools/govkit/__pycache__/x.pyc created and a read
 - **AC16** — When `BAD_JSON` runs and `FIX adopter-fresh-target` runs in the copy, it prints a
   `guard-trace` `WRONG`, as it does before this unit; this unit's diff writes `check_guard_trace`, so the run at its close is the one that can red.
   Red when: an unparsable manifest reads as a trace with no miss.
-- **AC17** — When `COLD_WRITING` runs on the built tree, it prints no `guard-trace` `WRONG` and no
-  `guard-trace` line naming `.pyc`; it holds before this unit, and the run at its close, the cut gone and S25's line printing, is the one that can red.
-  Red when: importlib's temporary write reaches the path steps once the digit-tail cut is gone.
-  fixture: bytecode writing on for the run; this node's shell sets `PYTHONDONTWRITEBYTECODE`, which `env -u` unsets.
+- **AC17** — When `PYC_TEMP_PROBE` runs on the built tree, it prints `[]`, no unmapped read, and then a
+  list holding the temporary's name as spelled and no `tools/govkit/govkit.py`; before this unit it raises
+  an `AttributeError` naming `UNMAPPED_READS`. After `CLONE_AT` and `CUT_BACK`, `PYC_TEMP_PROBE` in the copy prints `[]` and a list holding `tools/govkit/govkit.py` alone.
+  Red when: `CUT_BACK`'s digit-tail cut is back in `add_source_read`, so the temporary maps to its source and the probe prints the source path instead.
 - **AC18** — When `LOCAL_COUNT` runs on the built tree, it prints `0`, as it does before this unit;
   after `TRACK_LOCAL`, `LOCAL_COUNT` in the copy prints `1`.
   Red when: the count cannot see a tracked local-state file.
@@ -457,6 +466,12 @@ none
 - rev-6 · 2026-10-24 · §3 · the consumes-from edge on `TOOL-dGroundRules-25`, CLOSED and declaring no hands-off back,
   gives way to one on `TOOL-dGroundRules-32` naming `check_writes_intersect` and `derive_parallel_step`, the reciprocal
   of that unit's hands-off line; S4 still names the rule in its prose. No scope, design or criterion moved.
+- rev-7 · 2026-10-24 · §2 S20, §4 Evidence, §6 AC17 · the builder's divergence: `tools/policy/check_policy.py`
+  sets `sys.dont_write_bytecode` at import, so the cold-run literal, bytecode writing on through the environment, wrote no cache temporary and AC17 could not red.
+  The ruling: AC17 is a direct probe, `PYC_TEMP_PROBE`, red by `CUT_BACK`, and the cold-run literal leaves the spec,
+  no other criterion consuming it. The brief expected the temporary's name in `UNMAPPED_READS`; S20's `.pyc`
+  test, as §4 designs it and the patch builds it, never hands that name to `source_from_cache`, so it is kept
+  as spelled in `SOURCE_READS` and `UNMAPPED_READS` stays empty, which AC17 states. No other item moved.
 
 ## 10. Reuse audit
 
