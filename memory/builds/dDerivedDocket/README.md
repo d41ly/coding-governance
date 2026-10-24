@@ -199,7 +199,7 @@ Ids whose spec moved past its audited revision: none — 0 of 51 unit id(s) carr
 | 11 | `TOOL-dDerivedDocket-11` | no |
 | 12 | `TOOL-dDerivedDocket-12` | no |
 | 13 | `TOOL-dDerivedDocket-13`, `TOOL-dDerivedDocket-50` | no |
-| 14 | `TOOL-dDerivedDocket-14`, `TOOL-dDerivedDocket-51`, `TOOL-dDerivedDocket-53` | no |
+| 14 | `TOOL-dDerivedDocket-14`, `TOOL-dDerivedDocket-51`, `TOOL-dDerivedDocket-53` | unknown |
 | 15 | `TOOL-dDerivedDocket-15`, `TOOL-dDerivedDocket-48`, `TOOL-dDerivedDocket-49` | no |
 | 16 | `TOOL-dDerivedDocket-16` | no |
 | 17 | `TOOL-dDerivedDocket-17`, `TOOL-dDerivedDocket-52` | no |

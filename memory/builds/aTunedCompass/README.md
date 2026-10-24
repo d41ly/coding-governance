@@ -119,7 +119,7 @@ Ids whose spec moved past its audited revision: none — 0 of 11 unit id(s) carr
 | Step | Units | Parallel |
 |---|---|---|
 | 1 | `TOOL-aTunedCompass-1`, `TOOL-aTunedCompass-4`, `TOOL-aTunedCompass-5`, `TOOL-aTunedCompass-6`, `TOOL-aTunedCompass-7`, `TOOL-aTunedCompass-9` | no |
-| 2 | `TOOL-aTunedCompass-10`, `TOOL-aTunedCompass-11`, `TOOL-aTunedCompass-2` | no |
+| 2 | `TOOL-aTunedCompass-10`, `TOOL-aTunedCompass-11`, `TOOL-aTunedCompass-2` | unknown |
 | 3 | `TOOL-aTunedCompass-3`, `TOOL-aTunedCompass-8` | yes |
 <!-- /gen:build-order -->
 
