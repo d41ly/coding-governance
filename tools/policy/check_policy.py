@@ -102,7 +102,11 @@ the planted consumers, pushed to one bare remote, then the spec's working-tree t
 
 The `limit-` cases are outcome cases of the agent limit (TOOL-dGroundRules-10), one repository each
 with no remote, so local main is its landed revision. `limit-conf-lowers`, `limit-conf-no-raise` and
-`limit-conf-malformed` plant `.agent-cap.conf` and read `policy.py get runtime.agents-in-flight`;
+`limit-conf-malformed` plant `.agent-cap.conf` and read `policy.py get runtime.agents-in-flight`, the
+last `policy.py mirror --print` too, which must refuse at the same line;
+`limit-conf-mirror` and `limit-conf-last-valid` (TOOL-dGroundRules-15) plant a lowering, the second
+over a malformed file whose last valid revision sets 6, render the mirror and red a `get` or a
+helper reading the fresh mirror that does not answer the lowered value;
 `limit-settings-render` commits two policy values and runs `policy.py settings`; the six `limit-hook-`
 cases copy the hooks kit's agent-cap.js and scratch-guard.js beside a copy of this kit, so rule 7 reads
 the fixture's own limit, and judge each call by its exit code and the text its criterion names.
@@ -1909,11 +1913,12 @@ def render_limit_env(n):
     return {v: str(n) for v in policy.SETTINGS_VARS}
 
 
-def build_limit_repo(path, policy_text, conf=None):
+def build_limit_repo(path, policy_text, conf=None, mirror=True):
     """A git repository at `path` on `main`, no remote, so local main is its landed revision: this
     kit's reader, mirror helper and shim beside its catalogue at the kit's own path, the hooks kit's
     agent-cap.js and scratch-guard.js at theirs, `policy_text` as the policy file (None: none) and
-    `conf` as `.agent-cap.conf`, committed; then the mirror rendered at that commit, committed over it.
+    `conf` as `.agent-cap.conf`, committed; then, when `mirror`, the mirror rendered at that commit,
+    committed over it: a malformed conf refuses the render (TOOL-dGroundRules-15), so its case has none.
     -> (repo, kit copy, hook copy)."""
     hooks = resolve_kit_dir("hooks", "agent-cap.js", KIT)
     path.mkdir()
@@ -1931,6 +1936,8 @@ def build_limit_repo(path, policy_text, conf=None):
     run_fixture_git(path, "symbolic-ref", "HEAD", "refs/heads/main")
     run_fixture_git(path, "add", "-A")
     run_fixture_git(path, "commit", "-q", "-m", "the agent limit's fixture")
+    if not mirror:
+        return path, kit, hook_dir / "agent-cap.js"
     Path(path, *MIRROR_FILE).parent.mkdir(exist_ok=True)
     Path(path, *MIRROR_FILE).write_bytes(policy.render_mirror(path, "HEAD"))
     run_fixture_git(path, "add", "-A")
@@ -1995,10 +2002,36 @@ def run_limit_case(name):
                                     and o == f"{default}\n" and f"FANOUT_CAP=8 at {policy.LEGACY_FANOUT}:2 does not lower it" in e,
                                     kit=kit))
         elif name == "limit-conf-malformed":
-            repo, kit, _hook = build_limit_repo(t / "r", None, "FANOUT_CAP=abc\n")
-            checks.append(check_get(name, repo, [AGENTS_KEY], lambda rc, o, e: rc == 2 and not o and e.strip()
-                                    == f"policy: refused · {policy.LEGACY_FANOUT}:1 · FANOUT_CAP must be an integer of at least 1",
-                                    kit=kit))
+            repo, kit, _hook = build_limit_repo(t / "r", None, "FANOUT_CAP=abc\n", mirror=False)
+            refused = f"policy: refused · {policy.LEGACY_FANOUT}:1 · FANOUT_CAP must be an integer of at least 1"
+            checks += [check_get(name, repo, [AGENTS_KEY], lambda rc, o, e: rc == 2 and not o and e.strip() == refused,
+                                 kit=kit),
+                       check_get(name, repo, ["--print"], lambda rc, o, e: rc == 2 and not o and e.strip() == refused,
+                                 kit=kit, verb="mirror")]
+        elif name in ("limit-conf-mirror", "limit-conf-last-valid"):
+            # The lowering's one home is resolve_read (TOOL-dGroundRules-15): the mirror, rendered
+            # through it, must hold what `get` prints, read by the helper from that fresh mirror.
+            if name == "limit-conf-mirror":
+                n, source = 2, "default"
+                repo, kit, _hook = build_limit_repo(t / "r", None, f"FANOUT_CAP={n}\n")
+            else:
+                n, source = 3, "last-valid"
+                repo, kit, _hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=6))
+                for rel, text, what in ((policy.LEGACY_FANOUT, f"FANOUT_CAP={n}\n", "the conf"),
+                                        (POLICY_REL, MALFORMED, "a malformed policy file")):
+                    Path(repo, rel).write_text(text, encoding="utf-8", newline="\n")
+                    run_fixture_git(repo, "add", "-A")
+                    run_fixture_git(repo, "commit", "-q", "-m", what)
+                Path(repo, *MIRROR_FILE).write_bytes(policy.render_mirror(repo, "HEAD"))
+                run_fixture_git(repo, "commit", "-q", "-am", "its mirror")
+            lowered = f"lowered to {n} by FANOUT_CAP at {policy.LEGACY_FANOUT}:1"
+            checks += [
+                check_get(name, repo, [AGENTS_KEY, "--explain"], lambda rc, o, e: rc == 0 and o == f"{n}\n"
+                          and f" · {source} · " in e and lowered in e, kit=kit),
+                check_run(name, f"policy-mirror.js get {AGENTS_KEY} --explain",
+                          ["node", str(kit / "policy-mirror.js"), "get", AGENTS_KEY, "--repo", str(repo), "--explain"],
+                          lambda rc, o, e: rc == 0 and o == f"{n}\n" and f" · {source} · " in e and lowered in e
+                          and "mirror absent at" not in e and "mirror stale at" not in e)]
         elif name == "limit-settings-render":
             repo, kit, _hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=8))
             settings = Path(repo, *SETTINGS_FILE)
@@ -2083,7 +2116,8 @@ def run_limit_case(name):
     return print_checks(name, checks)
 
 
-LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed", "limit-settings-render",
+LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed", "limit-conf-mirror",
+               "limit-conf-last-valid", "limit-settings-render",
                "limit-hook-admits-eight", "limit-hook-six-spawns", "limit-hook-rules-kept", "limit-hook-env-cap",
                "limit-hook-settings-over", "limit-hook-local-over")
 

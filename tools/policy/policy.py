@@ -35,9 +35,10 @@ catalogue there; `mirror --write` writes it at HEAD, which every landing runs th
 `[[generated]]` row; `policy-mirror.js` beside this file is its one reader, and takes a key from
 the landed revision's mirror only while both ids match the blobs there.
 
-THE AGENT LIMIT, `runtime.agents-in-flight` (TOOL-dGroundRules-10), is lowered by `resolve` to a
+THE AGENT LIMIT, `runtime.agents-in-flight` (TOOL-dGroundRules-10), is lowered by `resolve_read` to a
 `FANOUT_CAP` line `.agent-cap.conf` holds at the revision read, its legacy home, and never raised by
-it. `settings --write` renders the resolved limit at HEAD into the harness's two concurrency settings
+it, so `get`, the mirror and the settings render read one value (TOOL-dGroundRules-15).
+`settings --write` renders the resolved limit at HEAD into the harness's two concurrency settings
 in `.claude/settings.json`, which this kit's `[[generated]]` row regenerates at every landing.
 
 Exit 0 green, 1 red, 2 usage or a refused read.
@@ -601,9 +602,10 @@ def read_revision(repo, rev=None, rows=None):
     """The per-revision read `resolve_read` answers from (TOOL-dGroundRules-5): the revision, `rev`
     resolved to a full sha, else the landed one, and how it was found; the policy text there;
     `validate`'s problems; and the parsed table, None for an absent or invalid file. The last valid
-    revision and its `policy-file.on-invalid` join it on first need. A dict, so a render reads git
-    once for every key. `rev_phrase`, `<sha8>, <how>`, is the one spelling of the revision read that
-    every reason names (TOOL-dGroundRules-65); `render_mirror` sets it to `{rev}`."""
+    revision, its `policy-file.on-invalid` and the agent limit's `FANOUT_CAP` line join it on first
+    need. A dict, so a render reads git once for every key. `rev_phrase`, `<sha8>, <how>`, is the one
+    spelling of the revision read that every reason names (TOOL-dGroundRules-65); `render_mirror` sets
+    it to `{rev}`."""
     sha, how = derive_landed_revision(repo) if rev is None else (resolve_commit(repo, rev), f"--rev {rev}")
     text = read_policy_text(repo, sha)
     problems = [] if text is None else validate(text, rows)
@@ -615,32 +617,22 @@ def read_revision(repo, rev=None, rows=None):
 def resolve_read(path, row, read):
     """-> Resolution for the key path `path`, `row` its catalogue row, over one `read_revision` read:
     text `validate` refuses takes `read_last_valid_value`; valid text, and an absent file (table
-    None), are answered by RESOLUTION_ORDER. The one composition of the two."""
+    None), are answered by RESOLUTION_ORDER. The one composition of the two, and the one home of the
+    agent limit's legacy lowering, `derive_lowered_limit`, applied to either branch's answer, so
+    `get`, the mirror and the settings render all read the lowered limit (TOOL-dGroundRules-15)."""
     if read["problems"]:
-        return read_last_valid_value(path, row, read)
-    return read_ordered_value(path, row, read["table"], read["rev_phrase"])
+        hit = read_last_valid_value(path, row, read)
+    else:
+        hit = read_ordered_value(path, row, read["table"], read["rev_phrase"])
+    return derive_lowered_limit(hit, read) if path == AGENTS_PATH else hit
 
 
 def resolve(key, repo=".", rev=None):
     """-> Resolution for `key`: its path and catalogue row, then `resolve_read` over the revision's
-    read, `rev` resolved to a full sha, else the landed revision. `runtime.agents-in-flight` is then
-    the smaller of that value and the `FANOUT_CAP` line `read_legacy_fanout` finds at the same
-    revision, the source kept and the line named in the reason (TOOL-dGroundRules-10)."""
+    read, `rev` resolved to a full sha, else the landed revision."""
     path = parse_key(key)
     rows = load_catalogue(KIT)
-    row = read_catalogue_row(path, rows)
-    read = read_revision(repo, rev, rows)
-    hit = resolve_read(path, row, read)
-    if path != AGENTS_PATH:
-        return hit
-    found = read_legacy_fanout(repo, read["sha"])
-    if found is None:
-        return hit
-    n, line = found
-    at = f"{LEGACY_FANOUT}:{line}"
-    if n < hit.value:
-        return Resolution(n, hit.source, f"{hit.reason}; lowered to {n} by FANOUT_CAP at {at}")
-    return hit._replace(reason=f"{hit.reason}; FANOUT_CAP={n} at {at} does not lower it")
+    return resolve_read(path, read_catalogue_row(path, rows), read_revision(repo, rev, rows))
 
 
 # ---- the agent limit's legacy home (TOOL-dGroundRules-10) ----------------------------------------
@@ -670,6 +662,24 @@ def read_legacy_fanout(repo, rev):
     if not re.fullmatch(r"[0-9]+", value) or int(value) < 1:
         raise Refusal(LEGACY_FANOUT, line, "FANOUT_CAP must be an integer of at least 1")
     return int(value), line
+
+
+def derive_lowered_limit(hit, read):
+    """`hit`, the Resolution `resolve_read` found for runtime.agents-in-flight over `read`, lowered to
+    the `FANOUT_CAP` line `read_legacy_fanout` finds at the read's own revision where that is smaller,
+    the source kept and the line named in the reason; a line that does not lower it is named too. The
+    conf is read once per read and kept on it; a malformed line is that reader's Refusal, so every
+    reader of the limit refuses alike (TOOL-dGroundRules-15)."""
+    if "legacy_fanout" not in read:
+        read["legacy_fanout"] = read_legacy_fanout(read["repo"], read["sha"])
+    found = read["legacy_fanout"]
+    if found is None:
+        return hit
+    n, line = found
+    at = f"{LEGACY_FANOUT}:{line}"
+    if n < hit.value:
+        return Resolution(n, hit.source, f"{hit.reason}; lowered to {n} by FANOUT_CAP at {at}")
+    return hit._replace(reason=f"{hit.reason}; FANOUT_CAP={n} at {at} does not lower it")
 
 
 # ---- the JSON mirror (TOOL-dGroundRules-5) -----------------------------------------------------

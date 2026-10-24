@@ -7573,6 +7573,11 @@
       "file": "tools/drift-audit/drift_report.py"
     },
     {
+      "id": "derive_lowered_limit",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "derive_manifest_plant",
       "kind": "function",
       "file": "tools/policy/check_policy.py"
