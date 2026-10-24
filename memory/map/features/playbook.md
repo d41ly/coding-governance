@@ -113,7 +113,8 @@ seam: check-template-size.sh subject resolution — reuse for gating ANY file's 
 merge bar without writing a sibling script; extend via one `tools/gate-legs.json` entry naming the
 subject alone, one row in `tools/template-size-limits.txt` giving its ceiling and the reason for
 it, one `[[cap]]` row in `tools/policy/caps.toml` naming the subject by the same key with a
-`limits:` home, and one `--bump` to seed its high-water row. A limits row with no census row is
+`limits:` home and `ships = false`, because the gate is a registry exemption no install holds and
+`budgets-ships-join` reds a row whose flag disagrees, and one `--bump` to seed its high-water row. A limits row with no census row is
 read by nothing, and `arm_cap_census` names it. The limit is no longer passed positionally —
 that spelling was this affordance's own text until the declaration replaced it.
 seam: the high-water record — reuse for pricing growth in any tracked artifact where a fixed

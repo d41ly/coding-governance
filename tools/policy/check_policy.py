@@ -22,7 +22,8 @@ is absent or differs from its render at HEAD; `arm_mirror_landed` reds a key the
 landed revision sets that the helper `policy-mirror.js` and the reader answer differently, one
 `node` call per key; `arm_mirror_readers` reds a tracked code file outside this kit, the memory root
 and `help/` that names `policy.json`. `arm_legacy_homes` reds each report `policy.py lists --check`
-makes on the legacy-homes list (TOOL-dGroundRules-7).
+makes on the legacy-homes list (TOOL-dGroundRules-7); where this kit holds no list, as in every
+install, it prints `policy-check: arm_legacy_homes · not graded · <why>` (TOOL-dGroundRules-17).
 
 THE FIXTURE makes one git repository per case under the system temp directory, with a short prefix
 because a long path fails a Windows clone: a copy of this kit's catalogue and list at the kit's own
@@ -114,13 +115,20 @@ the fixture's own limit, and judge each call by its exit code and the text its c
 THE SIZE CAPS (TOOL-dGroundRules-9) add two arms and three kinds of case. `arm_limits_readers` reds a
 tracked code file outside this kit, the memory root, `help/` and the self-tests that spells the
 template-size limits file on a line that is not a comment or a docstring; `arm_cap_census` joins
-`caps.toml` to the tree both ways. `budgets-pinned-outside`, `budgets-pinned-exempt`,
+`caps.toml` to the tree both ways, announcing a row whose enforcer does not ship or whose kit is not
+installed (TOOL-dGroundRules-17). `budgets-pinned-outside`, `budgets-pinned-exempt`,
 `budgets-pinned-unknown` and `budgets-family-value` are plant cases of `arm_schema`. The other named
 `budgets-` cases are outcome cases, one repository per observation. One `budgets-cap-<name>` case per
 census row, declared in CAP_CASES, builds a scratch repository on main with no remote, plants the
 cap's subject over its value, read from the source, and runs the row's enforcer under `warn` and under
 `refuse`: a `switch` row must warn and pass, then refuse naming `budgets.enforce`; an outside row must
 answer the same under both, and the reader must refuse to answer it.
+
+WHAT SHIPS (TOOL-dGroundRules-17) adds two cases that read only this kit and its source repository,
+so they hold on gov's tree alone. `legacy-homes-present` reds this kit's directory without
+`legacy-homes.txt`, or a `kit.toml` with no `project-owned` rule naming it. `budgets-ships-join` reds a
+census row whose `ships = false` disagrees with the deployer registry's `[[exempt]]` paths either way,
+naming the row, and a registry that exempts no census enforcer.
 
 `--live` (S9) is no case: it drives headless `claude -p` sessions in a fixture repository under a
 rendered limit and under a control with none, reads each agent's start and end stamps, and prints
@@ -321,7 +329,12 @@ def arm_mirror_readers(repo, kit):
 def arm_legacy_homes(repo, kit):
     """Each report `policy.py lists --check` makes on the legacy-homes list (TOOL-dGroundRules-7): the
     rows derived from the repository's legacy policy homes against this kit's list and the list at the
-    landed revision. A Refusal, an unreadable landed revision or house file, is the one finding."""
+    landed revision. A Refusal, an unreadable landed revision or house file, is the one finding. Where
+    `kit` holds no list, the arm grades nothing and says so: the list is gov's own, withheld from
+    installs by this kit's descriptor (TOOL-dGroundRules-17), and the `legacy-homes-present` case holds
+    gov's own copy present."""
+    if not (Path(kit) / policy.LEGACY_LIST).is_file():
+        return None, policy.LEGACY_WITHHELD, []
     try:
         reports, notes, rows, _new = policy.check_legacy_homes(repo, kit)
     except policy.Refusal as exc:
@@ -538,28 +551,58 @@ def arm_limits_readers(repo, kit):
     return len(files), f"{len(files)} tracked code file(s) outside the kit, the memory root, help/ and the self-tests", out
 
 
+def resolve_enforcer(cap, repo, troot):
+    """-> (the census row's enforcer file in `repo`, None where absent; its kit's home; the directory
+    that home resolves from) (TOOL-dGroundRules-17). A `{prefix}` enforcer resolves from the tool root
+    `troot` in `repo`, any other from the top of `repo`. Its home is its first segment below that
+    root: an enforcer below a home is found by `resolve_kit_dir`, the target's install receipt read
+    before any probe, and a root-level one is located at that root itself."""
+    lead = "{prefix}/"
+    spelled = str(cap.enforcer)
+    here = Path(repo, troot) if spelled.startswith(lead) else Path(repo)
+    home, _slash, anchor = spelled.removeprefix(lead).partition("/")
+    if not anchor:
+        return (here / home if (here / home).is_file() else None), home, here
+    try:
+        return resolve_kit_dir(home, anchor, here) / anchor, home, here
+    except LookupError:
+        return None, home, here
+
+
 def arm_cap_census(repo, kit):
     """The cap census joined to the tree both ways (TOOL-dGroundRules-9).
 
-    Census to tree: each row's enforcer, its `{prefix}` resolved against this kit's tool root, is a
-    file; a `switch` row's enforcer asks the policy kit and names the cap on a line that is not a
-    comment, a `limits:` row's naming it by the subject's key at run time; an outside row's enforcer
-    makes no request naming it; and each row has its case in CAP_CASES. Tree to census: a request in
-    a `derive_code_files` file naming a cap no row names, a CAP_CASES case for no row, and a row of
-    the limits file in the tree, parsed by `budgets.parse_limits_rows`, no `limits:` row names. A census
-    that does not read is the one finding."""
+    Census to tree: each row's enforcer, found by `resolve_enforcer`, is a file; a `switch` row's
+    enforcer asks the policy kit and names the cap on a line that is not a comment, a `limits:` row's
+    naming it by the subject's key at run time; an outside row's enforcer makes no request naming it;
+    and each row has its case in CAP_CASES. A row whose enforcer is absent is graded by what ships
+    (TOOL-dGroundRules-17): a `ships = false` row is announced, `<name> · enforcer not shipped`; a row
+    whose kit's home holds no `kit.toml` this install resolves is announced, `<name> · kit <home> not
+    installed`; a row whose kit resolves is a finding. Each announce is one `cap census:` line. Tree
+    to census: a request in a `derive_code_files` file naming a cap no row names, a CAP_CASES case for
+    no row, and a row of the limits file in the tree, parsed by `budgets.parse_limits_rows`, no
+    `limits:` row names. A census that does not read is the one finding."""
     try:
         census = budgets.read_cap_census(repo)
     except policy.Refusal as exc:
         return 0, "the cap census did not read", [(f"{exc.path}:{exc.line}", exc.why)]
     troot = budgets.derive_tool_root()
-    out = []
+    out, told = [], []
     for cap in census.values():
-        rel = budgets.resolve_prefix_token(cap.enforcer, troot)
-        text = policy.read_text_or_none(Path(repo, rel))
-        if text is None:
-            out.append((cap.name, f"its enforcer {rel} is not a file in this tree"))
+        path, home, here = resolve_enforcer(cap, repo, troot)
+        if path is None:
+            rel = budgets.resolve_prefix_token(cap.enforcer, troot)
+            try:
+                if cap.ships:
+                    resolve_kit_dir(home, "kit.toml", here)
+                    out.append((cap.name, f"its enforcer {rel} is not a file in this tree"))
+                else:
+                    told.append(f"{cap.name} · enforcer not shipped")
+            except LookupError:
+                told.append(f"{cap.name} · kit {home} not installed")
         else:
+            rel = Path(os.path.relpath(path, repo)).as_posix()
+            text = policy.read_text_or_none(path) or ""
             code = "\n".join(ln for ln in text.splitlines() if not ln.lstrip().startswith(COMMENT_LEADS))
             if cap.cls == "switch" and not ASKS_SHAPE.search(code):
                 out.append((cap.name, f"its enforcer {rel} asks the policy kit nothing, so the switch never reaches it"))
@@ -582,8 +625,10 @@ def arm_cap_census(repo, kit):
     homes = {c.home.partition(":")[2] for c in census.values() if c.home.startswith("limits:")}
     out += [(k, f"is a row of {lrel} no limits: census row names, so nothing enforces it")
             for k in sorted(set(lrows) - homes)]
-    return len(census), (f"{len(census)} census row(s) joined to their enforcers and cases · {asked} request(s) "
-                         f"in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel}"), out
+    for ln in told:
+        print(f"cap census: {ln}")
+    return len(census), (f"{len(census)} census row(s) joined to their enforcers and cases, {len(told)} announced "
+                         f"· {asked} request(s) in {len(files)} tracked code file(s) · {len(lrows)} row(s) of {lrel}"), out
 
 
 ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm_mirror_parity,
@@ -592,11 +637,15 @@ ARMS = [arm_schema, arm_shape, arm_summaries, arm_direction, arm_on_invalid, arm
 
 
 def run_arm(arm, repo, kit):
-    """-> (population, findings), a zero population being one more finding."""
+    """-> (the verdict `main` prints after the arm's name, findings): `<k> finding(s) · <population>`,
+    a zero population being one more finding, or `not graded · <why>` where the arm answers None for
+    its population, an announce that grades nothing (TOOL-dGroundRules-17)."""
     n, population, findings = arm(repo, kit)
+    if n is None:
+        return f"not graded · {population}", findings
     if n == 0:
         findings = findings + [("population", f"zero, so this arm graded nothing: {population}")]
-    return population, findings
+    return f"{len(findings)} finding(s) · {population}", findings
 
 
 # ---- the fixture -------------------------------------------------------------------------------
@@ -1693,8 +1742,8 @@ def build_legacy_repo(t, gate, house):
     """A repository at `t`/r holding a copy of this kit's policy.py, catalogue and summary list at the
     kit's own path, a `.unattended.conf`, the gate file's text `gate` (none where None) and, where
     `house`, a house file where the copy resolves HOUSE_HOME; committed on main and pushed to one bare
-    remote, then the copy's `lists --write` seeding the legacy list, committed and pushed, so the
-    landed list is that seed. -> the kit copy."""
+    remote, then the copy's `lists --write` seeding the legacy list over a header-only one, committed
+    and pushed, so the landed list is that seed. -> the kit copy."""
     repo = t / "r"
     kit = repo / (policy.run_git(KIT, "rev-parse", "--show-prefix") or "").strip()  # derived, never spelled
     kit.mkdir(parents=True)
@@ -1713,7 +1762,8 @@ def build_legacy_repo(t, gate, house):
     run_fixture_git(repo, "symbolic-ref", "HEAD", "refs/heads/main")
     run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, (t / "b.git").as_posix())
     for msg in ("the legacy homes", "the legacy list, seeded"):
-        if msg.endswith("seeded"):
+        if msg.endswith("seeded"):  # `lists --write` updates a list and never creates one (TOOL-dGroundRules-17)
+            (kit / policy.LEGACY_LIST).write_text(policy.LEGACY_HEADER, encoding="utf-8", newline="\n")
             run_legacy_lists(kit, "--write")
         run_fixture_git(repo, "add", "-A")
         run_fixture_git(repo, "commit", "-q", "-m", msg)
@@ -1797,6 +1847,26 @@ def run_legacy_homes(name):
         finally:
             remove_repo(t)
     return print_checks(name, checks)
+
+
+def run_legacy_present(name):
+    """`legacy-homes-present` (TOOL-dGroundRules-17): this kit's own directory holds the legacy list,
+    and its `kit.toml` withholds the list from installs by a `project-owned` rule naming it. Where the
+    list is absent `arm_legacy_homes` announces itself not graded, so on gov's tree this case is what
+    reds a list deleted there; the leg running it is gov's alone."""
+    held = (KIT / policy.LEGACY_LIST).is_file()
+    try:
+        rules = tomllib.loads((KIT / "kit.toml").read_text(encoding="utf-8")).get("files", [])
+        seen = "no such rule"
+    except (OSError, tomllib.TOMLDecodeError) as exc:
+        rules, seen = [], f"kit.toml does not read: {exc}"
+    withheld = any(r.get("role") == "project-owned" and policy.LEGACY_LIST in
+                   (r.get("include") if isinstance(r.get("include"), list) else [r.get("include")]) for r in rules)
+    return print_checks(name, [
+        ("the list", f"{policy.LEGACY_LIST} in this kit's directory", held,
+         f"{'present' if held else 'absent'} in {KIT.as_posix()}"),
+        ("the descriptor", f"a project-owned kit.toml rule naming {policy.LEGACY_LIST}", withheld,
+         "withheld from installs" if withheld else seen)])
 
 
 # ---- reader coverage (TOOL-dGroundRules-8) -----------------------------------------------------
@@ -2632,6 +2702,32 @@ BUDGET_CASES = ("budgets-pinned-warn", "budgets-two-homes", "budgets-limits-read
                 "budgets-switch-refuse", "budgets-no-kit", "budgets-correctness-kept")
 
 
+def run_ships_join(name):
+    """`budgets-ships-join` (TOOL-dGroundRules-17): the census rows carrying `ships = false` are exactly
+    those whose enforcer the deployer's registry exempts, an `[[exempt]]` path equal to the enforcer or
+    a directory above it, both ways. The registry is `govkit/registry.toml` under this kit's tool root
+    in the source repository, which no adopter holds. One line per row either side names, and a WRONG
+    where the registry names no census enforcer, which would join nothing."""
+    top = derive_source_top()
+    reg = top / budgets.derive_tool_root() / "govkit" / "registry.toml"
+    try:
+        census = budgets.read_cap_census(top)
+        exempt = [str(r.get("path")) for r in tomllib.loads(reg.read_text(encoding="utf-8")).get("exempt", [])]
+    except (OSError, tomllib.TOMLDecodeError, policy.Refusal) as exc:
+        return print_checks(name, [(name, "the census and the registry", False, f"{type(exc).__name__}: {exc}")])
+    checks, rows = [], 0
+    for cap in census.values():
+        by = next((p for p in exempt if cap.enforcer == p or cap.enforcer.startswith(p + "/")), None)
+        rows += by is not None
+        if by or not cap.ships:
+            checks.append((cap.name, "ships = false exactly where the registry exempts its enforcer",
+                           bool(by) != cap.ships, f"{cap.enforcer} · {'exempt as ' + by if by else 'not exempt'} · "
+                           f"ships = {str(cap.ships).lower()}"))
+    checks.append(("the join", "a census enforcer the registry exempts", rows > 0,
+                   f"{rows} row(s) of {len(census)}, exempt by {reg.relative_to(top).as_posix()}"))
+    return print_checks(name, checks)
+
+
 # ---- the live observation (TOOL-dGroundRules-10 S9) ------------------------------------------------
 
 LIVE_LIMIT = 2
@@ -2794,10 +2890,12 @@ CASES = [
     ("mirror-landed-parity", None, run_mirror_landed_parity),
     *((g, None, run_guard_case) for g in [*GUARD_PLANTS, "guard-merge-side", *GUARD_MIRROR]),  # outcome cases: guard.py --staged
     ("legacy-homes", None, run_legacy_homes),  # an outcome case: one planted repository per case
+    ("legacy-homes-present", None, run_legacy_present),  # gov's own list held and withheld from installs
     ("reader-coverage", None, run_reader_coverage),  # an outcome case: one planted repository per case
     *((c, None, run_limit_case) for c in LIMIT_CASES),  # outcome cases: the agent limit, one repository each
     *((c, arm_schema, s) for c, s in BUDGET_SCHEMA_SEEDS.items()),  # the size switch's schema plants
     *((c, None, run_budget_case) for c in BUDGET_CASES),  # outcome cases: the size switch
+    ("budgets-ships-join", None, run_ships_join),  # the census's ships flags against the registry's exemptions
     *((CAP_CASE_PREFIX + n, None, run_cap_case) for n in CAP_CASES),  # one per census row
 ]
 
@@ -2919,8 +3017,8 @@ def main(argv):
         return 2
     red = 0
     for arm in ARMS:
-        population, findings = run_arm(arm, repo, KIT)
-        print(f"policy-check: {arm.__name__} · {len(findings)} finding(s) · {population}")
+        verdict, findings = run_arm(arm, repo, KIT)
+        print(f"policy-check: {arm.__name__} · {verdict}")
         for key, why in findings:
             print(f"  {key}: {why}")
         red += len(findings)

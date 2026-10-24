@@ -17,6 +17,10 @@
 #   family    true where the value is per subject: the enforcer asks only the mode, and the policy
 #             file may not set a value.
 #   research  the caps research's row number.
+#   ships     optional, true when absent: `false` on a row whose enforcer is a `{prefix}` path the
+#             deployer's registry exempts, so no install holds it and an adopter's census arm
+#             announces the row rather than grading it (TOOL-dGroundRules-17). The `policy fixtures`
+#             case `budgets-ships-join` holds these flags to the registry's exemptions both ways.
 #
 # No value is copied here: every cap keeps the value its home holds (help/size-caps.md).
 
@@ -28,6 +32,7 @@ enforcer = "{prefix}/check-template-size.sh"
 home = "limits:coding-governance-agents.template.md"
 family = false
 research = 1
+ships = false
 
 [[cap]]
 name = "AGENTS.md"
@@ -37,6 +42,7 @@ enforcer = "{prefix}/check-template-size.sh"
 home = "limits:AGENTS.md"
 family = false
 research = 2
+ships = false
 
 [[cap]]
 name = "skills/session-kickoff/SKILL.md"
@@ -46,6 +52,7 @@ enforcer = "{prefix}/check-template-size.sh"
 home = "limits:skills/session-kickoff/SKILL.md"
 family = false
 research = 3
+ships = false
 
 [[cap]]
 name = "memory/guides/BUILD-METHOD.md"
@@ -55,6 +62,7 @@ enforcer = "{prefix}/check-template-size.sh"
 home = "limits:memory/guides/BUILD-METHOD.md"
 family = false
 research = 4
+ships = false
 
 [[cap]]
 name = "memory/guides/UNATTENDED-PROTOCOL.md"
@@ -64,6 +72,7 @@ enforcer = "{prefix}/check-template-size.sh"
 home = "limits:memory/guides/UNATTENDED-PROTOCOL.md"
 family = false
 research = 5
+ships = false
 
 [[cap]]
 name = ".claude/skills/unattended/SKILL.md"
@@ -73,6 +82,7 @@ enforcer = "{prefix}/check-template-size.sh"
 home = "limits:.claude/skills/unattended/SKILL.md"
 family = false
 research = 6
+ships = false
 
 [[cap]]
 name = "memory/builds/*/spec/"
@@ -82,6 +92,7 @@ enforcer = "{prefix}/check-spec-tokens.py"
 home = "limits:memory/builds/*/spec/"
 family = false
 research = 7
+ships = false
 
 [[cap]]
 name = "line-length"

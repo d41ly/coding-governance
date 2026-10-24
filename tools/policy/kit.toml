@@ -6,11 +6,20 @@ home = "policy"
 scope = "repo"
 
 # Everything the kit ships is engine, overwritten on every update: the catalogue, the shrink-only list
-# beside it, the module, the checker and the adopter. A repository's own policy is the file the
+# beside it, the module, the checker and the adopter; the legacy-home list alone is withheld, below. A repository's own policy is the file the
 # adopter scaffolds OUTSIDE this directory, `.governance/policy.toml`, which no update rewrites.
 [[files]]
 include = "**"
 role = "engine"
+
+# THE LEGACY-HOME LIST IS WITHHELD (TOOL-dGroundRules-17). Its rows are gov's own legacy homes, so in
+# an adopter every row would read as stale and every adopter key as a new home. Withheld by claiming
+# the destination as `project-owned`, the mechanism the runlog descriptor explains: govkit has no
+# `exclude` key and `apply` never writes a project-owned file. Where the list is absent the
+# `arm_legacy_homes` arm announces itself not graded, and `lists --write` never creates it.
+[[files]]
+include = ["legacy-homes.txt"]
+role = "project-owned"
 
 # `--scaffold` writes the starter policy file only where none exists, and says "kept" otherwise.
 [adopt]

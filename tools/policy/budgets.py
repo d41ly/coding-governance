@@ -5,7 +5,8 @@ answer per cap, and the verdict a breach takes.
     python <this kit>/budgets.py check <cap>[=legacy:<n>|=default:<n>] <measured>  # the verdict
 
 THE CENSUS, `caps.toml` beside this file, is one `[[cap]]` row per size cap: its name under
-`budgets.*`, its class, its unit, its enforcer, its legacy home and whether it is a family. A `switch`
+`budgets.*`, its class, its unit, its enforcer, its legacy home and whether it is a family, and
+optionally `ships = false` where no install holds its enforcer (TOOL-dGroundRules-17). A `switch`
 cap obeys the switch; a `consumer`, `correctness` or `exempt` cap sits outside it, and this module
 refuses to answer one, so its enforcer cannot read a mode it must not obey.
 
@@ -44,12 +45,15 @@ OUTSIDE = ("consumer", "correctness", "exempt")
 UNITS = ("bytes", "lines", "chars", "count")
 HOME_FORMS = ("limits", "file", "conf", "constant")
 FIELDS = ("name", "class", "unit", "enforcer", "home", "family", "research")
+# The optional fields, each with the value its absence means: `ships = false` marks a row whose
+# enforcer the deployer's registry exempts, so no install holds it (TOOL-dGroundRules-17).
+OPTIONAL = {"ships": True}
 # The two exact rows under `budgets` a cap name may never shadow.
 RESERVED = ("enforce", "pinned")
 REQUEST = re.compile(r"(?P<cap>[^=]+)(?:=(?P<how>legacy|default):(?P<n>[0-9]+))?")
 SHELL_KEY = r"^\s*(?:export\s+)?{}\s*="
 
-Cap = namedtuple("Cap", "name cls unit enforcer home family research line")
+Cap = namedtuple("Cap", "name cls unit enforcer home family research line ships")
 CapAnswer = namedtuple("CapAnswer", "value mode source reason cap unit rule")
 CapVerdict = namedtuple("CapVerdict", "over refuse line")
 
@@ -92,8 +96,8 @@ def derive_census_rel():
 def read_cap_census(repo="."):
     """{name: Cap} for the census `repo` holds at this kit's own path, else this kit's own, in file
     order. A census that does not parse, a row lacking a field or carrying an unknown one, a class,
-    unit or home form outside its set, a reserved name, or a name twice is a Refusal naming the
-    census and the row's line."""
+    unit or home form outside its set, a `family` or OPTIONAL `ships` that is not a boolean, a
+    reserved name, or a name twice is a Refusal naming the census and the row's line."""
     rel = derive_kit_rel()
     path = Path(repo, rel, CENSUS) if rel is not None and Path(repo, rel, CENSUS).is_file() else KIT / CENSUS
     shown = derive_census_rel()
@@ -107,19 +111,21 @@ def read_cap_census(repo="."):
     for i, row in enumerate(doc.get("cap", [])):
         line = heads[i] if i < len(heads) else 0
         missing = [f for f in FIELDS if f not in row]
-        unknown = [f for f in row if f not in FIELDS]
+        unknown = [f for f in row if f not in FIELDS and f not in OPTIONAL]
+        flags = {f: row.get(f, OPTIONAL.get(f)) for f in ("family", *OPTIONAL)}
+        bad = next((f for f, v in flags.items() if not isinstance(v, bool)), None)
         why = (f"lacks {', '.join(missing)}" if missing else f"carries the unknown field {unknown[0]}" if unknown
                else f"class {row['class']!r} is none of {', '.join(CLASSES)}" if row["class"] not in CLASSES
                else f"unit {row['unit']!r} is none of {', '.join(UNITS)}" if row["unit"] not in UNITS
                else f"home {row['home']!r} opens with none of {', '.join(HOME_FORMS)}"
                if str(row["home"]).partition(":")[0] not in HOME_FORMS
-               else f"family {row['family']!r} is not a boolean" if not isinstance(row["family"], bool)
+               else f"{bad} {flags[bad]!r} is not a boolean" if bad
                else f"{row['name']} shadows budgets.{row['name']}" if row["name"] in RESERVED
                else f"{row['name']} is a census row twice" if row["name"] in out else None)
         if why:
             raise policy.Refusal(shown, line, why)
         out[row["name"]] = Cap(row["name"], row["class"], row["unit"], row["enforcer"], row["home"],
-                               row["family"], row["research"], line)
+                               row["family"], row["research"], line, flags["ships"])
     return out
 
 

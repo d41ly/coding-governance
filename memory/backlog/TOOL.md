@@ -431,7 +431,7 @@ Cite ids, never line numbers.
 | [TOOL-dGatedProse-10](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | memory/map/features/memory-tree-hygiene.md line 54 names… |
 | [TOOL-dGatedProse-11](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | tools/check-spec-tokens.py grades a LIVE spec by a whitelist, OPEN,… |
 | [TOOL-dGatedProse-12](../builds/dGatedProse/BACKLOG.md) | OPEN | — | — | 2026-09-22 | FIVE KIT SELF-TESTS ARE RED ON MAIN and no row records them: measured… |
-| [TOOL-dGroundRules-12](../builds/dGroundRules/BACKLOG.md) | DEFERRED | MED | TOOL-dGroundRules-17 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
+| [TOOL-dGroundRules-12](../builds/dGroundRules/BACKLOG.md) | DEFERRED | MED | TOOL-dGroundRules-18 | 2026-10-21 | build every roster unit of this build from its spec, filed by the… |
 | [TOOL-dGroundRules-13](../builds/dGroundRules/BACKLOG.md) | OPEN | MED | — | 2026-10-23 | let the minimal guard of cl-dClosedLoop-0012 admit the agent write a… |
 | [TOOL-dGroundRules-100](../builds/dGroundRules/BACKLOG.md) | OPEN | HIGH | — | 2026-10-23 | held red: suite recall floor arms red at ce13efbe on the daily held… |
 | [TOOL-dGroundRules-101](../builds/dGroundRules/BACKLOG.md) | OPEN | HIGH | — | 2026-10-23 | held red: suite run-gates turnstile red at ce13efbe on the daily held… |

@@ -187,6 +187,10 @@ kit settings files at the repository root (`.unattended.conf`, `.memory-tree.con
 `house/policy.toml`. `tools/policy/legacy-homes.txt` lists every key those places hold. It is
 generated, never typed: `python tools/policy/policy.py lists --write` writes it.
 
+The list is coding-governance's own and is never installed into another repository. There the policy
+check prints `arm_legacy_homes · not graded · the list is gov's own and is withheld from installs`,
+and `lists --write` does not create the file.
+
 - **A row** is `<place> <key> <mark>`, for example `.unattended.conf REVIEW_ROUNDS owner-policy`. The
   roles file's place is written `<tool-root>/roles/house/policy.toml`, which means the roles kit
   wherever this repository installed it, and its keys are its tables, `[effort]` and `[gates]`.

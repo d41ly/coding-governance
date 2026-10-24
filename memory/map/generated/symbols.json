@@ -17808,6 +17808,11 @@
       "file": "tools/roles/roles_lib.py"
     },
     {
+      "id": "resolve_enforcer",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "resolve_entry",
       "kind": "function",
       "file": "tools/govkit/govkit.py"
@@ -20298,6 +20303,11 @@
       "file": "tools/policy/check_policy.py"
     },
     {
+      "id": "run_legacy_present",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "run_lg_leg",
       "kind": "function",
       "file": "tools/unattended/check-unattended.test.sh"
@@ -20771,6 +20781,11 @@
       "id": "run_sg_signal",
       "kind": "function",
       "file": ".githooks/pre-push.test.sh"
+    },
+    {
+      "id": "run_ships_join",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
     },
     {
       "id": "run_shuffle_control",
