@@ -77,7 +77,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 
 - baseline: `59ff8f2ac04a967751eae00de6856afbea66c033`, the pin `deviations.py` carries (P0.1 row 5)
 - v2: `memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md` blob `9bf3b4c91952d54f01be759082f7ae3e52cde160`
-- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `4c1efd466535a05ccf8f64a215d3adc46180fdf4`
+- as-built view: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-as-built.md` blob `2377b6439b8bd4e40f44df9a2cc512287d056740`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-carries.py` blob `0b5fab9cc06d7b03c50ab94522092e2b9e266ce3`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-deviations.py` blob `30a1f15bf67566aeaf5b7e1628483c630b23b416`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-19-build-PLAY-dClosedLoop-1-asbuilt.py` blob `97c8f8fbf07f6f8d4021cb5414e78ddf2f40a753`
@@ -85,7 +85,7 @@ Each clause of the row, in its order: its id at its baseline hash, its hash now 
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-schedule.py` blob `5aa5421e265b02ba4478f8860ad9a4f5fea94500`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-open.py` blob `b1bb8b6d4c3a27d865a143de428b8331980778e9`
 - instrument: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-bare-ids.py` blob `ea671312d2969bed2fc82f738bc02703d6f19c73`
-- rendered at: `96526383cd50d5e04e87a311971fc8776b764710`
+- rendered at: `9ad838b3f9ac98cba577769c59ae00a9d7cbcf29`
 - generator: `memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py` version `20a7319cfe496f0187cf1fe3269f5dfe897b2ac2`, its blob at HEAD
 
 ### Owned nodes
@@ -283,12 +283,12 @@ Open asks in dClosedLoop's `BACKLOG.md` naming a chain build:
 
 `carries.py --report dDeclaredLoop`:
 
-Coverage of dDeclaredLoop's 34 clauses and 49 owned nodes, over 34 specs:
+Coverage of dDeclaredLoop's 34 clauses and 49 owned nodes, over 55 specs:
 - carried whole: 34; carried in parts: 0 (none)
 - moved, retired or deferred: none
 - uncarried: none; stale: cl-dClosedLoop-0091; ambiguous: none
 - owned nodes no spec names: none
-- specs derived from no clause: none
+- specs derived from no clause: memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-36.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-37.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-38.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-39.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-40.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-41.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-42.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-43.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-44.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-45.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-46.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-47.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-48.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-49.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-50.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-51.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-52.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-53.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-54.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-55.md (PLAY-dClosedLoop-2), memory/builds/dDeclaredLoop/spec/2026-10-24-spec-TOOL-dDeclaredLoop-56.md (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0086, cl-dClosedLoop-0089, cl-dClosedLoop-0090, cl-dClosedLoop-0091, cl-dClosedLoop-0092, cl-dClosedLoop-0093, cl-dClosedLoop-0094, cl-dClosedLoop-0095, cl-dClosedLoop-0096, cl-dClosedLoop-0097, cl-dClosedLoop-0098, cl-dClosedLoop-0101, cl-dClosedLoop-0102, cl-dClosedLoop-0111
 
 ### Reading order
