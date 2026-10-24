@@ -170,7 +170,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-34 — the round-1 audit of units 26 to 32, its minors: thirty-seven findings closed in the code those units leave, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-34.md) | 12 | 2 | CLOSED | rev-9 | 2026-10-24 |
 | [TOOL-dGroundRules-35 — the guard trace records a bytecode-cache read as its source file, so a warm load still records `govkit.py`](spec/2026-10-23-spec-TOOL-dGroundRules-35.md) | 12 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-36 — a source read git ignores is set aside before the guard join, counted, and never offered to the guard](spec/2026-10-23-spec-TOOL-dGroundRules-36.md) | 12 | 2 | CLOSED | rev-4 | 2026-10-24 |
-| [TOOL-dGroundRules-37 — every `policy fixtures` guard entry names a file git tracks, so the trace's sweep cannot widen the guard with a path no diff carries](spec/2026-10-23-spec-TOOL-dGroundRules-37.md) | 12 | 2 | DEFERRED | rev-4 | 2026-10-24 |
+| [TOOL-dGroundRules-37 — every `policy fixtures` guard entry names a file git tracks, so the trace's sweep cannot widen the guard with a path no diff carries](spec/2026-10-23-spec-TOOL-dGroundRules-37.md) | 12 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-38 — the guard trace keeps no read under the source's git directories, so its verdict does not depend on where `.git` sits](spec/2026-10-23-spec-TOOL-dGroundRules-38.md) | 12 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-39 — the census registry window held at both edges by a standing case, its fixture paths spelled whole](spec/2026-10-23-spec-TOOL-dGroundRules-39.md) | 13 | 2 | DEFERRED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-40 — the overlap arm pins each pair's expected answer, so the render's rule and the dispatcher's are graded against the truth and not only against each other](spec/2026-10-23-spec-TOOL-dGroundRules-40.md) | 13 | 2 | DEFERRED | rev-4 | 2026-10-24 |
@@ -200,7 +200,7 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-2 | 2026-10-23 |
 <!-- /gen:build-units -->
 
-Records: 283 bound to this build, across 4 record folder(s).
+Records: 284 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

@@ -3937,6 +3937,32 @@ def derive_guardable_reads(kept, top):
     return [k for k in kept if k not in ignored], len(ignored)
 
 
+def check_guard_lines():
+    """Every entry of the `policy fixtures` guard names a file git tracks (TOOL-dGroundRules-37 S1):
+    the guard trips by its literal spelling, tracked or not, so the trace's join cannot see a dead
+    entry, and a gitignored or never-staged path a sweep wrote there guards nothing the runner's
+    `git diff` lists. Each entry, `{prefix}` resolved, is asked of `git ls-files` at the source top,
+    the index and never the disk (S3), and one that lists nothing is a WRONG. The count line comes
+    first (S2); a manifest that does not parse or holds no such row is a WRONG of its own, never zero
+    dead lines. -> (assertions, wrong)."""
+    top, troot = derive_source_top(), budgets.derive_tool_root()
+    try:
+        rows = json.loads((top / troot / "gate-legs.json").read_text(encoding="utf-8"))
+        row = next((r for r in rows if r.get("name") == FIXTURES_LEG), None)
+    except (OSError, ValueError, TypeError, AttributeError) as exc:
+        print(f"policy-fixture: guard-trace · WRONG: the manifest did not parse: {exc}, so no guard line was checked")
+        return 1, 1
+    if row is None:
+        print(f"policy-fixture: guard-trace · WRONG: the manifest holds no {FIXTURES_LEG} row, so no guard line was checked")
+        return 1, 1
+    guard = row.get("guard") or []
+    print(f"policy-fixture: guard-trace · {len(guard)} guard line(s) checked")
+    dead = [e for e in guard if not (policy.run_git(top, "ls-files", "--", budgets.resolve_prefix_token(e, troot)) or "").strip()]
+    for e in dead:
+        print(f"policy-fixture: guard-trace · WRONG guard {e} · names no file git tracks")
+    return 1 + len(guard), len(dead)
+
+
 ADOPTER_KITS =("policy", "memory-tree", "kickoff-manifest")  # the planted receipt's kits: no check-line-length
 ADOPTER_PREFIX = "vendor/gov"  # the planted tool root, unlike gov's own, so `{prefix}` must be read from the receipt
 
@@ -4269,9 +4295,10 @@ def run_fixture(only=None):
             print(f"policy-fixture: {name} · " + (f"WRONG: unplanted reds {findings}" if findings else "green unplanted"))
         finally:
             remove_repo(repo)
-    a, w = check_guard_trace()
-    asserted += a
-    wrong += w
+    for check in (check_guard_trace, check_guard_lines):
+        a, w = check()
+        asserted += a
+        wrong += w
     print(f"policy-fixture: {asserted} assertion(s) executed · {wrong} wrong")
     return 1 if wrong or not asserted else 0
 

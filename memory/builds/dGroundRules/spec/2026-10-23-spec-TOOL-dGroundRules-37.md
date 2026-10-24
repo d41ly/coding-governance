@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-37 — every `policy fixtures` guard entry names a file git tracks, so the trace's sweep cannot widen the guard with a path no diff carries
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 12 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-37-deviation-25.md](../build/2026-10-23-build-TOOL-dGroundRules-37-deviation-25.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-37-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-37-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-37-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-37-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-36-staleness-probe-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-36-staleness-probe-brief.md) | research | TOOL-dGroundRules-36 TOOL-dGroundRules-38 |
 | [2026-10-24-prompt-TOOL-dGroundRules-37-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-37-2-spec-writer.md) | journal | — |

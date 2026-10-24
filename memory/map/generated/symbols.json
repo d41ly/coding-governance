@@ -4338,6 +4338,11 @@
       "file": "tools/memory-tree/backlog.py"
     },
     {
+      "id": "check_guard_lines",
+      "kind": "function",
+      "file": "tools/policy/check_policy.py"
+    },
+    {
       "id": "check_guard_trace",
       "kind": "function",
       "file": "tools/policy/check_policy.py"

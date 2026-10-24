@@ -257,3 +257,11 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T14:30:33Z brief · item TOOL-dGroundRules-34 · reason 019041c179c2 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-34-build-brief.md
 
 2026-10-24T14:42:40Z dispatch · item 74d17b3a TOOL-dGroundRules-34 · reason tools/policy/check_policy.py tools/policy/adopt-policy.sh tools/policy/adopt-policy.test.sh tools/policy/README.md help/policy.md tools/workflows/check-protocol-parity.test.sh memory/gotchas/suite-invalidated-by-a-commit-under-it.md memory/gotchas/test-oracle-read-from-a-historical-sha.md memory/gotchas/INDEX.md memory/map/generated/symbols.json memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-34.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-34-ledger.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T14:50:20Z brief · item TOOL-dGroundRules-37 · reason f709e3306cd3 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-37-build-brief.md
+
+2026-10-24T14:51:31Z dispatch · item 0860b8c1 TOOL-dGroundRules-37 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-37-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-37.md
+
+2026-10-24T14:53:51Z dispatch · item 0860b8c1 TOOL-dGroundRules-37 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-37-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-37.md
+
+2026-10-24T14:55:52Z dispatch · item 0860b8c1 TOOL-dGroundRules-37 · reason tools/policy/check_policy.py memory/map/generated/symbols.json memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-37-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-37.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
