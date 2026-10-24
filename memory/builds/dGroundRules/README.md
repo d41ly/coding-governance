@@ -195,12 +195,12 @@ ids TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGrou
 | [TOOL-dGroundRules-54 — the trap row's verdicts observed a second time through the whole overlap probe, which reads the pair from the suite and spells none](spec/2026-10-23-spec-TOOL-dGroundRules-54.md) | 18 | 2 | WONTDO | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-56 — the row check observed refusing: the not-a-trap row run through the arm's own row function, never read off the table](spec/2026-10-23-spec-TOOL-dGroundRules-56.md) | 18 | 2 | CLOSED | rev-2 | 2026-10-24 |
 | [TOOL-dGroundRules-59 — the overlap criteria of units 40 and 43 observed through the whole probe, the raw-compare staging included](spec/2026-10-23-spec-TOOL-dGroundRules-59.md) | 18 | 2 | WONTDO | rev-2 | 2026-10-24 |
-| [TOOL-dGroundRules-60 — unit 52's overlap observations taken through the overlap arm run alone, with the Python rule shown failing on its own](spec/2026-10-23-spec-TOOL-dGroundRules-60.md) | 18 | 2 | DEFERRED | rev-4 | 2026-10-24 |
+| [TOOL-dGroundRules-60 — unit 52's overlap observations taken through the overlap arm run alone, with the Python rule shown failing on its own](spec/2026-10-23-spec-TOOL-dGroundRules-60.md) | 18 | 2 | CLOSED | rev-4 | 2026-10-24 |
 | [TOOL-dGroundRules-62 — an unset `budgets.<cap>` reads as no file value: the derived-default refusal is a type the caps module catches, and only that refusal](spec/2026-10-23-spec-TOOL-dGroundRules-62.md) | 18 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | DEFERRED | rev-3 | 2026-10-24 |
 <!-- /gen:build-units -->
 
-Records: 354 bound to this build, across 4 record folder(s).
+Records: 355 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

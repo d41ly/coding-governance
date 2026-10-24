@@ -397,3 +397,11 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-24T19:34:48Z dispatch · item 9bea9c85 TOOL-dGroundRules-62 · reason tools/policy/policy.py tools/policy/budgets.py tools/policy/check_policy.py memory/gotchas/amendment-leaves-its-other-half-standing.md memory/gotchas/INDEX.md memory/map/generated/symbols.json memory/map/generated/inventories.json memory/map/generated/MAP.md memory/map/generated/CARDS.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-62.md memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-62-ledger.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
 
 2026-10-24T19:42:29Z dispatch · item 7f3ba9aa TOOL-dGroundRules-62 · reason tools/policy/README.md
+
+2026-10-24T19:49:59Z dispatch · item ff7f6b52 TOOL-dGroundRules-60 · reason memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-60-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-60.md
+
+2026-10-24T19:50:04Z brief · item TOOL-dGroundRules-60 · reason ff88d8d06948 memory/builds/dGroundRules/prompts/2026-10-23-prompt-TOOL-dGroundRules-60-build-brief.md
+
+2026-10-24T19:53:00Z dispatch · item ff7f6b52 TOOL-dGroundRules-60 · reason memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-60-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-60.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md
+
+2026-10-24T19:55:14Z dispatch · item ff7f6b52 TOOL-dGroundRules-60 · reason memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-60-ledger.md memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-60.md memory/LIVE.md memory/builds/dGroundRules/README.md memory/backlog/TOOL.md

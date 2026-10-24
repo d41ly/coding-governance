@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-60 — unit 52's overlap observations taken through the overlap arm run alone, with the Python rule shown failing on its own
 
-**Status:** DEFERRED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-4 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 18 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-60-deviation-48.md](../build/2026-10-23-build-TOOL-dGroundRules-60-deviation-48.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-60-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-60-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-58-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-58-task.md) | research | TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-60-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-60-build-brief.md) | journal | — |
