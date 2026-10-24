@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-23 — the registry join holds each census row's destination and entry to what the deployer installs
 
-**Status:** DEFERRED · rev-8 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-8 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 7 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-23-deviation-11.md](../build/2026-10-23-build-TOOL-dGroundRules-23-deviation-11.md) | deviation | — |
 | [2026-10-23-build-TOOL-dGroundRules-23-deviation-57.md](../build/2026-10-23-build-TOOL-dGroundRules-23-deviation-57.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-23-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-23-ledger.md) | journal | — |
+| [2026-10-24-build-TOOL-dGroundRules-23-deviation-75.md](../build/2026-10-24-build-TOOL-dGroundRules-23-deviation-75.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-23-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-23-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-23-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-23-build-brief.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-23-mark-task.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-23-mark-task.md) | research | — |

@@ -1794,7 +1794,16 @@
       "{prefix}/agent-instructions/adopt-agent-instructions.sh",
       "{prefix}/runlog/record.py",
       "{prefix}/codebase-map/map_lib.py",
-      "{prefix}/hooks/scratch-guard.js"
+      "{prefix}/hooks/scratch-guard.js",
+      "{prefix}/govkit/entries/",
+      "{prefix}/memory-tree/kit.toml",
+      "{prefix}/roles/kit.toml",
+      "{prefix}/playbook/kit.toml",
+      "{prefix}/memory-recall/kit.toml",
+      "{prefix}/agent-instructions/kit.toml",
+      "{prefix}/runlog/kit.toml",
+      "{prefix}/codebase-map/kit.toml",
+      "{prefix}/hooks/kit.toml"
     ],
     "chunk": "selftests",
     "subject": "kit",

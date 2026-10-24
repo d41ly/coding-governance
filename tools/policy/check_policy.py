@@ -145,6 +145,10 @@ as an adopter, grading each shipped row of an installed kit at its `installed` p
 `census-adopter-receipt` is an outcome case: a planted receipt naming no `check-line-length`, each
 named kit's enforcers at their `installed` paths, read green with the line-length row announced, red
 naming `manifest-bytes` once its planted enforcer is deleted, and green again restored.
+`budgets-ships-join` holds those two fields to the deployer on gov's tree (TOOL-dGroundRules-23): it
+loads `govkit.py` from the source repository and reds, naming the row, the entry and the destination,
+a shipped row whose `kit` does not write its enforcer at `installed`, or whose enforcer another entry
+writes.
 
 THE MINORS BATCH (TOOL-dGroundRules-21) adds outcome cases, each named in its function's docstring:
 `adopter-suite` runs the adopter's sibling suite; `on-invalid-utf16`, `on-invalid-shallow` and
@@ -164,6 +168,7 @@ Later units add arms to ARMS and cases to CASES.
 import ast
 import contextlib
 import hashlib
+import importlib.util
 import io
 import json
 import os
@@ -3122,7 +3127,9 @@ def run_ships_join(name):
     those whose enforcer the deployer's registry exempts, an `[[exempt]]` path equal to the enforcer or
     a directory above it, both ways. The registry is `govkit/registry.toml` under this kit's tool root
     in the source repository, which no adopter holds. One line per row either side names, and a WRONG
-    where the registry names no census enforcer, which would join nothing."""
+    where the registry names no census enforcer, which would join nothing. TOOL-dGroundRules-23: each
+    shipped row's `kit` and `installed` equal what govkit's own `resolve_entry` under `canonical_ctx`
+    says, and no other entry writes its enforcer; a census with no shipped row is a WRONG too."""
     top = derive_source_top()
     reg = top / budgets.derive_tool_root() / "govkit" / "registry.toml"
     try:
@@ -3140,6 +3147,37 @@ def run_ships_join(name):
                            f"ships = {str(cap.ships).lower()}"))
     checks.append(("the join", "a census enforcer the registry exempts", rows > 0,
                    f"{rows} row(s) of {len(census)}, exempt by {reg.relative_to(top).as_posix()}"))
+    # TOOL-dGroundRules-23: each shipped row's `kit` and `installed` against what the deployer's own
+    # resolver says the entry writes, both ways: the row's entry writes its enforcer at `installed`, and
+    # no other entry writes that source. A `ships = false` row carrying either field never gets here:
+    # read_cap_census refuses it above, naming the row, and that Refusal is this case's WRONG.
+    troot = budgets.derive_tool_root()
+    gk = top / troot / "govkit" / "govkit.py"
+    try:
+        spec = importlib.util.spec_from_file_location("govkit_ships_join", gk)
+        govkit = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(govkit)
+        rep = govkit.Report()
+        descs = govkit.read_descriptors(top, govkit.load_registry(top), rep)
+        writes = {eid: govkit.resolve_entry(top, desc, govkit.canonical_ctx(eid))["writes"]
+                  for eid, (desc, _p) in descs.items()}
+    except Exception as exc:  # noqa: BLE001 (a deployer that does not import or resolve is this case's WRONG)
+        checks.append(("the deployer", "govkit.py loads and resolves every entry", False,
+                       f"{gk.relative_to(top).as_posix()}: {type(exc).__name__}: {exc}"))
+        return print_checks(name, checks)
+    if rep.problems:
+        checks.append(("the deployer", "every registry descriptor reads", False, "; ".join(rep.problems)))
+    shipped = [cap for cap in census.values() if cap.ships]
+    for cap in shipped:
+        src = budgets.resolve_prefix_token(cap.enforcer, troot)
+        hits = sorted((eid, dest) for eid, w in writes.items() for dest, row in w.items() if row.get("src") == src)
+        want = [(cap.kit, budgets.resolve_prefix_token(cap.installed, troot))]
+        checks.append((cap.name, "its kit writes its enforcer at installed, and no other entry writes it",
+                       hits == want, f"row: kit {cap.kit} · installed {cap.installed} · the resolver writes {src} as "
+                       f"{', '.join(f'{e} -> {d}' for e, d in hits) or 'no entry'}"))
+    checks.append(("the destination join", "a shipped census row", bool(shipped),
+                   f"{len(shipped)} shipped row(s) of {len(census)}, against {len(writes)} registry entries "
+                   f"resolved by {gk.name}"))
     return print_checks(name, checks)
 
 
