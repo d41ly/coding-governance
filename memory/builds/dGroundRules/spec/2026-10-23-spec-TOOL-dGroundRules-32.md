@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-32 — the round-1 audit of units 22 to 25, its minors: twenty findings closed in the code those units leave, one scope item each
 
-**Status:** DEFERRED · rev-6 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dGroundRules-12
+**Status:** DEFERRED · rev-7 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 10 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -12,6 +12,8 @@
 | [2026-10-23-build-TOOL-dGroundRules-32-deviation-61.md](../build/2026-10-23-build-TOOL-dGroundRules-32-deviation-61.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-32-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-32-build-brief.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-32-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-32-1-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-32-2-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-32-2-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dGroundRules-32-divergence-2-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-32-divergence-2-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-32-divergence-brief.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-32-divergence-brief.md) | research | — |
 | [2026-10-24-prompt-TOOL-dGroundRules-32-span-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dGroundRules-32-span-spec-writer.md) | journal | — |
 | [2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md](../reviews/2026-10-23-review-TOOL-dGroundRules-1-52-closing-diff-round1.md) | diff-review | TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-65 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 |
@@ -67,10 +69,12 @@ corrected fix. Where the review offered options, §8 records the pick.
 - **S2** — Finding 4. Step 7 (`TOOL-dGroundRules-21`, `-22` and `-23`, which meet on
   `tools/policy/check_policy.py` and `tools/policy/budgets.py`) renders `no` by the same rule.
   Observed by AC2.
-- **S3** — Finding 5. `fixtures-guard-census` derives, at run time, the descriptor path of every
-  entry a census row's `kit` names, from that entry's registry `descriptor` field, and prints `WRONG`
-  for one the `policy fixtures` guard does not cover; the guard gains each such path the row does not
-  already carry, `{prefix}/memory-tree/kit.toml` among them. Observed by AC3.
+- **S3** — Finding 5. The `policy fixtures` guard already carries the descriptor line of every
+  census kit, `{prefix}/memory-tree/kit.toml` among them (`tools/gate-legs.json:1798-1806`), written
+  by `TOOL-dGroundRules-23`; S3 adds no guard line. What remains is the run-time derivation:
+  `fixtures-guard-census` derives the descriptor path of every entry a census row's `kit` names from
+  that entry's `descriptor` field in `tools/govkit/registry.toml`, and prints `WRONG` for one the
+  guard does not cover, so no descriptor list is typed beside the registry. Observed by AC3.
 - **S4** — Finding 8. Every descriptor `build_install_target` writes carries the `[answers]` table
   of S16, `manifest_path` and `user_skills` among them, so the fresh-target case installs a closure
   that reaches `kickoff-manifest`. That case already reports a non-zero `apply` as its `WRONG`
@@ -89,11 +93,14 @@ corrected fix. Where the review offered options, §8 records the pick.
   `no`; a one-unit step, 10, 11, 15, 16 or 20, reads `no` by `derive_parallel_step`'s first branch.
   Steps 17 and 18 each hold one unit declaring it and read `yes`: no two of their units' write sets
   meet, and no unit of either step consumes from another unit of the same step. Observed by AC7.
-- **S8** — Finding 13. `read_shipped_descriptors(root)` in `tools/govkit/govkit.py`, factored out of
-  `cmd_shipped`, returns the registry's descriptors or raises `Refusal` naming every problem the
-  `Report` holds; `cmd_shipped` calls it and prints exactly what it prints today; and
-  `budgets-ships-join` reads the descriptors through it, a refusal being the case's `WRONG` naming the
-  problems. Observed by AC8.
+- **S8** — Finding 13. `budgets-ships-join` already prints a `WRONG` when the deployer's `Report`
+  holds a problem (`tools/policy/check_policy.py:3564-3565`). What remains is the refactor:
+  `read_shipped_descriptors(root)` in `tools/govkit/govkit.py`, factored out of `cmd_shipped`,
+  returns the registry's descriptors or raises `Refusal` naming every problem the `Report` holds;
+  `cmd_shipped` calls it and prints exactly what it prints today; and `budgets-ships-join` reads the
+  descriptors through it in place of its own `read_descriptors` call and `Report` check
+  (`:3556-3565`), the refusal being the case's `WRONG` naming the problems, so the join and
+  `govkit.py shipped` read the registry through one function. Observed by AC8.
 - **S9** — Finding 14. `derive_dir_segments`, `check_dir_shaped` and `check_guard_trips` move from
   `tools/check-spec-tokens.py` into `tools/memory-tree/design_lib.py`, and `check-spec-tokens.py`
   calls them through the `design_lib` it already loads. `check_writes_intersect(a, b)` in
@@ -104,7 +111,8 @@ corrected fix. Where the review offered options, §8 records the pick.
   a write set renders as it does at HEAD and no build README outside the eight S13 names changes.
   An arm in `tools/check-spec-tokens.test.sh` holds its verdict equal to `overlaps` of
   `tools/unattended/lib-unattended.sh` on a directory and file pair and on a disjoint pair.
-  Observed by AC9.
+  Observed by AC9, whose audited text stands; its probe is run with the two pairs spelled whole as
+  `TOOL-dGroundRules-34` S15 restates them.
 - **S10** — Finding 21. The `policy fixtures` guard carries, for each kit of the policy kit's
   `requires` closure, its `kit.toml` and its `[adopt]` script, and `{prefix}/run-gates/kit.toml` and
   `{prefix}/run-gates/regen.py`, which `TOOL-dGroundRules-25` S7's case runs; `fixtures-guard-census`
@@ -115,10 +123,16 @@ corrected fix. Where the review offered options, §8 records the pick.
   answers `invalid` with the field it failed, `arm_cap_census` prints one finding naming the receipt
   and that field, and the `legacy-homes` arm (`TOOL-dGroundRules-25` S11) announces under `invalid`
   as it does under `adopter`. Observed by AC11.
-- **S12** — Finding 27. `parse_policy(text)` (`TOOL-dGroundRules-2` S3) strips one leading U+FEFF
-  before it parses, in place of the strip `TOOL-dGroundRules-25` S30 puts in the reader; the guard's
-  parse of the policy file and `arm_schema`'s go through `parse_policy`, so the three agree; and
-  `on-invalid-bom` also runs `guard.py --staged` and `--check` over the BOM-led file.
+- **S12** — Finding 27. One helper in `tools/policy/policy.py`, `derive_bomless_text(text)`,
+  answers `text` less one leading U+FEFF. The strip `TOOL-dGroundRules-25` S30 put in
+  `read_policy_text` (`tools/policy/policy.py:488`) moves into it, and `parse_policy`, `validate` and
+  `arm_schema`'s nested parse (`tools/policy/check_policy.py:232`) each call it on their text before
+  `tomllib` parses, so the three readers agree. `tools/policy/guard.py` imports no policy reader, so
+  `TOOL-dGroundRules-6` AC10 stays true: `check_raise_shape` strips one leading U+FEFF from each
+  decoded side inline before its own `tomllib` parse, under one comment naming
+  `derive_bomless_text` as the helper it mirrors. `on-invalid-bom` also builds `build_guard_repo`'s
+  fixture with its committed policy file BOM-led, stages the `guard-admits-raise` change over it with
+  the BOM kept, and runs `guard.py --staged`, the one mode the guard accepts, which admits it.
   Observed by AC12.
 - **S13** — Finding 28. A unit whose spec has no `### Files touched` sub-head contributes an unknown
   write set: the unit record keeps the `None` `read_spec_writes` answers, `derive_parallel_step`
@@ -146,7 +160,9 @@ corrected fix. Where the review offered options, §8 records the pick.
   `legacy-homes-withheld-install` runs `plan` over the built target before its `apply`, and `check`
   is the fresh-target case's own (S18). An answer the closure asks for that `DEPLOY_FULL` lacks makes
   `apply` exit non-zero naming it, and each of the three cases carries `apply`'s output in its
-  `WRONG` when it does. Observed by AC16.
+  `WRONG` when it does. Before building, the builder probes `DEPLOY_FULL`'s answers against `apply`
+  in a fresh target of the three cases' closures; if `apply` refuses, the builder hands back a
+  divergence naming the failing answer and builds none of S16. Observed by AC16.
 - **S17** — Finding 15. `read_spec_edges(text, verb)` in `tools/memory-tree/design_lib.py` returns
   the target and the text of each `**<verb>**` bullet of a spec's `### Edges` under check 12's target
   rule. `TOOL-dGroundRules-25` S38's consumes read is `read_spec_edges(text, "consumes-from")`, and
@@ -202,7 +218,27 @@ corrected fix. Where the review offered options, §8 records the pick.
 ### Evidence
 
 Every line below was read at base `3708a705` on 2026-10-23 and re-read by symbol at `93e4b4d31` on
-2026-10-24; a line that moved is cited where it now sits.
+2026-10-24, and the S3, S8 and S12 lines again at `3e16f3efe`; a line that moved is cited where it
+now sits.
+
+- `tools/policy/guard.py` imports `tomllib` (`:30`) and no policy module, its docstring saying it
+  imports no policy reader (`:15-16`); `check_raise_shape` decodes both sides and parses them at
+  `:145-146`; `main` accepts `--staged` alone (`:194-196`). `TOOL-dGroundRules-6` AC10 holds that
+  import grep to printing nothing.
+- `parse_policy` parses at `tools/policy/policy.py:493` and `validate` at `:560`; `arm_schema`
+  parses again for `scan_keys` at `tools/policy/check_policy.py:232`. `build_guard_repo` sits at
+  `:2175-2189` and the `guard-admits-raise` plant at `:2145`.
+- The `policy fixtures` guard lists `{prefix}/govkit/entries/` and each census kit's descriptor
+  outside it (`tools/gate-legs.json:1798-1806`), and lists neither `{prefix}/run-gates/kit.toml`
+  nor `{prefix}/memory-tree/adopt-memory-tree.sh`.
+- `budgets-ships-join` calls `govkit.read_descriptors` at `tools/policy/check_policy.py:3557` and
+  reports a `Report` problem as a `WRONG` at `:3564-3565`.
+- The `watch:` line of `memory/guides/SESSION-KICKOFF.md:6` names `tools/gate-legs.json`, so a
+  commit writing it re-stamps the manifest's audit under check C5 of
+  `skills/session-kickoff/manifest-check.sh`.
+- `DEPLOY_FULL`'s `[answers]` (`tools/govkit/selftest.py:707-712`) set `manifest_path` to a
+  `docs/` path and `user_skills` to a home path; `check_policy.py` names `DEPLOY_FULL` nowhere yet,
+so no policy case has run `apply` with them.
 
 - `memory/builds/dGroundRules/README.md:244-267` is the build-order region; every step renders `no`
   but 17 and 18, which render `yes`. `grep -nE "^\| (4|6|7) \|"` over the README also prints the
@@ -302,14 +338,15 @@ nested function it is at HEAD.
 |---|---|
 | `tools/policy/check_policy.py` | S3, S4, S10, S11, S12, S16, S18, and S20 only if its probe finds a deployer commit |
 | `tools/policy/policy.py`, `tools/policy/guard.py` | S12 |
-| `tools/gate-legs.json` | S3, S10 |
+| `tools/gate-legs.json` | S10 |
+| `memory/guides/SESSION-KICKOFF.md` | S10, its audit re-stamped |
 | `tools/govkit/govkit.py` | S8 |
 | `tools/memory-tree/design_lib.py`, `tools/memory-tree/gen_build_index.py`, `tools/check-spec-tokens.py` | S9, S13, S17 |
 | `tools/check-spec-tokens.test.sh` | S9 |
 | `help/policy.md` | S19 |
 | `memory/builds/dGroundRules/README.md` | S1, S2, S6, S7, by re-render |
 | the eight build READMEs S13 names | S13, by re-render |
-| the codebase map | S9, S16, S17, by regeneration |
+| the codebase map | S9, S12, S16, S17, by regeneration |
 
 S1, S2, S5, S6, S7, S14, S15 and S19 change no code of their own (S19 writes the help page only); each is the observation this unit owes
 for a defect in a criterion or a stated outcome, made against the code S9 and `TOOL-dGroundRules-25`
@@ -320,12 +357,14 @@ build.
 | Identifier | Kind | Where |
 |---|---|---|
 | `read_shipped_descriptors` | py.function | `tools/govkit/govkit.py` |
+| `derive_bomless_text` | py.function | `tools/policy/policy.py` |
 | `check_writes_intersect`, `read_spec_edges` | py.function | `tools/memory-tree/design_lib.py` |
 | `invalid` | an answer of `derive_census_tree` | `tools/policy/check_policy.py` |
 | `unknown` | a Parallel value of `render_order` | `tools/memory-tree/gen_build_index.py` |
 
 `lexicon.py --suggest` answered OK for `read_shipped_descriptors`, `check_writes_intersect` and
-`read_spec_edges` under `py.function` on 2026-10-23. `derive_dir_segments`, `check_dir_shaped` and
+`read_spec_edges` under `py.function` on 2026-10-23, and for `derive_bomless_text` on 2026-10-24
+(`strip_bom` was refused for `extract`, which names a shape taken, not one left). `derive_dir_segments`, `check_dir_shaped` and
 `check_guard_trips` move and are not minted; `build_install_target` is extended, not minted.
 
 ### Files touched (estimate)
@@ -340,6 +379,7 @@ build.
 - `tools/check-spec-tokens.py`
 - `tools/check-spec-tokens.test.sh`
 - `help/policy.md`
+- `memory/guides/SESSION-KICKOFF.md`
 - `memory/builds/dGroundRules/README.md`
 - `memory/builds/aBlindedTrial/README.md`
 - `memory/builds/aBoundedCeiling/README.md`
@@ -355,7 +395,8 @@ build.
 
 The eight build READMEs after this build's own are those S13's re-render moves to `unknown`, each
 in its generated build-order region, written by `gen_build_index.py --write` in this commit; S9's
-kept `pathlike` filter changes no other README.
+kept `pathlike` filter changes no other README. `memory/guides/SESSION-KICKOFF.md` changes only in
+its audit block, re-stamped because S10 writes `tools/gate-legs.json`, a path its `watch:` line names.
 
 ### Alternatives rejected
 
@@ -401,11 +442,13 @@ and passes when it prints no `WRONG`. Let `ORDER_ROWS` stand for
   Red when: a step whose units share a write is told it may run concurrently.
 - **AC2** — When `ORDER_ROWS` runs, the row for step 7 ends `| no |`.
   Red when: units 21, 22 and 23 read as one parallel group.
-- **AC3** — When `tools/memory-tree/kit.toml` is staged out of the `policy fixtures` guard in a
-  scratch copy of the manifest and `--fixture fixtures-guard-census` runs there, it prints `WRONG`
-  naming that descriptor; on the built tree,
-  `python tools/check-spec-tokens.py --legs-for tools/memory-tree/kit.toml` names `policy fixtures`.
-  Red when: a census kit's descriptor outside `entries/` can change with the leg skipped.
+- **AC3** — The descriptor lines are already in the guard (`TOOL-dGroundRules-23`); this criterion
+  observes the derivation. When `--fixture fixtures-guard-census` runs on the built tree, it prints a
+  line naming `tools/memory-tree/kit.toml` and no `WRONG`; with the guard line for
+  `tools/memory-tree/kit.toml`, spelled under `{prefix}`, staged out of the `policy fixtures` guard
+  in a scratch copy of the manifest, it prints `WRONG` naming that descriptor.
+  Red when: a census kit's descriptor can leave the guard unseen, or is graded from a list typed
+  beside the registry.
 - **AC4** — When `requires` in a scratch copy of the policy kit's `kit.toml` is staged to name
   `agent-cap` and `--fixture adopter-fresh-target` runs there, it reports `apply` exiting 0 and the
   receipt's `agent-cap.js` row.
@@ -424,8 +467,11 @@ and passes when it prints no `WRONG`. Let `ORDER_ROWS` stand for
   2026-10-24; in steps 17 and 18 no two units' write sets meet and no unit consumes from another.
 - **AC8** — When one registry entry's descriptor is staged missing in a scratch copy and
   `--fixture budgets-ships-join` runs there, it prints `WRONG` naming that entry; and
-  `python tools/govkit/govkit.py shipped` there exits 1 printing no row.
-  Red when: the join grades a narrowed registry as the whole one.
+  `python tools/govkit/govkit.py shipped` there exits 1 printing no row; and on the built tree
+  `grep -cw read_descriptors check_policy.py` prints `0` and `grep -c read_shipped_descriptors check_policy.py`
+  prints 1 or more.
+  Red when: the join grades a narrowed registry as the whole one, or reads the registry through a
+  copy of `cmd_shipped`'s read.
 - **AC9** — When a `python -c` probe calls `check_writes_intersect` on `["tools/policy/"]` against
   `x.py"]` and on `a.py"]` against `ab.py"]`, it answers `True` then
   `False`, the answers `overlaps` gives for the same pairs; and
@@ -439,10 +485,15 @@ and passes when it prints no `WRONG`. Let `ORDER_ROWS` stand for
   `python check_policy.py --repo <t>` runs, `arm_cap_census` prints one finding naming the receipt
   and `kits`; with `{"kits":["policy"],"prefix":"../x"}`, the finding names `prefix`.
   Red when: a receipt of the wrong shape reads as an adopter that installed nothing.
-- **AC12** — When `--fixture on-invalid-bom` runs, `guard.py --staged` admits the BOM-led valid
-  file, `arm_schema` reports no parse failure for it, and `policy.py get budgets.enforce --explain`
-  prints the file's own value.
-  Red when: one of the three parsers of the policy file still rejects a leading BOM.
+- **AC12** — When `--fixture on-invalid-bom` runs, `guard.py --staged` admits the staged raise over
+  the BOM-led file, `arm_schema` reports no parse failure for it, and
+  `policy.py get budgets.enforce --explain` prints the file's own value. On the built tree,
+  `grep -n derive_bomless_text policy.py check_policy.py` prints its `def` line and one call each
+  inside `parse_policy`, `validate` and `arm_schema`; `grep -c derive_bomless_text guard.py` prints
+  `1`, the comment above the guard's inline strip in `check_raise_shape`; and
+  `grep -nE "^\s*(import|from)\s+policy\b" guard.py` still prints nothing.
+  Red when: a reader of the policy file or the guard still rejects a leading BOM, the readers strip
+  it in more than one place, or the guard reads the file through a policy reader.
 - **AC13** — When a `python -c` probe calls `derive_parallel_step` on two unit records, one of them
   with `writes` set to `None`, it answers `unknown`.
   Red when: an unknown write set renders as a disjoint one.
@@ -526,6 +577,7 @@ New arm: tools/memory-tree/gen_build_index.py (`--selftest`) · covers AC13 · a
 - rev-4 · 2026-10-24 · §6 · AC11: a criterion code span rejoined onto one line so hygiene check 23 reads the criterion's tokens; no meaning change.
 - rev-5 · 2026-10-24 · §7 · the policy fixtures leg added to the leg line, owed by its guard, which a §4 path trips; no design change.
 - rev-6 · 2026-10-24 · §2 §3 §4 §6 §8 §10 · the builder's divergence at `93e4b4d31`, ruled by the run. Disagreements: S7/AC7 claimed every step serial, and steps 17 and 18 render `yes`; S16 minted `build_fresh_target` beside `build_install_target`, the builder three cases share, with `KICKOFF_ANSWERS` typed in it; S20 asked for an identity `run_fixture_git` already passes; S19 kept a refusal sentence the guard no longer prints; S9 left the `pathlike` filter unsaid; S13 named no README; S5 already held. Rulings: S7/AC7 limited to the steps holding a `check_policy.py` pair, 17 and 18 pinned `yes`; S16 extends `build_install_target(name, ids)` with `DEPLOY_FULL`'s answers, neither `apply` nor `check` moving in, and S4 and S18 restated on it; S20 met unless AC20's probe finds a deployer commit; S19 keeps the HEAD sentence and appends the `legacy_blobs` keys to the help page; S9 keeps `pathlike`; S13 and §4 name the eight READMEs; S5 restated as holding; every moved citation re-read by symbol.
+- rev-7 · 2026-10-24 · §2 §4 §6 §9 §10 · the builder's second divergence at `3e16f3efe`, ruled by the run. Disagreements: S12/AC12 routed the guard's parse through `parse_policy`, which the reader-free guard cannot import under `TOOL-dGroundRules-6` AC10, ran a `--check` the guard does not accept, and left `validate` and `arm_schema`'s nested parse unstripped; S3 had the guard gain descriptor lines unit 23 already wrote; S8 asked for a `WRONG` that already fires; AC9's spans are the pair fragments `TOOL-dGroundRules-34` S15 restates whole; §4 lacked `memory/guides/SESSION-KICKOFF.md`; S16's `DEPLOY_FULL` answers were not probed against `apply`. Rulings: one helper, `derive_bomless_text`, called by `parse_policy`, `validate` and `arm_schema`, the guard stripping inline under a comment naming it, `on-invalid-bom` running `guard.py --staged` only; S3/AC3 keep only the run-time derivation and its `WRONG`; S8 keeps only the `read_shipped_descriptors` refactor, AC8 observing it; AC9 kept, S9 naming the whole spellings; §4 adds the manifest; S16 probes the answers first and hands back a divergence on refusal.
 
 ## 10. Reuse audit
 
@@ -535,7 +587,10 @@ identity (S20), `PLAN_LINE`, already matching the plan printer's own format (S5)
 `check_guard_trips` that `--legs-for` already uses (S9), `scan_handoffs` and check 12's Edges grammar
 (S17), `govkit.py check`'s receipt-integrity arm (S18), and `build_install_target`, the one builder
 `TOOL-dGroundRules-25` left, with `TOOL-dGroundRules-26` and `TOOL-dGroundRules-27`'s snapshot and
-helper (S16). `python tools/codebase-map/reuse_lookup.py "install a kit into a scratch target with the deployer and read its receipt"`
+helper (S16). S12's `derive_bomless_text` sits beside `parse_policy`, the policy kit's one reader;
+the other U+FEFF handling a grep for `ufeff` finds under `tools/` lives in other copy-installed kits,
+which carry their primitives inline, so no shared seam fits, and the guard mirrors the helper inline
+because it imports no reader. `python tools/codebase-map/reuse_lookup.py "install a kit into a scratch target with the deployer and read its receipt"`
 ranked `read`, `read_text`, `scratch`, `kit_rel` and `resolve_kit_dir` among name-stem hits; the
 others were found by reading the files the review cites, each verified at base. `tools/govkit/matrix.py`
 was weighed for S16 and rejected (§4). The recall probe returned the prior minors batch
