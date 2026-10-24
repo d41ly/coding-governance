@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-69 — a merge whose clean re-merge is computable is graded against that re-merge alone
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 18 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-69-deviation-691.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-69-deviation-691.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,8 @@ parent-equality exemption survives only where C is not. It repairs `TOOL-dDeclar
 
 - **consumes-from** `TOOL-dDeclaredLoop-59` — the merge key grade in `check_push_range` of `tools/loop/guard.py`, whose computable branch this unit restates against the clean re-merge alone
 - **hands-off** `TOOL-dDeclaredLoop-75` — the computable branch, which that unit widens to a merge-tree exit 1 whose conflicts miss the policy file (id 41)
+- **hands-off** `TOOL-dDeclaredLoop-78` — the C branch, whose reference that unit splits into three named states so a clean re-merge lacking the policy file is graded (the round-4 spec audit's id 33)
+- **hands-off** `TOOL-dDeclaredLoop-79` — the grade's pre-filter and stated cost, which that unit restates to skip only a merge whose policy blob equals every parent's (ids 7, 12); this pass keeps the sibling-minted `loop guard fixtures` leg green (id 3)
 
 ## 4. Design
 
@@ -131,6 +134,8 @@ New arm: tools/loop/guard.py · covers AC1 AC2 AC3 · the two revert variants be
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-3 spec audit's id 2 (HIGH, item H2).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-78 and TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

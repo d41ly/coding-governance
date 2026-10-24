@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-70 — every caller of the phase reading takes the adopter population from one driver-conf reader
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-70-deviation-701.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-70-deviation-701.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 
 <!-- /gen:spec-records -->
 
@@ -66,6 +67,7 @@ reader of the driver's conf. It repairs `TOOL-dDeclaredLoop-63`.
 - **hands-off** `TOOL-dDeclaredLoop-67` — S13's held-from lookup, which takes S3's default and passes no explicit `extra`
 - **hands-off** `TOOL-dDeclaredLoop-72` — `read_driver_conf`, through which that unit reads the driver's `MEMORY_ROOT`
 - **hands-off** `TOOL-dDeclaredLoop-75` — `read_driver_conf`, to which that unit points `check_transition_tables` (ids 20, 21)
+- **hands-off** `TOOL-dDeclaredLoop-79` — `read_driver_conf`'s subshell, which that unit isolates from the caller's environment and gives the driver's `ROOT` and `CONF` (ids 2, 16, 32)
 
 ## 4. Design
 
@@ -173,6 +175,8 @@ New arm: tools/loop/loop_table.py · covers AC1 AC2 AC3 AC4 · the default-popul
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-3 spec audit's id 19 (HIGH, item H3).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-75 — the round-3 spec audit's 36 minors, batched
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 39 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-75-deviation-751.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-75-deviation-751.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-74 |
 
 <!-- /gen:spec-records -->
 
@@ -206,6 +207,9 @@ are not in the disposal population.
 - **consumes-from** `TOOL-dDeclaredLoop-72` — `resolve_memory_root` (ids 4, 12, 17, 42, 44)
 - **consumes-from** `TOOL-dDeclaredLoop-73` — the vintage-correct refusal (ids 11, 36, 40)
 - **consumes-from** `TOOL-dDeclaredLoop-74` — the content-validated `FETCH_HEAD` population (ids 8, 15, 25)
+- **consumes-from** `TOOL-dDeclaredLoop-76` — `resolve_memory_root_source`, from whose source S7 and S8 print the conf, and the syntax-tree rule inside which S5's and S30's docstrings name it; this pass re-runs the `no-own-conf-read` plant (the round-4 spec audit's id 1)
+- **consumes-from** `TOOL-dDeclaredLoop-78` — the clean re-merge's three states, which S27 widens to a merge-tree exit 1 whose conflicts miss the policy path, a computable C that does not parse refusing by name (the round-4 spec audit's id 33)
+- **hands-off** `TOOL-dDeclaredLoop-79` — the pass-commit probe, S21's guards, S23's copies, S24's ask row, S25's protocol sentence and S29's key list, which that unit extends, mirrors in the descriptor, refreshes, re-observes, funds and pins (ids 3, 5, 9, 13, 18, 20, 21, 26, 28)
 
 ## 4. Design
 
@@ -448,6 +452,8 @@ New arm: tools/memory-tree/gen_build_index.py · covers AC31 · the directory-in
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, the round-3 spec audit's 36 minors batched (28 MEDIUM, 8 LOW).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-76 and TOOL-dDeclaredLoop-78 and TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

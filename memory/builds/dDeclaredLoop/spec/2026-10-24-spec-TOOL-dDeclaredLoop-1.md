@@ -21,6 +21,7 @@
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-5-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-5-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-6-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-6-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-7-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-7-spec-writer.md) | journal | — |
+| [2026-10-24-prompt-TOOL-dDeclaredLoop-1-8-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-8-spec-writer.md) | journal | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-cap.md) | research | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-until-no-high.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-owner-review-until-no-high.md) | research | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |

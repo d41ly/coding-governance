@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-74 — a FETCH_HEAD counts as a fetch only when it holds the default branch of the resolved remote
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 38 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-75 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-74-deviation-741.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-74-deviation-741.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-75 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-75 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,7 @@ This unit makes the file's content validate its mtime. It repairs `TOOL-dDeclare
 
 - **consumes-from** `TOOL-dDeclaredLoop-65` — the last-fetch population of S1 in `tools/loop/position.py`, whose `FETCH_HEAD` members this unit validates by content
 - **hands-off** `TOOL-dDeclaredLoop-75` — the validated population, beside which that unit plants the other-branch fetch, resolves the common directory absolutely and isolates the fixture's git config (ids 8, 15, 25)
+- **hands-off** `TOOL-dDeclaredLoop-77` — S1's URL normalisation, which that unit spells as git writes the URL into `FETCH_HEAD`, its user part stripped from both sides (the round-4 spec audit's id 8)
 
 ## 4. Design
 
@@ -128,6 +130,8 @@ New arm: tools/loop/position.py · covers AC1 AC2 · the failed-fetch plant besi
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-3 spec audit's id 45 (HIGH, item H7).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-77, written by the round-4 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

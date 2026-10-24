@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-71 — the breakpoints fixture runs under its own gate leg, so its plants are lasting coverage
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-71-deviation-711.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-71-deviation-711.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,7 @@ earlier or later than this one, is then run by the bar, so no plant has to move.
 
 - **consumes-from** `TOOL-dDeclaredLoop-64` — the `breakpoints.py --fixture` plants of its `New arm:`, which this unit's leg runs
 - **hands-off** `TOOL-dDeclaredLoop-67` — S30's arm-home sentence, superseded by S5, and AC31's `readded` plant, which the leg runs once that unit lands
+- **hands-off** `TOOL-dDeclaredLoop-79` — the `loop breakpoints fixtures` leg, whose guard that unit widens to the kits the module reaches, whose budget row it adds and whose sibling leg lines it amends (ids 9, 17, 22, 34)
 
 ## 4. Design
 
@@ -135,6 +137,8 @@ New arm: tools/loop/breakpoints.py · covers AC2 · the leg's own run, its faili
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-3 spec audit's id 28 (HIGH, item H4).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

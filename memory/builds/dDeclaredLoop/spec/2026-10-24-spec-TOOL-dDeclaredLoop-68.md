@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-68 — the witness normaliser has one owner, the run-gates program, before unit 67 reads it
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 37 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-deviation-681.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-deviation-681.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 
 <!-- /gen:spec-records -->
 
@@ -62,6 +63,7 @@ so 56's pass is untouched and 67's pass finds the program route in place. It rep
 
 - **consumes-from** `TOOL-dDeclaredLoop-56` — S27's normaliser in `run_witness_commands` and its `normalise_output` parity row, which this unit replaces with the run-gates program
 - **hands-off** `TOOL-dDeclaredLoop-67` — the program-route normaliser and the absent `normalise_output` row, which S24 and AC17 read as already landed
+- **hands-off** `TOOL-dDeclaredLoop-79` — the normaliser route, its named refusal and the loop kit's descriptor, which that unit applies inside the resolved bash, refuses on a failed `sed`, feeds forward-slash roots and gives a `requires` edge to run-gates (ids 4, 10, 11, 23, 30); this pass keeps the sibling-minted `loop computed witness` leg green (id 3)
 
 ## 4. Design
 
@@ -146,6 +148,8 @@ New arm: tools/loop/loop_witness.py · covers AC1 AC4 · the normalise and norma
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-3 spec audit's id 1 (HIGH, item H1).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 

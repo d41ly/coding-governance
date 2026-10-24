@@ -248,3 +248,13 @@ base: ed497191df0d973f903426cedc30f0ba6eb80d24
 2026-10-24T13:56:47Z rescope · item add TOOL-dDeclaredLoop-75 · reason spec-audit round 3 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-57-spec-audit.md) the 36 confirmed minors batched into one unit: 28 MEDIUM, ids 3 4 5 6 7 8 11 12 13 14 15 16 21 23 27 30 31 32 33 34 35 36 40 41 42 43 44 46, and 8 LOW, ids 10 17 18 20 24 25 26 38; repairs no unit in particular
 
 2026-10-24T14:18:15Z review · item dDeclaredLoop-spec-set-r3 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 7 · minors 36 · disposition promote
+
+2026-10-24T15:05:21Z rescope · item add TOOL-dDeclaredLoop-76 · reason spec-audit round 4 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) id 1 HIGH, item H1: spec 72 AC4 forbids the conf-name strings that spec 75 requires in budget.py and breakpoints.py; repairs TOOL-dDeclaredLoop-72
+
+2026-10-24T15:05:22Z rescope · item add TOOL-dDeclaredLoop-77 · reason spec-audit round 4 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) id 8 HIGH, item H2: spec 74 skips every FETCH_HEAD written over an scp-form SSH remote, whose user part git strips from the URL it writes; repairs TOOL-dDeclaredLoop-74
+
+2026-10-24T15:05:23Z rescope · item add TOOL-dDeclaredLoop-78 · reason spec-audit round 4 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) id 33 HIGH, item H3: spec 69 lets a clean re-merge that lacks the policy file read as none, reopening the parent exemption it removes; repairs TOOL-dDeclaredLoop-69
+
+2026-10-24T15:05:24Z rescope · item add TOOL-dDeclaredLoop-79 · reason spec-audit round 4 (reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) the 28 confirmed minors batched into one unit: 21 MEDIUM, ids 2 3 4 5 9 10 11 13 14 16 17 20 21 22 23 24 30 32 34 35 36 (items M1 to M16), and 7 LOW, ids 6 7 12 15 18 26 28 (items L1 to L6); repairs no unit in particular
+
+2026-10-24T15:15:46Z review · item dDeclaredLoop-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 28 · disposition promote

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-73 — the claimed-requires refusal grades each kit's `requires` at the vintage `update --to` installs
 
-**Status:** OPEN · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
+**Status:** OPEN · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 5 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-68-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-73-deviation-731.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-73-deviation-731.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-68-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
+| [2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-68-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ the registry there through `blob_at`. It repairs `TOOL-dDeclaredLoop-57`.
 
 - **consumes-from** `TOOL-dDeclaredLoop-57` — `demand_claimed_requires` and its call in `cmd_update`, whose `requires` this unit reads at `to_commit`
 - **hands-off** `TOOL-dDeclaredLoop-75` — the vintage-correct refusal, which that unit scopes to the edges an update introduces, names every pair in its route and observes on the write path (ids 11, 36, 40)
+- **hands-off** `TOOL-dDeclaredLoop-79` — `read_requires_at`, which that unit passes to the gained-prune loop as well, the reverse-vintage fixture, which it carries past the vintage checks, and the wording of the bullet above (ids 6, 14, 24)
 
 ## 4. Design
 
@@ -139,6 +141,8 @@ New arm: tools/govkit/selftest.py · covers AC1 AC2 AC3 · the two differing vin
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-3 spec audit's id 39 (HIGH, item H6).
+- rev-2 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
+  TOOL-dDeclaredLoop-79, written by the round-4 spec audit's disposal; nothing else moved.
 
 ## 10. Reuse audit
 
