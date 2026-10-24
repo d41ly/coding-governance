@@ -33,9 +33,9 @@
  *
  * RULE 7 (TOOL-dGroundRules-10) — the settings in force. With the policy kit's `policy-mirror.js` in
  * the `policy` kit beside this hooks kit, every `Agent` and `Workflow` call reads the landed limit
- * through `readPolicy`, then `.claude/settings.json` and `.claude/settings.local.json` at the payload
- * `cwd`'s checkout root, and refuses when either harness variable, the local file's value where it
- * sets one, is absent, not a positive integer, or above the limit. No policy kit beside this one, or a
+ * through `readPolicy`, then every settings layer `readSettingsLayers` reads at the payload `cwd`'s
+ * checkout root, and refuses when no layer sets a harness variable, or any layer that sets one holds
+ * a value that is not a positive integer, or is above the limit (TOOL-dGroundRules-61). No policy kit beside this one, or a
  * `cwd` in no checkout, adds no rule. Skipped under `--only=`. A throw inside it refuses.
  *
  * RULE 0 (TOOL-aBlindedTrial-6) denies a `Workflow` call whose structured `args` carry
@@ -1773,7 +1773,7 @@ function checkHarnessCall(data, index, root) {
 // workflows kit, and never the working-tree mirror; a hooks kit with no `policy` kit beside it adds no
 // rule. WHAT IT DOES NOT SEE: an environment override of the two variables, which the harness applies
 // and no hook can read. UNVERIFIED: that a session started before a lowering keeps its settings until
-// it restarts. In force: GOV_SETTINGS_JSON, else .claude/settings.json (TOOL-dGroundRules-21 S34); a cwd in no checkout, or a throw at any step, refuses, naming it (S38). null = allow · string = deny.
+// it restarts. Read: every layer readSettingsLayers returns (TOOL-dGroundRules-61 S1); a cwd in no checkout, or a throw at any step, refuses, naming it (TOOL-dGroundRules-21 S38). null = allow · string = deny.
 const SETTINGS_VARS = ['CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS', 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS']
 
 function checkSettingsInForce(data) {
@@ -1800,27 +1800,27 @@ function checkSettingsInForce(data) {
     throw e
   }
   if (!Number.isInteger(limit) || limit < 1) return renderSettingsDeny(`  runtime.agents-in-flight reads ${JSON.stringify(limit)}, not a positive integer.`)
-  const files = [process.env.GOV_SETTINGS_JSON || '.claude/settings.json', '.claude/settings.local.json']
-  const envs = files.map((f) => {
-    checkSettingsInForce.step = `reading ${f}`
-    let text
-    try { text = fs.readFileSync(path.resolve(root, f), 'utf8') } catch (e) {
-      if (e && e.code === 'ENOENT') return {}
-      throw e
-    }
-    let obj
-    try { obj = JSON.parse(text) } catch (e) { throw new Error(`${f} does not parse as JSON: ${e.message}`) }
-    return obj && typeof obj === 'object' && obj.env && typeof obj.env === 'object' ? obj.env : {}
-  })
+  // TOOL-dGroundRules-61 S2: the value the harness applies is one of the values its layers set, and the
+  // declared file's place in its precedence is declared nowhere, so EVERY read layer that sets a
+  // variable is bounded (§8 F1 (b)): a declared file never hides the project's, nor the project the
+  // declared one. Unread, so unbounded here: the --settings flag layer, the managed-policy layer and an
+  // exported variable (F2). A shadowed lower layer above the limit refuses too, naming its remedy.
+  const layers = readSettingsLayers(root)
   const bad = []
   for (const v of SETTINGS_VARS) {
-    // The value the harness applies: the local file's where it sets one, else the project file's.
-    const at = Object.prototype.hasOwnProperty.call(envs[1], v) ? 1 : 0
-    const got = envs[at][v]
-    const s = typeof got === 'number' ? String(got) : got
-    if (got === undefined) bad.push(`  ${files[0]}: env.${v} is absent, and runtime.agents-in-flight is ${limit}.`)
-    else if (typeof s !== 'string' || !/^[1-9][0-9]*$/.test(s)) bad.push(`  ${files[at]}: env.${v} is ${JSON.stringify(got)}, not a positive integer; runtime.agents-in-flight is ${limit}.`)
-    else if (Number(s) > limit) bad.push(`  ${files[at]}: env.${v} is ${s}, above runtime.agents-in-flight ${limit}.`)
+    const set = layers.filter((l) => Object.prototype.hasOwnProperty.call(l.env, v))
+    if (!set.length) {
+      bad.push(`  .claude/settings.json: env.${v} is absent, and runtime.agents-in-flight is ${limit} (layers read: ${layers.map((l) => l.name).join(', ')}).`)
+      continue
+    }
+    for (const { name, env } of set) { // highest precedence first: the first violating layer is named
+      const got = env[v]
+      const s = typeof got === 'number' ? String(got) : got
+      const why = typeof s !== 'string' || !/^[1-9][0-9]*$/.test(s)
+        ? `is ${JSON.stringify(got)}, not a positive integer; runtime.agents-in-flight is ${limit}.`
+        : Number(s) > limit ? `is ${s}, above runtime.agents-in-flight ${limit}.` : ''
+      if (why) { bad.push(`  ${name}: env.${v} ${why}`); break }
+    }
   }
   return bad.length ? renderSettingsDeny(bad.join('\n')) : null
 }
@@ -1969,3 +1969,36 @@ function main() {
 }
 
 main()
+
+// TOOL-dGroundRules-61 S1 — the settings layers rule 7 reads, highest precedence first: the local file
+// and the project file under the checkout root, then the file GOV_SETTINGS_JSON declares, a relative
+// path read against that root. Below main() so no line above it moves; a declaration hoists. A declared
+// path that is not a file throws, as check-wiring.sh's settings_json and `policy.py settings` refuse it,
+// and one that resolves to the project or the local file is read once. An absent file is a layer that
+// sets nothing; one that does not parse throws naming it (TOOL-dGroundRules-21 S38).
+function readSettingsLayers(root) {
+  const fs = require('fs')
+  const path = require('path')
+  const names = ['.claude/settings.local.json', '.claude/settings.json']
+  const declared = process.env.GOV_SETTINGS_JSON
+  if (declared) {
+    checkSettingsInForce.step = `resolving GOV_SETTINGS_JSON ${declared}`
+    const p = path.resolve(root, declared)
+    let st = null
+    try { st = fs.statSync(p) } catch { st = null }
+    if (!st || !st.isFile()) throw new Error(`GOV_SETTINGS_JSON names ${declared}, which is not a file`)
+    const real = fs.realpathSync(p)
+    if (!names.some((n) => { try { return fs.realpathSync(path.resolve(root, n)) === real } catch { return false } })) names.push(declared)
+  }
+  return names.map((name) => {
+    checkSettingsInForce.step = `reading ${name}`
+    let text
+    try { text = fs.readFileSync(path.resolve(root, name), 'utf8') } catch (e) {
+      if (e && e.code === 'ENOENT') return { name, env: {} }
+      throw e
+    }
+    let obj
+    try { obj = JSON.parse(text) } catch (e) { throw new Error(`${name} does not parse as JSON: ${e.message}`) }
+    return { name, env: obj && typeof obj === 'object' && obj.env && typeof obj.env === 'object' ? obj.env : {} }
+  })
+}

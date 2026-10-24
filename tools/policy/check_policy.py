@@ -167,6 +167,11 @@ and `mirror-absent-adopter` the mirror's; `legacy-homes-main-dropped` the lists'
 limit's settings; `budgets-zero-cap`, `budgets-reader-refused` and `limits-reader-docstring` the
 size caps.
 
+Rule 7 bounds every settings layer it reads (TOOL-dGroundRules-61): `limit-settings-elsewhere-project-over`
+refuses a project file above the limit beside a declared file at it, `limit-settings-declared-absent`
+refuses a `GOV_SETTINGS_JSON` that names no file, and `limit-settings-elsewhere` plants the project
+file at the limit before its declared file goes above it.
+
 `--live` (S9) is no case: it drives headless `claude -p` sessions in a fixture repository under a
 rendered limit and under a control with none, reads each agent's start and end stamps, and prints
 each run's peak overlap. It costs real sessions, so no leg runs it.
@@ -3037,9 +3042,33 @@ def run_limit_case(name):
             checks += [check_hook_call("GOV_SETTINGS_JSON at 2", "a Workflow call", hook, call, admits, env=env),
                        check_hook_call("GOV_SETTINGS_JSON unset", "a Workflow call", hook, call,
                                        has("/".join(SETTINGS_FILE), "is absent"))]
+            # TOOL-dGroundRules-61 S4: the project file planted at 2, so a pick of one value by precedence,
+            # the declared file ranked lowest, would take the project's 2 and admit; every layer is bounded.
+            write_settings(repo, render_limit_env(2))
             Path(named).write_text(json.dumps({"env": render_limit_env(3)}) + "\n", encoding="utf-8", newline="\n")
             checks.append(check_hook_call("GOV_SETTINGS_JSON at 3", "a Workflow call", hook, call,
                                           has(named, "above runtime.agents-in-flight 2"), env=env))
+        elif name in ("limit-settings-elsewhere-project-over", "limit-settings-declared-absent"):
+            # TOOL-dGroundRules-61 S1-S3: a declared file outside the checkout never hides the project's
+            # layer, and a declaration that names no file refuses rather than reading as a layer setting nothing.
+            repo, kit, hook = build_limit_repo(t / "r", LIMIT_POLICY.format(n=2))
+            named = (t / "elsewhere" / "settings.json").as_posix()
+            env = {**os.environ, "GOV_SETTINGS_JSON": named}
+            call = render_workflow(repo, "const r = await agent('one')\n")
+            var = policy.SETTINGS_VARS[1]
+            if name == "limit-settings-elsewhere-project-over":
+                Path(named).parent.mkdir()
+                Path(named).write_text(json.dumps({"env": render_limit_env(2)}) + "\n", encoding="utf-8", newline="\n")
+                write_settings(repo, {var: "2"})
+                checks.append(check_hook_call("declared at 2, project at 2 (control)", "a Workflow call", hook, call,
+                                              admits, env=env))
+                write_settings(repo, {var: "3"})
+                checks.append(check_hook_call(f"declared at 2, project {var} at 3", "a Workflow call", hook, call,
+                                              has("/".join(SETTINGS_FILE), var, "above runtime.agents-in-flight 2"), env=env))
+            else:
+                write_settings(repo, render_limit_env(2))
+                checks.append(check_hook_call("GOV_SETTINGS_JSON names no file, project at 2", "a Workflow call", hook,
+                                              call, has(named, "not a file"), env=env))
         elif name == "limit-settings-env-stale":
             # TOOL-dGroundRules-25 S32: the landing's render names the tracked file, so an exported
             # GOV_SETTINGS_JSON naming a fresh scratch file cannot hide a stale tracked one from
@@ -3106,7 +3135,8 @@ LIMIT_CASES = ("limit-conf-lowers", "limit-conf-no-raise", "limit-conf-malformed
                "limit-hook-admits-eight", "limit-hook-six-spawns", "limit-hook-rules-kept", "limit-hook-env-cap",
                "limit-hook-settings-over", "limit-hook-local-over", "limit-hook-writer-split",
                "limit-settings-elsewhere", "limit-hook-settings-malformed", "limit-hook-reader-throws",
-               "limit-fresh-target-spawn", "limit-settings-env-stale")
+               "limit-fresh-target-spawn", "limit-settings-env-stale",
+               "limit-settings-elsewhere-project-over", "limit-settings-declared-absent")
 
 
 # ---- the size caps' cases (TOOL-dGroundRules-9) --------------------------------------------------

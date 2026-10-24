@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-61 — rule 7 bounds every settings layer it can read, so a declared settings file never hides the project's
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
+**Status:** CLOSED · rev-3 · 2026-10-24 · node d · Tier-2 · base 3708a705 · streams tooling · order 17 · advances TOOL-dGroundRules-12
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-23-build-TOOL-dGroundRules-61-deviation-49.md](../build/2026-10-23-build-TOOL-dGroundRules-61-deviation-49.md) | deviation | — |
+| [2026-10-23-build-TOOL-dGroundRules-61-ledger.md](../build/2026-10-23-build-TOOL-dGroundRules-61-ledger.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-53-closing-promotions-brief.md) | research | TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 |
 | [2026-10-23-prompt-TOOL-dGroundRules-61-1-spec-writer.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-61-1-spec-writer.md) | journal | — |
 | [2026-10-23-prompt-TOOL-dGroundRules-61-build-brief.md](../prompts/2026-10-23-prompt-TOOL-dGroundRules-61-build-brief.md) | journal | — |

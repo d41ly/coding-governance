@@ -248,6 +248,7 @@
       "bounded-through-a-pipe-is-unbounded.md",
       "canary-waits-on-a-rendezvous-not-a-clock.md",
       "check-format-grades-two-populations.md",
+      "check-grades-one-layer-of-a-layered-config.md",
       "concurrency-is-not-a-budget.md",
       "concurrent-runs-are-announced-not-refused.md",
       "conf-value-interpolated-into-a-regex.md",

@@ -201,6 +201,7 @@ The policy file .governance/policy.toml, the policy kit's catalogue that is its 
 - decisions 1: `TOOL-dGroundRules-1`
 - gate-legs 2: `policy check`, `policy fixtures`
 - kits 1: `policy`
+- gotcha-classes 1: `check-grades-one-layer-of-a-layered-config.md`
 - globs 4: `tools/policy/**`, `.governance/policy.toml`, `.governance/policy.json`, `help/policy.md`
 
 ## process-monitor

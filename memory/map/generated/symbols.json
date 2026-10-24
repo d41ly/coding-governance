@@ -13053,6 +13053,11 @@
       "file": "tools/unattended/gate-guard.js"
     },
     {
+      "id": "readSettingsLayers",
+      "kind": "function",
+      "file": "tools/hooks/agent-cap.js"
+    },
+    {
       "id": "readSidecarLines",
       "kind": "function",
       "file": "tools/unattended/run-lease.js"

@@ -45,6 +45,7 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [bounded-through-a-pipe-is-unbounded](bounded-through-a-pipe-is-unbounded.md) | class | 7 |  | a wall-clock timeout captured through a command substitution bounds the verdict and not the clock, and reports success on schedule while the caller blocks |
 | [canary-waits-on-a-rendezvous-not-a-clock](canary-waits-on-a-rendezvous-not-a-clock.md) | invariant | 1 |  | the run-gates canary never compares elapsed times, and that is the ruling, not a gap |
 | [check-format-grades-two-populations](check-format-grades-two-populations.md) | class | 3 |  | the build README slot gate binds every tracked README on one axis and only the declared ones on the other, so a new folder can red on a rule its author never opted into |
+| [check-grades-one-layer-of-a-layered-config](check-grades-one-layer-of-a-layered-config.md) | class | 6 |  | an enforcement check reads one layer of a configuration its consumer layers, often through a resolver built to pick a write target, so a value in a layer it never reads runs past the check while the layer it grades is clean |
 | [concurrency-is-not-a-budget](concurrency-is-not-a-budget.md) | class | 6 |  | a per-item verify fan-out passes a concurrency cap and still spawns one agent per finding |
 | [concurrent-runs-are-announced-not-refused](concurrent-runs-are-announced-not-refused.md) | invariant | 2 |  | two live unattended runs of different builds are announced at preflight and never refused, and that is the ruling, not a gap |
 | [conf-value-interpolated-into-a-regex](conf-value-interpolated-into-a-regex.md) | class | 10 |  | a config value spliced into a regex must be VALIDATED as a plain path, not escaped — a quoted value matches nothing and a value with a pipe swallows a subtree, both silently |
@@ -163,6 +164,6 @@ python tools/memory-tree/gotchas.py --for-paths <path>...
 | [worktree-crlf-outside-the-gated-population](worktree-crlf-outside-the-gated-population.md) | class | 3 |  | a worktree checkout lands CRLF on eol-pinned files, no wiring gate sees it, and the reader that breaks is a consumer no gate byte-compares |
 | [zero-witness-over-an-unnamed-population](zero-witness-over-an-unnamed-population.md) | class | 5 |  | a scan whose zero is the witness names no population, so a skipped scan and a scan over less than the guarded boundary publishes both read as clean |
 
-148 record(s): 145 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
+149 record(s): 146 class, 0 note, 3 invariant, 0 superseded · 6 universal · 0 unanchored
 
 <!-- END GENERATED -->
