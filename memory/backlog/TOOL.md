@@ -444,6 +444,7 @@ Cite ids, never line numbers.
 | [TOOL-dGroundRules-109](../builds/dGroundRules/BACKLOG.md) | OPEN | LOW | — | 2026-10-24 | A LIVE SPEC OF ANOTHER BUILD WRITES A FILE THE policy fixtures GUARD… |
 | [TOOL-dGroundRules-110](../builds/dGroundRules/BACKLOG.md) | OPEN | LOW | — | 2026-10-24 | FIVE LIVE SPECS OF ANOTHER BUILD WRITE FILES THE policy fixtures GUARD… |
 | [TOOL-dGroundRules-111](../builds/dGroundRules/BACKLOG.md) | OPEN | LOW | — | 2026-10-24 | THREE LIVE SPECS OF ANOTHER BUILD WRITE FILES THE policy fixtures GUARD… |
+| [TOOL-dGroundRules-112](../builds/dGroundRules/BACKLOG.md) | OPEN | MED | — | 2026-10-25 | THE PACKET JOIN'S carries.py --report SPAWNS ONE git show PER CHAIN… |
 | [TOOL-dHomedResolver-6](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended gate selftest shard 6/8 red at d006cfc5 on… |
 | [TOOL-dHomedResolver-7](../builds/dHomedResolver/BACKLOG.md) | OPEN | HIGH | — | 2026-10-11 | held red: suite unattended cross-component red at d006cfc5 on the daily… |
 | [TOOL-dHonouredPark-5](../builds/dHonouredPark/BACKLOG.md) | DEFERRED | — | TOOL-aMendedFleet-106 | 2026-08-25 | A bespoke review fan-out must assign finding ids in the ORCHESTRATOR,… |

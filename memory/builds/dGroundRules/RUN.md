@@ -24,20 +24,20 @@ parked-surfaced: yes, 7 surfaced
 keepalive-reaped: yes
 refreshed-at: 462d20f3510072a1dddb5b948370937cfd3bbe0e · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 198f2c66449f9472ae4ddad48b0ebdf532acc6e8
-phase: HELD
+witness: 87917c2fe50965055fe8e52a4b7a573d41f884d1
+phase: VERIFYING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dgroundrules-e47ae1
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-23T19:14:57Z
+lease-utc: 2026-10-25T20:33:52Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 2556
 session: 7ea4ff9e-7e37-4093-bc35-c581a17fe1c6
-keepalive: 6e52b18d
+keepalive: 1273355c
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 anchor-ref: refs/heads/main
@@ -570,3 +570,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T19:51:38Z handoff · item owner-decision · reason in the run worktree: bash tools/push-main.sh --prepare --slug dGroundRules && bash tools/push-main.sh --land --slug dGroundRules && bash tools/unattended/unattended.sh --settle dGroundRules
 
 2026-10-25T19:51:38Z hold · item owner-decision · reason until owner · reaped 6e52b18d · resume none(owner)
+
+2026-10-25T20:33:58Z resume · item dGroundRules · reason held · keepalive 1273355c · manual
+
+2026-10-25T20:36:54Z rescope · item add TOOL-dGroundRules-87 · reason owner-authorized at the hand-off: the spec tokens leg's 180s ceiling cannot hold the packet join over this build's own live chain (170s alone, timed out twice in the close's bar); carries.py's batching waits on an owner repin that refuses inside a live chain run
+
+2026-10-25T20:39:19Z rescope · item add TOOL-dGroundRules-88 · reason owner-ordered: packet.py's --repin guard keys on tree state, so it refuses the owner inside a live chain run and makes any instrument fix in a chain run unclosable; specced and built in this build before any further unit
