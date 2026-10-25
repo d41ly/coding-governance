@@ -2113,7 +2113,7 @@ def run_mirror_landed(name):
                                     rc == 0 and f"at {rewrite[:8]}, the landed revision" in e and "{rev}" not in e))
         elif name == "mirror-landed-merge":
             # The landing's order (TOOL-dGroundRules-14), as push-main.sh --prepare runs it: b merged
-            # --no-ff onto main detached, the mirror regenerated over the merge, the merge rewritten by
+            # --no-ff onto main detached, the mirror written again over the merge, the merge rewritten by
             # commit-tree over its own parents, and the rewrite pushed as main.
             cli = [sys.executable, str(kit / "policy.py"), "mirror"]
             msg, rewrite, step = "merge: land b onto main", None, "main committed with its mirror, pushed as L"

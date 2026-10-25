@@ -14,8 +14,9 @@
 # `policy.py mirror --write` (TOOL-dGroundRules-25 S7); with no commit yet it prints one line naming
 # the re-run, and while an input of the mirror is uncommitted, as on install day, one line deferring
 # the mirror to the re-run after the commit, unless `check_policy.py`'s `arm_schema` finds the policy
-# file invalid, which exits 2 printing its findings (TOOL-dGroundRules-34 S20). `[[regenerate]]` in kit.toml runs this same verb on every update (TOOL-dGroundRules-21
-# S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
+# file invalid, which exits 2 printing its findings (TOOL-dGroundRules-34 S20). `[[regenerate]]` in
+# kit.toml runs this same verb on every update unless GOVKIT_RERENDER=0 is exported
+# (TOOL-dGroundRules-21 S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
 #
 # The kit dir is this script's own directory, never spelled, so the adopter runs from wherever the
 # kit is installed. Its refusals are armed by `adopt-policy.test.sh` beside it.

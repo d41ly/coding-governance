@@ -663,7 +663,8 @@ the re-run. While an input the mirror records is uncommitted, as on install day,
 `uncommitted changes` refusal is deferred, one line
 `adopt-policy: mirror deferred · <input> has uncommitted changes · commit, then re-run --scaffold`,
 and every other refusal of it stands (TOOL-dGroundRules-31). `kit.toml`'s
-`[[regenerate]]` runs the same verb on every update (TOOL-dGroundRules-21 S37). `--check [--target
+`[[regenerate]]` runs the same verb on every update unless GOVKIT_RERENDER=0 is exported
+(TOOL-dGroundRules-21 S37). `--check [--target
 <repo>]` runs `check_policy.py --repo`. Each refusal of the adopter, a `.governance` that cannot be
 made, a scaffold that cannot be written, a settings render that fails and a mirror refusal that is
 no `uncommitted changes`, is armed by `adopt-policy.test.sh`,

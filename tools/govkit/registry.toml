@@ -324,6 +324,14 @@ why = "gov's own rebase-time carrier for the straggler rule, deliberately not sh
 path = ".githooks/straggler-guard.test.sh"
 why = "gov's own red/green arms for the two files above, which are themselves registry exemptions. Its fixtures build a memory tree, install this repo's kits into it and drive the real hooks; an adopter receives neither the library nor `pre-rebase`, so the suite would red there on absence rather than on behaviour. Exemptions are exact-path, so the subjects' rows do not cover their sibling — the precedent is `.githooks/pre-commit.test.sh` above. TOOL-dDerivedDocket-13."
 
+[[exempt]]
+path = "AGENTS.md"
+why = "gov's own rendered charter, deliberately not shipped: the playbook kit renders each adopter its own. It lies outside the declared surface, so this row narrows nothing there. It is the class selfcheck's guard taxonomy (check 7c) gives the `policy fixtures` guard line naming it, a gov-only leg (its `[[exempt_leg]]` row) whose cases read the file. TOOL-dGroundRules-79."
+
+[[exempt]]
+path = "help/policy.md"
+why = "gov's own help page for the policy kit, deliberately not shipped: an adopter writes its own pages under its own help directory. It lies outside the declared surface, so this row narrows nothing there. It is the class selfcheck's guard taxonomy (check 7c) gives the `policy fixtures` guard line naming it, a gov-only leg (its `[[exempt_leg]]` row) whose cases read the file. TOOL-dGroundRules-79."
+
 [[exempt_leg]]
 name = "hook destinations (every declared hook path ships)"
 why = "it resolves gov's own descriptors through `<prefix>/govkit`, the deployer, which is a registry exemption itself and never travels into a target. An adopter has fragments and adopter scripts but no deployer, so this gate cannot run there at all. The protection it buys is therefore gov-side only, and that limit is the reason for this row rather than an oversight: gov is where the fragments and the descriptors are AUTHORED, so it is where a fragment naming an unshipped destination is created. TOOL-dRetiredFork-21."

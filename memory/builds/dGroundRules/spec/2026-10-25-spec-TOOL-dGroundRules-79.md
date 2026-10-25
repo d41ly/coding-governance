@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-79 — govkit selfcheck green over this build: the policy fixtures guard's two root-level lines get a declared class, and four policy-kit sentences stop failing the re-render rule
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fae6e637 · streams tooling · order 27
+**Status:** CLOSED · rev-2 · 2026-10-25 · node d · Tier-1 · base fae6e637 · streams tooling · order 27
 
 **Derived:** PLAY-dClosedLoop-2
 

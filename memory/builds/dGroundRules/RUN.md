@@ -501,3 +501,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T09:12:43Z dispatch · item ea46113d TOOL-dGroundRules-78 · reason tools/run-gates/selftest-budgets.txt tools/gate-legs.json tools/hooks/agent-cap.js tools/policy/policy-mirror.js tools/policy/README.md tools/playbook-kit-waivers.txt help/policy.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-78.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/guides/SESSION-KICKOFF.md
 
 2026-10-25T09:12:45Z brief · item TOOL-dGroundRules-78 · reason 1862b9340219 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-78-spec-brief.md
+
+2026-10-25T09:33:13Z dispatch · item ee061fd0 TOOL-dGroundRules-79 · reason memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-79.md tools/govkit/registry.toml tools/policy/README.md tools/policy/adopt-policy.sh tools/policy/kit.toml tools/policy/check_policy.py memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T09:33:27Z brief · item TOOL-dGroundRules-79 · reason 19797fa9879a memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-79-spec-brief.md

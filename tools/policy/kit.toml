@@ -33,8 +33,9 @@ role = "project-owned"
 argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold"]
 mutates_index = false
 
-# `--scaffold` IS the re-render: on every update it re-runs the settings render over a kept policy
-# file, so a changed renderer reaches every adopter (TOOL-dGroundRules-21 S37).
+# `--scaffold` IS the re-render: on every update, unless GOVKIT_RERENDER=0 is exported, it re-runs
+# the settings render over a kept policy file, so a changed renderer reaches every adopter
+# (TOOL-dGroundRules-21 S37).
 [[regenerate]]
 argv = ["bash", "{kit}/adopt-policy.sh", "--scaffold"]
 
