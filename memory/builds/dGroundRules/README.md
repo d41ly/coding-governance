@@ -216,7 +216,7 @@ ids TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGrou
 | [TOOL-dGroundRules-76 — `policy.py lists --check` grades the legacy-homes list by the gate arm's rule](spec/2026-10-25-spec-TOOL-dGroundRules-76.md) | 26 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-77 — guard plants reach the text-shape, key-scope and not-a-count refusals](spec/2026-10-25-spec-TOOL-dGroundRules-77.md) | 26 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-78 — the close sweep of the review's M4 and lows: the policy fixtures leg's figures, agent-cap.js's rule-7 header, policy-mirror.js's bash resolver order, and the stale "lands dark" waiver and help text](spec/2026-10-25-spec-TOOL-dGroundRules-78.md) | 26 | 1 | CLOSED | rev-3 | 2026-10-25 |
-| [TOOL-dGroundRules-79 — govkit selfcheck green over this build: the policy fixtures guard's two root-level lines get a declared class, and four policy-kit sentences stop failing the re-render rule](spec/2026-10-25-spec-TOOL-dGroundRules-79.md) | 27 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-79 — govkit selfcheck green over this build: the policy fixtures guard's two root-level lines get a declared class, and four policy-kit sentences stop failing the re-render rule](spec/2026-10-25-spec-TOOL-dGroundRules-79.md) | 27 | 1 | DEFERRED | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
 Records: 394 bound to this build, across 4 record folder(s).

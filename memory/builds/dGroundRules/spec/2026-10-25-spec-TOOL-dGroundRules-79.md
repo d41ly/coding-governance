@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-79 — govkit selfcheck green over this build: the policy fixtures guard's two root-level lines get a declared class, and four policy-kit sentences stop failing the re-render rule
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base fae6e637 · streams tooling · order 27
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fae6e637 · streams tooling · order 27
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -149,15 +149,16 @@ why = "gov's own help page for the policy kit, deliberately not shipped: an adop
 ### The sentences
 
 Three sentences claim the regenerate runs on every update, and with `GOVKIT_RERENDER=0` exported it
-does not. Each gains the condition in the words `tools/playbook/README.md` and
-`tools/branch-reconcile/README.md` already use, and keeps its meaning and its citation.
+does not. Each gains the condition in the words and the unbackticked spelling
+`tools/playbook/README.md:136` already uses, and keeps its meaning and its citation. All three
+snippets spell the flag without backticks, so AC3's one grep reads each of them.
 
 Under `## The adopter` in `tools/policy/README.md`, the line that holds the sentence's verb and its
 `(TOOL-dGroundRules-21 S37)` citation becomes two lines. The line before it, ending
 `` `kit.toml`'s ``, stays:
 
 ```
-`[[regenerate]]` runs the same verb on every update unless `GOVKIT_RERENDER=0` is exported
+`[[regenerate]]` runs the same verb on every update unless GOVKIT_RERENDER=0 is exported
 (TOOL-dGroundRules-21 S37). `--check [--target
 ```
 
@@ -166,7 +167,7 @@ In the header comment of `tools/policy/adopt-policy.sh`, the two lines from the 
 
 ```
 # file invalid, which exits 2 printing its findings (TOOL-dGroundRules-34 S20). `[[regenerate]]` in
-# kit.toml runs this same verb on every update unless `GOVKIT_RERENDER=0` is exported
+# kit.toml runs this same verb on every update unless GOVKIT_RERENDER=0 is exported
 # (TOOL-dGroundRules-21 S37). `--check` is `check_policy.py --repo <repo>`, whose exit it returns.
 ```
 
@@ -342,12 +343,21 @@ none
 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-79-spec-brief.md
 ```
 
+- rev-2 · 2026-10-25 · the build diverged on a contradiction inside this spec. §4 "The sentences"
+  spelled the README and `tools/policy/adopt-policy.sh` snippets with the flag backticked, and
+  AC3's grep for the unbackticked phrase could not match them: at the build it printed `0` for both
+  and `1` for `tools/policy/kit.toml`. The main loop ruled that the two snippets lose their
+  backticks, so all three spell the condition as `tools/playbook/README.md:136` does, and AC3 stays
+  as written. Only those two snippets and the prose naming the spelling change. Every other
+  criterion passed at `f2b41e328`: AC1 printed `0 problem(s)`, AC2 and AC4 held, and each staged
+  break redded as §5 states.
+
 ## 9. Reuse audit
 
 This unit builds no mechanism. S1 extends the declaration check 7c already reads for its `exempt`
 class, the registry's `[[exempt]]` rows (`tools/govkit/registry.toml:189-325`), with two rows in the
 existing shape. S2 reuses the condition other kits already use in these sentences,
-`unless GOVKIT_RERENDER=0 is exported` (`tools/playbook/README.md:136`,
+`unless GOVKIT_RERENDER=0 is exported` (`tools/playbook/README.md:136`; the backticked spelling at
 `tools/branch-reconcile/README.md:167`). The probe runs the selfcheck's own source and does not
 retype a predicate.
 `python tools/codebase-map/reuse_lookup.py "classify a guard pathspec into exactly one declared class for a root file no kit ships"`
