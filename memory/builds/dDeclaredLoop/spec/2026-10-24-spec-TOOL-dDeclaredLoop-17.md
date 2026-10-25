@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-17 — witnesses computed rather than typed by the acting agent
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 8 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 8 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0102@5579244a whole
 **Carries:** node:record-kind.acceptance
@@ -9,10 +9,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-build-TOOL-dDeclaredLoop-17-deviation-171.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-17-deviation-171.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -31,8 +34,14 @@ witness kinds and arms the stand-ins the executor replaces (I22).
 
 - **S1** — The record kind `acceptance`, `record-kind.acceptance`, in the record factory
   `tools/memory-tree/build_records.py` (dOrderedCharter-7 S7): `<date>-build-<unit id>-acceptance-<n>.md`,
-  `**Serves:** journal <unit id>`, fields `Unit`, `Sha`, `Writer` (`executor` or `stand-in`) and one
-  `run · <exit> · <hash> · <command>` line per command. Observed by AC1.
+  `**Serves:** acceptance <unit id>`, fields `Unit`, `Sha`, `Writer` (`executor` or `stand-in`) and one
+  `run · <exit> · <hash> · <command>` line per command. The kind joins the reader in the same pass:
+  `acceptance` is added to `TYPED_RECORD_KINDS` in `tools/memory-tree/tree_lib.py`, which the
+  factory's kind table must equal at import (PLAY-dOrderedCharter-42 S1, S2), and to the closed
+  `<kind>` list of `tools/memory-tree/HYGIENE.template.md` (its S5); under its S3 a `-acceptance-<n>.md`
+  file served as any other kind is malformed. `write_acceptance_record` passes the factory `--build`,
+  `--unit` and the fields; whether the factory's `new` verb is generic per kind is unknown until
+  dOrderedCharter-7 builds, so this unit claims no `new acceptance` door. Observed by AC1 and AC8.
 - **S2** — The re-run primitive, `run_witness_commands(repo, sha, commands, timeout)` in
   `tools/loop/loop_witness.py`: a detached worktree of `sha` in a temporary directory, each command run
   there with a timeout, its exit status and the first twelve hex digits of the SHA-256 of its combined
@@ -58,8 +67,17 @@ witness kinds and arms the stand-ins the executor replaces (I22).
   `acceptance`, `probe-rerun` and `red-attribution`, each with its class, its record, its writer today
   and the build that arms the real one, read by `read_computed_witnesses`. Observed by AC6.
 - **S8** — The leg `loop computed witness`, running `loop_witness.py --selftest`, with the rows a new
-  leg owes, and a sentence each for `--attest` and `--hold` in the verbs template and its render.
-  Observed by AC7.
+  leg owes, `enforces = ["principle.p2"]` among them, and a sentence each for `--attest` and `--hold` in
+  the verbs template and its render. P2 is the principle whose v2 `[enforcement]` row names this
+  unit's clause `cl-dClosedLoop-0102`. The key is owed in this pass, since dOrderedCharter-7 S3's
+  meta-check reds a leg with no `enforces` and its pending list only shrinks after that unit's pass;
+  where the list holds a `principle` row for `principle.p2`, this pass deletes it, as the meta-check
+  reds it stale. Observed by AC7.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of
+  the playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells
+  the `principle.p2` row at this spec's base; once that unit lands, the meta-check is the one reader, and it reds
+  the row as stale once a leg enforces its tag · by value: NO VALUE READERS — a pending row's value is
+  its arming build, which the meta-check prints only in its pending count.
 
 ## 3. Non-goals (OUT)
 
@@ -89,7 +107,7 @@ witness kinds and arms the stand-ins the executor replaces (I22).
 ### The acceptance record
 
 ```
-**Serves:** journal TOOL-dExample-3
+**Serves:** acceptance TOOL-dExample-3
 
 **Unit:** TOOL-dExample-3
 **Sha:** 3f9c2a71
@@ -164,8 +182,8 @@ does not hold or that names `actor`.
 | `check_acceptance_record` | function | `py.function`, OK |
 | `read_computed_witnesses` | function | `py.function`, asked at the pass |
 | `[[computed-witness]]` | table of `tools/loop/loop.toml` | none |
-| `acceptance` | record kind of `build_records.py` | none |
-| `loop computed witness` | leg | none |
+| `acceptance` | record kind of `build_records.py`, a member of `TYPED_RECORD_KINDS` | `lexicon naming predicates` grades the tuple |
+| `loop computed witness` | leg, with `enforces` | none |
 
 ### Migration
 
@@ -182,9 +200,12 @@ prescribes, so a run following the printed hold line is admitted.
 - `tools/loop/loop.toml`: the `[[computed-witness]]` rows
 - `tools/loop/kit.toml`: the module and the leg declared
 - `tools/memory-tree/build_records.py`: the `acceptance` kind row
+- `tools/memory-tree/tree_lib.py`: `acceptance` in `TYPED_RECORD_KINDS`
+- `tools/memory-tree/HYGIENE.template.md`, and its render `memory/HYGIENE.md`: `acceptance` in the closed kind list
+- `tools/playbook/core-pending.txt`: the stale `principle.p2` row, where it holds one
 - `tools/unattended/unattended.sh`: `run_hold` and `verb_attest`
 - `tools/unattended/VERBS.template.md`, and its render `memory/guides/UNATTENDED-VERBS.md`
-- `tools/gate-legs.json`: the leg `loop computed witness`, argv `python {prefix}/loop/loop_witness.py --selftest`
+- `tools/gate-legs.json`: the leg `loop computed witness`, argv `python {prefix}/loop/loop_witness.py --selftest`, `enforces = ["principle.p2"]`
 - `tools/govkit/subject-pins.tsv`, regenerated by `python tools/govkit/govkit.py selfcheck --write`
 - `tools/run-gates/ceiling-evidence.txt`, the new leg's row
 - `memory/map/features/loop.md`: the module's claim and the leg in its `gate-legs` list
@@ -246,9 +267,16 @@ prescribes, so a run following the printed hold line is admitted.
   witness kinds, and `--plant witness-actor`, a row of class `actor`, exits 1 naming it.
   Red when: a computed witness may declare the refused class.
 - **AC7** — When `grep -n '"loop computed witness"' tools/gate-legs.json` runs, it finds the leg row
-  and its argv naming `loop_witness.py`, and `grep -n 'inherited-red' tools/unattended/VERBS.template.md`
+  and its argv naming `loop_witness.py`; `python -m json.tool tools/gate-legs.json` read for that row
+  shows `enforces` holding `principle.p2`; and `grep -n 'inherited-red' tools/unattended/VERBS.template.md`
   finds the `--hold` sentence naming the attribution.
-  Red when: the leg row is absent or names another command, so no bar runs the check.
+  Red when: the leg row is absent, names another command, or carries no `enforces`, so the bar never
+  runs the check or the core meta-check reds it.
+- **AC8** — When `python tools/memory-tree/gen_build_index.py --print-bindings` runs over AC1's fixture
+  repository, it prints an `S` row for `<date>-build-tFix-1-acceptance-1.md` with kind `acceptance`,
+  and no `A` row for it.
+  Red when: the record serves as `journal` or the kind is missing from `TYPED_RECORD_KINDS`, so it
+  reads malformed.
 
 ## 7. Gates
 
@@ -284,12 +312,18 @@ New arm: tools/loop/loop_witness.py · covers AC1 AC2 AC3 AC4 AC5 AC6 AC7 · the
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-42, a hands-off TOOL-dDeclaredLoop-45, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
 
+- rev-3 · 2026-10-25 · §2 S1, S8 · §4 The acceptance record, Inventory, Files touched · §6 AC7, AC8 ·
+  §10 · re-grounded on dOrderedCharter at `462d20f35` by the cross-check record
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`, rows 45, 46 and 47:
+  the record serves as `acceptance`, joined to `TYPED_RECORD_KINDS` and the HYGIENE kind list; the
+  leg carries `enforces`.
+
 ## 10. Reuse audit
 
 The seams extended are `check_inherited_override` (`tools/unattended/unattended.sh:10290`), reused
 unchanged as a third caller beside `--abort` (:6727) and `--handoff` (:10429); `verb_attest` and its
 checker read (:12573, `checker_of` at :1275); the record factory of dOrderedCharter-7 S7 by one kind
-row; and `TOOL-dDeclaredLoop-5`'s classes and list. No seam fits the re-run at a pinned SHA:
+row and its `TYPED_RECORD_KINDS` member (PLAY-dOrderedCharter-42); and `TOOL-dDeclaredLoop-5`'s classes and list. No seam fits the re-run at a pinned SHA:
 `python tools/codebase-map/reuse_lookup.py "compute a witness by re-running commands at a pinned
 commit instead of an agent typed attestation"` ranked `build_commit`, `compute_coverage`, `pass_commit`
 and `measure_commitment`, none a re-run, and scout B's probe found only `run_ask_witness`

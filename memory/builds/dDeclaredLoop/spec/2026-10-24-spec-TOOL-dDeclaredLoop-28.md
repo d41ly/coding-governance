@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-28 — a build's recorded changes under flow.adapt, applied at its next step boundary, and its witnessed path held to its composition
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 25 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 25 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0113@11f77a79 whole
 **Carries:** node:policy-key.flow.adapt
@@ -9,10 +9,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-build-TOOL-dDeclaredLoop-28-deviation-281.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-28-deviation-281.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -32,17 +35,22 @@ pinned to, so an unrecorded skip leaves no trace.
 - **S1** — `flow.adapt`, read through dGroundRules-2's `resolve`, its catalogue row already written
   (I10), values `additive-recorded` (default), `owner-approves` and `off`. Observed by AC1, AC2, AC3.
 - **S2** — The proposal, `verb_rescope`'s row grammar widened (`tools/unattended/unattended.sh:13296`).
-  `--rescope <slug> --flow <row tag> --act add|amend|exclude|supersede --change <record> --reason <r>`
-  appends `<ts> rescope · flow <act> <row tag>[ -> <successor>] · change <record stem> · reason <r>` to
-  the run-state file, through the same field refusals the unit form inherits. The four acts are
+  `--rescope <slug> --flow <row tag> --act add|amend|exclude|supersede [--change <record>] --reason <r>`
+  appends `<ts> rescope · flow <act> <row tag>[ -> <successor>][ · change <record stem>] · reason <r>`
+  to the run-state file, through the same field refusals the unit form inherits. `--change` is required
+  for `add`, `amend` and `supersede` and refused for `exclude`. The four acts are
   dOrderedCharter-35's row operations. The unit form's closed case and its row stay byte-identical, so
   every reader anchored on ` rescope · item ` reads the same rows. Observed by AC6 and AC7.
-- **S3** — The rows. The proposed rows sit in a change record (I13, dOrderedCharter-15 S7) in the
-  build's `build/` folder, `<date>-build-<unit id>-change-<n>.md`, its `After` field a TOML fence of
-  overlay-grammar rows, `<unit id>` the unit whose pass proposed it. The row's act must agree with the
-  rows: an `add` holds only rows whose tags carry the `adopter` seat, an `amend` only `amends` patches,
-  an `exclude` only tags, a `supersede` one replacing row; a disagreement refuses the proposal.
-  Observed by AC6.
+- **S3** — The rows. Each proposed row is one change record (I13, dOrderedCharter-15 S7) in the
+  build's `build/` folder, `<date>-build-<unit id>-change-<n>.md`, `<unit id>` the unit whose pass
+  proposed it, written through the factory's `new change` door. Its fields are the change kind's:
+  `Unit` the row's tag, `Action` `add`, `Before` `none`, and `After` `<tag>@<hash8>`, the hash
+  dOrderedCharter-35 S6's normaliser gives over the row's canonical form, its other fields as
+  dOrderedCharter-15 S7 requires them. The row itself sits in a TOML fence in the record's body, below
+  the fields (§8 F5), and a fence whose canonical hash is not `After`'s refuses the proposal. The acts
+  map onto `WRITE_VERBS` as §4 states. The act must agree with the row: an `add` holds a row with no
+  edge, an `amend` one carrying an `amends` edge, a `supersede` one carrying a `supersedes` edge, each
+  tag in the `adopter` seat; a disagreement refuses the proposal. Observed by AC6.
 - **S4** — The class, derived and never typed, by `classify_change(rows, composition)` in the new
   module `tools/loop/adapt.py`: `additive` when every row adds an item, role or stage row, or is a patch
   dOrderedCharter-36 S5's classifier reads `narrows`; `loosening` otherwise, an exclusion, a
@@ -59,7 +67,8 @@ pinned to, so an unrecorded skip leaves no trace.
   to AC4.
 - **S6** — The composition. Applied rows are the build's own recorded changes, the last layer of its
   composition after the scenarios it was placed under (TOOL-dDeclaredLoop-27 S6), composed by
-  dOrderedCharter-35's `compose_rows`, so every row check reads them. A held or refused row is absent.
+  dOrderedCharter-35's `compose_rows` through TOOL-dDeclaredLoop-26's `compose_at` at the build's pin
+  (that unit's §8 F4 and F5), so every row check reads them. A held or refused row is absent.
   Observed by AC1 and AC8.
 - **S7** — The path comparison. At each transition out of a step, `compare_path(build, step)` sets the
   items the step's pinned composition declares against the items TOOL-dDeclaredLoop-7's
@@ -70,8 +79,10 @@ pinned to, so an unrecorded skip leaves no trace.
 - **S8** — The fixture: `python tools/loop/adapt.py --fixture --plant <case>` builds a scratch build
   with a run-state file, a change record, transition records and witnesses, each plant run against its
   expected observation by `--fixture` alone; the leg `loop adapt fixtures` in `tools/gate-legs.json`,
-  argv `python {prefix}/loop/adapt.py --fixture`, declared in `tools/loop/kit.toml`. Observed by AC1 to
-  AC8.
+  argv `python {prefix}/loop/adapt.py --fixture`, carrying `enforces = ["principle.p8"]`
+  (dOrderedCharter-7 S2), declared in `tools/loop/kit.toml`. P8's text names a build's composition
+  adding "its own recorded changes" (v2:885-886); no principle's enforcement row cites
+  `cl-dClosedLoop-0113`. Observed by AC1 to AC8 and AC10.
 - **S9** — The page `help/loop.md` (TOOL-dDeclaredLoop-1 S7) gains a section on a build's own changes:
   how a role proposes one, `flow.adapt`'s three values, what waits for the owner and the `flow-deviation`
   order. Observed by AC9.
@@ -107,7 +118,14 @@ The run-state rows, one proposal and its state:
 2026-11-02T11:40:55Z rescope · flow-state item.build.adopter.lint-pass · applied · class additive · flow.adapt additive-recorded
 ```
 
-The change record's `After` field:
+The change record's fields, and its row in a TOML fence in its body:
+
+| Field | Value |
+|---|---|
+| `Unit` | `item.build.adopter.lint-pass` |
+| `Action` | `add` |
+| `Before` | `none` |
+| `After` | `item.build.adopter.lint-pass@<hash8>`, the row's canonical hash |
 
 ```toml
 [[item]]
@@ -115,6 +133,21 @@ tag = "item.build.adopter.lint-pass"
 actor = "command"
 needs = ["item.build.unit-pass"]
 ```
+
+### The acts as write verbs
+
+| Act | Change record | `Action` | The row |
+|---|---|---|---|
+| `add` | one | `add` | a new row, no edge |
+| `amend` | one | `add` | a patch row carrying `amends=<gov tag>@<hash8>` |
+| `supersede` | one | `add` | a replacing row carrying `supersedes=<gov tag>@<hash8>` |
+| `exclude` | none | none | the gov tag, on the rescope row alone |
+
+Each recorded act adds one row of the build's layer under an `adopter` tag, so it is the verb `add`,
+and `Before` is `none`. An exclusion is not a `remove` record: dOrderedCharter-15 S9's
+`extract_change_records` reads a `remove` as its tag ending with no successor, for every build and the
+repository's own composition, where an exclusion here is this build's alone. Its whole content is one
+tag, which the rescope row holds.
 
 ### The step boundary, in order
 
@@ -167,7 +200,9 @@ always waits.
 - **A second record beside the rescope rows.** The brief's ruling: widen `verb_rescope`'s grammar,
   which already holds a run's amendments of its own scope.
 - **The rows inline in the run-state row.** An item row carries an actor, needs, a witness and routes,
-  which no single line holds; the change record already carries rows (dOrderedCharter-35 S7).
+  which no single line holds; a change record pins the row by its hash, and its body holds the row.
+- **An exclusion as a `remove` change record.** The tag index would read gov's tag as ended for every
+  build (dOrderedCharter-15 S9).
 - **A class typed by the proposer.** A role could call an exclusion additive; the classifier derives
   it from the rows.
 
@@ -224,6 +259,9 @@ always waits.
 - **AC9** — When `grep -n "owner-approves" loop.md` runs over the help page at this unit's commit, it
   finds the section naming `flow.adapt`'s three values and the `flow-deviation` order.
   Red when: the route ships and the page leaves a role no way to learn what it may change.
+- **AC10** — When `python -m json.tool gate-legs.json` runs in the tools folder, the row named
+  `loop adapt fixtures` carries `enforces` holding `principle.p8`.
+  Red when: the leg carries no `enforces`, which dOrderedCharter-7 S3's meta-check reds.
 
 ## 7. Gates
 
@@ -251,6 +289,16 @@ New arm: tools/unattended/unattended.test.sh · covers AC6 AC7 · the base `verb
   unchanged unit case; (b) one case holding both act sets. The leg's act axis reads the unit case's
   alternation (`tools/unattended/check-unattended.sh:1046-1062`), and (b) would hand it acts no unit
   row carries. RESOLVED (agent, 2026-10-24, delegated): (a), by rung 3.
+- **F5 — Where in the change record does the proposed row sit?** dOrderedCharter-15 S7's `Before` and
+  `After` are each `<tag>@<hash8>` or `none`, and `Action` is one of `WRITE_VERBS`, so no field holds
+  row content. Options: (a) a TOML fence in the record's body, `After` pinning it by its canonical
+  hash; (b) an ask to dOrderedCharter for a row field on the change kind; (c) a sibling file the record
+  names. Today's record reader skips every line that is not a field
+  (`tools/memory-tree/deviation_join.py:218-220`), the code unit 7 S7 extracts the factory from;
+  whether `build_records.py`'s reader keeps that is unknown until unit 7 builds, so the build run's
+  first probe reads a planted record with the fence, and a refusal stops the unit for ask (b). (c) is a
+  second file per row. RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, dOrderedCharter-15 S7.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -258,6 +306,13 @@ New arm: tools/unattended/unattended.test.sh · covers AC6 AC7 · the base `verb
   v2:1266, and `verb_rescope` and `RESCOPE` read at base `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-10-25 · S2 S3 S6 S8 · §4 Data model, The acts as write verbs, Alternatives rejected ·
+  AC10 · §8 F5 · re-grounded on dOrderedCharter's specs at `462d20f35` per
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md` rows 106 and 107: a
+  change record's `After` is `<tag>@<hash8>`, so the row sits in its body (F5); the three row acts are
+  `add`, and an exclusion rides the rescope row alone; S6 composes through TOOL-dDeclaredLoop-26's
+  `compose_at`; the leg carries `enforces`, by the leg fact of
+  `prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md`.
 
 ## 10. Reuse audit
 
@@ -265,7 +320,8 @@ The seam extended is `verb_rescope` (`tools/unattended/unattended.sh:13296`), th
 of a run's amendments of its own scope, read by `RESCOPE` (`tools/memory-tree/deviation_join.py:162`)
 and check 24 (`tools/unattended/check-unattended.sh:3936`), both anchored on ` rescope · item ` and
 so untouched by the flow form. The class is dOrderedCharter-36's classifier, the rows' record
-dOrderedCharter-15 S7's change kind, the order dSafePassage-9 S2's writer.
+dOrderedCharter-15 S7's change kind, its row pinned by dOrderedCharter-35 S6's normaliser, the order
+dSafePassage-9 S2's writer.
 `python tools/codebase-map/reuse_lookup.py "record a build's own flow change and apply it at the next step boundary"`
 ranked name stems (`build`, `records`, `changed`, `step`) and no step-boundary application exists.
 `python tools/memory-recall/query.py` returned scout B's row and the brief's row; scout B places

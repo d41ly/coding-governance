@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-56 — the round-1 spec audit's 47 minors: owed leg rows, one reader each, honest skew and failure paths, and the citations that drifted
 
-**Status:** DEFERRED · rev-3 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 36 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,11 +8,14 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-561.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-561.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-562.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-56-deviation-562.md) | deviation | — |
+| [2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-56-deviation-563.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 |
 
 <!-- /gen:spec-records -->
@@ -85,10 +88,19 @@ That is 44 MEDIUM and 3 LOW findings by raw id.
 - **S3** — id 58. `TOOL-dDeclaredLoop-33` S10's "the stage claim every leg carries" is valued: `loop
   termination` carries `stage = ["step.test"]`. Observed by AC1.
 - **S4** — id 26. Every leg this build adds has its `[[gate_leg]]` claim in `tools/loop/kit.toml` with
-  `chunk` and `subject`, and its `enforces` list or a `leg` row of `tools/playbook/core-pending.txt`, for
-  the legs of units 1, 2, 4, 6, 7, 8, 14, 25 and 33 that name none, each row the set
-  PLAY-dOrderedCharter-50's `owed_rows.py` prints where that parent has landed, else the set this item
-  lists. Observed by AC3.
+  `chunk` and `subject`, and a non-empty `enforces` list (§4 "The owed leg rows"). The claims owed are
+  the `[[gate_leg]]` part of what PLAY-dOrderedCharter-50's `owed_rows.py --base <the build run's start
+  commit>` prints for a leg added, where that parent has landed, else this item's list; an
+  `[[exempt_leg]]` row never answers one, since every loop leg ships in the loop kit's descriptor.
+  `enforces` is this item's own list, as the probe owes no such row: a leg whose unit wrote it is
+  observed; any other gets the tag of the principle whose v2 `[enforcement]` row names the adding
+  unit's clause, and the pending list's stale row for that tag is deleted. No tag is invented for a
+  clause no row names (§8 F5). Observed by AC3.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of
+  the playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells
+  the rows of S4's tags at this spec's base; once that unit lands, the meta-check is the one reader, and it reds
+  the row as stale once a leg enforces its tag · by value: NO VALUE READERS — a pending row's value is
+  its arming build, which the meta-check prints only in its pending count.
 - **S5** — id 39. The same legs, and those of units 21 and 26 to 30, have their
   `tools/govkit/subject-pins.tsv` row (regenerated by `python tools/govkit/govkit.py selfcheck --write`),
   their claim in `memory/map/features/loop.md`'s `gate-legs` list, their
@@ -138,9 +150,11 @@ That is 44 MEDIUM and 3 LOW findings by raw id.
   `--no-renames` and `core.quotepath=off`) and `ctime` (`%ct`), and a `counter` hook, so runlog's
   `read_git_range` (`tools/runlog/model.py:592-600`) keeps its one git call, its `GIT_CALLS` count and
   the integer type of `t`. Observed by AC14.
-- **S20** — id 21. `check_terminal_proof` asks stdin's console per platform: on win32 `os.isatty` and a
-  console-mode probe through `msvcrt`, on POSIX `os.isatty`; EOF on the confirmation read prints the
-  proposal and writes nothing. Observed by AC15.
+- **S20** — id 21. `check_terminal_proof` asks stderr's console per platform, the stream
+  PLAY-dOrderedCharter-15 S5 tests (its §8 F4, the owner's pick): on win32 `sys.stderr.isatty()` and a
+  console-mode probe of the stderr handle through `msvcrt`, on POSIX `sys.stderr.isatty()`; where
+  `policy_edit.py` keeps a typed confirmation, EOF on that read prints the proposal and writes nothing.
+  Observed by AC15.
 - **S21** — id 30. `TOOL-dDeclaredLoop-7`'s engine reads the run-state file through runlog's
   `read_run_state` and takes owed membership from `PARK_KINDS_OWED` and `PARK_ACTS_OWED`
   (`tools/runlog/model.py:102`, :105), reached with `resolve_kit_dir("runlog", "model.py", here)`.
@@ -280,19 +294,26 @@ sequenced.
 
 ### The owed leg rows (S4, S5)
 
-| Leg | Unit | Rows owed here |
-|---|---|---|
-| `loop definition` | 1 | `[[gate_leg]]`, `enforces`, pins, dossier, ceiling evidence |
-| `loop guard fixtures` | 2 | the same |
-| `loop stage coverage` | 4 | the same |
-| `loop command conformance`, `loop factories fixtures` | 6 | the same, and `stage` |
-| `loop position fixtures` | 7 | the same |
-| `loop claims fixtures` | 8 | the same |
-| `loop frontier fixtures` | 14 | the same |
-| `loop review bounds fixtures` | 21 | pins, dossier, ceiling evidence, `stage` |
-| `loop splice check` | 25 | all, and `stage` |
-| `loop composition fixtures`, `loop scenario fixtures`, `loop adapt fixtures`, `loop upstream fixtures`, `loop budget fixtures` | 26 to 30 | pins, dossier, ceiling evidence, `stage` |
-| `loop termination` | 33 | all, and `stage` |
+In the `enforces` column, "own" means the leg's unit writes it in its pass and this item observes it;
+a tag means this item writes it. "Base" is `[[gate_leg]]`, pins, dossier and ceiling evidence.
+
+| Leg | Unit | `enforces` | Rows owed here |
+|---|---|---|---|
+| `loop definition` | 1 | own | base |
+| `loop guard fixtures` | 2 | F5: no row names `cl-dClosedLoop-0087` | base |
+| `loop transition record` | 3 | own, its §8 F7 | base |
+| `loop stage coverage` | 4 | own | base |
+| `loop command conformance`, `loop factories fixtures` | 6 | own | base, and `stage` |
+| `loop position fixtures` | 7 | `principle.p22` | base |
+| `loop claims fixtures` | 8 | `principle.p23` | base |
+| `loop frontier fixtures` | 14 | `principle.p24` | base |
+| `loop computed witness` | 17 | own | base |
+| `loop review bounds fixtures` | 21 | `principle.p38` | pins, dossier, ceiling evidence, `stage` |
+| `loop splice check` | 25 | `principle.p20` | base, and `stage` |
+| `loop composition fixtures`, `loop adapt fixtures`, `loop upstream fixtures` | 26, 28, 29 | F5: no row names their clauses | pins, dossier, ceiling evidence, `stage` |
+| `loop scenario fixtures` | 27 | own | pins, dossier, ceiling evidence, `stage` |
+| `loop budget fixtures` | 30 | `principle.p39` | pins, dossier, ceiling evidence, `stage` |
+| `loop termination` | 33 | own | base, and `stage` |
 
 ### Evidence
 
@@ -327,6 +348,7 @@ sequenced.
 ### Files touched (estimate)
 
 - `tools/gate-legs.json`
+- `tools/playbook/core-pending.txt`: the stale `principle` rows of S4's tags, deleted where held
 - `tools/loop/kit.toml`
 - `tools/loop/loop.toml`
 - `tools/loop/loop_lib.py`
@@ -398,9 +420,13 @@ sequenced.
   every join and kind and exits 0.
   Red when: a dossier minted after order 19 lacks its `stage` key.
 - **AC3** — When `python tools/govkit/govkit.py selfcheck` runs on the built tree, 7h finds a descriptor
-  claim for every leg of §4's table and `tools/govkit/subject-pins.tsv` a row for each, and `grep -c` over
-  the loop dossier, `loop.md`, finds each leg name.
-  Red when: a leg this build added has no `[[gate_leg]]` claim or no subject-pins row.
+  claim for every leg of §4's table and `tools/govkit/subject-pins.tsv` a row for each; `grep -c` over
+  the loop dossier, `loop.md`, finds each leg name; no `[[exempt_leg]]` row of
+  `tools/govkit/registry.toml` names one; each leg's row of `tools/gate-legs.json` carries a non-empty
+  `enforces`, the tag §4 names where it names one; and `python tools/playbook/core.py meta-check`
+  names none of them.
+  Red when: a leg this build added has no `[[gate_leg]]` claim, no subject-pins row or no `enforces`,
+  or an `[[exempt_leg]]` row stands in for its claim.
 - **AC4** — When `grep -c 'refusal'` runs over the tuples at `tools/runlog/model.py:98` and
   `tools/drift-audit/drift_report.py:2427`, each prints 1, and `git grep -n 'def read_refusals' -- tools`
   prints nothing.
@@ -438,9 +464,10 @@ sequenced.
 - **AC14** — When `read_git_range` reads a scratch range through `read_commits` with the format arms, its
   `GIT_CALLS` count and the type of each `t` equal base `ed497191`'s on the same range.
   Red when: the re-point adds a git call or turns `t` into a string.
-- **AC15** — When `check_terminal_proof` runs with stdin a pipe, `NUL` and a regular file on win32, each is
-  refused by name, and EOF on the confirmation read prints the proposal and writes nothing.
-  Red when: `NUL` passes the terminal test, or EOF raises a traceback.
+- **AC15** — When `check_terminal_proof` runs with stderr redirected to a pipe, `NUL` and a regular file on
+  win32, each is refused by name, and where `policy_edit.py` keeps its typed confirmation, EOF on that
+  read prints the proposal and writes nothing.
+  Red when: `NUL` passes the terminal test, the check reads stdin, or EOF raises a traceback.
 - **AC16** — When `git grep -n 'read_run_state\|PARK_KINDS_OWED' -- tools/loop` runs, both
   appear in `position.py`, and `git grep -n 'PARK_KINDS_OWED *=' -- tools/loop` prints nothing.
   Red when: the engine carries a third owed-set copy.
@@ -554,6 +581,16 @@ AC42 are observed by probes, never by those suites.
 - **F4 — Where does the review-rounds upgrade write (S40)?** Options: (a) a proposal the owner lands; (b) a
   new admitted shape in the guard. (b) widens the guard's write surface, veto 3, and the skeptic judged it
   unsound. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3. widens: none · relaxes: none
+- **F5 — Who writes `enforces` for a leg whose own unit names none?** PLAY-dOrderedCharter-7 S3 reds
+  such a leg from the pass that adds it, and its pending list only shrinks after that unit's pass, so
+  no row excuses it. The re-ground gives the key to units 1, 3, 4, 6, 17, 27 and 33; units 2, 7, 8, 14,
+  21, 25, 26 and 28 to 30 add legs before order 36 with none, as do units 11 (P11), 13 (P20) and 15,
+  which §4's table omits. No `[enforcement]` row names the clauses of units 2, 15, 26, 28 and 29.
+  Options: (a) re-ground each such unit so its own pass writes the key, its tag settled where no row
+  names its clause, and S4 only observes; (b) S4 writes the keys at order 36, the bar's `core
+  meta-check` leg red from each such pass until then; (c) a pending-list row, which the shrink-only
+  list refuses. (b) lands red across many passes and (c) breaks unit 7's rule. Recommendation: (a).
+  Open for the owner, since (a) revises specs outside this re-ground.
 
 ## 9. Revision log
 
@@ -562,6 +599,12 @@ AC42 are observed by probes, never by those suites.
   consumes-from edges of TOOL-dDeclaredLoop-65 and TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
 - rev-3 · 2026-10-24 · §3 · the Edges block gains the bullets mirroring the edges of
   TOOL-dDeclaredLoop-68 and TOOL-dDeclaredLoop-70, written by the round-3 spec audit's disposal; nothing else moved.
+- rev-4 · 2026-10-25 · §2 S4, S20 · §4 The owed leg rows, Files touched · §6 AC3, AC15 · §8 F5 ·
+  re-grounded on dOrderedCharter at `462d20f35` by the cross-check record
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`, rows 126 and 127 and
+  the `enforces` rows 7, 18, 23, 36 and 47: S4 takes only the `[[gate_leg]]` part from `owed_rows.py`,
+  keeps its own `enforces` list with no pending-list fallback and refuses an `[[exempt_leg]]` answer;
+  the table gains units 3, 17 and 27; S20 tests stderr, per PLAY-dOrderedCharter-15 F4.
 
 ## 10. Reuse audit
 
