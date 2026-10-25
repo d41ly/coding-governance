@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-78 — the close sweep of the review's M4 and lows: the policy fixtures leg's figures, agent-cap.js's rule-7 header, policy-mirror.js's bash resolver order, and the stale "lands dark" waiver and help text
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -27,8 +27,8 @@ finding.
 
 - **S1** — The `policy fixtures` leg's figures (finding M4, id 11). In
   `tools/run-gates/selftest-budgets.txt`, the `policy fixtures` row's budget and its reading column,
-  and in `tools/gate-legs.json`, that leg's `ceiling`, are set from a reading the builder takes at
-  this unit's own base, as §4 "S1" gives. Observed by AC1.
+  and in `tools/gate-legs.json`, that leg's `ceiling`, are set to the fixed figures §4 "S1" derives
+  from the main loop's one whole run of the leg at `4f52f18c9`. Observed by AC1.
 - **S2** — agent-cap.js's rule-7 header (finding L1, id 7). In `tools/hooks/agent-cap.js`, the RULE 7
   paragraph of the file's header comment says that a `cwd` in no checkout refuses, as §4 "S2" gives.
   Observed by AC2 and AC3.
@@ -46,14 +46,14 @@ finding.
 
 - Splitting the `policy fixtures` leg, or running its outcome cases in a pool. §4 "Alternatives
   rejected" gives why.
-- `tools/run-gates/ceiling-evidence.txt`. This unit writes no evidence row there. The builder's
-  reading overstates a single run, and that file only ever rises (§4 "S1").
+- `tools/run-gates/ceiling-evidence.txt`. This unit writes no evidence row there (§4 "S1" gives
+  why).
 - `tools/lib/resolve_bash.py` and the inline copy in `tools/policy/check_policy.py`. The skeptic's fix
   leaves both unchanged.
 - A `kit:policy` block in the charter template. The charter's text for the policy kit is a later
   build's choice, and S4 does not need it (§4 "S4").
 - The "lands dark" paragraph of `tools/policy/README.md` (`:9-14`). It has the same stale wording, but
-  the report did not name it, and §7 lists it as a follow-up.
+  the report did not name it, and §8 lists it as a follow-up.
 - The other findings of the report, the inherited reds the close recorded (unattended shards 1, 3, 5
   and 7, and the hygiene partition arm), and any other spec.
 
@@ -105,80 +105,62 @@ red today, naming `policy`. This pass did not run the leg, so the main loop conf
 
 ### S1 — the figures
 
-The figures are not fixed in this spec. Two sibling units grow the fixture before this unit builds,
-and this unit builds last of 72 to 78. `TOOL-dGroundRules-75` S7 adds a `zero` run, through a new
-`derive_zero_plant`, to every census case of a non-family switch row. That makes existing cases cost
-more without adding any. `TOOL-dGroundRules-77` adds three `GUARD_PLANTS` rows. So the case count
-cannot scale the finder's 566s. The builder re-measures at this unit's own base, after 75 and 77
-land.
+The figures are fixed values the builder writes. Two sibling units grew the fixture before this unit
+builds. `TOOL-dGroundRules-75` S7 added a `zero` run to the census cases of the non-family switch
+rows, and `TOOL-dGroundRules-77` added three `GUARD_PLANTS` rows. At `4f52f18c9`, `derive_cases`
+yields 150 cases, measured by this pass over an archive of `tools/policy/` at that commit.
 
-**The measuring command.** The whole `--fixture` run is a self-test suite. The spec-token checker's
-`BAR` pattern names it so (`tools/check-spec-tokens.py:390-395`), and M6 bars a pass from running
-one. Naming one case makes it the direct check a pass may run. So the builder times one single-case
-run per case and sums the times:
+**The reading.** The main loop ran the leg's own argv once, whole, at `4f52f18c9`, on node a while
+it was idle:
 
 ```
-cat > "$TEMP/m78.py" <<'EOF'
-import subprocess, sys, time
-sys.path.insert(0, "tools/policy")
-import check_policy, policy
-names = [c[0] for c in check_policy.derive_cases(policy.load_catalogue(check_policy.KIT))]
-total, worst, bad = 0.0, (0.0, ""), []
-for name in names:
-    t = time.monotonic()
-    r = subprocess.run([sys.executable, "-B", "tools/policy/check_policy.py", "--fixture", "--strict-from",
-                        "memory/builds/dClosedLoop/build/", name], capture_output=True)
-    s = time.monotonic() - t
-    total, worst = total + s, max(worst, (s, name))
-    if r.returncode:
-        bad.append(name)
-print(f"{len(names)} cases {total:.1f}s worst {worst[1]} {worst[0]:.1f}s wrong {len(bad)} {' '.join(bad)}")
-EOF
-python -B "$TEMP/m78.py"
+python tools/policy/check_policy.py --fixture --strict-from memory/builds/dClosedLoop/build/
 ```
 
-In cost this is a whole fixture pass, run one case at a time. If the role hook refuses the loop, the
-builder returns the need to the main loop, which runs the same script and hands back its output line.
-The run takes about ten minutes, so the builder runs it in the background and runs nothing else
-beside it. A `wrong` count above 0 stops the unit. A red case is a sibling's defect, and the builder
-returns it to the main loop rather than sizing from that run. Measured at `fce5603f8`, the cheapest
-case (`shape-no-empty`) took 4.8s alone, so each case's process start and its guard-trace checks are
-paid once per case. The sum overstates one serial run by about that much per case. For a hang bound
-that errs on the safe side, and the reading says so.
+It printed `929 assertion(s) executed · 0 wrong`, exited 0, and took 644s of wall time. The main
+loop's log of that run ends `rc=0 wall=644s head=4f52f18c9`. The reading is PINNED: it was taken on
+2026-10-25 at that commit. No pass re-takes it. The whole `--fixture` run is a self-test suite: the
+spec-token checker's `BAR` pattern names it so (`tools/check-spec-tokens.py:390-395`), and M6 bars a
+pass from running one.
 
-**The rules.** Let `T` be the summed seconds rounded up to a whole second, and `n` the case count,
-both from the command's output line.
+The rev-2 measure, one timed single-case run per case summed, is not used. The build ran it and got
+150 cases in 1177.3s, with 7 cases "wrong". Each of the 7 failed only the run-level arm
+`guard-trace · WRONG: no source read was traced` (`check_guard_trace`,
+`tools/policy/check_policy.py:4043`), which a single-case run of a case that opens no traced file
+always trips. Every per-case check passed. Each single run also pays a python start and the imports,
+so the sum overstated the leg by almost double.
 
-- The budget is `T` x 1.5, rounded up to the next multiple of 10 and floored at 60. That is the
-  calibration in the header of `tools/run-gates/selftest-budgets.txt`, and the rounding is how its
-  own rows go: 389 x 1.5 = 583.5 is written as 590.
-- The ceiling is `T` + max(F, R x `T`), rounded up to the next multiple of 10. F and R are the floor
-  and fraction `tools/run-gates/ceiling-margin.txt` declares at the builder's HEAD, 120 and 1.0 at
-  `fce5603f8`. That is the headroom `derive-ceilings.py --check` demands
-  (`tools/run-gates/derive-ceilings.py:643`). The skeptic's x1.5 would leave the ceiling short of it,
-  and the ceilings leg would red at the first runner reading. With the margin at `fce5603f8` the
-  ceiling is 2 x `T`.
+**The rules.**
 
-**Where each number lands.** The budget is the second tab-separated field of the `policy fixtures`
-row in `tools/run-gates/selftest-budgets.txt`. The third field, the argv, stays empty. The fourth
-field, the reading, becomes the line below, with the builder's own node tag, the date, and its base
-cut to eight hex characters:
+- The budget is the reading x 1.5, rounded up to the next multiple of 10 and floored at 60. That is
+  the calibration in the header of `tools/run-gates/selftest-budgets.txt`, and the rounding is how its
+  own rows go: 389 x 1.5 = 583.5 is written as 590. Here 644 x 1.5 = 966, so the budget is **970**.
+- The ceiling is the reading + max(F, R x the reading), rounded up to the next multiple of 10. F and R
+  are the floor and fraction `tools/run-gates/ceiling-margin.txt` declares, 120 and 1.0. That is the
+  headroom `derive-ceilings.py --check` demands (`tools/run-gates/derive-ceilings.py:643`). Here
+  644 + max(120, 644) = 1288, so the ceiling is **1290**. The skeptic's x1.5 would leave the ceiling
+  short of that headroom, and the ceilings leg would red at the first runner reading.
+
+**Where each number lands.** The `policy fixtures` row of `tools/run-gates/selftest-budgets.txt`
+keeps its four tab-separated fields. The second, the budget, becomes 970. The third, the argv, stays
+empty. The fourth, the reading, becomes:
 
 ```
-measured <T>s for <n> cases on node <tag> <YYYY-MM-DD> at <sha8>, the sum of one timed single-case --fixture run per case, which overstates one serial run by each case's process start, x1.5. TOOL-dGroundRules-78
+measured 644s on node a 2026-10-25 at 4f52f18c, one whole serial run of the leg's own argv over the fixture's 150 cases, 929 assertion(s) executed and 0 wrong, x1.5. TOOL-dGroundRules-78
 ```
 
-The ceiling is the `ceiling` of the `policy fixtures` row in `tools/gate-legs.json`, the one value
-that changes there.
+The `ceiling` of the `policy fixtures` row in `tools/gate-legs.json` becomes 1290. It is the one
+value that changes in that file.
 
-**How the reading is recorded.** The command's whole output line goes into this unit's build ledger,
-beside AC1. `T` and `n` go into the budget row's reading, as above. No row is written to
-`tools/run-gates/ceiling-evidence.txt`. `derive-ceilings.py --write --observed` could write one, but
-that file is MONOTONE (its header), so an overstated reading would hold the ceiling's floor above the
-real cost until someone runs `--reset`. The ceiling stays UNBACKED until the close's bar run makes
-the first runner reading. `--check` reports UNBACKED and does not fail. If that reading is above half
-the ceiling, the next `--write` reds `leg ceilings clear their evidenced maximum` by name, and the
-main loop re-sizes from it.
+**No ceiling-evidence row.** No row is written to `tools/run-gates/ceiling-evidence.txt`. The rev-2
+reason, an overstated reading kept for good in a file that only rises, is gone: this is a real
+one-run reading. The decision stands for a second reason. `derive-ceilings.py --write` writes the
+`--observed` row, and it also re-derives every leg's row from the writer's own retained `gate-run`
+window (`cmd_write`, `tools/run-gates/derive-ceilings.py:488-547`). A write from the builder's
+worktree could therefore raise rows outside this unit. The close's bar run makes the first runner
+reading anyway. Until then the ceiling is UNBACKED, which `--check` reports and does not fail on. If
+that runner reading is above 645s, the next `--write` reds `leg ceilings clear their evidenced
+maximum` by name, and the main loop re-sizes from it.
 
 ### S2 — the header
 
@@ -277,9 +259,9 @@ the push boundary (`tools/govkit/govkit.py:13421`, `cmd_epoch`).
 ## 5. Acceptance criteria
 
 All commands run from the repository root of the pass's worktree. Three scratch scripts are written
-first, besides §4's measuring script. `c78.py` reads `T` and `n` back out of the budget row's
-reading. It applies §4 "S1"'s two rules, with the margin read from `tools/run-gates/ceiling-margin.txt`,
-and checks the case count against the live `derive_cases`. It prints `T`, `n`, the budget, the
+first. `c78.py` reads the seconds and the case count back out of the budget row's reading. It applies
+§4 "S1"'s two rules, with the margin read from `tools/run-gates/ceiling-margin.txt`, and checks the
+case count against the live `derive_cases`. It prints the seconds, the case count, the budget, the
 ceiling, and `ok` or what it wanted:
 
 ```
@@ -294,9 +276,9 @@ with open("tools/run-gates/selftest-budgets.txt", encoding="utf-8") as fh:
     row = next(r.rstrip("\n").split("\t") for r in fh if r.startswith("policy fixtures\t"))
 with open("tools/gate-legs.json", encoding="utf-8") as fh:
     c = next(leg["ceiling"] for leg in json.load(fh) if leg["name"] == "policy fixtures")
-m = re.match(r"measured (\d+)s for (\d+) cases on node \S+ \d{4}-\d\d-\d\d at [0-9a-f]{8},", row[3])
+m = re.match(r"measured (\d+)s on node \S+ \d{4}-\d\d-\d\d at [0-9a-f]{8}, one whole serial run of the leg's own argv over the fixture's (\d+) cases,", row[3])
 if not m:
-    sys.exit(f"{n} {row[1]} {c} WRONG: the reading names no measured seconds and case count")
+    sys.exit(f"{n} {row[1]} {c} WRONG: the reading names no whole-run seconds and case count")
 t, cases = int(m.group(1)), int(m.group(2))
 want_b = max(60, -(-3 * t // 20) * 10)
 want_c = math.ceil((t + max(int(f0), float(f1) * t)) / 10) * 10
@@ -346,14 +328,12 @@ EOF
 The `policy fixtures`, `playbook parity` and `leg ceilings clear their evidenced maximum` legs are
 gates this pass may not run. The main loop runs them at the close (§6).
 
-- **AC1** — When `python -B "$TEMP/c78.py"` runs, it prints the `T` and `n` of the builder's
-  measuring run, as the ledger records them, then the budget and the ceiling §4 "S1" derives from `T`,
-  then `ok`.
+- **AC1** — When `python -B "$TEMP/c78.py"` runs, it prints `644 150 970 1290 ok`.
   Red when: the row keeps its old reading. The script then exits 1 and prints the line
-  `146 60 300 WRONG: the reading names no measured seconds and case count`, as it did at `fce5603f8`. Red also when either figure is
-  not the one its rule gives, or when the case count no longer matches `derive_cases`. A scratch copy
-  holding a 600s reading for 146 cases, a budget of 900 and a ceiling of 1200 was measured printing
-  `600 146 900 1200 ok`.
+  `150 60 300 WRONG: the reading names no whole-run seconds and case count`, as it did at `4f52f18c9`.
+  Red also when either figure differs from §4 "S1", or when `derive_cases` no longer yields 150 cases,
+  so the reading no longer describes the leg. A scratch copy of `tools/policy/` at `4f52f18c9`, with
+  the row and the ceiling staged as §4 gives, was measured printing `644 150 970 1290 ok`.
 - **AC2** — When `grep -c 'in no checkout, adds no rule' tools/hooks/agent-cap.js` runs, it prints `0`.
   Red when: the header keeps the fail-open sentence. At `fce5603f8` it printed `1`.
 - **AC3** — When `grep -cF 'in no checkout refuses, naming it (TOOL-dGroundRules-21 S38). Skipped under' tools/hooks/agent-cap.js` runs, it prints `1`.
@@ -427,6 +407,9 @@ memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-78-spec-b
 ```
 - rev-2 · 2026-10-25 · the five follow-up bullets move out of §7 into the prose below, so §7 reads
   `none` and check 12 can grade a CLOSED flip.
+- rev-3 · 2026-10-25 · the build diverged on S1: the summed single-case measure tripped the run-level
+  guard-trace arm on 7 cases and overstated the leg, so S1 now writes fixed figures, 970 and 1290,
+  from the main loop's one whole run at `4f52f18c9` (644s, 929 assertions, node a).
 
 Follow-ups the main loop files as asks, none of them one arm of a mechanism here. M4's left-shift
 gate is an ask for a check that compares each budget row's recorded case count with its leg's live
@@ -446,9 +429,8 @@ This unit builds no mechanism. S1 edits the two declared figures in their own fi
 rules those files already state: the x1.5 calibration in the header of
 `tools/run-gates/selftest-budgets.txt`, and `derive-ceilings.py`'s margin from
 `tools/run-gates/ceiling-margin.txt`. The out-of-band evidence route, `derive-ceilings.py --observed`,
-was the seam to extend. It does not fit. The builder's per-case sum overstates one run, and that
-route writes into a file that only ever rises (§4 "S1"). The measuring script reuses the
-single-case form of `--fixture` that `main` already parses (`tools/policy/check_policy.py:4495-4500`). S3 narrows `resolveBash` to the order of the canonical `resolve_bash` and adds no resolver. S4
+was the seam to extend. It does not fit, because its `--write` also re-derives every other leg's
+row from the writer's own run window (§4 "S1"). The reading is the leg's own argv, run whole. S3 narrows `resolveBash` to the order of the canonical `resolve_bash` and adds no resolver. S4
 and S5 edit text. The probes reuse the module's own `derive_cases` and `readPolicy`, and the parity
 gate's own pattern.
 `python tools/codebase-map/reuse_lookup.py "resize a gate leg ceiling and its selftest budget row from a measured reading"`
