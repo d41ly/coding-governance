@@ -138,3 +138,13 @@ base: cdfbd1cf9c5e31cc8620af362be33a66db61a076
 2026-10-25T09:23:59Z rescope · item add TOOL-dWitnessedBar-84 · reason spec-audit round1 of units 74-78 minors batch, MEDIUM ids 3 4 6 8 9 13 15 16 19 20 21 22 and LOW ids 5 10 11 12
 
 2026-10-25T09:38:44Z review · item dWitnessedBar-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 5 · minors 16 · disposition promote
+
+2026-10-25T10:21:46Z rescope · item add TOOL-dWitnessedBar-85 · reason spec-audit round1 of units 79-84 finding id 1 at HIGH, report item H1 shared with id 17
+
+2026-10-25T10:21:52Z rescope · item add TOOL-dWitnessedBar-86 · reason spec-audit round1 of units 79-84 finding id 17 at HIGH, report item H1 shared with id 1
+
+2026-10-25T10:21:53Z rescope · item add TOOL-dWitnessedBar-87 · reason spec-audit round1 of units 79-84 finding id 7 at HIGH, report item H2
+
+2026-10-25T10:21:53Z rescope · item add TOOL-dWitnessedBar-88 · reason spec-audit round1 of units 79-84 minors batch, MEDIUM ids 2 3 4 9 10 11 12 14 18 19 21 and LOW ids 5 6 13 15 16 20 22 23
+
+2026-10-25T10:40:48Z review · item dWitnessedBar-spec-set-r10 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 19 · disposition promote

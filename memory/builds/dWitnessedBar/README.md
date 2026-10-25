@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84
+ids: TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88
 spec-audit: 2026-10-21
 parents: dDeclaredLoop
 may: PLAY-dClosedLoop-3
@@ -95,14 +95,14 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 75 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 79 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13
 ids TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26
 ids TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-31 TOOL-dWitnessedBar-32 TOOL-dWitnessedBar-33 TOOL-dWitnessedBar-34 TOOL-dWitnessedBar-35 TOOL-dWitnessedBar-36 TOOL-dWitnessedBar-37 TOOL-dWitnessedBar-38 TOOL-dWitnessedBar-39
 ids TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52
 ids TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65
 ids TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78
-ids TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84
+ids TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -173,22 +173,26 @@ ids TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitn
 | [TOOL-dWitnessedBar-74 — the canary's `rec_sha` byte check is seen red on every run, against a one-line variant whose `sha` value loses its CR after the read](spec/2026-10-25-spec-TOOL-dWitnessedBar-74.md) | 40 | 2 | OPEN | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-75 — the CR-reach canary's failure line names the check that failed, so a red at its line count cannot pass for a red at its byte check](spec/2026-10-25-spec-TOOL-dWitnessedBar-75.md) | 40 | 2 | OPEN | rev-2 | 2026-10-25 |
 | [TOOL-dWitnessedBar-73 — the round-1 audit of units 66 and 67, its 23 minors batched: fixtures, populations, the hook guard, every key and filesystem call exercised, predicates and records](spec/2026-10-25-spec-TOOL-dWitnessedBar-73.md) | 41 | 2 | OPEN | rev-3 | 2026-10-25 |
-| [TOOL-dWitnessedBar-76 — the canary's `rec_fp` byte check is seen red on every run, against a variant whose `fingerprint` value alone loses its CR](spec/2026-10-25-spec-TOOL-dWitnessedBar-76.md) | 41 | 2 | OPEN | rev-2 | 2026-10-25 |
-| [TOOL-dWitnessedBar-77 — the canary's failure line names `rec_fp` when the `fingerprint` CR did not arrive, and unit 72's red is recorded with that line](spec/2026-10-25-spec-TOOL-dWitnessedBar-77.md) | 41 | 2 | OPEN | rev-2 | 2026-10-25 |
-| [TOOL-dWitnessedBar-79 — the canary's liveness loop gains a length variant, so a vacuous or off-by-one byte count is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-79.md) | 41 | 2 | OPEN | rev-1 | 2026-10-25 |
-| [TOOL-dWitnessedBar-80 — the liveness variant that failed both conditions becomes a tail variant, so a check that lost its last-byte test is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-80.md) | 41 | 2 | OPEN | rev-1 | 2026-10-25 |
-| [TOOL-dWitnessedBar-81 — the byte check's staged reds are one break per condition, each recorded with the line it printed, so units 74 and 76 close on a red that happened](spec/2026-10-25-spec-TOOL-dWitnessedBar-81.md) | 41 | 2 | OPEN | rev-1 | 2026-10-25 |
-| [TOOL-dWitnessedBar-78 — the round-1 audit of units 68 to 73, its 20 minors batched: one read rule for every green record, derived and wider guards, an honest record open, and records of what each break printed](spec/2026-10-25-spec-TOOL-dWitnessedBar-78.md) | 42 | 2 | OPEN | rev-2 | 2026-10-25 |
-| [TOOL-dWitnessedBar-82 — the gov canary's assertion floor is restated after unit 78, so the arms of units 74 to 81 cannot be deleted with the canary green](spec/2026-10-25-spec-TOOL-dWitnessedBar-82.md) | 43 | 2 | OPEN | rev-1 | 2026-10-25 |
-| [TOOL-dWitnessedBar-83 — the gov canary's floor is owned by the last unit that adds an arm, derived from the specs, and its equality with the executed count is held at the close](spec/2026-10-25-spec-TOOL-dWitnessedBar-83.md) | 43 | 2 | OPEN | rev-1 | 2026-10-25 |
-| [TOOL-dWitnessedBar-84 — the round-1 audit of units 74 to 78, its 16 minors batched: single-copy checks that read what exists, a sed that admits the quoted arm, honest return codes, counted loops, one key derivation, the guide guarded and records on one line](spec/2026-10-25-spec-TOOL-dWitnessedBar-84.md) | 44 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-76 — the canary's `rec_fp` byte check is seen red on every run, against a variant whose `fingerprint` value alone loses its CR](spec/2026-10-25-spec-TOOL-dWitnessedBar-76.md) | 41 | 2 | OPEN | rev-3 | 2026-10-25 |
+| [TOOL-dWitnessedBar-77 — the canary's failure line names `rec_fp` when the `fingerprint` CR did not arrive, and unit 72's red is recorded with that line](spec/2026-10-25-spec-TOOL-dWitnessedBar-77.md) | 41 | 2 | OPEN | rev-3 | 2026-10-25 |
+| [TOOL-dWitnessedBar-79 — the canary's liveness loop gains a length variant, so a vacuous or off-by-one byte count is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-79.md) | 41 | 2 | OPEN | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-80 — the liveness variant that failed both conditions becomes a tail variant, so a check that lost its last-byte test is seen red on every run](spec/2026-10-25-spec-TOOL-dWitnessedBar-80.md) | 41 | 2 | OPEN | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-81 — the byte check's staged reds are one break per condition, each recorded with the line it printed, so units 74 and 76 close on a red that happened](spec/2026-10-25-spec-TOOL-dWitnessedBar-81.md) | 41 | 2 | OPEN | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-78 — the round-1 audit of units 68 to 73, its 20 minors batched: one read rule for every green record, derived and wider guards, an honest record open, and records of what each break printed](spec/2026-10-25-spec-TOOL-dWitnessedBar-78.md) | 42 | 2 | OPEN | rev-3 | 2026-10-25 |
+| [TOOL-dWitnessedBar-87 — unit 76 AC2's own break, a canary that skips `rec_fp`, is staged after unit 80 and recorded with the two lines it now prints](spec/2026-10-25-spec-TOOL-dWitnessedBar-87.md) | 42 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-82 — the gov canary's assertion floor is restated after unit 78, so the arms of units 74 to 81 cannot be deleted with the canary green](spec/2026-10-25-spec-TOOL-dWitnessedBar-82.md) | 43 | 2 | OPEN | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-83 — the gov canary's floor is owned by the last unit that adds an arm, derived from the specs, and its equality with the executed count is held at the close](spec/2026-10-25-spec-TOOL-dWitnessedBar-83.md) | 43 | 2 | OPEN | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-84 — the round-1 audit of units 74 to 78, its 16 minors batched: single-copy checks that read what exists, a sed that admits the quoted arm, honest return codes, counted loops, one key derivation, the guide guarded and records on one line](spec/2026-10-25-spec-TOOL-dWitnessedBar-84.md) | 44 | 2 | OPEN | rev-2 | 2026-10-25 |
+| [TOOL-dWitnessedBar-85 — each liveness variant seen red on each key adds to the canary's count, so the restated floor sees a variant that is no longer there](spec/2026-10-25-spec-TOOL-dWitnessedBar-85.md) | 44 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-86 — a suite run with either liveness variant missing is seen below the floor, and the floor claims of units 79, 80 and 82 are recorded against that red](spec/2026-10-25-spec-TOOL-dWitnessedBar-86.md) | 44 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dWitnessedBar-88 — the round-1 audit of units 79 to 84, 19 minors batched: quoted reasons answered, one return contract and pass-commit lookup, a derived owner on one line, a measure-keyed probe, arm spellings matched, hook directory guarded](spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md) | 45 | 2 | OPEN | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 54 bound to this build, across 4 record folder(s).
+Records: 64 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84.
+Ids no `spec-audit` record has ever named: TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88.
 
 Ids whose spec moved past its audited revision: TOOL-dWitnessedBar-1@rev-1 TOOL-dWitnessedBar-10@rev-1 TOOL-dWitnessedBar-11@rev-1 TOOL-dWitnessedBar-12@rev-1 TOOL-dWitnessedBar-13@rev-1 TOOL-dWitnessedBar-14@rev-1 TOOL-dWitnessedBar-15@rev-1 TOOL-dWitnessedBar-16@rev-1 TOOL-dWitnessedBar-17@rev-1
 TOOL-dWitnessedBar-18@rev-1 TOOL-dWitnessedBar-19@rev-1 TOOL-dWitnessedBar-2@rev-1 TOOL-dWitnessedBar-21@rev-1 TOOL-dWitnessedBar-22@rev-1 TOOL-dWitnessedBar-23@rev-1 TOOL-dWitnessedBar-24@rev-1 TOOL-dWitnessedBar-25@rev-1 TOOL-dWitnessedBar-26@rev-1 TOOL-dWitnessedBar-27@rev-1
@@ -196,12 +200,13 @@ TOOL-dWitnessedBar-28@rev-1 TOOL-dWitnessedBar-29@rev-1 TOOL-dWitnessedBar-3@rev
 TOOL-dWitnessedBar-45@rev-1 TOOL-dWitnessedBar-46@rev-1 TOOL-dWitnessedBar-47@rev-1 TOOL-dWitnessedBar-48@rev-1 TOOL-dWitnessedBar-49@rev-1 TOOL-dWitnessedBar-5@rev-1 TOOL-dWitnessedBar-50@rev-1 TOOL-dWitnessedBar-51@rev-1 TOOL-dWitnessedBar-52@rev-1 TOOL-dWitnessedBar-53@rev-1
 TOOL-dWitnessedBar-54@rev-1 TOOL-dWitnessedBar-55@rev-1 TOOL-dWitnessedBar-56@rev-1 TOOL-dWitnessedBar-57@rev-1 TOOL-dWitnessedBar-58@rev-1 TOOL-dWitnessedBar-59@rev-1 TOOL-dWitnessedBar-6@rev-1 TOOL-dWitnessedBar-60@rev-1 TOOL-dWitnessedBar-61@rev-1 TOOL-dWitnessedBar-62@rev-1
 TOOL-dWitnessedBar-63@rev-1 TOOL-dWitnessedBar-64@rev-1 TOOL-dWitnessedBar-65@rev-1 TOOL-dWitnessedBar-66@rev-1 TOOL-dWitnessedBar-67@rev-1 TOOL-dWitnessedBar-68@rev-1 TOOL-dWitnessedBar-69@rev-1 TOOL-dWitnessedBar-7@rev-1 TOOL-dWitnessedBar-70@rev-1 TOOL-dWitnessedBar-71@rev-1
-TOOL-dWitnessedBar-72@rev-1 TOOL-dWitnessedBar-73@rev-1 TOOL-dWitnessedBar-74@rev-1 TOOL-dWitnessedBar-75@rev-1 TOOL-dWitnessedBar-76@rev-1 TOOL-dWitnessedBar-77@rev-1 TOOL-dWitnessedBar-78@rev-1 TOOL-dWitnessedBar-8@rev-1 TOOL-dWitnessedBar-9@rev-1.
+TOOL-dWitnessedBar-72@rev-1 TOOL-dWitnessedBar-73@rev-1 TOOL-dWitnessedBar-74@rev-1 TOOL-dWitnessedBar-75@rev-1 TOOL-dWitnessedBar-76@rev-1 TOOL-dWitnessedBar-77@rev-1 TOOL-dWitnessedBar-78@rev-1 TOOL-dWitnessedBar-79@rev-1 TOOL-dWitnessedBar-8@rev-1 TOOL-dWitnessedBar-80@rev-1
+TOOL-dWitnessedBar-81@rev-1 TOOL-dWitnessedBar-82@rev-1 TOOL-dWitnessedBar-83@rev-1 TOOL-dWitnessedBar-84@rev-1 TOOL-dWitnessedBar-9@rev-1.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 75 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 79 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 30
 - carried in parts: 0 (none)
@@ -221,7 +226,8 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 75 spec(s) a
   `spec/2026-10-25-spec-TOOL-dWitnessedBar-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-74.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-25-spec-TOOL-dWitnessedBar-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-78.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-25-spec-TOOL-dWitnessedBar-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-82.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-25-spec-TOOL-dWitnessedBar-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-84.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-25-spec-TOOL-dWitnessedBar-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-85.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-86.md` (PLAY-dClosedLoop-2),
+  `spec/2026-10-25-spec-TOOL-dWitnessedBar-87.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dWitnessedBar-88.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0340, cl-dClosedLoop-0342, cl-dClosedLoop-0343, cl-dClosedLoop-0348, cl-dClosedLoop-0349, cl-dClosedLoop-0355, cl-dClosedLoop-0356, cl-dClosedLoop-0358, cl-dClosedLoop-0367
 <!-- /gen:build-coverage -->
 
@@ -270,9 +276,10 @@ Coverage of dWitnessedBar's 30 clause(s) and 37 owned node(s), over 75 spec(s) a
 | 39 | `TOOL-dWitnessedBar-67`, `TOOL-dWitnessedBar-68`, `TOOL-dWitnessedBar-69`, `TOOL-dWitnessedBar-70` | yes |
 | 40 | `TOOL-dWitnessedBar-71`, `TOOL-dWitnessedBar-72`, `TOOL-dWitnessedBar-74`, `TOOL-dWitnessedBar-75` | yes |
 | 41 | `TOOL-dWitnessedBar-73`, `TOOL-dWitnessedBar-76`, `TOOL-dWitnessedBar-77`, `TOOL-dWitnessedBar-79`, `TOOL-dWitnessedBar-80`, `TOOL-dWitnessedBar-81` | yes |
-| 42 | `TOOL-dWitnessedBar-78` | no |
+| 42 | `TOOL-dWitnessedBar-78`, `TOOL-dWitnessedBar-87` | yes |
 | 43 | `TOOL-dWitnessedBar-82`, `TOOL-dWitnessedBar-83` | yes |
-| 44 | `TOOL-dWitnessedBar-84` | no |
+| 44 | `TOOL-dWitnessedBar-84`, `TOOL-dWitnessedBar-85`, `TOOL-dWitnessedBar-86` | yes |
+| 45 | `TOOL-dWitnessedBar-88` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->

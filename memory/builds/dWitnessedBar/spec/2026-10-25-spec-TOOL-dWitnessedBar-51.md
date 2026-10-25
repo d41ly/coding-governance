@@ -8,10 +8,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 TOOL-dWitnessedBar-68 TOOL-dWitnessedBar-69 TOOL-dWitnessedBar-70 TOOL-dWitnessedBar-71 TOOL-dWitnessedBar-72 TOOL-dWitnessedBar-73 TOOL-dWitnessedBar-74 TOOL-dWitnessedBar-75 TOOL-dWitnessedBar-76 TOOL-dWitnessedBar-77 TOOL-dWitnessedBar-78 TOOL-dWitnessedBar-79 TOOL-dWitnessedBar-80 TOOL-dWitnessedBar-81 TOOL-dWitnessedBar-82 TOOL-dWitnessedBar-83 TOOL-dWitnessedBar-84 TOOL-dWitnessedBar-85 TOOL-dWitnessedBar-86 TOOL-dWitnessedBar-87 TOOL-dWitnessedBar-88 |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
+| [2026-10-25-build-TOOL-dWitnessedBar-51-round10-size-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-51-round10-size-return.md) | research | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-51-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-51-round10-size-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-51-round10-size-brief.md) | research | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-43 |
 
@@ -20,10 +23,8 @@
 ## 1. Goal
 
 The round-1 spec audit (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md`)
-exited CONVERGED with 61 findings over the build's 30 units; its 11 highs are units 40 to 50. This unit is
-M4's batch of every MEDIUM and LOW, one scope item per report id. They land on 28 units, so it builds
-after every unit (order 31), before the close's bar; an item changing an earlier pass's output reaches
-it through that unit's hands-off bullet to this one.
+has 61 findings, its 11 highs units 40 to 50. This unit is M4's batch of its 37 MEDIUM and 13 LOW by
+raw id, one scope item per id; they land on 28 units, so it builds last (order 31).
 
 | Report item | Severity | Report ids | Scope items |
 |---|---|---|---|
@@ -33,8 +34,6 @@ it through that unit's hands-off bullet to this one.
 
 Every other item, M4 to M34 and L1 to L13, is one id and one scope item in report order: M4 (id 2) is
 S7, L13 (id 56) is S50.
-
-That is 37 MEDIUM and 13 LOW findings by raw id.
 
 ## 2. Scope (IN)
 
@@ -249,10 +248,9 @@ That is 37 MEDIUM and 13 LOW findings by raw id.
 
 ### Why one unit and not two
 
-The write sets are one connected set, so M6's clause 1 fails for every split: `run-gates.sh` joins S28,
-S34 and S48; `held_halves.py` joins S21, S36, S47 and S48; `verdict_flow.py` joins S15 and S36; the
-manifest joins S11, S12 and S42; the ledger factory joins S1, S9, S17, S30, S32 and S50; the parity rows
-join S19, S20, S21, S29 and S46. One unit, sequenced.
+The write sets connect, so M6's clause 1 fails for every split: `run-gates.sh` joins S28, S34 and S48,
+`held_halves.py` S21, S36, S47 and S48, `verdict_flow.py` S15 and S36, the manifest S11, S12 and S42, the
+ledger factory S1, S9, S17, S30, S32 and S50, the parity rows S19, S20, S21, S29 and S46.
 
 ### Evidence
 
@@ -281,9 +279,8 @@ for each unit u whose pass in c24..HEAD touched a member of grown:
 
 ### The declarative keys (S36, S48)
 
-S36's tuple lives in `tools/run-gates/held_halves.py`: the keys that change neither what a leg runs nor
-how it is judged. The row hash and unit 30's release compare both drop them; the runner's embedded program
-imports the tuple from its sibling, as `measure_legs.py` imports `held_halves` (`:100`).
+S36's tuple holds the keys that change neither what a leg runs nor how it is judged; the runner's
+embedded program imports it from its sibling, as `measure_legs.py` imports `held_halves` (`:100`).
 
 ### Inventory
 
@@ -294,13 +291,13 @@ is asked of `python tools/lexicon/lexicon.py --suggest <name>` at the pass.
 
 ### Migration
 
-S48 changes every row hash once: each earlier reuse quarantine is released once and each held record
-re-earns once; the reuse key carries the row hash (`run-gates.sh:3225`), so no stale green is reused.
+S48 changes every row hash once: each earlier reuse quarantine releases and each held record re-earns
+once; the reuse key carries the row hash, so no stale green is reused.
 
 ### Rollout
 
-Live at landing, after every other unit. The pass runs
-`python tools/run-gates/owed_rows.py --base HEAD` before its commit (PLAY-dOrderedCharter-50 S6).
+Live at landing. The pass runs `python tools/run-gates/owed_rows.py --base HEAD` before its commit
+(PLAY-dOrderedCharter-50 S6).
 
 ### Files touched (estimate)
 
@@ -329,9 +326,7 @@ Live at landing, after every other unit. The pass runs
 
 ### Alternatives rejected
 
-- **One unit per minor, or folding the minors into the repaired specs.** M4 forbids both.
-- **Moving unit 24's shell-role arm to the end (id 1's option b).** Later units still grow files the arm
-  reds; S1's widen rows are the ledger's record.
+- **Unit 24's shell-role arm moved last (id 1's option b):** later units still grow files it reds.
 
 ## 5. Production-readiness checklist
 
@@ -521,39 +516,32 @@ New arm: tools/run-gates/keep_tails.py · covers AC30 · a tail holding a fence,
 
 ## 8. Open questions
 
-- **F1 — Which binding line does a promoted unit carry?** Options: (a) `**Derived:**` naming
-  `PLAY-dClosedLoop-2`; (b) a `part k/n` carry of each repaired unit's clause, which reds the parts join;
-  veto 1 discards it. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the precedent
-  `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
+- **F1 — Which binding line does a promoted unit carry?** RESOLVED (agent, 2026-10-25, delegated):
+  `**Derived:**` naming `PLAY-dClosedLoop-2`, rung 3, the precedent of `TOOL-dDeclaredLoop-36` §8 F1.
+  widens: none · relaxes: none
 - **F2 — Does an undeclared `INHERITED_RED` keep v2's default `own-only` (id 19)?** Today it reads the kit
-  default `land` (`.githooks/pre-push:1341-1342`, `tools/unattended/unattended.sh:9590-9591`), blocking
-  MIXED and CONTENDED reds. Options: (a) keep v2's default and say the loosening where the step runs
-  (S16); (b) write `own-mixed-contended`, overriding the owner's walk T1 ruling for every adopter that
-  never chose. RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, v2:1271 (walk T1, default
-  `own-only`). widens: none · relaxes: an adopter with no `INHERITED_RED` declared lands MIXED and
-  CONTENDED reds that blocked before; this pass's deviation record carries **Bound:** that undeclared
-  path only, **Tier:** middle, a policy key's bound, and **Reason:** v2's walk T1 default, the owner's.
+  default `land` (`.githooks/pre-push:1341-1342`, `tools/unattended/unattended.sh:9590-9591`).
+  RESOLVED (agent, 2026-10-25, delegated): keep v2's default and say the loosening where the step runs
+  (S16), rung 1, v2:1271 (walk T1). widens: none · relaxes: an adopter with no `INHERITED_RED` declared
+  lands MIXED and CONTENDED reds that blocked before; this pass's deviation record carries **Bound:** that
+  undeclared path only, **Tier:** middle, a policy key's bound, and **Reason:** v2's walk T1 default, the
+  owner's.
 - **F3 — Is a change to HYGIENE's Acceptance ledger and BUILD-METHOD M8 within this build's authority
-  (id 17)?** `TOOL-dWitnessedBar-7` S1 and S9 edit both and record no grant. RESOLVED (agent,
-  2026-10-25, delegated): yes, rung 3, veto 2 lifted by the README's `may:` grant, as the carried clause
-  cl-0345 names the ledger's seen-red line and M8's read-back.
+  (id 17)?** RESOLVED (agent, 2026-10-25, delegated): yes, rung 3, veto 2 lifted by the README's `may:`
+  grant, as cl-0345 names both.
   grants: PLAY-dClosedLoop-3 the seen-red line grammar in `memory/HYGIENE.md` and M8's read-back sentence
   in `memory/guides/BUILD-METHOD.md`. widens: none · relaxes: none
-- **F4 — How long does an unnamed per-tree verdict live (id 48)?** Options: (a) 30 days past its last
-  write, kept while any worktree's retained run or `HEAD^{tree}` names it; (b) a file count, unsafe under
-  churn; (c) no bound, the finding. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the bound that
-  never removes a named verdict. widens: none · relaxes: none
+- **F4 — How long does an unnamed per-tree verdict live (id 48)?** RESOLVED (agent, 2026-10-25,
+  delegated): 30 days past its last write, kept while any worktree's retained run or `HEAD^{tree}` names
+  it, rung 3, the bound that never removes a named verdict. widens: none · relaxes: none
 
 ## 9. Revision log
 
-- rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's 37 MEDIUM and 13 LOW
-  findings, batched.
-- rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
-  edges of TOOL-dWitnessedBar-56, TOOL-dWitnessedBar-57, promoted by the round-1 spec audit of units
-  40 to 51; the prose of §1, §3, §4, §5, §8 and §10 compressed under the size ceiling, no scope item,
-  criterion, edge, fork outcome or touched path moved.
-- rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring TOOL-dWitnessedBar-62's
-  consumes-from edge, promoted by the round-1 spec audit of units 52 to 57; nothing else moved.
+- rev-1 · 2026-10-25 · initial draft.
+- rev-2 · 2026-10-25 · §3 · hands-off bullets for TOOL-dWitnessedBar-56 and TOOL-dWitnessedBar-57;
+  prose compressed for the size ceiling.
+- rev-3 · 2026-10-25 · §3 · the hands-off bullet for TOOL-dWitnessedBar-62.
+  Prose of §1, §4, §8 and §9 trimmed for the size ceiling; nothing else moved.
 
 ## 10. Reuse audit
 
