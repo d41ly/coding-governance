@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-55 — the version oracle's verdict reads its walk's own exit status
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-56 |
 | [2026-10-25-build-TOOL-dPlacedRequest-55-deviation-551.md](../build/2026-10-25-build-TOOL-dPlacedRequest-55-deviation-551.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-56 |
+| [2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-56 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ the verdict, and a dead walk exits 2.
 - **consumes-from** `TOOL-dPlacedRequest-52` — S11's verdict line and §4's oracle sketch, which this unit makes read the walk's status, and §6, which gains AC29; without them there is no verdict to correct
 - **consumes-from** `TOOL-dPlacedRequest-44` — §4's oracle as unit 52 leaves it, whose verdict this unit rewrites in place
 - **hands-off** `TOOL-dPlacedRequest-56` — the oracle's captured walk, before which that unit's item for finding 8 guards the count line
+- **hands-off** `TOOL-dPlacedRequest-59` — AC1 and AC2, which that unit's item for finding 9 gives the fixture's base
 
 ## 4. Design
 
@@ -135,6 +137,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   22 (HIGH, item H3).
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edge to `TOOL-dPlacedRequest-59`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

@@ -123,3 +123,11 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T10:21:06Z rescope · item add TOOL-dPlacedRequest-56 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md findings at MEDIUM ids 2 3 7 8 9 12 13 18 19 23 24 25 and at LOW ids 4 5 6 10 11 14 15 20 21 26
 
 2026-10-25T10:35:00Z review · item dPlacedRequest-spec-set-r5 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 3 · minors 22 · disposition promote
+
+2026-10-25T11:17:11Z rescope · item add TOOL-dPlacedRequest-57 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md finding id 1 at HIGH, item H1, whose defect ids 8 and 21 of item M1 also report
+
+2026-10-25T11:17:13Z rescope · item add TOOL-dPlacedRequest-58 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md finding id 20 at HIGH, item H2
+
+2026-10-25T11:17:15Z rescope · item add TOOL-dPlacedRequest-59 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md findings at MEDIUM ids 2 8 9 10 14 16 17 21 and at LOW ids 3 4 5 6 7 11 12 13 15 18 19 22 23
+
+2026-10-25T11:35:17Z review · item dPlacedRequest-spec-set-r6 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 21 · disposition promote

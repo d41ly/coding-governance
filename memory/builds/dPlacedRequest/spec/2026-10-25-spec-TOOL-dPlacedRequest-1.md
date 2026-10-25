@@ -21,6 +21,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md) | journal | — |

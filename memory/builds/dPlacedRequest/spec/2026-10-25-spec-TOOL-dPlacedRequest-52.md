@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -186,6 +186,8 @@ unit and the items it carries.
 - **hands-off** `TOOL-dPlacedRequest-54` — the oracle's S12, S17, §4 sketch, AC12, fixtures and F1, which that unit gives the own-merge test
 - **hands-off** `TOOL-dPlacedRequest-55` — S11's verdict and §4's sketch, which that unit makes read the walk's status, and a new AC29
 - **hands-off** `TOOL-dPlacedRequest-56` — §6's `flat` note, the race arm, AC14, AC15, AC19, AC21, AC26, S14, S26, Edges and F1, which that unit's minors amend
+- **hands-off** `TOOL-dPlacedRequest-58` — S4 and §4's race sketch as unit 56 restates them, in which that unit keeps the handshake clear
+- **hands-off** `TOOL-dPlacedRequest-59` — AC12, AC29, §4's oracle and the hands-off edge to 53, which that unit's items for findings 3, 6, 9 and 21 amend
 
 ## 4. Design
 
@@ -404,6 +406,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC19 · a stub 
 - rev-2 · 2026-10-25 · the promoted fix brief's gate hits: AC7 cites `gov-feed.sh` by basename, the
   file `TOOL-dPlacedRequest-13` creates; AC22's red case on one `Red when:` line.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edges to `TOOL-dPlacedRequest-53`, `TOOL-dPlacedRequest-54`, `TOOL-dPlacedRequest-55`, `TOOL-dPlacedRequest-56`, mirroring their consumes-from.
+- rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edges to `TOOL-dPlacedRequest-58` and `TOOL-dPlacedRequest-59`, mirroring their consumes-from.
 
 ## 10. Reuse audit
 

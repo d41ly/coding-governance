@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-54 — the version oracle walks only this build's own prepared merge
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 | [2026-10-25-build-TOOL-dPlacedRequest-54-deviation-541.md](../build/2026-10-25-build-TOOL-dPlacedRequest-54-deviation-541.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
+| [2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 
 <!-- /gen:spec-records -->
 
@@ -68,6 +69,8 @@ is this build's own, and refuses with exit 2 otherwise.
 - **consumes-from** `TOOL-dPlacedRequest-44` — §4's oracle and AC1, as unit 52 leaves them, which this unit gives the own-merge test and the base argument
 - **consumes-from** `TOOL-dPlacedRequest-34` — AC59, which this unit restates as one line pointing at 44 AC1 on the prepared merge
 - **hands-off** `TOOL-dPlacedRequest-56` — the own-merge test, which that unit's items for findings 13 and 14 restate across 44, and 34 AC59 cut to one line, after which its item for finding 19 measures unit 34 against its ceiling
+- **hands-off** `TOOL-dPlacedRequest-57` — S1, S3, AC1 and AC3, which that unit restates to the observing run's `base:` fact; this unit's pass runs AC1 with that fact, never a sha an earlier run pinned
+- **hands-off** `TOOL-dPlacedRequest-59` — S1, §4, §5, AC2, AC3 and Files touched, which that unit's items for findings 2, 6, 8, 10, 15, 21 and 23 amend
 
 ## 4. Design
 
@@ -175,6 +178,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   16 (HIGH, item H2).
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edges to `TOOL-dPlacedRequest-57` and `TOOL-dPlacedRequest-59`, mirroring their consumes-from.
 
 ## 10. Reuse audit
 

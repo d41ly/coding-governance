@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-53 — unit 52's "named twice" criteria count occurrences, never lines of squeezed text
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-53-deviation-531.md](../build/2026-10-25-build-TOOL-dPlacedRequest-53-deviation-531.md) | deviation | — |
 | [2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md) | research | TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
+| [2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 
 <!-- /gen:spec-records -->
 
@@ -50,6 +51,7 @@ count occurrences, and the build's spec set holds no other criterion of the same
 
 - **consumes-from** `TOOL-dPlacedRequest-52` — §6's `flat` definition and AC1, AC6 and AC9, which this unit rewrites in place to count occurrences; without them there is no criterion to correct
 - **hands-off** `TOOL-dPlacedRequest-56` — the rewritten AC1, AC6 and AC9, beside which that unit's items for findings 7 and 18 observe each named place and state under `flat` what `grep -c` answers
+- **hands-off** `TOOL-dPlacedRequest-59` — S1, AC1, AC3 and §4 Evidence, which that unit's items for findings 3, 4, 7, 11, 12 and 19 amend
 
 ## 4. Design
 
@@ -131,6 +133,7 @@ No new arm: the three counts are criteria commands, observed by unit 52's pass a
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   1 (HIGH, item H1, whose defect findings 7 and 18 of item M1 also report).
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edge to `TOOL-dPlacedRequest-59`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

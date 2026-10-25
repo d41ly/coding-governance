@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks
 
-**Status:** OPEN · rev-8 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-9 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -267,6 +267,8 @@ the skeptic's binding re-grade. Criterion ACn observes item Sn.
 - **hands-off** `TOOL-dPlacedRequest-49` — AC59, which that unit's item for finding 5 points at unit 44's oracle
 - **hands-off** `TOOL-dPlacedRequest-52` — AC59's observation, which that unit's item for finding 11 restates as the oracle's header line, exit 0 and no `KIT_` line
 - **hands-off** `TOOL-dPlacedRequest-54` — AC59, which that unit cuts to one line pointing at 44 AC1 on the prepared merge
+- **hands-off** `TOOL-dPlacedRequest-57` — AC59, from which that unit drops the base
+- **hands-off** `TOOL-dPlacedRequest-59` — this spec's size, which that unit cuts in prose if over 48128
 
 ## 4. Design
 
@@ -588,6 +590,7 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC1
 - rev-7 · 2026-10-25 · round-4 fix brief: at most 47104 bytes, unit 43 S22's target, repetition cut
   and prose tightened; no item, criterion, edge or fork dropped.
 - rev-8 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-54`, mirroring its consumes-from.
+- rev-9 · 2026-10-25 · §3 · round-5 edge mirrors to units 57, 59.
 
 ## 10. Reuse audit
 

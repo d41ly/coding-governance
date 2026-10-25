@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-44 — the version-bump oracle walks the build's side of the prepared merge
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -62,6 +62,8 @@ order 25: the oracle names the parent it walks, says what it read, and refuses a
 - **hands-off** `TOOL-dPlacedRequest-54` — §4's oracle and AC1, which that unit gives the own-merge test and the base argument
 - **hands-off** `TOOL-dPlacedRequest-55` — §4's oracle, whose verdict that unit makes read the walk's status
 - **hands-off** `TOOL-dPlacedRequest-56` — S2, §4, §5, AC3 and §8 F1, which that unit's items for findings 8, 13 and 14 restate to one oracle contract
+- **hands-off** `TOOL-dPlacedRequest-57` — AC1, which that unit gives the observing run's base read
+- **hands-off** `TOOL-dPlacedRequest-59` — S1, §4, AC2, AC3 and §8 F1, which that unit's items for findings 5, 10, 16 and 23 restate
 
 ## 4. Design
 
@@ -161,6 +163,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edges to `TOOL-dPlacedRequest-54`, `TOOL-dPlacedRequest-55`, `TOOL-dPlacedRequest-56`, mirroring their consumes-from.
+- rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edges to `TOOL-dPlacedRequest-57` and `TOOL-dPlacedRequest-59`, mirroring their consumes-from.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-56 — the round-4 promotions' minors: fresh race attempts, failures staged so they take, one oracle contract, and criteria that read the places they name
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 |
 | [2026-10-25-build-TOOL-dPlacedRequest-56-deviation-561.md](../build/2026-10-25-build-TOOL-dPlacedRequest-56-deviation-561.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 |
+| [2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 |
 
 <!-- /gen:spec-records -->
 
@@ -147,6 +148,9 @@ unit and the items it carries.
 - **consumes-from** `TOOL-dPlacedRequest-53` — 52's occurrence counts, beside which S1 and S2 observe each place and note what `grep -c` answers
 - **consumes-from** `TOOL-dPlacedRequest-54` — the own-merge test and 34 AC59's one-line cut, which S10 and S19 restate in 44 and S11 measures unit 34 after
 - **consumes-from** `TOOL-dPlacedRequest-55` — the oracle's captured walk, after which S6 guards the count line
+- **consumes-from** `TOOL-dPlacedRequest-57` — 34 AC59 without its base, after which S11 measures unit 34; that unit's pass runs first at this order
+- **hands-off** `TOOL-dPlacedRequest-58` — S3, §4's per-attempt sketch, AC3 and the race arm, which that unit gives the handshake reset; AC3 is read again at that unit's pass
+- **hands-off** `TOOL-dPlacedRequest-59` — S4, S11, S19, S22, §3, §4, §5, §10 and AC5, which that unit's minors amend; a unit 34 over 48128 at this pass, and AC10 and AC19 while 44 F1's options keep the phrases they count, are read at that unit's pass
 
 ## 4. Design
 
@@ -316,6 +320,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC7 AC8 · a fi
 - rev-2 · 2026-10-25 · AC5 observes the two specs by one grep pipeline, the shared suite file a
   `grep -F` argument rather than a token of its own, so the criterion reads as a grep over specs and
   never as a suite run (the promoted fix brief's [bar] hit); the suite stays on §7's `New arm:` line.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the consumes-from edge to `TOOL-dPlacedRequest-57` and the hands-off edges to `TOOL-dPlacedRequest-58` and `TOOL-dPlacedRequest-59`, mirroring theirs.
 
 ## 10. Reuse audit
 
