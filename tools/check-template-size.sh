@@ -73,7 +73,8 @@ FILE=${1:-"$ROOT/coding-governance-agents.template.md"}
 # never ignored. The record path keeps its slot, `$3`, so an empty `$2` stands before it.
 if [ -n "${2:-}" ] || [ -n "${4:-}" ]; then
   FAIL_CODE=2
-  fail 7 "a retired positional was given, and the limit and the limits path are read through the policy kit's budgets.py now; pass the subject, an empty second argument and the record (given ${2:-} ${4:-})"
+  _given="${2:-} ${4:-}"   # named, so the harness-arms signature ends at `(given`
+  fail 7 "a retired positional was given, and the limit and the limits path are read through the policy kit's budgets.py now; pass the subject, an empty second argument and the record (given $_given)"
 fi
 
 # `key` is needed by BOTH the declared-limit lookup and the high-water lookup, so it is derived once
@@ -87,10 +88,11 @@ fi
 # whose directory git places in THIS repository takes git's own prefix; any other keeps its path.
 _name=$(basename "$FILE")
 if [ -e "$FILE" ]; then
-  _dir=$(cd "$(dirname "$FILE")" 2>/dev/null && pwd) || _dir=$(dirname "$FILE")
+  _up=.; [[ $FILE == */* ]] && { _up=${FILE%/*}; _up=${_up:-/}; }
+  _dir=$(cd "$_up" 2>/dev/null && pwd) || _dir=$_up
   key=$_dir/$_name
-  if [ "$(git -C "$_dir" rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ]; then
-    key=$(git -C "$_dir" rev-parse --show-prefix 2>/dev/null)$_name
+  if [ "$(unset GIT_DIR GIT_WORK_TREE; git -C "$_dir" rev-parse --show-toplevel 2>/dev/null)" = "$ROOT" ]; then
+    key=$(unset GIT_DIR GIT_WORK_TREE; git -C "$_dir" rev-parse --show-prefix 2>/dev/null)$_name
   fi
 else
   key=$FILE

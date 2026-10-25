@@ -33,9 +33,10 @@ want() { # label · exit wanted · text the output must carry · adopter args...
 mkrepo gov-file commit; printf 'not a directory\n' > "$R/.governance"
 want "--scaffold where .governance is a file refuses" 1 'policy: the directory .governance could not be made in ' --scaffold --target "$R"
 
-# 2 — the scaffold's temporary file is a directory: the scaffold cannot be written.
-mkrepo tmp-dir commit; mkdir -p "$R/.governance/policy.toml.tmp"
-want "--scaffold where the scaffold cannot be written refuses" 1 'policy: the scaffold could not be written to ' --scaffold --target "$R"
+# 2 — the scaffold cannot be moved into place: an `mv` first on PATH that exits 1 stages it, since the
+# scaffold's temporary name is unpredictable and nothing can be planted at it (TOOL-dGroundRules-84).
+mkrepo no-mv commit; mkdir -p "$TMP/no-mv-bin"; printf '#!/bin/sh\nexit 1\n' > "$TMP/no-mv-bin/mv"; chmod +x "$TMP/no-mv-bin/mv"
+PATH="$TMP/no-mv-bin:$PATH" want "--scaffold where the scaffold cannot be written refuses" 1 'policy: the scaffold could not be written to ' --scaffold --target "$R"
 
 # 3 — a settings file that is no JSON object: the render refuses, so --scaffold does.
 mkrepo bad-settings commit; mkdir -p "$R/.claude"; printf '{\n' > "$R/.claude/settings.json"

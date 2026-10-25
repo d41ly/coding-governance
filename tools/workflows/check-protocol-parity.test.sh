@@ -550,7 +550,7 @@ check_kit_cites protocol-parity "$KIT_PATHS" || exit 2
 # reason above prints first.
 if ! _pk_dir=$(resolve_kit_dir "$_cite_py" policy policy.py "$HERE" 2>&1); then
   echo "protocol-parity: no policy kit answers the agent limit the {{FANOUT_CAP}} token carries:"
-  printf '%s\n' "$_pk_dir" | sed 's/^/  /'
+  printf '  %s\n' "${_pk_dir//$'\n'/$'\n'  }"
   echo "  Nothing was rendered or graded."
   exit 2
 fi
@@ -601,7 +601,7 @@ if [ -f "$_ub_tpl" ] && [ -z "$MTD_SKIP" ]; then
     render "$_ub_tpl" > "$TMPD/writer-fallback.js" || { echo "protocol-parity: the render of $_ub_tpl FAILED — the template could not be read"; exit 2; }
     if ! _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-fallback.js" 2>&1); then
       echo "protocol-parity: the agent-cap hook denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded. Its answer:"
-      printf '%s\n' "$_ub_out" | sed 's/^/  /'
+      printf '  %s\n' "${_ub_out//$'\n'/$'\n'  }"
       exit 2
     fi
   fi

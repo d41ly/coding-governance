@@ -195,13 +195,14 @@ print_kit_miss() { # <leg> <kit dir, or ""> <file> [home] -> the announced skip,
 # an early signal. SO DOES A MISSING GUARD (TOOL-dGroundRules-21 S21): a `guard.py` no rung resolves,
 # while the list at HEAD under the declared GOV_KITROOT names a staged path, prints the rungs that
 # missed and refuses, so a deleted guard never reads as a clean commit.
-if g=$(resolve_kit_gate policy guard.py); then
+pg_kit=policy   # named once, so no guard path below spells the kit's directory (TOOL-dGroundRules-84)
+if g=$(resolve_kit_gate "$pg_kit" guard.py); then
   pg_list=$(git show "HEAD:${g%guard.py}guarded-paths.txt" 2>/dev/null | tr -d '\r' |
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
   pg_hit=""
   [ -z "$pg_list" ] || pg_hit=$(with_hook_index git diff --cached --name-only --no-renames | grep -xF -- "$pg_list" || true)
   if [ -n "$pg_hit" ]; then
-    pg_names=$(printf '%s\n' "$pg_hit" | tr '\n' ' ')
+    pg_names="${pg_hit//$'\n'/ } "
     pg_r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
     if [ -t 2 ]; then
       echo "pre-commit: policy guard — ${pg_names}staged, admitted on the owner's terminal proof."
@@ -213,10 +214,10 @@ if g=$(resolve_kit_gate policy guard.py); then
     fi
   fi
 else
-  pg_list=$(git show "HEAD:${kitroot_declared:+$kitroot_declared/}policy/guarded-paths.txt" 2>/dev/null | tr -d '\r' |
+  pg_list=$(git show "HEAD:${kitroot_declared:+$kitroot_declared/}$pg_kit/guarded-paths.txt" 2>/dev/null | tr -d '\r' |
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
   if [ -n "$pg_list" ] && with_hook_index git diff --cached --name-only --no-renames | grep -qxF -- "$pg_list"; then
-    print_kit_miss "policy guard" policy guard.py
+    print_kit_miss "policy guard" "$pg_kit" guard.py
     echo "pre-commit: policy guard REFUSING — a guarded path is staged and no guard.py resolves to judge it."
     rc=1
   fi

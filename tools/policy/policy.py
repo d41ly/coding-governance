@@ -1036,13 +1036,14 @@ LEGACY_LIST = "legacy-homes.txt"
 LEGACY_WITHHELD = ("the list is gov's own and is withheld from installs; the plan's ORDER [project-owned] row "
                    "for it is informational, and an adopter does not author the file")
 RECEIPT_REL = f"{posixpath.dirname(POLICY_REL)}/install.json"
-REGISTRY_REL = "govkit/registry.toml"  # the deployer's registry, under the tool root of gov's tree alone
+DEPLOYER_HOME = "govkit"
+REGISTRY_REL = f"{DEPLOYER_HOME}/registry.toml"  # the deployer's registry, under the tool root of gov's tree alone
 
 
 def derive_census_tree(repo):
     """-> ("adopter", the parsed receipt) where the tree under test holds an install receipt
     (TOOL-dGroundRules-22). With none (TOOL-dGroundRules-29): ("source", <d>) where exactly one
-    `<d>/govkit/registry.toml` sits with `<d>` 0 to 2 deep, the search govkit's `derive_tool_root`
+    `REGISTRY_REL` sits under a `<d>` 0 to 2 deep, the search govkit's `derive_tool_root`
     makes, since only gov's tree holds the registry; ("unadopted", None) where none does; and two or
     more is a Refusal naming each candidate. A receipt that is not a JSON object is a Refusal naming
     it, never a `source` answer. One whose `kits` is not a list of strings, or whose `prefix` is not a

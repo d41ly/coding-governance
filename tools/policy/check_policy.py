@@ -70,7 +70,7 @@ each kept key in a valid revision with a malformed one after it, and reds any re
 strict's value from `last-valid` or an empty population; with no `--strict-from` it prints NOT RUN,
 which is never a pass.
 
-The fixture's repository also carries a tracked consumer outside the kit, `hooks/consumer.js`, that
+The fixture's repository also carries a tracked consumer outside the kit, `consumer/consumer.js`, that
 reads policy through the helper, and the mirror rendered at its commit in the working tree.
 `mirror-hand-edited`, `mirror-absent` and `mirror-direct-reader` are plant cases of the mirror's
 parity and readers arms. `mirror-worktree-loosened`, `mirror-stale-last-valid`, `mirror-stale-refuse`
@@ -145,8 +145,8 @@ naming the row, and a registry that exempts no census enforcer.
 
 WHERE IT INSTALLS (TOOL-dGroundRules-22): `arm_cap_census` reads a tree with a
 `.governance/install.json` as an adopter, grading each shipped row of an installed kit at its
-`installed` path. With no receipt (TOOL-dGroundRules-29) a tree holding one `govkit/registry.toml`
-0 to 2 deep is the source, each row graded at its `enforcer`; a tree holding none is unadopted, every
+`installed` path. With no receipt (TOOL-dGroundRules-29) a tree holding one `<tool-root>/govkit/registry.toml`
+with the tool root 0 to 2 deep is the source, each row graded at its `enforcer`; a tree holding none is unadopted, every
 row announced and none graded; two are a finding naming both. `census-receiptless-target` reads a
 bare repository so, then again with the registry copied in, where every enforcer reds.
 `census-ambiguous-registry` (TOOL-dGroundRules-34 S13) is a plant case of `arm_cap_census`: two
@@ -1067,7 +1067,7 @@ def resolve_govkit(root):
     LookupError text whole, the three places looked, so a missing deployer is one named WRONG wherever
     it is asked for."""
     try:  # TOOL-dGroundRules-43 S15: the kit's one locator, its refusal raised as the RuntimeError callers catch
-        return resolve_kit_dir("govkit", "govkit.py", Path(root) / budgets.derive_tool_root() / "policy") / "govkit.py"
+        return resolve_kit_dir("govkit", "govkit.py", Path(root) / budgets.derive_tool_root() / KIT.name) / "govkit.py"
     except LookupError as exc:
         raise RuntimeError(str(exc)) from None
 
@@ -1969,7 +1969,7 @@ READER_REFUSAL_CASES = ("on-invalid-utf16", "on-invalid-bom", "on-invalid-shallo
 # ---- the JSON mirror (TOOL-dGroundRules-5) ------------------------------------------------------
 
 AGENTS_KEY = "runtime.agents-in-flight"
-CONSUMER_FILE = ("hooks", "consumer.js")
+CONSUMER_FILE = ("consumer", "consumer.js")
 # Its comment names the mirror, which `arm_mirror_readers` must not read as a read (TOOL-dGroundRules-21 AC18).
 CONSUMER_TEXT = ("// A consumer outside the policy kit: it reads policy through the helper, never policy.json itself.\n"
                  "const { readPolicy } = require(@helper@);\n"
@@ -2673,8 +2673,9 @@ def build_reader_coverage_repo(t, name, spec=None, prefix=None, tree_lib=True):
     run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "main")
     Path(repo, RC_SPEC).write_text(RC_HEADER.format(in_tree), encoding="utf-8", newline="\n")
     if tree_lib:
-        (kit.parent / "memory-tree").mkdir(parents=True, exist_ok=True)
-        shutil.copyfile(load_tree_lib().__file__, kit.parent / "memory-tree" / "tree_lib.py")
+        lib = Path(load_tree_lib().__file__)
+        (kit.parent / lib.parent.name).mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(lib, kit.parent / lib.parent.name / lib.name)
     return kit
 
 
@@ -3652,7 +3653,7 @@ def run_budget_case(name):
             rc, out = run_case_argv(r, [*bud, "resolve", "AGENTS.md"])
             checks.append(("key alone", "30000 with source file", rc == 0 and out.strip() == "AGENTS.md\t30000\twarn\tfile", f"exit {rc} · {out.strip()!r}"))
         elif name == "budgets-limits-reader":
-            r = build_cap_repo(t / "r", {lrel: no_agents, "hooks/consumer.sh": "#!/bin/sh\necho reads no cap\n"},
+            r = build_cap_repo(t / "r", {lrel: no_agents, "consumer/consumer.sh": "#!/bin/sh\necho reads no cap\n"},
                                "warn", '"AGENTS.md" = 20480\n')
             _n, _pop, found = ARM["arm_limits_readers"].run(r, KIT)
             checks.append(("unplanted", "arm_limits_readers green", not found, f"{found or 'no finding'}"))
@@ -3795,13 +3796,13 @@ BUDGET_CASES = ("budgets-pinned-warn", "budgets-two-homes", "budgets-limits-read
 def run_ships_join(name):
     """`budgets-ships-join` (TOOL-dGroundRules-17): the census rows carrying `ships = false` are exactly
     those whose enforcer the deployer's registry exempts, an `[[exempt]]` path equal to the enforcer or
-    a directory above it, both ways. The registry is `govkit/registry.toml` under this kit's tool root
+    a directory above it, both ways. The registry is `<tool-root>/govkit/registry.toml`, the tool root this kit's own
     in the source repository, which no adopter holds. One line per row either side names, and a WRONG
     where the registry names no census enforcer, which would join nothing. TOOL-dGroundRules-23: each
     shipped row's `kit` and `installed` equal what govkit's own `resolve_entry` under `canonical_ctx`
     says, and no other entry writes its enforcer; a census with no shipped row is a WRONG too."""
     top = derive_source_top()
-    reg = top / budgets.derive_tool_root() / "govkit" / "registry.toml"
+    reg = top / budgets.derive_tool_root() / REGISTRY_REL
     try:
         census = budgets.read_cap_census(top)
         exempt = [str(r.get("path")) for r in tomllib.loads(reg.read_text(encoding="utf-8")).get("exempt", [])]

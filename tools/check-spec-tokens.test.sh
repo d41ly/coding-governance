@@ -1712,7 +1712,7 @@ fi
 # inside a fenced block. The backticks are octal escapes, so this file's shell scanner reads no quote.
 seed_source() {
   local sp="$1/memory/builds/tOne/spec/2026-09-02-spec-TOOL-tOne-1.md" add="$2"
-  [ "${3:-}" = fence ] && add=$(printf '\n\140\140\140text\n%s\n\140\140\140' "$2")
+  [ "${3:-}" = fence ] && printf -v add '\n\140\140\140text\n%s\n\140\140\140' "$2"
   ADD="$add" awk '{print} /^- \*\*AC1\*\*/{print ENVIRON["ADD"]}' "$sp" > "$sp.tmp" && mv "$sp.tmp" "$sp"
   git -C "$1" add -A >/dev/null
 }
@@ -1723,7 +1723,7 @@ d=$base/source-whole; scratch "$d"
 seed_source "$d" "PROBE = bash -c '. sub/helper.sh; f'" fence
 arm "TOOL-dGroundRules-46 the same source by a path carrying a slash is no hit, and is counted" 0 "$d" "source join · 1 sourced file(s) examined in 1 live spec(s)" "[source]"
 d=$base/source-tick; scratch "$d"
-seed_source "$d" "$(printf -- '- When \140. helper.sh; f\140 runs, it prints \1400\140.')"
+printf -v _tick -- '- When \140. helper.sh; f\140 runs, it prints \1400\140.'; seed_source "$d" "$_tick"
 arm "TOOL-dGroundRules-46 a bullet whose code span opens on a bare-name source REDS as [source]" 1 "$d" '[source] `helper.sh`'
 
 # TOOL-dGroundRules-63: the packet join. A stub at the packet instrument's path exits 1 printing a
@@ -1771,8 +1771,8 @@ print(d.check_writes_intersect([sys.argv[2]], [sys.argv[3]]))' "$MEMORY_TREE" "$
   [ "$py" = "$wpy" ] || wi_bad+="[row $1 $2 $3: check_writes_intersect $py] "
   [ "$sh" = "$wsh" ] || wi_bad+="[row $1 $2 $3: overlaps exit $sh] "
 }
-check_overlap_pair policy/ policy/x.py intersect
-check_overlap_pair policy policy-x.py disjoint
+check_overlap_pair pkg/ pkg/x.py intersect
+check_overlap_pair pkg pkg-x.py disjoint
 if [ "$wi_rows" -ge 1 ] && [ -z "$wi_bad" ]; then
   echo "arm ok    TOOL-dGroundRules-40 check_writes_intersect and overlaps give each OVERLAP_PAIRS row its expected answer"; pass=$((pass+1))
 else

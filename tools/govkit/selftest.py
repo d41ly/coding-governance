@@ -14682,9 +14682,9 @@ user_skills = "/tmp/gk-fake-skills"
             `policy.py get runtime.agents-in-flight --rev HEAD` (TOOL-dGroundRules-10); the review
             harness requires the policy kit. With no policy file the reader answers the catalogue's
             default. A fixture without it could not render at all."""
-            (t / "scripts" / "policy").mkdir(parents=True, exist_ok=True)
+            (t / "scripts" / KIT_NAMES["policy"]).mkdir(parents=True, exist_ok=True)
             for _pf in ("policy.py", "catalogue.toml"):
-                shutil.copy2(KIT_DIRS["policy"] / _pf, t / "scripts" / "policy" / _pf)
+                shutil.copy2(KIT_DIRS["policy"] / _pf, t / "scripts" / KIT_NAMES["policy"] / _pf)
 
         def seed_pv_hook(t):
             """The agent-cap hook where inCMS core keeps its only copy, `.claude/hooks/`, which the

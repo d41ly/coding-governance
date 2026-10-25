@@ -25,7 +25,7 @@
 #   repository, no python, or an invalid policy file on install day.
 set -u
 
-HERE="$(cd "$(dirname "$0")" && pwd)" || exit 2
+HERE=.; [[ $0 == */* ]] && HERE=${0%/*}; HERE="$(cd "$HERE" && pwd)" || exit 2
 USAGE="usage: bash <this kit>/adopt-policy.sh --scaffold | --check [--target <repo>]"
 
 MODE=""
@@ -96,8 +96,9 @@ else
     echo "policy: the directory .governance could not be made in $TARGET"
     exit 1
   fi
-  if ! { "$PY" -B "$HERE/policy.py" scaffold > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"; } 2>/dev/null; then
-    rm -f "$FILE.tmp" 2>/dev/null
+  _tmp=$(mktemp -u "$FILE.XXXXXXXX")
+  if ! { "$PY" -B "$HERE/policy.py" scaffold > "$_tmp" && mv "$_tmp" "$FILE"; } 2>/dev/null; then
+    rm -f "$_tmp" 2>/dev/null
     echo "policy: the scaffold could not be written to $FILE"
     exit 1
   fi

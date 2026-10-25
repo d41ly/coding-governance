@@ -1104,9 +1104,9 @@ if [ -n "$_rg_k" ]; then
     _rc33=$(printf '%s\n' "$out33" | sed -n 's/^prepare-rc=//p')
     if [ "$_rc33" != 0 ]; then
       bad "33 --prepare over a policy-file change exited ${_rc33:-(it never ran)}, so neither check was read: $out33"
-    elif ! printf '%s\n' "$out33" | grep -q '^push-main: prepared ' || ! printf '%s\n' "$out33" | grep -qx 'merge=1'; then
+    elif [[ $'\n'$out33 != *$'\n''push-main: prepared '* || $'\n'$out33$'\n' != *$'\n'merge=1$'\n'* ]]; then
       bad "33 --prepare exited 0 without printing push-main: prepared and leaving a second parent: $out33"
-    elif printf '%s\n' "$out33" | grep -qx 'regen-rc=0' && printf '%s\n' "$out33" | grep -qx 'mirror-rc=0'; then
+    elif [[ $'\n'$out33$'\n' == *$'\n'regen-rc=0$'\n'* && $'\n'$out33$'\n' == *$'\n'mirror-rc=0$'\n'* ]]; then
       ok "33 a policy-file change landed through --prepare carries generated outputs regen.py --check and mirror --check both call fresh"
     else
       bad "33 the prepared merge carries a generated output its own checks call stale: $(printf '%s\n' "$out33" | grep -E '^(regen|mirror)-rc=' | tr '\n' ' ')"

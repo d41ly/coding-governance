@@ -537,3 +537,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T13:31:28Z rescope · item add TOOL-dGroundRules-85 · reason bar pre-check triage at cae57b1d8 adopted plan B (one unit per fix class, disjoint write sets): see build/2026-10-25-build-TOOL-dGroundRules-84-research-bar-triage.md
 
 2026-10-25T13:31:30Z rescope · item add TOOL-dGroundRules-86 · reason bar pre-check triage at cae57b1d8 adopted plan B (one unit per fix class, disjoint write sets): see build/2026-10-25-build-TOOL-dGroundRules-84-research-bar-triage.md
+
+2026-10-25T14:30:41Z dispatch · item 29d460ce TOOL-dGroundRules-84 · reason .githooks/pre-commit tools/check-install-prefix.sh tools/check-install-prefix.test.sh tools/check-line-length.sh tools/check-spec-tokens.test.sh tools/check-template-size.sh tools/govkit/selftest.py tools/hooks/agent-cap.test.sh tools/policy/README.md tools/policy/adopt-policy.sh tools/policy/adopt-policy.test.sh tools/policy/check_policy.py tools/policy/policy.py tools/push-main.test.sh tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh memory/project/spawn-idiom-sites.txt memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-84.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T14:30:49Z brief · item TOOL-dGroundRules-84 · reason ba6dc59af764 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-84-spec-brief.md
+
+2026-10-25T14:46:55Z dispatch · item 29d460ce TOOL-dGroundRules-84 · reason memory/guides/SESSION-KICKOFF.md

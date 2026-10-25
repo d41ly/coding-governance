@@ -469,7 +469,7 @@ with why (no row, a placeholder key, a cell that is no value, the default, a dot
 key), and reads each kept key at a malformed revision after a valid one setting them all: every read
 must be strict's value from `last-valid`, and an empty population reds.
 
-The fixture's repository also carries `hooks/consumer.js`, a tracked consumer that reads policy
+The fixture's repository also carries `consumer/consumer.js`, a tracked consumer that reads policy
 through the helper, and the mirror rendered at its commit. `mirror-hand-edited` sets the working-tree
 mirror's `runtime.agents-in-flight` to 8 with its blob ids kept, and `mirror-absent` deletes it: each
 must red `arm_mirror_parity` naming the key, then `absent`. `mirror-direct-reader` makes the consumer
@@ -532,7 +532,7 @@ the not-graded line and no report (TOOL-dGroundRules-76). Each copy's list is se
 source repository, so they hold on gov's tree. The first reds this kit's directory without
 `legacy-homes.txt`, or a `kit.toml` with no `project-owned` rule naming it: an absent list is an
 announcement in the arm, so this case is what reds a list deleted on gov's tree. The second reads
-`govkit/registry.toml` under the tool root and reds, naming the row, a census row whose
+`<tool-root>/govkit/registry.toml` and reds, naming the row, a census row whose
 `ships = false` disagrees either way with the registry's `[[exempt]]` paths, an exempt directory
 covering every enforcer under it, and a registry that exempts no census enforcer.
 
@@ -544,7 +544,7 @@ finding; it must red naming `manifest-bytes` and its installed path once the pla
 `manifest-check.sh` is deleted, and read green again once it is restored.
 
 `census-receiptless-target` (TOOL-dGroundRules-29) is an outcome case over one scratch repository
-holding no receipt and no `govkit/registry.toml`: `arm_cap_census` must print one `not installed`
+holding no receipt and no `<tool-root>/govkit/registry.toml`: `arm_cap_census` must print one `not installed`
 or `not shipped` line per census row and no finding; with this kit's registry copied in under its
 tool root it must print no announce line and a finding for every row, each enforcer absent there.
 `budgets-census-join` copies the registry in too, since its repository stands for gov's tree.
@@ -650,7 +650,7 @@ and the case reds a row whose opening word differs from it (TOOL-dGroundRules-25
 | `arm_legacy_homes` | nothing: `legacy-homes.txt` is gov's own list, which `kit.toml` withholds from every install (TOOL-dGroundRules-17) | finding: a list that derives no row is a zero population; with no list, or in any tree holding an install receipt, a receipt `derive_census_tree` answers `invalid` included (TOOL-dGroundRules-32 S11), it is announced: `policy-check: arm_legacy_homes · not graded · the list is gov's own and is withheld from installs; …`, and `lists --write` never creates it. `govkit plan` shows the list as an `ORDER [project-owned]` row: that row is informational, and the list is not the adopter's to author (TOOL-dGroundRules-25 S10, S11) |
 | `arm_reader_coverage` | each installed catalogue key whose owner build has landed in the target, against the target's tracked code | announce: before any owner build lands it grades 0 keys and prints `not graded` (TOOL-dGroundRules-21 S5), and a landed revision that does not resolve is announced too (TOOL-dGroundRules-25 S26); a memory-tree kit that does not resolve is a finding naming why |
 | `arm_limits_readers` | the target's tracked code outside the installed kit, its memory root, `help/` and the self-tests, for a second reader of the template-size limits file | announce: a target with no tracked code is a population of 0, a legal state, so it prints `not graded` (TOOL-dGroundRules-25 S26) |
-| `arm_cap_census` | the installed cap census against the target, by one of four answers (TOOL-dGroundRules-29, TOOL-dGroundRules-32 S11): the target's `.governance/install.json` makes it an adopter, and each shipped row whose `kit` its `kits` names is graded at its `installed` path, `{prefix}` read as its `prefix`; with no receipt, exactly one `<d>/govkit/registry.toml` with `<d>` 0 to 2 deep makes it gov's source tree, each row graded at its `enforcer`, `{prefix}` read as `<d>`, since no install carries the deployer's registry; neither receipt nor registry makes it unadopted, every row announced and none graded; a receipt whose `kits` is not a list of strings, or whose `prefix` opens with `/` or `\`, names a drive or holds a `..` segment, makes it `invalid`, no row graded; the requests its tracked code makes, and the limits file's rows | finding: a census that reads no row is a zero population; two or more `govkit/registry.toml` with no receipt is a finding naming each, never a guessed root; the rows are graded by what ships (TOOL-dGroundRules-17, TOOL-dGroundRules-22): a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; a row whose `kit` the receipt's `kits` lacks, or any shipped row of an unadopted tree, is announced, `cap census: <name> · kit <kit> not installed`; an installed kit's enforcer absent at `installed` is a finding naming that path; a receipt that does not parse is a finding naming it; under `invalid` the one finding is `.governance/install.json: its <field> is not of the shape the deployer writes` |
+| `arm_cap_census` | the installed cap census against the target, by one of four answers (TOOL-dGroundRules-29, TOOL-dGroundRules-32 S11): the target's `.governance/install.json` makes it an adopter, and each shipped row whose `kit` its `kits` names is graded at its `installed` path, `{prefix}` read as its `prefix`; with no receipt, exactly one `<tool-root>/govkit/registry.toml` with the tool root 0 to 2 deep makes it gov's source tree, each row graded at its `enforcer`, `{prefix}` read as that tool root, since no install carries the deployer's registry; neither receipt nor registry makes it unadopted, every row announced and none graded; a receipt whose `kits` is not a list of strings, or whose `prefix` opens with `/` or `\`, names a drive or holds a `..` segment, makes it `invalid`, no row graded; the requests its tracked code makes, and the limits file's rows | finding: a census that reads no row is a zero population; two or more `<tool-root>/govkit/registry.toml` with no receipt is a finding naming each, never a guessed root; the rows are graded by what ships (TOOL-dGroundRules-17, TOOL-dGroundRules-22): a `ships = false` row is announced, `cap census: <name> · enforcer not shipped`; a row whose `kit` the receipt's `kits` lacks, or any shipped row of an unadopted tree, is announced, `cap census: <name> · kit <kit> not installed`; an installed kit's enforcer absent at `installed` is a finding naming that path; a receipt that does not parse is a finding naming it; under `invalid` the one finding is `.governance/install.json: its <field> is not of the shape the deployer writes` |
 
 ## The adopter
 

@@ -343,9 +343,9 @@ def scan_line(line):
         if before[-1:] == "\0" or DRAINED.search(before):
             continue  # a render or prose token, or a span an earlier rule counted
         if before.endswith("/"):
-            operand = re.split(r"[\s\"'`=(]", before)[-1]
+            operand = re.split(r"[\s\"'`=(:]", before)[-1]
             if any(DOTDIR.match(s) for s in operand.split("/")) or NONKIT.search(operand):
-                continue  # a Skill dir, a git `hooks/`, a sidecar under the git dir
+                continue  # a Skill dir, even after a `limits:` prefix, a git `hooks/`, a sidecar under the git dir
         add(a, m.end(), m.group("k"))
     # 4. a quoted kit segment used as a path segment: joined by `/`, or by `,` after a quoted
     #    literal prefix segment inside a path join — unless the operand makes it a homonym

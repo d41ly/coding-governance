@@ -2106,17 +2106,17 @@ same "DGR10 ...and writes no harness" "$absent_harness" "yes"
 WS="$LAY/old-hook"; build_layout "$WS" scripts/$WFK scripts/$UNK scripts/gotchas.py
 sed -i "s/^const WRITER_MARK = 'gov:fixed-writers'\$/const WRITER_MARK = 'gov:an-older-writer-mark'/" "$WS/scripts/$HOOKS/agent-cap.js"
 same "DGR74 LIVENESS the layout's hook no longer carries the writer marker" "$(grep -c "^const WRITER_MARK = 'gov:an-older-writer-mark'\$" "$WS/scripts/$HOOKS/agent-cap.js")" "1"
-o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(cat "$LAY/old-hook.err")
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "DGR74 a hook that predates the writer marker: --render still renders" "$o" "rc=0"
 has "DGR74 ...and stderr carries the hook's own reason" "$e" "does not admit the writer split: BLOCKED by agent-cap:"
 has "DGR74 ...and names the update" "$e" "Update it: govkit update --kits agent-cap"
-h=$(cat "$WS/scripts/$WFK/unattended-build.js" 2>/dev/null)
+h=; [ -f "$WS/scripts/$WFK/unattended-build.js" ] && h=$(<"$WS/scripts/$WFK/unattended-build.js")
 has "DGR74 ...and the harness bounds its pool at the verify total" "$h" "async function boundedParallel(thunks, cap = 5)"
 has "DGR74 ...and its spec writers too" "$h" "const SPEC_WRITERS = 5"
 has "DGR74 ...and judges the split under the verifiers marker" "$h" "Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers"
 cp "$WS/scripts/$WFK/unattended-build.js" "$LAY/old-hook.js" 2>/dev/null
 printf '%s\n' "process.stdin.resume(); process.stdin.on('end', () => { console.error('a stub hook that denies every script'); process.exit(2) })" > "$WS/scripts/$HOOKS/agent-cap.js"
-o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(cat "$LAY/old-hook.err")
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
 has "DGR74 a hook that denies the fallback too: --render refuses" "$o" "rc=2"
 has "DGR74 ...naming the fallback" "$o" "denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded"
 has "DGR74 ...after a stderr notice carrying that hook's reason" "$e" "does not admit the writer split: a stub hook that denies every script. Update it"

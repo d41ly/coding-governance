@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-84 — the shell sources and kit-path spellings this build left red on the bar, each site converted or declared, and the install-prefix counter reads a `limits:` home as the Skill path it is
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 31
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 31
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -162,7 +162,8 @@ read_line_mode() {
   if [ -z "$LL_MODE" ]; then
     LL_MODE=refuse
     LL_RULE="no policy kit answered, so a breach refuses as before"
-    printf 'check-line-length: %s — %s\n' "$LL_RULE" "$(printf '%s\n' "${_out:-$_pk}" | head -n 1)"
+    _out=${_out:-$_pk}
+    printf 'check-line-length: %s — %s\n' "$LL_RULE" "${_out%%$'\n'*}"
   fi
 }
 

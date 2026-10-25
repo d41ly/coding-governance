@@ -35,8 +35,8 @@ TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
 # wherever a policy kit sits beside the hook, and every arm below runs from "$TMP", which no checkout
 # holds. The copy sits beside scratch-guard.js and no policy kit, where rule 7 adds no rule, so each arm
 # judges the rule it names; the sections that arm rule 7 build their own copies beside a policy kit.
-mkdir -p "$TMP/arms-hooks/hooks"; cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$TMP/arms-hooks/hooks/"
-HOOK="$TMP/arms-hooks/hooks/agent-cap.js"
+ARMS_HOOKS="$TMP/arms-hooks/hooks"; mkdir -p "$ARMS_HOOKS"; cp "$KIT_HOOK" "$HERE/scratch-guard.js" "$ARMS_HOOKS/"
+HOOK="$ARMS_HOOKS/agent-cap.js"
 pass=0; fail=0
 # The one resolver, not the retired `command -v python3 || python` idiom this repo banned — which the
 # ban could not see here, because it matches only `command -v`.
@@ -1191,29 +1191,29 @@ ROOTDIR=$(unset GIT_DIR GIT_WORK_TREE; git -C "$HERE" rev-parse --show-toplevel 
 if [ -z "$LIMPK" ] || [ -z "$ROOTDIR" ]; then
   echo "FAIL limit: no policy kit beside this hooks kit, so rule 7 has nothing to arm with"; fail=$((fail+1))
 else
-  R7="$TMP/r7"; mkdir -p "$R7/.governance" "$R7/kits/hooks" "$R7/kits/policy" "$R7/.claude"
-  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$R7/kits/hooks/"
+  R7="$TMP/r7"; R7_HOOKS="$R7/kits/hooks"; mkdir -p "$R7/.governance" "$R7_HOOKS" "$R7/kits/policy" "$R7/.claude"
+  cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$R7_HOOKS/"
   for f in policy.py budgets.py caps.toml catalogue.toml policy-mirror.js policy-shim.sh; do cp "$ROOTDIR/$LIMPK/$f" "$R7/kits/policy/"; done
   printf '[runtime]\nagents-in-flight = 2\n' > "$R7/.governance/policy.toml"
   ( cd "$R7" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
       && git config user.name t && git add -A && git commit -qm limit --no-verify )
   R7_WF='{"tool_name":"Workflow","cwd":"'"$NODEDIR/r7"'","tool_input":{"script":"const r = await agent(1)"}}'
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7/.claude/settings.json"
-  run_limit_call "rule7: settings at 3 over a landed limit of 2 -> deny, naming the variable" 2 "$R7_WF" "$R7/kits/hooks/agent-cap.js" 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS'
-  run_limit_call "rule7: ...and naming the render" 2 "$R7_WF" "$R7/kits/hooks/agent-cap.js" 'policy.py settings --write'
+  run_limit_call "rule7: settings at 3 over a landed limit of 2 -> deny, naming the variable" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" 'CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS'
+  run_limit_call "rule7: ...and naming the render" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" 'policy.py settings --write'
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7/.claude/settings.json"
-  run_limit_call "rule7: settings at the limit -> allow (control)" 0 "$R7_WF" "$R7/kits/hooks/agent-cap.js"
+  run_limit_call "rule7: settings at the limit -> allow (control)" 0 "$R7_WF" "$R7_HOOKS/agent-cap.js"
   # TOOL-dGroundRules-61: a settings file GOV_SETTINGS_JSON declares outside the checkout is one more
   # layer, never the project file's replacement, and every layer that sets a variable holds the limit.
   R7D="$TMP/r7-declared.json"; R7DN="$NODEDIR/r7-declared.json"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7D"
   printf '{"env":{"CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7/.claude/settings.json"
-  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 2, the project file at 3 -> deny, naming the project file" 2 "$R7_WF" "$R7/kits/hooks/agent-cap.js" '.claude/settings.json: env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS is 3'
+  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 2, the project file at 3 -> deny, naming the project file" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" '.claude/settings.json: env.CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS is 3'
   rm -f "$R7/.claude/settings.json"
-  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared only, at 2 -> allow" 0 "$R7_WF" "$R7/kits/hooks/agent-cap.js"
+  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared only, at 2 -> allow" 0 "$R7_WF" "$R7_HOOKS/agent-cap.js"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"2","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"2"}}\n' > "$R7/.claude/settings.json"
   printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"3","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"3"}}\n' > "$R7D"
-  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 3, the project file at 2 -> deny, naming the declared file" 2 "$R7_WF" "$R7/kits/hooks/agent-cap.js" 'r7-declared.json: env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS is 3'
+  GOV_SETTINGS_JSON="$R7DN" run_limit_call "rule7: declared at 3, the project file at 2 -> deny, naming the declared file" 2 "$R7_WF" "$R7_HOOKS/agent-cap.js" 'r7-declared.json: env.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS is 3'
 fi
 # TOOL-dGroundRules-18 — rule 2 judges a `gov:fixed-writers` split against the agent limit and a
 # `gov:fixed-verifiers` split against MAX_VERIFIERS whatever the limit. The copy sits beside a STUB
@@ -1221,23 +1221,23 @@ fi
 # settings hold both variables at 4, at or under each stub limit below (TOOL-dGroundRules-68): rule 7
 # admits, rule 6 finds no role index there, and each arm judges rule 2. With no stub, rule 7 adds no
 # rule.
-WS="$TMP/writer-split"; mkdir -p "$WS/hooks" "$WS/policy" "$WS/.claude"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$WS/hooks/"
+WS="$TMP/writer-split"; WS_HOOKS="$WS/hooks" WS_POLICY="$WS/policy"; mkdir -p "$WS_HOOKS" "$WS_POLICY" "$WS/.claude"; cp "$HERE/agent-cap.js" "$HERE/scratch-guard.js" "$WS_HOOKS/"
 printf '{"env":{"CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS":"4","CLAUDE_CODE_WORKFLOW_MAX_CONCURRENT_AGENTS":"4"}}\n' > "$WS/.claude/settings.json"
 ( unset GIT_DIR GIT_WORK_TREE; cd "$WS" && git init -q . && git symbolic-ref HEAD refs/heads/main && git config user.email t@t.test \
     && git config user.name t && git add -A && git commit -qm writer-split --no-verify )
 write_limit_stub() { # limit
-  printf 'class PolicyRefusal extends Error {}\nmodule.exports = { PolicyRefusal, readPolicy: () => ({ value: %s, source: "stub", reason: "stub" }) }\n' "$1" > "$WS/policy/policy-mirror.js"
+  printf 'class PolicyRefusal extends Error {}\nmodule.exports = { PolicyRefusal, readPolicy: () => ({ value: %s, source: "stub", reason: "stub" }) }\n' "$1" > "$WS_POLICY/policy-mirror.js"
 }
 WS_WRITER='{"tool_name":"Workflow","cwd":"'"$NODEDIR/writer-split"'","tool_input":{"script":"const SPEC_WRITERS = 6\nconst g = chunk(s, Math.ceil(s.length / SPEC_WRITERS)) // gov:fixed-writers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), SPEC_WRITERS)"}}'
 WS_VERIFIER='{"tool_name":"Workflow","cwd":"'"$NODEDIR/writer-split"'","tool_input":{"script":"const K = 6\nconst g = chunk(all, Math.ceil(all.length / K)) // gov:fixed-verifiers\nconst r = await boundedParallel(g.map((x) => () => agent(x)), 5)"}}'
 write_limit_stub 4
-run_limit_call "writer split: K 6 above a stub limit of 4 -> deny, naming the marker" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'gov:fixed-writers but its bounded split'
-run_limit_call "writer split: ...and the K it read against that limit" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'resolves to 6, above the bound 4: runtime.agents-in-flight'
+run_limit_call "writer split: K 6 above a stub limit of 4 -> deny, naming the marker" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'gov:fixed-writers but its bounded split'
+run_limit_call "writer split: ...and the K it read against that limit" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'resolves to 6, above the bound 4: runtime.agents-in-flight'
 write_limit_stub 6
-run_limit_call "writer split: K 6 at a stub limit of 6 -> allow (control)" 0 "$WS_WRITER" "$WS/hooks/agent-cap.js"
-run_limit_call "verifier split: K 6 under a stub limit of 6 -> deny, against MAX_VERIFIERS" 2 "$WS_VERIFIER" "$WS/hooks/agent-cap.js" 'above the bound 5: MAX_VERIFIERS'
-rm -f "$WS/policy/policy-mirror.js"
-run_limit_call "writer split: no policy kit beside the hooks kit -> deny, against MAX_VERIFIERS" 2 "$WS_WRITER" "$WS/hooks/agent-cap.js" 'above the bound 5: MAX_VERIFIERS, as no policy kit'
+run_limit_call "writer split: K 6 at a stub limit of 6 -> allow (control)" 0 "$WS_WRITER" "$WS_HOOKS/agent-cap.js"
+run_limit_call "verifier split: K 6 under a stub limit of 6 -> deny, against MAX_VERIFIERS" 2 "$WS_VERIFIER" "$WS_HOOKS/agent-cap.js" 'above the bound 5: MAX_VERIFIERS'
+rm -f "$WS_POLICY/policy-mirror.js"
+run_limit_call "writer split: no policy kit beside the hooks kit -> deny, against MAX_VERIFIERS" 2 "$WS_WRITER" "$WS_HOOKS/agent-cap.js" 'above the bound 5: MAX_VERIFIERS, as no policy kit'
 
 # ---- the two copies ------------------------------------------------------------------------------
 # `.claude/hooks/agent-cap.js` is the WIRED copy and `<prefix>/hooks/agent-cap.js` is the kit's. Nothing
