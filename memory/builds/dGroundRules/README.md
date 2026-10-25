@@ -203,7 +203,7 @@ ids TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGrou
 | [TOOL-dGroundRules-63 — the closing review's minors: unit 46's population re-measured with units 44 and 45, a packet join for each live chain run, and the owner-cap record's count named by range, one scope item each](spec/2026-10-23-spec-TOOL-dGroundRules-63.md) | 20 | 2 | CLOSED | rev-3 | 2026-10-24 |
 | [TOOL-dGroundRules-67 — the close sweep: the policy fixtures guard holds every path the guard trace reports, the review protocol names no untracked settings file, the verb pin is re-measured, and the bar predicate reads the policy check's whole-suite form](spec/2026-10-24-spec-TOOL-dGroundRules-67.md) | 21 | 1 | CLOSED | rev-2 | 2026-10-25 |
 | [TOOL-dGroundRules-68 — the writer-split arms of the hook suite run inside a scratch checkout whose settings hold the stub limit, so rule 7 reads before it admits](spec/2026-10-25-spec-TOOL-dGroundRules-68.md) | 22 | 1 | CLOSED | rev-1 | 2026-10-25 |
-| [TOOL-dGroundRules-69 — the strict case's source under the policy fixtures guard, so the leg's full run traces no read outside it](spec/2026-10-25-spec-TOOL-dGroundRules-69.md) | 23 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-69 — the strict case's source under the policy fixtures guard, so the leg's full run traces no read outside it](spec/2026-10-25-spec-TOOL-dGroundRules-69.md) | 23 | 1 | DEFERRED | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
 Records: 373 bound to this build, across 4 record folder(s).
