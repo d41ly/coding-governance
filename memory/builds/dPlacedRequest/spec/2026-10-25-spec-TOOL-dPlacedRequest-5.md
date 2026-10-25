@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0503@65f19d46 whole
 
@@ -12,8 +12,12 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-5-deviation-51.md](../build/2026-10-25-build-TOOL-dPlacedRequest-5-deviation-51.md) | deviation | — |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-5-deviation-52.md](../build/2026-10-26-build-TOOL-dPlacedRequest-5-deviation-52.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -47,10 +51,12 @@ the trigger's witness (the whole-design audit's A1-F5, settled by the owner's FK
   The check runs at placement, in the placing session, never at the later firing, whose session is the
   build's and did not type the request. Observed by AC3.
 - **S4** — The declaration. `python tools/loop/placement.py breakpoint --request <content key>` writes, for a
-  passed block, the owner's disposition record through TOOL-dDeclaredLoop-16 S4's door, `python
-  tools/memory-tree/build_records.py new disposition --build <slug> --unit <first unit id> --item
-  item.entry.place --disposition breakpoint --channel prompt`, its `Reason` `<name> · request <content key>`,
-  in the build's `build/` folder of the session's own tree, for the session's commit. That record and the
+  passed block, the owner's disposition record (TOOL-dDeclaredLoop-16 S4), served as `**Serves:**
+  disposition <first unit id>`, passing the record factory `tools/memory-tree/build_records.py`
+  `--build <slug> --unit <first unit id> --item item.entry.place --disposition breakpoint --channel
+  prompt`, its `Reason` `<name> · request <content key>`, in the build's `build/` folder of the
+  session's own tree, for the session's commit. No `new disposition` door is claimed: the build run
+  re-grounds the call on the landed factory, as that unit's S4 does. That record and the
   request record are the witness: the intake record's stand-in, TOOL-dPlacedRequest-19's request record, by
   the content key, and the placement disposition, by the record. The write needs the build's lease free or
   this session's, as `amend` does; a lease another session holds refuses `live-holder`, routed as
@@ -83,7 +89,7 @@ the trigger's witness (the whole-design audit's A1-F5, settled by the owner's FK
 - The `--trigger` verb, its causes and `review.blocks`: TOOL-dDeclaredLoop-20's, called by name.
 - Where every other breakpoint sits, and owner gates: TOOL-dDeclaredLoop-19's `review.<stage>`, `autonomy` and
   `review.breakpoints`.
-- The disposition record kind and its door: TOOL-dDeclaredLoop-16's.
+- The disposition record kind: TOOL-dDeclaredLoop-16's, written by the record factory.
 - The intake record and the mailbox that would carry a declaration to another session's build:
   dWellOiledMachine's and dKeptSession's; S4 names the stand-in for each.
 - The request record and its local text: TOOL-dPlacedRequest-19's; this unit reads where the text is held.
@@ -106,7 +112,7 @@ owner prompt "audit the specs" ──▶ scout return: disposition breakpoint ·
   place  ──▶ block (check: pending)
   check  ──▶ check_breakpoint: dX live · request held on this node · name known ──▶ check: pass
   placement.py breakpoint
-     ├─ build_records.py new disposition … --disposition breakpoint --channel prompt   (dX/build/)
+     ├─ build_records.py … --item item.entry.place --disposition breakpoint --channel prompt   (dX/build/)
      └─ dX past item.design.reason?  yes ─▶ unattended.sh --trigger dX --subject dX-specs --cause placement
 next preflight of dX at a BASE holding that record
      └─ AUTH_SPEC_AUDIT_FROM=placement ─▶ the audit owed: hand-out held, --close owes specs-audited
@@ -205,9 +211,12 @@ such a request derives exactly what it derived before.
   Red when: a request known only by its record's id fires a review.
 - **AC4** — When `python placement.py --fixture --plant declare` runs `breakpoint` on a passed block, the build's
   `build/` folder holds one `disposition` record whose `Item` is `item.entry.place`, `Disposition` is
-  `breakpoint`, `Channel` is `prompt` and `Reason` names `spec audit` and the content key; with
-  `--plant declare-held` the lease is another session's and it refuses `live-holder`, writing no record.
+  `breakpoint`, `Channel` is `prompt` and `Reason` names `spec audit` and the content key, served as
+  `disposition` and the first unit id; with `--plant declare-held` the lease is another session's and
+  it refuses `live-holder`, writing no record.
   Red when: the declaration is written into a build another session holds.
+  fixture: the factory call the plant reaches is re-grounded on the landed factory at the build pass
+  (TOOL-dDeclaredLoop-16 S4).
 - **AC5** — When `python breakpoints.py --fixture --plant placed` lists a build carrying that record,
   `derive_breakpoints` returns a `spec audit` entry with cause `placement` after `item.design.reason`.
   Red when: the record exists and the listing omits it, so nothing fires at the position.
@@ -260,12 +269,17 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · the preflight case
   each the mirror of that promoted unit's own edge.
 - rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
+- rev-4 · 2026-10-26 · §2 S4 · §3 · §4 The flow · §6 AC4 · §10 · re-grounded on dDeclaredLoop at
+  `783f1ad3a` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 32: the declaration
+  passes the record factory TOOL-dDeclaredLoop-16 S4's flags, no `new disposition` door claimed, and
+  AC4's call is re-grounded on the landed factory.
 
 ## 10. Reuse audit
 
 The seams are TOOL-dDeclaredLoop-20's `--trigger … --cause placement`, whose closed cause set already holds
-`placement`, so this unit is a caller; TOOL-dDeclaredLoop-16 S4's disposition record and door for the
-declaration; TOOL-dDeclaredLoop-19 S1's `derive_breakpoints` for the listing; and the driver's spec-audit
+`placement`, so this unit is a caller; TOOL-dDeclaredLoop-16 S4's disposition record for the
+declaration, written by the record factory with that unit's flags; TOOL-dDeclaredLoop-19 S1's `derive_breakpoints` for the listing; and the driver's spec-audit
 derivation in `check_authorization` (`tools/unattended/unattended.sh:3975-4041`) for the hold. `python
 tools/codebase-map/reuse_lookup.py "fire a review breakpoint on a live build from an owner request"` ranked
 only name stems (`live`, `build`, `build_commit`), and no trigger verb exists at base. Where the scout record

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys
 
-**Status:** DEFERRED · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
+**Status:** DEFERRED · rev-5 · 2026-10-26 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0120@5d655f07 whole
 **Carries:** node:record-kind.lease
@@ -21,6 +21,11 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-b.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-21 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-c.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-reuse-scout-c.md) | research | TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 |
 | [2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md](../build/2026-10-25-build-TOOL-dPlacedRequest-1-spec-stage-returns.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-agent-ledger.md) | journal | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64 |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-crosscheck-returns.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-crosscheck-returns.md) | research | — |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-deviation-12.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-deviation-12.md) | deviation | — |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | — |
+| [2026-10-26-build-TOOL-dPlacedRequest-1-reground-returns.md](../build/2026-10-26-build-TOOL-dPlacedRequest-1-reground-returns.md) | research | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md) | journal | — |
@@ -35,7 +40,9 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-9-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-9-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md) | research | — |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-parents-crosscheck.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dPlacedRequest-1-parents-reground.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-34 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
@@ -91,8 +98,9 @@ announced (`:2141-2149`).
   key and its value; the driver's run claim is a build lease under every value. Observed by AC5.
 - **S8** — `leases.renewal` (`progress`, `activity`, `fixed`, `none`; default `progress`) sets each
   write's `renews` and `witness`. Under `progress`, a write renews only when it carries a witness: a
-  commit that resolves, carries a `Gov-Transition` trailer (TOOL-dDeclaredLoop-3 S1) naming this
-  build, and differs from the record's `witness`; any other write, a beat included, writes
+  commit that resolves, records a transition of this build on the channel `transitions.record` makes
+  the source (TOOL-dDeclaredLoop-3 S4, S7; §4 "The witness under `progress`"), and differs from the
+  record's `witness`; any other write, a beat included, writes
   `renews: no`. `activity` renews on every write, `fixed` only at acquisition, and `none` writes
   `renews: -`, which `TOOL-dPlacedRequest-17` reads as a lease that never expires. Until
   dWellOiledMachine's progress ledger lands, the transition record is the only witness. Observed by AC4.
@@ -230,12 +238,20 @@ Defaults from v2:1157-1162. A policy file cannot hold `leases` and a `leases.*` 
 
 ### The witness under `progress`
 
-`--witness <sha>` must name a commit the clone holds whose `Gov-Transition` trailer names this build,
-read with one `git log -1 --format='%(trailers:key=Gov-Transition,valueonly)'`; a sha that does not
-resolve or carries none exits 2. A beat (`--beat`, `write_claim_beat`, `:2469`) and every holder write
+`--witness <sha>` must name a commit the clone holds that records a transition of this build, on the
+channel TOOL-dDeclaredLoop-3 S7's `read_transitions(build, repo)` reads (its §4 "The source, by
+selection"). `transitions.record` is read once per process through the same `policy.py get` S12 makes,
+its catalogue default all three channels until dGroundRules' reader lands (TOOL-dDeclaredLoop-3 S4). With
+`trailer` selected, the commit's `Gov-Transition` trailer names the build, read with one
+`git log -1 --format='%(trailers:key=Gov-Transition,valueonly)'`. With `log` and no `trailer`, the
+commit adds a `-transition-<n>.md` record under the build's `build/` folder whose `**Build:**` names
+it, read with `git diff-tree --no-commit-id --name-only -r <sha>` and `git show <sha>:<path>` (§8 F8).
+With `micro-format` alone nothing is stored, so no commit witnesses and `progress` renews nothing. A
+sha that does not resolve or records no transition of the build exits 2. A beat (`--beat`, `write_claim_beat`, `:2469`) and every holder write
 the driver makes without a new witness write `renews: no`; they still move `beat-utc`, which the
 liveness verdict reads until `TOOL-dPlacedRequest-17` replaces it. The driver passes the newest
-`Gov-Transition` commit on the run's branch as its witness when one exists. Until dWellOiledMachine's
+commit on the run's branch that records a transition of the build, read as above, as its witness
+when one exists. Until dWellOiledMachine's
 executor writes transitions at item boundaries, a run lease therefore renews only when a transition is
 recorded by hand, and this is the interim v2:1159 journals.
 
@@ -345,10 +361,13 @@ its runs move onto build leases at their next claim write; an adopter's stay unt
   Red when: both rows print, the legacy ref moves, or the lease starts a new chain.
 - **AC4** — When no policy file exists and `--lease renew build tFix` runs without `--witness`, the new
   record reads `renews: no`; with `--witness` naming a commit carrying `Gov-Transition: … build=tFix`,
-  it reads `renews: yes` and that `witness`; the same witness again reads `renews: no`; a witness with
-  no trailer exits 2. With `leases.renewal` planted `activity`, `fixed` and `none`, a renew without a
+  it reads `renews: yes` and that `witness`; the same witness again reads `renews: no`; a witness
+  recording no transition of `tFix` exits 2. With `transitions.record` planted `["log"]`, a witness
+  naming the commit that added `tFix`'s `-transition-1.md` record, with no trailer, reads
+  `renews: yes`. With `leases.renewal` planted `activity`, `fixed` and `none`, a renew without a
   witness reads `yes`, `no` and `-`.
-  Red when: a beat alone renews under the default `progress`, or a planted value is not read.
+  Red when: a beat alone renews under the default `progress`, a planted value is not read, or a
+  log-only transition never renews.
 - **AC5** — When `leases.granularity` is planted `build`, `--lease acquire unit tFix TOOL-tFix-2` exits
   2 naming `leases.granularity`; planted `unit`, `--lease acquire build tFix` exits 2; under the default
   both write.
@@ -406,10 +425,13 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
   removes the one exclusive claim section 7 exists for, and v2 names no run without a claim.
   RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. widens: none · relaxes: none
 - **F5 — What witnesses progress for a run lease before any caller records a transition?** (a) Only a
-  `Gov-Transition` trailer, as clause 0120 and v2:1159 state; (b) also the driver's `Pass:` commits and
-  phase moves. (b) renews on a witness the clause does not name, which veto 1 discards. RESOLVED
-  (agent, 2026-10-25, delegated): (a), rung 1; the consequence, a long run reading stale once
-  `TOOL-dPlacedRequest-17` lands, is listed in §5 and is the interim v2:1159 journals. widens: none · relaxes: none
+  recorded transition of the build, as clause 0120 and v2:1159 state, read on the channel
+  `transitions.record` makes the source; (b) also the driver's `Pass:` commits and phase moves. (b)
+  renews on a witness the clause does not name, which veto 1 discards. RESOLVED (agent, 2026-10-26,
+  delegated): (a), rung 1, TOOL-dDeclaredLoop-3 S4 and S7 at `783f1ad3a`, whose channel set is any
+  non-empty subset, so a trailer-only read, this fork's first pick on 2026-10-25, never renews under
+  `["log"]`; the consequence, a long run reading stale once `TOOL-dPlacedRequest-17` lands, is listed
+  in §5 and is the interim v2:1159 journals. widens: none · relaxes: none
 - **F6 — What do `fixed` and `none` mean, which v2 names without defining?** RESOLVED (agent,
   2026-10-25, delegated): `fixed` renews only at acquisition, so the lease expires `leases.expiry-hours`
   after it is taken; `none` tracks no renewal and the lease never expires, ending only by release or a
@@ -419,6 +441,14 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
   delegated): as §4 "The overlap reduction" states, `kit-dirs` coarsest by directory and `builds`
   coarsest in its report; rung 3, from the value names and coordination item 3's "against every live
   lease at `leases.overlap`'s granularity". widens: none · relaxes: none
+- **F8 — How does the bash driver read a log-only transition, when `read_transitions` is a Python
+  function with no verb?** Options: (a) the driver reads the selected channel itself with two `git`
+  calls, on the source TOOL-dDeclaredLoop-3 §4 "The source, by selection" names; (b) an ask for a
+  `loop_transition.py read --build <slug>` verb printing `read_transitions`, run as a subprocess
+  through `resolve_kit_dir`; (c) `python -c` importing `loop_transition`, a kit importing a sibling,
+  which TOOL-dDeclaredLoop-12 S4 bars after TOOL-dGroundRules-1 §4 Evidence. (a) restates which channel is the source, held to that table by
+  AC4's `["log"]` plant; (b) waits on a parent change for a read two `git` calls make. RESOLVED
+  (agent, 2026-10-26, delegated): (a), rung 3. widens: none · relaxes: none
 
 ## 9. Revision log
 
@@ -434,6 +464,11 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
 - rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
   hands-off TOOL-dPlacedRequest-40, hands-off TOOL-dPlacedRequest-41, hands-off
   TOOL-dPlacedRequest-42, hands-off TOOL-dPlacedRequest-43.
+- rev-5 · 2026-10-26 · §2 S8 · §4 The witness under `progress` · §6 AC4 · §8 F5, F8 · re-grounded on
+  dDeclaredLoop at `783f1ad3a` by the cross-check record
+  `build/2026-10-26-build-TOOL-dPlacedRequest-1-parents-crosscheck.md`, row 2: the witness is a
+  recorded transition on the channel `transitions.record` makes the source, the log record where
+  `trailer` is not selected.
 
 ## 10. Reuse audit
 
