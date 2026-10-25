@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-64 — the seed reads HEAD as unborn only when it names a branch that does not exist, so a HEAD git cannot resolve takes the no-HEAD path
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 36 · advances TOOL-dWitnessedBar-31
+**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 36 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-65 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 |
 | [2026-10-25-build-TOOL-dWitnessedBar-64-round5-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-64-round5-fix-return.md) | research | TOOL-dWitnessedBar-65 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-64-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-64-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-64-round5-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-64-round5-fix-brief.md) | research | TOOL-dWitnessedBar-65 |
+| [2026-10-25-review-TOOL-dWitnessedBar-64-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-64-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-65 |
 
 <!-- /gen:spec-records -->
 
@@ -72,6 +73,7 @@ commit, and holds it with one corrupt-state fixture beside each clean one. It re
 ### Edges
 
 - **consumes-from** `TOOL-dWitnessedBar-63` — S6's no-HEAD route and S8's exit-1-and-silent precondition, which S2 narrows to a branch that does not exist
+- **hands-off** `TOOL-dWitnessedBar-67` — the round-1 audit of units 64 and 65's minors on this unit: fixtures built files-backed and config-proof, both files of the symbolic loop, a one-file chain held unborn, a reason for a probe that exits 0, a timeout on each probe, and a `seed --all` run in a corrupt fixture (ids 4, 13, 15, 16, 21, 22)
 
 ## 4. Design
 
@@ -112,12 +114,11 @@ None: no population has been seeded under the factory yet.
 
 ### Rollout
 
-Live at landing, one step after `TOOL-dWitnessedBar-63`. Order 36 is shared with the minors batch of
-the same audit, and both write the three `legacy_ledger.py` copies and the resolver suite. Dispatch is
-strictly sequential, a shared order included (`tools/workflows/unattended-build.js:76-80`), and its tie
-break is the id string (`tools/workflows/unattended-build.js:612`), so this unit builds first. Neither
-unit consumes from the other: each states its items against the seed's SHA resolution by what it
-does, so either build order yields the same tree.
+Live at landing, one step after `TOOL-dWitnessedBar-63`. Order 36 holds this unit alone. The minors
+batch of the same audit, `TOOL-dWitnessedBar-65`, writes the three `legacy_ledger.py` copies and the
+resolver suite too, so `TOOL-dWitnessedBar-67` S16 moved it to order 37, applied in the commit that
+lands that spec. Neither unit consumes from the other: each states its items against the seed's SHA
+resolution by what it does, so either build order yields the same tree.
 
 ### Files touched (estimate)
 
@@ -205,6 +206,9 @@ New arm: tools/lib/resolve-python.test.sh · covers AC1 AC2 AC3 · section `2l` 
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of unit 63, id 20 (HIGH,
   item H1).
+- rev-2 · 2026-10-25 · §3 · §4 · §3 gains the hands-off edge to `TOOL-dWitnessedBar-67`. §4 Rollout
+  states order 36 alone, since `TOOL-dWitnessedBar-67` S16 moved unit 65 to order 37 (id 14 of the
+  round-1 audit of units 64 and 65). No scope item or criterion moves.
 
 ## 10. Reuse audit
 

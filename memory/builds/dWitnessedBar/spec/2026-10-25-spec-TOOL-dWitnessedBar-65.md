@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-65 — the round-1 audit of unit 63, its 22 minors batched: one containment rule in three readers, plants a leg runs, a seed order that never stalls, honest seed and sweep failures, and readers that keep every normalisation
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 36 · advances TOOL-dWitnessedBar-31
+**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 37 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,9 +8,10 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-63 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-66 TOOL-dWitnessedBar-67 |
 | [2026-10-25-build-TOOL-dWitnessedBar-64-round5-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-64-round5-fix-return.md) | research | TOOL-dWitnessedBar-64 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-64-round5-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-64-round5-fix-brief.md) | research | TOOL-dWitnessedBar-64 |
+| [2026-10-25-review-TOOL-dWitnessedBar-64-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-64-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-64 |
 
 <!-- /gen:spec-records -->
 
@@ -23,7 +24,7 @@ minors. BUILD-METHOD M4 batches every MEDIUM and LOW into one unit, or two only 
 disjoint write sets by M6's clauses so that both build concurrently. §4 "Why one unit" says why these
 stay one. Each finding is named by report id and is its own scope item, including where the report
 merged ids into one item. Every finding lands on `TOOL-dWitnessedBar-63`, so this unit repairs that
-unit and builds one step after it (order 36). The report's ids 4, 9 and 12 were refuted by the audit
+unit and builds after it (order 37, one step after `TOOL-dWitnessedBar-64`). The report's ids 4, 9 and 12 were refuted by the audit
 itself and are no finding here.
 
 | Report item | Severity | Report ids | Scope items |
@@ -72,7 +73,7 @@ That is 11 MEDIUM and 11 LOW findings by raw id.
   the build's last earlier raise set. Observed by AC3.
 - **S6** — id 1. `TOOL-dWitnessedBar-47` moves to order 6 and `TOOL-dWitnessedBar-61` stays at order 5,
   so unit 61 is CLOSED before unit 47 is handed out and the `--dispatch` edge refusal never fires on
-  47. 47's consumers sit at orders 10, 32, 35 and 36, and no order-6 unit has an edge to it. This item
+  47. 47's consumers sit at orders 10, 32, 35 and 37, and no order-6 unit has an edge to it. This item
   is applied in the commit that lands this spec, as unit 47's rev-5 with its §9 line (§8 F3). It
   supersedes unit 63 S14's sequencing claim and, for unit 47, unit 63's §3 renumbering non-goal and
   its §8 F3 resolution. It also makes unit 61's Rollout sentence "It shares order 5 with
@@ -156,6 +157,8 @@ That is 11 MEDIUM and 11 LOW findings by raw id.
 
 - **consumes-from** `TOOL-dWitnessedBar-63` — every item amends what unit 63 builds: its containment readers, plants, seed routes, sweep, record readers, `PM_SCRUB` reader and its AC18 (all 22 ids)
 - **consumes-from** `TOOL-dWitnessedBar-47` — its pass commit at order 6, which S6 observes landing after unit 61's (id 1)
+- **hands-off** `TOOL-dWitnessedBar-66` — AC12's hook half, which the round-1 audit of units 64 and 65 found planted on a key `read_green_file` never reads, replanted on `sha` (id 6)
+- **hands-off** `TOOL-dWitnessedBar-67` — the round-1 audit of units 64 and 65's minors on this unit: the AC12 `fingerprint` line, the sweep's arm and every filesystem call, the `PM_SCRUB` arm graded on the built list and its single assignment, the seed's timeout, `--all` route and `--sha` prefix check, the unterminated record line, AC4's per-file read, the segment rule's bytes and its second Python spelling, and this unit's order (ids 1, 3, 5, 7, 9, 11, 12, 14, 15, 16, 17, 18, 19, 20, 23)
 
 ## 4. Design
 
@@ -165,8 +168,9 @@ M4 admits a second unit only so that the two halves build concurrently. Here no 
 available to buy. Dispatch is strictly sequential, a shared order included
 (`tools/workflows/unattended-build.js:76-80`). The seed half (ids 15, 16, 23 and 24) writes the three
 `legacy_ledger.py` copies and `tools/lib/resolve-python.test.sh`, which `TOOL-dWitnessedBar-64` also
-writes at this same order 36. A seed half split off from this unit would therefore sit beside a unit
-holding its whole write set, and would never build beside it. One unit holds all 22 findings.
+writes. When this spec was written both units sat at order 36, so a seed half split off from this unit
+would have sat beside a unit holding its whole write set, and would never have built beside it.
+`TOOL-dWitnessedBar-67` S16 has since moved this unit to order 37. One unit holds all 22 findings.
 
 ### Evidence
 
@@ -209,9 +213,10 @@ runner escapes CR when it appends and writes each key once.
 ### Rollout
 
 S6 is applied in the commit that lands this spec, before step 5 is dispatched. Every other item is
-live at landing, one step after `TOOL-dWitnessedBar-63`. Order 36 is shared with
-`TOOL-dWitnessedBar-64`, which builds first on the id-string tie break. Neither unit consumes from the
-other. S1, S8, S9, S10, S11 and S14 to S17 stage the regression arms under §7. S6, S12, S13 and S22 are
+live at landing at order 37, after `TOOL-dWitnessedBar-63` (35) and `TOOL-dWitnessedBar-64` (36).
+`TOOL-dWitnessedBar-67` S16 gave this unit its own order, applied in the commit that lands that spec,
+because both units write the seed files and so fail BUILD-METHOD M6's first condition. Neither unit
+consumes from the other. S1, S8, S9, S10, S11 and S14 to S17 stage the regression arms under §7. S6, S12, S13 and S22 are
 observed by the main loop at the close.
 
 ### Files touched (estimate)
@@ -392,6 +397,10 @@ New arm: tools/lib/resolve-python.test.sh · covers AC5 AC6 AC7 AC8 · section `
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of unit 63: 11 MEDIUM and
   11 LOW findings, batched.
+- rev-2 · 2026-10-25 · §1 · §3 · §4 · S6 · the header's order moves from 36 to 37, applied as
+  `TOOL-dWitnessedBar-67` S16 (id 14 of the round-1 audit of units 64 and 65), with §1, S6's consumer
+  orders, §4 "Why one unit" and §4 Rollout restated to match. §3 gains the hands-off edges to units 66
+  and 67. No scope item or criterion moves.
 
 ## 10. Reuse audit
 
