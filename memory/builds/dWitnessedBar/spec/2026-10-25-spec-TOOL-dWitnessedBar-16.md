@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-16 — gov's own registries converted in place onto the ledger (RF-5), with the readers the conversion owes
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-26 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0354@13f6f9b8 whole
 
@@ -14,8 +14,11 @@
 | [2026-10-25-build-TOOL-dWitnessedBar-16-deviation-161.md](../build/2026-10-25-build-TOOL-dWitnessedBar-16-deviation-161.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-16-deviation-162.md](../build/2026-10-25-build-TOOL-dWitnessedBar-16-deviation-162.md) | deviation | — |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
+| [2026-10-26-build-TOOL-dWitnessedBar-16-deviation-163.md](../build/2026-10-26-build-TOOL-dWitnessedBar-16-deviation-163.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-parents-crosscheck.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-1-spec-brief.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-51 |
+| [2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md](../prompts/2026-10-26-prompt-TOOL-dWitnessedBar-1-parents-reground.md) | research | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-56 |
 | [2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-28 |
 
 <!-- /gen:spec-records -->
@@ -54,14 +57,21 @@ direction its own header declares (`shrink-only` debt, `append-only` history, `d
   no reason is lost (§8 F1). Observed by AC2.
 - **S6** — The two map files take the ledger grammar at `memory/map/baseline.txt` and
   `memory/map/affordance-exempt.txt`, in their own directory, because a TAB row is not TOML; every
-  reader of the old names is re-pointed, check 3's admitted names included (§8 F2). Observed by AC5.
+  reader of the old names is re-pointed, check 3's admitted names included (§8 F2). Observed by AC5
+  and AC11.
   **Readers:** by name: `tools/codebase-map/map_lib.py`, `tools/codebase-map/gen_map.py`,
   `tools/codebase-map/map_diff.py`, `tools/codebase-map/adopt-codebase-map.sh`,
   `tools/codebase-map/map_extractors.template.py`, `tools/drift-audit/drift_signals.template.py`,
   `tools/memory-tree/check-memory-hygiene.sh` (its check 3 case at `:772`) and
-  `tools/unattended/check-unattended.sh`, each found by a git grep for the two names
-  · by value: `map_lib.parse_baseline` (`:1107`) and `derive_baseline_additions` (`:1530`), which
-  compare the baseline's keys, re-pointed to the factory's rows.
+  `tools/unattended/check-unattended.sh`, each found by a git grep for the two names at base; and
+  `tools/run-gates/owed_rows.py`, READER NOT IN TREE at base because dOrderedCharter's build run
+  creates it after this spec's base, found by name in PLAY-dOrderedCharter-50 S2: its leg-removed
+  population owes "no row of `subject-pins.tsv`, `memory/map/baseline.toml` or
+  `tools/run-gates/selftest-budgets.txt` naming it", so that path re-points to the map file's `.txt`
+  successor, and its `--selftest` (PLAY-dOrderedCharter-50 S4) runs after the rename · by value: `map_lib.parse_baseline` (`:1107`) and `derive_baseline_additions`
+  (`:1530`), which compare the baseline's keys, re-pointed to the factory's rows; the probe's
+  leg-removed population, which reads the baseline's gate-leg names and would read none from a path
+  that is gone.
 - **S7** — `readme-contract.txt` keyed by `path` and `binding` (`bound` or `exempt`), a `declared-set`;
   its `exempt-pin:` line retires and `gen_build_index.py --check-format` refuses an `exempt` row whose
   path the base's rows did not hold as `exempt`, read through `compare_to_base` (§8 F4). Observed by
@@ -274,6 +284,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - `tools/check-agent-cap-restatement.sh`
 - `tools/check-dead-paths.sh`
 - `tools/check-playbook-parity.sh`
+- `tools/run-gates/owed_rows.py`
 - `tools/govkit/registry.toml`
 - `tools/govkit/refusal_join.py`
 - `tools/govkit/check_runbook_parity.py`
@@ -313,7 +324,7 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
 - observability — the conversion record's before and after counts per population.
 - risks — a reader whose message quoted a reason now has none to quote; the record keeps it, said in
   S5. The two ordinal registries' low water falls once, said in §4 "Drift".
-- testing — AC1 to AC10 by probes and scratch clones; the arm in §7 is observed RED then GREEN by the
+- testing — AC1 to AC11 by probes and scratch clones; the arm in §7 is observed RED then GREEN by the
   main loop at the close.
 - migration — §4 and S10.
 - user docs — `tools/drift-audit/README.md` replaces its `SHRINK_ONLY`, `PINS` and `BASELINES` rows;
@@ -365,13 +376,19 @@ retrofit.md's confirming probe on `readme-contract.txt` (AC6), and runs
   again, it exits 0 and writes nothing.
   Red when: a second run re-dates the rows, the `seed laundering` case.
   fixture: a scratch adopter under `%TEMP%/<short-name>` holding a copy of today's file.
+- **AC11** — When `python tools/run-gates/owed_rows.py --selftest` runs on the landed tree after the
+  rename, it exits 0; and when a scratch clone removes from `tools/gate-legs.json` a leg whose name
+  `memory/map/baseline.txt` still lists and runs `python tools/run-gates/owed_rows.py --base HEAD`, it
+  exits 1 printing an `owed —` line naming `memory/map/baseline.txt` and the leg.
+  Red when: the probe still reads the TOML name, so a removed leg's leftover baseline row owes nothing.
+  fixture: a scratch clone under `%TEMP%/<short-name>`.
 
 ## 7. Gates
 
 The `ratchet` pack's legs (unit 14) grade every converted population at the close; they are not on
 the leg line below, which the leg join reads against today's manifest.
 
-`memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `agent-cap restatement self-test` · `testsuite counts self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)`
+`memory hygiene` · `memory-hygiene self-test` · `run-gates canary` · `build-index selftest` · `corpus-ids selftest` · `check-arms selftest` · `method-carriers self-test` · `harness arms (fail branches armed or pinned)` · `transition-audit arms` · `shell-hygiene selftest` · `drift-audit selftest` · `drift-audit wiring` · `drift-audit records` · `codebase-map kit selftest` · `codebase-map gate coverage` · `codebase-map coverage + freshness` · `codebase-map adopter e2e` · `lexicon selftest` · `lexicon naming predicates` · `spec-tokens self-test` · `dead-path carriers self-test` · `agent-cap restatement self-test` · `testsuite counts self-test` · `playbook parity selftest` · `govkit selftest` · `govkit refusal join` · `govkit runbook parity` · `unattended kit gate` · `kit/dogfood doc parity` · `row-keyed merge driver replay` · `check-wiring self-test` · `govkit acceptance matrix` · `recall floor` · `recall floor arms` · `review-join self-test` · `tier2-review self-test` · `unattended-build self-test` · `verifier fan-out self-test` · `spec tokens (a spec's own names resolve)`
 
 New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PINS and BASELINES fixtures re-pointed to registrations and the two populations, the failing case staged by a raised `drift-pins` row and a gained `drift-baselines` id · none
 
@@ -425,6 +442,11 @@ New arm: tools/drift-audit/selftest.py · covers AC7 AC8 · its SHRINK_ONLY, PIN
 - rev-3 · 2026-10-25 · §3 · the Edges block gains the hands-off bullet mirroring the consumes-from
   edges of TOOL-dWitnessedBar-57, promoted by the round-1 spec audit of units 40 to 51; nothing else
   moved.
+- rev-4 · 2026-10-26 · §2 S6 · §4 Files touched · §5 testing · AC11 (new) · §7 · re-grounded by
+  `2026-10-26-build-TOOL-dWitnessedBar-1-parents-crosscheck` row 49: S6's readers gain
+  `tools/run-gates/owed_rows.py`, whose leg-removed population names `memory/map/baseline.toml`
+  (PLAY-dOrderedCharter-50 S2), and AC11 runs its `--selftest` and a leg-removed probe after the rename;
+  the leg line gains `run-gates canary`, the leg that runs the probe's self-test; no fork moved.
 
 ## 10. Reuse audit
 
