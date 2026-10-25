@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-74 — the writer-split fallback arm the closed specs TOOL-dGroundRules-25, -30 and -34 claim
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -41,8 +41,8 @@ suite's floor by the count it adds.
 - `tools/hooks/agent-cap.js`, and `build_layout` itself. The layout keeps copying only `policy.py`
   and `catalogue.toml` of the policy kit. Why that matters is in §4 "Evidence".
 - The `New arm:` lines of the closed specs TOOL-dGroundRules-25, -30 and -34, which name
-  `check-protocol-parity.test.sh` as the arm's home. This unit does not edit a CLOSED record (§7).
-- The report's left-shift gate, a spec-to-arm check at a unit's close (§7).
+  `check-protocol-parity.test.sh` as the arm's home. This unit does not edit a CLOSED record (§8, rev-2).
+- The report's left-shift gate, a spec-to-arm check at a unit's close (§8, rev-2).
 - The other findings of the report, any other spec, and the inherited reds the close recorded
   (unattended shards 1, 3, 5 and 7, and the hygiene partition arm).
 
@@ -251,17 +251,6 @@ New arm: tools/workflows/unattended-build.test.sh · covers AC1 · the denying h
 
 none
 
-Two follow-ups for the main loop to file as asks. Neither is a fork of this unit, and neither is
-built here:
-
-- The report's left-shift gate: a check at a unit's close that each `New arm: <file> · covers ACn`
-  line of a CLOSED spec matches an arm label in that file, so removing an arm a closed spec cites
-  goes red. It reads every closed spec against every suite, which is a mechanism of its own and not
-  one small arm of this one.
-- The three closed specs' arm lines name `tools/workflows/check-protocol-parity.test.sh` as the arm's
-  home, and the arm lands in `tools/workflows/unattended-build.test.sh`. Correcting a CLOSED record
-  is the owner's or a records pass's call, not this unit's.
-
 ## 8. Revision log
 
 - rev-1 · 2026-10-25 · initial draft from the build run's rescope add row for this unit and its spec
@@ -278,6 +267,13 @@ built here:
 ```
 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-74-spec-brief.md
 ```
+
+- rev-2 · 2026-10-25 · §7's two follow-up bullets move here as prose, so §7 reads `none` and check 12 admits a CLOSED flip.
+  The main loop files an ask for the report's left-shift gate, a close-time check that each CLOSED
+  spec's `New arm:` line matches an arm label in the suite it names.
+  It files a second ask for the owner or a records pass to correct the arm lines of
+  TOOL-dGroundRules-25, -30 and -34, which name `tools/workflows/check-protocol-parity.test.sh`
+  where the arm lands in `tools/workflows/unattended-build.test.sh`.
 
 ## 9. Reuse audit
 

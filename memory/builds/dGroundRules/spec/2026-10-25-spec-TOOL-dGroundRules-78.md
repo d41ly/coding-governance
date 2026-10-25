@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-78 — the close sweep of the review's M4 and lows: the policy fixtures leg's figures, agent-cap.js's rule-7 header, policy-mirror.js's bash resolver order, and the stale "lands dark" waiver and help text
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -406,24 +406,6 @@ over `tools/`), and the leg count does not change.
 
 none
 
-Follow-ups the main loop files as asks. Each is a new check or a text outside the report, not one arm
-of a mechanism here:
-
-- M4's left-shift gate. Each budget row's reading carries its case count, and a check compares that
-  count with the leg's live `derive_cases` length, going red past a 25% drift. S1 writes the count
-  into this one row. The check over every row is a new gate.
-- L1's left-shift gate. A bug-class checklist entry, "an amendment leaves its other half standing":
-  a unit that changes a rule's behaviour greps the file header and the kit README for the old
-  wording.
-- L2's left-shift gate. A row for the JS resolver in the resolver parity table
-  (`tools/lib/resolve-python.test.sh:186`). That table compares byte-identical blocks, and a JS
-  resolver cannot be one, so the row needs a candidate-order comparison. AC4's probe is a starting
-  point.
-- L3's left-shift gate. Each waiver row's reason carries a condition a machine can check, such as
-  "no consumer reads X", and the parity gate re-tests it.
-- The "lands dark" paragraph of `tools/policy/README.md` (`:9-14`). It still says "no consumer calls
-  the reader yet" and "no hook reads it yet", which are false for the reason L3 gives.
-
 ## 8. Revision log
 
 - rev-1 · 2026-10-25 · initial draft from the closing review's findings M4 (id 11), L1 (id 7), L2
@@ -443,6 +425,20 @@ of a mechanism here:
 memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md
 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-78-spec-brief.md
 ```
+- rev-2 · 2026-10-25 · the five follow-up bullets move out of §7 into the prose below, so §7 reads
+  `none` and check 12 can grade a CLOSED flip.
+
+Follow-ups the main loop files as asks, none of them one arm of a mechanism here. M4's left-shift
+gate is an ask for a check that compares each budget row's recorded case count with its leg's live
+`derive_cases` length and goes red past a 25% drift. L1's left-shift gate is an ask for a bug-class
+checklist entry, "an amendment leaves its other half standing", under which a unit that changes a
+rule's behaviour greps the file header and the kit README for the old wording. L2's left-shift gate
+is an ask for a JS-resolver row in the resolver parity table (`tools/lib/resolve-python.test.sh:186`),
+compared by candidate order rather than bytes, starting from AC4's probe. L3's left-shift gate is an
+ask for each waiver row's reason to carry a machine-checkable condition, such as "no consumer reads
+X", that the parity gate re-tests. The last is an ask to rewrite the stale "lands dark" paragraph of
+`tools/policy/README.md` (`:9-14`), which still says no consumer calls the reader and no hook reads
+the mirror.
 
 ## 9. Reuse audit
 

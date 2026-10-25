@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-72 — the pre-commit policy guard reads the index git hands the hook, so `git commit -a` and `git commit <path>` are graded
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -38,9 +38,9 @@ A plain `git add` and `git commit` is judged as it is today.
   environment on (§4 "Evidence"), so the index the hook passes reaches all of them.
 - The other staged legs of the hook: memory-tree hygiene at `:219`, kickoff-manifest at `:230`,
   unattended wiring at `:239`, the charter leg at `:248` and the codebase-map leg at `:272`. Each
-  reads the real index too, and §7 names them as a follow-up.
-- The left-shift gate the report proposes, a hook lint over every staged read after the unset. §7
-  names it as a follow-up.
+  reads the real index too, and §8's rev-1 entry names them as a follow-up.
+- The left-shift gate the report proposes, a hook lint over every staged read after the unset.
+  §8's rev-1 entry names it as a follow-up.
 - `help/policy.md`. Its guard section at `:145-200` already describes the behaviour this unit
   restores, and does not name `-a` among what passes the guard, so it stays current.
 - The `govkit:branch-guard` block at `:18-87`, which is all the push-main kit ships of this file
@@ -271,26 +271,19 @@ pinned count moves (§4 "The floors").
 
 none
 
-Follow-ups the main loop files as asks. Neither is one arm of this mechanism, so neither is specced
-here:
-
-- The report's left-shift gate: a hook-lint leg that fails any `.githooks/*` block running
-  `git diff --cached` or a `:<path>` read after the `GIT_INDEX_FILE` unset without passing the saved
-  index, and a rule that every staged-reading block in `.githooks/pre-commit.test.sh` carries a `-a`
-  arm and a `<path>` arm. That is a new gate, so it is a unit of its own.
-- The same defect in the hook's other staged legs, listed in §3. Each reads the real index after
-  `:8`, so `git commit -a` skips the memory-tree hygiene leg and the rest. `with_hook_index` is the
-  seam each would reuse. The backlog ask `TOOL-aTrimmedHook-8`, which proposes reading the staged
-  name list once, is the natural place to land it.
-
 ## 8. Revision log
 
 - rev-1 · 2026-10-25 · initial draft from the closing review's finding B1 (id 1) and this unit's spec
   brief, grounded at `fce5603f8`. The premise was checked twice: by a stand-in hook that printed the
   handed index for five commit shapes, and by AC1's fixture against the real hook, with the stand-in
   guard and with `tools/policy/guard.py`. Follows the skeptic's SOUND fix, corrected on one point:
-  a relative index is relative to the work tree top, not to the git dir, as the probe measured. Puts
-  the left-shift gate and the hook's other staged legs in §7 as follow-ups. The brief's leg item
+  a relative index is relative to the work tree top, not to the git dir, as the probe measured. Two
+  follow-ups are for the main loop to file as asks, because neither is one arm of this mechanism.
+  The first is the report's left-shift gate, a hook-lint leg that fails any `.githooks/*` block
+  reading the index after the `GIT_INDEX_FILE` unset without the saved one, with a `-a` arm and a
+  `<path>` arm owed by every staged-reading block in `.githooks/pre-commit.test.sh`. The second is
+  the same defect in the hook's other staged legs §3 lists, for which `with_hook_index` is the seam
+  and the backlog ask `TOOL-aTrimmedHook-8` the natural home. The brief's leg item
   names §6; in this Tier-1 shape the Gates section is §6, and the leg lines sit there. The review
   report and the brief, both untracked when this draft was written:
 
@@ -298,6 +291,9 @@ here:
 memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md
 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-72-spec-brief.md
 ```
+
+- rev-2 · 2026-10-25 · the two follow-ups move from §7 into the rev-1 entry as prose, so §7 reads
+  `none` and check 12 grades no bullet outside an F-item at the CLOSED flip; §3 points at them there.
 
 ## 9. Reuse audit
 
