@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-26 — the round-1 spec audit's 54 minors: one base rule, one writer each, honest populations, declared exits, and the texts that name them
 
-**Status:** DEFERRED · rev-4 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -255,11 +255,11 @@ here. Items whose fix the report records as REJECTED are built from the skeptic'
   when nothing but blanks and comments remains, and keeps the whole file in its before-image. Its
   witness: no `FANOUT_CAP` assignment in `.agent-cap.conf`, or the file absent. TOOL-dSafePassage-1's
   AC12 is read with `FANOUT_CAP=abc` alone.
-  **Readers:** by name: `loadDeclaredCap` in `tools/hooks/agent-cap.js`, which spells `FANOUT_CAP`
-  and `.agent-cap.conf`, and the other files S43's grep prints, which that item derives and disposes
-  · by value: `loadDeclaredCap`, whose declared cap the
-  fan-out guard holds the agents in flight under, the value the step's up carries to
-  `runtime.agents-in-flight`. Observed by AC29.
+  **Readers:** by name: `read_legacy_fanout` in `tools/policy/policy.py`, whose `FANOUT_LINE` spells
+  `FANOUT_CAP` and whose `LEGACY_FANOUT` spells `.agent-cap.conf`, and the other files S43's grep
+  prints, which that item derives and disposes · by value: `derive_lowered_limit` in
+  `tools/policy/policy.py`, which lowers `runtime.agents-in-flight` to that line's value where it is
+  smaller, the value the step's up carries to `runtime.agents-in-flight`. Observed by AC29.
 - **S31** — id 56. `write_before_image` writes through `write_atomic` (S15); an image that does not
   parse is treated as absent only when no path it would list has changed since, and otherwise the up
   exits 1 naming the image. Observed by AC30.
@@ -725,6 +725,7 @@ New arm: tools/push-main.test.sh · covers AC50 · each lander stage's base-run 
 - rev-2 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the round-1 audit of units 15 to 26, written by the disposal stage: `TOOL-dSafePassage-31`, `TOOL-dSafePassage-34`, `TOOL-dSafePassage-35`; no other section moved.
 - rev-3 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 27 to 35, written by the disposal stage: `TOOL-dSafePassage-41`; no other section moved.
 - rev-4 · 2026-10-23 · §3 · the Edges gain the ends this unit owes the promotions of the spec audit of units 36 to 42, written by the disposal stage: `TOOL-dSafePassage-45`; no other section moved.
+- rev-5 · 2026-10-25 · §2 · S30 · the Readers clause names the code that reads `FANOUT_CAP` since `TOOL-dGroundRules-10` (`2ebafd441`) moved the agent limit to the policy reader: `read_legacy_fanout` and `LEGACY_FANOUT` by name and `derive_lowered_limit` by value, each in `tools/policy/policy.py`. Hygiene check 25 found the hook function the clause named spelled by no reader. Written by `TOOL-dGroundRules-86`; no other section moved.
 
 ## 10. Reuse audit
 

@@ -224,10 +224,10 @@ ids TOOL-dGroundRules-111
 | [TOOL-dGroundRules-83 — the govkit selftest's [-PV] adopter targets hold the agent-cap hook again, and a render whose fan-out gate could not ask the hook refuses with the gate's own reason](spec/2026-10-25-spec-TOOL-dGroundRules-83.md) | 30 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-84 — the shell sources and kit-path spellings this build left red on the bar, each site converted or declared, and the install-prefix counter reads a `limits:` home as the Skill path it is](spec/2026-10-25-spec-TOOL-dGroundRules-84.md) | 31 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-85 — both size-cap enforcers split the budgets answer once with builtins, so the memory-hygiene and manifest-check probes fork within their ceilings again](spec/2026-10-25-spec-TOOL-dGroundRules-85.md) | 32 | 1 | CLOSED | rev-1 | 2026-10-25 |
-| [TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section](spec/2026-10-25-spec-TOOL-dGroundRules-86.md) | 33 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section](spec/2026-10-25-spec-TOOL-dGroundRules-86.md) | 33 | 1 | DEFERRED | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 421 bound to this build, across 4 record folder(s).
+Records: 423 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 

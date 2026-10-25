@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 33
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base cae57b1d · streams tooling · order 33
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,8 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-25-prompt-TOOL-dGroundRules-86-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-1-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dGroundRules-86-2-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-2-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dGroundRules-86-rev2-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-rev2-brief.md) | research | — |
 | [2026-10-25-prompt-TOOL-dGroundRules-86-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-spec-brief.md) | research | — |
 
 <!-- /gen:spec-records -->
@@ -20,7 +22,9 @@ kickoff-manifest ratchet, memory hygiene (checks 25 and 23), method carriers and
 parity. Each was green at the run's base `3c2b69be4`, and each red is this build's code moving under
 a record or a doc that describes it. This unit brings each record and the runbook back to the tree.
 It builds after `TOOL-dGroundRules-84` and `TOOL-dGroundRules-85`, so the manifest re-audit reads the
-tree they leave.
+tree they leave; both have landed, at `5e8c8c5e7` and `2550ccaa7`. S3 edits another build's spec,
+which only the spec-writer role may write, so it lands with this spec's rev-2 commit, before the
+build. The builder writes S1, S2, S4, S5 and S6.
 
 ## 2. Scope (IN)
 
@@ -33,10 +37,11 @@ tree they leave.
   `last-audit` (`:5`) becomes the audit's datetime `@` the full sha of the audit commit, and
   `last-body-change` (`:8`) becomes that same sha. The commit message carries a
   `manifest-audit: delta` line in the shape §4 gives. Observed by AC1.
-- **S3** — In `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md`, S30's
-  Readers clause (`:258-262`) takes the text §4 "The Readers clause" gives. Its header (`:3`) goes to
-  rev-5 with the build's date, its status DEFERRED kept. Its §9 gains the rev-5 line §4 gives, after
-  the rev-4 line (`:727`). Observed by AC2.
+- **S3** — Landed by this spec's rev-2 pass, in the spec commit. In
+  `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md`, S30's Readers clause
+  (`:258-262`) holds the text §4 "The Readers clause" gives. Its header (`:3`) reads rev-5 dated
+  2026-10-25, its status DEFERRED kept. Its §9 holds the rev-5 line §4 gives, at `:728`, after the
+  rev-4 line. The builder writes nothing for S3. Observed by AC2.
 - **S4** — The AC32 answer of the `TOOL-dGroundRules-34` ledger
   (`memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-34-ledger.md:51`) carries
   `gen:build-order` as its observation token in place of `165`. The rest of the line stays.
@@ -51,8 +56,9 @@ tree they leave.
 ## 3. Non-goals (OUT)
 
 - Legs 3 to 7 and 9 of the triage. `TOOL-dGroundRules-84` and `TOOL-dGroundRules-85` own them.
-- Any part of dSafePassage-26 other than S30's Readers clause, its header and its §9. S30's body
-  cites `tools/hooks/agent-cap.js:1631-1632` as the shared parser, and §8 names that as a follow-up.
+- Any edit to dSafePassage-26 by the builder. S3 landed with this spec's rev-2, and it touched
+  S30's Readers clause, the header and §9 only. S30's body cites
+  `tools/hooks/agent-cap.js:1631-1632` as the shared parser, and §8 names that as a follow-up.
 - The policy kit's code, and `PROBLEM_PIN` in `tools/govkit/check_runbook_parity.py:60`. The count
   meets the pin after S6 (§6).
 - Hygiene check 9. It reds on the staged rescope's build README, which the committing loop renders
@@ -71,18 +77,22 @@ none
 
 Measured at `cae57b1d8`. Scratch-guard refused this role a leg run (`manifest-check.sh` was refused
 by name), so memory hygiene, which the role may run, ran whole, and the other three legs were
-re-derived from each checker's own predicate, read from its source and replayed read-only.
+re-derived from each checker's own predicate, read from its source and replayed read-only. Every
+line this spec cites was re-read at `2550ccaa7` for rev-2, and the citations give the lines there.
 
 | Leg | Re-derived at `cae57b1d8` | The predicate replayed |
 |---|---|---|
-| kickoff-manifest ratchet | check 9: 20 non-merge commits touching a `watch:` path since `last-body-change` `f221e1135`, against a cap of 10 | `skills/session-kickoff/manifest-check.sh:1630-1633`, a `git rev-list --count --no-merges` over the eleven `watch:` paths |
+| kickoff-manifest ratchet | check 9: 20 non-merge commits touching a `watch:` path since `last-body-change` `f221e1135`, against a cap of 10 | `skills/session-kickoff/manifest-check.sh:1645-1648`, a `git rev-list --count --no-merges` over the eleven `watch:` paths |
 | memory hygiene | check 25: dSafePassage-26 S30 by name lists `loadDeclaredCap`, which no reader spells; check 23: `TOOL-dGroundRules-34/AC32`; check 9: the staged README | the leg's own run |
 | method carriers | check 3: `tools/policy/caps.toml` and `tools/policy/check_policy.py` mention the method and are undeclared; no row is stale | the population at `tools/memory-tree/check-method-carriers.sh:66-74`, the registry parse at `:82` |
 | govkit runbook parity | 19 problems against `PROBLEM_PIN` 18; the extra one is `registry entry 'policy' has no anchored runbook section` | `tools/govkit/check_runbook_parity.py:64-95` over `tools/govkit/registry.toml` and `WIRE-INTO-PROJECT.md` |
 
 Check 5 of the ratchet holds at `cae57b1d8`. The one watched commit after `ea46113d8`, `f2b41e328`,
 is itself the commit that stamped `last-audit` at `ea46113d8`
-(`skills/session-kickoff/manifest-check.sh:1511-1527` reads it so).
+(`skills/session-kickoff/manifest-check.sh:1526-1542` reads it so). At `2550ccaa7` it still holds:
+`last-audit` reads `5e8c8c5e7`, and the one watched commit after it, `2550ccaa7`, is the commit
+that stamped it. `last-body-change` still reads `f221e1135`, and check 9's replayed count there is
+22.
 
 S3 needs no deviation record. It revises dSafePassage-26 past its audited rev-1, which the audit arm
 addresses `TOOL-dSafePassage-26@rev-1` (`tools/memory-tree/deviation_join.py:603-606`).
@@ -119,7 +129,8 @@ Its host reports and never moves the exit (`tools/memory-tree/routed_commits.py:
 ### The manifest
 
 The §B re-audit at `cae57b1d8`, claim by claim. The builder re-runs the same probes at the audit
-commit, because `TOOL-dGroundRules-84` and `TOOL-dGroundRules-85` land between.
+commit, because `TOOL-dGroundRules-84` and `TOOL-dGroundRules-85` landed between. At `2550ccaa7`
+the §B body is byte-identical to `cae57b1d8`'s; only the `last-audit` stamp moved.
 
 | §B lines | What was probed | Verdict |
 |---|---|---|
@@ -171,8 +182,8 @@ manifest-audit: delta section B gains a pointer to the policy file and its guard
 
 ### The Readers clause
 
-The five lines at `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md:258-262`
-become:
+Landed by rev-2's pass (S3); this section records what it wrote. The five lines at
+`memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md:258-262` read:
 
 ```
   **Readers:** by name: `read_legacy_fanout` in `tools/policy/policy.py`, whose `FANOUT_LINE` spells
@@ -186,21 +197,21 @@ Every by-name token resolves: `tools/policy/policy.py` is a tracked path, and th
 `read_legacy_fanout`, `FANOUT_LINE`, `FANOUT_CAP`, `LEGACY_FANOUT` and `.agent-cap.conf`
 (`tools/policy/policy.py:763-768`). Check 25 resolves a token as a tracked path, or as a whole
 token spelled by a tracked file outside the memory tree's records
-(`tools/memory-tree/check-memory-hygiene.sh:2844-2896`).
+(`tools/memory-tree/check-memory-hygiene.sh:2858-2910`).
 
-The header becomes
-`**Status:** DEFERRED · rev-5 · <the build date> · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14`.
+The header reads
+`**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 6 · advances TOOL-dSafePassage-14`.
 The §9 line after rev-4:
 
 ```
-- rev-5 · <the build date> · §2 · S30 · the Readers clause names the code that reads `FANOUT_CAP` since `TOOL-dGroundRules-10` (`2ebafd441`) moved the agent limit to the policy reader: `read_legacy_fanout` and `LEGACY_FANOUT` by name and `derive_lowered_limit` by value, each in `tools/policy/policy.py`. Hygiene check 25 found the hook function the clause named spelled by no reader. Written by `TOOL-dGroundRules-86`; no other section moved.
+- rev-5 · 2026-10-25 · §2 · S30 · the Readers clause names the code that reads `FANOUT_CAP` since `TOOL-dGroundRules-10` (`2ebafd441`) moved the agent limit to the policy reader: `read_legacy_fanout` and `LEGACY_FANOUT` by name and `derive_lowered_limit` by value, each in `tools/policy/policy.py`. Hygiene check 25 found the hook function the clause named spelled by no reader. Written by `TOOL-dGroundRules-86`; no other section moved.
 ```
 
 ### The ledger answer
 
 Line 51 of the ledger opens `` - AC32 — `gen:build-order` — through `` and keeps the rest. Check 23
 passes a pair when either backticked token contains the other after case folding
-(`tools/memory-tree/check-memory-hygiene.sh:3376-3380`). `gen:build-order` sits inside the
+(`tools/memory-tree/check-memory-hygiene.sh:3390-3394`). `gen:build-order` sits inside the
 criterion's own token
 (`memory/builds/dGroundRules/spec/2026-10-23-spec-TOOL-dGroundRules-34.md:571`), and the answer
 already reports the grep that printed `165` and `179`.
@@ -214,8 +225,8 @@ tools/policy/caps.toml · the size-cap census row for the rendered method: its n
 tools/policy/check_policy.py · the cap census's case table and its budgets-correctness-kept case name the method's path as a size-cap subject they plant into a scratch repository — a path the checker reads, never a restatement of what the method says
 ```
 
-The two sites are `tools/policy/caps.toml:63`, `:67` and `tools/policy/check_policy.py:3488`,
-`:3757`. Neither file holds a `## M<n>` heading, so check 5 of the leg stays clean.
+The two sites are `tools/policy/caps.toml:63`, `:67` and `tools/policy/check_policy.py:3489`,
+`:3758`. Neither file holds a `## M<n>` heading, so check 5 of the leg stays clean.
 
 ### The runbook section
 
@@ -225,7 +236,7 @@ default list holds no `policy` (`tools/govkit/registry.toml:38-54`); `review-har
 (`tools/workflows/kit.toml:10`) and it requires `memory-tree` (`tools/policy/kit.toml:12`); govkit
 refuses an unmet dependency and never widens a selection (`tools/govkit/govkit.py:7558-7564`); the
 adopter, its regenerate and its check are `tools/policy/kit.toml:32-43`; its printed strings are
-`tools/policy/adopt-policy.sh:93`, `:135`; the shipped leg is `tools/policy/kit.toml:79-81`.
+`tools/policy/adopt-policy.sh:93`, `:136`; the shipped leg is `tools/policy/kit.toml:79-81`.
 
 The section opens with the anchor line `<!-- govkit:entry policy -->`, then the heading line
 `## 3i — Adopt the policy kit (with the review harness)`, then one blank line and this body. The two
@@ -276,7 +287,6 @@ sets this spec's status from DEFERRED to INPROGRESS before its first write, beca
 ### Files touched (estimate)
 
 - `memory/guides/SESSION-KICKOFF.md`
-- `memory/builds/dSafePassage/spec/2026-10-23-spec-TOOL-dSafePassage-26.md`
 - `memory/builds/dGroundRules/build/2026-10-23-build-TOOL-dGroundRules-34-ledger.md`
 - `memory/project/method-carriers.txt`
 - `WIRE-INTO-PROJECT.md`
@@ -284,18 +294,19 @@ sets this spec's status from DEFERRED to INPROGRESS before its first write, beca
 ## 5. Acceptance criteria
 
 All commands run from the repository root of the pass's worktree, in Git Bash, at the audit commit
-with S1 to S6 applied in the worktree and before the unit's commit. Each break below is the same
-command on the tree before this unit's edit, which at `cae57b1d8` printed what the clause quotes.
-The hygiene criterion's green and its break were both observed at `cae57b1d8` in a scratch clone,
-with S3 and S4 applied as §4 gives them. The carriers and runbook criteria were observed by
-replaying each checker's predicate there with S5 and S6 applied: no carrier undeclared or stale,
-and 18 runbook problems.
+with S1, S2, S4, S5 and S6 applied in the worktree and before the unit's commit. S3 is already in
+that tree, landed with this spec's rev-2 commit. Each break below is the same command on the tree
+before this unit's edit, which at `cae57b1d8` printed what the clause quotes. The hygiene
+criterion's green and its break were both observed at `cae57b1d8` in a scratch clone, with S3 and
+S4 applied as §4 gives them. The carriers and runbook criteria were observed by replaying each
+checker's predicate there with S5 and S6 applied: no carrier undeclared or stale, and 18 runbook
+problems.
 
 - **AC1** — When `bash skills/session-kickoff/manifest-check.sh` runs, it prints no `MANIFEST check 9 FAILED` line and no `MANIFEST check 5 FAILED` line, and exits 0. Then `git grep -c "budgets.enforce" -- memory/guides/SESSION-KICKOFF.md` prints `memory/guides/SESSION-KICKOFF.md:1`, and `git grep -c "an owner decision, not an edit" -- memory/guides/SESSION-KICKOFF.md` prints nothing.
   Red when: the stamps and the trap stand as at `cae57b1d8`. Then the ratchet prints `MANIFEST check 9 FAILED` ending `non-merge commits since f221e113556ac8406fcbd834cce37f746c23bd73`, and the second grep prints `memory/guides/SESSION-KICKOFF.md:1`.
-  figure: DERIVED. The watched-commit count was 20 at `cae57b1d8`, replayed, and grows with the commits of `TOOL-dGroundRules-84` and `TOOL-dGroundRules-85`.
-- **AC2** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, no line it prints names `§2 item S30` of `2026-10-23-spec-TOOL-dSafePassage-26.md`, and no line names `TOOL-dGroundRules-34/AC32`.
-  Red when: S3's clause and S4's token are absent. Then it prints `HYGIENE check 25 FAILED` with a line naming `§2 item S30` and `loadDeclaredCap`, and `HYGIENE check 23 FAILED` ending `TOOL-dGroundRules-34/AC32`.
+  figure: DERIVED. The watched-commit count was 20 at `cae57b1d8` and 22 at `2550ccaa7`, replayed, the two added being the commits of `TOOL-dGroundRules-84` and `TOOL-dGroundRules-85`.
+- **AC2** — When `bash tools/memory-tree/check-memory-hygiene.sh` runs, no line it prints names `§2 item S30` of `2026-10-23-spec-TOOL-dSafePassage-26.md`, and no line names `TOOL-dGroundRules-34/AC32`. The first half is S3's: the main loop observes it at the close, over the tree this spec's rev-2 commit leaves. The second half is S4's, observed at the audit commit.
+  Red when: S3's clause and S4's token are absent. Then it prints `HYGIENE check 25 FAILED` with a line naming `§2 item S30` and `loadDeclaredCap`, and `HYGIENE check 23 FAILED` ending `TOOL-dGroundRules-34/AC32`. Both were printed at `2550ccaa7`, before rev-2's pass.
 - **AC3** — When `bash tools/memory-tree/check-method-carriers.sh` runs, it prints one line, `method-carriers:` followed by the carrier count and `carrier(s), all declared and pointing`, and exits 0.
   Red when: S5's two rows are absent. Then it prints `METHOD-CARRIERS check 3 FAILED` and the two indented paths `tools/policy/caps.toml` and `tools/policy/check_policy.py`, and exits 1.
   figure: DERIVED. The carrier count was 33 at `cae57b1d8`, replayed from the leg's own population.
@@ -307,16 +318,16 @@ and 18 runbook problems.
 
 `recall floor` · `recall floor arms` · `kickoff-manifest ratchet` · `memory hygiene` · `method carriers (every pointer declared)` · `govkit runbook parity` · `install-prefix (shipped surface)` · `playbook parity` · `spec tokens (a spec's own names resolve)`
 
-Run through `derive_guarded_legs` at `cae57b1d8`, `python tools/check-spec-tokens.py --legs-for`
-over the five files touched names two guarded legs. Each of the four `memory/` files trips
+Run through `derive_guarded_legs` at `2550ccaa7`, `python tools/check-spec-tokens.py --legs-for`
+over the four files touched names two guarded legs. Each of the three `memory/` files trips
 `recall floor` and `recall floor arms` through the guard `memory/`, which two legs carry, under the
 broad floor of 5. `WIRE-INTO-PROJECT.md` trips no guarded leg.
 
 The unguarded legs named beside them read what this unit changes:
 
 - `kickoff-manifest ratchet` reads S1 and S2, observed by AC1.
-- `memory hygiene` reads S3 and S4, observed by AC2. Its check 12 also grades S3's header rev
-  against the rev-5 line in dSafePassage-26's §9.
+- `memory hygiene` reads S3 and S4, observed by AC2, S3's half at the close. Its check 12 also
+  grades S3's header rev against the rev-5 line in dSafePassage-26's §9.
 - `method carriers (every pointer declared)` reads S5, observed by AC3.
 - `govkit runbook parity` reads S6, observed by AC4. Its pin of 18 does not move: S6 takes the
   count from 19 to 18, which the pin already holds.
@@ -324,7 +335,8 @@ The unguarded legs named beside them read what this unit changes:
   spells only `<prefix>/`, a drained spelling (`:53`).
 - `playbook parity` reads the runbook and `memory/guides/`. Neither S1 nor S6 cites a charter
   section by number.
-- `spec tokens (a spec's own names resolve)` reads dSafePassage-26 after S3.
+- `spec tokens (a spec's own names resolve)` reads this spec while it is INPROGRESS. Its joins over
+  live specs read no DEFERRED spec, dSafePassage-26 included (`tools/check-spec-tokens.py:331`).
 
 No arm is added or moved. No floor, ceiling or pinned count moves.
 
@@ -353,6 +365,27 @@ none
 memory/builds/dGroundRules/build/2026-10-25-build-TOOL-dGroundRules-84-research-bar-triage.md
 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-86-spec-brief.md
 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-86-1-spec-writer.md
+```
+
+- rev-2 · 2026-10-25 · §1 · S3 · §3 · §4 · AC1 · AC2 · §6 · S3 leaves the build for this spec-writer
+  pass, which landed it in dSafePassage-26 with this spec's commit. The rev-1 builder returned a
+  DIVERGENCE with nothing committed, because scratch-guard admits a product role only a status
+  flip, and only on a spec its route names (`tools/hooks/scratch-guard.js:1064-1086`);
+  dSafePassage-26 is not on the route. §4 "Files touched" drops that path, so §6's guard derivation
+  reads four files, re-run at `2550ccaa7` with the same two guarded legs. AC2's check-25 half is
+  observed at the close over the tree this pass leaves. Every cited line was re-read at
+  `2550ccaa7`. Seven had moved, and each now cites its line there: the check 9 and check 5
+  predicates of `skills/session-kickoff/manifest-check.sh`, 15 lines lower; check 25's resolution rule and
+  check 23's containment test in `tools/memory-tree/check-memory-hygiene.sh`, 14 lines lower; the
+  two `tools/policy/check_policy.py` method sites, one lower; and the deferral line of
+  `tools/policy/adopt-policy.sh`, one lower. Every other citation reads at `2550ccaa7` as rev-1
+  says. The §B body is unchanged since `cae57b1d8`; `last-audit` was re-stamped at `5e8c8c5e7`, and
+  check 9's count is 22. S1, S2, S4, S5 and S6 did not move. The two follow-ups rev-1 names stand.
+  This pass's brief and prompt, untracked when it was written:
+
+```
+memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-86-rev2-brief.md
+memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-86-2-spec-writer.md
 ```
 
 ## 9. Reuse audit
