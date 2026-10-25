@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-51 — the round-1 spec audit's 50 minors, batched: owed widen rows and record bindings, one reader each, honest failure states, and the observations that read the wrong verb
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
+**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 31 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,22 +8,22 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-40-round1-fix-return.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
+| [2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-52-round2-fix-return.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-40-round1-fix-brief.md) | research | TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-44 |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-52-round2-fix-brief.md) | research | TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 |
+| [2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-40-spec-audit-round1.md) | spec-audit | TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-43 |
 
 <!-- /gen:spec-records -->
 
 ## 1. Goal
 
 The round-1 spec audit (`memory/builds/dWitnessedBar/reviews/2026-10-25-review-TOOL-dWitnessedBar-1-spec-audit-round1.md`)
-exited CONVERGED with 61 confirmed findings over the build's 30 units. Its 11 highs are units 40 to 50.
-This unit is the batch BUILD-METHOD M4 makes of the rest, every MEDIUM and every LOW, each by its report
-id and each its own scope item, where the report merged ids into one item too. The minors land on 28
-units, so this unit repairs none in particular and builds after every unit (order 31). The bar runs once,
-at the close and after this pass, so an item whose defect a unit's pass would leave red is closed here
-before that bar reads it; an item that changes what an earlier pass writes reaches that pass through the
-hands-off bullet its own §3 carries to this unit.
+exited CONVERGED with 61 findings over the build's 30 units; its 11 highs are units 40 to 50. This unit is
+M4's batch of every MEDIUM and LOW, one scope item per report id. They land on 28 units, so it builds
+after every unit (order 31), before the close's bar; an item changing an earlier pass's output reaches
+it through that unit's hands-off bullet to this one.
 
 | Report item | Severity | Report ids | Scope items |
 |---|---|---|---|
@@ -31,8 +31,8 @@ hands-off bullet its own §3 carries to this unit.
 | M2 | MEDIUM | 11, 20 | S3, S4 |
 | M3 | MEDIUM | 22, 37 | S5, S6 |
 
-Every other report item, M4 to M34 and L1 to L13, holds one report id and is one scope item, in
-report order from M4 (id 2) as S7 to L13 (id 56) as S50; each scope item names its id.
+Every other item, M4 to M34 and L1 to L13, is one id and one scope item in report order: M4 (id 2) is
+S7, L13 (id 56) is S50.
 
 That is 37 MEDIUM and 13 LOW findings by raw id.
 
@@ -202,10 +202,9 @@ That is 37 MEDIUM and 13 LOW findings by raw id.
 ## 3. Non-goals (OUT)
 
 - Any high: units 40 to 50, one per id.
-- The spec lints and checklist entries the report names as left-shifts for these minors: each would be a
-  new gate no clause of this build names; the classes are recorded at the close.
-- Re-reviewing any repaired unit: M4 forbids it; each item here is built and observed at this pass.
-- Re-wording another unit's spec text: each item is closed by what this pass builds or observes.
+- The left-shift lints and checklist entries the report names: no clause of this build names them; the
+  classes are recorded at the close.
+- Re-reviewing or re-wording a repaired unit's spec (M4): each item is built and observed at this pass.
 
 ### Edges
 
@@ -242,85 +241,64 @@ That is 37 MEDIUM and 13 LOW findings by raw id.
 - **consumes-from** `TOOL-dWitnessedBar-44` — the absent-key path of `inherited_red.py up` (id 19)
 - **consumes-from** `TOOL-dWitnessedBar-48` — shape 2's membership rule (ids 23, 43)
 - **consumes-from** `TOOL-dWitnessedBar-50` — the derived wrong-shell population and `refuse-wrong-shell.sh --coverage` (id 51)
+- **hands-off** `TOOL-dWitnessedBar-56` — the AC24 arm, the tail cut of S34 and the verdict prune of S28, which the verdict-boundary minors batch ages, escapes and annotates (ids 23, 48, 49)
+- **hands-off** `TOOL-dWitnessedBar-57` — S1, S13, S21, S23, AC8, AC15, AC35, AC36 and its two parity rows, which the resolver and ledger minors batch grades on the prepared merge, observes and gives canonical markers (ids 9, 10, 22, 26, 31, 34, 38, 39, 46)
 
 ## 4. Design
 
 ### Why one unit and not two
 
-The items' write sets form one connected set, so BUILD-METHOD M6's clause 1 fails for every split into
-two halves: `tools/run-gates/run-gates.sh` is written by S28, S34 and S48; S48 and S36 share
-`DECLARATIVE_LEG_KEYS` in `tools/run-gates/held_halves.py`, which S21 and S47 also read as a contract;
-`tools/run-gates/verdict_flow.py` joins S15 and S36; `tools/gate-legs.json` and the descriptors join S11,
-S12 and S42; `tools/memory-tree/legacy_ledger.py` and its copies join S9, S30, S32 and S50, whose
-ledger S1's widen rows and S17's conversion write through; `tools/lib/resolve-python.test.sh`'s
-`PARITY_ROWS` joins S19, S20, S21, S29 and S46. One unit, sequenced.
+The write sets are one connected set, so M6's clause 1 fails for every split: `run-gates.sh` joins S28,
+S34 and S48; `held_halves.py` joins S21, S36, S47 and S48; `verdict_flow.py` joins S15 and S36; the
+manifest joins S11, S12 and S42; the ledger factory joins S1, S9, S17, S30, S32 and S50; the parity rows
+join S19, S20, S21, S29 and S46. One unit, sequenced.
 
 ### Evidence
 
-- `RECORD_KIND_TOKENS = ("spec-audit", "diff-review", "journal", "research", "deviation")`
-  (`tools/memory-tree/tree_lib.py:406`); HYGIENE closes the kind set (`memory/HYGIENE.md:626-629`).
-- `check-arms.py` reads the central file and every tracked `unarmed-branches.txt` sidecar
-  (`tools/memory-tree/check-arms.py:41-42`, `:575-590`).
-- `PARK_KINDS` (`tools/unattended/unattended.sh:875`), its copies `_RUN_PARK_KINDS`
-  (`tools/drift-audit/drift_report.py:2427`) and `PARK_KINDS` (`tools/runlog/model.py:98`).
-- `SHARED_RECORDS="memory/DECISIONS.md memory/project/readme-contract.txt"` (`.unattended.conf:417`)
-  and `--dispatch`'s code-49 refusal (`tools/unattended/unattended.sh:13834-13839`).
-- The protocol render and template measure 66859 bytes against a 66860 row
-  (`tools/template-size-limits.txt:143`, measured 2026-10-25); `AGENTS.md` measures 16732 bytes against a
-  20480 row and a 16732 high-water (`tools/template-size-highwater.txt:2`).
-- `resolve_shell_argv`'s callers: `tools/govkit/govkit.py:1229`, `:5013`, `:5231`, `:5268`, `:5307`,
-  `:6214`, `:6321`, `:6445`, `:13574` (PINNED, `grep -n 'resolve_shell_argv('`, 2026-10-25);
-  `run_probe_in_empty_dir` catches `(OSError, subprocess.TimeoutExpired)` only (`:5234`).
-- `regen.run_command` maps `python` and `python3` to `sys.executable` and `bash` to a resolved bash
-  (`tools/run-gates/regen.py:270-279`).
-- The precedent that passes over no base: `tools/codebase-map/test_codebase_map.py:159-170` prints
-  `UNGRADED`.
+- HYGIENE closes the record kind set S7 reads (`memory/HYGIENE.md:626-629`).
+- `check-arms.py` reads the central file and every tracked sidecar (`tools/memory-tree/check-arms.py:41-42`,
+  `:575-590`); the driver's `PARK_KINDS` is `tools/unattended/unattended.sh:875`.
+- The protocol render and template measure 66859 bytes (row `tools/template-size-limits.txt:143`,
+  2026-10-25); `AGENTS.md` measures 16732 against a 20480 row and a 16732 high-water
+  (`tools/template-size-highwater.txt:2`).
+- S25's callers are PINNED by `grep -n 'resolve_shell_argv('` (2026-10-25); `run_probe_in_empty_dir`
+  catches `(OSError, subprocess.TimeoutExpired)` only (`tools/govkit/govkit.py:5234`).
+- `regen.run_command` maps `python`, `python3` and `bash` (`tools/run-gates/regen.py:270-279`); the
+  precedent over no base prints `UNGRADED` (`tools/codebase-map/test_codebase_map.py:159-170`).
 - The row hash is the SHA-1 of the whole row as sorted JSON (`tools/run-gates/run-gates.sh:2852`), read
   by the reuse quarantine (`:3600`) and the reuse key (`:3225`).
-- `scan_arm_covers`' arm walk (`tools/check-spec-tokens.py:1334-1345`) and `extract_acceptance` (`:515`).
 - The hook's `write_push_line` and `write_push_once` (`.githooks/pre-push:345`, `:421`).
 
 ### The shell-role derivation (S1, S2)
 
 ```
-c24  = the commit whose subject names TOOL-dWitnessedBar-24 and its pass
-grown = class members (unit 24 §4 "Line endings" less py, js, json, toml) whose
-        code-line count at HEAD exceeds the ledger row's count
-for each unit u whose pass commit in c24..HEAD touched a member of grown:
-    ratchet.py widen shell-role --key <path> ... --reason "grown by u's pass" --unit u
+c24   = unit 24's pass commit, found by its subject
+grown = class members (unit 24 §4 "Line endings" less py, js, json, toml) over their ledger count at HEAD
+for each unit u whose pass in c24..HEAD touched a member of grown:
+    ratchet.py widen shell-role --key <path> --reason "grown by u's pass" --unit u
 ```
 
 ### The declarative keys (S36, S48)
 
-`DECLARATIVE_LEG_KEYS = ("tag", "purpose", "tests", "enforces", "level", "precommit", "pack")` in
-`tools/run-gates/held_halves.py`: the keys that change neither what a leg runs nor how it is judged. The
-runner's row hash and unit 30's release compare both drop them; the runner's embedded program imports the
-tuple from its sibling, as `measure_legs.py` imports `held_halves` (`tools/run-gates/measure_legs.py:100`).
+S36's tuple lives in `tools/run-gates/held_halves.py`: the keys that change neither what a leg runs nor
+how it is judged. The row hash and unit 30's release compare both drop them; the runner's embedded program
+imports the tuple from its sibling, as `measure_legs.py` imports `held_halves` (`:100`).
 
 ### Inventory
 
-| Minted | Kind | Where |
-|---|---|---|
-| `--record-only` | flag of `verdict_flow.py flakes` | `tools/run-gates/verdict_flow.py` |
-| `purpose presence` | conformance arm | `tools/run-gates/leg_factory.py` |
-| `unseen-arm-with-args`, `arm-outside-gates` | plants | `tools/memory-tree/seen_red.py` |
-| `DECLARATIVE_LEG_KEYS` | tuple | `tools/run-gates/held_halves.py` |
-| `acceptance_reader`, `arm_walk`, `hold_predicate`, `write_push_line` | `PARITY_ROWS` rows | `tools/lib/resolve-python.test.sh` |
-| `writes-fixture` | plant | `tools/unattended/fix_keeps.py` |
-| `first seed` | `compare_to_base` reading | `tools/lib/legacy_ledger.py` |
-
-Naming cells: each is asked of `python tools/lexicon/lexicon.py --suggest <name>` at the pass.
+Minted: `--record-only` of `verdict_flow.py flakes`; the arm `purpose presence`; the plants
+`unseen-arm-with-args`, `arm-outside-gates` and `writes-fixture`; `DECLARATIVE_LEG_KEYS`; the parity rows
+`acceptance_reader`, `arm_walk`, `hold_predicate` and `write_push_line`; the reading `first seed`. Each
+is asked of `python tools/lexicon/lexicon.py --suggest <name>` at the pass.
 
 ### Migration
 
-S48 changes every row hash once, at this pass, so each reuse quarantine planted before it is released
-once and each held record re-earns once; the reuse key carries the row hash (`run-gates.sh:3225`), so no
-stale cached green is reused. From this pass on, a declarative key added to the manifest releases nothing.
-S22 converts `readme-contract.txt` in the main loop's commit. S1 writes one widen record per growing unit.
+S48 changes every row hash once: each earlier reuse quarantine is released once and each held record
+re-earns once; the reuse key carries the row hash (`run-gates.sh:3225`), so no stale green is reused.
 
 ### Rollout
 
-Live at landing, after every other unit of the build. The pass runs
+Live at landing, after every other unit. The pass runs
 `python tools/run-gates/owed_rows.py --base HEAD` before its commit (PLAY-dOrderedCharter-50 S6).
 
 ### Files touched (estimate)
@@ -350,26 +328,21 @@ Live at landing, after every other unit of the build. The pass runs
 
 ### Alternatives rejected
 
-- **One unit per minor.** M4 forbids it: the batch is the one unit the one-mechanism rule admits.
-- **Folding the minors into the repaired specs.** M4 forbids folding at the exit; each item is built here.
-- **Moving unit 24's shell-role arm to the end of the order (id 1's option b).** Every later unit would
-  still grow files the arm then reds; the derived widen rows of S1 are the record the ledger asks for.
+- **One unit per minor, or folding the minors into the repaired specs.** M4 forbids both.
+- **Moving unit 24's shell-role arm to the end (id 1's option b).** Later units still grow files the arm
+  reds; S1's widen rows are the ledger's record.
 
 ## 5. Production-readiness checklist
 
-- security — S25 keeps selfcheck from refusing whole on a node with no bash; S35 and S38 keep a fix pass
-  from rewriting the fixtures that judge it while leaving product code writable; S16 says a loosening
-  where it happens; S33 never passes a ratchet over nothing.
-- perf / scale — S48 removes a release-and-re-earn on every future key addition; S28 bounds a growing
-  directory.
-- error / empty / loading states — S30, S33, S37 and S50 each turn an absent or malformed input into a
-  named reading, never a silent green.
-- observability — each item's refusal or skip names its subject.
-- risks — S48 releases every quarantine once at this pass (§4 Migration); S22 writes a shared record
-  outside a dispatched pass, recorded in the commit.
-- testing — AC1 to AC40 as probes and plants; the arms under §7, observed at the close.
+- security — S25 keeps selfcheck alive with no bash; S35 and S38 fence a fix pass from its judging
+  fixtures; S16 and S33 refuse a silent pass.
+- perf / scale — S48 ends a release per key addition; S28 bounds a growing directory.
+- error / empty / loading states — S30, S33, S37 and S50 name a bad input, never a silent green.
+- observability — each refusal or skip names its subject.
+- risks — S48's one-time release (§4 Migration); S22's commit outside a dispatched pass.
+- testing — AC1 to AC40; the arms under §7 at the close.
 - migration — §4.
-- user docs — S44 and S45 in the kit READMEs and the leg's docstring; no page under `help/` changes.
+- user docs — S44 and S45 in the kit READMEs and a docstring; no page under `help/`.
 
 ## 6. Acceptance criteria
 
@@ -533,8 +506,8 @@ Live at landing, after every other unit of the build. The pass runs
 
 `memory hygiene` · `memory-hygiene self-test` · `build-index selftest` · `run-gates canary` · `run-gates evidence` · `measure-legs selftest` · `pre-push self-test` · `push-main self-test` · `drift-audit selftest` · `runlog selftest` · `codebase-map kit selftest` · `codebase-map adopter e2e` · `dead-path carriers (deleted files still named)` · `check-arms selftest` · `harness arms (fail branches armed or pinned)` · `python resolver (behaviour + inline parity + idiom ban)` · `row-keyed merge driver replay` · `unattended protocol size` · `charter size` · `playbook render wiring` · `govkit selftest` · `govkit selfcheck` · `shell-hygiene selftest` · `spec tokens (a spec's own names resolve)` · `recall floor` · `recall floor arms` · `kit/dogfood doc parity` · `codebase-map gate coverage` · `govkit acceptance matrix` · `playbook render selftest` · `run-gates gov canary` · `transition-audit arms` · `straggler-guard arms` · `govkit refusal join` · `run-selftests self-test` · `pre-push run-log line` · `run-gates run-log line`
 
-The unattended kit's own suites are waived for this build's landing (README rule), so S15's driver call
-and S22's commit are observed by AC12 and AC18, not by that kit's suites.
+The unattended kit's own suites are waived for this build's landing (README rule), so AC12 and AC18
+observe S15's driver call and S22's commit.
 
 New arm: tools/memory-tree/seen_red.py · covers AC2 · the plants `unseen-arm-with-args` and `arm-outside-gates`, staged red by restoring the whole-field suite path · none
 New arm: tools/run-gates/leg_factory.py · covers AC5 AC9 · the `purpose presence` arm and the self-test `enforces` rule in `--selftest`, staged red by a declaration with no `purpose` · none
@@ -547,45 +520,43 @@ New arm: tools/run-gates/keep_tails.py · covers AC30 · a tail holding a fence,
 
 ## 8. Open questions
 
-- **F1 — Which binding line does a unit the spec audit promoted carry?** The carries join reds a chain
-  spec carrying nothing and derived from nothing. Options: (a) `**Derived:**` naming
-  `PLAY-dClosedLoop-2`; (b) a `part k/n` carry of each repaired unit's clause, splitting 28 clauses those
-  units carry whole. (b) reds the parts join; veto 1 discards it. RESOLVED (agent, 2026-10-25,
-  delegated): (a), rung 3, the precedent `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
-- **F2 — Does an undeclared `INHERITED_RED` keep v2's default `own-only` (id 19)?** Today an absent line or
-  file reads the kit default `land` (`.githooks/pre-push:1341-1342`, `tools/unattended/unattended.sh:9562`, `:9590-9591`),
-  which blocks MIXED and CONTENDED reds. Options: (a) keep v2's catalogue default and say the loosening
-  where the step runs (S16); (b) write `own-mixed-contended` for an undeclared target. (b) overrides the
-  owner's walk T1 ruling for every adopter that never chose. RESOLVED (agent, 2026-10-25, delegated): (a),
-  rung 1, v2:1271 (walk T1, default `own-only`). widens: none · relaxes: an adopter with no
-  `INHERITED_RED` declared lands MIXED and CONTENDED reds that blocked before; the deviation record this
-  pass writes carries **Bound:** that undeclared path only, **Tier:** middle, a bound a policy key's value
-  sets, and **Reason:** v2's walk T1 default, which the owner chose.
+- **F1 — Which binding line does a promoted unit carry?** Options: (a) `**Derived:**` naming
+  `PLAY-dClosedLoop-2`; (b) a `part k/n` carry of each repaired unit's clause, which reds the parts join;
+  veto 1 discards it. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the precedent
+  `TOOL-dDeclaredLoop-36` §8 F1 set. widens: none · relaxes: none
+- **F2 — Does an undeclared `INHERITED_RED` keep v2's default `own-only` (id 19)?** Today it reads the kit
+  default `land` (`.githooks/pre-push:1341-1342`, `tools/unattended/unattended.sh:9590-9591`), blocking
+  MIXED and CONTENDED reds. Options: (a) keep v2's default and say the loosening where the step runs
+  (S16); (b) write `own-mixed-contended`, overriding the owner's walk T1 ruling for every adopter that
+  never chose. RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, v2:1271 (walk T1, default
+  `own-only`). widens: none · relaxes: an adopter with no `INHERITED_RED` declared lands MIXED and
+  CONTENDED reds that blocked before; this pass's deviation record carries **Bound:** that undeclared
+  path only, **Tier:** middle, a policy key's bound, and **Reason:** v2's walk T1 default, the owner's.
 - **F3 — Is a change to HYGIENE's Acceptance ledger and BUILD-METHOD M8 within this build's authority
-  (id 17)?** `TOOL-dWitnessedBar-7` S1 and S9 edit both through their templates and its §8 records no
-  grant. RESOLVED (agent, 2026-10-25, delegated): yes, rung 3 with veto 2 lifted by the README's `may:`
-  grant, because the carried clause cl-0345 names the seen-red line the ledger carries and M8's
-  read-back. grants: PLAY-dClosedLoop-3 the seen-red line grammar in `memory/HYGIENE.md` and M8's
-  read-back sentence in `memory/guides/BUILD-METHOD.md`. widens: none · relaxes: none
+  (id 17)?** `TOOL-dWitnessedBar-7` S1 and S9 edit both and record no grant. RESOLVED (agent,
+  2026-10-25, delegated): yes, rung 3, veto 2 lifted by the README's `may:` grant, as the carried clause
+  cl-0345 names the ledger's seen-red line and M8's read-back.
+  grants: PLAY-dClosedLoop-3 the seen-red line grammar in `memory/HYGIENE.md` and M8's read-back sentence
+  in `memory/guides/BUILD-METHOD.md`. widens: none · relaxes: none
 - **F4 — How long does an unnamed per-tree verdict live (id 48)?** Options: (a) 30 days past its last
-  write, kept while any worktree's retained run or `HEAD^{tree}` names it; (b) a count of files; (c) no
-  bound. (b) can remove a live tree's verdict under heavy churn; (c) is the finding. RESOLVED (agent,
-  2026-10-25, delegated): (a), rung 3, the bound that never removes a verdict anything names.
-  widens: none · relaxes: none
+  write, kept while any worktree's retained run or `HEAD^{tree}` names it; (b) a file count, unsafe under
+  churn; (c) no bound, the finding. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3, the bound that
+  never removes a named verdict. widens: none · relaxes: none
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's 37 MEDIUM and 13 LOW
   findings, batched.
+- rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring the consumes-from
+  edges of TOOL-dWitnessedBar-56, TOOL-dWitnessedBar-57, promoted by the round-1 spec audit of units
+  40 to 51; the prose of §1, §3, §4, §5, §8 and §10 compressed under the size ceiling, no scope item,
+  criterion, edge, fork outcome or touched path moved.
 
 ## 10. Reuse audit
 
-Each item extends the seam its finding names: the ledger factory's `compare_counts`, `compare_to_base`,
-`resolve_rows` and `seed` for S9, S30, S31, S32 and S50; `check-spec-tokens.py`'s `extract_acceptance`
-and `scan_arm_covers` walk, carried inline under parity rows for S19 and S20; `held_halves.test_held` and
-`load_manifest` for S21 and S47; the hook's `write_push_line` for S46; `regen.run_command`'s interpreter
-mapping for S32; check 3's named list for S13. `python tools/codebase-map/reuse_lookup.py "batch of spec
-audit minor findings across many units"` ranked generic stems (`units`, `audit`, `read_spec_revisions`,
-`parse_spec_h1`), none a seam for the batch as a whole, so the per-item seams above are the record.
+Each item extends the seam its finding names, the ledger factory's verbs, `check-spec-tokens.py`'s
+readers, `held_halves.py`, the hook's `write_push_line`, `regen.run_command` and check 3's named list,
+cited in its scope item. `python tools/codebase-map/reuse_lookup.py "batch of spec audit minor findings
+across many units"` ranked generic stems, none a seam for the batch.
 
 Recall terms used: `python tools/memory-recall/query.py "what did the dWitnessedBar spec audit find at medium and low" --terms "spec audit minors batch dWitnessedBar medium low widen shell-role seen-red flake journal binding"`
