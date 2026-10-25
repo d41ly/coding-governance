@@ -128,7 +128,7 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** DEFERRED · 80 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** CLOSED · 80 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14
 ids TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28
 ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42
@@ -219,7 +219,7 @@ ids TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGrou
 | [TOOL-dGroundRules-79 — govkit selfcheck green over this build: the policy fixtures guard's two root-level lines get a declared class, and four policy-kit sentences stop failing the re-render rule](spec/2026-10-25-spec-TOOL-dGroundRules-79.md) | 27 | 1 | CLOSED | rev-2 | 2026-10-25 |
 | [TOOL-dGroundRules-80 — the policy fixtures pin the new case's bare remote HEAD, and a sixth parity state holds the remote refusal variant byte-equal](spec/2026-10-25-spec-TOOL-dGroundRules-80.md) | 28 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-81 — policy-mirror.js resolves every PATH bash that can see the shim again, and its comment and refusal say what it does](spec/2026-10-25-spec-TOOL-dGroundRules-81.md) | 28 | 1 | CLOSED | rev-1 | 2026-10-25 |
-| [TOOL-dGroundRules-82 — a parity row holds policy-mirror.js's bash candidate order against the canonical resolve_bash](spec/2026-10-25-spec-TOOL-dGroundRules-82.md) | 29 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-82 — a parity row holds policy-mirror.js's bash candidate order against the canonical resolve_bash](spec/2026-10-25-spec-TOOL-dGroundRules-82.md) | 29 | 1 | CLOSED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
 Records: 401 bound to this build, across 4 record folder(s).

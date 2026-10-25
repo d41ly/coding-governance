@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-82 — a parity row holds policy-mirror.js's bash candidate order against the canonical resolve_bash
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base 59f02fde · streams tooling · order 29
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base 59f02fde · streams tooling · order 29
 
 **Derived:** PLAY-dClosedLoop-2
 
