@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-51 — the prepared-merge shape table splits the first-parent walk by `--no-merges`
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -54,6 +54,7 @@ section is re-measured by a criterion.
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-45` — the record's "A merge onto the default tip" section, its S1 and AC2, which this unit splits and re-measures in place; without the section there is no row to correct
+- **hands-off** `TOOL-dPlacedRequest-56` — S1, S2, §4 Evidence, §5, AC1 and AC2, which that unit's items for findings 4, 5, 10, 12, 20, 21 and 24 amend
 
 ## 4. Design
 
@@ -133,6 +134,7 @@ No new arm: the record declares no machine gate, and AC2 re-measures every row.
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-3 promotions, finding
   10 (HIGH, item H2).
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-56`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

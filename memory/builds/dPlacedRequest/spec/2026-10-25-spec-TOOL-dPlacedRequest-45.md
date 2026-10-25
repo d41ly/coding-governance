@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-45 — the default-branch merge class names the walk from a prepared merge, and selects the file that builds one
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -58,6 +58,7 @@ other direction, measured, and selects the file that makes the merge.
 
 - **hands-off** `TOOL-dPlacedRequest-51` — the section's first row, S1 and AC2, which that unit splits by `--no-merges` and re-measures row by row
 - **hands-off** `TOOL-dPlacedRequest-52` — AC2's fixture, which that unit's item for finding 3 states by its commit count
+- **hands-off** `TOOL-dPlacedRequest-56` — AC2, which that unit's item for finding 12 makes cite 44's fixture by count
 
 ## 4. Design
 
@@ -142,6 +143,7 @@ No new arm: the record declares no machine gate, and its rows are re-measured by
   21 (HIGH, item H1).
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edges to `TOOL-dPlacedRequest-51` and `TOOL-dPlacedRequest-52`, mirroring their consumes-from.
+- rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-56`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

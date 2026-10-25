@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-50 — the sighted guard on the threshold compare has a criterion that reaches it
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -56,6 +56,7 @@ reachable.
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-47` — the guarded threshold compare, its arm and AC1 to AC3, which this unit reaches with a new criterion and restates in place; without the guard there is nothing for AC4 to observe
+- **hands-off** `TOOL-dPlacedRequest-56` — §4 Files touched, Evidence and Edges, which that unit's items for findings 3, 6 and 15 amend
 
 ## 4. Design
 
@@ -137,6 +138,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · a sighted tip over
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-3 promotions, finding
   1 (HIGH, item H1).
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-56`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

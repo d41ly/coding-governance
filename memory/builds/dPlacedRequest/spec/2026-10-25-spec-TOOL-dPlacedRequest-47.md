@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-47 — the bounded age walk never compares an unsighted commit with the threshold
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -51,6 +51,7 @@ and never `stale`. This unit repairs `TOOL-dPlacedRequest-35`, at order 23, so i
 - **consumes-from** `TOOL-dPlacedRequest-35` — S1's threshold test and S2's fallback inside the age pass's `awk`, which this unit guards against an unsighted commit; without them there is no compare to guard
 - **hands-off** `TOOL-dPlacedRequest-50` — S1's guard, AC1 and AC3, which that unit observes with a new AC4 and restates in place so each criterion reaches the stop it names
 - **hands-off** `TOOL-dPlacedRequest-52` — the sighted test and the walk, which that unit's items for findings 34 and 36 make a shape test and merge with `TOOL-dPlacedRequest-46`'s walk
+- **hands-off** `TOOL-dPlacedRequest-56` — AC4's rows and arm, which that unit's item for finding 15 extends with the torn-stamp row
 
 ## 4. Design
 
@@ -142,6 +143,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · an emptied
   33 (HIGH, item H3).
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edges to `TOOL-dPlacedRequest-50` and `TOOL-dPlacedRequest-52`, mirroring their consumes-from.
+- rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-56`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

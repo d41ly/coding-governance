@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-44 — the version-bump oracle walks the build's side of the prepared merge
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -59,6 +59,9 @@ order 25: the oracle names the parent it walks, says what it read, and refuses a
 - **consumes-from** `TOOL-dPlacedRequest-43` — S24 and AC24, the oracle this unit re-ranges and rewrites in place; without them there is no oracle to correct
 - **hands-off** `TOOL-dPlacedRequest-49` — the corrected oracle, which that unit's item for finding 5 makes `TOOL-dPlacedRequest-34` AC59 run so one oracle stands
 - **hands-off** `TOOL-dPlacedRequest-52` — the oracle, its fixture and AC1, AC3 and AC4, which that unit's items for findings 2, 3, 11, 17, 27 and 29 re-range, re-status and re-scope
+- **hands-off** `TOOL-dPlacedRequest-54` — §4's oracle and AC1, which that unit gives the own-merge test and the base argument
+- **hands-off** `TOOL-dPlacedRequest-55` — §4's oracle, whose verdict that unit makes read the walk's status
+- **hands-off** `TOOL-dPlacedRequest-56` — S2, §4, §5, AC3 and §8 F1, which that unit's items for findings 8, 13 and 14 restate to one oracle contract
 
 ## 4. Design
 
@@ -157,6 +160,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
   26 (BLOCKER, item B1).
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
+- rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edges to `TOOL-dPlacedRequest-54`, `TOOL-dPlacedRequest-55`, `TOOL-dPlacedRequest-56`, mirroring their consumes-from.
 
 ## 10. Reuse audit
 

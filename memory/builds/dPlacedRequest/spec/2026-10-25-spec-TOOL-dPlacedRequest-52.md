@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -182,6 +182,10 @@ unit and the items it carries.
 - **consumes-from** `TOOL-dPlacedRequest-47` — the sighted test and the walk, which S21 and S22 amend
 - **consumes-from** `TOOL-dPlacedRequest-48` — the placed-race arm and S1, S2, AC2 and AC4, which S1 to S4, S6, S15 and S27 amend
 - **consumes-from** `TOOL-dPlacedRequest-49` — S1, S3, S6 to S8, S13, S21, AC7, AC13, AC24, AC30, AC31 and §5, which S7 to S11, S16, S18 to S20 and S24 amend, and S25's retry, which S1 reads as the placed race's bound
+- **hands-off** `TOOL-dPlacedRequest-53` — AC1, AC6 and AC9, which that unit rewrites to count occurrences
+- **hands-off** `TOOL-dPlacedRequest-54` — the oracle's S12, S17, §4 sketch, AC12, fixtures and F1, which that unit gives the own-merge test
+- **hands-off** `TOOL-dPlacedRequest-55` — S11's verdict and §4's sketch, which that unit makes read the walk's status, and a new AC29
+- **hands-off** `TOOL-dPlacedRequest-56` — §6's `flat` note, the race arm, AC14, AC15, AC19, AC21, AC26, S14, S26, Edges and F1, which that unit's minors amend
 
 ## 4. Design
 
@@ -399,6 +403,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC19 · a stub 
   MEDIUM and 8 LOW findings.
 - rev-2 · 2026-10-25 · the promoted fix brief's gate hits: AC7 cites `gov-feed.sh` by basename, the
   file `TOOL-dPlacedRequest-13` creates; AC22's red case on one `Red when:` line.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edges to `TOOL-dPlacedRequest-53`, `TOOL-dPlacedRequest-54`, `TOOL-dPlacedRequest-55`, `TOOL-dPlacedRequest-56`, mirroring their consumes-from.
 
 ## 10. Reuse audit
 
