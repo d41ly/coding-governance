@@ -160,7 +160,7 @@ ids TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64
 | [TOOL-dPlacedRequest-64 — the round-8 promotions' minors: criteria that read joined text and every carrier, a measured BINMODE, one lift seam that prints what it read, one bullet reader, and citations by anchor](spec/2026-10-25-spec-TOOL-dPlacedRequest-64.md) | 36 | 2 | DEFERRED | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 115 bound to this build, across 4 record folder(s).
+Records: 116 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
