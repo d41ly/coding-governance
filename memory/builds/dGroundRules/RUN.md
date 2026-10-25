@@ -531,3 +531,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T12:32:25Z dispatch · item e711d80a TOOL-dGroundRules-83 · reason tools/govkit/selftest.py tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-83.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-25T12:32:32Z brief · item TOOL-dGroundRules-83 · reason 2ea8a93a608c memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-83-spec-brief.md
+
+2026-10-25T13:14:52Z rescope · item add TOOL-dGroundRules-84 · reason close finding: the bar pre-check at cae57b1d8 reds 10 of 72 legs, each green at the run's base 3c2b69be4 (kickoff-manifest ratchet, memory hygiene check 25, three shell-hygiene scans, spawn budget, install-prefix, method carriers, harness arms, govkit runbook parity); a researcher triages them into fix units, the first of which takes this id
+
+2026-10-25T13:31:28Z rescope · item add TOOL-dGroundRules-85 · reason bar pre-check triage at cae57b1d8 adopted plan B (one unit per fix class, disjoint write sets): see build/2026-10-25-build-TOOL-dGroundRules-84-research-bar-triage.md
+
+2026-10-25T13:31:30Z rescope · item add TOOL-dGroundRules-86 · reason bar pre-check triage at cae57b1d8 adopted plan B (one unit per fix class, disjoint write sets): see build/2026-10-25-build-TOOL-dGroundRules-84-research-bar-triage.md

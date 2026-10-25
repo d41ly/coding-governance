@@ -4,7 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-100 TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107 TOOL-dGroundRules-108 TOOL-dGroundRules-109 TOOL-dGroundRules-110 TOOL-dGroundRules-111
+ids: TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14 TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28 TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42 TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70 TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-84 TOOL-dGroundRules-85 TOOL-dGroundRules-86 TOOL-dGroundRules-100 TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107 TOOL-dGroundRules-108 TOOL-dGroundRules-109 TOOL-dGroundRules-110 TOOL-dGroundRules-111
 spec-audit: 2026-10-21
 parents: dTrueNorth
 may: PLAY-dClosedLoop-3
@@ -128,14 +128,15 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** CLOSED · 81 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** DEFERRED · 84 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dGroundRules-1 TOOL-dGroundRules-2 TOOL-dGroundRules-3 TOOL-dGroundRules-4 TOOL-dGroundRules-5 TOOL-dGroundRules-6 TOOL-dGroundRules-7 TOOL-dGroundRules-8 TOOL-dGroundRules-9 TOOL-dGroundRules-10 TOOL-dGroundRules-11 TOOL-dGroundRules-12 TOOL-dGroundRules-13 TOOL-dGroundRules-14
 ids TOOL-dGroundRules-15 TOOL-dGroundRules-16 TOOL-dGroundRules-17 TOOL-dGroundRules-18 TOOL-dGroundRules-19 TOOL-dGroundRules-20 TOOL-dGroundRules-21 TOOL-dGroundRules-22 TOOL-dGroundRules-23 TOOL-dGroundRules-24 TOOL-dGroundRules-25 TOOL-dGroundRules-26 TOOL-dGroundRules-27 TOOL-dGroundRules-28
 ids TOOL-dGroundRules-29 TOOL-dGroundRules-30 TOOL-dGroundRules-31 TOOL-dGroundRules-32 TOOL-dGroundRules-33 TOOL-dGroundRules-34 TOOL-dGroundRules-35 TOOL-dGroundRules-36 TOOL-dGroundRules-37 TOOL-dGroundRules-38 TOOL-dGroundRules-39 TOOL-dGroundRules-40 TOOL-dGroundRules-41 TOOL-dGroundRules-42
 ids TOOL-dGroundRules-43 TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55 TOOL-dGroundRules-56
 ids TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-65 TOOL-dGroundRules-66 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70
-ids TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-100
-ids TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107 TOOL-dGroundRules-108 TOOL-dGroundRules-109 TOOL-dGroundRules-110 TOOL-dGroundRules-111
+ids TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-84
+ids TOOL-dGroundRules-85 TOOL-dGroundRules-86 TOOL-dGroundRules-100 TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGroundRules-104 TOOL-dGroundRules-105 TOOL-dGroundRules-106 TOOL-dGroundRules-107 TOOL-dGroundRules-108 TOOL-dGroundRules-109 TOOL-dGroundRules-110
+ids TOOL-dGroundRules-111
 
 <!-- gen:build-units -->
 | Unit | Order | Tier | Status | Rev | Last change |
@@ -221,15 +222,19 @@ ids TOOL-dGroundRules-101 TOOL-dGroundRules-102 TOOL-dGroundRules-103 TOOL-dGrou
 | [TOOL-dGroundRules-81 — policy-mirror.js resolves every PATH bash that can see the shim again, and its comment and refusal say what it does](spec/2026-10-25-spec-TOOL-dGroundRules-81.md) | 28 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-82 — a parity row holds policy-mirror.js's bash candidate order against the canonical resolve_bash](spec/2026-10-25-spec-TOOL-dGroundRules-82.md) | 29 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-83 — the govkit selftest's [-PV] adopter targets hold the agent-cap hook again, and a render whose fan-out gate could not ask the hook refuses with the gate's own reason](spec/2026-10-25-spec-TOOL-dGroundRules-83.md) | 30 | 1 | CLOSED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-84 — the shell sources and kit-path spellings this build left red on the bar, each site converted or declared, and the install-prefix counter reads a `limits:` home as the Skill path it is](spec/2026-10-25-spec-TOOL-dGroundRules-84.md) | 31 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-85 — both size-cap enforcers split the budgets answer once with builtins, so the memory-hygiene and manifest-check probes fork within their ceilings again](spec/2026-10-25-spec-TOOL-dGroundRules-85.md) | 32 | 1 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section](spec/2026-10-25-spec-TOOL-dGroundRules-86.md) | 33 | 1 | DEFERRED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 412 bound to this build, across 4 record folder(s).
+Records: 421 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
 Ids no `spec-audit` record has ever named: TOOL-dGroundRules-44 TOOL-dGroundRules-45 TOOL-dGroundRules-46 TOOL-dGroundRules-47 TOOL-dGroundRules-48 TOOL-dGroundRules-49 TOOL-dGroundRules-50 TOOL-dGroundRules-51 TOOL-dGroundRules-52 TOOL-dGroundRules-53 TOOL-dGroundRules-54 TOOL-dGroundRules-55
 TOOL-dGroundRules-56 TOOL-dGroundRules-57 TOOL-dGroundRules-58 TOOL-dGroundRules-59 TOOL-dGroundRules-60 TOOL-dGroundRules-61 TOOL-dGroundRules-62 TOOL-dGroundRules-63 TOOL-dGroundRules-64 TOOL-dGroundRules-66 TOOL-dGroundRules-67 TOOL-dGroundRules-68 TOOL-dGroundRules-69 TOOL-dGroundRules-70
-TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83.
+TOOL-dGroundRules-71 TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-77 TOOL-dGroundRules-78 TOOL-dGroundRules-79 TOOL-dGroundRules-80 TOOL-dGroundRules-81 TOOL-dGroundRules-82 TOOL-dGroundRules-83 TOOL-dGroundRules-84
+TOOL-dGroundRules-85 TOOL-dGroundRules-86.
 
 Ids whose spec moved past its audited revision: TOOL-dGroundRules-1@rev-1 TOOL-dGroundRules-10@rev-1 TOOL-dGroundRules-14@rev-1 TOOL-dGroundRules-15@rev-1 TOOL-dGroundRules-16@rev-1 TOOL-dGroundRules-17@rev-1 TOOL-dGroundRules-18@rev-1 TOOL-dGroundRules-19@rev-1 TOOL-dGroundRules-2@rev-2
 TOOL-dGroundRules-20@rev-1 TOOL-dGroundRules-21@rev-1 TOOL-dGroundRules-22@rev-1 TOOL-dGroundRules-23@rev-1 TOOL-dGroundRules-24@rev-1 TOOL-dGroundRules-25@rev-1 TOOL-dGroundRules-26@rev-1 TOOL-dGroundRules-27@rev-1 TOOL-dGroundRules-28@rev-1 TOOL-dGroundRules-29@rev-1 TOOL-dGroundRules-3@rev-2
@@ -239,7 +244,7 @@ TOOL-dGroundRules-40@rev-1 TOOL-dGroundRules-41@rev-1 TOOL-dGroundRules-42@rev-1
 
 <!-- gen:build-coverage -->
 
-Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 75 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 78 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
 - carried whole: 11
 - carried in parts: 0 (none)
@@ -264,7 +269,7 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 75 spec(s) at 
   `spec/2026-10-25-spec-TOOL-dGroundRules-71.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-72.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-73.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-74.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-25-spec-TOOL-dGroundRules-75.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-76.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-77.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-78.md` (PLAY-dClosedLoop-2),
   `spec/2026-10-25-spec-TOOL-dGroundRules-79.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-80.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-81.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-82.md` (PLAY-dClosedLoop-2),
-  `spec/2026-10-25-spec-TOOL-dGroundRules-83.md` (PLAY-dClosedLoop-2)
+  `spec/2026-10-25-spec-TOOL-dGroundRules-83.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-84.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-85.md` (PLAY-dClosedLoop-2), `spec/2026-10-25-spec-TOOL-dGroundRules-86.md` (PLAY-dClosedLoop-2)
 - clauses the token arm cannot see: cl-dClosedLoop-0009, cl-dClosedLoop-0014, cl-dClosedLoop-0017
 <!-- /gen:build-coverage -->
 
@@ -301,6 +306,9 @@ Coverage of dGroundRules's 11 clause(s) and 5 owned node(s), over 75 spec(s) at 
 | 28 | `TOOL-dGroundRules-80`, `TOOL-dGroundRules-81` | no |
 | 29 | `TOOL-dGroundRules-82` | no |
 | 30 | `TOOL-dGroundRules-83` | no |
+| 31 | `TOOL-dGroundRules-84` | no |
+| 32 | `TOOL-dGroundRules-85` | no |
+| 33 | `TOOL-dGroundRules-86` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
