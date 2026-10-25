@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-61 — the round-6 promotions' minors: a two-way oracle inventory, one run-fact reader, a claim reader that keeps its normalisation, honest orders, and criteria that can fail
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 33 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 33 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-25-build-TOOL-dPlacedRequest-61-deviation-611.md](../build/2026-10-25-build-TOOL-dPlacedRequest-61-deviation-611.md) | deviation | — |
+| [2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-60 |
 
 <!-- /gen:spec-records -->
 
@@ -152,6 +153,8 @@ by unit 60 S1's form, from the label to the next bullet, heading or blank line.
 - **consumes-from** `TOOL-dPlacedRequest-58` — §1 and the header order, which S7 moves
 - **consumes-from** `TOOL-dPlacedRequest-48` — the Files touched sequence sentence, which S9 fixes word for word
 - **consumes-from** `TOOL-dPlacedRequest-50` — the Files touched sequence sentence, which S9 fixes word for word
+- **hands-off** `TOOL-dPlacedRequest-62` — §2's "Extracted", AC13 and AC20, which that unit narrows and restates so a `###` section is read from its heading to the next heading
+- **hands-off** `TOOL-dPlacedRequest-63` — §1, §2's preamble, S1, S4, S7, S10, S11, S12, S14, S19, S20, §4's sketches and Evidence, §5, §7, §8 F1 and their criteria, which that unit's items for every finding but 10 amend
 
 ## 4. Design
 
@@ -347,6 +350,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC11 AC16 · the CRLF row
 
 - rev-1 · 2026-10-25 · initial draft, the batch of the spec audit of the round-6 promotions' 11
   MEDIUM and 9 LOW findings.
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edges to `TOOL-dPlacedRequest-62` and `TOOL-dPlacedRequest-63`, mirroring their consumes-from.
 
 ## 10. Reuse audit
 

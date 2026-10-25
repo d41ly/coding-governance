@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-43 — the round-1 promotions' minors: behavioural class checks, honest outcomes, every reader of a changed spelling, and the sizes kept
 
-**Status:** OPEN · rev-6 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-7 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -170,6 +170,7 @@ Criterion ACn observes item Sn.
 - **hands-off** `TOOL-dPlacedRequest-52` — S19 and its sketch, S22, AC22 and S30, which that unit's items for findings 5, 7 and 20 pin and rewrite; this unit's own pass reads AC22 at 48128, the figure that unit sets
 - **hands-off** `TOOL-dPlacedRequest-56` — AC24, which that unit's item for finding 13 restates as the oracle's header line and exit 0
 - **hands-off** `TOOL-dPlacedRequest-59` — AC24, which that unit's item for finding 16 gives the run's base
+- **hands-off** `TOOL-dPlacedRequest-63` — AC24, which that unit's item for finding 1 gives the `base:` fact of `RUN.md`
 
 ## 4. Design
 
@@ -354,6 +355,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC18 · a stub checker that
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edge to `TOOL-dPlacedRequest-56`, mirroring its consumes-from.
 - rev-6 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edge to `TOOL-dPlacedRequest-59`, mirroring its consumes-from.
+- rev-7 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

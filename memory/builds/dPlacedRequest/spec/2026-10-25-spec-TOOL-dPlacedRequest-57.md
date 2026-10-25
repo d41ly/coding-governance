@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-57 — the version oracle's base is the observing run's own pinned BASE, never a sha a spec pins
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -68,6 +68,7 @@ sits at order 29: every close-time read passes the base of the run doing the rea
 - **hands-off** `TOOL-dPlacedRequest-59` — S1's base read, which that unit's items for findings 2, 9 and 16 pass to every other oracle-running criterion, and for findings 8 and 21 state in 54's §4 prose and AC2
 - **hands-off** `TOOL-dPlacedRequest-60` — AC2, whose read of 34 AC59 that unit bounds at the end of the bullet
 - **hands-off** `TOOL-dPlacedRequest-61` — §1, S1, §4, §5, §10, AC1, AC2, the hands-off edge to 56 and the Files touched sentence on 44, which that unit's items for findings 3, 6, 7, 13, 14 and 21 amend
+- **hands-off** `TOOL-dPlacedRequest-63` — AC1, AC2 and §4 as units 60 and 61 leave them, which that unit's items for findings 1, 5, 6, 15 and 17 amend
 
 ## 4. Design
 
@@ -163,6 +164,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-5 promotions, finding
   1 (HIGH, item H1, whose defect findings 8 and 21 of item M1 also report).
 - rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edges to `TOOL-dPlacedRequest-60` and `TOOL-dPlacedRequest-61`, mirroring their consumes-from.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 
