@@ -24,20 +24,20 @@ parked-surfaced: yes, 7 surfaced
 keepalive-reaped: yes
 refreshed-at: 462d20f3510072a1dddb5b948370937cfd3bbe0e · handoff · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: 399ec42de36b47647ccd0a03a6fdcc1e361a40c7
-phase: HELD
+witness: 3c8c4718afd89ff56499a8f2fcce588daa03d829
+phase: BUILDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dgroundrules-e47ae1
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-25T20:33:52Z
+lease-utc: 2026-10-25T23:56:08Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 2556
 session: 7ea4ff9e-7e37-4093-bc35-c581a17fe1c6
-keepalive: 1273355c
+keepalive: d49f2fa7
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 anchor-ref: refs/heads/main
@@ -582,3 +582,5 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T21:40:30Z brief · item TOOL-dGroundRules-88 · reason 8cb8eaa3879b memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-88-spec-brief.md
 
 2026-10-25T22:15:06Z hold · item host-owner-action · reason until owner · reaped 1273355c · resume none(owner)
+
+2026-10-25T23:56:16Z resume · item dGroundRules · reason held · keepalive d49f2fa7 · manual
