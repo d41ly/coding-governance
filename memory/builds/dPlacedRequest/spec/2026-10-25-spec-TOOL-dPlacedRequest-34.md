@@ -1,0 +1,636 @@
+# TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks
+
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
+
+**Derived:** PLAY-dClosedLoop-2
+
+<!-- gen:spec-records -->
+
+| Record | Kind | Also serves |
+|---|---|---|
+| [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 |
+| [2026-10-25-build-TOOL-dPlacedRequest-34-deviation-341.md](../build/2026-10-25-build-TOOL-dPlacedRequest-34-deviation-341.md) | deviation | — |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 |
+
+<!-- /gen:spec-records -->
+
+## 1. Goal
+
+The spec audit of this build, round 1
+(`memory/builds/dPlacedRequest/reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md`),
+exited CONVERGED with 70 confirmed findings. Its eleven highs are units 23 to 33. This unit is the
+batch BUILD-METHOD M4 makes of the rest: 50 MEDIUM and 9 LOW findings, one scope item per raw id,
+each naming its finding and, in brackets, the review item holding it (M1 to M41, L1 to L9). It is
+ordered after every unit of the build (order 22), and each item amends the code its named unit built.
+Findings 2 and 11, the medium twins of H6 and H7, observe `TOOL-dPlacedRequest-27`'s and
+`TOOL-dPlacedRequest-28`'s mechanisms rather than build a second one. Findings 12, 32, 41, 50 and 73
+carry the skeptic's binding re-grade. Criterion ACn observes item Sn.
+
+## 2. Scope (IN)
+
+- **S1** — finding 2 (M1). Over `TOOL-dPlacedRequest-27`'s per-ref append rule, two deletions of one ref
+  with a re-create between them leave two deletion lines in `gov-feed.log`. Observed by AC1.
+- **S2** — finding 11 (M2). Over `TOOL-dPlacedRequest-28`'s `read_feed_lease_tip`, an offer over a pruned,
+  previously sighted unit tombstone exits 1 printing `tombstone`. Observed by AC2.
+- **S3** — finding 3 (M3). `read_feed_lease_tip` skips deletion events, whose `commit` is 40 zeros, and
+  reads the newest event of the ref with a real commit, so a create after `--lease prune` on the same
+  node parents on the pruned tip at its epoch plus one. Observed by AC3.
+- **S4** — finding 61 (M4), the skeptic's fix. When the feed-named commit cannot be read (`git cat-file -e`
+  fails), `read_feed_lease_tip` prints `unreadable`: a build or unit lease create refuses
+  `epoch-fence` naming the ref and writes nothing; a cadence `run` lease or a legacy run claim falls to
+  the plain create `TOOL-dPlacedRequest-16` §5 accepts under the queued-claim age. Observed by AC4.
+- **S5** — finding 4 (M5). Every governance fetch goes into `refs/gov/remote/` and calls
+  `add_feed_sightings` after it: the card lookup (S12's verb) and the request draw's read of
+  `refs/gov/requests/<key>` (`TOOL-dPlacedRequest-14` S3) take `read_claims`' fetch shape. The success
+  exit becomes one function in `gov_feed_sh`, `write_feed_success <ref> <commit or empty>`, which sets
+  or clears the cache ref and then appends; `write_gov_ref` calls it, and `scan_feed_writers` names it
+  beside `add_feed_event` and `write_gov_ref` as what a pusher must call. Observed by AC5.
+- **S6** — finding 35 (M5). The lander's fenced push (`TOOL-dPlacedRequest-15` S5) calls
+  `write_feed_success <lease ref> <beat>` in place of `add_feed_event`, so the cache names the landed
+  beat and `--feed check` reads no `extra` after a landing. Observed by AC6.
+- **S7** — finding 5 (M6). Route rule R7 (`TOOL-dPlacedRequest-2` S9) reads
+  `refs/gov/remote/builds/<slug>/card`, the cache ref a publish sets, so a session's own terminal
+  follow refuses the next route to that build with no lookup between. Observed by AC7.
+- **S8** — finding 25 (M6). The card has one local name: no code writes or reads
+  `refs/gov/builds/<slug>/card` locally. **Readers:** by name: READER NOT IN TREE, since the local
+  name's only readers are TOOL-dPlacedRequest-2's S6 fetch refspec and S9's R7, built in this build and
+  both moved here. by value: NO VALUE READERS, since no code counts or compares the local ref beyond
+  those two. Observed by AC8.
+- **S9** — finding 65 (M6). The lookup's fetch names the remote `resolve_claim_remote` resolves, never a
+  literal `origin`. Observed by AC9.
+- **S10** — finding 33 (M7). The kickoff engine sets no `GOVREF_RUNNER`, `GOVREF_REMOTE` or `GOVREF_GITDIR`
+  and calls no `write_gov_ref`: after `TOOL-dPlacedRequest-33` its one remote write is the driver's
+  `--card-ref write`, and the lookup becomes `--card-ref lookup` (S12). Observed by AC10.
+- **S11** — finding 66 (M7). The lookup is bounded as the publish is: the engine runs `--card-ref lookup`
+  into a file under `timeout -k 2 "$CARD_FETCH_BOUND"`, stdin from `/dev/null`, and a driver that
+  does not answer reads the next store, printing the `evidence` verdict. Observed by AC11.
+- **S12** — finding 32 (M8). `unattended.sh --card-ref lookup <slug>` is read-only: it fetches
+  `+refs/gov/builds/<slug>/card:refs/gov/remote/builds/<slug>/card` through `observe_remote` with
+  `--no-write-fetch-head`, the resolved remote and `add_feed_sightings`, and prints the commit id and
+  its message; `RUN_CLAIMS` off prints `card-ref — off` and reads nothing. `print_replay`'s lookup
+  calls it, so a replay writes no `FETCH_HEAD`, as TOOL-aGraftedHelix-2 decided. Observed by AC12.
+- **S13** — finding 34 (M9). The kickoff engine carries no inline parity block, so the `python resolver`
+  leg's guard needs no `skills/` path: `git grep` finds no `gov_ref_sh` or `gov_feed_sh` marker under
+  `skills/`. Observed by AC13.
+- **S14** — finding 7 (M10). `--entry-claim` never queues its create: an unanswered read prints
+  `claim not written — offline` and exits 4 under every `leases.offline` value but `refuse`, which
+  exits 1 printing `offline`; nothing is queued and no build folder is written. `TOOL-dPlacedRequest-3`
+  §4's `awaiting` row names this `offline`, and `TOOL-dPlacedRequest-21` S5's `offline` row routes there. Observed by AC14.
+- **S15** — finding 71 (M10). Because the claim never queues, no flush can land a claim no folder follows,
+  and no yield can lose one the session believes it holds; the next run's `--entry-claim` reads the
+  slug as claimed or taken. Observed by AC15.
+- **S16** — finding 8 (M11). `scan_feed_writers` reads a file's top-level body, outside every `name() {`, as
+  one scope, paired by the same rule. Observed by AC16.
+- **S17** — finding 70 (M12). The census joins `\`-continued lines before matching, and flags any
+  `--force-with-lease`, or a variable assigned it, inside a scope whose body holds a `push`.
+  Observed by AC17.
+- **S18** — finding 9 (M13). `TOOL-dPlacedRequest-4` AC8's observation reads "the block's claim lines and no
+  history": `placement.py --fixture --plant claim-lines` asserts that `record` prints `disposition`,
+  `build`, `playbook`, `reason`, `scenarios` and `facts` of the passed block and no line of an earlier
+  block, `check:` or `placer:`. Observed by AC18.
+- **S19** — finding 10 (M14). `TOOL-dPlacedRequest-20` AC6's history check reads what the fence guarantees:
+  epochs never fall along the first-parent chain, no commit authored under A's session carries epoch
+  n+1, and each epoch increment coincides with a change of holder, over a fresh fixture whose lease A
+  reads as foreign and stale. Observed by AC19.
+- **S20** — finding 13 (M15). `TOOL-dPlacedRequest-3`'s `item.entry.orient` row carries `map = "base"`, so
+  `TOOL-dPlacedRequest-6` §3's sentence "which declares `map` there" is true. Observed by AC20.
+- **S21** — finding 14 (M16). `TOOL-dPlacedRequest-14` AC1's arithmetic: with five refusals, places 2 to 5
+  print `1/4` to `4/4`, and the sixth `place` exits 3 printing `pre-claim budget exhausted` and writes
+  no block. Observed by AC21.
+- **S22** — finding 15 (M17). `unattended.sh --lease status <kind> <name> [<sub>]` is read-only and prints
+  one TAB line, `<tail> <fleet tag> <session> <status> <verdict> <epoch>`, or `lease — none · <tail>`;
+  `placement.py check` decides "free or this session's" from it, never from `--claims`' five fields.
+  Observed by AC22.
+- **S23** — finding 16 (M18). With `RUN_CLAIMS` off, every `--lease` act but `fence` prints
+  `lease — off · <tail>`, writes nothing and exits 0; `fence` keeps `TOOL-dPlacedRequest-15` S2's
+  `fence — none · leases are off`. `TOOL-dPlacedRequest-21`'s patch and repeat claim proceeds without
+  a lease on `off`. Observed by AC23.
+- **S24** — finding 37 (M19). The pre-push claim fast path (`.githooks/pre-push:851-870`) accepts a candidate
+  whose tree is `tree 0` and whose first parent reads `missing` or has a `tree 0` tree, by adding
+  `<sha>^^{tree}` to the one `cat-file --batch-check` query. Observed by AC24.
+- **S25** — finding 23 (M19), the skeptic's fix. A parented claim beat pushed alone does not source
+  `straggler-guard.sh`, staged against the base predicate, which accepts only `<sha>^ missing`; the
+  hook's comment at `:845-847` names both shapes. Observed by AC25.
+- **S26** — finding 24 (M20). `memory/map/features/unattended-stops.md` describes the parented claim chain
+  and the default-branch-only verdict clear in place of `claim-push.lock`, its `.break` guard and the
+  marker wait (`:58-66`), and the claim block's header comment in `tools/unattended/unattended.sh`
+  stops saying the hook clears both verdict files on every push. **Readers:** by name:
+  `claim-push.lock`, spelled by `memory/map/features/unattended-stops.md:61-65` and
+  `memory/gotchas/decision-re-derived-by-a-second-process.md:66` and `:74`, both rewritten here.
+  by value: NO VALUE READERS, since no code reads the lock's path after TOOL-dPlacedRequest-11 S6.
+  Observed by AC26.
+- **S27** — finding 49 (M20). `memory/gotchas/decision-re-derived-by-a-second-process.md` gains a dated
+  paragraph naming `TOOL-dPlacedRequest-11`'s removal of the lock and what now serialises the two
+  pushes. Observed by AC27.
+- **S28** — finding 26 (M21), the skeptic's fix. `readCard` in `tools/hooks/scratch-guard.js` resolves bash
+  as `tools/roles/handoff.py`'s `resolve_bash` does (`:225`), never a bare `bash`, folds the checker's
+  `/c/…` output through `buildNativePath` (`:819`), and reads a checker that does not answer as no
+  card, named; the measured per-call cost is stated in §4. Observed by AC28.
+- **S29** — finding 27 (M22). `TOOL-dPlacedRequest-1`'s fixture is hermetic: `render_playbook.py
+  --fleet-tag` takes `--fleet <path>`, the fixture plants its own `fleet.toml` and `COMPUTERNAME`, and
+  a row with an empty `host` resolves by its user. Observed by AC29.
+- **S30** — finding 38 (M22). `resolve_fleet_tag` asks `read_fleet` by user alone, case-folded, honouring
+  `GOV_NODE` validated against `fleet.toml`'s tags, as `resolve_node_tag` honours it
+  (`tools/run-gates/run-selftests.sh:293`); `--host` is dropped. `derive_node_tag`
+  (`skills/session-kickoff/manifest-check.sh:381`) and `resolve_node_tag` stay, because they read the
+  governance file's `## Node registry` table, a different registry, and §4 says so. **Readers:**
+  by name: READER NOT IN TREE, since the `--fleet-tag` form of `--host` and its one caller are
+  TOOL-dPlacedRequest-1 S11's, built in this build and amended here. by value: NO VALUE READERS, since
+  the host only selected a row. Observed by AC30.
+- **S31** — finding 28 (M23), the skeptic's fix. The two new legs, `loop placement fixtures`
+  (`TOOL-dPlacedRequest-4`) and `loop claim fixtures` (`TOOL-dPlacedRequest-21`), each state a subject,
+  a chunk and a ceiling in `tools/gate-legs.json`, and a `tools/run-gates/selftest-budgets.txt` row when
+  held; no `ceiling-evidence.txt` row is added, since that file is generated and an unbacked leg is
+  not a failure. Observed by AC31.
+- **S32** — finding 47 (M23). For each of the two legs, `tools/govkit/subject-pins.tsv` gains its row by
+  `python tools/govkit/govkit.py selfcheck --write`, `memory/map/features/loop.md` claims the leg's
+  key, and `python tools/codebase-map/gen_map.py --write` regenerates `memory/map/generated/`.
+  Observed by AC32.
+- **S33** — finding 36 (M24). Over `TOOL-dPlacedRequest-24`'s guarded factory, `write_node_lock`, which
+  `gov-feed.lock` is taken through, two breakers racing one planted stale feed lock append with unique `seq` values;
+  `TOOL-dPlacedRequest-13` §5's accepted "two events one `seq`" no longer holds. Observed by AC33.
+- **S34** — finding 39 (M25). `loop_lib.load_tree_lib` becomes a loader taking a module name and its `need`
+  tuple, keeping its by-name version-skew refusal, and `tools/loop/request.py` imports
+  `derive_content_key` through it, never through `resolve_kit_dir`; the loop kit loads memory-tree
+  modules only through that loader. Observed by AC34.
+- **S35** — finding 44 (M26). Every reader of the moved run-claim ref follows the lease:
+  `tools/unattended/resume-tick.test.sh`'s GH1 AC12 and GH11 AC1 arms (`:872-909`) read
+  `refs/gov/leases/tRun/build`; `tools/unattended/.unattended.conf.example:159` and `:163`,
+  `.unattended.conf:156`, `tools/unattended/PROTOCOL.template.md:521`,
+  `tools/unattended/VERBS.template.md:279` with their renders, and
+  `memory/map/features/unattended-stops.md:56` name `refs/gov/leases/<slug>/build`. **Readers:**
+  by name: `refs/gov/runs/<slug>` as the claim's home, spelled by each file listed.
+  by value: NO VALUE READERS beyond `read_claims`' legacy read, which TOOL-dPlacedRequest-1 S4 keeps.
+  Observed by AC35.
+- **S36** — finding 45 (M27). `skills/session-kickoff/SKILL.md` stays at or under its 18432-byte limit
+  (`tools/template-size-limits.txt:60`): the resume acts of `TOOL-dPlacedRequest-2` S7, the stand-in
+  paragraph of `TOOL-dPlacedRequest-3` and the ratchet sentence of `TOOL-dPlacedRequest-9` live in
+  `skills/session-kickoff/RESUME.md`, which SKILL.md points at in one line. Observed by AC36.
+- **S37** — finding 46 (M28). `memory/guides/UNATTENDED-PROTOCOL.md` stays at or under its 66860-byte limit
+  (`tools/template-size-limits.txt:143`): `TOOL-dPlacedRequest-5`'s third source of the spec-audit
+  opt-in is named in the verbs guide, and the protocol's sentence points there at no byte cost.
+  Observed by AC37.
+- **S38** — finding 48 (M29). `python tools/codebase-map/gen_map.py --write` regenerates
+  `memory/map/generated/` once over the build's final tree, so `symbols.json` names every function the
+  build minted and none it deleted, the four claim-push lock functions among them. **Readers:**
+  by name: `write_claim_push_lock` and its three siblings, spelled by
+  `memory/map/generated/symbols.json`, regenerated here. by value: NO VALUE READERS, since the map is
+  a generated index nothing counts. Observed by AC38.
+- **S39** — finding 50 (M30). `derive_claims_line`'s ranking (`skills/session-kickoff/manifest-check.sh:662`)
+  gains `released`, hidden past `CARD_CLAIMS_HIDE_S` as `stale` and `terminal` are. Observed by AC39.
+- **S40** — finding 57 (M31). The offline queue writes `-` for an empty cached tip, as `CLAIM_ROWS` writes
+  `-` for an unknown field (`tools/unattended/unattended.sh:2112-2113`), and the flush maps `-` back
+  to the empty expected sha. Observed by AC40.
+- **S41** — finding 58 (M32). `--request-draw <content key> --cause <c> --item <tag> [--request-text <file>]`
+  passes the file to `TOOL-dPlacedRequest-19`'s `--request <file>` when the ref is absent; with neither
+  the ref nor the flag it refuses naming `--request`. Observed by AC41.
+- **S42** — finding 59 (M33). A draw site that reads exit 2 stops: `place` prints `placement: pre-claim draw
+  not recorded — <why>` and writes no block, and `entry.claim` exits 2 with the same line.
+  Observed by AC42.
+- **S43** — finding 60 (M34). The age pass's walk is bounded: one streaming `git log --first-parent` over
+  the cached lease refs, without `--topo-order`, piped to the `awk`, which resolves a tail at its
+  renewing beat, at its tenure's start (`TOOL-dPlacedRequest-26`), or at the first commit the feed
+  sighted more than `leases.expiry-hours` ago, which reads `stale`, and exits once every tail is
+  resolved, so `git log` stops on the closed pipe. Observed by AC43.
+- **S44** — finding 62 (M35). `TOOL-dPlacedRequest-12` S6 refuses a subject, item or fork holding any byte
+  below 0x20 or 0x7f before a commit is built, exit 2 naming the field. Observed by AC44.
+- **S45** — finding 63 (M36). A failed cache-ref update in `write_feed_success` prints one `feed: NOTE -`
+  line, still appends the event and never changes rc 0; `TOOL-dPlacedRequest-12` S1's encoded segment
+  is refused over 200 bytes. Observed by AC45.
+- **S46** — finding 67 (M37), the skeptic's fix. The `restart-item` act, in `skills/session-kickoff/RESUME.md`,
+  reads in this order: `git add -A`; commit to `partial/<slug>/<sid8>`, taking `-2`, `-3` and on when
+  the name exists; verify with `git rev-parse` that the branch names the new commit; restore the tree
+  only after that, refusing with the cause otherwise. Observed by AC46.
+- **S47** — finding 68 (M38). An entry-time probe's pin: `probe.pin` writes the head to `<key>.probe.md` and
+  records its blob in the trigger record before `run`, which refuses when the head's blob moved; a
+  trigger after a returned probe opens `<key>.probe-2.md`, numbered, never overwriting. Observed by
+  AC47.
+- **S48** — finding 69 (M39). `write-set` reads a unit's spec whatever its status, through `--path-tokens
+  --files-touched --any-status`, and prints `unarmed — write-set: <spec> lists no path` on an empty
+  list; the token rule stays as `TOOL-dPlacedRequest-8` AC7 freezes it, so a backslash path is not a
+  token. Observed by AC48.
+- **S49** — finding 72 (M40). `--lease offer` refuses `offered` over a record whose offer is still open, to
+  anyone, and refuses an offer whose `--to` is the caller's own tag. Observed by AC49.
+- **S50** — finding 73 (M41). A manifest bullet is its `- ` line plus every following line indented by two
+  or more spaces, up to the next bullet or blank line, joined with single spaces. Observed by AC50.
+- **S51** — finding 12 (L1). Each of the thirteen items of `TOOL-dPlacedRequest-8` §4's table is seeded.
+  Observed by AC51.
+- **S52** — finding 17 (L2). `check_probe_outcomes` exempts `item.probe.*` rows, so
+  `TOOL-dPlacedRequest-7`'s own probe rows pass `--check` and no designer opens a probe of a probe.
+  Observed by AC52.
+- **S53** — finding 18 (L3). Every remaining inline copy of `gov_ref_sh` and `gov_feed_sh`, the lander's
+  included, cuts equal to its canonical block, and this spec's §7 names the `python resolver` leg.
+  Observed by AC53.
+- **S54** — finding 19 (L4). The offer refuses a build or unit lease tombstone with `tombstone`, keeping
+  `terminal` for cadence and legacy terminal claims only. Observed by AC54.
+- **S55** — finding 29 (L5). `TOOL-dPlacedRequest-18` AC4's parity probe prints `unarmed — tag_index.py does
+  not resolve` and exits 2 when `tools/playbook/tag_index.py` is absent, which PLAY-dOrderedCharter-19,
+  DEFERRED, mints. Observed by AC55.
+- **S56** — finding 30 (L6). The two size figures restated from measured commits (§4 "Measured sizes").
+  Observed by AC56.
+- **S57** — finding 31 (L7). The one `refs/gov` deletion in product code outside the lease namespace is
+  post-merge's `remove_red_ref` (`tools/run-gates/post-merge.sh:301`, called at `:392`), recorded in §4
+  in place of `TOOL-dPlacedRequest-16` §10's sentence. Observed by AC57.
+- **S58** — finding 40 (L8). `tools/loop/request.py` is new in this build, in the loop kit dDeclaredLoop
+  builds, and this spec's §3 carries the edge `TOOL-dPlacedRequest-19` omits. Observed by AC58.
+- **S59** — finding 41 (L9), the skeptic's fix. No commit of this build moves `KIT_UNATTENDED_VERSION` or
+  `KIT_RUN_GATES_VERSION` by hand; the lander mints them (TOOL-aMendedFleet-65). Observed by AC59.
+
+## 3. Non-goals (OUT)
+
+- No high finding: units 23 to 33.
+- No second mechanism for a twin: S1 and S2 observe units 27 and 28.
+- No change to I6's record keys or I11's content key.
+- No re-wording of any reviewed spec: each item states its correction here and amends the code.
+
+### Edges
+
+- **consumes-from** `TOOL-dPlacedRequest-1` — the lease verbs, the fleet tag resolver, the offline queue and the moved claim ref, which S22, S23, S29, S30, S35 and S40 amend
+- **consumes-from** `TOOL-dPlacedRequest-2` — the card's lookup, route rule R7 and the resume act, which S7 to S12, S28, S36 and S46 amend
+- **consumes-from** `TOOL-dPlacedRequest-3` — the entry items' rows and outcome table, which S14, S20 and S36 amend
+- **consumes-from** `TOOL-dPlacedRequest-4` — `placement.py` and its new leg, which S18, S22, S31 and S32 amend
+- **consumes-from** `TOOL-dPlacedRequest-5` — its protocol clause, which S37 moves
+- **consumes-from** `TOOL-dPlacedRequest-6` — the `map` slot declarations, which S20 makes true for `item.entry.orient`
+- **consumes-from** `TOOL-dPlacedRequest-7` — the probe pin and `check_probe_outcomes`, which S47 and S52 amend
+- **consumes-from** `TOOL-dPlacedRequest-8` — the seed resolver and `--path-tokens`, which S48 and S51 amend
+- **consumes-from** `TOOL-dPlacedRequest-9` — the manifest conversion and its kickoff sentence, which S36 and S50 amend
+- **consumes-from** `TOOL-dPlacedRequest-10` — `placement.py record`'s new lines, which S18 observes
+- **consumes-from** `TOOL-dPlacedRequest-11` — the parented claim commit and the lock's retirement, which S24 to S27 and S56 follow
+- **consumes-from** `TOOL-dPlacedRequest-12` — the register record and its encoder, which S44 and S45 amend
+- **consumes-from** `TOOL-dPlacedRequest-13` — the feed's success exit, sightings and census, which S5, S16, S17, S45 and S53 amend
+- **consumes-from** `TOOL-dPlacedRequest-14` — the draw verb and its sites, which S5, S21, S41 and S42 amend
+- **consumes-from** `TOOL-dPlacedRequest-15` — the lander's fenced beat and inline block, which S6 and S53 amend
+- **consumes-from** `TOOL-dPlacedRequest-16` — `released` and the prune, which S39 and S57 follow
+- **consumes-from** `TOOL-dPlacedRequest-17` — the age pass, which S43 bounds and S56 measures
+- **consumes-from** `TOOL-dPlacedRequest-18` — its parity probe, which S55 amends
+- **consumes-from** `TOOL-dPlacedRequest-19` — `request.py` and `--request`, which S34, S41 and S58 amend
+- **consumes-from** `TOOL-dPlacedRequest-20` — the offer act and its history check, which S19, S49 and S54 amend
+- **consumes-from** `TOOL-dPlacedRequest-21` — `--entry-claim` and its new leg, which S14, S15, S23, S31 and S32 amend
+- **consumes-from** `TOOL-dPlacedRequest-24` — the guarded node lock factory and the queue line, which S33 and S40 observe and extend
+- **consumes-from** `TOOL-dPlacedRequest-26` — the tenure-bounded walk, which S43 bounds in cost
+- **consumes-from** `TOOL-dPlacedRequest-27` — the per-ref append rule, which S1 observes
+- **consumes-from** `TOOL-dPlacedRequest-28` — `read_feed_lease_tip`, which S2 to S4 observe and extend
+- **consumes-from** `TOOL-dPlacedRequest-33` — the `--card-ref` verb, which S10 to S13 extend with the lookup
+- **consumes-from** external — dDeclaredLoop, built before this build run: the loop kit `tools/loop/` with its `kit.toml`, `selftest.py` and `loop_lib.load_tree_lib` (TOOL-dDeclaredLoop-19, -20, -92), which S34 and S58 extend
+
+## 4. Design
+
+### Evidence
+
+- Code this build mints is cited by its unit and scope item; base code by path and line, each read
+  for this spec.
+- `.githooks/pre-push:851-870` builds `_sg_q` as `<sha>^{tree}` and `<sha>^` per candidate and skips
+  the straggler layer only when each pair reads `tree 0` and `<sha>^ missing` (`:866`).
+- `derive_claims_line` ranks `live held unknown stale terminal` (`skills/session-kickoff/manifest-check.sh:662`);
+  any other verdict falls to the `skipped:` form.
+- `read_files_touched`'s `awk` sets `term` on a CLOSED or WONTDO status (`tools/unattended/unattended.sh:3398`)
+  and reads only `ft && !term` (`:3400`); its token test is at `:3404`.
+- `resolve_node_tag` honours `GOV_NODE` against the registry tags and lower-cases the user
+  (`tools/run-gates/run-selftests.sh:293-310`); `derive_node_tag` matches `USERNAME` against the
+  `## Node registry` table's Machine/user cell (`skills/session-kickoff/manifest-check.sh:375-400`);
+  `read_fleet` is `tools/playbook/render_playbook.py:347` and `check_user_clash` `:381`; `fleet.toml`
+  spells one host `COMPEETO-AGENT` (`:23`) and leaves one empty (`:44`).
+- `readCard` is `tools/hooks/scratch-guard.js:667`, called at `:774`; `resolve_bash`'s MSYS fold is
+  `tools/roles/handoff.py:279`.
+- `symbols.json` indexes the four lock functions (`memory/map/generated/symbols.json:3826`, `:3831`,
+  `:15301`, `:24166`).
+- Sizes, measured 2026-10-25 (PINNED): `skills/session-kickoff/SKILL.md` 18310 of 18432 bytes;
+  `memory/guides/UNATTENDED-PROTOCOL.md` 66859 of 66860.
+- `derive_content_key` is `tools/memory-tree/row_grammar.py:1475`; `tools/loop/` is absent at the
+  pinned base (`git ls-files tools/loop` prints nothing at `c63aabbb`).
+
+### The one fetch, the one cache, the one success exit (S5 to S13)
+
+```
+every governance fetch:  observe_remote fetch --no-write-fetch-head <resolved remote>
+                           +refs/gov/<ns>:refs/gov/remote/<ns>     then add_feed_sightings refs/gov/remote/
+every governance write:  write_gov_ref ... -> write_feed_success <ref> <commit|empty>
+                                               set or clear refs/gov/remote/<tail>; NOTE on failure
+                                               add_feed_event <ref> <commit|empty>
+the lander:              its fenced push      -> write_feed_success <lease ref> <beat>
+the card:                --card-ref write | lookup, in the driver; R7 reads refs/gov/remote/builds/<slug>/card
+```
+
+### The claim offline (S14, S15)
+
+| `leases.offline` | `--entry-claim`, remote unanswered | exit | `TOOL-dPlacedRequest-3` outcome |
+|---|---|---|---|
+| `warn`, `follow-leases` | `claim not written — offline`, nothing queued, no folder | 4 | `awaiting` |
+| `refuse` | `lease refused — offline` | 1 | `refused` |
+
+### The census (S16, S17)
+
+`scan_feed_writers` first joins every line ending in `\` with the next, then tracks scopes: each
+`name() {` to its column-0 `}`, and the rest of the file as one top-level scope. A scope is flagged
+when it holds a `push` and a `--force-with-lease`, or a variable assigned `--force-with-lease`, and
+calls none of `write_feed_success`, `add_feed_event` and `write_gov_ref`.
+
+### The bounded walk (S43)
+
+```
+git log --first-parent --format='%x01%H%n%B' <cached lease and legacy refs> | awk
+  load the feed's seen-utc per commit; threshold = now - leases.expiry-hours, as an ISO string
+  per tail: resolved at its renewing beat, its tenure's start, or a commit seen before threshold
+  every tail resolved -> exit; git log ends on the closed pipe
+```
+
+Within one first-parent chain `git log` emits a child before its parent whatever the dates, since a
+parent enters the walk only after its child; across chains the order is by date, which costs
+interleaving only. A commit sighted before the threshold makes the verdict `stale` whatever lies
+further back, because a parent is sighted no later than its child on one node. The walk reads at most
+each lease's commits sighted within `leases.expiry-hours`, plus that interleaving.
+
+### Measured sizes (S56)
+
+Measured 2026-10-25 (PINNED) with `git cat-file -s` over five `refs/gov/remote/runs` tips: a
+parentless claim commit is 380 to 390 bytes, so a parented one, with its 48-byte `parent` line, is
+about 430 bytes, not "sub-400" (`TOOL-dPlacedRequest-11` §4). A lease commit carries nine more keys,
+about 630 bytes, so a lease written once a minute for a day is about 0.9 MB of loose objects, not
+"under 0.6 MB" (`TOOL-dPlacedRequest-17` §4). Nothing in either unit branches on the figure.
+
+### The one deletion outside leases (S57)
+
+Correcting `TOOL-dPlacedRequest-16` §10, which finds no `refs/gov` deletion outside fixtures: post-merge's `remove_red_ref` deletes `refs/gov/bar-red` on every green after a red
+(`tools/run-gates/post-merge.sh:301`, `:392`), kept by `TOOL-dPlacedRequest-11` through
+`write_gov_ref`, outside the lease namespace that unit's S7 guards.
+
+### `readCard`'s cost (S28)
+
+One bounded `bash manifest-check.sh --card --path --session <sid>` per guarded write, about 0.3 s on a
+Git-for-Windows node (the review's measurement, PINNED 2026-10-25), bounded by the hook's existing
+spawn bound; a node where bash does not resolve reads no card, named.
+
+### Inventory
+
+| Minted | Kind | Lexicon cell |
+|---|---|---|
+| `write_feed_success` | shell function, in `gov_feed_sh` | `write`, OK |
+| `--card-ref lookup` | driver verb act | none |
+| `--lease status` | driver verb act | none |
+| `--any-status` | `--path-tokens` flag | none |
+| `--fleet` | `render_playbook.py --fleet-tag` flag | none |
+| `skills/session-kickoff/RESUME.md` | kickoff engine guide | none |
+| `claim not written — offline`, `lease — off`, `placement: pre-claim draw not recorded` | output lines | none |
+
+### Files touched (estimate)
+
+- `tools/lib/gov-feed.sh`
+- `tools/lib/gov-ref.sh`
+- `tools/unattended/unattended.sh`
+- `tools/unattended/unattended.test.sh`
+- `tools/unattended/resume-tick.test.sh`
+- `tools/unattended/.unattended.conf.example`
+- `.unattended.conf`
+- `tools/unattended/PROTOCOL.template.md`
+- `tools/unattended/VERBS.template.md`
+- `tools/unattended/STOPS.template.md`
+- `memory/guides/UNATTENDED-PROTOCOL.md`
+- `memory/guides/UNATTENDED-VERBS.md`
+- `memory/guides/UNATTENDED-STOPS.md`
+- `tools/run-gates/post-merge.sh`
+- `tools/push-main.sh`
+- `tools/push-main.test.sh`
+- `.githooks/pre-push`
+- `tools/hooks/scratch-guard.js`
+- `tools/hooks/scratch-guard.test.sh`
+- `skills/session-kickoff/manifest-check.sh`
+- `skills/session-kickoff/card-store.fixture.sh`
+- `skills/session-kickoff/SKILL.md`
+- `skills/session-kickoff/RESUME.md`
+- `tools/playbook/render_playbook.py`
+- `tools/loop/loop_lib.py`
+- `tools/loop/request.py`
+- `tools/loop/placement.py`
+- `tools/loop/budget.py`
+- `tools/loop/claim.py`
+- `tools/loop/probe.py`
+- `tools/loop/loop.toml`
+- `tools/govkit/steps/kickoff_facts_to_overlay.py`
+- `.githooks/pre-push.test.sh`
+- `tools/gate-legs.json`
+- `tools/run-gates/selftest-budgets.txt`
+- `tools/govkit/subject-pins.tsv`
+- `memory/map/features/loop.md`
+- `memory/map/features/unattended-stops.md`
+- `memory/gotchas/decision-re-derived-by-a-second-process.md`
+- `memory/map/generated/symbols.json`
+
+### Alternatives rejected
+
+- **Two batches.** Nearly every item shares `tools/unattended/unattended.sh`, the `gov_feed_sh` block
+  or the kickoff engine, so no split gives M6 two disjoint write sets.
+- **A `renewed-by` key (S43) or a backslash token (S48).** F3 and F4 record why.
+
+## 5. Production-readiness checklist
+
+- security — S44 closes key-line injection in the register; S10 to S13 leave the engine with no
+  writer; S23 makes the switch-off outcome explicit.
+- perf / scale — S24 restores the claim push's fast path; S43 bounds the age pass by the expiry
+  window; S12 takes the replay's fetch off `FETCH_HEAD`.
+- error / empty / loading states — S4, S42 and S45 each name an outcome the units left undefined.
+- observability — every new outcome is one named line.
+- risks — S36 moves kickoff text behind one pointer; S43's early `stale` is the verdict anyway.
+- testing — the probes of §6 and the arms of §7.
+- migration — none: every item lands before anything it amends ships.
+- user docs — the verbs, stops and protocol guides and `skills/session-kickoff/RESUME.md`; no `help/`
+  page covers these kits.
+
+## 6. Acceptance criteria
+
+Fixtures are the named unit's own unless an item names one.
+
+- **AC1** — When a probe deletes, re-creates and deletes one ref through `write_gov_ref`, the feed holds
+  two deletion lines for it. Red when: the second deletion is dropped.
+- **AC2** — When `--lease offer unit tFix TOOL-tFix-2 --to b` runs over a deleted, sighted unit
+  tombstone, it exits 1 printing `tombstone`. Red when: the offer re-creates it.
+- **AC3** — When `--lease prune` deletes a terminal run lease at epoch 3 and `--lease acquire run
+  maintain 2026-10` runs on the same node, the new record reads `epoch: 4` parented on the pruned tip.
+  Red when: the create reads the deletion event and restarts at 1.
+- **AC4** — When the feed-named commit is made unreadable by `git prune --expire=now` after its cache
+  ref is gone, a unit lease acquire exits 1 printing `epoch-fence`, and a run lease acquire creates at
+  epoch 1. Red when: a build or unit lease restarts its epoch.
+- **AC5** — When clone A writes a card on top of clone B's card commit, `bash unattended.sh --feed check`
+  exits 0. Red when: a commit fetched outside the sighting hook reads `missing`.
+- **AC6** — When a fenced landing lands in `TOOL-dPlacedRequest-15`'s fixture, `git rev-parse
+  refs/gov/remote/leases/tFix/build` names the beat and `--feed check` exits 0. Red when: the check
+  prints `extra`.
+- **AC7** — When `--card --follow --terminal` runs and an append routing to that build follows on the
+  same node with no planted ref and no lookup, `manifest-check.sh` refuses it naming R7.
+  Red when: R7 reads a ref the publish never moved.
+- **AC8** — When `git grep -n 'refs/gov/builds/[^ ]*:refs/gov/builds'` runs over
+  `skills/session-kickoff/manifest-check.sh` and `tools/unattended/unattended.sh`, it prints nothing.
+  Red when: a second local name for the card remains.
+- **AC9** — When `card-store.fixture.sh --plant lookup` runs in a clone whose one remote is named
+  `upstream`, the lookup reads the card. Red when: the fetch names a literal `origin`.
+- **AC10** — When `grep -n 'GOVREF_\|write_gov_ref' skills/session-kickoff/manifest-check.sh` runs, it
+  prints nothing. Red when: the engine holds the writer's caller contract.
+- **AC11** — When `card-store.fixture.sh --plant lookup-hung` runs with a stub driver that never
+  answers, the lookup prints `evidence` within the bound plus 3 s. Red when: the lookup hangs.
+- **AC12** — When `card-store.fixture.sh --plant replay` runs, `FETCH_HEAD`'s mtime is unchanged.
+  Red when: a replay writes `FETCH_HEAD`.
+- **AC13** — When `git grep -n '# >>> gov_ref_sh\|# >>> gov_feed_sh' -- skills/` runs, it prints
+  nothing. Red when: an unguarded copy ships in the engine.
+- **AC14** — When the origin is renamed away and `--entry-claim` runs under the default
+  `leases.offline`, it exits 4 printing `claim not written — offline`, `gov-queue.log` gains nothing
+  and no README is written; under planted `refuse` it exits 1 printing `offline`. Red when: the claim
+  is queued or a folder is written.
+- **AC15** — When the origin is restored after another node claims the slug and `--entry-claim` runs
+  again, it prints the slug-taken line. Red when: a claim lands with no folder, or is lost silently.
+- **AC16** — When `scan_feed_writers` reads a scratch file whose top-level body pushes with
+  `--force-with-lease` and never appends, it prints that line; over `tools/push-main.sh` it prints
+  nothing. Red when: a top-level writer escapes, or the correct one is flagged.
+- **AC17** — When it reads plants holding a `\`-wrapped push and a `git push "${args[@]}"` whose array
+  holds `--force-with-lease`, each with no append, it prints both. Red when: either escapes.
+- **AC18** — When `python placement.py --fixture --plant claim-lines` runs after unit 10's lines land,
+  it passes, printing the block's six claim lines and no history. Red when: unit 10's lines red it.
+- **AC19** — When `TOOL-dPlacedRequest-20`'s fixture runs the corrected history check over a chain
+  holding renews and an offer, it passes; with a planted take at a fallen epoch it fails.
+  Red when: a correct chain fails or a fallen epoch passes.
+- **AC20** — When `python loop_lib.py --check` runs, it lists `item.entry.orient` with
+  `map base`. Red when: the item defaults to `map none`.
+- **AC21** — When unit 14's fixture plants five refusals, places 2 to 5 print `1/4` to `4/4` and the
+  sixth exits 3 printing `pre-claim budget exhausted`. Red when: the counts are off by one.
+- **AC22** — When two same-node sessions hold and read one build lease, `--lease status build tFix`
+  prints the holder's session, and `placement.py check` refuses `amend` for the other session.
+  Red when: a same-node session reads another's lease as its own.
+- **AC23** — When `RUN_CLAIMS` is off, `--lease acquire build tFix` prints `lease — off · tFix/build`
+  and exits 0 with the origin unchanged, and `--lease fence build tFix` prints `fence — none`.
+  Red when: an off switch writes, hangs or refuses.
+- **AC24** — When `.githooks/pre-push` reads, in a scratch clone, one stdin line pushing a parented
+  claim beat alone, beside a stub `straggler-guard.sh` that prints a marker, the marker is absent.
+  Red when: the parented shape takes the slow path.
+- **AC25** — When the same line is fed to a scratch copy of the hook staged back to the base
+  `<sha>^ missing` test, the stub prints its marker. Red when: the two predicates read alike.
+- **AC26** — When `git grep -n 'claim-push.lock' -- memory/map/features/ memory/gotchas/` runs, the
+  only hits are in the gotcha's dated paragraph naming `TOOL-dPlacedRequest-11`. Red when: a reader
+  still describes the lock as live.
+- **AC27** — When `grep -n 'TOOL-dPlacedRequest-11' memory/gotchas/decision-re-derived-by-a-second-process.md`
+  runs, a dated paragraph names the lock's removal. Red when: the gotcha's history stops at the lock.
+- **AC28** — When a `node -e` probe calls the exported `readCard` with a stub checker printing a
+  `/c/` path, it reads the card at the `C:/` path. Red when: the MSYS path reads as no card.
+- **AC29** — When unit 1's fixture plants its own `fleet.toml` with an empty-host row and a
+  `COMPUTERNAME`, `--lease acquire build tFix` writes `fleet-tag` from that row. Red when: the result
+  depends on the machine.
+- **AC30** — When `USERNAME` matches a row in another case and `GOV_NODE` is unset, the tag resolves;
+  with `GOV_NODE` naming an unregistered tag, the verb exits 2. Red when: case or host refuses a node.
+- **AC31** — When `python -c` reads `tools/gate-legs.json`, each of the two legs carries a subject, a
+  chunk and a ceiling. Red when: a leg lacks one.
+- **AC32** — When `python tools/govkit/govkit.py selfcheck` and `python tools/codebase-map/gen_map.py
+  --check` run, both exit 0 with the two legs present. Red when: a pin row or dossier claim is missing.
+- **AC33** — When two background appenders break one planted stale `gov-feed.lock`, `cut -f1
+  gov-feed.log | sort | uniq -d` prints nothing. Red when: two events share a `seq`.
+- **AC34** — When `git grep -n resolve_kit_dir -- tools/loop/` runs, it prints only `loop_lib.py`'s
+  loader; with a skewed memory-tree kit planted, `request.py key` prints the named refusal.
+  Red when: a raw ImportError escapes.
+- **AC35** — When `git grep -n 'refs/gov/runs/<slug>\|refs/gov/runs/tRun'` runs over the files S35 lists,
+  it prints only legacy-read mentions. Red when: a reader still names the old home.
+- **AC36** — When `wc -c skills/session-kickoff/SKILL.md` runs, it prints at most 18432, and
+  `grep -n RESUME.md skills/session-kickoff/SKILL.md` finds the pointer. Red when: the size leg reds.
+- **AC37** — When `wc -c memory/guides/UNATTENDED-PROTOCOL.md` runs, it prints at most 66860.
+  Red when: the protocol size leg reds.
+- **AC38** — When `python tools/codebase-map/gen_map.py --check` runs, it exits 0 and
+  `grep -c claim_push_lock memory/map/generated/symbols.json` prints 0. Red when: the map is stale.
+- **AC39** — When `manifest-check.sh --card --write` runs over a fixture holding a `released` lease,
+  it prints a `claims —` count line, not `skipped:`. Red when: `released` hides the cell.
+- **AC40** — When AC7 of `TOOL-dPlacedRequest-1` queues an offline create and the origin returns,
+  `--lease flush` lands it. Red when: the empty field shifts the line and the create never lands.
+- **AC41** — When `--request-draw <key> --cause refused --item item.entry.place --request-text req.md`
+  runs with no ref, the ref is created and the draw recorded; with neither, it exits 2 naming
+  `--request`. Red when: the branch has no file to pass.
+- **AC42** — When unit 14's fixture plants `--plant unreachable`, `place` prints `pre-claim draw not
+  recorded` and writes no block. Red when: placement proceeds unbounded.
+- **AC43** — When `--claims` reads a planted 10,000-commit lease chain whose last 50 commits were
+  sighted within the bound, it completes at least five times faster than a scratch copy whose walk
+  reads every commit. Red when: the walk reads the whole chain.
+  figure: DERIVED at observation, as a ratio of the two timings.
+- **AC44** — When `--register problem` runs with a subject holding `\nsession: x`, it exits 2 naming
+  `subject` and builds no commit. Red when: a key line is injected.
+- **AC45** — When a probe holds `<git-common-dir>/refs/gov/remote/runs/tFix.lock` and writes the ref, `write_gov_ref`
+  returns 0, prints one `feed: NOTE -` line and the event is appended; a 201-byte encoded subject is
+  refused. Red when: a landed write returns non-zero.
+- **AC46** — When `grep -n` runs over `RESUME.md` for `git add -A`, the
+  numbered suffix, `git rev-parse` and "restore only after", each is found in that order.
+  Red when: the restore precedes its verified commit.
+- **AC47** — When unit 7's fixture edits an entry-time probe's head between `pin` and `run`, `run`
+  exits non-zero naming the moved head; a second trigger after a returned probe writes
+  `<key>.probe-2.md` and leaves `<key>.probe.md` unchanged. Red when: the pin is unchecked or a verdict
+  is overwritten.
+- **AC48** — When `python loop_lib.py seed item.build.unit-pass --unit <closed unit>` runs over a
+  CLOSED fixture spec, it prints its paths; over one listing none, `unarmed — write-set`.
+  Red when: a closed unit's write set reads as empty.
+- **AC49** — When clone A runs `--lease offer` over B's open offer to itself, it exits 1 printing
+  `offered`; `--to` its own tag also exits 1. Red when: a node re-offers to itself.
+- **AC50** — When the manifest step's `up` runs over a §B holding one wrapped bullet, the unit row's
+  `text` carries the whole bullet. Red when: the text is truncated.
+- **AC51** — When `python loop_lib.py seed` runs for each of the thirteen item tags of
+  `TOOL-dPlacedRequest-8` §4, each prints a seed or an `unarmed —` line. Red when: an item is unseeded.
+- **AC52** — When `python loop_lib.py --check` runs over unit 7's rows, it exits 0, and over a planted
+  role row outside `item.probe.*` lacking `probe`, it exits 1. Red when: the rule refuses its own rows.
+- **AC53** — When `awk` cuts every `gov_ref_sh` and `gov_feed_sh` block the tree holds, `cmp` finds
+  each equal to its canonical cut. Red when: a copy drifts unobserved.
+- **AC54** — When `--lease offer` runs over a build tombstone, it exits 1 printing `tombstone`.
+  Red when: the cause reads `terminal`.
+- **AC55** — When unit 18's parity probe runs with `tag_index.py` absent, it exits 2
+  printing `unarmed`. Red when: it reads as green.
+- **AC56** — When `git cat-file -s` reads a lease commit in unit 1's fixture, the size is within 15% of
+  §4's 630 bytes. Red when: §4's figure is off by more. figure: DERIVED at observation.
+- **AC57** — When `git grep -n remove_red_ref -- tools/run-gates/post-merge.sh` runs, it prints the
+  definition and its one call. Red when: §4's record of the deletion is false.
+- **AC58** — When `git ls-files -- tools/loop` runs at the close it lists `request.py`, and
+  `git cat-file -e` of that path at `c63aabbb` fails. Red when: the file pre-dates this build.
+- **AC59** — When `git diff c63aabbb..HEAD -- tools/unattended/unattended.sh tools/run-gates/run-gates.sh`
+  is grepped for `^[+-]KIT_(UNATTENDED|RUN_GATES)_VERSION=` before the lander's mint, it prints nothing.
+  Red when: a branch commit hand-bumps a version.
+
+## 7. Gates
+
+`memory hygiene` · `spec tokens (a spec's own names resolve)` · `python resolver (behaviour + inline parity + idiom ban)` · `unattended kit gate` · `kit epoch (shipped bytes move, the version moves)` · `kit version markers` · `govkit selfcheck` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `lexicon naming predicates` · `spawn budget (forks per hot entrypoint)` · `recall floor` · `recall floor arms` · `manifest-check self-test` · `scratch-guard self-test` · `agent-cap self-test` · `format-guard self-test` · `verifier fan-out self-test` · `review-join self-test` · `hook destinations self-test` · `branch-guard self-test` · `pre-push self-test` · `pre-push run-log line` · `pre-push bar self-test` · `push-main self-test` · `transition-audit arms` · `straggler-guard arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `playbook render selftest` · `kickoff engine size <=18KiB` · `unattended protocol size` · `codebase-map coverage + freshness` · `codebase-map gate coverage` · `harness arms (fail branches armed or pinned)`
+
+The full bar runs once, at the close.
+
+New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC14 AC15 AC22 AC23 AC33 AC40 AC43 AC45 AC49 AC54 · each item's plant, staged against the unit it amends · waived for this build's landing by README rule 8, so its clean reading is owed with PLAY-dClosedLoop-14
+New arm: tools/push-main.test.sh · covers AC6 · the fenced landing's cache ref, staged against `add_feed_event` alone · the suite's assertion count raised by the arm added
+New arm: .githooks/pre-push.test.sh · covers AC24 AC25 · a parented claim beat pushed alone, staged against the base `<sha>^ missing` predicate · the suite's assertion count raised by the arm added
+New arm: tools/hooks/scratch-guard.test.sh · covers AC28 · a stub checker printing a `/c/` path, staged against a bare `bash` and no fold · none
+New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC12 AC39 · the terminal-route, hung-lookup, replay and released plants, staged against `TOOL-dPlacedRequest-2`'s local ref and fetch · none
+
+## 8. Open questions
+
+- **F1 — Where does the kickoff text that overflows SKILL.md go (S36)?** (a)
+  `skills/session-kickoff/RESUME.md`, pointed at in one line; (b) a trim of equal size elsewhere in
+  SKILL.md; (c) raise the limit. (c) is an owner's ceiling; (b) cuts text other units did not write.
+  RESOLVED (agent, 2026-10-25, delegated): (a), rung 3. widens: none · relaxes: none
+- **F2 — How is the claim's offline outcome stated once (S14)?** (a) The claim never queues, `offline`
+  routing to `awaiting` under every value but `refuse`; (b) a queued claim is `awaiting` and a flush
+  lands it. (b) needs a yield to reach a session that has ended. RESOLVED (agent, 2026-10-25,
+  delegated): (a), rung 3. widens: none · relaxes: none
+- **F3 — How is the age pass bounded (S43)?** (a) A streaming walk that stops at the first commit
+  sighted before the expiry window; (b) per-ref windows of `git log -n`; (c) a `renewed-by` record key.
+  (b) spends a process per ref per read; (c) widens I6. RESOLVED (agent, 2026-10-25, delegated): (a),
+  rung 3. widens: none · relaxes: none
+- **F4 — Does `read_path_tokens` admit a backslash (S48)?** (a) No: the backslash case leaves
+  `TOOL-dPlacedRequest-8` AC4 and AC7 is kept; (b) yes, amending AC7. (b) changes a reader every caller
+  of `read_files_touched` shares. RESOLVED (agent, 2026-10-25, delegated): (a), rung 3.
+  widens: none · relaxes: none
+
+## 9. Revision log
+
+- rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's 50 MEDIUM and 9 LOW
+  findings, one scope item per raw id.
+- rev-2 · 2026-10-25 · promoted fix brief: review-item table folded into item brackets and §4's
+  repeated evidence cut, under the size ceiling; S8, S26, S30, S35, S38 answer check 25; S33 names
+  `write_node_lock`; AC24, AC25, AC28 observe the hook and `readCard`; built files by basename.
+
+## 10. Reuse audit
+
+Each item extends the seam of the unit it names, cited in §2; the base seams it reads are the claim
+fetch (`tools/unattended/unattended.sh:2136`), the hook's fast path (`.githooks/pre-push:851-870`),
+the claims cell (`skills/session-kickoff/manifest-check.sh:645-700`), `read_files_touched`
+(`tools/unattended/unattended.sh:3389-3405`) and `handoff.py`'s `resolve_bash` (`:225`). `python
+tools/codebase-map/reuse_lookup.py "append an event only when the ref's newest event differs"` and
+`"publish the build card ref through the driver behind the claims switch"`, run for units 27 and 33, ranked name stems only, `add_health_event`, `claims` and
+`build_commit`; no existing seam fits beyond the units named. `python tools/memory-recall/query.py "how is the build card published to the remote"`
+and `"how does the feed avoid appending a retried write twice"` returned units 2 and 13, the brief and
+the audit's items; none disagrees with source.
+
+Recall terms used: feed sightings cache census card lookup FETCH_HEAD parity size limit offline claim walk bound

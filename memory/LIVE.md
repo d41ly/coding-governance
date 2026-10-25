@@ -26,7 +26,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dLinkedLibrary](builds/dLinkedLibrary/README.md) | OPEN | d | 2026-10-21 | tooling | 26 | 2026-10-21 | active | 0 |
 | [dMindYourWords](builds/dMindYourWords/README.md) | OPEN | d | 2026-10-21 | tooling | 18 | 2026-10-21 | active | 0 |
 | [dOrderedCharter](builds/dOrderedCharter/README.md) | DEFERRED | d | 2026-10-21 | playbook | 55 | 2026-10-25 | active | 0 |
-| [dPlacedRequest](builds/dPlacedRequest/README.md) | OPEN | d | 2026-10-21 | tooling | 22 | 2026-10-25 | active | 0 |
+| [dPlacedRequest](builds/dPlacedRequest/README.md) | OPEN | d | 2026-10-21 | tooling | 34 | 2026-10-25 | active | 0 |
 | [dRankedPlan](builds/dRankedPlan/README.md) | OPEN | d | 2026-10-21 | tooling | 17 | 2026-10-21 | active | 0 |
 | [dSafePassage](builds/dSafePassage/README.md) | DEFERRED | d | 2026-10-21 | tooling | 60 | 2026-10-24 | active | 0 |
 | [dScopedBuild](builds/dScopedBuild/README.md) | OPEN | d | 2026-10-21 | tooling | 16 | 2026-10-21 | active | 0 |

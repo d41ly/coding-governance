@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0120@5d655f07 whole
 **Carries:** node:record-kind.lease
@@ -24,8 +24,10 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-5-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-5-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-6-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-6-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
+| [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
 
 <!-- /gen:spec-records -->
 
@@ -140,6 +142,13 @@ announced (`:2141-2149`).
 - **hands-off** `TOOL-dPlacedRequest-21` — `refs/gov/leases/<slug>/build` and the refusal causes, which `entry.claim` routes, and the offline queue it applies
 - **hands-off** `TOOL-dPlacedRequest-4` — `refs/gov/leases/<slug>/build`, the lease `placement.check` reads for `continue` and `amend`
 - **hands-off** external — dKeptSession's presets cannot set `leases` beside a `leases.*` key in one TOML file (TOOL-dGroundRules-1 §8 F5), and its mailbox posts overlaps and take-overs
+- **hands-off** `TOOL-dPlacedRequest-23` — `run_lease_verb` and `leases.offline`'s offline branch, which that unit keeps out of every strict claim read
+- **hands-off** `TOOL-dPlacedRequest-24` — `add_gov_queue`, `write_gov_queue` and `gov-queue.log`, which that unit puts under a node lock and makes idempotent
+- **hands-off** `TOOL-dPlacedRequest-25` — the lease writer's `renews` decision, which that unit derives so a write opening a tenure renews
+- **hands-off** `TOOL-dPlacedRequest-26` — the record's `epoch` and `renews` keys, which mark the tenure that unit's walk stops at
+- **hands-off** `TOOL-dPlacedRequest-29` — the record's `epoch`, `fleet-tag` and `session` and the `lease` mode, which decide that unit's same-holder re-fence
+- **hands-off** `TOOL-dPlacedRequest-32` — the `lease` mode's `mine` test and the `--lease` verbs, which that unit closes to an absent session
+- **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
 
 ## 4. Design
 
@@ -405,6 +414,10 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
 - rev-2 · 2026-10-25 · fix brief, the spec stage's gate hits: AC6 describes the overlap fixture's two planted
   scripts in prose, so no untracked path reads as a repository path; §3 gains the hands-off to
   TOOL-dPlacedRequest-4 that unit's consumes-from names.
+- rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-23,
+  hands-off TOOL-dPlacedRequest-24, hands-off TOOL-dPlacedRequest-25, hands-off
+  TOOL-dPlacedRequest-26, hands-off TOOL-dPlacedRequest-29, hands-off TOOL-dPlacedRequest-32,
+  hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
 
 ## 10. Reuse audit
 
