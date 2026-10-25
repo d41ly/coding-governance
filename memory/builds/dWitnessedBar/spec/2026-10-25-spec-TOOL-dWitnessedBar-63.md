@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-63 — the round-1 audit of units 58 to 62, its 34 minors batched: readers that read the whole list and every path form, criteria graded on what the built tree derives, honest failure paths, and observed sequences
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 35 · advances TOOL-dWitnessedBar-31
+**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 35 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,11 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 |
+| [2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dWitnessedBar-1-agent-ledger.md) | journal | TOOL-dWitnessedBar-1 TOOL-dWitnessedBar-2 TOOL-dWitnessedBar-3 TOOL-dWitnessedBar-4 TOOL-dWitnessedBar-5 TOOL-dWitnessedBar-6 TOOL-dWitnessedBar-7 TOOL-dWitnessedBar-8 TOOL-dWitnessedBar-9 TOOL-dWitnessedBar-10 TOOL-dWitnessedBar-11 TOOL-dWitnessedBar-12 TOOL-dWitnessedBar-13 TOOL-dWitnessedBar-14 TOOL-dWitnessedBar-15 TOOL-dWitnessedBar-16 TOOL-dWitnessedBar-17 TOOL-dWitnessedBar-18 TOOL-dWitnessedBar-19 TOOL-dWitnessedBar-20 TOOL-dWitnessedBar-21 TOOL-dWitnessedBar-22 TOOL-dWitnessedBar-23 TOOL-dWitnessedBar-24 TOOL-dWitnessedBar-25 TOOL-dWitnessedBar-26 TOOL-dWitnessedBar-27 TOOL-dWitnessedBar-28 TOOL-dWitnessedBar-29 TOOL-dWitnessedBar-30 TOOL-dWitnessedBar-40 TOOL-dWitnessedBar-41 TOOL-dWitnessedBar-42 TOOL-dWitnessedBar-43 TOOL-dWitnessedBar-44 TOOL-dWitnessedBar-45 TOOL-dWitnessedBar-46 TOOL-dWitnessedBar-47 TOOL-dWitnessedBar-48 TOOL-dWitnessedBar-49 TOOL-dWitnessedBar-50 TOOL-dWitnessedBar-51 TOOL-dWitnessedBar-52 TOOL-dWitnessedBar-53 TOOL-dWitnessedBar-54 TOOL-dWitnessedBar-55 TOOL-dWitnessedBar-56 TOOL-dWitnessedBar-57 TOOL-dWitnessedBar-58 TOOL-dWitnessedBar-59 TOOL-dWitnessedBar-60 TOOL-dWitnessedBar-61 TOOL-dWitnessedBar-62 TOOL-dWitnessedBar-64 TOOL-dWitnessedBar-65 |
 | [2026-10-25-build-TOOL-dWitnessedBar-63-round4-fix-return.md](../build/2026-10-25-build-TOOL-dWitnessedBar-63-round4-fix-return.md) | research | — |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-63-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-63-1-spec-writer.md) | journal | TOOL-dWitnessedBar-1 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-63-round4-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-63-round4-fix-brief.md) | research | — |
+| [2026-10-25-review-TOOL-dWitnessedBar-63-spec-audit-round1.md](../reviews/2026-10-25-review-TOOL-dWitnessedBar-63-spec-audit-round1.md) | spec-audit | — |
 
 <!-- /gen:spec-records -->
 
@@ -208,6 +209,8 @@ That is 22 MEDIUM and 12 LOW findings by raw id.
 - **consumes-from** `TOOL-dWitnessedBar-47` — its pass commit, which S14 observes landing after unit 61's (id 2)
 - **consumes-from** `TOOL-dWitnessedBar-15` — S2's refused-home branch, which the no-HEAD path takes (ids 5, 13)
 - **consumes-from** `TOOL-dWitnessedBar-40` — the scoped decline, which S34's second staged break removes (id 34)
+- **hands-off** `TOOL-dWitnessedBar-64` — S8's unborn predicate, narrowed to a HEAD that names a branch which does not exist, with its corrupt-state fixtures (id 20)
+- **hands-off** `TOOL-dWitnessedBar-65` — the round-1 audit's 22 minors on this unit: one `exists:` rule, the plants a leg runs, the order of units 47 and 61, the seed's routes and `--sha`, the sweep, the record readers, the `PM_SCRUB` reader and AC18 (ids 1, 2, 3, 5, 6, 7, 8, 10, 11, 13, 14, 15, 16, 17, 18, 19, 21, 22, 23, 24, 25, 26)
 
 ## 4. Design
 
@@ -472,6 +475,9 @@ New arm: tools/run-gates/run-gates.evidence.test.sh · covers AC16 AC24 · the `
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit of units 58 to 62: 22 MEDIUM
   and 12 LOW findings, batched.
+- rev-2 · 2026-10-25 · §3 · the Edges block gains the hands-off bullets mirroring TOOL-dWitnessedBar-64's
+  and TOOL-dWitnessedBar-65's consumes-from edges, promoted by the round-1 spec audit of this unit;
+  nothing else moved.
 
 ## 10. Reuse audit
 
