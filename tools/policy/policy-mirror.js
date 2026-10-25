@@ -67,7 +67,7 @@ function resolveBash() {
   if (BASH !== undefined) return BASH;
   const onPath = (ENV.PATH || ENV.Path || "").split(path.delimiter).filter(Boolean)
     .flatMap((d) => [path.join(d, "bash.exe"), path.join(d, "bash")]).filter((p) => fs.existsSync(p));
-  const cands = [ENV.GOV_BASH, ...onPath,"C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"];
+  const cands = [ENV.GOV_BASH, ...onPath, "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"];
   BASH = null;
   for (const c of [...new Set(cands.filter(Boolean))]) {
     const r = spawnSync(c, ["-c", 'test -f "$1"', "_", SHIM], { env: ENV, windowsHide: true, timeout: 20000 });
