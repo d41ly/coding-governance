@@ -437,3 +437,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T01:20:51Z dispatch · item bce69337 TOOL-dGroundRules-69 · reason tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-69.md memory/LIVE.md memory/builds/dGroundRules/README.md
 
 2026-10-25T03:36:23Z rescope · item add TOOL-dGroundRules-70 · reason close finding: tools/unattended/unattended.test.sh --shard 4/8 at 4f76c4b39 and 591cb00d7 fails 'the driver's five readers call it rather than parsing the rows their own way: expected [5], got [4]': TOOL-dGroundRules-66 (cfdee9fd0) routed two readers through read_open_passes, which itself calls read_pass_declarations (unattended.sh:13448), so the arm's literal count is stale; the shared derivation still holds
+
+2026-10-25T04:08:47Z rescope · item add TOOL-dGroundRules-71 · reason close finding: tools/memory-tree/check-memory-hygiene.test.sh at 4f76c4b39 fails three check-7 arms (check 7 emitted 0 findings, expected exactly 2; missing exact line memory/backlog/ARCH.md:7 (301 chars > 300); check 7 reported ''), absent at the run's base 3c2b69be4 where only the inherited partition arm fails; TOOL-dGroundRules-9 (69aa76517) rewrote check 7's emitter to carry tab-separated mode, class, measure and cap fields into check_cap_findings
+
+2026-10-25T04:09:50Z dispatch · item 2b758400 TOOL-dGroundRules-70 · reason tools/unattended/unattended.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-70.md memory/builds/dGroundRules/README.md memory/LIVE.md
+
+2026-10-25T04:09:56Z brief · item TOOL-dGroundRules-70 · reason 0ca8ffb8bd08 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-70-spec-brief.md

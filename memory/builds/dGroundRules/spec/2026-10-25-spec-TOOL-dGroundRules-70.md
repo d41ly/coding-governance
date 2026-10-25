@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-70 — the unattended suite's reader-count arm counts the readers that reach the shared derivation through read_open_passes
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base 533bd309 · streams tooling · order 24
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base 533bd309 · streams tooling · order 24
 
 **Derived:** PLAY-dClosedLoop-2
 

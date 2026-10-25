@@ -7588,8 +7588,10 @@ git reset -q --hard; rm -f "$GH39M"
 # (e): ONE derivation, in the shared library, called by every reader and defined by none of them
 same "read_pass_declarations is defined exactly once, in the shared library" \
   "$(grep -c '^read_pass_declarations()' "$HERE/lib-unattended.sh")" "1"
-same "the driver's five readers call it rather than parsing the rows their own way" \
-  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | grep -c 'read_pass_declarations ')" "5"
+same "the driver's five readers call it or read_open_passes rather than parsing the rows their own way" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | awk '/^read_open_passes\(\)/{s=1} !s; s&&/^}/{s=0}' | grep -cE 'read_(pass_declarations|open_passes) ')" "5"
+same "and read_open_passes itself calls it, so the two readers it serves reach the same derivation" \
+  "$(grep -v '^[[:space:]]*#' "$HERE/unattended.sh" | awk '/^read_open_passes\(\)/{s=1} s; s&&/^}/{s=0}' | grep -c 'read_pass_declarations ')" "1"
 same "and so does check 23" \
   "$(grep -v '^[[:space:]]*#' "$HERE/check-unattended.sh" | grep -c 'read_pass_declarations ')" "1"
 same "and neither defines its own" \
@@ -17962,7 +17964,9 @@ FLOOR_ASSERTIONS=675  # SHADOWED - the effective pin is the one below, and a bum
 # RAISED 2776 -> 2785 by TOOL-dGroundRules-66: the terminal-unit sibling arm in region four beside
 # condition 3's arms, three `mutate`s and six `hit`/`miss` lines, every one unconditional, counted off
 # the block's own lines; no suite ran, and its RED-first observation is the close's.
-FLOOR_ASSERTIONS=2785
+# RAISED 2785 -> 2786 by TOOL-dGroundRules-70: the reader arm's added hop through read_open_passes in
+# region four, one `same`, counted off the block's own lines; no suite ran.
+FLOOR_ASSERTIONS=2786
 # RAISED 845 -> 871 by TOOL-dDerivedDocket-49: the `next:` ladder's arms execute 26 assertions
 # (2 source arms for the retired accumulation, 6 for the declared rung order, 2 for the two
 # terminal literals, and 16 across the four runtime rung and boundary fixtures), all of them in
@@ -18160,7 +18164,8 @@ FLOOR_SHARD_2=218
 # Region five MERGED at TOOL-aSparedSpawn-34's reconcile: the shared 270, less 7, plus 34 = 297.
 FLOOR_SHARD_3=405
 # RAISED 373 -> 382 by TOOL-dGroundRules-66: the same 9 region-four terminal-unit assertions, see FLOOR_ASSERTIONS.
-FLOOR_SHARD_4=382
+# RAISED 382 -> 383 by TOOL-dGroundRules-70: the same 1 region-four reader assertion, see FLOOR_ASSERTIONS.
+FLOOR_SHARD_4=383
 FLOOR_SHARD_5=297
 FLOOR_SHARD_6=127
 FLOOR_SHARD_7=311
