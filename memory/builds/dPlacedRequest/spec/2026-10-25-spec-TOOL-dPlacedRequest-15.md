@@ -282,8 +282,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the `fence` act ov
   widens: none · relaxes: none
 - **F3 — Where is the beat built?** (a) In the driver, the `--lease fence` act, which owns the record
   and the `lease` mode, the lander only pushing; (b) in the lander, rewriting the record's lines. (b) is a second
-  writer of the record format. Rung 3. RESOLVED (agent, 2026-10-25, delegated): (a). widens: none ·
-  relaxes: none
+  writer of the record format. Rung 3. RESOLVED (agent, 2026-10-25, delegated): (a).
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
