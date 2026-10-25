@@ -12,4 +12,3 @@
 # the install-prefix gate's old waiver registry, which was shrink-only and could only lose rows.
 
 lib     gov-internal. Ships nothing to an adopter; every copy-installed kit carries its contents inline instead.
-policy  lands dark (TOOL-dGroundRules-1): no consumer reads the policy file until dGroundRules' later units re-point one, and its charter block is a later build's.

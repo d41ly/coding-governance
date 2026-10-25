@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-78 — the close sweep of the review's M4 and lows: the policy fixtures leg's figures, agent-cap.js's rule-7 header, policy-mirror.js's bash resolver order, and the stale "lands dark" waiver and help text
 
-**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** CLOSED · rev-3 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 

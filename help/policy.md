@@ -9,10 +9,10 @@ One reader reads the file: `python tools/policy/policy.py get <key>`, below. Two
 have consumers so far: `runtime.agents-in-flight`, the agent limit, which `policy.py settings
 --write` renders into the harness's settings and the agent-cap hook holds them to ([the agent
 limit](agent-limit.md)); and `budgets.enforce`, `budgets.pinned` and `budgets.<cap>`, which every
-gate that enforces a size cap reads ([the size caps](size-caps.md)). Later dGroundRules units
-re-point each other consumer, one at a time, so a value you set for any other key today is checked
-but changes no behaviour. The one exception is an invalid file, which the push gate refuses when it
-has nothing to fall back to, below.
+gate that enforces a size cap reads ([the size caps](size-caps.md)). Each other key's consumer is
+re-pointed by the build its catalogue row names as `owner`, so a value you set for any other key
+today is checked but changes no behaviour. The one exception is an invalid file, which the push gate
+refuses when it has nothing to fall back to, below.
 
 The kit README, `tools/policy/README.md`, is the full reference: the row fields, the grammar of
 allowed values and every check.

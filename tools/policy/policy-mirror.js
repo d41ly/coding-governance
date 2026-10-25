@@ -53,16 +53,17 @@ function runGit(cwd, args, input) {
   return spawnSync("git", args, { cwd, env: ENV, input, encoding: "utf8", windowsHide: true });
 }
 
-// The bash that can SEE the shim, by RUNNING each candidate, never by its place on PATH: GOV_BASH,
-// then each `bash` PATH names in order, then Git for Windows' two paths, each kept only when
-// `test -f` on the shim exits 0 under it. On Windows the bare name reaches the System32 WSL launcher,
-// which cannot open a `C:/` path (gotcha subprocess-resolves-a-different-shell). Found once per process.
+// The bash that can SEE the shim, by RUNNING each candidate, never by its place on PATH, in the order
+// the policy kit's checker's `resolve_bash` takes: GOV_BASH, then the first `bash` PATH names, then
+// Git for Windows' two paths, then the bare name, each kept only when `test -f` on the shim exits 0
+// under it. On Windows the bare name reaches the System32 WSL launcher, which cannot open a `C:/`
+// path (gotcha subprocess-resolves-a-different-shell). Found once per process.
 let BASH;
 function resolveBash() {
   if (BASH !== undefined) return BASH;
   const onPath = (ENV.PATH || ENV.Path || "").split(path.delimiter).filter(Boolean)
     .flatMap((d) => [path.join(d, "bash.exe"), path.join(d, "bash")]).filter((p) => fs.existsSync(p));
-  const cands = [ENV.GOV_BASH, ...onPath, "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"];
+  const cands = [ENV.GOV_BASH, onPath[0], "C:/Program Files/Git/bin/bash.exe", "C:/Program Files/Git/usr/bin/bash.exe", "bash"];
   BASH = null;
   for (const c of [...new Set(cands.filter(Boolean))]) {
     const r = spawnSync(c, ["-c", 'test -f "$1"', "_", SHIM], { env: ENV, windowsHide: true, timeout: 20000 });

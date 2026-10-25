@@ -35,8 +35,8 @@
  * the `policy` kit beside this hooks kit, every `Agent` and `Workflow` call reads the landed limit
  * through `readPolicy`, then every settings layer `readSettingsLayers` reads at the payload `cwd`'s
  * checkout root, and refuses when no layer sets a harness variable, or any layer that sets one holds
- * a value that is not a positive integer, or is above the limit (TOOL-dGroundRules-61). No policy kit beside this one, or a
- * `cwd` in no checkout, adds no rule. Skipped under `--only=`. A throw inside it refuses.
+ * a value that is not a positive integer, or is above the limit (TOOL-dGroundRules-61). No policy kit beside this one adds
+ * no rule; a `cwd` in no checkout refuses, naming it (TOOL-dGroundRules-21 S38). Skipped under `--only=`. A throw inside it refuses.
  *
  * RULE 0 (TOOL-aBlindedTrial-6) denies a `Workflow` call whose structured `args` carry
  * `kind: "spec-audit"` unless the build README under `args.repo` declares `spec-audit: <YYYY-MM-DD>`
