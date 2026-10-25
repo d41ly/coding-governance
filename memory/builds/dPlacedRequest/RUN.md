@@ -9,6 +9,7 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+refreshed-at: 60d60e69404d01caf230f5c448474adee4d21ee8 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 5352805c87e4fd9d3b239a2f4aac68c77d89f73e
 phase: REVIEWING
@@ -76,3 +77,5 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T01:58:46Z rescope · item add TOOL-dPlacedRequest-43 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md findings at MEDIUM ids 3 4 5 6 7 8 15 16 17 18 19 22 23 25 27 28 29 30 34 35 37 38 39 41 and at LOW ids 9 10 11 12 20 21 31 40 42 43
 
 2026-10-25T02:22:02Z review · item dPlacedRequest-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 34 · disposition promote
+
+2026-10-25T06:15:38Z decision · item Spec audit round 3 (workflow wf_22df4547-5f4, units 35-43) cannot finish: its grounding lens agent wedged three times, and its failure-envelope lens twice, on a Bash tool call that never returned (45, 14 and 10+ minutes) while no process of theirs ran, the same probes completing at once in the main session. Every wedged call ran rm -rf on a variable path inside its scratch dir; round 2's literal-path rm -rf calls passed. Most likely a tool-approval prompt a workflow agent cannot answer with no owner present. · reason Options seen: resume again (wedged 3 of 3 for grounding); edit the lens prompts in tools/workflows/tier2-review.js (product code, outside this records-only spec run and its write gate); close round 3 on four lenses (the harness has no such knob, and a degraded round is not an audit). Refused all three; held for an owner turn: approve or clear the pending tool prompt, or resume the round from wf_22df4547-5f4 attended.
