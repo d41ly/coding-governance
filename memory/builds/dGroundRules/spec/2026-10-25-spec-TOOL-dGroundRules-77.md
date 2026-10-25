@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-25-prompt-TOOL-dGroundRules-77-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-77-1-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dGroundRules-77-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-77-spec-brief.md) | research | — |
+| [2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md](../reviews/2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md) | diff-review | TOOL-dGroundRules-72 TOOL-dGroundRules-73 TOOL-dGroundRules-74 TOOL-dGroundRules-75 TOOL-dGroundRules-76 TOOL-dGroundRules-78 TOOL-dGroundRules-79 |
 
 <!-- /gen:spec-records -->
 

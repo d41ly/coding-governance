@@ -505,3 +505,11 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T09:33:13Z dispatch · item ee061fd0 TOOL-dGroundRules-79 · reason memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-79.md tools/govkit/registry.toml tools/policy/README.md tools/policy/adopt-policy.sh tools/policy/kit.toml tools/policy/check_policy.py memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
 
 2026-10-25T09:33:27Z brief · item TOOL-dGroundRules-79 · reason 19797fa9879a memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-79-spec-brief.md
+
+2026-10-25T09:54:17Z rescope · item add TOOL-dGroundRules-80 · reason closing review round 2 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md), M1: the limit-hook-landed-unread fixture leaves its bare remote's HEAD unpinned, so the policy fixtures leg reds on any node whose init.defaultBranch is main
+
+2026-10-25T09:54:20Z rescope · item add TOOL-dGroundRules-81 · reason closing review round 2 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md), M2: nothing holds the reader's and the shim's remote-variant refusal byte-equal
+
+2026-10-25T09:54:25Z rescope · item add TOOL-dGroundRules-82 · reason closing review round 2 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md), M3 and L1: the round-1 L2 fix narrowed policy-mirror.js's bash resolver to the first PATH bash, so a host whose first bash is the WSL launcher resolves none and rule 7 denies every spawn; the scan also stats every PATH dir for a value it never reads
+
+2026-10-25T09:55:00Z review · item dGroundRules · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 16 · disposition promote
