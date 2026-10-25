@@ -162,3 +162,15 @@ base: cdfbd1cf9c5e31cc8620af362be33a66db61a076
 2026-10-25T13:04:09Z rescope · item add TOOL-dWitnessedBar-92 · reason spec-audit round1 of unit 90 minors batch, MEDIUM ids 2 3 4 6 9 11 13 and LOW ids 5 7 8 12 14 16
 
 2026-10-25T13:17:46Z review · item dWitnessedBar-spec-set-r13 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 13 · disposition promote
+
+2026-10-25T14:39:01Z rescope · item add TOOL-dWitnessedBar-93 · reason spec-audit round1 of units 91-92 finding id 1 at HIGH, report item H1
+
+2026-10-25T14:39:01Z rescope · item add TOOL-dWitnessedBar-94 · reason spec-audit round1 of units 91-92 finding id 5 at HIGH, report item H2; id 16 is the same defect at MEDIUM, item M7, batched into TOOL-dWitnessedBar-97
+
+2026-10-25T14:39:02Z rescope · item add TOOL-dWitnessedBar-95 · reason spec-audit round1 of units 91-92 finding id 8 at HIGH, report item H3
+
+2026-10-25T14:39:03Z rescope · item add TOOL-dWitnessedBar-96 · reason spec-audit round1 of units 91-92 finding id 15 at HIGH, report item H4; ids 2 and 6 are the same defect at MEDIUM, item M1, batched into TOOL-dWitnessedBar-97
+
+2026-10-25T14:39:03Z rescope · item add TOOL-dWitnessedBar-97 · reason spec-audit round1 of units 91-92 minors batch, MEDIUM ids 2 3 4 6 9 11 12 14 16 and LOW id 10
+
+2026-10-25T15:01:13Z review · item dWitnessedBar-spec-set-r14 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 10 · disposition promote
