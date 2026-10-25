@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-56 — the round-4 promotions' minors: fresh race attempts, failures staged so they take, one oracle contract, and criteria that read the places they name
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 29 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -151,6 +151,7 @@ unit and the items it carries.
 - **consumes-from** `TOOL-dPlacedRequest-57` — 34 AC59 without its base, after which S11 measures unit 34; that unit's pass runs first at this order
 - **hands-off** `TOOL-dPlacedRequest-58` — S3, §4's per-attempt sketch, AC3 and the race arm, which that unit gives the handshake reset; AC3 is read again at that unit's pass
 - **hands-off** `TOOL-dPlacedRequest-59` — S4, S11, S19, S22, §3, §4, §5, §10 and AC5, which that unit's minors amend; a unit 34 over 48128 at this pass, and AC10 and AC19 while 44 F1's options keep the phrases they count, are read at that unit's pass
+- **hands-off** `TOOL-dPlacedRequest-61` — §1, the consumes-from edge to 57, the header order and AC5 as unit 59 restates it, which that unit's items for findings 3 and 10 amend
 
 ## 4. Design
 
@@ -321,6 +322,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC7 AC8 · a fi
   `grep -F` argument rather than a token of its own, so the criterion reads as a grep over specs and
   never as a suite run (the promoted fix brief's [bar] hit); the suite stays on §7's `New arm:` line.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the consumes-from edge to `TOOL-dPlacedRequest-57` and the hands-off edges to `TOOL-dPlacedRequest-58` and `TOOL-dPlacedRequest-59`, mirroring theirs.
+- rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

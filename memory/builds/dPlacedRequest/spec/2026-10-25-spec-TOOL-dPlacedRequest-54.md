@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-54 — the version oracle walks only this build's own prepared merge
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 28 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -71,6 +71,7 @@ is this build's own, and refuses with exit 2 otherwise.
 - **hands-off** `TOOL-dPlacedRequest-56` — the own-merge test, which that unit's items for findings 13 and 14 restate across 44, and 34 AC59 cut to one line, after which its item for finding 19 measures unit 34 against its ceiling
 - **hands-off** `TOOL-dPlacedRequest-57` — S1, S3, AC1 and AC3, which that unit restates to the observing run's `base:` fact; this unit's pass runs AC1 with that fact, never a sha an earlier run pinned
 - **hands-off** `TOOL-dPlacedRequest-59` — S1, §4, §5, AC2, AC3 and Files touched, which that unit's items for findings 2, 6, 8, 10, 15, 21 and 23 amend
+- **hands-off** `TOOL-dPlacedRequest-61` — §4's inventory, Evidence and head section as unit 59's pass leaves them, which that unit's items for findings 1, 5, 8, 9, 17 and 18 amend
 
 ## 4. Design
 
@@ -179,6 +180,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-4 promotions, finding
   16 (HIGH, item H2).
 - rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edges to `TOOL-dPlacedRequest-57` and `TOOL-dPlacedRequest-59`, mirroring their consumes-from.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

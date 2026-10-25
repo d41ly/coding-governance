@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-58 — every attempt of the placed race starts with no handshake file an earlier attempt left
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-57-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-57-promoted-fix-return.md) | research | TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-59 |
 | [2026-10-25-build-TOOL-dPlacedRequest-58-deviation-581.md](../build/2026-10-25-build-TOOL-dPlacedRequest-58-deviation-581.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-57-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-57-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-59 |
+| [2026-10-25-review-TOOL-dPlacedRequest-57-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-57-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-59 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ handshake and proves it did before A starts.
 - **consumes-from** `TOOL-dPlacedRequest-52` — S4 and §4's race sketch as unit 56 restates them, which keep the clear
 - **consumes-from** `TOOL-dPlacedRequest-48` — the stub's write set, `$h/once` and `$h/held`, which S2's assertion names whole beside the arm's own `$h/release`
 - **hands-off** `TOOL-dPlacedRequest-59` — 56 §4's per-attempt sketch and the arm with the reset, in which that unit's item for finding 22 sets the absent health log's count
+- **hands-off** `TOOL-dPlacedRequest-61` — §1 and the header order, which that unit's item for finding 3 moves
 
 ## 4. Design
 
@@ -143,6 +145,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · the reset and its 
   20 (HIGH, item H2).
 - rev-2 · 2026-10-25 · S1 reworded "removes" to "clears": it empties the arm's scratch handshake
   per attempt and retires no named thing, so it owes no **Readers:** clause (hygiene check 25).
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

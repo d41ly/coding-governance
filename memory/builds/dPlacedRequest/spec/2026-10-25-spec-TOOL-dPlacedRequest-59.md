@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-59 — the round-5 promotions' minors: every oracle reader passes a base, one claim-line reader, criteria that can fail, and cites by label
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 31 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 31 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-57-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-57-promoted-fix-return.md) | research | TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 |
 | [2026-10-25-build-TOOL-dPlacedRequest-59-deviation-591.md](../build/2026-10-25-build-TOOL-dPlacedRequest-59-deviation-591.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-57-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-57-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 |
+| [2026-10-25-review-TOOL-dPlacedRequest-57-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-57-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 |
 
 <!-- /gen:spec-records -->
 
@@ -140,6 +141,7 @@ fact; "the fixture's base" is the base commit of the fixture a criterion builds.
 - **consumes-from** `TOOL-dPlacedRequest-43` — AC24, which S5 gives the run's base
 - **consumes-from** `TOOL-dPlacedRequest-55` — AC1 and AC2, which S4 gives the fixture's base
 - **consumes-from** `TOOL-dPlacedRequest-34` — its size, which S8 cuts when unit 56's pass left it over 48128
+- **hands-off** `TOOL-dPlacedRequest-61` — §1, §3, S1, S3, S7, S19, S21, §4's sketches, AC1, AC3, AC4, AC5, AC7 and AC13, which that unit's items for findings 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 15, 17, 18, 20 and 22 amend
 
 ## 4. Design
 
@@ -320,6 +322,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 AC20 · the shared re
 
 - rev-1 · 2026-10-25 · initial draft, the batch of the spec audit of the round-5 promotions' 8 MEDIUM
   and 13 LOW findings.
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 
