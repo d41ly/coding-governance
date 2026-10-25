@@ -147,11 +147,11 @@ ids TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52
 | [TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name](spec/2026-10-25-spec-TOOL-dPlacedRequest-52.md) | 27 | 2 | OPEN | rev-2 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 59 bound to this build, across 4 record folder(s).
+Records: 61 bound to this build, across 4 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52.
+Ids no `spec-audit` record has ever named: none — every unit id has one.
 
 Ids whose spec moved past its audited revision: TOOL-dPlacedRequest-1@rev-2 TOOL-dPlacedRequest-10@rev-1 TOOL-dPlacedRequest-11@rev-2 TOOL-dPlacedRequest-12@rev-2 TOOL-dPlacedRequest-13@rev-2 TOOL-dPlacedRequest-14@rev-2 TOOL-dPlacedRequest-15@rev-2 TOOL-dPlacedRequest-16@rev-2
 TOOL-dPlacedRequest-17@rev-1 TOOL-dPlacedRequest-18@rev-2 TOOL-dPlacedRequest-19@rev-2 TOOL-dPlacedRequest-2@rev-2 TOOL-dPlacedRequest-20@rev-2 TOOL-dPlacedRequest-21@rev-2 TOOL-dPlacedRequest-23@rev-1 TOOL-dPlacedRequest-24@rev-2 TOOL-dPlacedRequest-26@rev-1 TOOL-dPlacedRequest-28@rev-1
