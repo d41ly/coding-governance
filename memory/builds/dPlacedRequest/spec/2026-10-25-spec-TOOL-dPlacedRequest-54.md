@@ -10,6 +10,7 @@
 |---|---|---|
 | [2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-53-promoted-fix-return.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 | [2026-10-25-build-TOOL-dPlacedRequest-54-deviation-541.md](../build/2026-10-25-build-TOOL-dPlacedRequest-54-deviation-541.md) | deviation | — |
+| [2026-10-25-build-TOOL-dPlacedRequest-54-deviation-542.md](../build/2026-10-25-build-TOOL-dPlacedRequest-54-deviation-542.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-53-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 | [2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-53-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 |
 

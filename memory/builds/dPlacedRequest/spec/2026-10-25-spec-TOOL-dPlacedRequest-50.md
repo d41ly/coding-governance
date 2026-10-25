@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-25-build-TOOL-dPlacedRequest-50-deviation-501.md](../build/2026-10-25-build-TOOL-dPlacedRequest-50-deviation-501.md) | deviation | — |
+| [2026-10-25-build-TOOL-dPlacedRequest-50-deviation-502.md](../build/2026-10-25-build-TOOL-dPlacedRequest-50-deviation-502.md) | deviation | — |
 | [2026-10-25-build-TOOL-dPlacedRequest-50-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-50-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-50-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-50-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 |
 | [2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-50-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 |

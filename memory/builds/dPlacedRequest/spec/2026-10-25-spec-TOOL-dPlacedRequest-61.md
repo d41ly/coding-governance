@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-25-build-TOOL-dPlacedRequest-61-deviation-611.md](../build/2026-10-25-build-TOOL-dPlacedRequest-61-deviation-611.md) | deviation | — |
+| [2026-10-25-build-TOOL-dPlacedRequest-61-deviation-612.md](../build/2026-10-25-build-TOOL-dPlacedRequest-61-deviation-612.md) | deviation | — |
 | [2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-60 |
 
 <!-- /gen:spec-records -->
