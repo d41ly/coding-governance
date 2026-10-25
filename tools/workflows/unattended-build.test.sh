@@ -2121,6 +2121,18 @@ has "DGR74 a hook that denies the fallback too: --render refuses" "$o" "rc=2"
 has "DGR74 ...naming the fallback" "$o" "denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded"
 has "DGR74 ...after a stderr notice carrying that hook's reason" "$e" "does not admit the writer split: a stub hook that denies every script. Update it"
 same "DGR74 ...and leaves the harness it rendered before unchanged" "$(cmp -s "$LAY/old-hook.js" "$WS/scripts/$WFK/unattended-build.js" && echo same || echo changed)" "same"
+# ---- TOOL-dGroundRules-83: A GATE THAT COULD NOT ASK THE HOOK IS NO VERDICT. A hook that denies
+# ---- printing nothing is said as one. With no hook at all the fan-out gate exits 2 naming why, and
+# ---- --render refuses at once with that answer on stderr, never as the hook's denial.
+printf '%s\n' "process.stdin.resume(); process.stdin.on('end', () => process.exit(2))" > "$WS/scripts/$HOOKS/agent-cap.js"
+( cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render >/dev/null 2>"$LAY/old-hook.err" ); e=$(<"$LAY/old-hook.err")
+has "DGR83 a hook that denies printing nothing: the notice says so" "$e" "does not admit the writer split: the agent-cap hook denied it and printed no reason"
+rm -f "$WS/scripts/$HOOKS/agent-cap.js"
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(<"$LAY/old-hook.err")
+has "DGR83 no hook at all: --render refuses" "$o" "rc=2"
+has "DGR83 ...naming the gate that could not ask the hook" "$e" "the fan-out gate exited 2 and could not ask the agent-cap hook"
+has "DGR83 ...and the gate's own reason" "$e" "has no predicate to delegate to"
+hasnt_ "DGR83 ...never as the hook's denial" "$e" "does not admit the writer split"
 
 # ---- AC3: the NESTED layout, and two ROOT installs, one of each memory-tree shape.
 NE="$LAY/nested"; build_layout "$NE" scripts/$WFK scripts/$UNK scripts/$MTK/gotchas.py

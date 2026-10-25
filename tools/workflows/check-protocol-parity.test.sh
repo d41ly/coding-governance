@@ -574,8 +574,11 @@ trap 'rm -rf "$TMPD"' EXIT
 # the two hooks apart, because a version is minted only at the landing, so the installed hook judges
 # the candidate render through this kit's own gate, `check-verifier-fanout.sh`, in both modes. A
 # denial renders the verifier-bounded fallback `render` holds, with one stderr line naming the hook's
-# first line and the update; a hook that denies the fallback too exits 2 and nothing is written. No
-# hook or no node denies both, and the kit requires `agent-cap`. VERIFY_TOTAL is the hook's
+# first line and the update; a hook that denies the fallback too exits 2 and nothing is written. A
+# gate exit other than 0 or 1 is no verdict: the gate could not ask the hook, which the kit
+# requires as `agent-cap`, for want of the hook, node or a checkout. The fallback would ask the same
+# gate, so the render refuses at once with the gate's own answer on stderr (TOOL-dGroundRules-83).
+# VERIFY_TOTAL is the hook's
 # MAX_VERIFIERS as a literal it resolves, as the templates write that total; a hook whose total falls
 # below it denies the fallback. A pair the memory-tree skip leaves unrendered asks nothing.
 VERIFY_TOTAL=5
@@ -584,10 +587,14 @@ _ub_tpl="$KITREL/unattended-build.template.js"
 if [ -f "$_ub_tpl" ] && [ -z "$MTD_SKIP" ]; then
   render "$_ub_tpl" > "$TMPD/writer-split.js" || { echo "protocol-parity: the render of $_ub_tpl FAILED — the template could not be read"; exit 2; }
   _ub_out=$(bash "$HERE/check-verifier-fanout.sh" "$TMPD/writer-split.js" 2>&1); _ub_rc=$?
-  if [ "$_ub_rc" != 0 ]; then
+  if [ "$_ub_rc" != 0 ] && [ "$_ub_rc" != 1 ]; then
+    printf 'protocol-parity: the fan-out gate exited %s and could not ask the agent-cap hook whether it admits the writer split, so nothing was rendered or graded. Its answer:\n  %s\n' "$_ub_rc" "${_ub_out//$'\n'/$'\n'  }" >&2
+    exit 2
+  fi
+  if [ "$_ub_rc" = 1 ]; then
     _ub_why=$(printf '%s\n' "$_ub_out" | awk 'f { sub(/^ +/, ""); print; exit } /^verifier-fanout: FAILED/ { f = 1 }')
     # An empty hook answer is said as one, never as the gate's header or the render's path (TOOL-dGroundRules-34 S31).
-    [ -n "$_ub_why" ] || _ub_why="the agent-cap hook exited $_ub_rc with no reason"
+    [ -n "$_ub_why" ] || _ub_why="the agent-cap hook denied it and printed no reason"
     _ub_why=${_ub_why%.}
     echo "protocol-parity: the agent-cap hook does not admit the writer split: $_ub_why. Update it: govkit update --kits agent-cap" >&2
     WRITER_SPLIT=0

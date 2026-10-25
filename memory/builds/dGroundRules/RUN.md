@@ -527,3 +527,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T10:55:48Z brief · item TOOL-dGroundRules-82 · reason 6eabeadb9679 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-82-spec-brief.md
 
 2026-10-25T11:45:46Z rescope · item add TOOL-dGroundRules-83 · reason close finding: python tools/govkit/selftest.py fails 7 arms at the run's base 3c2b69be4 (inherited) and about 48 more at HEAD, all in the [-PV] family: the review-harness kit's regenerate in a fresh adopter target exits 2 because its render's probe of the agent-cap hook is denied ('protocol-parity: the agent-cap hook does not admit the writer split: the agent-cap hook exited 2 with no reason'), so govkit update cannot re-stamp the receipt and every later block reds
+
+2026-10-25T12:32:25Z dispatch · item e711d80a TOOL-dGroundRules-83 · reason tools/govkit/selftest.py tools/workflows/check-protocol-parity.test.sh tools/workflows/unattended-build.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-83.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T12:32:32Z brief · item TOOL-dGroundRules-83 · reason 2ea8a93a608c memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-83-spec-brief.md

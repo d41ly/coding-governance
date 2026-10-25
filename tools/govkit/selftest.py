@@ -14635,7 +14635,8 @@ user_skills = "/tmp/gk-fake-skills"
                          g / PFX / KIT_NAMES["workflows"] / "check-protocol-parity.test.sh")
             # The verifier fan-out gate ships in the kit as it does in the real one. The renderer read
             # FANOUT_CAP through it until TOOL-dGroundRules-10 re-pointed the token to the policy
-            # reader, which is the target's own, see `seed_pv_policy`.
+            # reader, which is the target's own, see `seed_pv_policy`. Since TOOL-dGroundRules-30 the
+            # renderer asks it whether the target's hook admits the writer split, see `seed_pv_hook`.
             shutil.copy2(_pvREAL / "check-verifier-fanout.sh",
                          g / PFX / KIT_NAMES["workflows"] / "check-verifier-fanout.sh")
             # TOOL-aGraftedHelix-28 made the real parity script require this sibling wherever the
@@ -14685,6 +14686,15 @@ user_skills = "/tmp/gk-fake-skills"
             for _pf in ("policy.py", "catalogue.toml"):
                 shutil.copy2(KIT_DIRS["policy"] / _pf, t / "scripts" / "policy" / _pf)
 
+        def seed_pv_hook(t):
+            """The agent-cap hook where inCMS core keeps its only copy, `.claude/hooks/`, which the
+            fan-out gate's resolver probes third. The review harness requires the hook kit, so every
+            real install holds one, and since TOOL-dGroundRules-30 the renderer asks it, through
+            `check-verifier-fanout.sh`, whether it admits the writer split. A fixture without it
+            renders nothing (TOOL-dGroundRules-83)."""
+            (t / ".claude" / "hooks").mkdir(parents=True, exist_ok=True)
+            shutil.copy2(KIT_DIRS["hooks"] / "agent-cap.js", t / ".claude" / "hooks" / "agent-cap.js")
+
         def build_pv_target(g, name, harness_edit=None):
             """An install `apply` wrote at vintage A, with one local delta, which both measured
             consumers carry somewhere, and the checklist script a flat memory-tree install puts where
@@ -14693,6 +14703,7 @@ user_skills = "/tmp/gk-fake-skills"
             (t / "scripts").mkdir(exist_ok=True)
             (t / "scripts" / "gotchas.py").write_text("# a stub checklist\n", encoding="utf-8", newline="\n")
             seed_pv_policy(t)
+            seed_pv_hook(t)
             settle(t, "the memory-tree kit's checklist, installed flat")
             _ap = run_pv_govkit(g, "apply", "--target", str(t), "--kits", "review-harness")
             check(f"[-PV] the {name} fixture applies GREEN at vintage A, or every arm over it grades a "
@@ -14726,6 +14737,7 @@ user_skills = "/tmp/gk-fake-skills"
                     shutil.copy2(g / _rel, t / _dst / _name)
             (t / "scripts" / "gotchas.py").write_text("# a stub checklist\n", encoding="utf-8", newline="\n")
             seed_pv_policy(t)
+            seed_pv_hook(t)
             with (t / _pvD).open("a", encoding="utf-8", newline="\n") as _fh:
                 _fh.write("// a consumer's own line\n")
             (t / _pvJ).write_text("echo a join this tree wrote for itself\n", encoding="utf-8", newline="\n")

@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-83 — the govkit selftest's [-PV] adopter targets hold the agent-cap hook again, and a render whose fan-out gate could not ask the hook refuses with the gate's own reason
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base 9437976a · streams tooling · order 30
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base 9437976a · streams tooling · order 30
 
 **Derived:** PLAY-dClosedLoop-2
 
