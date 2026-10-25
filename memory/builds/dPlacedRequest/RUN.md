@@ -91,3 +91,17 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T06:16:32Z hold · item host-owner-action · reason until owner · reaped 37ace83d · resume none(owner)
 
 2026-10-25T07:45:37Z resume · item dPlacedRequest · reason held · keepalive 58fcd084 · manual
+
+2026-10-25T07:59:17Z review · item dPlacedRequest-spec-set-r3 · reason verdict BLOCKED · blockers 1 · BOUNDED · highs 4 · minors 34 · disposition promote
+
+2026-10-25T08:05:35Z rescope · item add TOOL-dPlacedRequest-44 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 26 at BLOCKER, item B1
+
+2026-10-25T08:05:36Z rescope · item add TOOL-dPlacedRequest-45 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 21 at HIGH, item H1
+
+2026-10-25T08:05:38Z rescope · item add TOOL-dPlacedRequest-46 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 32 at HIGH, item H2
+
+2026-10-25T08:05:40Z rescope · item add TOOL-dPlacedRequest-47 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 33 at HIGH, item H3
+
+2026-10-25T08:05:41Z rescope · item add TOOL-dPlacedRequest-48 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 16 at HIGH, item H4
+
+2026-10-25T08:05:43Z rescope · item add TOOL-dPlacedRequest-49 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md findings at MEDIUM ids 1 2 3 4 5 8 9 10 11 14 15 20 22 23 24 27 28 34 35 36 37 38 and at LOW ids 6 7 12 13 17 18 19 25 29 30 31 39

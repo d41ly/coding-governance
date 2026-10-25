@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-39 — a feed append that aborts never takes its carrier down
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-build-TOOL-dPlacedRequest-39-deviation-391.md](../build/2026-10-25-build-TOOL-dPlacedRequest-39-deviation-391.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
+| [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 |
 
 <!-- /gen:spec-records -->
 
@@ -56,6 +57,7 @@ abort ends only the append, and a lock it took is released on the way out.
 
 - **consumes-from** `TOOL-dPlacedRequest-13` — `add_feed_event` and its rule that the append never fails its caller, which this unit extends to an abort; without the appender there is nothing to contain
 - **consumes-from** `TOOL-dPlacedRequest-24` — `write_node_lock` and `remove_node_lock`, which the contained append takes and its `EXIT` trap releases; without the factory there is no lock to release
+- **hands-off** `TOOL-dPlacedRequest-49` — the contained append's trap order, AC1 and §4, which that unit's items for findings 9, 27 and 34 arm the trap before the take
 
 ## 4. Design
 
@@ -140,6 +142,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · the contained 
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   32 (HIGH, item H1, shared with findings 2, 13 and 24).
+- rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

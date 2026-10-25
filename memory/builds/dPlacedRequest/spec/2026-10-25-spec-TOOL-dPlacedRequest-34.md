@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-34 — the round-1 spec audit's minors: one fetch and one cache, honest censuses and counts, every reader of a moved name, and bounded walks
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 22 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -268,6 +268,7 @@ and 73 carry the skeptic's binding re-grade. Criterion ACn observes item Sn.
 - **consumes-from** `TOOL-dPlacedRequest-40` — the exempt act list, which `--lease status` joins by name when S22 mints it
 - **hands-off** `TOOL-dPlacedRequest-35` — S43's bounded walk, whose stops that unit orders with the tenure first
 - **hands-off** `TOOL-dPlacedRequest-43` — this spec's size, S30's reason, S35's protocol bytes, S40's tip readers and AC35, AC38 and AC59, which that unit's items for findings 7, 10, 11, 20, 23, 25, 27, 28 and 30 cut, correct and re-observe
+- **hands-off** `TOOL-dPlacedRequest-49` — AC59, which that unit's item for finding 5 points at unit 44's oracle
 
 ## 4. Design
 
@@ -600,6 +601,7 @@ New arm: skills/session-kickoff/card-store.fixture.sh · covers AC7 AC9 AC11 AC1
 - rev-4 · 2026-10-25 · round-2 promoted fix brief, under the size ceiling again: §4's fetch diagram and
   census folded into S5, S16 and S17, the edges' item lists cut, sibling ids spelled unit N in §2, §4 and
   §6, prose tightened; no item, criterion, edge or fork dropped.
+- rev-5 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

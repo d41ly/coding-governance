@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -88,6 +88,7 @@ deleted claim-push lock had (charter rule `[reuse]`).
 - **hands-off** `TOOL-dPlacedRequest-39` — `remove_node_lock`, which that unit's contained append calls from its `EXIT` trap
 - **hands-off** `TOOL-dPlacedRequest-41` — `add_gov_queue`'s dedupe and `write_gov_queue`'s order, which that unit narrows to a record compare and chains per ref
 - **hands-off** `TOOL-dPlacedRequest-43` — the flush's confirming read, `gov-feed.lock`'s spelling in `gov-feed.sh` and the lock factory, which that unit's items for findings 34, 12 and 39 amend and reuse
+- **hands-off** `TOOL-dPlacedRequest-49` — `write_node_lock`'s write order, which that unit's item for finding 14 makes `owner` before `until`
 
 ## 4. Design
 
@@ -218,6 +219,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
   hands-off TOOL-dPlacedRequest-36, hands-off TOOL-dPlacedRequest-37, hands-off
   TOOL-dPlacedRequest-38, hands-off TOOL-dPlacedRequest-39, hands-off TOOL-dPlacedRequest-41,
   hands-off TOOL-dPlacedRequest-43.
+- rev-4 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

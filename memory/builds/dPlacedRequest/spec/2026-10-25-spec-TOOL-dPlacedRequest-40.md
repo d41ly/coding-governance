@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-40 — the id-less refusal gates the holder acts by name and lets every other lease act run
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-build-TOOL-dPlacedRequest-40-deviation-401.md](../build/2026-10-25-build-TOOL-dPlacedRequest-40-deviation-401.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
+| [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,7 @@ unit states.
 - **consumes-from** `TOOL-dPlacedRequest-15` — `--lease fence` and its `fence — none` path, which AC3 runs with no session; without it there is no fence to exempt
 - **hands-off** `TOOL-dPlacedRequest-34` — `--lease status`, which that unit's S22 mints after this order and which joins the exempt set by name
 - **hands-off** external — dWellOiledMachine's supervisor, which runs `--lease prune` headless with no session and is not refused
+- **hands-off** `TOOL-dPlacedRequest-49` — the exempt `status` act, which that unit's item for finding 12 observes with no session
 
 ## 4. Design
 
@@ -142,6 +144,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the id
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   26 (HIGH, item H3).
+- rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

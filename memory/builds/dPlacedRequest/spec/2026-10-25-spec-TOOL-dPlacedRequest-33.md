@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-33 — the card's remote ref is written by the driver, dark behind `RUN_CLAIMS`
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -78,6 +78,7 @@ and the writer each live once.
 - **consumes-from** `TOOL-dPlacedRequest-11` — `write_gov_ref` and `build_gov_commit` in the driver, through which the verb writes; without them the driver has no compare-and-swap writer to call
 - **hands-off** `TOOL-dPlacedRequest-34` — the `--card-ref` verb family, which that unit's items for findings 18, 32, 33, 34 and 66 extend with the lookup and observe
 - **hands-off** `TOOL-dPlacedRequest-43` — `--card-ref write`'s engine call, its bound and its kill line, which that unit's items for findings 5, 17, 43 and 22 bound, word and route through `run_driver_bounded`
+- **hands-off** `TOOL-dPlacedRequest-49` — `--card-ref write`'s bound in S2 and its sketch, which that unit's item for finding 1 names `CARD_PUBLISH_BOUND`
 
 ## 4. Design
 
@@ -201,6 +202,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the verb under the
   `TOOL-dPlacedRequest-2` creates, by basename.
 - rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
   hands-off TOOL-dPlacedRequest-43.
+- rev-4 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

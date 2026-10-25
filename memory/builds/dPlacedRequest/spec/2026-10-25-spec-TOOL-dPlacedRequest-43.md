@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-43 — the round-1 promotions' minors: behavioural class checks, honest outcomes, every reader of a changed spelling, and the sizes kept
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 |
 | [2026-10-25-build-TOOL-dPlacedRequest-43-deviation-431.md](../build/2026-10-25-build-TOOL-dPlacedRequest-43-deviation-431.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 |
+| [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-35 |
 
 <!-- /gen:spec-records -->
 
@@ -163,6 +164,9 @@ Criterion ACn observes item Sn.
 - **consumes-from** `TOOL-dPlacedRequest-32` — the identity rule and the id-less refusal, which S15, S31 and S32 amend
 - **consumes-from** `TOOL-dPlacedRequest-33` — `--card-ref write` and its engine call, which S5, S16, S17 and S19 amend
 - **consumes-from** `TOOL-dPlacedRequest-34` — its spec, S14, S30, S35, S38, S40, the lookup and `readCard`, which S6, S11, S12, S18 to S22, S24 and S34 amend
+- **hands-off** `TOOL-dPlacedRequest-44` — S24 and AC24, which that unit re-ranges to the build's side of the prepared merge and rewrites in place
+- **hands-off** `TOOL-dPlacedRequest-48` — S30's `requests.lock` and AC30, which that unit observes by a placed race and rewrites in place
+- **hands-off** `TOOL-dPlacedRequest-49` — S6, S8, S15 to S22, S25, S26, S30 and their criteria, which that unit's items for the round-3 audit's minors re-point, re-bound and re-observe
 
 ## 4. Design
 
@@ -343,6 +347,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC18 · a stub checker that
 - rev-2 · 2026-10-25 · §7 leg line adds `agent-cap self-test`, `verifier fan-out self-test`,
   `review-join self-test` and `hook destinations self-test`, the legs whose `hooks/` guard
   `tools/hooks/scratch-guard.js` trips.
+- rev-3 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-44 and TOOL-dPlacedRequest-48 and TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

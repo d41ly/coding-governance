@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-35 — the bounded age walk ends a tail at its tenure before it reads an age
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 23 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 23 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-35-deviation-351.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-deviation-351.md) | deviation | — |
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
+| [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-43 |
 
 <!-- /gen:spec-records -->
 
@@ -52,6 +53,8 @@ inside the tip's tenure.
 
 - **consumes-from** `TOOL-dPlacedRequest-34` — S43's bounded streaming walk and its `awk`, whose stops this unit orders; without it there is no bounded walk to order
 - **consumes-from** `TOOL-dPlacedRequest-26` — the tenure rule and AC1's take-over chain, which this unit keeps true under the bounded walk; without it there is no tenure stop to put first
+- **hands-off** `TOOL-dPlacedRequest-46` — S1's stop order, which that unit extends with a `renews: -` stop ahead of the threshold test
+- **hands-off** `TOOL-dPlacedRequest-47` — S1's threshold test and S2's fallback, which that unit guards so an unsighted commit is never compared
 
 ## 4. Design
 
@@ -141,6 +144,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the stop-o
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   1 (HIGH, item H2).
+- rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-46 and TOOL-dPlacedRequest-47.
 
 ## 10. Reuse audit
 

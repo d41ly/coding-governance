@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-41 — a second offline write to a queued lease chains on the queued commit
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-build-TOOL-dPlacedRequest-41-deviation-411.md](../build/2026-10-25-build-TOOL-dPlacedRequest-41-deviation-411.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
+| [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ fix. It repairs `TOOL-dPlacedRequest-24` at order 5.
 
 - **consumes-from** `TOOL-dPlacedRequest-24` — `add_gov_queue`, `write_gov_queue` and S3's dedupe, which this unit narrows and chains; without the guarded queue there is no line to chain on
 - **consumes-from** `TOOL-dPlacedRequest-1` — S10's offline branch and S6's `acquire` that renews on `mine`, which build the write this unit rebases; without them there is no offline write
+- **hands-off** `TOOL-dPlacedRequest-49` — the offline write's read of the newest queued commit, which that unit's items for findings 36 and 38 route through `derive_queue_tip` and refuse when unreadable
 
 ## 4. Design
 
@@ -152,6 +154,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · each p
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   33 (HIGH, item H4).
+- rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

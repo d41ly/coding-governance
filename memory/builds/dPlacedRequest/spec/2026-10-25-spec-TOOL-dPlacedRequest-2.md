@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-2 — the build's orientation card kept per build: a remote ref, a clone cache and a snapshot, following its build
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 12 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0121@2f58beed whole
 **Carries:** node:record-kind.card
@@ -144,6 +144,7 @@ fresh session recommended by `resume.context` and partial work handled by `resum
 - **consumes-from** external — dOrderedCharter's `write_card_file` (PLAY-dOrderedCharter-8 S2) and record factory (PLAY-dOrderedCharter-7 S7); dGroundRules' `policy.py get`
 - **hands-off** `TOOL-dPlacedRequest-33` — the `remote-ref` store's publish and follow, which that unit routes through the driver's `--card-ref write`, dark behind `RUN_CLAIMS`
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-49` — `skills/session-kickoff/card-store.fixture.sh`, which that unit's item for finding 3 gives the `publish-late` plant
 
 ## 4. Design
 
@@ -342,6 +343,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC10 · `readCard` against 
   place of `--card --lookup`.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-33,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

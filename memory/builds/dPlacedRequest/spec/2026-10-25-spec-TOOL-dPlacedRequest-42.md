@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-42 — an offline lease create reads the feed first, as every create on an empty parent does
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 8 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 8 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-43 |
 | [2026-10-25-build-TOOL-dPlacedRequest-42-deviation-421.md](../build/2026-10-25-build-TOOL-dPlacedRequest-42-deviation-421.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-43 |
+| [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ at order 7, so it sits at order 8.
 
 - **consumes-from** `TOOL-dPlacedRequest-28` — `read_feed_lease_tip` and S2's create rule, which this unit extends to the offline branch; without the reader there is no feed read to call
 - **consumes-from** `TOOL-dPlacedRequest-1` — S10's offline branch and the cache ref it builds on, whose empty case this unit routes through the feed; without it there is no offline create
+- **hands-off** `TOOL-dPlacedRequest-49` — the offline create's empty-tip queue line, which that unit's item for finding 36 writes through `derive_queue_tip`
 
 ## 4. Design
 
@@ -134,6 +136,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the offlin
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   36 (HIGH, item H5).
+- rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 

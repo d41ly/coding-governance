@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-37 — the node lock's deadline is the block's own bound, never the driver's `REMOTE_BOUND`
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-35-promoted-fix-return.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
 | [2026-10-25-build-TOOL-dPlacedRequest-37-deviation-371.md](../build/2026-10-25-build-TOOL-dPlacedRequest-37-deviation-371.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-35-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-43 |
+| [2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 |
 
 <!-- /gen:spec-records -->
 
@@ -55,6 +56,7 @@ carrier, the lander's included, takes the lock with nothing from its host.
 
 - **consumes-from** `TOOL-dPlacedRequest-24` — `write_node_lock` and its `until` deadline, which this unit takes off the driver's bound; without the factory there is no deadline to move
 - **hands-off** `TOOL-dPlacedRequest-15` — `tools/push-main.sh`'s inline `gov_feed_sh` copy, which carries `NODE_LOCK_BOUND` and so takes the lock under `set -u` with no driver name
+- **hands-off** `TOOL-dPlacedRequest-49` — S1, AC1 and §4, which that unit's items for findings 15, 27, 30 and 37 fix, sequence and bound against every section the lock covers
 
 ## 4. Design
 
@@ -130,6 +132,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · the deadline writt
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   13 (HIGH, item H1, shared with findings 2, 24 and 32).
+- rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
 
 ## 10. Reuse audit
 
