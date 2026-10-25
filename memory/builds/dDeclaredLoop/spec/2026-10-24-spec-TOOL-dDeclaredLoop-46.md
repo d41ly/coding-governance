@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-46 — the `stage` claim follows the whole manifest-key path: descriptors, emitter, runner floor and selfcheck
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -8,10 +8,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-36-promoted-fix-return.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-46-deviation-461.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-46-deviation-461.md) | deviation | — |
+| [2026-10-25-build-TOOL-dDeclaredLoop-46-deviation-462.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-46-deviation-462.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-36-promoted-fix-brief.md) | research | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-36-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
 
 <!-- /gen:spec-records -->
@@ -31,9 +34,10 @@ It repairs `TOOL-dDeclaredLoop-4`.
 
 ## 2. Scope (IN)
 
-- **S1** — The key admitted: `stage` joins both `KNOWN` sets in `tools/run-gates/run-gates.test.sh`, and
-  `KIT_RUN_GATES_VERSION` in `tools/run-gates/run-gates.sh` moves to the next minor, the first version
-  whose canary admits it. Observed by AC1.
+- **S1** — The key admitted: `stage` joins both `KNOWN` sets in `tools/run-gates/run-gates.test.sh`,
+  which hold `enforces` by then (§4 Evidence), and `KIT_RUN_GATES_VERSION` in
+  `tools/run-gates/run-gates.sh` moves to the next minor of the version this pass finds, the first
+  version whose canary admits it. Observed by AC1.
 - **S2** — The descriptors: every `[[gate_leg]]` row of every kit descriptor (26 files and 68 rows at
   base, `git grep -c '^\[\[gate_leg\]\]'` over `tools/*kit.toml` and `tools/govkit/entries/`, PINNED
   2026-10-24) and of `tools/loop/kit.toml` declares `stage`, its value the manifest row's.
@@ -68,11 +72,16 @@ It repairs `TOOL-dDeclaredLoop-4`.
 
 ### Evidence
 
-- `KNOWN` holds `name argv guard impure reads chunk subject ceiling signature doc_reads` in both copies
-  (`tools/run-gates/run-gates.test.sh:244`, :580), PINNED 2026-10-24.
+- At base `KNOWN` holds `name argv guard impure reads chunk subject ceiling signature doc_reads` in both
+  copies (`tools/run-gates/run-gates.test.sh:244`, :580), PINNED 2026-10-24. PLAY-dOrderedCharter-50
+  S1 adds `enforces` to both copies, with a control pair, at its order 10, before unit 7 writes the key
+  (PLAY-dOrderedCharter-7 §3, its edge on unit 50), and dOrderedCharter lands before this build runs.
+  So the set S1 edits is those eleven keys, `enforces` included, and S1 makes it twelve. The line
+  numbers are base's; the pass re-reads both copies where unit 50 leaves them.
 - The floor pattern: `DOC_READS_FLOOR_RUN_GATES = (1, 25)` and `CEILING_FLOOR_RUN_GATES = (1, 2)`
   (`tools/govkit/govkit.py:6011-6017`), each read through `check_target_reads_subject` before its key is
-  written (:4436-4450); the runner is at 1.43 (`tools/run-gates/run-gates.sh:36`).
+  written (:4436-4450); the runner is at 1.43 at base (`tools/run-gates/run-gates.sh:36`), and S1 takes the
+  next minor of whatever version the pass finds.
 - 7h's correspondence reads one dict per manifest field (:2793-2803) and compares the descriptor's value
   per leg (:2820-2830); `stage` is one more dict and one more compare.
 
@@ -130,16 +139,18 @@ It repairs `TOOL-dDeclaredLoop-4`.
 
 ## 6. Acceptance criteria
 
-- **AC1** — When a probe stages a scratch `gate-legs.json` whose rows carry `stage` and runs the `KNOWN`
-  set extracted from each canary copy, `run-gates.test.sh:244` and `run-gates.test.sh:580`, over it,
-  both copies admit every key.
-  Red when: one copy of `KNOWN` lacks `stage`, so the canary reds every row.
+- **AC1** — When a probe stages a scratch `gate-legs.json` whose rows carry `stage` and `enforces` and runs
+  the `KNOWN` set extracted from each canary copy, `run-gates.test.sh:244` and `run-gates.test.sh:580` at
+  base, over it, both copies admit every key, and each copy equals the eleven keys of §4 Evidence plus
+  `stage`.
+  Red when: one copy of `KNOWN` lacks `stage`, so the canary reds every row, or S1's edit drops
+  `enforces`, so every row unit 7 marked reds.
 - **AC2** — When `python tools/govkit/govkit.py selfcheck` runs on the built tree, its 7h arm passes,
   and `git grep -c 'stage =' -- 'tools/*kit.toml' 'tools/govkit/entries/*'` counts one per `[[gate_leg]]`
   row.
   Red when: a descriptor row omits `stage` while its manifest row carries one.
 - **AC3** — When a probe applies the default selection into two scratch targets, one with a runner at
-  1.43 and one at the new version, the second target's `gate-legs.json` rows carry `stage` and the
+  the version before S1's and one at the new version, the second target's `gate-legs.json` rows carry `stage` and the
   first's carry none, with one omission line per leg printed.
   Red when: the key is written into a runner that predates it, which reds that adopter's canary.
   cost: two scratch installs, seconds each.
@@ -171,6 +182,12 @@ New arm: tools/govkit/selftest.py · covers AC3 AC4 · the emitter under each ru
 - rev-1 · 2026-10-24 · initial draft, promoted from the round-1 spec audit's id 25 (HIGH, item H11).
 - rev-2 · 2026-10-24 · §3 · the Edges block gains the hands-off bullets mirroring the
   consumes-from edges of TOOL-dDeclaredLoop-67, written by the round-2 spec audit's disposal; nothing else moved.
+
+- rev-3 · 2026-10-25 · §2 S1 · §4 Evidence · §6 AC1, AC3 · re-grounded on dOrderedCharter at
+  `462d20f35` by the cross-check record
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`, row 123: the `KNOWN`
+  set is stated as it is once PLAY-dOrderedCharter-50 S1 lands, with `enforces` in both copies, and
+  S1's edit and AC1 are read against it.
 
 ## 10. Reuse audit
 

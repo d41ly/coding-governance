@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-18 — the `step`, `item`, `policy` and `command` tag namespaces, with their extractors
 
-**Status:** DEFERRED · rev-1 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 1 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 1 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0103@2d82c817 whole
 **Carries:** node:tag-namespace.step
@@ -12,10 +12,13 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-build-TOOL-dDeclaredLoop-18-deviation-181.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-18-deviation-181.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -45,8 +48,10 @@ this unit lands, PLAY-dOrderedCharter-10 S5 keeps every `step`, `item` and `poli
   Observed by AC4.
 - **S5** — The per-namespace join, through PLAY-dOrderedCharter-10 S4's `check_namespace_joins`:
   every tag cited in each of the four namespaces is a declared member, a `policy` citation under a
-  family prefix resolving through dGroundRules-2 S4's `read_catalogue_row`, the one key-to-row matcher;
-  each join prints `unarmed` while its population is empty, never green. Observed by AC4 and AC6.
+  family prefix resolving through `policy.py get`, whose match is dGroundRules-2 S4's
+  `read_catalogue_row`, the one key-to-row matcher, run as a subprocess by PLAY-dOrderedCharter-19 S8's
+  `read_policy_value` and never imported; a `PolicyRefused` reads the citation as undeclared; each join
+  prints `unarmed` while its population is empty, never green. Observed by AC4 and AC6.
 - **S6** — The fixture plants, on PLAY-dOrderedCharter-19 S13's `gov_tag.py --fixture --plant <case>`:
   `policy-ns-word`, `policy-catalogue`, `policy-family`, `loop-rows`, `loop-bad-seg` and
   `command-rows`. Observed by AC1, AC2, AC3, AC4 and AC6.
@@ -77,6 +82,7 @@ this unit lands, PLAY-dOrderedCharter-10 S5 keeps every `step`, `item` and `poli
 
 - **hands-off** `TOOL-dDeclaredLoop-1` — the `step` namespace row and `extract_step`, so the loop definition's `step.<stage>` tags (`step.plan`, `step.design`, `step.build`, `step.test`, `step.deploy`) are registered members the shape check grades
 - **hands-off** `TOOL-dDeclaredLoop-9` — the `item` namespace row and `extract_item`, so each `item.<step>.<name>` tag an item row declares is a registered member
+- **consumes-from** external — PLAY-dOrderedCharter-19 S8's `read_policy_value` in `tools/playbook/policy_value.py`, the playbook kit's one subprocess caller of `policy.py get`, through which S5 resolves a family citation; without it the join would import the policy kit
 
 ## 4. Design
 
@@ -134,10 +140,19 @@ of v2's 260 `[policies]` key cells do (PINNED, measured 2026-10-24 over v2 lines
 `policy.roles.harness`, `policy.roles.auth`, `policy.review` and `policy.budgets`, each one `family`
 row whose text names every catalogue name under it. The shape check grades the family tag, so every
 literal segment of every catalogue name is graded, and the first segment of each is checked against
-the namespace words. A citation `policy.review.build` is joined as declared when `read_catalogue_row`
-returns a row for `review.build`; the join imports that matcher through
-`resolve_kit_dir("policy", "policy.py", here)`, the import PLAY-dOrderedCharter-10 S7 makes for the
-registry, so no second key matcher exists.
+the namespace words. A citation `policy.review.build` is joined as declared when
+`read_policy_value(key, root, rev="HEAD")`, `key` the citation's `review.build`, returns:
+`policy.py get` matches the key with `read_catalogue_row` against the policy kit's catalogue, so no
+second key matcher exists. A kit imports no sibling kit, so the policy kit is reached only by that
+subprocess (PLAY-dOrderedCharter-19 S8, PLAY-dOrderedCharter-7 §4 "The policy reads"). `rev="HEAD"`
+means the read needs no remote ladder; the row match reads the kit's catalogue at any revision. An
+unknown key reads as undeclared: `get` exits 2 naming `catalogue.toml` and `not a catalogue key`
+(TOOL-dGroundRules-2 AC4), `read_policy_value` raises `PolicyRefused`, and the join reds the citation as
+cited but undeclared, carrying the reader's line. Every other `PolicyRefused`, an absent policy kit
+included, reads the same way, so no refused read is a declaration. The call's key is the citation's,
+not a literal, which §8 F5 takes up. The `policy-family` plant's scratch repository holds copies of the
+playbook and policy kits, the policy copy's `catalogue.toml` the fixture's, so the `resolve_kit_dir` in
+`read_policy_value` finds that copy and `get` matches against the fixture catalogue.
 
 The red the clause names is a first segment that is a namespace word: a catalogue row
 `name = "step.timeout"` yields `policy.step.timeout`, whose first segment after the namespace is the
@@ -228,8 +243,9 @@ namespace's extractor and the shape check.
   `review.<stage>` and a guide citing `policy.review.build` and `policy.reviews.build`, the family
   row `policy.review` is graded, `policy.review.build` joins as declared, and the check exits 1 naming
   `policy.reviews.build` alone.
-  Red when: the join matches by string prefix rather than through `read_catalogue_row`, so
-  `policy.reviews.build` joins too.
+  Red when: the join matches by string prefix rather than through the `policy.py get` that
+  `read_policy_value` runs, so `policy.reviews.build` joins too; or a `PolicyRefused` reads as
+  declared.
 - **AC7** — When `printf 'policy.item.x\n' | python tools/lexicon/lexicon.py --tags` runs, it exits 1
   refusing a first segment that is a namespace word, the word read from the registry.
   Red when: the lexicon reads its namespace words from anywhere but the registry, so `item` is not
@@ -274,17 +290,36 @@ New arm: tools/playbook/adopt-playbook.sh · covers AC1 AC2 AC3 AC4 AC6 · the p
   second kit the index must locate. RESOLVED (agent, 2026-10-24, delegated): (a), rung 3, tie-broken by
   reuse of the seam PLAY-dOrderedCharter-10 S2 sets; these are functions added to an existing module,
   not a module, so I1's rule is kept for modules. widens: none · relaxes: none
+- **F5 — May S5's join call `read_policy_value` with a citation's key, when PLAY-dOrderedCharter-7 §4
+  says every call passes its key as a string literal?** The literal is the shape TOOL-dGroundRules-8's
+  reader-coverage arm counts as a reader of that key. The join consumes no value: it asks only whether a
+  row matches, and a call with a computed key matches neither of that arm's reader shapes, so it is
+  neither counted nor red. Options: (a) call `read_policy_value(key, root, rev="HEAD")` with the
+  citation's key, a departure from that sentence that this spec states, and ask dOrderedCharter to admit
+  it; (b) `tag_index.py` runs `policy.py get` itself through its own inline `resolve_kit_dir`, a second
+  playbook-kit caller of the reader, against that section's "the playbook kit's one caller"; (c) an ask
+  to dGroundRules for a `policy.py` verb that matches a key to its row and prints no value. (a) keeps
+  one caller and one matcher and changes no code of the parent. (b) breaks the one-caller rule. (c) is
+  the cleanest surface but waits on a third build. Recommendation (a). Open for the owner: the ask the
+  build run files is "PLAY-dOrderedCharter-7 §4: a caller that resolves a cited key's row, reading no
+  value, may pass that key unquoted; the reader-coverage arm neither counts nor reds it".
 
 ## 9. Revision log
 
 - rev-1 · 2026-10-24 · initial draft, from the packet's Items 18, the brief's shared interface I2 and
   owned-node table, scout B's row for cl-0103, and PLAY-dOrderedCharter-10 and -19 at base `ed497191`.
+- rev-2 · 2026-10-25 · S5 · §3 Edges · §4 The catalogue in the `policy` namespace · AC6 · §8 F5 · §10 ·
+  re-grounded on PLAY-dOrderedCharter-19 rev-5 by
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md` row 55: the policy join
+  reads the policy kit by subprocess through `read_policy_value`, never by import, and a `PolicyRefused`
+  reads a citation as undeclared; the computed-key call is §8 F5, open for the owner.
 
 ## 10. Reuse audit
 
 The seam extended is PLAY-dOrderedCharter-19's namespace registry and PLAY-dOrderedCharter-10's
 extractor module, shape check and per-namespace join, all specced and DEFERRED to that build's run; the
-key matcher is dGroundRules-2 S4's `read_catalogue_row`. `python tools/codebase-map/reuse_lookup.py
+key matcher is dGroundRules-2 S4's `read_catalogue_row`, reached through `policy.py get` by
+PLAY-dOrderedCharter-19 S8's `read_policy_value`. `python tools/codebase-map/reuse_lookup.py
 "register a tag namespace with an extractor and shape check"` ranked generic name stems (`check`,
 `extract` in `tools/lexicon/lexicon.py`, `shape` in `tools/govkit/matrix.py`) and named no seam, which
 is the expected answer: neither registry nor index exists at base (scout B: no

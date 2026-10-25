@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-2 — the guard, the TTY policy command and the default floor
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 15 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 15 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0087@5eb8d36a whole
 
@@ -16,10 +16,14 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-a.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-26 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-build-TOOL-dDeclaredLoop-2-deviation-21.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-2-deviation-21.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-2-1-spec-reviewer.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-2-1-spec-reviewer.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -62,12 +66,13 @@ the whole-design audit's C2-F9; the owner's FK-7-1).
   prints the proposal and writes nothing. `raise` is the one verb admitted without the proof, and
   only on the four conditions of §4. Observed by AC8, AC9.
 - **S5** — The shared guarded-write factory, extracted at its second instance (I12): the terminal
-  proof and its confirmation prompt, `check_terminal_proof`, and the write-then-record step,
+  proof, `check_terminal_proof`, standard error an interactive terminal, and the write-then-record step,
   `write_guarded`, canonical in `tools/lib/guarded_write.py` and carried inline, between
   `# >>> guarded_write_py` and `# <<< guarded_write_py`, in `tools/loop/policy_edit.py` and
   `tools/playbook/instructions_edit.py`, held by a `guarded_write_py` row of
-  `tools/lib/resolve-python.test.sh`'s `PARITY_ROWS`. `instructions_edit.py`'s own terminal check is
-  re-pointed to the inline block in the same unit. Observed by AC10.
+  `tools/lib/resolve-python.test.sh`'s `PARITY_ROWS`. `instructions_edit.py`'s own terminal check,
+  `sys.stderr.isatty()` (dOrderedCharter-15 S5, the owner's settlement of its §8 F4), is re-pointed to
+  the inline block in the same unit, which tests the same stream. Observed by AC10.
 - **S6** — The push arm, `tools/loop/guard.py --push-range <base>..<tip>`, called from
   `.githooks/pre-push`: every commit in the range whose diff changes `.governance/policy.toml`
   carries a `Gov-Policy:` trailer, read through `commit_trailers.py`'s `read_commits` with that key, naming each changed key with
@@ -162,6 +167,10 @@ the whole-design audit's C2-F9; the owner's FK-7-1).
   load as an absent component, the rule S8 generalises at its second instance.
 - An agent's shell has no terminal: dGroundRules-6 §4 measured `[ -t 0 ]`, `[ -t 1 ]` and `[ -t 2 ]`
   false on 2026-10-23.
+- The owner's proof is one stream, stderr: dOrderedCharter-15 S5 (rev-5) tests `sys.stderr.isatty()`,
+  the stream the minimal guard tests with `[ -t 2 ]`, as the owner resolved its §8 F4 on 2026-10-25,
+  and dOrderedCharter-7's `owner-only-expiring` proof is that check. A shared block testing stdin
+  would switch both.
 
 ### The verdict — `guard.py --staged`
 
@@ -194,7 +203,7 @@ reader.
 
 | Verb | Proof | Writes |
 |---|---|---|
-| `set <key> <value> --unit <id>` | `check_terminal_proof`: stdin a terminal and the typed confirmation `yes` | the leaf, the change record, prints the trailer |
+| `set <key> <value> --unit <id>` | `check_terminal_proof`: stderr a terminal; then `policy_edit.py`'s own typed confirmation `yes` | the leaf, the change record, prints the trailer |
 | `raise <cap> <new> --unit <id> --argument <text>` | none, the agent door | the cap, its RAISED comment, the change record, the decision row line it prints for the caller |
 | `propose <key> <value>` | none | nothing; prints the row diff and the command that would apply it |
 
@@ -216,8 +225,10 @@ for a key the file did not set. The key is registered with the `commit` kind by 
 
 ### The factory — `guarded_write.py`
 
-`check_terminal_proof(prompt)` returns the proof `tty-cli` when stdin is a terminal and the line
-typed is `yes`, else `None`. `write_guarded(path, new_text, record)` writes the file and the change
+`check_terminal_proof()` returns the proof `tty-cli` when `sys.stderr.isatty()` holds, else `None`,
+the one stream dOrderedCharter-15 S5 tests. The typed confirmation `yes` is `policy_edit.py`'s own
+step after the proof holds, outside the parity block, so `instructions_edit.py` gains no prompt.
+`write_guarded(path, new_text, record)` writes the file and the change
 record together and removes both when either write fails. `policy_edit.py` and
 `instructions_edit.py` carry the block inline because a kit may not import a sibling kit; the
 parity row holds each copy to the canonical.
@@ -360,17 +371,19 @@ policy kit, the loop kit, a tracked `big.md` of 118 bytes and a policy file whos
 - **AC7** — When `python guard.py --fixture --plant mandate-live` and then `--plant mandate-none`
   run, the first exits 0 and the second exits 1.
   Red when: `agents-within-mandate` admits a write outside a live run.
-- **AC8** — When `python policy_edit.py set review.max-rounds 4 --unit TOOL-x-1 </dev/null` runs in a
-  fixture repository, it prints the proposal, writes nothing and exits 1.
-  Red when: a non-terminal `set` writes the policy file.
+- **AC8** — When `python policy_edit.py set review.max-rounds 4 --unit TOOL-x-1 2>stderr.txt` runs in
+  a fixture repository, standard error a file, it prints the proposal, writes nothing and exits 1.
+  Red when: a `set` whose stderr is not a terminal writes the policy file.
 - **AC9** — When `python policy_edit.py raise big.md 120 --unit TOOL-x-1 --argument probe` runs in a
   fixture repository whose `big.md` measures 118 bytes, it writes the RAISED comment, the change
   record and prints one `Gov-Policy:` line; with `big.md` at 90 bytes it refuses naming condition 1.
   Red when: the raise is admitted with the file under its old cap.
 - **AC10** — When the two blocks are cut with
   `sed -n '/# >>> guarded_write_py/,/# <<< guarded_write_py/p'` from `instructions_edit.py` and from
-  the canonical `guarded_write.py`, `cmp` finds them equal.
-  Red when: either copy differs from the canonical.
+  the canonical `guarded_write.py`, `cmp` finds them equal; and in the canonical's block
+  `grep -c 'sys.stderr.isatty()'` prints 1 and `grep -c 'stdin'` prints 0.
+  Red when: either copy differs from the canonical, or the block tests stdin, which would move
+  dOrderedCharter-15's owner-settled proof to another stream.
 - **AC11** — When `python guard.py --fixture --plant push-no-trailer` runs, it exits 1 naming the
   commit and the policy file `policy.toml`.
   Red when: a policy change with no `Gov-Policy:` trailer passes the push arm.
@@ -452,6 +465,10 @@ New arm: tools/lib/resolve-python.test.sh · covers AC10 · the `guarded_write_p
 - rev-1 · 2026-10-24 · initial draft.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-43, a hands-off TOOL-dDeclaredLoop-44, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-10-25 · S5 · §4 Evidence, The command, The factory · AC8 · AC10 · re-grounded on
+  dOrderedCharter-15 rev-5 by `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`
+  row 12: `check_terminal_proof` tests stderr, as that unit's S5 and the owner's pick of its §8 F4 do; the
+  typed `yes` is `policy_edit.py`'s alone, outside the parity block; AC8 redirects stderr, not stdin.
 
 ## 10. Reuse audit
 

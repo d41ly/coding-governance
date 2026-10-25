@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-6 — the factories and conformance gates for commands, policy keys, stages, hooks, roles and workflows
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 20 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0091@b0158e81 whole
 
@@ -8,14 +8,17 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-readers-fix-return.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-readers-fix-return.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-61.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-61.md) | deviation | — |
 | [2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-62.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-62.md) | deviation | — |
+| [2026-10-25-build-TOOL-dDeclaredLoop-6-deviation-63.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-6-deviation-63.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-readers-fix-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-12 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -37,13 +40,17 @@ stays on dOrderedCharter-7's shrink-only pending list naming dKeptSession, which
 - **S1** — The six kind rows of `tools/playbook/kinds.toml`, each with its `population`, `factory`
   and `gate` filled (§4 Data model), and their six `kind` rows removed from
   `tools/playbook/core-pending.txt`. Observed by AC1, AC8.
-  **Readers:** by name: READER NOT IN TREE — the pending list and its one reader, the meta-check verb
-  of the playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED at rev-3, so no tracked
-  file spells the six `kind` rows at this spec's base; once that unit lands, its meta-check is the only
-  reader, and it reds each of the six rows as stale the moment this unit fills that kind's factory and
-  gate, which is why the rows leave in this unit · by value: NO VALUE READERS — a pending row's value is
-  its arming build, dDeclaredLoop, which the meta-check prints only in its pending count, and the six
-  kind names themselves stay, as the `kind.*` rows of the register this item fills.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its readers are minted by
+  PLAY-dOrderedCharter-7, DEFERRED at rev-5, so no tracked file spells the six `kind` rows at this
+  spec's base. Once that unit lands, two verbs of the playbook kit's core.py read them: `core.py kinds`,
+  which holds a kind row out of the pending list to the conformance contract (its S5), and the
+  meta-check, which prints each pending count (its S3). The rows leave in this unit because it fills
+  each kind's factory and gate, so the kinds come under the contract that AC1 observes. Whether a
+  `kind` row whose factory and gate have landed is also red as stale is unknown until that unit
+  builds: its S3 states the stale rule for `principle`, `practice` and `leg` rows, and this item does
+  not rest on it · by value: NO VALUE READERS — a pending row's value is its arming build,
+  dDeclaredLoop, which the meta-check prints only in its pending count, and the six kind names stay,
+  as the `kind.*` rows of the register this item fills.
 - **S2** — The factories, one module `tools/loop/factories.py`, one subcommand per kind, each the
   `factory` its row names, so `python tools/playbook/core.py new <kind> <name> …` runs it (dOrderedCharter-7
   S6). Every factory writes its files, runs its kind's gate over the result, and on a red restores
@@ -77,15 +84,25 @@ stays on dOrderedCharter-7's shrink-only pending list naming dKeptSession, which
   `tools/roles/workflows.toml` and its order-and-step row to `tools/loop/loop.toml` (unit 1). Its gates
   are `roles catalogue` (R6 to R9) and `loop definition`, both wrapped. Observed by AC7.
 - **S9** — The wrapped legs carry `enforces`: `roles catalogue`, `hook destinations (every declared
-  hook path ships)`, `policy check`, `loop definition` and `loop command conformance` each gain the
-  `enforces` list holding every tag of the `binds` of the kinds it gates, as dOrderedCharter-7 S5's
-  contract requires before a row leaves the pending list. Observed by AC8.
+  hook path ships)`, `policy check` and `loop command conformance` each gain the `enforces` list
+  holding every tag of the `binds` of the kinds it gates, and `loop definition`, which unit 1 lands
+  with `enforces = ["principle.p1"]`, gains each such tag it lacks, as dOrderedCharter-7 S5's contract
+  requires before a row leaves the pending list. Observed by AC8.
 - **S10** — The preset kind: its pending row keeps its key and names dKeptSession as its arming
   build, and its kinds-register `owner` reads `dKeptSession`, the departure recorded in
   `2026-10-24-build-TOOL-dDeclaredLoop-6-deviation-61.md`. Observed by AC9.
 - **S11** — The fixture, `python tools/loop/factories.py --fixture --plant <case>`, and its leg
-  `loop factories fixtures`: per kind, the factory's instance green under its gate, and a hand-made
-  non-conforming instance red under the same gate. Observed by AC2 to AC7, AC10.
+  `loop factories fixtures`, `enforces = ["principle.p16"]`, the principle whose v2 `[enforcement]`
+  row names this unit's clause `cl-dClosedLoop-0091`: per kind, the factory's instance green under its
+  gate, and a hand-made non-conforming instance red under the same gate. The key is owed in this
+  pass, since dOrderedCharter-7 S3's meta-check reds a leg with no `enforces` and its pending list
+  only shrinks after that unit's pass; where the list holds a `principle` row for `principle.p16`, this
+  pass deletes it, as the meta-check reds it stale. Observed by AC2 to AC8, AC10.
+  **Readers:** by name: READER NOT IN TREE — the pending list and its reader, the meta-check verb of
+  the playbook kit's core.py, are minted by PLAY-dOrderedCharter-7, DEFERRED, so no tracked file spells
+  the `principle.p16` row at this spec's base; once that unit lands, the meta-check is the one reader, and it reds
+  the row as stale once a leg enforces its tag · by value: NO VALUE READERS — a pending row's value is
+  its arming build, which the meta-check prints only in its pending count.
 
 ## 3. Non-goals (OUT)
 
@@ -169,7 +186,7 @@ A factory never writes outside the files its kind names.
 | `write_command`, `write_policy_key`, `write_stage`, `write_hook`, `write_role`, `write_workflow` | function | `tools/loop/factories.py` |
 | `check_commands`, `write_prior_bytes` | function | `tools/loop/factories.py` |
 | `command`, `policy-key`, `stage`, `hook`, `role`, `workflow`, `hooks --list`, `--fixture` | CLI verbs and flag | `tools/loop/factories.py` |
-| `loop command conformance`, `loop factories fixtures` | gate legs | `tools/gate-legs.json` |
+| `loop command conformance`, `loop factories fixtures` | gate legs, each with `enforces` | `tools/gate-legs.json` |
 
 ### The fixture cases
 
@@ -246,8 +263,9 @@ A factory never writes outside the files its kind names.
   `roles catalogue` is green and then red naming R8.
   Red when: a workflow naming no role file passes.
 - **AC8** — When `python -m json.tool tools/gate-legs.json` is read for the five wrapped legs, each row
-  carries a non-empty `enforces` list.
-  Red when: a wrapped leg carries no `enforces`.
+  carries a non-empty `enforces` list; the `loop factories fixtures` row carries `principle.p16`; and
+  `python core.py meta-check` in the playbook kit names none of the six legs.
+  Red when: a wrapped leg or the fixture leg carries no `enforces`.
 - **AC9** — When `grep -n kind.preset core-pending.txt` runs in the playbook kit, it prints the row
   naming dKeptSession.
   Red when: the preset kind leaves the list with no factory, or names this build.
@@ -286,6 +304,12 @@ New arm: tools/loop/factories.py · covers AC2 AC3 AC4 AC5 AC6 AC7 AC10 · each 
 - rev-1 · 2026-10-24 · initial draft.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-47, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit-round1.md); no scope moved.
+
+- rev-3 · 2026-10-25 · §2 S1, S9, S11 · §4 Inventory · §6 AC8 · re-grounded on dOrderedCharter at
+  `462d20f35` by the cross-check record
+  `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`, rows 32, 33 and 36: S1
+  cites unit 7 at rev-5, names `core.py kinds` as a reader of the `kind` rows and no longer rests on
+  the stale arm; `loop factories fixtures` carries `enforces`.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dDeclaredLoop-12 — each step a program of items with declared needs, outcomes and routes
 
-**Status:** DEFERRED · rev-2 · 2026-10-24 · node d · Tier-2 · base ed497191 · streams tooling · order 6 · advances TOOL-dDeclaredLoop-35
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base ed497191 · streams tooling · order 6 · advances TOOL-dDeclaredLoop-35
 
 **Carries:** cl-dClosedLoop-0097@56655276 whole
 
@@ -8,10 +8,15 @@
 
 | Record | Kind | Also serves |
 |---|---|---|
-| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 |
+| [2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-agent-ledger.md) | journal | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-36 TOOL-dDeclaredLoop-37 TOOL-dDeclaredLoop-38 TOOL-dDeclaredLoop-39 TOOL-dDeclaredLoop-40 TOOL-dDeclaredLoop-41 TOOL-dDeclaredLoop-42 TOOL-dDeclaredLoop-43 TOOL-dDeclaredLoop-44 TOOL-dDeclaredLoop-45 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-47 TOOL-dDeclaredLoop-48 TOOL-dDeclaredLoop-49 TOOL-dDeclaredLoop-50 TOOL-dDeclaredLoop-51 TOOL-dDeclaredLoop-52 TOOL-dDeclaredLoop-53 TOOL-dDeclaredLoop-54 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 TOOL-dDeclaredLoop-57 TOOL-dDeclaredLoop-58 TOOL-dDeclaredLoop-59 TOOL-dDeclaredLoop-60 TOOL-dDeclaredLoop-61 TOOL-dDeclaredLoop-62 TOOL-dDeclaredLoop-63 TOOL-dDeclaredLoop-64 TOOL-dDeclaredLoop-65 TOOL-dDeclaredLoop-66 TOOL-dDeclaredLoop-67 TOOL-dDeclaredLoop-68 TOOL-dDeclaredLoop-69 TOOL-dDeclaredLoop-70 TOOL-dDeclaredLoop-71 TOOL-dDeclaredLoop-72 TOOL-dDeclaredLoop-73 TOOL-dDeclaredLoop-74 TOOL-dDeclaredLoop-75 TOOL-dDeclaredLoop-76 TOOL-dDeclaredLoop-77 TOOL-dDeclaredLoop-78 TOOL-dDeclaredLoop-79 TOOL-dDeclaredLoop-80 TOOL-dDeclaredLoop-81 TOOL-dDeclaredLoop-82 TOOL-dDeclaredLoop-83 TOOL-dDeclaredLoop-84 TOOL-dDeclaredLoop-85 TOOL-dDeclaredLoop-86 TOOL-dDeclaredLoop-87 TOOL-dDeclaredLoop-88 TOOL-dDeclaredLoop-89 TOOL-dDeclaredLoop-90 TOOL-dDeclaredLoop-91 TOOL-dDeclaredLoop-92 TOOL-dDeclaredLoop-93 TOOL-dDeclaredLoop-94 TOOL-dDeclaredLoop-95 TOOL-dDeclaredLoop-96 TOOL-dDeclaredLoop-97 TOOL-dDeclaredLoop-98 TOOL-dDeclaredLoop-99 TOOL-dDeclaredLoop-100 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-reuse-scout-b.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 |
 | [2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md](../build/2026-10-24-build-TOOL-dDeclaredLoop-1-spec-stage-returns.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-build-TOOL-dDeclaredLoop-12-deviation-121.md](../build/2026-10-25-build-TOOL-dDeclaredLoop-12-deviation-121.md) | deviation | — |
 | [2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md](../prompts/2026-10-24-prompt-TOOL-dDeclaredLoop-1-spec-brief.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-55 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-1-dorderedcharter-reground.md) | research | TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-33 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-46 TOOL-dDeclaredLoop-56 |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-12-1-spec-reviewer.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-12-1-spec-reviewer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dDeclaredLoop-12-2-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dDeclaredLoop-12-2-spec-writer.md) | journal | — |
 | [2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md](../reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md) | spec-audit | TOOL-dDeclaredLoop-18 TOOL-dDeclaredLoop-1 TOOL-dDeclaredLoop-23 TOOL-dDeclaredLoop-16 TOOL-dDeclaredLoop-5 TOOL-dDeclaredLoop-9 TOOL-dDeclaredLoop-17 TOOL-dDeclaredLoop-11 TOOL-dDeclaredLoop-13 TOOL-dDeclaredLoop-24 TOOL-dDeclaredLoop-15 TOOL-dDeclaredLoop-3 TOOL-dDeclaredLoop-10 TOOL-dDeclaredLoop-2 TOOL-dDeclaredLoop-8 TOOL-dDeclaredLoop-7 TOOL-dDeclaredLoop-14 TOOL-dDeclaredLoop-4 TOOL-dDeclaredLoop-6 TOOL-dDeclaredLoop-25 TOOL-dDeclaredLoop-29 TOOL-dDeclaredLoop-26 TOOL-dDeclaredLoop-27 TOOL-dDeclaredLoop-28 TOOL-dDeclaredLoop-21 TOOL-dDeclaredLoop-34 TOOL-dDeclaredLoop-30 TOOL-dDeclaredLoop-32 TOOL-dDeclaredLoop-31 TOOL-dDeclaredLoop-20 TOOL-dDeclaredLoop-22 TOOL-dDeclaredLoop-19 TOOL-dDeclaredLoop-33 |
 
 <!-- /gen:spec-records -->
@@ -37,9 +42,18 @@ into flow-steps (flow-steps.md:13-14, "The audit's fixes are applied"), are the 
   item of the program, `transition` (a cross-step move, read by the transition table), or `stand-in`
   with its tool named; every input names a layer tag of `tools/playbook/layers.toml`; and each step's
   `exit` item is declared in that step. Observed by AC2.
-- **S4** — The instruction scope, derived and never typed: for each item, PLAY-dOrderedCharter-11 S1's
-  `derive_load_set(units, reader, item=<tag>)`, printed by `loop_lib.py --check` per item, `unarmed`
-  while no instruction unit selects an item. Observed by AC6.
+- **S4** — The instruction scope, derived and never typed: for each item, `loop_lib.py --check` finds
+  PLAY-dOrderedCharter-11's `tools/playbook/load_sets.py` through `resolve_kit_dir("playbook",
+  "load_sets.py", here)` and runs `load_sets.py derive --reader <reader> --units <units> --item <tag>`
+  as a subprocess, printing the item part of its output per item, `unarmed` while no instruction unit
+  selects an item. A kit may not import a sibling kit (TOOL-dGroundRules-1 §4 Evidence), and
+  PLAY-dOrderedCharter-11 S4 runs the same module the same way (rev-4). With the playbook kit absent,
+  every item's scope prints `unarmed` naming the kit and the rest of the check runs; a `derive` that
+  exits non-zero refuses the check, naming its exit and its first stderr line. `derive` takes no item
+  flag at that rev (its AC1), so `--item` is §8 F5's ask. The `resolve_kit_dir` block is carried inline
+  between its markers under the existing `resolve_kit_dir` row of `PARITY_ROWS`
+  (`tools/lib/resolve-python.test.sh:172`), one block in `loop_lib.py` whichever unit's pass inlines it
+  first. Observed by AC6 and AC7.
 - **S5** — The needs-graph helper (shared interface I14): `tools/lib/needs_graph.py` with
   `order_by_needs(nodes, needs)` and `find_cycles(edges, live=None)`, extracted at this, the third
   instance, from `derive_install_order` (`tools/govkit/govkit.py:911`) and `_scan_cycles`
@@ -81,6 +95,7 @@ into flow-steps (flow-steps.md:13-14, "The audit's fixes are applied"), are the 
 - **hands-off** `TOOL-dDeclaredLoop-51` — the eight recommendation rows, amended in place with actors in the declaration grammar (the round-1 spec audit's id 1)
 - **consumes-from** `TOOL-dDeclaredLoop-37` — the call-site greps for the re-point of S6, which this unit's pass runs as that re-point's observation (the round-1 spec audit's id 8)
 - **hands-off** `TOOL-dDeclaredLoop-56` — the minors of the round-1 spec audit that land on this unit, id 14, a scope item of that unit
+- **consumes-from** external — PLAY-dOrderedCharter-11's `tools/playbook/load_sets.py` and its `derive` verb, which S4 runs as a subprocess, with the `--item` flag §8 F5 asks for; without it no item's scope is derived
 
 ## 4. Design
 
@@ -154,7 +169,7 @@ Minted: the `[[item]]` table and its keys of §4, the sub-table `routes`, the ro
 `stand-in:<path>`; `read_items` and `check_program` in `tools/loop/loop_lib.py`; `tools/lib/needs_graph.py`
 with `order_by_needs`, `find_cycles` and `NeedsCycle`; the parity marker `needs_graph_py`; the plants
 `needs-cycle`, `needs-unresolved`, `outcome-unrouted`, `route-unresolved`, `input-no-layer`,
-`exit-missing` and `scope-selected`. Naming cells: each function is asked of `python
+`exit-missing`, `scope-selected` and `scope-no-kit`. Naming cells: each function is asked of `python
 tools/lexicon/lexicon.py --suggest <name> --as py.function` at the pass.
 
 ### Migration
@@ -221,9 +236,14 @@ Live at landing.
   the row.
   Red when: a copy carries no marker, so the parity population misses it.
 - **AC6** — When `python loop_lib.py --fixture --plant scope-selected` runs, a fixture instruction unit
-  whose `scope` names `item.plan.record` appears in that item's printed load set and in no other item's;
-  without the plant, every item's scope prints `unarmed`.
+  whose `scope` names `item.plan.record` appears in that item's printed load set, as `load_sets.py
+  derive --item item.plan.record` prints it, and in no other item's; without the plant, every item's
+  scope prints `unarmed`.
   Red when: the scope is read from a typed field, so the planted unit does not appear.
+- **AC7** — When `python loop_lib.py --fixture --plant scope-no-kit` runs, its `here` holding no playbook
+  kit, every item's scope prints `unarmed` naming the playbook kit and the plant exits 0; and
+  `git grep -n -E '(import|from) load_sets' -- tools/loop` prints nothing.
+  Red when: `loop_lib.py` imports `load_sets`, so the absent kit raises instead of printing `unarmed`.
 
 ## 7. Gates
 
@@ -231,7 +251,7 @@ The pass adds no leg: `check_program` runs under TOOL-dDeclaredLoop-1's `loop de
 
 `python resolver (behaviour + inline parity + idiom ban)` · `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `recall floor arms` · `backlog migration selftest` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
-New arm: tools/loop/loop_lib.py · covers AC1 AC2 AC6 · the `loop definition` leg's fixture plants, the failing case staged by the `needs-cycle` plant · none
+New arm: tools/loop/loop_lib.py · covers AC1 AC2 AC6 AC7 · the `loop definition` leg's fixture plants, the failing case staged by the `needs-cycle` plant · none
 New arm: tools/lib/resolve-python.test.sh · covers AC5 · the `needs_graph_py` parity row, its failing case staged by a one-byte edit to the backlog copy · none
 
 ## 8. Open questions
@@ -254,6 +274,21 @@ New arm: tools/lib/resolve-python.test.sh · covers AC5 · the `needs_graph_py` 
   parity row; (b) a module in the loop kit that govkit and memory-tree import. (b) makes two kits import
   a sibling, which copy-installed kits cannot. RESOLVED (agent, 2026-10-24, delegated): (a), rung 1,
   shared interface I14 and the charter's Kinds fact. widens: none · relaxes: none
+- **F5 — How does `loop_lib.py` ask the playbook kit for one item's load set, when `load_sets.py derive`
+  takes no item?** PLAY-dOrderedCharter-11 rev-4 runs `load_sets.py` as a subprocess because a kit
+  imports no sibling kit (its S4), and its `derive` verb takes `--reader` and `--units` only (its AC1),
+  though `derive_load_set` takes `item=` (its S1). Options: (a) an ask to dOrderedCharter: `derive` gains
+  `--item <tag>`, passed to `derive_load_set`'s `item`, and S4 runs it as a subprocess; (b) a declared
+  `requires_if` row on `tools/loop/kit.toml` naming `playbook`, S4 importing `derive_load_set` in
+  process and printing `unarmed` where the kit does not resolve. The rule admits (b) only as a
+  declaration `govkit selfcheck` grades and that installs nothing, the shape memory-tree's rows for its
+  in-process sibling reads state (`tools/memory-tree/kit.toml:8`). (a) is one flag on a verb whose
+  function already takes the argument, and keeps the call in the shape the parent uses for the same
+  module; its cost is a wait, since S4, AC6 and AC7 cannot pass until the ask lands in dOrderedCharter's
+  build. (b) needs no parent change, but makes the loop kit the one in-process consumer of a module the
+  parent reaches only by subprocess. Recommendation (a). Open for the owner: the ask the build run
+  files is "PLAY-dOrderedCharter-11: `load_sets.py derive` takes `--item <tag>` and passes it to
+  `derive_load_set`'s `item`".
 
 ## 9. Revision log
 
@@ -262,13 +297,19 @@ New arm: tools/lib/resolve-python.test.sh · covers AC5 · the `needs_graph_py` 
   `ed497191`.
 - rev-2 · 2026-10-24 · §3 · the Edges block gains a hands-off TOOL-dDeclaredLoop-50, a hands-off TOOL-dDeclaredLoop-51, a consumes-from TOOL-dDeclaredLoop-37, a hands-off TOOL-dDeclaredLoop-56, the mirror of each unit the round-1 spec audit
   promoted (reviews/2026-10-24-review-TOOL-dDeclaredLoop-1-spec-audit.md); no scope moved.
+- rev-3 · 2026-10-25 · S4 · §3 Edges · §4 Inventory · AC6 · AC7 · §7 · §8 F5 · §10 · re-grounded on
+  PLAY-dOrderedCharter-11 rev-4 by `build/2026-10-25-build-TOOL-dDeclaredLoop-1-dorderedcharter-crosscheck.md`
+  row 39: the scope is `load_sets.py derive` run as a subprocess through `resolve_kit_dir`, `unarmed`
+  with the playbook kit absent (AC7), and the item flag `derive` lacks is §8 F5's ask, open for the owner.
 
 ## 10. Reuse audit
 
 The seam extended is the pair of graph checks the scout found, `derive_install_order`
 (`tools/govkit/govkit.py:911`) and `_scan_cycles` (`tools/memory-tree/backlog.py:1271`), extracted into
 one helper with the canonical-copy pattern of `remote_ladder_py`; the instruction scope is
-PLAY-dOrderedCharter-11's `derive_load_set`. `python tools/codebase-map/reuse_lookup.py "acyclic
+PLAY-dOrderedCharter-11's `load_sets.py derive`, run as a subprocess through the inline `resolve_kit_dir`
+block (`tools/lib/resolve_kit_dir.py`) as `derive_role_roster` runs the roles kit's verb
+(`tools/playbook/render_playbook.py:470-499`). `python tools/codebase-map/reuse_lookup.py "acyclic
 dependency graph check over declared needs with cycle refusal"` ranked generic stems (`check`,
 `refusal`, `need` in `tools/check-kit-versions.sh`, `DesignRefusal`) and named neither graph check,
 which the scout found by reading the files. The recall probe returned scout B's row, scout C's row 33
