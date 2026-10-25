@@ -449,3 +449,19 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T05:23:47Z dispatch · item 21fa4ff4 TOOL-dGroundRules-71 · reason tools/memory-tree/check-memory-hygiene.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-71.md memory/builds/dGroundRules/README.md memory/LIVE.md
 
 2026-10-25T05:27:43Z dispatch · item 21fa4ff4 TOOL-dGroundRules-71 · reason tools/memory-tree/check-memory-hygiene.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-71.md memory/builds/dGroundRules/README.md memory/LIVE.md
+
+2026-10-25T05:54:02Z review · item dGroundRules · reason verdict BLOCKED · blockers 1
+
+2026-10-25T05:54:03Z rescope · item add TOOL-dGroundRules-72 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), B1: the pre-commit policy guard reads the real index, so git commit -a and git commit <path> bypass it
+
+2026-10-25T05:54:05Z rescope · item add TOOL-dGroundRules-73 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), H2: with no origin/HEAD and a default branch other than main every policy read refuses and rule 7 blocks every spawn with the wrong remedy
+
+2026-10-25T05:54:07Z rescope · item add TOOL-dGroundRules-74 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), H1: no arm reaches the writer-split fallback while three closed specs say one does
+
+2026-10-25T05:54:08Z rescope · item add TOOL-dGroundRules-75 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), M1: a cap of 0 means unchecked in the budgets switch but most enforcers read it as a 0 ceiling or the old constant
+
+2026-10-25T05:54:10Z rescope · item add TOOL-dGroundRules-76 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), M2: policy.py lists --check reds in every adopter install and its remedy cannot clear it
+
+2026-10-25T05:54:12Z rescope · item add TOOL-dGroundRules-77 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), M3: no guard fixture plant reaches the text-shape, key-scope or not-a-count refusals
+
+2026-10-25T05:54:13Z rescope · item add TOOL-dGroundRules-78 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), M4, L1, L2, L3: the policy fixtures leg's budget and ceiling are stale about tenfold, agent-cap.js's header contradicts rule 7, policy-mirror.js's bash resolver walks every PATH bash, and the waiver and help page still say the kit lands dark
