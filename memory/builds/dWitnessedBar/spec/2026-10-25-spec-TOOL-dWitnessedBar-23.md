@@ -242,8 +242,8 @@ The pass adds no leg: `roles catalogue` and `roles render wiring` grade the slot
   the two routes, and the item schema already closes an outcome set. widens: none · relaxes: none
 - **F3 — Does the tester get a gate allowance?** Options: (a) none; (b) the red leg alone, by a
   `[gates]` row. (b) widens the role past "its allowance scratch only".
-  RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, the clause's own words. widens: none ·
-  relaxes: none
+  RESOLVED (agent, 2026-10-25, delegated): (a), rung 1, the clause's own words.
+  widens: none · relaxes: none
 
 ## 9. Revision log
 
