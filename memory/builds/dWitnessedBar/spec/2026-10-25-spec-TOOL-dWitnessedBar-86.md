@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-86 — a suite run with either liveness variant missing is seen below the floor, and the floor claims of units 79, 80 and 82 are recorded against that red
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

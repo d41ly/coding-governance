@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-85 — each liveness variant seen red on each key adds to the canary's count, so the restated floor sees a variant that is no longer there
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 44 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

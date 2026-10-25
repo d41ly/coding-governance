@@ -174,3 +174,179 @@ base: cdfbd1cf9c5e31cc8620af362be33a66db61a076
 2026-10-25T14:39:03Z rescope · item add TOOL-dWitnessedBar-97 · reason spec-audit round1 of units 91-92 minors batch, MEDIUM ids 2 3 4 6 9 11 12 14 16 and LOW id 10
 
 2026-10-25T15:01:13Z review · item dWitnessedBar-spec-set-r14 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 4 · minors 10 · disposition promote
+
+2026-10-25T15:25:16Z rescope · item defer TOOL-dWitnessedBar-1 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:17Z rescope · item defer TOOL-dWitnessedBar-2 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:17Z rescope · item defer TOOL-dWitnessedBar-3 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:18Z rescope · item defer TOOL-dWitnessedBar-4 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:19Z rescope · item defer TOOL-dWitnessedBar-5 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:20Z rescope · item defer TOOL-dWitnessedBar-6 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:21Z rescope · item defer TOOL-dWitnessedBar-7 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:22Z rescope · item defer TOOL-dWitnessedBar-8 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:23Z rescope · item defer TOOL-dWitnessedBar-9 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:24Z rescope · item defer TOOL-dWitnessedBar-10 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:25Z rescope · item defer TOOL-dWitnessedBar-11 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:26Z rescope · item defer TOOL-dWitnessedBar-12 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:27Z rescope · item defer TOOL-dWitnessedBar-13 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:28Z rescope · item defer TOOL-dWitnessedBar-14 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:29Z rescope · item defer TOOL-dWitnessedBar-15 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:30Z rescope · item defer TOOL-dWitnessedBar-16 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:31Z rescope · item defer TOOL-dWitnessedBar-17 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:31Z rescope · item defer TOOL-dWitnessedBar-18 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:32Z rescope · item defer TOOL-dWitnessedBar-19 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:33Z rescope · item defer TOOL-dWitnessedBar-20 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:34Z rescope · item defer TOOL-dWitnessedBar-21 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:35Z rescope · item defer TOOL-dWitnessedBar-22 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:36Z rescope · item defer TOOL-dWitnessedBar-23 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:36Z rescope · item defer TOOL-dWitnessedBar-24 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:37Z rescope · item defer TOOL-dWitnessedBar-25 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:38Z rescope · item defer TOOL-dWitnessedBar-26 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:39Z rescope · item defer TOOL-dWitnessedBar-27 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:40Z rescope · item defer TOOL-dWitnessedBar-28 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:40Z rescope · item defer TOOL-dWitnessedBar-29 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:41Z rescope · item defer TOOL-dWitnessedBar-30 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:42Z rescope · item defer TOOL-dWitnessedBar-40 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:43Z rescope · item defer TOOL-dWitnessedBar-41 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:43Z rescope · item defer TOOL-dWitnessedBar-42 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:44Z rescope · item defer TOOL-dWitnessedBar-43 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:45Z rescope · item defer TOOL-dWitnessedBar-44 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:46Z rescope · item defer TOOL-dWitnessedBar-45 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:47Z rescope · item defer TOOL-dWitnessedBar-46 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:47Z rescope · item defer TOOL-dWitnessedBar-47 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:48Z rescope · item defer TOOL-dWitnessedBar-48 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:49Z rescope · item defer TOOL-dWitnessedBar-49 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:50Z rescope · item defer TOOL-dWitnessedBar-50 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:51Z rescope · item defer TOOL-dWitnessedBar-51 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:51Z rescope · item defer TOOL-dWitnessedBar-52 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:52Z rescope · item defer TOOL-dWitnessedBar-53 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:53Z rescope · item defer TOOL-dWitnessedBar-54 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:54Z rescope · item defer TOOL-dWitnessedBar-55 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:55Z rescope · item defer TOOL-dWitnessedBar-56 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:56Z rescope · item defer TOOL-dWitnessedBar-57 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:56Z rescope · item defer TOOL-dWitnessedBar-58 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:57Z rescope · item defer TOOL-dWitnessedBar-59 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:58Z rescope · item defer TOOL-dWitnessedBar-60 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:25:59Z rescope · item defer TOOL-dWitnessedBar-61 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:00Z rescope · item defer TOOL-dWitnessedBar-62 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:01Z rescope · item defer TOOL-dWitnessedBar-63 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:01Z rescope · item defer TOOL-dWitnessedBar-64 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:02Z rescope · item defer TOOL-dWitnessedBar-65 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:03Z rescope · item defer TOOL-dWitnessedBar-66 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:04Z rescope · item defer TOOL-dWitnessedBar-67 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:05Z rescope · item defer TOOL-dWitnessedBar-68 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:05Z rescope · item defer TOOL-dWitnessedBar-69 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:06Z rescope · item defer TOOL-dWitnessedBar-70 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:07Z rescope · item defer TOOL-dWitnessedBar-71 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:08Z rescope · item defer TOOL-dWitnessedBar-72 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:09Z rescope · item defer TOOL-dWitnessedBar-73 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:09Z rescope · item defer TOOL-dWitnessedBar-74 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:10Z rescope · item defer TOOL-dWitnessedBar-75 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:11Z rescope · item defer TOOL-dWitnessedBar-76 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:12Z rescope · item defer TOOL-dWitnessedBar-77 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:13Z rescope · item defer TOOL-dWitnessedBar-78 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:14Z rescope · item defer TOOL-dWitnessedBar-79 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:15Z rescope · item defer TOOL-dWitnessedBar-80 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:16Z rescope · item defer TOOL-dWitnessedBar-81 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:17Z rescope · item defer TOOL-dWitnessedBar-82 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:17Z rescope · item defer TOOL-dWitnessedBar-83 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:18Z rescope · item defer TOOL-dWitnessedBar-84 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:19Z rescope · item defer TOOL-dWitnessedBar-85 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:20Z rescope · item defer TOOL-dWitnessedBar-86 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:21Z rescope · item defer TOOL-dWitnessedBar-87 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:22Z rescope · item defer TOOL-dWitnessedBar-88 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:22Z rescope · item defer TOOL-dWitnessedBar-89 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:23Z rescope · item defer TOOL-dWitnessedBar-90 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:24Z rescope · item defer TOOL-dWitnessedBar-91 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:25Z rescope · item defer TOOL-dWitnessedBar-92 · reason spec run (README rule 1): specced and audited here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:26Z rescope · item defer TOOL-dWitnessedBar-93 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:27Z rescope · item defer TOOL-dWitnessedBar-94 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:27Z rescope · item defer TOOL-dWitnessedBar-95 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:28Z rescope · item defer TOOL-dWitnessedBar-96 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31
+
+2026-10-25T15:26:29Z rescope · item defer TOOL-dWitnessedBar-97 · reason spec run (README rule 1): specced here; the build run after this one builds it, advancing TOOL-dWitnessedBar-31

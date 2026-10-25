@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-87 — unit 76 AC2's own break, a canary that skips `rec_fp`, is staged after unit 80 and recorded with the two lines it now prints
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 42 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 42 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

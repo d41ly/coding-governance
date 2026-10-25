@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-89 — the round-1 audit of units 85 to 88, 13 minors batched: a visited failure on its own code, a whole-token match, one owner line and pinned records
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 46 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 46 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

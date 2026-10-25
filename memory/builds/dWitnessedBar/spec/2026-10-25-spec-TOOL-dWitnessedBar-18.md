@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-18 — the positional references, IW-1's legacy list and the unpinned facts registered from dOrderedCharter's keyed lists, and dSafePassage's landed step rows as an append-only population
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 12 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0356@4d098894 whole
 

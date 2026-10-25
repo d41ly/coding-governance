@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-22 — the `tests=` and `enforces=` edge fields on legs
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 6 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 6 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0360@f873b4dc whole
 

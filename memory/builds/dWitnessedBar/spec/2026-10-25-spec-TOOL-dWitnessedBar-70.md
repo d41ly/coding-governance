@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-70 — the CRLF record arm proves its planted CR reaches `read_green_file` before any CR-strip assertion counts, and each staged red is recorded with its failing line from a Windows node
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-72 — the `fingerprint` CRLF line's strip is proven reachable by the same canary, so unit 67's `rec_fp` break can turn red on Windows
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

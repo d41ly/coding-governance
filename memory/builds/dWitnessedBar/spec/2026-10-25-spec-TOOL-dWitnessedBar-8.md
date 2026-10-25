@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-8 — flake quarantine
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 22 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 22 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0346@c53fd58e whole
 **Carries:** node:item.test.flakes

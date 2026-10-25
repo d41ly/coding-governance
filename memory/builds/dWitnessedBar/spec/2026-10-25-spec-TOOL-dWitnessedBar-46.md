@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-46 — what an adopter receives of the ratchet pack: the scalar-pin leg over its own seeded pins, and the rest kept gov's
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 10 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

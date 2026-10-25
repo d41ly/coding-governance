@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-96 — unit 92's note check reads a token's value through an optional pattern column, so a derivation note must name the launcher and exit 0
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-74 — the canary's `rec_sha` byte check is seen red on every run, against a one-line variant whose `sha` value loses its CR after the read
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

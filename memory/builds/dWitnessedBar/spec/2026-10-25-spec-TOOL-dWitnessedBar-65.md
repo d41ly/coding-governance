@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-65 — the round-1 audit of unit 63, its 22 minors batched: one containment rule in three readers, plants a leg runs, a seed order that never stalls, honest seed and sweep failures, and readers that keep every normalisation
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 37 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 37 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

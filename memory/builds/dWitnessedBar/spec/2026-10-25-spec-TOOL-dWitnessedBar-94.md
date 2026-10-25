@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-94 — unit 92's note check matches a label only where it opens a continuation line, so another note's prose cannot stand in for a missing note
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

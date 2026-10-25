@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-30 — a quarantined leg released after its streak, and a contended red re-run on a quiet host
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 24 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 24 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0368@53672db0 whole
 **Carries:** node:policy-key.verdict.flakes.release

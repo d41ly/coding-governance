@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-15 — `test.seed` at every check's registration
 
-**Status:** OPEN · rev-5 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 4 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 4 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0353@24ae0391 whole
 **Carries:** node:item.test.seed

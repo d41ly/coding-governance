@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-13 — retrofit's baseline ledger factory in `tools/lib`
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 3 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 3 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0351@d6eaa553 whole
 **Carries:** node:system.retrofit

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-5 — held legs by policy
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 21 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0343@3d7be760 whole
 **Carries:** node:item.test.select

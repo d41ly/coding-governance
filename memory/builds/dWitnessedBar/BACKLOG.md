@@ -15,6 +15,7 @@
 ## Dispositions
 
 - SEV · TOOL-dWitnessedBar-31 · MED · the build's units stay unbuilt and its owned gaps open
+- DEFERRED · TOOL-dWitnessedBar-31 · until TOOL-dWitnessedBar-97 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dWitnessedBar-97 at order 50 today, closes it (README rule 1)
 - SEV · TOOL-dWitnessedBar-32 · LOW · a leg's `principle.*` target reads as an edge the grammar refuses
 - SEV · TOOL-dWitnessedBar-33 · LOW · the compare arm keeps two hand-kept copies in step
 - SEV · TOOL-dWitnessedBar-34 · LOW · owed_rows.py reads a literal that no longer exists

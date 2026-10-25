@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-27 — a wrong-shell refusal at every entry point
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 2 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 2 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0365@47113ea2 whole
 

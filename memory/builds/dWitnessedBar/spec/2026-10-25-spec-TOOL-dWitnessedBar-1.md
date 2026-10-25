@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-1 — gate health measured and the reliability bar
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 23 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0339@8e7bc7ae whole
 
@@ -31,6 +31,7 @@
 | [2026-10-25-prompt-TOOL-dWitnessedBar-68-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-68-1-spec-writer.md) | journal | TOOL-dWitnessedBar-68 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-78-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-78-1-spec-writer.md) | journal | TOOL-dWitnessedBar-78 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-83-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-83-1-spec-writer.md) | journal | TOOL-dWitnessedBar-83 |
+| [2026-10-25-prompt-TOOL-dWitnessedBar-84-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-84-1-spec-writer.md) | journal | TOOL-dWitnessedBar-84 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-88-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-88-1-spec-writer.md) | journal | TOOL-dWitnessedBar-88 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-88-2-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-88-2-spec-writer.md) | journal | TOOL-dWitnessedBar-88 |
 | [2026-10-25-prompt-TOOL-dWitnessedBar-89-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dWitnessedBar-89-1-spec-writer.md) | journal | TOOL-dWitnessedBar-89 |

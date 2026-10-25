@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-83 — the gov canary's floor is owned by the last unit that adds an arm, derived from the specs, and its equality with the executed count is held at the close
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 43 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 43 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

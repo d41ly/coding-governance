@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-3 — attribution deciding what blocks
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 20 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0341@65d333f3 whole
 **Carries:** node:item.test.route

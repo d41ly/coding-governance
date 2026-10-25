@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-67 — the round-1 audit of units 64 and 65, its 19 minors batched: fixtures git cannot reshape, seed routes and probes that are bounded and stated, sweeps and readers that keep every case, and arms graded on the tree they build on
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 39 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-82 — the gov canary's assertion floor is restated after unit 78, so the arms of units 74 to 81 cannot be deleted with the canary green
 
-**Status:** OPEN · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 43 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-4 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 43 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

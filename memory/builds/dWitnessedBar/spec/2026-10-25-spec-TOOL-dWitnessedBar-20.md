@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-20 — the legacy-homes list converted into a ledger population keyed by conf and key
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 13 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 13 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0358@a04b8b39 whole
 

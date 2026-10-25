@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-6 — the verdict backends registered under `verdict`: the local hook, the peer-node verifier and the `remote-ci` slot with its witness rule and pin
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 28 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 28 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0344@5cea08b4 whole
 **Carries:** node:policy-key.verdict

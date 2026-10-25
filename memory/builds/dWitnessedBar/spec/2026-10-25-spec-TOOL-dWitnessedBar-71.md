@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-71 — AC5's hostile git config reaches the fixture `git init` as command-scope environment config, which S6's isolation cannot mask, and the arm proves it is in effect before grading
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 40 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

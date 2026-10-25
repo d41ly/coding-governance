@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-95 — unit 92 AC5 reads the write grant through the shipped parser and containment test, so a declared ancestor of the spec directory reds
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 49 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

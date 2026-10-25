@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-63 — the round-1 audit of units 58 to 62, its 34 minors batched: readers that read the whole list and every path form, criteria graded on what the built tree derives, honest failure paths, and observed sequences
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 35 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 35 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

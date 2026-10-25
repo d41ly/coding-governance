@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-2 — each hook bypass recorded under `hooks.bypass`, and `refused` held by an off-node witness
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 29 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 29 · advances TOOL-dWitnessedBar-31
 
 **Carries:** cl-dClosedLoop-0340@1984aa46 whole
 **Carries:** node:policy-key.hooks.bypass

@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-64 — the seed reads HEAD as unborn only when it names a branch that does not exist, so a HEAD git cannot resolve takes the no-HEAD path
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 36 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 36 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 

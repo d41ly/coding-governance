@@ -1,6 +1,6 @@
 # TOOL-dWitnessedBar-76 — the canary's `rec_fp` byte check is seen red on every run, against a variant whose `fingerprint` value alone loses its CR
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
+**Status:** DEFERRED · rev-3 · 2026-10-25 · node d · Tier-2 · base cdfbd1cf · streams tooling · order 41 · advances TOOL-dWitnessedBar-31
 
 **Derived:** PLAY-dClosedLoop-2
 
