@@ -34,7 +34,7 @@ Landed-unclosed: the build's non-terminal units whose id tracked product source 
 | [dTendedCadence](builds/dTendedCadence/README.md) | OPEN | d | 2026-10-21 | tooling | 19 | 2026-10-21 | active | 0 |
 | [dTotalRecall](builds/dTotalRecall/README.md) | OPEN | d | 2026-10-21 | tooling | 27 | 2026-10-21 | active | 0 |
 | [dWellOiledMachine](builds/dWellOiledMachine/README.md) | OPEN | d | 2026-10-21 | tooling | 62 | 2026-10-21 | active | 0 |
-| [dWitnessedBar](builds/dWitnessedBar/README.md) | OPEN | d | 2026-10-21 | tooling | 67 | 2026-10-25 | active | 0 |
+| [dWitnessedBar](builds/dWitnessedBar/README.md) | OPEN | d | 2026-10-21 | tooling | 73 | 2026-10-25 | active | 0 |
 | [aBatchedLintel](builds/aBatchedLintel/README.md) | INPROGRESS | a | 2026-08-03 | tooling | 2 | 2026-08-08 | dormant | 1 |
 | [aDeclaredBound](builds/aDeclaredBound/README.md) | OPEN | a | 2026-08-18 | tooling | 6 | 2026-08-18 | dormant | 0 |
 | [aDeployScout](builds/aDeployScout/README.md) | SPECCED | a | 2026-07-12 | deployer | 1 | 2026-07-12 | dormant | 0 |
