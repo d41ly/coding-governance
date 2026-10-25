@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-45 — the default-branch merge class names the walk from a prepared merge, and selects the file that builds one
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 | [2026-10-25-build-TOOL-dPlacedRequest-45-deviation-451.md](../build/2026-10-25-build-TOOL-dPlacedRequest-45-deviation-451.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
+| [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 
 <!-- /gen:spec-records -->
 
@@ -55,7 +56,8 @@ other direction, measured, and selects the file that makes the merge.
 
 ### Edges
 
-none
+- **hands-off** `TOOL-dPlacedRequest-51` — the section's first row, S1 and AC2, which that unit splits by `--no-merges` and re-measures row by row
+- **hands-off** `TOOL-dPlacedRequest-52` — AC2's fixture, which that unit's item for finding 3 states by its commit count
 
 ## 4. Design
 
@@ -139,6 +141,7 @@ No new arm: the record declares no machine gate, and its rows are re-measured by
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-2 promotions, finding
   21 (HIGH, item H1).
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edges to `TOOL-dPlacedRequest-51` and `TOOL-dPlacedRequest-52`, mirroring their consumes-from.
 
 ## 10. Reuse audit
 

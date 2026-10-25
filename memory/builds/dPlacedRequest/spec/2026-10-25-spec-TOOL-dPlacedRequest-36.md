@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-36 — the node-lock factory writes its health events through the lock's own common dir
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -56,6 +56,7 @@ own directory and the health appender every carrier holds beside the block.
 - **consumes-from** `TOOL-dPlacedRequest-24` — `write_node_lock` and its two health events, whose writer this unit makes self-contained; without the factory there is no event to route
 - **hands-off** `TOOL-dPlacedRequest-15` — `tools/push-main.sh`, which carries the `health_log_sh` block beside `gov_feed_sh` when that unit inlines the block, so the lander's stale break writes its event
 - **hands-off** `TOOL-dPlacedRequest-49` — the Goal, S2, AC1 to AC3 and §4, which that unit's items for findings 11, 15, 17 and 27 reword, fix and observe over every carrier
+- **hands-off** `TOOL-dPlacedRequest-52` — AC3, which that unit's item for finding 6 points at `TOOL-dPlacedRequest-38`'s carrier arm
 
 ## 4. Design
 
@@ -144,6 +145,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · the break and 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-1 promotions, finding
   2 (HIGH, item H1, shared with findings 13, 24 and 32).
 - rev-2 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-49.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

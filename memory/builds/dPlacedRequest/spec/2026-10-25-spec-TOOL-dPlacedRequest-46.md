@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-46 — the bounded age walk stops on a `renews: -` commit before any threshold test
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 | [2026-10-25-build-TOOL-dPlacedRequest-46-deviation-461.md](../build/2026-10-25-build-TOOL-dPlacedRequest-46-deviation-461.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
+| [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 
 <!-- /gen:spec-records -->
 
@@ -49,6 +50,7 @@ and the `-` class has its own stop ahead of the threshold.
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-35` — S1's stop order inside the age pass's `awk`, which this unit extends with the `-` stop; without it there is no ordered walk to extend
+- **hands-off** `TOOL-dPlacedRequest-52` — the walk, S2 and AC3, which that unit's items for findings 9, 35 and 36 merge with `TOOL-dPlacedRequest-47`'s walk and extend with out-of-set rows
 
 ## 4. Design
 
@@ -139,6 +141,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · one walk p
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-2 promotions, finding
   32 (HIGH, item H2).
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

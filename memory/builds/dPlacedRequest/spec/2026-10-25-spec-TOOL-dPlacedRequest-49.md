@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-49 — the round-2 promotions' minors: one bound per question, traps before takes, every carrier observed, and criteria that can fail
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 26 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 |
 | [2026-10-25-build-TOOL-dPlacedRequest-49-deviation-491.md](../build/2026-10-25-build-TOOL-dPlacedRequest-49-deviation-491.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 |
+| [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 |
 
 <!-- /gen:spec-records -->
 
@@ -186,6 +187,7 @@ build, at order 26, after units 44, 45 and 48 at 25. Criterion ACn observes item
 - **consumes-from** `TOOL-dPlacedRequest-42` — the offline create's queue line, which S11 routes through `derive_queue_tip`
 - **consumes-from** `TOOL-dPlacedRequest-43` — S6, S8, S15 to S22, S25, S26, S30 and their criteria, which S1, S2 and S11 to S34 amend
 - **consumes-from** `TOOL-dPlacedRequest-44` — the version-bump oracle, which S3 makes unit 34's AC59 run
+- **hands-off** `TOOL-dPlacedRequest-52` — S1, S3, S6 to S8, S13, S21, S25, AC7, AC13, AC24, AC30, AC31 and §5, which that unit's items for findings 4, 6, 7, 11, 14, 18, 20, 21, 25, 26 and 32 amend or, for S25's retry, read as the placed race's bound
 
 ## 4. Design
 
@@ -404,6 +406,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC16 · a stub checker that
 - rev-1 · 2026-10-25 · initial draft, the batch of the spec audit of the round-2 promotions' 22 MEDIUM
   and 12 LOW findings.
 - rev-2 · 2026-10-25 · header above §1, §6 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line binding this unit; AC16 and AC22 observe `readCard` and `derive_claims_line` over their stubs rather than naming the suites, which stay on their `New arm:` lines; AC17 cites the page this build creates by its basename; AC26's `Red when:` is joined onto one line.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

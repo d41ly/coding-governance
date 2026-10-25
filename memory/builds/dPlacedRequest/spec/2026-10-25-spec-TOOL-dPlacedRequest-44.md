@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-44 — the version-bump oracle walks the build's side of the prepared merge
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-44-deviation-441.md](../build/2026-10-25-build-TOOL-dPlacedRequest-44-deviation-441.md) | deviation | — |
 | [2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md) | research | TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
+| [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-49 |
 
 <!-- /gen:spec-records -->
 
@@ -57,6 +58,7 @@ order 25: the oracle names the parent it walks, says what it read, and refuses a
 
 - **consumes-from** `TOOL-dPlacedRequest-43` — S24 and AC24, the oracle this unit re-ranges and rewrites in place; without them there is no oracle to correct
 - **hands-off** `TOOL-dPlacedRequest-49` — the corrected oracle, which that unit's item for finding 5 makes `TOOL-dPlacedRequest-34` AC59 run so one oracle stands
+- **hands-off** `TOOL-dPlacedRequest-52` — the oracle, its fixture and AC1, AC3 and AC4, which that unit's items for findings 2, 3, 11, 17, 27 and 29 re-range, re-status and re-scope
 
 ## 4. Design
 
@@ -154,6 +156,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-2 promotions, finding
   26 (BLOCKER, item B1).
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

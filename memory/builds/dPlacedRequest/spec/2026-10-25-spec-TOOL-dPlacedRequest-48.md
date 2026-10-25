@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-48 — the request-lock race is placed by an announcing stub, not left to the scheduler
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-44-promoted-fix-return.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-49 |
 | [2026-10-25-build-TOOL-dPlacedRequest-48-deviation-481.md](../build/2026-10-25-build-TOOL-dPlacedRequest-48-deviation-481.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-44-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-49 |
+| [2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-49 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,7 @@ first call announcing it is inside the window, and the arm reds if that announce
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-43` — S30's `requests.lock` around the compare, copy and append, which this arm observes, and AC30, which this unit rewrites in place; without the lock there is nothing for the placed race to observe
+- **hands-off** `TOOL-dPlacedRequest-52` — the placed-race arm, S1, S2, AC2 and AC4, which that unit's items for findings 4, 12, 13, 15, 23, 24 and 31 bound, cite and re-scope; at order 25 B's lock wait has no bound, so this unit's own pass observes AC3 and the stub, and the race is read at that unit's pass
 
 ## 4. Design
 
@@ -150,6 +152,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · the placed
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-2 promotions, finding
   16 (HIGH, item H4).
 - rev-2 · 2026-10-25 · header above §1 · the round-3 promotions' fix brief: the `**Derived:** PLAY-dClosedLoop-2` line, binding this audit-promoted unit, which carries no clause, to the decision that derives it.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

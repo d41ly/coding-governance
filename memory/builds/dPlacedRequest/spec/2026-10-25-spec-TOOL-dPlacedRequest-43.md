@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-43 — the round-1 promotions' minors: behavioural class checks, honest outcomes, every reader of a changed spelling, and the sizes kept
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 24 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -167,6 +167,7 @@ Criterion ACn observes item Sn.
 - **hands-off** `TOOL-dPlacedRequest-44` — S24 and AC24, which that unit re-ranges to the build's side of the prepared merge and rewrites in place
 - **hands-off** `TOOL-dPlacedRequest-48` — S30's `requests.lock` and AC30, which that unit observes by a placed race and rewrites in place
 - **hands-off** `TOOL-dPlacedRequest-49` — S6, S8, S15 to S22, S25, S26, S30 and their criteria, which that unit's items for the round-3 audit's minors re-point, re-bound and re-observe
+- **hands-off** `TOOL-dPlacedRequest-52` — S19 and its sketch, S22, AC22 and S30, which that unit's items for findings 5, 7 and 20 pin and rewrite; this unit's own pass reads AC22 at 48128, the figure that unit sets
 
 ## 4. Design
 
@@ -348,6 +349,7 @@ New arm: tools/hooks/scratch-guard.test.sh · covers AC18 · a stub checker that
   `review-join self-test` and `hook destinations self-test`, the legs whose `hooks/` guard
   `tools/hooks/scratch-guard.js` trips.
 - rev-3 · 2026-10-25 · §3 · the round-3 spec audit's disposal: the edge mirror hands-off TOOL-dPlacedRequest-44 and TOOL-dPlacedRequest-48 and TOOL-dPlacedRequest-49.
+- rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-3 promotions: the hands-off edge to `TOOL-dPlacedRequest-52`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

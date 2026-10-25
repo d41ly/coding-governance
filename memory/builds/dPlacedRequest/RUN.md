@@ -105,3 +105,11 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T08:05:41Z rescope · item add TOOL-dPlacedRequest-48 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md finding id 16 at HIGH, item H4
 
 2026-10-25T08:05:43Z rescope · item add TOOL-dPlacedRequest-49 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-35-spec-audit.md findings at MEDIUM ids 1 2 3 4 5 8 9 10 11 14 15 20 22 23 24 27 28 34 35 36 37 38 and at LOW ids 6 7 12 13 17 18 19 25 29 30 31 39
+
+2026-10-25T09:11:18Z rescope · item add TOOL-dPlacedRequest-50 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md finding id 1 at HIGH, item H1
+
+2026-10-25T09:11:19Z rescope · item add TOOL-dPlacedRequest-51 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md finding id 10 at HIGH, item H2
+
+2026-10-25T09:11:21Z rescope · item add TOOL-dPlacedRequest-52 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-44-spec-audit.md findings at MEDIUM ids 3 4 5 6 7 11 12 13 14 17 18 20 21 23 24 29 31 32 34 36 and at LOW ids 2 8 9 15 25 26 27 35
+
+2026-10-25T09:28:03Z review · item dPlacedRequest-spec-set-r4 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 2 · minors 28 · disposition promote
