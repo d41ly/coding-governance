@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-62 — unit 61's criteria read a `###` section from its heading to the next heading
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 34 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 34 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-25-build-TOOL-dPlacedRequest-62-deviation-621.md](../build/2026-10-25-build-TOOL-dPlacedRequest-62-deviation-621.md) | deviation | — |
+| [2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-63 |
 
 <!-- /gen:spec-records -->
 
@@ -60,6 +61,7 @@ unit and the criteria it restates.
 - **consumes-from** `TOOL-dPlacedRequest-61` — §2's "Extracted", AC13 and AC20, and 54's head section and 44's oracle section as that unit's pass leaves them, which this unit reads by the section form
 - **consumes-from** `TOOL-dPlacedRequest-59` — AC13 as unit 61 extends it with a clause over 54's head section, which this unit spells with the section form
 - **hands-off** `TOOL-dPlacedRequest-63` — §2's narrowed "Extracted" and the restated AC13 and AC20, which that unit's items for findings 4, 15 and 21 extend
+- **hands-off** `TOOL-dPlacedRequest-64` — S2, §4 Evidence, §6's preamble, §10, AC1, AC2 and AC4, which that unit's items for findings 4, 6, 10, 11, 15, 18 and 19 amend
 
 ## 4. Design
 
@@ -158,6 +160,7 @@ No new arm: the form is a criterion's command, observed by this unit's probes.
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-7 promotions,
   finding 13 (HIGH, item H1).
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

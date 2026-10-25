@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-44 — the version-bump oracle walks the build's side of the prepared merge
 
-**Status:** OPEN · rev-7 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-8 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 25 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -66,6 +66,7 @@ order 25: the oracle names the parent it walks, says what it read, and refuses a
 - **hands-off** `TOOL-dPlacedRequest-59` — S1, §4, AC2, AC3 and §8 F1, which that unit's items for findings 5, 10, 16 and 23 restate
 - **hands-off** `TOOL-dPlacedRequest-61` — AC1 and §4's oracle as units 57 and 59 leave them, which that unit's items for findings 5, 14 and 22 amend
 - **hands-off** `TOOL-dPlacedRequest-63` — §4's oracle as unit 61 leaves it, which that unit's item for finding 21 gives the base refusal
+- **hands-off** `TOOL-dPlacedRequest-64` — §4's oracle as units 61 and 63 leave it, whose base refusal that unit's item for finding 23 tries with a second input class
 
 ## 4. Design
 
@@ -168,6 +169,7 @@ No new arm: the oracle is a criterion's command, observed once at the close.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edges to `TOOL-dPlacedRequest-57` and `TOOL-dPlacedRequest-59`, mirroring their consumes-from.
 - rev-6 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 - rev-7 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
+- rev-8 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

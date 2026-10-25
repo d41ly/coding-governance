@@ -22,6 +22,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-1-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-10-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-11-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-12-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-12-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-2-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-2-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-3-reuse-scout.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md) | journal | — |

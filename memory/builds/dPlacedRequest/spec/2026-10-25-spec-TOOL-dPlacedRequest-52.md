@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-52 — the round-3 promotions' minors: a placed race inside its lock bound, an oracle that answers by status, one walk, and criteria that read what they name
 
-**Status:** OPEN · rev-5 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-6 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 27 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -189,6 +189,7 @@ unit and the items it carries.
 - **hands-off** `TOOL-dPlacedRequest-58` — S4 and §4's race sketch as unit 56 restates them, in which that unit keeps the handshake clear
 - **hands-off** `TOOL-dPlacedRequest-59` — AC12, AC29, §4's oracle and the hands-off edge to 53, which that unit's items for findings 3, 6, 9 and 21 amend
 - **hands-off** `TOOL-dPlacedRequest-63` — AC11 to AC14 and AC17, which that unit's item for finding 1 gives the fixture's base
+- **hands-off** `TOOL-dPlacedRequest-64` — the `### The oracle (S11 to S13, S17)` heading, which that unit's item for finding 19 names as the prefix of 59 AC13's section read
 
 ## 4. Design
 
@@ -409,6 +410,7 @@ New arm: skills/session-kickoff/manifest-check.test.sh · covers AC19 · a stub 
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-4 promotions: the hands-off edges to `TOOL-dPlacedRequest-53`, `TOOL-dPlacedRequest-54`, `TOOL-dPlacedRequest-55`, `TOOL-dPlacedRequest-56`, mirroring their consumes-from.
 - rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-5 promotions: the hands-off edges to `TOOL-dPlacedRequest-58` and `TOOL-dPlacedRequest-59`, mirroring their consumes-from.
 - rev-5 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
+- rev-6 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

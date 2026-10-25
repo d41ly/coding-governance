@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-60 — unit 57's read of 34 AC59 stops at the end of that bullet
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 30 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -51,6 +51,7 @@ order 29, so it sits at order 30: 57 AC2 reads the AC59 bullet and nothing after
 - **consumes-from** `TOOL-dPlacedRequest-57` — AC2 as that unit's pass leaves it, whose read of 34 AC59 this unit bounds
 - **hands-off** `TOOL-dPlacedRequest-61` — S1's bounded read, which that unit's item for finding 6 runs over a §9 line quoting a sha
 - **hands-off** `TOOL-dPlacedRequest-63` — S1's bounded form and AC3, which that unit's items for findings 10 and 15 amend
+- **hands-off** `TOOL-dPlacedRequest-64` — §4's `### The read`, which that unit's item for finding 12 gives the join
 
 ## 4. Design
 
@@ -129,6 +130,7 @@ No new arm: the read is a criterion's command, observed by this unit's probes.
 - rev-1 · 2026-10-25 · initial draft, promoted from the spec audit of the round-6 promotions,
   finding 16 (HIGH, item H1, whose defect finding 6 of item L3 also reports).
 - rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edge to `TOOL-dPlacedRequest-63`, mirroring its consumes-from.
+- rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

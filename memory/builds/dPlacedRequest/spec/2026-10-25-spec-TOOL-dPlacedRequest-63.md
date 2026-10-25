@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-63 — the round-7 promotions' minors: every inventory row names its base, the sweep places its own criteria, one run-fact clause, a CR the arm can see, and criteria that read what they amend
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 35 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -9,6 +9,7 @@
 | Record | Kind | Also serves |
 |---|---|---|
 | [2026-10-25-build-TOOL-dPlacedRequest-63-deviation-631.md](../build/2026-10-25-build-TOOL-dPlacedRequest-63-deviation-631.md) | deviation | — |
+| [2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-62 |
 
 <!-- /gen:spec-records -->
 
@@ -153,6 +154,7 @@ direction" is 61 S4's.
 - **consumes-from** `TOOL-dPlacedRequest-52` — AC11 to AC14 and AC17, which S1 gives the fixture's base
 - **consumes-from** `TOOL-dPlacedRequest-43` — AC24, which S1 gives the `base:` fact of `RUN.md`
 - **consumes-from** `TOOL-dPlacedRequest-56` — §3's renumbering bullet, which S21 restates
+- **hands-off** `TOOL-dPlacedRequest-64` — S1, S7, S10, S11, S15, S19, §4's readers, sketches and Evidence, §5, §6's preamble, §8 F2, §10, Edges, AC1, AC7, AC8, AC10, AC11, AC15, AC18, AC19 and AC21 as this unit's pass leaves them, which that unit's items for every finding but 6, 10, 18 and 19 amend
 
 ## 4. Design
 
@@ -369,6 +371,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC8 AC12 · the CRLF row 
 
 - rev-1 · 2026-10-25 · initial draft, the batch of the spec audit of the round-7 promotions' 12
   MEDIUM and 9 LOW findings.
+- rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

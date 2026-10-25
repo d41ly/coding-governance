@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-59 — the round-5 promotions' minors: every oracle reader passes a base, one claim-line reader, criteria that can fail, and cites by label
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 31 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 31 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -144,6 +144,7 @@ fact; "the fixture's base" is the base commit of the fixture a criterion builds.
 - **hands-off** `TOOL-dPlacedRequest-61` — §1, §3, S1, S3, S7, S19, S21, §4's sketches, AC1, AC3, AC4, AC5, AC7 and AC13, which that unit's items for findings 1, 2, 3, 4, 5, 8, 9, 10, 11, 12, 15, 17, 18, 20 and 22 amend
 - **hands-off** `TOOL-dPlacedRequest-62` — AC13 as unit 61 extends it, whose clause over 54's head section that unit spells with the section form
 - **hands-off** `TOOL-dPlacedRequest-63` — AC3, AC21, S21 and §4's key reader sketch as unit 61 leaves them, and the S7 arm, which that unit's items for findings 1, 4, 7, 11 and 24 amend
+- **hands-off** `TOOL-dPlacedRequest-64` — §1, AC3 and AC13 as units 61 and 63 leave them, which that unit's items for findings 2, 3 and 19 correct
 
 ## 4. Design
 
@@ -326,6 +327,7 @@ New arm: tools/unattended/unattended.test.sh · covers AC7 AC20 · the shared re
   and 13 LOW findings.
 - rev-2 · 2026-10-25 · §3 · the disposal of the spec audit of the round-6 promotions: the hands-off edge to `TOOL-dPlacedRequest-61`, mirroring its consumes-from.
 - rev-3 · 2026-10-25 · §3 · the disposal of the spec audit of the round-7 promotions: the hands-off edges to `TOOL-dPlacedRequest-62` and `TOOL-dPlacedRequest-63`, mirroring their consumes-from.
+- rev-4 · 2026-10-25 · §3 · the disposal of the spec audit of the round-8 promotions: the hands-off edge to `TOOL-dPlacedRequest-64`, mirroring its consumes-from.
 
 ## 10. Reuse audit
 

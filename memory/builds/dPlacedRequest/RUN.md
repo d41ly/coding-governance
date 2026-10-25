@@ -143,3 +143,7 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T12:49:54Z rescope · item add TOOL-dPlacedRequest-63 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-60-spec-audit.md findings at MEDIUM ids 1 2 6 8 9 11 14 16 21 22 23 24 and at LOW ids 3 4 5 7 10 12 15 17 18
 
 2026-10-25T13:08:58Z review · item dPlacedRequest-spec-set-r8 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 1 · minors 21 · disposition promote
+
+2026-10-25T13:39:11Z rescope · item add TOOL-dPlacedRequest-64 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-62-spec-audit.md findings at MEDIUM ids 1 2 3 7 9 13 19 20 21 and at LOW ids 4 5 6 10 11 12 14 15 18 23
+
+2026-10-25T14:00:59Z review · item dPlacedRequest-spec-set-r9 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 0 · minors 19 · disposition promote
