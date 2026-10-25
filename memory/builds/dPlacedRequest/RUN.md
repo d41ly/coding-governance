@@ -19,20 +19,20 @@ hold-code: host-owner-action
 held-from: REVIEWING
 refreshed-at: 60d60e69404d01caf230f5c448474adee4d21ee8 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
-witness: f19637c78a6563813a10a80f0e348b8ac0891e8a
-phase: HELD
+witness: 6ba7985e8088f6874a8842c66525969339650e16
+phase: REVIEWING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
 run-branch: refs/heads/branch/unattended-dplacedrequest-f41432
 anchor-kind: default-branch
 cli-version: 2.1.308
-lease-utc: 2026-10-24T22:11:20Z
+lease-utc: 2026-10-25T07:45:30Z
 pid-image: claude.exe
 host: compeeto-agent
 pid: 22224
 session: a4a72c24-4423-4b1e-9176-5acec5cc094f
-keepalive: 37ace83d
+keepalive: 58fcd084
 anchor-url: https://github.com/d41ly/coding-governance.git
 anchor-sha: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 anchor-ref: refs/heads/main
@@ -89,3 +89,5 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T06:15:38Z decision · item Spec audit round 3 (workflow wf_22df4547-5f4, units 35-43) cannot finish: its grounding lens agent wedged three times, and its failure-envelope lens twice, on a Bash tool call that never returned (45, 14 and 10+ minutes) while no process of theirs ran, the same probes completing at once in the main session. Every wedged call ran rm -rf on a variable path inside its scratch dir; round 2's literal-path rm -rf calls passed. Most likely a tool-approval prompt a workflow agent cannot answer with no owner present. · reason Options seen: resume again (wedged 3 of 3 for grounding); edit the lens prompts in tools/workflows/tier2-review.js (product code, outside this records-only spec run and its write gate); close round 3 on four lenses (the harness has no such knob, and a degraded round is not an audit). Refused all three; held for an owner turn: approve or clear the pending tool prompt, or resume the round from wf_22df4547-5f4 attended.
 
 2026-10-25T06:16:32Z hold · item host-owner-action · reason until owner · reaped 37ace83d · resume none(owner)
+
+2026-10-25T07:45:37Z resume · item dPlacedRequest · reason held · keepalive 58fcd084 · manual
