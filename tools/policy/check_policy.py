@@ -77,7 +77,7 @@ parity and readers arms. `mirror-worktree-loosened`, `mirror-stale-last-valid`, 
 and `mirror-absent-refuse` are outcome cases (TOOL-dGroundRules-5): each copies policy.py,
 policy-mirror.js and policy-shim.sh into the kit copy, pushes a landed revision L to a bare remote,
 and asserts what the helper, the hooks kit's agent-cap.js and `arm_mirror_landed` answer there.
-`mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in five ladder states.
+`mirror-landed-parity` holds the shim's `landed` to `derive_landed_revision` in six ladder states.
 `mirror-commit-rewrite` (TOOL-dGroundRules-65) commits the mirror rendered at its parent, rewrites
 that commit with `git commit-tree` as the lander does, and reds a `mirror --check` that is not fresh
 at either commit, or a helper reading the rewrite that leaves the render's `{rev}` unfilled.
@@ -2225,11 +2225,12 @@ def run_mirror_absent_adopter(name):
 
 
 def run_mirror_landed_parity(name):
-    """The shim's `landed` against the reader's `derive_landed_revision` in five ladder states, each
+    """The shim's `landed` against the reader's `derive_landed_revision` in six ladder states, each
     remote's main a different commit: two remotes with GOV_REMOTE naming the second; two without;
-    one remote; no remote; no remote, on master. The same sha in each, or both refusing with the same
-    whole line (TOOL-dGroundRules-73). The shim runs under the bash `resolve_bash` finds able to see
-    it, whatever PATH puts first, and the case names it."""
+    one remote; no remote; no remote, on master; one remote with no remote HEAD, on master. The same
+    sha in each, or both refusing with the same whole line (TOOL-dGroundRules-73, TOOL-dGroundRules-80).
+    The shim runs under the bash `resolve_bash` finds able to see it, whatever PATH puts first, and
+    the case names it."""
     repo, kit, bare = build_landed_repo(policy.load_catalogue(KIT))
     checks = []
     try:
@@ -2244,11 +2245,15 @@ def run_mirror_landed_parity(name):
         run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_SECOND}/main", "HEAD~1")
         for state, drop, gov in (("two remotes, GOV_REMOTE", None, FIXTURE_SECOND), ("two remotes", None, None),
                                  ("one remote", FIXTURE_SECOND, None), ("no remote", FIXTURE_REMOTE, None),
-                                 ("no remote, on master", None, None)):
+                                 ("no remote, on master", None, None),
+                                 ("one remote, no remote HEAD, on master", None, None)):
             if drop:
                 run_fixture_git(repo, "remote", "remove", drop)
             if state == "no remote, on master":
                 run_fixture_git(repo, "branch", "-m", "main", "master")
+            if state == "one remote, no remote HEAD, on master":
+                run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, bare.as_posix())
+                run_fixture_git(repo, "update-ref", f"refs/remotes/{FIXTURE_REMOTE}/master", "HEAD")
             if gov:
                 os.environ["GOV_REMOTE"] = gov
             try:
@@ -2987,6 +2992,8 @@ def run_limit_case(name):
             bare = t / "o.git"
             bare.mkdir()
             run_fixture_git(bare, "init", "-q", "--bare")
+            # the bare's HEAD names the branch pushed below, whatever this node's init.defaultBranch (TOOL-dGroundRules-80)
+            run_fixture_git(bare, "symbolic-ref", "HEAD", "refs/heads/master")
             run_fixture_git(repo, "remote", "add", FIXTURE_REMOTE, bare.as_posix())
             run_fixture_git(repo, "push", "-q", FIXTURE_REMOTE, "master")
             checks.append(check_hook_call("one remote, no remote HEAD", "a Workflow call", hook, call, unread(

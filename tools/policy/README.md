@@ -482,9 +482,10 @@ with a reason opening `mirror stale at`; `mirror-stale-refuse` lands the same un
 must refuse naming `.governance/policy.json:0` and red `arm_mirror_landed`; `mirror-absent-refuse`
 lands no mirror, refused under `refuse` and read as the reader reads it under `last-valid`. Every
 other outcome case must leave `arm_mirror_landed` green. `mirror-landed-parity` runs the shim's
-`landed` beside `derive_landed_revision` in five states, with two remotes and `GOV_REMOTE`, two
-without, one, none, and none on `master`: the same sha, or both refusing with the same whole line, in
-each (TOOL-dGroundRules-73). `mirror-commit-rewrite` runs `mirror --write` at a
+`landed` beside `derive_landed_revision` in six states, with two remotes and `GOV_REMOTE`, two
+without, one, none, none on `master`, and one on `master` with no remote HEAD: the same sha, or both
+refusing with the same whole line, in each (TOOL-dGroundRules-73, TOOL-dGroundRules-80).
+`mirror-commit-rewrite` runs `mirror --write` at a
 commit, commits the mirror, and rewrites that commit with `git commit-tree` over its tree and
 parents, once per reason kind (TOOL-dGroundRules-25 S1): a file setting the key, a file without it,
 no file, and an invalid file over a valid ancestor, `last-valid`. `mirror --check` must print

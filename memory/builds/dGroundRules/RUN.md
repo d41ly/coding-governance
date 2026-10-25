@@ -513,3 +513,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T09:54:25Z rescope · item add TOOL-dGroundRules-82 · reason closing review round 2 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-72-79-closing-diff-round2.md), M3 and L1: the round-1 L2 fix narrowed policy-mirror.js's bash resolver to the first PATH bash, so a host whose first bash is the WSL launcher resolves none and rule 7 denies every spawn; the scan also stats every PATH dir for a value it never reads
 
 2026-10-25T09:55:00Z review · item dGroundRules · reason verdict CLEAN WITH FIXES · blockers 0 · CONVERGED · highs 2 · minors 16 · disposition promote
+
+2026-10-25T10:33:30Z dispatch · item 7d7aa47b TOOL-dGroundRules-80 · reason tools/policy/check_policy.py tools/policy/README.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-80.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T10:33:32Z brief · item TOOL-dGroundRules-80 · reason 52f4a432be1b memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-80-spec-brief.md

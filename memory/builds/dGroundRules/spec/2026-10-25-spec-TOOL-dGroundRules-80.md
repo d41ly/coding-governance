@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-80 — the policy fixtures pin the new case's bare remote HEAD, and a sixth parity state holds the remote refusal variant byte-equal
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-1 · base 59f02fde · streams tooling · order 28
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-1 · base 59f02fde · streams tooling · order 28
 
 **Derived:** PLAY-dClosedLoop-2
 
