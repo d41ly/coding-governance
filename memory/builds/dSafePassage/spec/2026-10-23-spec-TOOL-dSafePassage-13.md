@@ -1,6 +1,6 @@
 # TOOL-dSafePassage-13 — the docs leg: each user-facing member's declared usage fingerprinted against its help page, under help.enforce
 
-**Status:** DEFERRED · rev-3 · 2026-10-23 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
+**Status:** DEFERRED · rev-5 · 2026-10-25 · node d · Tier-2 · base 3708a705 · streams tooling · order 5 · advances TOOL-dSafePassage-14
 
 **Carries:** cl-dClosedLoop-0030@e7612082 whole
 **Carries:** node:policy-key.help.enforce
@@ -13,9 +13,16 @@
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-148.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-148.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-51.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-51.md) | deviation | — |
 | [2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md](../build/2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md) | deviation | — |
+| [2026-10-24-build-TOOL-dSafePassage-13-deviation-156.md](../build/2026-10-24-build-TOOL-dSafePassage-13-deviation-156.md) | deviation | — |
+| [2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md](../build/2026-10-25-build-TOOL-dSafePassage-1-agent-ledger.md) | journal | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-15 TOOL-dSafePassage-16 TOOL-dSafePassage-17 TOOL-dSafePassage-18 TOOL-dSafePassage-19 TOOL-dSafePassage-20 TOOL-dSafePassage-21 TOOL-dSafePassage-22 TOOL-dSafePassage-23 TOOL-dSafePassage-24 TOOL-dSafePassage-25 TOOL-dSafePassage-26 TOOL-dSafePassage-27 TOOL-dSafePassage-28 TOOL-dSafePassage-29 TOOL-dSafePassage-30 TOOL-dSafePassage-31 TOOL-dSafePassage-32 TOOL-dSafePassage-33 TOOL-dSafePassage-34 TOOL-dSafePassage-35 TOOL-dSafePassage-36 TOOL-dSafePassage-37 TOOL-dSafePassage-38 TOOL-dSafePassage-39 TOOL-dSafePassage-40 TOOL-dSafePassage-41 TOOL-dSafePassage-42 TOOL-dSafePassage-43 TOOL-dSafePassage-44 TOOL-dSafePassage-45 TOOL-dSafePassage-46 TOOL-dSafePassage-47 TOOL-dSafePassage-48 TOOL-dSafePassage-49 TOOL-dSafePassage-50 TOOL-dSafePassage-51 TOOL-dSafePassage-52 TOOL-dSafePassage-53 TOOL-dSafePassage-54 TOOL-dSafePassage-55 TOOL-dSafePassage-56 TOOL-dSafePassage-57 TOOL-dSafePassage-58 TOOL-dSafePassage-59 |
+| [2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md](../build/2026-10-25-build-TOOL-dSafePassage-1-parent-fixes-return.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-26 |
+| [2026-10-25-build-TOOL-dSafePassage-13-deviation-163.md](../build/2026-10-25-build-TOOL-dSafePassage-13-deviation-163.md) | deviation | — |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-carries-repin.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-11 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-deviation-after-fix.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-7 TOOL-dSafePassage-11 |
 | [2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md](../prompts/2026-10-23-prompt-TOOL-dSafePassage-1-spec-brief.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-2 TOOL-dSafePassage-3 TOOL-dSafePassage-4 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-7 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 TOOL-dSafePassage-12 |
+| [2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-1-dgroundrules-reground.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-5 TOOL-dSafePassage-6 TOOL-dSafePassage-8 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-11 |
+| [2026-10-24-prompt-TOOL-dSafePassage-13-1-spec-writer.md](../prompts/2026-10-24-prompt-TOOL-dSafePassage-13-1-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md](../prompts/2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md) | research | TOOL-dSafePassage-1 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-26 |
 | [2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md](../reviews/2026-10-23-review-TOOL-dSafePassage-1-2-3-4-5-6-7-8-9-10-11-12-13-spec-audit-round1.md) | spec-audit | TOOL-dSafePassage-1 TOOL-dSafePassage-3 TOOL-dSafePassage-2 TOOL-dSafePassage-4 TOOL-dSafePassage-7 TOOL-dSafePassage-11 TOOL-dSafePassage-12 TOOL-dSafePassage-8 TOOL-dSafePassage-6 TOOL-dSafePassage-9 TOOL-dSafePassage-10 TOOL-dSafePassage-5 |
 
 <!-- /gen:spec-records -->
@@ -36,16 +43,23 @@ dSafePassage on".
 
 - **S1** — The usage declaration, `tools/govkit/usage.toml`. One `[[class]]` row per class of
   TOOL-dSafePassage-10's class registry (`tools/govkit/surface-classes.toml`), naming the class's
-  usage shape (`verb`, `key`, `hook`, `leg`, `page` or `none`), where its rows come from, and a
-  `why`. One `[[usage]]` row per member or page-shown script whose own registry states no usage.
-  Observed by AC6 and AC7.
-- **S2** — The four row shapes the clause names, and one source each. A `verb` row is a verb and
-  its flags; a `key` row a key with its values and default; a `hook` row a hook's event and matcher;
-  a `leg` row a leg's name and argv. A member whose own registry already states its usage is read
-  from there and never restated: a hook from its `*.fragment.json`, a policy key from the catalogue
-  `cl-dClosedLoop-0007` defines, a CLI verb from the usage text TOOL-dSafePassage-10's verb class
-  reads, a leg from `tools/gate-legs.json`. A `[[usage]]` row restating one of those is a finding.
-  Observed by AC6.
+  usage shape (`verb`, `key`, `hook`, `leg`, `page` or `none`), its `rows` and a `why`. `rows` is
+  where the class's usage rows come from, an extension point as TOOL-dSafePassage-10's class
+  `reader` is one: a reader spelled `<path under the tool root>:<function>` returning the members'
+  rows from their own registry, or `usage.toml` where they are `[[usage]]` rows here. A `page` or
+  `none` class has no rows and carries no `rows` key, absent as unit 10's optional `witness` is. One
+  `[[usage]]` row per member or page-shown script whose own registry states no usage. Observed by
+  AC6 and AC7.
+- **S2** — The four row shapes the clause names, and one source per class. A `verb` row is a verb
+  and its flags; a `key` row a key with its values and default; a `hook` row a hook's event and
+  matcher; a `leg` row a leg's name and argv. A member whose own registry already states its usage is
+  read from there by its class's `rows` reader and never restated. This unit ships four, in
+  `tools/govkit/docs_leg.py`: `read_hook_usage` over the `*.fragment.json` files, `read_policy_usage`
+  over the `[[key]]` rows of `tools/policy/catalogue.toml` (`cl-dClosedLoop-0007`),
+  `read_verb_usage` over the usage text TOOL-dSafePassage-10's verb class reads, and
+  `read_leg_usage` over `tools/gate-legs.json`. A later class whose registry states its usage joins
+  with its `[[class]]` row and its reader, and no `[[usage]]` row. A `[[usage]]` row whose id any
+  class's reader returns is a finding. Observed by AC6.
 - **S3** — The fingerprint and the page binding. A row's fingerprint is the first eight hex of the
   SHA-256 of its shape fields as canonical JSON. A page documents a member with the anchor
   `<!-- usage: <id> <fp8> -->`, and a `page`-shaped member with `<!-- usage: <id> -->`. Each member
@@ -68,15 +82,23 @@ dSafePassage on".
   and the list's row count above its low-water mark on the first-parent history is a finding,
   read by drift-audit's `derive_low_waters` (`tools/drift-audit/drift_report.py:781`). The list joins
   drift-audit's `SHRINK_ONLY` table (`tools/drift-audit/drift_signals.py:129`). Observed by AC5.
-- **S7** — `help.enforce`, owned here. Its catalogue row under `cl-dClosedLoop-0007` carries the
-  values `refuse`, `warn` and `off`, the default `refuse`, a summary and a usage, from v2's
-  `[policies]` row (v2:1294). It is read through the reader `cl-dClosedLoop-0008` lands. Under
-  `refuse` any finding exits 1; under `warn` each finding prints as a `WARN` line and the leg exits 0;
-  under `off` the leg prints one line, reads nothing else, and exits 0. Observed by AC8.
+- **S7** — `help.enforce`, owned here. Its `[[key]]` row in `tools/policy/catalogue.toml` lands with
+  dGroundRules, one row per v2 `[policies]` row in v2's order (TOOL-dGroundRules-1 S3), carrying
+  `allowed` `refuse`, `warn` and `off`, the default `refuse` and the owner `dSafePassage` (v2:1294),
+  with no `summary` or `usage`, and named on the shrink-only `tools/policy/unsummarised-keys.txt`
+  (TOOL-dGroundRules-1 S6). This unit adds no row: it fills that row's `summary` and its `usage`, a
+  line the row admits (`help.enforce = "warn"`), and drains the name in the same commit with
+  `python tools/policy/policy.py lists --write`. The leg reads the key once, with `policy.py get
+  help.enforce` at `get`'s default revision, the landed one (TOOL-dGroundRules-2 S6, S7), an unset
+  key answering the catalogue default with its reason (TOOL-dGroundRules-3), through govkit's
+  `read_policy_value` (§4). Under `refuse` any finding exits 1; under `warn` each finding prints as a
+  `WARN` line and the leg exits 0; under `off` the leg prints one line, reads nothing else, and exits 0. Observed by AC8.
 - **S8** — The states that are not a verdict, each exit 2 with its reason: a class whose usage shape
   is set and whose population is empty; pages that show commands of which none was tested; an
-  unreadable `usage.toml` or class registry. A class of the registry with no `[[class]]` row here,
-  or a `[[class]]` row naming no registered class, is a finding, which is how a later class's join
+  unreadable `usage.toml` or class registry, or a `rows` reader that will not load; no policy kit
+  found, or a refused `help.enforce` read. A class of the registry with no `[[class]]` row here, a
+  `[[class]]` row naming no registered class, a shaped class with no `rows`, or a `page` or `none`
+  class carrying one, is a finding, which is how a later class's join
   is armed. Observed by AC7.
 - **S9** — The module `tools/govkit/docs_leg.py`: the leg with no arguments, `--list`, and
   `--fixture --plant <case> [--enforce <value>]`, `--enforce` honoured under `--fixture` only.
@@ -121,10 +143,12 @@ dSafePassage on".
 ### Edges
 
 - **consumes-from** `TOOL-dSafePassage-10` — `read_surface_classes`, `read_surface_population` and `VERB_SOURCES` in `tools/govkit/step_gate.py`, and the nine class ids of its class table; without them the leg has no population and exits 2
+- **consumes-from** `TOOL-dSafePassage-6` — `read_policy_value(key, root)` in `tools/govkit/govkit.py`, the one govkit reader of a policy key, defined by it or by TOOL-dSafePassage-9, whichever builds first; without it the leg cannot read `help.enforce` and exits 2
+- **consumes-from** `TOOL-dSafePassage-9` — the same `read_policy_value`, where that unit builds before TOOL-dSafePassage-6 and defines it
 - **consumes-from** `TOOL-dSafePassage-11` — `help/python-floor.md` and the `platforms.provision` usage row, which S11 anchors and this leg fingerprints; without them the key sits on S6's list
-- **consumes-from** external — dGroundRules' catalogue (`cl-dClosedLoop-0007`), whose rows give each policy key's values, default, summary and usage, and its reader (`cl-dClosedLoop-0008`), through which `help.enforce` is read; without them the `policy` class is empty and the leg exits 2
+- **consumes-from** external — dGroundRules' policy kit: `tools/policy/catalogue.toml` (`cl-dClosedLoop-0007`, TOOL-dGroundRules-1), whose `[[key]]` rows give each policy key's `allowed` and `default` and hold the `help.enforce` row this unit fills, its shrink-only `unsummarised-keys.txt`, and its reader `policy.py get` (`cl-dClosedLoop-0008`, TOOL-dGroundRules-2 and 3), through which `help.enforce` is read; without them the `policy` class is empty and the leg exits 2
 - **hands-off** `TOOL-dSafePassage-5` — a `[[usage]]` row in `tools/govkit/usage.toml` and an anchor for each `upgrade_walk.py` command its help section shows, since that unit's page lands after this leg
-- **hands-off** external — each later build whose class joins the step gate adds its `[[class]]` row to `tools/govkit/usage.toml` and its members' rows, the clause's "each later class's rows joining when its build lands it"
+- **hands-off** external — each later build whose class joins the step gate adds its `[[class]]` row to `tools/govkit/usage.toml`, its `rows` a reader over its own registry where that registry states the members' usage, and `[[usage]]` rows only for members whose registry states none (S2), the clause's "each later class's rows joining when its build lands it"
 - **hands-off** `TOOL-dSafePassage-26` — the minors batch of the round-1 spec audit, which repairs the findings that land on this unit after every unit is built
 
 ## 4. Design
@@ -137,7 +161,7 @@ dSafePassage on".
 [[class]]
 class = "verb"          # a class id of tools/govkit/surface-classes.toml
 usage = "verb"          # verb | key | hook | leg | page | none
-rows = "usage-text"     # where this class's rows come from (table below)
+rows = "govkit/docs_leg.py:read_verb_usage"   # <path under the tool root>:<function>, or "usage.toml"
 why = "a CLI verb is a verb and its flags"
 
 [[usage]]
@@ -156,22 +180,26 @@ default = "memory"
 
 The classes, as TOOL-dSafePassage-10's table spells them:
 
-| Class | Shape | Rows from |
-|---|---|---|
-| `file` | `none` | an installed file's user-facing usage is the command or hook that runs it, graded in its own class |
-| `installable` | `none` | the same |
-| `hook` | `hook` | the `*.fragment.json` whose `name` is the member, its `event` and `matcher` (`tools/hooks/format-guard.fragment.json:1-7`) |
-| `command` | `verb` | `usage.toml`, the Skill's name and its arguments |
-| `agent` | `page` | presence only |
-| `conf` | `key` | `usage.toml` |
-| `policy` | `key` | the catalogue row `cl-dClosedLoop-0007` defines, its allowed values and default |
-| `verb` | `verb` | the usage line of the `VERB_SOURCES` text that states the verb, its `--` flags, a flag followed by `<...>` or `x=y` taking a value |
-| `entry` | `page` | presence only |
+| Class | Shape | `rows` | What it reads |
+|---|---|---|---|
+| `file` | `none` | absent | nothing: an installed file's user-facing usage is the command or hook that runs it, graded in its own class |
+| `installable` | `none` | absent | the same |
+| `hook` | `hook` | `govkit/docs_leg.py:read_hook_usage` | the `*.fragment.json` whose `name` is the member, its `event` and `matcher` (`tools/hooks/format-guard.fragment.json:1-7`) |
+| `command` | `verb` | `usage.toml` | the Skill's name and its arguments |
+| `agent` | `page` | absent | presence only |
+| `conf` | `key` | `usage.toml` | the key's values and default |
+| `policy` | `key` | `govkit/docs_leg.py:read_policy_usage` | the key's `[[key]]` row of `tools/policy/catalogue.toml`, its `allowed` and `default` |
+| `verb` | `verb` | `govkit/docs_leg.py:read_verb_usage` | the usage line of the `VERB_SOURCES` text that states the verb, its `--` flags, a flag followed by `<...>` or `x=y` taking a value |
+| `entry` | `page` | absent | presence only |
+
+A `rows` reader is `rows(root: pathlib.Path) -> dict[str, dict]`, each member id to its row's shape
+fields, loaded by path from the tree the leg grades, as TOOL-dSafePassage-10's class readers are.
 
 A `script:` row is a `verb` row for an entrypoint a page shows that no class holds. It is
 fingerprinted and anchored like a member's row, and it exists only because a page documents it.
 
-The `leg` shape reads a manifest row's `name` and `argv`; it is armed by a `[[class]]` row naming it.
+The `leg` shape reads a manifest row's `name` and `argv` through `read_leg_usage`; it is armed by a
+`[[class]]` row whose `rows` names that reader.
 
 ### The fingerprint and the anchors
 
@@ -209,6 +237,20 @@ the low-water is the red, and a list with no history yet is judged by its seed a
 seeded once, at this pass, from `docs_leg.py --list --undocumented`, which prints one id per line;
 nothing writes it after.
 
+### The policy read
+
+This unit defines no reader. `read_policy_value(key, root)` lives once, in `tools/govkit/govkit.py`,
+defined by whichever of TOOL-dSafePassage-6 and TOOL-dSafePassage-9 builds first (both order 4): it
+runs the policy kit's `policy.py get <key>` as a subprocess, the kit found through the
+`resolve_kit_dir` block `tools/govkit/govkit.py:196-233` carries inline, since a kit never imports a
+sibling kit (TOOL-dGroundRules-1, §4 Evidence). `docs_leg.py` imports `govkit` from its own directory
+as `tools/govkit/matrix.py:51-52` does and makes one call, `govkit.read_policy_value("help.enforce",
+root)`, the key literal its first argument, the `.py` shape TOOL-dGroundRules-8's reader-coverage arm
+counts. No `--rev` is passed, so the value is the landed revision's, and a branch's own edit of the
+policy file cannot relax the leg grading it; the source the helper reports is the mode line's. A `LookupError` or an exit 2 from `get` is S8's
+exit 2. Under `--fixture` nothing is read: the mode is `--enforce`'s value, else `refuse`. The leg
+opens neither `.governance/policy.toml` nor its JSON mirror.
+
 ### The leg and its output
 
 ```
@@ -217,7 +259,8 @@ python tools/govkit/docs_leg.py --list [--undocumented]
 python tools/govkit/docs_leg.py --fixture --plant <case> [--enforce refuse|warn|off]
 ```
 
-Every line opens `docs:`. The summary line carries the classes, members, rows, anchors, stale pages,
+Every line opens `docs:`. The first names the mode, `docs: help.enforce = <value> · <source>`. The
+summary line carries the classes, members, rows, anchors, stale pages,
 commands tested, skipped and unrowed, links checked and external, and the list's rows and low-water,
 every count DERIVED at the run. The leg row:
 `{"name": "docs", "argv": ["python", "{prefix}/govkit/docs_leg.py"], "chunk": "declarations",
@@ -250,6 +293,8 @@ default `refuse`:
 | `grown-list` | a list row added in a later commit | 1 |
 | `orphan-anchor` | an anchor naming no member | 1 |
 | `restated-row` | a `[[usage]]` row for the fixture hook | 1 |
+| `reader-rows` | a class whose `rows` names a reader in a fixture module, its member's row changed, the anchor unchanged | 1 |
+| `none-rows` | a `none` class carrying `rows` | 1 |
 | `leg-row` | the fixture leg's argv changed, its anchor unchanged | 1 |
 | `unclassed` | a registered class with no `[[class]]` row | 1 |
 | `empty-class` | a `key` class with no member | 2 |
@@ -261,16 +306,19 @@ one line and reading no page.
 ### Inventory
 
 Minted: the module `tools/govkit/docs_leg.py`; the file `tools/govkit/usage.toml` with its
-`[[class]]` keys `class`, `usage`, `rows` and `why`, its `[[usage]]` keys `id`, `shape`, `entry`,
+`[[class]]` keys `class`, `usage`, `rows` and `why`, the `rows` forms `<path>:<function>` and
+`usage.toml`, its `[[usage]]` keys `id`, `shape`, `entry`,
 `verb`, `flags`, `values` and `default`, and the shape words `verb`, `key`, `hook`, `leg`, `page`
 and `none`; the id form `script:<path>[#<verb>]`; the anchor `<!-- usage: ... -->`; the list
 `memory/project/docs-undocumented.txt`; the functions `read_usage_classes`, `read_usage_rows`,
-`derive_usage_fingerprint`, `read_page_anchors`, `read_page_commands`, `check_page_command`,
+`derive_usage_fingerprint`, `read_hook_usage`, `read_policy_usage`, `read_verb_usage`,
+`read_leg_usage`, `read_page_anchors`, `read_page_commands`, `check_page_command`,
 `check_page_links`, `read_legacy_rows`, `check_legacy_low_water`, `check_docs`,
 `build_docs_fixture` and `main`; the flags `--list`, `--undocumented`, `--fixture`, `--plant` and
 `--enforce`; the leg `docs`; the prefix `docs:`; the policy key `help.enforce`. Naming cells: each
 function passes `py.function` (`python tools/lexicon/lexicon.py --suggest <name> --as py.function`,
-OK for all eleven, 2026-10-23).
+OK for all eleven, 2026-10-23, and for the four `rows` readers, 2026-10-25). Called, not minted: govkit's `read_policy_value` (§4 "The policy
+read").
 
 ### Migration
 
@@ -279,7 +327,10 @@ adds must be documented, because the list may not grow. No adopter carries anyth
 
 ### Rollout
 
-Live at landing under `help.enforce = refuse`, the catalogue default. Order 5 holds this unit and
+Live at landing under `help.enforce = refuse`, the catalogue default. The catalogue's blob id is in
+the mirror (TOOL-dGroundRules-5 S1), so the row's fill stales `.governance/policy.json`: the pass
+commits the fill with its list drain, then the mirror alone from `policy.py mirror --write`, which the
+guard admits only once the catalogue equals HEAD (TOOL-dGroundRules-19 S1). Order 5 holds this unit and
 TOOL-dSafePassage-5, and their write sets meet at `tools/gate-legs.json`,
 `tools/govkit/registry.toml`, `tools/govkit/subject-pins.tsv`, `tools/run-gates/ceiling-evidence.txt`,
 `tools/govkit/selftest.py` and `memory/map/features/govkit.md`, so the two passes sequence (M6), this
@@ -303,7 +354,9 @@ of this build is graded at this pass, and S11 anchors it.
 - `help/roles.md`
 - `help/measure-legs.md`
 - `help/step-gate.md`, `help/upgrade-steps.md`, `help/shims.md`, `help/update-edits.md` and `help/python-floor.md`, the pages this build's earlier units land, for their anchors
-- the catalogue file of `cl-dClosedLoop-0007`, for the `help.enforce` row, at the path dGroundRules lands
+- `tools/policy/catalogue.toml`, the `help.enforce` row's `summary` and `usage`
+- `tools/policy/unsummarised-keys.txt`, drained by `lists --write`
+- `.governance/policy.json`, regenerated, in its own commit
 - `memory/builds/dSafePassage/build/2026-10-23-build-TOOL-dSafePassage-13-deviation-51.md` (new, at the spec commit)
 - `memory/builds/dSafePassage/build/2026-10-23-build-TOOL-dSafePassage-13-deviation-52.md` (new, at the spec commit)
 
@@ -317,11 +370,13 @@ of this build is graded at this pass, and S11 anchors it.
   false-reddened 4 real examples on mutually exclusive groups, so a row is declared. The `verb`
   class's usage text is the declared line a user reads, which is why it is read and not restated.
 - **A help.enforce in a conf key**: the key is the catalogue's, the parent's one reader.
+- **Parsing the working-tree policy file or its mirror**: the parent has one reader, which reads
+  revisions only, and its mirror reader is JavaScript's (TOOL-dGroundRules-5 S5, S9).
 
 ## 5. Production-readiness checklist
 
-- security: read-only over the tree; the fixture writes only in its own temp directory; `--enforce` is honoured under `--fixture` only, so the leg's argv cannot be relaxed past the policy file; a page command is parsed and never run.
-- perf / scale: one population read through TOOL-dSafePassage-10's reader, a read of each page, and one `git log -p` over the list, DERIVED at the run; the `ceiling` is set from the measured time at the pass and recorded in `tools/run-gates/ceiling-evidence.txt`.
+- security: read-only over the tree; the fixture writes only in its own temp directory; `--enforce` is honoured under `--fixture` only and `help.enforce` is read at the landed revision, so neither the leg's argv nor a branch's own policy edit relaxes it; a page command is parsed and never run.
+- perf / scale: one `policy.py get` run, one population read through TOOL-dSafePassage-10's reader, a read of each page, and one `git log -p` over the list, DERIVED at the run; the `ceiling` is set from the measured time at the pass and recorded in `tools/run-gates/ceiling-evidence.txt`.
 - error / empty / loading states: an empty shaped class, an untested page set and an unreadable declaration exit 2 with the reason; `off` prints one line naming the key and its source.
 - observability: one summary line and one line per finding, each naming page, line and id.
 - risks: the `verb` class's usage text grammar differs between `govkit.py` and `unattended.sh`, and a line the parser misreads yields a wrong flag set; the fixture's `bad-flag` plant and AC2's real-page run are what see it. A sibling class spelling a member id another way leaves that member undocumented, which reds rather than passes.
@@ -359,20 +414,27 @@ of this build is graded at this pass, and S11 anchors it.
   left on the list.
 - **AC6** — When `python "tools/govkit/docs_leg.py" --fixture --plant restated-row` runs, it exits 1
   naming the hook whose fragment states its usage; `--plant leg-row` exits 1 with a `STALE` line
-  naming the fixture leg.
-  Red when: a member's usage is read from `usage.toml` where its own registry states it, or the
-  `leg` shape is never fingerprinted.
+  naming the fixture leg; `--plant reader-rows` exits 1 with a `STALE` line naming the fixture
+  reader's member.
+  Red when: a member's usage is read from `usage.toml` where its own registry states it, the `leg`
+  shape is never fingerprinted, or a class's rows come from anywhere but its `rows` reader.
 - **AC7** — When `python "tools/govkit/docs_leg.py" --fixture --plant unclassed` runs, it exits 1
   naming the class with no `[[class]]` row; `--plant empty-class` exits 2 naming the class;
-  `--plant untested` exits 2 saying no page command was tested.
+  `--plant untested` exits 2 saying no page command was tested; `--plant none-rows` exits 1 naming
+  the class.
   Red when: a class with no usage declaration is skipped, or an empty population exits 0.
 - **AC8** — When `python "tools/govkit/docs_leg.py" --fixture --plant stale-page --enforce warn` runs,
   it exits 0 with a `docs: WARN` line naming the stale page; with `--enforce off` it exits 0 printing
-  one line that names `help.enforce`; and `python "tools/govkit/docs_leg.py" --list` on the tree
-  prints `policy:help.enforce` with `refuse warn off`, default `refuse`, and the page that anchors it.
-  Red when: `warn` exits 1, `off` still reads the pages, or the catalogue row lacks a value or a
-  default.
-  fixture: needs dGroundRules' catalogue and reader landed, which the build run lands first.
+  one line that names `help.enforce`. On the tree, `python "tools/govkit/docs_leg.py"` prints
+  `docs: help.enforce = refuse` with its source; `python "tools/govkit/docs_leg.py" --list` prints
+  `policy:help.enforce` with `refuse warn off`, default `refuse`, and the page that anchors it;
+  `python "tools/policy/check_policy.py"` exits 0; `git grep -n -e "^help.enforce$" -- "tools/policy/unsummarised-keys.txt"`
+  finds no line; and `git grep -n -F 'read_policy_value("help.enforce"' -- "tools/govkit/docs_leg.py"`
+  finds the one read.
+  Red when: `warn` exits 1, `off` still reads the pages, the row lacks a summary or a usage or is
+  still listed, the mirror is stale, or the read is in no shape the reader-coverage arm counts, which
+  grades this build only once its every spec is terminal.
+  fixture: the on-tree half needs dGroundRules' policy kit landed, which the build run lands first.
 - **AC9** — When `git grep -n -e "help.enforce" -e "docs_leg" -- help/` runs, it finds the new page
   and its line in `help/README.md`, and AC2's run grades that page green.
   Red when: the leg ships with no page, or its page is not graded by it.
@@ -390,7 +452,8 @@ of this build is graded at this pass, and S11 anchors it.
 `govkit selftest` · `govkit refusal join` · `govkit acceptance matrix` · `govkit selfcheck` · `govkit runbook parity` · `drift-audit selftest` · `drift-audit records` · `recall floor` · `recall floor arms` · `measure-legs selftest` · `run-gates canary` · `run-gates gov canary` · `codebase-map gate coverage` · `encoding posture (text IO names its encoding)` · `lexicon naming predicates` · `memory hygiene` · `spec tokens (a spec's own names resolve)`
 
 The new leg `docs` is not on the list above, since that list names legs the manifest holds today; the
-main loop observes it at the close through the arm lines below.
+main loop observes it at the close through the arm lines below. dGroundRules' `policy check` leg,
+which grades the catalogue fill, the list and the mirror, is off the list for the same reason.
 
 New arm: tools/govkit/docs_leg.py · covers AC2 · the new `docs` leg itself, its failing case staged by respelling a flag of a page command in `help/roles.md` · none
 New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC8 · a new arm runs the leg's fixture over every plant of §4, and `stale-page` under `warn` and `off`, asserting each exit and named line · none
@@ -457,13 +520,27 @@ New arm: tools/govkit/selftest.py · covers AC1 AC3 AC4 AC5 AC6 AC7 AC8 · a new
   `2026-10-23-build-TOOL-dSafePassage-13-deviation-52` moved the clause's text, carrying the
   population of `2026-10-23-build-TOOL-dSafePassage-13-deviation-51`, which it supersedes; every
   token of that text was already in the spec; §1 to §10 are unmoved.
+- rev-4 · 2026-10-24 · §2 S2 S7 S8 · §3 Edges · §4 data model, the policy read, the leg's output,
+  Inventory, Rollout, Files touched, Alternatives · §5 · AC8 · §7 · §10 · re-grounded on dGroundRules'
+  landed specs by `2026-10-24-build-TOOL-dSafePassage-1-dgroundrules-crosscheck` row 39, U5 and U6:
+  the `help.enforce` row is filled and drained, never added; the key is read with `policy.py get` in
+  a shape the reader-coverage arm counts; and the mirror is regenerated in a second commit. The
+  helper `read_policy_value` is called from `tools/govkit/govkit.py`, defined there by
+  TOOL-dSafePassage-6 or 9, and no longer minted here: §2 S7, §3 Edges, §4 the policy read and
+  Inventory, §10.
+- rev-5 · 2026-10-25 · §2 S1 S2 S8 · §3 Edges · §4 data model, the fixture, Inventory · AC6 AC7 ·
+  §10 · Item 7 of `2026-10-25-prompt-TOOL-dSafePassage-1-parent-fixes.md`: a class's `rows` is a
+  `<path>:<function>` reader or `usage.toml`, absent on a `page` or `none` class, with two plants;
+  the later-builds hand-off no longer asks for restated rows.
 
 ## 10. Reuse audit
 
 The seams extended: TOOL-dSafePassage-10's `read_surface_population` and `VERB_SOURCES`, the one
-population and the one verb source (brief S7); the runbook's `govkit:entry` anchor and its
+population and the one verb source (brief S7), and its class row's `<path>:<function>` reader form,
+which a `rows` reader takes; the runbook's `govkit:entry` anchor and its
 both-directions presence join (`tools/govkit/check_runbook_parity.py:42-121`), whose anchor shape
-this leg's anchor follows and whose liveness half it keeps; drift-audit's `derive_low_waters`
+this leg's anchor follows and whose liveness half it keeps; govkit's `read_policy_value`, which specs 6
+and 9 define once over dGroundRules' `policy.py get`, called and never copied; drift-audit's `derive_low_waters`
 (`tools/drift-audit/drift_report.py:781-818`) and its `SHRINK_ONLY` table
 (`tools/drift-audit/drift_signals.py:129-137`), read by path rather than copied; the waiver-list row
 format of `memory/project/spec-token-waivers.txt`. `reuse_lookup.py "check every user-facing surface

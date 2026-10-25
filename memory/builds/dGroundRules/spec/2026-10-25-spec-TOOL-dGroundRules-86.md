@@ -10,6 +10,8 @@
 |---|---|---|
 | [2026-10-25-prompt-TOOL-dGroundRules-86-1-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-1-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dGroundRules-86-2-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-2-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dGroundRules-86-3-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-3-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dGroundRules-86-merge-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-merge-brief.md) | research | — |
 | [2026-10-25-prompt-TOOL-dGroundRules-86-rev2-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-rev2-brief.md) | research | — |
 | [2026-10-25-prompt-TOOL-dGroundRules-86-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dGroundRules-86-spec-brief.md) | research | — |
 
