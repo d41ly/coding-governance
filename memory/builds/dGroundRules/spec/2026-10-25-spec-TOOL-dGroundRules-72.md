@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-72 — the pre-commit policy guard reads the index git hands the hook, so `git commit -a` and `git commit <path>` are graded
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** CLOSED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 

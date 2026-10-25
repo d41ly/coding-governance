@@ -467,3 +467,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T05:54:13Z rescope · item add TOOL-dGroundRules-78 · reason closing review round 1 (memory/builds/dGroundRules/reviews/2026-10-25-review-TOOL-dGroundRules-1-71-closing-diff-round1.md), M4, L1, L2, L3: the policy fixtures leg's budget and ceiling are stale about tenfold, agent-cap.js's header contradicts rule 7, policy-mirror.js's bash resolver walks every PATH bash, and the waiver and help page still say the kit lands dark
 
 2026-10-25T06:47:52Z rescope · item add TOOL-dGroundRules-79 · reason close finding: python tools/govkit/govkit.py selfcheck exits 1 at fce5603f8, so the govkit selftest fails 70 arms: the policy fixtures guard pathspecs AGENTS.md and help/policy.md fall into 0 declared classes, and tools/policy/README.md, adopt-policy.sh, check_policy.py and kit.toml say update re-renders without naming GOVKIT_RERENDER in the same sentence
+
+2026-10-25T07:21:09Z dispatch · item d2c23486 TOOL-dGroundRules-72 · reason .githooks/pre-commit,.githooks/pre-commit.test.sh,memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-72.md,memory/builds/dGroundRules/README.md,memory/LIVE.md
+
+2026-10-25T07:21:15Z brief · item TOOL-dGroundRules-72 · reason 61f269aa9471 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-72-spec-brief.md
+
+2026-10-25T07:28:08Z dispatch · item d2c23486 TOOL-dGroundRules-72 · reason .githooks/pre-commit .githooks/pre-commit.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-72.md memory/builds/dGroundRules/README.md memory/LIVE.md

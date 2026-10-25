@@ -3,6 +3,13 @@
 # Runs only the cheap staged-scoped gates so a scripts-less checkout stays green.
 set -u
 
+# The index git handed this hook, saved before the unset below (TOOL-dGroundRules-72). Under
+# `git commit -a` or `git commit <path>` it is a temporary index, and a staged read of the real one
+# sees nothing staged. Relative, it is relative to the work tree top, where git starts a hook.
+hook_index=${GIT_INDEX_FILE:-}
+case $hook_index in ""|/*|[A-Za-z]:*) ;; *) hook_index=$PWD/$hook_index ;; esac
+with_hook_index() { if [ -n "$hook_index" ]; then GIT_INDEX_FILE=$hook_index "$@"; else "$@"; fi; }
+
 # S2/S5 (TOOL-dScrubbedConduit-1), same two fixes as .githooks/pre-push and for the same reasons.
 # GIT_EXEC_PATH is deliberately kept.
 unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY GIT_ALTERNATE_OBJECT_DIRECTORIES       GIT_COMMON_DIR GIT_NAMESPACE GIT_PREFIX
@@ -192,7 +199,7 @@ if g=$(resolve_kit_gate policy guard.py); then
   pg_list=$(git show "HEAD:${g%guard.py}guarded-paths.txt" 2>/dev/null | tr -d '\r' |
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
   pg_hit=""
-  [ -z "$pg_list" ] || pg_hit=$(git diff --cached --name-only --no-renames | grep -xF -- "$pg_list" || true)
+  [ -z "$pg_list" ] || pg_hit=$(with_hook_index git diff --cached --name-only --no-renames | grep -xF -- "$pg_list" || true)
   if [ -n "$pg_hit" ]; then
     pg_names=$(printf '%s\n' "$pg_hit" | tr '\n' ' ')
     pg_r=$(git ls-files -- '*resolve-python.sh' | head -n 1)
@@ -201,14 +208,14 @@ if g=$(resolve_kit_gate policy guard.py); then
     elif [ -z "$pg_r" ] || ! . "./$pg_r" || ! py=$(resolve_python); then
       echo "pre-commit: policy guard REFUSING — ${pg_names}staged and no python launcher to judge them."
       rc=1
-    elif ! "$py" "$g" --staged; then
+    elif ! with_hook_index "$py" "$g" --staged; then
       rc=1
     fi
   fi
 else
   pg_list=$(git show "HEAD:${kitroot_declared:+$kitroot_declared/}policy/guarded-paths.txt" 2>/dev/null | tr -d '\r' |
             sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//' | grep -vE '^(#|$)' || true)
-  if [ -n "$pg_list" ] && git diff --cached --name-only --no-renames | grep -qxF -- "$pg_list"; then
+  if [ -n "$pg_list" ] && with_hook_index git diff --cached --name-only --no-renames | grep -qxF -- "$pg_list"; then
     print_kit_miss "policy guard" policy guard.py
     echo "pre-commit: policy guard REFUSING — a guarded path is staged and no guard.py resolves to judge it."
     rc=1

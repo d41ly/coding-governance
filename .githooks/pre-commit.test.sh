@@ -221,12 +221,30 @@ echo x > other.txt; git add other.txt
 out=$(git commit -q -m other 2>&1); rc=$?
 case "$out" in *"GUARD RAN"*|*"policy guard"*|*"policy-guard"*) r=1 ;; *) r=$rc ;; esac
 ck "AC9 a commit staging no listed path runs no guard and prints no policy guard line" "$r" 0
+# TOOL-dGroundRules-72: a listed path committed by `git commit -a` or `git commit -- <path>`, never
+# added. Git hands the hook a temporary index and the real one stages nothing, so the block and the
+# guard must both read the handed one. This stand-in refuses only when ITS OWN staged read names the
+# listed path, so an arm reds when either read misses it. Each arm resets the real index first.
+printf 'import subprocess, sys\nseen = subprocess.run(["git", "diff", "--cached", "--name-only"], capture_output=True, text=True).stdout.split()\nprint("GUARD SAW", *seen)\nsys.exit(1 if "%s" in seen else 0)\n' "$pl" > "$pk/guard.py"
+git reset -q; echo 5 > "$pl"
+out=$(git commit -qam g5 2>&1); rc=$?
+case "$out" in *"GUARD SAW"*"$pl"*) r=$rc ;; *) r=0 ;; esac
+ck "S1 a listed path committed by git commit -a, never added: refused by a guard that saw it" "$r" 1
+git reset -q; echo 6 > "$pl"
+out=$(git commit -qm g6 -- "$pl" 2>&1); rc=$?
+case "$out" in *"GUARD SAW"*"$pl"*) r=$rc ;; *) r=0 ;; esac
+ck "S1 a listed path committed by git commit -- <path>, never added: refused by a guard that saw it" "$r" 1
 # TOOL-dGroundRules-21 S21: guard.py removed from the working tree while its list stays at HEAD, and a
 # listed path staged. No rung resolves the guard, so the block's `else` refuses, naming the rungs.
 rm -f "$pk/guard.py"; echo 4 > "$pl"; git add "$pl"
 out=$(git commit -q -m g4 2>&1); rc=$?
 case "$out" in *"policy guard"*) r=$rc ;; *) r=0 ;; esac
 ck "S21 guard.py removed with its list at HEAD and a listed path staged: refused naming the policy guard" "$r" 1
+# TOOL-dGroundRules-72: the same guard-less refusal for a listed path committed by path, never added.
+git reset -q; echo 7 > "$pl"
+out=$(git commit -qm g7 -- "$pl" 2>&1); rc=$?
+case "$out" in *"no guard.py resolves"*) r=$rc ;; *) r=0 ;; esac
+ck "S1 guard.py removed and a listed path committed by git commit -- <path>, never added: refused" "$r" 1
 cd "$tmp" || exit 2
 
 echo "---- $pass passed, $fail failed ----"
