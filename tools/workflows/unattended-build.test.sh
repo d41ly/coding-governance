@@ -2097,6 +2097,31 @@ has "DGR10 ...naming the answer" "$o" "answered 'abc' for runtime.agents-in-flig
 absent_harness=yes; [ -e "$PN/scripts/$WFK/unattended-build.js" ] && absent_harness=no
 same "DGR10 ...and writes no harness" "$absent_harness" "yes"
 
+# ---- TOOL-dGroundRules-74: THE WRITER-SPLIT FALLBACK, from an adopter's side. A hook that predates
+# ---- `gov:fixed-writers` denies the split, and --render writes the verifier-bounded fallback with one
+# ---- stderr notice; a hook that denies the fallback too exits 2 and writes nothing. Gov's own tree
+# ---- always takes the split, so only a layout reaches this path. No layout carries the policy mirror,
+# ---- so its hook bounds the split at MAX_VERIFIERS and every layout above takes the fallback too, with
+# ---- nothing asserted. The old hook is staged by its marker here, never left to that accident.
+WS="$LAY/old-hook"; build_layout "$WS" scripts/$WFK scripts/$UNK scripts/gotchas.py
+sed -i "s/^const WRITER_MARK = 'gov:fixed-writers'\$/const WRITER_MARK = 'gov:an-older-writer-mark'/" "$WS/scripts/$HOOKS/agent-cap.js"
+same "DGR74 LIVENESS the layout's hook no longer carries the writer marker" "$(grep -c "^const WRITER_MARK = 'gov:an-older-writer-mark'\$" "$WS/scripts/$HOOKS/agent-cap.js")" "1"
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(cat "$LAY/old-hook.err")
+has "DGR74 a hook that predates the writer marker: --render still renders" "$o" "rc=0"
+has "DGR74 ...and stderr carries the hook's own reason" "$e" "does not admit the writer split: BLOCKED by agent-cap:"
+has "DGR74 ...and names the update" "$e" "Update it: govkit update --kits agent-cap"
+h=$(cat "$WS/scripts/$WFK/unattended-build.js" 2>/dev/null)
+has "DGR74 ...and the harness bounds its pool at the verify total" "$h" "async function boundedParallel(thunks, cap = 5)"
+has "DGR74 ...and its spec writers too" "$h" "const SPEC_WRITERS = 5"
+has "DGR74 ...and judges the split under the verifiers marker" "$h" "Math.ceil(slices.length / SPEC_WRITERS)) // gov:fixed-verifiers"
+cp "$WS/scripts/$WFK/unattended-build.js" "$LAY/old-hook.js" 2>/dev/null
+printf '%s\n' "process.stdin.resume(); process.stdin.on('end', () => { console.error('a stub hook that denies every script'); process.exit(2) })" > "$WS/scripts/$HOOKS/agent-cap.js"
+o=$( (cd "$WS" && bash scripts/$WFK/check-protocol-parity.test.sh --render 2>"$LAY/old-hook.err"; echo "rc=$?") ); e=$(cat "$LAY/old-hook.err")
+has "DGR74 a hook that denies the fallback too: --render refuses" "$o" "rc=2"
+has "DGR74 ...naming the fallback" "$o" "denies unattended-build.js's verifier-bounded fallback too, so nothing was rendered or graded"
+has "DGR74 ...after a stderr notice carrying that hook's reason" "$e" "does not admit the writer split: a stub hook that denies every script. Update it"
+same "DGR74 ...and leaves the harness it rendered before unchanged" "$(cmp -s "$LAY/old-hook.js" "$WS/scripts/$WFK/unattended-build.js" && echo same || echo changed)" "same"
+
 # ---- AC3: the NESTED layout, and two ROOT installs, one of each memory-tree shape.
 NE="$LAY/nested"; build_layout "$NE" scripts/$WFK scripts/$UNK scripts/$MTK/gotchas.py
 run_layout "$NE" scripts/$WFK --render >/dev/null
@@ -3078,7 +3103,11 @@ has    "OC27 AC15 audit OFF: ...and the hand-out leads with it" "$(printf '%s\n'
 # RAISED 691 -> 693 by TOOL-dTrueNorth-13: its 2 static sites, counted by hand off the TN13 lines — the
 # demanded Reviewed: line and the absent unprefixed one (2). Each runs once. Not measured by a run: the
 # pass that wrote it runs no suite.
-FLOOR_ASSERTIONS=693
+# RAISED 693 -> 704 by TOOL-dGroundRules-74: its 11 static sites, counted by hand off the DGR74 block —
+# the liveness arm (1), the old hook's exit, two stderr lines and three harness spans (6), and the
+# denying hook's exit, two lines and the unchanged harness (4). Each runs once. Not measured by a run:
+# the pass that wrote it runs no suite.
+FLOOR_ASSERTIONS=704
 [ "$n" -ge "$FLOOR_ASSERTIONS" ] || { echo "FAIL executed $n assertions against a floor of $FLOOR_ASSERTIONS — arms are UNREACHABLE rather than absent"; st=1; }
 # NOTHING RUNS AFTER THE TERMINAL EXIT (TOOL-dUnstalledConvoy-19): the floor cannot see an arm
 # appended past `exit $st`, and neither can check-arms.py or the summary line. One grep can. The

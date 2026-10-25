@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-74 — the writer-split fallback arm the closed specs TOOL-dGroundRules-25, -30 and -34 claim
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
+**Status:** CLOSED · rev-2 · 2026-10-25 · node d · Tier-1 · base fce5603f · streams tooling · order 26
 
 **Derived:** PLAY-dClosedLoop-2
 

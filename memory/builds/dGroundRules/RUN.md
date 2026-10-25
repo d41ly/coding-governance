@@ -473,3 +473,9 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T07:21:15Z brief · item TOOL-dGroundRules-72 · reason 61f269aa9471 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-72-spec-brief.md
 
 2026-10-25T07:28:08Z dispatch · item d2c23486 TOOL-dGroundRules-72 · reason .githooks/pre-commit .githooks/pre-commit.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-72.md memory/builds/dGroundRules/README.md memory/LIVE.md
+
+2026-10-25T07:35:03Z dispatch · item 62b647ce TOOL-dGroundRules-74 · reason tools/workflows/unattended-build.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-74.md memory/builds/dGroundRules/README.md memory/LIVE.md
+
+2026-10-25T07:35:04Z brief · item TOOL-dGroundRules-74 · reason 26e597d4267a memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-74-spec-brief.md
+
+2026-10-25T07:40:01Z dispatch · item 62b647ce TOOL-dGroundRules-74 · reason tools/workflows/unattended-build.test.sh memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-74.md memory/builds/dGroundRules/README.md memory/LIVE.md
