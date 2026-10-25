@@ -56,3 +56,23 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T00:28:30Z rescope · item add TOOL-dPlacedRequest-34 · reason closes spec-audit round 1 (2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) findings at MEDIUM ids 2 3 4 5 7 8 9 10 11 13 14 15 16 23 24 25 26 27 28 32 33 34 35 36 37 38 39 44 45 46 47 48 49 50 57 58 59 60 61 62 63 65 66 67 68 69 70 71 72 73 and at LOW ids 12 17 18 19 29 30 31 40 41
 
 2026-10-25T00:57:42Z review · item dPlacedRequest-spec-set-r1 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 11 · minors 59 · disposition promote
+
+2026-10-25T01:58:27Z rescope · item add TOOL-dPlacedRequest-35 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 1 at HIGH, item H2
+
+2026-10-25T01:58:34Z rescope · item add TOOL-dPlacedRequest-36 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 2 at HIGH, item H1 shared with ids 13 24 32
+
+2026-10-25T01:58:36Z rescope · item add TOOL-dPlacedRequest-37 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 13 at HIGH, item H1 shared with ids 2 24 32
+
+2026-10-25T01:58:38Z rescope · item add TOOL-dPlacedRequest-38 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 24 at HIGH, item H1 shared with ids 2 13 32
+
+2026-10-25T01:58:39Z rescope · item add TOOL-dPlacedRequest-39 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 32 at HIGH, item H1 shared with ids 2 13 24
+
+2026-10-25T01:58:41Z rescope · item add TOOL-dPlacedRequest-40 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 26 at HIGH, item H3
+
+2026-10-25T01:58:43Z rescope · item add TOOL-dPlacedRequest-41 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 33 at HIGH, item H4
+
+2026-10-25T01:58:44Z rescope · item add TOOL-dPlacedRequest-42 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md finding id 36 at HIGH, item H5
+
+2026-10-25T01:58:46Z rescope · item add TOOL-dPlacedRequest-43 · reason closes spec-audit 2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md findings at MEDIUM ids 3 4 5 6 7 8 15 16 17 18 19 22 23 25 27 28 29 30 34 35 37 38 39 41 and at LOW ids 9 10 11 12 20 21 31 40 42 43
+
+2026-10-25T02:22:02Z review · item dPlacedRequest-spec-set-r2 · reason verdict CLEAN · blockers 0 · CONVERGED · highs 8 · minors 34 · disposition promote

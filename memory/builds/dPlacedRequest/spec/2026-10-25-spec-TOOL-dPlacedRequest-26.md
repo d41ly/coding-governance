@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-26 — the renewing-beat walk stops at the current holder's tenure
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-26-deviation-261.md](../build/2026-10-25-build-TOOL-dPlacedRequest-26-deviation-261.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -61,6 +62,8 @@ aged from its first commit.
 - **consumes-from** `TOOL-dPlacedRequest-17` — the age pass's walk and verdict `awk` in `read_claims`, which this unit bounds to the tenure; without it there is no renewing-beat walk to bound
 - **consumes-from** `TOOL-dPlacedRequest-1` — the `epoch` and `renews` keys of the lease record, which mark the tenure and its renewals; without them a tenure cannot be told from the chain
 - **hands-off** `TOOL-dPlacedRequest-34` — the tenure-bounded walk, which that unit's item for finding 60 bounds in cost
+- **hands-off** `TOOL-dPlacedRequest-35` — the tenure stop, which that unit tests before any age once the walk is bounded
+- **hands-off** `TOOL-dPlacedRequest-43` — the walk's tip, which that unit's item for finding 38 observes as a one-commit tenure
 
 ## 4. Design
 
@@ -157,6 +160,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the te
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's finding 1 (HIGH, item H1,
   shared with finding 20).
+- rev-2 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
+  hands-off TOOL-dPlacedRequest-35, hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

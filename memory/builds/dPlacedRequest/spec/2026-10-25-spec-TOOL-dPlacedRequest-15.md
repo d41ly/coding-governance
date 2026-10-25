@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-15 — the fenced effect push: the lander's push carries the holder's lease beat atomically
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 9 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 9 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0133@231564d8 whole
 
@@ -87,6 +87,9 @@ headless P2(b) and P2(c′)).
 - **consumes-from** `TOOL-dPlacedRequest-13` — the change feed `gov-feed.log`, the `gov_feed_sh` block and `add_feed_event`, which the landed beat joins; without it the lander would be a `refs/gov/*` writer the feed's census reds
 - **hands-off** `TOOL-dPlacedRequest-29` — the fence act, the fenced push and its failure table, which that unit gives a same-holder `refenced` class
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **consumes-from** `TOOL-dPlacedRequest-36` — the rule that a carrier of `gov_feed_sh` carries `health_log_sh` beside it, which `tools/push-main.sh` follows when this unit inlines the block
+- **consumes-from** `TOOL-dPlacedRequest-37` — `NODE_LOCK_BOUND`, the block's own lock deadline, which the lander's copy carries so it takes the lock under `set -u` with no driver name
+- **hands-off** `TOOL-dPlacedRequest-40` — `--lease fence`, which that unit exempts from the id-less refusal so the `fence — none` path keeps exit 0
 
 ## 4. Design
 
@@ -289,6 +292,9 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the `fence` act ov
   `git ls-remote`; §7's leg line gains `recall floor` and `recall floor arms`.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-29,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
+  consumes-from TOOL-dPlacedRequest-36, consumes-from TOOL-dPlacedRequest-37, hands-off
+  TOOL-dPlacedRequest-40.
 
 ## 10. Reuse audit
 

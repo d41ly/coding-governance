@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-32 — an absent session is no identity: no consent, and no lease held on session alone
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-32-deviation-321.md](../build/2026-10-25-build-TOOL-dPlacedRequest-32-deviation-321.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -59,6 +60,8 @@ repairs `TOOL-dPlacedRequest-19` and `TOOL-dPlacedRequest-1`, and is ordered aft
 
 - **consumes-from** `TOOL-dPlacedRequest-19` — `--request`, its `.typed` file and `check_request_consent`, which this unit closes to an absent session; without them there is no consent to guard
 - **consumes-from** `TOOL-dPlacedRequest-1` — the `lease` mode's `mine` test and the `--lease` verbs, which this unit keeps from matching on an absent session; without them there is no lease identity to guard
+- **hands-off** `TOOL-dPlacedRequest-40` — S4's id-less refusal, which that unit scopes to the holder acts by name
+- **hands-off** `TOOL-dPlacedRequest-43` — the identity rule and the refusal's order, which that unit's items for findings 16, 40 and 41 restate against the code and place after `RUN_CLAIMS`
 
 ## 4. Design
 
@@ -147,6 +150,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's finding 55 (HIGH, item H8).
 - rev-2 · 2026-10-25 · promoted fix brief: AC1 writes the node-local `.typed` file with its
   `<git-common-dir>/` prefix, so it does not read as a repository path.
+- rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
+  hands-off TOOL-dPlacedRequest-40, hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-31 — consent is bound to the bytes a session typed
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-31-deviation-311.md](../build/2026-10-25-build-TOOL-dPlacedRequest-31-deviation-311.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -50,6 +51,7 @@ the bytes that session submitted, and consent holds only while the stored copy i
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-19` — `check_request_consent`, `--request` and `requests/<key>.typed`, whose line and predicate this unit binds to the words; without them there is no consent to bind
+- **hands-off** `TOOL-dPlacedRequest-43` — the `.typed` blob and `check_request_consent`, which that unit's items for findings 9, 15, 29 and 42 hash with `--no-filters` and observe
 
 ## 4. Design
 
@@ -131,6 +133,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 · a replaced
   shared with finding 54).
 - rev-2 · 2026-10-25 · promoted fix brief: AC1 to AC3 write the node-local request files with their
   `<git-common-dir>/` prefix, so they do not read as repository paths.
+- rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

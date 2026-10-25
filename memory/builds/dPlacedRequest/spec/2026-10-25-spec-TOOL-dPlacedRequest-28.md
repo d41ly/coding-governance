@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-28 — every create of a lease ref reads the feed first, the offer's included
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 7 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 7 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-28-deviation-281.md](../build/2026-10-25-build-TOOL-dPlacedRequest-28-deviation-281.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +64,8 @@ path included.
 - **consumes-from** `TOOL-dPlacedRequest-20` — `write_lease_offer` and its absent-lease branch, which this unit routes through the feed; without it there is no offer create to guard
 - **consumes-from** `TOOL-dPlacedRequest-16` — S5's feed read of an absent ref and the `tombstone` cause, which this unit extracts into `read_feed_lease_tip`; without it there is no epoch-for-life rule to apply
 - **hands-off** `TOOL-dPlacedRequest-34` — `read_feed_lease_tip`, which that unit's items for findings 3, 11 and 61 extend and observe
+- **hands-off** `TOOL-dPlacedRequest-42` — `read_feed_lease_tip`, which that unit calls from the offline branch's empty-tip create
+- **hands-off** `TOOL-dPlacedRequest-43` — S4's class, which that unit's items for findings 4 and 19 observe by behaviour over every online create
 
 ## 4. Design
 
@@ -156,6 +159,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 · the of
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's finding 53 (HIGH, item H7).
+- rev-2 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
+  hands-off TOOL-dPlacedRequest-42, hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

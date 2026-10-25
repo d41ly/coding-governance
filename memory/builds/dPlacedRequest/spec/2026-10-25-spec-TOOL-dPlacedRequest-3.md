@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-3 — the entry step's five items: the card's orientation, the three placing items and the claim
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 21 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0122@938c9643 whole
 
@@ -98,6 +98,7 @@ orders a session to re-derive the git state its card already printed, a median 6
 - **consumes-from** external — TOOL-dDeclaredLoop-12's `[[item]]` row shape and `check_program`, -9's actor grammar, -16's `dispositions` reference, -13's build table and `[[stand-in]]` list, -24's kind gate, -33's termination check, and dGroundRules-2's `policy.py get`
 - **hands-off** external — dWellOiledMachine adds `item.entry.intake` and makes it `entry.orient`'s need; dRankedPlan lands `kickoff.runs` and arms S5's stand-in with its value
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-43` — `item.entry.claim`'s `refused` outcome, which that unit's item for finding 6 holds to `awaiting` under `follow-leases`
 
 ## 4. Design
 
@@ -342,6 +343,8 @@ transition tables and termination legs that TOOL-dDeclaredLoop-1, -24, -13 and -
   `[rules]`, the orientation record's OR-2 and the parents' specs at base `c63aabbb`.
 - rev-2 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

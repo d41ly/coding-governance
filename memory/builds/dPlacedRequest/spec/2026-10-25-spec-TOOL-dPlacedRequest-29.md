@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-29 — the lander's fence survives its own holder's write: a same-holder move re-fences and retries
 
-**Status:** OPEN · rev-1 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-29-deviation-291.md](../build/2026-10-25-build-TOOL-dPlacedRequest-29-deviation-291.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -63,6 +64,7 @@ retried, and only a risen epoch or a changed holder is `fenced`.
 
 - **consumes-from** `TOOL-dPlacedRequest-15` — the fence act, the fenced push and its failure table, which this unit gives a same-holder class; without them there is no fence to retry
 - **consumes-from** `TOOL-dPlacedRequest-1` — the lease record's `epoch`, `fleet-tag` and `session` and the `lease` mode, which decide a same-holder move; without them a move cannot be attributed
+- **hands-off** `TOOL-dPlacedRequest-43` — the re-fence's unanswered read, which that unit's item for finding 35 keeps `offline` and maps to `unreachable`
 
 ## 4. Design
 
@@ -161,6 +163,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC3 · the `--after` read
 ## 9. Revision log
 
 - rev-1 · 2026-10-25 · initial draft, promoted from the round-1 spec audit's finding 51 (HIGH, item H5).
+- rev-2 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

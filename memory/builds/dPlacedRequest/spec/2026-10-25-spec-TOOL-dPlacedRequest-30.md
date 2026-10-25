@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-30 — a request whose words key alike but differ is refused, never merged
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 11 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-30-deviation-301.md](../build/2026-10-25-build-TOOL-dPlacedRequest-30-deviation-301.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -54,6 +55,7 @@ with exit 2 and a collision line, and nothing of it is written.
 ### Edges
 
 - **consumes-from** `TOOL-dPlacedRequest-19` — `--request`, its key and its store `<git-common-dir>/requests/`, whose first-copy rule this unit replaces with a refusal; without them there is no request to refuse
+- **hands-off** `TOOL-dPlacedRequest-43` — the collision compare, which that unit's item for finding 39 holds under `write_node_lock` on `requests.lock`
 
 ## 4. Design
 
@@ -133,6 +135,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 · a date-differi
   shared with finding 22).
 - rev-2 · 2026-10-25 · promoted fix brief: AC1 writes the node-local request files with their
   `<git-common-dir>/` prefix, so they do not read as repository paths.
+- rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-1 — one lease grammar for builds, units and cadence runs, with an epoch, run claims migrated onto it, and its verbs and four policy keys
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 3 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0120@5d655f07 whole
 **Carries:** node:record-kind.lease
@@ -25,6 +25,7 @@
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-4-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-5-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-5-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-6-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-6-spec-writer.md) | journal | — |
+| [2026-10-25-prompt-TOOL-dPlacedRequest-1-7-spec-writer.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-7-spec-writer.md) | journal | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-fix-brief.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-spec-brief.md) | research | TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-21 |
 | [2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-1-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 |
@@ -149,6 +150,10 @@ announced (`:2141-2149`).
 - **hands-off** `TOOL-dPlacedRequest-29` — the record's `epoch`, `fleet-tag` and `session` and the `lease` mode, which decide that unit's same-holder re-fence
 - **hands-off** `TOOL-dPlacedRequest-32` — the `lease` mode's `mine` test and the `--lease` verbs, which that unit closes to an absent session
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-40` — `--lease flush`, which that unit exempts from the id-less refusal so a sessionless flush drains the queue
+- **hands-off** `TOOL-dPlacedRequest-41` — the offline branch and `acquire` renewing on `mine`, which that unit rebases on the newest queued commit and dedupes by record
+- **hands-off** `TOOL-dPlacedRequest-42` — the offline branch's empty-tip create, which that unit routes through `read_feed_lease_tip`
+- **hands-off** `TOOL-dPlacedRequest-43` — the queue line's tip field and `resolve_fleet_tag`, which that unit's items for findings 7, 25 and 23 encode and hold to the other node-tag resolvers
 
 ## 4. Design
 
@@ -418,6 +423,9 @@ New arm: tools/playbook/render_playbook.py · covers AC8 · the `--fleet-tag` fl
   hands-off TOOL-dPlacedRequest-24, hands-off TOOL-dPlacedRequest-25, hands-off
   TOOL-dPlacedRequest-26, hands-off TOOL-dPlacedRequest-29, hands-off TOOL-dPlacedRequest-32,
   hands-off TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
+  hands-off TOOL-dPlacedRequest-40, hands-off TOOL-dPlacedRequest-41, hands-off
+  TOOL-dPlacedRequest-42, hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

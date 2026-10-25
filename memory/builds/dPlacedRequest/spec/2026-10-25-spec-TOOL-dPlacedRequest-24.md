@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-24 — the offline queue under one guarded node lock, appended once and flushed honestly
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 4 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-24-deviation-241.md](../build/2026-10-25-build-TOOL-dPlacedRequest-24-deviation-241.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -81,6 +82,12 @@ deleted claim-push lock had (charter rule `[reuse]`).
 - **consumes-from** `TOOL-dPlacedRequest-1` — `add_gov_queue`, `write_gov_queue` and `gov-queue.log`, which this unit puts under the lock and makes idempotent; without them there is no queue to guard
 - **consumes-from** `TOOL-dPlacedRequest-13` — the `gov_feed_sh` block and `add_feed_event`'s `gov-feed.lock`, which the factory joins and replaces; without the block the factory has no shared home
 - **hands-off** `TOOL-dPlacedRequest-34` — `write_node_lock` and the queue line, which that unit's items for findings 36 and 57 observe and extend
+- **hands-off** `TOOL-dPlacedRequest-36` — `write_node_lock`'s two health events, which that unit writes through the lock's common dir and `health_log_sh`
+- **hands-off** `TOOL-dPlacedRequest-37` — the `until` deadline, which that unit takes from `NODE_LOCK_BOUND`, never `REMOTE_BOUND`
+- **hands-off** `TOOL-dPlacedRequest-38` — the `gov_feed_sh` lock functions, which that unit's parity-leg arm runs per inline copy under `set -u`
+- **hands-off** `TOOL-dPlacedRequest-39` — `remove_node_lock`, which that unit's contained append calls from its `EXIT` trap
+- **hands-off** `TOOL-dPlacedRequest-41` — `add_gov_queue`'s dedupe and `write_gov_queue`'s order, which that unit narrows to a record compare and chains per ref
+- **hands-off** `TOOL-dPlacedRequest-43` — the flush's confirming read, `gov-feed.lock`'s spelling in `gov-feed.sh` and the lock factory, which that unit's items for findings 34, 12 and 39 amend and reuse
 
 ## 4. Design
 
@@ -207,6 +214,10 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 · th
 - rev-2 · 2026-10-25 · promoted fix brief: S1 gains its **Readers:** clause for the three renamed lock
   functions and two events; AC6 cites `gov-feed.sh` by basename, the file `TOOL-dPlacedRequest-13`
   creates.
+- rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirrors
+  hands-off TOOL-dPlacedRequest-36, hands-off TOOL-dPlacedRequest-37, hands-off
+  TOOL-dPlacedRequest-38, hands-off TOOL-dPlacedRequest-39, hands-off TOOL-dPlacedRequest-41,
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

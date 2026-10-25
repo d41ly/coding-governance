@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-16 — a lease never deleted: a release is a hand-over or a terminal tombstone, the epoch rises for life, and only a run's tombstone is ever pruned
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 5 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0134@bacb3ef7 whole
 
@@ -94,6 +94,7 @@ and nothing queues a claim or prunes one.
 - **consumes-from** `TOOL-dPlacedRequest-25` — `derive_lease_renews`, through which the take of a `released` lease and the draw set `renews`, so each opens its tenure renewed
 - **hands-off** `TOOL-dPlacedRequest-28` — S5's feed read of an absent ref, which that unit moves into `read_feed_lease_tip` for every create
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-40` — `--lease prune`, which that unit exempts from the id-less refusal so a headless supervisor prunes
 
 ## 4. Design
 
@@ -270,6 +271,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 A
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: consumes-from TOOL-dPlacedRequest-25,
   hands-off TOOL-dPlacedRequest-28, hands-off TOOL-dPlacedRequest-34, each the mirror of that
   promoted unit's own edge.
+- rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-40.
 
 ## 10. Reuse audit
 

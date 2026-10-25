@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-33 — the card's remote ref is written by the driver, dark behind `RUN_CLAIMS`
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 13 · advances TOOL-dPlacedRequest-22
 
 **Derived:** PLAY-dClosedLoop-2
 
@@ -11,6 +11,7 @@
 | [2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md](../build/2026-10-25-build-TOOL-dPlacedRequest-23-promoted-fix-return.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-34 |
 | [2026-10-25-build-TOOL-dPlacedRequest-33-deviation-331.md](../build/2026-10-25-build-TOOL-dPlacedRequest-33-deviation-331.md) | deviation | — |
 | [2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md](../prompts/2026-10-25-prompt-TOOL-dPlacedRequest-23-promoted-fix-brief.md) | research | TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-34 |
+| [2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md](../reviews/2026-10-25-review-TOOL-dPlacedRequest-23-spec-audit.md) | spec-audit | TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-34 |
 
 <!-- /gen:spec-records -->
 
@@ -76,6 +77,7 @@ and the writer each live once.
 - **consumes-from** `TOOL-dPlacedRequest-2` — the `remote-ref` store, its publish at READY and follow at a transition, and the card ref's commit message, which this unit routes through the driver; without them there is no card write to move
 - **consumes-from** `TOOL-dPlacedRequest-11` — `write_gov_ref` and `build_gov_commit` in the driver, through which the verb writes; without them the driver has no compare-and-swap writer to call
 - **hands-off** `TOOL-dPlacedRequest-34` — the `--card-ref` verb family, which that unit's items for findings 18, 32, 33, 34 and 66 extend with the lookup and observe
+- **hands-off** `TOOL-dPlacedRequest-43` — `--card-ref write`'s engine call, its bound and its kill line, which that unit's items for findings 5, 17, 43 and 22 bound, word and route through `run_driver_bounded`
 
 ## 4. Design
 
@@ -197,6 +199,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC5 · the verb under the
 - rev-2 · 2026-10-25 · promoted fix brief: S3's by-name half reads READER NOT IN TREE, since both
   block stems are minted in this build; §6 cites `card-store.fixture.sh`, which
   `TOOL-dPlacedRequest-2` creates, by basename.
+- rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

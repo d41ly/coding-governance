@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-13 — the change feed: every governance ref write appended once on its node, replayable and rebuilt equal from git
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 2 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0131@3532cbe6 whole
 
@@ -86,6 +86,7 @@ hooks `TOOL-dPlacedRequest-11`'s one writer, so every later writer joins it by c
 - **hands-off** `TOOL-dPlacedRequest-24` — the `gov_feed_sh` block and `add_feed_event`'s `gov-feed.lock`, which that unit's guarded node lock factory joins and replaces
 - **hands-off** `TOOL-dPlacedRequest-27` — `add_feed_event`'s append-once test, `add_feed_sightings` and `check_feed`, which that unit narrows to the ref's newest event
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-39` — `add_feed_event`, whose lock and append that unit runs in a subshell so an abort never ends its carrier
 
 ## 4. Design
 
@@ -285,6 +286,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 AC2 AC3 AC4 AC5 AC6 �
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-24,
   hands-off TOOL-dPlacedRequest-27, hands-off TOOL-dPlacedRequest-34, each the mirror of that
   promoted unit's own edge.
+- rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-39.
 
 ## 10. Reuse audit
 

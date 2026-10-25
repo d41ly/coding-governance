@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-19 — the project-level request record: pushed by its content key, its text kept where it was typed
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 10 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0137@39b3ef9d whole
 
@@ -92,6 +92,7 @@ P40; the owner's CL-4 and FR-1).
 - **hands-off** `TOOL-dPlacedRequest-31` — `check_request_consent` and the `.typed` line, which that unit binds to the bytes a session typed
 - **hands-off** `TOOL-dPlacedRequest-32` — `--request` and `check_request_consent`, which that unit closes to an absent session
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-43` — the `.typed` file's table row, which that unit's item for finding 29 reads in the two-field grammar of `TOOL-dPlacedRequest-31`
 
 ## 4. Design
 
@@ -261,6 +262,8 @@ New arm: tools/loop/selftest.py · covers AC1 · the normalised pair keyed alike
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-30,
   hands-off TOOL-dPlacedRequest-31, hands-off TOOL-dPlacedRequest-32, hands-off
   TOOL-dPlacedRequest-34, each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-5 — the `breakpoint` disposition: an owner's request for a review on a live build, fired through `review.trigger`
 
-**Status:** OPEN · rev-2 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 19 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0503@65f19d46 whole
 
@@ -94,6 +94,7 @@ the trigger's witness (the whole-design audit's A1-F5, settled by the owner's FK
 - **consumes-from** `TOOL-dPlacedRequest-4` — `disposition`, the placement record and the fact table whose `breakpoint` row calls `check_breakpoint`
 - **consumes-from** `TOOL-dPlacedRequest-19` — `check_request_consent`, the predicate that refuses a relayed request, and the request record the witness names by its content key
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-43` — the `relayed` plant's `.typed` line, which that unit's item for finding 29 writes as `<session>` TAB the stored copy's blob
 
 ## 4. Design
 
@@ -256,6 +257,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC1 · the preflight case
   and TOOL-dDeclaredLoop-16, -19 and -20, read at base `c63aabbb`.
 - rev-2 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-3 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 

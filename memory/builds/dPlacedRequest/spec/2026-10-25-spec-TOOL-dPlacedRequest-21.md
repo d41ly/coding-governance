@@ -1,6 +1,6 @@
 # TOOL-dPlacedRequest-21 — `entry.claim`: the claim ref, a patch or repeat build's derived plan record, `patch.ratify`, and every refusal routed by its cause
 
-**Status:** OPEN · rev-3 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 20 · advances TOOL-dPlacedRequest-22
+**Status:** OPEN · rev-4 · 2026-10-25 · node a · Tier-2 · base c63aabbb · streams tooling · order 20 · advances TOOL-dPlacedRequest-22
 
 **Carries:** cl-dClosedLoop-0501@e1101a14 whole
 **Carries:** node:policy-key.patch.ratify
@@ -118,6 +118,7 @@ plan record or a ratification (scout B's row for this unit).
 - **consumes-from** `TOOL-dPlacedRequest-14` — `--request-draw`, the draw before each fresh slug
 - **hands-off** `TOOL-dPlacedRequest-3` — `refs/gov/claims/<slug>`, the claim ref `entry.claim`'s item row names as its witness
 - **hands-off** `TOOL-dPlacedRequest-34` — the round-1 spec audit's minors this unit's code carries, which that unit amends in place as its §2 names
+- **hands-off** `TOOL-dPlacedRequest-43` — `--entry-claim`'s read of `leases.offline`, which that unit's item for finding 8 names in the stops guide's population
 
 ## 4. Design
 
@@ -294,6 +295,8 @@ New arm: tools/unattended/unattended.test.sh · covers AC2 AC4 · the `--entry-c
   `tools/memory-tree/gen_build_index.py` and `tools/gate-legs.json` in Files touched trip.
 - rev-3 · 2026-10-25 · §3 · the round-1 spec audit's disposal: hands-off TOOL-dPlacedRequest-34,
   each the mirror of that promoted unit's own edge.
+- rev-4 · 2026-10-25 · §3 · the spec audit of the round-1 promotions' disposal: the edge mirror
+  hands-off TOOL-dPlacedRequest-43.
 
 ## 10. Reuse audit
 
