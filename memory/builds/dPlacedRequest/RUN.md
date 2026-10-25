@@ -9,6 +9,9 @@ session and pid holding the run — the pinned BASE with its anchor evidence, an
 <!-- /run:generated -->
 
 ## Run facts
+asks-at-landing: TOOL-dPlacedRequest-22=DEFERRED
+units-at-landing: TOOL-dPlacedRequest-11 TOOL-dPlacedRequest-13 TOOL-dPlacedRequest-1 TOOL-dPlacedRequest-27 TOOL-dPlacedRequest-17 TOOL-dPlacedRequest-23 TOOL-dPlacedRequest-24 TOOL-dPlacedRequest-25 TOOL-dPlacedRequest-16 TOOL-dPlacedRequest-26 TOOL-dPlacedRequest-36 TOOL-dPlacedRequest-37 TOOL-dPlacedRequest-38 TOOL-dPlacedRequest-39 TOOL-dPlacedRequest-41 TOOL-dPlacedRequest-20 TOOL-dPlacedRequest-18 TOOL-dPlacedRequest-28 TOOL-dPlacedRequest-12 TOOL-dPlacedRequest-42 TOOL-dPlacedRequest-15 TOOL-dPlacedRequest-19 TOOL-dPlacedRequest-29 TOOL-dPlacedRequest-30 TOOL-dPlacedRequest-31 TOOL-dPlacedRequest-32 TOOL-dPlacedRequest-9 TOOL-dPlacedRequest-2 TOOL-dPlacedRequest-40 TOOL-dPlacedRequest-33 TOOL-dPlacedRequest-8 TOOL-dPlacedRequest-6 TOOL-dPlacedRequest-7 TOOL-dPlacedRequest-4 TOOL-dPlacedRequest-10 TOOL-dPlacedRequest-14 TOOL-dPlacedRequest-5 TOOL-dPlacedRequest-21 TOOL-dPlacedRequest-3 TOOL-dPlacedRequest-34 TOOL-dPlacedRequest-35 TOOL-dPlacedRequest-43 TOOL-dPlacedRequest-46 TOOL-dPlacedRequest-47 TOOL-dPlacedRequest-44 TOOL-dPlacedRequest-45 TOOL-dPlacedRequest-48 TOOL-dPlacedRequest-50 TOOL-dPlacedRequest-49 TOOL-dPlacedRequest-51 TOOL-dPlacedRequest-52 TOOL-dPlacedRequest-53 TOOL-dPlacedRequest-54 TOOL-dPlacedRequest-55 TOOL-dPlacedRequest-56 TOOL-dPlacedRequest-57 TOOL-dPlacedRequest-58 TOOL-dPlacedRequest-60 TOOL-dPlacedRequest-59 TOOL-dPlacedRequest-61 TOOL-dPlacedRequest-62 TOOL-dPlacedRequest-63 TOOL-dPlacedRequest-64
+gates-run: unattended-179294186236034214068-3349317 cac8516c
 parked-surfaced: yes
 keepalive-reaped: yes
 hold-run: 
@@ -22,7 +25,7 @@ held-from: REVIEWING
 refreshed-at: 60d60e69404d01caf230f5c448474adee4d21ee8 · park · 0 touching
 gate-backstop: 29400 (wall 21600 + queue 7200 + margin 600)
 witness: 316dcb69d3774b4449864b40cd0007151bdeba12
-phase: VERIFYING
+phase: LANDING
 spec-audit: 2026-10-21
 may: PLAY-dClosedLoop-3
 mode: slug
@@ -275,3 +278,7 @@ base: c63aabbb4a73d44315dd5dd1219ff1dac5055cf8
 2026-10-25T14:16:33Z rescope · item defer TOOL-dPlacedRequest-63 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
 
 2026-10-25T14:16:35Z rescope · item defer TOOL-dPlacedRequest-64 · reason spec run (README rule 1): specced here, the spec audit's chain ending at round 9 by the owner's ruling; the build run after this one builds it, advancing TOOL-dPlacedRequest-22
+
+2026-10-25T15:50:30Z override · item specs-audited · reason the owner's ruling ends the spec-audit chain at the first round confirming no HIGH and no BLOCKER ('stop auditing specs once there are no more highs left', memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md); round 9 confirmed none, so its batch unit TOOL-dPlacedRequest-64 closes with no audit naming it, as M4 provides when a chain ends
+
+2026-10-25T15:50:30Z override · item closing-review-recorded · reason the spec run's closing diff review is not run: this run's whole diff is specs and records, already read by nine spec-audit rounds, and the owner's ruling record names the audit chain as the review of this spec-only diff (memory/builds/dPlacedRequest/prompts/2026-10-25-prompt-TOOL-dPlacedRequest-1-owner-review-until-no-high.md); the build run's closing diff review over its code meets it
