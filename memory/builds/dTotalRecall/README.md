@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27
-status: OPEN
+ids: TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28 TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dWitnessedBar dPlacedRequest
 may: PLAY-dClosedLoop-3
@@ -88,45 +87,97 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 26 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dTotalRecall-1 TOOL-dTotalRecall-2 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14
-ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27
+ids TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-27 TOOL-dTotalRecall-28
+ids TOOL-dTotalRecall-29 TOOL-dTotalRecall-30 TOOL-dTotalRecall-31 TOOL-dTotalRecall-32 TOOL-dTotalRecall-33 TOOL-dTotalRecall-34 TOOL-dTotalRecall-35
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dTotalRecall-1 — the record-kind registry, the memory contract's one declaration of every kind](spec/2026-10-26-spec-TOOL-dTotalRecall-1.md) | 1 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-13 — the shared extraction primitive in `tools/lib`, which the map and the lexicon each call](spec/2026-10-26-spec-TOOL-dTotalRecall-13.md) | 2 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-8 — the core `code` record, derived per blob into the one index and re-timed before it is built](spec/2026-10-26-spec-TOOL-dTotalRecall-8.md) | 3 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-18 — the kind registry completed: every column declared, readers and writers rendered, the pockets witnessed, and `journal` renamed `log`](spec/2026-10-26-spec-TOOL-dTotalRecall-18.md) | 4 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-16 — the registry's `purpose` field, and every existing node's purpose reviewed as `memory.map-purpose` says](spec/2026-10-26-spec-TOOL-dTotalRecall-16.md) | 5 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-25 — the stream-plan kind, registered so the planner that writes it and the pick that reads it descend from one row](spec/2026-10-26-spec-TOOL-dTotalRecall-25.md) | 6 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-5 — the slug and id grammar exported once from `id_grammar.py` and read by every slug and id reader](spec/2026-10-26-spec-TOOL-dTotalRecall-5.md) | 7 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-4 — the build README's declared front-matter schema, its routing region, the work order as each agent's root, and a design-only build's ids as units](spec/2026-10-26-spec-TOOL-dTotalRecall-4.md) | 8 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-6 — typed relations between builds, inverted, checked both ways, free of `depends-on` cycles, and pending across nodes](spec/2026-10-26-spec-TOOL-dTotalRecall-6.md) | 9 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-22 — each edge type's cardinality declared per source and per target, mirrored in the kind registry, and checked over the merged tree after every merge](spec/2026-10-26-spec-TOOL-dTotalRecall-22.md) | 10 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-3 — slug claim refs and ask-family counter refs, each commit carrying its claimant, minted by leased compare-and-swap and never pruned](spec/2026-10-26-spec-TOOL-dTotalRecall-3.md) | 11 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-2 — the one `record` write door, `gov_record.py new <kind>`, grown from the record factory: minting under a claim or lease, idempotent and content-addressed, rendering and refusing](spec/2026-10-26-spec-TOOL-dTotalRecall-2.md) | 12 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-7 — the ask kind's acceptance at filing, under `asks.acceptance`](spec/2026-10-26-spec-TOOL-dTotalRecall-7.md) | 13 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-11 — the shape-run kind, the parsed view of the review-shape line](spec/2026-10-26-spec-TOOL-dTotalRecall-11.md) | 14 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-10 — derived anchors suffixed for a repeated heading](spec/2026-10-26-spec-TOOL-dTotalRecall-10.md) | 15 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-19 — every record names its cause: the door's header and edge lines, the causes and orphan checks over a legacy population](spec/2026-10-26-spec-TOOL-dTotalRecall-19.md) | 16 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-21 — memory-recall's FTS5 tables moved into the one index file, keyed by blob](spec/2026-10-26-spec-TOOL-dTotalRecall-21.md) | 17 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-9 — the memory extractors, `record find` and `record show` over the one index, and the per-item read budget](spec/2026-10-26-spec-TOOL-dTotalRecall-9.md) | 18 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-23 — the memory legs read the one index's rows for unchanged blobs and re-parse only changed ones](spec/2026-10-26-spec-TOOL-dTotalRecall-23.md) | 19 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-24 — every landed commit that touches a record appended to the change feed](spec/2026-10-26-spec-TOOL-dTotalRecall-24.md) | 20 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-20 — this build's own upgrade steps: the journal alias, the scaffold verbs forwarded to record, the front matter graded, and the retag](spec/2026-10-26-spec-TOOL-dTotalRecall-20.md) | 21 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-17 — the map's losing test: the coherence and reuse lenses replayed with the map and without, before any map code is built](spec/2026-10-26-spec-TOOL-dTotalRecall-17.md) | 22 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-14 — the level-0 project map: its renderer and gov map, derived from the one index, held to its budget without losing a node](spec/2026-10-26-spec-TOOL-dTotalRecall-14.md) | 23 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-15 — the map's three-way completeness check and the map leg pack](spec/2026-10-26-spec-TOOL-dTotalRecall-15.md) | 24 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-26 — the atlas under `help/atlas/`: generated Markdown and Mermaid pages from the one index's node table, refused when stale](spec/2026-10-26-spec-TOOL-dTotalRecall-26.md) | 25 | 2 | OPEN | rev-1 | 2026-10-26 |
+| [TOOL-dTotalRecall-12 — the acceptance re-measure: memory bytes per memory-reading agent over every read channel, passing only below 33 KB thirty days after landing](spec/2026-10-26-spec-TOOL-dTotalRecall-12.md) | 26 | 2 | OPEN | rev-1 | 2026-10-26 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 2 record folder(s).
+Records: 21 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dTotalRecall-1 TOOL-dTotalRecall-10 TOOL-dTotalRecall-11 TOOL-dTotalRecall-12 TOOL-dTotalRecall-13 TOOL-dTotalRecall-14 TOOL-dTotalRecall-15 TOOL-dTotalRecall-16 TOOL-dTotalRecall-17 TOOL-dTotalRecall-18 TOOL-dTotalRecall-19 TOOL-dTotalRecall-2
+TOOL-dTotalRecall-20 TOOL-dTotalRecall-21 TOOL-dTotalRecall-22 TOOL-dTotalRecall-23 TOOL-dTotalRecall-24 TOOL-dTotalRecall-25 TOOL-dTotalRecall-26 TOOL-dTotalRecall-3 TOOL-dTotalRecall-4 TOOL-dTotalRecall-5 TOOL-dTotalRecall-6 TOOL-dTotalRecall-7 TOOL-dTotalRecall-8 TOOL-dTotalRecall-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 26 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dTotalRecall's 26 clause(s) and 36 owned node(s), over 26 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 26
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 26 (cl-dClosedLoop-0212, cl-dClosedLoop-0213, cl-dClosedLoop-0214, cl-dClosedLoop-0215, cl-dClosedLoop-0216, cl-dClosedLoop-0217, cl-dClosedLoop-0218, cl-dClosedLoop-0219, cl-dClosedLoop-0220, cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0223, cl-dClosedLoop-0224,
-  cl-dClosedLoop-0225, cl-dClosedLoop-0226, cl-dClosedLoop-0227, cl-dClosedLoop-0228, cl-dClosedLoop-0229, cl-dClosedLoop-0230, cl-dClosedLoop-0231, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0234, cl-dClosedLoop-0235, cl-dClosedLoop-0236, cl-dClosedLoop-0237)
-- stale: 0 (none)
+- uncarried: 0 (none)
+- stale: 3 (cl-dClosedLoop-0213, cl-dClosedLoop-0219, cl-dClosedLoop-0234)
 - ambiguous: 0 (none)
-- owned nodes no spec names: policy-key.asks.acceptance, policy-key.builds.agent-root, policy-key.builds.slug-date, policy-key.builds.slug-style, policy-key.builds.slug-words, policy-key.help.atlas, policy-key.memory.code-languages, policy-key.memory.item-budget, policy-key.memory.legacy-anchors,
-  policy-key.memory.load-budget, policy-key.memory.map-budget, policy-key.memory.map-overflow, policy-key.memory.map-purpose, policy-key.memory.over-budget, policy-key.memory.superseded-slices, record-kind.archive, record-kind.ask, record-kind.backlog-row, record-kind.build-readme,
-  record-kind.claim, record-kind.code, record-kind.design-record, record-kind.dossier, record-kind.instrument, record-kind.registry, record-kind.shape-run, record-kind.stream-plan, record-kind.view, record-kind.witness, system.memory-structure, system.project-map, tag-namespace.class,
-  tag-namespace.feature, tag-namespace.marker, tag-namespace.record, tag-namespace.section
+- owned nodes no spec names: none
 - specs derived from no clause: none
-- clauses the token arm cannot see: cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0234, cl-dClosedLoop-0236
+- clauses the token arm cannot see: cl-dClosedLoop-0221, cl-dClosedLoop-0222, cl-dClosedLoop-0232, cl-dClosedLoop-0233, cl-dClosedLoop-0236
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dTotalRecall-1` | no |
+| 2 | `TOOL-dTotalRecall-13` | no |
+| 3 | `TOOL-dTotalRecall-8` | no |
+| 4 | `TOOL-dTotalRecall-18` | no |
+| 5 | `TOOL-dTotalRecall-16` | no |
+| 6 | `TOOL-dTotalRecall-25` | no |
+| 7 | `TOOL-dTotalRecall-5` | no |
+| 8 | `TOOL-dTotalRecall-4` | no |
+| 9 | `TOOL-dTotalRecall-6` | no |
+| 10 | `TOOL-dTotalRecall-22` | no |
+| 11 | `TOOL-dTotalRecall-3` | no |
+| 12 | `TOOL-dTotalRecall-2` | no |
+| 13 | `TOOL-dTotalRecall-7` | no |
+| 14 | `TOOL-dTotalRecall-11` | no |
+| 15 | `TOOL-dTotalRecall-10` | no |
+| 16 | `TOOL-dTotalRecall-19` | no |
+| 17 | `TOOL-dTotalRecall-21` | no |
+| 18 | `TOOL-dTotalRecall-9` | no |
+| 19 | `TOOL-dTotalRecall-23` | no |
+| 20 | `TOOL-dTotalRecall-24` | no |
+| 21 | `TOOL-dTotalRecall-20` | no |
+| 22 | `TOOL-dTotalRecall-17` | no |
+| 23 | `TOOL-dTotalRecall-14` | no |
+| 24 | `TOOL-dTotalRecall-15` | no |
+| 25 | `TOOL-dTotalRecall-26` | no |
+| 26 | `TOOL-dTotalRecall-12` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
