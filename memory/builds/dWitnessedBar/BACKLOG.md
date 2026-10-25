@@ -17,10 +17,18 @@
 - SEV · TOOL-dWitnessedBar-31 · MED · the build's units stay unbuilt and its owned gaps open
 - DEFERRED · TOOL-dWitnessedBar-31 · until TOOL-dWitnessedBar-97 · the spec run carries every unit forward DEFERRED against this ask, each spec header advancing it; the build run builds them, and its last unit in build order, TOOL-dWitnessedBar-97 at order 50 today, closes it (README rule 1)
 - SEV · TOOL-dWitnessedBar-32 · LOW · a leg's `principle.*` target reads as an edge the grammar refuses
+- DEFERRED · TOOL-dWitnessedBar-32 · until TOOL-dWitnessedBar-22 · TOOL-dWitnessedBar-22's build run widens the `enforces` row itself per its §8 F1 if PLAY-dOrderedCharter-24 has not, so the two specs agree there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-33 · LOW · the compare arm keeps two hand-kept copies in step
+- DEFERRED · TOOL-dWitnessedBar-33 · until TOOL-dWitnessedBar-22 · TOOL-dWitnessedBar-22's build run fills the legs' `tests` edges and compares them both ways with the dossiers' claims; dTotalRecall's derivation retires the second copy when it lands (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-34 · LOW · owed_rows.py reads a literal that no longer exists
+- DEFERRED · TOOL-dWitnessedBar-34 · until TOOL-dWitnessedBar-12 · TOOL-dWitnessedBar-12's build run folds the `KNOWN` literals into `LEG_KEYS` and re-points `owed_rows.py` where PLAY-dOrderedCharter-50 has landed first (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-35 · MED · a resolver landed by dGroundRules first resolves WSL's launcher on Windows
+- DEFERRED · TOOL-dWitnessedBar-35 · until TOOL-dWitnessedBar-26 · TOOL-dWitnessedBar-26's build run lands the one bash resolver in `tools/lib` with the refusal in place of the fall-back, per its §8 F1, whichever build reaches the file first (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-36 · MED · the ask can never be accepted once the key is gone
+- DEFERRED · TOOL-dWitnessedBar-36 · until TOOL-dWitnessedBar-3 · TOOL-dWitnessedBar-3's build run retires `INHERITED_RED` onto `verdict.blocks` with its upgrade step, and TOOL-dUnstuckLanding-11's acceptance is read against that step (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-37 · LOW · the leg kind's widening directions sit outside the grammar that reads them
+- DEFERRED · TOOL-dWitnessedBar-37 · until TOOL-dWitnessedBar-28 · TOOL-dWitnessedBar-28's build run adds the `rises` and `changes` directions to `read_kind_schema` per its §8 F2, so the grammar admits them there at the latest (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-38 · LOW · two builds may each build the arm or each leave it
+- DEFERRED · TOOL-dWitnessedBar-38 · until TOOL-dWitnessedBar-24 · TOOL-dWitnessedBar-24's build run builds the interpreter-floor arm cl-dClosedLoop-0362 gives it, without the TOML 1.0 arm; the other two specs' claims are answered there or by an owner ruling (the spec run carries it forward with the unit it waits on)
 - SEV · TOOL-dWitnessedBar-39 · LOW · dGroundRules' spec describes a file this build changes
+- DEFERRED · TOOL-dWitnessedBar-39 · until TOOL-dWitnessedBar-20 · TOOL-dWitnessedBar-20's build run converts the legacy-homes list into the ledger population, and TOOL-dGroundRules-7 S2 to S4 are restated over it there (the spec run carries it forward with the unit it waits on)
