@@ -431,3 +431,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T00:01:24Z brief · item TOOL-dGroundRules-68 · reason 8697b90bf659 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-68-spec-brief.md
 
 2026-10-25T00:32:26Z rescope · item add TOOL-dGroundRules-69 · reason close finding: the full policy fixtures leg, run with its real argv (--strict-from memory/builds/dClosedLoop/build/) at 3d86915cf, prints 895 assertions, 1 wrong: guard-trace WRONG memory/builds/dClosedLoop/build/2026-10-14-build-PLAY-dClosedLoop-1-architecture-v2.md not under the policy fixtures guard; TOOL-dGroundRules-67 guarded the twelve paths of a run without --strict-from, so on-invalid-strict's source read was never traced
+
+2026-10-25T01:18:01Z brief · item TOOL-dGroundRules-69 · reason c29426096516 memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-69-spec-brief.md
+
+2026-10-25T01:20:51Z dispatch · item bce69337 TOOL-dGroundRules-69 · reason tools/gate-legs.json memory/guides/SESSION-KICKOFF.md memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-69.md memory/LIVE.md memory/builds/dGroundRules/README.md

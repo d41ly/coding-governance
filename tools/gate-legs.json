@@ -1835,6 +1835,7 @@
       "{prefix}/unattended/kit.toml",
       "{prefix}/workflows/kit.toml",
       "AGENTS.md",
+      "memory/builds/dClosedLoop/build/",
       "help/policy.md"
     ],
     "chunk": "selftests",

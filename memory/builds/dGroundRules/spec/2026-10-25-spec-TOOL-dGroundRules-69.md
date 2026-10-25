@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-69 — the strict case's source under the policy fixtures guard, so the leg's full run traces no read outside it
 
-**Status:** DEFERRED · rev-2 · 2026-10-25 · node d · Tier-1 · base 591cb00d · streams tooling · order 23
+**Status:** CLOSED · rev-2 · 2026-10-25 · node d · Tier-1 · base 591cb00d · streams tooling · order 23
 
 **Derived:** PLAY-dClosedLoop-2
 
