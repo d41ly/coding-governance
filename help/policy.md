@@ -222,7 +222,9 @@ generated, never typed: `python tools/policy/policy.py lists --write` writes it.
 
 The list is coding-governance's own and is never installed into another repository. There the policy
 check prints `arm_legacy_homes · not graded · the list is gov's own and is withheld from installs; …`,
-even if that repository writes a list of its own, and `lists --write` does not create the file. The
+even if that repository writes a list of its own, and `lists --write` does not create the file.
+`lists --check` there prints `policy lists: legacy-homes.txt · not graded` and grades the summary
+list alone. The
 deployer's `plan` shows the list as an `ORDER [project-owned]` row: that row is for information, and
 the list is not yours to write.
 

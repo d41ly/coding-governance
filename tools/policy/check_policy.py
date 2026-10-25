@@ -398,10 +398,10 @@ def arm_legacy_homes(repo, kit):
     rows, so grading one would red every adopter (TOOL-dGroundRules-25 S11). A receipt that does not
     read, or two registries, is the one finding."""
     try:
-        tree, _receipt = derive_census_tree(repo)
+        graded = policy.check_legacy_graded(repo, kit)
     except policy.Refusal as exc:
         return 0, "the tree under test did not derive", [(exc.path, exc.why)]
-    if tree in ("adopter", "invalid") or not (Path(kit) / policy.LEGACY_LIST).is_file():
+    if not graded:
         return None, policy.LEGACY_WITHHELD, []
     try:
         with policy.run_without_git_env():  # the base `lists --check` reads, by the one comparison
@@ -649,52 +649,7 @@ def arm_single_reader(repo, path, reader_dir, const=""):
     return len(files), f"{len(files)} tracked code file(s) outside {prefix or 'the kit'}, the memory root, help/ and the self-tests", out
 
 
-RECEIPT_REL = f"{POLICY_FILE[0]}/install.json"
-REGISTRY_REL = "govkit/registry.toml"  # the deployer's registry, under the tool root of gov's tree alone
-
-
-def derive_census_tree(repo):
-    """-> ("adopter", the parsed receipt) where the tree under test holds an install receipt
-    (TOOL-dGroundRules-22). With none (TOOL-dGroundRules-29): ("source", <d>) where exactly one
-    `<d>/govkit/registry.toml` sits with `<d>` 0 to 2 deep, the search govkit's `derive_tool_root`
-    makes, since only gov's tree holds the registry; ("unadopted", None) where none does; and two or
-    more is a Refusal naming each candidate. A receipt that is not a JSON object is a Refusal naming
-    it, never a `source` answer. One whose `kits` is not a list of strings, or whose `prefix` is not a
-    relative string free of `..` segments, is ("invalid", that field) (TOOL-dGroundRules-32 S11)."""
-    try:
-        text = Path(repo, RECEIPT_REL).read_text(encoding="utf-8")
-    except FileNotFoundError:
-        found = sorted({p.relative_to(repo).as_posix() for pat in ("", "*/", "*/*/")
-                        for p in Path(repo).glob(pat + REGISTRY_REL)})
-        if len(found) > 1:
-            raise policy.Refusal(", ".join(found), 0, f"{len(found)} {REGISTRY_REL} candidates, so the "
-                                 "tool root is not guessed and no row is graded") from None
-        if not found:
-            return "unadopted", None
-        return "source", posixpath.dirname(posixpath.dirname(found[0]))
-    except OSError as exc:
-        raise policy.Refusal(RECEIPT_REL, 0, f"the install receipt does not read: {exc}") from None
-    try:
-        receipt = json.loads(text)
-    except ValueError as exc:
-        raise policy.Refusal(RECEIPT_REL, 0, f"the install receipt does not parse: {exc}") from None
-    if not isinstance(receipt, dict):
-        raise policy.Refusal(RECEIPT_REL, 0, "the install receipt does not parse as a JSON object")
-    kits, prefix = receipt.get("kits"), receipt.get("prefix")
-    if not isinstance(kits, list) or not all(isinstance(k, str) for k in kits):
-        return "invalid", "kits"
-    if not check_receipt_prefix(prefix):
-        return "invalid", "prefix"
-    return "adopter", receipt
-
-
-def check_receipt_prefix(value):
-    """True where a receipt's `prefix` is a relative string: it opens with neither `/` nor a backslash,
-    carries no drive letter and holds no `..` segment split on either separator (TOOL-dGroundRules-43
-    S14). Stricter than the deployer's `demand_contained_dest` on purpose (TOOL-dGroundRules-34 S21):
-    that one normalises first and admits `a/..`, this one refuses every `..` segment."""
-    return (isinstance(value, str) and not value.startswith(("/", "\\")) and not re.match(r"[A-Za-z]:", value)
-            and ".." not in re.split(r"[/\\]", value))
+RECEIPT_REL, REGISTRY_REL = policy.RECEIPT_REL, policy.REGISTRY_REL  # the census tree is the core module's (TOOL-dGroundRules-76)
 
 
 def arm_cap_census(repo, kit):
@@ -718,7 +673,7 @@ def arm_cap_census(repo, kit):
     except policy.Refusal as exc:
         return 0, "the cap census did not read", [(f"{exc.path}:{exc.line}", exc.why)]
     try:
-        tree, held = derive_census_tree(repo)  # the receipt in an adopter, the tool root on the source
+        tree, held = policy.derive_census_tree(repo)  # the receipt in an adopter, the tool root on the source
     except policy.Refusal as exc:
         return 0, "the tree under test did not derive", [(exc.path, exc.why)]
     if tree == "invalid":  # TOOL-dGroundRules-32 S11: a receipt of the wrong shape is no adopter that installed nothing
@@ -2472,7 +2427,7 @@ LEGACY_CONF = 'REVIEW_ROUNDS="3"\nKEPT_KEY="1"\n'
 LEGACY_GATE = "#!/usr/bin/env sh\n# The fixture's gate file.\n#   GOV_PYTHON=<launcher>  a documented key\nINHERITED_RED=land\n"
 LEGACY_HOUSE = '[effort]\ndefault = "medium"\n\n[gates]\n'
 LEGACY_REPORT = "  legacy homes: "
-LEGACY_CASES = ("today", "planted-row", "growth", "shrink", "retrofit", "unmarked", "absent-homes")
+LEGACY_CASES = ("today", "planted-row", "growth", "shrink", "retrofit", "unmarked", "absent-homes", "withheld")
 
 
 def build_legacy_repo(t, gate, house):
@@ -2534,7 +2489,8 @@ def run_legacy_homes(name):
     with the stale-list report alone, then green after `lists --write` with the row gone; `retrofit`
     a cutoff and a pin added, green with no row for either; `unmarked` a gate key GATE_ENV_MARKS
     lacks in the landed list, red with the no-mark report; `absent-homes` no gate file and no house
-    file, green with one announce line for each."""
+    file, green with one announce line for each; `withheld` the list deleted, the install shape,
+    green with the not-graded line and no report (TOOL-dGroundRules-76)."""
     checks = []
     for case in LEGACY_CASES:
         t = Path(tempfile.mkdtemp(prefix="pol-"))
@@ -2569,6 +2525,11 @@ def run_legacy_homes(name):
                 check = check_legacy_lists(case, kit, "--write", 0, [], label=f"case {case}: lists --write")[0]
                 rows = [r for r in policy.parse_list(listed.read_text(encoding="utf-8")) if " PLANTED_" in r]
                 checks.append(check[:2] + (check[2] and not rows, check[3] + f" · {len(rows)} PLANTED_ row(s) listed"))
+            elif case == "withheld":
+                listed.unlink()  # the install shape: kit.toml withholds the list (TOOL-dGroundRules-17)
+                check, out = check_legacy_lists(case, kit, "--check", 0, [])
+                told = f"policy lists: {policy.LEGACY_LIST} · not graded · {policy.LEGACY_WITHHELD}" in out.split("\n")
+                checks.append(check[:2] + (check[2] and told, check[3] + f" · {'announced not graded' if told else 'NO not-graded line'}"))
             else:
                 check, out = check_legacy_lists(case, kit, "--check", 1 if case == "unmarked" else 0,
                                                 [f"GATE_PLANTED in {policy.GATE_FILE} has no mark in GATE_ENV_MARKS"]
@@ -4191,7 +4152,7 @@ def run_census_window_edge(name):
 
     def ask():
         try:
-            return derive_census_tree(t)
+            return policy.derive_census_tree(t)
         except policy.Refusal as exc:
             return f"refused {exc.path}"
     try:

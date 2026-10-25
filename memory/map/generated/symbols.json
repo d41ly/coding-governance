@@ -4658,6 +4658,11 @@
       "file": "tools/govkit/govkit.py"
     },
     {
+      "id": "check_legacy_graded",
+      "kind": "function",
+      "file": "tools/policy/policy.py"
+    },
+    {
       "id": "check_legacy_homes",
       "kind": "function",
       "file": "tools/policy/policy.py"
@@ -5115,7 +5120,7 @@
     {
       "id": "check_receipt_prefix",
       "kind": "function",
-      "file": "tools/policy/check_policy.py"
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "check_receipt_vintage",
@@ -7015,7 +7020,7 @@
     {
       "id": "derive_census_tree",
       "kind": "function",
-      "file": "tools/policy/check_policy.py"
+      "file": "tools/policy/policy.py"
     },
     {
       "id": "derive_change_commit",

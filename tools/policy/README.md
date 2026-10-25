@@ -20,7 +20,7 @@ its three neighbours but one shape (TOOL-dGroundRules-6), and later units re-poi
 | `catalogue.toml` | the schema: one row per key |
 | `unsummarised-keys.txt` | GENERATED, shrink-only: the rows with no `summary` or no `usage` |
 | `legacy-homes.txt` | GENERATED, shrink-only: one row per key a legacy policy home holds, with its mark (TOOL-dGroundRules-7); gov's own, withheld from installs by a `project-owned` rule in `kit.toml` (TOOL-dGroundRules-17) |
-| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, and the `lists` (`cmd_lists`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
+| `policy.py` | the module: `load_catalogue`, `read_catalogue_row`, `check_value`, `check_shape`, `derive_bounds`, `check_direction`, `derive_unsummarised`, the inlined `resolve_compare_base`, `resolve_kit_dir` and `GIT_ENV_LEAKS`, the one blob reader `read_blob_at`, the reader `resolve` over `read_revision` and `resolve_read`, the file's one judge `validate`, the mirror's `render_mirror`, the legacy homes' `derive_legacy_homes` and `check_legacy_homes`, the census tree's `derive_census_tree` and the legacy list's one grading rule `check_legacy_graded`, and the `lists` (`cmd_lists`), `scaffold`, `get`, `check`, `mirror` and `settings` verbs |
 | `policy-mirror.js` | the mirror's one reader, for hooks: `readPolicy` and its `get` CLI |
 | `policy-shim.sh` | the helper's shell half: the landed revision, and the reader under a resolved launcher |
 | `guard.py` | the minimal guard: `guard.py --staged`, the verdict over an agent's staged change to a guarded path |
@@ -134,12 +134,14 @@ owner-silence rule that declines a raise is a later build's reader.
   that is a proper ancestor of HEAD, else the remote tip; no fetched ref is no base, and a list
   absent at the base is no comparison, never an empty one. It grades `legacy-homes.txt` too, below,
   against the SAME base: `cmd_lists` reads `resolve_compare_base` once for both lists, the block the
-  codebase map's baseline inlines too (TOOL-dGroundRules-21 S7, S23).
+  codebase map's baseline inlines too (TOOL-dGroundRules-21 S7, S23). It grades that list only where
+  `check_legacy_graded` answers true, and otherwise prints
+  `policy lists: legacy-homes.txt · not graded · <why>` (TOOL-dGroundRules-76).
   Exit 0 green, 1 red, 2 usage or a refused read.
 - `python <prefix>/policy/policy.py lists --write` — drain the list: it keeps the rows the catalogue
   still owes and never adds one. An absent list is seeded with every owed row. It writes
-  `legacy-homes.txt`'s derived rows too, and writes nothing, exit 1, while a derived row is new to the
-  list at the compare base.
+  `legacy-homes.txt`'s derived rows too, under the same `check_legacy_graded` rule, and writes
+  nothing, exit 1, while a derived row is new to the list at the compare base.
 
 ## The legacy policy homes
 
@@ -170,9 +172,13 @@ a `project-owned` rule, the runlog descriptor's mechanism (TOOL-dGroundRules-17)
 holds no list, `arm_legacy_homes` prints `policy-check: arm_legacy_homes · not graded · the list is
 gov's own and is withheld from installs; …` and finds nothing; it says the same wherever the tree
 holds an install receipt, a list an adopter wrote at the installed kit's directory included, since no
-adopter's list holds gov's rows (TOOL-dGroundRules-25 S11). `lists --write` writes the summary
-list alone, printing `legacy-homes.txt · not written`: it updates the legacy list where one exists
-and never creates it. On gov's tree the case `legacy-homes-present` reds a deleted list.
+adopter's list holds gov's rows (TOOL-dGroundRules-25 S11). Both verbs and the arm ask one
+predicate, `check_legacy_graded`: the list is present and `derive_census_tree` answers neither
+`adopter` nor `invalid` (TOOL-dGroundRules-76). Where it answers false, `lists --check` prints
+`policy lists: legacy-homes.txt · not graded · …` and grades the summary list alone, and `lists --write`
+writes the summary list alone, printing `legacy-homes.txt · not written`: it updates the legacy list
+where the predicate holds and never creates it. On gov's tree the case `legacy-homes-present` reds a
+deleted list.
 - `python <prefix>/policy/policy.py scaffold` — print the starter policy file: each row this kit's
   build owns that has a literal default, one table per first segment, written as UTF-8 bytes with LF
   line ends on every platform, so it equals the blob git stores (TOOL-dGroundRules-21 S1).
@@ -506,15 +512,16 @@ and run `mirror --write`: `guard-mirror-render` stages the mirror alone, exit 0 
 render recording one input more than today's and stages that input beside its mirror: each must exit
 1 naming the input (TOOL-dGroundRules-25 S19, S21). The hook block's arms are in gov's pre-commit suite.
 
-`legacy-homes` is one outcome case over seven repositories, each a copy of `policy.py` with a
+`legacy-homes` is one outcome case over one repository per name in `LEGACY_CASES`, each a copy of `policy.py` with a
 `.unattended.conf`, a gate file and a house file, pushed to a bare remote with the list seeded; it
 prints `case <name>: red|green` and judges the copy's `lists` verbs by exit code and exact reports:
 `today` green; `planted-row` a typed row; `growth` a conf key and its row typed in, the new-home
 report, and `lists --write` exiting 1 with the list unchanged; `shrink` a conf key removed, the
 stale-list report, then green after `lists --write`; `retrofit` a `_CUTOFF` and a `_PIN` key, green
 and unlisted; `unmarked` a gate key `GATE_ENV_MARKS` lacks; `absent-homes` no gate or house file,
-green with one announce line for each. Each copy's list is seeded by `lists --write` over a
-header-only list, since that verb never creates one.
+green with one announce line for each; `withheld` the list deleted, the install shape, green with
+the not-graded line and no report (TOOL-dGroundRules-76). Each copy's list is seeded by
+`lists --write` over a header-only list, since that verb never creates one.
 
 `legacy-homes-present` and `budgets-ships-join` (TOOL-dGroundRules-17) read only this kit and its
 source repository, so they hold on gov's tree. The first reds this kit's directory without
