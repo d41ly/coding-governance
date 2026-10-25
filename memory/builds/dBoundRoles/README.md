@@ -4,8 +4,7 @@ node: d
 opened: 2026-10-21
 streams: tooling
 roster: TOOL
-ids: TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27
-status: OPEN
+ids: TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29 TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36
 spec-audit: 2026-10-21
 parents: dDeclaredLoop dWitnessedBar dPlacedRequest
 may: PLAY-dClosedLoop-3
@@ -88,43 +87,97 @@ none
 <!-- /roster:units -->
 
 <!-- gen:build-index -->
-**Build status:** OPEN · 0 unit(s) · node d · opened 2026-10-21 · streams tooling
+**Build status:** OPEN · 26 unit(s) · node d · opened 2026-10-21 · streams tooling
 ids TOOL-dBoundRoles-1 TOOL-dBoundRoles-2 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15
-ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27
+ids TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-20 TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-27 TOOL-dBoundRoles-28 TOOL-dBoundRoles-29
+ids TOOL-dBoundRoles-30 TOOL-dBoundRoles-31 TOOL-dBoundRoles-32 TOOL-dBoundRoles-33 TOOL-dBoundRoles-34 TOOL-dBoundRoles-35 TOOL-dBoundRoles-36
 
 <!-- gen:build-units -->
-*No spec under this build carries a status header; the status above is declared in the front matter.*
+| Unit | Order | Tier | Status | Rev | Last change |
+|---|---|---|---|---|---|
+| [TOOL-dBoundRoles-14 — the `role` and `field` tag namespaces, their extractors and the role binding join](spec/2026-10-25-spec-TOOL-dBoundRoles-14.md) | 1 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-2 — each role's static instructions as structured fields: the never list with its enforcers, the ceiling and the typed return](spec/2026-10-25-spec-TOOL-dBoundRoles-2.md) | 2 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-1 — the roster sorted by layer: twelve core roles, two expansion roles registered, and core items kept to core roles](spec/2026-10-25-spec-TOOL-dBoundRoles-1.md) | 3 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-21 — the effort and model keys, `default` reserved, and the gate grant a role field, every reader re-pointed](spec/2026-10-25-spec-TOOL-dBoundRoles-21.md) | 4 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-22 — workflow entries as data: ordered stages, each naming its role, fan, cap, effort and rows, every cap under the agent limit](spec/2026-10-25-spec-TOOL-dBoundRoles-22.md) | 5 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-16 — the shapes: each workflow entry's kind, checklist, orientation, merge and twin rule, the five kinds as defaults over the stage rows](spec/2026-10-25-spec-TOOL-dBoundRoles-16.md) | 6 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-15 — the role static block carried once per spawn, and its budget over the whole rendered block](spec/2026-10-25-spec-TOOL-dBoundRoles-15.md) | 7 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-17 — every work order's marker carrying `item=`, every return naming the work order it `answers`, today's population seeded](spec/2026-10-25-spec-TOOL-dBoundRoles-17.md) | 8 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-6 — the role index and agent files beyond every worker's reach, a tree with no index refused, `role-sha` compared at spawn](spec/2026-10-25-spec-TOOL-dBoundRoles-6.md) | 9 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-13 — inputs handed as content, each fact keyed and classed by the executor and re-cut fresh at act launch](spec/2026-10-25-spec-TOOL-dBoundRoles-13.md) | 10 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-3 — the work order rendered per item, hashed into the spawn marker and bound to its act](spec/2026-10-25-spec-TOOL-dBoundRoles-3.md) | 11 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-8 — the role-gate arm's field escape explained and closed](spec/2026-10-25-spec-TOOL-dBoundRoles-8.md) | 12 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-9 — the `none` and `review` write classes enforced in the role arm](spec/2026-10-25-spec-TOOL-dBoundRoles-9.md) | 13 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-7 — shell writes held to the work order's allowance](spec/2026-10-25-spec-TOOL-dBoundRoles-7.md) | 14 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-5 — returns through a schema-forced channel on both routes, residual failures retried by `roles.retries`](spec/2026-10-25-spec-TOOL-dBoundRoles-5.md) | 15 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-10 — `driver.reads`, `prompts.author` and `roles.no-spawn`, each read and enforced at its seam](spec/2026-10-25-spec-TOOL-dBoundRoles-10.md) | 16 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-4 — the prompt writer composing every role's task from the driver's details](spec/2026-10-25-spec-TOOL-dBoundRoles-4.md) | 17 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-23 — the prompt writer's default frame, bounded lists, upstream rows, and the medium effort floor](spec/2026-10-25-spec-TOOL-dBoundRoles-23.md) | 18 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-24 — the framing checked at render: every anchor a work order points at resolves to a fact it hands](spec/2026-10-25-spec-TOOL-dBoundRoles-24.md) | 19 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-12 — the orientation scout's placement return through the typed channel, recorded and checked by the driver](spec/2026-10-25-spec-TOOL-dBoundRoles-12.md) | 20 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-11 — every fork resolved by the role that meets it with its full record, or held as `run.on-owner-question` says](spec/2026-10-25-spec-TOOL-dBoundRoles-11.md) | 21 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-26 — the typed refusal return: its rule, its remedy and the remedy's actor, routed at once and never re-offered](spec/2026-10-25-spec-TOOL-dBoundRoles-26.md) | 22 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-20 — a repository's roles and workflow entries composed beside gov's, with the role kind's fixed set, widening directions and step-gate classes](spec/2026-10-25-spec-TOOL-dBoundRoles-20.md) | 23 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-19 — the roles kit's house text files moved into the overlay as level-5 units selecting their role, by their own upgrade step](spec/2026-10-25-spec-TOOL-dBoundRoles-19.md) | 24 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-18 — the reviewers' merge as an upgrade step: an adopter's reviewer agents renamed to `gov-reviewer`, the role index re-rendered, every key the merge touches re-keyed](spec/2026-10-25-spec-TOOL-dBoundRoles-18.md) | 25 | 2 | OPEN | rev-1 | 2026-10-25 |
+| [TOOL-dBoundRoles-25 — the spawn guard and harness admission moved into the roles pack, admission held to the landed blob, `tools/hooks/agent-cap.js` retired with an upgrade step](spec/2026-10-25-spec-TOOL-dBoundRoles-25.md) | 26 | 2 | OPEN | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
-Records: 8 bound to this build, across 2 record folder(s).
+Records: 17 bound to this build, across 3 record folder(s).
 
 Ids no record names: none — every unit id is named by a record.
 
-Ids no `spec-audit` record has ever named: none — every unit id has one.
+Ids no `spec-audit` record has ever named: TOOL-dBoundRoles-1 TOOL-dBoundRoles-10 TOOL-dBoundRoles-11 TOOL-dBoundRoles-12 TOOL-dBoundRoles-13 TOOL-dBoundRoles-14 TOOL-dBoundRoles-15 TOOL-dBoundRoles-16 TOOL-dBoundRoles-17 TOOL-dBoundRoles-18 TOOL-dBoundRoles-19 TOOL-dBoundRoles-2 TOOL-dBoundRoles-20
+TOOL-dBoundRoles-21 TOOL-dBoundRoles-22 TOOL-dBoundRoles-23 TOOL-dBoundRoles-24 TOOL-dBoundRoles-25 TOOL-dBoundRoles-26 TOOL-dBoundRoles-3 TOOL-dBoundRoles-4 TOOL-dBoundRoles-5 TOOL-dBoundRoles-6 TOOL-dBoundRoles-7 TOOL-dBoundRoles-8 TOOL-dBoundRoles-9.
 
-Ids whose spec moved past its audited revision: none — 0 of 0 unit id(s) carry a pin.
+Ids whose spec moved past its audited revision: none — 0 of 26 unit id(s) carry a pin.
 <!-- /gen:build-index -->
 
 <!-- gen:build-coverage -->
 
-Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 0 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
+Coverage of dBoundRoles's 26 clause(s) and 15 owned node(s), over 26 spec(s) at or after SPEC_CARRIES_CUTOFF 2026-10-21:
 
-- carried whole: 0
+- carried whole: 26
 - carried in parts: 0 (none)
 - moved, retired or deferred: none
-- uncarried: 26 (cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0169, cl-dClosedLoop-0170, cl-dClosedLoop-0171, cl-dClosedLoop-0172, cl-dClosedLoop-0173, cl-dClosedLoop-0174, cl-dClosedLoop-0175, cl-dClosedLoop-0176, cl-dClosedLoop-0177, cl-dClosedLoop-0178,
-  cl-dClosedLoop-0179, cl-dClosedLoop-0180, cl-dClosedLoop-0181, cl-dClosedLoop-0182, cl-dClosedLoop-0183, cl-dClosedLoop-0184, cl-dClosedLoop-0185, cl-dClosedLoop-0186, cl-dClosedLoop-0187, cl-dClosedLoop-0188, cl-dClosedLoop-0189, cl-dClosedLoop-0190, cl-dClosedLoop-0191)
+- uncarried: 0 (none)
 - stale: 0 (none)
 - ambiguous: 0 (none)
-- owned nodes no spec names: policy-key.driver.reads, policy-key.instructions.task-charter, policy-key.prompts.author, policy-key.roles.effort.<role>, policy-key.roles.effort.<workflow>.<stage>, policy-key.roles.effort.default, policy-key.roles.model.<role>.<harness>, policy-key.roles.no-spawn,
-  policy-key.roles.retries, policy-key.run.on-owner-question, record-kind.work-order, system.role-shapes, tag-namespace.field, tag-namespace.role, tag-namespace.workflow
+- owned nodes no spec names: none
 - specs derived from no clause: none
-- clauses the token arm cannot see: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0169, cl-dClosedLoop-0172, cl-dClosedLoop-0173, cl-dClosedLoop-0178, cl-dClosedLoop-0187, cl-dClosedLoop-0189
+- clauses the token arm cannot see: cl-dClosedLoop-0166, cl-dClosedLoop-0167, cl-dClosedLoop-0168, cl-dClosedLoop-0173, cl-dClosedLoop-0178, cl-dClosedLoop-0187, cl-dClosedLoop-0189
 <!-- /gen:build-coverage -->
 
 <!-- gen:build-order -->
 
-*No spec under this build declares an `order` verb; the build order is whatever its authored plan states.*
+| Step | Units | Parallel |
+|---|---|---|
+| 1 | `TOOL-dBoundRoles-14` | no |
+| 2 | `TOOL-dBoundRoles-2` | no |
+| 3 | `TOOL-dBoundRoles-1` | no |
+| 4 | `TOOL-dBoundRoles-21` | no |
+| 5 | `TOOL-dBoundRoles-22` | no |
+| 6 | `TOOL-dBoundRoles-16` | no |
+| 7 | `TOOL-dBoundRoles-15` | no |
+| 8 | `TOOL-dBoundRoles-17` | no |
+| 9 | `TOOL-dBoundRoles-6` | no |
+| 10 | `TOOL-dBoundRoles-13` | no |
+| 11 | `TOOL-dBoundRoles-3` | no |
+| 12 | `TOOL-dBoundRoles-8` | no |
+| 13 | `TOOL-dBoundRoles-9` | no |
+| 14 | `TOOL-dBoundRoles-7` | no |
+| 15 | `TOOL-dBoundRoles-5` | no |
+| 16 | `TOOL-dBoundRoles-10` | no |
+| 17 | `TOOL-dBoundRoles-4` | no |
+| 18 | `TOOL-dBoundRoles-23` | no |
+| 19 | `TOOL-dBoundRoles-24` | no |
+| 20 | `TOOL-dBoundRoles-12` | no |
+| 21 | `TOOL-dBoundRoles-11` | no |
+| 22 | `TOOL-dBoundRoles-26` | no |
+| 23 | `TOOL-dBoundRoles-20` | no |
+| 24 | `TOOL-dBoundRoles-19` | no |
+| 25 | `TOOL-dBoundRoles-18` | no |
+| 26 | `TOOL-dBoundRoles-25` | no |
 <!-- /gen:build-order -->
 
 <!-- gen:build-edges -->
