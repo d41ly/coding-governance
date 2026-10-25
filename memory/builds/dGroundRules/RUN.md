@@ -576,3 +576,7 @@ base: 3c2b69be4652ade1ec267f0ce0e3d99389531633
 2026-10-25T20:36:54Z rescope · item add TOOL-dGroundRules-87 · reason owner-authorized at the hand-off: the spec tokens leg's 180s ceiling cannot hold the packet join over this build's own live chain (170s alone, timed out twice in the close's bar); carries.py's batching waits on an owner repin that refuses inside a live chain run
 
 2026-10-25T20:39:19Z rescope · item add TOOL-dGroundRules-88 · reason owner-ordered: packet.py's --repin guard keys on tree state, so it refuses the owner inside a live chain run and makes any instrument fix in a chain run unclosable; specced and built in this build before any further unit
+
+2026-10-25T21:40:21Z dispatch · item 5f035e94 TOOL-dGroundRules-88 · reason memory/builds/dClosedLoop/build/2026-10-20-build-PLAY-dClosedLoop-1-packet.py memory/builds/dGroundRules/spec/2026-10-25-spec-TOOL-dGroundRules-88.md memory/builds/dGroundRules/README.md memory/LIVE.md memory/map/generated/symbols.json
+
+2026-10-25T21:40:30Z brief · item TOOL-dGroundRules-88 · reason 8cb8eaa3879b memory/builds/dGroundRules/prompts/2026-10-25-prompt-TOOL-dGroundRules-88-spec-brief.md

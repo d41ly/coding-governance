@@ -1,6 +1,6 @@
 # TOOL-dGroundRules-88 — packet.py's `--repin` guard admits an owner at a console inside a live chain run, refuses every agent and unattended caller, and records the admitted repin in each packet's Pins
 
-**Status:** DEFERRED · rev-1 · 2026-10-25 · node d · Tier-2 · base 87917c2f · streams tooling · order 34
+**Status:** CLOSED · rev-1 · 2026-10-25 · node d · Tier-2 · base 87917c2f · streams tooling · order 34
 
 **Derived:** PLAY-dClosedLoop-2
 

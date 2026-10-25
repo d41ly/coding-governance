@@ -226,7 +226,7 @@ ids TOOL-dGroundRules-109 TOOL-dGroundRules-110 TOOL-dGroundRules-111 TOOL-dGrou
 | [TOOL-dGroundRules-85 — both size-cap enforcers split the budgets answer once with builtins, so the memory-hygiene and manifest-check probes fork within their ceilings again](spec/2026-10-25-spec-TOOL-dGroundRules-85.md) | 32 | 1 | CLOSED | rev-1 | 2026-10-25 |
 | [TOOL-dGroundRules-86 — the records and the runbook this build's code left stale: the kickoff manifest re-audited and re-stamped, dSafePassage-26's Readers clause, the TOOL-dGroundRules-34 ledger's AC32 token, two method-carrier rows and the policy kit's runbook section](spec/2026-10-25-spec-TOOL-dGroundRules-86.md) | 33 | 1 | CLOSED | rev-2 | 2026-10-25 |
 | [TOOL-dGroundRules-87 — the spec tokens leg's ceiling covers the packet join over a live chain run, sized through `derive-ceilings.py --observed` from a reading of the leg alone](spec/2026-10-25-spec-TOOL-dGroundRules-87.md) | 34 | 1 | DEFERRED | rev-1 | 2026-10-25 |
-| [TOOL-dGroundRules-88 — packet.py's `--repin` guard admits an owner at a console inside a live chain run, refuses every agent and unattended caller, and records the admitted repin in each packet's Pins](spec/2026-10-25-spec-TOOL-dGroundRules-88.md) | 34 | 2 | DEFERRED | rev-1 | 2026-10-25 |
+| [TOOL-dGroundRules-88 — packet.py's `--repin` guard admits an owner at a console inside a live chain run, refuses every agent and unattended caller, and records the admitted repin in each packet's Pins](spec/2026-10-25-spec-TOOL-dGroundRules-88.md) | 34 | 2 | CLOSED | rev-1 | 2026-10-25 |
 <!-- /gen:build-units -->
 
 Records: 433 bound to this build, across 4 record folder(s).
